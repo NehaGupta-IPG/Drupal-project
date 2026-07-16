@@ -1105,11 +1105,6 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       $return = $this->getTranslatedField($name, $this->activeLangcode);
       return $return;
     }
-    if ($name === 'original') {
-      // A variable is required that this technically is a return-by-reference.
-      $original = parent::__get('original');
-      return $original;
-    }
     // Else directly read/write plain values. That way, non-field entity
     // properties can always be accessed directly.
     if (!isset($this->values[$name])) {
@@ -1148,9 +1143,6 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     elseif ($name == 'translations') {
       $this->translations = $value;
     }
-    elseif ($name == 'original') {
-      parent::__set('original', $value);
-    }
     // Directly write non-field values.
     else {
       $this->values[$name] = $value;
@@ -1161,9 +1153,6 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * Implements the magic method for isset().
    */
   public function __isset($name) {
-    if ($name == 'original') {
-      return parent::__isset('original');
-    }
     // "Official" Field API fields are always set. For non-field properties,
     // check the internal values.
     return $this->hasField($name) ? TRUE : isset($this->values[$name]);
@@ -1173,9 +1162,6 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * Implements the magic method for unset().
    */
   public function __unset($name) {
-    if ($name == 'original') {
-      parent::__unset('original');
-    }
     // Unsetting a field means emptying it.
     if ($this->hasField($name)) {
       $this->get($name)->setValue([]);
@@ -1279,10 +1265,13 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // Ensure that the following properties are actually cloned by
     // overwriting the original references with ones pointing to copies of
     // them: enforceIsNew, newRevision, loadedRevisionId, fields, entityKeys,
-    // translatableEntityKeys, values, isDefaultRevision and
-    // enforceRevisionTranslationAffected.
+    // translatableEntityKeys, values, isDefaultRevision,
+    // enforceRevisionTranslationAffected and originalEntity.
     $enforce_is_new = $this->enforceIsNew;
     $this->enforceIsNew = &$enforce_is_new;
+
+    $originalEntity = $this->originalEntity;
+    $this->originalEntity = &$originalEntity;
 
     $new_revision = $this->newRevision;
     $this->newRevision = &$new_revision;

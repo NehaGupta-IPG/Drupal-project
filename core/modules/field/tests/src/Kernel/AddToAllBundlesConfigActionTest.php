@@ -92,7 +92,7 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
     // Expect an error when the 'addToAllBundles' action is invoked on anything
     // other than a field storage config entity.
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage('The "user_role" entity does not support the "addToAllBundles" config action.');
+    $this->expectExceptionMessageIs('The "user_role" entity does not support the "addToAllBundles" config action.');
     $this->applyAction('user.role.anonymous');
   }
 
@@ -113,7 +113,7 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
     $field->save();
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage('Field entity_test.one.body already exists.');
+    $this->expectExceptionMessageIs('Field entity_test.one.body already exists.');
     $this->applyAction('field.storage.entity_test.body', TRUE);
   }
 
@@ -147,6 +147,28 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
     $this->assertInstanceOf(FieldConfig::class, $field);
     $this->assertSame('Body field label', $field->label());
     $this->assertSame('Set by config actions.', $field->getDescription());
+  }
+
+  /**
+   * Tests that the action fails when the label property is not set.
+   */
+  public function testMissingLabel(): void {
+    $contents = <<<YAML
+name: Instantiate field on all bundles
+config:
+  import:
+    entity_test_with_storage:
+      - field.storage.entity_test.body
+  actions:
+    field.storage.entity_test.body:
+      addToAllBundles:
+        description: Set by config actions.
+YAML;
+    $recipe = $this->createRecipe($contents);
+
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessageIs('The `label` property must be set for entity_test.entity_test.body.');
+    RecipeRunner::processRecipe($recipe);
   }
 
   /**

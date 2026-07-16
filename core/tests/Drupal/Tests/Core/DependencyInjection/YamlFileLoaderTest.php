@@ -94,7 +94,7 @@ YAML;
  * Tests exceptions.
  */
   #[DataProvider('providerTestExceptions')]
-  public function testExceptions($yml, $message): void {
+  public function testExceptions(string $yml, string $message): void {
     vfsStream::setup('drupal', NULL, [
       'modules' => [
         'example' => [
@@ -107,7 +107,7 @@ YAML;
     $yaml_file_loader = new YamlFileLoader($builder);
 
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage($message);
+    $this->expectExceptionMessageIs($message);
     $yaml_file_loader->load('vfs://drupal/modules/example/example.yml');
   }
 

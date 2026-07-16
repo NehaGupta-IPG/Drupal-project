@@ -15,6 +15,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\Core\Theme\Plugin\IconExtractor\SvgExtractor.
@@ -39,10 +40,8 @@ class SvgExtractorTest extends UnitTestCase {
 
   /**
    * The IconFinder instance.
-   *
-   * @var \Drupal\Core\Theme\Icon\IconFinder|\PHPUnit\Framework\MockObject\MockObject
    */
-  private IconFinder $iconFinder;
+  private IconFinder&MockObject $iconFinder;
 
   /**
    * {@inheritdoc}
@@ -69,7 +68,7 @@ class SvgExtractorTest extends UnitTestCase {
    * @return \Generator
    *   The test cases, icons files returned by IconFinder::getFilesFromSources.
    */
-  public static function providerDiscoverIconsSvg() {
+  public static function providerDiscoverIconsSvg(): \Iterator {
     yield 'empty files' => [
       [],
       TRUE,
@@ -120,7 +119,9 @@ class SvgExtractorTest extends UnitTestCase {
    */
   #[DataProvider('providerDiscoverIconsSvg')]
   public function testDiscoverIconsSvg(array $files, bool $expected_empty = FALSE): void {
-    $this->iconFinder->method('getFilesFromSources')->willReturn($files);
+    $this->iconFinder->expects($this->once())
+      ->method('getFilesFromSources')
+      ->willReturn($files);
 
     $result = $this->svgExtractorPlugin->discoverIcons();
 
@@ -146,6 +147,11 @@ class SvgExtractorTest extends UnitTestCase {
    * Test the SvgExtractor::discoverIcons() method with remote svg.
    */
   public function testDiscoverIconsRemoteIgnored(): void {
+    // IconFinder::getFileContents() will not be called because of an early
+    // return when all sources are remote.
+    $this->iconFinder->expects($this->never())
+      ->method('getFilesFromSources');
+
     $svgExtractorPlugin = new SvgExtractor(
       [
         'id' => $this->pluginId,
@@ -174,7 +180,7 @@ class SvgExtractorTest extends UnitTestCase {
    * @return \Generator
    *   The test cases, icons data returned by SvgExtractor::discoverIcons.
    */
-  public static function providerLoadIconSvg() {
+  public static function providerLoadIconSvg(): \Iterator {
     yield 'svg file empty' => [
       [
         [
@@ -275,7 +281,8 @@ class SvgExtractorTest extends UnitTestCase {
   #[DataProvider('providerLoadIconSvg')]
   public function testLoadIconSvg(array $icons_extracted = [], array $file_content = [], array $expected_content = [], ?array $expected_attributes = NULL): void {
     foreach ($icons_extracted as $index => $icon) {
-      $this->iconFinder->method('getFileContents')
+      $this->iconFinder->expects($this->once())
+        ->method('getFileContents')
         ->with($icon['absolute_path'])
         ->willReturn($file_content[$index]);
       $icon_loaded = $this->svgExtractorPlugin->loadIcon($icon);
@@ -310,9 +317,10 @@ class SvgExtractorTest extends UnitTestCase {
       'icon_id' => 'foo',
       'source' => '/path/source/foo.svg',
     ];
-    $this->iconFinder->method('getFileContents')
-      ->with($icon['source'])
-      ->willReturn('Not valid svg');
+    // IconFinder::getFileContents() will not be called because of an early
+    // return when $icon['absolute_path'] is not set.
+    $this->iconFinder->expects($this->never())
+      ->method('getFileContents');
     $icon_loaded = $this->svgExtractorPlugin->loadIcon($icon);
 
     $this->assertNull($icon_loaded);
