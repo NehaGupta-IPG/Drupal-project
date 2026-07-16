@@ -184,11 +184,7 @@ class UpdateThemeHooks {
 
         // Sort by the status of each project, if possible.
         uksort($rows[$type_name], function ($a, $b) use ($rows, $type_name) {
-          // @todo replace with doing this the proper way.
-          if (substr($a, 0, 1) === '#' || substr($b, 0, 1) === '#') {
-            return $a <=> $b;
-          }
-          elseif (isset($rows[$type_name][$a]['status']['#project']['status']) && isset($rows[$type_name][$b]['status']['#project']['status']) && $rows[$type_name][$a]['status']['#project']['status'] !== $rows[$type_name][$b]['status']['#project']['status']) {
+          if (isset($rows[$type_name][$a]['status']['#project']['status']) && isset($rows[$type_name][$b]['status']['#project']['status']) && $rows[$type_name][$a]['status']['#project']['status'] !== $rows[$type_name][$b]['status']['#project']['status']) {
             return $rows[$type_name][$a]['status']['#project']['status'] <=> $rows[$type_name][$b]['status']['#project']['status'];
           }
           else {
