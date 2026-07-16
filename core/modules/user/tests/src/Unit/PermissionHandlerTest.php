@@ -6,9 +6,11 @@ namespace Drupal\Tests\user\Unit;
 
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\PermissionHandler;
 use org\bovigo\vfs\vfsStream;
@@ -17,6 +19,7 @@ use org\bovigo\vfs\vfsStreamWrapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests the permission handler.
@@ -35,10 +38,8 @@ class PermissionHandlerTest extends UnitTestCase {
 
   /**
    * The mocked module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&MockObject $moduleHandler;
 
   /**
    * The mocked string translation.
@@ -49,10 +50,8 @@ class PermissionHandlerTest extends UnitTestCase {
 
   /**
    * The mocked callable resolver.
-   *
-   * @var \Drupal\Core\Utility\CallableResolver|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $callableResolver;
+  protected CallableResolver&MockObject $callableResolver;
 
   /**
    * {@inheritdoc}
@@ -75,7 +74,7 @@ class PermissionHandlerTest extends UnitTestCase {
    * @return \Drupal\Core\Extension\Extension
    *   The extension object.
    */
-  protected function mockModuleExtension($module, $name) {
+  protected function mockModuleExtension($module, $name): Extension {
     $extension = new Extension('vfs:/', $module, "modules/$module");
     $extension->info['name'] = $name;
     return $extension;
@@ -365,7 +364,7 @@ class TestPermissionCallbacks {
   /**
    * Callback that returns a single description.
    */
-  public function singleDescription() {
+  public function singleDescription(): array {
     return [
       'access_module_a' => 'single_description',
     ];
@@ -374,7 +373,7 @@ class TestPermissionCallbacks {
   /**
    * Callback that returns the title and description.
    */
-  public function titleDescription() {
+  public function titleDescription(): array {
     return [
       'access module b' => [
         'title' => 'Access B',
@@ -386,7 +385,7 @@ class TestPermissionCallbacks {
   /**
    * Callback that returns restricted access.
    */
-  public function titleDescriptionRestrictAccess() {
+  public function titleDescriptionRestrictAccess(): array {
     return [
       'access_module_c' => [
         'title' => 'Access C',
@@ -399,7 +398,7 @@ class TestPermissionCallbacks {
   /**
    * Callback that returns the title.
    */
-  public function titleProvider() {
+  public function titleProvider(): array {
     return [
       'access module a via module b' => [
         'title' => 'Access A via B',
@@ -418,7 +417,7 @@ class TestTranslationManager implements TranslationInterface {
   /**
    * {@inheritdoc}
    */
-  public function translate($string, array $args = [], array $options = []) {
+  public function translate($string, array $args = [], array $options = []): TranslatableMarkup {
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     return new TranslatableMarkup($string, $args, $options, $this);
   }
@@ -433,7 +432,7 @@ class TestTranslationManager implements TranslationInterface {
   /**
    * {@inheritdoc}
    */
-  public function formatPlural($count, $singular, $plural, array $args = [], array $options = []) {
+  public function formatPlural($count, $singular, $plural, array $args = [], array $options = []): PluralTranslatableMarkup {
     return new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $this);
   }
 

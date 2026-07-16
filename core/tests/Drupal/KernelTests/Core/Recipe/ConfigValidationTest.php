@@ -25,7 +25,7 @@ class ConfigValidationTest extends KernelTestBase {
    * This test depends on us being able to create invalid config, so we can
    * ensure that validatable config is validated by the recipe runner.
    */
-  protected $strictConfigSchema = FALSE;
+  protected bool $strictConfigSchema = FALSE;
 
   /**
    * Creates a recipe with invalid config data in a particular file.
@@ -41,7 +41,7 @@ class ConfigValidationTest extends KernelTestBase {
     $dir = uniqid('public://');
     mkdir($dir . '/config', recursive: TRUE);
 
-    $data = file_get_contents($this->getDrupalRoot() . '/core/modules/config/tests/config_test/config/install/config_test.types.yml');
+    $data = file_get_contents($this->root . '/core/modules/config/tests/config_test/config/install/config_test.types.yml');
     assert(is_string($data));
     $data = Yaml::decode($data);
     // The `array` key needs to be an array, not an integer. If the config is
@@ -74,7 +74,7 @@ YAML;
     // data, we should get a validation error.
     $recipe = $this->createRecipeWithInvalidDataInFile('config_test.types.fully_validatable.yml');
     $this->expectException(InvalidConfigException::class);
-    $this->expectExceptionMessage('There were validation errors in config_test.types.fully_validatable');
+    $this->expectExceptionMessageIs('There were validation errors in config_test.types.fully_validatable');
     RecipeRunner::processRecipe($recipe);
   }
 
