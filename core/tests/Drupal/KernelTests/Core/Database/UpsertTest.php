@@ -214,6 +214,7 @@ class UpsertTest extends DatabaseTestBase {
   public function testDegeneratedUpsert(): void {
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
 
+    // An upsert that only adds a record with the key.
     $this->connection->upsert('test_people')
       ->key('job')
       ->fields(['job'])
@@ -223,11 +224,16 @@ class UpsertTest extends DatabaseTestBase {
     $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
     $this->assertEquals($num_records_before + 1, $num_records_after);
 
+    // Do the same upsert.
     $this->connection->upsert('test_people')
       ->key('job')
       ->fields(['job'])
       ->values(['Plumber'])
       ->execute();
+
+    // No records added.
+    $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
+    $this->assertEquals($num_records_before + 1, $num_records_after);
   }
 
   /**
