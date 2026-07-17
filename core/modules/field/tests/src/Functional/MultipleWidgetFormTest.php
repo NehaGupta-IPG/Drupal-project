@@ -182,6 +182,58 @@ class MultipleWidgetFormTest extends FieldTestBase {
   }
 
   /**
+   * Tests configurable description position for multi-value field widgets.
+   */
+  public function testDescriptionDisplayOnMultiValueFields(): void {
+    $field_storage = $this->fieldStorageMultiple;
+    $field_name = $field_storage['field_name'];
+    $this->field['field_name'] = $field_name;
+    $this->field['description'] = 'Multiple widget description.';
+    FieldStorageConfig::create($field_storage)->save();
+    FieldConfig::create($this->field)->save();
+    \Drupal::service('entity_display.repository')->getFormDisplay($this->field['entity_type'], $this->field['bundle'], 'default')
+      ->setComponent($field_name, [
+        'type' => 'test_field_widget_multiple',
+      ])
+      ->save();
+
+    $selector = str_replace('_', '-', $field_name);
+
+    // By default, the description is rendered after the field table.
+    $this->drupalGet('entity_test/add');
+    $this->assertSession()->elementExists('css', '[data-drupal-selector="edit-' . $selector . '"] > table.field-multiple-table + div.description');
+    $this->assertSession()->pageTextContains('Multiple widget description.');
+
+    // Configure the widget to render its description before the field table.
+    \Drupal::state()->set('field_test.widget_alter_test', [
+      'hook' => 'hook_field_widget_complete_form_alter',
+      'field_name' => $field_name,
+      'widget' => 'test_field_widget_multiple',
+      'description_display' => 'before',
+    ]);
+    $this->rebuildAll();
+
+    $this->drupalGet('entity_test/add');
+    $this->assertSession()->elementExists('css', '[data-drupal-selector="edit-' . $selector . '"] > div.description + table.field-multiple-table');
+
+    // Configure the widget to render its description in an invisible style.
+    \Drupal::state()->set('field_test.widget_alter_test', [
+      'hook' => 'hook_field_widget_complete_form_alter',
+      'field_name' => $field_name,
+      'widget' => 'test_field_widget_multiple',
+      'description_display' => 'invisible',
+    ]);
+    $this->rebuildAll();
+
+    $this->drupalGet('entity_test/add');
+    $this->assertSession()->elementExists('css', '[data-drupal-selector="edit-' . $selector . '"] > table.field-multiple-table + div.description.visually-hidden');
+    $this->assertSession()->pageTextContains('Multiple widget description.');
+
+    \Drupal::state()->delete('field_test.widget_alter_test');
+    $this->rebuildAll();
+  }
+
+  /**
    * Tests hook_field_widget_complete_form_alter().
    */
   public function testFieldFormMultipleWidgetAlter(): void {

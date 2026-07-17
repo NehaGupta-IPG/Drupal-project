@@ -220,6 +220,9 @@ class FieldTestHooks {
     $alter_info = \Drupal::state()->get("field_test.widget_alter_test");
     $name = $context['items']->getFieldDefinition()->getName();
     if (!empty($alter_info) && $hook === $alter_info['hook'] && $name === $alter_info['field_name']) {
+      if (!empty($alter_info['description_display'])) {
+        $elements['#description_display'] = $alter_info['description_display'];
+      }
       $elements['#prefix'] = "From $hook(): prefix on $name parent element.";
       foreach (Element::children($elements) as $delta => $element) {
         $elements[$delta]['#suffix'] = "From $hook(): suffix on $name child element.";

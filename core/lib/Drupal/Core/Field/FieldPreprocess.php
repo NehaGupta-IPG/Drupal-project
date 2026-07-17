@@ -186,7 +186,11 @@ class FieldPreprocess {
 
       if (!empty($element['#description'])) {
         $description_id = $element['#attributes']['aria-describedby'];
-        $description_attributes['id'] = $description_id;
+        $description_attributes = ['id' => $description_id];
+        $variables['description_display'] = $element['#description_display'] ?? 'after';
+        if ($variables['description_display'] === 'invisible') {
+          $description_attributes['class'][] = 'visually-hidden';
+        }
         $variables['description']['attributes'] = new Attribute($description_attributes);
         $variables['description']['content'] = $element['#description'];
 
