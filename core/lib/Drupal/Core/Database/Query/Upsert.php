@@ -123,7 +123,7 @@ abstract class Upsert extends Query implements \Countable {
       catch (IntegrityConstraintViolationException $e) {
         if ($this->isInsert) {
           $this->insertValues = [];
-          return $affected_rows ?? NULL;
+          return 0;
         }
         throw $e;
       }
