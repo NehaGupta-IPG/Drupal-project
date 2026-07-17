@@ -53,8 +53,8 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 184,
-      'CacheGetCount' => 232,
-      'CacheSetCount' => 240,
+      'CacheGetCount' => 229,
+      'CacheSetCount' => 237,
       'CacheDeleteCount' => 0,
       'CacheTagLookupQueryCount' => 25,
       'CacheTagInvalidationCount' => 0,
@@ -123,8 +123,8 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 60,
-      'CacheGetCount' => 170,
-      'CacheSetCount' => 75,
+      'CacheGetCount' => 168,
+      'CacheSetCount' => 73,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 19,
