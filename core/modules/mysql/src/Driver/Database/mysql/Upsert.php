@@ -38,7 +38,9 @@ class Upsert extends QueryUpsert {
       $update[] = "$field = VALUES($field)";
     }
 
-    $query .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $update);
+    if (!empty($update)) {
+      $query .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $update);
+    }
 
     return $query;
   }
