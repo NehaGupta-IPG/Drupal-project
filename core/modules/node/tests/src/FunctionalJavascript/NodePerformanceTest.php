@@ -130,9 +130,10 @@ class NodePerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 34,
-      'CacheGetCount' => 82,
+      'CacheGetCount' => 86,
       'CacheGetCountByBin' => [
         'page' => 1,
+        'chained_fast_invalidation' => 4,
         'config' => 18,
         'data' => 3,
         'discovery' => 31,
@@ -144,7 +145,7 @@ class NodePerformanceTest extends PerformanceTestBase {
         'entity' => 2,
         'file_parsing' => 1,
       ],
-      'CacheSetCount' => 41,
+      'CacheSetCount' => 43,
       'CacheSetCountByBin' => [
         'data' => 3,
         'config' => 8,
@@ -155,6 +156,7 @@ class NodePerformanceTest extends PerformanceTestBase {
         'render' => 6,
         'dynamic_page_cache' => 2,
         'page' => 1,
+        'chained_fast_invalidation' => 2,
         'bootstrap' => 3,
       ],
       'CacheDeleteCount' => 0,
@@ -216,9 +218,10 @@ class NodePerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 2,
-      'CacheGetCount' => 57,
+      'CacheGetCount' => 61,
       'CacheGetCountByBin' => [
         'page' => 1,
+        'chained_fast_invalidation' => 4,
         'config' => 10,
         'data' => 3,
         'discovery' => 20,
