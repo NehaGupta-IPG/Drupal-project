@@ -209,7 +209,7 @@ class UpsertTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests an upsert that has no colums to update.
+   * Tests an upsert that has no columns to update.
    */
   public function testDegeneratedUpsert(): void {
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
