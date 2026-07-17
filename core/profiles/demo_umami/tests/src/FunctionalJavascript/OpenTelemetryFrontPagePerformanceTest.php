@@ -6,14 +6,17 @@ namespace Drupal\Tests\demo_umami\FunctionalJavascript;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests demo_umami profile performance.
- *
- * @group OpenTelemetry
- * @group #slow
- * @requires extension apcu
  */
+#[Group('OpenTelemetry')]
+#[Group('#slow')]
+#[RequiresPhpExtension('apcu')]
+#[RunTestsInSeparateProcesses]
 class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
 
   /**
@@ -49,16 +52,16 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('Umami');
 
     $expected = [
-      'QueryCount' => 381,
-      'CacheGetCount' => 471,
-      'CacheSetCount' => 467,
+      'QueryCount' => 184,
+      'CacheGetCount' => 232,
+      'CacheSetCount' => 240,
       'CacheDeleteCount' => 0,
-      'CacheTagLookupQueryCount' => 49,
+      'CacheTagLookupQueryCount' => 25,
       'CacheTagInvalidationCount' => 0,
-      'ScriptCount' => 1,
+      'ScriptCount' => 3,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 2,
-      'StylesheetBytes' => 39750,
+      'StylesheetCount' => 6,
+      'StylesheetBytes' => 39150,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -93,10 +96,10 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 1,
-      'ScriptCount' => 1,
+      'ScriptCount' => 3,
       'ScriptBytes' => 11850,
-      'StylesheetCount' => 2,
-      'StylesheetBytes' => 39500,
+      'StylesheetCount' => 6,
+      'StylesheetBytes' => 38850,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -119,16 +122,16 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     }, 'umamiFrontPageCoolCache');
 
     $expected = [
-      'QueryCount' => 112,
-      'CacheGetCount' => 239,
-      'CacheSetCount' => 93,
+      'QueryCount' => 60,
+      'CacheGetCount' => 170,
+      'CacheSetCount' => 75,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 31,
-      'ScriptCount' => 1,
+      'CacheTagLookupQueryCount' => 19,
+      'ScriptCount' => 3,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 2,
-      'StylesheetBytes' => 39750,
+      'StylesheetCount' => 6,
+      'StylesheetBytes' => 38850,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

@@ -7,13 +7,15 @@ namespace Drupal\Tests\file\Kernel\Formatter;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Tests the default file formatter.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FileEntityFormatterTest extends KernelTestBase {
 
   /**
@@ -107,7 +109,7 @@ class FileEntityFormatterTest extends KernelTestBase {
 
     $entity_display->setComponent('uri', ['type' => 'file_uri', 'settings' => ['file_download_path' => TRUE]]);
     $build = $entity_display->buildMultiple($this->files)[0]['uri'][0];
-    $this->assertEquals($this->fileUrlGenerator->generateString('public://file.png'), $build['#markup']);
+    $this->assertEquals($this->fileUrlGenerator->generateAbsoluteString('public://file.png'), $build['#markup']);
 
     $entity_display->setComponent(
       'uri',
@@ -117,7 +119,7 @@ class FileEntityFormatterTest extends KernelTestBase {
       ]
     );
     $build = $entity_display->buildMultiple($this->files)[0]['uri'][0];
-    $this->assertEquals($this->fileUrlGenerator->generateString('public://file.png'), $build['#title']);
+    $this->assertEquals($this->fileUrlGenerator->generateAbsoluteString('public://file.png'), $build['#title']);
     $this->assertEquals($this->fileUrlGenerator->generate('public://file.png'), $build['#url']);
   }
 
@@ -202,7 +204,6 @@ class FileEntityFormatterTest extends KernelTestBase {
     $output = (string) \Drupal::service('renderer')->renderRoot($file_link);
     $this->assertStringContainsString($this->fileUrlGenerator->generate('dummy-external-readonly://file-query-string?foo=bar')->toUriString(), $output);
   }
-
   /**
    * Tests the file_link field formatter using link options.
    */

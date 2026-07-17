@@ -268,7 +268,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
 
     // Define a unique ID for the transaction.
-    $id = uniqid('', TRUE);
+    $id = bin2hex(random_bytes(12));
 
     // Do the client-level processing.
     if ($this->stackDepth() === 0) {
@@ -297,22 +297,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   }
 
   /**
-   * Purges a Drupal transaction from the manager.
-   *
-   * This is only called by a Transaction object's ::__destruct() method and
-   * should only be called internally by a database driver.
-   *
-   * @param string $name
-   *   The name of the transaction.
-   * @param string $id
-   *   The id of the transaction.
-   *
-   * @throws \Drupal\Core\Database\TransactionOutOfOrderException
-   *   If a Drupal Transaction with the specified name does not exist.
-   * @throws \Drupal\Core\Database\TransactionCommitFailedException
-   *   If the commit of the root transaction failed.
-   *
-   * @internal
+   * {@inheritdoc}
    */
   public function purge(string $name, string $id): void {
     // If this is a 'root' transaction, and it is voided (that is, no longer in
@@ -357,6 +342,12 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       if ($this->triggerWarningWhenUnpilingOnVoidTransaction) {
         trigger_error('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', E_USER_WARNING);
       }
+      return;
+    }
+
+    // If the client transaction was already committed, there's no longer
+    // anything to do on an explicit commit/savepoint release.
+    if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Committed) {
       return;
     }
 
@@ -423,7 +414,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // If the transaction was voided, we cannot rollback. Fail silently but
     // trigger a user warning.
     if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided) {
-      $this->connectionTransactionState = ClientConnectionTransactionState::RollbackFailed;
+      $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
       trigger_error('Transaction::rollBack() failed because of a prior execution of a DDL statement.', E_USER_WARNING);
       return;
     }

@@ -10,12 +10,14 @@ use Drupal\media\Entity\Media;
 use Drupal\media\MediaInterface;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the revisions of media entities.
- *
- * @group media
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaRevisionTest extends MediaFunctionalTestBase {
 
   /**
@@ -201,7 +203,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
    * @return \Drupal\media\MediaInterface
    *   A media object with up to date revision information.
    */
-  protected function createMediaRevision(MediaInterface $media) {
+  protected function createMediaRevision(MediaInterface $media): MediaInterface {
     $media->setName($this->randomMachineName());
     $media->setNewRevision();
     $media->save();

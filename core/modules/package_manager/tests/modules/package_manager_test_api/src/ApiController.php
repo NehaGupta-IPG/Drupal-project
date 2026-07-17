@@ -7,6 +7,7 @@ namespace Drupal\package_manager_test_api;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Url;
+use Drupal\package_manager\Attribute\AllowDirectWrite;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\SandboxManagerBase;
@@ -61,8 +62,7 @@ class ApiController extends ControllerBase {
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request. The runtime and dev dependencies are expected to be in
-   *   either the query string or request body, under the 'runtime' and 'dev'
-   *   keys, respectively.
+   *   the query string, under the 'runtime' and 'dev' keys, respectively.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A response that directs to the ::finish() method.
@@ -91,7 +91,7 @@ class ApiController extends ControllerBase {
   public function finish(string $id): Response {
     $this->stage->claim($id)->postApply();
     $this->stage->destroy();
-    return new Response();
+    return new Response('Finished');
   }
 
   /**
@@ -99,8 +99,7 @@ class ApiController extends ControllerBase {
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request. The runtime and dev dependencies are expected to be in
-   *   either the query string or request body, under the 'runtime' and 'dev'
-   *   keys, respectively.
+   *   the query string, under the 'runtime' and 'dev' keys, respectively.
    *
    * @return string
    *   Unique ID for the stage, which can be used to claim the stage before
@@ -110,8 +109,8 @@ class ApiController extends ControllerBase {
   protected function createAndApplyStage(Request $request) : string {
     $id = $this->stage->create();
     $this->stage->require(
-      $request->get('runtime', []),
-      $request->get('dev', [])
+      $request->query->all('runtime'),
+      $request->query->all('dev'),
     );
     $this->stage->apply();
     return $id;
@@ -142,6 +141,7 @@ class ApiController extends ControllerBase {
  *
  * @see \Drupal\package_manager\SandboxManagerBase::claim()
  */
+#[AllowDirectWrite]
 final class ControllerSandboxManager extends SandboxManagerBase {
 
   /**

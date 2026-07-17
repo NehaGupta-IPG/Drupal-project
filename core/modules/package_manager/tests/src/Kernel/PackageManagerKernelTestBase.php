@@ -12,14 +12,15 @@ use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Site\Settings;
 use Drupal\fixture_manipulator\StageFixtureManipulator;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\package_manager\Attribute\AllowDirectWrite;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
+use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager\StatusCheckTrait;
 use Drupal\package_manager\Validator\DiskSpaceValidator;
-use Drupal\package_manager\SandboxManagerBase;
 use Drupal\Tests\package_manager\Traits\AssertPreconditionsTrait;
 use Drupal\Tests\package_manager\Traits\ComposerStagerTestTrait;
 use Drupal\Tests\package_manager\Traits\FixtureManipulatorTrait;
@@ -57,11 +58,9 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
    * We need to preserve this as a class property so that we can re-inject it
    * into the container when a rebuild is triggered by module installation.
    *
-   * @var \GuzzleHttp\Client
-   *
    * @see ::register()
    */
-  private $client;
+  private ?Client $client = NULL;
 
   /**
    * {@inheritdoc}
@@ -173,11 +172,15 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
   /**
    * Creates a stage object for testing purposes.
    *
+   * @param class-string $class
+   *   (optional) The class of the sandbox manager to create. Defaults to
+   *   \Drupal\Tests\package_manager\Kernel\TestSandboxManager.
+   *
    * @return \Drupal\Tests\package_manager\Kernel\TestSandboxManager
    *   A stage object, with test-only modifications.
    */
-  protected function createStage(): TestSandboxManager {
-    return new TestSandboxManager(
+  protected function createStage(?string $class = TestSandboxManager::class): TestSandboxManager {
+    return new $class(
       $this->container->get(PathLocator::class),
       $this->container->get(BeginnerInterface::class),
       $this->container->get(StagerInterface::class),
@@ -467,11 +470,24 @@ class TestSandboxManager extends SandboxManagerBase {
    * will fail, because PHPUnit will want to serialize all arguments in the call
    * stack.
    *
-   * @see https://www.drupal.org/project/auto_updates/issues/3312619#comment-14801308
+   * @see https://www.drupal.org/node/3312619#comment-14801308
    */
   public function __sleep(): array {
     return [];
   }
+
+}
+
+/**
+ * Defines a test-only sandbox manager that allows direct-write.
+ */
+#[AllowDirectWrite]
+class TestDirectWriteSandboxManager extends TestSandboxManager {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected string $type = 'package_manager:test_direct_write';
 
 }
 

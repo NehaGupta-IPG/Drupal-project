@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Render\Attribute\RenderElement;
 
 /**
@@ -34,21 +35,20 @@ class StatusReport extends RenderElementBase {
    * This function is assigned as a #pre_render callback.
    */
   public static function preRenderGroupRequirements($element) {
-    $severities = static::getSeverities();
     $grouped_requirements = [];
+    /** @var array{title: \Drupal\Core\StringTranslation\TranslatableMarkup, value: mixed, description: \Drupal\Core\StringTranslation\TranslatableMarkup, severity: \Drupal\Core\Extension\Requirement\RequirementSeverity} $requirement */
     foreach ($element['#requirements'] as $key => $requirement) {
-      $severity = $severities[REQUIREMENT_INFO];
+      $severity = RequirementSeverity::Info;
       if (isset($requirement['severity'])) {
-        $requirement_severity = (int) $requirement['severity'] === REQUIREMENT_OK ? REQUIREMENT_INFO : (int) $requirement['severity'];
-        $severity = $severities[$requirement_severity];
+        $severity = $requirement['severity'] === RequirementSeverity::OK ? RequirementSeverity::Info : $requirement['severity'];
       }
       elseif (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install') {
-        $severity = $severities[REQUIREMENT_OK];
+        $severity = RequirementSeverity::OK;
       }
 
-      $grouped_requirements[$severity['status']]['title'] = $severity['title'];
-      $grouped_requirements[$severity['status']]['type'] = $severity['status'];
-      $grouped_requirements[$severity['status']]['items'][$key] = $requirement;
+      $grouped_requirements[$severity->status()]['title'] = $severity->title();
+      $grouped_requirements[$severity->status()]['type'] = $severity->status();
+      $grouped_requirements[$severity->status()]['items'][$key] = $requirement;
     }
 
     // Order the grouped requirements by a set order.
@@ -60,34 +60,6 @@ class StatusReport extends RenderElementBase {
     $element['#grouped_requirements'] = $grouped_requirements;
 
     return $element;
-  }
-
-  /**
-   * Gets the severities.
-   *
-   * @return array
-   *   An associative array of the requirements severities. The keys are the
-   *   requirement constants defined in install.inc.
-   */
-  public static function getSeverities() {
-    return [
-      REQUIREMENT_INFO => [
-        'title' => t('Checked', [], ['context' => 'Examined']),
-        'status' => 'checked',
-      ],
-      REQUIREMENT_OK => [
-        'title' => t('OK'),
-        'status' => 'ok',
-      ],
-      REQUIREMENT_WARNING => [
-        'title' => t('Warnings found'),
-        'status' => 'warning',
-      ],
-      REQUIREMENT_ERROR => [
-        'title' => t('Errors found'),
-        'status' => 'error',
-      ],
-    ];
   }
 
 }

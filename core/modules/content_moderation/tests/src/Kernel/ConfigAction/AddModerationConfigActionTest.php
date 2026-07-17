@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Kernel\ConfigAction;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\content_moderation\Plugin\ConfigAction\AddModeration;
+use Drupal\content_moderation\Plugin\ConfigAction\AddModerationDeriver;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeRunner;
@@ -13,13 +15,18 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 use Drupal\workflows\Entity\Workflow;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\content_moderation\Plugin\ConfigAction\AddModeration
- * @covers \Drupal\content_moderation\Plugin\ConfigAction\AddModerationDeriver
- * @group content_moderation
- * @group Recipe
+ * Tests Add Moderation Config Action.
  */
+#[Group('content_moderation')]
+#[Group('Recipe')]
+#[CoversClass(AddModeration::class)]
+#[CoversClass(AddModerationDeriver::class)]
+#[RunTestsInSeparateProcesses]
 class AddModerationConfigActionTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -76,7 +83,7 @@ class AddModerationConfigActionTest extends KernelTestBase {
 
     $recipe = $this->createRecipe($workflow->getConfigDependencyName());
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("The add_moderation:addNodeTypes config action only works with Content Moderation workflows.");
+    $this->expectExceptionMessageIs("The add_moderation:addNodeTypes config action only works with Content Moderation workflows.");
     RecipeRunner::processRecipe($recipe);
   }
 
@@ -86,7 +93,7 @@ class AddModerationConfigActionTest extends KernelTestBase {
   public function testActionOnlyTargetsWorkflows(): void {
     $recipe = $this->createRecipe('user.role.anonymous');
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage('The "user_role" entity does not support the "addNodeTypes" config action.');
+    $this->expectExceptionMessageIs('The "user_role" entity does not support the "addNodeTypes" config action.');
     RecipeRunner::processRecipe($recipe);
   }
 

@@ -9,7 +9,7 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
 use GuzzleHttp\RequestOptions;
-use PHPUnit\Framework\Attributes\Before;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Resource test base for taxonomy term entity.
@@ -39,13 +39,13 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
   protected $entity;
 
   /**
-   * Marks some tests as skipped because XML cannot be deserialized.
+   * {@inheritdoc}
    */
-  #[Before]
-  public function termResourceTestBaseSkipTests(): void {
+  protected function setUp(): void {
     if (static::$format === 'xml' && $this->name() === 'testPatchPath') {
       $this->markTestSkipped('Deserialization of the XML format is not supported.');
     }
+    parent::setUp();
   }
 
   /**
@@ -329,7 +329,10 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedCacheTags() {
-    return Cache::mergeTags(parent::getExpectedCacheTags(), ['config:filter.format.plain_text', 'config:filter.settings']);
+    return Cache::mergeTags(parent::getExpectedCacheTags(), [
+      'config:filter.format.plain_text',
+      'config:filter.settings',
+    ]);
   }
 
   /**
@@ -343,9 +346,8 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
    * Tests GETting a term with a parent term other than the default <root> (0).
    *
    * @see ::getExpectedNormalizedEntity()
-   *
-   * @dataProvider providerTestGetTermWithParent
    */
+  #[DataProvider('providerTestGetTermWithParent')]
   public function testGetTermWithParent(array $parent_term_ids): void {
     // Create all possible parent terms.
     Term::create(['vid' => Vocabulary::load('camelids')->id()])

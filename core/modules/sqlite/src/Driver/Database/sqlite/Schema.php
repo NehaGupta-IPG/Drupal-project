@@ -32,7 +32,10 @@ class Schema extends DatabaseSchema {
     $info = $this->getPrefixInfo($table, $add_prefix);
 
     // Don't use {} around sqlite_master table.
-    return (bool) $this->connection->query('SELECT 1 FROM [' . $info['schema'] . '].sqlite_master WHERE type = :type AND name = :name', [':type' => 'table', ':name' => $info['table']])->fetchField();
+    return (bool) $this->connection->query('SELECT 1 FROM [' . $info['schema'] . '].sqlite_master WHERE type = :type AND name = :name', [
+      ':type' => 'table',
+      ':name' => $info['table'],
+    ])->fetchField();
   }
 
   /**
@@ -249,6 +252,11 @@ class Schema extends DatabaseSchema {
 
       'blob:big'        => 'BLOB',
       'blob:normal'     => 'BLOB',
+
+      // Only the SQLite driver has this field map to due to a fatal error
+      // error caused by this driver's schema on table introspection.
+      // @todo Add support to all drivers in https://drupal.org/i/3343634
+      'json:normal'     => 'JSON',
     ];
     return $map;
   }

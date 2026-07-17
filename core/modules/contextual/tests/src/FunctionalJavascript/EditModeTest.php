@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\contextual\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests edit mode.
- *
- * @group contextual
- * @group #slow
  */
+#[Group('contextual')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class EditModeTest extends WebDriverTestBase {
 
   /**
@@ -139,7 +141,7 @@ class EditModeTest extends WebDriverTestBase {
     $web_assert = $this->assertSession();
     $page = $this->getSession()->getPage();
     // Wait till all the contextual links are hidden.
-    $page->waitFor(1, function () use ($page) {
+    $page->waitFor(1, function () use ($page): bool {
       return empty($page->find('css', '.contextual .trigger.visually-hidden'));
     });
     $web_assert->elementContains('css', static::ANNOUNCE_SELECTOR, 'Tabbing is no longer constrained by the Contextual module.');

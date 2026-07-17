@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the JavaScript updating of summaries on content type form.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class SettingSummariesContentTypeTest extends WebDriverTestBase {
 
   /**
@@ -46,7 +48,7 @@ class SettingSummariesContentTypeTest extends WebDriverTestBase {
     $page->findField('options[sticky]')->check();
     $page->findField('options[promote]')->check();
     $page->findField('options[revision]')->check();
-    $summary = 'Not published, Promoted to front page, Sticky at top of lists, Create new revision';
+    $summary = 'Not published, Promoted, Sticky at top of lists, Create new revision';
     $locator = '[href="#edit-workflow"] .vertical-tabs__menu-item-summary:contains("' . $summary . '")';
     $this->assertNotEmpty($this->assertSession()->waitForElement('css', $locator));
   }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\node\Hook;
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
@@ -67,15 +68,14 @@ class NodeRequirements {
       $views_storage = $this->entityTypeManager->getStorage('view');
       foreach ($views_storage->loadMultiple($active_view_ids) as $view) {
         foreach ($view->get('display') as $display_id => $display) {
-          if (array_key_exists('filters', $display['display_options'])) {
-            foreach ($display['display_options']['filters'] as $filter) {
-              if (array_key_exists('plugin_id', $filter) && $filter['plugin_id'] === 'node_status') {
-                $node_status_filter_problematic_views[$view->id()][$display_id] = [
-                  'view_label' => $view->label(),
-                  'display_name' => $display['display_title'] ?? $display_id,
-                ];
-                break;
-              }
+          $filters = $display['display_options']['filters'] ?? [];
+          foreach ($filters as $filter) {
+            if (array_key_exists('plugin_id', $filter) && $filter['plugin_id'] === 'node_status') {
+              $node_status_filter_problematic_views[$view->id()][$display_id] = [
+                'view_label' => $view->label(),
+                'display_name' => $display['display_title'] ?? $display_id,
+              ];
+              break;
             }
           }
         }
@@ -144,7 +144,7 @@ class NodeRequirements {
           'title' => $this->t('Content status filter'),
           'value' => $this->t('Redundant filters detected'),
           'description' => $node_status_filter_description,
-          'severity' => REQUIREMENT_WARNING,
+          'severity' => RequirementSeverity::Warning,
         ];
       }
     }

@@ -110,10 +110,6 @@ class CssOptimizer implements AssetOptimizerInterface {
    * when CSS aggregation is enabled. This optimization will not apply for
    * color.module enabled themes with CSS aggregation turned off.
    *
-   * Note: the only reason this method is public is so color.module can call it;
-   * it is not on the AssetOptimizerInterface, so any future refactoring can
-   * make it protected.
-   *
    * @param string $file
    *   Name of the stylesheet to be processed.
    * @param bool|null $optimize
@@ -124,14 +120,13 @@ class CssOptimizer implements AssetOptimizerInterface {
    * @return string
    *   Contents of the stylesheet, including any resolved @import commands.
    */
-  public function loadFile($file, $optimize = NULL, $reset_base_path = TRUE) {
+  protected function loadFile($file, $optimize = NULL, $reset_base_path = TRUE) {
     // These statics are not cache variables, so we don't use drupal_static().
     static $_optimize, $base_path;
     if ($reset_base_path) {
       $base_path = '';
     }
-    // Store the value of $optimize for preg_replace_callback with nested
-    // @import loops.
+    // Store $optimize for preg_replace_callback with nested @import loops.
     if (isset($optimize)) {
       $_optimize = $optimize;
     }

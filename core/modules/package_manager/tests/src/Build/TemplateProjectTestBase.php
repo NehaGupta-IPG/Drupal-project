@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Build;
 
+use Behat\Mink\Mink;
 use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
 use Drupal\BuildTests\QuickStart\QuickStartTestBase;
@@ -40,6 +41,13 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
    * @var string
    */
   private string $webRoot;
+
+  /**
+   * The project root of the test site, relative to the workspace directory.
+   *
+   * @var string
+   */
+  const string PROJECT_ROOT_RELATIVE = 'project/';
 
   /**
    * A secondary server instance, to serve XML metadata about available updates.
@@ -82,7 +90,9 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    $this->metadataServer?->stop();
+    if (isset($this->metadataServer)) {
+      $this->metadataServer?->stop();
+    }
     parent::tearDown();
   }
 
@@ -144,7 +154,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function instantiateServer($port, $working_dir = NULL) {
+  protected function instantiateServer(int $port, ?string $working_dir = NULL): Process {
     $working_dir = $working_dir ?: $this->webRoot;
     $finder = new PhpExecutableFinder();
     $working_path = $this->getWorkingPath($working_dir);
@@ -184,7 +194,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
    * {@inheritdoc}
    */
   public function installQuickStart($profile, $working_dir = NULL): void {
-    parent::installQuickStart("$profile --no-ansi", $working_dir ?: $this->webRoot);
+    parent::installQuickStart("$profile --no-ansi", $working_dir ?: self::PROJECT_ROOT_RELATIVE);
 
     // Allow package_manager to be installed, since it is hidden by default.
     // Always allow test modules to be installed in the UI and, for easier
@@ -200,7 +210,7 @@ END;
   /**
    * {@inheritdoc}
    */
-  public function visit($request_uri = '/', $working_dir = NULL) {
+  public function visit(string $request_uri = '/', $working_dir = NULL): Mink {
     return parent::visit($request_uri, $working_dir ?: $this->webRoot);
   }
 
@@ -221,7 +231,7 @@ END;
    * @param string $working_directory
    *   (optional) The Composer working directory. Defaults to 'project'.
    */
-  protected function addRepository(string $name, string $path, $working_directory = 'project'): void {
+  protected function addRepository(string $name, string $path, ?string $working_directory = 'project'): void {
     $this->assertDirectoryExists($path);
 
     $repository = json_encode([
@@ -319,15 +329,15 @@ END;
     // ignores .htaccess files and everything in them, so a Composer-generated
     // .htaccess file won't cause this test to fail.
     if ($template === 'RecommendedProject') {
-      $this->assertFileDoesNotExist("$workspace_dir/project/.htaccess");
+      $this->assertFileDoesNotExist($workspace_dir . '/' . self::PROJECT_ROOT_RELATIVE . '.htaccess');
     }
 
     // Now that we know the project was created successfully, we can set the
     // web root with confidence.
-    $this->webRoot = 'project/' . $data['extra']['drupal-scaffold']['locations']['web-root'];
+    $this->webRoot = self::PROJECT_ROOT_RELATIVE . $data['extra']['drupal-scaffold']['locations']['web-root'];
 
     // Install Drupal.
-    $this->installQuickStart('standard');
+    $this->installQuickStart('minimal');
     $this->formLogin($this->adminUsername, $this->adminPassword);
 
     // When checking for updates, we need to be able to make sub-requests, but
@@ -342,12 +352,12 @@ END;
 
     // Ensure Package Manager logs Composer Stager's process output to a file
     // named for the current test.
-    $log = $this->getDrupalRoot() . '/sites/simpletest/browser_output';
+    $log = $this->root . '/sites/simpletest/browser_output';
     @mkdir($log, recursive: TRUE);
     $this->assertDirectoryIsWritable($log);
     $log .= '/' . str_replace('\\', '_', static::class) . '-' . $this->name();
     if ($this->usesDataProvider()) {
-      $log .= '-' . preg_replace('/[^a-z0-9]+/i', '_', $this->dataName());
+      $log .= '-' . preg_replace('/[^a-z0-9]+/i', '_', (string) $this->dataName());
     }
     $code .= <<<END
 \$config['package_manager.settings']['log'] = '$log-package_manager.log';
@@ -357,6 +367,7 @@ END;
 
     // Install helpful modules.
     $this->installModules([
+      'automated_cron',
       'package_manager_test_api',
       'package_manager_test_event_logger',
       'package_manager_test_release_history',
@@ -432,7 +443,7 @@ END;
       // versions that are newer than the ones being polyfilled, which means we
       // won't be able to build our test project because these polyfills aren't
       // available in the local code base. Since we're guaranteed to be on PHP
-      // 8.3 or later, no package should need to polyfill older versions.
+      // 8.5 or later, no package should need to polyfill older versions.
       unset(
         $requirements['symfony/polyfill-php72'],
         $requirements['symfony/polyfill-php73'],
@@ -441,8 +452,8 @@ END;
         $requirements['symfony/polyfill-php81'],
         $requirements['symfony/polyfill-php82'],
         $requirements['symfony/polyfill-php83'],
-        // Needed for PHP 8.4 features while PHP 8.3 is the minimum.
         $requirements['symfony/polyfill-php84'],
+        $requirements['symfony/polyfill-php85'],
       );
       // If this package requires any Drupal core packages, ensure it allows
       // any version.
@@ -491,6 +502,12 @@ END;
         // scaffold files, like Drupal core.
         'extra' => $package_info['extra'] ?? [],
       ];
+
+      if ($name === 'drupal/core') {
+        $packages[$name][$version]['bin'] = [
+          'scripts/dr',
+        ];
+      }
     }
     $data = json_encode(['packages' => $packages], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     file_put_contents($workspace_dir . '/vendor.json', $data);
@@ -615,7 +632,7 @@ END;
     }
     $this->assertNotEmpty($expected_events);
 
-    $log_file = $this->getWorkspaceDirectory() . '/project/' . EventLogSubscriber::LOG_FILE_NAME;
+    $log_file = $this->getWorkspaceDirectory() . '/' . self::PROJECT_ROOT_RELATIVE . EventLogSubscriber::LOG_FILE_NAME;
     $max_wait = time() + $wait;
     do {
       $this->assertFileIsReadable($log_file);
@@ -721,12 +738,15 @@ END;
       $this->serverErrorLog,
     );
     $this->assertSame(200, $session->getStatusCode(), $message);
+    // Sometimes we get a 200 response after a PHP timeout or OOM error, so we
+    // also check the page content to ensure it's what we expect.
+    $this->assertSame('Finished', $session->getPage()->getText());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function copyCodebase(?\Iterator $iterator = NULL, $working_dir = NULL): void {
+  public function copyCodebase(?\Iterator $iterator = NULL, ?string $working_dir = NULL): void {
     parent::copyCodebase($iterator, $working_dir);
 
     // Create a local Composer repository for all third-party dependencies and

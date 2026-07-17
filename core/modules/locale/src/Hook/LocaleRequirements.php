@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\locale\Hook;
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\locale\LocaleSource;
 
 /**
  * Requirements for the Locale module.
@@ -15,6 +17,10 @@ use Drupal\Core\Url;
 class LocaleRequirements {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    protected LocaleSource $localeSource,
+  ) {}
 
   /**
    * Implements hook_runtime_requirements().
@@ -28,9 +34,9 @@ class LocaleRequirements {
 
     if ($languages) {
       // Determine the status of the translation updates per language.
-      $status = locale_translation_get_status();
-      if ($status) {
-        foreach ($status as $project) {
+      $sources = $this->localeSource->loadSources();
+      if ($sources) {
+        foreach ($sources as $project) {
           foreach ($project as $langcode => $project_info) {
             if (empty($project_info->type)) {
               $untranslated[$langcode] = $languages[$langcode]->getName();
@@ -46,16 +52,22 @@ class LocaleRequirements {
             $requirements['locale_translation'] = [
               'title' => $this->t('Translation update status'),
               'value' => Link::fromTextAndUrl($this->t('Updates available'), Url::fromRoute('locale.translate_status'))->toString(),
-              'severity' => REQUIREMENT_WARNING,
-              'description' => $this->t('Updates available for: @languages. See the <a href=":updates">Available translation updates</a> page for more information.', ['@languages' => implode(', ', $available_updates), ':updates' => Url::fromRoute('locale.translate_status')->toString()]),
+              'severity' => RequirementSeverity::Warning,
+              'description' => $this->t('Updates available for: @languages. See the <a href=":updates">Available translation updates</a> page for more information.', [
+                '@languages' => implode(', ', $available_updates),
+                ':updates' => Url::fromRoute('locale.translate_status')->toString(),
+              ]),
             ];
           }
           else {
             $requirements['locale_translation'] = [
               'title' => $this->t('Translation update status'),
               'value' => $this->t('Missing translations'),
-              'severity' => REQUIREMENT_INFO,
-              'description' => $this->t('Missing translations for: @languages. See the <a href=":updates">Available translation updates</a> page for more information.', ['@languages' => implode(', ', $untranslated), ':updates' => Url::fromRoute('locale.translate_status')->toString()]),
+              'severity' => RequirementSeverity::Info,
+              'description' => $this->t('Missing translations for: @languages. See the <a href=":updates">Available translation updates</a> page for more information.', [
+                '@languages' => implode(', ', $untranslated),
+                ':updates' => Url::fromRoute('locale.translate_status')->toString(),
+              ]),
             ];
           }
         }
@@ -63,7 +75,7 @@ class LocaleRequirements {
           $requirements['locale_translation'] = [
             'title' => $this->t('Translation update status'),
             'value' => $this->t('Up to date'),
-            'severity' => REQUIREMENT_OK,
+            'severity' => RequirementSeverity::OK,
           ];
         }
       }
@@ -71,7 +83,7 @@ class LocaleRequirements {
         $requirements['locale_translation'] = [
           'title' => $this->t('Translation update status'),
           'value' => Link::fromTextAndUrl($this->t('Can not determine status'), Url::fromRoute('locale.translate_status'))->toString(),
-          'severity' => REQUIREMENT_WARNING,
+          'severity' => RequirementSeverity::Warning,
           'description' => $this->t('No translation status is available. See the <a href=":updates">Available translation updates</a> page for more information.', [':updates' => Url::fromRoute('locale.translate_status')->toString()]),
         ];
       }

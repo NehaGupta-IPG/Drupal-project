@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Command } from 'ckeditor5/src/core';
+import { Command } from 'ckeditor5';
 import { getClosestSelectedDrupalMediaElement } from '../utils';
 import { METADATA_ERROR } from './utils';
 
@@ -22,8 +22,7 @@ export default class MediaImageTextAlternativeCommand extends Command {
       this.editor.model.document.selection,
     );
     this.isEnabled =
-      !!drupalMediaElement &&
-      drupalMediaElement.getAttribute('drupalMediaIsImage') &&
+      drupalMediaElement?.getAttribute('drupalMediaIsImage') &&
       drupalMediaElement.getAttribute('drupalMediaIsImage') !== METADATA_ERROR;
 
     if (this.isEnabled) {

@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* cspell:ignore drupalelementstyle drupalelementstylecommand */
-import { Command } from 'ckeditor5/src/core';
+import { Command } from 'ckeditor5';
 import { getClosestElementWithElementStyleAttribute } from './utils';
 import { groupNameToModelAttributeKey } from '../utils';
 
@@ -72,7 +72,7 @@ export default class DrupalElementStyleCommand extends Command {
    *
    * @example {drupalAlign: 'left', drupalViewMode: 'full'}
    *
-   * @param {module:engine/model/element~Element} element
+   * @param {module:engine/model/element~ModelElement} element
    *   The element.
    *
    * @return {Object}

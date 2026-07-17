@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\FunctionalJavascriptTests\SortableTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Media library entity reference widget.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceWidgetTest extends MediaLibraryTestBase {
 
   use SortableTestTrait;
@@ -205,7 +208,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
 
     $this->drupalGet('node/add/basic_page');
     $this->openMediaLibraryForField('field_twin_media');
-    $link_titles = array_map(function ($link) {
+    $link_titles = array_map(function (NodeElement $link) {
       return $link->getText();
     }, $links);
     $this->assertSame(
@@ -295,7 +298,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $this->waitForText('Dog has been removed.');
     $wrapper->pressButton('Remove');
     $this->waitForText('Dog has been removed.');
-    $result = $wrapper->waitFor(10, function ($wrapper) {
+    $result = $wrapper->waitFor(10, function ($wrapper): bool {
       /** @var \Behat\Mink\Element\NodeElement $wrapper */
       return $wrapper->findButton('Remove') == NULL;
     });

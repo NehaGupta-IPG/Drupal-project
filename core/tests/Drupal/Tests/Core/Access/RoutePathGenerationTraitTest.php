@@ -7,9 +7,13 @@ namespace Drupal\Tests\Core\Access;
 use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Access\CsrfAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
+use Drupal\Core\Access\RoutePathGenerationTrait;
 use Drupal\Core\Access\RouteProcessorCsrf;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,20 +21,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 
 /**
- * @covers \Drupal\Core\Access\RoutePathGenerationTrait
- * @group Access
+ * Tests Route Path Generation Trait.
  */
+#[Group('Access')]
+#[CoversTrait(RoutePathGenerationTrait::class)]
 class RoutePathGenerationTraitTest extends UnitTestCase {
-
-  /**
-   * The mock CSRF token generator.
-   */
-  protected CsrfTokenGenerator $csrfToken;
-
-  /**
-   * The request stack.
-   */
-  protected RequestStack $requestStack;
 
   /**
    * The route processor.
@@ -47,20 +42,17 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->csrfToken = $this->getMockBuilder(CsrfTokenGenerator::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $csrfToken = $this->createStub(CsrfTokenGenerator::class);
     // Make CsrfTokenGenerator mock use a simple hash of the value passed as
     // parameter, as it is enough for the sake of our tests.
-    $this->csrfToken->method('get')->willReturnCallback(function ($value) {
+    $csrfToken->method('get')->willReturnCallback(function ($value): string {
       return hash('sha256', $value);
     });
-    $this->csrfToken->method('validate')->willReturnCallback(function ($token, $value) {
+    $csrfToken->method('validate')->willReturnCallback(function ($token, $value): bool {
       return $token === hash('sha256', $value);
     });
-    $this->requestStack = $this->createMock(RequestStack::class);
-    $this->processor = new RouteProcessorCsrf($this->csrfToken, $this->requestStack);
-    $this->accessCheck = new CsrfAccessCheck($this->csrfToken);
+    $this->processor = new RouteProcessorCsrf($csrfToken, $this->createStub(RequestStack::class));
+    $this->accessCheck = new CsrfAccessCheck($csrfToken);
   }
 
   /**
@@ -71,17 +63,16 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
    *
    * Multiple cases are provided for an optional parameter (non-empty, empty,
    * null, undefined).
-   *
-   * @dataProvider providerTestCsrfTokenCompleteLifeCycle
    */
-  public function testCsrfTokenCompleteLifeCycle($params): void {
+  #[DataProvider('providerTestCsrfTokenCompleteLifeCycle')]
+  public function testCsrfTokenCompleteLifeCycle(array $params): void {
 
     // Mock a route.
     $route = $this->createMock(Route::class);
-    $route
+    $route->expects($this->atLeastOnce())
       ->method('getPath')
       ->willReturn('test/example/{param}');
-    $route
+    $route->expects($this->atLeastOnce())
       ->method('hasRequirement')
       ->with('_csrf_token')
       ->willReturn(TRUE);
@@ -93,7 +84,7 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
     $requestParams = $params + ['token' => $routeParams['token']];
 
     // Mock Parameter bag.
-    $parameterBag = $this->createMock(ParameterBagInterface::class);
+    $parameterBag = $this->createStub(ParameterBagInterface::class);
     $parameterBag->method('get')->willReturnCallback(function ($key, $default = NULL) use ($requestParams) {
       return $requestParams[$key] ?? $default;
     });
@@ -103,11 +94,11 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
     $inputBag = new InputBag($requestParams);
 
     // Mock Request.
-    $request = $this->createMock(Request::class);
+    $request = $this->createStub(Request::class);
     $request->query = $inputBag;
 
     // Mock RouteMatch.
-    $routeMatch = $this->createMock(RouteMatchInterface::class);
+    $routeMatch = $this->createStub(RouteMatchInterface::class);
     $routeMatch->method('getRawParameters')->willReturn($parameterBag);
 
     // Check for allowed access.
