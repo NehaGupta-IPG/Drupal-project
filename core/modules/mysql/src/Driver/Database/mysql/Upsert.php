@@ -41,6 +41,9 @@ class Upsert extends QueryUpsert {
     if (!empty($update)) {
       $query .= ' ON DUPLICATE KEY UPDATE ' . implode(', ', $update);
     }
+    else {
+      $this->isInsert = TRUE;
+    }
 
     return $query;
   }

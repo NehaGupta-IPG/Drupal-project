@@ -49,6 +49,9 @@ class Upsert extends QueryUpsert {
     if (!empty($update)) {
       $query .= ' ON CONFLICT (' . implode(', ', $keys) . ') DO UPDATE SET ' . implode(', ', $update);
     }
+    else {
+      $this->isInsert = TRUE;
+    }
 
     return $query;
   }

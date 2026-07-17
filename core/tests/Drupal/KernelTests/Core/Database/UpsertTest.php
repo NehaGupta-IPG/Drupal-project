@@ -209,6 +209,28 @@ class UpsertTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests an upsert that has no colums to update.
+   */
+  public function testDegeneratedUpsert(): void {
+    $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
+
+    $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job'])
+      ->values(['Plumber'])
+      ->execute();
+
+    $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
+    $this->assertEquals($num_records_before + 1, $num_records_after);
+
+    $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job'])
+      ->values(['Plumber'])
+      ->execute();
+  }
+
+  /**
    * Tests that we can upsert a null into blob field.
    */
   public function testUpsertNullBlob(): void {

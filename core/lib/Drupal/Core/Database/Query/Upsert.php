@@ -3,6 +3,7 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\IntegrityConstraintViolationException;
 
 /**
  * General class for an abstracted "Upsert" (UPDATE or INSERT) query operation.
@@ -21,6 +22,11 @@ abstract class Upsert extends Query implements \Countable {
    * @var string[]
    */
   protected $key;
+
+  /**
+   * When TRUE, indicates that the upsert degenerated to an insert.
+   */
+  protected bool $isInsert = FALSE;
 
   /**
    * Constructs an Upsert object.
@@ -111,7 +117,16 @@ abstract class Upsert extends Query implements \Countable {
       $affected_rows = $stmt->rowCount();
     }
     catch (\Exception $e) {
-      $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $values, $this->queryOptions);
+      try {
+        $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $values, $this->queryOptions);
+      }
+      catch (IntegrityConstraintViolationException $e) {
+        if ($this->isInsert) {
+          $this->insertValues = [];
+          return $affected_rows ?? NULL;
+        }
+        throw $e;
+      }
     }
 
     // Re-initialize the values array so that we can re-use this query.
