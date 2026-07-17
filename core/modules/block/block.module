@@ -130,6 +130,9 @@ function block_theme_initialize($theme) {
     $default_theme = \Drupal::config('system.theme')->get('default');
     // Apply only to new theme's visible regions.
     $regions = system_region_list($theme, REGIONS_VISIBLE);
+    // Track whether the theme extension list has already been rebuilt for this
+    // theme so a suspicious region miss triggers at most one rebuild here.
+    $reset = FALSE;
     $default_theme_blocks = \Drupal::entityTypeManager()->getStorage('block')->loadByProperties(['theme' => $default_theme]);
     foreach ($default_theme_blocks as $default_theme_block_id => $default_theme_block) {
       if (str_starts_with($default_theme_block_id, $default_theme . '_')) {
@@ -141,7 +144,18 @@ function block_theme_initialize($theme) {
       $id = \Drupal::service('block.repository')->getUniqueMachineName($id, $theme);
       $block = $default_theme_block->createDuplicateBlock($id, $theme);
       // If the region isn't supported by the theme, assign the block to the
-      // theme's default region.
+      // theme's default region. The region list is read from the cached theme
+      // extension list, which can transiently omit regions that modules add
+      // dynamically via hook_system_info_alter() (for example during a
+      // concurrent cache rebuild or config import). Before reassigning, force a
+      // one-time fresh rebuild of the theme extension list and re-check, so a
+      // stale cache does not cause blocks to be moved out of a region that
+      // actually exists.
+      if (!isset($regions[$block->getRegion()]) && !$reset) {
+        \Drupal::service('extension.list.theme')->reset();
+        $regions = system_region_list($theme, REGIONS_VISIBLE);
+        $reset = TRUE;
+      }
       if (!isset($regions[$block->getRegion()])) {
         $block->setRegion(system_default_region($theme));
       }
@@ -182,8 +196,24 @@ function block_rebuild() {
       $regions = system_region_list($theme);
       /** @var \Drupal\block\BlockInterface[] $blocks */
       $blocks = \Drupal::entityTypeManager()->getStorage('block')->loadByProperties(['theme' => $theme]);
+      // The region list is read from the cached theme extension list, which can
+      // transiently omit regions that modules add dynamically via
+      // hook_system_info_alter() (for example during a concurrent cache rebuild
+      // or config import). If any block appears to reference a missing region,
+      // force a one-time fresh rebuild of the theme extension list for this
+      // theme and re-read the region list before disabling anything, so a stale
+      // cache does not silently disable and move perfectly valid blocks.
+      foreach ($blocks as $block) {
+        if (!isset($regions[$block->getRegion()])) {
+          \Drupal::service('extension.list.theme')->reset();
+          $regions = system_region_list($theme);
+          break;
+        }
+      }
       foreach ($blocks as $block_id => $block) {
-        // Disable blocks in invalid regions.
+        // Disable blocks in invalid regions. After the fresh read above, a
+        // region that is still missing is genuinely gone, so the destructive
+        // cleanup is correct.
         if (!isset($regions[$block->getRegion()])) {
           if ($block->status()) {
             \Drupal::messenger()

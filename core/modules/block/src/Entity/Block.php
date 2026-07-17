@@ -350,11 +350,24 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
     // Ensure the region is valid to mirror the behavior of block_rebuild().
     // This is done primarily for backwards compatibility support of
     // \Drupal\block\BlockInterface::BLOCK_REGION_NONE.
+    //
+    // The region list is read from the cached theme extension list, which can
+    // transiently omit regions that modules add dynamically via
+    // hook_system_info_alter() (for example during a concurrent cache rebuild
+    // or config import). preSave() runs on every save, so trusting a stale
+    // cache here would silently disable and demote perfectly valid blocks.
+    // When the region appears to be missing, force a one-time fresh rebuild of
+    // the theme extension list and re-check; only disable and demote the block
+    // if the region is still missing after that guaranteed-fresh read.
     $regions = system_region_list($this->theme);
     if (!isset($regions[$this->region]) && $this->status()) {
-      $this
-        ->setRegion(system_default_region($this->theme))
-        ->disable();
+      \Drupal::service('extension.list.theme')->reset();
+      $regions = system_region_list($this->theme);
+      if (!isset($regions[$this->region])) {
+        $this
+          ->setRegion(system_default_region($this->theme))
+          ->disable();
+      }
     }
   }
 
