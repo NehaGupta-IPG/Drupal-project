@@ -60,7 +60,6 @@ use Drupal\user\Entity\EntityPermissionsRouteProvider;
     'help',
     'new_revision',
     'preview_mode',
-    'display_submitted',
   ],
 )]
 class NodeType extends ConfigEntityBundleBase implements NodeTypeInterface {
@@ -112,13 +111,6 @@ class NodeType extends ConfigEntityBundleBase implements NodeTypeInterface {
   protected $preview_mode = NodePreviewMode::Optional->value;
 
   /**
-   * Display setting for author and date Submitted by post information.
-   *
-   * @var bool
-   */
-  protected $display_submitted = TRUE;
-
-  /**
    * {@inheritdoc}
    */
   public function id() {
@@ -139,21 +131,6 @@ class NodeType extends ConfigEntityBundleBase implements NodeTypeInterface {
   #[ActionMethod(adminLabel: new TranslatableMarkup('Automatically create new revisions'), pluralize: FALSE)]
   public function setNewRevision($new_revision) {
     $this->new_revision = $new_revision;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function displaySubmitted() {
-    return $this->display_submitted;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  #[ActionMethod(adminLabel: new TranslatableMarkup('Set whether to display submission information'), pluralize: FALSE)]
-  public function setDisplaySubmitted($display_submitted) {
-    $this->display_submitted = $display_submitted;
   }
 
   /**

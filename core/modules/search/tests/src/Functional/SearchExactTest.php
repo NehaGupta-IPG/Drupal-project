@@ -51,7 +51,6 @@ class SearchExactTest extends BrowserTestBase {
     }
     // Create another node and save it for later.
     $settings['body'] = [['value' => 'Druplicon']];
-    $node = $this->drupalCreateNode($settings);
 
     // Update the search index.
     $this->container->get('plugin.manager.search')->createInstance('node_search')->updateIndex();
@@ -75,29 +74,6 @@ class SearchExactTest extends BrowserTestBase {
     $this->submitForm($edit, 'Search');
     $this->assertSession()->linkByHrefExists('page=1', 0, '2nd page link is found for exact phrase search.');
     $this->assertSession()->linkByHrefNotExists('page=2', '3rd page link is not found for exact phrase search.');
-
-    // Check that with post settings turned on the post information is
-    // displayed.
-    $node_type_config = \Drupal::configFactory()->getEditable('node.type.page');
-    $node_type_config->set('display_submitted', TRUE);
-    $node_type_config->save();
-
-    $edit = ['keys' => 'Druplicon'];
-    $this->drupalGet('search/node');
-    $this->submitForm($edit, 'Search');
-    $this->assertSession()->pageTextContains($user->getAccountName());
-    $this->assertSession()->pageTextContains($this->container->get('date.formatter')->format($node->getChangedTime(), 'short'));
-
-    // Check that with post settings turned off the user and changed date
-    // information is not displayed.
-    $node_type_config->set('display_submitted', FALSE);
-    $node_type_config->save();
-    $edit = ['keys' => 'Druplicon'];
-    $this->drupalGet('search/node');
-    $this->submitForm($edit, 'Search');
-    $this->assertSession()->pageTextNotContains($user->getAccountName());
-    $this->assertSession()->pageTextNotContains($this->container->get('date.formatter')->format($node->getChangedTime(), 'short'));
-
   }
 
 }

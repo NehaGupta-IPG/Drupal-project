@@ -45,7 +45,7 @@ class OliveroHooks {
       unset($variables['content']['links']['comment']['#links']['comment-add']);
     }
     // Apply custom date formatter to "date" field.
-    if (!empty($variables['date']) && !empty($variables['display_submitted']) && $variables['display_submitted'] === TRUE) {
+    if (!empty($variables['date'])) {
       $variables['date'] = \Drupal::service('date.formatter')->format($variables['node']->getCreatedTime(), 'olivero_medium');
     }
     // Pass layout variable to template if content type is article in full view

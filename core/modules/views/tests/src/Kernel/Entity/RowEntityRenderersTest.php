@@ -96,7 +96,6 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
       'type' => 'test',
       'name' => 'Test',
     ]);
-    $node_type->setDisplaySubmitted(FALSE);
     $node_type->save();
 
     FieldStorageConfig::create([

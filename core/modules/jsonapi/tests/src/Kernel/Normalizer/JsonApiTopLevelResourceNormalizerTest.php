@@ -554,12 +554,11 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
         'sparse_fieldset' => [
           'node_type--node_type' => [
             'description',
-            'display_submitted',
           ],
         ],
       ]);
     $normalized = $jsonapi_doc_object->getNormalization();
-    $this->assertSame(['description', 'display_submitted'], array_keys($normalized['data']['attributes']));
+    $this->assertSame(['description'], array_keys($normalized['data']['attributes']));
     $this->assertSame($normalized['data']['id'], NodeType::load('article')->uuid());
     $this->assertSame($normalized['data']['type'], 'node_type--node_type');
     // Make sure that the cache tags for the includes and the requested entities

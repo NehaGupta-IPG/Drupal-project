@@ -53,7 +53,6 @@ class FilterBooleanOperatorGroupTest extends ViewsKernelTestBase {
       'type' => 'page',
       'name' => 'Page',
     ]);
-    $node_type->setDisplaySubmitted(FALSE);
     $node_type->save();
 
     FieldStorageConfig::create([

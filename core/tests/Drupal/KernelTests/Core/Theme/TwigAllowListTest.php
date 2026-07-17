@@ -52,7 +52,6 @@ class TwigAllowListTest extends KernelTestBase {
     NodeType::create([
       'type' => 'page',
       'name' => 'Basic page',
-      'display_submitted' => FALSE,
     ])->save();
     // Add a vocabulary so we can test different view modes.
     $vocabulary = Vocabulary::create([

@@ -323,12 +323,10 @@ class SearchNode extends ConfigurableSearchPluginBase implements AccessibleInter
       // explicitly here.
       $this->addCacheableDependency($node->getOwner());
 
-      if ($type->displaySubmitted()) {
-        $result += [
-          'user' => $this->renderer->renderInIsolation($username),
-          'date' => $node->getChangedTime(),
-        ];
-      }
+      $result += [
+        'user' => $this->renderer->renderInIsolation($username),
+        'date' => $node->getChangedTime(),
+      ];
 
       $results[] = $result;
 

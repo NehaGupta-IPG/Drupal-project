@@ -48,7 +48,6 @@ class MenuUiContentModerationTest extends BrowserTestBase {
     $this->drupalCreateContentType([
       'type' => 'page',
       'name' => 'Basic page',
-      'display_submitted' => FALSE,
     ]);
 
     $workflow = $this->createEditorialWorkflow();

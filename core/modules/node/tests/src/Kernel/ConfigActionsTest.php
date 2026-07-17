@@ -50,7 +50,6 @@ class ConfigActionsTest extends KernelTestBase {
 
     $this->assertTrue($node_type->shouldCreateNewRevision());
     $this->assertSame(NodePreviewMode::Optional, $node_type->getPreviewMode(FALSE));
-    $this->assertTrue($node_type->displaySubmitted());
 
     $this->configActionManager->applyAction(
       'entity_method:node.type:setNewRevision',
@@ -62,16 +61,10 @@ class ConfigActionsTest extends KernelTestBase {
       $node_type->getConfigDependencyName(),
       NodePreviewMode::Required,
     );
-    $this->configActionManager->applyAction(
-      'entity_method:node.type:setDisplaySubmitted',
-      $node_type->getConfigDependencyName(),
-      FALSE,
-    );
 
     $node_type = NodeType::load($node_type->id());
     $this->assertFalse($node_type->shouldCreateNewRevision());
     $this->assertSame(NodePreviewMode::Required, $node_type->getPreviewMode(FALSE));
-    $this->assertFalse($node_type->displaySubmitted());
   }
 
 }

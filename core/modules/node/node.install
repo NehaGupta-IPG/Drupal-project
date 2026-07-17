@@ -131,3 +131,20 @@ function node_uninstall(): void {
 function node_update_last_removed(): int {
   return 8700;
 }
+
+/**
+ * Remove the 'display_submitted' setting from node type configuration.
+ *
+ * The "Submitted by" display toggle is being removed from node type
+ * configuration. This update removes the now-obsolete key from all
+ * existing node type config entities.
+ */
+function node_update_12001(): void {
+  $config_factory = \Drupal::configFactory();
+  foreach ($config_factory->listAll('node.type.') as $name) {
+    $config = $config_factory->getEditable($name);
+    if ($config->get('display_submitted') !== NULL) {
+      $config->clear('display_submitted')->save();
+    }
+  }
+}

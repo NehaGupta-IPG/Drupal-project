@@ -184,10 +184,8 @@ class NodeThemeHooks {
       // @todo https://www.drupal.org/project/drupal/issues/3015623
       //   Eventually delete this code and matching template lines. Using a
       //   field formatter is more flexible and consistent.
-      $node_type = $node->type->entity;
       $variables['author_attributes'] = new Attribute();
-      $variables['display_submitted'] = $node_type->displaySubmitted();
-      if ($variables['display_submitted'] && $this->themeSettingsProvider->getSetting('features.node_user_picture')) {
+      if ($this->themeSettingsProvider->getSetting('features.node_user_picture')) {
         // To change user picture settings (e.g. image style), edit the
         // 'compact' view mode on the User entity. Note that the 'compact'
         // view mode might not be configured, so remember to always check the

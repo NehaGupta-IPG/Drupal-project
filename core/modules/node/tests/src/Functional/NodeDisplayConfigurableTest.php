@@ -51,7 +51,6 @@ class NodeDisplayConfigurableTest extends NodeTestBase {
 
     // Change the node type setting to show submitted by information.
     $node_type = \Drupal::entityTypeManager()->getStorage('node_type')->load('page');
-    $node_type->setDisplaySubmitted(TRUE);
     $node_type->save();
 
     $user = $this->drupalCreateUser([

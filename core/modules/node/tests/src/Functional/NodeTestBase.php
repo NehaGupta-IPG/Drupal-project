@@ -36,7 +36,6 @@ abstract class NodeTestBase extends BrowserTestBase {
       $this->drupalCreateContentType([
         'type' => 'page',
         'name' => 'Basic page',
-        'display_submitted' => FALSE,
       ]);
       $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
     }
