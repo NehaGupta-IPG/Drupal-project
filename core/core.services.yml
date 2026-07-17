@@ -266,7 +266,7 @@ services:
       - [setContainer, ['@service_container']]
   cache.backend.chainedfast_coordinated:
     class: Drupal\Core\Cache\CoordinatedChainedFastBackendFactory
-    arguments: ['@settings']
+    arguments: ['@cache.chained_fast_invalidation', '@settings']
     calls:
       - [setContainer, ['@service_container']]
   cache.backend.database:
