@@ -204,6 +204,7 @@ class FileEntityFormatterTest extends KernelTestBase {
     $output = (string) \Drupal::service('renderer')->renderRoot($file_link);
     $this->assertStringContainsString($this->fileUrlGenerator->generate('dummy-external-readonly://file-query-string?foo=bar')->toUriString(), $output);
   }
+
   /**
    * Tests the file_link field formatter using link options.
    */
