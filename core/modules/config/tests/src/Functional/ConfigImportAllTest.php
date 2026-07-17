@@ -8,18 +8,21 @@ use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Field\FieldPurger;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\Tests\system\Functional\Module\ModuleTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the largest configuration import possible with all available modules.
  *
  * Note that the use of SchemaCheckTestTrait means that the schema conformance
  * of all default configuration is also tested.
- *
- * @group config
- * @group #slow
  */
+#[Group('config')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ConfigImportAllTest extends ModuleTestBase {
 
   use SchemaCheckTestTrait;
@@ -63,14 +66,15 @@ class ConfigImportAllTest extends ModuleTestBase {
 
     // Get a list of modules to install.
     $all_modules = $this->container->get('extension.list.module')->getList();
-    $all_modules = array_filter($all_modules, function ($module) {
+    $all_modules = array_filter($all_modules, function ($module): bool {
       // Filter out contrib, hidden, testing, experimental, and deprecated
       // modules. We also don't need to enable modules that are already enabled.
       if ($module->origin !== 'core'
         || !empty($module->info['hidden'])
         || $module->status == TRUE
         || $module->info['package'] == 'Testing'
-        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::OBSOLETE) {
         return FALSE;
       }
       return TRUE;
@@ -97,7 +101,8 @@ class ConfigImportAllTest extends ModuleTestBase {
     // example, if a comment field exists then Comment cannot be uninstalled.
     $entity_type_manager = \Drupal::entityTypeManager();
     foreach ($entity_type_manager->getDefinitions() as $entity_type) {
-      if (($entity_type instanceof ContentEntityTypeInterface || in_array($entity_type->id(), ['field_storage_config', 'filter_format'], TRUE))
+      if (($entity_type instanceof ContentEntityTypeInterface
+          || in_array($entity_type->id(), ['field_storage_config', 'filter_format'], TRUE))
         && !in_array($entity_type->getProvider(), ['system', 'user'], TRUE)) {
         $storage = $entity_type_manager->getStorage($entity_type->id());
         $storage->delete($storage->loadMultiple());
@@ -105,7 +110,7 @@ class ConfigImportAllTest extends ModuleTestBase {
     }
 
     // Purge the field data.
-    field_purge_batch(1000);
+    \Drupal::service(FieldPurger::class)->purgeBatch(1000);
 
     $all_modules = \Drupal::service('extension.list.module')->getList();
     $database_module = \Drupal::service('database')->getProvider();
@@ -120,7 +125,7 @@ class ConfigImportAllTest extends ModuleTestBase {
     $validation_modules = array_keys($validation_reasons);
     $this->assertEqualsCanonicalizing($expected_modules, $validation_modules);
 
-    $modules_to_uninstall = array_filter($all_modules, function ($module) {
+    $modules_to_uninstall = array_filter($all_modules, function ($module): bool {
       // Filter profiles, and required and not enabled modules.
       if (!empty($module->info['required']) || $module->status == FALSE || $module->getType() === 'profile') {
         return FALSE;

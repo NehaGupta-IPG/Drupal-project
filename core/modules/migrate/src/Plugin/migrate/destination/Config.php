@@ -64,8 +64,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * with the machine name "system.maintenance" as "system.maintenance.message",
  * coupled with the relevant langcode as obtained from the
  * "d6_variable_translation" source plugin.
- *
- * @see \Drupal\migrate_drupal\Plugin\migrate\source\d6\VariableTranslation
  */
 #[MigrateDestination('config')]
 class Config extends DestinationBase implements ContainerFactoryPluginInterface, DependentPluginInterface {
@@ -84,7 +82,7 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface,
    *
    * @var \Drupal\Core\Language\LanguageManagerInterface
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $language_manager;
 
   /**
@@ -234,7 +232,7 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface,
       return 'config_translation';
     }
     // Get the module handling this configuration object from the config_name,
-    // which is of the form <module_name>.<configuration object name>
+    // which is of the form "<module_name>.<configuration object name>".
     return !empty($this->configuration['config_name']) ? explode('.', $this->configuration['config_name'], 2)[0] : NULL;
   }
 

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_moderation\Unit;
 
 use Drupal\block_content\Entity\BlockContent;
+use Drupal\content_moderation\Access\LatestRevisionCheck;
+use Drupal\content_moderation\ModerationInformation;
 use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Access\AccessResultNeutral;
@@ -12,18 +14,20 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\Entity\Node;
-use Drupal\content_moderation\Access\LatestRevisionCheck;
-use Drupal\content_moderation\ModerationInformation;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\EntityOwnerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\content_moderation\Access\LatestRevisionCheck
- * @group content_moderation
+ * Tests Drupal\content_moderation\Access\LatestRevisionCheck.
  */
+#[CoversClass(LatestRevisionCheck::class)]
+#[Group('content_moderation')]
 class LatestRevisionCheckTest extends UnitTestCase {
 
   /**
@@ -56,10 +60,9 @@ class LatestRevisionCheckTest extends UnitTestCase {
    * @param string $result_class
    *   The AccessResult class that should result. One of AccessResultAllowed,
    *   AccessResultForbidden, AccessResultNeutral.
-   *
-   * @dataProvider accessSituationProvider
    */
-  public function testLatestAccessPermissions($entity_class, $entity_type, $has_pending_revision, array $account_permissions, $is_owner, $result_class): void {
+  #[DataProvider('accessSituationProvider')]
+  public function testLatestAccessPermissions(string $entity_class, string $entity_type, bool $has_pending_revision, array $account_permissions, bool $is_owner, string $result_class): void {
 
     /** @var \Drupal\Core\Session\AccountInterface $account */
     $account = $this->prophesize(AccountInterface::class);
@@ -105,7 +108,7 @@ class LatestRevisionCheckTest extends UnitTestCase {
   /**
    * Data provider for testLastAccessPermissions().
    */
-  public static function accessSituationProvider() {
+  public static function accessSituationProvider(): array {
     return [
       // Node with global permissions and latest version.
       [

@@ -7,15 +7,18 @@ namespace Drupal\Tests\system\Kernel\Extension;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleUninstallValidatorException;
+use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ModuleHandler functionality.
- *
- * @group Extension
  */
+#[Group('Extension')]
+#[RunTestsInSeparateProcesses]
 class ModuleHandlerTest extends KernelTestBase {
 
   /**
@@ -42,7 +45,7 @@ class ModuleHandlerTest extends KernelTestBase {
     $this->assertModuleList($module_list, 'After adding a module');
 
     // Try to mess with the module weights.
-    module_set_weight('dependency_foo_test', 20);
+    \Drupal::service(ModuleWeight::class)->set('dependency_foo_test', 20);
 
     // Move dependency_foo_test to the end of the array.
     unset($module_list[array_search('dependency_foo_test', $module_list)]);
@@ -253,7 +256,7 @@ class ModuleHandlerTest extends KernelTestBase {
 
     // Try uninstalling the dependencies.
     $this->expectException(ModuleUninstallValidatorException::class);
-    $this->expectExceptionMessage("The following reasons prevent the modules from being uninstalled: The 'Testing install profile all dependencies' install profile requires 'Database Logging'; The 'Testing install profile all dependencies' install profile requires 'Dependency foo test module'");
+    $this->expectExceptionMessageIs("The following reasons prevent the modules from being uninstalled: The 'Testing install profile all dependencies' install profile requires 'Database Logging'; The 'Testing install profile all dependencies' install profile requires 'Dependency foo test module'");
     $this->moduleInstaller()->uninstall($dependencies);
   }
 
@@ -417,7 +420,7 @@ class ModuleHandlerTest extends KernelTestBase {
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
    *   The module handler service.
    */
-  protected function moduleHandler() {
+  protected function moduleHandler(): ?object {
     return $this->container->get('module_handler');
   }
 
@@ -427,7 +430,7 @@ class ModuleHandlerTest extends KernelTestBase {
    * @return \Drupal\Core\Extension\ModuleInstallerInterface
    *   The module installer service.
    */
-  protected function moduleInstaller() {
+  protected function moduleInstaller(): ?object {
     return $this->container->get('module_installer');
   }
 

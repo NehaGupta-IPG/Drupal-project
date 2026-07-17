@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit\process;
 
-use Drupal\migrate\Plugin\migrate\process\UrlEncode;
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate\Plugin\migrate\process\UrlEncode;
 use Drupal\migrate\Row;
 use Drupal\Tests\migrate\Unit\MigrateTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\process\UrlEncode
- * @group file
+ * Tests Drupal\migrate\Plugin\migrate\process\UrlEncode.
  */
+#[CoversClass(UrlEncode::class)]
+#[Group('file')]
 class UrlEncodeTest extends MigrateTestCase {
 
   /**
@@ -28,7 +32,7 @@ class UrlEncodeTest extends MigrateTestCase {
    * @return array
    *   An array of URLs to test.
    */
-  public static function urlDataProvider() {
+  public static function urlDataProvider(): array {
     return [
       'A URL with no characters requiring encoding' => [
         'http://example.com/normal_url.html',
@@ -59,10 +63,9 @@ class UrlEncodeTest extends MigrateTestCase {
 
   /**
    * Cover various encoding scenarios.
-   *
-   * @dataProvider urlDataProvider
    */
-  public function testUrls($input, $output): void {
+  #[DataProvider('urlDataProvider')]
+  public function testUrls(string $input, string $output): void {
     $this->assertEquals($output, $this->doTransform($input));
   }
 

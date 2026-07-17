@@ -13,10 +13,15 @@ use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
- * @group Recipe
+ * Tests entity method config actions.
  */
+#[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class EntityMethodConfigActionsTest extends KernelTestBase {
 
   use BlockCreationTrait;
@@ -24,7 +29,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'config_test', 'entity_test', 'system'];
+  protected static $modules = ['block', 'config_test', 'entity_test', 'system', 'user'];
 
   /**
    * The configuration action manager.
@@ -50,7 +55,9 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
   }
 
   /**
-   *  @covers \Drupal\Core\Config\Entity\ConfigEntityBase::getThirdPartySetting
+   * Tests set single third party setting.
+   *
+   * @legacy-covers \Drupal\Core\Config\Entity\ConfigEntityBase::getThirdPartySetting
    */
   public function testSetSingleThirdPartySetting(): void {
     $this->configActionManager->applyAction(
@@ -98,9 +105,16 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
   }
 
   /**
-   * @testWith ["set", {"property_name": "protected_property", "value": "Here be sandworms..."}]
-   *   ["setMultiple", [{"property_name": "protected_property", "value": "Here be sandworms..."}, {"property_name": "label", "value": "New face"}]]
+   * Tests set.
    */
+  #[TestWith(["set", ["property_name" => "protected_property", "value" => "Here be sandworms..."]])]
+  #[TestWith([
+    "setMultiple",
+    [
+      ["property_name" => "protected_property", "value" => "Here be sandworms..."],
+      ["property_name" => "label", "value" => "New face"],
+    ],
+  ])]
   public function testSet(string $action_name, array $value): void {
     $storage = $this->container->get(EntityTypeManagerInterface::class)
       ->getStorage('config_test');
@@ -128,11 +142,12 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
   }
 
   /**
-   * @testWith [true, "setStatus", false, false]
-   *   [false, "setStatus", true, true]
-   *   [true, "disable", [], false]
-   *   [false, "enable", [], true]
+   * Tests set status.
    */
+  #[TestWith([TRUE, "setStatus", FALSE, FALSE])]
+  #[TestWith([FALSE, "setStatus", TRUE, TRUE])]
+  #[TestWith([TRUE, "disable", [], FALSE])]
+  #[TestWith([FALSE, "enable", [], TRUE])]
   public function testSetStatus(bool $initial_status, string $action_name, array|bool $value, bool $expected_status): void {
     $storage = $this->container->get(EntityTypeManagerInterface::class)
       ->getStorage('config_test');
@@ -155,9 +170,10 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
   }
 
   /**
-   * @testWith ["hideComponent"]
-   *   ["hideComponents"]
+   * Tests remove component from display.
    */
+  #[TestWith(["hideComponent"])]
+  #[TestWith(["hideComponents"])]
   public function testRemoveComponentFromDisplay(string $action_name): void {
     $this->assertStringStartsWith('hideComponent', $action_name);
 
@@ -221,7 +237,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
     // We should get an exception if we try to set a nested value on a property
     // that isn't an array.
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage('The setProperties config action can only set nested values on arrays.');
+    $this->expectExceptionMessageIs('The setProperties config action can only set nested values on arrays.');
     $this->configActionManager->applyAction(
       'setProperties',
       $block->getConfigDependencyName(),
@@ -231,10 +247,9 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
 
   /**
    * Tests that the setProperties action refuses to modify entity IDs or UUIDs.
-   *
-   * @testWith ["id"]
-   *   ["uuid"]
    */
+  #[TestWith(["id"])]
+  #[TestWith(["uuid"])]
   public function testSetPropertiesWillNotChangeEntityKeys(string $key): void {
     $view_display = $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('entity_test_with_bundle', 'test');
@@ -244,7 +259,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
     $this->assertNotEmpty($property_name);
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("Entity key '$property_name' cannot be changed by the setProperties config action.");
+    $this->expectExceptionMessageIs("Entity key '$property_name' cannot be changed by the setProperties config action.");
     $this->configActionManager->applyAction(
       'setProperties',
       $view_display->getConfigDependencyName(),
@@ -254,15 +269,14 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
 
   /**
    * Tests that the simpleConfigUpdate action cannot be used on entities.
-   *
-   * @group legacy
    */
   public function testSimpleConfigUpdateFailsOnEntities(): void {
     $view_display = $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('entity_test_with_bundle', 'test');
     $view_display->save();
 
-    $this->expectDeprecation('Using the simpleConfigUpdate config action on config entities is deprecated in drupal:11.2.0 and throws an exception in drupal:12.0.0. Use the setProperties action instead. See https://www.drupal.org/node/3515543');
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessageIs('Using the simpleConfigUpdate config action on config entities is not supported. Use the setProperties action instead. See https://www.drupal.org/node/3515543');
     $this->configActionManager->applyAction(
       'simpleConfigUpdate',
       $view_display->getConfigDependencyName(),

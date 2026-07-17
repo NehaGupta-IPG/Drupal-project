@@ -7,12 +7,14 @@ namespace Drupal\Tests\system\Functional\System;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal permissions hardening of /sites subdirectories.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class SitesDirectoryHardeningTest extends BrowserTestBase {
 
   /**
@@ -92,8 +94,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    *   An array of system requirements.
    */
   protected function checkSystemRequirements() {
-    \Drupal::moduleHandler()->loadInclude('system', 'install');
-    return system_requirements('runtime');
+    return \Drupal::moduleHandler()->invoke('system', 'runtime_requirements');
   }
 
   /**
@@ -102,7 +103,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    * @param string $site_path
    *   The sites directory path, such as 'sites/default'.
    */
-  protected function makeWritable($site_path): void {
+  protected function makeWritable(string $site_path): void {
     chmod($site_path, 0755);
     chmod($this->settingsFile($site_path), 0644);
   }
@@ -116,7 +117,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    * @return string
    *   The path to settings.php.
    */
-  protected function settingsFile($site_path): string {
+  protected function settingsFile(string $site_path): string {
     $settings_file = $site_path . '/settings.php';
     return $settings_file;
   }

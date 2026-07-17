@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Unit\Menu;
 
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Tests block local tasks.
- *
- * @group block
  */
+#[Group('block')]
 class BlockLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
@@ -45,11 +47,11 @@ class BlockLocalTasksTest extends LocalTaskIntegrationTestBase {
         'name' => 'test_c',
       ],
     ];
-    $theme_handler = $this->createMock('Drupal\Core\Extension\ThemeHandlerInterface');
-    $theme_handler->expects($this->any())
+    $theme_handler = $this->createStub(ThemeHandlerInterface::class);
+    $theme_handler
       ->method('listInfo')
       ->willReturn($themes);
-    $theme_handler->expects($this->any())
+    $theme_handler
       ->method('hasUi')
       ->willReturnMap([
         ['test_a', FALSE],
@@ -73,17 +75,16 @@ class BlockLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
    * Tests the block admin display local tasks.
-   *
-   * @dataProvider providerTestBlockAdminDisplay
    */
-  public function testBlockAdminDisplay($route, $expected): void {
+  #[DataProvider('providerTestBlockAdminDisplay')]
+  public function testBlockAdminDisplay(string $route, array $expected): void {
     $this->assertLocalTasks($route, $expected);
   }
 
   /**
    * Provides a list of routes to test.
    */
-  public static function providerTestBlockAdminDisplay() {
+  public static function providerTestBlockAdminDisplay(): array {
     return [
       [
         'block.admin_display',

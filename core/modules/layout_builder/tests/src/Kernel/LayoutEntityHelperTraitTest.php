@@ -18,13 +18,18 @@ use Drupal\layout_builder\OverridesSectionStorageInterface;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
 use Drupal\layout_builder\SectionStorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\layout_builder\LayoutEntityHelperTrait
- *
- * @group layout_builder
+ * Tests Drupal\layout_builder\LayoutEntityHelperTrait.
  */
+#[CoversClass(LayoutEntityHelperTrait::class)]
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutEntityHelperTraitTest extends KernelTestBase {
 
   /**
@@ -33,7 +38,6 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
   protected static $modules = [
     'layout_builder',
     'entity_test',
-    'system',
     'user',
   ];
 
@@ -50,7 +54,7 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
   /**
    * Data provider for testGetSectionStorageForEntity().
    */
-  public static function providerTestGetSectionStorageForEntity() {
+  public static function providerTestGetSectionStorageForEntity(): array {
     $data = [];
     $data['entity_view_display'] = [
       'entity_view_display',
@@ -76,10 +80,9 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getSectionStorageForEntity
-   *
-   * @dataProvider providerTestGetSectionStorageForEntity
+   * Tests get section storage for entity.
    */
+  #[DataProvider('providerTestGetSectionStorageForEntity')]
   public function testGetSectionStorageForEntity($entity_type_id, $values, $expected_context_keys): void {
     $section_storage_manager = $this->prophesize(SectionStorageManagerInterface::class);
     $section_storage_manager->load('')->willReturn(NULL);
@@ -123,7 +126,7 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
   /**
    * Data provider for testOriginalEntityUsesDefaultStorage().
    */
-  public static function providerTestOriginalEntityUsesDefaultStorage() {
+  public static function providerTestOriginalEntityUsesDefaultStorage(): array {
     return [
       'original uses default' => [
         [
@@ -180,11 +183,10 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::originalEntityUsesDefaultStorage
-   *
-   * @dataProvider providerTestOriginalEntityUsesDefaultStorage
+   * Tests original entity uses default storage.
    */
-  public function testOriginalEntityUsesDefaultStorage($entity_storages, $is_new, $has_original, $expected): void {
+  #[DataProvider('providerTestOriginalEntityUsesDefaultStorage')]
+  public function testOriginalEntityUsesDefaultStorage(array $entity_storages, bool $is_new, bool $has_original, bool $expected): void {
     $this->assertFalse($is_new && $has_original);
     $entity = EntityTest::create(['name' => 'updated']);
     if (!$is_new) {
@@ -218,7 +220,7 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getEntitySections
+   * Tests get entity sections.
    */
   public function testGetEntitySections(): void {
     $entity = EntityTest::create(['name' => 'updated']);

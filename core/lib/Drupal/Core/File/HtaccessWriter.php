@@ -15,36 +15,29 @@ use Psr\Log\LoggerInterface;
 class HtaccessWriter implements HtaccessWriterInterface {
 
   /**
-   * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
-   */
-  protected $streamWrapperManager;
-
-  /**
-   * The logger.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * Htaccess constructor.
    *
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
+   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
    *   The stream wrapper manager.
+   * @param \Drupal\Core\Site\Settings $settings
+   *   The settings.
    */
-  public function __construct(LoggerInterface $logger, StreamWrapperManagerInterface $stream_wrapper_manager) {
-    $this->logger = $logger;
-    $this->streamWrapperManager = $stream_wrapper_manager;
+  public function __construct(
+    protected LoggerInterface $logger,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    protected Settings $settings,
+  ) {
   }
 
   /**
    * {@inheritdoc}
    */
   public function ensure() {
+    if (!$this->settings->get('auto_create_htaccess', TRUE)) {
+      return;
+    }
     try {
       foreach ($this->defaultProtectedDirs() as $protected_dir) {
         $this->write($protected_dir->getPath(), $protected_dir->isPrivate());
@@ -78,11 +71,15 @@ class HtaccessWriter implements HtaccessWriterInterface {
    * @internal
    *
    * @return bool
-   *   TRUE if the .htaccess file was saved or already exists, FALSE otherwise.
+   *   TRUE if the .htaccess file was saved, already exists or auto-creation is
+   *   disabled, FALSE otherwise.
    *
    * @see \Drupal\Component\FileSecurity\FileSecurity::writeHtaccess()
    */
   public function write($directory, $deny_public_access = TRUE, $force_overwrite = FALSE) {
+    if (!$this->settings->get('auto_create_htaccess', TRUE)) {
+      return TRUE;
+    }
     if (StreamWrapperManager::getScheme($directory)) {
       $directory = $this->streamWrapperManager->normalizeUri($directory);
     }
