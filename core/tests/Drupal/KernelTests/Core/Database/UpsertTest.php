@@ -212,7 +212,7 @@ class UpsertTest extends DatabaseTestBase {
    * Tests an upsert that has no columns to update.
    */
   public function testDegeneratedSingleValueUpsert(): void {
-    $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
+    $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
     // An upsert that only adds a record with the key.
     $this->connection->upsert('test_people')
@@ -221,8 +221,7 @@ class UpsertTest extends DatabaseTestBase {
       ->values(['Plumber'])
       ->execute();
 
-    $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
-    $this->assertEquals($num_records_before + 1, $num_records_after);
+    $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
     // Do the same upsert.
     $this->connection->upsert('test_people')
@@ -232,8 +231,7 @@ class UpsertTest extends DatabaseTestBase {
       ->execute();
 
     // No records added.
-    $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
-    $this->assertEquals($num_records_before + 1, $num_records_after);
+    $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
   }
 
   /**
