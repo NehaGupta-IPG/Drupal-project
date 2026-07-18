@@ -258,7 +258,7 @@ class UpsertTest extends DatabaseTestBase {
       ->values(['GalacticHitchhiker'])
       ->execute();
 
-    // No records added.
+    // Two records added, for a total of four.
     $this->assertSame('4', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
   }
 
