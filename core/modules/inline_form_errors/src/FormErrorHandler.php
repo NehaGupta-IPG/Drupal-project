@@ -137,7 +137,7 @@ class FormErrorHandler extends CoreFormErrorHandler {
   }
 
   /**
-   * Adds inline table error markup for table elements with element-level errors.
+   * Adds inline table error markup for table form elements with errors.
    *
    * @param array $elements
    *   Form render array elements by reference.
