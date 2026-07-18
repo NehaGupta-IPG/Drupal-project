@@ -263,6 +263,70 @@ class UpsertTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests an upsert with a composite key and no columns to update.
+   */
+  public function testDegeneratedCompositeKeyUpsert(): void {
+    $this->installSchema('database_test', ['test_composite_primary']);
+
+    // Insert two new rows consisting only of the composite key.
+    $this->connection->insert('test_composite_primary')
+      ->fields([
+        'name' => 'Kate',
+        'age' => 25,
+        'job' => 'Volunteer',
+      ])
+      ->values([
+        'name' => 'Bertie',
+        'age' => 6,
+        'job' => 'Puppet',
+      ])
+      ->execute();
+
+    $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_composite_primary}')->fetchField());
+
+    // Upserting the same composite key should be a no-op.
+    $this->connection->upsert('test_composite_primary')
+      ->key(['name', 'age'])
+      // Add a new row directly from ::fields().
+      ->fields([
+        'name' => 'Kate',
+        'age' => 25,
+      ])
+      ->values([
+        'name' => 'Bertie',
+        'age' => 6,
+      ])
+      ->execute();
+
+    $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_composite_primary}')->fetchField());
+
+    // Different composite keys should insert other rows.
+    $this->connection->upsert('test_composite_primary')
+      ->key(['name', 'age'])
+      // Add a new row directly from ::fields().
+      ->fields(['name', 'age'])
+      ->values([
+        'name' => 'Kate',
+        'age' => 25,
+      ])
+      ->values([
+        'name' => 'Arthur',
+        'age' => 30,
+      ])
+      ->values([
+        'name' => 'Bertie',
+        'age' => 6,
+      ])
+      ->values([
+        'name' => 'Zaphod',
+        'age' => 200,
+      ])
+      ->execute();
+
+    $this->assertSame('4', $this->connection->query('SELECT COUNT(*) FROM {test_composite_primary}')->fetchField());
+  }
+
+  /**
    * Tests that we can upsert a null into blob field.
    */
   public function testUpsertNullBlob(): void {
