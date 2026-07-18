@@ -3,7 +3,6 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\IntegrityConstraintViolationException;
 
 /**
  * General class for an abstracted "Upsert" (UPDATE or INSERT) query operation.
@@ -22,11 +21,6 @@ abstract class Upsert extends Query implements \Countable {
    * @var string[]
    */
   protected $key;
-
-  /**
-   * When TRUE, indicates that the upsert degenerated to an insert.
-   */
-  protected bool $isInsert = FALSE;
 
   /**
    * Constructs an Upsert object.
