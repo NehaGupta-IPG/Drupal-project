@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
+// cspell:ignore Zaphod
+
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use PHPUnit\Framework\Attributes\Group;
@@ -284,7 +286,7 @@ class UpsertTest extends DatabaseTestBase {
 
     $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_composite_primary}')->fetchField());
 
-    // Upserting the same composite key should be a no-op.
+    // Performing an upsert with the same composite key should be a no-op.
     $this->connection->upsert('test_composite_primary')
       ->key(['name', 'age'])
       // Add a new row directly from ::fields().
