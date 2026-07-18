@@ -2,6 +2,7 @@
 
 namespace Drupal\inline_form_errors;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormElementHelper;
 use Drupal\Core\Form\FormErrorHandler as CoreFormErrorHandler;
 use Drupal\Core\Form\FormStateInterface;
@@ -48,6 +49,19 @@ class FormErrorHandler extends CoreFormErrorHandler {
     $this->stringTranslation = $string_translation;
     $this->renderer = $renderer;
     $this->messenger = $messenger;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function handleFormErrors(array &$form, FormStateInterface $form_state): static {
+    parent::handleFormErrors($form, $form_state);
+
+    if (!empty($form_state->getErrors()) && empty($form['#disable_inline_form_errors'])) {
+      $this->setTableElementInlineErrors($form);
+    }
+
+    return $this;
   }
 
   /**
@@ -119,6 +133,40 @@ class FormErrorHandler extends CoreFormErrorHandler {
       ];
       $message = $this->renderer->renderInIsolation($render_array);
       $this->messenger->addError($message);
+    }
+  }
+
+  /**
+   * Adds inline table error markup for table elements with element-level errors.
+   *
+   * @param array $elements
+   *   Form render array elements by reference.
+   */
+  protected function setTableElementInlineErrors(array &$elements): void {
+    foreach (Element::children($elements) as $key) {
+      if (empty($elements[$key])) {
+        continue;
+      }
+
+      $element = &$elements[$key];
+
+      if (in_array($element['#type'] ?? NULL, ['table', 'tableselect'], TRUE)
+        && !empty($element['#errors'])
+        && empty($element['#error_no_message'])
+      ) {
+        $error_id = ($element['#id'] ?? ('inline-form-errors-table-' . $key)) . '--error';
+        $existing_prefix = (string) ($element['#prefix'] ?? '');
+
+        if (!str_contains($existing_prefix, $error_id)) {
+          $error_markup = '<div id="' . Html::escape($error_id) . '" class="form-item--error-message form-item__error-message">' . Html::escape((string) $element['#errors']) . '</div>';
+          $element['#prefix'] = $error_markup . $existing_prefix;
+
+          $describedby = trim((string) ($element['#attributes']['aria-describedby'] ?? ''));
+          $element['#attributes']['aria-describedby'] = trim($describedby . ' ' . $error_id);
+        }
+      }
+
+      $this->setTableElementInlineErrors($element);
     }
   }
 
