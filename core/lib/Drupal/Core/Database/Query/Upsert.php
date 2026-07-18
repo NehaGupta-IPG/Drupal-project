@@ -117,16 +117,7 @@ abstract class Upsert extends Query implements \Countable {
       $affected_rows = $stmt->rowCount();
     }
     catch (\Exception $e) {
-      try {
-        $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $values, $this->queryOptions);
-      }
-      catch (IntegrityConstraintViolationException $e) {
-        if ($this->isInsert) {
-          $this->insertValues = [];
-          return 0;
-        }
-        throw $e;
-      }
+      $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $values, $this->queryOptions);
     }
 
     // Re-initialize the values array so that we can re-use this query.
