@@ -211,7 +211,7 @@ class UpsertTest extends DatabaseTestBase {
   /**
    * Tests an upsert that has no columns to update.
    */
-  public function testDegeneratedUpsert(): void {
+  public function testDegeneratedSingleValueUpsert(): void {
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
 
     // An upsert that only adds a record with the key.
@@ -234,6 +234,34 @@ class UpsertTest extends DatabaseTestBase {
     // No records added.
     $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
     $this->assertEquals($num_records_before + 1, $num_records_after);
+  }
+
+  /**
+   * Tests an upsert that has no columns to update.
+   */
+  public function testDegeneratedMultiValueUpsert(): void {
+    $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
+
+    // An upsert that only adds a record with the key.
+    $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job'])
+      ->values(['Plumber'])
+      ->execute();
+
+    $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
+
+    // Do a multi-value upsert that should add two more records.
+    $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job'])
+      ->values(['Plumber'])
+      ->values(['Carpenter'])
+      ->values(['GalacticHitchhiker'])
+      ->execute();
+
+    // No records added.
+    $this->assertSame('4', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
   }
 
   /**
