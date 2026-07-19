@@ -28,6 +28,11 @@ class DistributionProfileTranslationTest extends InstallerTestBase {
   protected $langcode = 'de';
 
   /**
+   * {@inheritdoc}
+   */
+  protected $profile = NULL;
+
+  /**
    * The distribution profile info.
    *
    * @var array
@@ -60,7 +65,7 @@ class DistributionProfileTranslationTest extends InstallerTestBase {
 
     // Place a custom local translation in the translations directory.
     mkdir($this->root . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
-    file_put_contents($this->root . '/' . $this->siteDirectory . '/files/translations/drupal-8.0.0.de.po', $this->getPo('de'));
+    file_put_contents($this->root . '/' . $this->siteDirectory . '/files/translations/drupal-' . \Drupal::VERSION . '.de.po', $this->getPo('de'));
   }
 
   /**
@@ -69,13 +74,6 @@ class DistributionProfileTranslationTest extends InstallerTestBase {
   protected function setUpLanguage(): void {
     // This step is skipped, because the distribution profile uses a fixed
     // language.
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUpProfile(): void {
-    // This step is skipped, because there is a distribution profile.
   }
 
   /**
