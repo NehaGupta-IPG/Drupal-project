@@ -1256,19 +1256,16 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // For a request URI of '/index.php/foo', $_SERVER['SCRIPT_NAME'] is
     // '/index.php', whereas $_SERVER['PHP_SELF'] is '/index.php/foo'.
     if ($dir = rtrim(dirname($request->server->get('SCRIPT_NAME')), '\/')) {
+      $base_path = $dir;
       // Remove path from webroot to "web" directory, if declared and present.
       $webroot = getenv('DRUPAL_WEBROOT');
-      if ($webroot !== FALSE && str_starts_with($dir, $webroot)) {
-        $dir = substr($dir, strlen($webroot));
+      if ($webroot !== FALSE && str_starts_with($base_path, $webroot)) {
+        $base_path = substr($base_path, strlen($webroot));
       }
-      // Remove "core" directory if present, allowing install.php, rebuild.php,
-      // and others to auto-detect a base path.
-      $core_position = strrpos($dir, '/core');
-      if ($core_position !== FALSE && strlen($dir) - 5 == $core_position) {
-        $base_path = substr($dir, 0, $core_position);
-      }
-      else {
-        $base_path = $dir;
+      // Remove "core" directory if present, allowing install.php,
+      // authorize.php, and others to auto-detect a base path.
+      if (str_ends_with($base_path, '/core')) {
+        $base_path = substr($base_path, 0, -5);
       }
       $base_url .= $base_path;
       $base_path .= '/';
