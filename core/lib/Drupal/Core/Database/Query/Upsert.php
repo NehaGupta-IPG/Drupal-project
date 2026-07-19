@@ -78,13 +78,13 @@ abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoi
    * ignored. To queue up multiple sets of values to be inserted at once,
    * use the values() method.
    *
-   * @param list<string>|array<string,string|int|float|bool|array|\Drupal\Core\Database\Query\UpsertValue> $fields
+   * @param array<string|int,string|\Drupal\Core\Database\Query\UpsertUpdateExpression>|array<string,string|int|float|bool|array> $fields
    *   An array of columns on which to insert. This array may be indexed or
    *   associative. If indexed, the array is taken to be the list of columns.
    *   If associative, the keys of the array are taken to be the columns and
    *   the values are taken to be corresponding values to insert. If a
    *   $values argument is provided, $fields must be indexed.
-   * @param list<string|int|float|bool|array|\Drupal\Core\Database\Query\UpsertValue> $values
+   * @param list<string|int|float|bool|array> $values
    *   (optional) An array of values to insert into the database. The values
    *   must be specified in the same order as the $fields array.
    *
@@ -94,24 +94,28 @@ abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoi
   public function fields(array $fields, array $values = []): static {
     if (empty($this->insertFields)) {
       if (empty($values)) {
-        if (!is_numeric(key($fields))) {
+        $isFieldsAssociative = TRUE;
+        array_walk($fields, function (mixed $value, int|string $key) use (&$isFieldsAssociative): void {
+          if (is_numeric($key) || (is_string($key) && $value instanceof UpsertUpdateExpression)) {
+            $isFieldsAssociative = FALSE;
+          }
+        });
+        if ($isFieldsAssociative) {
           $values = array_values($fields);
           $fields = array_keys($fields);
         }
       }
-      $this->insertFields = $fields;
-      if (!empty($values)) {
-        $tmp = [];
-        foreach ($values as $i => $value) {
-          if ($value instanceof UpsertValue) {
-            $tmp[] = $value->insert;
-            $this->updateExpressions[$fields[$i]] = $value->update;
-          }
-          else {
-            $tmp[] = $value;
-          }
+      foreach ($fields as $key => $def) {
+        if ($def instanceof UpsertUpdateExpression) {
+          $this->insertFields[] = $key;
+          $this->updateExpressions[$key] = $def;
         }
-        $this->insertValues[] = $tmp;
+        else {
+          $this->insertFields[] = $def;
+        }
+      }
+      if (!empty($values)) {
+        $this->values($values);
       }
     }
 

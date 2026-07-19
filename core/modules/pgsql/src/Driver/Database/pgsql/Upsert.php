@@ -136,10 +136,6 @@ class Upsert extends QueryUpsert {
       unset($insert_fields[$key]);
     }
 
-    if ($insert_fields === []) {
-      throw new \LogicException('There must be at least one column to update in an upsert operation');
-    }
-
     $update = [];
     foreach ($insert_fields as $field) {
       // The "excluded." prefix causes the field to refer to the value for field
@@ -147,7 +143,14 @@ class Upsert extends QueryUpsert {
       $update[] = isset($update_expressions[$field]) ? "$field = {$update_expressions[$field]}" : "$field = EXCLUDED.$field";
     }
 
-    $query .= ' ON CONFLICT (' . implode(', ', $keys) . ') DO UPDATE SET ' . implode(', ', $update);
+    $query .= ' ON CONFLICT (' . implode(', ', $keys) . ') DO ';
+
+    if (!empty($update)) {
+      $query .= 'UPDATE SET ' . implode(', ', $update);
+    }
+    else {
+      $query .= 'NOTHING';
+    }
 
     return $query;
   }
