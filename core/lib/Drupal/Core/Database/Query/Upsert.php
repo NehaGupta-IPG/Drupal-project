@@ -162,7 +162,7 @@ abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoi
    * @return void
    *   No return value.
    */
-  public function execute() {
+  public function execute() /* : void */ {
     if ($this->queryOptions['void_execute_return'] !== TRUE) {
       @trigger_error(__METHOD__ . '() returning a value is deprecated in drupal:42.1.0 and is removed in drupal:43.0.0. Pass \'void_execute_return\' => TRUE in the $options for now to silence the deprecation, and adjust any code handling a returned value to not rely on it. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     }
