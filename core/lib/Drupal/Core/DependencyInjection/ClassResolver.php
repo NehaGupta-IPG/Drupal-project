@@ -35,6 +35,17 @@ class ClassResolver implements ClassResolverInterface {
       $instance = $this->container->get($definition);
     }
     else {
+      // This resolver's own container can also be stale relative to the
+      // live container (e.g. after a mid-request container rebuild
+      // triggered by installing a module), so $this->container->has()
+      // above returns FALSE even though the service is defined. Blindly
+      // falling through to new $definition() then breaks any autowired
+      // class requiring constructor arguments with an ArgumentCountError.
+      // Prefer the live container's compiled definition in that case.
+      if (\Drupal::hasContainer() && \Drupal::getContainer() !== $this->container && \Drupal::getContainer()->has($definition)) {
+        return \Drupal::getContainer()->get($definition);
+      }
+
       if (!class_exists($definition)) {
         throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $definition));
       }
