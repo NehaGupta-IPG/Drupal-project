@@ -782,7 +782,7 @@ class RouteProviderTest extends KernelTestBase {
   #[DataProvider('providerTestParameterInfiniteParts')]
   public function testParameterInfiniteParts(string $route_path, string $parameter, string $route_requirement, string $request_path, int $expected_routes): void {
     $connection = Database::getConnection();
-    $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, 'test_routes');
+    $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, $this->cache, 'test_routes');
 
     $this->fixtures->createTables($connection);
     $dumper = new MatcherDumper($connection, $this->state, $this->logger, 'test_routes');
