@@ -33,6 +33,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->testNodePageCoolCache();
     $this->testNodePageWarmCache();
     $this->testNodePageHotCache();
+    $this->testNodePageCacheMiss();
   }
 
   /**
@@ -97,6 +98,124 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'StylesheetCount' => 6,
       'StylesheetBytes' => 40800,
     ];
+    $this->assertMetrics($expected, $performance_data);
+  }
+
+  /**
+   * Logs tracing data for a page cache miss, but a hit for everything else.
+   */
+  protected function testNodePageCacheMiss(): void {
+    // Assume that ::testNodePageHotCache() has fully warmed all caches.
+    // Delete any page cache entries then request it again.
+    \Drupal::cache('page')->deleteAll();
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('node/1');
+    }, 'umamiNodePageHotCache');
+    $this->assertSession()->pageTextContains('quiche');
+
+    $expected = [
+      'QueryCount' => 2,
+      'CacheGetCount' => 45,
+      'CacheSetCount' => 1,
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 5,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 12000,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 40800,
+      'CacheGetCountByBin' => [
+        'page' => 1,
+        'config' => 13,
+        'bootstrap' => 9,
+        'discovery' => 12,
+        'data' => 4,
+        'entity' => 1,
+        'dynamic_page_cache' => 2,
+        'render' => 2,
+        'routes' => 1,
+      ],
+      'CacheTagGroupedLookups' => [
+        [
+          'entity_types',
+          'route_match',
+          'access_policies',
+          'routes',
+          'router',
+          'entity_field_info',
+          'entity_bundles',
+          'local_task',
+          'library_info',
+          'http_response',
+        ],
+        [
+          'block_content:1',
+          'block_content:2',
+          'config:block_list',
+          'config:configurable_language_list',
+          'config:core.entity_view_display.node.recipe.full',
+          'config:filter.format.basic_html',
+          'config:image.style.large_3_2_2x',
+          'config:image.style.large_3_2_768x512',
+          'config:image.style.medium_3_2_2x',
+          'config:image.style.medium_3_2_600x400',
+          'config:responsive_image.styles.3_2_image',
+          'config:views.view.related_recipes',
+          'media:1',
+          'media:21',
+          'media:3',
+          'media:6',
+          'media:7',
+          'media_view',
+          'node:1',
+          'node:10',
+          'node:3',
+          'node:6',
+          'node:7',
+          'node_list',
+          'node_view',
+          'rendered',
+          'taxonomy_term:13',
+          'taxonomy_term:22',
+          'taxonomy_term:31',
+          'user:6',
+        ],
+        [
+          'config:system.menu.footer',
+        ],
+        [
+          'config:system.menu.account',
+          'config:system.site',
+          'block_content_view',
+          'config:image.style.medium_8_7',
+          'file:37',
+          'media:19',
+          'config:workflows.workflow.editorial',
+          'config:system.menu.main',
+          'config:views.view.recipe_collections',
+          'taxonomy_term:1',
+          'taxonomy_term:10',
+          'taxonomy_term:11',
+          'taxonomy_term:12',
+          'taxonomy_term:14',
+          'taxonomy_term:15',
+          'taxonomy_term:16',
+          'taxonomy_term:2',
+          'taxonomy_term:3',
+          'taxonomy_term:4',
+          'taxonomy_term:5',
+          'taxonomy_term:6',
+          'taxonomy_term:7',
+          'taxonomy_term:8',
+          'taxonomy_term:9',
+          'taxonomy_term_list',
+        ],
+        [
+          'config:user.role.anonymous',
+        ],
+      ],
+    ];
+
     $this->assertMetrics($expected, $performance_data);
   }
 
