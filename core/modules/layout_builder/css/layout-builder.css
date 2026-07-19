@@ -10,7 +10,7 @@
  * Layout Builder UI styling.
  */
 
-.layout-builder {
+ .layout-builder {
   padding: 1.5em 1.5em 0.5em;
   border: 3px solid #2f91da;
   background-color: #fff;
@@ -66,6 +66,10 @@
   padding: 1.5em 0;
   text-align: center;
   background-color: #eff6fc;
+}
+
+.layout-builder__link--configure {
+  margin-inline: 0 0.375rem;
 }
 
 .layout-builder__link--remove {
@@ -175,6 +179,7 @@
  * @todo create issue for todo.
  */
 
-.layout-builder-components-table .tabledrag-changed-warning {
+.layout-builder-components-table .tabledrag-changed-warning,
+.layout-builder-sections-table .tabledrag-changed-warning {
   display: none !important;
 }

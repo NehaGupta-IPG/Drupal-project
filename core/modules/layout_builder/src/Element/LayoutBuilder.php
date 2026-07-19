@@ -454,6 +454,29 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
           'data-dialog-renderer' => 'off_canvas',
         ],
       ],
+      'reorder' => [
+        '#type' => 'link',
+        '#title' => $this->t('Reorder sections'),
+        '#url' => Url::fromRoute('layout_builder.move_sections_form',
+        [
+          'section_storage_type' => $storage_type,
+          'section_storage' => $storage_id,
+          'delta' => $delta,
+        ],
+        [
+          'attributes' => [
+            'class' => [
+              'use-ajax',
+              'layout-builder__link',
+              'layout-builder__link--reorder',
+            ],
+            'data-dialog-type' => 'dialog',
+            'data-dialog-renderer' => 'off_canvas',
+            'data-disable-refocus' => 'true',
+          ],
+        ]
+        ),
+      ],
       'layout-builder__section' => $build,
     ];
   }

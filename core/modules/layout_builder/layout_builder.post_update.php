@@ -32,3 +32,10 @@ function layout_builder_removed_post_updates(): array {
     'layout_builder_post_update_enable_expose_field_block_feature_flag' => '11.0.0',
   ];
 }
+
+/**
+ * Clear caches due to new routes and UI elements.
+ */
+function layout_builder_post_update_section_move_form() {
+  // Empty post-update hook.
+}

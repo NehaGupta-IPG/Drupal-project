@@ -134,6 +134,27 @@ class DefaultsEntityForm extends EntityForm {
    */
   protected function actions(array $form, FormStateInterface $form_state) {
     $actions = parent::actions($form, $form_state);
+    $actions['#attributes']['role'] = 'region';
+    $actions['#attributes']['aria-label'] = $this->t('Layout Builder tools');
+    $actions['submit']['#value'] = $this->t('Save layout');
+    $actions['#weight'] = -1000;
+
+    $actions['discard_changes'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Discard changes'),
+      '#submit' => ['::redirectOnSubmit'],
+      '#redirect' => 'discard_changes',
+    ];
+
+    $actions['preview_toggle'] = $this->buildContentPreviewToggle();
+    return $actions;
+  }
+
+  /**
+   * Form submission handler.
+   */
+  public function redirectOnSubmit(array $form, FormStateInterface $form_state) {
+    $form_state->setRedirectUrl($this->sectionStorage->getLayoutBuilderUrl($form_state->getTriggeringElement()['#redirect']));
     return $this->buildActions($actions);
   }
 
