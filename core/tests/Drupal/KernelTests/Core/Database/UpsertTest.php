@@ -69,7 +69,7 @@ class UpsertTest extends DatabaseTestBase {
     $connection = Database::getConnection();
     $num_records_before = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
 
-    $upsert = $connection->upsert('test_people')
+    $upsert = $connection->upsert('test_people', ['void_execute_return' => TRUE])
       ->key('job')
       ->fields([
         'job',
@@ -311,7 +311,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
     // An upsert that only adds a record with the key.
-    $this->connection->upsert('test_people')
+    $this->connection->upsert('test_people', ['void_execute_return' => TRUE])
       ->key('job')
       ->fields(['job'])
       ->values(['Plumber'])
@@ -320,7 +320,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
     // Do the same upsert.
-    $this->connection->upsert('test_people')
+    $this->connection->upsert('test_people', ['void_execute_return' => TRUE])
       ->key('job')
       ->fields(['job'])
       ->values(['Plumber'])
@@ -337,7 +337,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
     // An upsert that only adds a record with the key.
-    $this->connection->upsert('test_people')
+    $this->connection->upsert('test_people', ['void_execute_return' => TRUE])
       ->key('job')
       ->fields(['job'])
       ->values(['Plumber'])
@@ -346,7 +346,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
     // Do a multi-value upsert that should add two more records.
-    $this->connection->upsert('test_people')
+    $this->connection->upsert('test_people', ['void_execute_return' => TRUE])
       ->key('job')
       ->fields(['job'])
       ->values(['Plumber'])
@@ -381,7 +381,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_composite_primary}')->fetchField());
 
     // Performing an upsert with the same composite key should be a no-op.
-    $this->connection->upsert('test_composite_primary')
+    $this->connection->upsert('test_composite_primary', ['void_execute_return' => TRUE])
       ->key(['name', 'age'])
       // Add a new row directly from ::fields().
       ->fields([
@@ -397,7 +397,7 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_composite_primary}')->fetchField());
 
     // Different composite keys should insert other rows.
-    $this->connection->upsert('test_composite_primary')
+    $this->connection->upsert('test_composite_primary', ['void_execute_return' => TRUE])
       ->key(['name', 'age'])
       // Add a new row directly from ::fields().
       ->fields(['name', 'age'])

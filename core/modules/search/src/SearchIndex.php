@@ -169,7 +169,7 @@ class SearchIndex implements SearchIndexInterface {
         // If a word already exists in the database, its score gets increased
         // appropriately. If not, we create a new record with the appropriate
         // starting score.
-        $this->connection->upsert('search_index')
+        $this->connection->upsert('search_index', ['void_execute_return' => TRUE])
           ->key(['word', 'sid', 'langcode', 'type'])
           ->fields([
             'word',

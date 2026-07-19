@@ -47,7 +47,7 @@ class DatabaseFileUsageBackend extends FileUsageBase {
    * {@inheritdoc}
    */
   public function add(FileInterface $file, $module, $type, $id, $count = 1) {
-    $this->connection->upsert($this->tableName)
+    $this->connection->upsert($this->tableName, ['void_execute_return' => TRUE])
       ->key(['fid', 'type', 'id', 'module'])
       ->fields([
         'fid',
