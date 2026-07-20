@@ -28,6 +28,10 @@ class StatementExecutionEndEvent extends DatabaseEvent {
    *   called.
    * @param float $startTime
    *   The time of the statement execution start.
+   * @param string|null $transactionId
+   *   The current transaction ID if active.
+   * @param string|null $transactionName
+   *   The current transaction name if active.
    */
   public function __construct(
     public readonly int $statementObjectId,
@@ -37,6 +41,8 @@ class StatementExecutionEndEvent extends DatabaseEvent {
     public readonly array $args,
     public readonly array $caller,
     public readonly float $startTime,
+    public readonly ?string $transactionId = NULL,
+    public readonly ?string $transactionName = NULL,
   ) {
     parent::__construct();
   }

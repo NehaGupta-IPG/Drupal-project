@@ -15,6 +15,10 @@ use Drupal\Core\Database\Query\Update;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
+use Drupal\Core\Database\Event\StatementExecutionEndEvent;
+use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
+use Drupal\Core\Database\Event\TransactionEventBase;
+use Drupal\Core\DrupalKernel;
 
 /**
  * Base Database API class.
@@ -1484,7 +1488,7 @@ abstract class Connection {
   /**
    * Enables database API events dispatching.
    *
-   * @param string[] $eventNames
+   * @param list<class-string<\Drupal\Core\Database\Event\DatabaseEvent>> $eventNames
    *   A list of database events to be enabled.
    *
    * @return static
@@ -1492,6 +1496,7 @@ abstract class Connection {
   public function enableEvents(array $eventNames): static {
     foreach ($eventNames as $eventName) {
       assert(class_exists($eventName), "Event class {$eventName} does not exist");
+      assert(is_a($eventName, DatabaseEvent::class, TRUE), "Event class {$eventName} is not a valid database event class");
       $this->enabledEvents[$eventName] = TRUE;
     }
     return $this;
@@ -1500,7 +1505,7 @@ abstract class Connection {
   /**
    * Disables database API events dispatching.
    *
-   * @param string[] $eventNames
+   * @param list<class-string<\Drupal\Core\Database\Event\DatabaseEvent>> $eventNames
    *   A list of database events to be disabled.
    *
    * @return static
@@ -1508,6 +1513,7 @@ abstract class Connection {
   public function disableEvents(array $eventNames): static {
     foreach ($eventNames as $eventName) {
       assert(class_exists($eventName), "Event class {$eventName} does not exist");
+      assert(is_a($eventName, DatabaseEvent::class, TRUE), "Event class {$eventName} is not a valid database event class");
       $this->enabledEvents[$eventName] = FALSE;
     }
     return $this;
@@ -1527,11 +1533,29 @@ abstract class Connection {
    * @throws \Drupal\Core\Database\Exception\EventException
    *   If the container is not initialized.
    */
-  public function dispatchEvent(DatabaseEvent $event, ?string $eventName = NULL): DatabaseEvent {
+  public function dispatchEvent(DatabaseEvent $event, ?string $eventName = NULL): ?DatabaseEvent {
+if ($event instanceof TransactionEventBase) {
+  echo "\033[0;30;103m";
+  echo "==> " . get_class($event);
+  echo "\033[0m";
+  echo "\n";
+}
+if ($event instanceof StatementExecutionEndEvent || $event instanceof StatementExecutionFailureEvent) {
+  if (\Drupal::hasContainer()) {
+    echo "\033[32m";
+  }
+  elseif (DrupalKernel::$hasBootstrapContainer) {
+    echo "\033[36m";
+  }
+  echo "====> " . $event->queryString;
+  echo "\033[0m\n";
+}
     if (\Drupal::hasService('event_dispatcher')) {
       return \Drupal::service('event_dispatcher')->dispatch($event, $eventName);
     }
-    throw new EventException('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
+#echo "====> " . "*** NO EVENT DISPATCHER ***" . "\n";
+return null;
+#    throw new EventException('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
   }
 
   /**

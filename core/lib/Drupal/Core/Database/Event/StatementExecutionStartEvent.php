@@ -26,6 +26,10 @@ class StatementExecutionStartEvent extends DatabaseEvent {
    * @param array $caller
    *   A normalized debug backtrace entry representing the last non-db method
    *   called.
+   * @param string|null $transactionId
+   *   The current transaction ID if active.
+   * @param string|null $transactionName
+   *   The current transaction name if active.
    */
   public function __construct(
     public readonly int $statementObjectId,
@@ -34,6 +38,8 @@ class StatementExecutionStartEvent extends DatabaseEvent {
     public readonly string $queryString,
     public readonly array $args,
     public readonly array $caller,
+    public readonly ?string $transactionId = NULL,
+    public readonly ?string $transactionName = NULL,
   ) {
     parent::__construct();
   }

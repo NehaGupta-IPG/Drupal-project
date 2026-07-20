@@ -7,6 +7,16 @@ namespace Drupal\database_test\EventSubscriber;
 use Drupal\Core\Database\Event\StatementExecutionEndEvent;
 use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
 use Drupal\Core\Database\Event\StatementExecutionStartEvent;
+use Drupal\Core\Database\Event\TransactionAutoCommitEvent;
+use Drupal\Core\Database\Event\TransactionBeginEvent;
+use Drupal\Core\Database\Event\TransactionCommitEvent;
+use Drupal\Core\Database\Event\TransactionReleaseSavepointEvent;
+use Drupal\Core\Database\Event\TransactionRollbackEvent;
+use Drupal\Core\Database\Event\TransactionRollbackFailureEvent;
+use Drupal\Core\Database\Event\TransactionRollbackToSavepointEvent;
+use Drupal\Core\Database\Event\TransactionSavepointEvent;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -34,14 +44,28 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
    */
   public array $statementIdsInExecution = [];
 
+  public function __construct(
+    #[Autowire(service: 'keyvalue')]
+    protected KeyValueFactoryInterface $keyValue,
+  ) {
+  }
+
   /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
     return [
-      StatementExecutionStartEvent::class => 'onStatementExecutionStart',
       StatementExecutionEndEvent::class => 'onStatementExecutionEnd',
       StatementExecutionFailureEvent::class => 'onStatementExecutionFailure',
+      StatementExecutionStartEvent::class => 'onStatementExecutionStart',
+      TransactionAutoCommitEvent::class => 'onTransactionAutoCommit',
+      TransactionBeginEvent::class => 'onTransactionBegin',
+      TransactionCommitEvent::class => 'onTransactionCommit',
+      TransactionReleaseSavepointEvent::class => 'onTransactionReleaseSavepoint',
+      TransactionRollbackEvent::class => 'onTransactionRollback',
+      TransactionRollbackFailureEvent::class => 'onTransactionRollbackFailureEvent',
+      TransactionRollbackToSavepointEvent::class => 'onTransactionRollbackToSavepoint',
+      TransactionSavepointEvent::class => 'onTransactionSavepoint',
     ];
   }
 
@@ -76,6 +100,86 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
   public function onStatementExecutionFailure(StatementExecutionFailureEvent $event): void {
     unset($this->statementIdsInExecution[$event->statementObjectId]);
     $this->countStatementFailures++;
+  }
+
+  /**
+   * Subscribes to a TransactionBeginEvent.
+   *
+   * @param \Drupal\Core\Database\Event\TransactionBeginEvent $event
+   *   The transaction event.
+   */
+  public function onTransactionBegin(TransactionBeginEvent $event): void {
+    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name);
+  }
+
+  /**
+   * Subscribes to a TransactionSavepointEvent.
+   *
+   * @param \Drupal\Core\Database\Event\TransactionSavepointEvent $event
+   *   The transaction event.
+   */
+  public function onTransactionSavepoint(TransactionSavepointEvent $event): void {
+    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name . ' stack: ' . implode(' > ', $event->stackItems));
+  }
+
+  /**
+   * Subscribes to a TransactionAutoCommitEvent.
+   *
+   * @param \Drupal\Core\Database\Event\TransactionAutoCommitEvent $event
+   *   The transaction event.
+   */
+  public function onTransactionAutoCommit(TransactionAutoCommitEvent $event): void {
+    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name);
+  }
+
+  /**
+   * Subscribes to a TransactionCommitEvent.
+   *
+   * @param \Drupal\Core\Database\Event\TransactionCommitEvent $event
+   *   The transaction event.
+   */
+  public function onTransactionCommit(TransactionCommitEvent $event): void {
+    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name . ' commit-type: ' . $event->type->name);
+  }
+
+  /**
+   * Subscribes to a TransactionReleaseSavepointEvent.
+   *
+   * @param \Drupal\Core\Database\Event\TransactionReleaseSavepointEvent $event
+   *   The transaction event.
+   */
+  public function onTransactionReleaseSavepoint(TransactionReleaseSavepointEvent $event): void {
+    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name . ' stack: ' . implode(' > ', $event->stackItems));
+  }
+
+  /**
+   * Subscribes to a TransactionRollbackEvent.
+   *
+   * @param \Drupal\Core\Database\Event\TransactionRollbackEvent $event
+   *   The transaction event.
+   */
+  public function onTransactionRollback(TransactionRollbackEvent $event): void {
+    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name);
+  }
+
+  /**
+   * Subscribes to a TransactionRollbackFailureEvent.
+   *
+   * @param \Drupal\Core\Database\Event\TransactionRollbackFailureEvent $event
+   *   The transaction event.
+   */
+  public function onTransactionRollbackFailureEvent(TransactionRollbackFailureEvent $event): void {
+    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name . ' ' . $event->className . ' ' . $event->message);
+  }
+
+  /**
+   * Subscribes to a TransactionRollbackToSavepointEvent.
+   *
+   * @param \Drupal\Core\Database\Event\TransactionRollbackToSavepointEvent $event
+   *   The transaction event.
+   */
+  public function onTransactionRollbackToSavepoint(TransactionRollbackToSavepointEvent $event): void {
+    $this->keyValue->get('TransactionEventTest')->set('event_data', get_class($event) . ' ' . $event->key . ' ' . $event->target . ' ' . $event->id . '\\' . $event->name . ' stack: ' . implode(' > ', $event->stackItems));
   }
 
 }

@@ -282,6 +282,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected $root;
 
+  public static bool $hasBootstrapContainer = FALSE;
+
   /**
    * Create a DrupalKernel object from a request.
    *
@@ -493,6 +495,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * {@inheritdoc}
    */
   public function boot() {
+echo "\n\n" . __METHOD__ . " START \n";
     if ($this->booted) {
       return $this;
     }
@@ -519,6 +522,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
 
     $this->bootstrapContainer = new $this->bootstrapContainerClass(Settings::get('bootstrap_container_definition', $this->defaultBootstrapContainerDefinition));
+self::$hasBootstrapContainer = TRUE;
+echo("\n*******************************\n");
+echo("*** BOOTSTRAP container set ***\n");
+echo("*******************************\n\n");
 
     // Initialize the container.
     $this->initializeContainer();
@@ -540,6 +547,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $this->booted = TRUE;
 
+echo "\n\n" . __METHOD__ . " END \n";
     return $this;
   }
 
@@ -990,6 +998,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   An initialized container object.
    */
   protected function initializeContainer() {
+echo "\n\n" . __METHOD__ . " START \n";
     $this->containerNeedsDumping = FALSE;
     $session_started = FALSE;
     $all_messages = [];
@@ -1103,6 +1112,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     \Drupal::setContainer($this->container);
+echo("\n**************************\n");
+echo("*** FULL container set ***\n");
+echo("**************************\n\n");
 
     // Allow other parts of the codebase to react on container initialization in
     // subrequest.
@@ -1115,6 +1127,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $this->container->get('logger.factory')->get('DrupalKernel')->error('Container cannot be saved to cache.');
     }
 
+echo "\n\n" . __METHOD__ . " END \n";
     return $this->container;
   }
 

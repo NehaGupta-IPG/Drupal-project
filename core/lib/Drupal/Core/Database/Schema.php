@@ -134,11 +134,21 @@ abstract class Schema implements PlaceholderInterface {
    *   run. The given options will be merged with self::defaultOptions().
    */
   protected function executeDdlStatement(string $sql, array $arguments = [], array $options = []): void {
+#global $xxx;
+#if ($xxx) {
+#  echo "*****\n";
+#  echo "Container: " . (\Drupal::hasContainer() ? 'true' : 'false') . "\n";
+#  echo $sql;
+#  echo \Drupal\Core\Utility\Error::formatBacktrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+#}
     $this->connection->query($sql, $arguments, $options);
+#if ($xxx) {
+#  echo "*****\n";
+#}
     // DDL statements when in a transaction force a commit in some databases.
     // Void the transaction in that case.
     if (!$this->connection->supportsTransactionalDDL() && $this->connection->transactionManager()->inTransaction()) {
-      $this->connection->transactionManager()->voidClientTransaction();
+      $this->connection->transactionManager()->handleAutomaticCommit();
     }
   }
 
