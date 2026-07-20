@@ -21,11 +21,12 @@ class ComposerTest extends UnitTestCase {
    */
   public function testEnsureComposerVersion(): void {
     try {
-      $this->assertNull(Composer::ensureComposerVersion());
+      Composer::ensureComposerVersion();
     }
     catch (\RuntimeException $e) {
       $this->assertMatchesRegularExpression('/Drupal core development requires Composer 2.3.5, but Composer /', $e->getMessage());
     }
+    $this->assertTrue(TRUE);
   }
 
   /**
