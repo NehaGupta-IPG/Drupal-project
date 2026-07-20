@@ -29,7 +29,7 @@ class PathWidget extends WidgetBase {
     // For new aliases, let the save logic fall back to the entity language
     // unless a form alter or other code explicitly provides an alias
     // langcode. Existing aliases keep their stored langcode.
-    $langcode = $items[$delta]->pid ? $items[$delta]->langcode : NULL,
+    $langcode = $items[$delta]->pid ? $items[$delta]->langcode : NULL;
     if (!$entity->get('path')->getFieldDefinition()->isTranslatable()) {
       $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED;
     }
