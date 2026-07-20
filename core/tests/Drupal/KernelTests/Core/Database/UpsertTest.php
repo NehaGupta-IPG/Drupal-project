@@ -67,10 +67,9 @@ class UpsertTest extends DatabaseTestBase {
    * Confirms that we can upsert using UpsertUpdateExpression.
    */
   public function testUpsertWithUpsertUpdateExpression(): void {
-    $connection = Database::getConnection();
-    $num_records_before = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
+    $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
-    $upsert = $connection->upsert('test_people')
+    $upsert = $this->connection->upsert('test_people')
       ->key('job')
       ->fields([
         'job',
@@ -96,15 +95,14 @@ class UpsertTest extends DatabaseTestBase {
 
     $upsert->execute();
 
-    $num_records_after = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
-    $this->assertEquals($num_records_before + 1, $num_records_after);
+    $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
-    $person = $connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Presenter'])->fetch();
+    $person = $this->connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Presenter'])->fetch();
     $this->assertSame('Presenter', $person->job);
     $this->assertSame('31', $person->age);
     $this->assertSame('Tiffany', $person->name);
 
-    $person = $connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Speaker'])->fetch();
+    $person = $this->connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Speaker'])->fetch();
     $this->assertSame('Speaker', $person->job);
     $this->assertSame('35', $person->age, 'Age should have been updated to 35.');
     $this->assertSame('Meredith', $person->name);
