@@ -9,6 +9,8 @@
  * - title: (optional) The title of the element, may not be set.
  * - description: (optional) The description of the element, may not be set.
  * - children: (optional) The children of the element, may not be set.
+ * - prefix: The content to add before the details children.
+ * - suffix: The content to add after the details children.
  * - value: (optional) The value of the element, may not be set.
  * - accordion: whether the details element should look as an accordion.
  * - accordion_item: whether the details element is an item of an accordion
@@ -90,9 +92,15 @@
       {%- if description -%}
         <div{{ create_attribute().addClass(description_classes) }}>{{ description }}</div>
       {%- endif -%}
+      {% if prefix %}
+        <span class="field-prefix">{{ prefix }}</span>
+      {% endif %}
       {%- if children -%}
         {{ children }}
       {%- endif -%}
+      {% if suffix %}
+        <span class="field-suffix">{{ suffix }}</span>
+      {% endif %}
       {%- if value -%}
         {{ value }}
       {%- endif -%}

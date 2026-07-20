@@ -1311,6 +1311,16 @@ class ClaroHooks {
   }
 
   /**
+   * Implements hook_preprocess_HOOK() for details__media_library_widget.
+   *
+   * @see \Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::formElement()
+   */
+  #[Hook('preprocess_details__media_library_widget')]
+  public function preprocessDetailsMediaLibraryWidget(array &$variables): void {
+    $this->preprocessFieldsetMediaLibraryWidget($variables);
+  }
+
+  /**
    * Implements hook_views_pre_render().
    */
   #[Hook('views_pre_render')]

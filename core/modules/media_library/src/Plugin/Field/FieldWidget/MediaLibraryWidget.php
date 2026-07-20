@@ -121,6 +121,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   public static function defaultSettings() {
     return [
       'media_types' => [],
+      'open' => FALSE,
     ] + parent::defaultSettings();
   }
 
@@ -175,6 +176,12 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $elements = [];
+    $elements['open'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Display element open by default'),
+      '#default_value' => $this->getSetting('open'),
+    ];
+
     $media_type_ids = $this->getAllowedMediaTypeIdsSorted();
 
     if (count($media_type_ids) <= 1) {
@@ -261,6 +268,9 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public function settingsSummary() {
     $summary = [];
+    if ($this->getSetting('open')) {
+      $summary[] = $this->t('Display element open by default');
+    }
     $media_type_labels = [];
     $media_types = $this->entityTypeManager->getStorage('media_type')->loadMultiple($this->getAllowedMediaTypeIdsSorted());
     if (count($media_types) !== 1) {
@@ -319,7 +329,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
 
     $settings = $this->getFieldSetting('handler_settings');
     $element += [
-      '#type' => 'fieldset',
+      '#type' => 'details',
+      '#open' => $this->getSetting('open'),
       '#cardinality' => $this->fieldDefinition->getFieldStorageDefinition()->getCardinality(),
       // If no target bundles are specified, all target bundles are allowed.
       '#target_bundles' => $settings['target_bundles'] ?? [],
@@ -334,7 +345,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
         'library' => ['media_library/widget'],
       ],
       '#theme_wrappers' => [
-        'fieldset__media_library_widget',
+        'details__media_library_widget',
       ],
     ];
 
@@ -615,6 +626,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $element['#field_suffix']['open_button'] = $element['open_button'];
       unset($element['open_button']);
     }
+
     return $element;
   }
 

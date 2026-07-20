@@ -443,6 +443,16 @@ final class PreprocessHooks implements TrustedCallbackInterface {
   }
 
   /**
+   * Implements hook_preprocess_HOOK() for details__media_library_widget.
+   *
+   * @see \Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::formElement()
+   */
+  #[Hook('preprocess_details__media_library_widget')]
+  public function preprocessDetailsMediaLibraryWidget(array &$variables): void {
+    $this->preprocessFieldsetMediaLibraryWidget($variables);
+  }
+
+  /**
    * Implements hook_preprocess_HOOK() for container__media_library_widget_selection.
    *
    * @see \Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::formElement()
