@@ -236,29 +236,53 @@ class EntityForm extends FormBase implements EntityFormInterface {
       '#submit' => ['::submitForm', '::save'],
     ];
 
-    if (!$this->entity->isNew() && $this->entity->hasLinkTemplate('delete-form')) {
-      $route_info = $this->entity->toUrl('delete-form');
-      if ($this->getRequest()->query->has('destination')) {
-        $query = $route_info->getOption('query');
-        $query['destination'] = $this->getRequest()->query->get('destination');
-        $route_info->setOption('query', $query);
+    if (!$this->entity->isNew()) {
+      if ($this->entity->hasLinkTemplate('delete-form')) {
+        $route_info = $this->entity->toUrl('delete-form');
+        if ($this->getRequest()->query->has('destination')) {
+          $query = $route_info->getOption('query');
+          $query['destination'] = $this->getRequest()->query->get('destination');
+          $route_info->setOption('query', $query);
+        }
+        $actions['delete'] = [
+          '#type' => 'link',
+          '#title' => $this->t('Delete'),
+          '#access' => $this->entity->access('delete'),
+          '#attributes' => [
+            'class' => ['button', 'button--danger', 'use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode([
+              'width' => 880,
+            ]),
+          ],
+          '#url' => $route_info,
+          '#attached' => [
+            'library' => ['core/drupal.dialog.ajax'],
+          ],
+        ];
       }
-      $actions['delete'] = [
-        '#type' => 'link',
-        '#title' => $this->t('Delete'),
-        '#access' => $this->entity->access('delete'),
-        '#attributes' => [
-          'class' => ['button', 'button--danger', 'use-ajax'],
-          'data-dialog-type' => 'modal',
-          'data-dialog-options' => Json::encode([
-            'width' => 880,
-          ]),
-        ],
-        '#url' => $route_info,
-        '#attached' => [
-          'library' => ['core/drupal.dialog.ajax'],
-        ],
-      ];
+
+      // Cancel.
+      if ($this->entity->hasLinkTemplate('edit-form')) {
+        $route_info = $this->entity->toUrl('edit-form');
+        if ($this->getRequest()->query->has('destination')) {
+          $query = $route_info->getOption('query');
+          $query['destination'] = $this->getRequest()->query->get('destination');
+          $route_info->setOption('query', $query);
+        }
+        $actions['cancel'] = [
+          '#type' => 'link',
+          '#title' => $this->t('Cancel'),
+          '#access' => $this->entity->access('view'),
+          '#attributes' => [
+            'class' => ['button', 'button--cancel'],
+          ],
+          '#url' => $route_info,
+          '#attached' => [
+            'library' => ['core/drupal.dialog.ajax'],
+          ],
+        ];
+      }
     }
 
     return $actions;

@@ -45,6 +45,10 @@ class FormHooks {
     $build_info = $form_state->getBuildInfo();
     $form_object = $form_state->getFormObject();
 
+    // Make entity forms cancel link use the action-link component.
+    if (isset($form['actions']['cancel']['#type']) && $form['actions']['cancel']['#type'] === 'link' && !empty($build_info['callback_object']) && $build_info['callback_object'] instanceof EntityForm) {
+      $form['actions']['cancel'] = Helper::convertLinkToActionLink($form['actions']['cancel'], 'trash', 'default', 'cancel');
+    }
     // Make entity forms delete link use the action-link component.
     if (isset($form['actions']['delete']['#type']) && $form['actions']['delete']['#type'] === 'link' && !empty($build_info['callback_object']) && $build_info['callback_object'] instanceof EntityForm) {
       $form['actions']['delete'] = Helper::convertLinkToActionLink($form['actions']['delete'], 'trash', 'default', 'danger');

@@ -126,6 +126,28 @@
 
   button,
   input[type="submit"],
+  .action-link--icon-trash.action-link--cancel,
+  .button.button--cancel,
+  a.button.button--cancel,
+  .local-actions__item a {
+    -webkit-text-decoration: none;
+    text-decoration: none;
+    box-shadow: none;
+    font-size: var(--admin-font-size-xs);
+    font-weight: var(--admin-font-weight-bold);
+    padding-block: calc(var(--admin-space-xs) - var(--admin-space-3xs));
+    padding-inline: var(--admin-space-s);
+    margin-block: 0;
+  }
+
+  .action-link--icon-trash.action-link--cancel,
+  .button.button--cancel,
+  a.button.button--cancel {
+    padding-block: calc(var(--admin-space-xs) - 0.5px);
+  }
+
+  button,
+  input[type="submit"],
   .action-link--icon-trash.action-link--danger,
   .button.button--danger,
   a.button.button--danger,
