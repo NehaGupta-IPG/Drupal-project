@@ -340,14 +340,13 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
       ->get('entity_display.repository');
     $typed_data_manager = $this->container->get('typed_data_manager');
     $language_manager = $this->container->get('language_manager');
-    $keyvalue = $this->container->get('keyvalue');
     $module_handler = $this->container->get('module_handler');
     $cache_discovery = $this->container->get('cache.discovery');
     $entity_last_installed_schema_repository = $this
       ->container
       ->get('entity.last_installed_schema.repository');
 
-    $decorated_entity_field_manager = new class ($entity_type_manager, $entity_type_bundle_info, $entity_display_repository, $typed_data_manager, $language_manager, $keyvalue, $module_handler, $cache_discovery, $entity_last_installed_schema_repository) extends EntityFieldManager {
+    $decorated_entity_field_manager = new class ($entity_type_manager, $entity_type_bundle_info, $entity_display_repository, $typed_data_manager, $language_manager, $module_handler, $cache_discovery, $entity_last_installed_schema_repository) extends EntityFieldManager {
 
       /**
        * {@inheritdoc}
