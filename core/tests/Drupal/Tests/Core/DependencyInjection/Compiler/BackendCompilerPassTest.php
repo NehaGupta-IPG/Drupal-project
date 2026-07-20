@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * Tests Drupal\Core\DependencyInjection\Compiler\BackendCompilerPass.
+ *
+ * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
  */
 #[CoversClass(BackendCompilerPass::class)]
 #[Group('DependencyInjection')]
@@ -129,11 +131,13 @@ class BackendCompilerPassTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->setDefinition('service', $service);
     $container->setDefinition('sqlite.service', new Definition(__NAMESPACE__ . '\\ServiceClassSqlite'));
-    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray([
+    /** @var UnprocessedConnectionInfoArray $connectionArray */
+    $connectionArray = [
       'driver' => 'sqlite',
       'database' => ':memory:',
       'foo' => 'bar',
-    ]);
+    ];
+    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray($connectionArray);
     $this->assertInstanceOf(ConnectionParameters::class, $connectionParameters);
     $database = new SqliteDatabase($this->createStub(SqliteConnection::class), $connectionParameters);
     $container->set('database', $database);
