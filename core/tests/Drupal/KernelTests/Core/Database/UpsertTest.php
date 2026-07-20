@@ -259,12 +259,12 @@ class UpsertTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests an upsert that has no columns to update.
+   * Tests a single-value upsert that has no columns to update.
    */
   public function testDegeneratedSingleValueUpsert(): void {
     $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
-    // An upsert that only adds a record with the key.
+    // An upsert that only adds a record.
     $this->connection->upsert('test_people')
       ->key('job')
       ->fields(['job'])
@@ -273,7 +273,7 @@ class UpsertTest extends DatabaseTestBase {
 
     $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
-    // Do the same upsert.
+    // Do the same upsert, should be a no-op.
     $this->connection->upsert('test_people')
       ->key('job')
       ->fields(['job'])
@@ -285,12 +285,12 @@ class UpsertTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests an upsert that has no columns to update.
+   * Tests a multi-value upsert that has no columns to update.
    */
   public function testDegeneratedMultiValueUpsert(): void {
     $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
-    // An upsert that only adds a record with the key.
+    // An upsert that only adds a record.
     $this->connection->upsert('test_people')
       ->key('job')
       ->fields(['job'])
@@ -318,7 +318,7 @@ class UpsertTest extends DatabaseTestBase {
   public function testDegeneratedCompositeKeyUpsert(): void {
     $this->installSchema('database_test', ['test_composite_primary']);
 
-    // Insert two new rows consisting only of the composite key.
+    // Insert two new rows.
     $this->connection->insert('test_composite_primary')
       ->fields([
         'name' => 'Kate',
