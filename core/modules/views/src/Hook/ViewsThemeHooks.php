@@ -678,6 +678,13 @@ class ViewsThemeHooks {
         if ($class) {
           $variables['header'][$field]['attributes']->addClass($class);
         }
+
+        // Provide an accessible label for the select-all checkbox column
+        // when the visible label is intentionally hidden.
+        if (str_contains($class, 'select-all') && empty($variables['header'][$field]['content'])) {
+          $variables['header'][$field]['attributes']->setAttribute('aria-label', $this->t('Select all'));
+        }
+
         // Add responsive header classes.
         if (!empty($options['info'][$field]['responsive'])) {
           $variables['header'][$field]['attributes']->addClass($options['info'][$field]['responsive']);
