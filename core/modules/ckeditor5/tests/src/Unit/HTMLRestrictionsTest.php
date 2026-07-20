@@ -26,7 +26,12 @@ class HTMLRestrictionsTest extends UnitTestCase {
    */
   #[DataProvider('providerConstruct')]
   public function testConstructor(array $elements, ?string $expected_exception_message): void {
+    // The constructor only validates when assertions are enabled.
+    // @see \Drupal\ckeditor5\HTMLRestrictions::__construct()
     if ($expected_exception_message !== NULL) {
+      if (ini_get('zend.assertions') !== '1') {
+        $this->markTestSkipped('Input validation requires zend.assertions=1.');
+      }
       $this->expectException(\InvalidArgumentException::class);
       $this->expectExceptionMessageIs($expected_exception_message);
     }

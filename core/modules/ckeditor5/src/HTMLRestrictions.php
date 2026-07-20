@@ -80,11 +80,13 @@ final class HTMLRestrictions {
    * @see \Drupal\filter\Plugin\FilterInterface::getHTMLRestrictions()
    */
   public function __construct(array $elements) {
-    self::validateAllowedRestrictionsPhase1($elements);
-    self::validateAllowedRestrictionsPhase2($elements);
-    self::validateAllowedRestrictionsPhase3($elements);
-    self::validateAllowedRestrictionsPhase4($elements);
-    self::validateAllowedRestrictionsPhase5($elements);
+    // Validating the allowed elements is expensive (>100ms in profiling) and
+    // this value object is constructed on every text editor load, not only on
+    // save. The validation only guards against programming errors in the input
+    // array, so run it exclusively when assertions are enabled: it is compiled
+    // out in production (zend.assertions=-1).
+    // @see https://www.drupal.org/node/3539183
+    assert(self::validateAllowedRestrictions($elements));
     $this->elements = $elements;
 
     // Simplify based on the global attributes:
@@ -132,6 +134,30 @@ final class HTMLRestrictions {
           ?? FALSE;
       }
     }
+  }
+
+  /**
+   * Validates the allowed elements by running all validation phases.
+   *
+   * Returns TRUE (rather than being typed `void`) so it can be used inside an
+   * assert() expression; the individual phases throw on invalid input.
+   *
+   * @param array $elements
+   *   The allowed elements.
+   *
+   * @return true
+   *   Always TRUE when the elements are valid.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown when the elements are invalid.
+   */
+  private static function validateAllowedRestrictions(array $elements): bool {
+    self::validateAllowedRestrictionsPhase1($elements);
+    self::validateAllowedRestrictionsPhase2($elements);
+    self::validateAllowedRestrictionsPhase3($elements);
+    self::validateAllowedRestrictionsPhase4($elements);
+    self::validateAllowedRestrictionsPhase5($elements);
+    return TRUE;
   }
 
   /**
