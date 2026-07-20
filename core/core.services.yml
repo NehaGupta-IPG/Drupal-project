@@ -830,7 +830,7 @@ services:
   Drupal\Core\Field\FieldStorageDefinitionListenerInterface: '@field_storage_definition.listener'
   field_definition.listener:
     class: Drupal\Core\Field\FieldDefinitionListener
-    arguments: ['@entity_type.manager', '@entity_field.manager', '@keyvalue', '@cache.discovery']
+    arguments: ['@entity_type.manager', '@entity_field.manager', '@cache.discovery']
   Drupal\Core\Field\FieldDefinitionListenerInterface: '@field_definition.listener'
   Drupal\Core\Field\FieldPreprocess:
     class: Drupal\Core\Field\FieldPreprocess
