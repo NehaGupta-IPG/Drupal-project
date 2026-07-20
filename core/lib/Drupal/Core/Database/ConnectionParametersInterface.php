@@ -8,6 +8,7 @@ namespace Drupal\Core\Database;
  * Interface for a database connection parameters object.
  *
  * @phpstan-import-type ConnectionInfoArray from \Drupal\Core\Database\Database
+ * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
  */
 interface ConnectionParametersInterface {
 
@@ -52,7 +53,7 @@ interface ConnectionParametersInterface {
    * This is used internally by the database layer, should not be called
    * otherwise.
    *
-   * @param ConnectionInfoArray $options
+   * @param UnprocessedConnectionInfoArray $options
    *   An array of connection options.
    *
    * @return ConnectionInfoArray

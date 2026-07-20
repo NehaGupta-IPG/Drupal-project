@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\DependencyInjection\Compiler;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\DependencyInjection\Compiler\BackendCompilerPass;
 use Drupal\driver_test\Driver\Database\DriverTestMysql\Connection as TestDatabase;
 use Drupal\sqlite\Driver\Database\sqlite\Connection as SqliteDatabase;
+use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use Drupal\sqlite\Driver\Database\sqlite\SqliteConnection;
 use Drupal\Tests\UnitTestCase;
 use Pdo\Mysql;
@@ -127,7 +129,13 @@ class BackendCompilerPassTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->setDefinition('service', $service);
     $container->setDefinition('sqlite.service', new Definition(__NAMESPACE__ . '\\ServiceClassSqlite'));
-    $database = new SqliteDatabase($this->createStub(SqliteConnection::class), []);
+    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray([
+      'driver' => 'sqlite',
+      'database' => ':memory:',
+      'foo' => 'bar',
+    ]);
+    $this->assertInstanceOf(ConnectionParameters::class, $connectionParameters);
+    $database = new SqliteDatabase($this->createStub(SqliteConnection::class), $connectionParameters);
     $container->set('database', $database);
     return $container;
   }

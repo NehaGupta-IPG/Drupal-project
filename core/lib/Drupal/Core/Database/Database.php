@@ -244,7 +244,7 @@ abstract class Database {
   /**
    * Process the configuration file for database information.
    *
-   * @param ConnectionInfoArray|list<ConnectionInfoArray> $info
+   * @param UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $info
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.

@@ -10,6 +10,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
+use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -119,6 +120,7 @@ abstract class MigrateTestCase extends UnitTestCase {
         'autoload' => $connection_options['autoload'] ?? '',
         'database' => ':memory:',
       ]);
+      $this->assertInstanceOf(ConnectionParameters::class, $connection_parameters);
       $pdo = Connection::open($connection_parameters);
       $connection = new Connection($pdo, $connection_parameters);
     }

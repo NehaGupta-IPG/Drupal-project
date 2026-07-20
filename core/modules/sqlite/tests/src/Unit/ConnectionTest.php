@@ -6,6 +6,7 @@ namespace Drupal\Tests\sqlite\Unit;
 
 use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
+use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use Drupal\sqlite\Driver\Database\sqlite\SqliteConnection;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -29,14 +30,13 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerCreateConnectionOptionsFromUrl')]
   public function testCreateConnectionOptionsFromUrl(string $url, string $expected): void {
-    $sqlite_connection = new Connection(
-      $this->createStub(SqliteConnection::class),
-      ConnectionParametersFactory::createFromOptionsArray([
-        'driver' => 'sqlite',
-        'database' => ':memory:',
-        'foo' => 'bar',
-      ]),
-    );
+    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray([
+      'driver' => 'sqlite',
+      'database' => ':memory:',
+      'foo' => 'bar',
+    ]);
+    $this->assertInstanceOf(ConnectionParameters::class, $connectionParameters);
+    $sqlite_connection = new Connection($this->createStub(SqliteConnection::class), $connectionParameters);
     $database = $sqlite_connection->createConnectionOptionsFromUrl($url, NULL);
     $this->assertEquals('sqlite', $database['driver']);
     $this->assertEquals($expected, $database['database']);
@@ -62,14 +62,13 @@ class ConnectionTest extends UnitTestCase {
    * Confirms legacy array access to the ConnectionParameters.
    */
   public function testConnectionParametersArrayAccess(): void {
-    $sqlite_connection = new Connection(
-      $this->createStub(SqliteConnection::class),
-      ConnectionParametersFactory::createFromOptionsArray([
-        'driver' => 'sqlite',
-        'database' => ':memory:',
-        'foo' => 'bar',
-      ]),
-    );
+    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray([
+      'driver' => 'sqlite',
+      'database' => ':memory:',
+      'foo' => 'bar',
+    ]);
+    $this->assertInstanceOf(ConnectionParameters::class, $connectionParameters);
+    $sqlite_connection = new Connection($this->createStub(SqliteConnection::class), $connectionParameters);
     $this->assertEquals('sqlite', $sqlite_connection->getConnectionOptions()->driver);
     $this->assertEquals(':memory:', $sqlite_connection->getConnectionOptions()->database);
     $this->assertEquals('sqlite', $sqlite_connection->getConnectionOptions()['driver']);

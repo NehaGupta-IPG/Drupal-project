@@ -14,6 +14,7 @@ use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
 use Drupal\migrate\Row;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
+use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -1023,6 +1024,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       'database' => ':memory:',
       'prefix' => 'prefix',
     ]);
+    $this->assertInstanceOf(ConnectionParameters::class, $connection_parameters);
     $pdo = Connection::open($connection_parameters);
     $this->database = new Connection($pdo, $connection_parameters);
     $qualified_map_table = $this->getIdMap()->getQualifiedMapTableName();

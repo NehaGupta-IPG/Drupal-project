@@ -9,6 +9,8 @@ use Composer\Autoload\ClassLoader;
 /**
  * The factory for database connection parameters.
  *
+ * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
+ *
  * @final
  */
 abstract class ConnectionParametersFactory {
@@ -16,7 +18,7 @@ abstract class ConnectionParametersFactory {
   /**
    * Converts a connection options array to a ConnectionParameters object.
    *
-   * @param ConnectionInfoArray|list<ConnectionInfoArray> $connection_options
+   * @param UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $info
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
@@ -37,7 +39,7 @@ abstract class ConnectionParametersFactory {
       $info_pick = $connection_options[mt_rand(0, count($connection_options) - 1)];
     }
 
-    /** @var ConnectionInfoArray $options */
+    /** @var UnprocessedConnectionInfoArray $options */
     $options = $info_pick ?? $connection_options;
 
     $options = array_merge([
