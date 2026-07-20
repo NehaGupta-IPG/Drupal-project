@@ -70,19 +70,6 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
     // Notify the storage about the new field.
     $this->entityTypeManager->getStorage($entity_type_id)->onFieldDefinitionCreate($field_definition);
 
-    // Update the bundle field map key value collection, add the new field.
-    $bundle_field_map = $this->keyValueFactory->get('entity.definitions.bundle_field_map')->get($entity_type_id);
-    if (!isset($bundle_field_map[$field_name])) {
-      // This field did not exist yet, initialize it with the type and empty
-      // bundle list.
-      $bundle_field_map[$field_name] = [
-        'type' => $field_definition->getType(),
-        'bundles' => [],
-      ];
-    }
-    $bundle_field_map[$field_name]['bundles'][$bundle] = $bundle;
-    $this->keyValueFactory->get('entity.definitions.bundle_field_map')->set($entity_type_id, $bundle_field_map);
-
     // Delete the cache entry.
     $this->cacheBackend->delete('entity_field_map');
 
@@ -120,15 +107,6 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
 
     // Notify the storage about the field deletion.
     $this->entityTypeManager->getStorage($entity_type_id)->onFieldDefinitionDelete($field_definition);
-
-    // Unset the bundle from the bundle field map key value collection.
-    $bundle_field_map = $this->keyValueFactory->get('entity.definitions.bundle_field_map')->get($entity_type_id);
-    unset($bundle_field_map[$field_name]['bundles'][$bundle]);
-    if (empty($bundle_field_map[$field_name]['bundles'])) {
-      // If there are no bundles left, remove the field from the map.
-      unset($bundle_field_map[$field_name]);
-    }
-    $this->keyValueFactory->get('entity.definitions.bundle_field_map')->set($entity_type_id, $bundle_field_map);
 
     // Delete the cache entry.
     $this->cacheBackend->delete('entity_field_map');
