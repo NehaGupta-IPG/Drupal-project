@@ -18,7 +18,7 @@ abstract class ConnectionParametersFactory {
   /**
    * Converts a connection options array to a ConnectionParameters object.
    *
-   * @param UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $info
+   * @param UnprocessedConnectionInfoArray|list<UnprocessedConnectionInfoArray> $connection_options
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
@@ -35,7 +35,7 @@ abstract class ConnectionParametersFactory {
     // If there is no "driver" property, then we assume it's an array of
     // possible connections for this target. Pick one at random. That allows
     // us to have, for example, multiple replica servers.
-    if (empty($connection_options['driver'])) {
+    if (!isset($connection_options['driver']) && count($connection_options) > 0) {
       $info_pick = $connection_options[mt_rand(0, count($connection_options) - 1)];
     }
 
@@ -56,7 +56,7 @@ abstract class ConnectionParametersFactory {
     // arrays. Those have the wrong 'namespace' key set, or not set at all
     // for core supported database drivers.
     if (empty($options['namespace']) || str_starts_with($options['namespace'], 'Drupal\\Core\\Database\\Driver\\')) {
-      switch (strtolower($options['driver'])) {
+      switch (strtolower($options['driver'] ?? '')) {
         case 'mysql':
           $options['namespace'] = 'Drupal\\mysql\\Driver\\Database\\mysql';
           break;

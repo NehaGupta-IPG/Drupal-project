@@ -22,27 +22,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 class ConnectionTest extends UnitTestCase {
 
   /**
-   * A mocked MySql connection.
-   *
-   * @var \Drupal\mysql\Driver\Database\mysql\Connection&\PHPUnit\Framework\MockObject\MockObject
-   */
-  private Connection&MockObject $connection;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->connection = $this->getMockBuilder(Connection::class)
-      ->setConstructorArgs([
-        $this->createStub(Mysql::class),
-        ['driver' => 'mysql', 'database' => 'foo'],
-      ])
-      ->onlyMethods(['getServerVersion'])
-      ->getMock();
-  }
-
-  /**
    * Tests version and is maria db.
    *
    * @legacy-covers ::version
@@ -50,12 +29,20 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerVersionAndIsMariaDb')]
   public function testVersionAndIsMariaDb(bool $expected_is_mariadb, string $server_version, string $expected_version): void {
-    $this->connection->expects($this->atLeastOnce())
+    $connection = $this->getMockBuilder(Connection::class)
+      ->setConstructorArgs([
+        $this->createStub(Mysql::class),
+        ['driver' => 'mysql', 'database' => 'foo'],
+      ])
+      ->onlyMethods(['getServerVersion'])
+      ->getMock();
+
+    $connection->expects($this->atLeastOnce())
       ->method('getServerVersion')
       ->willReturn($server_version);
 
-    $is_mariadb = $this->connection->isMariaDb();
-    $version = $this->connection->version();
+    $is_mariadb = $connection->isMariaDb();
+    $version = $connection->version();
 
     $this->assertSame($expected_is_mariadb, $is_mariadb);
     $this->assertSame($expected_version, $version);
