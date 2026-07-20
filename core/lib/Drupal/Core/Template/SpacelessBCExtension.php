@@ -19,7 +19,7 @@ final class SpacelessBCExtension extends AbstractExtension {
    */
   public function getFilters(): array {
     return [
-      new TwigFilter('spaceless', [self::class, 'spaceless'], ['is_safe' => ['html']]),
+      new TwigFilter('spaceless', [self::class, 'spaceless'], ['pre_escape' => 'html', 'is_safe' => ['html']]),
     ];
   }
 
