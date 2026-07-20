@@ -31792,12 +31792,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views_ui/src/Form/Ajax/ConfigHandlerGroup.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot unset offset \'\\#title\' on array\\{\'\\#theme_wrappers\'\\: array\\{\'container\'\\}, \'\\#attributes\'\\: array\\{class\\: array\\{\'scroll\'\\}, data\\-drupal\\-views\\-scroll\\: true\\}\\}\\.$#',
-	'identifier' => 'unset.offset',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/src/Form/Ajax/Display.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_ui\\\\Form\\\\Ajax\\\\Display\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
