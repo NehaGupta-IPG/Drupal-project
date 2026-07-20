@@ -17234,12 +17234,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media/src/OEmbed/Resource.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$resource_url on left side of \\?\\? always exists and is not nullable\\.$#',
-	'identifier' => 'nullCoalesce.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/OEmbed/UrlResolver.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\media\\\\Plugin\\\\Filter\\\\MediaEmbed\\:\\:applyPerEmbedMediaOverrides\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
