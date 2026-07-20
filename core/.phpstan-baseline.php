@@ -14072,12 +14072,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/filter/src/FilterPluginCollection.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^\\#lazy_builder value \'string\' at key \'0\' is invalid\\.$#',
-	'identifier' => 'renderCallback.invalidKeyValue',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/FilterProcessResult.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\filter\\\\Form\\\\FilterDisableForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

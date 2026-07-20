@@ -124,7 +124,7 @@ class FilterProcessResult extends BubbleableMetadata {
    * distinguish placeholders for filtered text versus generic render system
    * placeholders.
    *
-   * @param string $callback
+   * @param callable-string $callback
    *   The #lazy_builder callback that will replace the placeholder with its
    *   eventual markup.
    * @param array $args
