@@ -40,7 +40,7 @@ class DrupalRuntime extends SymfonyRuntime {
     // Remove path from webroot to "web" directory, if declared and present.
     // This allows Drupal to work when "/web" is a child of the webroot.
     $webroot = getenv('DRUPAL_WEBROOT');
-    if (str_starts_with($_SERVER['SCRIPT_NAME'], $webroot)) {
+    if ($webroot !== FALSE && str_starts_with($_SERVER['SCRIPT_NAME'], $webroot)) {
       $_SERVER['SCRIPT_NAME'] = substr($_SERVER['SCRIPT_NAME'], strlen($webroot));
     }
 
