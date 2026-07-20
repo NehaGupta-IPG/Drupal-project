@@ -15,7 +15,14 @@ use Drupal\Core\Database\Event\StatementExecutionEndEvent;
  * Every connection has one and only one logging object on it for all targets
  * and logging keys.
  *
- * @phpstan-type DatabaseLogEntry array{'query': string, 'args': list<mixed>, 'caller': string, 'target': string, 'time': float, 'start': float}
+ * @phpstan-type DatabaseLogEntry array{
+ *   'query': string,
+ *   'args': list<mixed>,
+ *   'caller': string,
+ *   'target': string,
+ *   'time': float,
+ *   'start': float,
+ * }
  */
 class Log {
 
@@ -52,6 +59,9 @@ class Log {
    *   The database connection key for which to enable logging.
    */
   public function __construct($key = 'default') {
+    if (!is_string($key)) {
+      @trigger_error('Passing a non-string value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
     $this->connectionKey = $key;
   }
 
