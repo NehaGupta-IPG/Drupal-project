@@ -4,6 +4,7 @@ namespace Drupal\system\Form;
 
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
@@ -26,6 +27,13 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
   protected $themeList;
 
   /**
+   * A module extension discovery instance.
+   *
+   * @var \Drupal\Core\Extension\ModuleExtensionList
+   */
+  protected $moduleList;
+
+  /**
    * The theme installer service.
    *
    * @var \Drupal\Core\Extension\ThemeInstallerInterface
@@ -37,11 +45,14 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
    *
    * @param \Drupal\Core\Extension\ThemeExtensionList $theme_list
    *   The theme extension list.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $module_list
+   *   The module extension list.
    * @param \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer
    *   The theme installer.
    */
-  public function __construct(ThemeExtensionList $theme_list, ThemeInstallerInterface $theme_installer) {
+  public function __construct(ThemeExtensionList $theme_list, ModuleExtensionList $module_list, ThemeInstallerInterface $theme_installer) {
     $this->themeList = $theme_list;
+    $this->moduleList = $module_list;
     $this->themeInstaller = $theme_installer;
   }
 
@@ -51,6 +62,7 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('extension.list.theme'),
+      $container->get('extension.list.module'),
       $container->get('theme_installer')
     );
   }
@@ -102,7 +114,9 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
     $this->messenger()->addWarning($this->t('Experimental themes are provided for testing purposes only. Use at your own risk.'));
 
     $dependencies = array_keys($all_themes[$theme]->requires);
-    $themes = array_merge([$theme], $dependencies);
+    $module_dependencies = array_keys($all_themes[$theme]->module_dependencies);
+    $theme_dependencies = array_values(array_diff($dependencies, $module_dependencies));
+    $themes = array_merge([$theme], $theme_dependencies);
     $is_experimental = function ($theme) use ($all_themes) {
       return isset($all_themes[$theme]) && $all_themes[$theme]->isExperimental();
     };
@@ -111,12 +125,12 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
     };
 
     $items = [];
-    if (!empty($dependencies)) {
+    if (!empty($theme_dependencies)) {
       // Display a list of required themes that have to be installed as well.
       $items[] = [
         [
           '#markup' => $this->formatPlural(
-            count($dependencies),
+            count($theme_dependencies),
               'You must install the following theme to install @theme:',
               'You must install the following themes to install @theme:',
               [
@@ -127,7 +141,26 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
         [
           '#theme' => 'item_list',
           '#list_type' => 'ul',
-          '#items' => array_map($get_label, $dependencies),
+          '#items' => array_map($get_label, $theme_dependencies),
+        ],
+      ];
+    }
+    if (!empty($module_dependencies)) {
+      $items[] = [
+        [
+          '#markup' => $this->formatPlural(
+            count($module_dependencies),
+            'You must install the following module to install @theme:',
+            'You must install the following modules to install @theme:',
+            [
+              '@theme' => $get_label($theme),
+            ]
+          ),
+        ],
+        [
+          '#theme' => 'item_list',
+          '#list_type' => 'ul',
+          '#items' => array_map($this->moduleList->getName(...), $module_dependencies),
         ],
       ];
     }
