@@ -47,16 +47,18 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
-   *   The key-value factory.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param \Drupal\Core\Cache\CacheBackendInterface|\Drupal\Core\KeyValueStore\KeyValueFactoryInterface $cache_backend
    *   The cache backend.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, KeyValueFactoryInterface $key_value_factory, CacheBackendInterface $cache_backend) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, CacheBackendInterface|KeyValueFactoryInterface $cache_backend) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
-    $this->keyValueFactory = $key_value_factory;
     $this->cacheBackend = $cache_backend;
+    if ($cache_backend instanceof KeyValueFactoryInterface) {
+      $this->keyValueFactory = $cache_backend;
+      $this->cacheBackend = func_get_arg(3);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $key_value_factory argument is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3612113', E_USER_DEPRECATED);
+    }
   }
 
   /**

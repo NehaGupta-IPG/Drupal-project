@@ -12,7 +12,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldDefinitionListener;
-use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -24,13 +23,6 @@ use Prophecy\Argument;
 #[CoversClass(FieldDefinitionListener::class)]
 #[Group('Field')]
 class FieldDefinitionListenerTest extends UnitTestCase {
-
-  /**
-   * The key-value factory.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface|\Prophecy\Prophecy\ProphecyInterface
-   */
-  protected $keyValueFactory;
 
   /**
    * The entity type manager.
@@ -66,12 +58,11 @@ class FieldDefinitionListenerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->keyValueFactory = $this->prophesize(KeyValueFactoryInterface::class);
     $this->entityTypeManager = $this->prophesize(EntityTypeManagerInterface::class);
     $this->entityFieldManager = $this->prophesize(EntityFieldManagerInterface::class);
     $this->cacheBackend = $this->prophesize(CacheBackendInterface::class);
 
-    $this->fieldDefinitionListener = new FieldDefinitionListener($this->entityTypeManager->reveal(), $this->entityFieldManager->reveal(), $this->keyValueFactory->reveal(), $this->cacheBackend->reveal());
+    $this->fieldDefinitionListener = new FieldDefinitionListener($this->entityTypeManager->reveal(), $this->entityFieldManager->reveal(), $this->cacheBackend->reveal());
   }
 
   /**
