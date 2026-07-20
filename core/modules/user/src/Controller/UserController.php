@@ -259,7 +259,7 @@ class UserController extends ControllerBase {
       '%name' => $user->getDisplayName(),
       '%timestamp' => $timestamp,
     ]);
-    $this->messenger()->addStatus($this->t('You have used a one-time login link. You can set your new password now.'));
+    $this->messenger()->addStatus($this->t('You have used a one-time login link.'));
     // Let the user's password be changed without the current password
     // check.
     $token = Crypt::randomBytesBase64(55);
@@ -343,7 +343,7 @@ class UserController extends ControllerBase {
    * @see https://www.drupal.org/node/3581062
    */
   protected function validatePathParameters(UserInterface $user, int $timestamp, string $hash, int $timeout = 0): bool {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\user\OneTimeAuthentication::verifyHmac() instead. See https://www.drupal.org/node/3581062', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\user\OneTimeAuthentication::verifyHmac() instead. See https://www.drupal.org/node/3581062', E_USER_DEPRECATED);
     return $this->oneTimeAuthentication->verifyHmac($user, $timestamp, $hash, $timeout);
   }
 
