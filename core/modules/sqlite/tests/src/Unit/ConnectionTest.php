@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Drupal\sqlite\Driver\Database\sqlite\Connection.
+ *
+ * @phpstan-import-type UnprocessedConnectionInfoArray from \Drupal\Core\Database\Database
  */
 #[CoversClass(Connection::class)]
 #[Group('Database')]
@@ -30,11 +32,13 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerCreateConnectionOptionsFromUrl')]
   public function testCreateConnectionOptionsFromUrl(string $url, string $expected): void {
-    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray([
+    /** @var UnprocessedConnectionInfoArray $connectionArray */
+    $connectionArray = [
       'driver' => 'sqlite',
       'database' => ':memory:',
       'foo' => 'bar',
-    ]);
+    ];
+    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray($connectionArray);
     $this->assertInstanceOf(ConnectionParameters::class, $connectionParameters);
     $sqlite_connection = new Connection($this->createStub(SqliteConnection::class), $connectionParameters);
     $database = $sqlite_connection->createConnectionOptionsFromUrl($url, NULL);
@@ -62,11 +66,13 @@ class ConnectionTest extends UnitTestCase {
    * Confirms legacy array access to the ConnectionParameters.
    */
   public function testConnectionParametersArrayAccess(): void {
-    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray([
+    /** @var UnprocessedConnectionInfoArray $connectionArray */
+    $connectionArray = [
       'driver' => 'sqlite',
       'database' => ':memory:',
       'foo' => 'bar',
-    ]);
+    ];
+    $connectionParameters = ConnectionParametersFactory::createFromOptionsArray($connectionArray);
     $this->assertInstanceOf(ConnectionParameters::class, $connectionParameters);
     $sqlite_connection = new Connection($this->createStub(SqliteConnection::class), $connectionParameters);
     $this->assertEquals('sqlite', $sqlite_connection->getConnectionOptions()->driver);
