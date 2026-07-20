@@ -13,7 +13,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldDefinitionListener;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
-use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -125,17 +124,6 @@ class FieldDefinitionListenerTest extends UnitTestCase {
     $entity = $this->prophesize(EntityTypeInterface::class);
     $this->setUpEntityTypeManager(['test_entity_type' => $entity]);
 
-    // Set up the stored bundle field map.
-    $key_value_store = $this->prophesize(KeyValueStoreInterface::class);
-    $this->keyValueFactory->get('entity.definitions.bundle_field_map')->willReturn($key_value_store->reveal());
-    $key_value_store->get('test_entity_type')->willReturn([]);
-    $key_value_store->set('test_entity_type', [
-      'test_field' => [
-        'type' => 'test_type',
-        'bundles' => ['test_bundle' => 'test_bundle'],
-      ],
-    ])->shouldBeCalled();
-
     $this->fieldDefinitionListener->onFieldDefinitionCreate($field_definition->reveal());
   }
 
@@ -154,23 +142,6 @@ class FieldDefinitionListenerTest extends UnitTestCase {
 
     $entity = $this->prophesize(EntityTypeInterface::class);
     $this->setUpEntityTypeManager(['test_entity_type' => $entity]);
-
-    // Set up the stored bundle field map.
-    $key_value_store = $this->prophesize(KeyValueStoreInterface::class);
-    $this->keyValueFactory->get('entity.definitions.bundle_field_map')->willReturn($key_value_store->reveal());
-    $key_value_store->get('test_entity_type')->willReturn([
-      'test_field' => [
-        'type' => 'test_type',
-        'bundles' => ['existing_bundle' => 'existing_bundle'],
-      ],
-    ]);
-    $key_value_store->set('test_entity_type', [
-      'test_field' => [
-        'type' => 'test_type',
-        'bundles' => ['existing_bundle' => 'existing_bundle', 'test_bundle' => 'test_bundle'],
-      ],
-    ])
-      ->shouldBeCalled();
 
     $this->fieldDefinitionListener->onFieldDefinitionCreate($field_definition->reveal());
   }
@@ -208,27 +179,6 @@ class FieldDefinitionListenerTest extends UnitTestCase {
     $entity = $this->prophesize(EntityTypeInterface::class);
     $this->setUpEntityTypeManager(['test_entity_type' => $entity]);
 
-    // Set up the stored bundle field map.
-    $key_value_store = $this->prophesize(KeyValueStoreInterface::class);
-    $this->keyValueFactory->get('entity.definitions.bundle_field_map')->willReturn($key_value_store->reveal());
-    $key_value_store->get('test_entity_type')->willReturn([
-      'test_field' => [
-        'type' => 'test_type',
-        'bundles' => ['test_bundle' => 'test_bundle'],
-      ],
-      'second_field' => [
-        'type' => 'test_type',
-        'bundles' => ['test_bundle' => 'test_bundle'],
-      ],
-    ]);
-    $key_value_store->set('test_entity_type', [
-      'second_field' => [
-        'type' => 'test_type',
-        'bundles' => ['test_bundle' => 'test_bundle'],
-      ],
-    ])
-      ->shouldBeCalled();
-
     $this->fieldDefinitionListener->onFieldDefinitionDelete($field_definition->reveal());
   }
 
@@ -247,23 +197,6 @@ class FieldDefinitionListenerTest extends UnitTestCase {
 
     $entity = $this->prophesize(EntityTypeInterface::class);
     $this->setUpEntityTypeManager(['test_entity_type' => $entity]);
-
-    // Set up the stored bundle field map.
-    $key_value_store = $this->prophesize(KeyValueStoreInterface::class);
-    $this->keyValueFactory->get('entity.definitions.bundle_field_map')->willReturn($key_value_store->reveal());
-    $key_value_store->get('test_entity_type')->willReturn([
-      'test_field' => [
-        'type' => 'test_type',
-        'bundles' => ['test_bundle' => 'test_bundle', 'second_bundle' => 'second_bundle'],
-      ],
-    ]);
-    $key_value_store->set('test_entity_type', [
-      'test_field' => [
-        'type' => 'test_type',
-        'bundles' => ['second_bundle' => 'second_bundle'],
-      ],
-    ])
-      ->shouldBeCalled();
 
     $this->fieldDefinitionListener->onFieldDefinitionDelete($field_definition->reveal());
   }
