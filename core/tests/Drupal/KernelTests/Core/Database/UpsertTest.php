@@ -336,7 +336,7 @@ class UpsertTest extends DatabaseTestBase {
 
     // An upsert that only adds a record.
     $this->connection->upsert('test_people', ['void_execute_return' => TRUE])
-, ['void_execute_return' => TRUE]      ->key('job')
+      ->key('job')
       ->fields(['job'])
       ->values(['Plumber'])
       ->execute();
