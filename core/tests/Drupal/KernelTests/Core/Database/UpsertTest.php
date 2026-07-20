@@ -66,10 +66,9 @@ class UpsertTest extends DatabaseTestBase {
    * Confirms that we can upsert using UpsertUpdateExpression.
    */
   public function testUpsertWithUpsertUpdateExpression(): void {
-    $connection = Database::getConnection();
-    $num_records_before = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
+    $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
-    $upsert = $connection->upsert('test_people', ['void_execute_return' => TRUE])
+    $upsert = $this->connection->upsert('test_people', ['void_execute_return' => TRUE])
       ->key('job')
       ->fields([
         'job',
@@ -95,15 +94,14 @@ class UpsertTest extends DatabaseTestBase {
 
     $upsert->execute();
 
-    $num_records_after = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
-    $this->assertEquals($num_records_before + 1, $num_records_after);
+    $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
-    $person = $connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Presenter'])->fetch();
+    $person = $this->connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Presenter'])->fetch();
     $this->assertSame('Presenter', $person->job);
     $this->assertSame('31', $person->age);
     $this->assertSame('Tiffany', $person->name);
 
-    $person = $connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Speaker'])->fetch();
+    $person = $this->connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Speaker'])->fetch();
     $this->assertSame('Speaker', $person->job);
     $this->assertSame('35', $person->age, 'Age should have been updated to 35.');
     $this->assertSame('Meredith', $person->name);
@@ -305,12 +303,12 @@ class UpsertTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests an upsert that has no columns to update.
+   * Tests a single-value upsert that has no columns to update.
    */
   public function testDegeneratedSingleValueUpsert(): void {
     $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
-    // An upsert that only adds a record with the key.
+    // An upsert that only adds a record.
     $this->connection->upsert('test_people', ['void_execute_return' => TRUE])
       ->key('job')
       ->fields(['job'])
@@ -319,7 +317,7 @@ class UpsertTest extends DatabaseTestBase {
 
     $this->assertSame('2', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
-    // Do the same upsert.
+    // Do the same upsert, should be a no-op.
     $this->connection->upsert('test_people', ['void_execute_return' => TRUE])
       ->key('job')
       ->fields(['job'])
@@ -331,14 +329,14 @@ class UpsertTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests an upsert that has no columns to update.
+   * Tests a multi-value upsert that has no columns to update.
    */
   public function testDegeneratedMultiValueUpsert(): void {
     $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
 
-    // An upsert that only adds a record with the key.
+    // An upsert that only adds a record.
     $this->connection->upsert('test_people', ['void_execute_return' => TRUE])
-      ->key('job')
+, ['void_execute_return' => TRUE]      ->key('job')
       ->fields(['job'])
       ->values(['Plumber'])
       ->execute();
@@ -364,7 +362,7 @@ class UpsertTest extends DatabaseTestBase {
   public function testDegeneratedCompositeKeyUpsert(): void {
     $this->installSchema('database_test', ['test_composite_primary']);
 
-    // Insert two new rows consisting only of the composite key.
+    // Insert two new rows.
     $this->connection->insert('test_composite_primary')
       ->fields([
         'name' => 'Kate',
