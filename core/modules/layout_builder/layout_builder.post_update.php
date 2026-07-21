@@ -55,10 +55,8 @@ function layout_builder_post_update_add_translation_field(): void {
           continue;
         }
         _layout_builder_add_translation_field($entity_type_id, $bundle);
-
       }
     }
-
   }
 }
 
@@ -96,10 +94,16 @@ function _layout_builder_add_translation_field($entity_type_id, $bundle): void {
 }
 
 /**
- * Adds the layout translation settings field.
+ * Update block revision_id in the layout translation field.
  */
 function layout_builder_post_update_update_block_revisions(array &$sandbox): ?TranslatableMarkup {
   if (!isset($sandbox['progress'])) {
+    // Check if field is present.
+    $field_storage = FieldStorageConfig::loadByName('node', OverridesSectionStorage::TRANSLATED_CONFIGURATION_FIELD_NAME);
+    if (!$field_storage) {
+      return NULL;
+    }
+
     // Count all nodes with layout translations.
     $count = \Drupal::entityTypeManager()
       ->getStorage('node')
