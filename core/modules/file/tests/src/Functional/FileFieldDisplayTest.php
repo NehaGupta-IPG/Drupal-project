@@ -176,7 +176,8 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $field_edit = [
       'settings[description_field]' => TRUE,
     ];
-    $this->fieldUIAddNewField('/admin/structure/types/manage/' . $type_name, $field_name, $label = $this->randomString(), $field_type, [], $field_edit);
+    $label = $this->randomString();
+    $this->fieldUIAddNewField('/admin/structure/types/manage/' . $type_name, $field_name, $label, $field_type, [], $field_edit);
     // Add a node of our new type and upload a file to it.
     $file = current($this->drupalGetTestFiles('text'));
     $title = $this->randomString();
