@@ -171,8 +171,6 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
       // are potentially invalid if older than the last time the bin was
       // written to in the consistent backend, so only keep ones that aren't.
       foreach ($items as $item) {
-        dump($items);
-        dump($last_write_timestamp);
         if ($item->created < $last_write_timestamp) {
           $cids[array_search($item->cid, $cids_copy)] = $item->cid;
         }
