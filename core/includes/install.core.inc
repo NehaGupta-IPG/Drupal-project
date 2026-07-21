@@ -33,6 +33,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -1769,7 +1770,7 @@ function install_import_translations(&$install_state) {
   // should import translations.
   $languages = \Drupal::languageManager()->getLanguages();
   if (count($languages) > 1 || !isset($languages['en'])) {
-    return \Drupal::service(LocaleFetch::class)->buildUpdateBatch();
+    return \Drupal::service(LocaleFetch::class)->buildUpdateBatch(['drupal']);
   }
 }
 
@@ -1826,7 +1827,7 @@ function install_finished(&$install_state): void {
   // If the profile has asked to be automatically uninstalled, do that.
   if ($install_state['profile_info']['keep_profile'] ?? TRUE) {
     // Installation profiles are always loaded last.
-    module_set_weight($profile, 1000);
+    \Drupal::service(ModuleWeight::class)->set($profile, 1000);
   }
   else {
     \Drupal::service('module_installer')->uninstall([$profile]);
