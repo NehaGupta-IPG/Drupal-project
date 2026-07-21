@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Cache;
 
 use Drupal\Component\Datetime\Time;
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\ChainedFastBackend;
 use Drupal\Core\Cache\CoordinatedChainedFastBackend;
@@ -35,7 +34,7 @@ class CoordinatedChainedFastBackendTest extends UnitTestCase {
 
     // There should be a single call to the invalidation consistent backend for
     // the last_write_timestamp.
-    $consistent_invalidation_cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
+    $consistent_invalidation_cache = $this->createMock(CacheBackendInterface::class);
     $timestamp_cid = ChainedFastBackend::LAST_WRITE_TIMESTAMP_PREFIX . 'cache_chained_fast_invalidation';
     // Use the request time because that is what we will be comparing against.
     $timestamp_item = (object) ['cid' => $timestamp_cid, 'data' => (int) $_SERVER['REQUEST_TIME'] - 60];
@@ -58,7 +57,7 @@ class CoordinatedChainedFastBackendTest extends UnitTestCase {
 
     // The consistent backend for the chained fast bin should neither have a
     // call for an invalidation timestamp nor for the cache item itself.
-    $consistent_cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
+    $consistent_cache = $this->createMock(CacheBackendInterface::class);
     $consistent_cache->expects($this->never())
       ->method('get');
     $consistent_cache->expects($this->never())
