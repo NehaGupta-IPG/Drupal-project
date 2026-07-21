@@ -21,7 +21,9 @@ function file_removed_post_updates(): array {
 }
 
 /**
- * Add the 'require description' file field setting.
+ * Add the 'description_required_field' file field setting.
+ *
+ * Updates all the field config and set description_required_field to FALSE.
  */
 function file_post_update_description_required(array &$sandbox): void {
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'field_config', function (FieldConfigInterface $field_config): bool {

@@ -249,6 +249,7 @@ class FileUploadTest extends ResourceTestBase {
     // Test the 'FileDescriptionRequired' constraint.
     // @see \Drupal\file\Plugin\Validation\Constraint\FileDescriptionRequired
     $this->field->setSetting('description_field_required', TRUE)->save();
+    $this->field->setSetting('description_field', TRUE)->save();
     $post_document = $this->getPostDocument();
     $post_document['data']['relationships']['field_rest_file_test']['data']['meta']['description'] = '';
     $request_options[RequestOptions::BODY] = Json::encode($post_document);
