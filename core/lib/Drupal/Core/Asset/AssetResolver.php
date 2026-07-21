@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Asset;
 
-use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -194,7 +193,7 @@ class AssetResolver implements AssetResolverInterface {
     // Add the active theme name to the cache key since active themes may
     // implement hook_library_info_alter().
     $active_theme = $this->themeManager->getActiveTheme()->getName();
-    $cid = 'fonts:' . $active_theme . ':' . $language->getId() . Crypt::hashBase64(serialize($libraries_to_load));
+    $cid = 'fonts:' . $active_theme . ':' . $language->getId() . implode(',', $libraries_to_load);
     if ($cached = $this->cache->get($cid)) {
       return $cached->data;
     }
@@ -239,7 +238,7 @@ class AssetResolver implements AssetResolverInterface {
     // active admin theme may include the default theme's ckeditor5-stylesheets
     // and default themes may be set conditionally and dynamically.
     $default_theme = $this->themeHandler->getDefault();
-    $cid = 'css:' . $active_theme . ':' . $default_theme . ':' . $language->getId() . Crypt::hashBase64(serialize($libraries_to_load)) . (int) $optimize;
+    $cid = 'css:' . $active_theme . ':' . $default_theme . ':' . $language->getId() . implode(',', $libraries_to_load) . ':' . (int) $optimize;
     if ($cached = $this->cache->get($cid)) {
       return $cached->data;
     }
@@ -361,7 +360,7 @@ class AssetResolver implements AssetResolverInterface {
     // Add the theme name to the cache key since themes may implement
     // hook_library_info_alter(). Additionally add the current language to
     // support translation of JavaScript files via hook_js_alter().
-    $cid = 'js:' . $theme_info->getName() . ':' . $language->getId() . ':' . Crypt::hashBase64(serialize($libraries_to_load)) . ':' . (int) $optimize;
+    $cid = 'js:' . $theme_info->getName() . ':' . $language->getId() . ':' . implode(', ', $libraries_to_load) . ':' . (int) $optimize;
 
     if ($cached = $this->cache->get($cid)) {
       [$js_assets_header, $js_assets_footer, $settings, $settings_in_header] = $cached->data;
