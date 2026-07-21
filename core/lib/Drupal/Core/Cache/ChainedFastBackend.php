@@ -315,7 +315,7 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
   /**
    * Gets the last write timestamp.
    */
-  protected function getLastWriteTimestamp() {
+  protected function getLastWriteTimestamp(): float {
     if ($this->lastWriteTimestamp === NULL) {
       $cache = $this->consistentBackend->get(self::LAST_WRITE_TIMESTAMP_PREFIX . $this->bin);
       $this->lastWriteTimestamp = $cache ? $cache->data : 0;
