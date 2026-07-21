@@ -22,7 +22,7 @@ class FileDescriptionRequiredValidator extends ConstraintValidator {
     }
 
     $field_definition = $field_item->getFieldDefinition();
-    if ($field_definition->getSetting('description') && $field_definition->getSetting('description_field_required')) {
+    if ($field_definition->getSetting('description_field') && $field_definition->getSetting('description_field_required')) {
       if (empty($field_item->getValue()['description'])) {
         $this->context->addViolation($constraint->message, [
           '@name' => $field_definition->getLabel(),

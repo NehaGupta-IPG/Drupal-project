@@ -192,7 +192,10 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $this->assertSession()->pageTextContains('The description may be used as the label of the link to the file.');
 
     // Set the description field as required.
-    $edit = ['settings[description_field_required]' => TRUE];
+    $edit = [
+      'settings[description_field]' => TRUE,
+      'settings[description_field_required]' => TRUE,
+    ];
     $this->drupalGet("admin/structure/types/manage/{$type_name}/fields/node.{$type_name}.field_{$field_name}");
     $this->submitForm($edit, 'Save settings');
     // When resubmitting the form a message should be shown indicating that the
@@ -200,6 +203,20 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $this->drupalGet($node->toUrl('edit-form'));
     $this->submitForm([], 'Save');
     $this->assertSession()->pageTextContains("The $label field description is required.");
+
+    // Test the scenario where description_field is unchecked and required field
+    // "description_field_required" is checked.
+    $edit = [
+      'settings[description_field]' => FALSE,
+      'settings[description_field_required]' => TRUE,
+    ];
+    $this->drupalGet("admin/structure/types/manage/{$type_name}/fields/node.{$type_name}.field_{$field_name}");
+    $this->submitForm($edit, 'Save settings');
+    // When resubmitting the form a message should be shown indicating that the
+    // description is now required.
+    $this->drupalGet($node->toUrl('edit-form'));
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextNotContains("The $label field description is required.");
   }
 
   /**
