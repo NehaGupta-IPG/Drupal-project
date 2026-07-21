@@ -25,18 +25,21 @@ class Xss {
     'address',
     'article',
     'aside',
+    'audio',
     'b',
     'bdi',
     'bdo',
     'big',
     'blockquote',
     'br',
+    'button',
     'caption',
     'cite',
     'code',
     'col',
     'colgroup',
     'command',
+    'data',
     'dd',
     'del',
     'details',
@@ -66,9 +69,11 @@ class Xss {
     'menu',
     'meter',
     'nav',
+    'noscript',
     'ol',
     'output',
     'p',
+    'picture',
     'pre',
     'progress',
     'q',
@@ -79,6 +84,7 @@ class Xss {
     'samp',
     'section',
     'small',
+    'source',
     'span',
     'strong',
     'sub',
@@ -87,6 +93,7 @@ class Xss {
     'table',
     'tbody',
     'td',
+    'template',
     'tfoot',
     'th',
     'thead',
@@ -96,9 +103,9 @@ class Xss {
     'u',
     'ul',
     'var',
+    'video',
     'wbr',
   ];
-
   /**
    * The default list of HTML tags allowed by filter().
    *
@@ -320,6 +327,8 @@ class Xss {
               'property',
               'class',
               'datetime',
+              'media',
+              'sizes',
             ]);
 
             $working = $mode = 1;

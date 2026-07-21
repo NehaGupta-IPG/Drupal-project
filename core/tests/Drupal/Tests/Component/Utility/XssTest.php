@@ -520,6 +520,18 @@ class XssTest extends TestCase {
         ['a'],
       ],
       [
+        '<source media="print and (resolution:300dpi)" />',
+        '<source media="print and (resolution:300dpi)" />',
+        'Source tag with media attribute',
+        ['source'],
+      ],
+      [
+        '<img src="http://example.com/foo.jpg" sizes="(min-width: 768px) 50vw, 100vw">',
+        '<img src="http://example.com/foo.jpg" sizes="(min-width: 768px) 50vw, 100vw">',
+        'Image tag with sizes attribute',
+        ['img'],
+      ],
+      [
         '<span property="dc:subject">Drupal 8: The best release ever.</span>',
         '<span property="dc:subject">Drupal 8: The best release ever.</span>',
         '<span property="dc:subject">Drupal 8: The best release ever.</span>',
