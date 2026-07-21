@@ -8,9 +8,9 @@ use Drupal\Core\Cache\CacheableDependencyTrait;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Menu\InaccessibleMenuLink;
-use Drupal\Core\Menu\MenuLinkTranslationInterface;
 use Drupal\Core\Menu\MenuLinkTreeContextualManipulatorInterface;
 use Drupal\Core\Menu\OnlyShowTranslatedMenuLinksInterface;
+use Drupal\menu_link_content\Plugin\Menu\MenuLinkContent;
 
 /**
  * Provides a menu link language manipulator.
@@ -34,7 +34,7 @@ class LanguageMenuLinkTreeManipulator implements MenuLinkTreeContextualManipulat
   public function process(array $tree, mixed $context): array {
     $current_language = $this->getCurrentLanguage()->getId();
     foreach ($tree as $key => $link) {
-      if (!$link->link instanceof MenuLinkTranslationInterface) {
+      if (!$link->link instanceof MenuLinkContent) {
         continue;
       }
 
