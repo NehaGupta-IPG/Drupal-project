@@ -27,9 +27,7 @@ class FileDescriptionRequiredUpdateTest extends UpdatePathTestBase {
   }
 
   /**
-   * Tests file_post_update_description_required().
-   *
-   * @see file_post_update_description_required()
+   * Tests the post update hook file_post_update_description_required.
    */
   public function testFilePostUpdateDescriptionRequired(): void {
     // Check that before running updates the file field setting is not present.
