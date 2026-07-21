@@ -6,14 +6,16 @@ namespace Drupal\Tests\file\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests adding the file field 'required description' setting.
  */
 #[Group('file')]
-#[Group('legacy')]
+#[Group('Update')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class FileDescriptionRequiredUpdateTest extends UpdatePathTestBase {
 
   /**
