@@ -44,7 +44,7 @@
     utterance. Per-column state is announced by each cell's own control on Tab,
     so this name stays column-agnostic.
   #}
-  aria-label="{{ movable ? title : '@title (locked)'|t({ '@title': title }) }}"
+  aria-label="{{ movable ? title : '@title (locked)'|t({'@title': title}) }}"
   {#
     The row is the keyboard cursor and the tree's single roving tab stop: the
     first top-level row is the initial stop, every other row starts at -1 and is
@@ -87,7 +87,7 @@
         <button
           type="button"
           class="menu-tree-ui-row__toggle"
-          aria-label="{{ 'Toggle children of @title'|t({ '@title': title }) }}"
+          aria-label="{{ 'Toggle children of @title'|t({'@title': title}) }}"
           data-treegrid-toggle
           tabindex="-1"
         >

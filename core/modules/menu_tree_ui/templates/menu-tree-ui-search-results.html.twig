@@ -21,7 +21,7 @@
 {% if query is not empty %}
   {% if results is empty %}
     <p class="menu-tree-ui-search-results__empty">
-      {{ 'No matches for "@q".'|t({ '@q': query }) }}
+      {{ 'No matches for "@q".'|t({'@q': query}) }}
     </p>
   {% else %}
     <p class="menu-tree-ui-search-results__summary">

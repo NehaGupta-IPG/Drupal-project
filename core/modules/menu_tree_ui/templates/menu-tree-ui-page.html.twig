@@ -19,11 +19,11 @@
   <noscript>
     <div class="messages messages--warning">
       {% if truncated %}
-        {{ 'Only the first @shown of @total links are shown. This tree UI needs JavaScript to load the rest, expand levels, and search. To edit @menu without JavaScript, use the classic menu administration:'|t({ '@shown': page_size, '@total': total, '@menu': menu.label }) }}
+        {{ 'Only the first @shown of @total links are shown. This tree UI needs JavaScript to load the rest, expand levels, and search. To edit @menu without JavaScript, use the classic menu administration:'|t({'@shown': page_size, '@total': total, '@menu': menu.label}) }}
       {% else %}
-        {{ 'This tree UI needs JavaScript to expand levels and search. To edit @menu without JavaScript, use the classic menu administration:'|t({ '@menu': menu.label }) }}
+        {{ 'This tree UI needs JavaScript to expand levels and search. To edit @menu without JavaScript, use the classic menu administration:'|t({'@menu': menu.label}) }}
       {% endif %}
-      <a href="{{ path('entity.menu.links', { menu: menu.id }) }}">{{ 'Open the classic administration for @menu'|t({ '@menu': menu.label }) }}</a>
+      <a href="{{ path('entity.menu.links', {menu: menu.id}) }}">{{ 'Open the classic administration for @menu'|t({'@menu': menu.label}) }}</a>
     </div>
   </noscript>
 
@@ -92,7 +92,7 @@
   {# Search bar above the list, with results popover anchored to the input. #}
   <div class="menu-tree-ui__search-container" role="search">
     <label for="menu-tree-ui-search-input" class="visually-hidden">
-      {{ 'Search @menu'|t({ '@menu': menu.label }) }}
+      {{ 'Search @menu'|t({'@menu': menu.label}) }}
     </label>
     <input
       id="menu-tree-ui-search-input"
@@ -115,9 +115,9 @@
 
   {% if locked %}
     <div class="menu-tree-ui__lock messages messages--warning" role="alert">
-      {{ '@user is currently editing this menu. Your changes cannot be saved until they finish.'|t({ '@user': lock_owner }) }}
+      {{ '@user is currently editing this menu. Your changes cannot be saved until they finish.'|t({'@user': lock_owner}) }}
       {% if lock_updated %}
-        {{ 'Their changes were last saved @time.'|t({ '@time': lock_updated|format_date('short') }) }}
+        {{ 'Their changes were last saved @time.'|t({'@time': lock_updated|format_date('short')}) }}
       {% endif %}
       {% if break_lock_url %}
         <a href="{{ break_lock_url }}">{{ 'Break lock'|t }}</a>
@@ -161,7 +161,7 @@
 
   {% if truncated %}
     <div class="menu-tree-ui__truncation messages messages--status" role="status">
-      {{ 'Showing the first @shown of @total links. The rest load as you scroll.'|t({ '@shown': page_size, '@total': total }) }}
+      {{ 'Showing the first @shown of @total links. The rest load as you scroll.'|t({'@shown': page_size, '@total': total}) }}
     </div>
   {% endif %}
 
