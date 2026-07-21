@@ -293,7 +293,7 @@ class HookCollectorPass implements CompilerPassInterface {
    *   or $function identifier.
    * @param array<class-string, string> $hookClassToServiceIdMap
    *   Map of FQCNs to registered service IDs. Each service ID references a
-   *   defintion in the container that uses the class.
+   *   definition in the container that uses the class.
    */
   protected static function registerHookServices(
     ContainerBuilder $container,
