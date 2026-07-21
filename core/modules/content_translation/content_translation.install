@@ -5,16 +5,17 @@
  * Installation functions for Content Translation module.
  */
 
+use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Url;
 
 /**
  * Implements hook_install().
  */
-function content_translation_install() {
-  // Assign a fairly low weight to ensure our implementation of
-  // hook_module_implements_alter() is run among the last ones.
-  module_set_weight('content_translation', 10);
+function content_translation_install(): void {
+  // Assign a fairly low weight to ensure our Order directive is run among the
+  // last ones.
+  \Drupal::service(ModuleWeight::class)->set('content_translation', 10);
 
   // Skip the guidance messages about enabling translation features if the
   // module was installed in the Drupal installation process.
@@ -41,6 +42,6 @@ function content_translation_install() {
 /**
  * Implements hook_update_last_removed().
  */
-function content_translation_update_last_removed() {
+function content_translation_update_last_removed(): int {
   return 8400;
 }

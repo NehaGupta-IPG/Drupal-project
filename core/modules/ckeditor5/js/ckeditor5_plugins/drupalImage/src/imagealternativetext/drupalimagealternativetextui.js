@@ -1,20 +1,23 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* cspell:ignore drupalimagealternativetextui contextualballoon componentfactory imagealternativetextformview missingalternativetextview imagetextalternativeui imagealternativetext */
+/* cspell:ignore imagealternativetext imagetextalternative */
+/* cspell:ignore imagetextalternativeui contextualballoon componentfactory */
+/* cspell:ignore drupalimagealternativetextui imagealternativetextformview */
+/* cspell:ignore missingalternativetextview */
 
 /**
  * @module drupalImage/imagealternativetext/drupalimagealternativetextui
  */
 
-import { Plugin, icons } from 'ckeditor5/src/core';
 import {
+  Plugin,
+  IconLowVision,
   ButtonView,
   ContextualBalloon,
+  CssTransitionDisablerMixin,
   clickOutsideHandler,
-} from 'ckeditor5/src/ui';
-import {
-  repositionContextualBalloon,
-  getBalloonPositionData,
-} from '@ckeditor/ckeditor5-image/src/image/ui/utils';
+  _repositionImageContextualBalloon as repositionContextualBalloon,
+  _getImageBalloonPositionData as getBalloonPositionData,
+} from 'ckeditor5';
 import ImageAlternativeTextFormView from './ui/imagealternativetextformview';
 import MissingAlternativeTextView from './ui/missingalternativetextview';
 
@@ -144,7 +147,7 @@ export default class DrupalImageAlternativeTextUi extends Plugin {
 
       view.set({
         label: Drupal.t('Change image alternative text'),
-        icon: icons.lowVision,
+        icon: IconLowVision,
         tooltip: true,
       });
 
@@ -182,7 +185,9 @@ export default class DrupalImageAlternativeTextUi extends Plugin {
      *
      * @member {module:drupalImage/imagetextalternative/ui/imagealternativetextformview~ImageAlternativeTextFormView}
      */
-    this._form = new ImageAlternativeTextFormView(editor.locale);
+    this._form = new (CssTransitionDisablerMixin(ImageAlternativeTextFormView))(
+      editor.locale,
+    );
 
     // Render the form so its #element is available for clickOutsideHandler.
     this._form.render();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\entity_test_update\EventSubscriber;
 
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
@@ -55,7 +57,7 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
   /**
    * {@inheritdoc}
    */
-  public function onEntityTypeCreate(EntityTypeInterface $entity_type) {
+  public function onEntityTypeCreate(EntityTypeInterface $entity_type): void {
     // Only add the new base field when a test needs it.
     if (!$this->state->get('entity_test_update.install_new_base_field_during_create', FALSE)) {
       return;
@@ -74,7 +76,7 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
   /**
    * {@inheritdoc}
    */
-  public function onEntityTypeUpdate(EntityTypeInterface $entity_type, EntityTypeInterface $original) {
+  public function onEntityTypeUpdate(EntityTypeInterface $entity_type, EntityTypeInterface $original): void {
     // Only add the new base field when a test needs it.
     if (!$this->state->get('entity_test_update.install_new_base_field_during_update', FALSE)) {
       return;

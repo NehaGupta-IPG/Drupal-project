@@ -6,12 +6,14 @@ namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests AJAX responses.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
+#[RunTestsInSeparateProcesses]
 class AjaxTest extends WebDriverTestBase {
 
   /**
@@ -24,11 +26,21 @@ class AjaxTest extends WebDriverTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    if ($this->name() === 'testAjaxFocus') {
+      $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3396536");
+    }
+    parent::setUp();
+  }
+
   public function testAjaxWithAdminRoute(): void {
-    \Drupal::service('theme_installer')->install(['stable9', 'claro']);
+    \Drupal::service('theme_installer')->install(['stark', 'claro']);
     $theme_config = \Drupal::configFactory()->getEditable('system.theme');
     $theme_config->set('admin', 'claro');
-    $theme_config->set('default', 'stable9');
+    $theme_config->set('default', 'stark');
     $theme_config->save();
 
     $account = $this->drupalCreateUser(['view the administration theme']);
@@ -42,11 +54,11 @@ class AjaxTest extends WebDriverTestBase {
 
     // Now click the modal, which should use the front-end theme.
     $this->drupalGet('ajax-test/dialog');
-    $assert->pageTextNotContains('Current theme: stable9');
+    $assert->pageTextNotContains('Current theme: stark');
     $this->clickLink('Link 8 (ajax)');
     $assert->assertWaitOnAjaxRequest();
 
-    $assert->pageTextContains('Current theme: stable9');
+    $assert->pageTextContains('Current theme: stark');
     $assert->pageTextNotContains('Current theme: claro');
   }
 
@@ -157,6 +169,12 @@ JS;
 JS;
     $expected = '<div class="div-wrapper-forever"></div>';
     $this->assertInsert('empty', $expected, $custom_wrapper_new_content);
+
+    // Checking inserting table elements.
+    $expected = '<tr><td>table-row</td></tr>';
+    $this->drupalGet('ajax-test/insert-table-wrapper');
+    $this->clickLink('Link table-row');
+    $this->assertWaitPageContains('<div class="ajax-target-wrapper"><table><tbody id="ajax-target">' . $expected . '</tbody></table></div>');
   }
 
   /**
@@ -250,7 +268,7 @@ JS;
    */
   protected function assertWaitPageContains(string $expected): void {
     $page = $this->getSession()->getPage();
-    $this->assertTrue($page->waitFor(10, function () use ($page, $expected) {
+    $this->assertTrue($page->waitFor(10, function () use ($page, $expected): bool {
       // Clear content from empty styles and "processed" classes after effect.
       $content = str_replace([' class="processed"', ' processed', ' style=""'], '', $page->getContent());
       return stripos($content, $expected) !== FALSE;
@@ -301,7 +319,8 @@ JS;
    * Tests ajax focus handling.
    */
   public function testAjaxFocus(): void {
-    $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3396536");
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3396536');
     $this->drupalGet('/ajax_forms_test_get_form');
 
     $this->assertNotNull($select = $this->assertSession()->elementExists('css', '#edit-select'));
@@ -342,6 +361,14 @@ JS;
     $this->assertSession()->assertWaitOnAjaxRequest();
     $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
     $this->assertEquals('edit-textfield-3', $has_focus_id);
+
+    $this->assertNotNull($email_field1 = $this->assertSession()->elementExists('css', '#edit-email-field-1'));
+    // Test email field with 'blur' event listener.
+    $email_field1->setValue('user@example.com');
+    $email_field1->focus();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
+    $this->assertEquals('edit-email-field-1', $has_focus_id);
   }
 
 }

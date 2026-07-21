@@ -7,13 +7,15 @@ namespace Drupal\Tests\settings_tray\FunctionalJavascript;
 use Drupal\settings_tray_test\Plugin\Block\SettingsTrayFormAnnotationIsClassBlock;
 use Drupal\settings_tray_test\Plugin\Block\SettingsTrayFormAnnotationNoneBlock;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Testing opening and saving block forms in the off-canvas dialog.
- *
- * @group #slow
- * @group settings_tray
  */
+#[Group('settings_tray')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
 
   /**
@@ -35,6 +37,10 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->name() === 'testEditModeEnableDisable') {
+      $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3317520");
+    }
+
     parent::setUp();
 
     $user = $this->createUser([
@@ -51,6 +57,8 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
    * Tests opening off-canvas dialog by click blocks and elements in the blocks.
    */
   public function testBlocks(): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3542883');
     foreach ($this->getBlockTests() as $test) {
       call_user_func_array([$this, 'doTestBlocks'], array_values($test));
     }
@@ -59,7 +67,7 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
   /**
    * Tests opening off-canvas dialog by click blocks and elements in the blocks.
    */
-  protected function doTestBlocks($theme, $block_plugin, $new_page_text, $element_selector, $label_selector, $button_text, $toolbar_item, $permissions) {
+  protected function doTestBlocks(string $theme, string $block_plugin, $new_page_text, $element_selector, $label_selector, ?string $button_text, $toolbar_item, $permissions): void {
     if ($permissions) {
       $this->grantPermissions(Role::load(Role::AUTHENTICATED_ID), $permissions);
     }
@@ -164,7 +172,7 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
   /**
    * Creates tests for ::testBlocks().
    */
-  public function getBlockTests() {
+  public function getBlockTests(): array {
     $blocks = [];
     foreach (static::getTestThemes() as $theme) {
       $blocks += [
@@ -232,7 +240,6 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
    * Tests enabling and disabling Edit Mode.
    */
   public function testEditModeEnableDisable(): void {
-    $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3317520");
     foreach (static::getTestThemes() as $theme) {
       $this->enableTheme($theme);
       $block = $this->placeBlock('system_powered_by_block');
@@ -280,7 +287,7 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
       $web_assert->assertWaitOnAjaxRequest();
       // The settings_tray_test_validation test plugin form always has a
       // validation error.
-      $web_assert->elementContains('css', '#drupal-off-canvas', 'Sorry system error. Save again');
+      $web_assert->elementContains('css', '#drupal-off-canvas', 'System error. Save again.');
       $this->disableEditMode();
       $block->delete();
     }

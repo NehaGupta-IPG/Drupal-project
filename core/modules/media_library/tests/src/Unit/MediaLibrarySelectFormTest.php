@@ -13,14 +13,17 @@ use Drupal\views\Plugin\views\display\DefaultDisplay;
 use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\media_library\Plugin\views\field\MediaLibrarySelectForm
- * @group media_library
+ * Tests Drupal\media_library\Plugin\views\field\MediaLibrarySelectForm.
  */
+#[CoversClass(MediaLibrarySelectForm::class)]
+#[Group('media_library')]
 class MediaLibrarySelectFormTest extends UnitTestCase {
 
   /**
@@ -33,7 +36,7 @@ class MediaLibrarySelectFormTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::viewsForm
+   * Tests views form.
    */
   public function testViewsForm(): void {
     $row = new ResultRow();
@@ -42,59 +45,45 @@ class MediaLibrarySelectFormTest extends UnitTestCase {
       ->onlyMethods(['getEntity'])
       ->disableOriginalConstructor()
       ->getMock();
-    $field->expects($this->any())
+    $field->expects($this->atLeastOnce())
       ->method('getEntity')
       ->willReturn(NULL);
 
     $container = new ContainerBuilder();
-    $container->set('string_translation', $this->createMock(TranslationInterface::class));
+    $container->set('string_translation', $this->createStub(TranslationInterface::class));
     \Drupal::setContainer($container);
 
-    $request = $this->getMockBuilder(Request::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $request = $this->createStub(Request::class);
     $request->query = new InputBag();
 
-    $view = $this->getMockBuilder(ViewExecutable::class)
-      ->onlyMethods(['getRequest', 'initStyle', 'getDisplay'])
-      ->disableOriginalConstructor()
-      ->getMock();
-    $view->expects($this->any())
+    $view = $this->createStub(ViewExecutable::class);
+    $view
       ->method('getRequest')
       ->willReturn($request);
-    $view->expects($this->any())
+    $view
       ->method('initStyle')
       ->willReturn(TRUE);
 
-    $display = $this->getMockBuilder(DefaultDisplay::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $display = $this->createStub(DefaultDisplay::class);
     $display->display['id'] = 'foo';
-    $view->expects($this->any())
+    $view
       ->method('getDisplay')
       ->willReturn($display);
 
-    $view_entity = $this->getMockBuilder(View::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $view_entity->expects($this->any())
+    $view_entity = $this->createStub(View::class);
+    $view_entity
       ->method('get')
       ->willReturn([]);
     $view->storage = $view_entity;
 
-    $display_manager = $this->getMockBuilder(ViewsPluginManager::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $display = $this->getMockBuilder(DefaultDisplay::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $display_manager->expects($this->any())
+    $display_manager = $this->createStub(ViewsPluginManager::class);
+    $display_manager
       ->method('createInstance')
-      ->willReturn($display);
+      ->willReturn($this->createStub(DefaultDisplay::class));
     $container->set('plugin.manager.views.display', $display_manager);
     \Drupal::setContainer($container);
 
-    $form_state = $this->createMock(FormStateInterface::class);
+    $form_state = $this->createStub(FormStateInterface::class);
     $view->result = [$row];
     $field->view = $view;
     $field->options = ['id' => 'bar'];

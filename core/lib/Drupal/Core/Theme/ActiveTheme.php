@@ -41,14 +41,6 @@ class ActiveTheme {
   protected $engine;
 
   /**
-   * The path to the theme engine for root themes.
-   *
-   * @var string
-   */
-  protected $owner;
-
-
-  /**
    * An array of base theme extension objects keyed by name.
    *
    * @var \Drupal\Core\Extension\Extension[]
@@ -100,7 +92,6 @@ class ActiveTheme {
     $values += [
       'path' => '',
       'engine' => 'twig',
-      'owner' => 'twig',
       'logo' => '',
       'libraries' => [],
       'extension' => 'html.twig',
@@ -114,7 +105,6 @@ class ActiveTheme {
     $this->logo = $values['logo'];
     $this->path = $values['path'];
     $this->engine = $values['engine'];
-    $this->owner = $values['owner'];
     $this->libraries = $values['libraries'];
     $this->extension = $values['extension'];
     $this->baseThemeExtensions = $values['base_theme_extensions'];
@@ -127,6 +117,7 @@ class ActiveTheme {
    * Returns the machine name of the theme.
    *
    * @return string
+   *   The machine name for the theme.
    */
   public function getName() {
     return $this->name;
@@ -136,6 +127,7 @@ class ActiveTheme {
    * Returns the path to the theme directory.
    *
    * @return string
+   *   The file path of the theme directory.
    */
   public function getPath() {
     return $this->path;
@@ -145,26 +137,17 @@ class ActiveTheme {
    * Returns the theme engine.
    *
    * @return string
+   *   The engine of the theme.
    */
   public function getEngine() {
     return $this->engine;
   }
 
   /**
-   * Returns the path to the theme engine for root themes.
-   *
-   * @see \Drupal\Core\Extension\ThemeExtensionList::doList()
-   *
-   * @return mixed
-   */
-  public function getOwner() {
-    return $this->owner;
-  }
-
-  /**
    * Returns the extension object.
    *
    * @return \Drupal\Core\Extension\Extension
+   *   The extension object for the theme.
    */
   public function getExtension() {
     return $this->extension;
@@ -174,6 +157,7 @@ class ActiveTheme {
    * Returns the libraries provided by the theme.
    *
    * @return mixed
+   *   The libraries provided by the theme.
    */
   public function getLibraries() {
     return $this->libraries;
@@ -187,6 +171,7 @@ class ActiveTheme {
    * be called first, so this order needs to be reversed with array_reverse()
    *
    * @return \Drupal\Core\Extension\Extension[]
+   *   An array of base theme extension objects keyed by name.
    */
   public function getBaseThemeExtensions() {
     return $this->baseThemeExtensions;
@@ -208,7 +193,8 @@ class ActiveTheme {
    * @return string[]
    *   The list of region machine names supported by the theme.
    *
-   * @see system_region_list()
+   * @see \Drupal\Core\Extension\Theme::listAllRegions()
+   * @see \Drupal\Core\Extension\Theme::listVisibleRegions()
    */
   public function getRegions() {
     return array_keys($this->regions);

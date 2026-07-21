@@ -1,7 +1,7 @@
 drupal.filter.admin:
   version: VERSION
   js:
-    filter.admin.js: {}
+    js/filter.admin.js: {}
   dependencies:
     - core/jquery
     - core/drupal
@@ -11,7 +11,7 @@ drupal.filter.admin:
 drupal.filter:
   version: VERSION
   js:
-    filter.js: {}
+    js/filter.js: {}
   dependencies:
     - core/jquery
     - core/drupal

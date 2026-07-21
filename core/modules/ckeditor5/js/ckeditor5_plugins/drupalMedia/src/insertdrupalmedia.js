@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
-// cspell:ignore insertdrupalmediacommand
-import { Command } from 'ckeditor5/src/core';
+/* cspell:ignore drupalelementstyle drupalelementstyleediting */
+/* cspell:ignore insertdrupalmediacommand */
+import { Command } from 'ckeditor5';
 import { groupNameToModelAttributeKey } from './utils';
 
 /**

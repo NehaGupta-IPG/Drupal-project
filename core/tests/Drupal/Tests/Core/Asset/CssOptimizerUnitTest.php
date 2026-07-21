@@ -7,12 +7,14 @@ namespace Drupal\Tests\Core\Asset;
 use Drupal\Core\Asset\CssOptimizer;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests the CSS asset optimizer.
- *
- * @group Asset
  */
+#[Group('Asset')]
 class CssOptimizerUnitTest extends UnitTestCase {
 
   /**
@@ -24,10 +26,8 @@ class CssOptimizerUnitTest extends UnitTestCase {
 
   /**
    * The file URL generator mock.
-   *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $fileUrlGenerator;
+  protected FileUrlGeneratorInterface&MockObject $fileUrlGenerator;
 
   /**
    * {@inheritdoc}
@@ -35,10 +35,10 @@ class CssOptimizerUnitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->fileUrlGenerator = $this->createMock(FileUrlGeneratorInterface::class);
-    $this->fileUrlGenerator->expects($this->any())
+    $this->fileUrlGenerator
       ->method('generateString')
-      ->with($this->isType('string'))
-      ->willReturnCallback(function ($uri) {
+      ->with($this->isString())
+      ->willReturnCallback(function (string $uri): string {
         return 'generated-relative-url:' . $uri;
       });
     $this->optimizer = new CssOptimizer($this->fileUrlGenerator);
@@ -47,7 +47,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
   /**
    * Provides data for the CSS asset optimizing test.
    */
-  public static function providerTestOptimize() {
+  public static function providerTestOptimize(): array {
     $path = 'core/tests/Drupal/Tests/Core/Asset/css_test_files/';
     $absolute_path = dirname(__FILE__) . '/css_test_files/';
     return [
@@ -142,8 +142,8 @@ class CssOptimizerUnitTest extends UnitTestCase {
           'weight' => 0.013,
           'media' => 'all',
           'preprocess' => TRUE,
-          'data' => $path . 'charset_sameline.css',
-          'basename' => 'charset_sameline.css',
+          'data' => $path . 'charset_same_line.css',
+          'basename' => 'charset_same_line.css',
         ],
         file_get_contents($absolute_path . 'charset.css.optimized.css'),
       ],
@@ -236,10 +236,9 @@ class CssOptimizerUnitTest extends UnitTestCase {
 
   /**
    * Tests optimizing a CSS asset group containing 'type' => 'file'.
-   *
-   * @dataProvider providerTestOptimize
    */
-  public function testOptimize($css_asset, $expected): void {
+  #[DataProvider('providerTestOptimize')]
+  public function testOptimize(array $css_asset, string|bool $expected): void {
     global $base_path;
     $original_base_path = $base_path;
     $base_path = '/';
@@ -254,7 +253,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
    */
   public function testTypeFilePreprocessingDisabled(): void {
     $this->expectException('Exception');
-    $this->expectExceptionMessage('Only file CSS assets with preprocessing enabled can be optimized.');
+    $this->expectExceptionMessageIs('Only file CSS assets with preprocessing enabled can be optimized.');
 
     $css_asset = [
       'group' => -100,
@@ -274,7 +273,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
    */
   public function testTypeExternal(): void {
     $this->expectException('Exception');
-    $this->expectExceptionMessage('Only file CSS assets can be optimized.');
+    $this->expectExceptionMessageIs('Only file CSS assets can be optimized.');
 
     $css_asset = [
       'group' => -100,
@@ -286,19 +285,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
       'data' => 'http://example.com/foo.js',
     ];
     $this->optimizer->optimize($css_asset);
-  }
-
-}
-
-/**
- * CssCollectionRenderer uses file_uri_scheme() which need to be mocked.
- */
-namespace Drupal\Core\Asset;
-
-if (!function_exists('Drupal\Core\Asset\file_uri_scheme')) {
-
-  function file_uri_scheme($uri) {
-    return FALSE;
   }
 
 }

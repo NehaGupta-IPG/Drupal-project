@@ -9,12 +9,15 @@ use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the rendering of a layout section field.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutSectionTest extends BrowserTestBase {
 
   /**
@@ -61,7 +64,7 @@ class LayoutSectionTest extends BrowserTestBase {
   /**
    * Provides test data for ::testLayoutSectionFormatter().
    */
-  public static function providerTestLayoutSectionFormatter() {
+  public static function providerTestLayoutSectionFormatter(): array {
     $data = [];
     $data['block_with_global_context'] = [
       [
@@ -85,7 +88,7 @@ class LayoutSectionTest extends BrowserTestBase {
       ],
       'user',
       'user:2',
-      'UNCACHEABLE',
+      'UNCACHEABLE (poor cacheability)',
     ];
     $data['block_with_entity_context'] = [
       [
@@ -168,10 +171,9 @@ class LayoutSectionTest extends BrowserTestBase {
 
   /**
    * Tests layout_section formatter output.
-   *
-   * @dataProvider providerTestLayoutSectionFormatter
    */
-  public function testLayoutSectionFormatter($layout_data, $expected_selector, $expected_content, $expected_cache_contexts, $expected_cache_tags, $expected_dynamic_cache): void {
+  #[DataProvider('providerTestLayoutSectionFormatter')]
+  public function testLayoutSectionFormatter(array $layout_data, $expected_selector, $expected_content, string $expected_cache_contexts, string $expected_cache_tags, string $expected_dynamic_cache): void {
     $node = $this->createSectionNode($layout_data);
 
     $canonical_url = $node->toUrl('canonical');
@@ -179,7 +181,7 @@ class LayoutSectionTest extends BrowserTestBase {
     $this->assertLayoutSection($expected_selector, $expected_content, $expected_cache_contexts, $expected_cache_tags, $expected_dynamic_cache);
 
     $this->drupalGet($canonical_url->toString() . '/layout');
-    $this->assertLayoutSection($expected_selector, $expected_content, $expected_cache_contexts, $expected_cache_tags, 'UNCACHEABLE');
+    $this->assertLayoutSection($expected_selector, $expected_content, $expected_cache_contexts, $expected_cache_tags, 'UNCACHEABLE (poor cacheability)');
   }
 
   /**
@@ -197,17 +199,17 @@ class LayoutSectionTest extends BrowserTestBase {
     ]);
 
     // Restrict access to the block.
-    $this->container->get('state')->set('test_block_access', FALSE);
+    $this->container->get('keyvalue')->get('block_test')->set('access', FALSE);
 
     $this->drupalGet($node->toUrl('canonical'));
-    $this->assertLayoutSection('.layout--onecol', NULL, '', '', 'UNCACHEABLE');
+    $this->assertLayoutSection('.layout--onecol', NULL, '', '', 'UNCACHEABLE (poor cacheability)');
     // Ensure the block was not rendered.
     $this->assertSession()->pageTextNotContains('Hello test world');
 
     // Grant access to the block, and ensure it was rendered.
-    $this->container->get('state')->set('test_block_access', TRUE);
+    $this->container->get('keyvalue')->get('block_test')->set('access', TRUE);
     $this->drupalGet($node->toUrl('canonical'));
-    $this->assertLayoutSection('.layout--onecol', 'Hello test world', '', '', 'UNCACHEABLE');
+    $this->assertLayoutSection('.layout--onecol', 'Hello test world', '', '', 'UNCACHEABLE (poor cacheability)');
   }
 
   /**
@@ -294,7 +296,8 @@ class LayoutSectionTest extends BrowserTestBase {
    * @param string $expected_cache_tags
    *   A string of cache tags to be found in the header.
    * @param string $expected_dynamic_cache
-   *   The expected dynamic cache header. Either 'HIT', 'MISS' or 'UNCACHEABLE'.
+   *   The expected dynamic cache header. Either 'HIT', 'MISS' or
+   *   'UNCACHEABLE (poor cacheability)'.
    *
    * @internal
    */

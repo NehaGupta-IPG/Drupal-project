@@ -15,9 +15,15 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class MenuSettingsConstraint extends SymfonyConstraint {
 
-  public $message = 'You can only change the menu settings for the <em>published</em> version of this content.';
-  public $messageWeight = 'You can only change the menu link weight for the <em>published</em> version of this content.';
-  public $messageParent = 'You can only change the parent menu link for the <em>published</em> version of this content.';
-  public $messageRemove = 'You can only remove the menu link in the <em>published</em> version of this content.';
+  public function __construct(
+    public $message = 'You can only change the menu settings for the <em>published</em> version of this content.',
+    public $messageWeight = 'You can only change the menu link weight for the <em>published</em> version of this content.',
+    public $messageParent = 'You can only change the parent menu link for the <em>published</em> version of this content.',
+    public $messageRemove = 'You can only remove the menu link in the <em>published</em> version of this content.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

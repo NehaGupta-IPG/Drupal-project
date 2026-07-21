@@ -12,18 +12,24 @@ use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
+use Drupal\mysql\Driver\Database\mysql\Schema;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests schema API for the MySQL driver.
- *
- * @group Database
  */
+#[Group('Database')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
+#[CoversClass(Schema::class)]
 class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**
    * {@inheritdoc}
    */
-  public function checkSchemaComment(string $description, string $table, ?string $column = NULL): void {
+  public function checkSchemaComment(string|false $description, string $table, ?string $column = NULL): void {
     $comment = $this->schema->getComment($table, $column);
     $max_length = $column ? 255 : 60;
     $description = Unicode::truncate($description, $max_length, TRUE, TRUE);
@@ -183,9 +189,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     // Count the number of columns defined in the indexes.
     $column_count = 0;
     foreach ($table_specification_with_new_index['indexes'] as $index) {
-      foreach ($index as $field) {
-        $column_count++;
-      }
+      $column_count += count($index);
     }
     $test_count = 0;
     foreach ($results as $result) {
@@ -196,7 +200,9 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
-   * @covers \Drupal\mysql\Driver\Database\mysql\Schema::introspectIndexSchema
+   * Tests introspect index schema.
+   *
+   * @legacy-covers \Drupal\mysql\Driver\Database\mysql\Schema::introspectIndexSchema
    */
   public function testIntrospectIndexSchema(): void {
     $table_specification = [
@@ -301,7 +307,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
    */
   public function testSchemaTableColumnSizeTooLargeException(): void {
     $this->expectException(SchemaTableColumnSizeTooLargeException::class);
-    $this->expectExceptionMessage("Column length too big for column 'too_large' (max = 16383); use BLOB or TEXT instead");
+    $this->expectExceptionMessageIs("Column length too big for column 'too_large' (max = 16383); use BLOB or TEXT instead");
     $this->schema->createTable('test_schema', [
       'description' => 'Tests SchemaTableColumnSizeTooLargeException.',
       'fields' => [
@@ -340,6 +346,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       'type' => 'serial',
       'not null' => TRUE,
     ], ['primary key' => ['id']]);
+    $this->assertTrue($this->schema->fieldExists('test_primary_key', 'id'));
   }
 
 }

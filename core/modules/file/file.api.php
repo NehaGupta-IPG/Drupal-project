@@ -2,6 +2,12 @@
 
 /**
  * @file
+ */
+
+use Drupal\file\FileInterface;
+
+/**
+ * @file
  * Hooks for file module.
  */
 
@@ -69,13 +75,17 @@
  *
  * @see \Drupal\file\FileRepositoryInterface::copy()
  */
-function hook_file_copy(\Drupal\file\FileInterface $file, \Drupal\file\FileInterface $source) {
+function hook_file_copy(FileInterface $file, FileInterface $source): void {
   // Make sure that the file name starts with the owner's user name.
   if (!str_starts_with($file->getFilename(), $file->getOwner()->name)) {
     $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
     $file->save();
 
-    \Drupal::logger('file')->notice('Copied file %source has been renamed to %destination', ['%source' => $source->filename, '%destination' => $file->getFilename()]);
+    \Drupal::logger('file')
+      ->notice('Copied file %source has been renamed to %destination', [
+        '%source' => $source->filename,
+        '%destination' => $file->getFilename(),
+      ]);
   }
 }
 
@@ -89,13 +99,17 @@ function hook_file_copy(\Drupal\file\FileInterface $file, \Drupal\file\FileInter
  *
  * @see \Drupal\file\FileRepositoryInterface::move()
  */
-function hook_file_move(\Drupal\file\FileInterface $file, \Drupal\file\FileInterface $source) {
+function hook_file_move(FileInterface $file, FileInterface $source): void {
   // Make sure that the file name starts with the owner's user name.
   if (!str_starts_with($file->getFilename(), $file->getOwner()->name)) {
     $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
     $file->save();
 
-    \Drupal::logger('file')->notice('Moved file %source has been renamed to %destination', ['%source' => $source->filename, '%destination' => $file->getFilename()]);
+    \Drupal::logger('file')
+      ->notice('Moved file %source has been renamed to %destination', [
+        '%source' => $source->filename,
+        '%destination' => $file->getFilename(),
+      ]);
   }
 }
 
