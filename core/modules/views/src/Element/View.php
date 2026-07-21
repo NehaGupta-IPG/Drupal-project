@@ -8,6 +8,7 @@ use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\views\ContextualLinksHelper;
 use Drupal\views\Exception\ViewRenderElementException;
+use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 
 /**
@@ -59,6 +60,12 @@ class View extends RenderElementBase {
     // possible to manipulate the $element.
     $view->element['#pre_rendered'] = TRUE;
 
+    // Assigned before the view is built so that anything rendered inside it,
+    // the exposed form in particular, can refer to the element that htmx
+    // replaces.
+    // @see static::htmxScrollModifier()
+    $element['#attributes']['id'] = $element['#attributes']['id'] ?? Html::getId('view-dom-id-' . $element['#name'] . '-' . $element['#display_id'] . '-wrapper');
+
     if (isset($element['#response'])) {
       $view->setResponse($element['#response']);
     }
@@ -101,12 +108,34 @@ class View extends RenderElementBase {
       }
     }
 
-    $element['#attributes']['id'] = $element['#attributes']['id'] ?? Html::getId('view-dom-id-' . $element['#name'] . '-' . $element['#display_id'] . '-wrapper');
     (new Htmx())
       ->swapOob(TRUE)
       ->applyTo($element);
 
     return $element;
+  }
+
+  /**
+   * Returns an hx-swap modifier that scrolls to the top of a rendered view.
+   *
+   * Htmx scrolls to the top of the page after a boosted request, on the
+   * reasoning that a boost stands in for an ordinary navigation. Only the view
+   * is replaced here, so the page is taken to the top of the view instead,
+   * which is where the Ajax implementation leaves it as well.
+   *
+   * @param \Drupal\views\ViewExecutable $view
+   *   The view being rendered.
+   *
+   * @return string
+   *   The modifier for \Drupal\Core\Htmx\Htmx::swap(), or an empty string when
+   *   the view is not wrapped by this element and so has nothing to scroll to.
+   *
+   * @see \Drupal\views\Controller\ViewAjaxController::ajaxView()
+   * @see https://htmx.org/attributes/hx-swap/
+   */
+  public static function htmxScrollModifier(ViewExecutable $view): string {
+    $id = $view->element['#attributes']['id'] ?? NULL;
+    return $id === NULL ? '' : 'show:#' . $id . ':top';
   }
 
 }

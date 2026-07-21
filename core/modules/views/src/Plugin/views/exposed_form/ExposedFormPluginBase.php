@@ -8,6 +8,7 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Htmx\Htmx;
+use Drupal\views\Element\View;
 use Drupal\views\Plugin\views\PluginBase;
 
 /**
@@ -268,7 +269,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
         ->boost()
         ->onlyMainContent()
         ->swapOob(TRUE)
-        ->swap('none')
+        ->swap('none', View::htmxScrollModifier($this->view))
         ->params(array_merge(array_keys($all_exposed), ['op']))
         ->applyTo($form);
 

@@ -19,6 +19,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\TableSort;
+use Drupal\views\Element\View;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -677,7 +678,7 @@ class ViewsThemeHooks {
               ->onlyMainContent()
               // Only trigger the AJAX request, updating the necessary element
               // is done with an out-of-band swap.
-              ->swap('none')
+              ->swap('none', View::htmxScrollModifier($view))
               ->applyTo($array);
             $variables['header'][$field]['link_attributes'] = $array['#attributes'];
           }

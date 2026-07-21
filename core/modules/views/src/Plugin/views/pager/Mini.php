@@ -5,6 +5,7 @@ namespace Drupal\views\Plugin\views\pager;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsPager;
+use Drupal\views\Element\View;
 
 /**
  * The plugin to handle mini pager.
@@ -109,7 +110,7 @@ class Mini extends SqlBase {
       (new Htmx())
         ->boost()
         ->onlyMainContent()
-        ->swap('none')
+        ->swap('none', View::htmxScrollModifier($this->view))
         ->applyTo($render);
     }
     return [

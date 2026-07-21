@@ -6,6 +6,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsPager;
+use Drupal\views\Element\View;
 
 /**
  * The plugin to handle full pager.
@@ -100,7 +101,7 @@ class Full extends SqlBase {
       (new Htmx())
         ->boost()
         ->onlyMainContent()
-        ->swap('none')
+        ->swap('none', View::htmxScrollModifier($this->view))
         ->applyTo($render);
     }
 
