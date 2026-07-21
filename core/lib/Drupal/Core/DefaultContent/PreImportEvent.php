@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\DefaultContent;
 
+use Drupal\Core\DefaultContent\DataProvider\DataProviderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -26,14 +27,14 @@ final class PreImportEvent extends Event {
   /**
    * Constructs a PreImportEvent object.
    *
-   * @param \Drupal\Core\DefaultContent\Finder $finder
-   *   The content finder, which has information on the entities to create
+   * @param \Drupal\Core\DefaultContent\DataProvider\DataProviderInterface $dataProvider
+   *   The data provider, which has information on the entities to create
    *   in the necessary dependency order.
    * @param \Drupal\Core\DefaultContent\Existing $existing
    *   What the importer will do when importing an entity that already exists.
    */
   public function __construct(
-    public readonly Finder $finder,
+    public readonly DataProviderInterface $dataProvider,
     public readonly Existing $existing,
   ) {}
 
@@ -49,7 +50,7 @@ final class PreImportEvent extends Event {
    *   If the given UUID is not one of the ones being imported.
    */
   public function skip(string $uuid, string|\Stringable|null $reason = NULL): void {
-    if (array_key_exists($uuid, $this->finder->data)) {
+    if (array_key_exists($uuid, $this->dataProvider->getData())) {
       $this->skip[$uuid] = $reason;
     }
     else {

@@ -9,7 +9,7 @@ use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\Utility\SortArray;
 use Drupal\Core\DefaultContent\Command\ContentExportCommand;
 use Drupal\Core\DefaultContent\Exporter;
-use Drupal\Core\DefaultContent\Finder;
+use Drupal\Core\DefaultContent\DataProvider\Finder;
 use Drupal\Core\DefaultContent\Importer;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;

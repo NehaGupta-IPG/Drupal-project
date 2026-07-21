@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Core\DefaultContent;
+namespace Drupal\Core\DefaultContent\DataProvider;
 
 use Drupal\Component\Graph\Graph;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\Utility\SortArray;
+use Drupal\Core\DefaultContent\ImportException;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder as SymfonyFinder;
 
@@ -17,7 +18,7 @@ use Symfony\Component\Finder\Finder as SymfonyFinder;
  * @internal
  *   This API is experimental.
  */
-final class Finder {
+final class Finder implements DataProviderInterface {
 
   /**
    * The content entity data to import.
@@ -87,6 +88,13 @@ final class Finder {
       }
     }
     $this->data = $entities;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getData(): array {
+    return $this->data;
   }
 
 }

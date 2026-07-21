@@ -13,6 +13,7 @@ use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\DefaultContent\DataProvider\DataProviderInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\file\FileInterface;
 use Drupal\link\Plugin\Field\FieldType\LinkItem;
@@ -53,8 +54,8 @@ final class Importer implements LoggerAwareInterface {
   /**
    * Imports content entities from disk.
    *
-   * @param \Drupal\Core\DefaultContent\Finder $content
-   *   The content finder, which has information on the entities to create
+   * @param \Drupal\Core\DefaultContent\DataProvider\DataProviderInterface $content
+   *   The data provider, which has information on the entities to create
    *   in the necessary dependency order.
    * @param \Drupal\Core\DefaultContent\Existing $existing
    *   (optional) What to do if one of the entities being imported already
@@ -71,8 +72,8 @@ final class Importer implements LoggerAwareInterface {
    *   - If any of the entities being imported already exists, by UUID, and
    *     $existing is \Drupal\Core\DefaultContent\Existing::Error.
    */
-  public function importContent(Finder $content, Existing $existing = Existing::Error, ?AccountInterface $account = NULL): void {
-    if (count($content->data) === 0) {
+  public function importContent(DataProviderInterface $content, Existing $existing = Existing::Error, ?AccountInterface $account = NULL): void {
+    if (count($content->getData()) === 0) {
       return;
     }
 
@@ -88,7 +89,7 @@ final class Importer implements LoggerAwareInterface {
 
     try {
       /** @var array{_meta: array<mixed>} $decoded */
-      foreach ($content->data as $decoded) {
+      foreach ($content->getData() as $decoded) {
         ['uuid' => $uuid, 'entity_type' => $entity_type_id, 'path' => $path] = $decoded['_meta'];
         assert(is_string($uuid));
         assert(is_string($entity_type_id));
@@ -231,42 +232,46 @@ final class Importer implements LoggerAwareInterface {
       }
     }
 
-    ['entity_type' => $entity_type] = $data['_meta'];
-    assert(is_string($entity_type));
-    /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
-    $entity_type = $this->entityTypeManager->getDefinition($entity_type);
+    try {
+      ['entity_type' => $entity_type] = $data['_meta'];
+      assert(is_string($entity_type));
+      /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
+      $entity_type = $this->entityTypeManager->getDefinition($entity_type);
 
-    $values = [
-      'uuid' => $data['_meta']['uuid'],
-    ];
-    if (!empty($data['_meta']['bundle'])) {
-      $values[$entity_type->getKey('bundle')] = $data['_meta']['bundle'];
-    }
+      $values = [
+        'uuid' => $data['_meta']['uuid'],
+      ];
+      if (!empty($data['_meta']['bundle'])) {
+        $values[$entity_type->getKey('bundle')] = $data['_meta']['bundle'];
+      }
 
-    if (!empty($data['_meta']['default_langcode'])) {
-      $data = $this->verifyNormalizedLanguage($data);
-      $values[$entity_type->getKey('langcode')] = $data['_meta']['default_langcode'];
-    }
+      if (!empty($data['_meta']['default_langcode'])) {
+        $data = $this->verifyNormalizedLanguage($data);
+        $values[$entity_type->getKey('langcode')] = $data['_meta']['default_langcode'];
+      }
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $this->entityTypeManager->getStorage($entity_type->id())->create($values);
-    foreach ($data['default'] as $field_name => $values) {
-      $this->setFieldValues($entity, $field_name, $values);
-    }
+      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      $entity = $this->entityTypeManager->getStorage($entity_type->id())->create($values);
+      foreach ($data['default'] as $field_name => $values) {
+        $this->setFieldValues($entity, $field_name, $values);
+      }
 
-    foreach ($data['translations'] ?? [] as $langcode => $translation_data) {
-      if ($this->languageManager->getLanguage($langcode)) {
-        $translation = $entity->addTranslation($langcode, $entity->toArray());
-        foreach ($translation_data as $field_name => $values) {
-          $this->setFieldValues($translation, $field_name, $values);
+      foreach ($data['translations'] ?? [] as $langcode => $translation_data) {
+        if ($this->languageManager->getLanguage($langcode)) {
+          $translation = $entity->addTranslation($langcode, $entity->toArray());
+          foreach ($translation_data as $field_name => $values) {
+            $this->setFieldValues($translation, $field_name, $values);
+          }
         }
       }
-    }
 
-    if ($is_root) {
-      $this->dependencies = NULL;
+      return $entity;
     }
-    return $entity;
+    finally {
+      if ($is_root) {
+        $this->dependencies = NULL;
+      }
+    }
   }
 
   /**

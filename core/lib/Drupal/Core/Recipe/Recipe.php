@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Recipe;
 
-use Drupal\Core\DefaultContent\Finder;
+use Drupal\Core\DefaultContent\DataProvider\Finder;
 use Drupal\Core\Extension\Dependency;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\ModuleExtensionList;
@@ -57,7 +57,7 @@ final class Recipe {
    * @param \Drupal\Core\Recipe\InputConfigurator $input
    *   The input configurator, which collects any input values used by the
    *   recipe.
-   * @param \Drupal\Core\DefaultContent\Finder $content
+   * @param \Drupal\Core\DefaultContent\DataProvider\Finder $content
    *   The default content finder.
    * @param string $path
    *   The recipe's path.

@@ -9,9 +9,9 @@ use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\StorageInterface;
+use Drupal\Core\DefaultContent\DataProvider\Finder;
 use Drupal\Core\DefaultContent\Existing;
 use Drupal\Core\DefaultContent\Importer;
-use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -144,7 +144,7 @@ final class RecipeRunner {
   /**
    * Creates content contained in a recipe.
    *
-   * @param \Drupal\Core\DefaultContent\Finder $content
+   * @param \Drupal\Core\DefaultContent\DataProvider\Finder $content
    *   The content finder object for the recipe.
    */
   protected static function processContent(Finder $content): void {

@@ -8,7 +8,7 @@ use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\block_content\BlockContentInterface;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\DefaultContent\Existing;
-use Drupal\Core\DefaultContent\Finder;
+use Drupal\Core\DefaultContent\DataProvider\Finder;
 use Drupal\Core\DefaultContent\Importer;
 use Drupal\Core\DefaultContent\InvalidEntityException;
 use Drupal\Core\DefaultContent\PreImportEvent;
