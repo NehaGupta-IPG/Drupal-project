@@ -46,7 +46,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
     ConfigurableLanguage::createFromLangcode('it')->save();
 
     // Enable translation for the node type 'bundle_with_section_field'.
-    \Drupal::service('content_translation.manager')->setEnabled('node', 'bundle_with_section_field', TRUE);
+    $this->container->get('content_translation.manager')->setEnabled('node', 'bundle_with_section_field', TRUE);
 
     // Add a non-translatable text field to the basic block bundle.
     $field_storage = FieldStorageConfig::create([
@@ -62,7 +62,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
       'label' => 'Non-translatable text',
     ]);
     $field->save();
-    $display_repository = \Drupal::service('entity_display.repository');
+    $display_repository = $this->container->get('entity_display.repository');
     // Assign widget settings for the default form mode.
     $display_repository->getFormDisplay('block_content', 'basic')
       ->setComponent('field_non_translatable_text', [
@@ -76,6 +76,9 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
         'type' => 'string',
       ])
       ->save();
+
+    // Reload storage to have the latest changes.
+    $this->blockStorage = $this->container->get('entity_type.manager')->getStorage('block_content');
   }
 
   /**
@@ -150,7 +153,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
 
     // Enable translation for block_content type 'bundle_with_section_field'.
     /** @var \Drupal\content_translation\ContentTranslationManager $content_translation_manager */
-    $content_translation_manager = \Drupal::service('content_translation.manager');
+    $content_translation_manager = $this->container->get('content_translation.manager');
     $content_translation_manager->setEnabled('block_content', 'basic', TRUE);
 
     // Update the translate node's inline block.
@@ -302,6 +305,7 @@ class InlineBlockTranslationTest extends InlineBlockTestBase {
 
     $assert_session->pageTextContains($new_label);
     $assert_session->pageTextContains($new_body);
+    $assert_session->pageTextContains($new_non_translatable_text);
     $assert_session->pageTextNotContains($existing_label);
     $assert_session->pageTextNotContains($existing_body);
   }
