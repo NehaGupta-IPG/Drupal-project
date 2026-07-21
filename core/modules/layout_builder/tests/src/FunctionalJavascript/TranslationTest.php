@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
+use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Core\Url;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\layout_builder\Functional\TranslationTestTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -117,6 +118,7 @@ class TranslationTest extends WebDriverTestBase {
   /**
    * Tests that block labels can be translated.
    */
+  #[DataProvider('providerLabelTranslation')]
   public function testLabelTranslation($install_config_translation): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
