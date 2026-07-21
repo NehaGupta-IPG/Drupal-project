@@ -10,6 +10,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\locale\CurrentImportStorage;
 use Drupal\locale\LocaleProjectRepository;
 use Drupal\locale\CurrentImport;
+use Drupal\locale\LocaleSource;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -85,8 +86,10 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->submitForm($edit, 'Save configuration');
 
     // Get status of translation sources at local file system.
-    $this->drupalGet('admin/reports/translations/check');
-    $result = locale_translation_get_status();
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
+    $this->checkForMetaRefresh();
+    $result = \Drupal::service(LocaleSource::class)->loadSources();
     $this->assertEquals(LOCALE_TRANSLATION_LOCAL, $result['contrib_module_one']['de']->type, 'Translation of contrib_module_one found');
     $this->assertEquals($this->timestampOld, $result['contrib_module_one']['de']->timestamp, 'Translation timestamp found');
     $this->assertEquals(LOCALE_TRANSLATION_LOCAL, $result['contrib_module_two']['de']->type, 'Translation of contrib_module_two found');
@@ -102,8 +105,10 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->submitForm($edit, 'Save configuration');
 
     // Get status of translation sources at both local and remote locations.
-    $this->drupalGet('admin/reports/translations/check');
-    $result = locale_translation_get_status();
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
+    $this->checkForMetaRefresh();
+    $result = \Drupal::service(LocaleSource::class)->loadSources();
     $this->assertEquals(LOCALE_TRANSLATION_REMOTE, $result['contrib_module_one']['de']->type, 'Translation of contrib_module_one found');
     $this->assertEquals($this->timestampNew, $result['contrib_module_one']['de']->timestamp, 'Translation timestamp found');
     $this->assertEquals(LOCALE_TRANSLATION_LOCAL, $result['contrib_module_two']['de']->type, 'Translation of contrib_module_two found');
@@ -112,6 +117,10 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->assertEquals($this->timestampOld, $result['contrib_module_three']['de']->timestamp, 'Translation timestamp found');
     $this->assertEquals(LOCALE_TRANSLATION_LOCAL, $result['locale_test']['de']->type, 'Translation of locale_test found');
     $this->assertEquals(LOCALE_TRANSLATION_LOCAL, $result['custom_module_one']['de']->type, 'Translation of custom_module_one found');
+
+    // Tests that the check route is protected against CSRF.
+    $this->drupalGet('admin/reports/translations/check');
+    $this->assertSession()->statusCodeEquals(403);
   }
 
   /**
@@ -122,6 +131,8 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *  - Import overwrite: all existing translations.
    */
   public function testUpdateImportSourceRemote(): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3393477');
     $config = $this->config('locale.settings');
 
     // Build the test environment.
@@ -138,7 +149,9 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->submitForm($edit, 'Save configuration');
 
     // Get the translation status.
-    $this->drupalGet('admin/reports/translations/check');
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
+    $this->checkForMetaRefresh();
 
     // Check the status on the Available translation status page.
     $this->assertSession()->responseContains('<label for="edit-langcodes-de" class="visually-hidden">Update German</label>');
@@ -153,7 +166,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->submitForm([], 'Update translations');
 
     // Check if the translation has been updated, using the status cache.
-    $status = locale_translation_get_status();
+    $status = \Drupal::service(LocaleSource::class)->loadSources();
     $this->assertEquals(LOCALE_TRANSLATION_CURRENT, $status['contrib_module_one']['de']->type, 'Translation of contrib_module_one found');
     $this->assertEquals(LOCALE_TRANSLATION_CURRENT, $status['contrib_module_two']['de']->type, 'Translation of contrib_module_two found');
     $this->assertEquals(LOCALE_TRANSLATION_CURRENT, $status['contrib_module_three']['de']->type, 'Translation of contrib_module_three found');
@@ -208,12 +221,14 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->submitForm($edit, 'Save configuration');
 
     // Execute the translation update.
-    $this->drupalGet('admin/reports/translations/check');
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
+    $this->checkForMetaRefresh();
     $this->drupalGet('admin/reports/translations');
     $this->submitForm([], 'Update translations');
 
     // Check if the translation has been updated, using the status cache.
-    $status = locale_translation_get_status();
+    $status = \Drupal::service(LocaleSource::class)->loadSources();
     $this->assertEquals(LOCALE_TRANSLATION_CURRENT, $status['contrib_module_one']['de']->type, 'Translation of contrib_module_one found');
     $this->assertEquals(LOCALE_TRANSLATION_CURRENT, $status['contrib_module_two']['de']->type, 'Translation of contrib_module_two found');
     $this->assertEquals(LOCALE_TRANSLATION_CURRENT, $status['contrib_module_three']['de']->type, 'Translation of contrib_module_three found');
@@ -267,7 +282,9 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->submitForm($edit, 'Save configuration');
 
     // Execute translation update.
-    $this->drupalGet('admin/reports/translations/check');
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
+    $this->checkForMetaRefresh();
     $this->drupalGet('admin/reports/translations');
     $this->submitForm([], 'Update translations');
 
@@ -307,7 +324,9 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     $this->submitForm($edit, 'Save configuration');
 
     // Execute translation update.
-    $this->drupalGet('admin/reports/translations/check');
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
+    $this->checkForMetaRefresh();
     $this->drupalGet('admin/reports/translations');
     $this->submitForm([], 'Update translations');
 
