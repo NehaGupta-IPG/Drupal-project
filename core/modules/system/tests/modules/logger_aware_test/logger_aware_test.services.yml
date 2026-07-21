@@ -16,3 +16,19 @@ services:
     class: Drupal\logger_aware_test\LoggerAwareStub
     calls:
       - [setLogger, ['@logger.channel.logger_stub']]
+
+  logger_aware_test.logger_aware_decorated:
+    class: Drupal\logger_aware_test\LoggerAwareStub
+
+  logger_aware_test.logger_aware_decorated_decorator:
+    class: Drupal\logger_aware_test\LoggerAwareStubDecorator
+    autowire: true
+    decorates: logger_aware_test.logger_aware_decorated
+
+  logger_aware_test.logger_aware_multi_base:
+    class: Drupal\logger_aware_test\LoggerAwareStub
+
+  logger_aware_test.logger_aware_multi_middle:
+    class: Drupal\logger_aware_test\LoggerAwareMiddleDecorator
+    autowire: true
+    decorates: logger_aware_test.logger_aware_multi_base

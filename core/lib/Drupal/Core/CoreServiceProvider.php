@@ -13,6 +13,7 @@ use Drupal\Core\DependencyInjection\Compiler\DevelopmentSettingsPass;
 use Drupal\Core\DependencyInjection\Compiler\ConsoleCompilerPass;
 use Drupal\Core\Hook\HookCollectorPass;
 use Drupal\Core\Hook\HookCollectorKeyValueWritePass;
+use Drupal\Core\DependencyInjection\Compiler\LoggerAwareInstanceTaggingPass;
 use Drupal\Core\DependencyInjection\Compiler\LoggerAwarePass;
 use Drupal\Core\DependencyInjection\Compiler\ModifyServiceDefinitionsPass;
 use Drupal\Core\DependencyInjection\Compiler\ProxyServicesPass;
@@ -105,6 +106,7 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
 
     // Add a compiler pass for registering event subscribers.
     $container->addCompilerPass(new RegisterEventSubscribersPass(new RegisterListenersPass()), PassConfig::TYPE_AFTER_REMOVING);
+    // Consumes tags applied by LoggerAwareInstanceTaggingPass, below.
     $container->addCompilerPass(new LoggerAwarePass(), PassConfig::TYPE_AFTER_REMOVING);
 
     $container->addCompilerPass(new RegisterAccessChecksPass());
@@ -130,6 +132,9 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
 
     $container->registerForAutoconfiguration(LoggerAwareInterface::class)
       ->addTag('logger_aware');
+
+    // See LoggerAwarePass::INSTANCE_TAG / PROVIDER_TAG.
+    $container->addCompilerPass(new LoggerAwareInstanceTaggingPass());
 
     $container->registerForAutoconfiguration(QueueFactoryInterface::class)
       ->addTag('queue_factory');
