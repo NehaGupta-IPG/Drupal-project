@@ -39,7 +39,7 @@ class CoordinatedChainedFastBackendTest extends UnitTestCase {
     $timestamp_cid = ChainedFastBackend::LAST_WRITE_TIMESTAMP_PREFIX . 'cache_chained_fast_invalidation';
     // Use the request time because that is what we will be comparing against.
     $timestamp_item = (object) ['cid' => $timestamp_cid, 'data' => (int) $_SERVER['REQUEST_TIME'] - 60];
-    $consistent_invalidationcache->expects($this->once())
+    $consistent_invalidation_cache->expects($this->once())
       ->method('get')->with($timestamp_cid)
       ->willReturn($timestamp_item);
     $consistent_invalidation_cache->expects($this->never())
