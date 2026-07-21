@@ -57,7 +57,7 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
     if ($cache_backend instanceof KeyValueFactoryInterface) {
       $this->keyValueFactory = $cache_backend;
       $this->cacheBackend = func_get_arg(3);
-      @trigger_error('Calling ' . __METHOD__ . '() with the $key_value_factory argument is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3612113', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $key_value_factory argument is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3612113', E_USER_DEPRECATED);
     }
   }
 
