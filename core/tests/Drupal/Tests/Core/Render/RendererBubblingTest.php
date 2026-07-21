@@ -140,7 +140,7 @@ class RendererBubblingTest extends RendererTestBase {
    * ::testBubblingWithPrerender() already tests the common case.
    */
   #[DataProvider('providerTestContextBubblingEdgeCases')]
-  public function testContextBubblingEdgeCases(array $element, array $expected_top_level_contexts, $expected_cache_item): void {
+  public function testContextBubblingEdgeCases(array $element, array $expected_top_level_contexts, array $expected_cache_item): void {
     $this->setUpRequest();
     $this->setUpMemoryCache();
     $this->cacheContextsManager
@@ -547,7 +547,7 @@ class RendererBubblingTest extends RendererTestBase {
       '#pre_render' => [__NAMESPACE__ . '\\BubblingTest::bubblingCacheOverwritePrerender'],
     ];
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Cache keys may not be changed after initial setup. Use the contexts property instead to bubble additional metadata.');
+    $this->expectExceptionMessageIs('Cache keys may not be changed after initial setup. Use the contexts property instead to bubble additional metadata.');
     $this->renderer->renderRoot($data);
   }
 
