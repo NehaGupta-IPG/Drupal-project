@@ -31,4 +31,6 @@ services:
     class: Drupal\hook_collector_hook_attribute\DeprecatedServiceWithHook
     deprecated: The "%service_id%" service is deprecated.
 
-  Drupal\hook_collector_hook_attribute\EventSubscriber\EventSubscriberWithHook: ~
+  Drupal\hook_collector_hook_attribute\EventSubscriber\EventSubscriberWithHook:
+    class: Drupal\hook_collector_hook_attribute\EventSubscriber\EventSubscriberWithHook
+    arguments: ['not_autowired']

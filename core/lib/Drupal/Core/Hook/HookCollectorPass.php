@@ -124,7 +124,7 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   protected function writeToContainer(ContainerBuilder $container): void {
     $implementationsByHook = $this->calculateImplementations();
-    static::registerHookServices($container, $implementationsByHook);
+    static::registerHookServices($container, $implementationsByHook, $this->hookClassToServiceIdMap);
 
     $packed_order_operations = [];
     $order_operations = $this->getOrderOperations();
@@ -226,7 +226,7 @@ class HookCollectorPass implements CompilerPassInterface {
         if (isset($parts[1])) {
           $class = $parts[0];
           if (isset($this->hookClassToServiceIdMap[$class])) {
-            $identifier = $this->hookClassToServiceIdMap[$class] . '::' . $parts[1];
+            $identifier = 'hook.' . $class . '::' . $parts[1];
           }
         }
         $implementation[$identifier] = $module;
@@ -291,10 +291,14 @@ class HookCollectorPass implements CompilerPassInterface {
    * @param array<string, array<string, string>> $implementationsByHook
    *   Implementations, as module names keyed by hook name and "$class::$method"
    *   or $function identifier.
+   * @param array<class-string, string> $hookClassToServiceIdMap
+   *   Map of FQCNs to registered service IDs. Each service ID references a
+   *   defintion in the container that uses the class.
    */
   protected static function registerHookServices(
     ContainerBuilder $container,
     array $implementationsByHook,
+    array $hookClassToServiceIdMap,
   ): void {
     $classesMap = [];
     foreach ($implementationsByHook as $hookImplementations) {
@@ -315,12 +319,20 @@ class HookCollectorPass implements CompilerPassInterface {
 
     foreach ($classesMap as $id => $class) {
       if (!$container->hasDefinition($id)) {
-        $container
+        $definition = $container
           ->register($id, $class)
           ->setAutowired(TRUE)
-          // Prevent hook service from being picked up as an event subscriber.
-          ->setAutoconfigured(FALSE)
           ->addTag('hook');
+
+        // For classes that are registered services, copy over arguments,
+        // properties, and calls from the existing service to the 'hook.'
+        // service.
+        if (array_key_exists($class, $hookClassToServiceIdMap)) {
+          $registeredServiceDefinition = $container->getDefinition($hookClassToServiceIdMap[$class]);
+          $definition->setArguments($registeredServiceDefinition->getArguments())
+            ->setProperties($registeredServiceDefinition->getProperties())
+            ->setMethodCalls($registeredServiceDefinition->getMethodCalls());
+        }
       }
       else {
         $container->getDefinition($id)->addTag('hook');
@@ -526,7 +538,7 @@ class HookCollectorPass implements CompilerPassInterface {
 
       $subPath = implode(DIRECTORY_SEPARATOR, $parts);
       $filename = $providerPath . DIRECTORY_SEPARATOR . $subPath . DIRECTORY_SEPARATOR . $filename;
-      $this->collectHookImplementationsFromClassFile($filename, $class, $provider, $hook_file_cache, TRUE);
+      $this->collectHookImplementationsFromClassFile($filename, $class, $provider, $hook_file_cache, $id);
     }
   }
 
@@ -565,10 +577,10 @@ class HookCollectorPass implements CompilerPassInterface {
    *   The name of module the class file is in.
    * @param \Drupal\Component\FileCache\FileCacheInterface $cache
    *   The cache of hook attribute data associated with file paths.
-   * @param bool $isRegistered
-   *   Whether this class is an already registered service.
+   * @param string|null $existingServiceId
+   *   ID of the service definition for this class, if any.
    */
-  protected function collectHookImplementationsFromClassFile(string $filename, string $class, string $module, FileCacheInterface $cache, bool $isRegistered = FALSE): void {
+  protected function collectHookImplementationsFromClassFile(string $filename, string $class, string $module, FileCacheInterface $cache, ?string $existingServiceId = NULL): void {
     $cached = $cache->get($filename);
     if ($cached) {
       $class = $cached['class'];
@@ -621,11 +633,11 @@ class HookCollectorPass implements CompilerPassInterface {
       foreach ($methodAttributes as $attribute) {
         if ($attribute instanceof Hook) {
           self::checkForProceduralOnlyHooks($attribute, $class);
-          // If the class has already been registered as a service, add a
-          // 'hook.' prefix to the class to be used as a separate service ID.
+          // If the class has already been registered as a service, keep a map
+          // of the class to the existing service.
           // @see ::calculateImplementations()
-          if ($isRegistered) {
-            $this->hookClassToServiceIdMap[$class] = 'hook.' . $class;
+          if (isset($existingServiceId)) {
+            $this->hookClassToServiceIdMap[$class] = $existingServiceId;
           }
           $this->oopImplementations[$attribute->hook][$class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
           if ($attribute->order !== NULL) {

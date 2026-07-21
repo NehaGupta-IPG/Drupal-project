@@ -19,6 +19,8 @@ class EventSubscriberWithHook implements EventSubscriberInterface {
 
   use TrackHookInvocationsTrait;
 
+  public function __construct(public readonly string $notAutowiredArgument) {}
+
   /**
    * Handles the event.
    *
@@ -44,6 +46,9 @@ class EventSubscriberWithHook implements EventSubscriberInterface {
   #[Hook('test_hook_1')]
   public function testHook1(array &$invocations): void {
     $this->trackInvocation($invocations, __FUNCTION__);
+    if ($this->notAutowiredArgument !== 'not_autowired') {
+      throw new \InvalidArgumentException('Non-autowired property not set');
+    }
   }
 
 }
