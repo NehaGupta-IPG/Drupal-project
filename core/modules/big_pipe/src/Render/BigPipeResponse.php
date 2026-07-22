@@ -72,8 +72,13 @@ class BigPipeResponse extends HtmlResponse implements ResponseKeepSessionOpenInt
    * Populates this BigPipeResponse object based on the original HTML response.
    */
   protected function populateBasedOnOriginalHtmlResponse() {
-    // Clone the HtmlResponse's data into the new BigPipeResponse.
-    $this->headers = clone $this->originalHtmlResponse->headers;
+    // Copy the HtmlResponse's data into the new BigPipeResponse. The header bag
+    // object itself cannot be replaced, so its contents are copied instead.
+    // Cookies are handled separately because they are not plain headers.
+    $this->headers->replace($this->originalHtmlResponse->headers->allPreserveCaseWithoutCookies());
+    foreach ($this->originalHtmlResponse->headers->getCookies() as $cookie) {
+      $this->headers->setCookie($cookie);
+    }
     $this
       ->setStatusCode($this->originalHtmlResponse->getStatusCode())
       ->setContent($this->originalHtmlResponse->getContent())

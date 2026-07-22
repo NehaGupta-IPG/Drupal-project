@@ -70,8 +70,7 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     }
 
     $validator = $this->createValidator();
-    $validator->initialize($context);
-    $validator->validate($items, $constraint);
+    $validator->validateInContext($items, $constraint, $context);
   }
 
   /**

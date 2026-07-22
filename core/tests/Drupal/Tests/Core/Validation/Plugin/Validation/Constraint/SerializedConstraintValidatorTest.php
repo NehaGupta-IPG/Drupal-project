@@ -44,8 +44,7 @@ class SerializedConstraintValidatorTest extends UnitTestCase {
     $constraint = new SerializedConstraint();
 
     $validate = new SerializedConstraintValidator();
-    $validate->initialize($context);
-    $validate->validate($value, $constraint);
+    $validate->validateInContext($value, $constraint, $context);
   }
 
   /**

@@ -10,6 +10,7 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Core\Validation\ExecutionContext;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Composite;
+use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -227,8 +228,15 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
       $this->context->setConstraint($constraint);
 
       $validator = $this->constraintValidatorFactory->getInstance($constraint);
-      $validator->initialize($this->context);
-      $validator->validate($value, $constraint);
+      if ($validator instanceof ConstraintValidator || method_exists($validator, 'validateInContext')) {
+        $validator->validateInContext($value, $constraint, $this->context);
+      }
+      else {
+        // BC layer for constraint validators not implementing the new API.
+        // DebugClassLoader already triggers a deprecation.
+        $validator->initialize($this->context);
+        $validator->validate($value, $constraint);
+      }
     }
   }
 
