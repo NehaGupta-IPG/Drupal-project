@@ -31,7 +31,7 @@ class TransactionManagerTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->connection = new StubConnection($this->createStub(StubPDO::class), []);
+    $this->connection = new StubConnection($this->createStub(\PDO::class), []);
   }
 
   /**
