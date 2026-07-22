@@ -20,7 +20,7 @@ class ExceptionHandler extends BaseExceptionHandler {
   /**
    * {@inheritdoc}
    */
-  public function handleExecutionException(\Exception $exception, StatementInterface $statement, array $arguments = [], array $options = []): void {
+  public function handleExecutionException(\Exception $exception, StatementInterface $statement, array $arguments = [], array $options = []): never {
     if (!$exception instanceof \PDOException) {
       throw $exception;
     }
@@ -60,8 +60,7 @@ class ExceptionHandler extends BaseExceptionHandler {
     ?int $errorCode,
     string $queryString,
     array $arguments,
-    array $options,
-  ): void {
+  ): never {
 
     // SQLState could be 'HY000' which cannot be used as a $code argument for
     // exceptions. PDOException is contravariant in this case, but since we are
