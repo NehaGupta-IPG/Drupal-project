@@ -5,4 +5,3 @@ package: Testing
 version: VERSION
 dependencies:
   - drupal:mysql
-  - drupal:pgsql

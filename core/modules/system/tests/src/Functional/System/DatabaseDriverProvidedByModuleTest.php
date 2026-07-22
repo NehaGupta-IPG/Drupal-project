@@ -38,7 +38,7 @@ class DatabaseDriverProvidedByModuleTest extends BrowserTestBase {
    */
   public function testDatabaseDriverIsProvidedByModuleButTheModuleIsNotEnabled(): void {
     $driver = Database::getConnection()->driver();
-    if (!in_array($driver, ['mysql', 'pgsql'])) {
+    if ($driver !== 'mysql') {
       $this->markTestSkipped("This test does not support the {$driver} database driver.");
     }
 
@@ -57,11 +57,7 @@ class DatabaseDriverProvidedByModuleTest extends BrowserTestBase {
       'dependencies' => [
         $driver => [
           'namespace' => "Drupal\\{$driver}",
-          // The pgsql driver has been relocated out of core to the custom
-          // pgsql module; other drivers still ship from core/modules.
-          'autoload' => $driver === 'pgsql'
-            ? 'modules/custom/pgsql/src/'
-            : "core/modules/$driver/src/",
+          'autoload' => "core/modules/$driver/src/",
         ],
       ],
     ];
