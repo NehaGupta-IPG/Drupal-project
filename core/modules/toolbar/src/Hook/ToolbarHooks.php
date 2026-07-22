@@ -172,8 +172,8 @@ class ToolbarHooks {
     if ($this->moduleHandler->moduleExists('user')) {
       $items += $this->userToolbar();
     }
-    if ($this->moduleHandler->moduleExists('workspaces')) {
-      $items += $this->workspacesToolbar();
+    if ($this->moduleHandler->moduleExists('workspaces_ui')) {
+      $items += $this->workspacesUiToolbarHook();
     }
 
     return $items;
@@ -365,7 +365,7 @@ class ToolbarHooks {
     return $items;
   }
 
-  public function workspacesToolbar(): array {
+  public function workspacesUiToolbarHook(): array {
     $items['workspace'] = [
       '#cache' => [
         'contexts' => [
