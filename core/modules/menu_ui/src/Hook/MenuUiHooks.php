@@ -6,6 +6,7 @@ use Drupal\block\BlockInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\HookDependsOnModule;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Link;
 use Drupal\menu_ui\MenuUiUtility;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
@@ -150,7 +151,9 @@ class MenuUiHooks {
     $type_menus = Menu::loadMultiple($type_menus_ids);
     $available_menus = [];
     foreach ($type_menus as $menu) {
-      $available_menus[$menu->id()] = $menu->label();
+      if (in_array($menu->language()->getId(), [$node->language()->getId(), LanguageInterface::LANGCODE_NOT_SPECIFIED, LanguageInterface::LANGCODE_NOT_APPLICABLE])) {
+        $available_menus[$menu->id()] = $menu->label();
+      }
     }
     if ($defaults['id']) {
       $default = $defaults['menu_name'] . ':' . $defaults['parent'];
