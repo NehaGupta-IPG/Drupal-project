@@ -8,6 +8,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\file\Entity\File;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\image\ImageStyleStorageInterface;
 use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatter;
@@ -124,15 +125,22 @@ class MediaThumbnailFormatter extends ImageFormatter {
 
     /** @var \Drupal\media\MediaInterface[] $media_items */
     foreach ($media_items as $delta => $media) {
-      $elements[$delta] = [
-        '#theme' => 'image_formatter',
-        '#item' => $media->get('thumbnail')->first(),
-        '#attributes' => [
-          'loading' => $this->getSetting('image_loading')['attribute'],
-        ],
-        '#image_style' => $this->getSetting('image_style'),
-        '#url' => $this->getMediaThumbnailUrl($media, $items->getEntity()),
-      ];
+      $build = $this->renderSvgTheme($media, $image_style_setting);
+      if (!empty($build)) {
+        // Set svg image theme.
+        $elements[$delta] = $build;
+      }
+      else {
+        $elements[$delta] = [
+          '#theme' => 'image_formatter',
+          '#item' => $media->get('thumbnail')->first(),
+          '#attributes' => [
+            'loading' => $this->getSetting('image_loading')['attribute'],
+          ],
+          '#image_style' => $this->getSetting('image_style'),
+          '#url' => $this->getMediaThumbnailUrl($media, $items->getEntity()),
+        ];
+      }
 
       // Add cacheability of each item in the field.
       $this->renderer->addCacheableDependency($elements[$delta], $media);
@@ -188,6 +196,38 @@ class MediaThumbnailFormatter extends ImageFormatter {
       $url = $media->toUrl();
     }
     return $url;
+  }
+
+  /**
+   * Return svg image.
+   */
+  protected function renderSvgTheme(MediaInterface $media, $image_style_setting) {
+    $build = NULL;
+    // Get field media image.
+    /** @var \Drupal\media\MediaSourceInterface $source_file */
+    $source_file = $media->getSource();
+    $file_id = $source_file->getSourceFieldValue($media);
+    if ($file_id) {
+      // Get file and check if this is an SVG image.
+      $file = File::load($file_id);
+      if (!empty($file) && $file->filemime->value == 'image/svg+xml') {
+        $path = $this->fileUrlGenerator->generateString($file->getFileUri());
+        $build = [
+          '#theme' => 'image',
+          '#attributes' => [
+            'src' => $path,
+          ],
+        ];
+        $image_style = $this->imageStyleStorage->load($image_style_setting);
+        if ($image_style) {
+          $config = $image_style->getEffects()->getConfiguration();
+          $data = reset($config);
+          $build['#attributes']['width'] = $data['data']['width'] ?? NULL;
+          $build['#attributes']['height'] = $data['data']['height'] ?? NULL;
+        }
+      }
+    }
+    return $build;
   }
 
 }
