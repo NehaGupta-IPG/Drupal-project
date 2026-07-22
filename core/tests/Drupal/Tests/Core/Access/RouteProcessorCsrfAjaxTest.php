@@ -8,14 +8,15 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Access\RouteProcessorCsrf;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\Access\RouteProcessorCsrf
- * @group Access
+ * Test CSRF token exclusion via _csrf_exclude_parameters.
  */
+#[Group('Access')]
 class RouteProcessorCsrfAjaxTest extends UnitTestCase {
 
   /**
