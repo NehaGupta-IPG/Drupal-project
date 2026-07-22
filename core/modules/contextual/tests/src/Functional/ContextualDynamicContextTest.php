@@ -10,6 +10,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Message\ResponseInterface;
@@ -20,6 +21,8 @@ use Psr\Http\Message\ResponseInterface;
 #[Group('contextual')]
 #[RunTestsInSeparateProcesses]
 class ContextualDynamicContextTest extends BrowserTestBase {
+
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -64,6 +67,8 @@ class ContextualDynamicContextTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->enablePromotedContentView();
 
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);

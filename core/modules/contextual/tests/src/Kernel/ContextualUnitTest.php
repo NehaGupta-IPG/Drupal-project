@@ -64,7 +64,7 @@ class ContextualUnitTest extends KernelTestBase {
       [
         'views_ui_edit' => [
           'route_parameters' => [
-            'view' => 'frontpage',
+            'view' => 'promoted_content',
           ],
           'metadata' => [
             'location' => 'page',
