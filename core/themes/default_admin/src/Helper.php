@@ -221,7 +221,8 @@ final class Helper {
       // Add theme name to base theme array.
       $frontend_base_themes[$frontend_theme_name] = $frontend_theme_name;
 
-      // Admin theme will have no value if it is set to use the default theme.
+      // Default Admin theme will have no value if it is set to use the default
+      // theme.
       if ($admin_theme_name && isset($theme_handler[$admin_theme_name]->base_themes)) {
         $admin_base_themes = $theme_handler[$admin_theme_name]->base_themes;
         $admin_base_themes[$admin_theme_name] = $admin_theme_name;
@@ -271,8 +272,8 @@ final class Helper {
     if ($form_id) {
       // Forms to exclude.
       // If media library widget, don't use new content edit form.
-      // gin_preprocess_html is not triggered here, so checking the form id is
-      // enough.
+      // \Drupal\default_admin\Hook\PreprocessHooks::preprocessHtml() is not
+      // triggered here, so checking the form ID is enough.
       $form_ids_to_ignore = [
         'media_library_add_form_',
         'views_form_media_library_widget_',

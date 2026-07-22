@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\File\FileSystem.
@@ -36,10 +37,8 @@ class FileSystemTest extends UnitTestCase {
 
   /**
    * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
    */
-  protected $streamWrapperManager;
+  protected StreamWrapperManagerInterface&Stub $streamWrapperManager;
 
   /**
    * {@inheritdoc}
@@ -164,7 +163,7 @@ class FileSystemTest extends UnitTestCase {
     // cspell:disable-next-line
     $filename = "a\xFFsdf\x80€" . '.txt';
     $this->expectException(FileException::class);
-    $this->expectExceptionMessage("Invalid filename '$filename'");
+    $this->expectExceptionMessageIs("Invalid filename '$filename'");
     $this->fileSystem->createFilename($filename, 'vfs://dir');
   }
 

@@ -17,13 +17,17 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Field\FieldTypePluginManager;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -55,31 +59,23 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * The entity type used for testing.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
    */
-  protected $entityType;
+  protected EntityTypeInterface&Stub $entityType;
 
   /**
    * The entity field manager used for testing.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityFieldManager;
+  protected EntityFieldManagerInterface&MockObject $entityFieldManager;
 
   /**
    * The entity type bundle manager used for testing.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $entityTypeBundleInfo;
+  protected EntityTypeBundleInfoInterface&Stub $entityTypeBundleInfo;
 
   /**
    * The entity type manager used for testing.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&MockObject $entityTypeManager;
 
   /**
    * The type ID of the entity under test.
@@ -90,31 +86,23 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * The typed data manager used for testing.
-   *
-   * @var \Drupal\Core\TypedData\TypedDataManager
    */
-  protected $typedDataManager;
+  protected TypedDataManagerInterface&Stub $typedDataManager;
 
   /**
    * The field type manager used for testing.
-   *
-   * @var \Drupal\Core\Field\FieldTypePluginManager|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $fieldTypePluginManager;
+  protected FieldTypePluginManager&MockObject $fieldTypePluginManager;
 
   /**
    * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&Stub $languageManager;
 
   /**
    * The UUID generator used for testing.
-   *
-   * @var \Drupal\Component\Uuid\UuidInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $uuid;
+  protected UuidInterface&Stub $uuid;
 
   /**
    * The entity ID.
@@ -321,7 +309,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
       ->with('revision')
       ->willReturn(FALSE);
     $this->expectException('LogicException');
-    $this->expectExceptionMessage('Entity type ' . $this->entityTypeId . ' does not support revisions.');
+    $this->expectExceptionMessageIs('Entity type ' . $this->entityTypeId . ' does not support revisions.');
     $this->entity->setNewRevision();
   }
 
@@ -550,7 +538,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     // results in an exception.
     $this->assertTrue($this->entity->isValidationRequired());
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Entity validation is required, but was skipped.');
+    $this->expectExceptionMessageIs('Entity validation is required, but was skipped.');
     $this->entity->save();
   }
 

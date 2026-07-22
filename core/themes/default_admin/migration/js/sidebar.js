@@ -7,7 +7,7 @@
   const storageDesktop = 'Drupal.gin.sidebarExpanded.desktop';
   const storageWidth = "Drupal.gin.sidebarWidth";
   const reSizer = document.getElementById('gin-sidebar-draggable');
-  const resizable = document.getElementById('gin_sidebar');
+  const resizable = document.getElementById('default_admin_sidebar');
   let isResizing = false;
   let startX, startWidth;
 
@@ -19,7 +19,7 @@
 
   Drupal.ginSidebar = {
     init: function (context) {
-      once('ginSidebarInit', '#gin_sidebar', context).forEach(() => {
+      once('ginSidebarInit', '#default_admin_sidebar', context).forEach(() => {
         // If variable does not exist, create it, default being to show sidebar.
         if (!localStorage.getItem(storageDesktop)) {
           localStorage.setItem(storageDesktop, 'true');
@@ -172,7 +172,7 @@
 
     resizeEnd: () => {
       isResizing = false;
-      const setWidth = document.documentElement.style.getPropertyValue('--gin-sidebar-width');
+      const setWidth = document.documentElement.style.getPropertyValue('--admin-theme-sidebar-width');
       const currentWidth = setWidth ? setWidth : resizable.style.width;
       localStorage.setItem(storageWidth, currentWidth);
       document.removeEventListener('mousemove', this.resizeWidth);
@@ -191,7 +191,7 @@
 
         sidebarWidth = `${sidebarWidth}px`;
         // resizable.style.width = sidebarWidth;
-        document.documentElement.style.setProperty('--gin-sidebar-width', sidebarWidth);
+        document.documentElement.style.setProperty('--admin-theme-sidebar-width', sidebarWidth);
       }
     }
 
