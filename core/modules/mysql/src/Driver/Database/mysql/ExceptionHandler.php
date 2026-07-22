@@ -60,6 +60,7 @@ class ExceptionHandler extends BaseExceptionHandler {
     ?int $errorCode,
     string $queryString,
     array $arguments,
+    array $options,
   ): never {
 
     // SQLState could be 'HY000' which cannot be used as a $code argument for
