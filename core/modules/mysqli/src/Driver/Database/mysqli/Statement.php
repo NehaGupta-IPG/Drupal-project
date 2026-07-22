@@ -6,7 +6,9 @@ namespace Drupal\mysqli\Driver\Database\mysqli;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Statement\FetchAs;
+use Drupal\Core\Database\Statement\PlaceholderType;
 use Drupal\Core\Database\Statement\StatementBase;
+use Drupal\Core\Database\Utility\SqlDumper;
 
 /**
  * MySQLi implementation of \Drupal\Core\Database\Query\StatementInterface.
@@ -33,6 +35,8 @@ class Statement extends StatementBase {
    *   Client database connection object.
    * @param string $queryString
    *   The SQL query string.
+   * @param \Drupal\Core\Database\Statement\PlaceholderType $placeholderType
+   *   The type of placeholders in the query string.
    * @param array $driverOpts
    *   (optional) Array of query options.
    * @param bool $rowCountEnabled
@@ -42,6 +46,7 @@ class Statement extends StatementBase {
     Connection $connection,
     \mysqli $clientConnection,
     string $queryString,
+    protected readonly PlaceholderType $placeholderType,
     protected array $driverOpts = [],
     bool $rowCountEnabled = FALSE,
   ) {
@@ -84,10 +89,30 @@ class Statement extends StatementBase {
       // Prepare the lower-level statement if it's not been prepared already.
       if (!$this->hasClientStatement()) {
         // Replace named placeholders with positional ones if needed.
-        $this->paramsPositions = array_flip(array_keys($args));
-        $converter = new NamedPlaceholderConverter();
-        $converter->parse($this->queryString, $args);
-        [$convertedQueryString, $args] = [$converter->getConvertedSQL(), $converter->getConvertedParameters()];
+        if ($this->placeholderType === PlaceholderType::Positional) {
+          assert(call_user_func(function () use ($args, &$sqlDump): bool {
+            try {
+              $converter = new NamedPlaceholderConverter();
+              $converter->parse($this->queryString, $args);
+              $isDifferent = $converter->getConvertedSQL() !== $this->queryString;
+            }
+            catch (\Exception) {
+              $isDifferent = FALSE;
+            }
+            if ($isDifferent) {
+              // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+              $sqlDump = SqlDumper::export($this->queryString, $args);
+            }
+            return !$isDifferent;
+          }), "Expected positional-placeholder-only query string has named placeholders in it.\n{$sqlDump}");
+          $convertedQueryString = $this->queryString;
+        }
+        else {
+          $this->paramsPositions = array_flip(array_keys($args));
+          $converter = new NamedPlaceholderConverter();
+          $converter->parse($this->queryString, $args);
+          [$convertedQueryString, $args] = [$converter->getConvertedSQL(), $converter->getConvertedParameters()];
+        }
         $this->clientStatement = $this->clientConnection->prepare($convertedQueryString);
       }
       else {
@@ -110,7 +135,10 @@ class Statement extends StatementBase {
       );
       $this->markResultsetIterable($return);
     }
-    catch (\Exception $e) {
+    catch (\Exception | \ValueError $e) {
+      if ($e instanceof \ValueError) {
+        $e = new \Exception($e->getMessage(), $e->getCode(), $e);
+      }
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
       throw $e;
     }

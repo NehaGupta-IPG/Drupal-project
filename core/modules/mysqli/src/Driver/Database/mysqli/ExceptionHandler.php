@@ -22,7 +22,7 @@ class ExceptionHandler extends BaseMySqlExceptionHandler {
     }
 
     if (!($exception instanceof \mysqli_sql_exception)) {
-      throw $exception;
+      $this->rethrowNormalizedException($exception, 0, $exception->getCode(), $statement->getQueryString(), $arguments);
     }
     $this->rethrowNormalizedException($exception, $exception->getSqlState(), $exception->getCode(), $statement->getQueryString(), $arguments);
   }

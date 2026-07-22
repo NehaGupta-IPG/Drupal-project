@@ -3,6 +3,7 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Statement\PlaceholderType;
 
 /**
  * Query builder for SELECT statements.
@@ -136,13 +137,18 @@ class Select extends Query implements SelectInterface {
    *   Database connection object.
    * @param string|\Drupal\Core\Database\Query\SelectInterface $table
    *   The table name or subquery that is being queried.
-   * @param string $alias
+   * @param ?string $alias
    *   The alias for the table.
    * @param array $options
    *   Array of query options.
    */
-  public function __construct(Connection $connection, $table, $alias = NULL, $options = []) {
-    parent::__construct($connection, $options);
+  public function __construct(
+    Connection $connection,
+    string|SelectInterface $table,
+    ?string $alias = NULL,
+    array $options = [],
+  ) {
+    parent::__construct($connection, $options + ['placeholder_format' => $connection->placeholderFormat()]);
     $conjunction = $options['conjunction'] ?? 'AND';
     $this->condition = $this->connection->condition($conjunction);
     $this->having = $this->connection->condition($conjunction);
@@ -201,11 +207,19 @@ class Select extends Query implements SelectInterface {
       return NULL;
     }
 
-    $args = $this->condition->arguments() + $this->having->arguments();
+    $args = [];
 
+    // These are the SELECT expressions.
+    foreach ($this->expressions as $expression) {
+      if ($expression['arguments']) {
+        $args = array_merge($args, $this->processExpressionPlaceholders($expression)[1]);
+      }
+    }
+
+    // These are the FROM parts.
     foreach ($this->tables as $table) {
       if ($table['arguments']) {
-        $args += $table['arguments'];
+        $args = array_merge($args, $this->processConditionPlaceholders((string) $table['condition'], $table['arguments'])[1]);
       }
       // If this table is a subquery, grab its arguments recursively.
       if ($table['table'] instanceof SelectInterface) {
@@ -217,11 +231,11 @@ class Select extends Query implements SelectInterface {
       }
     }
 
-    foreach ($this->expressions as $expression) {
-      if ($expression['arguments']) {
-        $args += $expression['arguments'];
-      }
-    }
+    // These are the WHERE conditions.
+    $args = array_merge($args, $this->condition->arguments());
+
+    // These are the HAVING expressions.
+    $args = array_merge($args, $this->having->arguments());
 
     // If there are any dependent queries to UNION,
     // incorporate their arguments recursively.
@@ -839,7 +853,7 @@ class Select extends Query implements SelectInterface {
       $fields[] = $this->connection->escapeField($table . $field['field']) . ' AS ' . $this->connection->escapeAlias($field['alias']);
     }
     foreach ($this->expressions as $expression) {
-      $fields[] = $expression['expression'] . ' AS ' . $this->connection->escapeAlias($expression['alias']);
+      $fields[] = $this->processExpressionPlaceholders($expression)[0] . ' AS ' . $this->connection->escapeAlias($expression['alias']);
     }
     $query .= implode(', ', $fields);
 
@@ -873,7 +887,7 @@ class Select extends Query implements SelectInterface {
       $query .= $table_string . ' ' . $this->connection->escapeAlias($table['alias']);
 
       if (!empty($table['condition'])) {
-        $query .= ' ON ' . (string) $table['condition'];
+        $query .= ' ON ' . $this->processConditionPlaceholders((string) $table['condition'], $table['arguments'])[0];
       }
     }
 
@@ -951,6 +965,96 @@ class Select extends Query implements SelectInterface {
         $this->tables[$alias]['table'] = clone $table['table'];
       }
     }
+  }
+
+  /**
+   * Processes placeholders.
+   *
+   * @param string $condition
+   *   The condition to modify.
+   * @param array $arguments
+   *   The arguments for the condition.
+   *
+   * @return array{0: string, 1: array}
+   *   The processed condition string and the placeholders' values.
+   *
+   * @throws \InvalidArgumentException
+   *   This exception is thrown when:
+   *   - A placeholder that ends in [] is supplied, and the supplied value is
+   *     not an array.
+   *   - A placeholder that does not end in [] is supplied, and the supplied
+   *     value is an array.
+   */
+  protected function processConditionPlaceholders(string $condition, array $arguments): array {
+    $returnCondition = $condition;
+    $returnArguments = [];
+    foreach ($arguments as $placeholder => $value) {
+      // Deal with array placeholder.
+      if (str_ends_with($placeholder, '[]')) {
+        if (!is_array($value)) {
+          throw new \InvalidArgumentException('Placeholders with a trailing [] can only be expanded with an array of values.');
+        }
+        if ($this->queryOptions['placeholder_format'] === PlaceholderType::Named) {
+          $key = str_replace('[]', '__', $placeholder);
+          $tmp = [];
+          foreach (array_values($value) as $i => $v) {
+            $tmp[$key . $i] = $v;
+          }
+          if (isset($i)) {
+            $returnCondition = str_replace($placeholder, implode(', ', array_keys($tmp)), $returnCondition);
+            $returnArguments = array_merge($returnArguments, $tmp);
+          }
+        }
+        else {
+          $tmp = [];
+          foreach (array_values($value) as $i => $v) {
+            $tmp[$i] = $v;
+          }
+          if (isset($i)) {
+            $returnCondition = str_replace($placeholder, implode(', ', array_fill(0, $i + 1, '?')), $returnCondition);
+            $returnArguments = array_merge($returnArguments, $tmp);
+          }
+        }
+      }
+      // Deal with scalar placeholder.
+      else {
+        if (is_array($value)) {
+          throw new \InvalidArgumentException('Placeholders must have a trailing [] if they are to be expanded with an array of values.');
+        }
+        if ($this->queryOptions['placeholder_format'] === PlaceholderType::Named) {
+          $returnArguments[$placeholder] = $value;
+        }
+        else {
+          $returnCondition = str_replace($placeholder, '?', $returnCondition);
+          $returnArguments[] = $value;
+        }
+      }
+    }
+    return [$returnCondition, $returnArguments];
+  }
+
+  /**
+   * Processes expression placeholders.
+   *
+   * @param array $expression
+   *   The expression.
+   *
+   * @return array{0: string, 1: array}
+   *   The processed expression string and the placeholders' values.
+   */
+  protected function processExpressionPlaceholders(array $expression): array {
+    $returnExpression = $expression['expression'];
+    $returnArguments = [];
+    foreach ($expression['arguments'] as $placeholder => $value) {
+      if ($this->queryOptions['placeholder_format'] === PlaceholderType::Named) {
+        $returnArguments[$placeholder] = $value;
+      }
+      else {
+        $returnExpression = str_replace($placeholder, '?', $returnExpression);
+        $returnArguments[] = $value;
+      }
+    }
+    return [$returnExpression, $returnArguments];
   }
 
 }

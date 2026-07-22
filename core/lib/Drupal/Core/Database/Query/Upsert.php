@@ -3,6 +3,7 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Statement\PlaceholderType;
 
 /**
  * General class for an abstracted "Upsert" (UPDATE or INSERT) query operation.
@@ -22,18 +23,12 @@ abstract class Upsert extends Query implements \Countable {
    */
   protected $key;
 
-  /**
-   * Constructs an Upsert object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   A Connection object.
-   * @param string $table
-   *   Name of the table to associate with this query.
-   * @param array $options
-   *   (optional) An array of database options.
-   */
-  public function __construct(Connection $connection, $table, array $options = []) {
-    parent::__construct($connection, $options);
+  public function __construct(
+    Connection $connection,
+    string $table,
+    array $options = [],
+  ) {
+    parent::__construct($connection, $options + ['placeholder_format' => $connection->placeholderFormat()]);
     $this->table = $table;
   }
 
@@ -101,7 +96,11 @@ abstract class Upsert extends Query implements \Countable {
     $values = [];
     foreach ($this->insertValues as $insert_values) {
       foreach ($insert_values as $value) {
-        $values[':db_insert_placeholder_' . $max_placeholder++] = $value;
+        $placeholderKey = match ($this->queryOptions['placeholder_format']) {
+          PlaceholderType::Named => ':db_insert_placeholder_' . $max_placeholder++,
+          PlaceholderType::Positional => $max_placeholder++,
+        };
+        $values[$placeholderKey] = $value;
       }
     }
 

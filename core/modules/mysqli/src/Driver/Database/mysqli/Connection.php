@@ -9,6 +9,8 @@ use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseAccessDeniedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
+use Drupal\Core\Database\Statement\PlaceholderType;
+use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\mysql\Driver\Database\mysql\Connection as BaseMySqlConnection;
 
@@ -16,11 +18,6 @@ use Drupal\mysql\Driver\Database\mysql\Connection as BaseMySqlConnection;
  * MySQLi implementation of \Drupal\Core\Database\Connection.
  */
 class Connection extends BaseMySqlConnection {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $statementWrapperClass = Statement::class;
 
   public function __construct(
     \mysqli $connection,
@@ -157,6 +154,53 @@ class Connection extends BaseMySqlConnection {
     }
     catch (\Exception $e) {
       throw new DatabaseNotFoundException($e->getMessage());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function placeholderFormat(): PlaceholderType {
+    return PlaceholderType::Positional;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
+    try {
+      return new Statement(
+        $this,
+        $this->connection,
+        $this->preprocessStatement($query, $options),
+        $options['placeholder_format'] ?? $this->placeholderFormat(),
+        [],
+        $allow_row_count,
+      );
+    }
+    catch (\Exception $e) {
+      $this->exceptionHandler()->handleStatementException($e, $query, $options);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function query($query, array $args = [], $options = []) {
+    // Use default values if not already set.
+    $options += $this->defaultOptions();
+    if (!isset($options['placeholder_format'])) {
+      $options['placeholder_format'] = PlaceholderType::Named;
+    }
+
+    $this->expandArguments($query, $args);
+    $statement = $this->prepareStatement($query, $options);
+    try {
+      $statement->execute($args, $options);
+      return $statement;
+    }
+    catch (\Exception $e) {
+      $this->exceptionHandler()->handleExecutionException($e, $statement, $args, $options);
     }
   }
 

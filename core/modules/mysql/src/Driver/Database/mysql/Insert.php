@@ -3,6 +3,7 @@
 namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Core\Database\Query\Insert as QueryInsert;
+use Drupal\Core\Database\Statement\PlaceholderType;
 
 /**
  * MySQL implementation of \Drupal\Core\Database\Query\Insert.
@@ -24,7 +25,11 @@ class Insert extends QueryInsert {
       $values = [];
       foreach ($this->insertValues as $insert_values) {
         foreach ($insert_values as $value) {
-          $values[':db_insert_placeholder_' . $max_placeholder++] = $value;
+          $placeholderKey = match ($this->queryOptions['placeholder_format']) {
+            PlaceholderType::Named => ':db_insert_placeholder_' . $max_placeholder++,
+            PlaceholderType::Positional => $max_placeholder++,
+          };
+          $values[$placeholderKey] = $value;
         }
       }
     }

@@ -4,6 +4,7 @@ namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\InvalidQueryException;
+use Drupal\Core\Database\Statement\PlaceholderType;
 
 /**
  * Generic class for a series of conditions in a query.
@@ -69,6 +70,11 @@ class Condition implements ConditionInterface, \Countable {
   protected $queryPlaceholderIdentifier;
 
   /**
+   * The placeholder type, named or positional.
+   */
+  protected readonly PlaceholderType $placeholderType;
+
+  /**
    * Contains the string version of the Condition.
    *
    * @var string
@@ -78,11 +84,17 @@ class Condition implements ConditionInterface, \Countable {
   /**
    * Constructs a Condition object.
    *
+   * @param \Drupal\Core\Database\Connection $connection
+   *   Database connection object.
    * @param string $conjunction
    *   The operator to use to combine conditions: 'AND' or 'OR'.
    */
-  public function __construct($conjunction) {
+  public function __construct(
+    $connection,
+    string $conjunction,
+  ) {
     $this->conditions['#conjunction'] = $conjunction;
+    $this->placeholderType = $connection instanceof Connection ? $connection->placeholderFormat() : PlaceholderType::Named;
   }
 
   /**
@@ -232,7 +244,11 @@ class Condition implements ConditionInterface, \Countable {
           // ConditionInterface::where() method. Put brackets around the snippet
           // and collect the arguments from the value part. Also ignore the
           // operator and value parts.
-          $field_fragment = '(' . $condition['field'] . ')';
+          $field_condition = match ($this->placeholderType) {
+            PlaceholderType::Named => $condition['field'],
+            PlaceholderType::Positional => str_replace(array_keys($condition['value']), '?', $condition['field']),
+          };
+          $field_fragment = '(' . $field_condition . ')';
           $arguments += $condition['value'];
           $ignore_operator = TRUE;
         }
@@ -307,9 +323,15 @@ class Condition implements ConditionInterface, \Countable {
             else {
               // Right hand part is a normal value. Replace the value with a
               // placeholder and add the value as an argument.
-              $placeholder = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
-              $value_fragment[] = $placeholder;
-              $arguments[$placeholder] = $value;
+              $placeholderKey = match ($this->placeholderType) {
+                PlaceholderType::Named => ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder(),
+                PlaceholderType::Positional => $queryPlaceholder->nextPlaceholder(),
+              };
+              $value_fragment[] = match ($this->placeholderType) {
+                PlaceholderType::Named => $placeholderKey,
+                PlaceholderType::Positional => '?',
+              };
+              $arguments[$placeholderKey] = $value;
             }
           }
           $value_fragment = $operator['prefix'] . implode($operator['delimiter'], $value_fragment) . $operator['postfix'];
@@ -322,7 +344,10 @@ class Condition implements ConditionInterface, \Countable {
       // Concatenate all conditions using the conjunction and brackets around
       // the individual conditions to assure the proper evaluation order.
       $this->stringVersion = count($condition_fragments) > 1 ? '(' . implode(") $conjunction (", $condition_fragments) . ')' : implode($condition_fragments);
-      $this->arguments = $arguments;
+      $this->arguments = match ($this->placeholderType) {
+        PlaceholderType::Named => $arguments,
+        PlaceholderType::Positional => array_values($arguments),
+      };
       $this->changed = FALSE;
     }
   }

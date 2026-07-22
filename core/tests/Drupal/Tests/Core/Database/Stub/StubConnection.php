@@ -131,7 +131,7 @@ class StubConnection extends Connection {
    * {@inheritdoc}
    */
   public function condition($conjunction): StubCondition {
-    return new StubCondition($conjunction);
+    return new StubCondition($this, $conjunction);
   }
 
 }

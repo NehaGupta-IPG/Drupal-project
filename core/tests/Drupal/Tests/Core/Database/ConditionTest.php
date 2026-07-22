@@ -44,12 +44,13 @@ class ConditionTest extends UnitTestCase {
    */
   #[DataProvider('providerSimpleCondition')]
   public function testSimpleCondition(string $expected, string $field_name): void {
+    /** @var \Drupal\Core\Database\Connection $connection */
     $connection = $this->prophesize(Connection::class);
     $connection->escapeField($field_name)->will(function ($args): string|array|null {
       return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
     });
     $connection->mapConditionOperator('=')->willReturn(['operator' => '=']);
-    $connection->condition('AND')->willReturn(new Condition('AND'));
+    $connection->condition('AND')->willReturn(new Condition($connection, 'AND'));
     $connection = $connection->reveal();
 
     $query_placeholder = $this->prophesize(PlaceholderInterface::class);
@@ -85,12 +86,13 @@ class ConditionTest extends UnitTestCase {
    */
   #[DataProvider('dataProviderTestCompileWithKnownOperators')]
   public function testCompileWithKnownOperators($expected, $field, $value, $operator, $expected_arguments = NULL): void {
+    /** @var \Drupal\Core\Database\Connection $connection */
     $connection = $this->prophesize(Connection::class);
     $connection->escapeField(Argument::any())->will(function ($args): string|array|null {
       return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
     });
     $connection->mapConditionOperator(Argument::any())->willReturn(NULL);
-    $connection->condition('AND')->willReturn(new Condition('AND'));
+    $connection->condition('AND')->willReturn(new Condition($connection, 'AND'));
     $connection = $connection->reveal();
 
     $query_placeholder = $this->prophesize(PlaceholderInterface::class);
@@ -188,12 +190,13 @@ class ConditionTest extends UnitTestCase {
    */
   #[DataProvider('providerTestCompileWithSqlInjectionForOperator')]
   public function testCompileWithSqlInjectionForOperator($operator): void {
+    /** @var \Drupal\Core\Database\Connection $connection */
     $connection = $this->prophesize(Connection::class);
     $connection->escapeField(Argument::any())->will(function ($args): string|array|null {
       return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
     });
     $connection->mapConditionOperator(Argument::any())->willReturn(NULL);
-    $connection->condition('AND')->willReturn(new Condition('AND'));
+    $connection->condition('AND')->willReturn(new Condition($connection, 'AND'));
     $connection = $connection->reveal();
 
     $query_placeholder = $this->prophesize(PlaceholderInterface::class);

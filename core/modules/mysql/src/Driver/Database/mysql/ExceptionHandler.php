@@ -10,6 +10,7 @@ use Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\StatementInterface;
+use Drupal\Core\Database\Utility\SqlDumper;
 
 /**
  * MySql database exception handler class.
@@ -74,7 +75,7 @@ class ExceptionHandler extends BaseExceptionHandler {
       throw new DatabaseExceptionWrapper($message, $code, $exception);
     }
 
-    $message = $exception->getMessage() . ": " . $queryString . "; " . print_r($arguments, TRUE);
+    $message = $exception->getMessage() . "\n" . SqlDumper::export($queryString, $arguments);
 
     // SQLSTATE 23xxx errors indicate an integrity constraint violation. Also,
     // in case of attempted INSERT of a record with an undefined column and no

@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
+use Drupal\Core\Database\Statement\PlaceholderType;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -185,19 +186,25 @@ class UpdateTest extends DatabaseTestBase {
 
     // Confirm placeholders are present.
     $query_string = (string) $query;
-    $this->assertStringContainsString(':db_update_placeholder_0', $query_string);
-    $this->assertStringContainsString(':db_update_placeholder_1', $query_string);
-    $this->assertStringContainsString(':db_condition_placeholder_0', $query_string);
-    $this->assertStringContainsString(':db_condition_placeholder_1', $query_string);
+    if ($this->connection->placeholderFormat() === PlaceholderType::Named) {
+      $this->assertStringContainsString(':db_update_placeholder_0', $query_string);
+      $this->assertStringContainsString(':db_update_placeholder_1', $query_string);
+      $this->assertStringContainsString(':db_condition_placeholder_0', $query_string);
+      $this->assertStringContainsString(':db_condition_placeholder_1', $query_string);
+      $expected_arguments = [
+        ':db_update_placeholder_0' => 27,
+        ':db_update_placeholder_1' => 42,
+        ':db_condition_placeholder_0' => 1,
+        ':db_condition_placeholder_1' => 2,
+      ];
+    }
+    else {
+      $this->assertSame(4, substr_count($query_string, '?'));
+      $expected_arguments = [27, 42, 1, 2];
+    }
 
     // Test arguments.
-    $expected = [
-      ':db_update_placeholder_0' => 27,
-      ':db_update_placeholder_1' => 42,
-      ':db_condition_placeholder_0' => 1,
-      ':db_condition_placeholder_1' => 2,
-    ];
-    $this->assertEquals($expected, $query->arguments());
+    $this->assertSame($expected_arguments, $query->arguments());
   }
 
 }

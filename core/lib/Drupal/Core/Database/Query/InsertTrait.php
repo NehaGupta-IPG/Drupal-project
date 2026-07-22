@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Core\Database\Statement\PlaceholderType;
+
 /**
  * Provides common functionality for INSERT and UPSERT queries.
  *
@@ -161,7 +163,10 @@ trait InsertTrait {
 
         $new_placeholder = $max_placeholder + count($insert_values);
         for ($i = $max_placeholder; $i < $new_placeholder; ++$i) {
-          $placeholders[] = ':db_insert_placeholder_' . $i;
+          $placeholders[] = match ($this->queryOptions['placeholder_format']) {
+            PlaceholderType::Named => ':db_insert_placeholder_' . $i,
+            PlaceholderType::Positional => '?',
+          };
         }
         $max_placeholder = $new_placeholder;
         $values[] = '(' . implode(', ', $placeholders) . ')';
