@@ -532,7 +532,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 5,
-      'CacheGetCount' => 59,
+      'CacheGetCount' => 61,
       'CacheGetCountByBin' => [
         'config' => 11,
         'data' => 4,
@@ -541,7 +541,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'entity' => 1,
         'dynamic_page_cache' => 1,
         'routes' => 5,
-        'render' => 9,
+        'render' => 11,
         'menu' => 1,
       ],
       'CacheSetCount' => 2,
@@ -550,7 +550,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       ],
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 7,
+      'CacheTagLookupQueryCount' => 8,
       'ScriptCount' => 9,
       'ScriptBytes' => 141736,
       'StylesheetCount' => 3,
