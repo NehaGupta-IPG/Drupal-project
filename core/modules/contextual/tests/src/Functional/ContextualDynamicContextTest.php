@@ -111,7 +111,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
       'node:node=' . $node1->id() . ':changed=' . $node1->getChangedTime() . '&langcode=en&admin_langcode=en',
       'node:node=' . $node2->id() . ':changed=' . $node2->getChangedTime() . '&langcode=en&admin_langcode=en',
       'node:node=' . $node3->id() . ':changed=' . $node3->getChangedTime() . '&langcode=en&admin_langcode=en',
-      'entity.view.edit_form:view=frontpage:location=page&name=frontpage&display_id=page_1&langcode=en&admin_langcode=en',
+      'entity.view.edit_form:view=promoted_content:location=page&name=promoted_content&display_id=page_1&langcode=en&admin_langcode=en',
     ];
 
     // Editor user: can access contextual links and can edit articles.
