@@ -28,105 +28,49 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
   use DependencySerializationTrait;
 
   /**
-   * The class resolver to get the subform form objects.
-   *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
-   */
-  protected $classResolver;
-
-  /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * The URL generator to generate the form action.
-   *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
-   */
-  protected $urlGenerator;
-
-  /**
-   * The current route match.
-   *
-   * @var \Drupal\Core\Routing\CurrentRouteMatch
-   */
-  protected $currentRouteMatch;
-
-  /**
-   * The current path stack.
-   *
-   * @var \Drupal\Core\Path\CurrentPathStack
-   */
-  protected $currentPathStack;
-
-  /**
-   * The ID of the view.
-   *
-   * @var string
-   */
-  protected $viewId;
-
-  /**
-   * The ID of the active view's display.
-   *
-   * @var string
-   */
-  protected $viewDisplayId;
-
-  /**
-   * The arguments passed to the active view.
-   *
-   * @var string[]
-   */
-  protected $viewArguments;
-
-  /**
    * Constructs a ViewsForm object.
    *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $classResolver
    *   The class resolver to get the subform form objects.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
    *   The URL generator to generate the form action.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
+   * @param string $viewId
+   *   The ID of the view.
+   * @param string $viewDisplayId
+   *   The ID of the active view's display.
+   * @param string[] $viewArguments
+   *   The arguments passed to the active view.
    * @param \Drupal\Core\Routing\CurrentRouteMatch $currentRouteMatch
    *   The current route match.
    * @param \Drupal\Core\Path\CurrentPathStack $currentPathStack
    *   The current path stack.
-   * @param string $view_id
-   *   The ID of the view.
-   * @param string $view_display_id
-   *   The ID of the active view's display.
-   * @param string[] $view_args
-   *   The arguments passed to the active view.
    */
-  public function __construct(ClassResolverInterface $class_resolver, UrlGeneratorInterface $url_generator, RequestStack $requestStack, CurrentRouteMatch $currentRouteMatch, CurrentPathStack $currentPathStack, $view_id, $view_display_id, array $view_args) {
-    $this->classResolver = $class_resolver;
-    $this->urlGenerator = $url_generator;
-    $this->requestStack = $requestStack;
-    $this->currentRouteMatch = $currentRouteMatch;
-    $this->currentPathStack = $currentPathStack;
-    $this->viewId = $view_id;
-    $this->viewDisplayId = $view_display_id;
-    $this->viewArguments = $view_args;
-  }
+  public function __construct(
+    protected ClassResolverInterface $classResolver,
+    protected UrlGeneratorInterface $urlGenerator,
+    protected RequestStack $requestStack,
+    protected $viewId,
+    protected $viewDisplayId,
+    protected array $viewArguments,
+    protected CurrentRouteMatch $currentRouteMatch,
+    protected CurrentPathStack $currentPathStack,
+  ) {}
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, $view_id = NULL, $view_display_id = NULL, array $view_args = NULL) {
+  public static function create(ContainerInterface $container, $view_id = NULL, $view_display_id = NULL, ?array $view_args = NULL) {
     return new static(
       $container->get('class_resolver'),
       $container->get('url_generator'),
       $container->get('request_stack'),
-      $container->get('current_route_match'),
-      $container->get('path.current'),
       $view_id,
       $view_display_id,
-      $view_args
+      $view_args,
+      $container->get('current_route_match'),
+      $container->get('path.current'),
     );
   }
 
