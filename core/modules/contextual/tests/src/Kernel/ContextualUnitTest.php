@@ -74,7 +74,7 @@ class ContextualUnitTest extends KernelTestBase {
           ],
         ],
       ],
-      'views_ui_edit:view=frontpage:location=page&display=page_1&langcode=en&admin_langcode=en',
+      'views_ui_edit:view=promoted_content:location=page&display=page_1&langcode=en&admin_langcode=en',
       'olivero',
     ];
 
