@@ -103,7 +103,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
 
       // For DatabaseException, we dump the information if available.
       if ($exception instanceof DatabaseException && property_exists($exception, 'info')) {
-        $dump = SqlDumper::export($exception->info->sqlString, $exception->info->placeholders, $exception->info->options);
+        $dump = (new SqlDumper())->export($exception->info);
         $error['@message'] = Markup::create($error['@message'] . $dump);
       }
 

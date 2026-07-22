@@ -11,7 +11,7 @@ abstract class DatabaseExceptionBase extends \RuntimeException implements Databa
     string $message = "",
     int $code = 0,
     ?\Throwable $previous = NULL,
-    public readonly ?DatabaseExceptionInfo $info = NULL,
+    public readonly ?SqlExecutionInfo $info = NULL,
   ) {
     parent::__construct($message, $code, $previous);
   }

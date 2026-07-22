@@ -8,6 +8,7 @@ use Doctrine\SqlFormatter\SqlFormatter;
 use Doctrine\SqlFormatter\CliHighlighter;
 use Doctrine\SqlFormatter\HtmlHighlighter;
 use Doctrine\SqlFormatter\NullHighlighter;
+use Drupal\Core\Database\SqlExecutionInfo;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
@@ -15,7 +16,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 /**
  * An utility class for dumping an SQL statement and its placeholders.
  */
-abstract class SqlDumper {
+class SqlDumper {
 
   /**
    * Exports the SQL statement information to a string.
@@ -24,15 +25,8 @@ abstract class SqlDumper {
    * and in CLI (tests or dr). The method detects whether we are in a CLI or
    * a HTML environment and dumps information accordingly.
    *
-   * @param string $sqlString
-   *   The SQL statement string.
-   * @param list<array|int|float|string|bool|null>|array<string,array|int|float|string|bool|null> $placeholders
-   *   The placeholder values, keyed by placeholder name for a string
-   *   containing named placeholders, 0-indexed for a string containing
-   *   positional placeholders.
-   * @param array<string,mixed> $options
-   *   An associative array of options to control how the database operation is
-   *   run.
+   * @param \Drupal\Core\Database\SqlExecutionInfo $info
+   *   The SQL statement execution information.
    * @param ?bool $color
    *   (optional) whether output should be colored. If not specified, it will
    *   be TRUE for CLI output, irrelevant for HTML output.
@@ -43,10 +37,8 @@ abstract class SqlDumper {
    * @return string
    *   The output for printing.
    */
-  public static function export(
-    string $sqlString,
-    array $placeholders,
-    array $options,
+  public function export(
+    SqlExecutionInfo $info,
     ?bool $color = NULL,
     ?bool $html = NULL,
   ): string {
@@ -62,12 +54,12 @@ abstract class SqlDumper {
 
     // In prod environments, keep using a minimal output.
     if (!class_exists(SqlFormatter::class) || !class_exists(VarCloner::class)) {
-      return ": " . $sqlString . "; " . print_r($placeholders, TRUE);
+      return ": " . $info->sqlString . "; " . print_r($info->placeholders, TRUE);
     }
 
     // Format the SQL statement string.
     $highlighter = $html ? new HtmlHighlighter() : ($color ? new CliHighlighter() : new NullHighlighter());
-    $formattedSql = (new SqlFormatter($highlighter))->format($sqlString);
+    $formattedSql = (new SqlFormatter($highlighter))->format($info->sqlString);
 
     $cloner = new VarCloner();
     $dumper = $html ? new HtmlDumper() : new CliDumper();
@@ -79,12 +71,12 @@ abstract class SqlDumper {
     }
 
     // Format the placeholders.
-    $formattedArgs = !empty($placeholders) ? $dumper->dump($cloner->cloneVar($placeholders), TRUE) : NULL;
+    $formattedArgs = !empty($info->placeholders) ? $dumper->dump($cloner->cloneVar($info->placeholders), TRUE) : NULL;
 
     // Format the options.
-    $formattedOptions = !empty($options) ? $dumper->dump($cloner->cloneVar($options), TRUE) : NULL;
+    $formattedOptions = !empty($info->options) ? $dumper->dump($cloner->cloneVar($info->options), TRUE) : NULL;
 
-    return static::output(
+    return $this->output(
       $formattedSql,
       $formattedArgs,
       $formattedOptions,
@@ -113,30 +105,32 @@ abstract class SqlDumper {
    * @return string
    *   The output for printing.
    */
-  protected static function output(
-    string $sqlDump,
+  protected function output(
+    ?string $sqlDump,
     ?string $placeholderDump,
     ?string $optionDump,
     string $delimiter,
     string $newLine,
     bool $resetColor,
   ): string {
-    $output = static::stringOutput($delimiter . $newLine, $resetColor);
-    $output .= static::stringOutput("SQL statement" . $newLine, $resetColor);
-    $output .= static::stringOutput($delimiter . $newLine, $resetColor);
-    $output .= static::stringOutput($sqlDump . $newLine, $resetColor);
-    $output .= static::stringOutput($delimiter . $newLine, $resetColor);
+    $output = $this->stringOutput($delimiter . $newLine, $resetColor);
+    if ($sqlDump !== NULL) {
+      $output .= $this->stringOutput("SQL statement" . $newLine, $resetColor);
+      $output .= $this->stringOutput($delimiter . $newLine, $resetColor);
+      $output .= $this->stringOutput($sqlDump . $newLine, $resetColor);
+      $output .= $this->stringOutput($delimiter . $newLine, $resetColor);
+    }
     if ($placeholderDump !== NULL) {
-      $output .= static::stringOutput("Placeholders" . $newLine, $resetColor);
-      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
-      $output .= static::stringOutput($placeholderDump . $newLine, $resetColor);
-      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
+      $output .= $this->stringOutput("Placeholders" . $newLine, $resetColor);
+      $output .= $this->stringOutput($delimiter . $newLine, $resetColor);
+      $output .= $this->stringOutput($placeholderDump . $newLine, $resetColor);
+      $output .= $this->stringOutput($delimiter . $newLine, $resetColor);
     }
     if ($optionDump !== NULL) {
-      $output .= static::stringOutput("Options" . $newLine, $resetColor);
-      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
-      $output .= static::stringOutput($optionDump . $newLine, $resetColor);
-      $output .= static::stringOutput($delimiter . $newLine, $resetColor);
+      $output .= $this->stringOutput("Options" . $newLine, $resetColor);
+      $output .= $this->stringOutput($delimiter . $newLine, $resetColor);
+      $output .= $this->stringOutput($optionDump . $newLine, $resetColor);
+      $output .= $this->stringOutput($delimiter . $newLine, $resetColor);
     }
 
     return $output;
@@ -153,7 +147,7 @@ abstract class SqlDumper {
    * @return string
    *   The output for printing.
    */
-  private static function stringOutput(string $string, bool $resetColor): string {
+  private function stringOutput(string $string, bool $resetColor): string {
     if ($resetColor) {
       $tmp = explode("\n", $string);
       $tmp = array_map(function (string $value): string {

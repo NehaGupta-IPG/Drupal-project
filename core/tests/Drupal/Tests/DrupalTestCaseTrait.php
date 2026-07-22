@@ -131,7 +131,7 @@ trait DrupalTestCaseTrait {
     if ($t instanceof DatabaseException) {
       $exceptionClass = get_class($t);
       if (property_exists($t, 'info')) {
-        $infoDump = SqlDumper::export($t->info->sqlString, $t->info->placeholders, $t->info->options);
+        $infoDump = (new SqlDumper())->export($t->info);
         $t = new $exceptionClass($t->getMessage() . "\n" . $infoDump, $t->getCode(), $t->getPrevious(), $t->info);
       }
     }

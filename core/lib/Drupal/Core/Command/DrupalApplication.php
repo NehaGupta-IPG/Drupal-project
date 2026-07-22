@@ -164,15 +164,14 @@ class DrupalApplication extends Application {
   /**
    * {@inheritdoc}
    */
-  protected function doRenderThrowable(\Throwable $e, OutputInterface $output): void {
-    parent::doRenderThrowable($e, $output);
+  protected function doRenderThrowable(\Throwable $t, OutputInterface $output): void {
+    parent::doRenderThrowable($t, $output);
 
     // Database exceptions may carry the information of the executed statement,
     // that can be exported to a more readable dump.
-    if ($e instanceof DatabaseException) {
-      if (property_exists($e, 'info')) {
-        $infoDump = SqlDumper::export($e->info->sqlString, $e->info->placeholders, $e->info->options, $output->isDecorated());
-        $output->writeln($infoDump);
+    if ($t instanceof DatabaseException) {
+      if (property_exists($t, 'info')) {
+        $output->writeln((new SqlDumper())->export($t->info, $output->isDecorated()));
       }
     }
   }

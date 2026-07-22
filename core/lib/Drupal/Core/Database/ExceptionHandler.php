@@ -33,7 +33,7 @@ class ExceptionHandler {
       // Wrap the exception in another exception, because PHP does not allow
       // overriding Exception::getMessage(). Its message is the extra database
       // debug information.
-      $info = new DatabaseExceptionInfo($sql, [], $options);
+      $info = new SqlExecutionInfo($sql, [], $options);
       throw new DatabaseExceptionWrapper($exception->getMessage(), 0, $exception, $info);
     }
 
@@ -64,7 +64,7 @@ class ExceptionHandler {
       // Wrap the exception in another exception, because PHP does not allow
       // overriding Exception::getMessage(). Its message is the extra database
       // debug information.
-      $info = new DatabaseExceptionInfo($statement->getQueryString(), $arguments, $options);
+      $info = new SqlExecutionInfo($statement->getQueryString(), $arguments, $options);
       $message = $exception->getMessage();
       // Match all SQLSTATE 23xxx errors.
       if (substr($exception->getCode(), -6, -3) == '23') {

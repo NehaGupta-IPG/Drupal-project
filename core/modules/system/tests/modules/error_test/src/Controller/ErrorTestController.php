@@ -91,6 +91,7 @@ class ErrorTestController extends ControllerBase {
     define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     $this->database->select('bananas_are_awesome', 'b')
       ->fields('b')
+      ->condition('palm_height', 180, '>')
       ->execute();
   }
 

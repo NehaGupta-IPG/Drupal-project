@@ -3,13 +3,13 @@
 namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Component\Utility\Unicode;
-use Drupal\Core\Database\DatabaseExceptionInfo;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\ExceptionHandler as BaseExceptionHandler;
 use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
 use Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
+use Drupal\Core\Database\SqlExecutionInfo;
 use Drupal\Core\Database\StatementInterface;
 
 /**
@@ -71,7 +71,7 @@ class ExceptionHandler extends BaseExceptionHandler {
     // @see https://www.php.net/manual/en/class.pdoexception.php
     $code = (int) $sqlState;
 
-    $info = new DatabaseExceptionInfo($queryString, $arguments, $options);
+    $info = new SqlExecutionInfo($queryString, $arguments, $options);
 
     // If a max_allowed_packet error occurs the message length is truncated.
     // This should prevent the error from recurring if the exception is logged
