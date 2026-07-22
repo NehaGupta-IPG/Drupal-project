@@ -171,8 +171,14 @@ class HandlerTest extends UITestBase {
     $add_handler_url = "admin/structure/views/nojs/add-handler/test_view_empty/default/field";
     $type_info = $handler_types['field'];
     $this->drupalGet($add_handler_url);
+    // Under pgsql JSON storage the user data table ("users_field_data") is
+    // collapsed onto the entity base table ("users"), so the add-handler
+    // checkbox is keyed by the base table.
+    $name_field = \Drupal::database()->driver() == 'pgsql'
+      ? 'name[users.name]'
+      : 'name[users_field_data.name]';
     $this->submitForm([
-      'name[users.name]' => TRUE,
+      $name_field => TRUE,
     ], 'Add and configure ' . $type_info['ltitle']);
     $id = 'name';
     $edit_handler_url = "admin/structure/views/nojs/handler/test_view_empty/default/field/$id";
