@@ -15278,12 +15278,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Kernel/Query/FilterTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Unit\\\\JsonApiSpecTest\\:\\:providerTestIsValidCustomQueryParameter\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Unit/JsonApiSpecTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\language\\\\Config\\\\LanguageConfigFactoryOverride\\:\\:addCollections\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -20756,24 +20750,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/serialization/tests/src/Kernel/MapDataNormalizerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\serialization\\\\Unit\\\\Normalizer\\\\DateTimeIso8601NormalizerTestDrupalDateTime\\:\\:setTimezone\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/serialization/tests/src/Unit/Normalizer/DateTimeIso8601NormalizerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\serialization\\\\Unit\\\\Normalizer\\\\DateTimeNormalizerTestDrupalDateTime\\:\\:setTimezone\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/serialization/tests/src/Unit/Normalizer/DateTimeNormalizerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\serialization\\\\Unit\\\\Normalizer\\\\TimestampNormalizerTestDrupalDateTime\\:\\:setTimezone\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/serialization/tests/src/Unit/Normalizer/TimestampNormalizerTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\settings_tray\\\\Block\\\\BlockEntitySettingTrayForm\\:\\:form\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -22232,12 +22208,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/form_test/src/Form/FormTestCheckboxTypeJugglingForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\form_test\\\\Form\\\\FormTestDetailsContainsRequiredTextfieldForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/form_test/src/Form/FormTestDetailsContainsRequiredTextfieldForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\form_test\\\\Form\\\\FormTestDetailsForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -34076,13 +34046,13 @@ $ignoreErrors[] = [
 	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
 	'identifier' => 'disallowed.function',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/ComposerIntegrationTest.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Calling sha1\\(\\) is forbidden, use sha256\\(\\) or hash\\(\\) with an xxHash algorithm instead\\.$#',
 	'identifier' => 'disallowed.function',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/ComposerIntegrationTest.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Access\\\\TestAccessCheckInterface\\:\\:access\\(\\) has no return type specified\\.$#',
@@ -34817,12 +34787,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/themes/olivero/src/OliveroPreRender.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Missing call to parent\\:\\:setUp\\(\\) method\\.$#',
-	'identifier' => 'phpunit.callParent',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/stable9/tests/Kernel/Stable9LibraryOverrideTest.php',
 ];
 
 return ['parameters' => ['ignoreErrors' => $ignoreErrors]];

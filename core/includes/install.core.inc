@@ -33,6 +33,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -1656,6 +1657,18 @@ function install_profile_modules(&$install_state) {
   $batch_builder
     ->setTitle(t('Installing @drupal', ['@drupal' => drupal_install_profile_distribution_name()]))
     ->setErrorMessage(t('The installation has encountered an error.'));
+
+  // If the profile has a list of recipes to apply, add them to the batch job.
+  $recipes = array_map(
+    Recipe::createFromDirectory(...),
+    $install_state['profile_info']['recipes'] ?? [],
+  );
+  foreach ($recipes as $recipe) {
+    foreach (RecipeRunner::toBatchOperations($recipe) as [$callback, $arguments]) {
+      $batch_builder->addOperation($callback, $arguments);
+    }
+  }
+
   return $batch_builder->toArray();
 }
 
@@ -1826,7 +1839,7 @@ function install_finished(&$install_state): void {
   // If the profile has asked to be automatically uninstalled, do that.
   if ($install_state['profile_info']['keep_profile'] ?? TRUE) {
     // Installation profiles are always loaded last.
-    module_set_weight($profile, 1000);
+    \Drupal::service(ModuleWeight::class)->set($profile, 1000);
   }
   else {
     \Drupal::service('module_installer')->uninstall([$profile]);
