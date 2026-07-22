@@ -199,9 +199,17 @@ class MediaThumbnailFormatter extends ImageFormatter {
   }
 
   /**
-   * Return svg image.
+   * Render the SVG file as an image.
+   *
+   * @param \Drupal\media\MediaInterface $media
+   *   The media item containing the file.
+   * @param string $image_style_setting
+   *   The image style to use for rendering.
+   *
+   * @return array|null
+   *   The build, or NULL if the file could not be rendered.
    */
-  protected function renderSvgTheme(MediaInterface $media, $image_style_setting) {
+  protected function renderSvgTheme(MediaInterface $media, string $image_style_setting): ?array {
     $build = NULL;
     // Get field media image.
     /** @var \Drupal\media\MediaSourceInterface $source_file */
@@ -218,6 +226,7 @@ class MediaThumbnailFormatter extends ImageFormatter {
             'src' => $path,
           ],
         ];
+        /** @var \Drupal\image\Entity\ImageStyle $image_style */
         $image_style = $this->imageStyleStorage->load($image_style_setting);
         if ($image_style) {
           $config = $image_style->getEffects()->getConfiguration();
