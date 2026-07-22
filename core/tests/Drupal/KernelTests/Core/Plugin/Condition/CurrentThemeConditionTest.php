@@ -62,14 +62,14 @@ class CurrentThemeConditionTest extends KernelTestBase {
     // 1. Verify that no theme dependency is returned when the theme is empty.
     $condition->setConfiguration(['theme' => '']);
     $dependencies = $condition->calculateDependencies();
-    $this->assertArrayNotHasKey('theme', $dependencies, 'The theme dependency should not be present when no theme is configured.');
+    $this->assertArrayNotHasKey('theme', $dependencies);
 
     // 2. Verify that the configured theme is correctly added to the dependencies.
     $condition->setConfiguration(['theme' => 'test_theme']);
     $dependencies = $condition->calculateDependencies();
 
-    $this->assertArrayHasKey('theme', $dependencies, 'The theme dependency should be present when a theme is configured.');
-    $this->assertContains('test_theme', $dependencies['theme'], 'The dependencies should include the configured theme name.');
+    $this->assertArrayHasKey('theme', $dependencies);
+    $this->assertContains('test_theme', $dependencies['theme']);
   }
 
 }
