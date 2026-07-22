@@ -19928,12 +19928,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Select.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\pgsql\\\\Driver\\\\Database\\\\pgsql\\\\Upsert\\:\\:execute\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Upsert.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$responsive_image_styles in empty\\(\\) always exists and is not falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
