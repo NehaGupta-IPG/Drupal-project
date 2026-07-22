@@ -51,9 +51,7 @@ services:
   inline_block.usage:
     class: Drupal\layout_builder\InlineBlockUsage
   Drupal\layout_builder\InlineBlockUsageInterface: '@inline_block.usage'
-  layout_builder.component_visibility_subscriber:
-    class: Drupal\layout_builder\EventSubscriber\SectionComponentVisibility
-    arguments: ['@context.handler', '@plugin.manager.condition']
+  Drupal\layout_builder\EventSubscriber\SectionComponentVisibility: ~
   layout_builder.element.prepare_layout:
     class: Drupal\layout_builder\EventSubscriber\PrepareLayout
   Drupal\layout_builder\EventSubscriber\DefaultContentSubscriber:
