@@ -672,7 +672,7 @@ class JsonApiRegressionTest extends JsonApiFunctionalTestBase {
       ],
       RequestOptions::JSON => [
         'data' => [
-          'type' => 'article',
+          'type' => 'node--article',
           'attributes' => [
             'title' => 'foobar',
             'created' => 'not_a_date',

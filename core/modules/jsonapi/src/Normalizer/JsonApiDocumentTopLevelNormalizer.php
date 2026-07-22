@@ -24,6 +24,7 @@ use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\serialization\Normalizer\SchematicNormalizerTrait;
 use Drupal\serialization\Serializer\JsonSchemaProviderSerializerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -318,6 +319,11 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
     // Ensure that the resource object contains the "type" key.
     if (!isset($document['data']['type'])) {
       throw new BadRequestHttpException("Resource object must include a \"type\".");
+    }
+    // Ensure that the given type matches the resource type being requested.
+    // See https://jsonapi.org/format/#crud-creating-responses-409.
+    if ($document['data']['type'] !== $resource_type->getTypeName()) {
+      throw new ConflictHttpException(sprintf('Resource object with type "%s" does not match type "%s" of the requested resource.', $document['data']['type'], $resource_type->getTypeName()));
     }
     // Ensure that the client provided ID is a valid UUID.
     if (isset($document['data']['id']) && !Uuid::isValid($document['data']['id'])) {

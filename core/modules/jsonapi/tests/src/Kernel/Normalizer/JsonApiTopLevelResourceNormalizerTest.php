@@ -35,6 +35,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -571,7 +572,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
    * Try to POST a node and check if it exists afterwards.
    */
   public function testDenormalize(): void {
-    $payload = '{"data":{"type":"article","attributes":{"title":"Testing article"}}}';
+    $payload = '{"data":{"type":"node--article","attributes":{"title":"Testing article"}}}';
 
     $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node', 'article');
     $node = $this
@@ -581,6 +582,22 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
       ]);
     $this->assertInstanceOf(Node::class, $node);
     $this->assertSame('Testing article', $node->getTitle());
+  }
+
+  /**
+   * Tests that a mismatched top-level "type" is rejected.
+   */
+  public function testDenormalizeTypeMismatch(): void {
+    $payload = '{"data":{"type":"taxonomy_term--tags","attributes":{"title":"Testing article"}}}';
+
+    $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('node', 'article');
+    $this->expectException(ConflictHttpException::class);
+    $this->expectExceptionMessage('Resource object with type "taxonomy_term--tags" does not match type "node--article" of the requested resource.');
+    $this
+      ->getNormalizer()
+      ->denormalize(Json::decode($payload), NULL, 'api_json', [
+        'resource_type' => $resource_type,
+      ]);
   }
 
   /**
