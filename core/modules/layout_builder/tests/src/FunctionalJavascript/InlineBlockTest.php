@@ -301,7 +301,7 @@ class InlineBlockTest extends InlineBlockTestBase {
     $cron = \Drupal::service('cron');
     /** @var \Drupal\layout_builder\InlineBlockUsageInterface $usage */
     $usage = \Drupal::service('inline_block.usage');
-    $this->drupalLogin($this->drupalCreateUser([
+    $account = $this->drupalCreateUser([
       'administer content types',
       'access contextual links',
       'configure any layout',
@@ -310,7 +310,8 @@ class InlineBlockTest extends InlineBlockTestBase {
       'administer nodes',
       'bypass node access',
       'create and edit custom blocks',
-    ]));
+    ]);
+    $this->drupalLogin($account);
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -380,8 +381,11 @@ class InlineBlockTest extends InlineBlockTestBase {
     $this->assertCount(2, $this->blockStorage->loadMultiple());
     $this->assertEmpty($usage->getUsage($default_block_id));
 
+    // Check for broken / missing message.
     $this->drupalGet('node/3/layout');
     $assert_session->pageTextNotContains('The DEFAULT block body');
+    $assert_session->pageTextContains('This block is broken or missing. You may be missing content or you might need to enable the original module.');
+
     $log = \Drupal::database()
       ->select('watchdog', 'w')
       ->fields('w', ['message', 'variables'])

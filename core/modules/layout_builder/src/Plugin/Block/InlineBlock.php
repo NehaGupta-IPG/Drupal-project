@@ -207,7 +207,11 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
     if ($entity = $this->getEntity()) {
       return $entity->access('view', $account, TRUE);
     }
-    return AccessResult::allowedIfHasPermission($account, 'administer blocks');
+    $access = AccessResult::allowedIfHasPermission($account, 'administer blocks');
+    if (!$access->isAllowed()) {
+      $access = AccessResult::forbidden();
+    }
+    return $access;
   }
 
   /**
