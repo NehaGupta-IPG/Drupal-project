@@ -10,8 +10,6 @@
         "drupal/core": "12.x-dev",
         "asm89/stack-cors": "~v2.4.0",
         "composer/semver": "~3.4.4",
-        "daffie/drupal-core-pgsql-module-remover": "~1.0.2",
-        "daffie/pgsql": "~dev-main",
         "doctrine/lexer": "~3.0.1",
         "egulias/email-validator": "~4.0.4",
         "justinrainbow/json-schema": "~6.6.1",

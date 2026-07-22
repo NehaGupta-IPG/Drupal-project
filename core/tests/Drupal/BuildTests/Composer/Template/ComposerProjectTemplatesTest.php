@@ -111,17 +111,22 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
     $minimum_stability_order_index = $stability_order_indexes[static::MINIMUM_STABILITY];
 
     $project_stabilities = [];
+    // Dependencies that are not subject to the stability check.
     $exclude = [
+      // These are required with "self.version", so their stabilities
+      // automatically match the corresponding Drupal release.
       'drupal/core',
       'drupal/core-composer-scaffold',
       'drupal/core-recipe-unpack',
       'drupal/core-project-message',
       'drupal/core-vendor-hardening',
+      // The PostgreSQL database driver is tracked on its development branch
+      // while the JSON entity storage work is in progress.
+      // @todo Require a tagged release in
+      //   https://www.drupal.org/i/3400517
+      'daffie/pgsql',
     ];
     foreach ($installed['installed'] as $project) {
-      // Exclude dependencies that are required with "self.version", since
-      // those stabilities will automatically match the corresponding Drupal
-      // release.
       if (in_array($project['name'], $exclude, TRUE)) {
         continue;
       }
