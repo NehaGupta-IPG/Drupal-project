@@ -16,6 +16,7 @@ use Drupal\views\ViewExecutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -52,7 +53,8 @@ class MediaLibrarySelectFormTest extends UnitTestCase {
     $container->set('string_translation', $this->createStub(TranslationInterface::class));
     \Drupal::setContainer($container);
 
-    $request = new Request();
+    $request = $this->createStub(Request::class);
+    $request->query = new InputBag();
 
     $view = $this->createStub(ViewExecutable::class);
     $view

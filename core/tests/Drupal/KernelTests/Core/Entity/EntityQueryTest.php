@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Query\QueryException;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\Entity\EntityTest;
@@ -1624,10 +1625,29 @@ class EntityQueryTest extends EntityKernelTestBase {
     $embedded_table = $table_mapping->getJsonStorageDedicatedTableName($field_storage, $context_table);
     $registry = $connection->tableInformation();
 
-    $builder = new class {
+    $builder = new class() {
       use \Drupal\pgsql\Driver\Database\pgsql\JsonStorageUnwindTrait;
 
-      public function build($connection, $id_key, $base_table, $embedded_table, $registry, $langcode_key) {
+      /**
+       * Builds the embedded unwind subquery for a dedicated field table.
+       *
+       * @param \Drupal\Core\Database\Connection $connection
+       *   The pgsql database connection.
+       * @param string $id_key
+       *   The base table's entity-id column.
+       * @param string $base_table
+       *   The physical base table name.
+       * @param string $embedded_table
+       *   The embedded (dedicated) table name.
+       * @param \Drupal\pgsql\Driver\Database\pgsql\TableInformation $registry
+       *   The embedding registry.
+       * @param string $langcode_key
+       *   The entity type's langcode key.
+       *
+       * @return \Drupal\Core\Database\Query\SelectInterface
+       *   The unwind subquery.
+       */
+      public function build($connection, $id_key, $base_table, $embedded_table, $registry, $langcode_key): SelectInterface {
         return $this->buildEmbeddedUnwindSubquery($connection, $id_key, $base_table, $embedded_table, $registry, $langcode_key);
       }
 

@@ -133,7 +133,10 @@ class EntitySchemaTest extends EntityKernelTestBase {
         'entity_test_update_revision_data',
       ];
       $base_dedicated_tables = ['entity_test_update__custom_bundle_field'];
-      $updated_dedicated_tables = ['entity_test_update__custom_bundle_field', 'entity_test_update_revision__custom_bundle_field'];
+      $updated_dedicated_tables = [
+        'entity_test_update__custom_bundle_field',
+        'entity_test_update_revision__custom_bundle_field',
+      ];
     }
 
     // Initially only the base table and the dedicated field data table should

@@ -113,7 +113,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
    */
   public function testFieldLoad(): void {
     $entity_type = $bundle = 'entity_test_rev';
-    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    /** @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage($entity_type);
     $connection = Database::getConnection();
     $pgsql = $connection->driver() == 'pgsql';
@@ -131,6 +131,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
 
     // Create an entity with four revisions.
     $revision_ids = [];
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->container->get('entity_type.manager')
       ->getStorage($entity_type)
       ->create();
@@ -193,6 +194,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     }
 
     // Load the "current revision" and check the values.
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $storage->load($entity->id());
     foreach ($values[$last_revision_id] as $delta => $value) {
       if ($delta < $this->fieldCardinality) {
@@ -438,7 +440,9 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
    */
   public function testFieldWrite(): void {
     $entity_type = $bundle = 'entity_test_rev';
+    /** @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage($entity_type);
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $storage->create();
 
     $revision_values = [];
