@@ -13,7 +13,7 @@
  *      description content wrapper. Will only be set when description is set.
  * - variant: specifies option type. Typically 'field-option' or 'field-suboption'.
  *
- * @see\Drupal\Core\Form\FormPreprocess::preprocessFormElement()
+ * @see \Drupal\Core\Form\FormPreprocess::preprocessFormElement()
  *
  * @ingroup themeable
  */
@@ -21,7 +21,7 @@
 {%
   set classes = [
     errors ? 'form-item--error',
-    variant ? variant ~ '__item'
+    variant ? variant ~ '__item',
   ]
 %}
 <div{{ attributes.addClass(classes) }}>
