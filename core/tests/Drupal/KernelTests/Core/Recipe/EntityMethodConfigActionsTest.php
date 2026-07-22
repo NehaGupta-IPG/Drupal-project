@@ -14,7 +14,6 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 
@@ -238,7 +237,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
     // We should get an exception if we try to set a nested value on a property
     // that isn't an array.
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage('The setProperties config action can only set nested values on arrays.');
+    $this->expectExceptionMessageIs('The setProperties config action can only set nested values on arrays.');
     $this->configActionManager->applyAction(
       'setProperties',
       $block->getConfigDependencyName(),
@@ -260,7 +259,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
     $this->assertNotEmpty($property_name);
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("Entity key '$property_name' cannot be changed by the setProperties config action.");
+    $this->expectExceptionMessageIs("Entity key '$property_name' cannot be changed by the setProperties config action.");
     $this->configActionManager->applyAction(
       'setProperties',
       $view_display->getConfigDependencyName(),
@@ -271,14 +270,13 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
   /**
    * Tests that the simpleConfigUpdate action cannot be used on entities.
    */
-  #[IgnoreDeprecations]
   public function testSimpleConfigUpdateFailsOnEntities(): void {
     $view_display = $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('entity_test_with_bundle', 'test');
     $view_display->save();
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage('Using the simpleConfigUpdate config action on config entities is not supported. Use the setProperties action instead. See https://www.drupal.org/node/3515543');
+    $this->expectExceptionMessageIs('Using the simpleConfigUpdate config action on config entities is not supported. Use the setProperties action instead. See https://www.drupal.org/node/3515543');
     $this->configActionManager->applyAction(
       'simpleConfigUpdate',
       $view_display->getConfigDependencyName(),

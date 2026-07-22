@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Component\Utility\Html;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Entity\View;
@@ -258,7 +259,7 @@ class ExposedFormTest extends ViewTestBase {
    * Tests the exposed block functionality.
    */
   #[DataProvider('providerTestExposedBlock')]
-  public function testExposedBlock($display): void {
+  public function testExposedBlock(string $display): void {
     $view = Views::getView('test_exposed_block');
     $view->setDisplay($display);
     $block = $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_block-' . $display);
@@ -333,7 +334,7 @@ class ExposedFormTest extends ViewTestBase {
    * @return array
    *   Array of display names to test.
    */
-  public static function providerTestExposedBlock() {
+  public static function providerTestExposedBlock(): array {
     return [
       'page_display' => ['page_1'],
       'block_display' => ['block_1'],
@@ -384,7 +385,7 @@ class ExposedFormTest extends ViewTestBase {
     // @see https://www.drupal.org/node/535868
     $on_demand_text = 'Select any filter and click Apply to see results.';
     $display['display_options']['exposed_form']['options']['text_input_required'] = $on_demand_text;
-    $display['display_options']['exposed_form']['options']['text_input_required_format'] = filter_default_format();
+    $display['display_options']['exposed_form']['options']['text_input_required_format'] = \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id();
     $view->save();
 
     // Ensure that the "on demand text" is displayed when no exposed filters are

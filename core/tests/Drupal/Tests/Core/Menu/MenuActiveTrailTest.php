@@ -17,6 +17,8 @@ use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -52,30 +54,23 @@ class MenuActiveTrailTest extends UnitTestCase {
 
   /**
    * The mocked menu link manager.
-   *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $menuLinkManager;
+  protected MenuLinkManagerInterface&MockObject $menuLinkManager;
 
   /**
-   * The mocked cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * The cache backend.
    */
-  protected $cache;
+  protected CacheBackendInterface&Stub $cache;
 
   /**
-   * The mocked lock.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\Stub
+   * The lock.
    */
-  protected $lock;
-
+  protected LockBackendInterface&Stub $lock;
 
   /**
-   * The mocked path matcher.
+   * The path matcher.
    */
-  protected PathMatcherInterface $pathMatcher;
+  protected PathMatcherInterface&Stub $pathMatcher;
 
   /**
    * {@inheritdoc}
@@ -361,9 +356,6 @@ class MenuActiveTrailTest extends UnitTestCase {
       ->method('set')
       // Ensure we normalize the serialized data by sorting them.
       ->with('active-trail:route:baby_llama:route_parameters:' . serialize(['a' => 0, 'b' => 1]));
-    $this->lock
-      ->method('acquire')
-      ->willReturn(TRUE);
     $this->menuActiveTrail->destruct();
   }
 

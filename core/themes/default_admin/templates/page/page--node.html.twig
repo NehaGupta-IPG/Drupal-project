@@ -1,7 +1,7 @@
 {#
 /**
  * @file
- * Gin's theme implementation to display a single Drupal page.
+ * Default Admin theme implementation to display a single Drupal page.
  *
  * The doctype, html, head, and body tags are not in this template. Instead they
  * can be found in the html.html.twig template normally located in the
@@ -41,5 +41,5 @@
 #}
 
 <div class="page-wrapper__node-edit-form">
-  {% include '@default_admin/page/page.html.twig' %}
+  {{ include('@default_admin/page/page.html.twig') }}
 </div>
