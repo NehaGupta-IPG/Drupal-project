@@ -470,7 +470,7 @@ INFO;
     // cleared.
     $this->drupalGet('admin/appearance');
     // Stark is the first 'Set as default' link.
-    $this->click('A[title="Set Stark as default theme"]');
+    $this->clickLink('Set as default');
     $this->drupalGet('admin/structure/block');
     $this->assertSession()->pageTextContains('Stark');
   }
