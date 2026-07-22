@@ -6,6 +6,7 @@ addtogroup
 adminforms
 afterclose
 aftercreate
+agnostically
 ahah
 ajaxing
 allwords
@@ -116,11 +117,14 @@ csrftoken
 csslintrc
 csstools
 cweagans
+daffie
 datelist
 datestamp
 datetimeiso
 dburl
+ddev
 dealerdirect
+deepclone
 defaultable
 defgroup
 delayable
@@ -243,6 +247,7 @@ kinberg
 kolkata
 lamoids
 libc
+libgd
 lified
 lightninggreen
 linkability
@@ -385,6 +390,7 @@ rasterizes
 realpaths
 realword
 rebuilder
+reencodes
 refback
 referenceables
 referencers
@@ -546,6 +552,7 @@ uninstallations
 unminified
 unmoderated
 unpublishing
+unrenamed
 unrouted
 unsanitized
 unserialization

@@ -345,7 +345,7 @@ class RouterTest extends BrowserTestBase {
     // DDEV) collapse successive slashes in the request path before it reaches
     // PHP. When that happens Drupal never sees the duplicate slashes, so
     // \Drupal\Core\EventSubscriber\RedirectLeadingSlashesSubscriber has nothing
-    // to redirect and this behaviour cannot be exercised. Detect that (the
+    // to redirect and this behavior cannot be exercised. Detect that (the
     // request URL is served as-is, without a redirect to the single-slash
     // variant) and skip rather than report a spurious failure.
     if (str_contains($this->getSession()->getCurrentUrl(), '//router_test')) {

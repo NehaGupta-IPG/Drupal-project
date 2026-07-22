@@ -611,7 +611,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
       // so the failure mode and dedicated-table checks do not apply.
       //
       // This is a genuine storage-model gap, not a temporary workaround: there
-      // is no JSON-storage equivalent behaviour to rewrite the assertions
+      // is no JSON-storage equivalent behavior to rewrite the assertions
       // against, so the skip is permanent. Verified by running the test against
       // the pgsql driver — assertTrue($schema->tableExists(...)) fails because
       // the dedicated tables never exist under JSON storage.
@@ -662,7 +662,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
       // physical tables or relational indexes to update.
       //
       // This is a genuine storage-model gap, not a temporary workaround: there
-      // is no JSON-storage equivalent behaviour to rewrite the assertions
+      // is no JSON-storage equivalent behavior to rewrite the assertions
       // against, so the skip is permanent. Verified by running the test against
       // the pgsql driver — the index-inspection path errors on the absent
       // dedicated table.
