@@ -161,25 +161,25 @@ class ToolbarHooks {
     $hash_cacheability->applyTo($items['administration']);
 
     if ($this->moduleHandler->moduleExists('announcements_feed')) {
-      $items += $this->announcementsFeedToolbarHook();
+      $items += $this->announcementsFeedToolbar();
     }
     if ($this->moduleHandler->moduleExists('contextual')) {
-      $items += $this->contextualToolbarHook();
+      $items += $this->contextualToolbar();
     }
     if ($this->moduleHandler->moduleExists('demo_umami')) {
-      $items += $this->demoUmamiToolbarHook();
+      $items += $this->demoUmamiToolbar();
     }
     if ($this->moduleHandler->moduleExists('user')) {
-      $items += $this->userToolbarHook();
+      $items += $this->userToolbar();
     }
     if ($this->moduleHandler->moduleExists('workspaces')) {
-      $items += $this->workspacesToolbarHook();
+      $items += $this->workspacesToolbar();
     }
 
     return $items;
   }
 
-  public function announcementsFeedToolbarHook(): array {
+  public function announcementsFeedToolbar(): array {
     if (!$this->currentUser->hasPermission('access announcements')) {
       return ['#cache' => ['contexts' => ['user.permissions']]];
     }
@@ -219,7 +219,7 @@ class ToolbarHooks {
     return $items;
   }
 
-  public function contextualToolbarHook(): array {
+  public function contextualToolbar(): array {
     $items = [];
     $items['contextual'] = ['#cache' => ['contexts' => ['user.permissions']]];
     if (!\Drupal::currentUser()->hasPermission('access contextual links')) {
@@ -255,7 +255,7 @@ class ToolbarHooks {
     return $items;
   }
 
-  public function demoUmamiToolbarHook(): array {
+  public function demoUmamiToolbar(): array {
     // Add a warning about using an experimental profile.
     // @todo This can be removed once a generic warning for experimental
     //   profiles has been introduced in
@@ -288,7 +288,7 @@ class ToolbarHooks {
     return $items;
   }
 
-  protected function userToolbarHook(): array {
+  protected function userToolbar(): array {
     $user = \Drupal::currentUser();
     $items['user'] = [
       '#type' => 'toolbar_item',
@@ -365,7 +365,7 @@ class ToolbarHooks {
     return $items;
   }
 
-  public function workspacesToolbarHook(): array {
+  public function workspacesToolbar(): array {
     $items['workspace'] = [
       '#cache' => [
         'contexts' => [
