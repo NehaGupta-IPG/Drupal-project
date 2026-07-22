@@ -265,8 +265,14 @@ class ViewEditTest extends UITestBase {
    * Tests Representative Node for a Taxonomy Term.
    */
   public function testRelationRepresentativeNode(): void {
-    // Populate and submit the form.
-    $edit["name[taxonomy_term_field_data.tid_representative]"] = TRUE;
+    // Populate and submit the form. Under pgsql JSON storage the taxonomy term
+    // data table ("taxonomy_term_field_data") is collapsed onto the entity base
+    // table ("taxonomy_term_data"), so the add-handler checkbox is keyed by the
+    // base table.
+    $tid_field = \Drupal::database()->driver() == 'pgsql'
+      ? 'name[taxonomy_term_data.tid_representative]'
+      : 'name[taxonomy_term_field_data.tid_representative]';
+    $edit[$tid_field] = TRUE;
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_groupwise_term_ui/default/relationship');
     $this->submitForm($edit, 'Add and configure relationships');
     // Apply changes.

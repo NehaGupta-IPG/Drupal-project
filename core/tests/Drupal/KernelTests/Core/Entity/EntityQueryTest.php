@@ -1498,6 +1498,19 @@ class EntityQueryTest extends EntityKernelTestBase {
    * Tests langcode key handling for revision data table joins.
    */
   public function testRevisionDataTableJoinUsesConfiguredLangcodeKey(): void {
+    if ($this->container->get('database')->driver() == 'pgsql') {
+      // This is a white-box regression guard for the relational query compiler:
+      // it asserts the exact SQL for the physical "*_property_revision" join and
+      // that its langcode predicate uses the entity type's configured langcode
+      // key column. The pgsql driver has no such physical table — an
+      // all-revisions query unwinds the base row's "__data_all_revisions" jsonb
+      // column with jsonb_array_elements() into one row per (revision, language)
+      // and restricts that derived base, so there is no physical join to assert
+      // against here. The same configured-langcode-key invariant this test
+      // guards for relational storage is covered for JSONB storage by
+      // \Drupal\Tests\pgsql\Kernel\JsonStorageLangcodeKeyQueryTest.
+      $this->markTestSkipped('pgsql JSONB storage generates jsonb-unwind SQL with no physical revision data table to assert against.');
+    }
     $entity_type_manager = $this->container->get('entity_type.manager');
     $entity_type = $entity_type_manager->getActiveDefinition('entity_test_mulrev');
     $keys = $entity_type->getKeys();
@@ -1539,16 +1552,28 @@ class EntityQueryTest extends EntityKernelTestBase {
     // EntityQuery. This way we ensure that the database driver is free to
     // create its own comparable SQL statement.
     $connection = Database::getConnection();
-    $expected = $connection->select("entity_test_mulrev", "base_table");
-    $expected->addField("base_table", "revision_id", "revision_id");
-    $expected->addField("base_table", "id", "id");
-    $expected->join("entity_test_mulrev__$figures", "entity_test_mulrev__$figures", '[entity_test_mulrev__' . $figures . '].[entity_id] = [base_table].[id]');
-    $expected->join("entity_test_mulrev__$figures", "entity_test_mulrev__{$figures}_2", '[entity_test_mulrev__' . $figures . '_2].[entity_id] = [base_table].[id]');
-    $expected->addJoin("LEFT", "entity_test_mulrev__$figures", "entity_test_mulrev__{$figures}_3", '[entity_test_mulrev__' . $figures . '_3].[entity_id] = [base_table].[id]');
-    $expected->condition("entity_test_mulrev__$figures.{$figures}_color", ["blue"], "IN");
-    $expected->condition("entity_test_mulrev__{$figures}_2.{$figures}_color", ["red"], "IN");
-    $expected->isNull("entity_test_mulrev__{$figures}_3.{$figures}_color");
-    $expected->orderBy("base_table.id");
+    if ($connection->driver() == 'pgsql') {
+      // The pgsql driver emits valid SQL through the same DB API, only its
+      // string differs: it has no physical dedicated field tables (the field
+      // lives as a JSON array inside a `__data*` column on the base row), so it
+      // replaces each field-table join with a non-correlated derived table that
+      // "unwinds" that JSON array (@see \Drupal\pgsql\EntityQuery\Tables). The
+      // expected query is rebuilt below with that unwind rather than the
+      // relational dedicated-table joins.
+      $expected = $this->buildExpectedPgsqlToStringQuery($connection, $figures);
+    }
+    else {
+      $expected = $connection->select("entity_test_mulrev", "base_table");
+      $expected->addField("base_table", "revision_id", "revision_id");
+      $expected->addField("base_table", "id", "id");
+      $expected->join("entity_test_mulrev__$figures", "entity_test_mulrev__$figures", '[entity_test_mulrev__' . $figures . '].[entity_id] = [base_table].[id]');
+      $expected->join("entity_test_mulrev__$figures", "entity_test_mulrev__{$figures}_2", '[entity_test_mulrev__' . $figures . '_2].[entity_id] = [base_table].[id]');
+      $expected->addJoin("LEFT", "entity_test_mulrev__$figures", "entity_test_mulrev__{$figures}_3", '[entity_test_mulrev__' . $figures . '_3].[entity_id] = [base_table].[id]');
+      $expected->condition("entity_test_mulrev__$figures.{$figures}_color", ["blue"], "IN");
+      $expected->condition("entity_test_mulrev__{$figures}_2.{$figures}_color", ["red"], "IN");
+      $expected->isNull("entity_test_mulrev__{$figures}_3.{$figures}_color");
+      $expected->orderBy("base_table.id");
+    }
 
     // Apply table prefixes and quote identifiers for the expected SQL.
     $expected_string = $connection->prefixTables((string) $expected);
@@ -1561,6 +1586,69 @@ class EntityQueryTest extends EntityKernelTestBase {
     $expected_string = strtr($expected_string, $quoted);
 
     $this->assertSame($expected_string, (string) $query);
+  }
+
+  /**
+   * Builds the expected ::testToString() query for the pgsql JSONB driver.
+   *
+   * Under pgsql JSONB embedded storage the dedicated field tables do not exist
+   * — the dedicated field lives as a JSON array inside a `__data*` column on the
+   * base row — so the query backend replaces each field-table join with a
+   * non-correlated derived table that "unwinds" that JSON array
+   * (@see \Drupal\pgsql\EntityQuery\Tables). This rebuilds the equivalent query
+   * through the public DB API, reusing the very unwind builder the query backend
+   * uses so the assertion covers the join assembly (types, conditions, order,
+   * WHERE) rather than re-deriving the subquery internals. Referencing the trait
+   * inside this pgsql-only helper keeps non-pgsql runs from autoloading it.
+   *
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
+   * @param string $figures
+   *   The dedicated multi-value field name under test.
+   *
+   * @return \Drupal\Core\Database\Query\Select
+   *   The expected query.
+   */
+  protected function buildExpectedPgsqlToStringQuery($connection, string $figures) {
+    // Resolve the embedded (dedicated) table the figures field is stored in.
+    // entity_test_mulrev is revisionable, so a default query reads dedicated
+    // fields from the current-revision context document.
+    $entity_type = $this->container->get('entity_type.manager')->getDefinition('entity_test_mulrev');
+    $base_table = $entity_type->getBaseTable();
+    $id_key = $entity_type->getKey('id');
+    /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
+    $table_mapping = $this->storage->getTableMapping();
+    $context_table = $table_mapping->getJsonStorageCurrentRevisionTable();
+    $field_storage = $this->container->get('entity_field.manager')
+      ->getFieldStorageDefinitions('entity_test_mulrev')[$figures];
+    $embedded_table = $table_mapping->getJsonStorageDedicatedTableName($field_storage, $context_table);
+    $registry = $connection->tableInformation();
+
+    $builder = new class {
+      use \Drupal\pgsql\Driver\Database\pgsql\JsonStorageUnwindTrait;
+
+      public function build($connection, $id_key, $base_table, $embedded_table, $registry, $langcode_key) {
+        return $this->buildEmbeddedUnwindSubquery($connection, $id_key, $base_table, $embedded_table, $registry, $langcode_key);
+      }
+
+    };
+
+    $expected = $connection->select($base_table, 'base_table');
+    $expected->addField('base_table', 'revision_id', 'revision_id');
+    $expected->addField('base_table', 'id', 'id');
+    // Each condition group joins its own unwind of the dedicated field array,
+    // keyed on the entity id — INNER for the two IN conditions, LEFT for the
+    // notExists() group.
+    $langcode_key = $entity_type->getKey('langcode');
+    $alias_blue = $expected->addJoin('INNER', $builder->build($connection, $id_key, $base_table, $embedded_table, $registry, $langcode_key), NULL, "[%alias].[entity_id] = [base_table].[$id_key]");
+    $alias_red = $expected->addJoin('INNER', $builder->build($connection, $id_key, $base_table, $embedded_table, $registry, $langcode_key), NULL, "[%alias].[entity_id] = [base_table].[$id_key]");
+    $alias_null = $expected->addJoin('LEFT', $builder->build($connection, $id_key, $base_table, $embedded_table, $registry, $langcode_key), NULL, "[%alias].[entity_id] = [base_table].[$id_key]");
+    $expected->condition("$alias_blue.{$figures}_color", ['blue'], 'IN');
+    $expected->condition("$alias_red.{$figures}_color", ['red'], 'IN');
+    $expected->isNull("$alias_null.{$figures}_color");
+    $expected->orderBy('base_table.id');
+
+    return $expected;
   }
 
   /**

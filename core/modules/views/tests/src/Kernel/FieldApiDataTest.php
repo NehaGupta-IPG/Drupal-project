@@ -116,53 +116,72 @@ class FieldApiDataTest extends ViewsKernelTestBase {
     $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage_string);
     $data = $this->getViewsData();
 
+    // Under the pgsql (JSON) driver a content entity's dedicated field tables
+    // ("node__<field>", "node_revision__<field>") do not exist physically; their
+    // views data is collapsed onto the entity base table. The field content
+    // (click-sortable, help, title) is therefore asserted against the "node"
+    // base table and the dedicated-table join structure is not present.
+    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
+    // The table the field content is described on.
+    $field_table = $is_pgsql ? 'node' : $current_table;
+
     $this->assertArrayHasKey($current_table, $data);
     $this->assertArrayHasKey($revision_table, $data);
 
-    // The node field should join against node_field_data.
-    $this->assertArrayHasKey('node_field_data', $data[$current_table]['table']['join']);
-    $this->assertArrayHasKey('node_field_revision', $data[$revision_table]['table']['join']);
+    if (!$is_pgsql) {
+      // The node field should join against node_field_data.
+      $this->assertArrayHasKey('node_field_data', $data[$current_table]['table']['join']);
+      $this->assertArrayHasKey('node_field_revision', $data[$revision_table]['table']['join']);
 
-    $expected_join = [
-      'table' => $current_table,
-      'left_field' => 'nid',
-      'field' => 'entity_id',
-      'extra' => [
-        ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
-        ['left_field' => 'langcode', 'field' => 'langcode'],
-      ],
-    ];
-    $this->assertSame($expected_join, $data[$current_table]['table']['join']['node_field_data']);
-    $expected_join = [
-      'table' => $revision_table,
-      'left_field' => 'vid',
-      'field' => 'revision_id',
-      'extra' => [
-        ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
-        ['left_field' => 'langcode', 'field' => 'langcode'],
-      ],
-    ];
-    $this->assertSame($expected_join, $data[$revision_table]['table']['join']['node_field_revision']);
+      $expected_join = [
+        'table' => $current_table,
+        'left_field' => 'nid',
+        'field' => 'entity_id',
+        'extra' => [
+          ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
+          ['left_field' => 'langcode', 'field' => 'langcode'],
+        ],
+      ];
+      $this->assertSame($expected_join, $data[$current_table]['table']['join']['node_field_data']);
+      $expected_join = [
+        'table' => $revision_table,
+        'left_field' => 'vid',
+        'field' => 'revision_id',
+        'extra' => [
+          ['field' => 'deleted', 'value' => 0, 'numeric' => TRUE],
+          ['left_field' => 'langcode', 'field' => 'langcode'],
+        ],
+      ];
+      $this->assertSame($expected_join, $data[$revision_table]['table']['join']['node_field_revision']);
+    }
+    else {
+      // The dedicated field tables are collapsed away: they carry no table
+      // definition and the field is described on the entity base table instead.
+      $this->assertArrayNotHasKey('table', $data[$current_table]);
+      $this->assertArrayNotHasKey('table', $data[$revision_table]);
+      $this->assertArrayHasKey($field_storage_string->getName(), $data['node']);
+    }
 
     // Test click sortable for string field.
-    $this->assertTrue($data[$current_table][$field_storage_string->getName()]['field']['click sortable']);
+    $this->assertTrue($data[$field_table][$field_storage_string->getName()]['field']['click sortable']);
     // Click sort should only be on the primary field.
     $this->assertArrayNotHasKey($field_storage_string->getName(), $data[$revision_table]);
     // Test click sortable for long text field.
     $data_long = $this->getViewsData('field_string_long');
     $current_table_long = $table_mapping->getDedicatedDataTableName($field_storage_string_long);
-    $this->assertTrue($data_long[$current_table_long][$field_storage_string_long->getName()]['field']['click sortable']);
+    $field_table_long = $is_pgsql ? 'node' : $current_table_long;
+    $this->assertTrue($data_long[$field_table_long][$field_storage_string_long->getName()]['field']['click sortable']);
 
-    $this->assertInstanceOf(MarkupInterface::class, $data[$current_table][$field_storage_string->getName()]['help']);
-    $this->assertEquals('Appears in: page, article. Also known as: Content: GiraffeB&quot; label', $data[$current_table][$field_storage_string->getName()]['help']);
+    $this->assertInstanceOf(MarkupInterface::class, $data[$field_table][$field_storage_string->getName()]['help']);
+    $this->assertEquals('Appears in: page, article. Also known as: Content: GiraffeB&quot; label', $data[$field_table][$field_storage_string->getName()]['help']);
 
-    $this->assertInstanceOf(MarkupInterface::class, $data[$current_table][$field_storage_string->getName() . '_value']['help']);
-    $this->assertEquals('Appears in: page, article. Also known as: Content: GiraffeA&quot; label (field_string)', $data[$current_table][$field_storage_string->getName() . '_value']['help']);
+    $this->assertInstanceOf(MarkupInterface::class, $data[$field_table][$field_storage_string->getName() . '_value']['help']);
+    $this->assertEquals('Appears in: page, article. Also known as: Content: GiraffeA&quot; label (field_string)', $data[$field_table][$field_storage_string->getName() . '_value']['help']);
 
     // Since each label is only used once,
     // EntityFieldManagerInterface::getFieldLabels() will return a label using
     // alphabetical sorting.
-    $this->assertEquals('GiraffeA&quot; label (field_string)', $data[$current_table][$field_storage_string->getName() . '_value']['title']);
+    $this->assertEquals('GiraffeA&quot; label (field_string)', $data[$field_table][$field_storage_string->getName() . '_value']['title']);
 
     // Attach the same field to a different bundle with a different label.
     NodeType::create([
@@ -180,9 +199,9 @@ class FieldApiDataTest extends ViewsKernelTestBase {
 
     // Now the 'GiraffeB&quot; label' is used twice and therefore will be
     // selected by EntityFieldManagerInterface::getFieldLabels().
-    $this->assertEquals('GiraffeB&quot; label (field_string)', $data[$current_table][$field_storage_string->getName() . '_value']['title']);
-    $this->assertInstanceOf(MarkupInterface::class, $data[$current_table][$field_storage_string->getName()]['help']);
-    $this->assertEquals('Appears in: article, page, news. Also known as: Content: GiraffeA&quot; label', $data[$current_table][$field_storage_string->getName()]['help']);
+    $this->assertEquals('GiraffeB&quot; label (field_string)', $data[$field_table][$field_storage_string->getName() . '_value']['title']);
+    $this->assertInstanceOf(MarkupInterface::class, $data[$field_table][$field_storage_string->getName()]['help']);
+    $this->assertEquals('Appears in: article, page, news. Also known as: Content: GiraffeA&quot; label', $data[$field_table][$field_storage_string->getName()]['help']);
   }
 
   /**
@@ -206,6 +225,10 @@ class FieldApiDataTest extends ViewsKernelTestBase {
     $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage);
     $data[$current_table] = $views_data->get($current_table);
     $data[$revision_table] = $views_data->get($revision_table);
+    // Under the pgsql (JSON) driver the dedicated field tables are collapsed
+    // onto the entity base table; expose it too so the field content can be
+    // asserted there.
+    $data['node'] = $views_data->get('node');
     return $data;
   }
 

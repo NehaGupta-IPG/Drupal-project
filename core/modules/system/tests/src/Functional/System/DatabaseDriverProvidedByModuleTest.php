@@ -57,7 +57,11 @@ class DatabaseDriverProvidedByModuleTest extends BrowserTestBase {
       'dependencies' => [
         $driver => [
           'namespace' => "Drupal\\{$driver}",
-          'autoload' => "core/modules/$driver/src/",
+          // The pgsql driver has been relocated out of core to the custom
+          // pgsql module; other drivers still ship from core/modules.
+          'autoload' => $driver === 'pgsql'
+            ? 'modules/custom/pgsql/src/'
+            : "core/modules/$driver/src/",
         ],
       ],
     ];

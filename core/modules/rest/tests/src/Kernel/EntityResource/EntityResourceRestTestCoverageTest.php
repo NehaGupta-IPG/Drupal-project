@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\rest\Kernel\EntityResource;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
@@ -91,6 +92,16 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
     $problems = [];
     foreach ($this->definitions as $entity_type_id => $info) {
       $class_name_full = $info->getClass();
+      // Under the pgsql driver PgsqlEntityHooks::entityTypeAlter() swaps some
+      // entity classes for driver-specific subclasses in the
+      // "Drupal\pgsql\modules\..." namespace (for example the "view" entity
+      // class becomes \Drupal\pgsql\modules\views\View). The REST test class is
+      // still provided by the entity's original module, so derive the module
+      // name and class from the core parent class rather than the driver
+      // subclass.
+      if (Database::getConnection()->driver() == 'pgsql' && str_starts_with($class_name_full, 'Drupal\\pgsql\\')) {
+        $class_name_full = get_parent_class($class_name_full);
+      }
       $parts = explode('\\', $class_name_full);
       $class_name = end($parts);
       $module_name = $parts[1];

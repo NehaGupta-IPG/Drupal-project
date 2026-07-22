@@ -81,13 +81,25 @@ class NodeRevisionWizardTest extends WizardTestBase {
     $view = Views::getView($view['id']);
     $view->initHandlers();
 
-    $this->assertEquals(['node_field_revision' => TRUE, '#global' => TRUE, 'node_field_data' => TRUE], $view->getBaseTables());
+    // Under pgsql JSON storage the relational node_field_revision and
+    // node_field_data tables are collapsed onto the node entity base table, so
+    // the base tables and created handlers reference the base table.
+    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
+    $revision_table = $is_pgsql ? 'node' : 'node_field_revision';
+    $data_table = $is_pgsql ? 'node' : 'node_field_data';
+
+    if ($is_pgsql) {
+      $this->assertEquals(['node' => TRUE, '#global' => TRUE], $view->getBaseTables());
+    }
+    else {
+      $this->assertEquals(['node_field_revision' => TRUE, '#global' => TRUE, 'node_field_data' => TRUE], $view->getBaseTables());
+    }
 
     // Check for the default filters.
-    $this->assertEquals('node_field_revision', $view->filter['status']->table);
+    $this->assertEquals($revision_table, $view->filter['status']->table);
     $this->assertEquals('status', $view->filter['status']->field);
     $this->assertEquals('1', $view->filter['status']->value);
-    $this->assertEquals('node_field_data', $view->filter['type']->table);
+    $this->assertEquals($data_table, $view->filter['type']->table);
 
     $this->executeView($view);
 
@@ -112,10 +124,15 @@ class NodeRevisionWizardTest extends WizardTestBase {
     $view = Views::getView($view['id']);
     $view->initHandlers();
 
-    $this->assertEquals(['node_field_revision' => TRUE, '#global' => TRUE], $view->getBaseTables());
+    if ($is_pgsql) {
+      $this->assertEquals(['node' => TRUE, '#global' => TRUE], $view->getBaseTables());
+    }
+    else {
+      $this->assertEquals(['node_field_revision' => TRUE, '#global' => TRUE], $view->getBaseTables());
+    }
 
     // Check for the default filters.
-    $this->assertEquals('node_field_revision', $view->filter['status']->table);
+    $this->assertEquals($revision_table, $view->filter['status']->table);
     $this->assertEquals('status', $view->filter['status']->field);
     $this->assertEquals('1', $view->filter['status']->value);
     $this->assertArrayNotHasKey('type', $view->filter);

@@ -89,7 +89,7 @@ class InstallerTest extends InstallerTestBase {
     // Assert that we use the by core supported database drivers by default and
     // not the ones from the driver_test module.
     $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupalmysqldriverdatabasemysql"]', 'MySQL, MariaDB, or equivalent');
-    $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupalpgsqldriverdatabasepgsql"]', 'PostgreSQL');
+    $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupalpgsqldriverdatabasepgsql"]', 'PostgreSQL with JSON entity storage');
 
     parent::setUpSettings();
   }

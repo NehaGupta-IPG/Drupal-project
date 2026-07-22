@@ -10,6 +10,7 @@
     },
     "require": {
         "composer/installers": "^2.3",
+        "daffie/pgsql": "dev-main",
         "drupal/core": "self.version",
         "drupal/core-project-message": "self.version",
         "drupal/core-recipe-unpack": "self.version",
@@ -68,6 +69,7 @@
         },
         "allow-plugins": {
             "composer/installers": true,
+            "daffie/drupal-core-pgsql-module-remover": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "drupal/core-composer-scaffold": false,
             "drupal/core-project-message": true,

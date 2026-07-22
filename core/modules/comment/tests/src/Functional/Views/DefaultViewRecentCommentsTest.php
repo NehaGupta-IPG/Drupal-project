@@ -131,6 +131,15 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
       'cid' => 'cid',
       'comment_field_data_created' => 'created',
     ];
+    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
+    if ($is_pgsql) {
+      // Under pgsql JSON storage the comment_field_data table is collapsed
+      // onto the comment base table and the created sort is resolved through
+      // the comment translations context unwind, so the sort's result alias
+      // is "comment_comment_translations_created".
+      unset($map['comment_field_data_created']);
+      $map['comment_comment_translations_created'] = 'created';
+    }
     $expected_result = [];
     foreach (array_values($this->commentsCreated) as $key => $comment) {
       $expected_result[$key]['subject'] = $comment->getSubject();

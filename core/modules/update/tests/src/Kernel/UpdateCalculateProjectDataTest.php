@@ -44,6 +44,12 @@ class UpdateCalculateProjectDataTest extends KernelTestBase {
     // our fake release metadata to be fetched.
     $this->installConfig('update');
     $this->installConfig('update_test');
+    // Only check installed extensions, which in this test are all core and so
+    // collapse into the single 'drupal' project. Otherwise the update manager
+    // also scans uninstalled extensions on disk, including any contrib modules
+    // or themes present in the codebase, and would queue a fetch task (and
+    // therefore expect a mocked HTTP response) for each of them.
+    $this->config('update.settings')->set('check.disabled_extensions', FALSE)->save();
     $this->setCoreVersion('8.0.1');
 
   }

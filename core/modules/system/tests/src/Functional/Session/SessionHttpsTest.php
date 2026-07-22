@@ -106,6 +106,15 @@ class SessionHttpsTest extends BrowserTestBase {
     // HTTP on HTTPS environments.
     $browser_kit_cookie_jar->expire($this->secureSessionName);
 
+    // Also remove the empty insecure session cookie set above. When the base
+    // URL is a multi-label host (e.g. "example.ddev.site"), Drupal issues the
+    // real session cookie with a leading-dot domain (".example.ddev.site")
+    // while the empty cookie above was stored host-only. BrowserKit treats
+    // those as distinct cookies, so the empty one would otherwise survive
+    // alongside the real login cookie and send an empty SID. On single-label
+    // hosts (localhost/IP) the cookie domain is empty and this is a no-op.
+    $browser_kit_cookie_jar->expire($this->insecureSessionName);
+
     // Test HTTP session handling by submitting the login form through http.php,
     // which creates a mock HTTP request on HTTPS test environments.
     $this->loginHttp($user);

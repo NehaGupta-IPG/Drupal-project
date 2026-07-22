@@ -161,6 +161,16 @@ class HtaccessTest extends BrowserTestBase {
     $this->drupalGet('core/modules/system/tests/logo.svgz');
     $this->assertSession()->statusCodeEquals(200);
 
+    // The Content-Encoding: gzip header for .svgz files is set by the
+    // "AddEncoding gzip svgz" directive in .htaccess. That directive is only
+    // honored by Apache; web servers such as nginx do not process .htaccess
+    // files and will serve the file without that header, so skip the assertion
+    // in that case.
+    $server = (string) $this->getSession()->getResponseHeader('Server');
+    if ($server !== '' && stripos($server, 'Apache') === FALSE) {
+      $this->markTestSkipped("The '$server' web server does not process .htaccess files, so the Content-Encoding header is not set for .svgz files.");
+    }
+
     // Use x-encoded-content-encoding because of Content-Encoding responses
     // (gzip, deflate, etc.) are automatically decoded by Guzzle.
     $this->assertSession()->responseHeaderEquals('x-encoded-content-encoding', 'gzip');

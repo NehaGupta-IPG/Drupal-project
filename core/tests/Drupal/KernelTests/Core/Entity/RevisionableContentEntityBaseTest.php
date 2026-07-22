@@ -182,7 +182,40 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
    */
   protected function assertItemsTableCount(int $count, EntityTypeInterface $definition): void {
     $connection = Database::getConnection();
+    // The base table is a physical table on every driver and holds exactly one
+    // row per entity.
     $this->assertEquals(1, (int) $connection->select($definition->getBaseTable())->countQuery()->execute()->fetchField());
+
+    if ($connection->driver() == 'pgsql') {
+      // JSON storage has no physical data/revision/revision-data tables: the
+      // current default revision is embedded in the base row's
+      // `__data_current_revision` jsonb column and every revision (one document
+      // per revision and language) in `__data_all_revisions`, each keyed by the
+      // embedded table name. Count those documents to mirror the relational
+      // data-table (1) and revision/revision-data-table ($count) row counts.
+      $storage = \Drupal::entityTypeManager()->getStorage($definition->id());
+      /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
+      $table_mapping = $storage->getTableMapping();
+      $all_revisions_table = $table_mapping->getJsonStorageAllRevisionsTable();
+      $current_revision_table = $table_mapping->getJsonStorageCurrentRevisionTable();
+
+      $record = $connection->select($definition->getBaseTable(), 'b')
+        ->fields('b', ['__data_all_revisions', '__data_current_revision'])
+        ->execute()
+        ->fetchAssoc();
+      $all_revisions = $record['__data_all_revisions'] ? (json_decode($record['__data_all_revisions'], TRUE)[$all_revisions_table] ?? []) : [];
+      $current_revision = $record['__data_current_revision'] ? (json_decode($record['__data_current_revision'], TRUE)[$current_revision_table] ?? []) : [];
+
+      // The data table holds the default revision's per-language rows; these
+      // tests use a single language, so exactly one document is expected.
+      $this->assertEquals(1, count($current_revision));
+      // The revision table holds one row per revision (distinct revision IDs).
+      $this->assertEquals($count, count(array_unique(array_column($all_revisions, 'revision_id'))));
+      // The revision data table holds one row per revision and language.
+      $this->assertEquals($count, count($all_revisions));
+      return;
+    }
+
     $this->assertEquals(1, (int) $connection->select($definition->getDataTable())->countQuery()->execute()->fetchField());
     $this->assertEquals($count, (int) $connection->select($definition->getRevisionTable())->countQuery()->execute()->fetchField());
     $this->assertEquals($count, (int) $connection->select($definition->getRevisionDataTable())->countQuery()->execute()->fetchField());

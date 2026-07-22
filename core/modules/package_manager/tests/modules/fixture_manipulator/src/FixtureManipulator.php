@@ -540,6 +540,12 @@ class FixtureManipulator {
           // Cannot be set using `composer init`, only `composer config` can.
           return NULL;
 
+        case 'authors':
+          // `composer init` may auto-populate an `authors` entry from the local
+          // environment's git config. It is irrelevant to these fixtures, so it
+          // is ignored here (otherwise forking such a package would fail).
+          return NULL;
+
         default:
           throw new \InvalidArgumentException($k);
       }

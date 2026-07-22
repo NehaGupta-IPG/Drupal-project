@@ -44,13 +44,7 @@ class UserDeleteTest extends KernelTestBase {
 
     // These users should have a role.
     $connection = Database::getConnection();
-    $query = $connection->select('user__roles', 'r');
-    $roles_created = $query
-      ->fields('r', ['entity_id'])
-      ->condition('entity_id', $uids, 'IN')
-      ->countQuery()
-      ->execute()
-      ->fetchField();
+    $roles_created = $this->countRoleAssignments($connection, $uids);
 
     $this->assertGreaterThan(0, $roles_created);
     // We should be able to load one of the users.
@@ -60,18 +54,60 @@ class UserDeleteTest extends KernelTestBase {
     $users = $storage->loadMultiple($uids);
     $storage->delete($users);
     // Test if the roles assignments are deleted.
-    $query = $connection->select('user__roles', 'r');
-    $roles_after_deletion = $query
-      ->fields('r', ['entity_id'])
-      ->condition('entity_id', $uids, 'IN')
-      ->countQuery()
-      ->execute()
-      ->fetchField();
+    $roles_after_deletion = $this->countRoleAssignments($connection, $uids);
     $this->assertEquals(0, $roles_after_deletion);
     // Test if the users are deleted, User::load() will return NULL.
     $this->assertNull(User::load($user_a->id()));
     $this->assertNull(User::load($user_b->id()));
     $this->assertNull(User::load($user_c->id()));
+  }
+
+  /**
+   * Counts the role assignments for the given users.
+   *
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
+   * @param array $uids
+   *   The user IDs to count role assignments for.
+   *
+   * @return int
+   *   The number of role assignments held by the given users.
+   */
+  protected function countRoleAssignments($connection, array $uids): int {
+    if ($connection->driver() !== 'pgsql') {
+      return (int) $connection->select('user__roles', 'r')
+        ->fields('r', ['entity_id'])
+        ->condition('entity_id', $uids, 'IN')
+        ->countQuery()
+        ->execute()
+        ->fetchField();
+    }
+
+    // Under pgsql the 'user__roles' table is not physical: the roles are
+    // embedded in each user's 'users_translations' documents (nested as
+    // 'users_translations__roles') inside the base 'users' table JSONB column.
+    // Selecting the embedded 'users_translations' table as a field lets the
+    // pgsql Select re-expand it into the decoded JSON array of translations,
+    // so walk it to count the assignments.
+    $result = $connection->select('users', 'u')
+      ->fields('u', ['users_translations'])
+      ->execute()
+      ->fetchCol();
+
+    $count = 0;
+    foreach ($result as $translations) {
+      if (is_string($translations)) {
+        $translations = json_decode($translations, TRUE);
+      }
+      foreach ($translations ?? [] as $translation) {
+        foreach ($translation['users_translations__roles'] ?? [] as $role) {
+          if (in_array((string) $role['entity_id'], array_map('strval', $uids), TRUE)) {
+            $count++;
+          }
+        }
+      }
+    }
+    return $count;
   }
 
 }

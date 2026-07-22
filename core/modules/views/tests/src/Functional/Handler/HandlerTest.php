@@ -262,18 +262,25 @@ class HandlerTest extends ViewTestBase {
     $this->drupalGet($handler_options_path);
     $this->assertSession()->fieldNotExists($relationship_name);
 
+    // Under the pgsql (JSON) driver a content entity's field data is collapsed
+    // onto the entity base table, so views are based on (and add-handler
+    // checkboxes are keyed by) the base table.
+    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
+    $comment_table = $is_pgsql ? 'comment' : 'comment_field_data';
+    $node_table = $is_pgsql ? 'node' : 'node_field_data';
+
     // Create a view of comments with node relationship.
     View::create([
-      'base_table' => 'comment_field_data',
+      'base_table' => $comment_table,
       'id' => 'test_get_entity_type',
       'label' => 'Test',
     ])->save();
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_get_entity_type/default/relationship');
-    $this->submitForm(['name[comment_field_data.node]' => 'comment_field_data.node'], 'Add and configure relationships');
+    $this->submitForm(["name[$comment_table.node]" => "$comment_table.node"], 'Add and configure relationships');
     $this->submitForm([], 'Apply');
     // Add a content type filter.
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_get_entity_type/default/filter');
-    $this->submitForm(['name[node_field_data.type]' => 'node_field_data.type'], 'Add and configure filter criteria');
+    $this->submitForm(["name[$node_table.type]" => "$node_table.type"], 'Add and configure filter criteria');
     $this->assertTrue($this->assertSession()->optionExists('edit-options-relationship', 'node')->isSelected());
     $this->submitForm(['options[value][page]' => 'page'], 'Apply');
     // Check content type filter options.

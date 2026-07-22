@@ -39,6 +39,13 @@ class UpdateMiscTest extends UpdateTestBase {
       ],
     ];
     $this->config('update_test.settings')->set('system_info', $setting)->save();
+    // Restrict the available updates report to Drupal core. This isolates the
+    // test from any contributed modules or themes present in the code base:
+    // without it, those extra projects would be reported and fetched, breaking
+    // the assertions that data is checked "for one project" and exhausting the
+    // shared per-URL fetch-failure limit.
+    // See \Drupal\update_test\Hook\UpdateTestHooks::updateProjectsAlter().
+    $this->config('update_test.settings')->set('allowed_projects', ['drupal'])->save();
     $this->drupalPlaceBlock('local_actions_block');
   }
 

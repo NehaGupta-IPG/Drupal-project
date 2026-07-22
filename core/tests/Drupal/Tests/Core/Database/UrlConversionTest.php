@@ -129,7 +129,7 @@ class UrlConversionTest extends UnitTestCase {
             ],
             'pgsql' => [
               'namespace' => 'Drupal\pgsql',
-              'autoload' => 'core/modules/pgsql/src/',
+              'autoload' => 'modules/custom/pgsql/src/',
             ],
           ],
         ],
@@ -154,7 +154,7 @@ class UrlConversionTest extends UnitTestCase {
             ],
             'pgsql' => [
               'namespace' => 'Drupal\pgsql',
-              'autoload' => 'core/modules/pgsql/src/',
+              'autoload' => 'modules/custom/pgsql/src/',
             ],
           ],
         ],
@@ -178,7 +178,7 @@ class UrlConversionTest extends UnitTestCase {
             ],
             'pgsql' => [
               'namespace' => 'Drupal\pgsql',
-              'autoload' => 'core/modules/pgsql/src/',
+              'autoload' => 'modules/custom/pgsql/src/',
             ],
           ],
         ],
@@ -203,7 +203,7 @@ class UrlConversionTest extends UnitTestCase {
             ],
             'pgsql' => [
               'namespace' => 'Drupal\pgsql',
-              'autoload' => 'core/modules/pgsql/src/',
+              'autoload' => 'modules/custom/pgsql/src/',
             ],
           ],
         ],
@@ -246,7 +246,7 @@ class UrlConversionTest extends UnitTestCase {
           'host' => 'test_host',
           'database' => 'test_database',
           'namespace' => 'Drupal\pgsql\Driver\Database\pgsql',
-          'autoload' => 'core/modules/pgsql/src/Driver/Database/pgsql/',
+          'autoload' => 'modules/custom/pgsql/src/Driver/Database/pgsql/',
         ],
         FALSE,
       ],
@@ -259,7 +259,7 @@ class UrlConversionTest extends UnitTestCase {
           'host' => 'test_host',
           'database' => 'test_database',
           'namespace' => 'Drupal\pgsql\Driver\Database\pgsql',
-          'autoload' => 'core/modules/pgsql/src/Driver/Database/pgsql/',
+          'autoload' => 'modules/custom/pgsql/src/Driver/Database/pgsql/',
         ],
         FALSE,
       ],
@@ -450,11 +450,29 @@ class UrlConversionTest extends UnitTestCase {
         ],
         'pgsql' => [
           'namespace' => 'Drupal\pgsql',
-          'autoload' => 'core/modules/pgsql/src/',
+          'autoload' => 'modules/custom/pgsql/src/',
         ],
       ],
     ];
     $expected_url9 = 'DriverTestMysql://test_user:test_pass@test_host:3306/test_database?module=driver_test';
+
+    // A driver that extends another driver may have its 'driver' connection
+    // option set to the parent driver's name (here 'pgsql') while its namespace
+    // points to the extending driver. The URL scheme must be the extending
+    // driver's name as encoded in the namespace ('DriverTestPgsql') so that the
+    // URL can be converted back to the correct driver namespace.
+    $info10 = [
+      'database' => 'test_database',
+      'username' => 'test_user',
+      'password' => 'test_pass',
+      'prefix' => '',
+      'host' => 'test_host',
+      'port' => '5432',
+      'driver' => 'pgsql',
+      'namespace' => 'Drupal\\driver_test\\Driver\\Database\\DriverTestPgsql',
+      'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTestPgsql/',
+    ];
+    $expected_url10 = 'DriverTestPgsql://test_user:test_pass@test_host:5432/test_database?module=driver_test';
 
     return [
       [$info1, $expected_url1],
@@ -466,6 +484,7 @@ class UrlConversionTest extends UnitTestCase {
       [$info7, $expected_url7],
       [$info8, $expected_url8],
       [$info9, $expected_url9],
+      [$info10, $expected_url10],
     ];
   }
 

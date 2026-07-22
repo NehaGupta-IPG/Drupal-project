@@ -129,7 +129,18 @@ class ToolkitGdTest extends KernelTestBase {
     $this->assertSame(20, $image_reloaded->getHeight());
     $this->assertSame(image_type_to_mime_type($type), $image_reloaded->getMimeType());
     if ($image_reloaded->getToolkit()->getType() == IMAGETYPE_GIF) {
-      $this->assertSame('#ffff00', $image_reloaded->getToolkit()->getTransparentColor(), "Image '$file' after reload should have color channel set to #ffff00, but it has not.");
+      // PHP's bundled GD (and older external libgd) preserve the exact
+      // transparent color through a GIF save/reload, while external libgd 2.3
+      // and later quantize the fully transparent fill to a different palette
+      // color. In both cases a transparent color must still be set.
+      $gd_version = gd_info()['GD Version'];
+      $preserves_color = !(preg_match('/(\d+\.\d+\.\d+)/', $gd_version, $matches) && version_compare($matches[1], '2.3.0', '>='));
+      if ($preserves_color) {
+        $this->assertSame('#ffff00', $image_reloaded->getToolkit()->getTransparentColor(), "Image '$file' after reload should have color channel set to #ffff00, but it has not.");
+      }
+      else {
+        $this->assertNotNull($image_reloaded->getToolkit()->getTransparentColor(), "Image '$file' after reload should have a transparent color set, but it has not.");
+      }
     }
     else {
       $this->assertNull($image_reloaded->getToolkit()->getTransparentColor(), "Image '$file' after reload should have no color channel set, but it has.");

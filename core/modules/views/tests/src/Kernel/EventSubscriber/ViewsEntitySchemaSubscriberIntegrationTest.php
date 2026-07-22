@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\EventSubscriber;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeEvent;
 use Drupal\Core\Entity\EntityTypeEvents;
@@ -72,10 +73,28 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
   protected $state;
 
   /**
+   * Whether the database driver embeds entity field data in JSON documents.
+   *
+   * Under the pgsql (JSON storage) driver a content entity's field data is
+   * embedded in "jsonb" columns on the entity base table; the logical
+   * "<entity>_field_data"/"<entity>_revision" tables do not exist physically
+   * and \Drupal\pgsql\modules\views\ViewStorage collapses every view's base
+   * table and handler tables onto the entity base table at config load/create.
+   * The views therefore reference the base table for all fields regardless of
+   * the entity's data/revision table layout, which changes both the expected
+   * handler table names and which views a schema change actually rewrites.
+   *
+   * @var bool
+   */
+  protected bool $jsonStorage = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp($import_test_views = TRUE): void {
     parent::setUp();
+
+    $this->jsonStorage = Database::getConnection()->driver() === 'pgsql';
 
     $this->eventDispatcher = $this->container->get('event_dispatcher');
     $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');
@@ -146,8 +165,15 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     $this->assertEquals('entity_test_update_new', $display['display_options']['fields']['id']['table']);
     $this->assertEquals('entity_test_update_new', $display['display_options']['fields']['name']['table']);
 
-    // Check that only the impacted views have been updated.
-    $this->assertUpdatedViews([
+    // Check that only the impacted views have been updated. Under JSON storage
+    // the revision view is collapsed onto the same base table, so renaming the
+    // base table rewrites it as well.
+    $this->assertUpdatedViews($this->jsonStorage ? [
+      'test_view_entity_test',
+      'test_view_entity_test_data',
+      'test_view_entity_test_additional_base_field',
+      'test_view_entity_test_revision',
+    ] : [
       'test_view_entity_test',
       'test_view_entity_test_data',
       'test_view_entity_test_additional_base_field',
@@ -165,8 +191,9 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     $this->assertEquals('entity_test_update', $view->get('base_table'));
     $display = $view->getDisplay('default');
     $this->assertEquals('entity_test_update', $display['display_options']['fields']['id']['table']);
-    // Ensure that the data table is used.
-    $this->assertEquals('entity_test_update_data', $display['display_options']['fields']['name']['table']);
+    // Ensure that the data table is used. Under JSON storage the data table is
+    // collapsed onto the base table.
+    $this->assertEquals($this->jsonStorage ? 'entity_test_update' : 'entity_test_update_data', $display['display_options']['fields']['name']['table']);
 
     $this->renameDataTable();
     $this->applyEntityUpdates('entity_test_update');
@@ -179,10 +206,16 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     $this->assertEquals('entity_test_update', $view->get('base_table'));
     $display = $view->getDisplay('default');
     $this->assertEquals('entity_test_update', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_data_new', $display['display_options']['fields']['name']['table']);
+    // Under JSON storage the data table (and thus its rename) is collapsed onto
+    // the base table, so the handler keeps referencing the base table.
+    $this->assertEquals($this->jsonStorage ? 'entity_test_update' : 'entity_test_update_data_new', $display['display_options']['fields']['name']['table']);
 
-    // Check that only the impacted views have been updated.
-    $this->assertUpdatedViews([
+    // Check that only the impacted views have been updated. Under JSON storage
+    // only the data view is rewritten; the base view keeps referencing the base
+    // table, which is unaffected by the data table rename.
+    $this->assertUpdatedViews($this->jsonStorage ? [
+      'test_view_entity_test_data',
+    ] : [
       'test_view_entity_test',
       'test_view_entity_test_data',
     ]);
@@ -197,10 +230,12 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     /** @var \Drupal\views\Entity\View $view */
     $entity_storage = $this->entityTypeManager->getStorage('view');
     $view = $entity_storage->load('test_view_entity_test_revision');
-    $this->assertEquals('entity_test_update_revision', $view->get('base_table'));
+    // Under JSON storage the revision table is collapsed onto the base table.
+    $revision_table = $this->jsonStorage ? 'entity_test_update' : 'entity_test_update_revision';
+    $this->assertEquals($revision_table, $view->get('base_table'));
     $display = $view->getDisplay('default');
-    $this->assertEquals('entity_test_update_revision', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_revision', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($revision_table, $display['display_options']['fields']['id']['table']);
+    $this->assertEquals($revision_table, $display['display_options']['fields']['name']['table']);
 
     $this->renameRevisionBaseTable();
     $this->applyEntityUpdates('entity_test_update');
@@ -209,11 +244,14 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     $entity_storage = $this->entityTypeManager->getStorage('view');
     $view = $entity_storage->load('test_view_entity_test_revision');
 
-    // Ensure the base table got renamed, so also the views fields.
-    $this->assertEquals('entity_test_update_revision_new', $view->get('base_table'));
+    // Ensure the base table got renamed, so also the views fields. Under JSON
+    // storage no view references the revision table (it is collapsed onto the
+    // base table), so the rename leaves every handler on the base table.
+    $renamed_revision_table = $this->jsonStorage ? 'entity_test_update' : 'entity_test_update_revision_new';
+    $this->assertEquals($renamed_revision_table, $view->get('base_table'));
     $display = $view->getDisplay('default');
-    $this->assertEquals('entity_test_update_revision_new', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_revision_new', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($renamed_revision_table, $display['display_options']['fields']['id']['table']);
+    $this->assertEquals($renamed_revision_table, $display['display_options']['fields']['name']['table']);
 
     // Check that only the impacted views have been updated.
     $this->assertUpdatedViews([
@@ -230,10 +268,13 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     /** @var \Drupal\views\Entity\View $view */
     $entity_storage = $this->entityTypeManager->getStorage('view');
     $view = $entity_storage->load('test_view_entity_test_revision');
-    $this->assertEquals('entity_test_update_revision', $view->get('base_table'));
+    // Under JSON storage the revision and revision data tables are collapsed
+    // onto the base table.
+    $revision_table = $this->jsonStorage ? 'entity_test_update' : 'entity_test_update_revision';
+    $this->assertEquals($revision_table, $view->get('base_table'));
     $display = $view->getDisplay('default');
-    $this->assertEquals('entity_test_update_revision', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_revision_data', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($revision_table, $display['display_options']['fields']['id']['table']);
+    $this->assertEquals($this->jsonStorage ? 'entity_test_update' : 'entity_test_update_revision_data', $display['display_options']['fields']['name']['table']);
 
     $this->renameRevisionDataTable();
     $this->applyEntityUpdates('entity_test_update');
@@ -242,14 +283,16 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     $entity_storage = $this->entityTypeManager->getStorage('view');
     $view = $entity_storage->load('test_view_entity_test_revision');
 
-    // Ensure the base table got renamed, so also the views fields.
-    $this->assertEquals('entity_test_update_revision', $view->get('base_table'));
+    // Ensure the base table got renamed, so also the views fields. Under JSON
+    // storage no view references the revision data table, so the rename leaves
+    // every handler on the base table.
+    $this->assertEquals($revision_table, $view->get('base_table'));
     $display = $view->getDisplay('default');
-    $this->assertEquals('entity_test_update_revision', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_revision_data_new', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($revision_table, $display['display_options']['fields']['id']['table']);
+    $this->assertEquals($this->jsonStorage ? 'entity_test_update' : 'entity_test_update_revision_data_new', $display['display_options']['fields']['name']['table']);
 
     // Check that only the impacted views have been updated.
-    $this->assertUpdatedViews([
+    $this->assertUpdatedViews($this->jsonStorage ? [] : [
       'test_view_entity_test',
       'test_view_entity_test_revision',
     ]);
@@ -265,14 +308,15 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     $entity_storage = $this->entityTypeManager->getStorage('view');
     $view = $entity_storage->load('test_view_entity_test');
 
-    // Ensure the data table got renamed, so also the views fields.
+    // Ensure the data table got renamed, so also the views fields. Under JSON
+    // storage the data table is collapsed onto the base table.
     $this->assertEquals('entity_test_update', $view->get('base_table'));
     $display = $view->getDisplay('default');
     $this->assertEquals('entity_test_update', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_data', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($this->jsonStorage ? 'entity_test_update' : 'entity_test_update_data', $display['display_options']['fields']['name']['table']);
 
     // Check that only the impacted views have been updated.
-    $this->assertUpdatedViews([
+    $this->assertUpdatedViews($this->jsonStorage ? [] : [
       'test_view_entity_test',
     ]);
   }
@@ -308,12 +352,21 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     $entity_storage = $this->entityTypeManager->getStorage('view');
     $view = $entity_storage->load('test_view_entity_test_revision');
 
-    $this->assertFalse($view->status());
+    if ($this->jsonStorage) {
+      // Under JSON storage the revision view is collapsed onto the (still
+      // existing) entity base table, so removing revision support does not
+      // disable it and no view is rewritten.
+      $this->assertTrue($view->status());
+      $this->assertUpdatedViews([]);
+    }
+    else {
+      $this->assertFalse($view->status());
 
-    // Check that only the impacted views have been updated.
-    $this->assertUpdatedViews([
-      'test_view_entity_test_revision',
-    ]);
+      // Check that only the impacted views have been updated.
+      $this->assertUpdatedViews([
+        'test_view_entity_test_revision',
+      ]);
+    }
   }
 
   /**
@@ -327,13 +380,17 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     // base <-> base + revision
     // base <-> base + translation + revision.
 
+    // Under JSON storage the data table is collapsed onto the base table, so
+    // translatable fields keep referencing the base table.
+    $data_table = $this->jsonStorage ? 'entity_test_update' : 'entity_test_update_data';
+
     // Base <-> base + translation.
     $this->updateEntityTypeToTranslatable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
 
     $this->assertEquals('entity_test_update', $view->get('base_table'));
     $this->assertEquals('entity_test_update', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_data', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($data_table, $display['display_options']['fields']['name']['table']);
 
     $this->updateEntityTypeToNotTranslatable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
@@ -350,21 +407,21 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     $this->assertEquals('entity_test_update', $view->get('base_table'));
     $this->assertEquals('entity_test_update', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_data', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($data_table, $display['display_options']['fields']['name']['table']);
 
     $this->updateEntityTypeToRevisionable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
 
     $this->assertEquals('entity_test_update', $view->get('base_table'));
     $this->assertEquals('entity_test_update', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_data', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($data_table, $display['display_options']['fields']['name']['table']);
 
     $this->updateEntityTypeToNotRevisionable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
 
     $this->assertEquals('entity_test_update', $view->get('base_table'));
     $this->assertEquals('entity_test_update', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_data', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($data_table, $display['display_options']['fields']['name']['table']);
 
     $this->resetEntityType();
 
@@ -381,7 +438,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     $this->assertEquals('entity_test_update', $view->get('base_table'));
     $this->assertEquals('entity_test_update', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_data', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($data_table, $display['display_options']['fields']['name']['table']);
 
     $this->updateEntityTypeToNotTranslatable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
@@ -416,7 +473,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     $this->assertEquals('entity_test_update', $view->get('base_table'));
     $this->assertEquals('entity_test_update', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_data', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($data_table, $display['display_options']['fields']['name']['table']);
 
     $this->updateEntityTypeToNotRevisionable(TRUE);
     $this->updateEntityTypeToNotTranslatable(TRUE);
@@ -426,8 +483,12 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     $this->assertEquals('entity_test_update', $display['display_options']['fields']['id']['table']);
     $this->assertEquals('entity_test_update', $display['display_options']['fields']['name']['table']);
 
-    // Check that only the impacted views have been updated.
-    $this->assertUpdatedViews([
+    // Check that only the impacted views have been updated. Under JSON storage
+    // the data/revision tables collapse onto the base table, so only the data
+    // view (which references the collapsed data table) is rewritten.
+    $this->assertUpdatedViews($this->jsonStorage ? [
+      'test_view_entity_test_data',
+    ] : [
       'test_view_entity_test',
       'test_view_entity_test_data',
       'test_view_entity_test_revision',
@@ -438,31 +499,41 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
    * Tests some possible entity table updates for a revision view.
    */
   public function testVariousTableUpdatesForRevisionView(): void {
+    // Under JSON storage the revision and revision data tables are collapsed
+    // onto the base table, so the revision view references the base table for
+    // all of its fields regardless of the entity's revision/translation layout.
+    $revision_table = $this->jsonStorage ? 'entity_test_update' : 'entity_test_update_revision';
+    $revision_data_table = $this->jsonStorage ? 'entity_test_update' : 'entity_test_update_revision_data';
+
     // Base + revision <-> base + translation + revision.
     $this->updateEntityTypeToRevisionable(TRUE);
 
     [$view, $display] = $this->getUpdatedViewAndDisplay(TRUE);
 
-    $this->assertEquals('entity_test_update_revision', $view->get('base_table'));
-    $this->assertEquals('entity_test_update_revision', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_revision', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($revision_table, $view->get('base_table'));
+    $this->assertEquals($revision_table, $display['display_options']['fields']['id']['table']);
+    $this->assertEquals($revision_table, $display['display_options']['fields']['name']['table']);
 
     $this->updateEntityTypeToTranslatable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay(TRUE);
 
-    $this->assertEquals('entity_test_update_revision', $view->get('base_table'));
-    $this->assertEquals('entity_test_update_revision', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_revision_data', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($revision_table, $view->get('base_table'));
+    $this->assertEquals($revision_table, $display['display_options']['fields']['id']['table']);
+    $this->assertEquals($revision_data_table, $display['display_options']['fields']['name']['table']);
 
     $this->updateEntityTypeToNotTranslatable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay(TRUE);
 
-    $this->assertEquals('entity_test_update_revision', $view->get('base_table'));
-    $this->assertEquals('entity_test_update_revision', $display['display_options']['fields']['id']['table']);
-    $this->assertEquals('entity_test_update_revision', $display['display_options']['fields']['name']['table']);
+    $this->assertEquals($revision_table, $view->get('base_table'));
+    $this->assertEquals($revision_table, $display['display_options']['fields']['id']['table']);
+    $this->assertEquals($revision_table, $display['display_options']['fields']['name']['table']);
 
-    // Check that only the impacted views have been updated.
-    $this->assertUpdatedViews([
+    // Check that only the impacted views have been updated. Under JSON storage
+    // the data/revision tables collapse onto the base table, so only the data
+    // view (which references the collapsed data table) is rewritten.
+    $this->assertUpdatedViews($this->jsonStorage ? [
+      'test_view_entity_test_data',
+    ] : [
       'test_view_entity_test',
       'test_view_entity_test_data',
       'test_view_entity_test_revision',
@@ -494,6 +565,10 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     $this->assertEquals('entity_test_update_new', $view->get('base_table'));
     $display = $view->getDisplay('default');
     $this->assertEquals('entity_test_update_new', $display['display_options']['fields']['id']['table']);
+    // The 'name' handler references the data table, which is only collapsed onto
+    // the base table once the entity type becomes translatable. This entity type
+    // never does, so the handler keeps referencing the (unrenamed) data table
+    // under every driver.
     $this->assertEquals('entity_test_update_data', $display['display_options']['fields']['name']['table']);
 
     $view = $entity_storage->load('test_view_entity_test_additional_base_field');
@@ -502,7 +577,13 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     $this->assertEquals('entity_test_update_new', $display['display_options']['fields']['id']['table']);
     $this->assertEquals('entity_test_update_new', $display['display_options']['fields']['new_base_field']['table']);
 
-    $this->assertUpdatedViews([
+    // Under JSON storage the revision view is collapsed onto the same base
+    // table, so it is rewritten by the base table rename as well.
+    $this->assertUpdatedViews($this->jsonStorage ? [
+      'test_view_entity_test_data',
+      'test_view_entity_test_additional_base_field',
+      'test_view_entity_test_revision',
+    ] : [
       'test_view_entity_test_data',
       'test_view_entity_test_additional_base_field',
     ]);
@@ -524,7 +605,9 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     $display = $view->getDisplay('default');
     $this->assertFalse(isset($display['display_options']['fields']['id_broken']));
 
-    $this->assertUpdatedViews([$view_id]);
+    // Under JSON storage adding a data table collapses onto the base table and
+    // moves no handler, so the subscriber rewrites no view.
+    $this->assertUpdatedViews($this->jsonStorage ? [] : [$view_id]);
   }
 
   /**

@@ -172,7 +172,7 @@ class HandlerTest extends UITestBase {
     $type_info = $handler_types['field'];
     $this->drupalGet($add_handler_url);
     $this->submitForm([
-      'name[users_field_data.name]' => TRUE,
+      'name[users.name]' => TRUE,
     ], 'Add and configure ' . $type_info['ltitle']);
     $id = 'name';
     $edit_handler_url = "admin/structure/views/nojs/handler/test_view_empty/default/field/$id";
@@ -263,16 +263,25 @@ class HandlerTest extends UITestBase {
   public function testNoDuplicateFields(): void {
     $handler_types = ['field', 'filter', 'sort', 'argument'];
 
+    // Under pgsql JSON storage the node revision tables are collapsed onto
+    // the node base table, so no "Content revision" group is offered in the
+    // add-handler listing.
+    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
+
     foreach ($handler_types as $handler_type) {
       $add_handler_url = 'admin/structure/views/nojs/add-handler/test_node_view/default/' . $handler_type;
       $this->drupalGet($add_handler_url);
 
       $this->assertNoDuplicateField('ID', 'Content');
-      $this->assertNoDuplicateField('ID', 'Content revision');
+      if (!$is_pgsql) {
+        $this->assertNoDuplicateField('ID', 'Content revision');
+      }
       $this->assertNoDuplicateField('Content type', 'Content');
       $this->assertNoDuplicateField('UUID', 'Content');
       $this->assertNoDuplicateField('Revision ID', 'Content');
-      $this->assertNoDuplicateField('Revision ID', 'Content revision');
+      if (!$is_pgsql) {
+        $this->assertNoDuplicateField('Revision ID', 'Content revision');
+      }
     }
   }
 

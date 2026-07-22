@@ -6,6 +6,7 @@ namespace Drupal\Tests\block_content\Kernel\Views;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
+use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Tests\ViewTestData;
@@ -65,10 +66,20 @@ class RevisionRelationshipsTest extends KernelTestBase {
     $block_content_revision = clone $block_content;
     $block_content_revision->setNewRevision();
     $block_content_revision->save();
+    // Under the pgsql JSON-storage driver the block_content revision and data
+    // tables both collapse onto the entity base table, so the relationship's
+    // computed result-column alias degenerates from
+    // "block_content_field_data_block_content_field_revision_id" to
+    // "block_content_block_content_id". The joined value is identical; only the
+    // result property name differs, so map that property to the same expected
+    // key.
+    $rel_field_column = Database::getConnection()->driver() === 'pgsql'
+      ? 'block_content_block_content_id'
+      : 'block_content_field_data_block_content_field_revision_id';
     $column_map = [
       'revision_id' => 'revision_id',
       'id_1' => 'id_1',
-      'block_content_field_data_block_content_field_revision_id' => 'block_content_field_data_block_content_field_revision_id',
+      $rel_field_column => 'block_content_field_data_block_content_field_revision_id',
     ];
 
     // Here should be two rows.

@@ -103,7 +103,11 @@ class ViewsIntegrationTest extends ViewTestBase {
     // Add the image field to the View.
     $this->drupalGet('admin/structure/views/nojs/add-handler/entity_test_row/default/field');
     $this->drupalGet('admin/structure/views/nojs/add-handler/entity_test_row/default/field');
-    $this->submitForm(['name[entity_test__bar.bar]' => TRUE], 'Add and configure field');
+    // Under the pgsql (JSON) driver the dedicated "entity_test__bar" table is
+    // collapsed onto the entity_test base table, so the add-handler checkbox
+    // is keyed by the base table.
+    $bar_table = \Drupal::database()->driver() == 'pgsql' ? 'entity_test' : 'entity_test__bar';
+    $this->submitForm(['name[' . $bar_table . '.bar]' => TRUE], 'Add and configure field');
     // Set the formatter to 'Responsive image'.
     $this->submitForm(['options[type]' => 'responsive_image'], 'Apply');
     $this->assertSession()

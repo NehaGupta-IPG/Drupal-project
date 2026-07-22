@@ -54,6 +54,15 @@ abstract class UpdateSemverTestBase extends UpdateTestBase {
     if (!isset($xml_map['drupal'])) {
       $xml_map['drupal'] = '8.0.0';
     }
+    // Restrict the available updates report to Drupal core and the project under
+    // test. This isolates the test from any contributed modules or themes that
+    // are present in the code base: without this, those extra projects would add
+    // tables to the report (shifting the CSS locators these tests rely on) and,
+    // having no release history fixture, would exhaust the shared per-URL
+    // fetch-failure limit and stop the tested projects from being fetched.
+    $this->config('update_test.settings')
+      ->set('allowed_projects', array_unique(['drupal', $this->updateProject]))
+      ->save();
     parent::refreshUpdateStatus($xml_map, $url);
   }
 

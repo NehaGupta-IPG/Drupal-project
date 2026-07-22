@@ -76,7 +76,7 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
       ],
       'pgsql' => [
         'namespace' => 'Drupal\\pgsql',
-        'autoload' => 'core/modules/pgsql/src/',
+        'autoload' => 'modules/custom/pgsql/src/',
       ],
     ], $installedDatabaseSettings['default']['default']['dependencies']);
 

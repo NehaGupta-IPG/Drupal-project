@@ -610,7 +610,10 @@ class FieldFieldTest extends ViewsKernelTestBase {
       [
         'entity_test_rev_revision_id' => 'id',
         'revision_id' => 'revision_id',
-        'users_field_data_entity_test_rev_revision_uid' => 'uid',
+        // Under pgsql the users_field_data table collapses onto the users base
+        // table, so the relationship-joined uid column carries the base-table
+        // alias.
+        (\Drupal::database()->driver() == 'pgsql' ? 'users_entity_test_rev_uid' : 'users_field_data_entity_test_rev_revision_uid') => 'uid',
         'timezone' => 'timezone',
         'field_test_multiple' => 'field_test_multiple',
         'field_test_multiple_1' => 'field_test_multiple_1',

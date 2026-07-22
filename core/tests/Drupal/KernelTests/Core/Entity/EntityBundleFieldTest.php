@@ -42,6 +42,7 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
    * Tests making use of a custom bundle field.
    */
   public function testCustomBundleFieldUsage(): void {
+    $is_json_storage = $this->database->driver() == 'pgsql';
     EntityTestHelper::createBundle('custom', NULL, 'entity_test_update');
 
     // Check that an entity with bundle entity_test does not have the custom
@@ -74,15 +75,25 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     $entity = $storage->load($entity->id());
     $this->assertEquals('cozy', $entity->custom_bundle_field->value, 'Entity was updated correctly.');
 
+    $deleted_entity_id = $entity->id();
     $entity->delete();
     /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
     $table_mapping = $storage->getTableMapping();
     $table = $table_mapping->getDedicatedDataTableName($entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition());
-    $result = $this->database->select($table, 'f')
-      ->fields('f')
-      ->condition('f.entity_id', $entity->id())
-      ->execute();
-    $this->assertFalse($result->fetchAssoc(), 'Field data has been deleted');
+    if ($is_json_storage) {
+      // The pgsql driver embeds the dedicated field data in the base row's
+      // jsonb column, so deleting the entity removes the field data with it;
+      // there is no physical dedicated table to read.
+      $storage->resetCache();
+      $this->assertNull($storage->load($deleted_entity_id), 'Field data has been deleted');
+    }
+    else {
+      $result = $this->database->select($table, 'f')
+        ->fields('f')
+        ->condition('f.entity_id', $entity->id())
+        ->execute();
+      $this->assertFalse($result->fetchAssoc(), 'Field data has been deleted');
+    }
 
     // Create another entity to test that values are marked as deleted when a
     // bundle is deleted.
@@ -90,13 +101,29 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     $entity->save();
     EntityTestHelper::deleteBundle('custom', 'entity_test_update');
 
-    $table = $table_mapping->getDedicatedDataTableName($entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition(), TRUE);
-    $result = $this->database->select($table, 'f')
-      ->condition('f.entity_id', $entity->id())
-      ->condition('deleted', 1)
-      ->countQuery()
-      ->execute();
-    $this->assertEquals(1, $result->fetchField(), 'Field data has been deleted');
+    if ($is_json_storage) {
+      // Deleting the bundle marks the embedded field data deleted; assert the
+      // matching base row now carries a deleted-flagged row under the field's
+      // context-qualified "deleted" dedicated-table key in its jsonb column.
+      $table = $table_mapping->getJsonStorageDedicatedTableName($entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition(), $table_mapping->getBaseTable(), TRUE);
+      $raw = $this->database->select('entity_test_update', 't')
+        ->fields('t', ['__data'])
+        ->condition('id', $entity->id())
+        ->execute()
+        ->fetchField();
+      $document = $raw ? json_decode($raw, TRUE) : [];
+      $deleted_rows = array_filter($document[$table] ?? [], static fn($row) => !empty($row['deleted']));
+      $this->assertCount(1, $deleted_rows, 'Field data has been deleted');
+    }
+    else {
+      $table = $table_mapping->getDedicatedDataTableName($entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition(), TRUE);
+      $result = $this->database->select($table, 'f')
+        ->condition('f.entity_id', $entity->id())
+        ->condition('deleted', 1)
+        ->countQuery()
+        ->execute();
+      $this->assertEquals(1, $result->fetchField(), 'Field data has been deleted');
+    }
 
     // Ensure that the field no longer exists in the field map.
     $field_map = \Drupal::service('entity_field.manager')->getFieldMap();

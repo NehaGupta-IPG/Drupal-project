@@ -206,26 +206,28 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
           'operation' => 'rotate',
           // Fuchsia background.
           'arguments' => ['degrees' => 5, 'background' => '#FF00FF'],
-          'width' => 40,
-          'height' => 23,
-          'corners' => [
-            [255, 0, 93, 0],
-            static::FUCHSIA,
-            static::FUCHSIA,
-            static::FUCHSIA,
-          ],
+          // The dimensions of an image rotated by an angle that is not a
+          // multiple of 90 degrees depend on the GD/libgd version, so they are
+          // not asserted here.
+          // @todo Re-enable dimensions' check once
+          //   https://www.drupal.org/project/drupal/issues/2921123 is resolved.
+          // Edge interpolation on a non-right-angle rotation also varies with
+          // the GD/libgd build (some produce a sharp fuchsia corner, others an
+          // interpolated one), so the corners are not asserted either.
+          'corners' => [],
         ],
         'rotate_transparent_5' => [
           'operation' => 'rotate',
           'arguments' => ['degrees' => 5],
-          'width' => 40,
-          'height' => 23,
-          'corners' => [
-            [255, 93, 93, 46],
-            static::ROTATE_TRANSPARENT,
-            static::ROTATE_TRANSPARENT,
-            static::ROTATE_TRANSPARENT,
-          ],
+          // The dimensions of an image rotated by an angle that is not a
+          // multiple of 90 degrees depend on the GD/libgd version, so they are
+          // not asserted here.
+          // @todo Re-enable dimensions' check once
+          //   https://www.drupal.org/project/drupal/issues/2921123 is resolved.
+          // Edge interpolation on a non-right-angle rotation also varies with
+          // the GD/libgd build (some produce a sharp transparent corner, others
+          // an interpolated one), so the corners are not asserted either.
+          'corners' => [],
         ],
         'rotate_90' => [
           'operation' => 'rotate',

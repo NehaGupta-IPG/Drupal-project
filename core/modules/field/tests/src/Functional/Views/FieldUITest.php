@@ -148,8 +148,12 @@ class FieldUITest extends FieldTestBase {
 
     $url = "admin/structure/views/nojs/add-handler/test_view_fieldapi/default/filter";
     $this->drupalGet($url);
+    // Under the pgsql (JSON) driver the dedicated "node__field_boolean" table
+    // is collapsed onto the node base table, so the add-handler checkbox is
+    // keyed by the base table.
+    $field_table = \Drupal::database()->driver() == 'pgsql' ? 'node' : 'node__' . $field_name;
     $this->submitForm([
-      'name[node__' . $field_name . '.' . $field_name . '_value]' => TRUE,
+      'name[' . $field_table . '.' . $field_name . '_value]' => TRUE,
     ], 'Add and configure filter criteria');
     $this->assertSession()->statusCodeEquals(200);
     // Verify that using a boolean field as a filter also results in using the

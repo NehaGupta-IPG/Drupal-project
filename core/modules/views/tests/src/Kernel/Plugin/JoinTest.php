@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\views\Plugin\views\join\JoinPluginBase;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\join\JoinTest as JoinTestPlugin;
@@ -109,7 +110,7 @@ class JoinTest extends RelationshipJoinTestBase {
     $tables = $query->getTables();
     $join_info = $tables['users_field_data'];
     $this->assertEquals('LEFT', $join_info['join type'], 'Make sure the default join type is LEFT');
-    $this->assertEquals($configuration['table'], $join_info['table']);
+    $this->assertJoinTarget($configuration['table'], $join_info['table']);
     $this->assertEquals('users_field_data', $join_info['alias']);
     $this->assertEquals('views_test_data.uid = users_field_data.uid', $join_info['condition']);
 
@@ -243,9 +244,31 @@ class JoinTest extends RelationshipJoinTestBase {
     $tables = $query->getTables();
     $join_info = $tables['users_field_data'];
     $this->assertEquals('LEFT', $join_info['join type']);
-    $this->assertEquals($configuration['table'], $join_info['table']);
+    $this->assertJoinTarget($configuration['table'], $join_info['table']);
     $this->assertEquals('users_field_data', $join_info['alias']);
     $this->assertEquals('views_test_data.uid <> users_field_data.uid', $join_info['condition']);
+  }
+
+  /**
+   * Asserts the built join targets the expected table.
+   *
+   * Under the pgsql (JSON storage) driver the users_field_data data table is
+   * virtual — its columns live in a jsonb document on the users base table — so
+   * the join target is realized as an unwind subquery rather than the physical
+   * table name. The join alias and condition are unaffected.
+   *
+   * @param string $expected_table
+   *   The physical table name expected under relational storage.
+   * @param mixed $actual_table
+   *   The 'table' entry of the built join info.
+   */
+  protected function assertJoinTarget(string $expected_table, $actual_table): void {
+    if (Database::getConnection()->driver() == 'pgsql') {
+      $this->assertInstanceOf(SelectInterface::class, $actual_table);
+    }
+    else {
+      $this->assertEquals($expected_table, $actual_table);
+    }
   }
 
 }

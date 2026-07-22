@@ -39,6 +39,14 @@ class DefaultContentFilesAccessTest extends BrowserTestBase {
       $content_path = "core/profiles/demo_umami/modules/demo_umami_content/default_content/$file";
       $this->assertFileExists($this->root . '/' . $content_path);
       $this->drupalGet($content_path);
+      // Access to these files is denied by the .htaccess file shipped in the
+      // default_content directory. That directive is only honored by Apache;
+      // web servers such as nginx do not process .htaccess files and will
+      // serve the file directly, so skip the assertion in that case.
+      $server = (string) $this->getSession()->getResponseHeader('Server');
+      if ($server !== '' && stripos($server, 'Apache') === FALSE) {
+        $this->markTestSkipped("The '$server' web server does not process .htaccess files, so access to default content files cannot be denied.");
+      }
       $this->assertSession()->statusCodeEquals(403);
     }
   }

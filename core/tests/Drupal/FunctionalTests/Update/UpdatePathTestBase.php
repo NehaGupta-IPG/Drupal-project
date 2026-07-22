@@ -6,9 +6,11 @@ namespace Drupal\FunctionalTests\Update;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\pgsql\EntityStorage\JsonStorageLayoutConverter;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
@@ -122,6 +124,15 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
     // not safe to do here, because the database has not been updated yet.
     $this->container = \Drupal::getContainer();
 
+    // The fixture dumps recreate the relational entity-table layout of the
+    // site they were generated on. The module-provided pgsql driver stores
+    // entity field data as embedded JSONB documents on the base table instead,
+    // so convert the loaded fixture to the layout that driver would have
+    // created itself before anything reads or writes entity data.
+    if (Database::getConnection()->getProvider() === 'pgsql' && class_exists(JsonStorageLayoutConverter::class)) {
+      JsonStorageLayoutConverter::convertDatabase();
+    }
+
     $this->replaceUser1();
 
     // Ensure the locale.settings:translation.path config is set to the dynamic
@@ -162,6 +173,64 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
       }
       require $file;
     }
+
+    // The fixtures only install the core database driver modules (mysql, pgsql
+    // and sqlite). When the test runner uses a driver provided by another
+    // module (for example a contributed, pgsql-derived driver such as
+    // "pgsql"), that module is absent from the loaded fixture, and update.php's
+    // requirements check errors out with "the database driver is provided by a
+    // module that is not installed", which blocks the update. Register the
+    // provider module so the requirements check passes, mirroring a real site
+    // that uses the driver.
+    $connection = Database::getConnection();
+    $provider = $connection->getProvider();
+    if ($provider !== 'core') {
+      $this->installDatabaseDriverProviderModule($connection, $provider);
+    }
+  }
+
+  /**
+   * Registers the database driver's provider module in the loaded fixture.
+   *
+   * Adds the module to core.extension and records a baseline installed schema
+   * version, so that a fixture which predates the driver still satisfies
+   * update.php's "database driver provided by module" requirement.
+   *
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
+   * @param string $provider
+   *   The name of the module providing the database driver.
+   */
+  protected function installDatabaseDriverProviderModule(Connection $connection, string $provider): void {
+    $serialized = $connection->select('config', 'c')
+      ->fields('c', ['data'])
+      ->condition('collection', '')
+      ->condition('name', 'core.extension')
+      ->execute()
+      ->fetchField();
+    if ($serialized === FALSE) {
+      return;
+    }
+    $extension = unserialize($serialized);
+    if (isset($extension['module'][$provider])) {
+      return;
+    }
+    $extension['module'][$provider] = 0;
+    // core.extension keeps modules ordered by weight, then by name.
+    uksort($extension['module'], function ($a, $b) use ($extension) {
+      return [$extension['module'][$a], $a] <=> [$extension['module'][$b], $b];
+    });
+    $connection->update('config')
+      ->fields(['data' => serialize($extension)])
+      ->condition('collection', '')
+      ->condition('name', 'core.extension')
+      ->execute();
+
+    // Record the installed schema version for the provider module.
+    $connection->merge('key_value')
+      ->keys(['collection' => 'system.schema', 'name' => $provider])
+      ->fields(['value' => serialize(\Drupal::CORE_MINIMUM_SCHEMA_VERSION)])
+      ->execute();
   }
 
   /**
@@ -248,6 +317,17 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
     // might be out of sync, or hook invocations might rely on other schemas
     // that also aren't updated yet. Hence we are directly updating the database
     // tables with the values.
+    // Under the module-provided pgsql driver the user field data lives in
+    // JSONB documents on the users base row rather than in a physical
+    // users_field_data table; apply the same direct, hook-free write there.
+    if (Database::getConnection()->getProvider() === 'pgsql' && class_exists(JsonStorageLayoutConverter::class)) {
+      JsonStorageLayoutConverter::replaceUserOne(
+        $this->rootUser->getAccountName(),
+        \Drupal::service('password')->hash($this->rootUser->pass_raw),
+        $this->rootUser->getEmail(),
+      );
+      return;
+    }
     Database::getConnection()->update('users_field_data')
       ->fields([
         'name' => $this->rootUser->getAccountName(),
