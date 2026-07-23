@@ -17,6 +17,6 @@ interface ProvidesPermissionsInterface {
    * @return array<string, array<string, mixed>>
    *   Array of permissions.
    */
-  public function getPerms(): array;
+  public function getPermissions(): array;
 
 }
