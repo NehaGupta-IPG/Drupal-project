@@ -495,7 +495,7 @@ class MenuTreeStorageTest extends KernelTestBase {
   #[IgnoreDeprecations]
   #[DataProvider('providerBackwardsCompatibilityLayer')]
   public function testBackwardsCompatibilityLayer(bool $pass_options = FALSE): void {
-    $this->expectUserDeprecationMessage('Calling Drupal\Core\Menu\MenuTreeStorage::__construct() without the $route_provider argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3364323');
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Menu\MenuTreeStorage::__construct() without the $route_provider argument is deprecated in drupal:11.5.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3364323');
     $options = ['some' => 'options'];
     $storage = new MenuTreeStorage($this->container->get('database'), $this->container->get('cache.menu'), $this->container->get('cache_tags.invalidator'), 'menu_tree', $pass_options ? $options : NULL);
     $reflection = new \ReflectionProperty(MenuTreeStorage::class, 'routeProvider');

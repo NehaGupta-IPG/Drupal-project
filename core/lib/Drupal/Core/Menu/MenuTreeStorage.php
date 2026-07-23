@@ -108,7 +108,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   A database table name to store configuration data in.
    * @param \Drupal\Core\Routing\RouteProviderInterface|array|null $route_provider
    *   (optional) The route provider to use for loading routes.
-   *   Passing an array instead is deprecated as of Drupal 11.3.0, and used to
+   *   Passing an array instead is deprecated as of Drupal 11.5.0, and used to
    *   be for passing options. Use the $options parameter instead.
    * @param array $options
    *   (optional) Additional database connection options to use in queries.
@@ -133,7 +133,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       }
       $route_provider = \Drupal::service('router.route_provider');
       @trigger_error(
-        'Calling ' . __METHOD__ . '() without the $route_provider argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3364323',
+        'Calling ' . __METHOD__ . '() without the $route_provider argument is deprecated in drupal:11.5.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3364323',
         E_USER_DEPRECATED
       );
     }
