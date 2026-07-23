@@ -129,7 +129,8 @@ trait UiHelperTrait {
         '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
       $html_output .= '<hr />' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
-      $this->htmlOutput($html_output);
+      $label = 'POST: ' . $action . ' - ' . $this->getSession()->getStatusCode();
+      $this->htmlOutput($html_output, $label);
     }
 
   }
@@ -290,7 +291,8 @@ trait UiHelperTrait {
         '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
       $html_output .= '<hr />' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
-      $this->htmlOutput($html_output);
+      $label = 'GET: ' . $url . ' - ' . $this->getSession()->getStatusCode();
+      $this->htmlOutput($html_output, $label);
     }
 
     return $out;
@@ -431,7 +433,8 @@ trait UiHelperTrait {
         '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
       $html_output .= '<hr />' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
-      $this->htmlOutput($html_output);
+      $label = 'CLICK: ' . $css_selector . ' - ' . $this->getSession()->getStatusCode();
+      $this->htmlOutput($html_output, $label);
     }
   }
 
