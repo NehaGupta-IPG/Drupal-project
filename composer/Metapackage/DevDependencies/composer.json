@@ -28,7 +28,7 @@
         "phpspec/prophecy": "^1.23",
         "phpspec/prophecy-phpunit": "^2.4",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan": "^2.1.54",
+        "phpstan/phpstan": "^2.2.0",
         "phpstan/phpstan-phpunit": "^2.0.16",
         "phpunit/phpunit": "^12.5.14",
         "spaze/phpstan-disallowed-calls": "^4.12.0",
@@ -37,6 +37,7 @@
         "symfony/dom-crawler": "^8.0.12",
         "symfony/error-handler": "^8.0",
         "symfony/lock": "^8.0",
-        "symfony/var-dumper": "^8.0"
+        "symfony/var-dumper": "^8.0",
+        "vincentlanglet/twig-cs-fixer": "^4.0"
     }
 }

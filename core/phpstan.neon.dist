@@ -18,10 +18,13 @@ parameters:
 
   fileExtensions:
     - sh
+    - ''
 
   paths:
     - .
     - ../composer
+    - scripts/dr
+    - scripts/drupal
 
   bootstrapFiles:
     # Load aliases.
@@ -51,6 +54,10 @@ parameters:
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/fruit/ExtendingNonInstalledClass.php
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/custom_annotation/UsingNonInstalledTraitClass.php
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/custom_annotation/ExtendingNonInstalledClass.php
+    - modules/system/tests/modules/router_test_directory/src/Controller/TestInvalidController.php
+    - modules/system/tests/modules/router_test_directory/src/Controller/TestMissingDependency.php
+    # The following class is only for PHPCS.
+    - tests/phpcs/PhpScriptFilter.php
 
   ignoreErrors:
     # new static() is a best practice in Drupal, so we cannot fix that.
@@ -60,6 +67,29 @@ parameters:
     - "#Drupal calls should be avoided in classes, use dependency injection instead#"
     - "#^Class .* extends @internal class#"
     - identifier: missingType.iterableValue
+
+  disallowedFunctionCalls:
+    -
+       function: 'crc32()'
+       message: 'use hash() with an xxHash algorithm instead'
+       errorTip: 'See https://www.drupal.org/node/3581605'
+    -
+       function: 'md5()'
+       message: 'use hash() with an xxHash algorithm instead'
+       errorTip: 'See https://www.drupal.org/node/3581605'
+    -
+       function: 'sha1()'
+       message: 'use sha256() or hash() with an xxHash algorithm instead'
+       errorTip: 'See https://www.drupal.org/node/3581605'
+    -
+       function: 'hash()'
+       message: "with 'md5'|'sha1'|'crc32'|'crc32b' encryption algorithms. Use hash() with an xxHash algorithm instead"
+       errorTip: 'See https://www.drupal.org/node/3581605'
+       allowExceptCaseInsensitiveParams:
+         -
+            position: 1
+            name: 'algo'
+            typeString: "'md5'|'sha1'|'crc32'|'crc32b'"
 
 rules:
   # The rules below are Drupal custom ones.
