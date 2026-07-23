@@ -64,10 +64,7 @@ trait EntityOwnerTrait {
    */
   public function getOwner() {
     $key = $this->getEntityType()->getKey('owner');
-    $user = $this->get($key)->entity;
-    if (!$user) {
-      $user = User::getAnonymousUser();
-    }
+    $user = $this->get($key)->entity ?? User::getAnonymousUser();
     return $user;
   }
 
