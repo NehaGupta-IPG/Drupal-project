@@ -7,12 +7,14 @@ namespace Drupal\Core\Hook;
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\Attribute\ReorderHook;
+use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -230,6 +232,12 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
           $attributes = $cached['attributes'];
         }
         else {
+          // Immediately after a deployment, opcache may not yet have refreshed
+          // depending on the value of opcache.revalidation_freq which defaults
+          // to 2 seconds. Ensure that reflection operates on the new code by
+          // forcibly invalidating the opcode cache.
+          // @see https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.revalidate-freq
+          OpCodeCache::invalidate($filename);
           $namespace = preg_replace('#^src/#', "Drupal/$theme/", $iterator->getSubPath());
           $class = $namespace . '/' . $fileinfo->getBasename('.php');
           $class = str_replace('/', '\\', $class);
@@ -350,8 +358,9 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
       if ($subPathName === 'src' || $subPathName === 'src/Hook') {
         return TRUE;
       }
+      $ignore_directories = Settings::get('file_scan_ignore_directories', []);
       // glob() doesn't support streams but scandir() does.
-      return !in_array($fileInfo->getFilename(), ['tests', 'js', 'css', 'templates']) && !array_filter(scandir($key), static fn($filename) => str_ends_with($filename, '.info.yml'));
+      return !in_array($fileInfo->getFilename(), array_merge(['tests', 'js', 'css', 'templates'], $ignore_directories)) && !array_filter(scandir($key), static fn($filename) => str_ends_with($filename, '.info.yml'));
     }
     if ($fileInfo->getFilename() === 'theme-settings.php') {
       return TRUE;

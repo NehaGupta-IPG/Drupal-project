@@ -11,6 +11,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\node\NodeAccessRebuild;
 
 /**
  * Help hook implementation for node.
@@ -21,6 +22,7 @@ class NodeHelpHooks {
 
   public function __construct(
     protected readonly EntityDisplayRepositoryInterface $entityDisplayRepository,
+    protected readonly NodeAccessRebuild $nodeAccessRebuild,
   ) {}
 
   /**
@@ -31,7 +33,7 @@ class NodeHelpHooks {
     // Remind site administrators about the {node_access} table being flagged
     // for rebuild. We don't need to issue the message on the confirm form, or
     // while the rebuild is being processed.
-    if ($route_name != 'node.configure_rebuild_confirm' && $route_name != 'system.batch_page.html' && $route_name != 'help.page.node' && $route_name != 'help.main' && \Drupal::currentUser()->hasPermission('rebuild node access permissions') && node_access_needs_rebuild()) {
+    if ($route_name != 'node.configure_rebuild_confirm' && $route_name != 'system.batch_page.html' && $route_name != 'help.page.node' && $route_name != 'help.main' && \Drupal::currentUser()->hasPermission('rebuild node access permissions') && $this->nodeAccessRebuild->needsRebuild()) {
       if ($route_name == 'system.status') {
         $message = $this->t('The content access permissions need to be rebuilt.');
       }
@@ -55,7 +57,7 @@ class NodeHelpHooks {
         $output .= '<h2>' . $this->t('Uses') . '</h2>';
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Creating content') . '</dt>';
-        $output .= '<dd>' . $this->t('When new content is created, the Node module records basic information about the content, including the author, date of creation, and the <a href=":content-type">Content type</a>. It also manages the <em>publishing options</em>, which define whether or not the content is published, promoted to the front page of the site, and/or sticky at the top of content lists. Default settings can be configured for each <a href=":content-type">type of content</a> on your site.', [
+        $output .= '<dd>' . $this->t('When new content is created, the Node module records basic information about the content, including the author, date of creation, and the <a href=":content-type">Content type</a>. It also manages the <em>publishing options</em>, which define whether or not the content is published, promoted, and/or sticky at the top of content lists. Default settings can be configured for each <a href=":content-type">type of content</a> on your site.', [
           ':content-type' => Url::fromRoute('entity.node_type.collection')->toString(),
         ]) . '</dd>';
         $output .= '<dt>' . $this->t('Creating custom content types') . '</dt>';
