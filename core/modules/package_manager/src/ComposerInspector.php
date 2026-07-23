@@ -48,6 +48,11 @@ class ComposerInspector implements LoggerAwareInterface {
   private array $packageLists = [];
 
   /**
+   * The Composer Inspector configuration.
+   */
+  private array $config = [];
+
+  /**
    * A semantic version constraint for the supported version(s) of Composer.
    *
    * @see https://endoflife.date/composer
@@ -225,6 +230,10 @@ class ComposerInspector implements LoggerAwareInterface {
    * @see \Composer\Command\ConfigCommand::execute()
    */
   public function getConfig(string $key, string $context): ?string {
+    $this->invalidateCacheIfNeeded($context);
+    if (isset($this->config[$key][$context])) {
+      return $this->config[$key][$context];
+    }
     $this->validateExecutable();
 
     $command = ['config', $key];
@@ -243,13 +252,15 @@ class ComposerInspector implements LoggerAwareInterface {
     catch (RuntimeException $e) {
       // Assume any error from `composer config` is about an undefined key-value
       // pair which may have a known default value.
-      return match ($key) {
-        'extra' => '{}',
-        default => throw $e,
-      };
+      if ($key === 'extra') {
+        $this->config[$key][$context] = '{}';
+        return $this->config[$key][$context];
+      }
+      throw $e;
     }
     $output = $this->processCallback->getOutput();
-    return $output ? trim(implode('', $output)) : NULL;
+    $this->config[$key][$context] = $output ? trim(implode('', $output)) : NULL;
+    return $this->config[$key][$context];
   }
 
   /**
@@ -450,6 +461,7 @@ class ComposerInspector implements LoggerAwareInterface {
       $invalidate = TRUE;
     }
     if ($invalidate) {
+      $this->config = [];
       unset($this->packageLists[$working_dir]);
     }
     return $invalidate;
