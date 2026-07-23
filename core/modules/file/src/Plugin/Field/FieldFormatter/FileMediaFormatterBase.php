@@ -60,12 +60,13 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
       ],
       'preload' => [
         '#type' => 'radios',
-        '#title' => $this->t('Preload'),
+        '#title' => $this->t('Preload attribute'),
         '#options' => [
-          'none' => $this->t("None: Media won't be preloaded."),
-          'auto' => $this->t('Auto: The browser decides to preload or not.'),
-          'metadata' => $this->t('Metadata: Only metadata is fetched.'),
+          'none' => $this->t("None: The media file should not be preloaded."),
+          'auto' => $this->t('Auto: The whole media file can be downloaded, even if the user is not expected to use it.'),
+          'metadata' => $this->t('Metadata: Only media metadata should be fetched.'),
         ],
+        '#description' => $this->t('Regardless of the attribute value, the browser decides what to do since this is only a hint.'),
         '#default_value' => $this->getSetting('preload'),
         '#required' => TRUE,
       ],
