@@ -18,6 +18,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Twig\Environment;
 use Twig\Extension\SandboxExtension;
@@ -272,6 +273,7 @@ class TwigSandboxTest extends UnitTestCase {
    * @legacy-covers ::checkMethodAllowed
    */
   #[RunInSeparateProcess]
+  #[IgnoreDeprecations]
   public function testLegacyAllowedMethod(): void {
     // Replace settings
     new Settings([
