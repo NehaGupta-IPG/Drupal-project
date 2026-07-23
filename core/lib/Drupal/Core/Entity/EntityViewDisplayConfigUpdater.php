@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\language;
+namespace Drupal\Core\Entity;
 
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 

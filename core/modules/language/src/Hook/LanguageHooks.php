@@ -4,8 +4,8 @@ namespace Drupal\language\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityViewDisplayConfigUpdater;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\language\EntityViewDisplayConfigUpdater;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrlFallback;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
@@ -35,7 +35,7 @@ class LanguageHooks {
   use StringTranslationTrait;
 
   public function __construct(
-    private readonly EntityViewDisplayConfigUpdater $languageConfigUpdater,
+    protected EntityViewDisplayConfigUpdater $entityViewDisplayConfigUpdater,
   ) {}
 
   /**
@@ -394,7 +394,7 @@ class LanguageHooks {
   #[Hook('entity_view_display_presave')]
   public function entityViewDisplayPresave(EntityViewDisplayInterface $entityViewDisplay): void {
     if ($entityViewDisplay->isSyncing()) {
-      $this->languageConfigUpdater->updateEntityViewDisplay($entityViewDisplay);
+      $this->entityViewDisplayConfigUpdater->updateEntityViewDisplay($entityViewDisplay);
     }
   }
 

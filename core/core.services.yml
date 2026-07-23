@@ -790,6 +790,7 @@ services:
     class: Drupal\Core\Entity\EntityBundleListener
     arguments: ['@entity_type.manager', '@entity_type.bundle.info', '@entity_field.manager', '@module_handler']
   Drupal\Core\Entity\EntityBundleListenerInterface: '@entity_bundle.listener'
+  Drupal\Core\Entity\EntityViewDisplayConfigUpdater: ~
   entity_route_subscriber:
     class: Drupal\Core\EventSubscriber\EntityRouteProviderSubscriber
     arguments: ['@entity_type.manager']
