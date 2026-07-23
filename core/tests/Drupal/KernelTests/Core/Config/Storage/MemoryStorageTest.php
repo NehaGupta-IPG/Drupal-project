@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Config\Storage;
 
 use Drupal\Core\Config\MemoryStorage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests MemoryStorage operations.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class MemoryStorageTest extends ConfigStorageTestBase {
 
   /**
@@ -24,7 +26,7 @@ class MemoryStorageTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function read($name) {
+  protected function read($name): array|object {
     return $this->storage->read($name);
   }
 

@@ -24,14 +24,15 @@ class Datelist extends DateElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
+    // Note that since this information is cached, the #date_timezone property
+    // is not set here, as this needs to vary potentially by-user.
     return [
       '#input' => TRUE,
       '#element_validate' => [
-        [$class, 'validateDatelist'],
+        [static::class, 'validateDatelist'],
       ],
       '#process' => [
-        [$class, 'processDatelist'],
+        [static::class, 'processDatelist'],
       ],
       '#theme' => 'datetime_form',
       '#theme_wrappers' => ['datetime_wrapper'],
@@ -39,7 +40,6 @@ class Datelist extends DateElementBase {
       '#date_year_range' => '1900:2050',
       '#date_increment' => 1,
       '#date_date_callbacks' => [],
-      '#date_timezone' => date_default_timezone_get(),
     ];
   }
 
@@ -50,6 +50,8 @@ class Datelist extends DateElementBase {
    * If the date is valid, the date is set in the form.
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
+    $element += ['#date_timezone' => date_default_timezone_get()];
+
     $parts = $element['#date_part_order'];
     $increment = $element['#date_increment'];
 
@@ -132,11 +134,11 @@ class Datelist extends DateElementBase {
    *
    * Required settings:
    *   - #default_value: A DrupalDateTime object, adjusted to the proper local
-   *     timezone. Converting a date stored in the database from UTC to the local
-   *     zone and converting it back to UTC before storing it is not handled here.
-   *     This element accepts a date as the default value, and then converts the
-   *     user input strings back into a new date object on submission. No timezone
-   *     adjustment is performed.
+   *     timezone. Converting a date stored in the database from UTC to the
+   *     local zone and converting it back to UTC before storing it is not
+   *     handled here. This element accepts a date as the default value, and
+   *     then converts the user input strings back into a new date object on
+   *     submission. No timezone adjustment is performed.
    * Optional properties include:
    *   - #date_part_order: Array of date parts indicating the parts and order
    *     that should be used in the selector, optionally including 'ampm' for
@@ -230,7 +232,7 @@ class Datelist extends DateElementBase {
         case 'second':
           $format = 's';
           $options = $date_helper->seconds($format, $element['#required'], $element['#date_increment']);
-          $title = t('Second');
+          $title = t('Second', [], ['context' => 'PHP date format']);
           break;
 
         case 'ampm':
@@ -346,7 +348,8 @@ class Datelist extends DateElementBase {
     // The object key does not represent an input value, see
     // \Drupal\Core\Datetime\Element\Datelist::valueCallback().
     unset($input['object']);
-    // Filters out empty array values, any valid value would have a string length.
+    // Filters out empty array values, any valid value would have a string
+    // length.
     $filtered_input = FilterArray::removeEmptyStrings($input);
     return array_diff($parts, array_keys($filtered_input));
   }
@@ -354,9 +357,9 @@ class Datelist extends DateElementBase {
   /**
    * Rounds minutes and seconds to nearest requested value.
    *
-   * @param $date
+   * @param mixed $date
    *   The date.
-   * @param $increment
+   * @param int $increment
    *   The value to round to.
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime

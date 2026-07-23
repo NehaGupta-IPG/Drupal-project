@@ -20,9 +20,23 @@ class AttributeClassDiscovery implements DiscoveryInterface {
   protected FileCacheInterface $fileCache;
 
   /**
+   * List of root namespaces abbreviated to two levels.
+   *
+   * This list of namespaces is derived from the namespaces to look for plugin
+   * implementations in, with each namespace in the list reduced to the first
+   * two levels only, such as "Drupal\Component". Checking class namespaces
+   * against this list provides a way to check that dependencies' classes exist
+   * without using the "*_exists()" functions, which loads every class into
+   * memory and can throw errors.
+   *
+   * @var list<string>
+   */
+  protected readonly array $rootTwoLevelNamespaces;
+
+  /**
    * Constructs a new instance.
    *
-   * @param string[] $pluginNamespaces
+   * @param array<string, list<string>> $pluginNamespaces
    *   (optional) An array of namespace that may contain plugin implementations.
    *   Defaults to an empty array.
    * @param string $pluginDefinitionAttributeName
@@ -35,6 +49,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
   ) {
     $file_cache_suffix = str_replace('\\', '_', $this->pluginDefinitionAttributeName);
     $this->fileCache = FileCacheFactory::get('attribute_discovery:' . $this->getFileCacheSuffix($file_cache_suffix));
+    $this->rootTwoLevelNamespaces = array_unique(array_map(fn($namespace) => $this->getTwoLevelNamespace($namespace), array_keys($this->getPluginNamespaces())));
   }
 
   /**
@@ -71,8 +86,12 @@ class AttributeClassDiscovery implements DiscoveryInterface {
             if ($fileinfo->getExtension() === 'php') {
               if ($cached = $this->fileCache->get($fileinfo->getPathName())) {
                 if (isset($cached['id'])) {
-                  // Explicitly unserialize this to create a new object instance.
-                  $definitions[$cached['id']] = unserialize($cached['content']);
+                  // Explicitly unserialize this to create a new object
+                  // instance.
+                  $dependencies = isset($cached['dependencies']) ? unserialize($cached['dependencies']) : [];
+                  if (!$this->hasMissingDependencies($dependencies ?? [])) {
+                    $definitions[$cached['id']] = unserialize($cached['content']);
+                  }
                 }
                 continue;
               }
@@ -80,30 +99,37 @@ class AttributeClassDiscovery implements DiscoveryInterface {
               $sub_path = $iterator->getSubIterator()->getSubPath();
               $sub_path = $sub_path ? str_replace(DIRECTORY_SEPARATOR, '\\', $sub_path) . '\\' : '';
               $class = $namespace . '\\' . $sub_path . $fileinfo->getBasename('.php');
-              try {
-                ['id' => $id, 'content' => $content] = $this->parseClass($class, $fileinfo);
-                if ($id) {
-                  $definitions[$id] = $content;
-                  // Explicitly serialize this to create a new object instance.
-                  $this->fileCache->set($fileinfo->getPathName(), ['id' => $id, 'content' => serialize($content)]);
-                }
-                else {
-                  // Store a NULL object, so that the file is not parsed again.
-                  $this->fileCache->set($fileinfo->getPathName(), [NULL]);
-                }
-              }
-              // Plugins may rely on Attribute classes defined by modules that
-              // are not installed. In such a case, a 'class not found' error
-              // may be thrown from reflection. However, this is an unavoidable
+              // Plugins may rely on classes, interfaces, or traits defined by
+              // modules that are not installed. In such a case, an error may
+              // be thrown from reflection. However, this is an unavoidable
               // situation with optional dependencies and plugins. Therefore,
               // silently skip over this class and avoid writing to the cache,
               // so that it is scanned each time. This ensures that the plugin
-              // definition will be found if the module it requires is
-              // enabled.
-              catch (\Error $e) {
-                if (!preg_match('/(Class|Interface) .* not found$/', $e->getMessage())) {
-                  throw $e;
+              // definition will be found if the module it requires is enabled.
+              try {
+                if (!class_exists($class)) {
+                  continue;
                 }
+              }
+              catch (\Error) {
+                continue;
+              }
+              $result = $this->parseClass($class, $fileinfo);
+              ['id' => $id, 'content' => $content] = $result;
+              if ($id) {
+                if (!$this->hasMissingDependencies($result['dependencies'] ?? [])) {
+                  $definitions[$id] = $content;
+                }
+                // Explicitly serialize this to create a new object instance.
+                $this->fileCache->set($fileinfo->getPathName(), [
+                  'id' => $id,
+                  'content' => serialize($content),
+                  'dependencies' => serialize($result['dependencies'] ?? NULL),
+                ]);
+              }
+              else {
+                // Store a NULL object, so that the file is not parsed again.
+                $this->fileCache->set($fileinfo->getPathName(), [NULL]);
               }
             }
           }
@@ -111,10 +137,6 @@ class AttributeClassDiscovery implements DiscoveryInterface {
       }
     }
 
-    // Plugin discovery is a memory expensive process due to reflection and the
-    // number of files involved. Collect cycles at the end of discovery to be as
-    // efficient as possible.
-    gc_collect_cycles();
     return $definitions;
   }
 
@@ -127,8 +149,9 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    *   The SPL file information for the class.
    *
    * @return array
-   *   An array with the keys 'id' and 'content'. The 'id' is the plugin ID and
-   *   'content' is the plugin definition.
+   *   An array with the keys 'id', 'content', and 'dependencies'. The 'id' is
+   *   the plugin ID, 'content' is the plugin definition, and 'dependencies' is
+   *   a list of class, interface or trait names in the plugin class hierarchy.
    *
    * @throws \ReflectionException
    * @throws \Error
@@ -143,11 +166,15 @@ class AttributeClassDiscovery implements DiscoveryInterface {
       /** @var \Drupal\Component\Plugin\Attribute\AttributeInterface $attribute */
       $attribute = $attributes[0]->newInstance();
       $this->prepareAttributeDefinition($attribute, $class);
-
+      if (($dependencies = $this->getClassDependencies($reflection_class))) {
+        // Include the dependencies in the plugin definition content in case
+        // plugins need to know about them.
+        $attribute->setDependencies($dependencies);
+      }
       $id = $attribute->getId();
       $content = $attribute->get();
     }
-    return ['id' => $id, 'content' => $content];
+    return ['id' => $id, 'content' => $content, 'dependencies' => $dependencies ?? NULL];
   }
 
   /**
@@ -166,9 +193,84 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    * Gets an array of PSR-4 namespaces to search for plugin classes.
    *
    * @return string[][]
+   *   An array of namespaces to search.
    */
   protected function getPluginNamespaces(): array {
     return $this->pluginNamespaces;
+  }
+
+  /**
+   * Gets a string containing the first two levels of a class name or namespace.
+   *
+   * @param string $namespace
+   *   The class name or namespace.
+   *
+   * @return string
+   *   A namespace string containing only two levels.
+   */
+  protected function getTwoLevelNamespace(string $namespace): string {
+    return implode('\\', array_slice(explode('\\', $namespace), 0, 2));
+  }
+
+  /**
+   * Gets the list of class, interface, and trait dependencies for the class.
+   *
+   * @param \ReflectionClass $reflection_class
+   *   Plugin class reflection object.
+   *
+   * @return array{"class"?: list<class-string>, "interface"?: list<class-string>, "trait"?: list<class-string>, "provider"?: list<string>}|null
+   *   The list of dependencies, keyed by type. If the type is 'class', 'trait',
+   *   or 'interface', the values for the type are class names. If the type is
+   *   'provider', the values for the type are provider names. NULL if there are
+   *   no dependencies.
+   */
+  protected function getClassDependencies(\ReflectionClass $reflection_class): ?array {
+    $dependencies = [];
+    if (($interfaces = $reflection_class->getInterfaceNames())) {
+      $dependencies['interface'] = $interfaces;
+    }
+    if (($traits = $reflection_class->getTraitNames())) {
+      $dependencies['trait'] = $traits;
+    }
+
+    $child_class = $reflection_class;
+    while (($parent_class = $child_class->getParentClass())) {
+      $dependencies['class'][] = $parent_class->getName();
+      if (($traits = $parent_class->getTraitNames())) {
+        $dependencies['trait'] ??= [];
+        $dependencies['trait'] = array_unique(array_merge($dependencies['trait'], $traits));
+      }
+      $child_class = $parent_class;
+    }
+
+    return $dependencies ?: NULL;
+  }
+
+  /**
+   * Whether the plugin definition has missing dependencies.
+   *
+   * @param array<string, array<class-string>> $dependencies
+   *   An array of dependencies' class names or namespaces, keyed by type.
+   *
+   * @return bool
+   *   TRUE if any dependencies are missing. FALSE otherwise.
+   */
+  protected function hasMissingDependencies(array $dependencies): bool {
+    foreach ($dependencies as $type_dependencies) {
+      foreach ($type_dependencies as $dependency) {
+        $namespace = $this->getTwoLevelNamespace($dependency);
+        if (!str_starts_with($namespace, 'Drupal')) {
+          // Not checking non-Drupal dependencies.
+          continue;
+        }
+
+        if (!in_array($namespace, $this->rootTwoLevelNamespaces)) {
+          return TRUE;
+        }
+      }
+    }
+
+    return FALSE;
   }
 
 }

@@ -8,12 +8,15 @@ use Drupal\Component\Gettext\PoItem;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\WaitTerminateTestTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests LocaleLookup.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleLocaleLookupTest extends BrowserTestBase {
 
   use WaitTerminateTestTrait;
@@ -75,10 +78,9 @@ class LocaleLocaleLookupTest extends BrowserTestBase {
 
   /**
    * Tests old plural style @count[number] fix.
-   *
-   * @dataProvider providerTestFixOldPluralStyle
    */
-  public function testFixOldPluralStyle($translation_value, $expected): void {
+  #[DataProvider('providerTestFixOldPluralStyle')]
+  public function testFixOldPluralStyle(string $translation_value, string $expected): void {
     $string_storage = \Drupal::service('locale.storage');
     $string = $string_storage->findString(['source' => 'Member for', 'context' => '']);
     $lid = $string->getId();
@@ -107,7 +109,7 @@ class LocaleLocaleLookupTest extends BrowserTestBase {
    *     - translation value
    *     - expected result
    */
-  public static function providerTestFixOldPluralStyle() {
+  public static function providerTestFixOldPluralStyle(): array {
     return [
       'non-plural translation' => ['@count[2] non-plural test', '@count[2] non-plural test'],
       'plural translation' => ['@count[2] plural test' . PoItem::DELIMITER, '@count plural test'],

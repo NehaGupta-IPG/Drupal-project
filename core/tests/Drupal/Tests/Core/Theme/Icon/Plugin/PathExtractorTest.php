@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Theme\Icon\Plugin;
 
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Theme\Icon\IconDefinition;
 use Drupal\Core\Theme\Icon\IconFinder;
 use Drupal\Core\Theme\Plugin\IconExtractor\PathExtractor;
 use Drupal\Tests\Core\Theme\Icon\IconTestTrait;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
- * @coversDefaultClass \Drupal\Core\Theme\Plugin\IconExtractor\PathExtractor
- *
- * @group icon
+ * Tests Drupal\Core\Theme\Plugin\IconExtractor\PathExtractor.
  */
+#[CoversClass(PathExtractor::class)]
+#[Group('icon')]
 class PathExtractorTest extends UnitTestCase {
 
   use IconTestTrait;
@@ -33,17 +37,15 @@ class PathExtractorTest extends UnitTestCase {
 
   /**
    * The IconFinder instance.
-   *
-   * @var \Drupal\Core\Theme\Icon\IconFinder|\PHPUnit\Framework\MockObject\MockObject
    */
-  private IconFinder $iconFinder;
+  private IconFinder&Stub $iconFinder;
 
   /**
    * {@inheritdoc}
    */
   public function setUp():void {
     parent::setUp();
-    $this->iconFinder = $this->createMock(IconFinder::class);
+    $this->iconFinder = $this->createStub(IconFinder::class);
     $this->pathExtractorPlugin = new PathExtractor(
       [
         'id' => $this->pluginId,
@@ -110,9 +112,8 @@ class PathExtractorTest extends UnitTestCase {
    *   The files to test from IconFinder::getFilesFromSources.
    * @param bool $expected_empty
    *   Has icon result, default FALSE.
-   *
-   * @dataProvider providerDiscoverIconsPath
    */
+  #[DataProvider('providerDiscoverIconsPath')]
   public function testDiscoverIconsPath(array $files, bool $expected_empty = FALSE): void {
     $this->iconFinder->method('getFilesFromSources')->willReturn($files);
 

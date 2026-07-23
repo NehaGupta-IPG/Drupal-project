@@ -5,23 +5,25 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Component\Utility\Bytes;
+use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore postupdate
-
 /**
  * Tests output on the status overview page.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class StatusTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['update_test_postupdate', 'update'];
+  protected static $modules = ['update_test_postupdate', 'update', 'experimental_module_requirements_test'];
 
   /**
    * {@inheritdoc}
@@ -50,9 +52,8 @@ class StatusTest extends BrowserTestBase {
 
   /**
    * Tests that the status page returns.
-   *
-   * @group legacy
    */
+  #[IgnoreDeprecations]
   public function testStatusPage(): void {
     // Verify if the 'Status report' is the first item link.
     $this->drupalGet('admin/reports');
@@ -64,6 +65,13 @@ class StatusTest extends BrowserTestBase {
 
     // Verify that the PHP version is shown on the page.
     $this->assertSession()->pageTextContains(phpversion());
+
+    // Test that the experimental modules requirement is reported as info (in
+    // the "Checked" group), rather than as a warning.
+    $elements = $this->xpath('//div[h3[@id="checked"]]//summary[contains(@class, "system-status-report__status-title") and contains(text(), :text)]', [
+      ':text' => 'Experimental modules installed',
+    ]);
+    $this->assertCount(1, $elements);
 
     if (function_exists('phpinfo')) {
       $this->assertSession()->linkByHrefExists(Url::fromRoute('system.php')->toString());
@@ -97,6 +105,8 @@ class StatusTest extends BrowserTestBase {
 
     $this->drupalGet('admin/reports/status/php');
     $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('PHP');
+    $this->assertSession()->pageTextNotContains('$_COOKIE');
 
     $settings['settings']['sa_core_2023_004_phpinfo_flags'] = (object) [
       'value' => INFO_ALL,
@@ -117,7 +127,7 @@ class StatusTest extends BrowserTestBase {
     // Check if JSON database support is enabled.
     $this->assertSession()->pageTextContains('Database support for JSON');
     $elements = $this->xpath('//details[@class="system-status-report__entry"]//div[contains(text(), :text)]', [
-      ':text' => 'Is required in Drupal 10.0.',
+      ':text' => 'Drupal requires databases that support JSON storage.',
     ]);
     $this->assertCount(1, $elements);
     $this->assertStringStartsWith('Available', $elements[0]->getParent()->getText());
@@ -181,6 +191,10 @@ class StatusTest extends BrowserTestBase {
     $session->pageTextNotContains('Deprecated themes installed');
     $session->pageTextNotContains('Deprecated themes found: Test deprecated theme.');
     $this->assertSession()->elementNotExists('xpath', "//a[contains(@href, 'http://example.com/deprecated_theme')]");
+
+    // Check that the installation profile information is displayed.
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->pageTextContains('Testing (testing-' . \Drupal::VERSION . ')');
 
     // Check if pg_trgm extension is enabled on postgres.
     if (\Drupal::database()->databaseType() == 'pgsql') {

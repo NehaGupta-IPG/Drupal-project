@@ -17,6 +17,9 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\serialization\Normalizer\DateTimeIso8601Normalizer;
 use Drupal\Tests\serialization\Traits\JsonSchemaTestTrait;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -24,11 +27,11 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 /**
  * Unit test coverage for the "datetime_iso8601" @DataType.
  *
- * @coversDefaultClass \Drupal\serialization\Normalizer\DateTimeIso8601Normalizer
- * @group serialization
  * @see \Drupal\Core\TypedData\Plugin\DataType\DateTimeIso8601
  * @see \Drupal\datetime\Plugin\Field\FieldType\DateTimeItem::DATETIME_TYPE_DATE
  */
+#[CoversClass(DateTimeIso8601Normalizer::class)]
+#[Group('serialization')]
 class DateTimeIso8601NormalizerTest extends UnitTestCase {
 
   use JsonSchemaTestTrait;
@@ -65,7 +68,7 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::supportsNormalization
+   * Tests supports normalization.
    */
   public function testSupportsNormalization(): void {
     $this->assertTrue($this->normalizer->supportsNormalization($this->data->reveal()));
@@ -78,17 +81,17 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::supportsDenormalization
+   * Tests supports denormalization.
    */
   public function testSupportsDenormalization(): void {
     $this->assertTrue($this->normalizer->supportsDenormalization($this->data->reveal(), DateTimeIso8601::class));
   }
 
   /**
-   * @covers ::normalize
-   * @dataProvider providerTestNormalize
+   * Tests normalize.
    */
-  public function testNormalize($parent_field_item_class, $datetime_type, $expected_format): void {
+  #[DataProvider('providerTestNormalize')]
+  public function testNormalize(string $parent_field_item_class, ?string $datetime_type, string $expected_format): void {
     $formatted_string = $this->randomMachineName();
 
     $field_item = $this->prophesize($parent_field_item_class);
@@ -122,10 +125,10 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::normalize
-   * @dataProvider providerTestNormalize
+   * Tests normalize when null.
    */
-  public function testNormalizeWhenNull($parent_field_item_class, $datetime_type, $expected_format): void {
+  #[DataProvider('providerTestNormalize')]
+  public function testNormalizeWhenNull(string $parent_field_item_class, ?string $datetime_type, string $expected_format): void {
     $field_item = $this->prophesize($parent_field_item_class);
     if ($parent_field_item_class === DateTimeItem::class) {
       $field_storage_definition = $this->prophesize(FieldStorageDefinitionInterface::class);
@@ -155,8 +158,9 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
    * Data provider for testNormalize.
    *
    * @return array
+   *   The data provider array.
    */
-  public static function providerTestNormalize() {
+  public static function providerTestNormalize(): array {
     return [
       // @see \Drupal\datetime\Plugin\Field\FieldType\DateTimeItem::DATETIME_TYPE_DATE
       'datetime field, configured to store only date: must be handled by DateTimeIso8601Normalizer' => [
@@ -182,10 +186,8 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
 
   /**
    * Tests the denormalize function with good data.
-   *
-   * @covers ::denormalize
-   * @dataProvider providerTestDenormalizeValidFormats
    */
+  #[DataProvider('providerTestDenormalizeValidFormats')]
   public function testDenormalizeValidFormats($type, $normalized, $expected): void {
     $field_definition = $this->prophesize(FieldDefinitionInterface::class);
     $field_definition->getSetting('datetime_type')->willReturn($type === 'date-only' ? DateTimeItem::DATETIME_TYPE_DATE : DateTimeItem::DATETIME_TYPE_DATETIME);
@@ -199,8 +201,9 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
    * Data provider for testDenormalizeValidFormats.
    *
    * @return array
+   *   An array of test cases.
    */
-  public static function providerTestDenormalizeValidFormats() {
+  public static function providerTestDenormalizeValidFormats(): array {
     $data = [];
     $data['just a date'] = ['date-only', '2016-11-06', '2016-11-06'];
 
@@ -217,12 +220,10 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
 
   /**
    * Tests the denormalize function with bad data for the date-only case.
-   *
-   * @covers ::denormalize
    */
   public function testDenormalizeDateOnlyException(): void {
     $this->expectException(UnexpectedValueException::class);
-    $this->expectExceptionMessage('The specified date "2016/11/06" is not in an accepted format: "Y-m-d" (date-only).');
+    $this->expectExceptionMessageIs('The specified date "2016/11/06" is not in an accepted format: "Y-m-d" (date-only).');
 
     $normalized = '2016/11/06';
 
@@ -233,12 +234,10 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
 
   /**
    * Tests the denormalize function with bad data for the date+time case.
-   *
-   * @covers ::denormalize
    */
   public function testDenormalizeDateAndTimeException(): void {
     $this->expectException(UnexpectedValueException::class);
-    $this->expectExceptionMessage('The specified date "on a rainy day" is not in an accepted format: "Y-m-d\TH:i:sP" (RFC 3339), "Y-m-d\TH:i:sO" (ISO 8601).');
+    $this->expectExceptionMessageIs('The specified date "on a rainy day" is not in an accepted format: "Y-m-d\TH:i:sP" (RFC 3339), "Y-m-d\TH:i:sO" (ISO 8601).');
 
     $normalized = 'on a rainy day';
 
@@ -249,12 +248,10 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
 
   /**
    * Tests the denormalize function with incomplete serialization context.
-   *
-   * @covers ::denormalize
    */
   public function testDenormalizeNoTargetInstanceOrFieldDefinitionException(): void {
     $this->expectException(InvalidArgumentException::class);
-    $this->expectExceptionMessage('$context[\'target_instance\'] or $context[\'field_definition\'] must be set to denormalize with the DateTimeIso8601Normalizer');
+    $this->expectExceptionMessageIs('$context[\'target_instance\'] or $context[\'field_definition\'] must be set to denormalize with the DateTimeIso8601Normalizer');
     $this->normalizer->denormalize('', DateTimeIso8601::class, NULL, []);
   }
 
@@ -305,8 +302,11 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
  */
 class DateTimeIso8601NormalizerTestDrupalDateTime extends DrupalDateTime {
 
-  public function setTimezone(\DateTimeZone $timezone) {
-    parent::setTimezone($timezone);
+  /**
+   * Sets the timezone.
+   */
+  public function setTimezone(\DateTimeZone $timezone): static {
+    return parent::setTimezone($timezone);
   }
 
 }

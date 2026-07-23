@@ -14,14 +14,15 @@ use Drupal\Tests\workspaces\Kernel\WorkspaceTestTrait;
 use Drupal\workflows\Entity\Workflow;
 use Drupal\workflows\WorkflowInterface;
 use Drupal\workspaces\WorkspacePublishException;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that Workspaces and Content Moderation work together properly.
- *
- * @group content_moderation
- * @group workspaces
- * @group #slow
  */
+#[Group('content_moderation')]
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
 
   use ContentModerationTestTrait {
@@ -100,7 +101,7 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
     $editorial_2_values['type_settings']['states']['archived']['default_revision'] = FALSE;
 
     $editorial_2 = Workflow::create($editorial_2_values);
-    $this->workspaceManager->executeOutsideWorkspace(function () use ($editorial_2) {
+    $this->workspaceManager->executeOutsideWorkspace(function () use ($editorial_2): void {
       $editorial_2->save();
     });
 
@@ -112,18 +113,42 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
 
     // Create three entities for each bundle, covering all the available
     // moderation states.
-    $page_archived = Node::create(['type' => 'page', 'title' => 'Test page - archived', 'moderation_state' => 'archived']);
+    $page_archived = Node::create([
+      'type' => 'page',
+      'title' => 'Test page - archived',
+      'moderation_state' => 'archived',
+    ]);
     $page_archived->save();
-    $page_draft = Node::create(['type' => 'page', 'title' => 'Test page - draft', 'moderation_state' => 'draft']);
+    $page_draft = Node::create([
+      'type' => 'page',
+      'title' => 'Test page - draft',
+      'moderation_state' => 'draft',
+    ]);
     $page_draft->save();
-    $page_published = Node::create(['type' => 'page', 'title' => 'Test page - published', 'moderation_state' => 'published']);
+    $page_published = Node::create([
+      'type' => 'page',
+      'title' => 'Test page - published',
+      'moderation_state' => 'published',
+    ]);
     $page_published->save();
 
-    $article_archived = Node::create(['type' => 'article', 'title' => 'Test article - archived', 'moderation_state' => 'archived']);
+    $article_archived = Node::create([
+      'type' => 'article',
+      'title' => 'Test article - archived',
+      'moderation_state' => 'archived',
+    ]);
     $article_archived->save();
-    $article_draft = Node::create(['type' => 'article', 'title' => 'Test article - draft', 'moderation_state' => 'draft']);
+    $article_draft = Node::create([
+      'type' => 'article',
+      'title' => 'Test article - draft',
+      'moderation_state' => 'draft',
+    ]);
     $article_draft->save();
-    $article_published = Node::create(['type' => 'article', 'title' => 'Test article - published', 'moderation_state' => 'published']);
+    $article_published = Node::create([
+      'type' => 'article',
+      'title' => 'Test article - published',
+      'moderation_state' => 'published',
+    ]);
     $article_published->save();
 
     // We have three items in a non-default moderation state:
@@ -186,18 +211,30 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
     $type_settings = $editorial->get('type_settings');
     $type_settings['states']['draft']['default_revision'] = FALSE;
     $type_settings['states']['archived']['default_revision'] = FALSE;
-    $this->workspaceManager->executeOutsideWorkspace(function () use ($editorial) {
+    $this->workspaceManager->executeOutsideWorkspace(function () use ($editorial): void {
       $editorial->save();
     });
     // Create an node bundle 'note' that uses non-default workflow.
     $this->createContentType(['type' => 'note']);
 
     // Create content in all states none with default revisions.
-    $note_archived = Node::create(['type' => 'note', 'title' => 'Test note - archived', 'moderation_state' => 'archived']);
+    $note_archived = Node::create([
+      'type' => 'note',
+      'title' => 'Test note - archived',
+      'moderation_state' => 'archived',
+    ]);
     $note_archived->save();
-    $note_draft = Node::create(['type' => 'note', 'title' => 'Test note - draft', 'moderation_state' => 'draft']);
+    $note_draft = Node::create([
+      'type' => 'note',
+      'title' => 'Test note - draft',
+      'moderation_state' => 'draft',
+    ]);
     $note_draft->save();
-    $note_published = Node::create(['type' => 'note', 'title' => 'Test note - published', 'moderation_state' => 'published']);
+    $note_published = Node::create([
+      'type' => 'note',
+      'title' => 'Test note - published',
+      'moderation_state' => 'published',
+    ]);
     $note_published->save();
 
     // Check workspace can be published.
@@ -256,7 +293,7 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
   /**
    * Test cases for basic moderation test.
    */
-  public static function basicModerationTestCases() {
+  public static function basicModerationTestCases(): array {
     return [
       'Nodes' => [
         'node',
@@ -302,7 +339,7 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
    * {@inheritdoc}
    */
   protected function addEntityTypeAndBundleToWorkflow(WorkflowInterface $workflow, $entity_type_id, $bundle): void {
-    $this->workspaceManager->executeOutsideWorkspace(function () use ($workflow, $entity_type_id, $bundle) {
+    $this->workspaceManager->executeOutsideWorkspace(function () use ($workflow, $entity_type_id, $bundle): void {
       $this->traitAddEntityTypeAndBundleToWorkflow($workflow, $entity_type_id, $bundle);
     });
   }
@@ -310,9 +347,9 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
   /**
    * {@inheritdoc}
    */
-  protected function createContentType(array $values = []) {
-    $note_type = $this->workspaceManager->executeOutsideWorkspace(function () use ($values) {
-      return $this->traitCreateContentType($values);
+  protected function createContentType(array $values = [], bool $create_body = TRUE) {
+    $note_type = $this->workspaceManager->executeOutsideWorkspace(function () use ($values, $create_body) {
+      return $this->traitCreateContentType($values, $create_body);
     });
 
     return $note_type;

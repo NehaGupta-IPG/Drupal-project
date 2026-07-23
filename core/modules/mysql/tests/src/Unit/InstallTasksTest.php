@@ -7,56 +7,55 @@ namespace Drupal\Tests\mysql\Unit;
 use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\mysql\Driver\Database\mysql\Install\Tasks;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the MySQL install tasks.
- *
- * @coversDefaultClass \Drupal\mysql\Driver\Database\mysql\Install\Tasks
- * @group Database
  */
+#[CoversClass(Tasks::class)]
+#[Group('Database')]
 class InstallTasksTest extends UnitTestCase {
-
-  /**
-   * A connection object prophecy.
-   *
-   * @var \Drupal\mysql\Driver\Database\mysql\Connection|\Prophecy\Prophecy\ObjectProphecy
-   */
-  private $connection;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->connection = $this->prophesize(Connection::class);
-  }
 
   /**
    * Creates a Tasks object for testing.
    *
+   * @param \Drupal\mysql\Driver\Database\mysql\Connection $connection
+   *   The database connection.
+   *
    * @return \Drupal\mysql\Driver\Database\mysql\Install\Tasks
+   *   A Tasks object.
    */
-  private function createTasks(): Tasks {
-    /** @var \Drupal\mysql\Driver\Database\mysql\Connection $connection */
-    $connection = $this->connection->reveal();
-
+  private function createTasks(Connection $connection): Tasks {
     return new class($connection) extends Tasks {
 
-      private $connection;
+      /**
+       * The database connection.
+       */
+      private Connection $connection;
 
       public function __construct(Connection $connection) {
         $this->connection = $connection;
       }
 
-      protected function isConnectionActive() {
+      /**
+       * {@inheritdoc}
+       */
+      protected function isConnectionActive(): bool {
         return TRUE;
       }
 
-      protected function getConnection() {
+      /**
+       * {@inheritdoc}
+       */
+      protected function getConnection(): Connection {
         return $this->connection;
       }
 
+      /**
+       * {@inheritdoc}
+       */
       protected function t($string, array $args = [], array $options = []) {
         return $string;
       }
@@ -68,18 +67,28 @@ class InstallTasksTest extends UnitTestCase {
    * Creates a Tasks object for testing, without connection.
    *
    * @return \Drupal\mysql\Driver\Database\mysql\Install\Tasks
+   *   A Tasks object.
    */
   private function createTasksNoConnection(): Tasks {
     return new class() extends Tasks {
 
-      protected function isConnectionActive() {
+      /**
+       * {@inheritdoc}
+       */
+      protected function isConnectionActive(): bool {
         return FALSE;
       }
 
-      protected function getConnection() {
+      /**
+       * {@inheritdoc}
+       */
+      protected function getConnection(): null {
         return NULL;
       }
 
+      /**
+       * {@inheritdoc}
+       */
       protected function t($string, array $args = [], array $options = []) {
         return $string;
       }
@@ -88,16 +97,19 @@ class InstallTasksTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::minimumVersion
-   * @covers ::name
-   * @dataProvider providerNameAndMinimumVersion
+   * Tests name and minimum version.
+   *
+   * @legacy-covers ::minimumVersion
+   * @legacy-covers ::name
    */
+  #[DataProvider('providerNameAndMinimumVersion')]
   public function testNameAndMinimumVersion(bool $is_mariadb, string $expected_name, string $expected_minimum_version): void {
-    $this->connection
-      ->isMariaDb()
-      ->shouldBeCalledTimes(2)
+    $connection = $this->createMock(Connection::class);
+    $connection
+      ->expects($this->exactly(2))
+      ->method('isMariaDb')
       ->willReturn($is_mariadb);
-    $tasks = $this->createTasks();
+    $tasks = $this->createTasks($connection);
 
     $minimum_version = $tasks->minimumVersion();
     $name = $tasks->name();
@@ -111,6 +123,7 @@ class InstallTasksTest extends UnitTestCase {
    * Provides test data.
    *
    * @return array
+   *   An array of test data.
    */
   public static function providerNameAndMinimumVersion(): array {
     return [
@@ -121,18 +134,20 @@ class InstallTasksTest extends UnitTestCase {
       ],
       [
         FALSE,
-        'MySQL, Percona Server, or equivalent',
+        'MySQL or equivalent',
         Tasks::MYSQL_MINIMUM_VERSION,
       ],
     ];
   }
 
   /**
-   * @covers ::name
+   * Tests name with no connection.
+   *
+   * @legacy-covers ::name
    */
   public function testNameWithNoConnection(): void {
     $tasks = $this->createTasksNoConnection();
-    $this->assertSame('MySQL, MariaDB, Percona Server, or equivalent', $tasks->name());
+    $this->assertSame('MySQL, MariaDB, or equivalent', $tasks->name());
   }
 
 }

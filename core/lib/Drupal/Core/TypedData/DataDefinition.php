@@ -303,7 +303,7 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
   /**
    * {@inheritdoc}
    */
-  public function addConstraint($constraint_name, $options = NULL) {
+  public function addConstraint(string $constraint_name, ?array $options = NULL): static {
     $this->definition['constraints'][$constraint_name] = $options;
     return $this;
   }
@@ -361,6 +361,7 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    * Returns all definition values as array.
    *
    * @return array
+   *   The array holding values for all definition keys.
    */
   public function toArray() {
     return $this->definition;

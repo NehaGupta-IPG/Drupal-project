@@ -30,11 +30,13 @@ use Drupal\Core\Field\FieldException;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'id',
-      'entity_type',
-      'bundle',
-      'field_name',
-      'field_type',
+      'properties' => [
+        'id',
+        'entity_type',
+        'bundle',
+        'field_name',
+        'field_type',
+      ],
     ],
   ],
   config_export: [
@@ -177,6 +179,7 @@ class BaseFieldOverride extends FieldConfigBase {
    * Gets the base field definition.
    *
    * @return \Drupal\Core\Field\BaseFieldDefinition
+   *   An associative array of the base field definition.
    */
   protected function getBaseFieldDefinition() {
     if (!isset($this->baseFieldDefinition)) {

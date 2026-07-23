@@ -30,24 +30,25 @@ class FormTestRebuildPreserveValuesForm extends FormBase {
     $form = [
       'checkbox_1_default_off' => [
         '#type' => 'checkbox',
-        '#title' => t('This checkbox defaults to unchecked'),
+        '#title' => $this->t('This checkbox defaults to unchecked'),
         '#default_value' => FALSE,
       ],
       'checkbox_1_default_on' => [
         '#type' => 'checkbox',
-        '#title' => t('This checkbox defaults to checked'),
+        '#title' => $this->t('This checkbox defaults to checked'),
         '#default_value' => TRUE,
       ],
       'text_1' => [
         '#type' => 'textfield',
-        '#title' => t('This textfield has a non-empty default value.'),
+        '#title' => $this->t('This textfield has a non-empty default value.'),
         '#default_value' => 'DEFAULT 1',
       ],
     ];
-    // Provide an 'add more' button that rebuilds the form with an additional two
-    // checkboxes and a textfield. The test is to make sure that the rebuild
+    // Provide an 'add more' button that rebuilds the form with an additional
+    // two checkboxes and a textfield. The test is to make sure that the rebuild
     // triggered by this button preserves the user input values for the initial
-    // elements and initializes the new elements with the correct default values.
+    // elements and initializes the new elements with the correct default
+    // values.
     if (!$form_state->has('add_more')) {
       $form['add_more'] = [
         '#type' => 'submit',
@@ -59,17 +60,17 @@ class FormTestRebuildPreserveValuesForm extends FormBase {
       $form += [
         'checkbox_2_default_off' => [
           '#type' => 'checkbox',
-          '#title' => t('This checkbox defaults to unchecked'),
+          '#title' => $this->t('This checkbox defaults to unchecked'),
           '#default_value' => FALSE,
         ],
         'checkbox_2_default_on' => [
           '#type' => 'checkbox',
-          '#title' => t('This checkbox defaults to checked'),
+          '#title' => $this->t('This checkbox defaults to checked'),
           '#default_value' => TRUE,
         ],
         'text_2' => [
           '#type' => 'textfield',
-          '#title' => t('This textfield has a non-empty default value.'),
+          '#title' => $this->t('This textfield has a non-empty default value.'),
           '#default_value' => 'DEFAULT 2',
         ],
       ];
@@ -85,7 +86,7 @@ class FormTestRebuildPreserveValuesForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function addMoreSubmitForm(array &$form, FormStateInterface $form_state) {
+  public function addMoreSubmitForm(array &$form, FormStateInterface $form_state): void {
     // Rebuild, to test preservation of input values.
     $form_state->set('add_more', TRUE);
     $form_state->setRebuild();
@@ -94,7 +95,7 @@ class FormTestRebuildPreserveValuesForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // Finish the workflow. Do not rebuild.
     $this->messenger()->addStatus($this->t('Form values: %values', ['%values' => var_export($form_state->getValues(), TRUE)]));
   }

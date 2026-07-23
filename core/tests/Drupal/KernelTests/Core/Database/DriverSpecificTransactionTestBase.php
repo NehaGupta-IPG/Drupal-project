@@ -38,7 +38,7 @@ use Drupal\Core\Database\TransactionOutOfOrderException;
  * is active, and mysqli does not fail when rolling back and no transaction
  * active.
  */
-class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
+abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
 
   /**
    * Keeps track of the post-transaction callback action executed.
@@ -104,14 +104,14 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * transaction (which was already committed when the inner transaction
    * started).
    *
-   * @param $suffix
+   * @param string $suffix
    *   Suffix to add to field values to differentiate tests.
-   * @param $rollback
+   * @param bool $rollback
    *   Whether or not to try rolling back the transaction when we're done.
-   * @param $ddl_statement
+   * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the inner transaction.
    */
-  protected function transactionOuterLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
+  protected function transactionOuterLayer(string $suffix, $rollback = FALSE, $ddl_statement = FALSE): void {
     $depth = $this->connection->transactionManager()->stackDepth();
     $txn = $this->connection->startTransaction();
 
@@ -145,14 +145,14 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * This "inner layer" transaction is either used alone or nested inside of the
    * "outer layer" transaction.
    *
-   * @param $suffix
+   * @param string $suffix
    *   Suffix to add to field values to differentiate tests.
-   * @param $rollback
+   * @param bool $rollback
    *   Whether or not to try rolling back the transaction when we're done.
-   * @param $ddl_statement
+   * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the transaction.
    */
-  protected function transactionInnerLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
+  protected function transactionInnerLayer(string $suffix, $rollback = FALSE, $ddl_statement = FALSE): void {
     $depth = $this->connection->transactionManager()->stackDepth();
     // Start a transaction. If we're being called from ->transactionOuterLayer,
     // then we're already in a transaction. Normally, that would make starting
@@ -432,9 +432,6 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
 
   /**
    * Tests rollback after a DDL statement when no transactional DDL supported.
-   *
-   * @todo In drupal:12.0.0, rollBack will throw a
-   *   TransactionOutOfOrderException. Adjust the test accordingly.
    */
   public function testRollbackAfterDdlStatementForNonTransactionalDdlDatabase(): void {
     if ($this->connection->supportsTransactionalDDL()) {
@@ -477,7 +474,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Inserts a single row into the testing table.
    */
-  protected function insertRow($name) {
+  protected function insertRow($name): void {
     $this->connection->insert('test')
       ->fields([
         'name' => $name,
@@ -488,7 +485,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Executes a DDL statement.
    */
-  protected function executeDDLStatement() {
+  protected function executeDDLStatement(): void {
     static $count = 0;
     $table = [
       'fields' => [
@@ -506,7 +503,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Starts over for a new test.
    */
-  protected function cleanUp() {
+  protected function cleanUp(): void {
     $this->connection->truncate('test')
       ->execute();
     $this->postTransactionCallbackAction = NULL;
@@ -523,7 +520,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @internal
    */
   public function assertRowPresent(string $name, ?string $message = NULL): void {
-    $present = (boolean) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
+    $present = (bool) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
     $this->assertTrue($present, $message ?? "Row '{$name}' should be present, but it actually does not exist.");
   }
 
@@ -538,7 +535,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @internal
    */
   public function assertRowAbsent(string $name, ?string $message = NULL): void {
-    $present = (boolean) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
+    $present = (bool) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
     $this->assertFalse($present, $message ?? "Row '{$name}' should be absent, but it actually exists.");
   }
 
@@ -780,7 +777,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $this->assertSame('savepoint_1', $savepoint1->name());
 
     $this->expectException(TransactionNameNonUniqueException::class);
-    $this->expectExceptionMessage("savepoint_1 is already in use.");
+    $this->expectExceptionMessageIs("savepoint_1 is already in use.");
     $this->connection->startTransaction('savepoint_1');
   }
 
@@ -919,9 +916,6 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * transaction including DDL statements is not possible, since a commit
    * happened already. We cannot decide what should be the status of the
    * callback, an exception is thrown.
-   *
-   * @todo In drupal:12.0.0, rollBack will throw a
-   *   TransactionOutOfOrderException. Adjust the test accordingly.
    */
   public function testRootTransactionEndCallbackFailureUponDdlAndRollbackForNonTransactionalDdlDatabase(): void {
     if ($this->connection->supportsTransactionalDDL()) {

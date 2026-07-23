@@ -56,10 +56,10 @@ use Drupal\Component\Utility\Xss;
  *   $grants['example_realm'] = [888];
  * }
  * @endcode
- * If you decide to do this, be aware that the node_access_rebuild() function
- * will erase any node ID 0 entry when it is called, so you will need to make
- * sure to restore your {node_access} record after node_access_rebuild() is
- * called.
+ * If you decide to do this, be aware that
+ * \Drupal\node\NodeAccessRebuild::rebuild() will erase any node ID 0 entry when
+ * it is called, so you will need to make sure to restore your {node_access}
+ * record after \Drupal\node\NodeAccessRebuild::rebuild() is called.
  *
  * @param \Drupal\Core\Session\AccountInterface $account
  *   The account object whose grants are requested.
@@ -70,8 +70,8 @@ use Drupal\Component\Utility\Xss;
  *   An array whose keys are "realms" of grants, and whose values are arrays of
  *   the grant IDs within this realm that this user is being granted.
  *
- * @see node_access_view_all_nodes()
- * @see node_access_rebuild()
+ * @see \Drupal\node\NodeGrantDatabaseStorage::checkAllGrants()
+ * @see \Drupal\node\NodeAccessRebuild::rebuild()
  * @ingroup node_access
  */
 function hook_node_grants(AccountInterface $account, $operation): array {
@@ -108,8 +108,8 @@ function hook_node_grants(AccountInterface $account, $operation): array {
  * - 'gid': A 'grant ID' from hook_node_grants().
  * - 'grant_view': If set to 1 a user that has been identified as a member
  *   of this gid within this realm can view this node. This should usually be
- *   set to $node->isPublished(). Failure to do so may expose unpublished content
- *   to some users.
+ *   set to $node->isPublished(). Failure to do so may expose unpublished
+ *   content to some users.
  * - 'grant_update': If set to 1 a user that has been identified as a member
  *   of this gid within this realm can edit this node.
  * - 'grant_delete': If set to 1 a user that has been identified as a member
@@ -156,8 +156,8 @@ function hook_node_access_records(NodeInterface $node): array {
   // treated just like any other node and we completely ignore it.
   if ($node->private->value) {
     // Only published Catalan translations of private nodes should be viewable
-    // to all users. If we fail to check $node->isPublished(), all users would be able
-    // to view an unpublished node.
+    // to all users. If we fail to check $node->isPublished(), all users would
+    // be able to view an unpublished node.
     if ($node->isPublished()) {
       $grants[] = [
         'realm' => 'example',
@@ -296,7 +296,7 @@ function hook_node_grants_alter(&$grants, AccountInterface $account, $operation)
  *   the post information (last updated, author) in the default search result
  *   theming.
  *
- * @see template_preprocess_search_result()
+ * @see \Drupal\search\Hook\SearchThemeHooks::preprocessSearchResult()
  * @see search-result.html.twig
  *
  * @ingroup entity_crud
@@ -315,12 +315,12 @@ function hook_node_search_result(NodeInterface $node): array {
  * @param \Drupal\node\NodeInterface $node
  *   The node being indexed.
  *
- * @return string
+ * @return string|\Stringable
  *   Additional node information to be indexed.
  *
  * @ingroup entity_crud
  */
-function hook_node_update_index(NodeInterface $node) {
+function hook_node_update_index(NodeInterface $node): string|\Stringable {
   $text = '';
   $ratings = \Drupal::database()->query('SELECT [title], [description] FROM {my_ratings} WHERE [nid] = :nid', [':nid' => $node->id()]);
   foreach ($ratings as $rating) {
@@ -372,23 +372,23 @@ function hook_node_update_index(NodeInterface $node) {
  *
  * @ingroup entity_crud
  */
-function hook_ranking(): array {
+function hook_node_search_ranking(): array {
   $data = [];
   // If voting is disabled, we can avoid returning the array, no hard feelings.
   if (\Drupal::config('vote.settings')->get('node_enabled')) {
     $data += [
       'vote_average' => [
         'title' => t('Average vote'),
-        // Note that we use i.sid, the search index's search item id, rather than
-        // n.nid.
+        // Note that we use i.sid, the search index's search item id, rather
+        // than n.nid.
         'join' => [
           'type' => 'LEFT',
           'table' => 'vote_node_data',
           'alias' => 'vote_node_data',
           'on' => 'vote_node_data.nid = i.sid',
         ],
-        // The highest possible score should be 1, and the lowest possible score,
-        // always 0, should be 0.
+        // The highest possible score should be 1, and the lowest possible
+        // score, always 0, should be 0.
         'score' => 'vote_node_data.average / CAST(%f AS DECIMAL)',
         // Pass in the highest possible voting score as a decimal argument.
         'arguments' => [\Drupal::config('vote.settings')->get('score_max')],
@@ -408,8 +408,8 @@ function hook_ranking(): array {
  * @param array &$context
  *   Various aspects of the context in which the node links are going to be
  *   displayed, with the following keys:
- *   - 'view_mode': the view mode in which the node is being viewed
- *   - 'langcode': the language in which the node is being viewed
+ *   - 'view_mode': the view mode in which the node is being viewed.
+ *   - 'langcode': the language in which the node is being viewed.
  *
  * @see \Drupal\node\NodeViewBuilder::renderLinks()
  * @see \Drupal\node\NodeViewBuilder::buildLinks()

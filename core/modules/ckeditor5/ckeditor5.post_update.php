@@ -18,5 +18,7 @@ function ckeditor5_removed_post_updates(): array {
     'ckeditor5_post_update_code_block' => '11.0.0',
     'ckeditor5_post_update_list_multiblock' => '11.0.0',
     'ckeditor5_post_update_list_start_reversed' => '11.0.0',
+    'ckeditor5_post_update_list_type' => '12.0.0',
+    'ckeditor5_post_update_list_type_again' => '12.0.0',
   ];
 }

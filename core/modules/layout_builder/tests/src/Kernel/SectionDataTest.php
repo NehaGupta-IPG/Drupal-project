@@ -7,13 +7,18 @@ namespace Drupal\Tests\layout_builder\Kernel;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\layout_builder\Plugin\DataType\SectionData;
 use Drupal\layout_builder\Section;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\layout_builder\Plugin\DataType\SectionData
- *
- * @group layout_builder
+ * Tests Drupal\layout_builder\Plugin\DataType\SectionData.
  */
+#[CoversClass(SectionData::class)]
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class SectionDataTest extends KernelTestBase {
 
   /**
@@ -22,7 +27,9 @@ class SectionDataTest extends KernelTestBase {
   protected static $modules = ['layout_builder'];
 
   /**
-   * @covers ::setValue
+   * Tests set array value.
+   *
+   * @legacy-covers ::setValue
    */
   public function testSetArrayValue(): void {
     $definition = DataDefinition::create('layout_section');
@@ -33,7 +40,7 @@ class SectionDataTest extends KernelTestBase {
     $data->setValue([]);
     $this->assertInstanceOf(Section::class, $data->getValue());
     // Anything else should raise an exception.
-    $this->expectExceptionMessage('Value assigned to "test_section" is not a valid section');
+    $this->expectExceptionMessageIs('Value assigned to "test_section" is not a valid section');
     $data->setValue('[]');
   }
 
