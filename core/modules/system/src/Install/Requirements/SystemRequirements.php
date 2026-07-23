@@ -46,6 +46,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     'history' => 'History',
     'migrate_drupal_ui' => 'Migrate Drupal UI',
     'migrate_drupal' => 'Migrate Drupal',
+    'pgsql' => 'PostgreSQL',
     'quickedit' => 'Quick Edit',
     'rdf' => 'RDF',
     'statistics' => 'Statistics',

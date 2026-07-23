@@ -9,6 +9,8 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\pgsql\EntityStorage\JsonStorageLayoutConverter;
 use Drupal\Core\Language\Language;
@@ -183,10 +185,71 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
     // provider module so the requirements check passes, mirroring a real site
     // that uses the driver.
     $connection = Database::getConnection();
+    $this->uninstallModulesMissingFromTheFileSystem($connection);
     $provider = $connection->getProvider();
     if ($provider !== 'core') {
       $this->installDatabaseDriverProviderModule($connection, $provider);
     }
+  }
+
+  /**
+   * Uninstalls fixture modules that are absent from the file system.
+   *
+   * The fixtures were dumped from a site running an older version of Drupal,
+   * so they can list modules that core no longer ships. The core "pgsql"
+   * module is one: every site installed it, but the driver now lives in a
+   * contributed project that a core test run does not have. update.php stops
+   * with a "Missing or invalid module" error while core.extension names a
+   * module that is not on the file system, so drop those modules from the
+   * loaded fixture first.
+   *
+   * A module the test runner does need — the provider of its database driver —
+   * is added back by ::installDatabaseDriverProviderModule().
+   *
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
+   */
+  protected function uninstallModulesMissingFromTheFileSystem(Connection $connection): void {
+    $serialized = $connection->select('config', 'c')
+      ->fields('c', ['data'])
+      ->condition('collection', '')
+      ->condition('name', 'core.extension')
+      ->execute()
+      ->fetchField();
+    if ($serialized === FALSE) {
+      return;
+    }
+    $extension = unserialize($serialized);
+
+    // Scan for profiles first, so that the modules a profile provides are
+    // discovered as well. Test modules are included because fixtures install
+    // them. @see \Drupal\Core\DrupalKernel::setExtensionData()
+    $listing = new ExtensionDiscovery($this->root);
+    $listing->setProfileDirectories([]);
+    $profiles = array_intersect_key($listing->scan('profile', TRUE), $extension['module']);
+    $listing->setProfileDirectories(array_map(
+      fn (Extension $profile) => $profile->getPath(),
+      $profiles
+    ));
+    $available = $profiles + $listing->scan('module', TRUE);
+
+    $missing = array_diff_key($extension['module'], $available);
+    if (!$missing) {
+      return;
+    }
+    $extension['module'] = array_diff_key($extension['module'], $missing);
+    $connection->update('config')
+      ->fields(['data' => serialize($extension)])
+      ->condition('collection', '')
+      ->condition('name', 'core.extension')
+      ->execute();
+
+    // Drop the installed schema versions too, otherwise update.php warns that
+    // the modules still have an entry in the system.schema key/value storage.
+    $connection->delete('key_value')
+      ->condition('collection', 'system.schema')
+      ->condition('name', array_keys($missing), 'IN')
+      ->execute();
   }
 
   /**
