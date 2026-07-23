@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\media\Kernel;
 
 use Drupal\entity_test\Entity\EntityTestBundle;
+use Drupal\entity_test\Entity\EntityTestWithBundle;
+use Drupal\file\Entity\File;
+use Drupal\media\Entity\Media;
 use Drupal\media\Plugin\Field\FieldFormatter\MediaThumbnailFormatter;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -21,6 +25,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class MediaThumbnailFormatterTest extends MediaKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
+  use UserCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -55,6 +60,8 @@ class MediaThumbnailFormatterTest extends MediaKernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->user->addRole($this->createRole(['view media']));
+    $this->user->save();
     $this->installEntitySchema('entity_test_with_bundle');
     // Create an entity bundle that has a media reference field.
     $entity_test_bundle = EntityTestBundle::create([
@@ -129,6 +136,52 @@ class MediaThumbnailFormatterTest extends MediaKernelTestBase {
         ],
       ],
     ];
+  }
+
+  /**
+   * Tests that stale source field alt text is not rendered.
+   *
+   * Media::hasSourceFieldChanged() compares only the source field's main
+   * property (the referenced file's target ID), so updating just the alt
+   * text on an existing source field value does not trigger a thumbnail
+   * update. The formatter must therefore fall back to the source field
+   * itself rather than the (potentially stale) thumbnail field.
+   */
+  public function testViewElementsReflectsUpdatedSourceFieldAltText(): void {
+    /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display  */
+    $display = \Drupal::service('entity_display.repository')->getViewDisplay($this->testEntityTypeId, $this->testEntityBundleId);
+    $display->setComponent($this->mediaFieldName, ['type' => 'media_thumbnail']);
+
+    $media_type = $this->createMediaType('image');
+    $source_field_name = $media_type->getSource()->getConfiguration()['source_field'];
+
+    $file = File::create(['uri' => 'public://original.jpg']);
+    $file->setPermanent();
+    $file->save();
+
+    $media = Media::create([
+      'bundle' => $media_type->id(),
+      'name' => 'Test media',
+      $source_field_name => [
+        'target_id' => $file->id(),
+        'alt' => 'Original alt text',
+      ],
+    ]);
+    $media->save();
+
+    $host = EntityTestWithBundle::create([
+      'type' => $this->testEntityBundleId,
+      $this->mediaFieldName => ['target_id' => $media->id()],
+    ]);
+    $host->save();
+
+    // Update only the alt text on the source field; the referenced file
+    // itself is unchanged.
+    $media->get($source_field_name)->alt = 'Updated alt text';
+    $media->save();
+
+    $build = $display->build($host);
+    $this->assertSame('Updated alt text', $build[$this->mediaFieldName][0]['#item']->alt);
   }
 
 }
