@@ -194,34 +194,12 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    *   by route name for routes with the same fit.
    */
   public function getRouteCollectionForRequest(Request $request) {
-    // Cache both the system path as well as route parameters and matching
-    // routes.
-    $cid = $this->getRouteCollectionCacheId($request);
-    if ($cached = $this->cache->get($cid)) {
-      $this->currentPath->setPath($cached->data['path'], $request);
-      $request->query->replace($cached->data['query']);
-      if ($cached->data['routes'] === FALSE) {
-        return new RouteCollection();
-      }
-      return $cached->data['routes'];
-    }
-    else {
-      // Just trim on the right side.
-      $path = $request->getPathInfo();
-      $path = $path === '/' ? $path : rtrim($request->getPathInfo(), '/');
-      $path = $this->pathProcessor->processInbound($path, $request);
-      $this->currentPath->setPath($path, $request);
-      // Incoming path processors may also set query parameters.
-      $query_parameters = $request->query->all();
-      $routes = $this->getRoutesByPath(rtrim($path, '/'));
-      $cache_value = [
-        'path' => $path,
-        'query' => $query_parameters,
-        'routes' => $routes->count() === 0 ? FALSE : $routes,
-      ];
-      $this->cache->set($cid, $cache_value, CacheBackendInterface::CACHE_PERMANENT, ['route_match']);
-      return $routes;
-    }
+    // Just trim on the right side.
+    $path = $request->getPathInfo();
+    $path = $path === '/' ? $path : rtrim($request->getPathInfo(), '/');
+    $path = $this->pathProcessor->processInbound($path, $request);
+    $this->currentPath->setPath($path, $request);
+    return $this->getRoutesByPath(rtrim($path, '/'));
   }
 
   /**
