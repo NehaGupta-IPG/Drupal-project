@@ -95,12 +95,7 @@ class DrupalApplication extends Application {
       // Discovery can get out of whack if cleared caches and try to run this
       // command without a web request priming discovery.
       chdir(\DRUPAL_ROOT);
-      // We need to not load a cached copy of the container from disk. For
-      // example, inside Kernel tests, we need to fully build the container so
-      // we discover and register commands, instead of reusing the container
-      // from the Kernel test itself. Therefore, we pass `FALSE` for the
-      // `$allow_dumping` parameter here.
-      $kernel = new DrupalKernel('prod', $this->classloader, FALSE);
+      $kernel = new DrupalKernel($this->context['kernel.environment'] ?? 'prod', $this->classloader, $this->context['kernel.allow_dumping'] ?? TRUE);
       // We tried calling `DrupalKernel::bootEnvironment()` right here to setup
       // some common environment and PHP initialization steps. However, that
       // method also calls `set_error_handler('_drupal_error_handler')` which
@@ -113,7 +108,7 @@ class DrupalApplication extends Application {
       // @see https://www.drupal.org/node/2690035
       // Define the DRUPAL_TEST_IN_CHILD_SITE based on if we're inside a test.
       DrupalKernel::setupDrupalTestInChildSite($kernel->getAppRoot());
-      $sitePath = DrupalKernel::findSitePath($request, TRUE);
+      $sitePath = getenv('DRUPAL_DEV_SITE_PATH') ?: DrupalKernel::findSitePath($request, TRUE);
       $kernel->setSitePath($sitePath);
       Settings::initialize($kernel->getAppRoot(), $kernel->getSitePath(), $this->classloader);
       $kernel->boot();
