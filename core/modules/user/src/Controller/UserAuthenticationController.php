@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Controller;
 
+use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -21,10 +22,6 @@ use Symfony\Component\Serializer\Serializer;
 
 /**
  * Provides controllers for login, login status and logout via HTTP requests.
- *
- * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
- * \Drupal\rest\Controller\RestAuthenticationController instead.
- * @see https://www.drupal.org/node/3552724
  */
 class UserAuthenticationController extends ControllerBase implements ContainerInjectionInterface {
 
@@ -119,7 +116,6 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    *   A logger instance.
    */
   public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\rest\Controller\RestAuthenticationController instead. See https://www.drupal.org/node/3552724', E_USER_DEPRECATED);
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
     $this->csrfToken = $csrf_token;
@@ -204,7 +200,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
         if ($account->get('name')->access('view', $account)) {
           $response_data['current_user']['name'] = $account->getAccountName();
         }
-        $response_data['csrf_token'] = $this->csrfToken->get('rest');
+        $response_data['csrf_token'] = $this->csrfToken->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY);
 
         $logout_route = $this->routeProvider->getRouteByName('user.logout.http');
         // Trim '/' off path to match \Drupal\Core\Access\CsrfAccessCheck.
