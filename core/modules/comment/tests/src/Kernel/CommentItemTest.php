@@ -141,7 +141,7 @@ class CommentItemTest extends FieldKernelTestBase {
     // Set original values on a cloned list for comparison.
     $original_list = clone $field;
     $original_list->setValue([
-      'status' => CommentItemInterface::OPEN,
+      'status' => CommentingStatus::Open,
       'cid' => 99,
       'last_comment_timestamp' => 1766149999,
       'last_comment_name' => 'FooBar',
@@ -151,7 +151,7 @@ class CommentItemTest extends FieldKernelTestBase {
 
     // Same status, different other fields → not affecting.
     $field->setValue([
-      'status' => CommentItemInterface::OPEN,
+      'status' => CommentingStatus::Open,
       'cid' => 0,
       'last_comment_timestamp' => 1766146139,
       'last_comment_name' => NULL,
@@ -162,7 +162,7 @@ class CommentItemTest extends FieldKernelTestBase {
 
     // Different status → affecting.
     $field->setValue([
-      'status' => CommentItemInterface::CLOSED,
+      'status' => CommentingStatus::Closed,
       'cid' => 0,
       'last_comment_timestamp' => 1766146139,
       'last_comment_name' => NULL,
