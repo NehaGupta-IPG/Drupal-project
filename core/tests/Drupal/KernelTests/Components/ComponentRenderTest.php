@@ -498,7 +498,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
       ],
     ];
     $this->expectException(InvalidComponentDataException::class);
-    $this->expectExceptionMessageIs('Unable to render component "sdc_test:my-banner". A render array or a scalar is expected for the slot "banner_body" when using the render element with the "#slots" property');
+    $this->expectExceptionMessageIs('Unable to render component "sdc_test:my-banner". A scalar, render array, markup, or RenderableInterface is expected for the slot "banner_body" when using the render element with the "#slots" property');
     $this->renderComponentRenderArray($build);
   }
 
