@@ -143,7 +143,7 @@ class FieldBlockDeriver extends DeriverBase implements ContainerDeriverInterface
           $derivative['_block_ui_hidden'] = !$field_definition->isDisplayConfigurable('view');
 
           $context_definition = EntityContextDefinition::fromEntityTypeId($entity_type_id)->setLabel($entity_type_labels[$entity_type_id]);
-          $context_definition->addConstraint('Bundle', [$bundle]);
+          $context_definition->addConstraint('Bundle', ['bundle' => [$bundle]]);
           $derivative['context_definitions'] = [
             'entity' => $context_definition,
             'view_mode' => new ContextDefinition('string'),
@@ -167,12 +167,6 @@ class FieldBlockDeriver extends DeriverBase implements ContainerDeriverInterface
    */
   protected function getFieldMap(): array {
     $field_map = $this->entityFieldManager->getFieldMap();
-
-    // If all fields are exposed as field blocks, just return the field map
-    // without any further processing.
-    if ($this->moduleHandler->moduleExists('layout_builder_expose_all_field_blocks')) {
-      return $field_map;
-    }
 
     // Load all entity view displays which are using Layout Builder.
     /** @var \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface[] $displays */

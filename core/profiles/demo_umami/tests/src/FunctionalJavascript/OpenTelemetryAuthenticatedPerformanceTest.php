@@ -42,6 +42,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
   protected function doTestFrontPageAuthenticatedWarmCache(): void {
     $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
+    sleep(2);
+    $this->drupalGet('<front>');
+    sleep(2);
     $this->drupalGet('<front>');
     sleep(2);
     $this->drupalGet('<front>');
@@ -66,18 +69,18 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
         'config' => 12,
         'bootstrap' => 7,
         'discovery' => 5,
-        'data' => 5,
+        'data' => 4,
         'dynamic_page_cache' => 2,
-        'menu' => 1,
         'render' => 2,
+        'routes' => 2,
       ],
       'CacheSetCount' => 0,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 5,
-      'ScriptCount' => 1,
+      'CacheTagLookupQueryCount' => 4,
+      'ScriptCount' => 3,
       'ScriptBytes' => 13150,
-      'StylesheetCount' => 2,
+      'StylesheetCount' => 6,
       'StylesheetBytes' => 39163,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -101,7 +104,6 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'access site reports',
       'administer users',
       'access navigation',
-      'administer shortcuts',
       'administer media',
       'access files overview',
       'administer blocks',
@@ -128,27 +130,29 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 331,
-      'CacheGetCount' => 349,
+      'QueryCount' => 264,
+      'CacheGetCount' => 264,
       'CacheGetCountByBin' => [
-        'config' => 91,
-        'bootstrap' => 16,
-        'discovery' => 108,
-        'data' => 23,
-        'entity' => 25,
+        'config' => 60,
+        'bootstrap' => 15,
+        'discovery' => 75,
+        'data' => 14,
+        'entity' => 24,
         'dynamic_page_cache' => 1,
-        'default' => 22,
-        'render' => 39,
-        'menu' => 24,
+        'default' => 20,
+        'routes' => 18,
+        'render' => 14,
+        'file_parsing' => 1,
+        'menu' => 22,
       ],
-      'CacheSetCount' => 341,
+      'CacheSetCount' => 266,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 30,
-      'ScriptCount' => 5,
-      'ScriptBytes' => 198900,
-      'StylesheetCount' => 8,
-      'StylesheetBytes' => 78297,
+      'CacheTagLookupQueryCount' => 29,
+      'ScriptCount' => 10,
+      'ScriptBytes' => 200400,
+      'StylesheetCount' => 11,
+      'StylesheetBytes' => 79412,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

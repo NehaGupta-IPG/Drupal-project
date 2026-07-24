@@ -178,6 +178,26 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
+   * Tests that set pathname survives reset.
+   *
+   * @legacy-covers ::setPathname
+   * @legacy-covers ::getPathname
+   * @legacy-covers ::reset
+   */
+  public function testSetPathnameSurvivesReset(): void {
+    $test_extension_list = $this->setupTestExtensionList();
+
+    $pathname = 'vfs://drupal_root/example2/test_name/test_name.info.yml';
+    $test_extension_list->setPathname('test_name', $pathname);
+    $this->assertSame($pathname, $test_extension_list->getPathname('test_name'));
+
+    $test_extension_list->reset();
+
+    $this->assertSame($pathname, $test_extension_list->getPathname('test_name'));
+    $this->assertSame('vfs://drupal_root/example2/test_name', $test_extension_list->getPath('test_name'));
+  }
+
+  /**
    * Tests get path.
    */
   public function testGetPath(): void {
@@ -219,7 +239,7 @@ class ExtensionListTest extends UnitTestCase {
    * Tests check incompatibility.
    */
   #[DataProvider('providerCheckIncompatibility')]
-  public function testCheckIncompatibility($additional_settings, $expected): void {
+  public function testCheckIncompatibility(array $additional_settings, bool $expected): void {
     $test_extension_list = $this->setupTestExtensionList(['test_name'], $additional_settings);
     $this->assertSame($expected, $test_extension_list->checkIncompatibility('test_name'));
   }

@@ -72,7 +72,7 @@ class SectionTest extends UnitTestCase {
    */
   public function testGetComponentInvalidUuid(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Invalid UUID "invalid-uuid"');
+    $this->expectExceptionMessageIs('Invalid UUID "invalid-uuid"');
     $this->section->getComponent('invalid-uuid');
   }
 
@@ -140,7 +140,7 @@ class SectionTest extends UnitTestCase {
    */
   public function testInsertAfterComponentValidUuidRegionMismatch(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Invalid preceding UUID "existing-uuid"');
+    $this->expectExceptionMessageIs('Invalid preceding UUID "existing-uuid"');
     $this->section->insertAfterComponent('existing-uuid', new SectionComponent('new-uuid', 'ordered-region'));
   }
 
@@ -149,7 +149,7 @@ class SectionTest extends UnitTestCase {
    */
   public function testInsertAfterComponentInvalidUuid(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Invalid preceding UUID "invalid-uuid"');
+    $this->expectExceptionMessageIs('Invalid preceding UUID "invalid-uuid"');
     $this->section->insertAfterComponent('invalid-uuid', new SectionComponent('new-uuid', 'ordered-region'));
   }
 
@@ -191,7 +191,7 @@ class SectionTest extends UnitTestCase {
    */
   public function testInsertComponentInvalidDelta(): void {
     $this->expectException(\OutOfBoundsException::class);
-    $this->expectExceptionMessage('Invalid delta "7" for the "new-uuid" component');
+    $this->expectExceptionMessageIs('Invalid delta "7" for the "new-uuid" component');
     $this->section->insertComponent(7, new SectionComponent('new-uuid', 'ordered-region'));
   }
 
@@ -222,7 +222,7 @@ class SectionTest extends UnitTestCase {
   /**
    * Provides test data for ::testGetThirdPartySettings().
    */
-  public static function providerTestGetThirdPartySettings() {
+  public static function providerTestGetThirdPartySettings(): array {
     $data = [];
     $data[] = [
       'bad_judgement',
@@ -298,7 +298,7 @@ class SectionTest extends UnitTestCase {
   /**
    * Provides test data for ::testSetThirdPartySettings().
    */
-  public static function providerTestSetThirdPartySetting() {
+  public static function providerTestSetThirdPartySetting(): array {
     $data = [];
     $data[] = [
       'bad_judgement',
@@ -342,7 +342,7 @@ class SectionTest extends UnitTestCase {
   /**
    * Provides test data for ::testUnsetThirdPartySetting().
    */
-  public static function providerTestUnsetThirdPartySetting() {
+  public static function providerTestUnsetThirdPartySetting(): array {
     $data = [];
     $data['Key with values'] = [
       'bad_judgement',
@@ -411,7 +411,7 @@ class SectionTest extends UnitTestCase {
   /**
    * Provides test data for ::testGetLayout().
    */
-  public static function providerTestGetLayout() {
+  public static function providerTestGetLayout(): array {
     $data = [];
     $data['contexts'] = [['foo' => 'bar'], TRUE];
     $data['no contexts'] = [[], FALSE];
