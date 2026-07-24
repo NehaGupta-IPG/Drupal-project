@@ -63,24 +63,25 @@ class TermName extends Entity {
    * {@inheritdoc}
    */
   public function validateArgument($argument) {
-    if (!($argument === NULL || $argument === '')) {
-      if ($this->options['transform']) {
-        $argument = str_replace('-', ' ', $argument);
-        $this->argument->argument = $argument;
-      }
-      // If bundles is set then restrict the loaded terms to the given bundles.
-      if (!empty($this->options['bundles'])) {
-        $terms = $this->termStorage->loadByProperties(['name' => $argument, 'vid' => $this->options['bundles']]);
-      }
-      else {
-        $terms = $this->termStorage->loadByProperties(['name' => $argument]);
-      }
+    if (empty($argument)) {
+      return FALSE;
+    }
+    if ($this->options['transform']) {
+      $argument = str_replace('-', ' ', $argument);
+      $this->argument->argument = $argument;
+    }
+    // If bundles is set then restrict the loaded terms to the given bundles.
+    if (!empty($this->options['bundles'])) {
+      $terms = $this->termStorage->loadByProperties(['name' => $argument, 'vid' => $this->options['bundles']]);
+    }
+    else {
+      $terms = $this->termStorage->loadByProperties(['name' => $argument]);
+    }
 
-      // $terms are already bundle tested but we need to test access control.
-      foreach ($terms as $term) {
-        if ($this->validateEntity($term)) {
-          return TRUE;
-        }
+    // $terms are already bundle tested but we need to test access control.
+    foreach ($terms as $term) {
+      if ($this->validateEntity($term)) {
+        return TRUE;
       }
     }
 
