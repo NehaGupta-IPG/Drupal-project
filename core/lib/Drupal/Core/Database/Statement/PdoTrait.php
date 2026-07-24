@@ -235,7 +235,7 @@ trait PdoTrait {
   protected function clientFetchAll(?FetchAs $mode = NULL, int|string|null $columnOrClass = NULL, array|null $constructorArguments = NULL, FetchAs|null $additionalMode = NULL): array {
     return match ($mode) {
       FetchAs::Column => $this->getClientStatement()->fetchAll(
-        \PDO::FETCH_COLUMN,
+        $this->fetchAsToPdo($mode) | ($additionalMode ? $this->fetchAsToPdo($additionalMode) : 0),
         $columnOrClass ?? $this->fetchOptions['column'],
       ),
       FetchAs::ClassObject => $this->getClientStatement()->fetchAll(
