@@ -368,7 +368,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "9eb3b6d1261580d22a7234e7b9ccd7f801a9bbb5"
+                "reference": "4422a017fac0f04144329a6241108b4d1f6e9571"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -10236,10 +10236,10 @@
     },
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
+    "platform": {},
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.5.0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
