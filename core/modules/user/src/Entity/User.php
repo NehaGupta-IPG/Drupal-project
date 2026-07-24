@@ -560,14 +560,9 @@ class User extends ContentEntityBase implements UserInterface {
       ]);
     $fields['timezone']->getItemDefinition()->setClass(TimeZoneItem::class);
 
-    $fields['color_scheme'] = BaseFieldDefinition::create('list_string')
+    $fields['color_scheme'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Color scheme'))
       ->setDescription(t("The user's preferred color scheme for the interface."))
-      ->setSetting('allowed_values', [
-        'light' => t('Light'),
-        'dark' => t('Dark'),
-        'auto' => t('Auto'),
-      ])
       ->setDefaultValue('auto');
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
