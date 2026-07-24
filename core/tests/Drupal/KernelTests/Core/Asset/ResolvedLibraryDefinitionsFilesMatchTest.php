@@ -8,6 +8,7 @@ use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the asset files for all core libraries exist.
@@ -17,7 +18,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  * applied.
  */
 #[Group('Asset')]
-#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
 
   /**
@@ -66,7 +67,6 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   protected $allThemes = [
     'claro',
     'olivero',
-    'stable9',
     'stark',
   ];
 
@@ -100,6 +100,8 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
+
     // Install all core themes.
     sort($this->allThemes);
     $this->container->get('theme_installer')->install($this->allThemes);
@@ -116,7 +118,7 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   public function testCoreLibraryCompleteness(): void {
     // Enable all core modules.
     $all_modules = $this->container->get('extension.list.module')->getList();
-    $all_modules = array_filter($all_modules, function ($module) {
+    $all_modules = array_filter($all_modules, function ($module): bool {
       // Filter contrib, hidden, already enabled modules and modules in the
       // Testing package.
       if ($module->origin !== 'core'
@@ -124,7 +126,8 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
         || $module->status == TRUE
         || $module->info['package'] == 'Testing'
         || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::EXPERIMENTAL
-        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::OBSOLETE) {
         return FALSE;
       }
       return TRUE;
@@ -203,7 +206,7 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   /**
    * Checks that all the library files exist.
    *
-   * @param array[] $library_definitions
+   * @param array<\Drupal\Core\Extension\Extension> $library_definitions
    *   An array of library definitions, keyed by extension, then by library, and
    *   so on.
    */

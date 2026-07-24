@@ -4,7 +4,7 @@ namespace Drupal\comment\Controller;
 
 use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentManagerInterface;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\comment\CommentingStatus;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Controller\ControllerBase;
@@ -13,8 +13,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Url;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -233,7 +231,7 @@ class CommentController extends ControllerBase {
         // We make sure the field value isn't set so we don't end up with a
         // redirect loop.
         $entity = clone $entity;
-        $entity->{$field_name}->status = CommentItemInterface::HIDDEN;
+        $entity->{$field_name}->status = CommentingStatus::Hidden->value;
         // Render array of the entity full view mode.
         $build['commented_entity'] = $this->entityTypeManager()->getViewBuilder($entity->getEntityTypeId())->view($entity, 'full');
         unset($build['commented_entity']['#cache']);
@@ -297,8 +295,8 @@ class CommentController extends ControllerBase {
     $access = AccessResult::allowedIfHasPermission($account, 'post comments');
 
     // If commenting is open on the entity.
-    $status = $entity->{$field_name}->status;
-    $access = $access->andIf(AccessResult::allowedIf($status == CommentItemInterface::OPEN)
+    $status = CommentingStatus::tryFrom((int) $entity->{$field_name}->status);
+    $access = $access->andIf(AccessResult::allowedIf($status == CommentingStatus::Open)
       ->addCacheableDependency($entity))
       // And if user has access to the host entity.
       ->andIf(AccessResult::allowedIf($entity->access('view')));
@@ -317,48 +315,6 @@ class CommentController extends ControllerBase {
       }
     }
     return $access;
-  }
-
-  /**
-   * Returns a set of nodes' last read timestamps.
-   *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request of the page.
-   *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
-   *   The JSON response.
-   *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-   */
-  public function renderNewCommentsNodeLinks(Request $request) {
-    if ($this->currentUser()->isAnonymous()) {
-      throw new AccessDeniedHttpException();
-    }
-
-    if (!$request->request->has('node_ids') || !$request->request->has('field_name')) {
-      throw new NotFoundHttpException();
-    }
-    $nids = $request->request->all('node_ids');
-    $field_name = $request->request->get('field_name');
-
-    // Only handle up to 100 nodes.
-    $nids = array_slice($nids, 0, 100);
-
-    $links = [];
-    foreach ($nids as $nid) {
-      $node = $this->entityTypeManager()->getStorage('node')->load($nid);
-      $new = $this->commentManager->getCountNewComments($node);
-      $page_number = $this->entityTypeManager()->getStorage('comment')
-        ->getNewCommentPageNumber($node->{$field_name}->comment_count, $new, $node, $field_name);
-      $query = $page_number ? ['page' => $page_number] : NULL;
-      $links[$nid] = [
-        'new_comment_count' => (int) $new,
-        'first_new_comment_link' => Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['query' => $query, 'fragment' => 'new'])->toString(),
-      ];
-    }
-
-    return new JsonResponse($links);
   }
 
 }

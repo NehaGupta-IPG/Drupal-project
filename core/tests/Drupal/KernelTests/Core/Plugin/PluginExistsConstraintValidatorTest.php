@@ -7,19 +7,23 @@ namespace Drupal\KernelTests\Core\Plugin;
 use Drupal\Component\Plugin\FallbackPluginManagerInterface;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Action\ActionInterface;
+use Drupal\Core\Plugin\Plugin\Validation\Constraint\PluginExistsConstraint;
+use Drupal\Core\Plugin\Plugin\Validation\Constraint\PluginExistsConstraintValidator;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\MenuInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Plugin Exists Constraint Validator.
- *
- * @legacy-covers \Drupal\Core\Plugin\Plugin\Validation\Constraint\PluginExistsConstraint
- * @legacy-covers \Drupal\Core\Plugin\Plugin\Validation\Constraint\PluginExistsConstraintValidator
  */
 #[Group('Plugin')]
 #[Group('Validation')]
+#[CoversClass(PluginExistsConstraint::class)]
+#[CoversClass(PluginExistsConstraintValidator::class)]
+#[RunTestsInSeparateProcesses]
 class PluginExistsConstraintValidatorTest extends KernelTestBase {
 
   /**
@@ -32,7 +36,7 @@ class PluginExistsConstraintValidatorTest extends KernelTestBase {
    */
   public function testValidation(): void {
     $definition = DataDefinition::create('string')
-      ->addConstraint('PluginExists', 'plugin.manager.action');
+      ->addConstraint('PluginExists', ['manager' => 'plugin.manager.action']);
 
     // An existing action plugin should pass validation.
     $data = $this->container->get('typed_data_manager')->create($definition);

@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests translation files for multiple languages get imported during install.
  */
 #[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerTranslationMultipleLanguageTest extends InstallerTestBase {
 
   /**
@@ -30,8 +32,8 @@ class InstallerTranslationMultipleLanguageTest extends InstallerTestBase {
   protected function setUpLanguage(): void {
     // Place custom local translations in the translations directory.
     mkdir(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
-    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-8.0.0.de.po', $this->getPo('de'));
-    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-8.0.0.es.po', $this->getPo('es'));
+    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-' . \Drupal::VERSION . '.de.po', $this->getPo('de'));
+    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-' . \Drupal::VERSION . '.es.po', $this->getPo('es'));
 
     parent::setUpLanguage();
   }
@@ -68,7 +70,7 @@ PO;
   /**
    * {@inheritdoc}
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $params = parent::installParameters();
     $params['forms']['install_configure_form']['site_name'] = 'SITE_NAME_' . $this->langcode;
     return $params;

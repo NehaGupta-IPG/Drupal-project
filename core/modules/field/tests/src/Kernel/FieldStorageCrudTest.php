@@ -11,12 +11,14 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_test\FieldTestHelper;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests field storage create, read, update, and delete.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldStorageCrudTest extends FieldKernelTestBase {
 
   /**
@@ -145,7 +147,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
         'type' => 'test_field',
       ];
       FieldStorageConfig::create($field_storage_definition)->save();
-      $this->fail('Cannot create a field with a name containing an illegal character.');
+      $this->fail('Cannot create a field with a name containing an invalid character.');
     }
     catch (\Exception $e) {
       $this->assertInstanceOf(FieldException::class, $e);
@@ -421,7 +423,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
     $field_storage->save();
 
     $this->expectException(FieldException::class);
-    $this->expectExceptionMessage('Cannot change the field type for an existing field storage. The field storage entity_test.field_type has the type decimal.');
+    $this->expectExceptionMessageIs('Cannot change the field type for an existing field storage. The field storage entity_test.field_type has the type decimal.');
 
     $field_storage->set('type', 'foobar');
     $field_storage->save();
@@ -439,7 +441,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
     $field_storage->save();
 
     $this->expectException(FieldException::class);
-    $this->expectExceptionMessage('Cannot change the entity type for an existing field storage. The field storage foobar.field_type has the type entity_test.');
+    $this->expectExceptionMessageIs('Cannot change the entity type for an existing field storage. The field storage foobar.field_type has the type entity_test.');
 
     $field_storage->set('entity_type', 'foobar');
     $field_storage->save();

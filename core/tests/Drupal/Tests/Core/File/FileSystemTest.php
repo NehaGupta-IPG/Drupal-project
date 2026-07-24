@@ -13,6 +13,8 @@ use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\File\FileSystem.
@@ -35,10 +37,8 @@ class FileSystemTest extends UnitTestCase {
 
   /**
    * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $streamWrapperManager;
+  protected StreamWrapperManagerInterface&Stub $streamWrapperManager;
 
   /**
    * {@inheritdoc}
@@ -47,14 +47,12 @@ class FileSystemTest extends UnitTestCase {
     parent::setUp();
 
     $settings = new Settings([]);
-    $this->streamWrapperManager = $this->createMock(StreamWrapperManagerInterface::class);
+    $this->streamWrapperManager = $this->createStub(StreamWrapperManagerInterface::class);
     $this->fileSystem = new FileSystem($this->streamWrapperManager, $settings);
   }
 
   /**
    * Tests chmod file.
-   *
-   * @legacy-covers ::chmod
    */
   public function testChmodFile(): void {
     vfsStream::setup('dir');
@@ -69,8 +67,6 @@ class FileSystemTest extends UnitTestCase {
 
   /**
    * Tests chmod dir.
-   *
-   * @legacy-covers ::chmod
    */
   public function testChmodDir(): void {
     vfsStream::setup('dir');
@@ -85,8 +81,6 @@ class FileSystemTest extends UnitTestCase {
 
   /**
    * Tests chmod unsuccessful.
-   *
-   * @legacy-covers ::chmod
    */
   public function testChmodUnsuccessful(): void {
     vfsStream::setup('dir');
@@ -95,10 +89,11 @@ class FileSystemTest extends UnitTestCase {
 
   /**
    * Tests unlink.
-   *
-   * @legacy-covers ::unlink
    */
   public function testUnlink(): void {
+    $this->streamWrapperManager = $this->createMock(StreamWrapperManagerInterface::class);
+    $this->fileSystem = new FileSystem($this->streamWrapperManager, new Settings([]));
+
     vfsStream::setup('dir');
     vfsStream::create(['test.txt' => 'asdf']);
     $uri = 'vfs://dir/test.txt';
@@ -114,15 +109,15 @@ class FileSystemTest extends UnitTestCase {
 
   /**
    * Tests basename.
-   *
-   * @legacy-covers ::basename
    */
+  #[IgnoreDeprecations]
   #[DataProvider('providerTestBasename')]
   public function testBasename($uri, $expected, $suffix = NULL): void {
+    $this->expectUserDeprecationMessage("Calling FileSystem::basename() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use PHP native basename() instead. See https://www.drupal.org/node/3530869");
     $this->assertSame($expected, $this->fileSystem->basename($uri, $suffix));
   }
 
-  public static function providerTestBasename() {
+  public static function providerTestBasename(): array {
     $data = [];
     $data[] = [
       'public://nested/dir',
@@ -168,7 +163,7 @@ class FileSystemTest extends UnitTestCase {
     // cspell:disable-next-line
     $filename = "a\xFFsdf\x80€" . '.txt';
     $this->expectException(FileException::class);
-    $this->expectExceptionMessage("Invalid filename '$filename'");
+    $this->expectExceptionMessageIs("Invalid filename '$filename'");
     $this->fileSystem->createFilename($filename, 'vfs://dir');
   }
 

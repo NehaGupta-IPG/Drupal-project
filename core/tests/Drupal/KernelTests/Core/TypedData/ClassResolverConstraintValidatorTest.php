@@ -6,15 +6,19 @@ namespace Drupal\KernelTests\Core\TypedData;
 
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
+use Drupal\Core\Validation\Plugin\Validation\Constraint\ClassResolverConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ClassResolver validation constraint with both valid and invalid values.
- *
- * @legacy-covers \Drupal\Core\Validation\Plugin\Validation\Constraint\ClassResolverConstraintValidator
  */
 #[Group('Validation')]
+#[CoversClass(ClassResolverConstraintValidator::class)]
+#[RunTestsInSeparateProcesses]
 class ClassResolverConstraintValidatorTest extends KernelTestBase {
 
   /**
@@ -93,8 +97,9 @@ class ClassResolverConstraintValidatorTest extends KernelTestBase {
   }
 
   /**
-   * @dataProvider provideServiceValidationCases
+   * Tests validation for service.
    */
+  #[DataProvider('provideServiceValidationCases')]
   public function testValidationForService(string $method, int $expected_violations, string $message, ?string $expected_violation_message = NULL): void {
     $definition = DataDefinition::create('integer')
       ->addConstraint('ClassResolver', ['classOrService' => 'test.service', 'method' => $method]);
@@ -118,7 +123,7 @@ class ClassResolverConstraintValidatorTest extends KernelTestBase {
     $typed_data = $this->typedDataManager->create($definition, 1);
 
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('The method "missingMethod" does not exist on the service "test.service".');
+    $this->expectExceptionMessageIs('The method "missingMethod" does not exist on the service "test.service".');
     $typed_data->validate();
   }
 
@@ -133,7 +138,7 @@ class ClassResolverConstraintValidatorTest extends KernelTestBase {
       ->addConstraint('ClassResolver', ['classOrService' => '\Drupal\NonExisting\Class', 'method' => 'boo']);
     $typed_data = $this->typedDataManager->create($definition, 1);
 
-    $this->expectExceptionMessage('Class "\Drupal\NonExisting\Class" does not exist.');
+    $this->expectExceptionMessageIs('Class "\Drupal\NonExisting\Class" does not exist.');
     $typed_data->validate();
   }
 

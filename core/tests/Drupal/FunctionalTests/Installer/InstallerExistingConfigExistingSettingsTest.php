@@ -6,11 +6,13 @@ namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Database\Database;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies that installing from existing configuration works.
  */
 #[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerExistingConfigExistingSettingsTest extends InstallerExistingConfigTest {
 
   /**
@@ -37,6 +39,15 @@ class InstallerExistingConfigExistingSettingsTest extends InstallerExistingConfi
       'value' => $connection_info,
       'required' => TRUE,
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpLanguage(): void {
+    // This step is skipped, because we are installing from the configuration of
+    // a site that was originally installed in French. The installer will detect
+    // that, based on the language set in the `system.site` config.
   }
 
 }

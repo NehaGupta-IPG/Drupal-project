@@ -9,12 +9,15 @@ use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
+use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests access controlled node views have the right amount of comment pages.
  */
 #[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeAccessPagerTest extends BrowserTestBase {
 
   use CommentTestTrait;
@@ -42,7 +45,7 @@ class NodeAccessPagerTest extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
     $this->addDefaultCommentField('node', 'page');
     $this->webUser = $this->drupalCreateUser([

@@ -6,17 +6,14 @@ namespace Drupal\KernelTests\Core\TempStore;
 
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the PrivateTempStore for anonymous users.
  */
 #[Group('TempStore')]
+#[RunTestsInSeparateProcesses]
 class AnonymousPrivateTempStoreTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * The private temp store.

@@ -9,11 +9,13 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldConfigInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of numeric fields.
  */
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class NumberFieldTest extends BrowserTestBase {
 
   /**
@@ -440,7 +442,7 @@ class NumberFieldTest extends BrowserTestBase {
    *
    * @internal
    */
-  public function assertSetMinimumValue(FieldConfigInterface $field, $minimum_value): void {
+  public function assertSetMinimumValue(FieldConfigInterface $field, string|int|float|bool $minimum_value): void {
     $field_configuration_url = 'entity_test/structure/entity_test/fields/entity_test.entity_test.' . $field->getName();
 
     // Set the minimum value.

@@ -13,6 +13,7 @@ use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests reverting a revision with revision revert form.
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(RevisionRevertForm::class)]
 #[Group('Entity')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class RevisionRevertFormTest extends BrowserTestBase {
 
   /**
@@ -190,8 +192,6 @@ class RevisionRevertFormTest extends BrowserTestBase {
    *   Expected messenger message.
    * @param string $expectedDestination
    *   Expected destination after deletion.
-   *
-   * @legacy-covers ::submitForm
    */
   #[DataProvider('providerSubmitForm')]
   public function testSubmitForm(array $permissions, string $entityTypeId, string $entityLabel, array $expectedLog, string $expectedMessage, string $expectedDestination): void {
@@ -304,8 +304,6 @@ class RevisionRevertFormTest extends BrowserTestBase {
 
   /**
    * Tests the revert process.
-   *
-   * @legacy-covers ::prepareRevision
    */
   protected function testPrepareRevision(): void {
     $user = $this->createUser();

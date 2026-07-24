@@ -6,11 +6,13 @@ namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests building and processing of core form elements.
  */
 #[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class ElementTest extends BrowserTestBase {
 
   /**
@@ -31,6 +33,7 @@ class ElementTest extends BrowserTestBase {
     $this->testOptions();
     $this->testRadiosChecked();
     $this->testWrapperIds();
+    $this->testChildAttributes();
     $this->testButtonClasses();
     $this->testSubmitButtonAttribute();
     $this->testGroupElements();
@@ -137,6 +140,17 @@ class ElementTest extends BrowserTestBase {
   }
 
   /**
+   * Tests checkboxes and radios child element attributes.
+   */
+  protected function testChildAttributes(): void {
+    $this->drupalGet('form-test/checkboxes-radios');
+
+    // Verify that the child elements don't have aria-describedby attributes.
+    $this->assertSession()->elementsCount('xpath', "//input[@type='checkbox' and @aria-describedby]", 0);
+    $this->assertSession()->elementsCount('xpath', "//input[@type='radio' and @aria-describedby]", 0);
+  }
+
+  /**
    * Tests button classes.
    */
   protected function testButtonClasses(): void {
@@ -193,7 +207,7 @@ class ElementTest extends BrowserTestBase {
   }
 
   /**
-   * Tests a form with an autocomplete setting..
+   * Tests a form with an autocomplete setting.
    */
   protected function testFormAutocomplete(): void {
     $this->drupalGet('form-test/autocomplete');

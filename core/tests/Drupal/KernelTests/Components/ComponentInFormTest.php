@@ -8,18 +8,19 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the correct rendering of components in form.
  */
 #[Group('sdc')]
+#[RunTestsInSeparateProcesses]
 class ComponentInFormTest extends ComponentKernelTestBase implements FormInterface {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'sdc_test',
   ];
 

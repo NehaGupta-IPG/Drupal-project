@@ -6,11 +6,13 @@ namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Serialization\Yaml;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests distribution profile support.
  */
 #[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class SingleVisibleProfileTest extends InstallerTestBase {
 
   /**
@@ -45,13 +47,6 @@ class SingleVisibleProfileTest extends InstallerTestBase {
       mkdir($path, 0777, TRUE);
       file_put_contents("$path/$profile.info.yml", Yaml::encode($info));
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUpProfile(): void {
-    // This step is skipped, because there is only one visible profile.
   }
 
   /**

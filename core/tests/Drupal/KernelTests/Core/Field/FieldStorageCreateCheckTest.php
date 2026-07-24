@@ -7,11 +7,13 @@ namespace Drupal\KernelTests\Core\Field;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the field storage create check subscriber.
  */
 #[Group('Field')]
+#[RunTestsInSeparateProcesses]
 class FieldStorageCreateCheckTest extends KernelTestBase {
 
   /**
@@ -26,7 +28,7 @@ class FieldStorageCreateCheckTest extends KernelTestBase {
    */
   public function testFieldStorageCreateCheck(): void {
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Creating the "entity_test.field_test" field storage definition without the entity schema "entity_test" being installed is not allowed.');
+    $this->expectExceptionMessageIs('Creating the "entity_test.field_test" field storage definition without the entity schema "entity_test" being installed is not allowed.');
 
     FieldStorageConfig::create([
       'field_name' => 'field_test',

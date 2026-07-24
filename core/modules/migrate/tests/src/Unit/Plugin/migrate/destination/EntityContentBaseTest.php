@@ -25,8 +25,6 @@ class EntityContentBaseTest extends EntityTestBase {
 
   /**
    * Tests basic entity save.
-   *
-   * @legacy-covers ::import
    */
   public function testImport(): void {
     $bundles = [];
@@ -60,8 +58,6 @@ class EntityContentBaseTest extends EntityTestBase {
 
   /**
    * Tests row skipping when we can't get an entity to save.
-   *
-   * @legacy-covers ::import
    */
   public function testImportEntityLoadFailure(): void {
     $bundles = [];
@@ -76,7 +72,7 @@ class EntityContentBaseTest extends EntityTestBase {
     );
     $destination->setEntity(FALSE);
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('Unable to get entity');
+    $this->expectExceptionMessageIs('Unable to get entity');
     $destination->import(new Row());
   }
 
@@ -103,7 +99,7 @@ class EntityContentBaseTest extends EntityTestBase {
       $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal(),
     );
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('The "foo" entity type does not support translations.');
+    $this->expectExceptionMessageIs('The "foo" entity type does not support translations.');
     $destination->getIds();
   }
 
@@ -140,7 +136,7 @@ class EntityTestDestination extends EntityContentBase {
   /**
    * Gets the test entity ID.
    */
-  public static function getEntityTypeId($plugin_id) {
+  public static function getEntityTypeId($plugin_id): string {
     return 'foo';
   }
 

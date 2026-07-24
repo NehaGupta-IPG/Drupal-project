@@ -4,19 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_translation\Functional;
 
+use Drupal\content_translation\Hook\ContentTranslationFormLanguageHooks;
 use Drupal\language\Form\ContentLanguageSettingsForm;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test enabling content translation module.
  */
 #[Group('content_translation')]
+#[Group('#slow')]
 #[CoversClass(ContentLanguageSettingsForm::class)]
-#[CoversFunction('_content_translation_form_language_content_settings_form_alter')]
+#[CoversClass(ContentTranslationFormLanguageHooks::class)]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationEnableTest extends BrowserTestBase {
 
   /**

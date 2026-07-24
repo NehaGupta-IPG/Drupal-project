@@ -7,7 +7,9 @@ namespace Drupal\Tests\views\Functional\Plugin;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests pluggable access for views.
@@ -16,6 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
  *   and the two generic ones.
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AccessTest extends ViewTestBase {
 
   /**
@@ -135,7 +138,7 @@ class AccessTest extends ViewTestBase {
 
     // Enable node access test module to ensure that table is present again.
     \Drupal::service('module_installer')->install(['node_access_test']);
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
     $view = Views::getView('test_content_access_filter');
     $view->setDisplay('page_1');

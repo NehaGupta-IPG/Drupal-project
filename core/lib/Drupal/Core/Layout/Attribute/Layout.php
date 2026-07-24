@@ -100,6 +100,9 @@ class Layout extends Plugin {
     // @see \Drupal\Core\Layout\LayoutDefinition::$additional
     // @see \Drupal\Core\Layout\LayoutDefinition::get()
     $this->additional = $additional;
+    if ($this->label === NULL && $this->deriver === NULL) {
+      throw new \InvalidArgumentException(sprintf('The "%s" layout plugin must have at least one of the label or deriver properties.', $this->id));
+    }
   }
 
   /**

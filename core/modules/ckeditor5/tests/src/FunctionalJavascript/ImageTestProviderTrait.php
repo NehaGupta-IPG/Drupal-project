@@ -185,7 +185,7 @@ trait ImageTestProviderTrait {
   /**
    * Data provider for testAlignment().
    */
-  public static function providerAlignment() {
+  public static function providerAlignment(): array {
     return [
       'Block image' => ['block'],
       'Inline image' => ['inline'],
@@ -213,7 +213,7 @@ trait ImageTestProviderTrait {
     }
 
     // Add image to the host body.
-    $this->host->body->value = sprintf('<img data-foo="bar" alt="drupalimage test image" ' . $this->imageAttributesAsString() . ' width="%s" />', $width);
+    $this->host->body->value = sprintf('<img data-foo="bar" alt="drupalimage test image" width="%s" ' . $this->imageAttributesAsString() . ' />', $width);
     $this->host->save();
 
     $this->drupalGet($this->host->toUrl('edit-form'));

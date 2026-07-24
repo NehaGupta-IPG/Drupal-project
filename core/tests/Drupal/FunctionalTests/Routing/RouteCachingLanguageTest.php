@@ -13,11 +13,13 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that route lookup is cached by the current language.
  */
 #[Group('routing')]
+#[RunTestsInSeparateProcesses]
 class RouteCachingLanguageTest extends BrowserTestBase {
 
   use ContentTranslationTestTrait;
@@ -128,7 +130,7 @@ class RouteCachingLanguageTest extends BrowserTestBase {
    * Creates content with a link field pointing to an alias of another language.
    */
   #[DataProvider('providerLanguage')]
-  public function testLinkTranslationWithAlias($source_langcode): void {
+  public function testLinkTranslationWithAlias(string $source_langcode): void {
     $source_url_options = [
       'language' => ConfigurableLanguage::load($source_langcode),
     ];
@@ -191,7 +193,7 @@ class RouteCachingLanguageTest extends BrowserTestBase {
   /**
    * Data provider for testFromUri().
    */
-  public static function providerLanguage() {
+  public static function providerLanguage(): array {
     return [
       ['en'],
       ['fr'],

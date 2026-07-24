@@ -7,26 +7,23 @@ namespace Drupal\Tests\serialization\Kernel;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Test field level normalization process.
- *
- * @group serialization
  */
+#[Group('serialization')]
+#[RunTestsInSeparateProcesses]
 class FieldItemSerializationTest extends NormalizerTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'serialization',
-    'system',
-    'field',
     'entity_test',
-    'text',
-    'filter',
-    'user',
     'field_normalization_test',
   ];
 
@@ -150,7 +147,7 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    */
   public function testFieldDenormalizeWithScalarValue(): void {
     $this->expectException(UnexpectedValueException::class);
-    $this->expectExceptionMessage('Field values for "uuid" must use an array structure');
+    $this->expectExceptionMessageIs('Field values for "uuid" must use an array structure');
 
     $normalized = $this->serializer->normalize($this->entity, 'json');
 
@@ -167,10 +164,9 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    *   The test modules to install.
    * @param string $format
    *   The format to test. (NULL results in the format-agnostic normalization.)
-   *
-   * @dataProvider providerTestCustomBooleanNormalization
    */
-  public function testCustomBooleanNormalization(array $test_modules, $format): void {
+  #[DataProvider('providerTestCustomBooleanNormalization')]
+  public function testCustomBooleanNormalization(array $test_modules, ?string $format): void {
     // Asserts the entity contains the value we set.
     $this->assertFalse($this->entity->field_test_boolean->value);
 
@@ -179,7 +175,7 @@ class FieldItemSerializationTest extends NormalizerTestBase {
     $core_normalization = $this->container->get('serializer')->normalize($this->entity, $format);
     $this->assertFalse($core_normalization['field_test_boolean'][0]['value']);
 
-    $assert_denormalization = function (array $normalization) use ($format) {
+    $assert_denormalization = function (array $normalization) use ($format): void {
       $denormalized_entity = $this->container->get('serializer')->denormalize($normalization, EntityTestMulRev::class, $format, []);
       $this->assertInstanceOf(EntityTestMulRev::class, $denormalized_entity);
       $this->assertTrue($denormalized_entity->field_test_boolean->value);
@@ -217,7 +213,7 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    * @return array
    *   Test cases.
    */
-  public static function providerTestCustomBooleanNormalization() {
+  public static function providerTestCustomBooleanNormalization(): array {
     return [
       'Format-agnostic @FieldType-level normalizers SHOULD be able to affect the format-agnostic normalization' => [
         ['test_fieldtype_boolean_emoji_normalizer'],

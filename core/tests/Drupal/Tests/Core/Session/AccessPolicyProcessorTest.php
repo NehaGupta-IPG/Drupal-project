@@ -148,7 +148,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     $processor->addAccessPolicy(new AlwaysAddsAccessPolicy());
 
     $this->expectException(AccessPolicyScopeException::class);
-    $this->expectExceptionMessage(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', AlwaysAddsAccessPolicy::class, 'bar'));
+    $this->expectExceptionMessageIs(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', AlwaysAddsAccessPolicy::class, 'bar'));
     $processor->processAccessPolicies($this->prophesize(AccountInterface::class)->reveal(), 'bar');
   }
 
@@ -161,7 +161,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     $processor->addAccessPolicy(new AlwaysAddsAccessPolicy());
 
     $this->expectException(AccessPolicyScopeException::class);
-    $this->expectExceptionMessage(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', AlwaysAddsAccessPolicy::class, 'foo'));
+    $this->expectExceptionMessageIs(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', AlwaysAddsAccessPolicy::class, 'foo'));
     $processor->processAccessPolicies($this->prophesize(AccountInterface::class)->reveal(), 'foo');
   }
 
@@ -174,7 +174,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     $processor->addAccessPolicy(new AlwaysAltersAccessPolicy());
 
     $this->expectException(AccessPolicyScopeException::class);
-    $this->expectExceptionMessage(sprintf('The access policy "%s" altered permissions in a scope other than "%s".', AlwaysAltersAccessPolicy::class, 'foo'));
+    $this->expectExceptionMessageIs(sprintf('The access policy "%s" altered permissions in a scope other than "%s".', AlwaysAltersAccessPolicy::class, 'foo'));
     $processor->processAccessPolicies($this->prophesize(AccountInterface::class)->reveal(), 'foo');
   }
 
@@ -301,7 +301,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
    * @return array
    *   A list of testAccountSwitcher method arguments.
    */
-  public static function cachingProvider() {
+  public static function cachingProvider(): array {
     $cases = [
       'no-cache' => [FALSE, FALSE],
       'static-cache-hit' => [FALSE, TRUE],
@@ -375,11 +375,11 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     ?CacheBackendInterface $cache_static = NULL,
     ?AccountProxyInterface $current_user = NULL,
     ?AccountSwitcherInterface $account_switcher = NULL,
-  ) {
+  ): AccessPolicyProcessor {
     // Prophecy does not accept a willReturn call on a mocked method if said
     // method has a return type of void. However, without willReturn() or any
     // other will* call, the method mock will not be registered.
-    $prophecy_workaround = function () {};
+    $prophecy_workaround = function (): void {};
 
     if (!isset($variation_cache)) {
       $variation_cache = $this->prophesize(VariationCacheInterface::class);

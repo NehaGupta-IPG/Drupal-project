@@ -8,11 +8,13 @@ use Drupal\Core\Config\DatabaseStorage;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests DatabaseStorage operations.
  */
 #[Group('config')]
+#[RunTestsInSeparateProcesses]
 class DatabaseStorageTest extends ConfigStorageTestBase {
 
   /**
@@ -28,7 +30,7 @@ class DatabaseStorageTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function read($name) {
+  protected function read($name): array|object {
     $data = Database::getConnection()->select('config', 'c')->fields('c', ['data'])->condition('name', $name)->execute()->fetchField();
     return unserialize($data);
   }

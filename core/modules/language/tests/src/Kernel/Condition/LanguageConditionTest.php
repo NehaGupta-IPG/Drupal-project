@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Kernel\Condition;
 
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the language condition plugin.
- *
- * @group language
  */
+#[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguageConditionTest extends KernelTestBase {
 
   /**
@@ -20,13 +22,6 @@ class LanguageConditionTest extends KernelTestBase {
    * @var \Drupal\Core\Condition\ConditionManager
    */
   protected $manager;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
 
   /**
    * {@inheritdoc}

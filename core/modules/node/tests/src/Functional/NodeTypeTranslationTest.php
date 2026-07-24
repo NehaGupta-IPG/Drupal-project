@@ -8,6 +8,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures that node types translation work correctly.
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
  * ensures the asserts pass regardless of the Drupal version.
  */
 #[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTypeTranslationTest extends BrowserTestBase {
 
   use StringTranslationTrait;
@@ -91,14 +93,14 @@ class NodeTypeTranslationTest extends BrowserTestBase {
    *
    * @see https://www.drupal.org/node/2584603
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $parameters = parent::installParameters();
     $parameters['parameters']['langcode'] = $this->defaultLangcode;
     // Create an empty po file so we don't attempt to download one from
     // localize.drupal.org. It does not need to match the version exactly as the
     // multi-lingual system will fallback.
     \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/translations', NULL, TRUE);
-    file_put_contents($this->publicFilesDirectory . "/translations/drupal-8.0.0.{$this->defaultLangcode}.po", '');
+    file_put_contents($this->publicFilesDirectory . '/translations/drupal-' . \Drupal::VERSION . ".{$this->defaultLangcode}.po", '');
     return $parameters;
   }
 

@@ -7,12 +7,14 @@ namespace Drupal\FunctionalTests\Installer;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests the installer with an existing settings file.
  */
 #[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerExistingSettingsTest extends InstallerTestBase {
 
   /**
@@ -59,9 +61,9 @@ class InstallerExistingSettingsTest extends InstallerTestBase {
   /**
    * Visits the interactive installer.
    */
-  protected function visitInstaller(): void {
+  protected function visitInstaller(array $query = []): void {
     // Should redirect to the installer.
-    $this->drupalGet($GLOBALS['base_url']);
+    parent::visitInstaller();
     // Ensure no database tables have been created yet.
     $this->assertSame([], Database::getConnection()->schema()->findTables('%'));
     $this->assertSession()->addressEquals($GLOBALS['base_url'] . '/core/install.php');

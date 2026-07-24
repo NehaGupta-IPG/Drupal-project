@@ -6,6 +6,7 @@ namespace Drupal\Tests\views_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the JavaScript filtering on the Views listing page.
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see core/modules/views_ui/js/views_ui.listing.js
  */
 #[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class ViewsListingTest extends WebDriverTestBase {
 
   /**
@@ -42,9 +44,9 @@ class ViewsListingTest extends WebDriverTestBase {
    * Tests the filtering on the Views listing page.
    */
   public function testFilterViewsListing(): void {
-    $enabled_views_count = 6;
-    $disabled_views_count = 2;
-    $content_views_count = 3;
+    $enabled_views_count = 5;
+    $disabled_views_count = 3;
+    $content_views_count = 2;
 
     $this->drupalGet('admin/structure/views');
 

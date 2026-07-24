@@ -19,11 +19,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class ToolbarItemConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'The provided toolbar item %toolbar_item is not valid.';
+  public function __construct(
+    public $message = 'The provided toolbar item %toolbar_item is not valid.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

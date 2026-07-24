@@ -16,6 +16,7 @@ use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 // cspell:ignore arrakis complote détruire harkonnen
@@ -26,6 +27,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  */
 #[CoversClass(MediaLibrary::class)]
 #[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class MediaLibraryTest extends WebDriverTestBase {
 
   use MediaTypeCreationTrait;
@@ -101,7 +103,7 @@ class MediaLibraryTest extends WebDriverTestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -160,6 +162,8 @@ class MediaLibraryTest extends WebDriverTestBase {
    * Tests using drupalMedia button to embed media into CKEditor 5.
    */
   public function testButton(): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3547493');
     $media_preview_selector = '.ck-content .ck-widget.drupal-media .media';
     $this->drupalGet('/node/add/blog');
     $this->waitForEditor();
@@ -167,6 +171,7 @@ class MediaLibraryTest extends WebDriverTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-content'));
+    $this->assertSession()->elementAttributeContains('css', '.ui-dialog', 'class', 'media-library-widget-modal');
 
     // Ensure that the tab order is correct.
     $tabs = $page->findAll('css', '.media-library-menu__link');

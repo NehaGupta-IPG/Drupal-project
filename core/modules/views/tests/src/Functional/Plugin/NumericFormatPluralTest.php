@@ -10,11 +10,13 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of numeric fields.
  */
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class NumericFormatPluralTest extends ViewTestBase {
 
   /**
@@ -45,6 +47,8 @@ class NumericFormatPluralTest extends ViewTestBase {
       'administer languages',
     ]);
     $this->drupalLogin($web_user);
+    $config = $this->config('locale.settings');
+    $config->set('translate_english', TRUE)->save();
   }
 
   /**

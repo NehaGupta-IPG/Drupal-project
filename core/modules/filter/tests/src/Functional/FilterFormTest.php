@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\filter\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests form elements with associated text formats.
  */
 #[Group('filter')]
+#[RunTestsInSeparateProcesses]
 class FilterFormTest extends BrowserTestBase {
 
   /**
@@ -197,7 +200,7 @@ class FilterFormTest extends BrowserTestBase {
   protected function assertOptions(string $id, array $expected_options, string $selected): void {
     $select = $this->assertSession()->selectExists($id);
     $found_options = $select->findAll('css', 'option');
-    $found_options = array_map(function ($item) {
+    $found_options = array_map(function (NodeElement $item) {
       return $item->getValue();
     }, $found_options);
     $this->assertEqualsCanonicalizing($expected_options, $found_options);

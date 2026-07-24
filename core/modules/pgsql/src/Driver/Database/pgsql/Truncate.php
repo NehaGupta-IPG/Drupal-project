@@ -12,18 +12,22 @@ class Truncate extends QueryTruncate {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
-    $this->connection->addSavepoint();
+  public function execute(): void {
+    if ($this->connection->inTransaction()) {
+      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
+    }
     try {
-      $result = parent::execute();
+      parent::execute();
     }
     catch (\Exception $e) {
-      $this->connection->rollbackSavepoint();
+      if (isset($savepoint)) {
+        $savepoint->rollback();
+      }
       throw $e;
     }
-    $this->connection->releaseSavepoint();
-
-    return $result;
+    if (isset($savepoint)) {
+      $savepoint->commitOrRelease();
+    }
   }
 
 }

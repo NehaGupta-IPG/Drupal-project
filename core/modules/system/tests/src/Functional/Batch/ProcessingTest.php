@@ -8,11 +8,13 @@ use Drupal\batch_test\BatchTestHelper;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests batch processing in form and non-form workflow.
  */
 #[Group('Batch')]
+#[RunTestsInSeparateProcesses]
 class ProcessingTest extends BrowserTestBase {
 
   /**
@@ -242,7 +244,7 @@ class ProcessingTest extends BrowserTestBase {
   /**
    * Returns expected execution stacks for the test batches.
    */
-  public function _resultStack($id, $value = 0) {
+  public function _resultStack($id, $value = 0): array {
     $stack = [];
     switch ($id) {
       case 'batch1':
@@ -328,7 +330,7 @@ class ProcessingTest extends BrowserTestBase {
   /**
    * Returns expected result messages for the test batches.
    */
-  public function _resultMessages($id) {
+  public function _resultMessages($id): array {
     $messages = [];
 
     // The elapsed time should be either in minutes and seconds or only seconds.

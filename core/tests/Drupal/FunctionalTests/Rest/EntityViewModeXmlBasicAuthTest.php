@@ -7,11 +7,13 @@ namespace Drupal\FunctionalTests\Rest;
 use Drupal\Tests\rest\Functional\BasicAuthResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Entity View Mode Xml Basic Auth.
  */
 #[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class EntityViewModeXmlBasicAuthTest extends EntityViewModeResourceTestBase {
 
   use BasicAuthResourceTestTrait;
@@ -35,7 +37,7 @@ class EntityViewModeXmlBasicAuthTest extends EntityViewModeResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $mimeType = 'text/xml; charset=UTF-8';
+  protected static $mimeType = 'text/xml; charset=utf-8';
 
   /**
    * {@inheritdoc}

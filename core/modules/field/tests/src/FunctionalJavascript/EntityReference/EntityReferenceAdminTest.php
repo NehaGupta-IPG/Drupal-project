@@ -12,11 +12,13 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiJSTestTrait;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for the administrative UI.
  */
 #[Group('entity_reference')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceAdminTest extends WebDriverTestBase {
 
   use FieldUiTestTrait;
@@ -371,7 +373,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
       $nested_options[] = $optgroup->findAll('xpath', 'option');
     }
     $options = array_merge($options, ...$nested_options);
-    array_walk($options, function (NodeElement &$option) {
+    array_walk($options, function (NodeElement &$option): void {
       $option = $option->getAttribute('value');
     });
     $this->assertEqualsCanonicalizing($expected_options, $options);

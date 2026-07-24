@@ -99,8 +99,6 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests supports normalization.
-   *
-   * @legacy-covers ::supportsNormalization
    */
   public function testSupportsNormalization(): void {
     $this->assertTrue($this->normalizer->supportsNormalization($this->fieldItem->reveal()));
@@ -109,8 +107,6 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests supports denormalization.
-   *
-   * @legacy-covers ::supportsDenormalization
    */
   public function testSupportsDenormalization(): void {
     $this->assertTrue($this->normalizer->supportsDenormalization([], EntityReferenceItem::class));
@@ -119,8 +115,6 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests normalize.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalize(): void {
     $test_url = '/test/100';
@@ -238,8 +232,6 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests normalize with empty taxonomy term reference.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalizeWithEmptyTaxonomyTermReference(): void {
     // Override the serializer prophecy from setUp() to return a zero value.
@@ -280,8 +272,6 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests normalize with no entity.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalizeWithNoEntity(): void {
     $entity_reference = $this->prophesize(TypedDataInterface::class);
@@ -314,8 +304,6 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests denormalize with type and uuid.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalizeWithTypeAndUuid(): void {
     $data = [
@@ -343,8 +331,6 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests denormalize with uuid without type.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalizeWithUuidWithoutType(): void {
     $data = [
@@ -371,12 +357,10 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests denormalize with uuid with incorrect type.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalizeWithUuidWithIncorrectType(): void {
     $this->expectException(UnexpectedValueException::class);
-    $this->expectExceptionMessage('The field "field_reference" property "target_type" must be set to "test_type" or omitted.');
+    $this->expectExceptionMessageIs('The field "field_reference" property "target_type" must be set to "test_type" or omitted.');
 
     $data = [
       'target_id' => 'test',
@@ -394,12 +378,10 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests denormalize with type with incorrect uuid.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalizeWithTypeWithIncorrectUuid(): void {
     $this->expectException(InvalidArgumentException::class);
-    $this->expectExceptionMessage('No "test_type" entity found with UUID "unique-but-none-non-existent" for field "field_reference"');
+    $this->expectExceptionMessageIs('No "test_type" entity found with UUID "unique-but-none-non-existent" for field "field_reference"');
 
     $data = [
       'target_id' => 'test',
@@ -420,12 +402,10 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests denormalize with empty uuid.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalizeWithEmptyUuid(): void {
     $this->expectException(InvalidArgumentException::class);
-    $this->expectExceptionMessage('If provided "target_uuid" cannot be empty for field "field_reference".');
+    $this->expectExceptionMessageIs('If provided "target_uuid" cannot be empty for field "field_reference".');
 
     $data = [
       'target_id' => 'test',
@@ -442,8 +422,6 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests denormalize with id.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalizeWithId(): void {
     $data = [
@@ -507,8 +485,6 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests construct value properties.
-   *
-   * @legacy-covers ::constructValue
    */
   public function testConstructValueProperties(): void {
     $data = [

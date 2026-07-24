@@ -8,13 +8,12 @@ use Drupal\KernelTests\Core\Database\DriverSpecificKernelTestBase;
 use Drupal\user\Entity\User;
 use Drupal\views\Plugin\views\join\CastedIntFieldJoin;
 use Drupal\views\Tests\ViewTestData;
-use Drupal\views\Views;
 use Drupal\views\ViewExecutable;
+use Drupal\views\Views;
 
 /**
  * Tests the "casted_int_field_join" join plugin.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\join\CastedIntFieldJoin
  */
 abstract class CastedIntFieldJoinTestBase extends DriverSpecificKernelTestBase {
@@ -190,7 +189,7 @@ abstract class CastedIntFieldJoinTestBase extends DriverSpecificKernelTestBase {
    *   \Drupal\Core\Database\Query\Select::$tables for more information on the
    *   structure of the array.
    */
-  protected function buildJoin(ViewExecutable $view, $configuration, $table_alias) {
+  protected function buildJoin(ViewExecutable $view, array $configuration, $table_alias) {
     // Build the actual join values and read them back from the query object.
     $query = \Drupal::database()->select('node');
 

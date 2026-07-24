@@ -8,13 +8,16 @@ use Drupal\Core\Test\AssertMailTrait;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\Hook\UserHooks;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Log\LoggerInterface;
 
 /**
  * Tests _user_mail_notify() use of user.settings.notify.*.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserMailNotifyTest extends EntityKernelTestBase {
 
   /**
@@ -35,7 +38,7 @@ class UserMailNotifyTest extends EntityKernelTestBase {
    * @return array
    *   An array of operations and the mail keys they should send.
    */
-  public static function userMailsProvider() {
+  public static function userMailsProvider(): array {
     return [
       'cancel confirm notification' => [
         'cancel_confirm',
@@ -79,10 +82,9 @@ class UserMailNotifyTest extends EntityKernelTestBase {
    *   The operation being performed on the account.
    * @param array $mail_keys
    *   The mail keys to test for.
-   *
-   * @dataProvider userMailsProvider
    */
-  public function testUserMailsSent($op, array $mail_keys): void {
+  #[DataProvider('userMailsProvider')]
+  public function testUserMailsSent(string $op, array $mail_keys): void {
     $this->installConfig('user');
     $this->config('system.site')->set('mail', 'test@example.com')->save();
     $this->config('user.settings')->set('notify.' . $op, TRUE)->save();
@@ -100,10 +102,11 @@ class UserMailNotifyTest extends EntityKernelTestBase {
    *
    * @param string $op
    *   The operation being performed on the account.
-   *
-   * @dataProvider userMailsProvider
+   * @param array $mail_keys
+   *   The mail keys to test for.
    */
-  public function testUserMailsNotSent($op): void {
+  #[DataProvider('userMailsProvider')]
+  public function testUserMailsNotSent(string $op, array $mail_keys): void {
     $this->installConfig('user');
     $this->config('user.settings')->set('notify.' . $op, FALSE)->save();
     $return = _user_mail_notify($op, $this->createUser());
@@ -116,10 +119,11 @@ class UserMailNotifyTest extends EntityKernelTestBase {
    *
    * @param string $op
    *   The operation being performed on the account.
-   *
-   * @dataProvider userMailsProvider
+   * @param array $mail_keys
+   *   The mail keys to test for.
    */
-  public function testUserMailsWithoutAccountEmail($op): void {
+  #[DataProvider('userMailsProvider')]
+  public function testUserMailsWithoutAccountEmail(string $op, array $mail_keys): void {
     $this->installConfig('user');
     $this->config('user.settings')->set('notify.' . $op, TRUE)->save();
 
@@ -165,9 +169,9 @@ class UserMailNotifyTest extends EntityKernelTestBase {
     // Install configs.
     $this->installConfig(['language', 'locale', 'user']);
 
-    locale_system_set_config_langcodes();
-    $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
     $locale_config_manager = \Drupal::service('locale.config_manager');
+    $locale_config_manager->updateDefaultConfigLangcodes();
+    $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
     $names = $locale_config_manager->getComponentNames();
     $locale_config_manager->updateConfigTranslations($names, $langcodes);
 

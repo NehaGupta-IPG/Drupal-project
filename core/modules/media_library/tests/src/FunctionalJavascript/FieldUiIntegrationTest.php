@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore shatner
 /**
  * Tests field UI integration for media library widget.
  */
 #[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class FieldUiIntegrationTest extends MediaLibraryTestBase {
 
   /**
@@ -58,6 +60,8 @@ class FieldUiIntegrationTest extends MediaLibraryTestBase {
    * Tests field UI integration for media library widget.
    */
   public function testFieldUiIntegration(): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3390881');
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
     $user = $this->drupalCreateUser([

@@ -6,16 +6,19 @@ namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Core\Entity\Form\RevisionRevertForm;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\VocabularyInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Taxonomy term revision form test.
  */
 #[CoversClass(RevisionRevertForm::class)]
 #[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TaxonomyRevisionRevertTest extends BrowserTestBase {
 
   use TaxonomyTestTrait;
@@ -43,10 +46,8 @@ class TaxonomyRevisionRevertTest extends BrowserTestBase {
 
   /**
    * Vocabulary for testing.
-   *
-   * @var \Drupal\taxonomy\VocabularyInterface
    */
-  private $vocabulary;
+  private VocabularyInterface $vocabulary;
 
   /**
    * {@inheritdoc}

@@ -11,18 +11,18 @@ use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\Config\FileStorageFactory.
  */
 #[CoversClass(FileStorageFactory::class)]
 #[Group('config')]
+#[RunTestsInSeparateProcesses]
 class FileStorageFactoryTest extends KernelTestBase {
 
   /**
    * Tests get sync.
-   *
-   * @legacy-covers ::getSync
    */
   public function testGetSync(): void {
 
@@ -43,7 +43,7 @@ class FileStorageFactoryTest extends KernelTestBase {
 
     // On an empty settings there is an exception thrown.
     $this->expectException(ConfigDirectoryNotDefinedException::class);
-    $this->expectExceptionMessage('The config sync directory is not defined in $settings["config_sync_directory"]');
+    $this->expectExceptionMessageIs('The config sync directory is not defined in $settings["config_sync_directory"]');
     FileStorageFactory::getSync();
   }
 

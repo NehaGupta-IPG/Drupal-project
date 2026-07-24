@@ -13,6 +13,7 @@ use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests InfoParser class and exception.
@@ -49,7 +50,7 @@ class InfoParserUnitTest extends UnitTestCase {
   public function testInfoParserNonExisting(): void {
     vfsStream::setup('modules');
     $this->expectException('\Drupal\Core\Extension\InfoParserException');
-    $this->expectExceptionMessage('Unable to parse vfs://modules/does_not_exist.info.txt as it does not exist');
+    $this->expectExceptionMessageIs('Unable to parse vfs://modules/does_not_exist.info.txt as it does not exist');
     $this->infoParser->parse(vfsStream::url('modules') . '/does_not_exist.info.txt');
   }
 
@@ -62,7 +63,7 @@ class InfoParserUnitTest extends UnitTestCase {
    *   The expected exception message.
    */
   #[DataProvider('providerInfoException')]
-  public function testInfoException($yaml, $expected_exception_message): void {
+  public function testInfoException(string $yaml, string $expected_exception_message): void {
 
     vfsStream::setup('modules');
     vfsStream::create([
@@ -80,7 +81,7 @@ class InfoParserUnitTest extends UnitTestCase {
     }
 
     $this->expectException(InfoParserException::class);
-    $this->expectExceptionMessage("$expected_exception_message vfs://modules/fixtures/broken-duplicate.info.txt");
+    $this->expectExceptionMessageIs("$expected_exception_message vfs://modules/fixtures/broken-duplicate.info.txt");
     $this->infoParser->parse(vfsStream::url("modules/fixtures/broken-duplicate.info.txt"));
   }
 
@@ -119,6 +120,18 @@ dependencies:
 YML,
         'Missing required keys (type, name) in',
       ],
+      'version is not scalar' => [
+      <<<YML
+package: Core
+type: module
+name: Broken
+core_version_requirement: '*'
+version:
+  - Not
+  - Scalar
+YML,
+        "The 'version' value must be a scalar in",
+      ],
     ];
   }
 
@@ -148,7 +161,7 @@ BROKEN_INFO;
     ]);
     $filename = vfsStream::url('modules/fixtures/broken.info.txt');
     $this->expectException('\Drupal\Core\Extension\InfoParserException');
-    $this->expectExceptionMessage('Unable to parse vfs://modules/fixtures/broken.info.txt');
+    $this->expectExceptionMessageIs('Unable to parse vfs://modules/fixtures/broken.info.txt');
     $this->infoParser->parse($filename);
   }
 
@@ -174,6 +187,55 @@ MISSING_CORE_VERSION_REQUIREMENT;
     ]);
     $info_values = $this->infoParser->parse(vfsStream::url('modules/fixtures/missing_core_version_requirement.info.txt'));
     $this->assertSame($info_values['core_version_requirement'], \Drupal::VERSION);
+  }
+
+  /**
+   * Tests a version string that looks like a float.
+   *
+   * @legacy-covers ::parse
+   */
+  public function testFloatLikeVersion(): void {
+    $float_like_version = <<<VERSION_TEST
+core_version_requirement: '*'
+name: 'Float-like version'
+type: module
+version: '1.0'
+VERSION_TEST;
+
+    vfsStream::setup('modules');
+    vfsStream::create([
+      'fixtures' => [
+        'float_like_version.info.txt' => $float_like_version,
+      ],
+    ]);
+    $info_values = $this->infoParser->parse(vfsStream::url('modules/fixtures/float_like_version.info.txt'));
+    $this->assertSame('1.0', $info_values['version'], 'Version that looks like a float should be a string');
+  }
+
+  /**
+   * Tests a version string that is a float.
+   *
+   * @legacy-covers ::parse
+   */
+  #[IgnoreDeprecations]
+  public function testFloatVersion(): void {
+    $float_version = <<<VERSION_TEST
+core_version_requirement: '*'
+name: 'Float version'
+type: module
+version: 1.1
+VERSION_TEST;
+
+    vfsStream::setup('modules');
+    vfsStream::create([
+      'fixtures' => [
+        'float_version.info.txt' => $float_version,
+      ],
+    ]);
+    $this->expectUserDeprecationMessage("Using a non-string as the 'version' value in vfs://modules/fixtures/float_version.info.txt is deprecated in drupal:11.4.0 and will be a fatal error in drupal:13.0.0. Instead, wrap the version value in single quotes. See https://www.drupal.org/node/3576311");
+
+    $info_values = $this->infoParser->parse(vfsStream::url('modules/fixtures/float_version.info.txt'));
+    $this->assertSame('1.1', $info_values['version'], 'Floating point version should be cast to a string');
   }
 
   /**
@@ -242,7 +304,7 @@ CORE;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerCoreIncompatibility')]
-  public function testCoreIncompatibility($test_case, $constraint, $expected): void {
+  public function testCoreIncompatibility(string $test_case, string $constraint, bool $expected): void {
     $core_incompatibility = <<<CORE_INCOMPATIBILITY
 core_version_requirement: $constraint
 name: common_test
@@ -269,7 +331,7 @@ CORE_INCOMPATIBILITY;
   /**
    * Data provider for testCoreIncompatibility().
    */
-  public static function providerCoreIncompatibility() {
+  public static function providerCoreIncompatibility(): array {
     // Remove possible stability suffix to properly parse 11.0-dev.
     $version = preg_replace('/-dev$/', '', \Drupal::VERSION);
     [$major, $minor] = explode('.', $version, 2);
@@ -344,7 +406,7 @@ UNPARSABLE_CORE_VERSION_REQUIREMENT;
       ],
     ]);
     $this->expectException(InfoParserException::class);
-    $this->expectExceptionMessage("The 'core_version_requirement' constraint (not-this-version) is not a valid value in vfs://modules/fixtures/unparsable_core_version_requirement.info.txt");
+    $this->expectExceptionMessageIs("The 'core_version_requirement' constraint (not-this-version) is not a valid value in vfs://modules/fixtures/unparsable_core_version_requirement.info.txt");
     $this->infoParser->parse(vfsStream::url('modules/fixtures/unparsable_core_version_requirement.info.txt'));
   }
 
@@ -354,7 +416,7 @@ UNPARSABLE_CORE_VERSION_REQUIREMENT;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerValidLifecycle')]
-  public function testValidLifecycle($lifecycle, $expected): void {
+  public function testValidLifecycle(string $lifecycle, string $expected): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'
@@ -382,7 +444,7 @@ INFO;
   /**
    * Data provider for testValidLifecycle().
    */
-  public static function providerValidLifecycle() {
+  public static function providerValidLifecycle(): array {
     return [
       'empty' => [
         '',
@@ -413,7 +475,7 @@ INFO;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerInvalidLifecycle')]
-  public function testInvalidLifecycle($lifecycle, $exception_message): void {
+  public function testInvalidLifecycle(string $lifecycle, string $exception_message): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'
@@ -430,7 +492,7 @@ INFO;
       ],
     ]);
     $this->expectException('\Drupal\Core\Extension\InfoParserException');
-    $this->expectExceptionMessage($exception_message);
+    $this->expectExceptionMessageIs($exception_message);
     $info_values = $this->infoParser->parse(vfsStream::url("modules/fixtures/$filename"));
     $this->assertEmpty($info_values);
   }
@@ -438,7 +500,7 @@ INFO;
   /**
    * Data provider for testInvalidLifecycle().
    */
-  public static function providerInvalidLifecycle() {
+  public static function providerInvalidLifecycle(): array {
     return [
       'bogus' => [
         'bogus',
@@ -461,7 +523,7 @@ INFO;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerLifecycleLink')]
-  public function testLifecycleLink($lifecycle, $lifecycle_link = NULL, $exception_message = NULL): void {
+  public function testLifecycleLink(string $lifecycle, ?string $lifecycle_link = NULL, ?string $exception_message = NULL): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'
@@ -486,7 +548,7 @@ INFO;
     $path = vfsStream::url("modules/fixtures/$filename");
     if ($exception_message) {
       $this->expectException(InfoParserException::class);
-      $this->expectExceptionMessage(sprintf($exception_message, $path));
+      $this->expectExceptionMessageIs(sprintf($exception_message, $path));
     }
     $info_values = $this->infoParser->parse($path);
     $this->assertSame($lifecycle, $info_values[ExtensionLifecycle::LIFECYCLE_IDENTIFIER]);
@@ -495,7 +557,7 @@ INFO;
   /**
    * Data provider for testLifecycleLink().
    */
-  public static function providerLifecycleLink() {
+  public static function providerLifecycleLink(): array {
     return [
       'valid deprecated' => [
         ExtensionLifecycle::DEPRECATED,

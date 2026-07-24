@@ -10,6 +10,7 @@ use Drupal\Tests\media\Traits\OEmbedTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore dailymotion Schipulcon
 /**
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(ResourceFetcher::class)]
 #[Group('media')]
+#[RunTestsInSeparateProcesses]
 class ResourceFetcherTest extends MediaFunctionalTestBase {
 
   use OEmbedTestTrait;
@@ -41,7 +43,7 @@ class ResourceFetcherTest extends MediaFunctionalTestBase {
    * @return array
    *   An array of test data.
    */
-  public static function providerFetchResource() {
+  public static function providerFetchResource(): array {
     return [
       'JSON resource' => [
         'video_vimeo.json',
@@ -65,11 +67,9 @@ class ResourceFetcherTest extends MediaFunctionalTestBase {
    *   The expected name of the resource provider.
    * @param string $title
    *   The expected title of the resource.
-   *
-   * @legacy-covers ::fetchResource
    */
   #[DataProvider('providerFetchResource')]
-  public function testFetchResource($resource_url, $provider_name, $title): void {
+  public function testFetchResource(string $resource_url, string $provider_name, string $title): void {
     /** @var \Drupal\media\OEmbed\Resource $resource */
     $resource = $this->container->get('media.oembed.resource_fetcher')
       ->fetchResource($resource_url);

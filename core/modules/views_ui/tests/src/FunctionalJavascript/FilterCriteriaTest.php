@@ -6,11 +6,13 @@ namespace Drupal\Tests\views_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the View UI filter criteria group dialog.
  */
 #[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class FilterCriteriaTest extends WebDriverTestBase {
 
   /**
@@ -131,8 +133,8 @@ class FilterCriteriaTest extends WebDriverTestBase {
    * Tests operator labels.
    */
   public function testOperatorLabels(): void {
-    // Open the "Frontpage" view.
-    $this->drupalGet('admin/structure/views/view/frontpage');
+    // Open the "Promoted Content" view.
+    $this->drupalGet('admin/structure/views/view/promoted_content');
     $session = $this->getSession();
     $page = $session->getPage();
 

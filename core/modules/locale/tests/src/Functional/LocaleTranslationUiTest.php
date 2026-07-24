@@ -12,12 +12,14 @@ use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // phpcs:disable Drupal.Semantics.FunctionT.NotLiteralString
 /**
  * Tests the validation of translation strings and search results.
  */
 #[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleTranslationUiTest extends BrowserTestBase {
 
   use StringTranslationTrait;
@@ -312,7 +314,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     _locale_rebuild_js($langcode);
 
     $locale_javascripts = \Drupal::state()->get('locale.translation.javascript', []);
-    $js_file = 'public://' . $config->get('javascript.directory') . '/' . $langcode . '_' . $locale_javascripts[$langcode] . '.js';
+    $js_file = 'assets://' . $config->get('javascript.directory') . '/' . $langcode . '_' . $locale_javascripts[$langcode] . '.js';
     $this->assertFileExists($js_file);
 
     // Test JavaScript translation rebuilding.
@@ -329,7 +331,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     new Settings($settings);
     _locale_rebuild_js($langcode);
     $locale_javascripts = \Drupal::state()->get('locale.translation.javascript', []);
-    $js_file = 'public://' . $config->get('javascript.directory') . '/' . $langcode . '_' . $locale_javascripts[$langcode] . '.js';
+    $js_file = 'assets://' . $config->get('javascript.directory') . '/' . $langcode . '_' . $locale_javascripts[$langcode] . '.js';
     $content = file_get_contents($js_file);
     $this->assertStringContainsString('"' . $string_override . '":"' . $string_override . '"', $content);
   }

@@ -10,12 +10,14 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\Layout\Icon\SvgIconBuilder.
  */
 #[CoversClass(SvgIconBuilder::class)]
 #[Group('Layout')]
+#[RunTestsInSeparateProcesses]
 class IconBuilderTest extends KernelTestBase {
 
   /**
@@ -28,7 +30,7 @@ class IconBuilderTest extends KernelTestBase {
    * @legacy-covers ::getOffset
    */
   #[DataProvider('providerTestBuild')]
-  public function testBuild(SvgIconBuilder $icon_builder, $icon_map, $expected): void {
+  public function testBuild(SvgIconBuilder $icon_builder, array $icon_map, $expected): void {
     $renderer = $this->container->get('renderer');
 
     $build = $icon_builder->build($icon_map);
@@ -42,7 +44,7 @@ class IconBuilderTest extends KernelTestBase {
   /**
    * Returns data for testing the icon builder.
    */
-  public static function providerTestBuild() {
+  public static function providerTestBuild(): array {
     $data = [];
     $data['empty'][] = (new SvgIconBuilder());
     $data['empty'][] = [];

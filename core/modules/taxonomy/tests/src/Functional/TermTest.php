@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Url;
@@ -12,11 +13,13 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermInterface;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests load, save and delete for taxonomy terms.
  */
 #[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TermTest extends TaxonomyTestBase {
 
   use AssertBreadcrumbTrait;
@@ -627,7 +630,7 @@ class TermTest extends TaxonomyTestBase {
    * @return array
    *   A sorted array of tids and 0 if the root is a parent.
    */
-  private function getParentTids($term): array {
+  private function getParentTids(TermInterface $term): array {
     $parent_tids = [];
     foreach ($term->get('parent') as $item) {
       $parent_tids[] = (int) $item->target_id;
@@ -702,6 +705,26 @@ class TermTest extends TaxonomyTestBase {
     ];
     $this->assertBreadcrumb('taxonomy/term/' . $term->id() . '/delete', $trail);
     $this->assertSession()->assertEscaped($term->label());
+  }
+
+  /**
+   * Tests the order of primary tabs on the term edit page.
+   */
+  public function testPrimaryTabsOrder(): void {
+    $term = $this->createTerm($this->vocabulary);
+    $this->drupalGet($term->toUrl('edit-form'));
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Getting primary tab items.
+    $tab_links = $this->xpath('//h2[text()[contains(.,"Primary tabs")]]/following-sibling::ul[1]/li/a');
+    $labels = array_map(fn(NodeElement $link) => $link->getText(), $tab_links);
+    $edit_index = array_search('Edit', $labels);
+    $delete_index = array_search('Delete', $labels);
+
+    // Check that "Edit" comes before "Delete".
+    $this->assertIsInt($edit_index, '"Edit" tab found');
+    $this->assertIsInt($delete_index, '"Delete" tab found');
+    $this->assertLessThan($delete_index, $edit_index, '"Edit" tab appears before "Delete" tab');
   }
 
 }

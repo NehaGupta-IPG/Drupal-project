@@ -7,17 +7,26 @@ namespace Drupal\Tests\search\Functional;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests if the search form block is available.
  */
 #[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchBlockTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'search', 'dblog', 'user'];
+  protected static $modules = [
+    'block',
+    'node',
+    'search',
+    'search_node',
+    'dblog',
+    'user',
+  ];
 
   /**
    * {@inheritdoc}

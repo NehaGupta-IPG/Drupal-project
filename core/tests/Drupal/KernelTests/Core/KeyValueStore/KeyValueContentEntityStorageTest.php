@@ -9,11 +9,13 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\entity_test\Entity\EntityTestLabel;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests KeyValueEntityStorage for content entities.
  */
 #[Group('KeyValueStore')]
+#[RunTestsInSeparateProcesses]
 class KeyValueContentEntityStorageTest extends KernelTestBase {
 
   /**
@@ -163,6 +165,13 @@ class KeyValueContentEntityStorageTest extends KernelTestBase {
       // Verify that originalID points to new ID directly after renaming.
       $this->assertSame($new_id, $entity_test->id());
     }
+
+    // Test loading multiple entities. There should be an entity keyed by the ID
+    // we just created.
+    $entities = $storage->loadMultiple();
+    $this->assertCount(3, $entities);
+    $this->assertArrayHasKey($entity_test->id(), $entities);
+    $this->assertSame($entity_test->uuid(), $entities[$entity_test->id()]->uuid());
   }
 
   /**

@@ -11,12 +11,14 @@ use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore publi publié
 /**
  * Functional tests for the language switching feature.
  */
 #[Group('language')]
+#[RunTestsInSeparateProcesses]
 class LanguageSwitchingTest extends BrowserTestBase {
 
   /**
@@ -87,16 +89,15 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->doTestLanguageBlockAnonymous($block->label());
     $this->doTestLanguageBlock404($block->label(), 'system/404');
 
-    // Test 404s with big_pipe where the behavior is different for logged-in
-    // users.
+    // Confirm that enabling big_pipe doesn't change the behavior of the block.
+    // Note that this is the case because the language switcher block deny lists
+    // the big_pipe placeholder strategy, otherwise it would be subject to the
+    // bug described in https://www.drupal.org/project/drupal/issues/3349201
     \Drupal::service('module_installer')->install(['big_pipe']);
     $this->rebuildAll();
     $this->doTestLanguageBlock404($block->label(), 'system/404');
     $this->drupalLogin($this->drupalCreateUser());
-    // @todo This is testing the current behavior with the big_pipe module
-    //   enabled. This behavior is a bug will be fixed in
-    //   https://www.drupal.org/project/drupal/issues/3349201.
-    $this->doTestLanguageBlock404($block->label(), '<front>');
+    $this->doTestLanguageBlock404($block->label(), 'system/404');
   }
 
   /**
@@ -107,7 +108,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageBlock()
    */
-  protected function doTestHomePageLinks($block_label): void {
+  protected function doTestHomePageLinks(string|int|float|bool $block_label): void {
     // Create a node and set as home page.
     $this->createHomePage();
     // Go to home page.
@@ -122,7 +123,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $labels = [];
     foreach ($language_switchers as $list_item) {
       $list_items[] = [
-        'hreflang' => $list_item->getAttribute('hreflang'),
+        'data-drupal-language' => $list_item->getAttribute('data-drupal-language'),
         'data-drupal-link-system-path' => $list_item->getAttribute('data-drupal-link-system-path'),
       ];
 
@@ -136,11 +137,11 @@ class LanguageSwitchingTest extends BrowserTestBase {
     }
     $expected_list_items = [
       0 => [
-        'hreflang' => 'en',
+        'data-drupal-language' => 'en',
         'data-drupal-link-system-path' => '<front>',
       ],
       1 => [
-        'hreflang' => 'fr',
+        'data-drupal-language' => 'fr',
         'data-drupal-link-system-path' => '<front>',
       ],
     ];
@@ -169,7 +170,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageBlock()
    */
-  protected function doTestLanguageBlockAuthenticated($block_label): void {
+  protected function doTestLanguageBlockAuthenticated(string|int|float|bool $block_label): void {
     // Assert that the language switching block is displayed on the frontpage.
     $this->drupalGet('');
     $this->assertSession()->pageTextContains($block_label);
@@ -182,7 +183,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $labels = [];
     foreach ($language_switchers as $list_item) {
       $list_items[] = [
-        'hreflang' => $list_item->getAttribute('hreflang'),
+        'data-drupal-language' => $list_item->getAttribute('data-drupal-language'),
         'data-drupal-link-system-path' => $list_item->getAttribute('data-drupal-link-system-path'),
       ];
 
@@ -194,8 +195,8 @@ class LanguageSwitchingTest extends BrowserTestBase {
       $labels[] = $link->getText();
     }
     $expected_list_items = [
-      0 => ['hreflang' => 'en', 'data-drupal-link-system-path' => 'user/2'],
-      1 => ['hreflang' => 'fr', 'data-drupal-link-system-path' => 'user/2'],
+      0 => ['data-drupal-language' => 'en', 'data-drupal-link-system-path' => 'user/2'],
+      1 => ['data-drupal-language' => 'fr', 'data-drupal-link-system-path' => 'user/2'],
     ];
     $this->assertSame($expected_list_items, $list_items, 'The list items have the correct attributes that will allow the drupal.active-link library to mark them as active.');
     $expected_anchors = [
@@ -218,7 +219,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageBlock()
    */
-  protected function doTestLanguageBlockAnonymous($block_label): void {
+  protected function doTestLanguageBlockAnonymous(string|int|float|bool $block_label): void {
     $this->drupalLogout();
 
     // Assert that the language switching block is displayed on the frontpage
@@ -238,7 +239,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     ];
     $labels = [];
     foreach ($language_switchers as $list_item) {
-      $langcode = $list_item->getAttribute('hreflang');
+      $langcode = $list_item->getAttribute('data-drupal-language');
       if ($list_item->hasClass('is-active')) {
         $links['active'][] = $langcode;
       }
@@ -283,7 +284,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $labels = [];
     foreach ($language_switchers as $list_item) {
       $list_items[] = [
-        'hreflang' => $list_item->getAttribute('hreflang'),
+        'data-drupal-language' => $list_item->getAttribute('data-drupal-language'),
         'data-drupal-link-system-path' => $list_item->getAttribute('data-drupal-link-system-path'),
       ];
 
@@ -295,8 +296,8 @@ class LanguageSwitchingTest extends BrowserTestBase {
       $labels[] = $link->getText();
     }
     $expected_list_items = [
-      0 => ['hreflang' => 'en', 'data-drupal-link-system-path' => $system_path],
-      1 => ['hreflang' => 'fr', 'data-drupal-link-system-path' => $system_path],
+      0 => ['data-drupal-language' => 'en', 'data-drupal-link-system-path' => $system_path],
+      1 => ['data-drupal-language' => 'fr', 'data-drupal-link-system-path' => $system_path],
     ];
     $this->assertSame($expected_list_items, $list_items, 'The list items have the correct attributes that will allow the drupal.active-link library to mark them as active.');
     $expected_anchors = [
@@ -685,7 +686,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    * @param string $label
    *   The native name of the language.
    */
-  protected function saveNativeLanguageName($langcode, $label): void {
+  protected function saveNativeLanguageName(string $langcode, $label): void {
     \Drupal::service('language.config_factory_override')
       ->getOverride($langcode, 'language.entity.' . $langcode)->set('label', $label)->save();
   }

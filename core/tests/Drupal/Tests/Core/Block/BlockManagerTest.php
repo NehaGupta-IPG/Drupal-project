@@ -45,7 +45,9 @@ class BlockManagerTest extends UnitTestCase {
 
     $container = new ContainerBuilder();
     $current_user = $this->prophesize(AccountInterface::class);
-    $container->set('current_user', $current_user->reveal());
+    // Set the service name as the fully qualified class name so that plugin
+    // autowiring works.
+    $container->set(AccountInterface::class, $current_user->reveal());
     $container->set('string_translation', $this->getStringTranslationStub());
     \Drupal::setContainer($container);
 
@@ -117,8 +119,6 @@ class BlockManagerTest extends UnitTestCase {
 
   /**
    * Tests handle plugin not found.
-   *
-   * @legacy-covers ::handlePluginNotFound
    */
   public function testHandlePluginNotFound(): void {
     $this->logger->warning('The "%plugin_id" block plugin was not found', ['%plugin_id' => 'invalid'])->shouldBeCalled();

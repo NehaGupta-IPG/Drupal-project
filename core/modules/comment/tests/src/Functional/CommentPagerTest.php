@@ -8,11 +8,13 @@ use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentPreviewMode;
 use Drupal\node\Entity\Node;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests paging of comments and their settings.
  */
 #[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentPagerTest extends CommentTestBase {
 
   /**
@@ -358,7 +360,7 @@ class CommentPagerTest extends CommentTestBase {
     // Make sure pager appears in formatter summary and settings form.
     $account = $this->drupalCreateUser(['administer node display']);
     $this->drupalLogin($account);
-    $this->drupalGet('admin/structure/types/manage/article/display');
+    $this->drupalGet('admin/structure/types/manage/article/display/default');
     // No summary for standard pager.
     $this->assertSession()->pageTextNotContains('Pager ID: 0');
     $this->assertSession()->pageTextContains('Pager ID: 1');
@@ -439,7 +441,7 @@ class CommentPagerTest extends CommentTestBase {
    *
    * @see \Drupal\Tests\UiHelperTrait::clickLink()
    */
-  protected function clickLinkWithXPath($xpath, $arguments = [], $index = 0) {
+  protected function clickLinkWithXPath($xpath, array $arguments = [], $index = 0): string|false {
     $url_before = $this->getUrl();
     $urls = $this->xpath($xpath, $arguments);
     if (isset($urls[$index])) {

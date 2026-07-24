@@ -9,12 +9,14 @@ use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests Rollback.
  */
 #[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class RollbackTest extends BrowserTestBase {
 
   use RecipeTestTrait;
@@ -75,7 +77,7 @@ class RollbackTest extends BrowserTestBase {
    */
   private function assertCheckpointsExist(array $expected_labels): void {
     $checkpoints = \Drupal::service('config.checkpoints');
-    $labels = array_map(fn (Checkpoint $c) => $c->label, iterator_to_array($checkpoints));
+    $labels = array_map(fn (Checkpoint $c): \Stringable|string => $c->label, iterator_to_array($checkpoints));
     $this->assertSame($expected_labels, array_values($labels));
   }
 

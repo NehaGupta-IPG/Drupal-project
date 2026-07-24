@@ -7,12 +7,15 @@ namespace Drupal\Tests\system\Functional\UpdateSystem;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
+use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that hook_update_8000() is disallowed.
  */
 #[Group('Update')]
+#[RunTestsInSeparateProcesses]
 class InvalidUpdateHookTest extends BrowserTestBase {
 
   use RequirementsPageTrait;
@@ -33,17 +36,15 @@ class InvalidUpdateHookTest extends BrowserTestBase {
 
   /**
    * URL for the upgrade script.
-   *
-   * @var string
    */
-  private $updateUrl;
+  private string $updateUrl;
 
   /**
    * A user account with upgrade permission.
    *
    * @var \Drupal\user\UserInterface
    */
-  private $updateUser;
+  private UserInterface $updateUser;
 
   /**
    * {@inheritdoc}

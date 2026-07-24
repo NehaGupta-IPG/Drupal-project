@@ -25,11 +25,9 @@ class WorkflowStateTransitionOperationsAccessCheckTest extends UnitTestCase {
 
   /**
    * Tests the access method correctly proxies to the entity access system.
-   *
-   * @legacy-covers ::access
    */
   #[DataProvider('accessTestCases')]
-  public function testAccess($route_requirement, $resulting_entity_access_check, $route_parameters = []): void {
+  public function testAccess(string $route_requirement, string $resulting_entity_access_check, array $route_parameters = []): void {
     $workflow_entity_access_result = AccessResult::allowed();
     $workflow = $this->prophesize(WorkflowInterface::class);
     $workflow->access($resulting_entity_access_check, Argument::type(AccountInterface::class), TRUE)
@@ -54,7 +52,7 @@ class WorkflowStateTransitionOperationsAccessCheckTest extends UnitTestCase {
   /**
    * Test cases for ::testAccess.
    */
-  public static function accessTestCases() {
+  public static function accessTestCases(): array {
     return [
       'Transition add' => [
         'add-transition',
@@ -134,9 +132,9 @@ class WorkflowStateTransitionOperationsAccessCheckTest extends UnitTestCase {
    * @legacy-covers ::access
    */
   #[DataProvider('invalidOperationNameTestCases')]
-  public function testInvalidOperationName($operation_name): void {
+  public function testInvalidOperationName(string $operation_name): void {
     $this->expectException(\Exception::class);
-    $this->expectExceptionMessage("Invalid _workflow_access operation '$operation_name' specified for route 'Foo Route'.");
+    $this->expectExceptionMessageIs("Invalid _workflow_access operation '$operation_name' specified for route 'Foo Route'.");
     $route = new Route('', [], [
       '_workflow_access' => $operation_name,
     ]);
@@ -148,7 +146,7 @@ class WorkflowStateTransitionOperationsAccessCheckTest extends UnitTestCase {
   /**
    * Test cases for ::testInvalidOperationName.
    */
-  public static function invalidOperationNameTestCases() {
+  public static function invalidOperationNameTestCases(): array {
     return [
       ['invalid-op'],
       ['foo-add-transition'],

@@ -8,12 +8,13 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\TestTools\Extension\InfoWriterTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the theme UI.
  */
 #[Group('Theme')]
-#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ThemeUiTest extends BrowserTestBase {
   use InfoWriterTrait;
 
@@ -88,12 +89,12 @@ class ThemeUiTest extends BrowserTestBase {
    *   Machine names of the modules required by $base_theme_to_uninstall.
    */
   #[DataProvider('providerTestThemeInstallWithModuleDependencies')]
-  public function testThemeInstallWithModuleDependencies($theme_name, array $first_modules, array $second_modules, array $required_by_messages, $base_theme_to_uninstall, array $base_theme_module_names): void {
+  public function testThemeInstallWithModuleDependencies(string $theme_name, array $first_modules, array $second_modules, array $required_by_messages, string $base_theme_to_uninstall, array $base_theme_module_names): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $all_dependent_modules = array_merge($first_modules, $second_modules);
     $this->drupalGet('admin/appearance');
-    $assert_module_enabled_message = function ($enabled_modules) {
+    $assert_module_enabled_message = function ($enabled_modules): void {
       $count = count($enabled_modules);
       $module_enabled_text = $count === 1 ? "{$this->testModules[$enabled_modules[0]]} has been installed." : $count . " modules have been installed:";
       $this->assertSession()->pageTextContains($module_enabled_text);
@@ -203,6 +204,7 @@ class ThemeUiTest extends BrowserTestBase {
   protected function uninstallTheme($theme_name): void {
     $this->drupalGet('admin/appearance');
     $this->clickLink("Uninstall $theme_name theme");
+    $this->submitForm([], 'Uninstall');
     $this->assertSession()->pageTextContains("The $theme_name theme has been uninstalled.");
   }
 
@@ -213,7 +215,7 @@ class ThemeUiTest extends BrowserTestBase {
    *   An array of arrays. Details on the specific elements can be found in the
    *   function body.
    */
-  public static function providerTestThemeInstallWithModuleDependencies() {
+  public static function providerTestThemeInstallWithModuleDependencies(): array {
     // Data provider values with the following keys:
     // -'theme_name': The name of the theme being tested.
     // -'first_modules': Array of module machine names to enable first.
@@ -321,7 +323,10 @@ class ThemeUiTest extends BrowserTestBase {
    * Tests installing a theme with incompatible module dependencies.
    */
   public function testInstallModuleWithIncompatibleDependencies(): void {
-    $this->container->get('module_installer')->install(['test_module_compatible_constraint', 'test_module_incompatible_constraint']);
+    $this->container->get('module_installer')->install([
+      'test_module_compatible_constraint',
+      'test_module_incompatible_constraint',
+    ]);
     $this->drupalGet('admin/appearance');
     $theme_container = $this->getSession()->getPage()->find('css', 'h3:contains("Test Theme Depending on Version Constrained Modules")')->getParent();
     $this->assertStringContainsString('Requires: Test Module Theme Depends on with Compatible ConstraintTest Module Theme Depends on with Incompatible Constraint (>=8.x-2.x) (incompatible with version 8.x-1.8)', $theme_container->getText());

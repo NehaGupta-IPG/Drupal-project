@@ -8,6 +8,7 @@ use Drupal\Core\Pager\PagerParameters;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -17,12 +18,11 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  */
 #[CoversClass(PagerParameters::class)]
 #[Group('Pager')]
+#[RunTestsInSeparateProcesses]
 class RequestPagerTest extends KernelTestBase {
 
   /**
    * Tests find page.
-   *
-   * @legacy-covers ::findPage
    */
   public function testFindPage(): void {
     $request = Request::create('http://example.com', 'GET', ['page' => '0,10']);
@@ -39,8 +39,6 @@ class RequestPagerTest extends KernelTestBase {
 
   /**
    * Tests get query parameters.
-   *
-   * @legacy-covers ::getQueryParameters
    */
   public function testGetQueryParameters(): void {
     $test_parameters = [

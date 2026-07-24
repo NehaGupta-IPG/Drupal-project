@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
-use Drupal\node\NodePreviewMode;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
+use Drupal\node\NodePreviewMode;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests validation of node_type entities.
- *
- * @group node
- * @group #slow
  */
+#[Group('node')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
 class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
 
   use ContentTypeCreationTrait;
@@ -47,7 +51,7 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
    */
   #[IgnoreDeprecations]
   public function testPreviewModeValidation(): void {
-    $this->expectDeprecation('Calling Drupal\node\Entity\NodeType::setPreviewMode with an integer $preview_mode parameter is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. Use the \Drupal\node\NodePreviewMode enum instead. See https://www.drupal.org/node/3538666');
+    $this->expectUserDeprecationMessage('Calling Drupal\node\Entity\NodeType::setPreviewMode with an integer $preview_mode parameter is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. Use the \Drupal\node\NodePreviewMode enum instead. See https://www.drupal.org/node/3538666');
     $this->entity->setPreviewMode(38);
     $this->assertValidationErrors(['preview_mode' => 'The value you selected is not a valid choice.']);
 
@@ -81,9 +85,10 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
   }
 
   /**
-   * @testWith [true, {"third_party_settings.menu_ui": "'parent' is a required key."}]
-   *           [false, {}]
+   * Tests third party settings menu UI.
    */
+  #[TestWith([TRUE, ["third_party_settings.menu_ui" => "'parent' is a required key."]])]
+  #[TestWith([FALSE, []])]
   public function testThirdPartySettingsMenuUi(bool $third_party_settings_menu_ui_fully_validatable, array $expected_validation_errors): void {
     $this->enableModules(['menu_ui']);
 

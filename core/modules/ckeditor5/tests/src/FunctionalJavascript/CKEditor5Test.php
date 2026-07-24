@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\editor\Entity\Editor;
@@ -15,6 +16,7 @@ use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 // cspell:ignore esque māori sourceediting splitbutton upcasted
@@ -24,6 +26,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  * @internal
  */
 #[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class CKEditor5Test extends CKEditor5TestBase {
 
   use TestFileCreationTrait;
@@ -213,6 +216,7 @@ JS;
     // Confirm there are no longer any warnings.
     $assert_session->waitForElementRemoved('css', '[data-drupal-messages] [role="alert"]');
     $page->pressButton('Save configuration');
+    $this->assertNotEmpty($assert_session->waitForText('Added text format ckeditor5'));
     $assert_session->responseContains('Added text format <em class="placeholder">ckeditor5</em>.');
   }
 
@@ -566,7 +570,7 @@ JS;
       ],
       'settings' => [
         'toolbar' => [
-          'items' => ['sourceEditing', 'numberedList', 'bulletedList'],
+          'items' => ['numberedList', 'bulletedList'],
         ],
         'plugins' => [
           'ckeditor5_list' => [
@@ -577,14 +581,39 @@ JS;
             ],
             'multiBlock' => TRUE,
           ],
-          'ckeditor5_sourceEditing' => [
-            'allowed_tags' => [],
-          ],
         ],
       ],
     ])->save();
+
+    // Test that checking the list styles checkbox saves correctly.
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+    $this->drupalGet('admin/config/content/formats/manage/test_format');
+    $this->assertSame(['List'], $this->getVerticalTabs('#plugin-settings-wrapper', FALSE));
+    $this->clickLink('List');
+    $this->assertNotNull($assert_session->waitForElementVisible('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-list-styles"]'));
+    $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_list][styles]'));
+    $page->checkField('editor[settings][plugins][ckeditor5_list][styles]');
+    $page->pressButton('Save');
+
+    /** @var \Drupal\editor\EditorInterface $editor */
+    $editor = Editor::load('test_format');
+    $settings = $editor->getSettings();
+    $this->assertTrue($settings['plugins']['ckeditor5_list']['properties']['styles']);
+    $this->drupalGet('admin/config/content/formats/manage/test_format');
+    $this->assertSame(['List'], $this->getVerticalTabs('#plugin-settings-wrapper', FALSE));
+    $this->clickLink('List');
+    $this->assertNotNull($assert_session->waitForElementVisible('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-list-styles"]'));
+    $this->assertTrue($page->hasCheckedField('editor[settings][plugins][ckeditor5_list][styles]'));
+
+    // Add source editing plugin.
+    $settings['toolbar']['items'] = ['sourceEditing', 'numberedList', 'bulletedList'];
+    $settings['plugins']['ckeditor5_list']['properties']['styles'] = FALSE;
+    $settings['plugins']['ckeditor5_sourceEditing']['allowed_tags'] = [];
+    $editor->setSettings($settings)->save();
+
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -593,8 +622,6 @@ JS;
       ))
     ));
     $ordered_list_html = '<ol><li>apple</li><li>banana</li><li>cantaloupe</li></ol>';
-    $page = $this->getSession()->getPage();
-    $assert_session = $this->assertSession();
     $this->drupalGet('node/add/page');
     $page->fillField('title[0][value]', 'My test content');
     $this->pressEditorButton('Source');
@@ -685,7 +712,7 @@ JS;
         // While this is a bit of an indirect way to find the correct button, it
         // accounts for the mixed dash characters and worked better than other
         // attempts.
-        $toolbar_button_tips = array_map(fn($item) => str_replace('–', '-', $item->getAttribute('data-cke-tooltip-text')), $toolbar_buttons);
+        $toolbar_button_tips = array_map(fn(NodeElement $item): string => str_replace('–', '-', $item->getAttribute('data-cke-tooltip-text')), $toolbar_buttons);
         $this->assertNotFalse(array_search($type, $toolbar_button_tips));
         $toolbar_buttons[array_search($type, $toolbar_button_tips)]->click();
         $widget_selector = '.ck-editor__editable_inline > ' . $list_tag . '[type="' . $type_attribute . '"]';
@@ -738,7 +765,7 @@ JS;
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -759,7 +786,7 @@ JS;
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(

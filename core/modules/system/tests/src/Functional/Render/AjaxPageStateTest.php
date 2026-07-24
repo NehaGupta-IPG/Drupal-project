@@ -6,13 +6,18 @@ namespace Drupal\Tests\system\Functional\Render;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Performs tests for the effects of the ajax_page_state query parameter.
  */
 #[Group('Render')]
+#[RunTestsInSeparateProcesses]
 class AjaxPageStateTest extends BrowserTestBase {
+
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -36,6 +41,9 @@ class AjaxPageStateTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->enablePromotedContentView();
+
     // Create an administrator with all permissions.
     $this->adminUser = $this->drupalCreateUser(array_keys(\Drupal::service('user.permissions')
       ->getPermissions()));

@@ -16,6 +16,7 @@ use Drupal\user\RoleInterface;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Asserts external normalizers are handled as expected by the JSON:API module.
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see jsonapi.normalizers
  */
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class ExternalNormalizersTest extends BrowserTestBase {
 
   use GetDocumentFromResponseTrait;
@@ -75,7 +77,7 @@ class ExternalNormalizersTest extends BrowserTestBase {
       ->grantPermission('create entity_test entity_test_with_bundle entities')
       ->save();
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     FieldStorageConfig::create([
       'field_name' => 'field_test',
@@ -113,7 +115,7 @@ class ExternalNormalizersTest extends BrowserTestBase {
    *   - static::VALUE_ORIGINAL (denormalizer IS expected to override)
    */
   #[DataProvider('providerTestFormatAgnosticNormalizers')]
-  public function testFormatAgnosticNormalizers($test_module, $expected_value_jsonapi_normalization, $expected_value_jsonapi_denormalization): void {
+  public function testFormatAgnosticNormalizers(string $test_module, $expected_value_jsonapi_normalization, $expected_value_jsonapi_denormalization): void {
     assert(in_array($expected_value_jsonapi_normalization, [static::VALUE_ORIGINAL, static::VALUE_OVERRIDDEN], TRUE));
     assert(in_array($expected_value_jsonapi_denormalization, [static::VALUE_ORIGINAL, static::VALUE_OVERRIDDEN], TRUE));
 
@@ -187,7 +189,7 @@ class ExternalNormalizersTest extends BrowserTestBase {
    * @return array
    *   Test cases.
    */
-  public static function providerTestFormatAgnosticNormalizers() {
+  public static function providerTestFormatAgnosticNormalizers(): array {
     return [
       'Format-agnostic @FieldType-level normalizers SHOULD NOT be able to affect the JSON:API normalization' => [
         'jsonapi_test_field_type',

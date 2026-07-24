@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Functional;
 
 use Behat\Mink\Exception\ResponseTextException;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentPreviewMode;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\filter\Entity\FilterFormat;
@@ -14,11 +14,13 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests integration searching comments.
  */
 #[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchCommentTest extends BrowserTestBase {
 
   use CommentTestTrait;
@@ -27,7 +29,7 @@ class SearchCommentTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['filter', 'node', 'comment', 'search'];
+  protected static $modules = ['filter', 'node', 'comment', 'search', 'search_node'];
 
   /**
    * {@inheritdoc}
@@ -224,7 +226,7 @@ class SearchCommentTest extends BrowserTestBase {
 
     // Hide comments.
     $this->drupalLogin($this->adminUser);
-    $node->set('comment', CommentItemInterface::HIDDEN);
+    $node->set('comment', CommentingStatus::Hidden->value);
     $node->save();
 
     // Invoke search index update.

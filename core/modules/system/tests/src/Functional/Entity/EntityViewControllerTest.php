@@ -8,11 +8,13 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests EntityViewController functionality.
  */
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityViewControllerTest extends BrowserTestBase {
 
   /**
@@ -51,7 +53,7 @@ class EntityViewControllerTest extends BrowserTestBase {
    * Tests EntityViewController.
    */
   public function testEntityViewController(): void {
-    $get_label_markup = function ($label) {
+    $get_label_markup = function (string $label): string {
       return '<h1 class="page-title">
             <div class="field field--name-name field--type-string field--label-hidden field__item">' . $label . '</div>
       </h1>';

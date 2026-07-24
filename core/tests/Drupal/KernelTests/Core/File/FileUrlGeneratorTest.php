@@ -10,6 +10,7 @@ use Drupal\file_test\FileTestCdn;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -19,6 +20,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  */
 #[CoversClass(FileUrlGenerator::class)]
 #[Group('File')]
+#[RunTestsInSeparateProcesses]
 class FileUrlGeneratorTest extends FileTestBase {
 
   /**
@@ -43,8 +45,6 @@ class FileUrlGeneratorTest extends FileTestBase {
 
   /**
    * Tests missing stream handler.
-   *
-   * @legacy-covers ::generate
    */
   public function testGenerateMissingStreamWrapper(): void {
     $this->expectException(InvalidStreamWrapperException::class);
@@ -53,8 +53,6 @@ class FileUrlGeneratorTest extends FileTestBase {
 
   /**
    * Tests missing stream handler.
-   *
-   * @legacy-covers ::generateString
    */
   public function testGenerateStringMissingStreamWrapper(): void {
     $this->expectException(InvalidStreamWrapperException::class);
@@ -63,8 +61,6 @@ class FileUrlGeneratorTest extends FileTestBase {
 
   /**
    * Tests missing stream handler.
-   *
-   * @legacy-covers ::generateAbsoluteString
    */
   public function testGenerateAbsoluteStringMissingStreamWrapper(): void {
     $this->expectException(InvalidStreamWrapperException::class);
@@ -135,21 +131,19 @@ class FileUrlGeneratorTest extends FileTestBase {
     $public_directory_path = \Drupal::service('stream_wrapper_manager')
       ->getViaScheme('public')
       ->getDirectoryPath();
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-    $file_system = \Drupal::service('file_system');
-    $this->assertEquals(FileTestCdn::Second->value . '/' . $public_directory_path . '/' . $file_system->basename($uri), $url, 'Correctly generated a CDN URL for a created file.');
+    $this->assertEquals(FileTestCdn::Second->value . '/' . $public_directory_path . '/' . basename($uri), $url, 'Correctly generated a CDN URL for a created file.');
 
     // Test alteration of file URLs to use root-relative URLs.
     \Drupal::state()->set('file_test.hook_file_url_alter', 'root-relative');
     $uri = $this->createUri();
     $url = $this->fileUrlGenerator->generateAbsoluteString($uri);
-    $this->assertEquals(base_path() . '/' . $public_directory_path . '/' . $file_system->basename($uri), $url, 'Correctly generated a root-relative URL for a created file.');
+    $this->assertEquals(base_path() . '/' . $public_directory_path . '/' . basename($uri), $url, 'Correctly generated a root-relative URL for a created file.');
 
     // Test alteration of file URLs to use a protocol-relative URLs.
     \Drupal::state()->set('file_test.hook_file_url_alter', 'protocol-relative');
     $uri = $this->createUri();
     $url = $this->fileUrlGenerator->generateAbsoluteString($uri);
-    $this->assertEquals('/' . base_path() . '/' . $public_directory_path . '/' . $file_system->basename($uri), $url, 'Correctly generated a protocol-relative URL for a created file.');
+    $this->assertEquals('/' . base_path() . '/' . $public_directory_path . '/' . basename($uri), $url, 'Correctly generated a protocol-relative URL for a created file.');
   }
 
   /**
@@ -178,17 +172,15 @@ class FileUrlGeneratorTest extends FileTestBase {
     $public_directory_path = \Drupal::service('stream_wrapper_manager')
       ->getViaScheme('public')
       ->getDirectoryPath();
-    $this->assertSame(base_path() . $public_directory_path . '/' . rawurlencode(\Drupal::service('file_system')
-      ->basename($uri)), $this->fileUrlGenerator->transformRelative($url));
+    $this->assertSame(base_path() . $public_directory_path . '/' . rawurlencode(
+      basename($uri)), $this->fileUrlGenerator->transformRelative($url));
   }
 
   /**
    * Tests generate u r i.
-   *
-   * @legacy-covers ::generate
    */
   #[DataProvider('providerGenerateURI')]
-  public function testGenerateURI($filepath, $expected): void {
+  public function testGenerateURI(string $filepath, string $expected): void {
     // Disable file_test.module's hook_file_url_alter() implementation.
     \Drupal::state()->set('file_test.hook_file_url_alter', NULL);
 
@@ -205,8 +197,6 @@ class FileUrlGeneratorTest extends FileTestBase {
 
   /**
    * Tests generate u r i with schema.
-   *
-   * @legacy-covers ::generate
    */
   public function testGenerateURIWithSchema(): void {
     // Disable file_test.module's hook_file_url_alter() implementation.
@@ -229,7 +219,7 @@ class FileUrlGeneratorTest extends FileTestBase {
   /**
    * Data provider.
    */
-  public static function providerGenerateURI() {
+  public static function providerGenerateURI(): array {
     return [
       'schemaless' =>
         [

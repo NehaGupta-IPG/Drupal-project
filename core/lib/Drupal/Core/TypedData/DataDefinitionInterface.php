@@ -168,8 +168,8 @@ interface DataDefinitionInterface {
    * specified without nesting it into another array:
    * @code
    * $constraints = [
-   *   'EntityType' => 'node',
-   *   'Bundle' => 'article',
+   *   'EntityType' => ['type' => 'node'],
+   *   'Bundle' => ['bundle' => 'article'],
    * ];
    * @endcode
    *
@@ -219,7 +219,7 @@ interface DataDefinitionInterface {
    * @return static
    *   The object itself for chaining.
    */
-  public function addConstraint($constraint_name, $options = NULL);
+  public function addConstraint(string $constraint_name, ?array $options = NULL): static;
 
   /**
    * Determines whether the data value is internal.

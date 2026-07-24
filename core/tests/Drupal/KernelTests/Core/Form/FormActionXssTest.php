@@ -9,6 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  * Ensures that a form's action attribute can't be exploited with XSS.
  */
 #[Group('system')]
+#[RunTestsInSeparateProcesses]
 class FormActionXssTest extends KernelTestBase implements FormInterface {
 
   /**
@@ -28,14 +30,14 @@ class FormActionXssTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'external_form_url_test';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['something'] = [
       '#type' => 'textfield',
       '#title' => 'What do you think?',
@@ -46,12 +48,12 @@ class FormActionXssTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
+  public function validateForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * {@inheritdoc}

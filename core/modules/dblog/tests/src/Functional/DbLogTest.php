@@ -13,11 +13,13 @@ use Drupal\dblog\Controller\DbLogController;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies log entries and user access based on permissions.
  */
 #[Group('dblog')]
+#[RunTestsInSeparateProcesses]
 class DbLogTest extends BrowserTestBase {
   use FakeLogEntries;
   use AssertBreadcrumbTrait;
@@ -303,7 +305,7 @@ class DbLogTest extends BrowserTestBase {
    * @param int $row_limit
    *   The row limit.
    */
-  private function verifyRowLimit($row_limit): void {
+  private function verifyRowLimit(int $row_limit): void {
     // Change the database log row limit.
     $edit = [];
     $edit['dblog_row_limit'] = $row_limit;
@@ -349,7 +351,7 @@ class DbLogTest extends BrowserTestBase {
    * @param int $response
    *   (optional) HTTP response code. Defaults to 200.
    */
-  private function verifyReports($response = 200): void {
+  private function verifyReports(int $response = 200): void {
     // View the database log help page.
     $this->drupalGet('admin/help/dblog');
     $this->assertSession()->statusCodeEquals($response);
@@ -479,7 +481,10 @@ class DbLogTest extends BrowserTestBase {
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->statusCodeEquals(200);
     // Retrieve the user object.
-    $user = user_load_by_name($name);
+    $users = \Drupal::entityTypeManager()
+      ->getStorage('user')
+      ->loadByProperties(['name' => $name]);
+    $user = reset($users);
     $this->assertNotNull($user, "User $name was loaded");
     // pass_raw property is needed by drupalLogin.
     $user->passRaw = $pass;
@@ -549,7 +554,7 @@ class DbLogTest extends BrowserTestBase {
    * @param string $type
    *   A node type (e.g., 'article' or 'page').
    */
-  private function doNode($type): void {
+  private function doNode(string $type): void {
     // Create user.
     $perm = ['create ' . $type . ' content', 'edit own ' . $type . ' content', 'delete own ' . $type . ' content'];
     $user = $this->drupalCreateUser($perm);

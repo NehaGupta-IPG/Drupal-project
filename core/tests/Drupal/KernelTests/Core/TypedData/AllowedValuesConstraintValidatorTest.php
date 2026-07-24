@@ -7,12 +7,13 @@ namespace Drupal\KernelTests\Core\TypedData;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests AllowedValues validation constraint with both valid and invalid values.
  */
 #[Group('Validation')]
+#[RunTestsInSeparateProcesses]
 class AllowedValuesConstraintValidatorTest extends KernelTestBase {
 
   /**
@@ -38,7 +39,7 @@ class AllowedValuesConstraintValidatorTest extends KernelTestBase {
   public function testValidation(): void {
     // Create a definition that specifies some AllowedValues.
     $definition = DataDefinition::create('integer')
-      ->addConstraint('AllowedValues', [1, 2, 3]);
+      ->addConstraint('AllowedValues', ['choices' => [1, 2, 3]]);
 
     // Test the validation.
     $typed_data = $this->typedDataManager->create($definition, 1);
@@ -98,7 +99,7 @@ class AllowedValuesConstraintValidatorTest extends KernelTestBase {
    * @return string[]
    *   A list of allowed values.
    */
-  public static function allowedValueCallback() {
+  public static function allowedValueCallback(): array {
     return ['a', 'b', 'c', '1'];
   }
 
@@ -113,8 +114,8 @@ class AllowedValuesConstraintValidatorTest extends KernelTestBase {
       ->addConstraint('AllowedValues', ['choices' => [1, 2, 3], 'callback' => [static::class, 'doesNotExist']]);
     $typed_data = $this->typedDataManager->create($definition, 1);
 
-    $this->expectException(ConstraintDefinitionException::class);
-    $this->expectExceptionMessage('The AllowedValuesConstraint constraint expects a valid callback');
+    $this->expectException(\TypeError::class);
+    $this->expectExceptionMessageIs('Symfony\Component\Validator\Constraints\Choice::__construct(): Argument #3 ($callback) must be of type callable|string|null, array given');
     $typed_data->validate();
   }
 
