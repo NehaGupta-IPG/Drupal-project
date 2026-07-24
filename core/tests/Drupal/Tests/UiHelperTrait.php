@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests;
 
 use Behat\Mink\Driver\BrowserKitDriver;
+use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Session\AccountInterface;
@@ -129,7 +130,7 @@ trait UiHelperTrait {
         '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
       $html_output .= '<hr />' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
-      $label = 'POST: ' . $action . ' - ' . $this->getSession()->getStatusCode();
+      $label = 'POST: ' . $action . ' - ' . $this->getHtmlOutputStatusCode();
       $this->htmlOutput($html_output, $label);
     }
 
@@ -291,7 +292,7 @@ trait UiHelperTrait {
         '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
       $html_output .= '<hr />' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
-      $label = 'GET: ' . $url . ' - ' . $this->getSession()->getStatusCode();
+      $label = 'GET: ' . $url . ' - ' . $this->getHtmlOutputStatusCode();
       $this->htmlOutput($html_output, $label);
     }
 
@@ -433,7 +434,7 @@ trait UiHelperTrait {
         '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
       $html_output .= '<hr />' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
-      $label = 'CLICK: ' . $css_selector . ' - ' . $this->getSession()->getStatusCode();
+      $label = 'CLICK: ' . $css_selector . ' - ' . $this->getHtmlOutputStatusCode();
       $this->htmlOutput($html_output, $label);
     }
   }
@@ -543,6 +544,23 @@ trait UiHelperTrait {
       return $driver->getClient() instanceof DrupalTestBrowser;
     }
     return FALSE;
+  }
+
+  /**
+   * Returns the response status code for HTML output labels.
+   *
+   * Drivers such as Selenium do not support retrieving the status code.
+   *
+   * @return string
+   *   The status code, or 'N/A' if the driver does not support it.
+   */
+  private function getHtmlOutputStatusCode(): string {
+    try {
+      return (string) $this->getSession()->getStatusCode();
+    }
+    catch (UnsupportedDriverActionException) {
+      return 'N/A';
+    }
   }
 
 }
