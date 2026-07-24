@@ -125,7 +125,7 @@ class CommentItemTest extends FieldKernelTestBase {
   }
 
   /**
-   * Tests ::hasAffectingChanges.
+   * Tests CommentFieldItemList field has relevant changes.
    *
    * @legacy-covers \Drupal\comment\CommentFieldItemList::hasAffectingChanges
    */

@@ -8,6 +8,7 @@ use Drupal\comment\CommentingStatus;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
+use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class CommentTranslationUITest extends ContentTranslationUITestBase {
 
   use CommentTestTrait;
+  use ContentTranslationTestTrait;
 
   /**
    * {@inheritdoc}
@@ -245,21 +247,16 @@ class CommentTranslationUITest extends ContentTranslationUITestBase {
    */
   public function testNonTranslatableCommentFieldHasAffectingChanges(): void {
     // Make comment field non-translatable and hide on translation forms.
-    $this->drupalLogin($this->administrator);
-    $edit = [
-      'entity_types[node]' => 1,
-      'settings[node][article][translatable]' => 1,
-      'settings[node][article][settings][content_translation][untranslatable_fields_hide]' => 1,
-      'settings[node][article][fields][comment_article]' => 0,
-    ];
-    $this->drupalGet('/admin/config/regional/content-language');
-    $this->submitForm($edit, 'Save configuration');
-    // Create article translator.
-    $user = $this->createUser([
+    $this->enableContentTranslation('node', 'article');
+    $this->container->get('content_translation.manager')->setBundleTranslationSettings('node', 'article', [
+      'untranslatable_fields_hide' => TRUE,
+    ]);
+    self::setFieldTranslatable('node', 'article', 'comment_article', FALSE);
+    // Login as article translator.
+    $this->drupalLogin($this->createUser([
       'create content translations',
       'translate article node',
-    ]);
-    $this->drupalLogin($user);
+    ]));
     // Create a node.
     $node = $this->drupalCreateNode([
       'title' => 'Node with non-translatable comment field',
