@@ -29,18 +29,17 @@ class Result extends ResultBase {
    *   The MySQLi result object.
    * @param \mysqli $mysqliConnection
    *   Client database connection object.
-   * @param bool $valid
-   *   TRUE if the statement's ::execute() call was successful, or FALSE on
-   *   failure.
+   * @param bool $isIterable
+   *   TRUE if the statement result is iterable, FALSE otherwise.
    */
   public function __construct(
     FetchAs $fetchMode,
     array $fetchOptions,
     protected readonly \mysqli_result|false $mysqliResult,
     protected readonly \mysqli $mysqliConnection,
-    bool $valid,
+    bool $isIterable,
   ) {
-    parent::__construct($fetchMode, $fetchOptions, $valid && (bool) $mysqliResult);
+    parent::__construct($fetchMode, $fetchOptions, $isIterable && (bool) $mysqliResult);
   }
 
   /**

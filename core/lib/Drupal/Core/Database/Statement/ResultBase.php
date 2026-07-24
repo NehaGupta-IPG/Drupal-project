@@ -55,16 +55,15 @@ abstract class ResultBase implements \Iterator {
    *   The fetch mode.
    * @param FetchOptions $fetchOptions
    *   The fetch options.
-   * @param bool $valid
-   *   TRUE if the statement's ::execute() call was successful, or FALSE on
-   *   failure.
+   * @param bool $isIterable
+   *   TRUE if the statement result is iterable, FALSE otherwise.
    */
   public function __construct(
     FetchAs $fetchMode,
     array $fetchOptions,
-    bool $valid,
+    bool $isIterable,
   ) {
-    $this->markResultsetIterable($valid);
+    $this->markResultsetIterable($isIterable);
     $this->setFetchMode($fetchMode, $fetchOptions);
   }
 
@@ -183,13 +182,13 @@ abstract class ResultBase implements \Iterator {
   /**
    * Informs the iterator whether rows can be fetched from the resultset.
    *
-   * @param bool $valid
-   *   The result of the execution of the client statement.
+   * @param bool $isIterable
+   *   TRUE if the statement result is iterable, FALSE otherwise.
    */
-  protected function markResultsetIterable(bool $valid): void {
-    $this->isIterable = $valid;
+  protected function markResultsetIterable(bool $isIterable): void {
+    $this->isIterable = $isIterable;
     $this->resultsetRow = NULL;
-    if ($valid === TRUE) {
+    if ($isIterable) {
       $this->resultsetIndex = -1;
     }
   }

@@ -36,18 +36,17 @@ class PrefetchedResult extends ResultBase {
    *   The prefetched data, in FetchAs::Associative format.
    * @param int|null $rowCount
    *   The row count.
-   * @param bool $valid
-   *   TRUE if the statement's ::execute() call was successful, or FALSE on
-   *   failure.
+   * @param bool $isIterable
+   *   TRUE if the statement result is iterable, FALSE otherwise.
    */
   public function __construct(
     FetchAs $fetchMode,
     array $fetchOptions,
     protected array $data,
     public readonly ?int $rowCount,
-    bool $valid,
+    bool $isIterable,
   ) {
-    parent::__construct($fetchMode, $fetchOptions, $valid);
+    parent::__construct($fetchMode, $fetchOptions, $isIterable);
     $this->columnNames = isset($this->data[0]) ? array_keys($this->data[0]) : [];
     $this->currentRowIndex = -1;
   }

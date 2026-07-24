@@ -49,10 +49,10 @@ abstract class StatementBase implements \Iterator, StatementInterface {
   /**
    * Holds the default fetch mode.
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
    *   ResultBase::setFetchMode() instead.
    *
-   * @see https://www.drupal.org/node/7654123
+   * @see https://www.drupal.org/node/3613105
    */
   protected FetchAs $fetchMode = FetchAs::Object;
 
@@ -61,10 +61,10 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    *
    * @var array{'class': class-string, 'constructor_args': list<mixed>, 'column': int}
    *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
    *   ResultBase::setFetchMode() instead.
    *
-   * @see https://www.drupal.org/node/7654123
+   * @see https://www.drupal.org/node/3613105
    */
   protected array $fetchOptions = [
     'class' => 'stdClass',

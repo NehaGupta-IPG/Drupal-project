@@ -23,17 +23,16 @@ class PdoResult extends ResultBase {
    * @param \PDOStatement $clientStatement
    *   The PDO Statement object. PDO does not provide a separate object for
    *   results, se we need to fetch data from the Statement.
-   * @param bool $valid
-   *   TRUE if the statement's ::execute() call was successful, or FALSE on
-   *   failure.
+   * @param bool $isIterable
+   *   TRUE if the statement result is iterable, FALSE otherwise.
    */
   public function __construct(
     FetchAs $fetchMode,
     array $fetchOptions,
     protected readonly \PDOStatement $clientStatement,
-    bool $valid,
+    bool $isIterable,
   ) {
-    parent::__construct($fetchMode, $fetchOptions, $valid);
+    parent::__construct($fetchMode, $fetchOptions, $isIterable);
   }
 
   /**
