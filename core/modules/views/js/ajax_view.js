@@ -85,13 +85,28 @@
       // Remove the question mark and Drupal path component if any.
       queryString = queryString.slice(1);
 
+      // Collect the base names of every named field in the exposed form. The
+      // trailing `[…]` is stripped so a multi-select field named `type[]`
+      // matches URL params serialized by PHP as `type[0]`, `type[1]`, or
+      // `type[]`.
+      const stripArraySuffix = (name) => {
+        const bracketIndex = name.indexOf('[');
+        return bracketIndex === -1 ? name : name.slice(0, bracketIndex);
+      };
+      const exposedFieldBaseNames = new Set();
+      this.$exposed_form
+        .find('input[name], select[name], textarea[name]')
+        .each(function () {
+          exposedFieldBaseNames.add(stripArraySuffix(this.name));
+        });
+
       // Remove current exposed filters.
       const params = decodeURI(queryString)
         .split('&')
         .filter((param) => {
-          const [name, value] = param.split('=');
+          const [name] = param.split('=');
           return (
-            this.$exposed_form.find(`input[name="${name}"]`).length === 0 &&
+            !exposedFieldBaseNames.has(stripArraySuffix(name)) &&
             /*
             Submitting filters should reset paging and sorting
             because that is what happens without AJAX.

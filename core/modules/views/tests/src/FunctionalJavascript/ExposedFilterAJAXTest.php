@@ -253,6 +253,63 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests deselecting a multi-select exposed filter clears it from the URL.
+   */
+  public function testUnselectMultiSelectExposedFilter(): void {
+    // Flip the type filter to allow multiple selections.
+    \Drupal::configFactory()->getEditable('views.view.content')
+      ->set('display.default.display_options.filters.type.expose.multiple', TRUE)
+      ->save();
+
+    // Create a second content type and a node of that type so we can tell the
+    // filter was actually cleared.
+    $this->createContentType(['type' => 'article']);
+    $this->createNode(['type' => 'article', 'title' => 'Article One']);
+
+    $assert = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalGet('admin/content', ['query' => ['type[]' => 'page']]);
+    $html = $page->getHtml();
+    $this->assertStringContainsString('Page One', $html);
+    $this->assertStringNotContainsString('Article One', $html);
+
+    $select = $page->find('css', 'select[name="type[]"]');
+    $this->assertNotNull($select);
+    $select->setValue([]);
+    $page->pressButton('Filter');
+    $assert->assertWaitOnAjaxRequest();
+
+    $html = $page->getHtml();
+    $this->assertStringContainsString('Page One', $html);
+    $this->assertStringContainsString('Article One', $html);
+    $url = $this->getSession()->getCurrentUrl();
+    $this->assertStringNotContainsString('type%5B%5D=page', $url);
+    $this->assertStringNotContainsString('type[]=page', $url);
+
+    $this->drupalGet('admin/content', [
+      'query' => ['type[0]' => 'article', 'type[1]' => 'page'],
+    ]);
+    $html = $page->getHtml();
+    $this->assertStringContainsString('Page One', $html);
+    $this->assertStringContainsString('Article One', $html);
+
+    $select = $page->find('css', 'select[name="type[]"]');
+    $this->assertNotNull($select);
+    // Keep only article selected; drop page.
+    $select->setValue(['article']);
+    $page->pressButton('Filter');
+    $assert->assertWaitOnAjaxRequest();
+
+    $html = $page->getHtml();
+    $this->assertStringContainsString('Article One', $html);
+    $this->assertStringNotContainsString('Page One', $html);
+    $this->assertStringNotContainsString('Page Two', $html);
+    $url = $this->getSession()->getCurrentUrl();
+    $this->assertStringNotContainsString('=page', $url);
+  }
+
+  /**
    * Tests that errors messages are displayed for exposed filters via ajax.
    */
   public function testExposedFilterErrorMessages(): void {
