@@ -88,7 +88,34 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     bool $colors,
     bool $suppressDeprecations,
   ): Process {
-    $command = $this->prepareCommand($test_run, $test_class, $colors, $suppressDeprecations);
+    $testFileName = (new \ReflectionClass($test_class))->getFileName();
+    return $this->startPhpUnitOnSingleTestFile($test_run, $testFileName, $colors, $suppressDeprecations);
+  }
+
+  /**
+   * Starts asynchronous execution of a PHPUnit process.
+   *
+   * This method executes the tests for a single test file.
+   *
+   * @param \Drupal\Core\Test\TestRun $test_run
+   *   The test run object.
+   * @param string $testFileName
+   *   The test file name.
+   * @param bool $colors
+   *   Whether to use colors in output.
+   * @param bool $suppressDeprecations
+   *   If TRUE, disables the deprecation reporting.
+   *
+   * @return \Symfony\Component\Process\Process
+   *   The spawned process object.
+   */
+  public function startPhpUnitOnSingleTestFile(
+    TestRun $test_run,
+    string $testFileName,
+    bool $colors,
+    bool $suppressDeprecations,
+  ): Process {
+    $command = $this->prepareCommand($test_run, $testFileName, $colors, $suppressDeprecations);
     $test_run->start(microtime(TRUE));
     $process = new Process($command['cli_command'], $command['work_dir'], $command['environment_vars']);
     $process->setTimeout(NULL);
@@ -223,8 +250,8 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    *
    * @param \Drupal\Core\Test\TestRun $test_run
    *   The test run object.
-   * @param class-string $test_class_name
-   *   A fully qualified test class name.
+   * @param string $testFileName
+   *   The test file name.
    * @param bool $colors
    *   Whether to use colors in output.
    * @param bool $suppressDeprecations
@@ -235,7 +262,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    */
   protected function prepareCommand(
     TestRun $test_run,
-    string $test_class_name,
+    string $testFileName,
     bool $colors = FALSE,
     bool $suppressDeprecations = FALSE,
   ): array {
@@ -290,9 +317,8 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       }
     }
 
-    // Add to the command the file containing the test class to be run.
-    $reflectedClass = new \ReflectionClass($test_class_name);
-    $command[] = $reflectedClass->getFileName();
+    // Add the file containing the test class to be run.
+    $command[] = $testFileName;
 
     return [
       'cli_command' => $command,

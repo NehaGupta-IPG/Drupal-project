@@ -6,12 +6,14 @@ namespace Drupal\KernelTests\Core\Test;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Test\JUnitConverter;
 use Drupal\Core\Test\PhpUnitTestRunner;
 use Drupal\Core\Test\SimpletestTestRunResultsStorage;
 use Drupal\Core\Test\TestRun;
 use Drupal\Core\Test\TestRunResultsStorageInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\TestRunner\MemoryTestRunResultsStorage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -298,6 +300,27 @@ class TestRunTest extends KernelTestBase {
       'message' => 'Major Tom',
       'message_group' => 'other',
     ];
+  }
+
+  /**
+   * Tests SQL exception dumps the execution information in PHPUnit.
+   */
+  public function testSqlStatementExceptionDump(): void {
+    $runner = PhpUnitTestRunner::create(\Drupal::getContainer())
+      ->setConfigurationFilePath($this->root . '/core');
+    $process = $runner->startPhpUnitOnSingleTestFile(
+      TestRun::createNew(new MemoryTestRunResultsStorage()),
+      __DIR__ . '/../../../../fixtures/TestTools/SqlExceptionDumpTest.php',
+      colors: FALSE,
+      suppressDeprecations: FALSE,
+    );
+    while (!$process->isTerminated()) {
+      sleep(1);
+    }
+    $output = $process->getOutput();
+    $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*FROM.*bananas_are_awesome.*WHERE.*palm_height.*\>.*:db_condition_placeholder_0/s', $output);
+    $this->assertMatchesRegularExpression('/Placeholders.*:db_condition_placeholder_0.*180/s', $output);
+    $this->assertMatchesRegularExpression('/Options.*allow_delimiter_in_query.*false/s', $output);
   }
 
 }

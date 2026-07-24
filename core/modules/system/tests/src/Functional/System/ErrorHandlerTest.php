@@ -117,7 +117,7 @@ class ErrorHandlerTest extends BrowserTestBase {
       '%line' => 64,
       '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
-    $error_renderer_exception = '<em class="placeholder">Exception</em>: This is an exception that occurs during rendering in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():104}()</em> (line';
+    $error_renderer_exception = '<em class="placeholder">Exception</em>: This is an exception that occurs during rendering in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():105}()</em> (line';
     $this->drupalGet('error-test/trigger-exception');
     $this->assertSession()->statusCodeEquals(500);
     $this->assertSession()->responseContains($error_exception);
@@ -130,6 +130,10 @@ class ErrorHandlerTest extends BrowserTestBase {
     // Assert statement improved since static queries adds table alias in the
     // error message.
     $this->assertSession()->pageTextContains($error_pdo_exception['@message']);
+    $this->assertSession()->responseMatches('/SQL statement.*SELECT.*FROM.*bananas_are_awesome.*WHERE.*palm_height.*\>.*:db_condition_placeholder_0/s');
+    $this->assertSession()->responseMatches('/Placeholders.*:db_condition_placeholder_0.*180/s');
+    $this->assertSession()->responseMatches('/Options.*allow_delimiter_in_query.*false/s');
+
     $error_details = 'in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;triggerPDOException()</em> (line';
     $this->assertSession()->responseContains($error_details);
     $this->drupalGet('error-test/trigger-renderer-exception');
