@@ -283,9 +283,9 @@ class BlockHooks {
    * Assigns an initial, default set of blocks for a theme.
    *
    * This function is called the first time a new theme is installed. The new
-   * theme gets a copy of the default theme's blocks, with the difference that
-   * if a particular region isn't available in the new theme, the block is
-   * assigned to the new theme's default region.
+   * theme gets a copy of its base theme's blocks, if available, or the default
+   * theme's blocks. If a particular region isn't available in the new theme,
+   * the block is assigned to the new theme's default region.
    *
    * @param string $theme
    *   The name of a theme.
@@ -296,21 +296,27 @@ class BlockHooks {
     // Initialize theme's blocks if none already registered.
     $has_blocks = $storage->loadByProperties(['theme' => $theme]);
     if (!$has_blocks) {
-      $default_theme = \Drupal::configFactory()->get('system.theme')->get('default');
       $theme_extension = $this->themeHandler->getTheme($theme);
       // Apply only to new theme's visible regions.
       $regions = $theme_extension->listVisibleRegions();
-      $default_theme_blocks = $storage->loadByProperties(['theme' => $default_theme]);
+      $source_theme = \Drupal::configFactory()->get('system.theme')->get('default');
+      if (!empty($theme_extension->base_theme) && $this->themeHandler->themeExists($theme_extension->base_theme)) {
+        $base_theme_blocks = $storage->loadByProperties(['theme' => $theme_extension->base_theme]);
+        if ($base_theme_blocks) {
+          $source_theme = $theme_extension->base_theme;
+        }
+      }
+      $source_theme_blocks = $storage->loadByProperties(['theme' => $source_theme]);
       $block_repository = \Drupal::service('block.repository');
-      foreach ($default_theme_blocks as $default_theme_block_id => $default_theme_block) {
-        if (str_starts_with($default_theme_block_id, $default_theme . '_')) {
-          $id = str_replace($default_theme . '_', '', $default_theme_block_id);
+      foreach ($source_theme_blocks as $source_theme_block_id => $source_theme_block) {
+        if (str_starts_with($source_theme_block_id, $source_theme . '_')) {
+          $id = str_replace($source_theme . '_', '', $source_theme_block_id);
         }
         else {
-          $id = $default_theme_block_id;
+          $id = $source_theme_block_id;
         }
         $id = $block_repository->getUniqueMachineName($id, $theme);
-        $block = $default_theme_block->createDuplicateBlock($id, $theme);
+        $block = $source_theme_block->createDuplicateBlock($id, $theme);
         // If the region isn't supported by the theme, assign the block to the
         // theme's default region.
         if (!isset($regions[$block->getRegion()])) {

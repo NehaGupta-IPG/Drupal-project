@@ -109,6 +109,71 @@ class NewDefaultThemeBlocksTest extends KernelTestBase {
   }
 
   /**
+   * Tests that a subtheme gets blocks from its base theme.
+   */
+  public function testSubthemeBlocks(): void {
+    $default_theme = $this->defaultTheme;
+    $base_theme = 'test_base_theme';
+    $subtheme = 'test_subtheme';
+    $this->container->get('theme_installer')->install([
+      $default_theme,
+      $base_theme,
+    ]);
+
+    // Ensure blocks from the default theme are not copied to the subtheme.
+    $this->placeBlock('system_powered_by_block', [
+      'id' => $default_theme . '_default',
+    ]);
+
+    $this->placeBlock('user_login_block', [
+      'id' => $base_theme . '_login',
+      'theme' => $base_theme,
+    ]);
+    $this->placeBlock('system_powered_by_block', [
+      'id' => $base_theme . '_powered',
+      'theme' => $base_theme,
+    ]);
+
+    $this->container->get('theme_installer')->install([$subtheme]);
+
+    $block_storage = $this->container->get('entity_type.manager')->getStorage('block');
+    $subtheme_blocks = $block_storage->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('theme', $subtheme)
+      ->execute();
+    $this->assertSame([
+      $subtheme . '_login',
+      $subtheme . '_powered',
+    ], array_values($subtheme_blocks));
+  }
+
+  /**
+   * Tests that a subtheme with no base theme blocks gets default theme blocks.
+   */
+  public function testSubthemeWithoutBaseThemeBlocks(): void {
+    $default_theme = $this->defaultTheme;
+    $subtheme = 'test_subtheme';
+    $this->container->get('theme_installer')->install([$default_theme]);
+
+    $this->placeBlock('system_powered_by_block', [
+      'id' => $default_theme . '_default',
+    ]);
+
+    // Installing the subtheme also installs its hidden base theme. The base
+    // theme has no blocks, so the subtheme gets the default theme's blocks.
+    $this->container->get('theme_installer')->install([$subtheme]);
+
+    $block_storage = $this->container->get('entity_type.manager')->getStorage('block');
+    $subtheme_blocks = $block_storage->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('theme', $subtheme)
+      ->execute();
+    $this->assertSame([
+      $subtheme . '_default',
+    ], array_values($subtheme_blocks));
+  }
+
+  /**
    * Checks that a theme block is still created when same ID exists.
    */
   public function testBlockCollision(): void {
