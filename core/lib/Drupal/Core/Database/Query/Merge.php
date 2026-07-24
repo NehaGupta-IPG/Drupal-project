@@ -359,28 +359,21 @@ class Merge extends Query implements ConditionInterface {
       throw new InvalidMergeQueryException('Invalid merge query: no conditions');
     }
 
+    $transaction = $this->connection->inTransaction() ? NULL : $this->connection->startTransaction();
+
     $select = $this->connection->select($this->conditionTable)
       ->condition($this->condition);
     $select->addExpression('1');
+    $select->forUpdate();
 
     if (!$select->execute()->fetchField()) {
-      try {
-        $insert = $this->connection->insert($this->table)->fields($this->insertFields);
-        if ($this->defaultFields) {
-          $insert->useDefaults($this->defaultFields);
-        }
-        $insert->execute();
-        return self::STATUS_INSERT;
+      $insert = $this->connection->insert($this->table)->fields($this->insertFields);
+      if ($this->defaultFields) {
+        $insert->useDefaults($this->defaultFields);
       }
-      catch (IntegrityConstraintViolationException $e) {
-        // The insert query failed, maybe it's because a racing insert query
-        // beat us in inserting the same row. Retry the select query, if it
-        // returns a row, ignore the error and continue with the update
-        // query below.
-        if (!$select->execute()->fetchField()) {
-          throw $e;
-        }
-      }
+      $insert->execute();
+      $transaction?->commitOrRelease();
+      return self::STATUS_INSERT;
     }
 
     if ($this->needsUpdate) {
@@ -393,8 +386,11 @@ class Merge extends Query implements ConditionInterface {
         }
       }
       $update->execute();
+      $transaction?->commitOrRelease();
       return self::STATUS_UPDATE;
     }
+
+    $transaction?->commitOrRelease();
     return NULL;
   }
 
