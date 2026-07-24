@@ -193,6 +193,13 @@ class UserSession implements AccountInterface {
   /**
    * {@inheritdoc}
    */
+  public function getColorScheme() {
+    return $this->color_scheme ?? 'auto';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getLastAccessedTime() {
     return (int) $this->access;
   }

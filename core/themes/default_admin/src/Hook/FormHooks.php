@@ -481,7 +481,6 @@ class FormHooks {
       $user_settings = [
         'preset_accent_color' => $form_state->getValue('preset_accent_color'),
         'preset_focus_color' => $form_state->getValue('preset_focus_color'),
-        'enable_dark_mode' => $form_state->getValue('enable_dark_mode'),
         'high_contrast_mode' => (bool) $form_state->getValue('high_contrast_mode'),
         'accent_color' => $form_state->getValue('accent_color'),
         'focus_color' => $form_state->getValue('focus_color'),

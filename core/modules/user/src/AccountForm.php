@@ -324,6 +324,24 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       $form['timezone']['timezone']['#attributes'] = ['class' => ['timezone-detect']];
     }
 
+    $form['user_settings'] = [
+      '#type' => 'details',
+      '#title' => $this->t('User settings'),
+      '#open' => TRUE,
+      '#weight' => 7,
+    ];
+    $form['user_settings']['color_scheme'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Dark mode'),
+      '#options' => [
+        'light' => $this->t('Light'),
+        'dark' => $this->t('Dark'),
+        'auto' => $this->t('Auto'),
+      ],
+      '#default_value' => $account->get('color_scheme')->value ?: 'auto',
+      '#description' => $this->t('Choose the interface color scheme. Auto follows your operating system setting. Whether the selected color scheme is applied depends on the active theme.'),
+    ];
+
     return parent::form($form, $form_state);
   }
 
@@ -414,6 +432,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       'mail',
       'roles',
       'timezone',
+      'color_scheme',
       'langcode',
       'preferred_langcode',
       'preferred_admin_langcode',
@@ -433,6 +452,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       'mail',
       'roles',
       'timezone',
+      'color_scheme',
       'langcode',
       'preferred_langcode',
       'preferred_admin_langcode',

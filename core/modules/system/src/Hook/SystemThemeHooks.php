@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Hook;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Theme\ThemeCommonElements;
 use Drupal\system\Theme\SystemAdminThemePreprocess;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -11,6 +12,10 @@ use Drupal\Core\Hook\Attribute\Hook;
  * Hook implementations for system.
  */
 class SystemThemeHooks {
+
+  public function __construct(
+    protected readonly AccountInterface $currentUser,
+  ) {}
 
   /**
    * Implements hook_theme().
@@ -233,6 +238,20 @@ class SystemThemeHooks {
     $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#field_name'];
     $suggestions[] = 'field__' . $element['#entity_type'] . '__' . $element['#field_name'] . '__' . $element['#bundle'];
     return $suggestions;
+  }
+
+  /**
+   * Implements hook_preprocess_HOOK() for the html template.
+   *
+   * Sets the data-color-scheme attribute on the <html> element based on the
+   * current user's preferred color scheme.
+   */
+  #[Hook('preprocess_html')]
+  public function preprocessHtml(array &$variables): void {
+    $variables['html_attributes']['data-color-scheme'] = $this->currentUser->getColorScheme();
+    // The color scheme varies per user, so the html markup must not be shared
+    // across users.
+    $variables['#cache']['contexts'][] = 'user';
   }
 
   /**

@@ -15,6 +15,7 @@ use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
  * Implements hook_schema().
@@ -112,4 +113,21 @@ function user_install(): void {
  */
 function user_update_last_removed(): int {
   return 10000;
+}
+
+/**
+ * Adds the 'color_scheme' base field to the user entity.
+ */
+function user_update_11101(): void {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $field = BaseFieldDefinition::create('list_string')
+    ->setLabel(t('Color scheme'))
+    ->setDescription(t("The user's preferred color scheme for the interface."))
+    ->setSetting('allowed_values', [
+      'light' => t('Light'),
+      'dark' => t('Dark'),
+      'auto' => t('Auto'),
+    ])
+    ->setDefaultValue('auto');
+  $definition_update_manager->installFieldStorageDefinition('color_scheme', 'user', 'user', $field);
 }

@@ -161,6 +161,14 @@ interface AccountInterface {
   public function getTimeZone();
 
   /**
+   * Returns the preferred color scheme of this account.
+   *
+   * @return string
+   *   The color scheme, one of 'light', 'dark' or 'auto'. Defaults to 'auto'.
+   */
+  public function getColorScheme();
+
+  /**
    * The timestamp when the account last accessed the site.
    *
    * A value of 0 means the user has never accessed the site.

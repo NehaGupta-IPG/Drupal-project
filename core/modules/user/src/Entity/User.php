@@ -364,6 +364,13 @@ class User extends ContentEntityBase implements UserInterface {
   /**
    * {@inheritdoc}
    */
+  public function getColorScheme() {
+    return $this->getFieldValue('color_scheme', 'value') ?: 'auto';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getPreferredLangcode($fallback_to_default = TRUE) {
     $language_list = $this->languageManager()->getLanguages();
     $preferred_langcode = $this->get('preferred_langcode')->value;
@@ -552,6 +559,16 @@ class User extends ContentEntityBase implements UserInterface {
         'AllowedValues' => ['callback' => __CLASS__ . '::getAllowedTimezones'],
       ]);
     $fields['timezone']->getItemDefinition()->setClass(TimeZoneItem::class);
+
+    $fields['color_scheme'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(t('Color scheme'))
+      ->setDescription(t("The user's preferred color scheme for the interface."))
+      ->setSetting('allowed_values', [
+        'light' => t('Light'),
+        'dark' => t('Dark'),
+        'auto' => t('Auto'),
+      ])
+      ->setDefaultValue('auto');
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('User status'))
