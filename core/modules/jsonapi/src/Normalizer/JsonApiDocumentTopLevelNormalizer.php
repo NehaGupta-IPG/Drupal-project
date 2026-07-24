@@ -321,7 +321,8 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
       throw new BadRequestHttpException("Resource object must include a \"type\".");
     }
     // Ensure that the given type matches the resource type being requested.
-    // See https://jsonapi.org/format/#crud-creating-responses-409.
+    // See https://jsonapi.org/format/#crud-creating-responses-409 (POST) and
+    // https://jsonapi.org/format/#crud-updating-responses-409 (PATCH).
     if ($document['data']['type'] !== $resource_type->getTypeName()) {
       throw new ConflictHttpException(sprintf('Resource object with type "%s" does not match type "%s" of the requested resource.', $document['data']['type'], $resource_type->getTypeName()));
     }

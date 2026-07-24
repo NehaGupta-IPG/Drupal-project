@@ -894,6 +894,22 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertNotEmpty($document['errors']);
     $this->assertSame("Bad Request", $document['errors'][0]['title']);
     $this->assertSame("Resource object must include a \"type\".", $document['errors'][0]['detail']);
+    // 6.3 "type" does not match the requested resource type.
+    $mismatched_type = $body;
+    $mismatched_type['data']['type'] = 'taxonomy_term--tags';
+    $response = $this->request('POST', $collection_url, [
+      'body' => Json::encode($mismatched_type),
+      'auth' => [$this->user->getAccountName(), $this->user->pass_raw],
+      'headers' => [
+        'Accept' => 'application/vnd.api+json',
+        'Content-Type' => 'application/vnd.api+json',
+      ],
+    ]);
+    $document = $this->getDocumentFromResponse($response, FALSE);
+    $this->assertSame(409, $response->getStatusCode());
+    $this->assertNotEmpty($document['errors']);
+    $this->assertSame('Conflict', $document['errors'][0]['title']);
+    $this->assertSame('Resource object with type "taxonomy_term--tags" does not match type "node--article" of the requested resource.', $document['errors'][0]['detail']);
     // 7. Successful PATCH.
     $body = [
       'data' => [
@@ -931,6 +947,20 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'headers' => ['Content-Type' => 'application/vnd.api+json'],
     ]);
     $this->assertEquals(403, $response->getStatusCode());
+
+    // 7.2 Unsuccessful PATCH due to a mismatched resource type.
+    $mismatched_type = $body;
+    $mismatched_type['data']['type'] = 'taxonomy_term--tags';
+    $response = $this->request('PATCH', $individual_url, [
+      'body' => Json::encode($mismatched_type),
+      'auth' => [$this->user->getAccountName(), $this->user->pass_raw],
+      'headers' => ['Content-Type' => 'application/vnd.api+json'],
+    ]);
+    $document = $this->getDocumentFromResponse($response, FALSE);
+    $this->assertSame(409, $response->getStatusCode());
+    $this->assertNotEmpty($document['errors']);
+    $this->assertSame('Conflict', $document['errors'][0]['title']);
+    $this->assertSame('Resource object with type "taxonomy_term--tags" does not match type "node--article" of the requested resource.', $document['errors'][0]['detail']);
 
     // 8. Field access forbidden check.
     $body = [
