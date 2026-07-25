@@ -28,7 +28,7 @@ class Item extends FormElementBase {
       '#markup' => '',
       // An item exposes its #id on the wrapping div, which is not a labelable
       // element, so its title must not be rendered as a label element.
-      '#nonlabelable' => TRUE,
+      '#non_labelable' => TRUE,
       '#theme_wrappers' => ['form_element'],
     ];
   }

@@ -8,7 +8,7 @@
  * - title_display: Elements title_display setting.
  * - required: An indicator for whether the associated form element is required.
  * - attributes: A list of HTML attributes for the label.
- * - nonlabelable: An indicator that the label does not apply to a labelable
+ * - non_labelable: An indicator that the label does not apply to a labelable
  *   element. The title is then wrapped in a span instead of a label.
  *
  * @see \Drupal\Core\Form\FormPreprocess::preprocessFormElementLabel()
@@ -24,7 +24,7 @@
   ]
 %}
 {% if title is not empty or required -%}
-  {%- if nonlabelable -%}
+  {%- if non_labelable -%}
     <span{{ attributes.addClass(classes) }}>{{ title }}</span>
   {%- else -%}
     <label{{ attributes.addClass(classes) }}>{{ title }}</label>
