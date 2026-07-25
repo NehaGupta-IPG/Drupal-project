@@ -177,7 +177,7 @@ class ImageFormatterTest extends FieldKernelTestBase {
   }
 
   /**
-   * Tests ImageUrlFormatter's handling of SVG images.
+   * Tests Image Formatter URL handling of SVG images.
    */
   #[RequiresPhpExtension('gd')]
   public function testImageUrlFormatterSvg(): void {

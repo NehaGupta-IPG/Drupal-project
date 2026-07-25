@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the ResponsiveImageBuilder service.
+ * Tests the Responsive Image Builder service.
  */
 #[Group('responsive_image')]
 #[RunTestsInSeparateProcesses]
@@ -33,7 +33,7 @@ class ResponsiveImageBuilderTest extends KernelTestBase {
   /**
    * The responsive image builder service.
    *
-   * @var \Drupal\responsive_image\ResponsiveImageBuilderInterface
+   * @var \Drupal\responsive_image\ResponsiveImageBuilder
    */
   protected $responsiveImageBuilder;
 
