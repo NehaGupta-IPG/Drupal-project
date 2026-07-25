@@ -157,17 +157,7 @@ class EntityConverterLatestRevisionTest extends KernelTestBase {
     /** @var \Drupal\Core\Database\Connection $database */
     $database = $this->container->get('database');
 
-    if ($database->driver() == 'pgsql') {
-      // JSON storage embeds every revision in the base row's `__data*` jsonb
-      // columns, so the relational trick of deleting the base row (and relying
-      // on a surviving revision table) is impossible — it would remove the
-      // revisions too. Prove the same optimization, that converting a default
-      // revision returns the already-loaded entity without a redundant storage
-      // load, by corrupting the embedded field data after the entity is
-      // statically cached: a fresh load would read the corrupted value, so
-      // getting the original value back proves no reload happened. The revision
-      // structure (ids, flags) is left intact so the latest revision is still
-      // resolved.
+    if ($database->supportsJsonEntityStorage()) {
       $entity = EntityTestMulRev::create(['name' => 'original']);
       $entity->save();
 

@@ -73,7 +73,7 @@ class RevisionRelationshipsTest extends KernelTestBase {
     // "block_content_block_content_id". The joined value is identical; only the
     // result property name differs, so map that property to the same expected
     // key.
-    $rel_field_column = Database::getConnection()->driver() === 'pgsql'
+    $rel_field_column = Database::getConnection()->supportsJsonEntityStorage()
       ? 'block_content_block_content_id'
       : 'block_content_field_data_block_content_field_revision_id';
     $column_map = [

@@ -100,11 +100,11 @@ class ViewsIntegrationTest extends ViewsKernelTestBase {
     $view = Views::getView('dblog_integration_test');
     $view->setDisplay('page_1');
     // The uid relationship should now join to the {users_field_data} table.
-    // Under JSON (jsonb) storage the user field data is collapsed into the
+    // Under JSON entity storage the user field data is collapsed into the
     // physical "users" base table (the logical "users_field_data" table does
     // not exist), so the relationship is re-homed to "users" instead.
     $base_tables = $view->getBaseTables();
-    if (Database::getConnection()->driver() == 'pgsql') {
+    if (\Database::getConnection()->supportsJsonEntityStorage()) {
       $this->assertArrayHasKey('users', $base_tables);
       $this->assertArrayNotHasKey('users_field_data', $base_tables);
     }

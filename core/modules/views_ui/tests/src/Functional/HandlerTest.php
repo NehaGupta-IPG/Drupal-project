@@ -174,7 +174,7 @@ class HandlerTest extends UITestBase {
     // Under pgsql JSON storage the user data table ("users_field_data") is
     // collapsed onto the entity base table ("users"), so the add-handler
     // checkbox is keyed by the base table.
-    $name_field = \Drupal::database()->driver() == 'pgsql'
+    $name_field = \Drupal::database()->supportsJsonEntityStorage()
       ? 'name[users.name]'
       : 'name[users_field_data.name]';
     $this->submitForm([
@@ -272,20 +272,20 @@ class HandlerTest extends UITestBase {
     // Under pgsql JSON storage the node revision tables are collapsed onto
     // the node base table, so no "Content revision" group is offered in the
     // add-handler listing.
-    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
+    $json_storage = \Drupal::database()->supportsJsonEntityStorage();
 
     foreach ($handler_types as $handler_type) {
       $add_handler_url = 'admin/structure/views/nojs/add-handler/test_node_view/default/' . $handler_type;
       $this->drupalGet($add_handler_url);
 
       $this->assertNoDuplicateField('ID', 'Content');
-      if (!$is_pgsql) {
+      if (!$json_storage) {
         $this->assertNoDuplicateField('ID', 'Content revision');
       }
       $this->assertNoDuplicateField('Content type', 'Content');
       $this->assertNoDuplicateField('UUID', 'Content');
       $this->assertNoDuplicateField('Revision ID', 'Content');
-      if (!$is_pgsql) {
+      if (!$json_storage) {
         $this->assertNoDuplicateField('Revision ID', 'Content revision');
       }
     }

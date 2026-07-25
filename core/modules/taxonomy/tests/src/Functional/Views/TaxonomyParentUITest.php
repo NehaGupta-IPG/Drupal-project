@@ -45,12 +45,11 @@ class TaxonomyParentUITest extends UITestBase {
    * Tests the taxonomy parent plugin UI.
    */
   public function testTaxonomyParentUI(): void {
-    // The pgsql JSON storage driver collapses the taxonomy_term__parent table
-    // onto the term base table and prunes the view's "parent" relationship at
-    // import time, so the handler page under test does not exist.
-    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
-    if ($is_pgsql) {
-      $this->markTestSkipped('The pgsql JSON storage driver prunes the taxonomy_term__parent relationship from the view.');
+    // JSON entity storage collapses the taxonomy_term__parent table onto the
+    // term base table and prunes the view's "parent" relationship at import
+    // time, so the handler page under test does not exist.
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
+      $this->markTestSkipped('JSON entity storage prunes the taxonomy_term__parent relationship from the view.');
     }
 
     $this->drupalGet('admin/structure/views/nojs/handler/test_taxonomy_parent/default/relationship/parent');

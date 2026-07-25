@@ -1499,18 +1499,8 @@ class EntityQueryTest extends EntityKernelTestBase {
    * Tests langcode key handling for revision data table joins.
    */
   public function testRevisionDataTableJoinUsesConfiguredLangcodeKey(): void {
-    if ($this->container->get('database')->driver() == 'pgsql') {
-      // This is a white-box regression guard for the relational query compiler:
-      // it asserts the exact SQL for the physical "*_property_revision" join and
-      // that its langcode predicate uses the entity type's configured langcode
-      // key column. The pgsql driver has no such physical table — an
-      // all-revisions query unwinds the base row's "__data_all_revisions" jsonb
-      // column with jsonb_array_elements() into one row per (revision, language)
-      // and restricts that derived base, so there is no physical join to assert
-      // against here. The same configured-langcode-key invariant this test
-      // guards for relational storage is covered for JSONB storage by
-      // \Drupal\Tests\pgsql\Kernel\JsonStorageLangcodeKeyQueryTest.
-      $this->markTestSkipped('pgsql JSONB storage generates jsonb-unwind SQL with no physical revision data table to assert against.');
+    if ($this->container->get('database')->supportsJsonEntityStorage()) {
+      $this->markTestSkipped('JSON entity storage generates json unwind SQL with no physical revision data table to assert against.');
     }
     $entity_type_manager = $this->container->get('entity_type.manager');
     $entity_type = $entity_type_manager->getActiveDefinition('entity_test_mulrev');
@@ -1553,14 +1543,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     // EntityQuery. This way we ensure that the database driver is free to
     // create its own comparable SQL statement.
     $connection = Database::getConnection();
-    if ($connection->driver() == 'pgsql') {
-      // The pgsql driver emits valid SQL through the same DB API, only its
-      // string differs: it has no physical dedicated field tables (the field
-      // lives as a JSON array inside a `__data*` column on the base row), so it
-      // replaces each field-table join with a non-correlated derived table that
-      // "unwinds" that JSON array (@see \Drupal\pgsql\EntityQuery\Tables). The
-      // expected query is rebuilt below with that unwind rather than the
-      // relational dedicated-table joins.
+    if ($connection->supportsJsonEntityStorage()) {
       $expected = $this->buildExpectedPgsqlToStringQuery($connection, $figures);
     }
     else {

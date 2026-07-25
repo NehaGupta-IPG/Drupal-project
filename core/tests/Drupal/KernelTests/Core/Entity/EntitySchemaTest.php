@@ -101,23 +101,13 @@ class EntitySchemaTest extends EntityKernelTestBase {
     \Drupal::service('field_storage_definition.listener')->onFieldStorageDefinitionCreate($storage_definitions['custom_base_field']);
     \Drupal::service('field_storage_definition.listener')->onFieldStorageDefinitionCreate($storage_definitions['custom_bundle_field']);
     $schema_handler = $this->database->schema();
-    if ($this->database->driver() == 'pgsql') {
-      // JSON storage keeps the revision/translation contexts (and the dedicated
-      // field data nested inside them) in embedded `__data*` jsonb columns on
-      // the base table rather than in physical revision/data tables (§7.4
-      // playbook). Only the base table is a physical relation; the other
-      // "tables" are registered embedded tables.
-      // For a revisionable and translatable entity the translation data is
-      // embedded within the revision contexts, so there is no separate
-      // translations table.
+    if ($this->database->supportsJsonEntityStorage()) {
       $tables = [
         'entity_test_update',
         'entity_test_update_all_revisions',
         'entity_test_update_current_revision',
         'entity_test_update_latest_revision',
       ];
-      // While non-revisionable the dedicated field lives in the base context;
-      // once revisionable its data lives in the revision contexts instead.
       $base_dedicated_tables = ['entity_test_update__custom_bundle_field'];
       $updated_dedicated_tables = [
         'entity_test_update_all_revisions__custom_bundle_field',
@@ -218,7 +208,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
 
     $expected = [];
     $expected[$entity_type->getBaseTable()] = [$id_key];
-    if ($this->database->driver() == 'pgsql') {
+    if ($this->database->supportsJsonEntityStorage()) {
       // JSON storage embeds the revision/translation data in `__data*` jsonb
       // columns; the shared documents carry the (revision, langcode) keys.
       $storage = \Drupal::entityTypeManager()->getStorage($entity_type->id());
@@ -276,13 +266,14 @@ class EntitySchemaTest extends EntityKernelTestBase {
     // Now test updating a field with data.
     /** @var \Drupal\Core\Entity\FieldableEntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
-    if ($this->database->driver() == 'pgsql' && $field_name === 'revision_id' && $entity_type->isRevisionable()) {
-      // JSON storage has no physical revision table; the base table's revision
-      // column is sequence-backed. Reinstalling the revision key here leaves it
-      // as a non-revisionable field, which does not re-establish that sequence,
-      // so a freshly created entity has no revision ID to count. This is the
-      // same schema-mutation limitation as ::testEntitySchemaUpdate(); the
-      // primary-key assertions above are the meaningful coverage for this case.
+    if ($this->database->supportsJsonEntityStorage() && $field_name === 'revision_id' && $entity_type->isRevisionable()) {
+      // JSON entity storage has no physical revision table; the base table's
+      // revision column is sequence-backed. Reinstalling the revision key here
+      // leaves it as a non-revisionable field, which does not re-establish
+      // that sequence, so a freshly created entity has no revision ID to count.
+      // This is the same schema-mutation limitation as
+      // ::testEntitySchemaUpdate(); the primary-key assertions above are the
+      // meaningful coverage for this case.
       return;
     }
     $storage->create()->save();
@@ -316,7 +307,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
     // primary key, we skip the assertion for that table as this represents an
     // intermediate and invalid state of the entity schema.
     $primary_keys[$base_table] = $find_primary_key_columns->invoke($schema, $base_table);
-    if ($this->database->driver() == 'pgsql') {
+    if ($this->database->supportsJsonEntityStorage()) {
       $storage = \Drupal::entityTypeManager()->getStorage($entity_type->id());
       if ($entity_type->isRevisionable()) {
         $all_revisions_table = $storage->getJsonStorageAllRevisionsTable();
@@ -462,11 +453,12 @@ class EntitySchemaTest extends EntityKernelTestBase {
     $id_schema = $key_value_store->get('entity_test_rev.field_schema_data.id', []);
     $revision_id_schema = $key_value_store->get('entity_test_rev.field_schema_data.revision_id', []);
 
-    $is_json_storage = $this->database->driver() == 'pgsql';
+    $is_json_storage = $this->database->supportsJsonEntityStorage();
     if ($is_json_storage) {
-      // JSON storage embeds the revision data in three `__data*` jsonb columns
-      // (all/current/latest revision) rather than a physical revision table, so
-      // the id column is replicated across those revision documents as an int.
+      // JSON entity storage embeds the revision data in JSON columns
+      // (all/current/latest revision) rather than a physical revision table,
+      // so the id column is replicated across those revision documents as an
+      // int.
       $expected_id_schema = [
         'entity_test_rev' => [
           'fields' => [

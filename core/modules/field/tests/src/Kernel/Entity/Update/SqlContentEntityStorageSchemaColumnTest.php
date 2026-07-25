@@ -106,9 +106,10 @@ class SqlContentEntityStorageSchemaColumnTest extends KernelTestBase {
   public function testColumnUpdate(): void {
     // Change the field type in the stored schema.
     $schema = \Drupal::keyValue('entity.storage_schema.sql')->get('entity_test_rev.field_schema_data.test');
-    if (Database::getConnection()->driver() == 'pgsql') {
-      // Under JSON storage the dedicated field schema is keyed by the embedded
-      // revision table names, not the canonical '<entity>__<field>' name.
+    if (\Database::getConnection()->supportsJsonEntityStorage()) {
+      // Under JSON entity storage the dedicated field schema is keyed by the
+      // embedded revision table names, not the canonical '<entity>__<field>'
+      // name.
       $schema['entity_test_rev_current_revision__test']['fields']['test_value']['type'] = 'varchar_ascii';
     }
     else {

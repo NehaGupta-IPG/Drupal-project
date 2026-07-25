@@ -105,10 +105,10 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     $this->submitForm($edit, 'Apply');
 
     // Set sort to NID ascending.
-    // Under the pgsql (JSON) driver the "node_field_data" table is collapsed
+    // With JSON entity storage, the "node_field_data" table is collapsed
     // onto the node base table, so the add-handler checkbox is keyed by the
     // base table.
-    $node_table = \Drupal::database()->driver() == 'pgsql' ? 'node' : 'node_field_data';
+    $node_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node_field_data';
     $edit = [
       'name[' . $node_table . '.nid]' => 1,
     ];

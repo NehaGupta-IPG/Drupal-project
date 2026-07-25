@@ -255,7 +255,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     // Under the pgsql (JSON) driver a content entity's field data is collapsed
     // onto the entity base table, so the add-handler checkboxes are keyed by
     // the base table.
-    $term_table = \Drupal::database()->driver() == 'pgsql' ? 'taxonomy_term_data' : 'taxonomy_term_field_data';
+    $term_table = \Drupal::database()->supportsJsonEntityStorage() ? 'taxonomy_term_data' : 'taxonomy_term_field_data';
     // Select 'Term ID' as the field to be displayed.
     $edit = ["name[$term_table.tid]" => TRUE];
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_taxonomy_term_name/default/field');

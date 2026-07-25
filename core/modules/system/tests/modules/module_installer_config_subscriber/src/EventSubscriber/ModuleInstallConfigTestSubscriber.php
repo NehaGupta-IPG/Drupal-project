@@ -36,14 +36,11 @@ class ModuleInstallConfigTestSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    // Probe a physical storage table to prove node's storage was installed
-    // before this config. Node's canonical marker is its data_table, but the
-    // pgsql JSON storage driver embeds node's field data in jsonb columns on
-    // the base row and creates no physical data_table, so fall back to the base
-    // table (which every driver creates) as the storage-installed marker.
-    $table = $definition->get('data_table');
-    if ($this->connection->driver() === 'pgsql') {
+    if ($this->connection->supportsJsonEntityStorage()) {
       $table = $definition->get('base_table');
+    }
+    else {
+      $table = $definition->get('data_table');
     }
     if (!$this->connection->schema()->tableExists($table)) {
       $this->keyValue->get('module_installer_config_subscriber')->set('node_tables_missing', TRUE);

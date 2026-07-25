@@ -88,15 +88,7 @@ class FieldTranslationSqlStorageTest extends EntityLanguageTestBase {
     /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
     $table_mapping = $storage->getTableMapping();
 
-    if (\Drupal::database()->driver() == 'pgsql') {
-      // JSON storage embeds the per-language field data in the base row's
-      // `__data_translations` jsonb column instead of physical dedicated field
-      // tables. The column holds an array of per-language translation documents
-      // keyed by the translations table name; each document carries its
-      // langcode and, per embedded field, an array of dedicated-field rows that
-      // each stamp their own langcode (@see the write layer's
-      // \Drupal\pgsql\Driver\Database\pgsql\DocumentInsertTrait). Read that
-      // column and assert every stored field row carries the expected langcode.
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
       $base_table = $table_mapping->getBaseTable();
       $translations_table = $table_mapping->getJsonStorageTranslationsTable();
       $json = \Drupal::database()

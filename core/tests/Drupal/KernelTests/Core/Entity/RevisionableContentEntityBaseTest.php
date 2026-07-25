@@ -186,13 +186,7 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
     // row per entity.
     $this->assertEquals(1, (int) $connection->select($definition->getBaseTable())->countQuery()->execute()->fetchField());
 
-    if ($connection->driver() == 'pgsql') {
-      // JSON storage has no physical data/revision/revision-data tables: the
-      // current default revision is embedded in the base row's
-      // `__data_current_revision` jsonb column and every revision (one document
-      // per revision and language) in `__data_all_revisions`, each keyed by the
-      // embedded table name. Count those documents to mirror the relational
-      // data-table (1) and revision/revision-data-table ($count) row counts.
+    if ($connection->supportsJsonEntityStorage()) {
       $storage = \Drupal::entityTypeManager()->getStorage($definition->id());
       /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
       $table_mapping = $storage->getTableMapping();

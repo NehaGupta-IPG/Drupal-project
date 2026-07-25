@@ -510,18 +510,8 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
    * Tests that a failed entity schema update preserves the existing data.
    */
   public function testFieldableEntityTypeUpdatesErrorHandling(): void {
-    if ($this->database->driver() == 'pgsql') {
-      // The underlying fieldable entity-type update with data (temporary
-      // embedded tables, data copy via ::restore(), rename-into-place) works for
-      // JSON storage and is covered by
-      // \Drupal\Tests\pgsql\Kernel\JsonStorageEntityTypeUpdateTest. This test's
-      // assertions are irreducibly relational: it counts four per-layout `old_%`
-      // physical backup tables and inspects physical `entity_test_update_data` /
-      // dedicated-table rows. JSON storage keeps everything on the single base
-      // table's `__data*` jsonb columns with the revision/translation/dedicated
-      // contexts tracked as embedded (non-physical) registry entries, so those
-      // exact-table assertions have no equivalent under JSON storage.
-      $this->markTestSkipped('The pgsql JSON storage driver stores backups on the base table, not as physical per-layout backup tables.');
+    if ($this->database->supportsJsonEntityStorage()) {
+      $this->markTestSkipped('With JSON entity storage, it stores backups on the base table, not as physical per-layout backup tables.');
     }
     $schema = $this->database->schema();
 
@@ -693,15 +683,8 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
    * Tests the removal of the backup tables after a successful update.
    */
   public function testFieldableEntityTypeUpdatesRemoveBackupTables(): void {
-    if ($this->database->driver() == 'pgsql') {
-      // The fieldable entity-type update itself works for JSON storage (covered
-      // by \Drupal\Tests\pgsql\Kernel\JsonStorageEntityTypeUpdateTest). This
-      // test inspects the four physical per-layout `old_%` backup tables that
-      // the relational drivers create; JSON storage keeps the whole entity on
-      // the base table's `__data*` jsonb columns and backs it up as a single
-      // renamed base table with embedded (non-physical) registry entries, so the
-      // `findTables('old_%')` count of four has no equivalent under JSON storage.
-      $this->markTestSkipped('The pgsql JSON storage driver stores backups on the base table, not as physical per-layout backup tables.');
+    if ($this->database->supportsJsonEntityStorage()) {
+      $this->markTestSkipped('With JSON entity storage, it stores backups on the base table, not as physical per-layout backup tables.');
     }
     $schema = $this->database->schema();
 

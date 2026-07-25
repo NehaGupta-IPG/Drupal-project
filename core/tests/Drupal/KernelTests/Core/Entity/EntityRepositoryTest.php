@@ -188,7 +188,7 @@ class EntityRepositoryTest extends KernelTestBase {
     $storage->save($it_revision2);
 
     $active = $this->entityRepository->getActive($entity_type_id, $entity->id(), $en_contexts);
-    if (\Drupal::database()->driver() != 'pgsql') {
+    if (!\Drupal::database()->supportsJsonEntityStorage()) {
       // @todo Fix this for JSON storage. This looks like a
       //   result of a bug in the EntityQuery tool when resolving the active
       //   revision for a non-default-language context.

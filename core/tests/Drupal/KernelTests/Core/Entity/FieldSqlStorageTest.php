@@ -116,7 +116,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     /** @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage($entity_type);
     $connection = Database::getConnection();
-    $pgsql = $connection->driver() == 'pgsql';
+    $json_entity_storage = $connection->supportsJsonEntityStorage();
 
     $value_column = $this->tableMapping->getFieldColumnName($this->fieldStorage, 'value');
     $columns = [
@@ -154,7 +154,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     // The "current" revision is the last one saved.
     $last_revision_id = (int) $revision_id;
 
-    if ($pgsql) {
+    if ($json_entity_storage) {
       // JSON storage has no physical dedicated field tables; a revisionable
       // entity's field data is embedded in the base row's `__data_*` jsonb
       // columns. Inject the generated values directly into those documents to
@@ -208,7 +208,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     // Add a translation in an unavailable language code and verify it is not
     // loaded.
     $unavailable_langcode = 'xx';
-    if ($pgsql) {
+    if ($json_entity_storage) {
       $this->insertEmbeddedUnavailableLangcode($storage, $entity, $unavailable_langcode, $value_column, $bundle);
     }
     else {
@@ -397,7 +397,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
    */
   protected function readStoredFieldRows($storage, $entity, bool $revision, ?int $revision_id = NULL): array {
     $connection = Database::getConnection();
-    if ($connection->driver() != 'pgsql') {
+    if (!$connection->supportsJsonEntityStorage()) {
       $query = $connection->select($revision ? $this->revisionTable : $this->table, 't')->fields('t');
       if ($revision_id !== NULL) {
         $query->condition('revision_id', $revision_id);
@@ -609,17 +609,8 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
    * Tests that failure to create fields is handled gracefully.
    */
   public function testFieldUpdateFailure(): void {
-    if (Database::getConnection()->driver() == 'pgsql') {
-      // This test relies on the physical dedicated field tables and a relational
-      // schema update to break; JSON storage embeds field data in jsonb columns,
-      // so the failure mode and dedicated-table checks do not apply.
-      //
-      // This is a genuine storage-model gap, not a temporary workaround: there
-      // is no JSON-storage equivalent behavior to rewrite the assertions
-      // against, so the skip is permanent. Verified by running the test against
-      // the pgsql driver — assertTrue($schema->tableExists(...)) fails because
-      // the dedicated tables never exist under JSON storage.
-      $this->markTestSkipped('The pgsql JSON storage driver does not use physical dedicated field tables.');
+    if (\Database::getConnection()->supportsJsonEntityStorage()) {
+      $this->markTestSkipped('With JSON entity storage, the physical dedicated field tables do not exist.');
     }
     // Create a text field.
     $field_storage = FieldStorageConfig::create([
@@ -660,17 +651,8 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
    * Tests adding and removing indexes while data is present.
    */
   public function testFieldUpdateIndexesWithData(): void {
-    if (Database::getConnection()->driver() == 'pgsql') {
-      // This test creates and inspects indexes on the physical dedicated field
-      // tables. JSON storage embeds field data in jsonb columns and has no such
-      // physical tables or relational indexes to update.
-      //
-      // This is a genuine storage-model gap, not a temporary workaround: there
-      // is no JSON-storage equivalent behavior to rewrite the assertions
-      // against, so the skip is permanent. Verified by running the test against
-      // the pgsql driver — the index-inspection path errors on the absent
-      // dedicated table.
-      $this->markTestSkipped('The pgsql JSON storage driver has no physical dedicated field tables or relational indexes.');
+    if (\Database::getConnection()->supportsJsonEntityStorage()) {
+      $this->markTestSkipped('With JSON entity storage, the physical dedicated field tables do not exist.');
     }
     // Create a decimal field.
     $field_name = 'test_field';
@@ -855,7 +837,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
     ]);
     $field_storage->save();
     $table_mapping = \Drupal::entityTypeManager()->getStorage('entity_test_rev')->getTableMapping();
-    if (Database::getConnection()->driver() == 'pgsql') {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       // A multi-valued field on a revisionable entity is embedded in the
       // current-revision document, not a physical dedicated data table.
       $this->assertEquals($table_mapping->getJsonStorageDedicatedTableName($field_storage, $table_mapping->getJsonStorageCurrentRevisionTable()), $table_mapping->getFieldTableName('some_field_name'));
@@ -904,14 +886,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
       ->fields(['serialized' => NULL])
       ->condition('id', $entity->id())
       ->execute();
-    if ($connection->driver() == 'pgsql') {
-      // The pgsql JSON storage driver has no physical dedicated field table to
-      // insert into: a configurable field is embedded in the base row's
-      // `__data` jsonb column, keyed by the embedded table name. A NULL value is
-      // represented by omitting the value key — the driver omits NULL columns on
-      // write and reconstructs an absent key as NULL on read (@see
-      // \Drupal\Core\Entity\Sql\SqlContentEntityStorage::loadFromEmbeddedDedicatedTables()).
-      // Write that embedded document directly to mirror the relational INSERT.
+    if ($connection->supportsJsonEntityStorage()) {
       $table_mapping = $storage->getTableMapping();
       $base_table = $storage->getEntityType()->getBaseTable();
       $embedded_table = $table_mapping->getJsonStorageDedicatedTableName($field_storage, $base_table);

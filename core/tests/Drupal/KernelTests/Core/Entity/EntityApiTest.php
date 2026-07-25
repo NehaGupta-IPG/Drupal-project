@@ -106,16 +106,16 @@ class EntityApiTest extends EntityKernelTestBase {
     // Under JSON storage the data/revision/revision-data tables are embedded in
     // the base table's jsonb columns, so there are no physical tables to check;
     // emptying the base table removes the embedded data with it.
-    $json_storage = $connection->driver() == 'pgsql';
+    $json_entity_storage = $connection->supportsJsonEntityStorage();
     $this->assertEquals(0, (int) $connection->select($definition->getBaseTable())->countQuery()->execute()->fetchField(), 'Base table was emptied');
 
-    if (!$json_storage && $data_table = $definition->getDataTable()) {
+    if (!$json_entity_storage && $data_table = $definition->getDataTable()) {
       $this->assertEquals(0, (int) $connection->select($data_table)->countQuery()->execute()->fetchField(), 'Data table was emptied');
     }
-    if (!$json_storage && $revision_table = $definition->getRevisionTable()) {
+    if (!$json_entity_storage && $revision_table = $definition->getRevisionTable()) {
       $this->assertEquals(0, (int) $connection->select($revision_table)->countQuery()->execute()->fetchField(), 'Revision table was emptied');
     }
-    if (!$json_storage && $revision_data_table = $definition->getRevisionDataTable()) {
+    if (!$json_entity_storage && $revision_data_table = $definition->getRevisionDataTable()) {
       $this->assertEquals(0, (int) $connection->select($revision_data_table)->countQuery()->execute()->fetchField(), 'Revision data table was emptied');
     }
 
@@ -138,13 +138,13 @@ class EntityApiTest extends EntityKernelTestBase {
     $definition = \Drupal::entityTypeManager()->getDefinition($entity_type);
     $this->assertEquals(0, (int) $connection->select($definition->getBaseTable())->countQuery()->execute()->fetchField(), 'Base table was emptied');
 
-    if (!$json_storage && $data_table = $definition->getDataTable()) {
+    if (!$json_entity_storage && $data_table = $definition->getDataTable()) {
       $this->assertEquals(0, (int) $connection->select($data_table)->countQuery()->execute()->fetchField(), 'Data table was emptied');
     }
-    if (!$json_storage && $revision_table = $definition->getRevisionTable()) {
+    if (!$json_entity_storage && $revision_table = $definition->getRevisionTable()) {
       $this->assertEquals(0, (int) $connection->select($revision_table)->countQuery()->execute()->fetchField(), 'Revision table was emptied');
     }
-    if (!$json_storage && $revision_data_table = $definition->getRevisionDataTable()) {
+    if (!$json_entity_storage && $revision_data_table = $definition->getRevisionDataTable()) {
       $this->assertEquals(0, (int) $connection->select($revision_data_table)->countQuery()->execute()->fetchField(), 'Revision data table was emptied');
     }
   }

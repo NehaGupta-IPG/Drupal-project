@@ -40,7 +40,7 @@ trait MigrateNodeCompleteStorageTrait {
    */
   protected function loadDestinationNodeTable(string $table, array $expected, array $order_by): array {
     $database = \Drupal::database();
-    if ($database->driver() !== 'pgsql') {
+    if (!$database->supportsJsonEntityStorage()) {
       $select = $database->select($table, 't')->fields('t');
       foreach ($order_by as $column) {
         $select->orderBy($column);
@@ -96,7 +96,7 @@ trait MigrateNodeCompleteStorageTrait {
    */
   protected function countMigratedNodesOfType(string $type): string {
     $database = \Drupal::database();
-    if ($database->driver() !== 'pgsql') {
+    if (!$database->supportsJsonEntityStorage()) {
       return (string) $database->select('node_field_data')
         ->condition('type', $type)
         ->countQuery()

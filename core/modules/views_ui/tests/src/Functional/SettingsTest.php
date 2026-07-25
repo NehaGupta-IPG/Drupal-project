@@ -148,7 +148,7 @@ class SettingsTest extends UITestBase {
     // Under the pgsql (JSON) driver the status filter is rewritten onto a
     // jsonb document unwind whose derived-table alias is generated, so only
     // assert the column condition itself.
-    $status_field = \Drupal::database()->driver() == 'pgsql' ? 'status' : 'node_field_data.status';
+    $status_field = \Drupal::database()->supportsJsonEntityStorage() ? 'status' : 'node_field_data.status';
     $this->assertSession()->elementTextContains('xpath', '//div[@class="views-query-info"]//pre', Database::getConnection()->escapeField($status_field) . " = '1'");
 
     // Test the advanced settings form.

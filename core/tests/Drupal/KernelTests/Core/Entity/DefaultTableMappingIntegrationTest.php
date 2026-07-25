@@ -65,9 +65,7 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
     // Test the field table name for a translatable and revisionable base field,
     // which is stored in the entity's data table.
-    if (\Drupal::database()->driver() == 'pgsql') {
-      // The pgsql driver embeds shared field data in the current-revision JSONB
-      // document instead of a physical data table.
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
       $expected = 'entity_test_mulrev_current_revision';
     }
     else {
@@ -77,7 +75,7 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
     // Test the field table name for a multi-valued base field, which is stored
     // in a dedicated table.
-    if (\Drupal::database()->driver() == 'pgsql') {
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
       // The dedicated field is embedded within the current-revision document.
       $expected = 'entity_test_mulrev_current_revision__multivalued_base_field';
     }
@@ -91,10 +89,10 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
    * Tests get all field table names.
    */
   public function testGetAllFieldTableNames(): void {
-    $is_json_storage = \Drupal::database()->driver() == 'pgsql';
+    $json_entity_storage = \Drupal::database()->supportsJsonEntityStorage();
 
     // Check a field that is stored in all the shared tables.
-    if ($is_json_storage) {
+    if ($json_entity_storage) {
       $expected = [
         'entity_test_mulrev',
         'entity_test_mulrev_all_revisions',
@@ -113,7 +111,7 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
     $this->assertEquals($expected, $this->tableMapping->getAllFieldTableNames('id'));
 
     // Check a field that is stored only in the base table.
-    if ($is_json_storage) {
+    if ($json_entity_storage) {
       // JSON storage replicates the UUID onto all shared documents so that
       // entity queries on the UUID remain possible.
       $expected = [
@@ -129,7 +127,7 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
     $this->assertEquals($expected, $this->tableMapping->getAllFieldTableNames('uuid'));
 
     // Check a field that is stored only in the revision table.
-    if ($is_json_storage) {
+    if ($json_entity_storage) {
       $expected = [
         'entity_test_mulrev_all_revisions',
         'entity_test_mulrev_current_revision',
@@ -143,7 +141,7 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
     // Check a field that field that is stored in the data and revision data
     // tables.
-    if ($is_json_storage) {
+    if ($json_entity_storage) {
       $expected = [
         'entity_test_mulrev_all_revisions',
         'entity_test_mulrev_current_revision',
@@ -159,7 +157,7 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
     $this->assertEquals($expected, $this->tableMapping->getAllFieldTableNames('name'));
 
     // Check a field that is stored in dedicated data and revision data tables.
-    if ($is_json_storage) {
+    if ($json_entity_storage) {
       $expected = [
         'entity_test_mulrev_current_revision__multivalued_base_field',
         'entity_test_mulrev_all_revisions__multivalued_base_field',
@@ -182,7 +180,7 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
     $storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('entity_test_mulrev');
     $database_schema = \Drupal::database()->schema();
 
-    if (\Drupal::database()->driver() == 'pgsql') {
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
       $dedicated_all_revisions_table = $this->tableMapping->getJsonStorageDedicatedTableName($storage_definitions['multivalued_base_field'], $this->tableMapping->getJsonStorageAllRevisionsTable());
       $dedicated_current_revision_table = $this->tableMapping->getJsonStorageDedicatedTableName($storage_definitions['multivalued_base_field'], $this->tableMapping->getJsonStorageCurrentRevisionTable());
       $dedicated_latest_revision_table = $this->tableMapping->getJsonStorageDedicatedTableName($storage_definitions['multivalued_base_field'], $this->tableMapping->getJsonStorageLatestRevisionTable());

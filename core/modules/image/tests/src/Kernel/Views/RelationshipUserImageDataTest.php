@@ -103,11 +103,11 @@ class RelationshipUserImageDataTest extends ViewsKernelTestBase {
     $this->assertSame($expected, $view->getDependencies());
     $this->executeView($view);
     // The file relationship is joined to the entity base table, so its auto
-    // generated field alias reflects that table. Under JSON (jsonb) storage the
+    // generated field alias reflects that table. Under JSON entity storage the
     // user field data is embedded in the "users" base table (the dedicated
     // "user__user_picture" table does not exist), so the relationship alias —
     // and therefore the fid column alias — is keyed on "users" instead.
-    $fid_alias = Database::getConnection()->driver() == 'pgsql'
+    $fid_alias = \Database::getConnection()->supportsJsonEntityStorage()
       ? 'file_managed_users_fid'
       : 'file_managed_user__user_picture_fid';
     $expected_result = [

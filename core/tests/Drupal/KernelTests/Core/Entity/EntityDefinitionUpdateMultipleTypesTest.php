@@ -93,12 +93,8 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * Tests updating entity schema when there are no existing entities.
    */
   public function testEntityTypeUpdateWithoutData(): void {
-    $is_json_storage = $this->database->driver() == 'pgsql';
-    // For JSON storage the revision context is stored in embedded `__data*`
-    // jsonb columns on the base table rather than in a physical revision table,
-    // so the revision-table existence assertions are checked against the
-    // embedded revision tables instead (§7.4 playbook).
-    $revision_table = $is_json_storage ? 'entity_test_update_all_revisions' : 'entity_test_update_revision';
+    $json_entity_storage = $this->database->supportsJsonEntityStorage();
+    $revision_table = $json_entity_storage ? 'entity_test_update_all_revisions' : 'entity_test_update_revision';
 
     // The 'entity_test_update' entity type starts out non-revisionable, so
     // ensure the revision table hasn't been created during setUp().
@@ -446,12 +442,12 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
     // Test that required columns are created as 'not null'.
     $this->addBundleField('shape_required');
     $this->applyEntityUpdates();
-    if ($this->database->driver() == 'pgsql') {
-      // JSON storage embeds dedicated field data in the base row's `__data*`
-      // jsonb columns; there is no physical dedicated table with a NOT NULL
+    if ($this->database->supportsJsonEntityStorage()) {
+      // JSON entity storage embeds dedicated field data in the base row's JSON
+      // columns; there is no physical dedicated table with a NOT NULL
       // column to insert into directly, so the relational integrity-constraint
-      // check below does not apply. The create/apply-updates path above is still
-      // exercised for the required ('shape_required') field.
+      // check below does not apply. The create/apply-updates path above is
+      // still exercised for the required ('shape_required') field.
       return;
     }
     $message = 'The new_bundle_field_shape column is not nullable.';
@@ -515,9 +511,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
     // 'deleted' table name.
     $this->assertFalse($schema_handler->tableExists($dedicated_table_name), 'The dedicated table of the bundle field no longer exists.');
 
-    if ($this->database->driver() == 'pgsql') {
-      // Under JSON storage the field is embedded per storage context and each
-      // context's table is renamed to a context-qualified "deleted" name.
+    if ($this->database->supportsJsonEntityStorage()) {
       $dedicated_deleted_table_name = $table_mapping->getJsonStorageDedicatedTableName($storage_definition, $table_mapping->getBaseTable(), TRUE);
     }
     else {
@@ -527,14 +521,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
 
     // Check that the deleted field's data is preserved in the dedicated
     // 'deleted' table.
-    if ($this->database->driver() == 'pgsql') {
-      // JSON storage keeps the deleted field's rows embedded in the base row's
-      // `__data*` jsonb column (marked deleted) rather than in a physical
-      // dedicated table, so it cannot be read with a direct SELECT. Data
-      // preservation is verified end to end by the purge assertions below (the
-      // FieldPurger reads the embedded deleted rows) and by JsonStoragePurgeTest.
-    }
-    else {
+    if (!$this->database->supportsJsonEntityStorage()) {
       $result = $this->database->select($dedicated_deleted_table_name, 't')
         ->fields('t')
         ->execute()
@@ -721,10 +708,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    */
   public function testSingleActionCalls(): void {
     $db_schema = $this->database->schema();
-    // For JSON storage the revision context lives in embedded `__data*` jsonb
-    // columns on the base table rather than in a physical revision table
-    // (§7.4 playbook).
-    $revision_table = $this->database->driver() == 'pgsql' ? 'entity_test_update_all_revisions' : 'entity_test_update_revision';
+    $revision_table = $this->database->supportsJsonEntityStorage() ? 'entity_test_update_all_revisions' : 'entity_test_update_revision';
 
     // Ensure that a non-existing entity type cannot be installed.
     $message = 'A non-existing entity type cannot be installed';

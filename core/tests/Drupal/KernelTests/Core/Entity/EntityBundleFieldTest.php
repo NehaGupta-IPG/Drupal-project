@@ -42,7 +42,7 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
    * Tests making use of a custom bundle field.
    */
   public function testCustomBundleFieldUsage(): void {
-    $is_json_storage = $this->database->driver() == 'pgsql';
+    $json_entity_storage = $this->database->supportsJsonEntityStorage();
     EntityTestHelper::createBundle('custom', NULL, 'entity_test_update');
 
     // Check that an entity with bundle entity_test does not have the custom
@@ -80,7 +80,7 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
     $table_mapping = $storage->getTableMapping();
     $table = $table_mapping->getDedicatedDataTableName($entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition());
-    if ($is_json_storage) {
+    if ($json_entity_storage) {
       // The pgsql driver embeds the dedicated field data in the base row's
       // jsonb column, so deleting the entity removes the field data with it;
       // there is no physical dedicated table to read.
@@ -101,7 +101,7 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     $entity->save();
     EntityTestHelper::deleteBundle('custom', 'entity_test_update');
 
-    if ($is_json_storage) {
+    if ($json_entity_storage) {
       // Deleting the bundle marks the embedded field data deleted; assert the
       // matching base row now carries a deleted-flagged row under the field's
       // context-qualified "deleted" dedicated-table key in its jsonb column.

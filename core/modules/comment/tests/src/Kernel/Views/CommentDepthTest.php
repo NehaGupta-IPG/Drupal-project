@@ -109,7 +109,7 @@ class CommentDepthTest extends CommentViewsKernelTestBase {
 
     $view->displayHandlers->get('default')->overrideOption('fields', [
       'thread' => [
-        'table' => (Database::getConnection()->driver() == 'pgsql' ? 'comment' : 'comment_field_data'),
+        'table' => (Database::getConnection()->supportsJsonEntityStorage() ? 'comment' : 'comment_field_data'),
         'field' => 'thread',
         'id' => 'thread',
         'plugin_id' => 'comment_depth',

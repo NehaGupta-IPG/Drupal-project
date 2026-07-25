@@ -81,14 +81,14 @@ class NodeRevisionWizardTest extends WizardTestBase {
     $view = Views::getView($view['id']);
     $view->initHandlers();
 
-    // Under pgsql JSON storage the relational node_field_revision and
+    // Under JSON entity storage the relational node_field_revision and
     // node_field_data tables are collapsed onto the node entity base table, so
     // the base tables and created handlers reference the base table.
-    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
-    $revision_table = $is_pgsql ? 'node' : 'node_field_revision';
-    $data_table = $is_pgsql ? 'node' : 'node_field_data';
+    $json_storage = \Drupal::database()->supportsJsonEntityStorage();
+    $revision_table = $json_storage ? 'node' : 'node_field_revision';
+    $data_table = $json_storage ? 'node' : 'node_field_data';
 
-    if ($is_pgsql) {
+    if ($json_storage) {
       $this->assertEquals(['node' => TRUE, '#global' => TRUE], $view->getBaseTables());
     }
     else {
@@ -124,7 +124,7 @@ class NodeRevisionWizardTest extends WizardTestBase {
     $view = Views::getView($view['id']);
     $view->initHandlers();
 
-    if ($is_pgsql) {
+    if ($json_storage) {
       $this->assertEquals(['node' => TRUE, '#global' => TRUE], $view->getBaseTables());
     }
     else {

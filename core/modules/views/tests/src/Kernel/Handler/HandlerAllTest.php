@@ -80,7 +80,7 @@ class HandlerAllTest extends ViewsKernelTestBase {
       // collapsed onto the entity base table, so the representative
       // relationships live on the base tables rather than the "_field_data"
       // logical tables.
-      if (Database::getConnection()->driver() == 'pgsql') {
+      if (Database::getConnection()->supportsJsonEntityStorage()) {
         $exclude[] = 'taxonomy_term_data:tid_representative';
         $exclude[] = 'users:uid_representative';
       }

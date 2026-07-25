@@ -266,11 +266,11 @@ class MediaOverviewPageTest extends MediaFunctionalTestBase {
 
     // Add the media author filter to the media overview view.
     $this->drupalGet('admin/structure/views/nojs/add-handler/media/media_page_list/filter');
-    // Under pgsql JSON storage the media data table ("media_field_data") is
-    // collapsed onto the entity base table ("media"), so the "user_name" filter
-    // is declared on — and the add-handler checkbox is keyed by — the base
-    // table (see \Drupal\pgsql\modules\media\MediaViewsData).
-    $user_name_field = \Drupal::database()->driver() == 'pgsql'
+    // Under JSON entity storage the media data table ("media_field_data") is
+    // collapsed onto the entity base table ("media"), so the "user_name"
+    // filter is declared on — and the add-handler checkbox is keyed by — the
+    // base table (see \Drupal\pgsql\modules\media\MediaViewsData).
+    $user_name_field = \Drupal::database()->supportsJsonEntityStorage()
       ? 'name[media.user_name]'
       : 'name[media_field_data.user_name]';
     $edit = [

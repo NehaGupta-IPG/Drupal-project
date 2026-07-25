@@ -95,7 +95,7 @@ class HandlerAliasTest extends ViewsKernelTestBase {
     // collapsed onto the users entity base table, so a handler referencing it is
     // rewritten to the base table at build time (@see
     // \Drupal\pgsql\Hook\PgsqlViewsHooks::viewsPreBuild()).
-    $expected_table = Database::getConnection()->driver() == 'pgsql' ? 'users' : 'users_field_data';
+    $expected_table = Database::getConnection()->supportsJsonEntityStorage() ? 'users' : 'users_field_data';
     $this->assertSame($expected_table, $filter->table);
     $this->assertSame('uid', $filter->realField);
   }

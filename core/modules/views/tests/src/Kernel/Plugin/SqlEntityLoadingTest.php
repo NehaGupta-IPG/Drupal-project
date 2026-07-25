@@ -72,11 +72,7 @@ class SqlEntityLoadingTest extends ViewsKernelTestBase {
     $view = Views::getView('base_and_revision');
     $view->execute();
 
-    if (\Drupal::database()->driver() == 'pgsql') {
-      // Under pgsql the node_field_data and node_field_revision rows are
-      // embedded as jsonb documents on the "node" table, so the relationship to
-      // the default-revision data table cannot be independently joined; vid_1
-      // resolves to the same (latest) revision the base row was loaded for.
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
       $expected = [
         [
           'nid' => $node->id(),

@@ -59,7 +59,7 @@ class ImageViewsDataTest extends ViewsKernelTestBase {
     // Under the pgsql JSON-storage driver an entity's field data is embedded
     // in the entity base table rather than a dedicated field table, so the
     // dedicated table's views data is collapsed onto the base table.
-    $json_storage = Database::getConnection()->driver() === 'pgsql';
+    $json_storage = Database::getConnection()->supportsJsonEntityStorage();
     // Check the generated views data.
     $views_data = Views::viewsData()->get($json_storage ? 'entity_test' : 'entity_test__field_base_image');
     $relationship = $views_data['field_base_image_target_id']['relationship'];

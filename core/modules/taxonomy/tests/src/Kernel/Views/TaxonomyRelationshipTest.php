@@ -59,13 +59,9 @@ class TaxonomyRelationshipTest extends TaxonomyTestBase {
    * Tests the taxonomy parent plugin UI.
    */
   public function testTaxonomyRelationships(): void {
-    // The pgsql JSON storage driver collapses the logical data tables
-    // (taxonomy_term_field_data, node_field_data) and the dedicated field
-    // table taxonomy_term__parent onto the entity base tables, so the views
-    // data lives on those base tables instead.
-    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
-    $taxonomy_table = $is_pgsql ? 'taxonomy_term_data' : 'taxonomy_term_field_data';
-    $node_table = $is_pgsql ? 'node' : 'node_field_data';
+    $json_storage = \Drupal::database()->supportsJsonEntityStorage();
+    $taxonomy_table = $json_storage ? 'taxonomy_term_data' : 'taxonomy_term_field_data';
+    $node_table = $json_storage ? 'node' : 'node_field_data';
 
     // Check the generated views data of taxonomy_index.
     $views_data = Views::viewsData()->get('taxonomy_index');
@@ -74,7 +70,7 @@ class TaxonomyRelationshipTest extends TaxonomyTestBase {
     $this->assertEquals('tid', $views_data['table']['join'][$taxonomy_table]['field']);
     $this->assertEquals('nid', $views_data['table']['join'][$node_table]['left_field']);
     $this->assertEquals('nid', $views_data['table']['join'][$node_table]['field']);
-    if (!$is_pgsql) {
+    if (!$json_storage) {
       $this->assertEquals('entity_id', $views_data['table']['join']['taxonomy_term__parent']['left_field']);
       $this->assertEquals('tid', $views_data['table']['join']['taxonomy_term__parent']['field']);
 
@@ -110,7 +106,7 @@ class TaxonomyRelationshipTest extends TaxonomyTestBase {
       // Under the pgsql JSON storage driver the taxonomy_term__parent table
       // is collapsed away, so the "parent" relationship is pruned from the
       // view at import time.
-      if (!$index && !$is_pgsql) {
+      if (!$index && !$json_storage) {
         $this->assertInstanceOf(TermInterface::class, $row->_relationship_entities['parent']);
         $this->assertEquals($this->term2->id(), $row->_relationship_entities['parent']->id());
         $this->assertEquals($this->term2->id(), $row->taxonomy_term_field_data_taxonomy_term__parent_tid);

@@ -74,7 +74,32 @@ class UserDeleteTest extends KernelTestBase {
    *   The number of role assignments held by the given users.
    */
   protected function countRoleAssignments($connection, array $uids): int {
-    if ($connection->driver() !== 'pgsql') {
+    if ($connection->supportsJsonEntityStorage()) {
+      // Under JSON entity storage is the 'user__roles' table is not physical:
+      // the roles are embedded in each user's 'users_translations' documents
+      // (nested as 'users_translations__roles') inside the base 'users' table
+      // JSON column.
+      $result = $connection->select('users', 'u')
+        ->fields('u', ['users_translations'])
+        ->execute()
+        ->fetchCol();
+
+      $count = 0;
+      foreach ($result as $translations) {
+        if (is_string($translations)) {
+          $translations = json_decode($translations, TRUE);
+        }
+        foreach ($translations ?? [] as $translation) {
+          foreach ($translation['users_translations__roles'] ?? [] as $role) {
+            if (in_array((string) $role['entity_id'], array_map('strval', $uids), TRUE)) {
+              $count++;
+            }
+          }
+        }
+      }
+      return $count;
+    }
+    else {
       return (int) $connection->select('user__roles', 'r')
         ->fields('r', ['entity_id'])
         ->condition('entity_id', $uids, 'IN')
@@ -82,32 +107,6 @@ class UserDeleteTest extends KernelTestBase {
         ->execute()
         ->fetchField();
     }
-
-    // Under pgsql the 'user__roles' table is not physical: the roles are
-    // embedded in each user's 'users_translations' documents (nested as
-    // 'users_translations__roles') inside the base 'users' table JSONB column.
-    // Selecting the embedded 'users_translations' table as a field lets the
-    // pgsql Select re-expand it into the decoded JSON array of translations,
-    // so walk it to count the assignments.
-    $result = $connection->select('users', 'u')
-      ->fields('u', ['users_translations'])
-      ->execute()
-      ->fetchCol();
-
-    $count = 0;
-    foreach ($result as $translations) {
-      if (is_string($translations)) {
-        $translations = json_decode($translations, TRUE);
-      }
-      foreach ($translations ?? [] as $translation) {
-        foreach ($translation['users_translations__roles'] ?? [] as $role) {
-          if (in_array((string) $role['entity_id'], array_map('strval', $uids), TRUE)) {
-            $count++;
-          }
-        }
-      }
-    }
-    return $count;
   }
 
 }

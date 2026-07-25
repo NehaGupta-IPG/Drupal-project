@@ -73,7 +73,7 @@ class EntityViewsDataTest extends KernelTestBase {
     // handler class resolves, then use it as the views_data handler.
     $views_data_handler = EntityViewsData::class;
     $storage_handler = NULL;
-    if (Database::getConnection()->driver() === 'pgsql') {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       $this->classLoader->addPsr4('Drupal\\pgsql\\', $this->root . '/modules/custom/pgsql/src');
       $views_data_handler = 'Drupal\pgsql\EntityViewsData';
       $storage_handler = 'Drupal\pgsql\EntityStorage\JsonSqlContentEntityStorage';
@@ -229,7 +229,7 @@ class EntityViewsDataTest extends KernelTestBase {
   public function testBaseTables(): void {
     $data = $this->entityTypeManager->getHandler('entity_test', 'views_data')->getViewsData();
 
-    if (Database::getConnection()->driver() === 'pgsql') {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       // Under JSON storage all data is collapsed onto the entity base table.
       $this->assertJsonStorageBaseTable($data, 'entity_test', 'entity_test', 'entity_test_current_revision', [
         'entity_test_field_data',
@@ -275,7 +275,7 @@ class EntityViewsDataTest extends KernelTestBase {
     // Tests the join definition between the base and the data table.
     $data = $this->entityTypeManager->getHandler('entity_test_mul', 'views_data')->getViewsData();
 
-    if (Database::getConnection()->driver() === 'pgsql') {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       // Under JSON storage there is no separate data table; the base info and
       // all field data live on the entity base table, with no base->data join.
       $this->assertJsonStorageBaseTable($data, 'entity_test', 'entity_test_mul', 'entity_test_current_revision', [
@@ -326,7 +326,7 @@ class EntityViewsDataTest extends KernelTestBase {
 
     $data = $this->entityTypeManager->getHandler('entity_test_mulrev', 'views_data')->getViewsData();
 
-    if (Database::getConnection()->driver() === 'pgsql') {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       // Under JSON storage revisions are embedded documents, not a physical
       // revision table; everything lives on the entity base table.
       $this->assertJsonStorageBaseTable($data, 'entity_test', 'entity_test_mulrev', 'entity_test_current_revision', [
@@ -378,7 +378,7 @@ class EntityViewsDataTest extends KernelTestBase {
 
     $data = $this->entityTypeManager->getHandler('entity_test_mulrev', 'views_data')->getViewsData();
 
-    if (Database::getConnection()->driver() === 'pgsql') {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       // Under JSON storage the revision and revision-data tables are embedded
       // documents; everything is collapsed onto the entity base table.
       $this->assertJsonStorageBaseTable($data, 'entity_test', 'entity_test_mulrev', 'entity_test_current_revision', [
@@ -448,7 +448,7 @@ class EntityViewsDataTest extends KernelTestBase {
 
     $data = $this->entityTypeManager->getHandler('entity_test_mulrev', 'views_data')->getViewsData();
 
-    if (Database::getConnection()->driver() === 'pgsql') {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       // Under JSON storage the revision and revision-data tables are embedded
       // documents; everything is collapsed onto the entity base table.
       $this->assertJsonStorageBaseTable($data, 'entity_test', 'entity_test_mulrev', 'entity_test_current_revision', [
@@ -509,7 +509,7 @@ class EntityViewsDataTest extends KernelTestBase {
   public function testBaseTableFields(): void {
     $data = $this->entityTypeManager->getHandler('entity_test', 'views_data')->getViewsData();
 
-    if (Database::getConnection()->driver() === 'pgsql') {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       // Under JSON storage every field is collapsed onto the entity base table
       // and carries a 'real field' pointing at its physical jsonb document
       // column; the dedicated "entity_test__string" table does not exist.
@@ -627,7 +627,7 @@ class EntityViewsDataTest extends KernelTestBase {
 
     $data = $this->entityTypeManager->getHandler('entity_test_mul', 'views_data')->getViewsData();
 
-    if (Database::getConnection()->driver() === 'pgsql') {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       // Under JSON storage the translatable entity's field data is collapsed
       // onto the entity base table (no "entity_test_mul_property_data" table and
       // no dedicated "entity_test_mul__string" table); each field carries a
@@ -753,7 +753,7 @@ class EntityViewsDataTest extends KernelTestBase {
 
     $data = $this->entityTypeManager->getHandler('entity_test_mulrev', 'views_data')->getViewsData();
 
-    if (Database::getConnection()->driver() === 'pgsql') {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       // Under JSON storage the revisionable + translatable entity's field data
       // is collapsed onto the entity base table: no
       // "entity_test_mulrev_property_data" / "_property_revision" tables and no

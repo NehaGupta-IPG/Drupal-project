@@ -203,8 +203,8 @@ class BulkDeleteTest extends FieldKernelTestBase {
     $this->assertEquals($bundle, $field->getTargetBundle(), 'The deleted field is for the correct bundle');
 
     // Check that the actual stored content did not change during delete.
-    if (Database::getConnection()->driver() !== 'pgsql') {
-      // The pgsql JSON storage driver has no physical dedicated field table to
+    if (!\Database::getConnection()->supportsJsonEntityStorage()) {
+      // The JSON entity storage driver has no physical dedicated field table to
       // read directly; the deleted-data entity queries below verify that the
       // embedded field values survived the delete intact.
       /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
@@ -340,10 +340,10 @@ class BulkDeleteTest extends FieldKernelTestBase {
     $this->assertCount(0, $fields, 'The field is gone');
 
     // Verify there are still 10 entries for the recreated field.
-    if (\Drupal::database()->driver() === 'pgsql') {
-      // The pgsql JSON storage driver embeds the field data in the base row's
-      // jsonb column rather than a physical dedicated table, so count the
-      // entities that still carry the recreated field via an entity query.
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
+      // JSON entity storage embeds the field data in the base row's column
+      // rather than a physical dedicated table, so count the entities that
+      // still carry the recreated field via an entity query.
       $count = \Drupal::entityQuery('entity_test')
         ->accessCheck(FALSE)
         ->condition('type', $bundle)

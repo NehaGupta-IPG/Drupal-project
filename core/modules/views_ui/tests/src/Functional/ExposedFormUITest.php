@@ -139,7 +139,7 @@ class ExposedFormUITest extends UITestBase {
     // Under the pgsql (JSON) driver a content entity's field data is collapsed
     // onto the entity base table, so the add-handler checkboxes are keyed by
     // the base table.
-    $node_table = \Drupal::database()->driver() == 'pgsql' ? 'node' : 'node_field_data';
+    $node_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node_field_data';
     $this->submitForm(["name[$node_table.created]" => 1], 'Add and configure sort criteria');
     $this->assertSession()->fieldValueEquals('options[order]', 'ASC');
     // Change the order and expose the sort.
@@ -254,7 +254,7 @@ class ExposedFormUITest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_exposed_admin_ui/default/filter');
     // Under the pgsql (JSON) driver a content entity's field data is collapsed
     // onto the entity base table.
-    $node_table = \Drupal::database()->driver() == 'pgsql' ? 'node' : 'node_field_data';
+    $node_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node_field_data';
     $this->submitForm(["name[$node_table.nid]" => TRUE], 'Add and configure filter criteria');
     $this->submitForm([], 'Expose filter');
     $this->submitForm([], 'Grouped filters');
@@ -370,7 +370,7 @@ class ExposedFormUITest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_exposed_admin_ui/default/filter');
     // Under the pgsql (JSON) driver a content entity's field data is collapsed
     // onto the entity base table.
-    $node_table = \Drupal::database()->driver() == 'pgsql' ? 'node' : 'node_field_data';
+    $node_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node_field_data';
     $this->submitForm(["name[$node_table.status]" => 1], 'Add and configure filter criteria');
     $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_admin_ui/default/filter/status');
     $this->submitForm([], 'Expose filter');

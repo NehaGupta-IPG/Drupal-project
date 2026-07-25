@@ -262,12 +262,12 @@ class HandlerTest extends ViewTestBase {
     $this->drupalGet($handler_options_path);
     $this->assertSession()->fieldNotExists($relationship_name);
 
-    // Under the pgsql (JSON) driver a content entity's field data is collapsed
-    // onto the entity base table, so views are based on (and add-handler
-    // checkboxes are keyed by) the base table.
-    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
-    $comment_table = $is_pgsql ? 'comment' : 'comment_field_data';
-    $node_table = $is_pgsql ? 'node' : 'node_field_data';
+    // Under the JSON entity storage, a content entity's field data is
+    // collapsed onto the entity base table, so views are based on (and
+    // add-handler checkboxes are keyed by) the base table.
+    $json_storage = \Drupal::database()->supportsJsonEntityStorage();
+    $comment_table = $json_storage ? 'comment' : 'comment_field_data';
+    $node_table = $json_storage ? 'node' : 'node_field_data';
 
     // Create a view of comments with node relationship.
     View::create([

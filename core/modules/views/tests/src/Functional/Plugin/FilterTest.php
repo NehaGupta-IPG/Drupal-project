@@ -161,11 +161,8 @@ class FilterTest extends ViewTestBase {
     $row['row[type]'] = 'fields';
     $this->drupalGet('admin/structure/views/nojs/display/test_filter_in_operator_ui/default/row');
     $this->submitForm($row, 'Apply');
-    // Under the pgsql (JSON) driver a content entity's field data is collapsed
-    // onto the entity base table, so the add-handler checkboxes are keyed by
-    // the base table.
-    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
-    $field['name[' . ($is_pgsql ? 'node.nid' : 'node_field_data.nid') . ']'] = TRUE;
+    $json_storage = \Drupal::database()->supportsJsonEntityStorage();
+    $field['name[' . ($json_storage ? 'node.nid' : 'node_field_data.nid') . ']'] = TRUE;
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_filter_in_operator_ui/default/field');
     $this->submitForm($field, 'Add and configure fields');
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_in_operator_ui/default/field/nid');
@@ -248,9 +245,7 @@ class FilterTest extends ViewTestBase {
 
     // Add Role exposed filter.
     $this->drupalGet('admin/structure/views/nojs/add-handler/user_list_view/page_1/filter');
-    // Under the pgsql (JSON) driver the dedicated "user__roles" table is
-    // collapsed onto the users base table.
-    $roles_table = \Drupal::database()->driver() == 'pgsql' ? 'users' : 'user__roles';
+    $roles_table = \Drupal::database()->supportsJsonEntityStorage() ? 'users' : 'user__roles';
     $this->submitForm(['name[' . $roles_table . '.roles_target_id]' => TRUE], 'Add and configure filter criteria');
     $edit = ['options[expose_button][checkbox][checkbox]' => TRUE];
     $this->drupalGet('admin/structure/views/nojs/handler/user_list_view/page_1/filter/roles_target_id');

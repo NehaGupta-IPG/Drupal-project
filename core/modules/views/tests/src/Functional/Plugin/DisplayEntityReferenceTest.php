@@ -136,11 +136,11 @@ class DisplayEntityReferenceTest extends ViewTestBase {
     $this->drupalGet('admin/structure/views/view/test_display_entity_reference/edit/entity_reference_1');
     $this->assertSession()->linkByHrefNotExists('admin/structure/views/nojs/display/test_display_entity_reference/entity_reference_1/title');
 
-    // Under the pgsql (JSON) driver a content entity's field data (including
+    // Under the JSON entity storage, a content entity's field data (including
     // dedicated field tables) is collapsed onto the entity base table, so the
     // add-handler checkboxes are keyed by the base table.
-    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
-    $field_table = $is_pgsql ? 'entity_test' : 'entity_test__' . $this->fieldName;
+    $json_storage = \Drupal::database()->supportsJsonEntityStorage();
+    $field_table = $json_storage ? 'entity_test' : 'entity_test__' . $this->fieldName;
 
     // Add the new field to the fields.
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_display_entity_reference/default/field');
@@ -226,7 +226,7 @@ class DisplayEntityReferenceTest extends ViewTestBase {
     $this->submitForm([], 'Apply');
 
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_display_entity_reference/default/field');
-    $this->submitForm(['name[' . ($is_pgsql ? 'users' : 'users_field_data') . '.uid]' => TRUE], 'Add and configure fields');
+    $this->submitForm(['name[' . ($json_storage ? 'users' : 'users_field_data') . '.uid]' => TRUE], 'Add and configure fields');
     $this->submitForm([], 'Apply');
 
     // Add the new field to the search fields.
@@ -254,7 +254,7 @@ class DisplayEntityReferenceTest extends ViewTestBase {
     $view->destroy();
 
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_display_entity_reference/default/relationship');
-    $ref_table = $is_pgsql ? 'entity_test' : 'entity_test__field_test_entity_ref_entity_ref';
+    $ref_table = $json_storage ? 'entity_test' : 'entity_test__field_test_entity_ref_entity_ref';
     $this->submitForm([
       'name[' . $ref_table . '.field_test_entity_ref_entity_ref]' => TRUE,
     ], 'Add and configure relationships');

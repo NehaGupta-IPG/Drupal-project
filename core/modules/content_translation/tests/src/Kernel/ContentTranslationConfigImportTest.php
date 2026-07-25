@@ -89,7 +89,7 @@ class ContentTranslationConfigImportTest extends KernelTestBase {
     // Verify that updates were performed.
     $entity_type = $this->container->get('entity_type.manager')->getDefinition($entity_type_id);
     $db_schema = $this->container->get('database')->schema();
-    if ($this->container->get('database')->driver() == 'pgsql') {
+    if ($this->container->get('database')->supportsJsonEntityStorage()) {
       // JSON storage has no physical data table; the content translation
       // metadata fields are shared translatable fields, so they live in the
       // entity's translations document instead.

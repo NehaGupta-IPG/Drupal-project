@@ -116,19 +116,14 @@ class FieldApiDataTest extends ViewsKernelTestBase {
     $revision_table = $table_mapping->getDedicatedRevisionTableName($field_storage_string);
     $data = $this->getViewsData();
 
-    // Under the pgsql (JSON) driver a content entity's dedicated field tables
-    // ("node__<field>", "node_revision__<field>") do not exist physically; their
-    // views data is collapsed onto the entity base table. The field content
-    // (click-sortable, help, title) is therefore asserted against the "node"
-    // base table and the dedicated-table join structure is not present.
-    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
+    $json_entity_storage = \Drupal::database()->supportsJsonEntityStorage();
     // The table the field content is described on.
-    $field_table = $is_pgsql ? 'node' : $current_table;
+    $field_table = $json_entity_storage ? 'node' : $current_table;
 
     $this->assertArrayHasKey($current_table, $data);
     $this->assertArrayHasKey($revision_table, $data);
 
-    if (!$is_pgsql) {
+    if (!$json_entity_storage) {
       // The node field should join against node_field_data.
       $this->assertArrayHasKey('node_field_data', $data[$current_table]['table']['join']);
       $this->assertArrayHasKey('node_field_revision', $data[$revision_table]['table']['join']);
@@ -169,7 +164,7 @@ class FieldApiDataTest extends ViewsKernelTestBase {
     // Test click sortable for long text field.
     $data_long = $this->getViewsData('field_string_long');
     $current_table_long = $table_mapping->getDedicatedDataTableName($field_storage_string_long);
-    $field_table_long = $is_pgsql ? 'node' : $current_table_long;
+    $field_table_long = $json_entity_storage ? 'node' : $current_table_long;
     $this->assertTrue($data_long[$field_table_long][$field_storage_string_long->getName()]['field']['click sortable']);
 
     $this->assertInstanceOf(MarkupInterface::class, $data[$field_table][$field_storage_string->getName()]['help']);

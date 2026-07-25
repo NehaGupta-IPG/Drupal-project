@@ -269,7 +269,7 @@ class ViewEditTest extends UITestBase {
     // data table ("taxonomy_term_field_data") is collapsed onto the entity base
     // table ("taxonomy_term_data"), so the add-handler checkbox is keyed by the
     // base table.
-    $tid_field = \Drupal::database()->driver() == 'pgsql'
+    $tid_field = \Drupal::database()->supportsJsonEntityStorage()
       ? 'name[taxonomy_term_data.tid_representative]'
       : 'name[taxonomy_term_field_data.tid_representative]';
     $edit[$tid_field] = TRUE;

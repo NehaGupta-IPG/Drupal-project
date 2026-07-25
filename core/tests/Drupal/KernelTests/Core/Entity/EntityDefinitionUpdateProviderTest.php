@@ -115,12 +115,11 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
     // Check that the base field's column is deleted.
     $this->assertFalse($schema_handler->fieldExists($entity_type_id, 'new_base_field'), 'Column deleted from shared table for new_base_field.');
 
-    // With JSON storage all entity data is stored in the base row's jsonb
-    // columns; a deleted shared base field is removed rather than moved to a
-    // dedicated "deleted" physical table. The dedicated-table preservation and
-    // purge assertions below
-    // therefore do not apply.
-    if ($this->database->driver() == 'pgsql') {
+    // With JSON entity storage, all entity data is stored in the base row's
+    // JSON columns; a deleted shared base field is removed rather than moved
+    // to a dedicated "deleted" physical table. The dedicated-table
+    // preservation and purge assertions below therefore do not apply.
+    if ($this->database->supportsJsonEntityStorage()) {
       return;
     }
 

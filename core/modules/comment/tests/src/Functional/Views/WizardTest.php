@@ -90,12 +90,17 @@ class WizardTest extends WizardTestBase {
     $row = $view->display_handler->getOption('row');
     $this->assertEquals('entity:comment', $row['type']);
 
-    // Under pgsql JSON storage the relational comment_field_data and
+    // Under JSON entity storage the relational comment_field_data and
     // node_field_data tables are collapsed onto the comment and node entity
     // base tables, so the created handlers reference the base tables.
-    $is_pgsql = \Drupal::database()->driver() == 'pgsql';
-    $comment_data_table = $is_pgsql ? 'comment' : 'comment_field_data';
-    $node_data_table = $is_pgsql ? 'node' : 'node_field_data';
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
+      $comment_data_table = 'comment';
+      $node_data_table = 'node';
+    }
+    else {
+      $comment_data_table = 'comment_field_data';
+      $node_data_table = 'node_field_data';
+    }
 
     // Check for the default filters.
     $this->assertEquals($comment_data_table, $view->filter['status']->table);

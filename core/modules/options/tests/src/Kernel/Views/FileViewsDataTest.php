@@ -56,11 +56,7 @@ class FileViewsDataTest extends ViewsKernelTestBase {
       'bundle' => 'entity_test',
     ])->save();
     // Check the generated views data.
-    if (Database::getConnection()->driver() == 'pgsql') {
-      // Under JSON (jsonb) storage entity_test's field data is embedded in a
-      // jsonb column on the entity base table; PgsqlViewsHooks re-homes the
-      // configurable field's views data onto the "entity_test" base table
-      // rather than a physical "entity_test__field_base_file" table.
+    if (\Database::getConnection()->supportsJsonEntityStorage()) {
       $views_data = Views::viewsData()->get('entity_test');
     }
     else {
@@ -77,7 +73,7 @@ class FileViewsDataTest extends ViewsKernelTestBase {
     $this->assertEquals('entity_reverse', $relationship['id']);
     $this->assertEquals('entity_test', $relationship['base']);
     $this->assertEquals('id', $relationship['base field']);
-    if (Database::getConnection()->driver() != 'pgsql') {
+    if (!\Database::getConnection()->supportsJsonEntityStorage()) {
       // The dedicated field table does not exist under embedded storage.
       $this->assertEquals('entity_test__field_base_file', $relationship['field table']);
     }
@@ -98,11 +94,7 @@ class FileViewsDataTest extends ViewsKernelTestBase {
       'bundle' => 'entity_test_mul',
     ])->save();
     // Check the generated views data.
-    if (Database::getConnection()->driver() == 'pgsql') {
-      // entity_test_mul is translatable; its field data is embedded in the
-      // entity's jsonb context documents and re-homed onto the "entity_test_mul"
-      // base table (the logical "entity_test_mul_property_data" data table and
-      // dedicated field table do not exist under embedded storage).
+    if (\Database::getConnection()->supportsJsonEntityStorage()) {
       $views_data = Views::viewsData()->get('entity_test_mul');
     }
     else {
@@ -117,8 +109,7 @@ class FileViewsDataTest extends ViewsKernelTestBase {
     $views_data = Views::viewsData()->get('file_managed');
     $relationship = $views_data['reverse_field_data_file_entity_test_mul']['relationship'];
     $this->assertEquals('entity_reverse', $relationship['id']);
-    if (Database::getConnection()->driver() == 'pgsql') {
-      // The data table collapses onto the base table under embedded storage.
+    if (\Database::getConnection()->supportsJsonEntityStorage()) {
       $this->assertEquals('entity_test_mul', $relationship['base']);
     }
     else {

@@ -40,7 +40,7 @@ class ContentTranslationSettingsApiTest extends KernelTestBase {
   public function testSettingsApi(): void {
     $this->container->get('content_translation.manager')->setEnabled('entity_test_mul', 'entity_test_mul', TRUE);
     $connection = Database::getConnection();
-    if ($connection->driver() == 'pgsql') {
+    if ($connection->supportsJsonEntityStorage()) {
       // Under pgsql JSON storage the translatable entity has no physical
       // "<entity>_property_data" table; the translation fields are embedded in
       // the "entity_test_mul_translations" table recorded in the registry.

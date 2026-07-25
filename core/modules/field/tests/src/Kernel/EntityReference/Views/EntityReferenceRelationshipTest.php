@@ -117,7 +117,7 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
     // the entity base table and its "relationship field" carries the jsonb
     // storage path. The reverse relationship works as-is: the pgsql query
     // plugin reproduces the dedicated field table with a jsonb array unwind.
-    $json_storage = Database::getConnection()->driver() === 'pgsql';
+    $json_storage = Database::getConnection()->supportsJsonEntityStorage();
 
     // Check the generated views data.
     if ($json_storage) {
@@ -224,7 +224,7 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
 
     Views::viewsData()->clear();
 
-    $json_storage = Database::getConnection()->driver() === 'pgsql';
+    $json_storage = Database::getConnection()->supportsJsonEntityStorage();
 
     // Check the generated views data.
     if ($json_storage) {
@@ -424,7 +424,7 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
     // Test that a relationship got added for content entities but not config
     // entities. Under the pgsql JSON-storage driver the field data is homed
     // on the entity base table rather than a dedicated field table.
-    if (Database::getConnection()->driver() === 'pgsql') {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       $data_table = 'entity_test';
       $config_table = 'entity_test';
     }
