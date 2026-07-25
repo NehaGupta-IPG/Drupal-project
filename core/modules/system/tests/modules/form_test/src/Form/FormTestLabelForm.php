@@ -120,6 +120,13 @@ class FormTestLabelForm extends FormBase {
     $form['form_textfield_test_title_no_show'] = [
       '#type' => 'textfield',
     ];
+    // Item test. Do not use a label element since div is not a labelable
+    // element.
+    $form['form_item_test_no_label'] = [
+      '#type' => 'item',
+      '#title' => $this->t('Item test'),
+      '#markup' => $this->t('An item element should not use a label element.'),
+    ];
     // Checkboxes & radios with title as attribute.
     $form['form_checkboxes_title_attribute'] = [
       '#type' => 'checkboxes',
