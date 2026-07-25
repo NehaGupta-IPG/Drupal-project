@@ -46,13 +46,20 @@ class ClaroItemLabelTest extends KernelTestBase {
     $form_builder->doBuildForm('form', $form, $form_state);
     $this->render($form);
 
-    // An item's #id is on the wrapping div, which is not a labelable element,
-    // so Claro renders the title in a span with its label class, and no label
-    // element is present.
-    $spans = $this->cssSelect('span.form-item__label');
+    // An item's #id is on the wrapping div, which is not a labelable element.
+    // The wrapper has a '-wrapper' id and references the title through
+    // aria-describedby, which points to a span with a '-label' id.
+    $wrappers = $this->cssSelect('div[aria-describedby]');
+    $this->assertCount(1, $wrappers);
+    $wrapper = $wrappers[0];
+    $this->assertStringEndsWith('-wrapper', (string) $wrapper['id']);
+    $label_id = (string) $wrapper['aria-describedby'];
+    $this->assertStringEndsWith('-label', $label_id);
+    $this->assertCount(0, $wrapper->xpath('.//label'));
+    $spans = $wrapper->xpath('.//span[@id="' . $label_id . '"]');
     $this->assertCount(1, $spans);
+    $this->assertStringContainsString('form-item__label', (string) $spans[0]['class']);
     $this->assertSame('Item title', trim((string) $spans[0]));
-    $this->assertCount(0, $this->cssSelect('label'));
   }
 
 }

@@ -101,9 +101,14 @@ class FormPreprocess {
     ];
     $variables['attributes'] = $element['#wrapper_attributes'];
 
-    // Add element #id to the wrapper div.
+    // A non-labelable element exposes its #id on the wrapping div.
     if (isset($element['#nonlabelable']) && !empty($element['#id'])) {
-      $variables['attributes']['id'] = $element['#id'];
+      $edit_id = $element['#id'];
+      $base_id = str_starts_with($edit_id, 'edit-')
+        ? substr($edit_id, 5)
+        : $edit_id;
+      $variables['attributes']['id'] = $base_id . '-wrapper';
+      $variables['attributes']['aria-describedby'] = $base_id . '-label';
     }
 
     // Pass elements #type and #name to template.
@@ -206,6 +211,15 @@ class FormPreprocess {
     // Otherwise, point to the #id of the form input element.
     elseif (!empty($element['#id']) && !$variables['nonlabelable']) {
       $variables['attributes']['for'] = $element['#id'];
+    }
+    // A non-labelable element renders its title in a span. Give the span an id
+    // so the wrapping div can reference it with aria-describedby.
+    elseif ($variables['nonlabelable'] && !empty($element['#id'])) {
+      $edit_id = $element['#id'];
+      $base_id = str_starts_with($edit_id, 'edit-')
+        ? substr($edit_id, 5)
+        : $edit_id;
+      $variables['attributes']['id'] = "$base_id-label";
     }
 
     // Pass elements required to template.
