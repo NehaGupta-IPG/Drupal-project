@@ -68,7 +68,14 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processTaxonomyTermViewsFilterUpdate($view);
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
+      // @todo leaving this here now but new update hooks will need to update.
+      $changed = FALSE;
+      if ($this->processTaxonomyTermViewsFilterUpdate($handler, $handler_type)) {
+        $changed = TRUE;
+      }
+      return $changed;
+    });
   }
 
   /**
@@ -141,48 +148,39 @@ class ViewsConfigUpdater {
    *   TRUE if any filter needs the update.
    */
   public function needsTaxonomyTermViewsFilterUpdate(ViewEntityInterface $view): bool {
-    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) use ($view) {
-      return $this->processTaxonomyTermViewsFilterUpdate($view);
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) {
+      return $this->processTaxonomyTermViewsFilterUpdate($handler, $handler_type);
     });
   }
 
   /**
    * Converts taxonomy term filter values from entity IDs to UUIDs.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
-   *   The view entity.
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
    *
    * @return bool
-   *   TRUE if the view was updated.
+   *   Whether the handler was updated.
    */
-  public function processTaxonomyTermViewsFilterUpdate(ViewEntityInterface $view): bool {
-    $changed = FALSE;
-    $displays = $view->get('display');
-
-    foreach ($displays as &$display) {
-      $filters = $display['display_options']['filters'] ?? [];
-      foreach ($filters as $id => $filter) {
-        if (isset($filter['plugin_id']) && $filter['plugin_id'] === 'taxonomy_index_tid' && isset($filter['value'])) {
-          // Filter all the IDs and UUIDs.
-          // If someone has applied that patch, we can already have UUIDs.
-          $valid_uuids = array_filter($filter['value'], fn($v) => Uuid::isValid($v));
-          $ids_to_load = array_filter($filter['value'], fn($v) => !Uuid::isValid($v));
-          if (!empty($ids_to_load)) {
-            $changed = TRUE;
-            $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadMultiple($ids_to_load);
-            $loaded_uuids = array_map(fn($term) => $term->uuid(), $terms);
-            $filters[$id]['value'] = array_merge($valid_uuids, $loaded_uuids);
-            $display['display_options']['filters'] = $filters;
-          }
-        }
-      }
+  protected function processTaxonomyTermViewsFilterUpdate(array &$handler, string $handler_type): bool {
+    if ($handler_type !== 'filter') {
+      return FALSE;
     }
-
-    if ($changed) {
-      $view->set('display', $displays);
+    if (!isset($handler['plugin_id']) || $handler['plugin_id'] !== 'taxonomy_index_tid' || !isset($handler['value'])) {
+      return FALSE;
     }
-
-    return $changed;
+    // Filter all the IDs and UUIDs.
+    $valid_uuids = array_filter($handler['value'], fn($v) => Uuid::isValid($v));
+    $ids_to_load = array_filter($handler['value'], fn($v) => !Uuid::isValid($v));
+    if (empty($ids_to_load)) {
+      return FALSE;
+    }
+    $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadMultiple($ids_to_load);
+    $loaded_uuids = array_map(fn($term) => $term->uuid(), $terms);
+    $handler['value'] = array_merge($valid_uuids, $loaded_uuids);
+    return TRUE;
   }
 
 }
