@@ -101,8 +101,8 @@ class FormPreprocess {
     ];
     $variables['attributes'] = $element['#wrapper_attributes'];
 
-    // Add element #id for #type 'item'.
-    if (isset($element['#markup']) && !empty($element['#id'])) {
+    // Add element #id to the wrapper div.
+    if (isset($element['#nonlabelable']) && !empty($element['#id'])) {
       $variables['attributes']['id'] = $element['#id'];
     }
 
