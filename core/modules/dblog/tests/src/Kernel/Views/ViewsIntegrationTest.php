@@ -104,7 +104,7 @@ class ViewsIntegrationTest extends ViewsKernelTestBase {
     // physical "users" base table (the logical "users_field_data" table does
     // not exist), so the relationship is re-homed to "users" instead.
     $base_tables = $view->getBaseTables();
-    if (\Database::getConnection()->supportsJsonEntityStorage()) {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       $this->assertArrayHasKey('users', $base_tables);
       $this->assertArrayNotHasKey('users_field_data', $base_tables);
     }

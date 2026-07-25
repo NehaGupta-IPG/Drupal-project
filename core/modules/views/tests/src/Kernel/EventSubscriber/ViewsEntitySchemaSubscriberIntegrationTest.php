@@ -86,7 +86,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
    *
    * @var bool
    */
-  protected bool $jsonStorage = FALSE;
+  protected bool $supportsJsonEntityStorage = FALSE;
 
   /**
    * {@inheritdoc}
@@ -94,7 +94,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
   protected function setUp($import_test_views = TRUE): void {
     parent::setUp();
 
-    $this->supportsJsonEntityStorage = \Database::getConnection()->supportsJsonEntityStorage();
+    $this->supportsJsonEntityStorage = Database::getConnection()->supportsJsonEntityStorage();
 
     $this->eventDispatcher = $this->container->get('event_dispatcher');
     $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');

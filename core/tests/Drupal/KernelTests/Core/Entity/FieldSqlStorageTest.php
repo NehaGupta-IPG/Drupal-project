@@ -609,7 +609,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
    * Tests that failure to create fields is handled gracefully.
    */
   public function testFieldUpdateFailure(): void {
-    if (\Database::getConnection()->supportsJsonEntityStorage()) {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       $this->markTestSkipped('With JSON entity storage, the physical dedicated field tables do not exist.');
     }
     // Create a text field.
@@ -651,7 +651,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
    * Tests adding and removing indexes while data is present.
    */
   public function testFieldUpdateIndexesWithData(): void {
-    if (\Database::getConnection()->supportsJsonEntityStorage()) {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       $this->markTestSkipped('With JSON entity storage, the physical dedicated field tables do not exist.');
     }
     // Create a decimal field.

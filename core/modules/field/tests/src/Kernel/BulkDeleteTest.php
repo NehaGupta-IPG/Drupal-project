@@ -203,7 +203,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
     $this->assertEquals($bundle, $field->getTargetBundle(), 'The deleted field is for the correct bundle');
 
     // Check that the actual stored content did not change during delete.
-    if (!\Database::getConnection()->supportsJsonEntityStorage()) {
+    if (!Database::getConnection()->supportsJsonEntityStorage()) {
       // The JSON entity storage driver has no physical dedicated field table to
       // read directly; the deleted-data entity queries below verify that the
       // embedded field values survived the delete intact.

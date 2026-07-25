@@ -263,7 +263,7 @@ class JoinTest extends RelationshipJoinTestBase {
    *   The 'table' entry of the built join info.
    */
   protected function assertJoinTarget(string $expected_table, $actual_table): void {
-    if (\Database::getConnection()->supportsJsonEntityStorage()) {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       $this->assertInstanceOf(SelectInterface::class, $actual_table);
     }
     else {

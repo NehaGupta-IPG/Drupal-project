@@ -110,7 +110,7 @@ class RelationshipUserFileDataTest extends ViewsKernelTestBase {
     // user field data is embedded in the "users" base table (the dedicated
     // "user__user_file" table does not exist), so the relationship alias — and
     // therefore the fid column alias — is keyed on "users" instead.
-    $fid_alias = \Database::getConnection()->supportsJsonEntityStorage()
+    $fid_alias = Database::getConnection()->supportsJsonEntityStorage()
       ? 'file_managed_users_fid'
       : 'file_managed_user__user_file_fid';
     $expected_result = [

@@ -92,7 +92,7 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
     $problems = [];
     foreach ($this->definitions as $entity_type_id => $info) {
       $class_name_full = $info->getClass();
-      if (\Database::getConnection()->supportsJsonEntityStorage()) {
+      if (Database::getConnection()->supportsJsonEntityStorage()) {
         $class_name_full = get_parent_class($class_name_full);
       }
       $parts = explode('\\', $class_name_full);

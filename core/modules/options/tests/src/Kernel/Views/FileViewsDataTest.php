@@ -56,7 +56,7 @@ class FileViewsDataTest extends ViewsKernelTestBase {
       'bundle' => 'entity_test',
     ])->save();
     // Check the generated views data.
-    if (\Database::getConnection()->supportsJsonEntityStorage()) {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       $views_data = Views::viewsData()->get('entity_test');
     }
     else {
@@ -73,7 +73,7 @@ class FileViewsDataTest extends ViewsKernelTestBase {
     $this->assertEquals('entity_reverse', $relationship['id']);
     $this->assertEquals('entity_test', $relationship['base']);
     $this->assertEquals('id', $relationship['base field']);
-    if (!\Database::getConnection()->supportsJsonEntityStorage()) {
+    if (!Database::getConnection()->supportsJsonEntityStorage()) {
       // The dedicated field table does not exist under embedded storage.
       $this->assertEquals('entity_test__field_base_file', $relationship['field table']);
     }
@@ -94,7 +94,7 @@ class FileViewsDataTest extends ViewsKernelTestBase {
       'bundle' => 'entity_test_mul',
     ])->save();
     // Check the generated views data.
-    if (\Database::getConnection()->supportsJsonEntityStorage()) {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       $views_data = Views::viewsData()->get('entity_test_mul');
     }
     else {
@@ -109,7 +109,7 @@ class FileViewsDataTest extends ViewsKernelTestBase {
     $views_data = Views::viewsData()->get('file_managed');
     $relationship = $views_data['reverse_field_data_file_entity_test_mul']['relationship'];
     $this->assertEquals('entity_reverse', $relationship['id']);
-    if (\Database::getConnection()->supportsJsonEntityStorage()) {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
       $this->assertEquals('entity_test_mul', $relationship['base']);
     }
     else {
