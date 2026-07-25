@@ -190,6 +190,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
     protected readonly TimeInterface $time,
     protected readonly PathFactoryInterface $pathFactory,
     protected readonly FailureMarker $failureMarker,
+    protected readonly ComposerInspector $composerInspector,
   ) {
     $this->tempStore = $tempStoreFactory->get('package_manager_stage');
   }
@@ -283,6 +284,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    * @see ::apply()
    */
   protected function getPathsToExclude(): PathListInterface {
+    $this->composerInspector->validate($this->pathLocator->getProjectRoot());
     $event = new CollectPathsToExcludeEvent($this, $this->pathLocator, $this->pathFactory);
     try {
       return $this->eventDispatcher->dispatch($event);
