@@ -17,8 +17,10 @@ use Symfony\Component\HttpFoundation\Request;
  *       static::ALLOW and none to static::DENY</li>
  *   <li>Otherwise returns NULL</li>
  * </ol>
+ *
+ * @phpstan-ignore class.implementsDeprecatedInterface
  */
-class ChainRequestPolicy implements RequestPolicyInterface {
+class ChainRequestPolicy implements ChainRequestPolicyInterface {
 
   /**
    * Constructs a ChainRequestPolicy object.

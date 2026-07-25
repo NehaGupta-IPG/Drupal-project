@@ -16,8 +16,10 @@ use Symfony\Component\HttpFoundation\Response;
  *   <li>Returns static::DENY if any of the rules evaluated to static::DENY</li>
  *   <li>Otherwise returns NULL</li>
  * </ol>
+ *
+ * @phpstan-ignore class.implementsDeprecatedInterface
  */
-class ChainResponsePolicy implements ResponsePolicyInterface {
+class ChainResponsePolicy implements ChainResponsePolicyInterface {
 
   /**
    * Constructs a ChainResponsePolicy object.

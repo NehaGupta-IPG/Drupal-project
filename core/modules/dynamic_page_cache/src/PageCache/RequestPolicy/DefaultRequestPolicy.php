@@ -3,6 +3,7 @@
 namespace Drupal\dynamic_page_cache\PageCache\RequestPolicy;
 
 use Drupal\Core\PageCache\ChainRequestPolicy;
+use Drupal\Core\PageCache\RequestPolicy\CommandLineOrUnsafeMethod;
 
 /**
  * The default Dynamic Page Cache request policy.
@@ -19,7 +20,7 @@ class DefaultRequestPolicy extends ChainRequestPolicy {
    */
   public function __construct() {
     @trigger_error(__CLASS__ . ' is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\Core\PageCache\ChainRequestPolicy with tagged services instead. See https://www.drupal.org/node/3579668', E_USER_DEPRECATED);
-    parent::__construct(NULL);
+    parent::__construct(new \ArrayIterator([new CommandLineOrUnsafeMethod()]));
   }
 
 }
