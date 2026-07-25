@@ -164,7 +164,7 @@ class ViewsConfigUpdater {
    * @return bool
    *   Whether the handler was updated.
    */
-  protected function processTaxonomyTermViewsFilterUpdate(array &$handler, string $handler_type): bool {
+  public function processTaxonomyTermViewsFilterUpdate(array &$handler, string $handler_type): bool {
     if ($handler_type !== 'filter') {
       return FALSE;
     }

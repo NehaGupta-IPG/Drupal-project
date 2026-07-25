@@ -76,25 +76,45 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
     $updater = $this->container->get(ViewsConfigUpdater::class);
     $updater->setDeprecationsEnabled(FALSE);
 
-    // A view with no taxonomy filters is not changed.
-    $view = $this->buildViewWithTidFilter([]);
-    $this->assertFalse($updater->processTaxonomyTermViewsFilterUpdate($view));
+    // A filter handler with wrong plugin_id is not changed.
+    $handler = [
+      'plugin_id' => 'string',
+      'value' => [$term->id()],
+    ];
+    $this->assertFalse($updater->processTaxonomyTermViewsFilterUpdate($handler, 'filter'));
 
-    // A view with UUID filter values is not changed.
-    $view = $this->buildViewWithTidFilter([$term->uuid()]);
-    $this->assertFalse($updater->processTaxonomyTermViewsFilterUpdate($view));
+    // A filter handler with no value is not changed.
+    $handler = ['plugin_id' => 'taxonomy_index_tid'];
+    $this->assertFalse($updater->processTaxonomyTermViewsFilterUpdate($handler, 'filter'));
 
-    // A view with integer entity ID values is updated.
-    $view = $this->buildViewWithTidFilter([$term->id()]);
-    $this->assertTrue($updater->processTaxonomyTermViewsFilterUpdate($view));
+    // Test the filter handler with input term ids.
+    $handler = [
+      'plugin_id' => 'taxonomy_index_tid',
+      'value' => [$term->id()],
+    ];
+    $this->assertFalse($updater->processTaxonomyTermViewsFilterUpdate($handler, 'field'));
 
-    // After processing, the filter value should be the term UUID.
-    $filters = $view->get('display')['default']['display_options']['filters'];
-    $this->assertContains($term->uuid(), $filters['tid']['value']);
-    $this->assertNotContains($term->id(), $filters['tid']['value']);
+    // Handler doesn't update if anyone is using the patch and view already has
+    // UUIDs.
+    $handler = [
+      'plugin_id' => 'taxonomy_index_tid',
+      'value' => [$term->uuid()],
+    ];
+    $this->assertFalse($updater->processTaxonomyTermViewsFilterUpdate($handler, 'filter'));
 
-    // Running again returns FALSE — already converted.
-    $this->assertFalse($updater->processTaxonomyTermViewsFilterUpdate($view));
+    $handler = [
+      'plugin_id' => 'taxonomy_index_tid',
+      'value' => [$term->id()],
+    ];
+    $this->assertTrue($updater->processTaxonomyTermViewsFilterUpdate($handler, 'filter'));
+
+    // After processing, the handler value should contain the term UUID.
+    $this->assertContains($term->uuid(), $handler['value']);
+    $this->assertNotContains($term->id(), $handler['value']);
+
+    // Process again to validate that it doesn't update again since already
+    // updated.
+    $this->assertFalse($updater->processTaxonomyTermViewsFilterUpdate($handler, 'filter'));
   }
 
   /**
