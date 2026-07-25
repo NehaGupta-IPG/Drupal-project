@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\link\Functional;
 
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
@@ -565,6 +566,75 @@ class LinkFieldTest extends BrowserTestBase {
     $this->drupalGet("/entity_test/manage/{$invalidLinkUrlEntity->id()}/edit");
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->fieldValueEquals("{$field_name}[0][uri]", $invalidUri);
+  }
+
+  /**
+   * Tests that attributes are retained when the link is saved via the UI.
+   */
+  public function testAttributesOnLink(): void {
+    $field_name = mb_strtolower($this->randomMachineName());
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => 'link',
+      'cardinality' => 1,
+    ]);
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
+      'label' => 'Read more about this entity',
+      'bundle' => 'entity_test',
+      'settings' => [
+        'title' => LinkTitleVisibility::Optional->value,
+        'link_type' => LinkItemInterface::LINK_INTERNAL,
+      ],
+    ])->save();
+
+    \Drupal::entityTypeManager()
+      ->getStorage('entity_form_display')
+      ->load('entity_test.entity_test.default')
+      ->setComponent($field_name, [
+        'type' => 'link_default',
+      ])
+      ->save();
+
+    EntityViewDisplay::create([
+      'targetEntityType' => 'entity_test',
+      'bundle' => 'entity_test',
+      'mode' => 'full',
+      'status' => TRUE,
+    ])->setComponent($field_name, [
+      'type' => 'link',
+    ])
+      ->save();
+
+    // Test a link with attributes.
+    $edit = [
+      "{$field_name}[0][title]" => 'Link with attributes.',
+      "{$field_name}[0][uri]" => '<front>',
+    ];
+
+    $this->drupalGet('entity_test/add');
+    $this->submitForm($edit, 'Save');
+    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    $id = $match[1];
+
+    $entity = EntityTest::load($id);
+    $field = $entity->get($field_name)->first();
+
+    $attribute_value = mb_strtolower($this->randomMachineName());
+
+    $field->set('options', ['attributes' => ['custom-attribute' => $attribute_value]]);
+    $entity->save();
+
+    $output = $this->renderTestEntity($id);
+    $this->assertStringContainsString($attribute_value, $output);
+
+    $this->drupalGet($entity->toUrl('edit-form'));
+    $this->submitForm([], 'Save');
+
+    $output = $this->renderTestEntity($id);
+    $this->assertStringContainsString($attribute_value, $output);
   }
 
 }
