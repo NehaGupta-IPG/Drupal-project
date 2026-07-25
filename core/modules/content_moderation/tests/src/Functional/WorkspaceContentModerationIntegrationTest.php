@@ -95,7 +95,7 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
 
     // Take the first node through various moderation states.
     $this->drupalGet('/node/1/edit');
-    $this->assertEquals('Current state Published', $this->cssSelect('#edit-moderation-state-0-current')[0]->getText());
+    $this->assertEquals('Current state Published', $this->cssSelect('#moderation-state-0-current-wrapper')[0]->getText());
 
     $this->submitForm([
       'title[0][value]' => 'First article - draft',
@@ -106,7 +106,7 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
     $this->assertSession()->pageTextContains('First article - draft');
 
     $this->drupalGet('/node/1/edit');
-    $this->assertEquals('Current state Draft', $this->cssSelect('#edit-moderation-state-0-current')[0]->getText());
+    $this->assertEquals('Current state Draft', $this->cssSelect('#moderation-state-0-current-wrapper')[0]->getText());
 
     $this->submitForm([
       'title[0][value]' => 'First article - published',

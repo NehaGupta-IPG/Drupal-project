@@ -18,7 +18,7 @@ module.exports = {
       .drupalRelativeURL('/form-test/javascript-states-form')
       .waitForElementVisible('body', 1000)
       .waitForElementNotVisible(
-        '#edit-item-visible-when-number-trigger-filled-by-spinner',
+        '#item-visible-when-number-trigger-filled-by-spinner-wrapper',
         1000,
       )
       .execute(() => {
@@ -30,7 +30,7 @@ module.exports = {
       });
 
     browser.waitForElementVisible(
-      '#edit-item-visible-when-number-trigger-filled-by-spinner',
+      '#item-visible-when-number-trigger-filled-by-spinner-wrapper',
       1000,
     );
   },
