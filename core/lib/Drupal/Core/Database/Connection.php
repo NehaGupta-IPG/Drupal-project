@@ -1222,6 +1222,16 @@ abstract class Connection {
   }
 
   /**
+   * Determines if this driver supports JSON entity storage.
+   *
+   * @return bool
+   *   TRUE if this connection supports JSON entity storage, FALSE otherwise.
+   */
+  public function supportsJsonEntityStorage(): bool {
+    return FALSE;
+  }
+
+  /**
    * Returns the name of the database engine accessed by this driver.
    *
    * @return string
