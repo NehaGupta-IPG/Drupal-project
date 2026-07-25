@@ -138,10 +138,10 @@ class ConfigTranslationUiTest extends ConfigTranslationUiTestBase {
       // Check if the expected number of source elements are present.
       foreach ($data['expected'] as $index => $expected) {
         if ($expected) {
-          $this->assertSession()->responseContains('edit-source-config-names-viewsviewfiles-display-default-display-options-fields-count-format-plural-string-' . $index);
+          $this->assertSession()->responseContains('source-config-names-viewsviewfiles-display-default-display-options-fields-count-format-plural-string-' . $index . '-wrapper');
         }
         else {
-          $this->assertSession()->responseNotContains('edit-source-config-names-viewsviewfiles-display-default-display-options-fields-count-format-plural-string-' . $index);
+          $this->assertSession()->responseNotContains('source-config-names-viewsviewfiles-display-default-display-options-fields-count-format-plural-string-' . $index . '-wrapper');
         }
       }
     }
