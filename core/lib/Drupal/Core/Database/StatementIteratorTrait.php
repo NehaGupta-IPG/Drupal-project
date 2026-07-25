@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Database;
 
+@trigger_error('\Drupal\Core\Database\StatementIteratorTrait is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Iteration control is moved to ResultBase. See https://www.drupal.org/node/3613105', E_USER_DEPRECATED);
+
 /**
  * StatementInterface iterator trait.
  *

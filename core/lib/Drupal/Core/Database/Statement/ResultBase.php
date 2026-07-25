@@ -248,7 +248,7 @@ abstract class ResultBase implements \Iterator {
     // attempted.
     if ($this->resultsetIndex >= 0) {
       $this->markResultsetIterable(FALSE);
-      throw new DatabaseExceptionWrapper('Attempted rewinding a StatementInterface object when fetching has already started. Refactor your code to avoid rewinding statement objects.');
+      throw new DatabaseExceptionWrapper('Attempted rewinding a database result set when fetching has already started. Refactor your code to avoid rewinding ResultBase objects');
     }
   }
 
