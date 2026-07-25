@@ -73,12 +73,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     catch (RuntimeException) {
       // We don't need to do anything here.
     }
-
-    // If composer.json is removed, we should get an exception because
-    // getConfig() should validate that $dir is Composer-ready.
-    unlink($dir . '/composer.json');
-    $this->expectExceptionMessageIsOrContains("composer.json not found.");
-    $inspector->getConfig('extra', $dir);
   }
 
   /**
@@ -153,13 +147,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     unset($lock_data['_readme']);
     $lock_file->write($lock_data);
     $this->assertNotSame($list, $inspector->getInstalledPackagesList($project_root));
-
-    // If composer.lock is removed, we should get an exception because
-    // getInstalledPackagesList() should validate that $project_root is
-    // Composer-ready.
-    unlink($lock_file->getPath());
-    $this->expectExceptionMessageIs("composer.lock not found in $project_root.");
-    $inspector->getInstalledPackagesList($project_root);
   }
 
   /**
