@@ -149,7 +149,8 @@ class FormPreprocess {
     // Add label_display and label variables to template.
     $variables['label_display'] = $element['#title_display'];
     $variables['label'] = ['#theme' => 'form_element_label'];
-    $variables['label'] += array_intersect_key($element, array_flip(['#id', '#nonlabelable', '#required', '#title', '#title_display']));
+    $properties = ['#id', '#nonlabelable', '#required', '#title', '#title_display'];
+    $variables['label'] += array_intersect_key($element, array_flip($properties));
     $variables['label']['#attributes'] = $element['#label_attributes'];
     if (!empty($element['#label_for'])) {
       $variables['label']['#for'] = $element['#label_for'];
