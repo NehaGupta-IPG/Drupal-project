@@ -254,8 +254,12 @@ simpletest_script_reporter_display_results($test_run_results_storage);
 // CONSOLIDATE. --------------------
 
 try {
+  $tmpDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . getenv('_ARTIFACTS_DIR') . \DIRECTORY_SEPARATOR . 'deprecation-handler' . \DIRECTORY_SEPARATOR . 'jobs';
+  if ($jobId = getenv('CI_JOB_ID')) {
+    $tmpDirectory .= \DIRECTORY_SEPARATOR . $jobId;
+  }
   $files = \Drupal::service(FileSystemInterface::class)->scanDirectory(
-    \Drupal::root() . \DIRECTORY_SEPARATOR . getenv('_ARTIFACTS_DIR') . '/jobs' . \DIRECTORY_SEPARATOR . getenv('CI_JOB_ID') . \DIRECTORY_SEPARATOR . 'deprecation-handler',
+    $tmpDirectory,
     '/^deprecation-ignore-stats.*\.json$/',
   );
 
@@ -278,7 +282,12 @@ try {
   $outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . getenv('_ARTIFACTS_DIR');
   \Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY);
 
-  $outputFile = $outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats-" . getenv('CI_JOB_ID') . ".json";
+  if ($jobId) {
+    $outputFile = $outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats-" . $jobId . ".json";
+  }
+  else {
+    $outputFile = $outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json";
+  }
   file_put_contents($outputFile, json_encode([
     'metadata' => $metadata,
     'skips' => $tmp,

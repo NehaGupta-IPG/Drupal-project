@@ -161,11 +161,10 @@ final class DeprecationHandler implements Extension {
     $facade->registerSubscriber(new TestRunnerFinished($this));
 
     // Artifacts directory.
-    $directory = $this->config->deprecationStatisticsOutputPath . '/jobs';
+    $directory = $this->config->deprecationStatisticsOutputPath . \DIRECTORY_SEPARATOR . 'deprecation-handler' . \DIRECTORY_SEPARATOR . 'jobs';
     if ($jobId = getenv('CI_JOB_ID')) {
       $directory .= \DIRECTORY_SEPARATOR . $jobId;
     }
-    $directory .= \DIRECTORY_SEPARATOR . 'deprecation-handler';
     Filesystem::createDirectory($directory);
     $realDirectory = realpath($directory);
     if ($realDirectory === FALSE || !is_dir($realDirectory) || !is_writable($realDirectory)) {
