@@ -154,10 +154,12 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
       $langcode = $language->getId();
       $query[static::QUERY_PARAMETER] = $langcode;
       $links[$langcode] = [
-        'url' => $url,
+        // Clone the url because options will be set that differ per language.
+        'url' => clone $url,
         'title' => $language->getName(),
         'attributes' => ['class' => ['language-link']],
         'query' => $query,
+        'language' => $language,
       ];
     }
 

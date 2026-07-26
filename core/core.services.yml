@@ -1416,11 +1416,12 @@ services:
     arguments: ['@private_key', '@session_manager.metadata_bag']
   Drupal\Core\Access\CsrfTokenGenerator: '@csrf_token'
   access_arguments_resolver_factory:
+    autowire: true
     class: Drupal\Core\Access\AccessArgumentsResolverFactory
   Drupal\Core\Access\AccessArgumentsResolverFactoryInterface: '@access_arguments_resolver_factory'
   access_manager:
+    autowire: true
     class: Drupal\Core\Access\AccessManager
-    arguments: ['@router.route_provider', '@paramconverter_manager', '@access_arguments_resolver_factory', '@current_user', '@access_manager.check_provider']
   Drupal\Core\Access\AccessManagerInterface: '@access_manager'
   access_manager.check_provider:
     class: Drupal\Core\Access\CheckProvider

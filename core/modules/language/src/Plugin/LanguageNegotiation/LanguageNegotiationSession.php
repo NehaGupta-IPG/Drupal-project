@@ -173,6 +173,7 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase implement
         'url' => clone $url,
         'title' => $language->getName(),
         'attributes' => ['class' => ['language-link']],
+        'language' => $language,
         'query' => $query,
       ];
       if ($language_query != $langcode) {

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Access;
 
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\ParamConverter\ParamConverterManagerInterface;
 use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\Core\Routing\RouteMatch;
@@ -19,61 +20,19 @@ use Drupal\Core\Routing\RouteObjectInterface;
  * @see \Drupal\Tests\Core\Access\AccessManagerTest
  */
 class AccessManager implements AccessManagerInterface {
-  /**
-   * The route provider.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
-   */
-  protected $routeProvider;
 
-  /**
-   * The paramconverter manager.
-   *
-   * @var \Drupal\Core\ParamConverter\ParamConverterManagerInterface
-   */
-  protected $paramConverterManager;
-
-  /**
-   * The access arguments resolver.
-   *
-   * @var \Drupal\Core\Access\AccessArgumentsResolverFactoryInterface
-   */
-  protected $argumentsResolverFactory;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
-
-  /**
-   * The check provider.
-   *
-   * @var \Drupal\Core\Access\CheckProviderInterface
-   */
-  protected $checkProvider;
-
-  /**
-   * Constructs an AccessManager instance.
-   *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
-   * @param \Drupal\Core\ParamConverter\ParamConverterManagerInterface $paramconverter_manager
-   *   The param converter manager.
-   * @param \Drupal\Core\Access\AccessArgumentsResolverFactoryInterface $arguments_resolver_factory
-   *   The access arguments resolver.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param CheckProviderInterface $check_provider
-   *   The check access provider.
-   */
-  public function __construct(RouteProviderInterface $route_provider, ParamConverterManagerInterface $paramconverter_manager, AccessArgumentsResolverFactoryInterface $arguments_resolver_factory, AccountInterface $current_user, CheckProviderInterface $check_provider) {
-    $this->routeProvider = $route_provider;
-    $this->paramConverterManager = $paramconverter_manager;
-    $this->argumentsResolverFactory = $arguments_resolver_factory;
-    $this->currentUser = $current_user;
-    $this->checkProvider = $check_provider;
+  public function __construct(
+    protected RouteProviderInterface $routeProvider,
+    protected ParamConverterManagerInterface $paramConverterManager,
+    protected AccessArgumentsResolverFactoryInterface $argumentsResolverFactory,
+    protected AccountInterface $currentUser,
+    protected CheckProviderInterface $checkProvider,
+    protected ?LanguageManagerInterface $languageManager = NULL,
+  ) {
+    if (!isset($this->languageManager)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $languageManager argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3576381', E_USER_DEPRECATED);
+      $this->languageManager = \Drupal::service(LanguageManagerInterface::class);
+    }
   }
 
   /**
@@ -82,6 +41,19 @@ class AccessManager implements AccessManagerInterface {
   public function checkNamedRoute($route_name, array $parameters = [], ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     try {
       $route = $this->routeProvider->getRouteByName($route_name);
+
+      // Set defaults on the route for the languages if provided, so that the
+      // specified language can be used in param converters and access callbacks
+      // for any language-based access control.
+      // @see \Drupal\Core\ParamConverter\EntityConverter::convert()
+      // @see \Drupal\Core\ParamConverter\EntityRevisionParamConverter::convert()
+      // @see \Drupal\Core\Access\AccessArgumentResolverFactory::getArgumentsResolver()
+      foreach ($this->languageManager->getLanguageTypes() as $type) {
+        $param_name = $type . '_';
+        if (isset($parameters[$param_name])) {
+          $route->setDefault($param_name, $parameters[$param_name]);
+        }
+      }
 
       // ParamConverterManager relies on the route name and object being
       // available from the parameters array.

@@ -6,6 +6,8 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
@@ -50,6 +52,13 @@ class Url implements TrustedCallbackInterface {
    * @var \Drupal\Core\Access\AccessManagerInterface
    */
   protected $accessManager;
+
+  /**
+   * The language manage.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected LanguageManagerInterface $languageManager;
 
   /**
    * The route name.
@@ -259,8 +268,12 @@ class Url implements TrustedCallbackInterface {
    *     added to the anchor tag if you use the \Drupal\Core\Link class to make
    *     the link.
    *   - 'language': An optional language object used to look up the alias
-   *     for the URL. If $options['language'] is omitted, it defaults to the
-   *     current language for the language type LanguageInterface::TYPE_URL.
+   *     for the URL, or provide as arguments to access check methods. For alias
+   *     lookups, if $options['language'] is omitted, it defaults to the current
+   *     language for the language type LanguageInterface::TYPE_URL. For access
+   *     checks, if $options['language'] is omitted, the argument associated
+   *     with the language type of the access check argument defaults to the
+   *     the current language for the type.
    *   - 'https': Whether this URL should point to a secure location. If not
    *     defined, the current scheme is used, so the user stays on HTTP or HTTPS
    *     respectively. TRUE enforces HTTPS and FALSE enforces HTTP.
@@ -816,10 +829,23 @@ class Url implements TrustedCallbackInterface {
    *   access is either explicitly forbidden or "no opinion".
    */
   public function access(?AccountInterface $account = NULL, $return_as_object = FALSE) {
-    if ($this->isRouted()) {
-      return $this->accessManager()->checkNamedRoute($this->getRouteName(), $this->getRouteParameters(), $account, $return_as_object);
+    if (!$this->isRouted()) {
+      return $return_as_object ? AccessResult::allowed() : TRUE;
     }
-    return $return_as_object ? AccessResult::allowed() : TRUE;
+
+    $parameters = $this->getRouteParameters();
+    $language = $this->getOption('language');
+    if ($language instanceof LanguageInterface) {
+      foreach ($this->languageManager()->getLanguageTypes() as $type) {
+        // Provide the langcode as a route parameter that can be upcasted for
+        // entity translation or passed as languages to access callbacks.
+        // @see \Drupal\Core\ParamConverter\EntityConverter::convert()
+        // @see \Drupal\Core\ParamConverter\EntityRevisionParamConverter::convert()
+        // @see \Drupal\Core\Access\AccessArgumentResolverFactory::getArgumentsResolver()
+        $parameters[$type . '_'] ??= $language->getId();
+      }
+    }
+    return $this->accessManager()->checkNamedRoute($this->getRouteName(), $parameters, $account, $return_as_object);
   }
 
   /**
@@ -831,6 +857,19 @@ class Url implements TrustedCallbackInterface {
       $this->accessManager = \Drupal::service('access_manager');
     }
     return $this->accessManager;
+  }
+
+  /**
+   * Gets the language manager.
+   *
+   * @return \Drupal\Core\Language\LanguageManagerInterface
+   *   The language manager service.
+   */
+  protected function languageManager(): LanguageManagerInterface {
+    if (!isset($this->languageManager)) {
+      $this->languageManager = \Drupal::service(LanguageManagerInterface::class);
+    }
+    return $this->languageManager;
   }
 
   /**

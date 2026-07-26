@@ -7,6 +7,7 @@ use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -125,6 +126,12 @@ class EntityConverter implements ParamConverterInterface, ParamConverterRouteReq
    */
   public function convert($value, $definition, $name, array $defaults) {
     $entity_type_id = $this->getEntityTypeFromDefaults($definition, $name, $defaults);
+    // If the 'language_content_' property is set on route defaults, use that
+    // as the langcode for the entity translation to load. The trailing
+    // underscore is used to avoid collisions with other route parameters or
+    // defaults.
+    $langcode = $defaults[LanguageInterface::TYPE_CONTENT . '_'] ?? NULL;
+    $contexts = $langcode ? ['langcode' => $langcode] : [];
 
     // If the entity type is dynamic, confirm it to be a config entity. Static
     // entity types will have performed this check in self::applies().
@@ -140,7 +147,7 @@ class EntityConverter implements ParamConverterInterface, ParamConverterRouteReq
     // If the entity type is revisionable and the parameter has the
     // "load_latest_revision" flag, load the active variant.
     if (!empty($definition['load_latest_revision'])) {
-      $entity = $this->entityRepository->getActive($entity_type_id, $value);
+      $entity = $this->entityRepository->getActive($entity_type_id, $value, $contexts);
 
       if (
         !empty($definition['bundle']) &&
@@ -152,7 +159,7 @@ class EntityConverter implements ParamConverterInterface, ParamConverterRouteReq
       return $entity;
     }
 
-    $contexts = ['operation' => 'entity_upcast'];
+    $contexts += ['operation' => 'entity_upcast'];
     $entity = $this->entityRepository->getCanonical($entity_type_id, $value, $contexts);
 
     if (
