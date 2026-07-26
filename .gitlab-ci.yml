@@ -308,7 +308,7 @@ default:
     DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version"
   before_script:
     - *composer-setup
-    - mkdir -p $_ARTIFACTS_DIR ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
+    - mkdir -p ./$_ARTIFACTS_DIR ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
   script:
     - export EXIT_CODE=0
@@ -351,7 +351,7 @@ default:
     TESTSUITE: "unit-component"
     DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version"
   before_script:
-    - mkdir -p $_ARTIFACTS_DIR
+    - mkdir -p ./$_ARTIFACTS_DIR
     - *composer-setup
     - |
       [[ $_TARGET_PHP == $PRIMARY_PHP ]] && docker-php-ext-enable pcov
