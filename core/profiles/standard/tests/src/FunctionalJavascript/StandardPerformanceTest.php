@@ -183,7 +183,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $expected = [
       'QueryCount' => 25,
       'CacheGetCount' => 73,
-      'CacheSetCount' => 42,
+      'CacheSetCount' => 32,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 7,
