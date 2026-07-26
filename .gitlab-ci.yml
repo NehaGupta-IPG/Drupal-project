@@ -319,7 +319,7 @@ default:
     - exit $EXIT_CODE
   after_script:
     - sed -i "s#$CI_PROJECT_DIR/##" $_ARTIFACTS_DIR/phpunit-*.xml || true
-    - php .gitlab-ci/scripts/statistics-job-consolidator.php $_ARTIFACTS_DIR/deprecation-handler/jobs $_ARTIFACTS_DIR/deprecation-ignore-stats-$CI_JOB_ID.json
+    - php .gitlab-ci/scripts/statistics-job-consolidator.php $_ARTIFACTS_DIR/deprecation-handler/jobs $_ARTIFACTS_DIR/deprecation-statistics-$CI_JOB_ID.json
   artifacts:
     when: always
     expire_in: 6 mos
@@ -375,7 +375,7 @@ default:
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == $NEXT_PHP_MAJOR ]] && exit 100
     - exit $EXIT_CODE
   after_script:
-    - php .gitlab-ci/scripts/statistics-job-consolidator.php $_ARTIFACTS_DIR/deprecation-handler/jobs $_ARTIFACTS_DIR/deprecation-ignore-stats-$CI_JOB_ID.json
+    - php .gitlab-ci/scripts/statistics-job-consolidator.php $_ARTIFACTS_DIR/deprecation-handler/jobs $_ARTIFACTS_DIR/deprecation-statistics-$CI_JOB_ID.json
     # Process the coverage text report to produce an OpenMetrics report.
     - |
       [[ $_TARGET_PHP == $PRIMARY_PHP ]] && php .gitlab-ci/scripts/component-coverage-metrics.php $_ARTIFACTS_DIR/coverage-report.txt $_ARTIFACTS_DIR/coverage-metrics.txt
@@ -518,8 +518,10 @@ default:
   variables:
     TESTSUITE: kernel
     KUBERNETES_CPU_REQUEST: "12"
+    _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
     CONCURRENCY: "24"
-    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
+    DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version,database-driver,database-version"
+    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
   services:
     - <<: *with-database
 

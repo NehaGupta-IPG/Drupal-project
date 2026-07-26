@@ -45,7 +45,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 $finder = new Finder();
 
-$files = $finder->files()->in($args[1])->name('deprecation-ignore-stats.json');
+$files = $finder->files()->in($args[1])->name('deprecation-statistics-*.json');
 
 $tmp = [];
 $tmp_test = [];
@@ -67,7 +67,7 @@ foreach ($files as $file) {
   }
 }
 
-$outputFile = $args[1] . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json";
+$outputFile = $args[1] . \DIRECTORY_SEPARATOR . "deprecation-statistics-consolidated.json";
 file_put_contents($outputFile, json_encode($tmp));
 file_put_contents($outputFile, json_encode($tmp_test), \FILE_APPEND);
 file_put_contents($outputFile, json_encode($tmp_deprecation), \FILE_APPEND);
@@ -104,6 +104,6 @@ foreach ($tmp_test as $test => $ignored) {
 }
 echo "-----------+----------------------------------------------------------------------\n";
 
-ksort($tmp_deprecation);
-echo "\n\nDeprecations\n";
-dump($tmp_deprecation);
+// ksort($tmp_deprecation);.
+// echo "\n\nDeprecations\n";.
+// dump($tmp_deprecation);.
