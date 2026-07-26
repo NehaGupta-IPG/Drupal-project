@@ -137,8 +137,7 @@ class ResponsiveImageThemeHooks {
       ($this->loggerClosure)()->error('Failed to load responsive image style: “@style” while displaying responsive image.', ['@style' => $variables['responsive_image_style_id']]);
       return;
     }
-    // Gracefully handle zero-byte or otherwise unreadable image files to avoid
-    // fatal errors when the image toolkit tries to parse them.
+    // Warn when the image file is zero-bytes or otherwise unreadable.
     if (!$this->imageFactory->get($variables['uri'])->isValid()) {
       $variables['img_element'] = [];
       ($this->loggerClosure)()->warning('Image file is not valid (possibly zero bytes) for URI “@uri”. Responsive image style “@style” was not applied.', [

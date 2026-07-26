@@ -104,34 +104,60 @@ class ResponsiveImageFormatterTest extends FieldKernelTestBase {
   }
 
   /**
-   * Tests that zero-byte image files are rendered gracefully without errors.
+   * Tests that zero-byte image files are rendered without errors.
    */
   public function testZeroByteImageRendersGracefully(): void {
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = $this->container->get('renderer');
+
+    // Copy a valid JPEG fixture to confirm a normal file produces an img tag.
+    \Drupal::service('file_system')->copy(
+      $this->root . '/core/tests/fixtures/files/image-test.jpg',
+      'public://valid-test.jpg',
+    );
+    $valid_file = File::create([
+      'uri' => 'public://valid-test.jpg',
+      'filename' => 'valid-test.jpg',
+      'filemime' => 'image/jpeg',
+      'status' => 1,
+    ]);
+    $valid_file->save();
+
+    $valid_entity = EntityTest::create([
+      'name' => 'valid',
+      $this->fieldName => [
+        'target_id' => $valid_file->id(),
+        'alt' => 'Valid image',
+      ],
+    ]);
+    $valid_entity->save();
+
+    $build = $this->display->build($valid_entity);
+    $output = (string) $renderer->renderRoot($build[$this->fieldName][0]);
+    $this->assertStringContainsString('<img', $output);
+
     // Create a zero-byte file, simulating a failed remote download during
     // migration.
-    $uri = 'public://zero-byte-test.jpg';
-    file_put_contents($uri, '');
-    $file = File::create([
-      'uri' => $uri,
+    file_put_contents('public://zero-byte-test.jpg', '');
+    $zero_file = File::create([
+      'uri' => 'public://zero-byte-test.jpg',
       'filename' => 'zero-byte-test.jpg',
       'filemime' => 'image/jpeg',
       'status' => 1,
     ]);
-    $file->save();
+    $zero_file->save();
 
-    $entity = EntityTest::create([
-      'name' => $this->randomMachineName(),
+    $zero_entity = EntityTest::create([
+      'name' => 'zero',
       $this->fieldName => [
-        'target_id' => $file->id(),
-        'alt' => 'Test image',
+        'target_id' => $zero_file->id(),
+        'alt' => 'Zero-byte image',
       ],
     ]);
-    $entity->save();
+    $zero_entity->save();
 
     // Rendering must not throw an exception.
-    $build = $this->display->build($entity);
-    /** @var \Drupal\Core\Render\RendererInterface $renderer */
-    $renderer = $this->container->get('renderer');
+    $build = $this->display->build($zero_entity);
     $output = (string) $renderer->renderRoot($build[$this->fieldName][0]);
 
     // A zero-byte image should not produce an img or source element.
