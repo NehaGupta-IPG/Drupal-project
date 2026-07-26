@@ -89,7 +89,7 @@ variables:
   # Use local cache for yarn, see .yarn-install-from-cache.
   YARN_ENABLE_GLOBAL_CACHE: false
   YARN_ENABLE_MIRROR: false
-  DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableCollectStats":true}'
+  DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true}'
 
 #############
 # Stages    #
@@ -730,6 +730,7 @@ default:
       - core/.eslintcache
       - core/.stylelintcache
       - core/.phpcscache
+      - core/.twigcsfixercache
 
 # Download the cache artifacts from the previous pipeline run to work around
 # https://gitlab.com/gitlab-org/gitlab/-/issues/458828 due to performance
@@ -756,6 +757,8 @@ default:
     - CACHE_FILE=core/.stylelintcache
     - *download-cache
     - CACHE_FILE=core/.phpcscache
+    - *download-cache
+    - CACHE_FILE=core/.twigcsfixercache
     - *download-cache
 
 '📔 Spell-checking':
@@ -854,6 +857,51 @@ default:
       - $_ARTIFACTS_DIR
       - core/.phpcscache
 
+'🧹 Twig Coding standards (twig-cs-fixer)':
+  <<: [ *default-job-settings-lint ]
+  stage: 🪄 Lint
+  variables:
+    KUBERNETES_CPU_REQUEST: "4"
+    _ARTIFACTS_DIR: "test-artifacts/twig-cs-fixer"
+    CACHE_FILE: "core/.twigcsfixercache"
+  before_script:
+    - mkdir -p $_ARTIFACTS_DIR
+    - *composer-setup
+    - if [ -n "$COMPOSER_UPDATE" ]; then
+        composer update --optimize-autoloader;
+        composer outdated;
+      fi
+    - mkdir -p $_ARTIFACTS_DIR
+    - *download-cache
+  # Run on push, or on MRs if Twig files have changed, or manually.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - core/.twig-cs-fixer.php
+        - core/composer.json
+        - core/composer.lock
+        - "**/*.twig"
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /Test lint cache warming/)
+    - when: manual
+      allow_failure: true
+  script:
+    - vendor/bin/twig-cs-fixer --version
+    - composer twigcs -- --report=gitlab > $_ARTIFACTS_DIR/twig-cs-fixer-quality-report.json
+  artifacts:
+    reports:
+      codequality: $_ARTIFACTS_DIR/twig-cs-fixer-quality-report.json
+    expire_in: 1 week
+    expose_as: 'web-vendor'
+    paths:
+      - vendor/
+      - composer.lock
+      - composer/Metapackage/
+      - $_ARTIFACTS_DIR
+      - core/.twigcsfixercache
+
 '🧹 JavaScript linting (eslint)':
   <<: [ *yarn-install-from-cache ]
   # Overwrites the cache key to be the job that pushes the cache. All the other
@@ -866,7 +914,7 @@ default:
   variables:
     KUBERNETES_CPU_REQUEST: "2"
     CACHE_FILE: "core/.eslintcache"
-  # Run on push, or on MRs if CSS files have changed, or manually.
+  # Run on push, or on MRs if JS files have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
@@ -1023,6 +1071,7 @@ default:
     - if [ ! -f core/.eslintcache ]; then exit 1; fi
     - if [ ! -f core/.stylelintcache ]; then exit 1; fi
     - if [ ! -f core/.phpcscache ]; then exit 1; fi
+    - if [ ! -f core/.twigcsfixercache ]; then exit 1; fi
 
 ########################
 # Consolidate stage jobs
@@ -1041,4 +1090,3 @@ default:
       - composer.lock
       - composer/Metapackage/
       - test-artifacts
-

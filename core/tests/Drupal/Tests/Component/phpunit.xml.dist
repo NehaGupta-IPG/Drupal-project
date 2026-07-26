@@ -29,7 +29,7 @@
       <parameter name="enableProjectIgnores" value="true"/>
       <parameter name="projectIgnoreFile" value="core/.deprecation-ignore.txt"/>
       <parameter name="enableDebugClassLoader" value="true"/>
-      <parameter name="enableCollectStats" value="false"/>
+      <parameter name="enableDeprecationStatistics" value="false"/>
     </bootstrap>
   </extensions>
   <testsuites>

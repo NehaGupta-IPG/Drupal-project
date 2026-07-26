@@ -76,8 +76,8 @@ final class Configuration {
     if (array_key_exists('enableDebugClassLoader', $parameters)) {
       $this->debugClassLoaderEnabled = filter_var($parameters['enableDebugClassLoader'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
     }
-    if (array_key_exists('enableCollectStats', $parameters)) {
-      $this->collectStatsEnabled = filter_var($parameters['enableCollectStats'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+    if (array_key_exists('enableDeprecationStatistics', $parameters)) {
+      $this->collectStatsEnabled = filter_var($parameters['enableDeprecationStatistics'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
     }
   }
 
