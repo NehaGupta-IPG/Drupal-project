@@ -299,7 +299,7 @@ final class DeprecationHandler implements Extension {
     // @todo echo "\n********\n";.
 
     file_put_contents(
-$this->directory . \DIRECTORY_SEPARATOR . $dumpFileName,
+      $this->directory . \DIRECTORY_SEPARATOR . $dumpFileName,
       json_encode($stats),
     );
   }

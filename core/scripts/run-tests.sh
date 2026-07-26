@@ -251,55 +251,6 @@ TestDatabase::releaseAllTestLocks();
 // Display results before database is cleared.
 simpletest_script_reporter_display_results($test_run_results_storage);
 
-// CONSOLIDATE. --------------------
-
-try {
-  $tmpDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . getenv('_ARTIFACTS_DIR') . \DIRECTORY_SEPARATOR . 'deprecation-handler' . \DIRECTORY_SEPARATOR . 'jobs';
-  if ($jobId = getenv('CI_JOB_ID')) {
-    $tmpDirectory .= \DIRECTORY_SEPARATOR . $jobId;
-  }
-  $files = \Drupal::service(FileSystemInterface::class)->scanDirectory(
-    $tmpDirectory,
-    '/^deprecation-ignore-stats.*\.json$/',
-  );
-
-  $tmp = [];
-  $tmp_test = [];
-  $metadata = NULL;
-  foreach ($files as $file) {
-    $contents = json_decode(file_get_contents($file->uri), TRUE);
-    $metadata = $contents['metadata'];
-    foreach ($contents['skips'] as $key => $count) {
-      $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
-    }
-    foreach ($contents['tests'] as $testId => $data) {
-      if ($data['ignoreDeprecations'] || isset($data['reported'])) {
-        $tmp_test[$testId] = $data;
-      }
-    }
-  }
-
-  $outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . getenv('_ARTIFACTS_DIR');
-  \Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY);
-
-  if ($jobId) {
-    $outputFile = $outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats-" . $jobId . ".json";
-  }
-  else {
-    $outputFile = $outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json";
-  }
-  file_put_contents($outputFile, json_encode([
-    'metadata' => $metadata,
-    'skips' => $tmp,
-    'tests' => $tmp_test,
-  ]));
-}
-catch (\Exception) {
-  // Do nothing.
-}
-
-// CONSOLIDATE. --------------------
-
 if (Config::get('xml')) {
   simpletest_script_reporter_write_xml_results($test_run_results_storage);
 }
@@ -1293,23 +1244,4 @@ function dump_discovery_warnings(): void {
       echo "\n";
     }
   }
-}
-
-/**
- * Outputs the deprecation ignore statistics.
- */
-function dump_deprecation_ignore_stats(array $stats): void {
-  echo "\n\nDeprecation skips statistics\n";
-  echo "-----------+----------------------------------------------------------------------\n";
-  echo "    Skips# | Line\n";
-  echo "-----------+----------------------------------------------------------------------\n";
-  foreach (file(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . '.deprecation-ignore.txt') as $pattern) {
-    if ((trim($pattern)[0] ?? '#') !== '#') {
-      echo sprintf("%10d | %s\n", $stats[$pattern] ?? 0, trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
-    }
-    else {
-      echo sprintf("           | %s\n", trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
-    }
-  }
-  echo "-----------+----------------------------------------------------------------------\n";
 }
