@@ -66,8 +66,6 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
    */
   public function onFieldDefinitionCreate(FieldDefinitionInterface $field_definition) {
     $entity_type_id = $field_definition->getTargetEntityTypeId();
-    $bundle = $field_definition->getTargetBundle();
-    $field_name = $field_definition->getName();
 
     // Notify the storage about the new field.
     $this->entityTypeManager->getStorage($entity_type_id)->onFieldDefinitionCreate($field_definition);
@@ -89,9 +87,6 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
    */
   public function onFieldDefinitionDelete(FieldDefinitionInterface $field_definition) {
     $entity_type_id = $field_definition->getTargetEntityTypeId();
-    $bundle = $field_definition->getTargetBundle();
-    $field_name = $field_definition->getName();
-
     // Notify the storage about the field deletion.
     $this->entityTypeManager->getStorage($entity_type_id)->onFieldDefinitionDelete($field_definition);
 
