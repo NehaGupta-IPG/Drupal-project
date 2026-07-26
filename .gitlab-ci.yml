@@ -212,6 +212,7 @@ default:
     - time sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_NODE_INDEX --ci-parallel-node-total $CI_NODE_TOTAL
   after_script:
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+    - php .gitlab-ci/scripts/statistics-job-consolidator.php $_ARTIFACTS_DIR/deprecation-handler/jobs $_ARTIFACTS_DIR/deprecation-statistics-$CI_JOB_ID.json
   artifacts:
     when: always
     expire_in: 6 mos
