@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\Lock {
     /**
      * Provides a proxy class for \Drupal\Core\Lock\DatabaseLockBackend.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class DatabaseLockBackend implements \Drupal\Core\Lock\LockBackendInterface
     {

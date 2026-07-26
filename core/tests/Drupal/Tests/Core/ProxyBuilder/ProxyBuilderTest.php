@@ -85,7 +85,7 @@ namespace {{ namespace }} {
     /**
      * Provides a proxy class for \{{ class }}.
      *
-     * @see \Drupal\Component\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
      */
     class {{ proxy_class }}{{ interface_string }}
     {
