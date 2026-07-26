@@ -85,7 +85,7 @@ final class Configuration {
       $this->collectStatsEnabled = filter_var($parameters['enableDeprecationStatistics'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
     }
     if (array_key_exists('deprecationStatisticsFile', $parameters)) {
-      $this->deprecationStatisticsFile = $parameters['deprecationStatisticsFile'];
+      $this->deprecationStatisticsFile = $this->absolutePath($parameters['deprecationStatisticsFile']);
     }
   }
 
@@ -116,6 +116,8 @@ final class Configuration {
   /**
    * Returns an absolute file path, resolving relative ones from Drupal root.
    *
+   * The file must already exist.
+   *
    * @param string $path
    *   A file path.
    *
@@ -131,6 +133,27 @@ final class Configuration {
     }
     if ($realPath === FALSE || !is_file($realPath)) {
       throw new \InvalidArgumentException(sprintf('The file "%s" does not exist.', $path));
+    }
+    return $realPath;
+  }
+
+  /**
+   * Returns an absolute file path, resolving relative ones from Drupal root.
+   *
+   * The file does not need to exist already.
+   *
+   * @param string $path
+   *   A file path.
+   *
+   * @return string
+   *   An absolute file path.
+   */
+  private function absolutePath(string $path): string {
+    if (!str_starts_with($path, \DIRECTORY_SEPARATOR)) {
+      $realPath = dirname(__DIR__, 6) . \DIRECTORY_SEPARATOR . $path;
+    }
+    else {
+      $realPath = $path;
     }
     return $realPath;
   }
