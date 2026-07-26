@@ -61,11 +61,11 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
       $this->drupalGet($effect_path);
       $this->assertSession()->fieldValueEquals('data[test_parameter]', '100');
       $page->findField('data[test_parameter]')->setValue(111);
-      $ajax_value = $page->find('css', '#ajax-value')->getText();
+      $ajax_value = $page->find('css', '#ajax-value-wrapper')->getText();
       $this->assertSame('Ajax value bar', $ajax_value);
       $this->getSession()->getPage()->pressButton('Ajax refresh');
       $this->assertTrue($page->waitFor(10, function ($page): bool {
-        $ajax_value = $page->find('css', '#ajax-value')->getText();
+        $ajax_value = $page->find('css', '#ajax-value-wrapper')->getText();
         return (bool) preg_match('/^Ajax value [0-9.]+ [0-9.]+$/', $ajax_value);
       }));
       $page->pressButton('Update effect');

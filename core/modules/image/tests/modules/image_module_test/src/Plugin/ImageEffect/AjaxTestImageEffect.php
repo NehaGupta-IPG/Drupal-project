@@ -64,7 +64,7 @@ class AjaxTestImageEffect extends ConfigurableImageEffectBase {
       '#markup' => microtime(),
     ];
     $response = new AjaxResponse();
-    $response->addCommand(new HtmlCommand('#ajax-value', $item));
+    $response->addCommand(new HtmlCommand('#ajax-value-wrapper', $item));
     return $response;
   }
 
