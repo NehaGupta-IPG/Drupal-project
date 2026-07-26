@@ -127,10 +127,11 @@ class EntityConverter implements ParamConverterInterface, ParamConverterRouteReq
   public function convert($value, $definition, $name, array $defaults) {
     $entity_type_id = $this->getEntityTypeFromDefaults($definition, $name, $defaults);
     // If the 'language_content_' property is set on route defaults, use that
-    // as the langcode for the entity translation to load. The trailing
+    // as the langcode for the entity translation to load. Fall back to the
+    // interface language if content language type is not set. The trailing
     // underscore is used to avoid collisions with other route parameters or
     // defaults.
-    $langcode = $defaults[LanguageInterface::TYPE_CONTENT . '_'] ?? NULL;
+    $langcode = $defaults[LanguageInterface::TYPE_CONTENT . '_'] ?? ($defaults[LanguageInterface::TYPE_INTERFACE . '_'] ?? NULL);
     $contexts = $langcode ? ['langcode' => $langcode] : [];
 
     // If the entity type is dynamic, confirm it to be a config entity. Static

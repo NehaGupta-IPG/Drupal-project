@@ -227,6 +227,7 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
           LanguageNegotiationContentEntity::QUERY_PARAMETER => 'de',
           'param1' => 'xyz',
         ],
+        'language' => $this->languages['de'],
       ],
       'en' => [
         'url' => $url,
@@ -236,6 +237,7 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
           LanguageNegotiationContentEntity::QUERY_PARAMETER => 'en',
           'param1' => 'xyz',
         ],
+        'language' => $this->languages['en'],
       ],
     ];
     $providedLanguageSwitchLinksArray = $languageNegotiationContentEntity->getLanguageSwitchLinks($request, $this->randomMachineName(), $url);
