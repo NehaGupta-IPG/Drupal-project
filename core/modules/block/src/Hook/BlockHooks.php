@@ -300,13 +300,16 @@ class BlockHooks {
       // Apply only to new theme's visible regions.
       $regions = $theme_extension->listVisibleRegions();
       $source_theme = \Drupal::configFactory()->get('system.theme')->get('default');
+      $source_theme_blocks = [];
       if (!empty($theme_extension->base_theme) && $this->themeHandler->themeExists($theme_extension->base_theme)) {
-        $base_theme_blocks = $storage->loadByProperties(['theme' => $theme_extension->base_theme]);
-        if ($base_theme_blocks) {
+        $source_theme_blocks = $storage->loadByProperties(['theme' => $theme_extension->base_theme]);
+        if (count($source_theme_blocks) > 0) {
           $source_theme = $theme_extension->base_theme;
         }
       }
-      $source_theme_blocks = $storage->loadByProperties(['theme' => $source_theme]);
+      if (count($source_theme_blocks) === 0) {
+        $source_theme_blocks = $storage->loadByProperties(['theme' => $source_theme]);
+      }
       $block_repository = \Drupal::service('block.repository');
       foreach ($source_theme_blocks as $source_theme_block_id => $source_theme_block) {
         if (str_starts_with($source_theme_block_id, $source_theme . '_')) {
