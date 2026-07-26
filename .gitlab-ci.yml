@@ -305,7 +305,7 @@ default:
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
     TESTSUITE: "unit"
     DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version"
-    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsFile": "${_ARTIFACTS_DIR}/deprecation-statistics-${CI_JOB_ID}.json"}'
+    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
   before_script:
     - *composer-setup
     - mkdir -p $_ARTIFACTS_DIR ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
@@ -350,7 +350,7 @@ default:
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
     TESTSUITE: "unit-component"
     DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version"
-    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsFile": "${_ARTIFACTS_DIR}/deprecation-statistics-${CI_JOB_ID}.json"}'
+    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
   before_script:
     - mkdir -p $_ARTIFACTS_DIR
     - *composer-setup

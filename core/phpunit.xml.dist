@@ -70,7 +70,7 @@
       <!-- Set to true to enable collection and reporting of deprecations
         triggered during the execution of the tests. -->
       <parameter name="enableDeprecationStatistics" value="false"/>
-      <parameter name="deprecationStatisticsFile" value="test-artifacts/deprecation-statistics.json"/>
+      <parameter name="deprecationStatisticsOutputPath" value="test-artifacts"/>
     </bootstrap>
     <!-- Functional tests HTML output logging. -->
     <bootstrap class="Drupal\TestTools\Extension\HtmlLogging\HtmlOutputLogger">

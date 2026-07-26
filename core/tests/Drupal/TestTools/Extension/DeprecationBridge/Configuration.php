@@ -46,9 +46,9 @@ final class Configuration {
   public private(set) bool $collectStatsEnabled = FALSE;
 
   /**
-   * Path to the deprecation statistics output file.
+   * Path to the deprecation statistics output directory.
    */
-  public private(set) string $deprecationStatisticsFile;
+  public private(set) string $deprecationStatisticsOutputPath;
 
   /**
    * Returns the singleton.
@@ -84,8 +84,8 @@ final class Configuration {
     if (array_key_exists('enableDeprecationStatistics', $parameters)) {
       $this->collectStatsEnabled = filter_var($parameters['enableDeprecationStatistics'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
     }
-    if (array_key_exists('deprecationStatisticsFile', $parameters)) {
-      $this->deprecationStatisticsFile = $this->absolutePath($parameters['deprecationStatisticsFile']);
+    if (array_key_exists('deprecationStatisticsOutputPath', $parameters)) {
+      $this->deprecationStatisticsOutputPath = $this->absolutePath($parameters['deprecationStatisticsOutputPath']);
     }
   }
 
@@ -125,12 +125,7 @@ final class Configuration {
    *   An absolute file path.
    */
   private function absoluteAndExistingPath(string $path): string {
-    if (!str_starts_with($path, \DIRECTORY_SEPARATOR)) {
-      $realPath = realpath(dirname(__DIR__, 6) . \DIRECTORY_SEPARATOR . $path);
-    }
-    else {
-      $realPath = $path;
-    }
+    $realPath = realpath($this->absolutePath($path));
     if ($realPath === FALSE || !is_file($realPath)) {
       throw new \InvalidArgumentException(sprintf('The file "%s" does not exist.', $path));
     }
@@ -149,13 +144,7 @@ final class Configuration {
    *   An absolute file path.
    */
   private function absolutePath(string $path): string {
-    if (!str_starts_with($path, \DIRECTORY_SEPARATOR)) {
-      $realPath = dirname(__DIR__, 6) . \DIRECTORY_SEPARATOR . $path;
-    }
-    else {
-      $realPath = $path;
-    }
-    return $realPath;
+    return str_starts_with($path, \DIRECTORY_SEPARATOR) ? $path : dirname(__DIR__, 6) . \DIRECTORY_SEPARATOR . $path;
   }
 
 }
