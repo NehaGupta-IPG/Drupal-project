@@ -1803,7 +1803,15 @@
       const allUniqueBundleIds = response.data.map((script) => {
         const uniqueBundleId = script.src;
         if (!loadjs.isDefined(uniqueBundleId)) {
-          loadjs(script.src, uniqueBundleId, {
+          // Prefix bundle ID with a path modifier to allow loadjs to handle
+          // JavaScript modules.
+          let modifier = '';
+          if (script.type === 'module') {
+            modifier = 'module!';
+          } else if (script.nomodule) {
+            modifier = 'nomodule!';
+          }
+          loadjs(modifier + script.src, uniqueBundleId, {
             // The default loadjs behavior is to load script with async, in Drupal
             // we need to explicitly tell scripts to load async, this is set in
             // the before callback below if necessary.
@@ -1812,6 +1820,11 @@
               // This allows all attributes to be added, like defer, async and
               // crossorigin.
               Object.keys(script).forEach((attributeKey) => {
+                if (['type', 'nomodule'].includes(attributeKey)) {
+                  // These attributes are handled with path modifiers passed to
+                  // loadjs.
+                  return;
+                }
                 scriptEl.setAttribute(attributeKey, script[attributeKey]);
               });
 

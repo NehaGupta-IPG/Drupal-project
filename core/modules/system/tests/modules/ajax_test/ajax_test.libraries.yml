@@ -48,3 +48,12 @@ global_events:
     js/global_events.js: {}
   dependencies:
     - core/drupal.ajax
+
+module_attributes:
+  js:
+    js/module.js:
+      attributes:
+        type: module
+    js/script.js:
+      attributes:
+        nomodule: true

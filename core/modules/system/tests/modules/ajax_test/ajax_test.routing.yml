@@ -168,3 +168,11 @@ ajax_test.link_page.dialog_contents:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::httpMethodsDialog'
   requirements:
     _access: 'TRUE'
+
+ajax_test.module_attributes:
+  path: '/ajax-test/module-attributes'
+  defaults:
+    _title: 'Ajax Form Module Attributes'
+    _form: '\Drupal\ajax_test\Form\AjaxTestFormModuleAttributes'
+  requirements:
+    _access: 'TRUE'
