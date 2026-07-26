@@ -46,6 +46,11 @@ final class Configuration {
   public private(set) bool $collectStatsEnabled = FALSE;
 
   /**
+   * Path to the deprecation statistics output file.
+   */
+  public private(set) string $deprecationStatisticsFile;
+
+  /**
    * Returns the singleton.
    *
    * @return self
@@ -78,6 +83,9 @@ final class Configuration {
     }
     if (array_key_exists('enableDeprecationStatistics', $parameters)) {
       $this->collectStatsEnabled = filter_var($parameters['enableDeprecationStatistics'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+    }
+    if (array_key_exists('deprecationStatisticsFile', $parameters)) {
+      $this->deprecationStatisticsFile = $parameters['deprecationStatisticsFile'];
     }
   }
 

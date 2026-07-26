@@ -145,10 +145,6 @@ final class DeprecationHandler implements Extension {
     // Use the extension configuration loaded in ::preBootstrap().
     $this->config = Configuration::instance();
 
-    if (!$this->config->projectIgnoresEnabled) {
-      return;
-    }
-
     if (!$this->config->collectStatsEnabled) {
       return;
     }
@@ -165,8 +161,7 @@ final class DeprecationHandler implements Extension {
     $facade->registerSubscriber(new TestRunnerFinished($this));
 
     // Artifacts directory.
-    // $directory = $parameters->get('directory');
-$directory = '../' . getenv('_ARTIFACTS_DIR') . '/jobs/' . getenv('CI_JOB_ID');
+    $directory = dirname($this->config->deprecationStatisticsFile) . '/jobs/' . getenv('CI_JOB_ID');
     Filesystem::createDirectory($directory);
     $realDirectory = realpath($directory);
     if ($realDirectory === FALSE || !is_dir($realDirectory) || !is_writable($realDirectory)) {
@@ -267,8 +262,6 @@ $directory = '../' . getenv('_ARTIFACTS_DIR') . '/jobs/' . getenv('CI_JOB_ID');
     assert($this->config->collectStatsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     $content = @file_get_contents($this->statisticsStagingFilePath);
-    $statisticsArtifactDirectory = $this->directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
-    Filesystem::createDirectory($statisticsArtifactDirectory);
 
     $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
     if (!empty($test_run_id)) {
@@ -303,7 +296,7 @@ $directory = '../' . getenv('_ARTIFACTS_DIR') . '/jobs/' . getenv('CI_JOB_ID');
     // @todo echo "\n********\n";.
 
     file_put_contents(
-      $statisticsArtifactDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
+$this->directory . \DIRECTORY_SEPARATOR . $dumpFileName,
       json_encode($stats),
     );
   }
