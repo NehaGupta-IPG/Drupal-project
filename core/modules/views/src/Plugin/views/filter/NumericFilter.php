@@ -243,7 +243,6 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
       $form['value']['value'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Value'),
-        '#title_display' => !$exposed ? NULL : 'invisible',
         '#size' => 30,
         '#default_value' => $this->value['value'],
       ];
@@ -267,7 +266,6 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
       $form['value'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Value'),
-        '#title_display' => !$exposed ? NULL : 'invisible',
         '#size' => 30,
         '#default_value' => $this->value['value'],
       ];
