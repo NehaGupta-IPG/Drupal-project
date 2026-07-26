@@ -166,7 +166,7 @@ final class DeprecationHandler implements Extension {
 
     // Artifacts directory.
     // $directory = $parameters->get('directory');
-    $directory = getenv('_ARTIFACTS_DIR') . '/jobs/' . getenv('CI_JOB_ID');
+    $directory = '../' . getenv('_ARTIFACTS_DIR') . '/jobs/' . getenv('CI_JOB_ID');
     Filesystem::createDirectory($directory);
     $realDirectory = realpath($directory);
     if ($realDirectory === FALSE || !is_dir($realDirectory) || !is_writable($realDirectory)) {

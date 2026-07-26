@@ -275,10 +275,10 @@ try {
     }
   }
 
-  $outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . getenv('_ARTIFACTS_DIR') . '/jobs' . \DIRECTORY_SEPARATOR . getenv('CI_JOB_ID') . \DIRECTORY_SEPARATOR . 'deprecation-handler';
+  $outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . getenv('_ARTIFACTS_DIR');
   \Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY);
 
-  $outputFile = $outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json";
+  $outputFile = $outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats-" . getenv('CI_JOB_ID') . ".json";
   file_put_contents($outputFile, json_encode([
     'metadata' => $metadata,
     'skips' => $tmp,
