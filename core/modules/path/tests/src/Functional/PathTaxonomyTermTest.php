@@ -53,7 +53,6 @@ class PathTaxonomyTermTest extends PathTestBase {
   public function testTermAlias(): void {
     // Create a term in the default 'Tags' vocabulary with URL alias.
     $vocabulary = Vocabulary::load('tags');
-    $description = $this->randomMachineName();
     $edit = [
       'name[0][value]' => $this->randomMachineName(),
       'path[0][alias]' => '/' . $this->randomMachineName(),

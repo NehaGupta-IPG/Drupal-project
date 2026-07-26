@@ -7,7 +7,6 @@ namespace Drupal\Tests\taxonomy\Functional;
 use Behat\Mink\Element\NodeElement;
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermInterface;
