@@ -125,7 +125,7 @@ class TwigPhpStorageCache implements CacheInterface {
   public function getTimestamp(string $key): int {
     $cid = 'twig:' . $key;
     if ($cache = $this->cache->get($cid)) {
-      return $cache->data;
+      throw new \Exception('hello');
     }
     else {
       return 0;
