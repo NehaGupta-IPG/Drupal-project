@@ -185,7 +185,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    */
   public function xmlLogFilePath(int $test_id): string {
     $env = getenv('_ARTIFACTS_DIR');
-    $dir = $env ? $this->root . \DIRECTORY_SEPRATOR . $env : $this->workingDirectory;
+    $dir = $env ? $this->appRoot . \DIRECTORY_SEPARATOR . $env : $this->workingDirectory;
     return $dir . '/phpunit-' . $test_id . '.xml';
   }
 
