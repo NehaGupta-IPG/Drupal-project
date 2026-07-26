@@ -122,15 +122,14 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       '#id' => Html::getUniqueId('edit-submit-' . $view->storage->id()),
     ];
 
-    // Only use a routed display when the current display is routed or when an
-    // explicit link display is configured; otherwise fall back to the current
-    // page to avoid guessing.
+    // A routed display with an available route builds its own URL.
     if ($view->display_handler instanceof DisplayRouterInterface && $view->hasUrl()) {
       $form_action = $view->getUrl()->toString();
     }
     else {
-      // For unrouted displays, honor an explicitly configured link display
-      // rather than guessing based on display order.
+      // An unrouted display uses its explicitly configured link display. With
+      // no such display, fall back to the current page instead of guessing
+      // based on display order.
       $form_action = NULL;
       $linked_display_id = $view->display_handler->getOption('link_display');
       if (!empty($linked_display_id) && $linked_display_id !== 'custom_url' && $view->displayHandlers->has($linked_display_id) && $view->hasUrl(NULL, $linked_display_id)) {
