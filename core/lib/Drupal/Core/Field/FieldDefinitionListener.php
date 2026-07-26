@@ -74,21 +74,6 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
 
     // Delete the cache entry.
     $this->cacheBackend->delete('entity_field_map');
-
-    // If the field map is initialized, update it as well, so that calls to it
-    // do not have to rebuild it again.
-    if ($field_map = $this->entityFieldManager->getFieldMap()) {
-      if (!isset($field_map[$entity_type_id][$field_name])) {
-        // This field did not exist yet, initialize it with the type and empty
-        // bundle list.
-        $field_map[$entity_type_id][$field_name] = [
-          'type' => $field_definition->getType(),
-          'bundles' => [],
-        ];
-      }
-      $field_map[$entity_type_id][$field_name]['bundles'][$bundle] = $bundle;
-      $this->entityFieldManager->setFieldMap($field_map);
-    }
   }
 
   /**
@@ -112,16 +97,6 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
 
     // Delete the cache entry.
     $this->cacheBackend->delete('entity_field_map');
-
-    // If the field map is initialized, update it as well, so that calls to it
-    // do not have to rebuild it again.
-    if ($field_map = $this->entityFieldManager->getFieldMap()) {
-      unset($field_map[$entity_type_id][$field_name]['bundles'][$bundle]);
-      if (empty($field_map[$entity_type_id][$field_name]['bundles'])) {
-        unset($field_map[$entity_type_id][$field_name]);
-      }
-      $this->entityFieldManager->setFieldMap($field_map);
-    }
   }
 
 }
