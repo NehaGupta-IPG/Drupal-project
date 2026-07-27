@@ -335,13 +335,13 @@ abstract class BrowserTestBase extends TestCase {
   /**
    * Sets up the root application path.
    *
-   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Access
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Access
    *   $this->root directly.
    *
    * @see https://www.drupal.org/node/3574112
    */
   protected function setUpAppRoot(): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Access $this->root directly. See https://www.drupal.org/node/3574112', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Access $this->root directly. See https://www.drupal.org/node/3574112', E_USER_DEPRECATED);
   }
 
   /**
@@ -458,10 +458,14 @@ abstract class BrowserTestBase extends TestCase {
    */
   protected function getSessionCookies() {
     $domain = parse_url($this->getUrl(), PHP_URL_HOST);
-    $session_id = $this->getSession()->getCookie($this->getSessionName());
-    $cookies = CookieJar::fromArray([$this->getSessionName() => $session_id], $domain);
+    $session_name = $this->getSessionName();
+    $session_id = $this->getSession()->getCookie($session_name);
 
-    return $cookies;
+    $cookies = [];
+    if ($session_id !== NULL) {
+      $cookies[$session_name] = $session_id;
+    }
+    return CookieJar::fromArray($cookies, $domain);
   }
 
   /**
