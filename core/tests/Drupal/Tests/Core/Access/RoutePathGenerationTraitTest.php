@@ -124,6 +124,10 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
     $route->expects($this->atLeastOnce())
       ->method('hasOption')
       ->with('_csrf_exclude_parameters')
+      ->willReturn(TRUE);
+    $route->expects($this->atLeastOnce())
+      ->method('getOption')
+      ->with('_csrf_exclude_parameters')
       ->willReturn(['js']);
 
     // Process the route so the "token" param is generated.
