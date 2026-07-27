@@ -286,6 +286,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
     ]);
     $expected_cacheability->addCacheTags([
       'config:system.menu.account',
+      'config:system.site',
       'http_response',
     ]);
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/account/linkset'));
