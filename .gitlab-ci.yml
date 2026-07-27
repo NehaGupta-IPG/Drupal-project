@@ -276,6 +276,12 @@ default:
       - vendor/
       - composer.lock
       - composer/Metapackage/
+      # The PostgreSQL database driver is provided by the daffie/pgsql module,
+      # which composer/installers places outside of vendor/. Test jobs do not
+      # run "composer install" themselves, so without this the pgsql module is
+      # missing and run-tests.sh fails with "The database_driver
+      # Drupal\pgsql\Driver\Database\pgsql does not exist."
+      - modules/contrib/
 
 ##################
 # Unit test Jobs
