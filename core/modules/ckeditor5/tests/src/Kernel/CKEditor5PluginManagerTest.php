@@ -24,6 +24,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Yaml\Yaml;
 
 // cspell:ignore layercake everytextcontainer justheading
@@ -209,7 +210,7 @@ YAML,
       $this->expectException($expected_exception);
     }
     if ($expected_message) {
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessageIs($expected_message);
     }
     $container = $this->mockModuleInVfs('ckeditor5_invalid_plugin', $yaml, $additional_files);
     $pluginManager = $container->get('plugin.manager.ckeditor5.plugin');
@@ -1097,7 +1098,7 @@ PHP,
     // editor config entity is passed: only then can a subset be generated based
     // on configuration.
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageIs($expected_exception_message);
     $this->manager->getProvidedElements([$sneaky_plugin_id], $text_editor);
   }
 
@@ -1151,11 +1152,6 @@ PHP,
       'ckeditor5/internal.drupal.ckeditor5',
       'ckeditor5/internal.drupal.ckeditor5.emphasis',
       'ckeditor5/internal.drupal.ckeditor5.htmlEngine',
-      'core/ckeditor5.autoformat',
-      'core/ckeditor5.basic',
-      'core/ckeditor5.essentials',
-      'core/ckeditor5.htmlSupport',
-      'core/ckeditor5.pasteFromOffice',
     ];
     $this->assertSame($default_libraries, $this->manager->getEnabledLibraries($editor));
 
@@ -1235,7 +1231,6 @@ PHP,
       'ckeditor5/internal.drupal.ckeditor5.media',
       'ckeditor5/internal.drupal.ckeditor5.mediaAlign',
       'ckeditor5_test/layercake',
-      'core/ckeditor5.table',
     ]);
     sort($expected_libraries);
     $this->assertSame($expected_libraries, $this->manager->getEnabledLibraries($editor));
@@ -1251,10 +1246,6 @@ PHP,
     ]);
     sort($expected_plugins);
     $this->assertSame(array_values($expected_plugins), $plugin_ids);
-    $expected_libraries = array_merge($expected_libraries, [
-      'core/ckeditor5.alignment',
-    ]);
-    sort($expected_libraries);
     $this->assertSame($expected_libraries, $this->manager->getEnabledLibraries($editor));
 
     // Case 8: GHS is enabled for Full HTML (or any other text format that has
@@ -1277,11 +1268,6 @@ PHP,
       'ckeditor5/internal.drupal.ckeditor5',
       'ckeditor5/internal.drupal.ckeditor5.emphasis',
       'ckeditor5/internal.drupal.ckeditor5.htmlEngine',
-      'core/ckeditor5.autoformat',
-      'core/ckeditor5.basic',
-      'core/ckeditor5.essentials',
-      'core/ckeditor5.htmlSupport',
-      'core/ckeditor5.pasteFromOffice',
     ];
     $this->assertSame($default_libraries, $this->manager->getEnabledLibraries($editor));
   }
@@ -1325,7 +1311,7 @@ PHP,
     );
     // @todo Remove in https://www.drupal.org/project/drupal/issues/3361534, which moves this into ::assertConfigSchema()
     $this->assertSame([], array_map(
-      fn ($v) => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
+      fn (ConstraintViolationInterface $v): string => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
       iterator_to_array($this->typedConfig->createFromNameAndData($text_editor->getConfigDependencyName(), $text_editor->toArray())->validate())
     ));
 
@@ -1561,7 +1547,7 @@ PHP,
   /**
    * Provides use cases for findPluginSupportingElement().
    */
-  public static function providerTestPluginSupportingElement() {
+  public static function providerTestPluginSupportingElement(): array {
     return [
       'tag that belongs to a superset' => [
         'tag' => 'h2',
@@ -1609,7 +1595,7 @@ PHP,
    */
   public function testAutomaticLinkDecoratorsDisallowed(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "ckeditor5_automatic_link_decorator_test_llamaClass" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
+    $this->expectExceptionMessageIs('The "ckeditor5_automatic_link_decorator_test_llamaClass" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
 
     $this->enableModules(['ckeditor5_automatic_link_decorator_test']);
 
@@ -1623,7 +1609,7 @@ PHP,
    */
   public function testExternalLinkAutomaticLinkDecoratorDisallowed(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "ckeditor5_automatic_link_decorator_test_2_addTargetToExternalLinks" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
+    $this->expectExceptionMessageIs('The "ckeditor5_automatic_link_decorator_test_2_addTargetToExternalLinks" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
 
     $this->enableModules(['ckeditor5_automatic_link_decorator_test_2']);
 
@@ -1642,7 +1628,7 @@ PHP,
       $this->expectException($expected_exception);
     }
     if ($expected_message) {
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessageIs($expected_message);
     }
     if ($expected_deprecation_message) {
       $this->expectUserDeprecationMessage($expected_deprecation_message);

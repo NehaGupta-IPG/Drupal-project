@@ -26,7 +26,11 @@ class SearchAdminThemeTest extends BrowserTestBase {
     'help',
     'node',
     'search',
+    'search_help',
+    'search_node',
     'search_extra_type',
+    'search_help',
+    'search_user',
     'user',
   ];
 
@@ -69,9 +73,9 @@ class SearchAdminThemeTest extends BrowserTestBase {
   /**
    * Tests that search results could be displayed in administration theme.
    *
-   * @see \Drupal\node\Plugin\Search\NodeSearch
+   * @see \Drupal\node\Plugin\Search\SearchNode
    * @see \Drupal\search_extra_type\Plugin\Search\SearchExtraTypeSearch
-   * @see \Drupal\user\Plugin\Search\UserSearch
+   * @see \Drupal\user\Plugin\Search\SearchUser
    */
   public function testSearchUsingAdminTheme(): void {
     /** @var \Drupal\search\SearchPageRepositoryInterface $repository */
@@ -81,6 +85,7 @@ class SearchAdminThemeTest extends BrowserTestBase {
     $page_ids = [
       'node_search' => FALSE,
       'dummy_search_type' => TRUE,
+      // The help_search plugin is provided by the search_help sub-module.
       'help_search' => TRUE,
       'user_search' => FALSE,
     ];

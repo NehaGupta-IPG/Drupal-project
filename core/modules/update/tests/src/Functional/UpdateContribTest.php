@@ -605,7 +605,7 @@ class UpdateContribTest extends UpdateTestBase {
    * @param string $fixture
    *   The fixture file to use.
    */
-  protected function doTestSecurityUpdateAvailability($module_version, array $expected_security_releases, $expected_update_message_type, $fixture): void {
+  protected function doTestSecurityUpdateAvailability($module_version, array $expected_security_releases, string $expected_update_message_type, $fixture): void {
     $this->mockInstalledExtensionsInfo([
       'aaa_update_test' => [
         'project' => 'aaa_update_test',
@@ -648,7 +648,7 @@ class UpdateContribTest extends UpdateTestBase {
    *   - 8.x-1.1
    *   - 8.x-1.0
    */
-  public static function securityUpdateAvailabilityProvider() {
+  public static function securityUpdateAvailabilityProvider(): array {
     return [
       // Security releases available for module major release 1.
       // No releases for next major.
