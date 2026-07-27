@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Install text_with_summary_field module.
+ * Install text_with_summary module.
  */
 
 use Drupal\Core\Database\Database;
@@ -18,8 +18,8 @@ $extensions = $connection->select('config')
 
 if ($extensions) {
   $data = unserialize($extensions);
-  if (!isset($data['module']['text_with_summary_field'])) {
-    $data['module']['text_with_summary_field'] = 1;
+  if (!isset($data['module']['text_with_summary'])) {
+    $data['module']['text_with_summary'] = 1;
     $connection->update('config')
       ->fields(['data' => serialize($data)])
       ->condition('collection', '')
@@ -28,13 +28,13 @@ if ($extensions) {
   }
 }
 
-// Set text_with_summary_field module schema version.
+// Set text_with_summary module schema version.
 $connection->merge('key_value')
   ->condition('collection', 'system.schema')
-  ->condition('name', 'text_with_summary_field')
+  ->condition('name', 'text_with_summary')
   ->keys([
     'collection' => 'system.schema',
-    'name' => 'text_with_summary_field',
+    'name' => 'text_with_summary',
   ])
   ->fields([
     'value' => serialize(8000),

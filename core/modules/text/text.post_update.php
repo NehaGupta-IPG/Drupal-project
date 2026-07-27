@@ -15,3 +15,18 @@ function text_removed_post_updates(): array {
     'text_post_update_allowed_formats' => '11.0.0',
   ];
 }
+
+/**
+ * Installs text_with_summary when widget is used.
+ */
+function text_post_update_install_text_with_summary(): void {
+  if (\Drupal::moduleHandler()->moduleExists('text_with_summary')) {
+    return;
+  }
+  $storages = \Drupal::entityTypeManager()
+    ->getStorage('field_storage_config')
+    ->loadByProperties(['type' => 'text_with_summary']);
+  if ($storages !== []) {
+    \Drupal::service('module_installer')->install(['text_with_summary']);
+  }
+}
