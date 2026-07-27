@@ -74,9 +74,10 @@ class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
     $form_state = new FormState();
     $form_state->set('file_upload_delta_initial', 99);
 
-    $request = Request::create('/file/ajax');
-    $request->query->set('element_parents', 'file_upload');
-    $request->query->set('form_build_id', 'test_build_id');
+    $request = Request::create('/file/ajax', parameters: [
+      'element_parents' => 'file_upload',
+      'form_build_id' => 'test_build_id',
+    ]);
 
     $response = ManagedFile::uploadAjaxCallback($form, $form_state, $request);
     $this->assertNotNull($response);
