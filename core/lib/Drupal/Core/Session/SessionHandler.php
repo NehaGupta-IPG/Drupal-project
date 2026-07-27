@@ -46,7 +46,7 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
     ?array $options = NULL,
   ) {
     if ($options === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $options argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3522112', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $options argument is deprecated in drupal:11.5.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3522112', E_USER_DEPRECATED);
       $options = \Drupal::getContainer()->getParameter('session.handler.options');
     }
     $this->ttl = $options['ttl'];
