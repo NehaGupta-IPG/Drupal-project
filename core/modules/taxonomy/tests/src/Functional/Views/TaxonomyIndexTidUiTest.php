@@ -252,14 +252,18 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     ]);
     $this->assertSession()->elementsCount('xpath', $xpath_node4_link, 1);
 
+    // Under the pgsql (JSON) driver a content entity's field data is collapsed
+    // onto the entity base table, so the add-handler checkboxes are keyed by
+    // the base table.
+    $term_table = \Drupal::database()->supportsJsonEntityStorage() ? 'taxonomy_term_data' : 'taxonomy_term_field_data';
     // Select 'Term ID' as the field to be displayed.
-    $edit = ['name[taxonomy_term_field_data.tid]' => TRUE];
+    $edit = ["name[$term_table.tid]" => TRUE];
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_taxonomy_term_name/default/field');
     $this->submitForm($edit, 'Add and configure fields');
     // Select 'Term' and 'Vocabulary' as filters.
     $edit = [
-      'name[taxonomy_term_field_data.tid]' => TRUE,
-      'name[taxonomy_term_field_data.vid]' => TRUE,
+      "name[$term_table.tid]" => TRUE,
+      "name[$term_table.vid]" => TRUE,
     ];
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_taxonomy_term_name/default/filter');
     $this->submitForm($edit, 'Add and configure filter criteria');

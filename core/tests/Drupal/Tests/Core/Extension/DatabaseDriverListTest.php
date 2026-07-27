@@ -35,10 +35,8 @@ class DatabaseDriverListTest extends UnitTestCase {
   public static function providerDatabaseDrivers(): array {
     return [
       ['mysql', 'mysql', 'Drupal\\mysql\\Driver\\Database\\mysql'],
-      ['pgsql', 'pgsql', 'Drupal\\pgsql\\Driver\\Database\\pgsql'],
       ['sqlite', 'sqlite', 'Drupal\\sqlite\\Driver\\Database\\sqlite'],
       ['DriverTestMysql', 'driver_test', 'Drupal\\driver_test\\Driver\\Database\\DriverTestMysql'],
-      ['DriverTestPgsql', 'driver_test', 'Drupal\\driver_test\\Driver\\Database\\DriverTestPgsql'],
       [
         'DriverTestMysqlDeprecatedVersion',
         'driver_test',

@@ -105,8 +105,12 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     $this->submitForm($edit, 'Apply');
 
     // Set sort to NID ascending.
+    // With JSON entity storage, the "node_field_data" table is collapsed
+    // onto the node base table, so the add-handler checkbox is keyed by the
+    // base table.
+    $node_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node_field_data';
     $edit = [
-      'name[node_field_data.nid]' => 1,
+      'name[' . $node_table . '.nid]' => 1,
     ];
     $this->drupalGet('admin/structure/views/nojs/add-handler/node_test_view/entity_reference_1/sort');
     $this->submitForm($edit, 'Add and configure sort criteria');

@@ -103,7 +103,8 @@ class ViewsIntegrationTest extends ViewTestBase {
     // Add the image field to the View.
     $this->drupalGet('admin/structure/views/nojs/add-handler/entity_test_row/default/field');
     $this->drupalGet('admin/structure/views/nojs/add-handler/entity_test_row/default/field');
-    $this->submitForm(['name[entity_test__bar.bar]' => TRUE], 'Add and configure field');
+    $bar_table = \Drupal::database()->supportsJsonEntityStorage() ? 'entity_test' : 'entity_test__bar';
+    $this->submitForm(['name[' . $bar_table . '.bar]' => TRUE], 'Add and configure field');
     // Set the formatter to 'Responsive image'.
     $this->submitForm(['options[type]' => 'responsive_image'], 'Apply');
     $this->assertSession()

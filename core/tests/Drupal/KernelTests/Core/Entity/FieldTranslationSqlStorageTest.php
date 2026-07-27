@@ -84,8 +84,44 @@ class FieldTranslationSqlStorageTest extends EntityLanguageTestBase {
     $id = $entity->id();
     $langcode = $entity->getUntranslated()->language()->getId();
     $fields = [$this->fieldName, $this->untranslatableFieldName];
+    $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
     /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
-    $table_mapping = \Drupal::entityTypeManager()->getStorage($entity_type)->getTableMapping();
+    $table_mapping = $storage->getTableMapping();
+
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
+      $base_table = $table_mapping->getBaseTable();
+      $translations_table = $table_mapping->getJsonStorageTranslationsTable();
+      $json = \Drupal::database()
+        ->select($base_table, 'b')
+        ->fields('b', ['__data_translations'])
+        ->condition('b.' . $entity->getEntityType()->getKey('id'), $id)
+        ->execute()
+        ->fetchField();
+      $translation_rows = $json ? (json_decode($json, TRUE)[$translations_table] ?? []) : [];
+
+      foreach ($fields as $field_name) {
+        $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
+        $embedded_key = $table_mapping->getJsonStorageDedicatedTableName($field_storage, $translations_table);
+        $found = FALSE;
+        foreach ($translation_rows as $translation_row) {
+          foreach ($translation_row[$embedded_key] ?? [] as $dedicated_row) {
+            $found = TRUE;
+            if (($dedicated_row['langcode'] ?? NULL) != $langcode) {
+              $status = FALSE;
+              break 3;
+            }
+          }
+        }
+        if (!$found) {
+          // No stored row for this field cannot confirm the langcode.
+          $status = FALSE;
+          break;
+        }
+      }
+
+      $this->assertTrue($status, $message);
+      return;
+    }
 
     foreach ($fields as $field_name) {
       $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);

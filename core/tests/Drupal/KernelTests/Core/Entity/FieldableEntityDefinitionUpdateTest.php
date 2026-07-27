@@ -510,6 +510,9 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
    * Tests that a failed entity schema update preserves the existing data.
    */
   public function testFieldableEntityTypeUpdatesErrorHandling(): void {
+    if ($this->database->supportsJsonEntityStorage()) {
+      $this->markTestSkipped('With JSON entity storage, it stores backups on the base table, not as physical per-layout backup tables.');
+    }
     $schema = $this->database->schema();
 
     // First, convert the entity type to be translatable for better coverage and
@@ -680,6 +683,9 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
    * Tests the removal of the backup tables after a successful update.
    */
   public function testFieldableEntityTypeUpdatesRemoveBackupTables(): void {
+    if ($this->database->supportsJsonEntityStorage()) {
+      $this->markTestSkipped('With JSON entity storage, it stores backups on the base table, not as physical per-layout backup tables.');
+    }
     $schema = $this->database->schema();
 
     // Convert the entity type to be revisionable.

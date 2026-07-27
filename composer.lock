@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1976e0c86eb893f92680f2c395aea3dc",
+    "content-hash": "b0205ac3e48e923b1c60871b3ece8f87",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -284,6 +284,88 @@
                 }
             ],
             "time": "2025-08-20T19:15:30+00:00"
+        },
+        {
+            "name": "daffie/drupal-core-pgsql-module-remover",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/daffie/drupal-core-pgsql-module-remover.git",
+                "reference": "ee70951206782f95b572770445b830c0a5276069"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/daffie%2Fdrupal-core-pgsql-module-remover/repository/archive.zip?sha=ee70951206782f95b572770445b830c0a5276069",
+                "reference": "ee70951206782f95b572770445b830c0a5276069",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.0",
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "composer/composer": "^2.3",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Daffie\\DrupalCorePgsqlModuleRemover\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Daffie\\DrupalCorePgsqlModuleRemover\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Composer plugin that removes the pgsql module from Drupal core so a contrib/custom module named 'pgsql' can be used.",
+            "support": {
+                "issues": "https://gitlab.com/daffie/drupal-core-pgsql-module-remover/-/issues",
+                "source": "https://gitlab.com/daffie/drupal-core-pgsql-module-remover/-/tree/1.0.2"
+            },
+            "time": "2026-07-02T12:25:29+00:00"
+        },
+        {
+            "name": "daffie/pgsql",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/daffie/pgsql.git",
+                "reference": "df735b09db5d8fe0a41a6ef66b4e5e1fcad9c53b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/daffie%2Fpgsql/repository/archive.zip?sha=df735b09db5d8fe0a41a6ef66b4e5e1fcad9c53b",
+                "reference": "df735b09db5d8fe0a41a6ef66b4e5e1fcad9c53b",
+                "shasum": ""
+            },
+            "require": {
+                "daffie/drupal-core-pgsql-module-remover": "^1.0",
+                "drupal/core": "^11.4 || ^12"
+            },
+            "default-branch": true,
+            "type": "drupal-module",
+            "extra": {
+                "drupal-scaffold": {
+                    "file-mapping": {
+                        "[web-root]/sites/default/default.settings.php": {
+                            "append": "assets/scaffold/pgsql-driver.settings.php"
+                        }
+                    }
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Provides the PostgreSQL database driver with JSON entity storage.",
+            "support": {
+                "issues": "https://gitlab.com/daffie/pgsql/-/issues",
+                "source": "https://gitlab.com/daffie/pgsql/-/tree/main"
+            },
+            "time": "2026-07-27T18:07:43+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -10226,6 +10308,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "daffie/pgsql": 20,
         "drupal/core": 20,
         "drupal/core-project-message": 20,
         "drupal/core-recipe-unpack": 20,

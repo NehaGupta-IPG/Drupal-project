@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\views\Plugin\views\join\FieldOrLanguageJoin;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
@@ -75,7 +77,7 @@ class FieldOrLanguageJoinTest extends RelationshipJoinTestBase {
 
     $join_info = $this->buildJoin($view, $configuration, 'users_field_data');
     $this->assertSame($join_info['join type'], 'LEFT');
-    $this->assertSame($join_info['table'], $configuration['table']);
+    $this->assertJoinTarget($configuration['table'], $join_info['table']);
     $this->assertSame($join_info['alias'], 'users_field_data');
     $this->assertSame($join_info['condition'], 'views_test_data.uid = users_field_data.uid');
 
@@ -183,6 +185,28 @@ class FieldOrLanguageJoinTest extends RelationshipJoinTestBase {
     ];
     $join_info = $this->buildJoin($view, $configuration, 'node__field_tags');
     $this->assertStringContainsString('AND (node__field_tags.bundle = :views_join_condition_1 OR node__field_tags.langcode = views_test_data.langcode)', $join_info['condition']);
+  }
+
+  /**
+   * Asserts the built join targets the expected table.
+   *
+   * Under the pgsql (JSON storage) driver the users_field_data data table is
+   * virtual — its columns live in a jsonb document on the users base table — so
+   * the join target is realized as an unwind subquery rather than the physical
+   * table name. The join alias and condition are unaffected.
+   *
+   * @param string $expected_table
+   *   The physical table name expected under relational storage.
+   * @param mixed $actual_table
+   *   The 'table' entry of the built join info.
+   */
+  protected function assertJoinTarget(string $expected_table, $actual_table): void {
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      $this->assertInstanceOf(SelectInterface::class, $actual_table);
+    }
+    else {
+      $this->assertSame($expected_table, $actual_table);
+    }
   }
 
   /**

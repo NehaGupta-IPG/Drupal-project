@@ -49,12 +49,18 @@ class MediaViewsWizardTest extends MediaJavascriptTestBase {
     $view->initHandlers();
     $row = $view->display_handler->getOption('row');
     $this->assertSame($row['type'], 'fields');
+
+    // Under JSON entity storage the relational media_field_data table is
+    // collapsed onto the media entity base table, so the created handlers
+    // reference the base table.
+    $data_table = \Drupal::database()->supportsJsonEntityStorage() ? 'media' : 'media_field_data';
+
     // Check for the default filters.
-    $this->assertSame($view->filter['status']->table, 'media_field_data');
+    $this->assertSame($view->filter['status']->table, $data_table);
     $this->assertSame($view->filter['status']->field, 'status');
     $this->assertSame($view->filter['status']->value, '1');
     // Check for the default fields.
-    $this->assertSame($view->field['name']->table, 'media_field_data');
+    $this->assertSame($view->field['name']->table, $data_table);
     $this->assertSame($view->field['name']->field, 'name');
 
   }
@@ -83,15 +89,20 @@ class MediaViewsWizardTest extends MediaJavascriptTestBase {
     $row = $view->display_handler->getOption('row');
     $this->assertSame($row['type'], 'fields');
 
+    // Under JSON entity storage the relational media_field_revision table is
+    // collapsed onto the media entity base table, so the created handlers
+    // reference the base table.
+    $revision_table = \Drupal::database()->supportsJsonEntityStorage() ? 'media' : 'media_field_revision';
+
     // Check for the default filters.
-    $this->assertSame($view->filter['status']->table, 'media_field_revision');
+    $this->assertSame($view->filter['status']->table, $revision_table);
     $this->assertSame($view->filter['status']->field, 'status');
     $this->assertSame($view->filter['status']->value, '1');
 
     // Check for the default fields.
-    $this->assertSame($view->field['name']->table, 'media_field_revision');
+    $this->assertSame($view->field['name']->table, $revision_table);
     $this->assertSame($view->field['name']->field, 'name');
-    $this->assertSame($view->field['changed']->table, 'media_field_revision');
+    $this->assertSame($view->field['changed']->table, $revision_table);
     $this->assertSame($view->field['changed']->field, 'changed');
   }
 

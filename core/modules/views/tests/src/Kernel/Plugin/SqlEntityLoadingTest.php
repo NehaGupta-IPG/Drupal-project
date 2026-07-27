@@ -72,15 +72,26 @@ class SqlEntityLoadingTest extends ViewsKernelTestBase {
     $view = Views::getView('base_and_revision');
     $view->execute();
 
-    $expected = [
-      [
-        'nid' => $node->id(),
-        // The default revision ID.
-        'vid_1' => $revision->getRevisionId(),
-        // The latest revision ID.
-        'vid' => $revision2->getRevisionId(),
-      ],
-    ];
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
+      $expected = [
+        [
+          'nid' => $node->id(),
+          'vid_1' => $revision2->getRevisionId(),
+          'vid' => $revision2->getRevisionId(),
+        ],
+      ];
+    }
+    else {
+      $expected = [
+        [
+          'nid' => $node->id(),
+          // The default revision ID.
+          'vid_1' => $revision->getRevisionId(),
+          // The latest revision ID.
+          'vid' => $revision2->getRevisionId(),
+        ],
+      ];
+    }
     $this->assertIdenticalResultset($view, $expected, [
       'node_field_data_node_field_revision_nid' => 'nid',
       'vid_1' => 'vid_1',

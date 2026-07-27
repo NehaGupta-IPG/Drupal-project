@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Kernel\Views;
 
 use Drupal\comment\CommentManagerInterface;
+use Drupal\Core\Database\Database;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -108,7 +109,7 @@ class CommentDepthTest extends CommentViewsKernelTestBase {
 
     $view->displayHandlers->get('default')->overrideOption('fields', [
       'thread' => [
-        'table' => 'comment_field_data',
+        'table' => (Database::getConnection()->supportsJsonEntityStorage() ? 'comment' : 'comment_field_data'),
         'field' => 'thread',
         'id' => 'thread',
         'plugin_id' => 'comment_depth',

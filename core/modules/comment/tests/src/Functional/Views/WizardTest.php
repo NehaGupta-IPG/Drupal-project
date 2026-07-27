@@ -90,16 +90,28 @@ class WizardTest extends WizardTestBase {
     $row = $view->display_handler->getOption('row');
     $this->assertEquals('entity:comment', $row['type']);
 
+    // Under JSON entity storage the relational comment_field_data and
+    // node_field_data tables are collapsed onto the comment and node entity
+    // base tables, so the created handlers reference the base tables.
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
+      $comment_data_table = 'comment';
+      $node_data_table = 'node';
+    }
+    else {
+      $comment_data_table = 'comment_field_data';
+      $node_data_table = 'node_field_data';
+    }
+
     // Check for the default filters.
-    $this->assertEquals('comment_field_data', $view->filter['status']->table);
+    $this->assertEquals($comment_data_table, $view->filter['status']->table);
     $this->assertEquals('status', $view->filter['status']->field);
     $this->assertEquals('1', $view->filter['status']->value);
-    $this->assertEquals('node_field_data', $view->filter['status_node']->table);
+    $this->assertEquals($node_data_table, $view->filter['status_node']->table);
     $this->assertEquals('status', $view->filter['status_node']->field);
     $this->assertEquals('1', $view->filter['status_node']->value);
 
     // Check for the default fields.
-    $this->assertEquals('comment_field_data', $view->field['subject']->table);
+    $this->assertEquals($comment_data_table, $view->field['subject']->table);
     $this->assertEquals('subject', $view->field['subject']->field);
   }
 

@@ -48,6 +48,25 @@ class UpdateContribTest extends UpdateTestBase {
     parent::setUp();
     $admin_user = $this->drupalCreateUser(['administer site configuration']);
     $this->drupalLogin($admin_user);
+    // Restrict the available updates report to Drupal core and the projects
+    // this test defines. This isolates the test from any contributed modules or
+    // themes present in the code base: without it, those extra projects would
+    // add tables to the report (shifting the CSS locators the test relies on)
+    // and, having no release history fixture, would exhaust the shared per-URL
+    // fetch-failure limit and stop the tested projects from being fetched.
+    // The allowlist only removes projects, so listing projects that a given
+    // test method does not define has no effect.
+    // See \Drupal\update_test\Hook\UpdateTestHooks::updateProjectsAlter().
+    $this->config('update_test.settings')
+      ->set('allowed_projects', [
+        'drupal',
+        'aaa_update_test',
+        'bbb_update_test',
+        'ccc_update_test',
+        'update_test_base_theme',
+        'update_test_subtheme',
+      ])
+      ->save();
   }
 
   /**

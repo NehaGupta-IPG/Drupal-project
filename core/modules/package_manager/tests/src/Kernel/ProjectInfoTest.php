@@ -22,6 +22,19 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class ProjectInfoTest extends PackageManagerKernelTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    // Only check installed extensions, which in these tests are all core and so
+    // collapse into the single 'drupal' project. Otherwise the update manager
+    // also scans uninstalled extensions on disk, including any contrib modules
+    // or themes present in the codebase, and would report them as additional
+    // projects (and queue a fetch task for each of them).
+    $this->config('update.settings')->set('check.disabled_extensions', FALSE)->save();
+  }
+
+  /**
    * Tests get installable releases.
    *
    * @param string $fixture

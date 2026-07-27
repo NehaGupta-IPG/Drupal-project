@@ -90,7 +90,9 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
 
     $problems = [];
     foreach ($this->definitions as $entity_type_id => $info) {
-      $class_name_full = $info->getClass();
+      // Use the original entity class: a database driver module may swap the
+      // class at runtime, but test coverage is provided for the original one.
+      $class_name_full = $info->getDecoratedClasses()[0] ?? $info->getClass();
       $parts = explode('\\', $class_name_full);
       $class_name = end($parts);
       $module_name = $parts[1];

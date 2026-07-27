@@ -149,8 +149,15 @@ class TaxonomyTermViewTest extends TaxonomyTestBase {
     $query = $view->build_info['query'];
     $tables = $query->getTables();
 
-    // Ensure that the join to node_field_data is not added by default.
-    $this->assertEquals(['node_field_data', 'taxonomy_index'], array_keys($tables));
+    if (\Drupal::database()->supportsJsonEntityStorage()) {
+      // JSON entity storage driver collapses node_field_data onto the node
+      // base table, so the view joins the node base table instead.
+      $this->assertEquals(['node', 'taxonomy_index'], array_keys($tables));
+    }
+    else {
+      // Ensure that the join to node_field_data is not added by default.
+      $this->assertEquals(['node_field_data', 'taxonomy_index'], array_keys($tables));
+    }
     // Ensure that the filter to the language column is not there by default.
     $condition = $query->conditions();
     // We only want to check the no. of conditions in the query.

@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Kernel\Entity;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityType;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -64,6 +65,20 @@ class EntityViewsDataTest extends KernelTestBase {
 
     $this->entityTypeManager = $this->container->get('entity_type.manager');
 
+    // Under the pgsql (JSON) driver, content entity field data is embedded in
+    // jsonb columns and views data is produced by the module's base-table-centric
+    // \Drupal\pgsql\EntityViewsData rather than core's handler. The module is
+    // not installed in this isolated handler test (only its database driver is
+    // active), so its root namespace is not on the autoloader; register it so the
+    // handler class resolves, then use it as the views_data handler.
+    $views_data_handler = EntityViewsData::class;
+    $storage_handler = NULL;
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      $this->classLoader->addPsr4('Drupal\\pgsql\\', $this->root . '/modules/custom/pgsql/src');
+      $views_data_handler = 'Drupal\pgsql\EntityViewsData';
+      $storage_handler = 'Drupal\pgsql\EntityStorage\JsonSqlContentEntityStorage';
+    }
+
     // A common entity type definition. Tests may change this prior to passing
     // it to setUpEntityType().
     $this->baseEntityType = new TestEntityType([
@@ -80,9 +95,10 @@ class EntityViewsDataTest extends KernelTestBase {
         'bundle' => 'type',
         'revision' => 'revision_id',
       ],
-      'handlers' => [
-        'views_data' => EntityViewsData::class,
-      ],
+      'handlers' => array_filter([
+        'views_data' => $views_data_handler,
+        'storage' => $storage_handler,
+      ]),
       'provider' => 'entity_test',
       'list_cache_contexts' => ['entity_test_list_cache_context'],
     ]);
@@ -135,6 +151,48 @@ class EntityViewsDataTest extends KernelTestBase {
   }
 
   /**
+   * Asserts the base-table-centric shape of pgsql (JSON) storage views data.
+   *
+   * Under the pgsql driver a content entity's field data is embedded in jsonb
+   * columns on the entity base table (and the "<entity>_current_revision" /
+   * "<entity>_all_revisions" / "<entity>_translations" embedded document
+   * tables). The module's \Drupal\pgsql\EntityViewsData therefore collapses all
+   * field data onto the entity base table: the logical "<entity>_field_data",
+   * "<entity>_revision" and dedicated "<entity>__<field>" tables a relational
+   * views data set would declare do not exist, and every field records its
+   * physical jsonb location in a "real field" key.
+   *
+   * @param array $data
+   *   The views data returned by the handler.
+   * @param string $base_table
+   *   The entity base table; the only top-level table expected in $data.
+   * @param string $entity_type_id
+   *   The entity type ID.
+   * @param string $current_revision_table
+   *   The embedded current-revision document table recorded on the base table.
+   * @param string[] $absent_tables
+   *   Logical tables that must NOT be present under JSON storage.
+   */
+  protected function assertJsonStorageBaseTable(array $data, string $base_table, string $entity_type_id, string $current_revision_table, array $absent_tables = []): void {
+    // The entity base table is the only top-level table.
+    $this->assertSame([$base_table], array_keys($data));
+    foreach ($absent_tables as $absent) {
+      $this->assertArrayNotHasKey($absent, $data);
+    }
+    $this->assertEquals($entity_type_id, $data[$base_table]['table']['entity type']);
+    $this->assertFalse($data[$base_table]['table']['entity revision']);
+    $this->assertEquals('id', $data[$base_table]['table']['base']['field']);
+    $this->assertEquals('Entity test', $data[$base_table]['table']['base']['title']);
+    // The embedded revision document tables are recorded on the base table so
+    // the pgsql Views query layer can select the right jsonb document.
+    $this->assertEquals($current_revision_table, $data[$base_table]['table']['current revision table']);
+    // The id key is a physical base-table column, so it is never rewritten to a
+    // jsonb document location.
+    $this->assertArrayHasKey('id', $data[$base_table]);
+    $this->assertArrayNotHasKey('real field', $data[$base_table]['id']);
+  }
+
+  /**
    * Mocks an entity type and its base fields.
    *
    * This works by:
@@ -171,6 +229,20 @@ class EntityViewsDataTest extends KernelTestBase {
   public function testBaseTables(): void {
     $data = $this->entityTypeManager->getHandler('entity_test', 'views_data')->getViewsData();
 
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      // Under JSON storage all data is collapsed onto the entity base table.
+      $this->assertJsonStorageBaseTable($data, 'entity_test', 'entity_test', 'entity_test_current_revision', [
+        'entity_test_field_data',
+        'entity_test_revision',
+      ]);
+      $this->assertEquals('Entity test', $data['entity_test']['table']['group']);
+      $this->assertEquals('entity_test', $data['entity_test']['table']['provider']);
+      $this->assertEquals(['entity_test_list_cache_context'], $data['entity_test']['table']['base']['cache_contexts']);
+      $this->assertArrayNotHasKey('defaults', $data['entity_test']['table']);
+      $this->assertEquals('entity_test_all_revisions', $data['entity_test']['table']['all revisions table']);
+      return;
+    }
+
     $this->assertEquals('entity_test', $data['entity_test']['table']['entity type']);
     $this->assertEquals(FALSE, $data['entity_test']['table']['entity revision']);
     $this->assertEquals('Entity test', $data['entity_test']['table']['group']);
@@ -202,6 +274,22 @@ class EntityViewsDataTest extends KernelTestBase {
 
     // Tests the join definition between the base and the data table.
     $data = $this->entityTypeManager->getHandler('entity_test_mul', 'views_data')->getViewsData();
+
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      // Under JSON storage there is no separate data table; the base info and
+      // all field data live on the entity base table, with no base->data join.
+      $this->assertJsonStorageBaseTable($data, 'entity_test', 'entity_test_mul', 'entity_test_current_revision', [
+        'entity_test_mul_property_data',
+      ]);
+      // The label default is recorded on the base table (no 'table' redirect to
+      // a data table).
+      $this->assertEquals(['field' => 'label'], $data['entity_test']['table']['base']['defaults']);
+      $this->assertArrayNotHasKey('join', $data['entity_test']['table']);
+      $this->assertArrayNotHasKey('revision_table', $data);
+      $this->assertArrayNotHasKey('revision_data_table', $data);
+      return;
+    }
+
     // @todo Change the base table in the entity type definition to match the
     //   changed entity ID.
     $base_views_data = $data['entity_test'];
@@ -237,6 +325,18 @@ class EntityViewsDataTest extends KernelTestBase {
     $this->setUpEntityType($entity_type);
 
     $data = $this->entityTypeManager->getHandler('entity_test_mulrev', 'views_data')->getViewsData();
+
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      // Under JSON storage revisions are embedded documents, not a physical
+      // revision table; everything lives on the entity base table.
+      $this->assertJsonStorageBaseTable($data, 'entity_test', 'entity_test_mulrev', 'entity_test_current_revision', [
+        'entity_test_mulrev_revision',
+      ]);
+      $this->assertEquals('revision_id', $data['entity_test']['table']['entity revision field']);
+      $this->assertEquals('entity_test_all_revisions', $data['entity_test']['table']['all revisions table']);
+      $this->assertArrayNotHasKey('data_table', $data);
+      return;
+    }
 
     $this->assertEquals('Entity test revisions', $data['entity_test_mulrev_revision']['table']['base']['title']);
     $this->assertEquals('revision_id', $data['entity_test_mulrev_revision']['table']['base']['field']);
@@ -277,6 +377,19 @@ class EntityViewsDataTest extends KernelTestBase {
     $this->setUpEntityType($entity_type);
 
     $data = $this->entityTypeManager->getHandler('entity_test_mulrev', 'views_data')->getViewsData();
+
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      // Under JSON storage the revision and revision-data tables are embedded
+      // documents; everything is collapsed onto the entity base table.
+      $this->assertJsonStorageBaseTable($data, 'entity_test', 'entity_test_mulrev', 'entity_test_current_revision', [
+        'entity_test_mulrev_revision',
+        'entity_test_mulrev_property_revision',
+        'entity_test_mul_property_data',
+      ]);
+      $this->assertEquals('entity_test_all_revisions', $data['entity_test']['table']['all revisions table']);
+      $this->assertArrayNotHasKey('data_table', $data);
+      return;
+    }
 
     $this->assertEquals('Entity test revisions', $data['entity_test_mulrev_property_revision']['table']['base']['title']);
     $this->assertEquals('revision_id', $data['entity_test_mulrev_property_revision']['table']['base']['field']);
@@ -335,6 +448,19 @@ class EntityViewsDataTest extends KernelTestBase {
 
     $data = $this->entityTypeManager->getHandler('entity_test_mulrev', 'views_data')->getViewsData();
 
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      // Under JSON storage the revision and revision-data tables are embedded
+      // documents; everything is collapsed onto the entity base table.
+      $this->assertJsonStorageBaseTable($data, 'entity_test', 'entity_test_mulrev', 'entity_test_current_revision', [
+        'entity_test_mulrev_revision',
+        'entity_test_mulrev_property_revision',
+        'entity_test_mulrev_field_data',
+      ]);
+      $this->assertEquals('entity_test_all_revisions', $data['entity_test']['table']['all revisions table']);
+      $this->assertArrayNotHasKey('data_table', $data);
+      return;
+    }
+
     $this->assertEquals('Entity test revisions', $data['entity_test_mulrev_property_revision']['table']['base']['title']);
     $this->assertEquals('revision_id', $data['entity_test_mulrev_property_revision']['table']['base']['field']);
     $this->assertFalse(isset($data['entity_test_mulrev_revision']['table']['base']));
@@ -382,6 +508,38 @@ class EntityViewsDataTest extends KernelTestBase {
    */
   public function testBaseTableFields(): void {
     $data = $this->entityTypeManager->getHandler('entity_test', 'views_data')->getViewsData();
+
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      // Under JSON storage every field is collapsed onto the entity base table
+      // and carries a 'real field' pointing at its physical jsonb document
+      // column; the dedicated "entity_test__string" table does not exist.
+      $crt = 'entity_test_current_revision';
+      $this->assertSame(['entity_test'], array_keys($data));
+      $this->assertArrayNotHasKey('entity_test__string', $data);
+      // The id key stays a physical base-table column.
+      $this->assertNumericField($data['entity_test']['id']);
+      $this->assertArrayNotHasKey('real field', $data['entity_test']['id']);
+      // Single-value base fields are re-homed onto the base table.
+      $this->assertStringField($data['entity_test']['name']);
+      $this->assertEquals($crt . '.name', $data['entity_test']['name']['real field']);
+      $this->assertUriField($data['entity_test']['homepage']);
+      $this->assertEquals($crt . '.homepage', $data['entity_test']['homepage']['real field']);
+      $this->assertLongTextField($data['entity_test'], 'description');
+      $this->assertEquals($crt . '.description__value', $data['entity_test']['description__value']['real field']);
+      $this->assertEquals($crt . '.description__format', $data['entity_test']['description__format']['real field']);
+      $this->assertEntityReferenceField($data['entity_test']['user_id']);
+      $this->assertEquals($crt . '.user_id', $data['entity_test']['user_id']['real field']);
+      // The reference relationship targets the user entity base table.
+      $this->assertEquals('users', $data['entity_test']['user_id']['relationship']['base']);
+      $this->assertEquals('uid', $data['entity_test']['user_id']['relationship']['base field']);
+      // The multi-value base field's value column is embedded as a dedicated
+      // document nested in the current-revision document, still on the base
+      // table.
+      $this->assertStringField($data['entity_test']['string_value']);
+      $this->assertEquals('string', $data['entity_test']['string_value']['entity field']);
+      $this->assertEquals($crt . '.' . $crt . '__string.string_value', $data['entity_test']['string_value']['real field']);
+      return;
+    }
 
     $this->assertNumericField($data['entity_test']['id']);
     $this->assertViewsDataField($data['entity_test']['id'], 'id');
@@ -468,6 +626,38 @@ class EntityViewsDataTest extends KernelTestBase {
     $this->setUpEntityType($entity_type, $base_field_definitions);
 
     $data = $this->entityTypeManager->getHandler('entity_test_mul', 'views_data')->getViewsData();
+
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      // Under JSON storage the translatable entity's field data is collapsed
+      // onto the entity base table (no "entity_test_mul_property_data" table and
+      // no dedicated "entity_test_mul__string" table); each field carries a
+      // 'real field' pointing at its jsonb document column.
+      $crt = 'entity_test_mul_current_revision';
+      $this->assertSame(['entity_test_mul'], array_keys($data));
+      $this->assertArrayNotHasKey('entity_test_mul_property_data', $data);
+      $this->assertArrayNotHasKey('entity_test_mul__string', $data);
+      // The id/bundle keys stay physical base-table columns.
+      $this->assertNumericField($data['entity_test_mul']['id']);
+      $this->assertArrayNotHasKey('real field', $data['entity_test_mul']['id']);
+      $this->assertBundleField($data['entity_test_mul']['type']);
+      $this->assertUuidField($data['entity_test_mul']['uuid']);
+      // Translated field data is re-homed onto the base table.
+      $this->assertLanguageField($data['entity_test_mul']['langcode']);
+      $this->assertEquals($crt . '.langcode', $data['entity_test_mul']['langcode']['real field']);
+      $this->assertStringField($data['entity_test_mul']['name']);
+      $this->assertEquals($crt . '.name', $data['entity_test_mul']['name']['real field']);
+      $this->assertLongTextField($data['entity_test_mul'], 'description');
+      $this->assertEquals($crt . '.description__value', $data['entity_test_mul']['description__value']['real field']);
+      $this->assertUriField($data['entity_test_mul']['homepage']);
+      $this->assertEquals($crt . '.homepage', $data['entity_test_mul']['homepage']['real field']);
+      $this->assertEntityReferenceField($data['entity_test_mul']['user_id']);
+      $this->assertEquals($crt . '.user_id', $data['entity_test_mul']['user_id']['real field']);
+      $this->assertEquals('users', $data['entity_test_mul']['user_id']['relationship']['base']);
+      $this->assertEquals('uid', $data['entity_test_mul']['user_id']['relationship']['base field']);
+      $this->assertStringField($data['entity_test_mul']['string_value']);
+      $this->assertEquals($crt . '.' . $crt . '__string.string_value', $data['entity_test_mul']['string_value']['real field']);
+      return;
+    }
 
     // Check the base fields.
     $this->assertFalse(isset($data['entity_test_mul']['id']));
@@ -562,6 +752,45 @@ class EntityViewsDataTest extends KernelTestBase {
     $this->setUpEntityType($entity_type, $base_field_definitions);
 
     $data = $this->entityTypeManager->getHandler('entity_test_mulrev', 'views_data')->getViewsData();
+
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      // Under JSON storage the revisionable + translatable entity's field data
+      // is collapsed onto the entity base table: no
+      // "entity_test_mulrev_property_data" / "_property_revision" tables and no
+      // dedicated "entity_test_mulrev__string" tables. Each field carries a
+      // 'real field' pointing at its jsonb document column.
+      $crt = 'entity_test_mulrev_current_revision';
+      $this->assertSame(['entity_test_mulrev'], array_keys($data));
+      $this->assertArrayNotHasKey('entity_test_mulrev_property_data', $data);
+      $this->assertArrayNotHasKey('entity_test_mulrev_property_revision', $data);
+      $this->assertArrayNotHasKey('entity_test_mulrev__string', $data);
+      // The id key stays a physical base-table column; revision_id is embedded.
+      $this->assertNumericField($data['entity_test_mulrev']['id']);
+      $this->assertArrayNotHasKey('real field', $data['entity_test_mulrev']['id']);
+      $this->assertNumericField($data['entity_test_mulrev']['revision_id']);
+      $this->assertEquals($crt . '.revision_id', $data['entity_test_mulrev']['revision_id']['real field']);
+      $this->assertUuidField($data['entity_test_mulrev']['uuid']);
+      $this->assertLanguageField($data['entity_test_mulrev']['langcode']);
+      $this->assertEquals($crt . '.langcode', $data['entity_test_mulrev']['langcode']['real field']);
+      $this->assertStringField($data['entity_test_mulrev']['name']);
+      $this->assertEquals($crt . '.name', $data['entity_test_mulrev']['name']['real field']);
+      $this->assertLongTextField($data['entity_test_mulrev'], 'description');
+      $this->assertEquals($crt . '.description__value', $data['entity_test_mulrev']['description__value']['real field']);
+      $this->assertUriField($data['entity_test_mulrev']['homepage']);
+      $this->assertEquals($crt . '.homepage', $data['entity_test_mulrev']['homepage']['real field']);
+      $this->assertEntityReferenceField($data['entity_test_mulrev']['user_id']);
+      $this->assertEquals($crt . '.user_id', $data['entity_test_mulrev']['user_id']['real field']);
+      $this->assertEquals('users', $data['entity_test_mulrev']['user_id']['relationship']['base']);
+      $this->assertEquals('uid', $data['entity_test_mulrev']['user_id']['relationship']['base field']);
+      // The non-revisionable and non-multi-value base fields are re-homed too.
+      $this->assertStringField($data['entity_test_mulrev']['non_rev_field']);
+      $this->assertEquals($crt . '.non_rev_field', $data['entity_test_mulrev']['non_rev_field']['real field']);
+      $this->assertStringField($data['entity_test_mulrev']['non_mul_field']);
+      $this->assertEquals($crt . '.non_mul_field', $data['entity_test_mulrev']['non_mul_field']['real field']);
+      $this->assertStringField($data['entity_test_mulrev']['string_value']);
+      $this->assertEquals($crt . '.' . $crt . '__string.string_value', $data['entity_test_mulrev']['string_value']['real field']);
+      return;
+    }
 
     // Check the base fields.
     $this->assertFalse(isset($data['entity_test_mulrev']['id']));

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\Database;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -90,7 +91,12 @@ class HandlerAliasTest extends ViewsKernelTestBase {
     $this->assertSame('uid', $filter->definition['real field']);
 
     $this->assertSame('uid_raw', $filter->field);
-    $this->assertSame('users_field_data', $filter->table);
+    // Under the pgsql (JSON storage) driver the users_field_data data table is
+    // collapsed onto the users entity base table, so a handler referencing it is
+    // rewritten to the base table at build time (@see
+    // \Drupal\pgsql\Hook\PgsqlViewsHooks::viewsPreBuild()).
+    $expected_table = Database::getConnection()->supportsJsonEntityStorage() ? 'users' : 'users_field_data';
+    $this->assertSame($expected_table, $filter->table);
     $this->assertSame('uid', $filter->realField);
   }
 

@@ -154,6 +154,51 @@ class EntityConverterLatestRevisionTest extends KernelTestBase {
    * Tests that pending revisions are loaded only when needed.
    */
   public function testOptimizedConvert(): void {
+    /** @var \Drupal\Core\Database\Connection $database */
+    $database = $this->container->get('database');
+
+    if ($database->supportsJsonEntityStorage()) {
+      $entity = EntityTestMulRev::create(['name' => 'original']);
+      $entity->save();
+
+      // Populate static cache for the current entity.
+      $entity = EntityTestMulRev::load($entity->id());
+
+      $columns = ['__data_all_revisions', '__data_current_revision', '__data_latest_revision'];
+      $record = $database->select('entity_test_mulrev', 'b')
+        ->fields('b', $columns)
+        ->condition('id', $entity->id())
+        ->execute()
+        ->fetchAssoc();
+      foreach ($columns as $column) {
+        if (!$record[$column]) {
+          continue;
+        }
+        $document = json_decode($record[$column], TRUE);
+        foreach ($document as &$rows) {
+          foreach ($rows as &$row) {
+            if (array_key_exists('name', $row)) {
+              $row['name'] = 'corrupted';
+            }
+          }
+        }
+        $database->update('entity_test_mulrev')
+          ->fields([$column => json_encode($document)])
+          ->condition('id', $entity->id())
+          ->execute();
+      }
+
+      // If optimization works, converting a default revision does not trigger a
+      // storage load, so the cached (uncorrupted) entity is returned.
+      $converted = $this->converter->convert(1, [
+        'load_latest_revision' => TRUE,
+        'type' => 'entity:entity_test_mulrev',
+      ], 'foo', []);
+      $this->assertEquals($entity->getLoadedRevisionId(), $converted->getLoadedRevisionId());
+      $this->assertEquals('original', $converted->get('name')->value);
+      return;
+    }
+
     $entity = EntityTestMulRev::create();
     $entity->save();
 
@@ -163,8 +208,6 @@ class EntityConverterLatestRevisionTest extends KernelTestBase {
     // Delete the base table entry for the current entity, however, since the
     // storage will query the revision table to get the latest revision, the
     // logic handling pending revisions will work correctly anyway.
-    /** @var \Drupal\Core\Database\Connection $database */
-    $database = $this->container->get('database');
     $database->delete('entity_test_mulrev')
       ->condition('id', $entity->id())
       ->execute();

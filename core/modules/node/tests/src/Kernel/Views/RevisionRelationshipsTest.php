@@ -68,11 +68,16 @@ class RevisionRelationshipsTest extends ViewsKernelTestBase {
     $node->setNewRevision(TRUE);
     $node->save();
 
+    // Under JSON entity storage, the content entity's logical tables
+    // (node_field_data, node_field_revision) collapse onto the entity base
+    // table, so the relationship join and the shared revision columns carry
+    // the collapsed base-table aliases rather than the relational ones.
+    $json_storage = \Drupal::database()->supportsJsonEntityStorage();
     $column_map = [
       'vid' => 'vid',
-      'node_field_data_node_field_revision_nid' => 'node_node_revision_nid',
+      ($json_storage ? 'node_node_nid' : 'node_field_data_node_field_revision_nid') => 'node_node_revision_nid',
       'nid_1' => 'nid_1',
-      'node_field_revision_langcode' => 'node_field_revision_langcode',
+      ($json_storage ? 'node_node_all_revisions_langcode' : 'node_field_revision_langcode') => 'node_field_revision_langcode',
     ];
 
     // Here should be two rows for each translation.

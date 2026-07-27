@@ -89,18 +89,35 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
     ];
 
     $database = \Drupal::database();
-    $id = $database->insert('path_alias')
-      ->fields($values + ['uuid' => \Drupal::service('uuid')->generate()])
-      ->execute();
+    if ($database->getProvider() === 'pgsql' && method_exists($database, 'tableInformation')) {
+      // Under the pgsql JSONB layout there is no physical path_alias_revision
+      // table to insert into: the revision documents live on the base row.
+      // Restore a fully formed entity through the storage instead — like the
+      // raw inserts below, this writes directly and fires no hooks.
+      $storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+      $id = 1 + (int) $database->query('SELECT MAX([id]) FROM {path_alias}')->fetchField();
+      $path_alias = $storage->create($values + [
+        'id' => $id,
+        'revision_id' => $id,
+        'revision_default' => TRUE,
+        'uuid' => \Drupal::service('uuid')->generate(),
+      ]);
+      $storage->restore($path_alias);
+    }
+    else {
+      $id = $database->insert('path_alias')
+        ->fields($values + ['uuid' => \Drupal::service('uuid')->generate()])
+        ->execute();
 
-    $revision_id = $database->insert('path_alias_revision')
-      ->fields($values + ['id' => $id, 'revision_default' => 1])
-      ->execute();
+      $revision_id = $database->insert('path_alias_revision')
+        ->fields($values + ['id' => $id, 'revision_default' => 1])
+        ->execute();
 
-    $database->update('path_alias')
-      ->fields(['revision_id' => $revision_id])
-      ->condition('id', $id)
-      ->execute();
+      $database->update('path_alias')
+        ->fields(['revision_id' => $revision_id])
+        ->condition('id', $id)
+        ->execute();
+    }
 
     // Increment the schema version.
     \Drupal::state()->set('update_test_schema_version', 8002);

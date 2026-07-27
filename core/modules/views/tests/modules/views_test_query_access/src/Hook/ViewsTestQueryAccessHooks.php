@@ -60,9 +60,10 @@ class ViewsTestQueryAccessHooks {
     $data_table = $table_mapping->getDataTable();
 
     // We are excluding entities by UUID, which means we need to be certain the
-    // base table is joined in the query.
+    // base table is joined in the query. Under JSON entity storage there is no
+    // data table, so the base table is always present in the query.
     $tables = $query->getTables();
-    if (isset($tables[$data_table]) && !isset($tables[$base_table])) {
+    if ($data_table !== NULL && isset($tables[$data_table]) && !isset($tables[$base_table])) {
       $data_table_alias = $tables[$data_table]['alias'];
       $id_key = $entity_type->getKey('id');
       $base_table = $query->innerJoin($base_table, NULL, "[$data_table_alias].[$id_key] = [$base_table].[$id_key]");

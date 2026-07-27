@@ -32,6 +32,12 @@ class DrupalCoreRecommendedBuilder extends DrupalPackageBuilder {
     // Make a list of packages we do not want to put in the 'require' section.
     $remove_list = [
       'composer/installers',
+      // The PostgreSQL driver is a Drupal module, not a dependency of
+      // drupal/core. It is installed into the modules directory, and sites
+      // choose for themselves whether to use it. Its own Composer plugin is
+      // only needed by sites that do so.
+      'daffie/drupal-core-pgsql-module-remover',
+      'daffie/pgsql',
       'drupal/core',
       // Guzzle regularly releases security fixes in only minor releases.
       'guzzlehttp/guzzle',

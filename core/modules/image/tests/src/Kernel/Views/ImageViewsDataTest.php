@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\image\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
@@ -55,8 +56,12 @@ class ImageViewsDataTest extends ViewsKernelTestBase {
       'field_name' => 'field_base_image',
       'bundle' => 'entity_test',
     ])->save();
+    // Under the pgsql JSON-storage driver an entity's field data is embedded
+    // in the entity base table rather than a dedicated field table, so the
+    // dedicated table's views data is collapsed onto the base table.
+    $json_storage = Database::getConnection()->supportsJsonEntityStorage();
     // Check the generated views data.
-    $views_data = Views::viewsData()->get('entity_test__field_base_image');
+    $views_data = Views::viewsData()->get($json_storage ? 'entity_test' : 'entity_test__field_base_image');
     $relationship = $views_data['field_base_image_target_id']['relationship'];
     $this->assertEquals('standard', $relationship['id']);
     $this->assertEquals('file_managed', $relationship['base']);
@@ -86,7 +91,7 @@ class ImageViewsDataTest extends ViewsKernelTestBase {
       'bundle' => 'entity_test_mul',
     ])->save();
     // Check the generated views data.
-    $views_data = Views::viewsData()->get('entity_test_mul__field_data_image');
+    $views_data = Views::viewsData()->get($json_storage ? 'entity_test_mul' : 'entity_test_mul__field_data_image');
     $relationship = $views_data['field_data_image_target_id']['relationship'];
     $this->assertEquals('standard', $relationship['id']);
     $this->assertEquals('file_managed', $relationship['base']);
@@ -96,7 +101,9 @@ class ImageViewsDataTest extends ViewsKernelTestBase {
     $views_data = Views::viewsData()->get('file_managed');
     $relationship = $views_data['reverse_field_data_image_entity_test_mul']['relationship'];
     $this->assertEquals('entity_reverse', $relationship['id']);
-    $this->assertEquals('entity_test_mul_property_data', $relationship['base']);
+    // Under pgsql the data table's views data is collapsed onto the entity
+    // base table, so the reverse relationship's base is the base table.
+    $this->assertEquals($json_storage ? 'entity_test_mul' : 'entity_test_mul_property_data', $relationship['base']);
     $this->assertEquals('id', $relationship['base field']);
     $this->assertEquals('entity_test_mul__field_data_image', $relationship['field table']);
     $this->assertEquals('field_data_image_target_id', $relationship['field field']);

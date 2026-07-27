@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel\EntityReference\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMul;
 use Drupal\entity_test\Entity\EntityTestMulChanged;
@@ -110,16 +111,37 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
 
     Views::viewsData()->clear();
 
-    // Check the generated views data.
-    $views_data = Views::viewsData()->get('entity_test__field_test_data');
-    $this->assertEquals('standard', $views_data['field_test_data']['relationship']['id']);
-    $this->assertEquals('entity_test_mul_property_data', $views_data['field_test_data']['relationship']['base']);
-    $this->assertEquals('id', $views_data['field_test_data']['relationship']['base field']);
-    $this->assertEquals('field_test_data_target_id', $views_data['field_test_data']['relationship']['relationship field']);
-    $this->assertEquals('entity_test_mul', $views_data['field_test_data']['relationship']['entity type']);
+    // Under the pgsql JSON-storage driver an entity's field data is embedded
+    // in the entity base table rather than a dedicated field table, so the
+    // field's views data — including the forward relationship — is homed on
+    // the entity base table and its "relationship field" carries the jsonb
+    // storage path. The reverse relationship works as-is: the pgsql query
+    // plugin reproduces the dedicated field table with a jsonb array unwind.
+    $json_storage = Database::getConnection()->supportsJsonEntityStorage();
 
-    // Check the backwards reference.
-    $views_data = Views::viewsData()->get('entity_test_mul_property_data');
+    // Check the generated views data.
+    if ($json_storage) {
+      $views_data = Views::viewsData()->get('entity_test');
+    }
+    else {
+      $views_data = Views::viewsData()->get('entity_test__field_test_data');
+    }
+    $this->assertEquals('standard', $views_data['field_test_data']['relationship']['id']);
+    $this->assertEquals('id', $views_data['field_test_data']['relationship']['base field']);
+    $this->assertEquals('entity_test_mul', $views_data['field_test_data']['relationship']['entity type']);
+    if ($json_storage) {
+      $this->assertEquals('entity_test_mul', $views_data['field_test_data']['relationship']['base']);
+      $this->assertEquals('entity_test__field_test_data.field_test_data_target_id', $views_data['field_test_data']['relationship']['relationship field']);
+    }
+    else {
+      $this->assertEquals('entity_test_mul_property_data', $views_data['field_test_data']['relationship']['base']);
+      $this->assertEquals('field_test_data_target_id', $views_data['field_test_data']['relationship']['relationship field']);
+    }
+
+    // Check the backwards reference. Under pgsql the data table's views data
+    // is collapsed onto the entity base table; the definition itself is
+    // unchanged.
+    $views_data = Views::viewsData()->get($json_storage ? 'entity_test_mul' : 'entity_test_mul_property_data');
     $this->assertEquals('entity_reverse', $views_data['reverse__entity_test__field_test_data']['relationship']['id']);
     $this->assertEquals('entity_test', $views_data['reverse__entity_test__field_test_data']['relationship']['base']);
     $this->assertEquals('id', $views_data['reverse__entity_test__field_test_data']['relationship']['base field']);
@@ -141,7 +163,12 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
       $this->assertEquals($this->entities[$index]->id(), $row->_entity->id());
 
       // Test the forward relationship.
-      $this->assertEquals(1, $row->entity_test_mul_property_data_entity_test__field_test_data_i);
+      if ($json_storage) {
+        $this->assertEquals(1, $row->entity_test_mul_entity_test_id);
+      }
+      else {
+        $this->assertEquals(1, $row->entity_test_mul_property_data_entity_test__field_test_data_i);
+      }
 
       // Test that the correct relationship entity is on the row.
       $this->assertEquals(1, $row->_relationship_entities['field_test_data']->id());
@@ -151,13 +178,20 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
     // Check the backwards reference view.
     $view = Views::getView('test_entity_reference_reverse_entity_test_view');
     $this->executeView($view);
+    $this->assertCount(count($this->entities), $view->result);
     /** @var \Drupal\views\ResultRow $row */
     foreach ($view->result as $index => $row) {
       $this->assertEquals(1, $row->id);
       $this->assertEquals(1, $row->_entity->id());
 
-      // Test the backwards relationship.
-      $this->assertEquals($this->entities[$index]->id(), $row->field_test_data_entity_test_mul_property_data_id);
+      // Test the backwards relationship. Under pgsql the relationship's
+      // collapsed table name shortens the field alias.
+      if ($json_storage) {
+        $this->assertEquals($this->entities[$index]->id(), $row->field_test_data_entity_test_mul_id);
+      }
+      else {
+        $this->assertEquals($this->entities[$index]->id(), $row->field_test_data_entity_test_mul_property_data_id);
+      }
 
       // Test that the correct relationship entity is on the row.
       $this->assertEquals($this->entities[$index]->id(), $row->_relationship_entities['reverse__entity_test__field_test_data']->id());
@@ -190,18 +224,34 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
 
     Views::viewsData()->clear();
 
+    $json_storage = Database::getConnection()->supportsJsonEntityStorage();
+
     // Check the generated views data.
-    $views_data = Views::viewsData()->get('entity_test_mul__field_data_test');
+    if ($json_storage) {
+      $views_data = Views::viewsData()->get('entity_test_mul');
+    }
+    else {
+      $views_data = Views::viewsData()->get('entity_test_mul__field_data_test');
+    }
     $this->assertEquals('standard', $views_data['field_data_test']['relationship']['id']);
     $this->assertEquals('entity_test', $views_data['field_data_test']['relationship']['base']);
     $this->assertEquals('id', $views_data['field_data_test']['relationship']['base field']);
-    $this->assertEquals('field_data_test_target_id', $views_data['field_data_test']['relationship']['relationship field']);
     $this->assertEquals('entity_test', $views_data['field_data_test']['relationship']['entity type']);
+    if ($json_storage) {
+      // entity_test_mul is translatable, so its dedicated field is nested in
+      // the translations context document.
+      $this->assertEquals('entity_test_mul_translations.entity_test_mul_translations__field_data_test.field_data_test_target_id', $views_data['field_data_test']['relationship']['relationship field']);
+    }
+    else {
+      $this->assertEquals('field_data_test_target_id', $views_data['field_data_test']['relationship']['relationship field']);
+    }
 
-    // Check the backwards reference.
+    // Check the backwards reference. Under pgsql the relationship's base —
+    // the referencing entity's data table — is remapped to the collapsed
+    // entity base table; the rest of the definition is unchanged.
     $views_data = Views::viewsData()->get('entity_test');
     $this->assertEquals('entity_reverse', $views_data['reverse__entity_test_mul__field_data_test']['relationship']['id']);
-    $this->assertEquals('entity_test_mul_property_data', $views_data['reverse__entity_test_mul__field_data_test']['relationship']['base']);
+    $this->assertEquals($json_storage ? 'entity_test_mul' : 'entity_test_mul_property_data', $views_data['reverse__entity_test_mul__field_data_test']['relationship']['base']);
     $this->assertEquals('id', $views_data['reverse__entity_test_mul__field_data_test']['relationship']['base field']);
     $this->assertEquals('entity_test_mul__field_data_test', $views_data['reverse__entity_test_mul__field_data_test']['relationship']['field table']);
     $this->assertEquals('field_data_test_target_id', $views_data['reverse__entity_test_mul__field_data_test']['relationship']['field field']);
@@ -221,7 +271,12 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
       $this->assertEquals($this->entities[$index]->id(), $row->_entity->id());
 
       // Test the forward relationship.
-      $this->assertEquals(1, $row->entity_test_entity_test_mul__field_data_test_id);
+      if ($json_storage) {
+        $this->assertEquals(1, $row->entity_test_entity_test_mul_id);
+      }
+      else {
+        $this->assertEquals(1, $row->entity_test_entity_test_mul__field_data_test_id);
+      }
 
       // Test that the correct relationship entity is on the row.
       $this->assertEquals(1, $row->_relationship_entities['field_data_test']->id());
@@ -232,6 +287,7 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
     // Check the backwards reference view.
     $view = Views::getView('test_entity_reference_reverse_entity_test_mul_view');
     $this->executeView($view);
+    $this->assertCount(count($this->entities), $view->result);
     /** @var \Drupal\views\ResultRow $row */
     foreach ($view->result as $index => $row) {
       $this->assertEquals(1, $row->id);
@@ -293,6 +349,13 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
    * Tests group by with optional and empty relationship.
    */
   public function testGroupByWithEmptyRelationships(): void {
+    // This view relates each entity_test to the entity_test_mul entities that
+    // reference it through an "entity_reverse" (reverse) relationship. Under
+    // the pgsql JSON-storage driver a referencing entity's field data is
+    // embedded in that entity's own base table, so there is no dedicated field
+    // table to reverse-join from; the pgsql query plugin reproduces it with a
+    // jsonb array unwind (@see
+    // \Drupal\pgsql\Plugin\views\query\ViewsQuery::rewriteJoin()).
     $entities = [];
     // Create 4 entities with name1 and 3 entities with name2.
     for ($i = 1; $i <= 4; $i++) {
@@ -359,9 +422,18 @@ class EntityReferenceRelationshipTest extends ViewsKernelTestBase {
     Views::viewsData()->clear();
     $views_data = Views::viewsData()->getAll();
     // Test that a relationship got added for content entities but not config
-    // entities.
-    $this->assertTrue(isset($views_data['entity_test__field_test_data']['field_test_data']['relationship']));
-    $this->assertFalse(isset($views_data['entity_test__field_test_config_entity']['field_test_config_entity']['relationship']));
+    // entities. Under the pgsql JSON-storage driver the field data is homed
+    // on the entity base table rather than a dedicated field table.
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      $data_table = 'entity_test';
+      $config_table = 'entity_test';
+    }
+    else {
+      $data_table = 'entity_test__field_test_data';
+      $config_table = 'entity_test__field_test_config_entity';
+    }
+    $this->assertTrue(isset($views_data[$data_table]['field_test_data']['relationship']));
+    $this->assertFalse(isset($views_data[$config_table]['field_test_config_entity']['relationship']));
   }
 
 }

@@ -93,9 +93,12 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * Tests updating entity schema when there are no existing entities.
    */
   public function testEntityTypeUpdateWithoutData(): void {
+    $json_entity_storage = $this->database->supportsJsonEntityStorage();
+    $revision_table = $json_entity_storage ? 'entity_test_update_all_revisions' : 'entity_test_update_revision';
+
     // The 'entity_test_update' entity type starts out non-revisionable, so
     // ensure the revision table hasn't been created during setUp().
-    $this->assertFalse($this->database->schema()->tableExists('entity_test_update_revision'), 'Revision table not created for entity_test_update.');
+    $this->assertFalse($this->database->schema()->tableExists($revision_table), 'Revision table not created for entity_test_update.');
 
     // Update it to be revisionable and ensure the definition update manager
     // reports that an update is needed.
@@ -115,7 +118,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
 
     // Run the update and ensure the revision table is created.
     $this->updateEntityTypeToRevisionable(TRUE);
-    $this->assertTrue($this->database->schema()->tableExists('entity_test_update_revision'), 'Revision table created for entity_test_update.');
+    $this->assertTrue($this->database->schema()->tableExists($revision_table), 'Revision table created for entity_test_update.');
   }
 
   /**
@@ -439,6 +442,14 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
     // Test that required columns are created as 'not null'.
     $this->addBundleField('shape_required');
     $this->applyEntityUpdates();
+    if ($this->database->supportsJsonEntityStorage()) {
+      // JSON entity storage embeds dedicated field data in the base row's JSON
+      // columns; there is no physical dedicated table with a NOT NULL
+      // column to insert into directly, so the relational integrity-constraint
+      // check below does not apply. The create/apply-updates path above is
+      // still exercised for the required ('shape_required') field.
+      return;
+    }
     $message = 'The new_bundle_field_shape column is not nullable.';
     $values = [
       'bundle' => $entity->bundle(),
@@ -500,29 +511,36 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
     // 'deleted' table name.
     $this->assertFalse($schema_handler->tableExists($dedicated_table_name), 'The dedicated table of the bundle field no longer exists.');
 
-    $dedicated_deleted_table_name = $table_mapping->getDedicatedDataTableName($storage_definition, TRUE);
+    if ($this->database->supportsJsonEntityStorage()) {
+      $dedicated_deleted_table_name = $table_mapping->getJsonStorageDedicatedTableName($storage_definition, $table_mapping->getBaseTable(), TRUE);
+    }
+    else {
+      $dedicated_deleted_table_name = $table_mapping->getDedicatedDataTableName($storage_definition, TRUE);
+    }
     $this->assertTrue($schema_handler->tableExists($dedicated_deleted_table_name), 'The dedicated table of the bundle fields has been renamed to use the "deleted" name.');
 
     // Check that the deleted field's data is preserved in the dedicated
     // 'deleted' table.
-    $result = $this->database->select($dedicated_deleted_table_name, 't')
-      ->fields('t')
-      ->execute()
-      ->fetchAll();
-    $this->assertCount(1, $result);
+    if (!$this->database->supportsJsonEntityStorage()) {
+      $result = $this->database->select($dedicated_deleted_table_name, 't')
+        ->fields('t')
+        ->execute()
+        ->fetchAll();
+      $this->assertCount(1, $result);
 
-    $expected = [
-      'bundle' => $entity->bundle(),
-      'deleted' => '1',
-      'entity_id' => $entity->id(),
-      'revision_id' => $entity->id(),
-      'langcode' => $entity->language()->getId(),
-      'delta' => '0',
-      'new_bundle_field_value' => $entity->new_bundle_field->value,
-    ];
-    // Use assertEquals and not assertSame here to prevent that a different
-    // sequence of the columns in the table will affect the check.
-    $this->assertEquals($expected, (array) $result[0]);
+      $expected = [
+        'bundle' => $entity->bundle(),
+        'deleted' => '1',
+        'entity_id' => $entity->id(),
+        'revision_id' => $entity->id(),
+        'langcode' => $entity->language()->getId(),
+        'delta' => '0',
+        'new_bundle_field_value' => $entity->new_bundle_field->value,
+      ];
+      // Use assertEquals and not assertSame here to prevent that a different
+      // sequence of the columns in the table will affect the check.
+      $this->assertEquals($expected, (array) $result[0]);
+    }
 
     // Check that the field definition is marked for purging.
     $deleted_field_definitions = \Drupal::service('entity_field.deleted_fields_repository')->getFieldDefinitions();
@@ -690,6 +708,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    */
   public function testSingleActionCalls(): void {
     $db_schema = $this->database->schema();
+    $revision_table = $this->database->supportsJsonEntityStorage() ? 'entity_test_update_all_revisions' : 'entity_test_update_revision';
 
     // Ensure that a non-existing entity type cannot be installed.
     $message = 'A non-existing entity type cannot be installed';
@@ -755,10 +774,10 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
 
     // Make the entity type revisionable.
     $this->updateEntityTypeToRevisionable();
-    $this->assertFalse($db_schema->tableExists('entity_test_update_revision'), "The 'entity_test_update_revision' does not exist before applying the update.");
+    $this->assertFalse($db_schema->tableExists($revision_table), "The '$revision_table' does not exist before applying the update.");
 
     $this->updateEntityTypeToRevisionable(TRUE);
-    $this->assertTrue($db_schema->tableExists('entity_test_update_revision'), "The 'entity_test_update_revision' table has been created.");
+    $this->assertTrue($db_schema->tableExists($revision_table), "The '$revision_table' table has been created.");
   }
 
   /**

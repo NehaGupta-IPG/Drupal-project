@@ -58,6 +58,12 @@ class ComponentsTaggedReleaseTest extends ComposerBuildTestBase {
     $this->copyCodebase($finder->getIterator());
     $drupal_root = $this->getWorkspaceDirectory();
 
+    // The daffie/pgsql package pins drupal/core to a real core version range,
+    // so it cannot coexist with the arbitrary tags applied below. It is an
+    // external dependency unrelated to the component release tagging being
+    // tested, so remove it before emulating the release script.
+    $this->removePgsqlRequirement($drupal_root);
+
     // Set the core version.
     Composer::setDrupalVersion($drupal_root, $tag);
     $this->assertDrupalVersion($tag, $drupal_root);
@@ -86,6 +92,20 @@ class ComponentsTaggedReleaseTest extends ComposerBuildTestBase {
         }
       }
     }
+  }
+
+  /**
+   * Removes the daffie/pgsql requirement from the workspace composer.json.
+   *
+   * @param string $drupal_root
+   *   The Drupal root directory.
+   */
+  protected function removePgsqlRequirement(string $drupal_root): void {
+    $composer_json_path = $drupal_root . '/composer.json';
+    $composer_json_data = json_decode(file_get_contents($composer_json_path), TRUE);
+    unset($composer_json_data['require']['daffie/pgsql']);
+    unset($composer_json_data['config']['allow-plugins']['daffie/drupal-core-pgsql-module-remover']);
+    file_put_contents($composer_json_path, json_encode($composer_json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
   }
 
 }

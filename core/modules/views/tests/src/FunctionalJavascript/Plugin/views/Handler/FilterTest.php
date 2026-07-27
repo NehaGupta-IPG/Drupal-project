@@ -84,8 +84,10 @@ class FilterTest extends WebDriverTestBase {
     $filtering_done = $this->waitForVisibleElementCount(1, 'tr.filterable-option');
     $this->assertTrue($filtering_done);
 
-    // Select the body field and apply the choice.
-    $page->checkField('name[node__body.body_value]');
+    // Select the body field and apply the choice. With JSON entity storage
+    // the dedicated field table is collapsed onto the entity base table.
+    $field_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node__body';
+    $page->checkField('name[' . $field_table . '.body_value]');
     $page->find('css', '.ui-dialog .ui-dialog-buttonpane')->pressButton('Add and configure filter criteria');
     $web_assert->waitForField('options[expose_button][checkbox][checkbox]');
 

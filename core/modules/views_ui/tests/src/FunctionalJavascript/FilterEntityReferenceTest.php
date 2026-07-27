@@ -71,12 +71,16 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     // Wait for the popup to open and the search field to be available.
     $assert->waitForField('override[controls][options_search]');
 
+    // With JSON entity storage the dedicated field table is collapsed onto
+    // the entity base table.
+    $field_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node__field_test';
+
     // Test that the both entity_reference and numeric options are visible.
-    $this->assertTrue($page->findField('name[node__field_test.field_test_target_id]')
+    $this->assertTrue($page->findField('name[' . $field_table . '.field_test_target_id]')
       ->isVisible());
-    $this->assertTrue($page->findField('name[node__field_test.field_test_target_id]')
+    $this->assertTrue($page->findField('name[' . $field_table . '.field_test_target_id]')
       ->isVisible());
-    $page->findField('name[node__field_test.field_test_target_id]')
+    $page->findField('name[' . $field_table . '.field_test_target_id]')
       ->click();
     $this->assertTrue($page->find('css', 'button.button.button--primary.form-submit.ui-button')
       ->isVisible());
@@ -193,9 +197,13 @@ class FilterEntityReferenceTest extends WebDriverTestBase {
     // Wait for the popup to open and the search field to be available.
     $assert->waitForField('override[controls][group]');
 
+    // With JSON entity storage the dedicated field table is collapsed onto
+    // the entity base table.
+    $field_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node__field_test_config';
+
     // Test that the entity_reference option is visible.
-    $this->assertTrue($page->findField('name[node__field_test_config.field_test_config_target_id]')->isVisible());
-    $page->findField('name[node__field_test_config.field_test_config_target_id]')->click();
+    $this->assertTrue($page->findField('name[' . $field_table . '.field_test_config_target_id]')->isVisible());
+    $page->findField('name[' . $field_table . '.field_test_config_target_id]')->click();
     $submitButton = $page->find('css', 'button.button.button--primary.form-submit.ui-button');
     $this->assertTrue($submitButton->isVisible());
     $submitButton->click();

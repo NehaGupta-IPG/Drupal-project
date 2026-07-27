@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\options\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use PHPUnit\Framework\Attributes\Group;
@@ -67,7 +68,12 @@ class ViewsDataTest extends OptionsTestBase {
    * Tests the option module's implementation of hook_field_views_data().
    */
   public function testOptionsFieldViewsData(): void {
-    $field_data = \Drupal::service('views.views_data')->get('entity_test__test_options');
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      $field_data = \Drupal::service('views.views_data')->get('entity_test');
+    }
+    else {
+      $field_data = \Drupal::service('views.views_data')->get('entity_test__test_options');
+    }
 
     // Check that the options module has properly overridden default views data.
     $test_options_field = $field_data['test_options_value'];

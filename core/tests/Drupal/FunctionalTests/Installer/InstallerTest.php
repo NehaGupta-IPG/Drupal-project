@@ -11,7 +11,7 @@ use Drupal\Core\Test\PerformanceTestRecorder;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cspell:ignore drupalmysqldriverdatabasemysql drupalpgsqldriverdatabasepgsql
+// cspell:ignore drupalmysqldriverdatabasemysql
 /**
  * Tests the interactive installer.
  */
@@ -89,7 +89,6 @@ class InstallerTest extends InstallerTestBase {
     // Assert that we use the by core supported database drivers by default and
     // not the ones from the driver_test module.
     $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupalmysqldriverdatabasemysql"]', 'MySQL, MariaDB, or equivalent');
-    $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupalpgsqldriverdatabasepgsql"]', 'PostgreSQL');
 
     parent::setUpSettings();
   }

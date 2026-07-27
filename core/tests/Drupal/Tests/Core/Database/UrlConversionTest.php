@@ -127,10 +127,6 @@ class UrlConversionTest extends UnitTestCase {
               'namespace' => 'Drupal\mysql',
               'autoload' => 'core/modules/mysql/src/',
             ],
-            'pgsql' => [
-              'namespace' => 'Drupal\pgsql',
-              'autoload' => 'core/modules/pgsql/src/',
-            ],
           ],
         ],
         TRUE,
@@ -151,59 +147,6 @@ class UrlConversionTest extends UnitTestCase {
             'mysql' => [
               'namespace' => 'Drupal\mysql',
               'autoload' => 'core/modules/mysql/src/',
-            ],
-            'pgsql' => [
-              'namespace' => 'Drupal\pgsql',
-              'autoload' => 'core/modules/pgsql/src/',
-            ],
-          ],
-        ],
-        TRUE,
-      ],
-      'PostgreSQL contrib test driver without prefix' => [
-        'DriverTestPgsql://test_user:test_pass@test_host:5432/test_database?module=driver_test',
-        [
-          'driver' => 'DriverTestPgsql',
-          'username' => 'test_user',
-          'password' => 'test_pass',
-          'host' => 'test_host',
-          'database' => 'test_database',
-          'port' => 5432,
-          'namespace' => 'Drupal\driver_test\Driver\Database\DriverTestPgsql',
-          'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTestPgsql/',
-          'dependencies' => [
-            'mysql' => [
-              'namespace' => 'Drupal\mysql',
-              'autoload' => 'core/modules/mysql/src/',
-            ],
-            'pgsql' => [
-              'namespace' => 'Drupal\pgsql',
-              'autoload' => 'core/modules/pgsql/src/',
-            ],
-          ],
-        ],
-        TRUE,
-      ],
-      'PostgreSQL contrib test driver with prefix' => [
-        'DriverTestPgsql://test_user:test_pass@test_host:5432/test_database?module=driver_test#bar',
-        [
-          'driver' => 'DriverTestPgsql',
-          'username' => 'test_user',
-          'password' => 'test_pass',
-          'host' => 'test_host',
-          'database' => 'test_database',
-          'prefix' => 'bar',
-          'port' => 5432,
-          'namespace' => 'Drupal\driver_test\Driver\Database\DriverTestPgsql',
-          'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTestPgsql/',
-          'dependencies' => [
-            'mysql' => [
-              'namespace' => 'Drupal\mysql',
-              'autoload' => 'core/modules/mysql/src/',
-            ],
-            'pgsql' => [
-              'namespace' => 'Drupal\pgsql',
-              'autoload' => 'core/modules/pgsql/src/',
             ],
           ],
         ],
@@ -234,32 +177,6 @@ class UrlConversionTest extends UnitTestCase {
           'port' => 3306,
           'namespace' => 'Drupal\mysql\Driver\Database\mysql',
           'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
-        ],
-        FALSE,
-      ],
-      'PostgreSql without the module name set' => [
-        'pgsql://test_user:test_pass@test_host/test_database',
-        [
-          'driver' => 'pgsql',
-          'username' => 'test_user',
-          'password' => 'test_pass',
-          'host' => 'test_host',
-          'database' => 'test_database',
-          'namespace' => 'Drupal\pgsql\Driver\Database\pgsql',
-          'autoload' => 'core/modules/pgsql/src/Driver/Database/pgsql/',
-        ],
-        FALSE,
-      ],
-      'PostgreSql with the module name pgsql' => [
-        'pgsql://test_user:test_pass@test_host/test_database?module=pgsql',
-        [
-          'driver' => 'pgsql',
-          'username' => 'test_user',
-          'password' => 'test_pass',
-          'host' => 'test_host',
-          'database' => 'test_database',
-          'namespace' => 'Drupal\pgsql\Driver\Database\pgsql',
-          'autoload' => 'core/modules/pgsql/src/Driver/Database/pgsql/',
         ],
         FALSE,
       ],
@@ -413,32 +330,6 @@ class UrlConversionTest extends UnitTestCase {
       'password' => 'test_pass',
       'prefix' => '',
       'host' => 'test_host',
-      'port' => '5432',
-      'driver' => 'DriverTestPgsql',
-      'namespace' => 'Drupal\\driver_test\\Driver\\Database\\DriverTestPgsql',
-      'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTestPgsql/',
-    ];
-    $expected_url7 = 'DriverTestPgsql://test_user:test_pass@test_host:5432/test_database?module=driver_test';
-
-    $info8 = [
-      'database' => 'test_database',
-      'username' => 'test_user',
-      'password' => 'test_pass',
-      'prefix' => 'pre',
-      'host' => 'test_host',
-      'port' => '5432',
-      'driver' => 'DriverTestPgsql',
-      'namespace' => 'Drupal\\driver_test\\Driver\\Database\\DriverTestPgsql',
-      'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTestPgsql/',
-    ];
-    $expected_url8 = 'DriverTestPgsql://test_user:test_pass@test_host:5432/test_database?module=driver_test#pre';
-
-    $info9 = [
-      'database' => 'test_database',
-      'username' => 'test_user',
-      'password' => 'test_pass',
-      'prefix' => '',
-      'host' => 'test_host',
       'port' => '3306',
       'driver' => 'DriverTestMysql',
       'namespace' => 'Drupal\\driver_test\\Driver\\Database\\DriverTestMysql',
@@ -448,13 +339,9 @@ class UrlConversionTest extends UnitTestCase {
           'namespace' => 'Drupal\mysql',
           'autoload' => 'core/modules/mysql/src/',
         ],
-        'pgsql' => [
-          'namespace' => 'Drupal\pgsql',
-          'autoload' => 'core/modules/pgsql/src/',
-        ],
       ],
     ];
-    $expected_url9 = 'DriverTestMysql://test_user:test_pass@test_host:3306/test_database?module=driver_test';
+    $expected_url7 = 'DriverTestMysql://test_user:test_pass@test_host:3306/test_database?module=driver_test';
 
     return [
       [$info1, $expected_url1],
@@ -464,8 +351,6 @@ class UrlConversionTest extends UnitTestCase {
       [$info5, $expected_url5],
       [$info6, $expected_url6],
       [$info7, $expected_url7],
-      [$info8, $expected_url8],
-      [$info9, $expected_url9],
     ];
   }
 

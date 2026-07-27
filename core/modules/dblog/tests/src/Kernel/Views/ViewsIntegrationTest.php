@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\dblog\Kernel\Views;
 
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Link;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
@@ -99,9 +100,18 @@ class ViewsIntegrationTest extends ViewsKernelTestBase {
     $view = Views::getView('dblog_integration_test');
     $view->setDisplay('page_1');
     // The uid relationship should now join to the {users_field_data} table.
+    // Under JSON entity storage the user field data is collapsed into the
+    // physical "users" base table (the logical "users_field_data" table does
+    // not exist), so the relationship is re-homed to "users" instead.
     $base_tables = $view->getBaseTables();
-    $this->assertArrayHasKey('users_field_data', $base_tables);
-    $this->assertArrayNotHasKey('users', $base_tables);
+    if (Database::getConnection()->supportsJsonEntityStorage()) {
+      $this->assertArrayHasKey('users', $base_tables);
+      $this->assertArrayNotHasKey('users_field_data', $base_tables);
+    }
+    else {
+      $this->assertArrayHasKey('users_field_data', $base_tables);
+      $this->assertArrayNotHasKey('users', $base_tables);
+    }
     $this->assertArrayHasKey('watchdog', $base_tables);
   }
 

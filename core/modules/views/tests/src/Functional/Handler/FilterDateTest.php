@@ -311,8 +311,9 @@ class FilterDateTest extends ViewTestBase {
   protected function _testFilterDatetimeUI(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer views']));
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_filter_date_between/default/filter');
+    $date_field = \Drupal::database()->supportsJsonEntityStorage() ? 'node.field_date_value' : 'node__field_date.field_date_value';
     $this->submitForm([
-      'name[node__field_date.field_date_value]' => 'node__field_date.field_date_value',
+      'name[' . $date_field . ']' => $date_field,
     ], 'Add and configure filter criteria');
 
     $this->submitForm([], 'Expose filter');

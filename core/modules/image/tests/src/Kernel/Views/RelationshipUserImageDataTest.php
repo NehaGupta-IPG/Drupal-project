@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\image\Kernel\Views;
 
+use Drupal\Core\Database\Database;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
@@ -101,12 +102,20 @@ class RelationshipUserImageDataTest extends ViewsKernelTestBase {
     ];
     $this->assertSame($expected, $view->getDependencies());
     $this->executeView($view);
+    // The file relationship is joined to the entity base table, so its auto
+    // generated field alias reflects that table. Under JSON entity storage the
+    // user field data is embedded in the "users" base table (the dedicated
+    // "user__user_picture" table does not exist), so the relationship alias —
+    // and therefore the fid column alias — is keyed on "users" instead.
+    $fid_alias = Database::getConnection()->supportsJsonEntityStorage()
+      ? 'file_managed_users_fid'
+      : 'file_managed_user__user_picture_fid';
     $expected_result = [
       [
-        'file_managed_user__user_picture_fid' => '2',
+        $fid_alias => '2',
       ],
     ];
-    $column_map = ['file_managed_user__user_picture_fid' => 'file_managed_user__user_picture_fid'];
+    $column_map = [$fid_alias => $fid_alias];
     $this->assertIdenticalResultset($view, $expected_result, $column_map);
   }
 

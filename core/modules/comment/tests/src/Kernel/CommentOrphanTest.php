@@ -106,10 +106,22 @@ class CommentOrphanTest extends EntityKernelTestBase {
     }
 
     // Make comment 2 an orphan by setting the property to an invalid value.
-    \Drupal::database()->update('comment_field_data')
-      ->fields([$property => 10])
-      ->condition('cid', 2)
-      ->execute();
+    $database = \Drupal::database();
+    if ($database->supportsJsonEntityStorage()) {
+      // Under JSON entity storage there is no physical comment_field_data
+      // table; the field data lives in a JSON translations document on the
+      // base table. Rewrite the property inside every translation element for
+      // the target comment.
+      $database->query("UPDATE {comment} SET __data_translations = jsonb_set(__data_translations, string_to_array('comment_translations', ','), (SELECT jsonb_agg(jsonb_set(elem, string_to_array(:prop, ','), to_jsonb(10))) FROM jsonb_array_elements(__data_translations -> 'comment_translations') elem)) WHERE cid = 2", [
+        ':prop' => $property,
+      ]);
+    }
+    else {
+      $database->update('comment_field_data')
+        ->fields([$property => 10])
+        ->condition('cid', 2)
+        ->execute();
+    }
     $comment_storage->resetCache();
     $node_storage->resetCache();
 

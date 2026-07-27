@@ -317,10 +317,15 @@ class HandlerFieldFieldTest extends KernelTestBase {
   protected function prepareView(ViewExecutable $view): void {
     $view->storage->invalidateCaches();
     $view->initDisplay();
+    // Under the pgsql (JSON) driver a content entity's dedicated field tables
+    // ("node__<field>") do not exist physically; their views data is collapsed
+    // onto the entity base table. Reference the collapsed base table so the
+    // field handlers resolve instead of falling back to the "broken" handler.
+    $json_storage = \Drupal::database()->supportsJsonEntityStorage();
     foreach ($this->fieldStorages as $field_storage) {
       $field_name = $field_storage->getName();
       $view->display_handler->options['fields'][$field_name]['id'] = $field_name;
-      $view->display_handler->options['fields'][$field_name]['table'] = 'node__' . $field_name;
+      $view->display_handler->options['fields'][$field_name]['table'] = $json_storage ? 'node' : 'node__' . $field_name;
       $view->display_handler->options['fields'][$field_name]['field'] = $field_name;
     }
   }

@@ -88,8 +88,16 @@ class ContentTranslationConfigImportTest extends KernelTestBase {
 
     // Verify that updates were performed.
     $entity_type = $this->container->get('entity_type.manager')->getDefinition($entity_type_id);
-    $table = $entity_type->getDataTable();
     $db_schema = $this->container->get('database')->schema();
+    if ($this->container->get('database')->supportsJsonEntityStorage()) {
+      // JSON storage has no physical data table; the content translation
+      // metadata fields are shared translatable fields, so they live in the
+      // entity's translations document instead.
+      $table = $this->container->get('entity_type.manager')->getStorage($entity_type_id)->getJsonStorageTranslationsTable();
+    }
+    else {
+      $table = $entity_type->getDataTable();
+    }
     $result = $db_schema->fieldExists($table, 'content_translation_source') && $db_schema->fieldExists($table, 'content_translation_outdated');
     $this->assertTrue($result, 'Content translation updates were successfully performed during config import.');
   }

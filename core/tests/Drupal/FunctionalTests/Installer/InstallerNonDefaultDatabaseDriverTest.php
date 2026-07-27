@@ -9,7 +9,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore drupaldriver testdriverdatabasedrivertestmysql
-// cspell:ignore testdriverdatabasedrivertestpgsql
 /**
  * Tests the interactive installer.
  */
@@ -35,7 +34,7 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
    */
   protected function setUpSettings(): void {
     $driver = Database::getConnection()->driver();
-    if (!in_array($driver, ['mysql', 'pgsql'])) {
+    if ($driver !== 'mysql') {
       $this->markTestSkipped("This test does not support the {$driver} database driver.");
     }
     $driverNamespace = Database::getConnection()->getConnectionOptions()['namespace'];
@@ -45,7 +44,6 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
     // Assert that we are using the database drivers from the driver_test
     // module.
     $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupaldriver-testdriverdatabasedrivertestmysql"]', 'MySQL by the driver_test module');
-    $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupaldriver-testdriverdatabasedrivertestpgsql"]', 'PostgreSQL by the driver_test module');
 
     $settings = $this->parameters['forms']['install_settings_form'];
 
@@ -74,10 +72,6 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
         'namespace' => 'Drupal\\mysql',
         'autoload' => 'core/modules/mysql/src/',
       ],
-      'pgsql' => [
-        'namespace' => 'Drupal\\pgsql',
-        'autoload' => 'core/modules/pgsql/src/',
-      ],
     ], $installedDatabaseSettings['default']['default']['dependencies']);
 
     // Assert that the module "driver_test" and its dependencies have been
@@ -85,15 +79,13 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
     $this->drupalGet('admin/modules');
     $this->assertSession()->checkboxChecked('modules[driver_test][enable]');
     $this->assertSession()->checkboxChecked('modules[mysql][enable]');
-    $this->assertSession()->checkboxChecked('modules[pgsql][enable]');
 
     // The module "driver_test" can not be uninstalled, because it is providing
-    // the database driver. Also, the "mysql" and "pgsql" modules can not be
-    // uninstalled being dependencies of the "driver_test" module.
+    // the database driver. Also, the "mysql" module can not be uninstalled
+    // being a dependency of the "driver_test" module.
     $this->drupalGet('admin/modules/uninstall');
     $this->assertSession()->elementTextContains('xpath', '//tr[@data-drupal-selector="edit-driver-test"]', "The following reason prevents Contrib database driver test from being uninstalled: The module 'Contrib database driver test' is providing the database driver '{$this->testDriverName}'.");
     $this->assertSession()->elementTextContains('xpath', '//tr[@data-drupal-selector="edit-mysql"]', "The following reason prevents MySQL from being uninstalled: Required by: Contrib database driver test (driver_test)");
-    $this->assertSession()->elementTextContains('xpath', '//tr[@data-drupal-selector="edit-pgsql"]', "The following reason prevents PostgreSQL from being uninstalled: Required by: Contrib database driver test (driver_test)");
   }
 
   /**

@@ -136,7 +136,11 @@ class ExposedFormUITest extends UITestBase {
     // Test adding a new exposed sort criteria.
     $view_id = $this->randomView()['id'];
     $this->drupalGet("admin/structure/views/nojs/add-handler/$view_id/default/sort");
-    $this->submitForm(['name[node_field_data.created]' => 1], 'Add and configure sort criteria');
+    // Under the pgsql (JSON) driver a content entity's field data is collapsed
+    // onto the entity base table, so the add-handler checkboxes are keyed by
+    // the base table.
+    $node_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node_field_data';
+    $this->submitForm(["name[$node_table.created]" => 1], 'Add and configure sort criteria');
     $this->assertSession()->fieldValueEquals('options[order]', 'ASC');
     // Change the order and expose the sort.
     $this->submitForm(['options[order]' => 'DESC'], 'Apply');
@@ -248,7 +252,10 @@ class ExposedFormUITest extends UITestBase {
 
     // Ensure the string "0" can be used as a value for numeric filters.
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_exposed_admin_ui/default/filter');
-    $this->submitForm(['name[node_field_data.nid]' => TRUE], 'Add and configure filter criteria');
+    // Under the pgsql (JSON) driver a content entity's field data is collapsed
+    // onto the entity base table.
+    $node_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node_field_data';
+    $this->submitForm(["name[$node_table.nid]" => TRUE], 'Add and configure filter criteria');
     $this->submitForm([], 'Expose filter');
     $this->submitForm([], 'Grouped filters');
     $edit = [];
@@ -361,7 +368,10 @@ class ExposedFormUITest extends UITestBase {
 
     // Click the Expose filter button.
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_exposed_admin_ui/default/filter');
-    $this->submitForm(['name[node_field_data.status]' => 1], 'Add and configure filter criteria');
+    // Under the pgsql (JSON) driver a content entity's field data is collapsed
+    // onto the entity base table.
+    $node_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node_field_data';
+    $this->submitForm(["name[$node_table.status]" => 1], 'Add and configure filter criteria');
     $this->drupalGet('admin/structure/views/nojs/handler/test_exposed_admin_ui/default/filter/status');
     $this->submitForm([], 'Expose filter');
     // Select 'Grouped filters' radio button.

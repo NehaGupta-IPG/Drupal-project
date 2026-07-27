@@ -29,3 +29,9 @@ update_test.settings:
       sequence:
         type: string
         label: 'Value'
+    allowed_projects:
+      type: sequence
+      label: 'Allowed projects'
+      sequence:
+        type: string
+        label: 'Project name'
