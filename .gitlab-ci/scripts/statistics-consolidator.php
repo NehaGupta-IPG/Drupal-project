@@ -49,7 +49,6 @@ $files = $finder->files()->in($args[1])->name('deprecation-statistics-*.json');
 
 $tmp = [];
 $tmp_test = [];
-$tmp_deprecation = [];
 foreach ($files as $file) {
   $contents = json_decode($file->getContents(), TRUE);
   dump([$file->getRealPath(), $contents['metadata'], $contents['metadata']['php_version'] === $phpVersion ? 'MATCH' : '**MISS**']);
@@ -63,14 +62,11 @@ foreach ($files as $file) {
     if ($data['ignoreDeprecations']) {
       $tmp_test[$testId] = isset($data['ignoredByPhpunit']) ? count($data['ignoredByPhpunit']) : 0;
     }
-    $tmp_deprecation[] = $data;
   }
 }
 
 $outputFile = $args[1] . \DIRECTORY_SEPARATOR . "deprecation-statistics-consolidated.json";
-file_put_contents($outputFile, json_encode($tmp));
-file_put_contents($outputFile, json_encode($tmp_test), \FILE_APPEND);
-file_put_contents($outputFile, json_encode($tmp_deprecation), \FILE_APPEND);
+file_put_contents($outputFile, json_encode(['skips' => $tmp, 'tests' => $tmp_test]));
 
 echo "\n\nDeprecation skips statistics\n";
 echo "-----------+----------------------------------------------------------------------\n";
@@ -103,7 +99,3 @@ foreach ($tmp_test as $test => $ignored) {
   echo sprintf($msg . "\n", $ignored, trim_with_ellipsis(rtrim($test, "\n"), 80, \STR_PAD_RIGHT));
 }
 echo "-----------+----------------------------------------------------------------------\n";
-
-// ksort($tmp_deprecation);.
-// echo "\n\nDeprecations\n";.
-// dump($tmp_deprecation);.

@@ -40,10 +40,13 @@ foreach ($files as $file) {
     $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
   }
   foreach ($contents['tests'] as $testId => $data) {
-    if ($data['ignoreDeprecations'] || isset($data['reported'])) {
-      $tmp_test[$testId] = $data;
+    if (isset($tmp_test[$testId])) {
+      echo $testId . " is already consolidated.\n";
+      exit(2);
     }
+    $tmp_test[$testId] = $data;
   }
+  unlink($file->getPathName());
 }
 
 file_put_contents($args[2], json_encode([

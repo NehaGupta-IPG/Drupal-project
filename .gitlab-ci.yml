@@ -211,16 +211,15 @@ default:
     # Need to pass this along directly.
     - time sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_NODE_INDEX --ci-parallel-node-total $CI_NODE_TOTAL
   after_script:
-    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+    - sed -i "s#$CI_PROJECT_DIR/##" $_ARTIFACTS_DIR/phpunit-*.xml || true
     - php .gitlab-ci/scripts/statistics-job-consolidator.php $_ARTIFACTS_DIR/deprecation-handler/jobs $_ARTIFACTS_DIR/deprecation-statistics-$CI_JOB_ID.json
   artifacts:
     when: always
     expire_in: 6 mos
     reports:
-      junit: ./sites/default/files/simpletest/phpunit-*.xml
+      junit: $_ARTIFACTS_DIR/phpunit-*.xml
     paths:
-      - test-artifacts
-      - ./sites/default/files/simpletest/phpunit-*.xml
+      - $_ARTIFACTS_DIR
       - ./sites/simpletest/browser_output
       - '*.log'
 
@@ -431,7 +430,9 @@ default:
     TESTSUITE: build
     KUBERNETES_CPU_REQUEST: "16"
     CONCURRENCY: "8"
-    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
+    _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
+    DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version,database-driver,database-version"
+    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
     # No parallel for this job, setup manually the env variables that need to
     # be passed to run-tests.sh command line options.
     CI_NODE_INDEX: 1
@@ -494,7 +495,9 @@ default:
     TESTSUITE: functional-javascript
     CONCURRENCY: "12"
     KUBERNETES_CPU_REQUEST: "14"
-    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
+    _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
+    DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version,database-driver,database-version"
+    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
@@ -509,7 +512,9 @@ default:
     TESTSUITE: functional
     CONCURRENCY: "24"
     KUBERNETES_CPU_REQUEST: "14"
-    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
+    _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
+    DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version,database-driver,database-version"
+    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
   services:
     - <<: *with-database
 
@@ -519,8 +524,8 @@ default:
   variables:
     TESTSUITE: kernel
     KUBERNETES_CPU_REQUEST: "12"
-    _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
     CONCURRENCY: "24"
+    _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
     DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version,database-driver,database-version"
     DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
   services:
