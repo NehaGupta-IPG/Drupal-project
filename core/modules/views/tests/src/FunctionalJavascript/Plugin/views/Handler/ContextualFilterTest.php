@@ -66,7 +66,10 @@ class ContextualFilterTest extends WebDriverTestBase {
 
     $page->clickLink('views-add-argument');
 
-    $field = $web_assert->waitForField('name[node_field_data.nid]');
+    // With JSON entity storage the data table is collapsed onto the entity
+    // base table.
+    $data_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node_field_data';
+    $field = $web_assert->waitForField('name[' . $data_table . '.nid]');
     $this->assertNotEmpty($field);
     $field->check();
 
