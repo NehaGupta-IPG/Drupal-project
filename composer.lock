@@ -333,12 +333,12 @@
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/daffie/pgsql.git",
-                "reference": "4a407c92c5875724ca7a8d899aec3ae278e87b23"
+                "reference": "76665f664b1f41f5fa18ec7d7d1ddc4792007738"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/daffie%2Fpgsql/repository/archive.zip?sha=4a407c92c5875724ca7a8d899aec3ae278e87b23",
-                "reference": "4a407c92c5875724ca7a8d899aec3ae278e87b23",
+                "url": "https://gitlab.com/api/v4/projects/daffie%2Fpgsql/repository/archive.zip?sha=76665f664b1f41f5fa18ec7d7d1ddc4792007738",
+                "reference": "76665f664b1f41f5fa18ec7d7d1ddc4792007738",
                 "shasum": ""
             },
             "require": {
@@ -365,7 +365,7 @@
                 "issues": "https://gitlab.com/daffie/pgsql/-/issues",
                 "source": "https://gitlab.com/daffie/pgsql/-/tree/main"
             },
-            "time": "2026-07-27T07:53:34+00:00"
+            "time": "2026-07-27T15:35:08+00:00"
         },
         {
             "name": "doctrine/lexer",
