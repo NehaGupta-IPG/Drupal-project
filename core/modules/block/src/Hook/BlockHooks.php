@@ -4,6 +4,8 @@ namespace Drupal\block\Hook;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\ConfigurableLanguageInterface;
@@ -293,41 +295,58 @@ class BlockHooks {
   protected function themeInitialize(string $theme): void {
     $storage = \Drupal::entityTypeManager()->getStorage('block');
 
-    // Initialize theme's blocks if none already registered.
-    $has_blocks = $storage->loadByProperties(['theme' => $theme]);
-    if (!$has_blocks) {
-      $theme_extension = $this->themeHandler->getTheme($theme);
-      // Apply only to new theme's visible regions.
-      $regions = $theme_extension->listVisibleRegions();
-      $source_theme = \Drupal::configFactory()->get('system.theme')->get('default');
-      $source_theme_blocks = [];
-      if (!empty($theme_extension->base_theme) && $this->themeHandler->themeExists($theme_extension->base_theme)) {
-        $source_theme_blocks = $storage->loadByProperties(['theme' => $theme_extension->base_theme]);
-        if (count($source_theme_blocks) > 0) {
-          $source_theme = $theme_extension->base_theme;
-        }
+    // Only initialize themes that do not already have blocks registered.
+    if ($storage->loadByProperties(['theme' => $theme])) {
+      return;
+    }
+
+    $theme_extension = $this->themeHandler->getTheme($theme);
+    [$source_theme, $source_theme_blocks] = $this->getSourceThemeBlocks($theme_extension, $storage);
+
+    // Apply only to the new theme's visible regions.
+    $regions = $theme_extension->listVisibleRegions();
+    $block_repository = \Drupal::service('block.repository');
+    foreach ($source_theme_blocks as $source_theme_block_id => $source_theme_block) {
+      $id = str_starts_with($source_theme_block_id, $source_theme . '_')
+        ? str_replace($source_theme . '_', '', $source_theme_block_id)
+        : $source_theme_block_id;
+      $id = $block_repository->getUniqueMachineName($id, $theme);
+      $block = $source_theme_block->createDuplicateBlock($id, $theme);
+      // If the region isn't supported by the theme, assign the block to the
+      // theme's default region.
+      if (!isset($regions[$block->getRegion()])) {
+        $block->setRegion($theme_extension->getDefaultRegion());
       }
-      if (count($source_theme_blocks) === 0) {
-        $source_theme_blocks = $storage->loadByProperties(['theme' => $source_theme]);
-      }
-      $block_repository = \Drupal::service('block.repository');
-      foreach ($source_theme_blocks as $source_theme_block_id => $source_theme_block) {
-        if (str_starts_with($source_theme_block_id, $source_theme . '_')) {
-          $id = str_replace($source_theme . '_', '', $source_theme_block_id);
-        }
-        else {
-          $id = $source_theme_block_id;
-        }
-        $id = $block_repository->getUniqueMachineName($id, $theme);
-        $block = $source_theme_block->createDuplicateBlock($id, $theme);
-        // If the region isn't supported by the theme, assign the block to the
-        // theme's default region.
-        if (!isset($regions[$block->getRegion()])) {
-          $block->setRegion($theme_extension->getDefaultRegion());
-        }
-        $block->save();
+      $block->save();
+    }
+  }
+
+  /**
+   * Determines which theme's blocks to copy for a newly initialized theme.
+   *
+   * Prefers the new theme's base theme, if it exists, is installed, and
+   * already has blocks assigned. Falls back to the site's default theme
+   * otherwise.
+   *
+   * @param \Drupal\Core\Extension\Extension $theme_extension
+   *   The theme extension being initialized.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   *   The block entity storage.
+   *
+   * @return array{0: string, 1: \Drupal\block\BlockInterface[]}
+   *   A two-item array containing the source theme name and the blocks to
+   *   copy from it.
+   */
+  protected function getSourceThemeBlocks(Extension $theme_extension, EntityStorageInterface $storage): array {
+    if (!empty($theme_extension->base_theme) && $this->themeHandler->themeExists($theme_extension->base_theme)) {
+      $base_theme_blocks = $storage->loadByProperties(['theme' => $theme_extension->base_theme]);
+      if (count($base_theme_blocks) > 0) {
+        return [$theme_extension->base_theme, $base_theme_blocks];
       }
     }
+
+    $default_theme = \Drupal::configFactory()->get('system.theme')->get('default');
+    return [$default_theme, $storage->loadByProperties(['theme' => $default_theme])];
   }
 
 }
