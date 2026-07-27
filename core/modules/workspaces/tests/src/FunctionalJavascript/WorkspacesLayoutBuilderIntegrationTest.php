@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\FunctionalJavascript;
 
+use Drupal\Core\Url;
 use Drupal\Tests\layout_builder\FunctionalJavascript\InlineBlockTestBase;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
 use Drupal\Tests\workspaces\Functional\WorkspaceTestUtilities;
@@ -72,11 +73,30 @@ class WorkspacesLayoutBuilderIntegrationTest extends InlineBlockTestBase {
       'layout[enabled]' => TRUE,
       'layout[allow_custom]' => TRUE,
     ], 'Save');
+    // The submit click does not block until the new page has loaded, so wait
+    // for the link to appear.
+    $this->assertNotEmpty($this->assertSession()->waitForLink('Manage layout'));
     $this->clickLink('Manage layout');
     $this->assertSession()->addressEquals(static::FIELD_UI_PREFIX . '/display/default/layout');
     // Add a basic block with the body field set.
     $this->addInlineBlockToLayout('Block title', 'The DEFAULT block body');
     $this->assertSaveLayout();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function drupalLogout(): void {
+    $assert_session = $this->assertSession();
+    $destination = Url::fromRoute('user.page')->toString();
+    $this->drupalGet(Url::fromRoute('user.logout.confirm', options: ['query' => ['destination' => $destination]]));
+    $this->submitForm([], 'op', 'user-logout-confirm');
+    // The submit click does not block until the new page has loaded, so wait
+    // for the login page to appear.
+    $this->assertNotEmpty($assert_session->waitForField('name'));
+    $assert_session->fieldExists('pass');
+
+    $this->drupalResetSession();
   }
 
   /**

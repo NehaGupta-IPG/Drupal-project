@@ -27,6 +27,30 @@ trait WorkspaceTestUtilities {
   protected $switcherBlockConfigured = FALSE;
 
   /**
+   * Waits for the given text to appear on the page.
+   *
+   * Unlike \Drupal\FunctionalJavascriptTests\JSWebAssert::waitForText(), this
+   * works with any Mink driver, so it can be used in both Functional and
+   * FunctionalJavascript tests. On drivers without JavaScript support the
+   * text is present on the first iteration.
+   *
+   * @param string $text
+   *   The text to wait for.
+   */
+  protected function waitForPageText(string $text): void {
+    $this->getSession()->getPage()->waitFor(10, function () use ($text) {
+      try {
+        return str_contains($this->getSession()->getPage()->getText(), $text);
+      }
+      catch (\Exception) {
+        // The page might be mid-navigation, in which case reading it can
+        // fail. Keep waiting.
+        return FALSE;
+      }
+    });
+  }
+
+  /**
    * Loads a single entity by its label.
    *
    * The UI approach to creating an entity doesn't make it easy to know what
@@ -147,6 +171,9 @@ trait WorkspaceTestUtilities {
     $session = $this->assertSession();
     $session->buttonExists('Activate');
     $this->submitForm(['workspace_id' => $workspace->id()], 'Activate');
+    // On WebDriver-based tests the submit click does not block until the new
+    // page has loaded, so wait for the confirmation message to appear.
+    $this->waitForPageText($workspace->label() . ' is now the active workspace.');
     $session->pageTextContains($workspace->label() . ' is now the active workspace.');
     // Keep the test runner in sync with the system under test.
     \Drupal::service('workspaces.manager')->setActiveWorkspace($workspace);
@@ -162,6 +189,9 @@ trait WorkspaceTestUtilities {
     /** @var \Drupal\Tests\WebAssert $session */
     $session = $this->assertSession();
     $this->submitForm([], 'Switch to Live');
+    // On WebDriver-based tests the submit click does not block until the new
+    // page has loaded, so wait for the confirmation message to appear.
+    $this->waitForPageText('You are now viewing the live version of the site.');
     $session->pageTextContains('You are now viewing the live version of the site.');
     // Keep the test runner in sync with the system under test.
     \Drupal::service('workspaces.manager')->switchToLive();

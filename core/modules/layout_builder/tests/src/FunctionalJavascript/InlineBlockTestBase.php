@@ -90,13 +90,15 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
     // Reload the page to prevent random failures.
     $this->drupalGet($this->getUrl());
     $page->pressButton('Save layout');
-    $this->assertNotEmpty($assert_session->waitForElement('css', '.messages--status'));
 
+    // The layout page contains a status message even before saving, so
+    // waiting for a '.messages--status' element would match the current page
+    // before the redirect. Wait for the confirmation message text instead.
     if (stristr($this->getUrl(), 'admin/structure') === FALSE) {
-      $assert_session->pageTextContains('The layout override has been saved.');
+      $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
     }
     else {
-      $assert_session->pageTextContains('The layout has been saved.');
+      $this->assertTrue($assert_session->waitForText('The layout has been saved.'));
     }
   }
 
