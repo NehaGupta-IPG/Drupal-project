@@ -231,7 +231,7 @@ class CommentTypeTest extends CommentTestBase {
   /**
    * Tests that the provider of the target entity is listed as a dependency.
    */
-  public function testCalculateDependencies() {
+  public function testCalculateDependencies(): void {
     // Create a comment type programmatically.
     $comment_type = $this->createCommentType('dep_test');
     $target_entity_type = \Drupal::entityTypeManager()->getDefinition($comment_type->getTargetEntityTypeId());
