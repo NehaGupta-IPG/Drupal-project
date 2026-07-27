@@ -67,17 +67,36 @@ class MultiCardinalitySpineTest extends EntityKernelTestBase {
     $id = $entity->id();
 
     // Introduce a sparse delta: delete the middle value of field_a directly in
-    // the dedicated table, leaving deltas 0, 2, 3. The highest cardinality
+    // the stored field data, leaving deltas 0, 2, 3. The highest cardinality
     // field would not contain delta 1 as a spine.
-    \Drupal::database()->delete('entity_test_mulrev__field_a')
-      ->condition('entity_id', $id)
-      ->condition('langcode', 'en')
-      ->condition('delta', 1)
-      ->execute();
+    $database = \Drupal::database();
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage('entity_test_mulrev');
+    if ($database->supportsJsonEntityStorage()) {
+      // Under JSON entity storage there is no physical dedicated field table;
+      // the field data lives as embedded rows in the current-revision JSON
+      // document on the base table. Remove the delta 1 element of field_a for
+      // the 'en' translation from every embedded row.
+      /** @var \Drupal\pgsql\EntityStorage\JsonTableMapping $table_mapping */
+      $table_mapping = $storage->getTableMapping();
+      $context_table = $table_mapping->getJsonStorageCurrentRevisionTable();
+      $field_storage = FieldStorageConfig::loadByName('entity_test_mulrev', 'field_a');
+      $embedded_table = $table_mapping->getJsonStorageDedicatedTableName($field_storage, $context_table);
+      $database->query("UPDATE {entity_test_mulrev} SET __data_current_revision = jsonb_set(__data_current_revision, string_to_array(:context, ','), (SELECT jsonb_agg(CASE WHEN jsonb_exists(context_row, :embedded) THEN jsonb_set(context_row, string_to_array(:embedded, ','), COALESCE((SELECT jsonb_agg(field_row) FROM jsonb_array_elements(context_row -> :embedded) field_row WHERE (field_row ->> 'langcode') <> 'en' OR (field_row ->> 'delta')::int <> 1), '[]'::jsonb)) ELSE context_row END) FROM jsonb_array_elements(__data_current_revision -> :context) context_row)) WHERE id = :id", [
+        ':context' => $context_table,
+        ':embedded' => $embedded_table,
+        ':id' => $id,
+      ]);
+    }
+    else {
+      $database->delete('entity_test_mulrev__field_a')
+        ->condition('entity_id', $id)
+        ->condition('langcode', 'en')
+        ->condition('delta', 1)
+        ->execute();
+    }
 
-    $this->container->get('entity_type.manager')
-      ->getStorage('entity_test_mulrev')
-      ->resetCache();
+    $storage->resetCache();
 
     $loaded = EntityTestMulRev::load($id);
     $this->assertSame(['10', '12', '13'], array_column($loaded->get('field_a')->getValue(), 'value'));
