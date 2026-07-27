@@ -219,7 +219,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
         $cache_value = [
           'path' => $path,
           'query' => $query_parameters,
-          'routes' => $has_routes ? FALSE : $routes,
+          'routes' => $has_routes ? $routes : FALSE,
         ];
         $this->cache->set($cid, $cache_value, CacheBackendInterface::CACHE_PERMANENT, ['route_match']);
       }
