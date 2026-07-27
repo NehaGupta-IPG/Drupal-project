@@ -104,6 +104,9 @@ class FormPreprocess {
     // Add element #id for #type 'item'.
     if (isset($element['#markup']) && !empty($element['#id'])) {
       $variables['attributes']['id'] = $element['#id'];
+      if (!empty($element['#non_labelable'])) {
+        $variables['attributes']['aria-describedby'] = $element['#id'] . '--label';
+      }
     }
 
     // Pass elements #type and #name to template.
@@ -144,7 +147,8 @@ class FormPreprocess {
     // Add label_display and label variables to template.
     $variables['label_display'] = $element['#title_display'];
     $variables['label'] = ['#theme' => 'form_element_label'];
-    $variables['label'] += array_intersect_key($element, array_flip(['#id', '#required', '#title', '#title_display']));
+    $properties = ['#id', '#non_labelable', '#required', '#title', '#title_display', '#title_tag'];
+    $variables['label'] += array_intersect_key($element, array_flip($properties));
     $variables['label']['#attributes'] = $element['#label_attributes'];
     if (!empty($element['#label_for'])) {
       $variables['label']['#for'] = $element['#label_for'];
@@ -188,11 +192,14 @@ class FormPreprocess {
       $variables['title'] = ['#markup' => $element['#title']];
     }
 
+    $variables['non_labelable'] = !empty($element['#non_labelable']);
+    $variables['tag'] = $element['#title_tag'] ?? ($variables['non_labelable'] ? 'span' : 'label');
+
     // Pass elements title_display to template.
     $variables['title_display'] = $element['#title_display'];
 
     // A #for property of a dedicated #type 'label' element as precedence.
-    if (!empty($element['#for'])) {
+    if (!empty($element['#for']) && $variables['tag'] === 'label') {
       $variables['attributes']['for'] = $element['#for'];
       // A custom #id allows the referenced form input element to refer back to
       // the label element; e.g., in the 'aria-labelledby' attribute.
@@ -201,8 +208,11 @@ class FormPreprocess {
       }
     }
     // Otherwise, point to the #id of the form input element.
-    elseif (!empty($element['#id'])) {
+    elseif (!empty($element['#id']) && $variables['tag'] === 'label') {
       $variables['attributes']['for'] = $element['#id'];
+    }
+    elseif ($variables['non_labelable'] && !empty($element['#id'])) {
+      $variables['attributes']['id'] = $element['#id'] . '--label';
     }
 
     // Pass elements required to template.
