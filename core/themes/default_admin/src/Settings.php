@@ -6,6 +6,7 @@ namespace Drupal\default_admin;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -32,12 +33,15 @@ final class Settings implements ContainerInjectionInterface {
    *   The user data service.
    * @param \Drupal\Core\Extension\ThemeSettingsProvider $themeSettingsProvider
    *   The theme settings provider.
+   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
+   *   The theme handler.
    */
   public function __construct(
     protected AccountInterface $currentUser,
     protected ConfigFactoryInterface $configFactory,
     protected ?UserDataInterface $userData,
     protected ThemeSettingsProvider $themeSettingsProvider,
+    protected ThemeHandlerInterface $themeHandler,
   ) {
   }
 
@@ -50,6 +54,7 @@ final class Settings implements ContainerInjectionInterface {
       $container->get('config.factory'),
       $container->get('user.data', ContainerInterface::NULL_ON_INVALID_REFERENCE),
       $container->get(ThemeSettingsProvider::class),
+      $container->get('theme_handler'),
     );
   }
 
@@ -88,8 +93,7 @@ final class Settings implements ContainerInjectionInterface {
       $value = $settings[$name] ?? $this->userData->get('default_admin', $account->id(), $name);
     }
     if (is_null($value)) {
-      $admin_theme = $this->getAdminTheme();
-      $value = $this->themeSettingsProvider->getSetting($name, $admin_theme);
+      $value = $this->getThemeSetting($name);
     }
     return $value;
   }
@@ -104,8 +108,7 @@ final class Settings implements ContainerInjectionInterface {
    *   The current value.
    */
   public function getDefault(string $name): mixed {
-    $admin_theme = $this->getAdminTheme();
-    return $this->themeSettingsProvider->getSetting($name, $admin_theme);
+    return $this->getThemeSetting($name);
   }
 
   /**
@@ -147,8 +150,7 @@ final class Settings implements ContainerInjectionInterface {
    *   otherwise.
    */
   public function allowUserOverrides(): bool {
-    $admin_theme = $this->getAdminTheme();
-    return $this->themeSettingsProvider->getSetting('show_user_theme_settings', $admin_theme) ?? FALSE;
+    return (bool) $this->getThemeSetting('show_user_theme_settings');
   }
 
   /**
@@ -190,8 +192,7 @@ final class Settings implements ContainerInjectionInterface {
     if (!$account) {
       $account = $this->currentUser;
     }
-    $admin_theme = $this->getAdminTheme();
-    return $this->themeSettingsProvider->getSetting($name, $admin_theme) !== $this->get($name, $account);
+    return $this->getThemeSetting($name) !== $this->get($name, $account);
   }
 
   /**
@@ -206,6 +207,19 @@ final class Settings implements ContainerInjectionInterface {
       $admin_theme = $this->configFactory->get('system.theme')->get('default');
     }
     return $admin_theme;
+  }
+
+  /**
+   * Returns a setting from the admin theme or Default Admin base theme.
+   */
+  private function getThemeSetting(string $name): mixed {
+    $admin_theme = $this->getAdminTheme();
+    $value = $this->themeSettingsProvider->getSetting($name, $admin_theme);
+    $themes = $this->themeHandler->listInfo();
+    if (is_null($value) && isset($themes[$admin_theme]->base_themes['default_admin'])) {
+      $value = $this->themeSettingsProvider->getSetting($name, 'default_admin');
+    }
+    return $value;
   }
 
   /**
