@@ -258,8 +258,7 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerTestQuoteIdentifiers')]
   public function testQuoteIdentifiers($expected, $query, array $quote_identifier = ['"', '"']): void {
-    $mock_pdo = $this->createStub(StubPDO::class);
-    $connection = new StubConnection($mock_pdo, [], $quote_identifier);
+    $connection = new StubConnection($this->createStub(\PDO::class), [], $quote_identifier);
     $this->assertEquals($expected, $connection->quoteIdentifiers($query));
   }
 
