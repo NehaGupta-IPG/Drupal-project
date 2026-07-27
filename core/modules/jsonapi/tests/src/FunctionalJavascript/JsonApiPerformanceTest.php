@@ -59,7 +59,7 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
     }, 'jsonapi_individual_cool_cache');
 
     $expected_queries = [
-      'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
+      'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" AND "timestamp" >= "TIMESTAMP" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/jsonapi/node/article/677f9911-f002-4639-9891-5c39e8b00d9d" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
@@ -135,7 +135,7 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
     }, 'jsonapi_individual_hot_cache');
 
     $expected_queries = [
-      'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
+      'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" AND "timestamp" >= "TIMESTAMP" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
       'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node" "base_table" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table"."uuid" IN ("677f9911-f002-4639-9891-5c39e8b00d9d")) AND ("node_field_data"."default_langcode" IN (1))',
@@ -187,7 +187,7 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
     }, 'jsonapi_node_individual_invalidated');
 
     $expected_queries = [
-      'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
+      'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" AND "timestamp" >= "TIMESTAMP" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
       'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node" "base_table" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE ("base_table"."uuid" IN ("677f9911-f002-4639-9891-5c39e8b00d9d")) AND ("node_field_data"."default_langcode" IN (1))',

@@ -18,6 +18,13 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
   use DependencySerializationTrait;
 
   /**
+   * The session time-to-live (TTL) in seconds.
+   *
+   * @var int
+   */
+  private int $ttl;
+
+  /**
    * Constructs a new SessionHandler instance.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
@@ -26,12 +33,23 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
    *   The database connection.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
+   * @param array{ttl?: int<0, max>}|null $options
+   *   An associative array containing the following key value pairs:
+   *   - ttl: (int) The session time-to-live (TTL) in seconds. If more than this
+   *     amount of time has elapsed since the user's last visit the session is
+   *     considered expired and is not loaded.
    */
   public function __construct(
     protected RequestStack $requestStack,
     protected Connection $connection,
     protected TimeInterface $time,
+    ?array $options = NULL,
   ) {
+    if ($options === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $options argument is deprecated in drupal:11.5.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/project/drupal/issues/3522112', E_USER_DEPRECATED);
+      $options = \Drupal::getContainer()->getParameter('session.handler.options');
+    }
+    $this->ttl = $options['ttl'];
   }
 
   /**
@@ -50,7 +68,10 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
       try {
         // Read the session data from the database.
         $query = $this->connection
-          ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid', 0, 1, [':sid' => Crypt::hashBase64($sessionId)]);
+          ->queryRange('SELECT [session] FROM {sessions} WHERE [sid] = :sid AND [timestamp] >= :timestamp', 0, 1, [
+            ':sid' => Crypt::hashBase64($sessionId),
+            ':timestamp' => $this->time->getRequestTime() - $this->ttl,
+          ]);
         $data = (string) $query->fetchField();
       }
       // Swallow the error if the table hasn't been created yet.

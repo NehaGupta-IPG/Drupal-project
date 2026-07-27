@@ -20,6 +20,8 @@ parameters:
     cookie_lifetime: 2000000
     cookie_samesite: Lax
     name_suffix: ''
+  session.handler.options:
+    ttl: 200000
   twig.config:
     debug: false
     auto_reload: null
@@ -1737,7 +1739,7 @@ services:
     alias: session_handler.storage
   session_handler.storage:
     class: Drupal\Core\Session\SessionHandler
-    arguments: ['@request_stack', '@database', '@datetime.time']
+    arguments: ['@request_stack', '@database', '@datetime.time', '%session.handler.options%']
     tags:
       - { name: backend_overridable }
   session_handler.write_safe:
