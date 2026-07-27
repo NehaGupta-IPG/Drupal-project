@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\rest\Kernel\EntityResource;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
@@ -91,10 +90,9 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
 
     $problems = [];
     foreach ($this->definitions as $entity_type_id => $info) {
-      $class_name_full = $info->getClass();
-      if (Database::getConnection()->supportsJsonEntityStorage()) {
-        $class_name_full = get_parent_class($class_name_full);
-      }
+      // Use the original entity class: a database driver module may swap the
+      // class at runtime, but test coverage is provided for the original one.
+      $class_name_full = $info->getDecoratedClasses()[0] ?? $info->getClass();
       $parts = explode('\\', $class_name_full);
       $class_name = end($parts);
       $module_name = $parts[1];
