@@ -77,7 +77,11 @@ final class ConfigHandlerExtraFormTest extends WebDriverTestBase {
 
     // Wait for the popup to open and the search field to be available.
     $assert->waitForField('override[controls][options_search]');
-    $page->findField('name[node__field_test.field_test_target_id]')
+
+    // With JSON entity storage the dedicated field table is collapsed onto
+    // the entity base table.
+    $field_table = \Drupal::database()->supportsJsonEntityStorage() ? 'node' : 'node__field_test';
+    $page->findField('name[' . $field_table . '.field_test_target_id]')
       ->click();
     $page->find('css', 'button.button.button--primary.form-submit.ui-button')
       ->click();
