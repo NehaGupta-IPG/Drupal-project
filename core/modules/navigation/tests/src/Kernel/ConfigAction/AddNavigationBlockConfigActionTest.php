@@ -51,7 +51,7 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
   #[TestWith([1, 1])]
   #[TestWith([3, 3])]
   #[TestWith([7, 3])]
-  public function testAddBlockToNavigation($delta, $computed_delta): void {
+  public function testAddBlockToNavigation($delta, int $computed_delta): void {
     // Load the navigation section storage.
     $navigation_storage = \Drupal::service('plugin.manager.layout_builder.section_storage')->load('navigation', [
       'navigation' => new Context(new ContextDefinition('string'), 'navigation'),
@@ -93,7 +93,7 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
    */
   public function testActionOnlySupportsNavigationConfig(): void {
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage('addNavigationBlock can only be executed for the navigation.block_layout config.');
+    $this->expectExceptionMessageIs('addNavigationBlock can only be executed for the navigation.block_layout config.');
     // Try to apply the Config Action against an unexpected config entity.
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');

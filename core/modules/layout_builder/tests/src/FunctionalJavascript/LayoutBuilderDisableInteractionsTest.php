@@ -39,6 +39,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     'layout_builder',
     'node',
     'search',
+    'search_node',
     'contextual',
     'off_canvas_test',
   ];
@@ -113,7 +114,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
 
     $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
 
-    $this->drupalGet("{$field_ui_prefix}/display");
+    $this->drupalGet("{$field_ui_prefix}/display/default");
     $this->submitForm(['layout[enabled]' => TRUE], 'Save');
     $assert_session->linkExists('Manage layout');
     $this->clickLink('Manage layout');

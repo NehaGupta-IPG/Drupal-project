@@ -403,7 +403,7 @@ class EntityFieldManagerTest extends UnitTestCase {
     $this->entityType->getLabel()->willReturn('Test');
 
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('The Test entity type cannot be translatable as it does not define a translatable "langcode" field.');
+    $this->expectExceptionMessageIs('The Test entity type cannot be translatable as it does not define a translatable "langcode" field.');
     $this->entityFieldManager->getBaseFieldDefinitions('test_entity_type');
   }
 
@@ -600,7 +600,7 @@ class EntityFieldManagerTest extends UnitTestCase {
    *   (optional) An array of entity keys for the mocked entity type. Defaults
    *   to an empty array.
    *
-   * @return \Drupal\Core\Field\BaseFieldDefinition|\Prophecy\Prophecy\ProphecyInterface
+   * @return \Prophecy\Prophecy\ProphecyInterface<\Drupal\Core\Field\BaseFieldDefinition>
    *   A field definition object.
    */
   protected function setUpEntityWithFieldDefinition($custom_invoke_all = FALSE, $field_definition_id = 'id', $entity_keys = []) {
