@@ -19,7 +19,7 @@ function text_removed_post_updates(): array {
 }
 
 /**
- * Installs text_with_summary when widget is used.
+ * Installs text_with_summary when the site uses text_with_summary field storage.
  */
 function text_post_update_install_text_with_summary(): void {
   if (\Drupal::moduleHandler()->moduleExists('text_with_summary')) {
@@ -34,14 +34,37 @@ function text_post_update_install_text_with_summary(): void {
 }
 
 /**
- * Update potential config dependencies.
+ * Update field storage dependencies after text_with_summary install.
  */
-function text_post_update_recalculate_text_with_summary_dependencies(array &$sandbox): void {
+function text_post_update_update_field_storage_dependencies(array &$sandbox): void {
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'field_storage_config');
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'field_config');
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'entity_form_display');
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'entity_view_display');
+}
 
+/**
+ * Update field dependencies after text_with_summary install.
+ */
+function text_post_update_update_field_dependencies(array &$sandbox): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'field_config');
+}
+
+/**
+ * Update form display dependencies after text_with_summary install.
+ */
+function text_post_update_update_form_display_dependencies(array &$sandbox): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'entity_form_display');
+}
+
+/**
+ * Update view display dependencies after text_with_summary install.
+ */
+function text_post_update_update_view_display_dependencies(array &$sandbox): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'entity_view_display');
+}
+
+/**
+ * Update view dependencies after text_with_summary install.
+ */
+function text_post_update_update_view_dependencies(array &$sandbox): void {
   if (!\Drupal::moduleHandler()->moduleExists('views')) {
     return;
   }
