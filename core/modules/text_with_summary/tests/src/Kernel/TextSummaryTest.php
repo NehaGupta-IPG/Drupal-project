@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\text_with_summary_field\Kernel;
+namespace Drupal\Tests\text_with_summary\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\entity_test\Entity\EntityTest;
@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests text_summary() with different strings and lengths.
  */
-#[Group('text_with_summary_field')]
+#[Group('text_with_summary')]
 #[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class TextSummaryTest extends KernelTestBase {
@@ -31,7 +31,7 @@ class TextSummaryTest extends KernelTestBase {
     'system',
     'user',
     'filter',
-    'text_with_summary_field',
+    'text_with_summary',
     'text',
     'field',
     'entity_test',

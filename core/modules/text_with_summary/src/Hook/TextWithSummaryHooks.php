@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\text_with_summary_field\Hook;
+namespace Drupal\text_with_summary\Hook;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -8,9 +8,9 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
- * Hook implementations for text_with_summary_field.
+ * Hook implementations for text_with_summary.
  */
-class TextWithSummaryFieldHooks {
+class TextWithSummaryHooks {
 
   use StringTranslationTrait;
 
@@ -20,7 +20,7 @@ class TextWithSummaryFieldHooks {
   #[Hook('help')]
   public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
-      case 'help.page.text_with_summary_field':
+      case 'help.page.text_with_summary':
         $output = '';
         $output .= '<h2>' . $this->t('About') . '</h2>';
         $output .= '<p>' . $this->t('The Text With Summary Field module allows you to create long text fields with optional summaries. See the <a href=":field">Field module help</a> and the <a href=":field_ui">Field UI help</a> pages for general information on fields and how to create and manage them. For more information, see the <a href=":text_documentation">online documentation for the Text With Summary Field module</a>.', [

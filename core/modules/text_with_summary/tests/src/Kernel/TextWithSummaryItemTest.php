@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\text_with_summary_field\Kernel;
+namespace Drupal\Tests\text_with_summary\Kernel;
 
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests using entity fields of the text summary field type.
  */
-#[Group('text_with_summary_field')]
+#[Group('text_with_summary')]
 #[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class TextWithSummaryItemTest extends FieldKernelTestBase {
@@ -25,7 +25,7 @@ class TextWithSummaryItemTest extends FieldKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['filter', 'text_with_summary_field'];
+  protected static $modules = ['filter', 'text_with_summary'];
 
   /**
    * Field storage entity.

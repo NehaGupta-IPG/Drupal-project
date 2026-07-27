@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\text_with_summary_field\Plugin\Field\FieldFormatter;
+namespace Drupal\text_with_summary\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\StringTranslation\TranslatableMarkup;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\text_with_summary_field\FunctionalJavascript;
+namespace Drupal\Tests\text_with_summary\FunctionalJavascript;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests the JavaScript functionality of the text_textarea_with_summary widget.
  */
-#[Group('text_with_summary_field')]
+#[Group('text_with_summary')]
 #[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class TextareaWithSummaryTest extends WebDriverTestBase {
@@ -24,7 +24,7 @@ class TextareaWithSummaryTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'text_with_summary_field',
+    'text_with_summary',
     'text_summary_test',
     'node',
   ];

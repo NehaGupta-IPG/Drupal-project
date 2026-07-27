@@ -12,7 +12,7 @@ use Drupal\Core\TypedData\DataDefinition;
  * Plugin implementation of the 'text_with_summary' field type.
  *
  * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Download
- *   the contrib module text_with_summary_field
+ *   the contrib module text_with_summary
  *
  * @see https://www.drupal.org/node/3568381
  */

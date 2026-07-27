@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\text_with_summary_field\Functional;
+namespace Drupal\Tests\text_with_summary\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests the functionality of the text_textarea_with_summary widget.
  */
-#[Group('text_with_summary_field')]
+#[Group('text_with_summary')]
 #[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class TextareaWithSummaryTest extends BrowserTestBase {
@@ -20,7 +20,7 @@ class TextareaWithSummaryTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['text_with_summary_field', 'text_test', 'node'];
+  protected static $modules = ['text_with_summary', 'text_test', 'node'];
 
   /**
    * {@inheritdoc}

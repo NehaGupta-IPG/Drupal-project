@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\text_with_summary_field\Plugin\Field\FieldType;
+namespace Drupal\text_with_summary\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
