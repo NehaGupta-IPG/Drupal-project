@@ -115,7 +115,7 @@ class CommentType extends ConfigEntityBundleBase implements CommentTypeInterface
     parent::calculateDependencies();
     // Add dependency on target entity type provider to remove the entity when
     // extension uninstalled.
-    $type = \Drupal::entityTypeManager()->getDefinition($this->target_entity_type_id, FALSE);
+    $type = \Drupal::entityTypeManager()->getDefinition($this->getTargetEntityTypeId(), FALSE);
     if ($type) {
       $provider = $type->getProvider();
       if (\Drupal::moduleHandler()->moduleExists($provider)) {
