@@ -12,8 +12,6 @@ use Drupal\text\TextSummary;
 
 /**
  * Plugin implementation of the 'text_trimmed' formatter.
- *
- * @see \Drupal\text\Field\Formatter\TextSummaryOrTrimmedFormatter
  */
 #[FieldFormatter(
   id: 'text_trimmed',
