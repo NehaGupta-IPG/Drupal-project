@@ -34,7 +34,7 @@ function text_post_update_install_text_with_summary(): void {
 }
 
 /**
- * Update potential filed dependencies
+ * Update potential config dependencies.
  */
 function text_post_update_recalculate_text_with_summary_dependencies(array &$sandbox): void {
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'field_storage_config');
