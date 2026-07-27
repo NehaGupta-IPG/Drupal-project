@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Entity;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\Entity\Access\EntityFormDisplayAccessControlHandler;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -191,8 +192,15 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
     // Set #parents to 'top-level' by default.
     $form += ['#parents' => []];
 
+    // Sort the components by their weight in order to allow a form element from
+    // a widget to depend on the processed elements of another form element from
+    // another widget. For example, the 'machine_name' widget needs the
+    // processed '#id' property of its source field.
+    $components = $this->getComponents();
+    uasort($components, SortArray::sortByWeightElement(...));
+
     // Let each widget generate the form elements.
-    foreach ($this->getComponents() as $name => $options) {
+    foreach ($components as $name => $options) {
       if ($widget = $this->getRenderer($name)) {
         $items = $entity->get($name);
         $items->filterEmptyItems();

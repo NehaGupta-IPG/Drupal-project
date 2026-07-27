@@ -68,16 +68,27 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
       ->setDescription(new TranslatableMarkup('The workspace ID.'))
       ->setSetting('max_length', 128)
       ->setRequired(TRUE)
-      ->addConstraint('UniqueField')
-      ->addConstraint('DeletedWorkspace')
-      ->addPropertyConstraints('value', ['Regex' => ['pattern' => '/^[a-z0-9_]+$/']]);
+      ->addConstraint('UniqueField', [])
+      ->addConstraint('DeletedWorkspace', [])
+      ->addPropertyConstraints('value', ['Regex' => ['pattern' => '/^[a-z0-9_]+$/']])
+      ->setDisplayOptions('form', [
+        'type' => 'machine_name',
+        'weight' => -5,
+        'settings' => [
+          'source_field' => 'label',
+        ],
+      ]);
 
     $fields['label'] = BaseFieldDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Workspace name'))
       ->setDescription(new TranslatableMarkup('The workspace name.'))
       ->setRevisionable(TRUE)
       ->setSetting('max_length', 128)
-      ->setRequired(TRUE);
+      ->setRequired(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => -10,
+      ]);
 
     $fields['uid']
       ->setLabel(new TranslatableMarkup('Owner'))

@@ -72,8 +72,8 @@ trait WorkspaceTestUtilities {
 
     $this->drupalGet('/admin/config/workflow/workspaces/add');
     $this->submitForm([
-      'id' => $id,
-      'label' => $label,
+      'id[0][value]' => $id,
+      'label[0][value]' => $label,
       'parent' => $parent,
     ], 'Save and switch');
 
@@ -105,12 +105,10 @@ trait WorkspaceTestUtilities {
 
     $this->drupalGet('/admin/config/workflow/workspaces/add');
     $this->submitForm([
-      'id' => $id,
-      'label' => $label,
+      'id[0][value]' => $id,
+      'label[0][value]' => $label,
       'parent' => $parent,
     ], 'Save');
-
-    $this->getSession()->getPage()->hasContent("$label ($id)");
 
     return Workspace::load($id);
   }

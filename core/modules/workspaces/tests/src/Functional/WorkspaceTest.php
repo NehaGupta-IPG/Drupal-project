@@ -95,8 +95,8 @@ class WorkspaceTest extends BrowserTestBase {
     $this->drupalGet('/admin/config/workflow/workspaces/add');
     $this->assertSession()->statusCodeEquals(200);
 
-    $page->fillField('label', 'workspace2');
-    $page->fillField('id', 'A!"£%^&*{}#~@?');
+    $page->fillField('label[0][value]', 'workspace2');
+    $page->fillField('id[0][value]', 'A!"£%^&*{}#~@?');
     $page->findButton('Save')->click();
     $page->hasContent("This value is not valid");
   }
@@ -107,11 +107,7 @@ class WorkspaceTest extends BrowserTestBase {
   public function testWorkspaceToolbar(): void {
     $this->drupalLogin($this->editor1);
 
-    $this->drupalGet('/admin/config/workflow/workspaces/add');
-    $this->submitForm([
-      'id' => 'test_workspace',
-      'label' => 'Test workspace',
-    ], 'Save');
+    $this->createWorkspaceThroughUi('Test workspace', 'test_workspace');
 
     // Activate the test workspace.
     $this->drupalGet('/admin/config/workflow/workspaces/manage/test_workspace/activate');
@@ -124,7 +120,7 @@ class WorkspaceTest extends BrowserTestBase {
 
     // Change the workspace label.
     $this->drupalGet('/admin/config/workflow/workspaces/manage/test_workspace/edit');
-    $this->submitForm(['label' => 'New name'], 'Save');
+    $this->submitForm(['label[0][value]' => 'New name'], 'Save');
 
     $this->drupalGet('<front>');
     $page = $this->getSession()->getPage();
@@ -138,11 +134,7 @@ class WorkspaceTest extends BrowserTestBase {
   public function testWorkspaceOwner(): void {
     $this->drupalLogin($this->editor1);
 
-    $this->drupalGet('/admin/config/workflow/workspaces/add');
-    $this->submitForm([
-      'id' => 'test_workspace',
-      'label' => 'Test workspace',
-    ], 'Save');
+    $this->createWorkspaceThroughUi('Test workspace', 'test_workspace');
 
     $storage = \Drupal::entityTypeManager()->getStorage('workspace');
     $test_workspace = $storage->load('test_workspace');
@@ -364,11 +356,7 @@ class WorkspaceTest extends BrowserTestBase {
     ];
     $this->drupalLogin($this->drupalCreateUser($permissions));
 
-    $this->drupalGet('/admin/config/workflow/workspaces/add');
-    $this->submitForm([
-      'id' => 'test_workspace',
-      'label' => 'Test workspace',
-    ], 'Save');
+    $this->createWorkspaceThroughUi('Test workspace', 'test_workspace');
 
     // Activate the test workspace.
     $this->drupalGet('/admin/config/workflow/workspaces/manage/test_workspace/activate');
