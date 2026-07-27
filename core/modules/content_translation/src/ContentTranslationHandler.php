@@ -715,8 +715,8 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     $metadata->setAuthor(!empty($values['uid']) ? User::load($values['uid']) : User::load(0));
     $metadata->setPublished(!empty($values['status']));
     $metadata->setCreatedTime(!empty($values['created']) ? strtotime($values['created']) : $this->time->getRequestTime());
-    $metadata->setOutdated(!empty($values['outdated']));
 
+    $metadata->setOutdated(!empty($values['outdated']));
     if (!empty($values['retranslate']) && !ContentTranslationManager::isPendingRevisionSupportEnabled($entity->getEntityTypeId(), $entity->bundle())) {
       $this->retranslate($entity, $form_langcode);
     }
