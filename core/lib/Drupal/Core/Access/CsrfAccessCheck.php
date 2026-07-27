@@ -4,8 +4,8 @@ namespace Drupal\Core\Access;
 
 use Drupal\Core\Routing\Access\AccessInterface as RoutingAccessInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Access protection against CSRF attacks.

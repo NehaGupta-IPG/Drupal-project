@@ -4,8 +4,8 @@ namespace Drupal\Core\Access;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 
@@ -50,7 +50,6 @@ class RouteProcessorCsrf implements OutboundRouteProcessorInterface, TrustedCall
         $placeholder_render_array = [
           '#lazy_builder' => ['route_processor_csrf:renderPlaceholderCsrfToken', [$path]],
         ];
-
         // Instead of setting an actual CSRF token as the query string, we set
         // the placeholder, which will be replaced at the very last moment. This
         // ensures links with CSRF tokens don't break cacheability.

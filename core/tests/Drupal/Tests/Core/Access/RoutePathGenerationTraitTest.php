@@ -100,6 +100,61 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
   }
 
   /**
+   * Tests that CSRF token creation and validation is consistent.
+   *
+   * This checks that our excluded parameters are correctly excluded.
+   *
+   * This checks that CsrfAccessCheck() and RouteProcessorCsrf() produce the
+   * same results.
+   *
+   * Multiple cases are provided for an optional parameter (non-empty, empty,
+   * null, undefined).
+   */
+  #[DataProvider('providerTestCsrfTokenCompleteLifeCycleWithExcludedParams')]
+  public function testCsrfTokenCompleteLifeCycleWithExcludedParams(array $params, string $js_route_param, string $js_request_param): void {
+    // Mock a route.
+    $route = $this->createMock(Route::class);
+    $route->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->willReturn('test/example/{param}/{js}');
+    $route->expects($this->atLeastOnce())
+      ->method('hasRequirement')
+      ->with('_csrf_token')
+      ->willReturn(TRUE);
+    $route->expects($this->atLeastOnce())
+      ->method('hasOption')
+      ->with('_csrf_exclude_parameters')
+      ->willReturn(['js']);
+
+    // Process the route so the "token" param is generated.
+    $routeParams = $params + ['js' => $js_route_param];
+    $this->processor->processOutbound('test.example', $route, $routeParams);
+
+    $requestParams = $params + ['token' => $routeParams['token'], 'js' => $js_request_param];
+
+    // Mock Parameter bag.
+    $parameterBag = $this->createStub(ParameterBagInterface::class);
+    $parameterBag->method('get')->willReturnCallback(function ($key, $default = NULL) use ($requestParams) {
+      return $requestParams[$key] ?? $default;
+    });
+    $parameterBag->method('all')->willReturn($requestParams);
+
+    // Get a real InputBag because it is a final class.
+    $inputBag = new InputBag($requestParams);
+
+    // Mock Request.
+    $request = $this->createStub(Request::class);
+    $request->query = $inputBag;
+
+    // Mock RouteMatch.
+    $routeMatch = $this->createStub(RouteMatchInterface::class);
+    $routeMatch->method('getRawParameters')->willReturn($parameterBag);
+
+    // Check for allowed access.
+    $this->assertInstanceOf(AccessResultAllowed::class, $this->accessCheck->access($route, $request, $routeMatch));
+  }
+
+  /**
    * Data provider for testCsrfTokenCompleteLifeCycle().
    *
    * @return array
@@ -111,6 +166,21 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
       [['param' => '']],
       [['param' => NULL]],
       [[]],
+    ];
+  }
+
+  /**
+   * Data provider for testCsrfTokenCompleteLifeCycleWithExcludedParams().
+   *
+   * @return array
+   *   An array of route parameters.
+   */
+  public static function providerTestCsrfTokenCompleteLifeCycleWithExcludedParams(): array {
+    return [
+      [['param' => 'value'], 'nojs', 'nojs'],
+      [['param' => 'value'], 'nojs', 'ajax'],
+      [['param' => 'value'], 'ajax', 'nojs'],
+      [['param' => 'value'], 'ajax', 'ajax'],
     ];
   }
 
