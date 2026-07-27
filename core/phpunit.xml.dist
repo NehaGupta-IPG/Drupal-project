@@ -70,6 +70,8 @@
       <!-- Set to true to enable collection and reporting of deprecations
         triggered during the execution of the tests. -->
       <parameter name="enableDeprecationStatistics" value="false"/>
+      <!-- The path to the directory where the deprecation statistics should be
+        output. -->
       <parameter name="deprecationStatisticsOutputPath" value="test-artifacts"/>
     </bootstrap>
     <!-- Functional tests HTML output logging. -->

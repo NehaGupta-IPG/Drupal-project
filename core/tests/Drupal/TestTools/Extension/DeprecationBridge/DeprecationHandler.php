@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\Extension\DeprecationBridge;
 
-use Drupal\Core\Database\Database;
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\ErrorHandler\DrupalDebugClassLoader;
 use Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber\Deprecation;
@@ -50,27 +49,6 @@ final class DeprecationHandler implements Extension {
    * @todo remove.
    */
   private string $directory;
-
-  /**
-   * The PHP major/minor version in use.
-   *
-   * @todo remove.
-   */
-  private string $phpVersion;
-
-  /**
-   * The database driver used by the SUT.
-   *
-   * @todo remove.
-   */
-  private ?string $databaseDriver = NULL;
-
-  /**
-   * The database version used by the SUT.
-   *
-   * @todo remove.
-   */
-  private ?string $databaseVersion = NULL;
 
   /**
    * Statistics for the currently executing test case.
@@ -145,7 +123,7 @@ final class DeprecationHandler implements Extension {
     // Use the extension configuration loaded in ::preBootstrap().
     $this->config = Configuration::instance();
 
-    if (!$this->config->collectStatsEnabled) {
+    if (!$this->config->deprecationStatisticsEnabled) {
       return;
     }
 
@@ -171,24 +149,6 @@ final class DeprecationHandler implements Extension {
       throw new \RuntimeException("Test artifacts directory {$directory} is not a writable directory.");
     }
     $this->directory = $realDirectory;
-
-    // PHP major/minor version.
-    preg_match('/^\d+\.\d+/', \PHP_VERSION, $matches);
-    $this->phpVersion = $matches[0];
-
-    // Database driver.
-    if (!empty(getenv('SIMPLETEST_DB'))) {
-      $currDir = getcwd();
-      chdir(dirname(__DIR__, 6));
-      $dbInfo = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'), TRUE);
-      chdir($currDir);
-      $this->databaseDriver = $dbInfo['driver'];
-    }
-
-    // Database version.
-    if (!empty(getenv('_TARGET_DB'))) {
-      $this->databaseVersion = getenv('_TARGET_DB');
-    }
   }
 
   /**
@@ -262,7 +222,7 @@ final class DeprecationHandler implements Extension {
    * Dump statistics after test runner end.
    */
   public function processStatisticsArtifact(): void {
-    assert($this->config->collectStatsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert($this->config->deprecationStatisticsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     $content = @file_get_contents($this->statisticsStagingFilePath);
 
@@ -276,7 +236,6 @@ final class DeprecationHandler implements Extension {
 
     $encodedStats = explode("\n", $content);
     $stats = [
-      'metadata' => $this->metadata(),
       'skips' => [],
       'tests' => [],
     ];
@@ -309,7 +268,7 @@ final class DeprecationHandler implements Extension {
    */
   private static function writeStatisticEntry(string $status, array $stat): void {
     $config = Configuration::instance();
-    assert($config->collectStatsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert($config->deprecationStatisticsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     $stat['status'] = $status;
 
@@ -353,7 +312,7 @@ final class DeprecationHandler implements Extension {
         throw new \RuntimeException(preg_last_error_msg());
       }
       if ((bool) $result) {
-        if ($config->collectStatsEnabled) {
+        if ($config->deprecationStatisticsEnabled) {
           $stat = [];
           if ($testMethod !== NULL) {
             $stat['testId'] = $testMethod;
@@ -368,53 +327,8 @@ final class DeprecationHandler implements Extension {
     return FALSE;
   }
 
-  /**
-   * Remove.
-   *
-   * @todo remove.
-   */
-  public function metadata(): array {
-    if ($env = getenv('DRUPAL_TEST_CONTEXT_KEYS')) {
-      $contextKeys = explode(",", $env);
-    }
-    else {
-      $contextKeys = [];
-    }
-
-    $tmp = [];
-    if ($env = getenv('CI_PIPELINE_ID')) {
-      $tmp['CI_PIPELINE_ID'] = $env;
-    }
-    if ($env = getenv('CI_PIPELINE_NAME')) {
-      $tmp['CI_PIPELINE_NAME'] = $env;
-    }
-    if ($env = getenv('CI_JOB_ID')) {
-      $tmp['CI_JOB_ID'] = $env;
-    }
-    if ($env = getenv('CI_JOB_STAGE')) {
-      $tmp['CI_JOB_STAGE'] = $env;
-    }
-    if ($env = getenv('CI_JOB_NAME')) {
-      $tmp['CI_JOB_NAME'] = $env;
-    }
-    $env = getenv('TESTSUITE');
-    if ($env !== FALSE && in_array('phpunit-testsuite', $contextKeys)) {
-      $tmp['phpunit_testsuite'] = $env;
-    }
-    if ($this->phpVersion && in_array('php-version', $contextKeys)) {
-      $tmp['php_version'] = $this->phpVersion;
-    }
-    if ($this->databaseDriver && in_array('database-driver', $contextKeys)) {
-      $tmp['database_driver'] = $this->databaseDriver;
-    }
-    if ($this->databaseVersion && in_array('database-version', $contextKeys)) {
-      $tmp['database_version'] = $this->databaseVersion;
-    }
-    return $tmp;
-  }
-
   public function setCurrentTest(TestMethod $test): void {
-    assert($this->config->collectStatsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert($this->config->deprecationStatisticsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     self::$currentTest['testId'] = $test->id();
     if ($test->metadata()->isIgnoreDeprecations()) {
@@ -426,7 +340,7 @@ final class DeprecationHandler implements Extension {
   }
 
   public function deprecationTriggered(DeprecationTriggered|PhpDeprecationTriggered $deprecation): void {
-    assert($this->config->collectStatsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert($this->config->deprecationStatisticsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     if ($deprecation->ignoredByTest() || $deprecation->ignoredByBaseline()) {
       self::$currentTest['ignored_by_phpunit'][] = $deprecation->message();
@@ -436,7 +350,7 @@ final class DeprecationHandler implements Extension {
   }
 
   public function testFinished(): void {
-    assert($this->config->collectStatsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert($this->config->deprecationStatisticsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
     $stat = [];
     $stat['testId'] = self::$currentTest['testId'];
     $stat['ignoreDeprecations'] = self::$currentTest['testIgnoresDeprecations'];

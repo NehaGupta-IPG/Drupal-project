@@ -43,7 +43,7 @@ final class Configuration {
   /**
    * Indicates if the deprecation stats collection is enabled.
    */
-  public private(set) bool $collectStatsEnabled = FALSE;
+  public private(set) bool $deprecationStatisticsEnabled = FALSE;
 
   /**
    * Path to the deprecation statistics output directory.
@@ -82,7 +82,7 @@ final class Configuration {
       $this->debugClassLoaderEnabled = filter_var($parameters['enableDebugClassLoader'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
     }
     if (array_key_exists('enableDeprecationStatistics', $parameters)) {
-      $this->collectStatsEnabled = filter_var($parameters['enableDeprecationStatistics'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+      $this->deprecationStatisticsEnabled = filter_var($parameters['enableDeprecationStatistics'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
     }
     if (array_key_exists('deprecationStatisticsOutputPath', $parameters)) {
       $this->deprecationStatisticsOutputPath = $this->absolutePath($parameters['deprecationStatisticsOutputPath']);
