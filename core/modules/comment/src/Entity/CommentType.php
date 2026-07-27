@@ -108,4 +108,21 @@ class CommentType extends ConfigEntityBundleBase implements CommentTypeInterface
     return $this->target_entity_type_id;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+    parent::calculateDependencies();
+    // Add dependency on target entity type provider to remove the entity when
+    // extension uninstalled.
+    $type = \Drupal::entityTypeManager()->getDefinition($this->target_entity_type_id, FALSE);
+    if ($type) {
+      $provider = $type->getProvider();
+      if (\Drupal::moduleHandler()->moduleExists($provider)) {
+        $this->addDependency('module', $provider);
+      }
+    }
+    return $this;
+  }
+
 }

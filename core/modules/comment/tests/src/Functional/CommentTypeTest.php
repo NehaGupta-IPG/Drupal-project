@@ -210,6 +210,33 @@ class CommentTypeTest extends CommentTestBase {
     $this->submitForm([], 'Delete');
     $this->assertNull(CommentType::load($type->id()), 'Comment type deleted.');
     $this->assertSession()->pageTextContains('The comment type ' . $type->label() . ' has been deleted.');
+
+    // Test that uninstall of the node module deletes dependent comment type.
+    $type = $this->createCommentType('node_dependent');
+    $this->assertEquals(['module' => ['node']], $type->getDependencies());
+    $this->drupalGet('admin/structure/comment');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('node_dependent');
+    // Delete existing content to not block uninstall.
+    foreach (Node::loadMultiple() as $node) {
+      $node->delete();
+    }
+    \Drupal::service('module_installer')->uninstall(['node']);
+    $this->rebuildContainer();
+    $this->drupalGet('admin/structure/comment');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('node_dependent');
+  }
+
+  /**
+   * Tests that the provider of the target entity is listed as a dependency.
+   */
+  public function testCalculateDependencies() {
+    // Create a comment type programmatically.
+    $comment_type = $this->createCommentType('dep_test');
+    $target_entity_type = \Drupal::entityTypeManager()->getDefinition($comment_type->getTargetEntityTypeId());
+    $dependencies = $comment_type->getDependencies() + ['module' => []];
+    $this->assertTrue(in_array($target_entity_type->getProvider(), $dependencies['module']));
   }
 
 }
