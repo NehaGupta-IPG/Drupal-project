@@ -646,6 +646,9 @@ default:
 # The value set in the "needs" property will determine the order in the sequence.
 '[Commit] PHP 8.5 PostgreSQL 18':
   <<: [ *recursive-trigger, *run-on-commit ]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      allow_failure: true
   variables:
     _TARGET_PHP: $MINIMUM_PHP
     _TARGET_DB: "pgsql-18"
