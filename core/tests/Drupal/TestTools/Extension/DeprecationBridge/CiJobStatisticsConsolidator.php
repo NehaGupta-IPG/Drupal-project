@@ -33,7 +33,7 @@ final class CiJobStatisticsConsolidator {
   ): void {
     $finder = new Finder();
 
-    $workDir = $inputArtifactsPath . \DIRECTORY_SEPARATOR . 'deprecation-handler' . \DIRECTORY_SEPARATOR . 'jobs' . \DIRECTORY_SEPARATOR . $this->jobInfo['CI_JOB_ID'];
+    $workDir = $inputArtifactsPath . \DIRECTORY_SEPARATOR . $this->jobInfo['CI_JOB_ID'];
 
     $files = $finder->files()->in($workDir)->name('deprecation-ignore-stats*.json');
 
@@ -60,7 +60,7 @@ final class CiJobStatisticsConsolidator {
     ]));
 
     $filesystem = new Filesystem();
-    $filesystem->remove($inputArtifactsPath . \DIRECTORY_SEPARATOR . 'deprecation-handler');
+    $filesystem->remove($inputArtifactsPath);
   }
 
 }
