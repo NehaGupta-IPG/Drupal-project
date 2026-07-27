@@ -170,6 +170,11 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     foreach (array_reverse($this->stack()) as $id => $item) {
       $this->unpile($item->name, $id);
     }
+
+    // Run post-transaction callbacks now (while Connection is still valid).
+    // Prevents destructor-order bug: Connection::__destruct can run before
+    // Transaction::__destruct, leaving PDO null when callbacks run.
+    $this->processPostTransactionCallbacks();
   }
 
   /**
@@ -268,7 +273,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
 
     // Define a unique ID for the transaction.
-    $id = uniqid('', TRUE);
+    $id = bin2hex(random_bytes(12));
 
     // Do the client-level processing.
     if ($this->stackDepth() === 0) {

@@ -38,7 +38,6 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     'taxonomy',
     'image',
     'responsive_image',
-    'toolbar',
   ];
 
   /**
@@ -413,7 +412,7 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
    * @param string $link
    *   URL of the settings page to test.
    */
-  public function doSettingsPageTest($link): void {
+  public function doSettingsPageTest(string $link): void {
     // Get the settings page.
     $this->drupalGet($link);
 

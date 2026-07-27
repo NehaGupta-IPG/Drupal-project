@@ -7,9 +7,11 @@ namespace Drupal\Tests\system\Unit\Menu;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests existence of system local tasks.
@@ -19,10 +21,8 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
    * The mocked theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
-  protected $themeHandler;
+  protected ThemeHandlerInterface&MockObject $themeHandler;
 
   /**
    * {@inheritdoc}
@@ -69,14 +69,14 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
    * Tests local task existence.
    */
   #[DataProvider('getSystemAdminRoutes')]
-  public function testSystemAdminLocalTasks($route, $expected): void {
+  public function testSystemAdminLocalTasks(string $route, array $expected): void {
     $this->assertLocalTasks($route, $expected);
   }
 
   /**
    * Provides a list of routes to test.
    */
-  public static function getSystemAdminRoutes() {
+  public static function getSystemAdminRoutes(): array {
     return [
       ['system.admin_content', [['system.admin_content']]],
       [

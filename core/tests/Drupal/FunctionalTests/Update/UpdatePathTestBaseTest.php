@@ -7,6 +7,7 @@ namespace Drupal\FunctionalTests\Update;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Site\Settings;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Update')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class UpdatePathTestBaseTest extends UpdatePathTestBase {
 
   /**
@@ -29,7 +31,6 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/install-text-with-summary.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-8.update-test-schema-enabled.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-8.update-test-semver-update-n-enabled.php';
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/install-mysqli.php';
   }
 
   /**

@@ -208,7 +208,7 @@ default:
   script:
     - sudo -u www-data -E -H composer run-script drupal-phpunit-upgrade-check
     # Need to pass this along directly.
-    - time sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite ":memory:" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_NODE_INDEX --ci-parallel-node-total $CI_NODE_TOTAL
+    - time sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_NODE_INDEX --ci-parallel-node-total $CI_NODE_TOTAL
   after_script:
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
   artifacts:
@@ -240,7 +240,7 @@ default:
 
 .run-on-commit: &run-on-commit
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "11.x"
       allow_failure: true
 
 .run-daily: &run-daily
@@ -305,7 +305,8 @@ default:
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
   script:
-    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "PHPUnit-Unit" --concurrency "$CONCURRENCY" --repeat "1" --sqlite ":memory:" --verbose --non-html --all || EXIT_CODE=$?
+    - export EXIT_CODE=0
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "unit" --concurrency "$CONCURRENCY" --repeat "1" --verbose --non-html --all || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == $NEXT_PHP_MAJOR ]] && exit 100
@@ -357,6 +358,7 @@ default:
     # Component tests are run via the PHPUnit CLI using a PHPUnit configuration
     # file of its own located in the core/tests/Drupal/Tests/Component
     # directory.
+    - export EXIT_CODE=0
     - vendor/bin/phpunit -c core/tests/Drupal/Tests/Component --testsuite unit-component --colors=always --testdox --log-junit $_ARTIFACTS_DIR/junit.xml --fail-on-deprecation $_FAIL_ON_PHPUNIT_DEPRECATION $_PHPUNIT_COVERAGE || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
@@ -414,7 +416,7 @@ default:
   <<: [ *with-composer, *test-setup ]
   retry: 1
   variables:
-    TESTSUITE: PHPUnit-Build
+    TESTSUITE: build
     KUBERNETES_CPU_REQUEST: "16"
     CONCURRENCY: "8"
     # No parallel for this job, setup manually the env variables that need to
@@ -476,7 +478,7 @@ default:
   <<: [ *with-composer, *test-setup ]
   parallel: 3
   variables:
-    TESTSUITE: PHPUnit-FunctionalJavascript
+    TESTSUITE: functional-javascript
     CONCURRENCY: "12"
     KUBERNETES_CPU_REQUEST: "14"
   services:
@@ -490,9 +492,9 @@ default:
   <<: [ *with-composer, *test-setup ]
   parallel: 8
   variables:
-    TESTSUITE: PHPUnit-Functional
-    CONCURRENCY: "20"
-    KUBERNETES_CPU_REQUEST: "14"
+    TESTSUITE: functional
+    CONCURRENCY: "24"
+    KUBERNETES_CPU_REQUEST: "16"
   services:
     - <<: *with-database
 
@@ -500,9 +502,9 @@ default:
   <<: [ *with-composer, *test-setup ]
   parallel: 4
   variables:
-    TESTSUITE: PHPUnit-Kernel
-    KUBERNETES_CPU_REQUEST: "10"
-    CONCURRENCY: "20"
+    TESTSUITE: kernel
+    KUBERNETES_CPU_REQUEST: "12"
+    CONCURRENCY: "24"
   services:
     - <<: *with-database
 
@@ -526,7 +528,7 @@ default:
         echo '   "Key" to "REPEAT_TEST_CLASS" and "Value" to "Drupal\Tests\ckeditor5\FunctionalJavascript\MediaLinkabilityTest"';
         exit 1;
       else
-        sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --color --keep-results --concurrency "$CONCURRENCY" --repeat "$REPEAT_COUNT" --sqlite ":memory:" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --class $REPEAT_TEST_CLASS
+        sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --color --keep-results --concurrency "$CONCURRENCY" --repeat "$REPEAT_COUNT" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --class $REPEAT_TEST_CLASS
       fi
 
 '🚲 Performance tests':
@@ -716,6 +718,7 @@ default:
       - core/.eslintcache
       - core/.stylelintcache
       - core/.phpcscache
+      - core/.twigcsfixercache
 
 # Download the cache artifacts from the previous pipeline run to work around
 # https://gitlab.com/gitlab-org/gitlab/-/issues/458828 due to performance
@@ -742,6 +745,8 @@ default:
     - CACHE_FILE=core/.stylelintcache
     - *download-cache
     - CACHE_FILE=core/.phpcscache
+    - *download-cache
+    - CACHE_FILE=core/.twigcsfixercache
     - *download-cache
 
 '📔 Spell-checking':
@@ -840,6 +845,51 @@ default:
       - $_ARTIFACTS_DIR
       - core/.phpcscache
 
+'🧹 Twig Coding standards (twig-cs-fixer)':
+  <<: [ *default-job-settings-lint ]
+  stage: 🪄 Lint
+  variables:
+    KUBERNETES_CPU_REQUEST: "4"
+    _ARTIFACTS_DIR: "test-artifacts/twig-cs-fixer"
+    CACHE_FILE: "core/.twigcsfixercache"
+  before_script:
+    - mkdir -p $_ARTIFACTS_DIR
+    - *composer-setup
+    - if [ -n "$COMPOSER_UPDATE" ]; then
+        composer update --optimize-autoloader;
+        composer outdated;
+      fi
+    - mkdir -p $_ARTIFACTS_DIR
+    - *download-cache
+  # Run on push, or on MRs if Twig files have changed, or manually.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - core/.twig-cs-fixer.php
+        - core/composer.json
+        - core/composer.lock
+        - "**/*.twig"
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /Test lint cache warming/)
+    - when: manual
+      allow_failure: true
+  script:
+    - vendor/bin/twig-cs-fixer --version
+    - composer twigcs -- --report=gitlab > $_ARTIFACTS_DIR/twig-cs-fixer-quality-report.json
+  artifacts:
+    reports:
+      codequality: $_ARTIFACTS_DIR/twig-cs-fixer-quality-report.json
+    expire_in: 1 week
+    expose_as: 'web-vendor'
+    paths:
+      - vendor/
+      - composer.lock
+      - composer/Metapackage/
+      - $_ARTIFACTS_DIR
+      - core/.twigcsfixercache
+
 '🧹 JavaScript linting (eslint)':
   <<: [ *yarn-install-from-cache ]
   # Overwrites the cache key to be the job that pushes the cache. All the other
@@ -852,7 +902,7 @@ default:
   variables:
     KUBERNETES_CPU_REQUEST: "2"
     CACHE_FILE: "core/.eslintcache"
-  # Run on push, or on MRs if CSS files have changed, or manually.
+  # Run on push, or on MRs if JS files have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
@@ -945,7 +995,7 @@ default:
     # Composer-install Drush & the Config Inspector module.
     - composer require drush/drush drupal/config_inspector || exit 100
     # Install Drupal's Standard install profile + all core modules (except obsolete ones) + the config inspector module.
-    - php core/scripts/drupal install standard
+    - vendor/bin/dr install standard
     - ls core/modules | grep -v sdc | xargs vendor/bin/drush pm:install --yes
     - vendor/bin/drush pm:install config_inspector --yes --quiet || exit 101
     # Compute statistics for coverage of validatable config for HEAD.
@@ -1009,3 +1059,4 @@ default:
     - if [ ! -f core/.eslintcache ]; then exit 1; fi
     - if [ ! -f core/.stylelintcache ]; then exit 1; fi
     - if [ ! -f core/.phpcscache ]; then exit 1; fi
+    - if [ ! -f core/.twigcsfixercache ]; then exit 1; fi
