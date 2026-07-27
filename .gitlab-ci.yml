@@ -502,7 +502,8 @@ default:
     - <<: *with-database
     - <<: *with-selenium-chrome
   after_script:
-    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+    - sed -i "s#$CI_PROJECT_DIR/##" $_ARTIFACTS_DIR/phpunit-*.xml || true
+    - php .gitlab-ci/scripts/statistics-job-consolidator.php $_ARTIFACTS_DIR/deprecation-handler/jobs $_ARTIFACTS_DIR/deprecation-statistics-$CI_JOB_ID.json
     - cp /builds/chromedriver.log ./
 
 '🌐️️ PHPUnit Functional':
