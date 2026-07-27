@@ -134,17 +134,6 @@ class Term extends EditorialContentEntityBase implements TermInterface {
   /**
    * {@inheritdoc}
    */
-  public function preSave(EntityStorageInterface $storage) {
-    parent::preSave($storage);
-    // Terms with no parents are mandatory children of <root>.
-    if (!$this->get('parent')->count()) {
-      $this->parent->target_id = 0;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);

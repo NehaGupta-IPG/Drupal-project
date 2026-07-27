@@ -60,22 +60,6 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
 
   /**
    * {@inheritdoc}
-   *
-   * @param array $values
-   *   An array of values to set, keyed by property name. A value for the
-   *   vocabulary ID ('vid') is required.
-   */
-  public function create(array $values = []) {
-    // Save new terms with no parents by default.
-    if (empty($values['parent'])) {
-      $values['parent'] = [0];
-    }
-    $entity = parent::create($values);
-    return $entity;
-  }
-
-  /**
-   * {@inheritdoc}
    */
   public function resetCache(?array $ids = NULL) {
     $this->ancestors = [];
