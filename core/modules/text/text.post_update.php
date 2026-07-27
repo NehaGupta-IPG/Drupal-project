@@ -19,7 +19,7 @@ function text_removed_post_updates(): array {
 }
 
 /**
- * Installs text_with_summary when the site uses text_with_summary field storage.
+ * Installs text_with_summary for text_with_summary field.
  */
 function text_post_update_install_text_with_summary(): void {
   if (\Drupal::moduleHandler()->moduleExists('text_with_summary')) {
