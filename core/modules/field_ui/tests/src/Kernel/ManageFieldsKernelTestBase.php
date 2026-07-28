@@ -95,7 +95,7 @@ abstract class ManageFieldsKernelTestBase extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('taxonomy_term');
     $this->installSchema('node', ['node_access']);
-    $this->installConfig(['field_ui', 'node', 'system', 'user']);
+    $this->installConfig(['field_ui', 'filter', 'node', 'system', 'user']);
 
     \Drupal::service(ThemeInstallerInterface::class)->install(['stark']);
     $this->config('system.theme')->set('default', 'stark')->save();
