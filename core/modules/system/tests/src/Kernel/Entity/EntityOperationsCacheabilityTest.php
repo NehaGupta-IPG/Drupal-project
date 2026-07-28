@@ -87,7 +87,15 @@ class EntityOperationsCacheabilityTest extends EntityKernelTestBase {
       TRUE,
     ];
     yield [['block_content'], 'block_content', [], ['block_content:1'], ['user.permissions'], TRUE];
-    yield [['comment'], 'comment_type', ['target_entity_type_id' => 'entity_test'], [], ['user.permissions'], FALSE, TRUE];
+    yield [
+      ['comment'],
+      'comment_type',
+      ['target_entity_type_id' => 'entity_test'],
+      [],
+      ['user.permissions'],
+      FALSE,
+      TRUE,
+    ];
     yield [
       ['field_ui'],
       'entity_view_mode',
