@@ -332,11 +332,11 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     ];
     $form['user_settings']['color_scheme'] = [
       '#type' => 'select',
-      '#title' => $this->t('Dark mode'),
+      '#title' => $this->t('Light / dark mode'),
       '#options' => [
+        'auto' => $this->t('Auto'),
         'light' => $this->t('Light'),
         'dark' => $this->t('Dark'),
-        'auto' => $this->t('Auto'),
       ],
       '#default_value' => $account->get('color_scheme')->value ?: 'auto',
       '#description' => $this->t('Choose the interface color scheme. Auto follows your operating system setting. Whether the selected color scheme is applied depends on the active theme.'),
