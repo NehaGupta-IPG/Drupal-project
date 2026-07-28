@@ -168,3 +168,19 @@ ajax_test.link_page.dialog_contents:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::httpMethodsDialog'
   requirements:
     _access: 'TRUE'
+
+ajax_test.pointer_events_form:
+  path: '/ajax-test/pointer-events-form'
+  defaults:
+    _title: 'Ajax Pointer Events Test Form'
+    _form: '\Drupal\ajax_test\Form\AjaxTestPointerEventsForm'
+  requirements:
+    _access: 'TRUE'
+
+ajax_test.file_upload_pointer_events_form:
+  path: '/ajax-test/file-upload-pointer-events-form'
+  defaults:
+    _title: 'Ajax File Upload Pointer Events Test Form'
+    _form: '\Drupal\ajax_test\Form\AjaxTestFileUploadPointerEventsForm'
+  requirements:
+    _access: 'TRUE'
