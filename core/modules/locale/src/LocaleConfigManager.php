@@ -59,6 +59,7 @@ class LocaleConfigManager {
     protected TypedConfigManagerInterface $typedConfigManager,
     #[Autowire(service: 'language_manager')]
     protected ConfigurableLanguageManagerInterface $languageManager,
+    #[Autowire(service: 'locale.default.config.storage')]
     protected DefaultConfigStorageInterface $defaultConfigStorage,
     protected ConfigManagerInterface $configManager,
   ) {}
