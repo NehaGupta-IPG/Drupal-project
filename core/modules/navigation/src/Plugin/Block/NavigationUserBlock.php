@@ -12,6 +12,7 @@ use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\navigation\Attribute\AllowInNavigation;
 use Drupal\user\Entity\User;
 
 /**
@@ -23,6 +24,7 @@ use Drupal\user\Entity\User;
   id: 'navigation_user',
   admin_label: new TranslatableMarkup('User'),
 )]
+#[AllowInNavigation]
 final class NavigationUserBlock extends BlockBase {
 
   const string NAVIGATION_LINKS_MENU = 'navigation-user-links';

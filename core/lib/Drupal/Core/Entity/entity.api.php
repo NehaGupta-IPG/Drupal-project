@@ -432,11 +432,15 @@ use Drupal\node\Entity\NodeType;
  *   provide a link_target.view handler: a class implementing
  *   \Drupal\Core\Entity\EntityLinkTargetInterface. Optionally, if the content
  *   entity type is downloadable, also provide a link_target.download handler.
- * - If your content entity is fieldable, provide the 'field_ui_base_route'
- *   annotation property, giving the name of the route that the Manage Fields,
- *   Manage Display, and Manage Form Display pages from the Field UI module
- *   will be attached to. This is usually the bundle settings edit page, or an
- *   entity type settings page if there are no bundles.
+ * - If your content entity is fieldable, add the
+ *   \Drupal\field_ui\Attribute\FieldUiBaseRoute attribute to the entity class,
+ *   giving the name of the route that the Manage Fields, Manage Display, and
+ *   Manage Form Display pages from the Field UI module will be attached to.
+ *   This is usually the bundle settings edit page, or an entity type settings
+ *   page if there are no bundles. The attribute sets the
+ *   'field_ui_base_route' property when the Field UI module is installed, and
+ *   is ignored when it is not, so the entity type does not need to depend on
+ *   Field UI.
  * - If your content entity has bundles, you will also need to define a second
  *   plugin to handle the bundles. This plugin is itself a configuration entity
  *   type, so follow the steps here to define it. The machine name ('id'

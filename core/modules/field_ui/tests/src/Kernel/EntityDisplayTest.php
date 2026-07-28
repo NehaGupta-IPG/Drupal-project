@@ -40,6 +40,10 @@ class EntityDisplayTest extends KernelTestBase {
     'field_test',
     'node',
     'system',
+    // The test builds field_ui forms, which are only reachable for entity
+    // types with a 'field_ui_base_route'. That property is only set when
+    // field_ui is installed.
+    'field_ui',
   ];
 
   /**

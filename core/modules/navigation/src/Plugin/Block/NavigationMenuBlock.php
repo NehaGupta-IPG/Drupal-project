@@ -9,6 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\navigation\Attribute\AllowInNavigation;
 use Drupal\navigation\Menu\NavigationMenuLinkTreeManipulators;
 use Drupal\navigation\Plugin\Derivative\SystemMenuNavigationBlock as SystemMenuNavigationBlockDeriver;
 use Drupal\system\Plugin\Block\SystemMenuBlock;
@@ -25,6 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   category: new TranslatableMarkup("Menus (Navigation)"),
   deriver: SystemMenuNavigationBlockDeriver::class,
 )]
+#[AllowInNavigation]
 final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFactoryPluginInterface {
 
   const NAVIGATION_MAX_DEPTH = 3;

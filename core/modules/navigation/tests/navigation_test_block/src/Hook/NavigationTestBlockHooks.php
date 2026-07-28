@@ -12,14 +12,6 @@ use Drupal\Core\Hook\Attribute\Hook;
 class NavigationTestBlockHooks {
 
   /**
-   * Implements hook_block_alter().
-   */
-  #[Hook('block_alter')]
-  public function blockAlter(&$definitions): void {
-    $definitions['navigation_test']['allow_in_navigation'] = TRUE;
-  }
-
-  /**
    * Implements hook_navigation_defaults().
    */
   #[Hook('navigation_defaults')]
