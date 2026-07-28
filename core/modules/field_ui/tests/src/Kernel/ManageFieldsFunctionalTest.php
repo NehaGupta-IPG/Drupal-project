@@ -2,11 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\field_ui\Functional;
+namespace Drupal\Tests\field_ui\Kernel;
 
+use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\Tests\HttpKernelFormHelperTrait;
+use Drupal\Tests\block\Traits\BlockCreationTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,9 +24,128 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the Field UI "Manage fields" screen.
  */
 #[Group('field_ui')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
-class ManageFieldsFunctionalTest extends ManageFieldsFunctionalTestBase {
+class ManageFieldsFunctionalTest extends KernelTestBase {
+
+  use BlockCreationTrait {
+    placeBlock as drupalPlaceBlock;
+  }
+  use ContentTypeCreationTrait {
+    createContentType as drupalCreateContentType;
+  }
+  use EntityReferenceFieldCreationTrait;
+  use FieldUiTestTrait;
+  use HttpKernelFormHelperTrait;
+  use UserCreationTrait {
+    createUser as drupalCreateUser;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = [
+    'block',
+    'field',
+    'field_test',
+    'field_ui',
+    'file',
+    'filter',
+    'image',
+    'node',
+    'system',
+    'taxonomy',
+    'text',
+    'user',
+  ];
+
+  /**
+   * The ID of the custom content type created for testing.
+   *
+   * @var string
+   */
+  protected string $contentType;
+
+  /**
+   * The label for a random field to be created for testing.
+   *
+   * @var string
+   */
+  protected string $fieldLabel;
+
+  /**
+   * The input name of a random field to be created for testing.
+   *
+   * @var string
+   */
+  protected string $fieldNameInput;
+
+  /**
+   * The name of a random field to be created for testing.
+   *
+   * @var string
+   */
+  protected string $fieldName;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    $this->installEntitySchema('node');
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('taxonomy_term');
+    $this->installConfig(['field_ui', 'node', 'system', 'user']);
+
+    \Drupal::service(ThemeInstallerInterface::class)->install(['stark']);
+    $this->config('system.theme')->set('default', 'stark')->save();
+    $this->drupalPlaceBlock('local_actions_block');
+
+    // Create a test user.
+    $admin_user = $this->drupalCreateUser([
+      'access content',
+      'administer content types',
+      'bypass node access',
+      'administer node fields',
+      'administer node form display',
+      'administer node display',
+    ]);
+    $this->setCurrentUser($admin_user);
+
+    // Create content type, with underscores.
+    $type_name = $this->randomMachineName(8) . '_test';
+    $type = $this->drupalCreateContentType(['name' => $type_name, 'type' => $type_name]);
+    $this->contentType = $type->id();
+
+    // Create random field name with markup to test escaping.
+    $this->fieldLabel = '<em>' . $this->randomMachineName(8) . '</em>';
+    $this->fieldNameInput = $this->randomMachineName(8);
+    $this->fieldName = 'field_' . $this->fieldNameInput;
+
+    // Create Basic page and Article node types.
+    $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
+    $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
+
+    // Create a vocabulary named "Tags".
+    $vocabulary = Vocabulary::create([
+      'name' => 'Tags',
+      'vid' => 'tags',
+      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+    ]);
+    $vocabulary->save();
+
+    $handler_settings = [
+      'target_bundles' => [
+        $vocabulary->id() => $vocabulary->id(),
+      ],
+    ];
+    $this->createEntityReferenceField('node', 'article', 'field_' . $vocabulary->id(), 'Tags', 'taxonomy_term', 'default', $handler_settings);
+
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay('node', 'article')
+      ->setComponent('field_' . $vocabulary->id())
+      ->save();
+  }
 
   /**
    * Tests that default value is correctly validated and saved.
