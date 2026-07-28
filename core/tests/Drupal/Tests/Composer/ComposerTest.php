@@ -26,7 +26,8 @@ class ComposerTest extends UnitTestCase {
     catch (\RuntimeException $e) {
       $this->assertMatchesRegularExpression('/Drupal core development requires Composer 2.3.5, but Composer /', $e->getMessage());
     }
-    $this->assertTrue(TRUE);
+    // Nothing broke so there is nothing to assert.
+    $this->expectNotToPerformAssertions();
   }
 
   /**
