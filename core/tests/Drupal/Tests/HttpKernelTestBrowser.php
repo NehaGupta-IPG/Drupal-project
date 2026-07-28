@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Form\FormState;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
@@ -34,6 +36,10 @@ class HttpKernelTestBrowser extends HttpKernelBrowser {
    * {@inheritdoc}
    */
   protected function doRequest(object $request): Response {
+    Html::resetSeenIds();
+    // Reset static properties from previous requests.
+    (new FormState())->clearErrors();
+
     // Temporarily remove all requests from the request stack, so that the
     // request being handled is the main request, as it would be for a real
     // HTTP request.
