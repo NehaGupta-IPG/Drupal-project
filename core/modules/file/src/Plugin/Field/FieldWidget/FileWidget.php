@@ -13,7 +13,6 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
-use Drupal\Core\Validation\ConstraintManager;
 use Drupal\file\Element\ManagedFile;
 use Drupal\file\Entity\File;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -613,7 +612,14 @@ class FileWidget extends WidgetBase {
     // the field settings.
     // @see \Drupal\file\Plugin\Validation\Constraint\FileDescriptionRequired
     if ($clicked_button === 'upload_button' && $this->getFieldSetting('description_field_required')) {
-      $required_description_definition = $this->getConstraintManager()->getDefinition('FileDescriptionRequired');
+
+      // Cannot inject "validation.constraint" service as this plugin is
+      // extended by other plugins, such as
+      // \Drupal\image\Plugin\Field\FieldWidget\ImageWidget.
+      /** @var \Drupal\Core\Validation\ConstraintManager $constraint_manager */
+      $constraint_manager = \Drupal::service('validation.constraint');
+
+      $required_description_definition = $constraint_manager->getDefinition('FileDescriptionRequired');
       /** @var \Symfony\Component\Validator\ConstraintViolationInterface $violation */
       foreach ($violations as $offset => $violation) {
         // Constraint plugins are Symfony classes so they don't implement the
@@ -629,21 +635,6 @@ class FileWidget extends WidgetBase {
     if ($clicked_button !== 'remove_button') {
       parent::flagErrors($items, $violations, $form, $form_state);
     }
-  }
-
-  /**
-   * Returns the constraint plugin manager service.
-   *
-   * Cannot inject this service as this plugin is extended by other plugins,
-   * such as \Drupal\image\Plugin\Field\FieldWidget\ImageWidget.
-   *
-   * @return \Drupal\Core\Validation\ConstraintManager
-   *   The constraint plugin manager service.
-   *
-   * @see \Drupal\image\Plugin\Field\FieldWidget\ImageWidget
-   */
-  private function getConstraintManager(): ConstraintManager {
-    return \Drupal::service('validation.constraint');
   }
 
 }
