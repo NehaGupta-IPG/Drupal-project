@@ -17,12 +17,12 @@ class LoggerAwarePass implements CompilerPassInterface {
    *
    * @see \Drupal\Core\DependencyInjection\Compiler\LoggerAwareInstanceTaggingPass
    */
-  public const INSTANCE_TAG = '_logger_awar.instance';
+  public const INSTANCE_TAG = '_logger_aware.instance';
 
   /**
    * Copy of '_provider', captured before decoration can move/strip it.
    */
-  public const PROVIDER_TAG = '_logger_awar.instance_provider';
+  public const PROVIDER_TAG = '_logger_aware.instance.provider';
 
   /**
    * {@inheritdoc}
