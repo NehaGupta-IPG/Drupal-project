@@ -203,7 +203,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
           'relationship' => 'parent',
           'group' => 'field-region',
           'subgroup' => 'field-region',
-          'source' => 'field-name',
+          'source' => 'field-region',
         ],
       ],
     ];
