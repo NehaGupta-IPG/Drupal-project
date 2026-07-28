@@ -14072,12 +14072,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/filter/src/FilterPluginCollection.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^\\#lazy_builder value \'string\' at key \'0\' is invalid\\.$#',
-	'identifier' => 'renderCallback.invalidKeyValue',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/src/FilterProcessResult.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\filter\\\\Form\\\\FilterDisableForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17232,12 +17226,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media/src/OEmbed/Resource.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$resource_url on left side of \\?\\? always exists and is not nullable\\.$#',
-	'identifier' => 'nullCoalesce.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/OEmbed/UrlResolver.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\media\\\\Plugin\\\\Filter\\\\MediaEmbed\\:\\:applyPerEmbedMediaOverrides\\(\\) has no return type specified\\.$#',
@@ -21828,14 +21816,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/default_format_test/src/DefaultFormatTestController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to deprecated function deprecation_test_function\\(\\)\\:
-in drupal\\:8\\.4\\.0 and is removed from drupal\\:9\\.0\\.0\\. This is
-  the deprecation message for deprecated_test_function\\(\\)\\.$#',
-	'identifier' => 'function.deprecated',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/deprecation_test/src/DeprecatedController.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\dialog_renderer_test\\\\Form\\\\TestForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -31792,12 +31772,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views_ui/src/Form/Ajax/ConfigHandlerGroup.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot unset offset \'\\#title\' on array\\{\'\\#theme_wrappers\'\\: array\\{\'container\'\\}, \'\\#attributes\'\\: array\\{class\\: array\\{\'scroll\'\\}, data\\-drupal\\-views\\-scroll\\: true\\}\\}\\.$#',
-	'identifier' => 'unset.offset',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/src/Form/Ajax/Display.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_ui\\\\Form\\\\Ajax\\\\Display\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -33946,12 +33920,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Utility/ReflectionTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Result of static method Drupal\\\\Composer\\\\Composer\\:\\:ensureComposerVersion\\(\\) \\(void\\) is used\\.$#',
-	'identifier' => 'staticMethod.void',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
 	'identifier' => 'disallowed.function',
 	'count' => 2,
@@ -34670,18 +34638,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Theme/RegistryTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in include_once\\(\\) "vfs\\://drupal/sites/default/modules/module_a/module_a\\.post_update\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'includeOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Update/UpdateRegistryTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Path in include_once\\(\\) "vfs\\://drupal/sites/default/modules/module_b/module_b\\.post_update\\.php" is not a file or it does not exist\\.$#',
-	'identifier' => 'includeOnce.fileNotFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Update/UpdateRegistryTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\DrupalTestBrowser\\:\\:addPostFiles\\(\\) has no return type specified\\.$#',

@@ -180,7 +180,7 @@ class UrlResolver implements UrlResolverInterface {
         break;
       }
     }
-    return $resource_url ?? reset($endpoints)->buildResourceUrl($url);
+    return $resource_url;
   }
 
 }

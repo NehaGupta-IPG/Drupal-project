@@ -57,6 +57,7 @@ class Display extends ViewsFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\views\ViewEntityInterface $view */
     $view = $form_state->get('view');
     $display_id = $form_state->get('display_id');
 
