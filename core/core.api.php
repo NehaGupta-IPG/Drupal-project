@@ -1410,7 +1410,7 @@
  *   contain member variables corresponding to the annotations plugins will
  *   need to provide.
  *     - All plugins have at least an ID, which is a unique string within
- *       plugins of the same type There are no restrictions on the characters
+ *       plugins of the same type. There are no restrictions on the characters
  *       that can be used. However, it is recommended that the colon, ':',
  *       character is not used. The colon is used internally to build the ID of
  *       derived plugins.
