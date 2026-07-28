@@ -16,11 +16,9 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests plugin property attributes against the plugin discovery file cache.
  *
- * The namespaces a discovery scans stand in for the installed modules, as they
- * do in \Drupal\Core\Plugin\Discovery\AttributeClassDiscovery, where they come
- * from the installed modules by way of the 'container.namespaces' parameter. An
- * attribute class in a namespace that is not among them is treated as belonging
- * to a module that is not installed.
+ * The namespaces a discovery is constructed with stand in for the providers
+ * that are in use: an attribute class in a namespace the discovery was not
+ * given is treated as belonging to a provider that is not in use.
  *
  * The plugin classes have to be discovered by scanning a directory, so they are
  * fixture files. The attribute classes are only ever reached by name, so they
