@@ -70,7 +70,7 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
 
     // If there are no Composer-installed recipes, we will only find core
     // recipes.
-    $path ??= self::getRecipesPathFromComposer();
+    $path ??= self::getRecipeDirectory();
     if ($path) {
       assert(is_dir($path));
       $this->directoriesToSearch[] = $path;
@@ -78,20 +78,37 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
   }
 
   /**
-   * Gets the path at which Composer has installed recipes.
+   * Returns the directory where recipes are installed.
+   *
+   * Placeholder tokens, like {$name} and {$vendor}, are left as-is.
    *
    * @return string|null
    *   The path where Composer has installed recipes, or NULL if no recipes
    *   are installed.
-   */
-  private static function getRecipesPathFromComposer(): ?string {
-    $installed_recipes = InstalledVersions::getInstalledPackagesByType(Recipe::COMPOSER_PROJECT_TYPE);
-    if ($installed_recipes) {
-      $name = reset($installed_recipes);
-      $path = InstalledVersions::getInstallPath($name);
-      return dirname($path);
+ */
+  private static function getRecipeDirectory(): ?string {
+    // This is expensive to compute, and very unlikely to change in a request.
+    static $cookbook;
+    if (isset($cookbook)) {
+      return $cookbook;
     }
-    return NULL;
+
+    ['install_path' => $project_root] = InstalledVersions::getRootPackage();
+    $project_root = realpath($project_root);
+    assert(is_string($project_root));
+
+    $file = $project_root . DIRECTORY_SEPARATOR . 'composer.json';
+    $data = (string) file_get_contents($file);
+    $data = json_decode($data, TRUE, flags: JSON_THROW_ON_ERROR);
+
+    $directory = array_find_key(
+      $data['extra']['installer-paths'] ?? [],
+      fn (array $criteria): bool => in_array('type:' . Recipe::COMPOSER_PROJECT_TYPE, $criteria, TRUE),
+    );
+    if ($directory) {
+      $cookbook = $project_root . DIRECTORY_SEPARATOR . $directory;
+    }
+    return $cookbook;
   }
 
   /**
