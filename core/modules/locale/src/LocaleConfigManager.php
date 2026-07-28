@@ -64,26 +64,6 @@ class LocaleConfigManager {
   ) {}
 
   /**
-   * Gets the current default config storage.
-   *
-   * @return \Drupal\Core\Config\DefaultConfigStorageInterface
-   *   The default config storage.
-   */
-  public function getDefaultConfigStorage(): DefaultConfigStorageInterface {
-    return $this->defaultConfigStorage;
-  }
-
-  /**
-   * Sets default config storage.
-   *
-   * @param \Drupal\Core\Config\DefaultConfigStorageInterface $default_config_storage
-   *   The default config storage.
-   */
-  public function setDefaultConfigStorage(DefaultConfigStorageInterface $default_config_storage): void {
-    $this->defaultConfigStorage = $default_config_storage;
-  }
-
-  /**
    * Gets array of translated strings for Locale translatable configuration.
    *
    * @param string $name
@@ -582,6 +562,34 @@ class LocaleConfigManager {
       }
     }
     return $count;
+  }
+
+  /**
+   * Updates config translations reading the list from the provided $storage.
+   *
+   * While the update is running, default configuration is read from $storage
+   * first, falling back to the default config storage. This allows, for
+   * example, a recipe's own configuration to be used to determine
+   * translatability and fetch translatable data before the recipe's
+   * configuration has been installed elsewhere.
+   *
+   * @param \Drupal\Core\Config\StorageInterface $storage
+   *   Additional configuration storage to read default configuration from.
+   *
+   * @return int
+   *   Total number of configuration override and active configuration objects
+   *   updated (saved or removed).
+   */
+  public function updateConfigTranslationsFromStorage(StorageInterface $storage): int {
+    $original_default_config_storage = $this->defaultConfigStorage;
+    $this->defaultConfigStorage = new RecipeDefaultConfigStorage($storage, $original_default_config_storage);
+    try {
+      $names = $this->defaultConfigStorage->listAll();
+      return $this->updateConfigTranslations($names, array_keys($this->languageManager->getLanguages()));
+    }
+    finally {
+      $this->defaultConfigStorage = $original_default_config_storage;
+    }
   }
 
   /**

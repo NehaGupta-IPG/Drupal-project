@@ -158,23 +158,10 @@ final class RecipeRunner {
   protected static function processConfigTranslations(Recipe $recipe): void {
     /** @var \Drupal\locale\LocaleConfigManager $locale_config_manager */
     $locale_config_manager = \Drupal::service('locale.config_manager');
+    $recipe_storage = $recipe->config->getConfigStorage();
 
-    // Replace the default config storage with one that reads from the recipe,
-    // so that locale system picks up the recipe's config when determining
-    // translatability and fetching translatable data.
-    $default_config_storage = $locale_config_manager->getDefaultConfigStorage();
-    $recipe_config_storage = new RecipeDefaultConfigStorage($recipe->config->getConfigStorage(), $default_config_storage);
-    $locale_config_manager->setDefaultConfigStorage($recipe_config_storage);
-
-    $names = $recipe_config_storage->listAll();
-    $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
-
-    $locale_config_manager->updateDefaultConfigLangcodes($names);
-
-    $locale_config_manager->updateConfigTranslations($names, $langcodes);
-
-    // Reset to the original default config storage.
-    $locale_config_manager->setDefaultConfigStorage($default_config_storage);
+    $locale_config_manager->updateDefaultConfigLangcodes($recipe_storage->listAll());
+    $locale_config_manager->updateConfigTranslationsFromStorage($recipe_storage);
   }
 
   /**
