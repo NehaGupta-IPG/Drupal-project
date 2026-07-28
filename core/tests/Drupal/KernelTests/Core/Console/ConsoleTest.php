@@ -108,6 +108,23 @@ class ConsoleTest extends KernelTestBase {
   }
 
   /**
+   * Tests that an invokable command's attribute help and usages are kept.
+   *
+   * Invokable commands are wrapped in a plain Command via setCode(), so the
+   * help text and usage examples declared on their #[AsCommand] attribute are
+   * only retained because ConsoleCompilerPass forwards them to the service tag.
+   */
+  public function testInvokableCommandHelpAndUsages(): void {
+    $tester = $this->applicationTester();
+    $code = $tester->run(['command' => 'help', 'command_name' => 'example:invokable']);
+    $this->assertEquals(Command::SUCCESS, $code, $tester->getDisplay());
+    $display = $tester->getDisplay();
+    $this->assertStringContainsString('example:invokable foo', $display);
+    $this->assertStringContainsString('example:invokable --bar', $display);
+    $this->assertStringContainsString('Example invokable command help text.', $display);
+  }
+
+  /**
    * Tests running a console command defined in a subdirectory.
    */
   public function testSubdirectoryCommand(): void {
