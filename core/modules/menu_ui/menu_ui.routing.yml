@@ -11,7 +11,7 @@ menu_ui.menu_administrative:
   defaults:
     _entity_list: 'menu'
     _title: 'Administrative Menus'
-    administrative: TRUE
+    administrative: true
   requirements:
     _permission: 'administer menu'
 

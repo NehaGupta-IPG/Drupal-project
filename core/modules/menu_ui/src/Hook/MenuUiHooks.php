@@ -70,7 +70,7 @@ class MenuUiHooks {
     if ($route_name == 'entity.menu.add_form' && \Drupal::moduleHandler()->moduleExists('block') && \Drupal::currentUser()->hasPermission('administer blocks')) {
       return '<p>' . $this->t('You can enable the newly-created block for this menu on the <a href=":blocks">Block layout page</a>.', [':blocks' => Url::fromRoute('block.admin_display')->toString()]) . '</p>';
     }
-    elseif (($route_name == 'entity.menu.collection' || $route_name == 'menu_ui.menu_administrative') && \Drupal::moduleHandler()->moduleExists('block') && \Drupal::currentUser()->hasPermission('administer blocks')) {
+    elseif (($route_name === 'entity.menu.collection' || $route_name === 'menu_ui.menu_administrative') && \Drupal::moduleHandler()->moduleExists('block') && \Drupal::currentUser()->hasPermission('administer blocks')) {
       return '<p>' . $this->t('Each menu has a corresponding block that is managed on the <a href=":blocks">Block layout page</a>.', [':blocks' => Url::fromRoute('block.admin_display')->toString()]) . '</p>';
     }
     return NULL;
