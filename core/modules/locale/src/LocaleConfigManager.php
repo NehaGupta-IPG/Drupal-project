@@ -582,8 +582,7 @@ class LocaleConfigManager {
     $original_default_config_storage = $this->defaultConfigStorage;
     $this->defaultConfigStorage = new RecipeDefaultConfigStorage($storage, $original_default_config_storage);
     try {
-      $names = $this->defaultConfigStorage->listAll();
-      return $this->updateConfigTranslations($names, array_keys($this->languageManager->getLanguages()));
+      return $this->updateConfigTranslations($this->defaultConfigStorage->listAll());
     }
     finally {
       $this->defaultConfigStorage = $original_default_config_storage;
