@@ -215,6 +215,11 @@ services:
     arguments: ['@current_user']
     tags:
       - { name: cache.context}
+  cache_context.user.color_scheme:
+    class: Drupal\Core\Cache\Context\ColorSchemeCacheContext
+    arguments: ['@current_user']
+    tags:
+      - { name: cache.context}
   cache_context.languages:
     class: Drupal\Core\Cache\Context\LanguagesCacheContext
     arguments: ['@language_manager']

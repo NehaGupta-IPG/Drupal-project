@@ -129,6 +129,9 @@ abstract class UserResourceTestBase extends EntityResourceTestBase {
           'value' => 'Llama',
         ],
       ],
+      'color_scheme' => [
+        ['value' => 'auto'],
+      ],
       'created' => [
         [
           'value' => (new \DateTime())->setTimestamp(123456789)->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),

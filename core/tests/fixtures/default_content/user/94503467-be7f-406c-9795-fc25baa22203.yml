@@ -26,6 +26,9 @@ default:
   timezone:
     -
       value: UTC
+  color_scheme:
+    -
+      value: auto
   status:
     -
       value: true
