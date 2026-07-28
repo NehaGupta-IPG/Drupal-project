@@ -39,7 +39,7 @@ class FileDescriptionRequiredUpdateTest extends UpdatePathTestBase {
     // Run updates.
     $this->runUpdates();
 
-    // Check that after running updates the file field setting is set to  FALSE.
+    // Check that after running updates the file field setting is set to FALSE.
     $field_config = $this->config('field.field.node.test_content_type.field_test_9');
     $this->assertArrayHasKey('description_field_required', $field_config->get('settings'));
     $this->assertFalse($field_config->get('settings.description_field_required'));
