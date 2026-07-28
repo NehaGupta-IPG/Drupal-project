@@ -19,9 +19,8 @@ use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * Implements hook_file_download().
+ * Hook implementations for image.
  */
-#[Hook('file_download')]
 class ImageDownloadFileHook {
 
   public function __construct(
@@ -38,7 +37,8 @@ class ImageDownloadFileHook {
   /**
    * Implements hook_file_download().
    */
-  public function __invoke(string $uri): array|int|null {
+  #[Hook('file_download')]
+  public function fileDownload(string $uri): array|int|null {
     $path = StreamWrapperManager::getTarget($uri);
     // Private file access for image style derivatives.
     if (str_starts_with($path, 'styles/')) {
