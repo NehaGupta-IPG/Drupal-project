@@ -1408,7 +1408,11 @@
  * - Define an annotation class for your plugin type. This class should extend
  *   \Drupal\Component\Annotation\Plugin, and for most plugin types, it should
  *   contain member variables corresponding to the annotations plugins will
- *   need to provide. All plugins have at least $id: a unique string
+ *   need to provide.
+ *     - All plugins have at least an ID, which is a unique string. There are no
+ *       restrictions on the characters that can be used. However, tt is
+ *       recommended that the colon, ':', character is not used. The colon is
+ *       used internally to build the ID of derived plugins.
  *   identifier.
  * - Define an alter hook for altering the discovered plugin definitions. You
  *   should document the hook in a *.api.php file.
