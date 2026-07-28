@@ -66,7 +66,9 @@ class UpdateHooks {
         case 'update.status':
         case 'update.settings':
         case 'system.status':
+        case 'system.modules_uninstall':
         case 'system.theme_install':
+        case 'system.theme_uninstall':
         case 'system.batch_page.html':
           return;
 
@@ -103,37 +105,6 @@ class UpdateHooks {
           }
         }
       }
-    }
-  }
-
-  /**
-   * Implements hook_cron().
-   */
-  #[Hook('cron')]
-  public function cron(): void {
-    $update_config = \Drupal::config('update.settings');
-    $frequency = $update_config->get('check.interval_days');
-    $interval = 60 * 60 * 24 * $frequency;
-    $last_check = \Drupal::state()->get('update.last_check', 0);
-    $request_time = \Drupal::time()->getRequestTime();
-    if ($request_time - $last_check > $interval) {
-      // If the configured update interval has elapsed, we want to invalidate
-      // the data for all projects, attempt to re-fetch, and trigger any
-      // configured notifications about the new status.
-      update_refresh();
-      update_fetch_data();
-    }
-    else {
-      // Otherwise, see if any individual projects are now stale or still
-      // missing data, and if so, try to fetch the data.
-      update_get_available(TRUE);
-    }
-    $last_email_notice = \Drupal::state()->get('update.last_email_notification', 0);
-    if ($request_time - $last_email_notice > $interval) {
-      // If configured time between notifications elapsed, send email about
-      // updates possibly available.
-      \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.fetch');
-      _update_cron_notify();
     }
   }
 
@@ -191,7 +162,7 @@ class UpdateHooks {
    * Constructs the email notification message when the site is out of date.
    *
    * @see \Drupal\Core\Mail\MailManagerInterface::mail()
-   * @see _update_cron_notify()
+   * @see \Drupal\update\Hook\UpdateCronHooks::notify()
    * @see _update_message_text()
    * @see \Drupal\update\UpdateManagerInterface
    */
@@ -201,7 +172,7 @@ class UpdateHooks {
     $language = \Drupal::languageManager()->getLanguage($langcode);
     $message['subject'] .= $this->t('New release(s) available for @site_name', ['@site_name' => \Drupal::config('system.site')->get('name')], ['langcode' => $langcode]);
     foreach ($params as $msg_type => $msg_reason) {
-      $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode);
+      $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode, TRUE);
     }
     $message['body'][] = $this->t('See the available updates page for more information:',
       [],
@@ -217,69 +188,6 @@ class UpdateHooks {
     else {
       $message['body'][] = $this->t('Your site is currently configured to send these emails only when security updates are available. To get notified for any available updates, @url.', ['@url' => $settings_url]);
     }
-  }
-
-  /**
-   * Implements hook_verify_update_archive().
-   *
-   * First, we ensure that the archive isn't a copy of Drupal core, which the
-   * update manager does not yet support. See
-   * https://www.drupal.org/node/606592.
-   *
-   * Then, we make sure that at least one module included in the archive file
-   * has an .info.yml file which claims that the code is compatible with the
-   * current version of Drupal core.
-   *
-   * @see \Drupal\Core\Extension\ExtensionDiscovery
-   */
-  #[Hook('verify_update_archive')]
-  public function verifyUpdateArchive($project, $archive_file, $directory): array {
-    $errors = [];
-    // Make sure this isn't a tarball of Drupal core.
-    if (file_exists("{$directory}/{$project}/index.php") && file_exists("{$directory}/{$project}/core/install.php") && file_exists("{$directory}/{$project}/core/includes/bootstrap.inc") && file_exists("{$directory}/{$project}/core/modules/node/node.module") && file_exists("{$directory}/{$project}/core/modules/system/system.module")) {
-      return [
-        'no-core' => $this->t('Automatic updating of Drupal core is not supported. See the <a href=":update-guide">Updating Drupal guide</a> for information on how to update Drupal core manually.', [
-          ':update-guide' => 'https://www.drupal.org/docs/updating-drupal',
-        ]),
-      ];
-    }
-    // Parse all the .info.yml files and make sure at least one is compatible
-    // with this version of Drupal core. If one is compatible, then the project
-    // as a whole is considered compatible (since, for example, the project may
-    // ship with some out-of-date modules that are not necessary for its overall
-    // functionality).
-    $compatible_project = FALSE;
-    $incompatible = [];
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-    $file_system = \Drupal::service('file_system');
-    $files = $file_system->scanDirectory(
-      "{$directory}/{$project}",
-      '/.*\.info.yml$/',
-      ['key' => 'name', 'min_depth' => 0],
-    );
-    foreach ($files as $file) {
-      // Get the .info.yml file for the module or theme this file belongs to.
-      $info = \Drupal::service('info_parser')->parse($file->uri);
-      // If the module or theme is incompatible with Drupal core, set an error.
-      if ($info['core_incompatible']) {
-        $incompatible[] = !empty($info['name']) ? $info['name'] : $this->t('Unknown');
-      }
-      else {
-        $compatible_project = TRUE;
-        break;
-      }
-    }
-    if (empty($files)) {
-      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => basename($archive_file)]);
-    }
-    elseif (!$compatible_project) {
-      $errors[] = \Drupal::translation()->formatPlural(count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
-        '@version' => \Drupal::VERSION,
-        '%archive_file' => basename($archive_file),
-        '%names' => implode(', ', $incompatible),
-      ]);
-    }
-    return $errors;
   }
 
 }

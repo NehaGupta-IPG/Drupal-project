@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
@@ -34,13 +33,6 @@ class EntitySchemaTest extends EntityKernelTestBase {
    * @var \Drupal\Core\Database\Connection
    */
   protected $database;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
    * The entity definition update manager.
@@ -340,13 +332,13 @@ class EntitySchemaTest extends EntityKernelTestBase {
 
     // Get a list of all the entities in the schema.
     $key_value_store = \Drupal::keyValue('entity.storage_schema.sql');
-    $schema = $key_value_store->getAll();
+    $schema = $key_value_store->getAllKeys();
 
     // Count the storage definitions provided by the entity_test module, so that
     // after uninstall we can be sure there were some to be deleted.
     $entity_type_id_count = 0;
 
-    foreach (array_keys($schema) as $storage_definition_name) {
+    foreach ($schema as $storage_definition_name) {
       [$entity_type_id] = explode('.', $storage_definition_name);
       if (in_array($entity_type_id, $entity_type_ids)) {
         $entity_type_id_count++;
@@ -361,13 +353,13 @@ class EntitySchemaTest extends EntityKernelTestBase {
 
     // Get a list of all the entities in the schema.
     $key_value_store = \Drupal::keyValue('entity.storage_schema.sql');
-    $schema = $key_value_store->getAll();
+    $schema = $key_value_store->getAllKeys();
 
     // Count the storage definitions that come from entity types provided by
     // the entity_test module.
     $entity_type_id_count = 0;
 
-    foreach (array_keys($schema) as $storage_definition_name) {
+    foreach ($schema as $storage_definition_name) {
       [$entity_type_id] = explode('.', $storage_definition_name);
       if (in_array($entity_type_id, $entity_type_ids)) {
         $entity_type_id_count++;

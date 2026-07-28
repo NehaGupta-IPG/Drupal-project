@@ -9,6 +9,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use Drupal\update\UpdateFetcher;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -16,6 +17,7 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -73,7 +75,7 @@ class UpdateFetcherTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->mockConfigFactory = $this->getConfigFactoryStub(['update.settings' => ['fetch_url' => 'http://www.example.com']]);
-    $this->mockHttpClient = $this->createMock('\GuzzleHttp\ClientInterface');
+    $this->mockHttpClient = $this->createStub(ClientInterface::class);
     $settings = new Settings([]);
     $this->logger = new TestLogger();
     $this->updateFetcher = new UpdateFetcher($this->mockConfigFactory, $this->mockHttpClient, $settings, $this->logger);
@@ -117,7 +119,7 @@ class UpdateFetcherTest extends UnitTestCase {
    *   - 'site_key' - An arbitrary site key.
    *   - 'expected' - The expected URL from UpdateFetcher::buildFetchUrl().
    */
-  public static function providerTestUpdateBuildFetchUrl() {
+  public static function providerTestUpdateBuildFetchUrl(): array {
     $data = [];
 
     // First test that we didn't break the trivial case.
@@ -198,8 +200,8 @@ class UpdateFetcherTest extends UnitTestCase {
     $this->assertEquals(500, $response->getStatusCode());
     $this->assertEmpty($data);
 
-    $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record) {
-      return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n";
+    $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record): bool {
+      return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response: HTTPS failed";
     }));
   }
 
@@ -209,6 +211,7 @@ class UpdateFetcherTest extends UnitTestCase {
    * @legacy-covers ::doRequest
    * @legacy-covers ::fetchProjectData
    */
+  #[IgnoreDeprecations]
   public function testUpdateFetcherHttpFallback(): void {
     $settings = new Settings(['update_fetch_with_http_fallback' => TRUE]);
     $this->mockClient(
@@ -236,8 +239,8 @@ class UpdateFetcherTest extends UnitTestCase {
     // Although this is a bogus mocked response, it's what fetchProjectData()
     // should return in this case.
     $this->assertEquals('HTTP worked', $data);
-    $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record) {
-      return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n";
+    $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record): bool {
+      return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response: HTTPS failed";
     }));
   }
 

@@ -11,6 +11,7 @@ use Drupal\package_manager\Validator\SettingsValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * @internal
  */
 #[Group('package_manager')]
+#[Group('#slow')]
 #[CoversClass(SettingsValidator::class)]
 #[RunTestsInSeparateProcesses]
 class SettingsValidatorTest extends PackageManagerKernelTestBase {
@@ -47,6 +49,7 @@ class SettingsValidatorTest extends PackageManagerKernelTestBase {
    *   The expected validation results.
    */
   #[DataProvider('providerSettingsValidation')]
+  #[IgnoreDeprecations]
   public function testSettingsValidation(bool $setting, array $expected_results): void {
     $this->setSetting('update_fetch_with_http_fallback', $setting);
     $this->assertStatusCheckResults($expected_results);
@@ -62,6 +65,7 @@ class SettingsValidatorTest extends PackageManagerKernelTestBase {
    *   The expected validation results.
    */
   #[DataProvider('providerSettingsValidation')]
+  #[IgnoreDeprecations]
   public function testSettingsValidationDuringPreApply(bool $setting, array $expected_results): void {
     $this->addEventTestListener(function () use ($setting): void {
       $this->setSetting('update_fetch_with_http_fallback', $setting);

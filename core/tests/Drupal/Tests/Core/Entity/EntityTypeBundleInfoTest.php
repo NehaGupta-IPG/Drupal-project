@@ -116,7 +116,7 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
    * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
-  protected function setUpEntityTypeDefinitions($definitions = []): void {
+  protected function setUpEntityTypeDefinitions(array $definitions = []): void {
     foreach ($definitions as $key => $entity_type) {
       // \Drupal\Core\Entity\EntityTypeInterface::getLinkTemplates() is called
       // by \Drupal\Core\Entity\EntityTypeManager::processDefinition() so it
@@ -161,17 +161,19 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
    * Tests the getBundleInfo() method.
    */
   #[DataProvider('providerTestGetBundleInfo')]
-  public function testGetBundleInfo($entity_type_id, $expected): void {
+  public function testGetBundleInfo(string $entity_type_id, array $expected): void {
     $this->moduleHandler->invokeAll('entity_bundle_info')->willReturn([]);
     $this->moduleHandler->alter('entity_bundle_info', Argument::type('array'))->willReturn(NULL);
 
     $apple = $this->prophesize(EntityTypeInterface::class);
     $apple->getLabel()->willReturn('Apple');
     $apple->getBundleEntityType()->willReturn(NULL);
+    $apple->get('entity_type_bundle_info')->willReturn(NULL);
 
     $banana = $this->prophesize(EntityTypeInterface::class);
     $banana->getLabel()->willReturn('Banana');
     $banana->getBundleEntityType()->willReturn(NULL);
+    $banana->get('entity_type_bundle_info')->willReturn(NULL);
 
     $this->setUpEntityTypeDefinitions([
       'apple' => $apple,
@@ -216,10 +218,12 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
     $apple = $this->prophesize(EntityTypeInterface::class);
     $apple->getLabel()->willReturn('Apple');
     $apple->getBundleEntityType()->willReturn(NULL);
+    $apple->get('entity_type_bundle_info')->willReturn(NULL);
 
     $banana = $this->prophesize(EntityTypeInterface::class);
     $banana->getLabel()->willReturn('Banana');
     $banana->getBundleEntityType()->willReturn(NULL);
+    $banana->get('entity_type_bundle_info')->willReturn(NULL);
 
     $this->setUpEntityTypeDefinitions([
       'apple' => $apple,
@@ -286,10 +290,12 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
     $apple = $this->prophesize(EntityTypeInterface::class);
     $apple->getLabel()->willReturn('Apple');
     $apple->getBundleEntityType()->willReturn(NULL);
+    $apple->get('entity_type_bundle_info')->willReturn(NULL);
 
     $banana = $this->prophesize(EntityTypeInterface::class);
     $banana->getLabel()->willReturn('Banana');
     $banana->getBundleEntityType()->willReturn(NULL);
+    $banana->get('entity_type_bundle_info')->willReturn(NULL);
 
     $this->setUpEntityTypeDefinitions([
       'apple' => $apple,
@@ -323,10 +329,12 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
     $apple = $this->prophesize(EntityTypeInterface::class);
     $apple->getLabel()->willReturn('Apple');
     $apple->getBundleEntityType()->willReturn(NULL);
+    $apple->get('entity_type_bundle_info')->willReturn(NULL);
 
     $banana = $this->prophesize(EntityTypeInterface::class);
     $banana->getLabel()->willReturn('Banana');
     $banana->getBundleEntityType()->willReturn(NULL);
+    $banana->get('entity_type_bundle_info')->willReturn(NULL);
 
     $this->setUpEntityTypeDefinitions([
       'apple' => $apple,

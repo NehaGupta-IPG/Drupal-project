@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalJavascriptTests;
 
+use Behat\Mink\Session;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Tests\WebAssert;
 use PHPUnit\Framework\Attributes\PostCondition;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Runs a browser test using a driver that supports JavaScript.
@@ -51,7 +53,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function initMink() {
+  protected function initMink(): Session {
     if (!is_a($this->minkDefaultDriverClass, DrupalSelenium2Driver::class, TRUE)) {
       throw new \UnexpectedValueException(sprintf("%s has to be an instance of %s", $this->minkDefaultDriverClass, DrupalSelenium2Driver::class));
     }
@@ -72,7 +74,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installModulesFromClassProperty(ContainerInterface $container) {
+  protected function installModulesFromClassProperty(ContainerInterface $container): void {
     self::$modules = [
       'js_testing_ajax_request_test',
       'js_testing_log_test',
@@ -86,7 +88,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function initFrontPage() {
+  protected function initFrontPage(): void {
     parent::initFrontPage();
     // Set a standard window size so that all javascript tests start with the
     // same viewport.
@@ -108,14 +110,6 @@ abstract class WebDriverTestBase extends BrowserTestBase {
         // Rather than allow it to fail, throw an explicit exception now
         // explaining what the problem is.
         throw new \RuntimeException('Unfinished AJAX requests while tearing down a test');
-      }
-
-      $warnings = $this->getSession()->evaluateScript("JSON.parse(sessionStorage.getItem('js_testing_log_test.warnings') || JSON.stringify([]))");
-      foreach ($warnings as $warning) {
-        if (str_starts_with($warning, '[Deprecation]')) {
-          // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-          @trigger_error('Javascript Deprecation:' . substr($warning, 13), E_USER_DEPRECATED);
-        }
       }
     }
     parent::tearDown();
@@ -139,7 +133,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getMinkDriverArgs() {
+  protected function getMinkDriverArgs(): string|false {
     if ($this->minkDefaultDriverClass === DrupalSelenium2Driver::class) {
       return getenv('MINK_DRIVER_ARGS_WEBDRIVER') ?: parent::getMinkDriverArgs();
     }
@@ -161,7 +155,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    *
    * @see \Behat\Mink\Driver\DriverInterface::evaluateScript()
    */
-  protected function assertJsCondition($condition, $timeout = 10000, $message = '') {
+  protected function assertJsCondition(string $condition, int $timeout = 10000, $message = ''): void {
     $message = $message ?: "JavaScript condition met:\n" . $condition;
     $result = $this->getSession()->getDriver()->wait($timeout, $condition);
     $this->assertTrue($result, $message);
@@ -182,7 +176,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    * @throws \Behat\Mink\Exception\DriverException
    *   When the operation cannot be done.
    */
-  protected function createScreenshot($filename, $set_background_color = TRUE) {
+  protected function createScreenshot($filename, $set_background_color = TRUE): void {
     $session = $this->getSession();
     if ($set_background_color) {
       $session->executeScript("document.body.style.backgroundColor = 'white';");
@@ -200,8 +194,25 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    * @return \Drupal\FunctionalJavascriptTests\WebDriverWebAssert
    *   A new web-assert option for asserting the presence of elements with.
    */
-  public function assertSession($name = NULL) {
+  public function assertSession($name = NULL): WebAssert {
     return new WebDriverWebAssert($this->getSession($name), $this->baseUrl);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function drupalGet($path, array $options = [], array $headers = []): string {
+    $result = parent::drupalGet($path, $options, $headers);
+
+    // Wait for all requests to finish.
+    $this->getSession()->wait(5000, 'window.drupalActiveXhrCount === 0 || typeof window.drupalActiveXhrCount === "undefined"');
+
+    // Process Javascript deprecations.
+    $driver = $this->getSession()->getDriver();
+    assert($driver instanceof DrupalSelenium2Driver);
+    $driver->processJavascriptDeprecations();
+
+    return $result;
   }
 
   /**
@@ -234,7 +245,7 @@ EndOfScript;
   /**
    * {@inheritdoc}
    */
-  protected function getHtmlOutputHeaders() {
+  protected function getHtmlOutputHeaders(): string {
     // The webdriver API does not support fetching headers.
     return '';
   }

@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Tinky Winky Dipsy phpggc
+
 /**
  * Tests the transactions, using the explicit ::commitOrRelease method.
  *
@@ -512,9 +513,10 @@ class TransactionTest extends DatabaseTestBase {
       }
     }
     $this->assertRowPresent('row');
+    unset($transaction);
+    $this->cleanUp();
 
     // Even in different order.
-    $this->cleanUp();
     $transaction = $this->createRootTransaction('', FALSE);
     $this->executeDDLStatement();
     $this->insertRow('row');
@@ -536,9 +538,10 @@ class TransactionTest extends DatabaseTestBase {
       }
     }
     $this->assertRowPresent('row');
+    unset($transaction);
+    $this->cleanUp();
 
     // Even with stacking.
-    $this->cleanUp();
     $transaction = $this->createRootTransaction('', FALSE);
     $transaction2 = $this->createFirstSavepointTransaction('', FALSE);
     $this->executeDDLStatement();
@@ -563,23 +566,18 @@ class TransactionTest extends DatabaseTestBase {
     $this->insertRow('row');
     $transaction3->commitOrRelease();
 
-    if ($this->connection->supportsTransactionalDDL()) {
-      $transaction->commitOrRelease();
-    }
-    else {
-      try {
-        $transaction->commitOrRelease();
-        $this->fail('TransactionOutOfOrderException was expected, but did not throw.');
-      }
-      catch (TransactionOutOfOrderException) {
-        // Just continue, this is out or order since $transaction3 started a
-        // new root.
-      }
-    }
+    // If this is running on a database supporting transactional DDL,
+    // $transaction is still active. Otherwise, the initial root
+    // transaction's commit is a no-op now since the DDL statement forced a
+    // commit and then $transaction3 was fully committed too: we do not raise
+    // any error in this case.
+    $transaction->commitOrRelease();
+
     $this->assertRowPresent('row');
+    unset($transaction, $transaction2, $transaction3);
+    $this->cleanUp();
 
     // A transaction after a DDL statement should still work the same.
-    $this->cleanUp();
     $transaction = $this->createRootTransaction('', FALSE);
     $transaction2 = $this->createFirstSavepointTransaction('', FALSE);
     $this->executeDDLStatement();
@@ -617,12 +615,13 @@ class TransactionTest extends DatabaseTestBase {
       }
     }
     $this->assertRowAbsent('row');
+    unset($transaction, $transaction2, $transaction3);
+    $this->cleanUp();
 
     // The behavior of a rollback depends on the type of database server.
     if ($this->connection->supportsTransactionalDDL()) {
       // For database servers that support transactional DDL, a rollback
       // of a transaction including DDL statements should be possible.
-      $this->cleanUp();
       $transaction = $this->createRootTransaction('', FALSE);
       $this->insertRow('row');
       $this->executeDDLStatement();
@@ -997,11 +996,9 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
     $this->assertFalse($this->connection->inTransaction());
     $this->assertRowPresent('row');
-    // Trying to release the inner (savepoint) Transaction object, throws an
-    // exception since it was dropped by the database already, and removed from
-    // our transaction stack.
-    $this->expectException(TransactionOutOfOrderException::class);
-    $this->expectExceptionMessageMatches("/^Error attempting commit of .*\\\\savepoint_2\\. Active stack: .* empty/");
+    // Trying to release the inner (savepoint) Transaction object is a no-op
+    // at this point since the root transaction was fully committed already; we
+    // do not raise any error in this case.
     $savepoint2->commitOrRelease();
   }
 
@@ -1016,7 +1013,7 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertSame('savepoint_1', $savepoint1->name());
 
     $this->expectException(TransactionNameNonUniqueException::class);
-    $this->expectExceptionMessage("savepoint_1 is already in use.");
+    $this->expectExceptionMessageIsOrContains("A transaction named savepoint_1 is already in use.");
     $this->connection->startTransaction('savepoint_1');
   }
 
@@ -1033,7 +1030,7 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertSame('Dipsy', $savepoint1->name());
 
     $this->expectException(TransactionNameNonUniqueException::class);
-    $this->expectExceptionMessage("Dipsy is already in use.");
+    $this->expectExceptionMessageIsOrContains("A transaction named Dipsy is already in use.");
     $this->connection->startTransaction('Dipsy');
   }
 
@@ -1120,7 +1117,26 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertRowAbsent('rtcRollback');
     $this->assertRowPresent('row');
 
-    // Destruct the transaction.
+    // Commit and destruct the transaction. Non-transactional DDL database
+    // will have committed already, so the explicit commit would be a no-op in
+    // that case.
+    if ($this->connection->supportsTransactionalDDL()) {
+      $transaction->commitOrRelease();
+    }
+    else {
+      set_error_handler(static function (int $errno, string $errstr): bool {
+        throw new \ErrorException($errstr);
+      });
+      try {
+        $transaction->commitOrRelease();
+      }
+      catch (\ErrorException $e) {
+        $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
+      }
+      finally {
+        restore_error_handler();
+      }
+    }
     unset($transaction);
 
     // The post-transaction callback should now have inserted a 'rtcCommit'
@@ -1234,6 +1250,35 @@ class TransactionTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests post-transaction callback executes on "garbage collection".
+   *
+   * Simulate the end of a request by closing the connection and destroying
+   * the transaction manually. The order matters for this test as the garbage
+   * collection is unpredictable and could operate this way.
+   */
+  public function testPostTransactionsAlwaysExecutedBeforeConnectionIsDestroyed(): void {
+    $transaction = $this->createRootTransaction('', FALSE);
+    $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallback']);
+    $this->insertRow('row');
+    $this->assertNull($this->postTransactionCallbackAction);
+    $this->assertRowAbsent('rtcCommit');
+
+    Database::closeConnection();
+    // @phpstan-ignore unset.possiblyHookedProperty
+    unset($this->connection);
+    unset($transaction);
+
+    // Reopen the database connection so we can continue running assertions.
+    $this->connection = Database::getConnection();
+
+    // The post-transaction callback should now have inserted a 'rtcCommit'
+    // row.
+    $this->assertSame('rtcCommit', $this->postTransactionCallbackAction);
+    $this->assertRowPresent('row');
+    $this->assertRowPresent('rtcCommit');
+  }
+
+  /**
    * A post-transaction callback for testing purposes.
    */
   public function rootTransactionCallback(bool $success): void {
@@ -1282,13 +1327,14 @@ class TransactionTest extends DatabaseTestBase {
    * Tests that mocking transactions works fine.
    */
   public function testMockTransaction(): void {
-    $connection = $this->getMockBuilder(Connection::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->getMockBuilder(Transaction::class)
+    $connection = $this->createStub(Connection::class);
+    $transaction = $this->getMockBuilder(Transaction::class)
       ->setConstructorArgs([$connection, '', ''])
       ->getMock();
-    $this->assertTrue(TRUE);
+    $transaction->expects($this->once())
+      ->method('name')
+      ->willReturn('foo');
+    $this->assertSame('foo', $transaction->name());
   }
 
   /**
@@ -1303,7 +1349,7 @@ class TransactionTest extends DatabaseTestBase {
     // that prevents the payload from executing is thrown, so we ignore
     // deprecations for this test.
     $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessage('Cannot unserialize Drupal\Core\Database\Transaction');
+    $this->expectExceptionMessageIs('Cannot unserialize Drupal\Core\Database\Transaction');
     unserialize($payload);
   }
 

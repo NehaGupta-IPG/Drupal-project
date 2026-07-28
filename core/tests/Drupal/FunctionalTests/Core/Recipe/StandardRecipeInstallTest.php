@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Core\Recipe;
 
 use Drupal\FunctionalTests\Installer\InstallerTestBase;
-use Drupal\shortcut\Entity\Shortcut;
 use Drupal\Tests\standard\Traits\StandardTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -51,9 +50,12 @@ class StandardRecipeInstallTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function visitInstaller(): void {
+  protected function visitInstaller(array $query = []): void {
     // Use a URL to install from a recipe.
-    $this->drupalGet($GLOBALS['base_url'] . '/core/install.php?profile=&recipe=core/recipes/standard');
+    parent::visitInstaller([
+      'profile' => '',
+      'recipe' => 'core/recipes/standard',
+    ]);
   }
 
   /**
@@ -80,20 +82,10 @@ class StandardRecipeInstallTest extends InstallerTestBase {
       'link[0][uri]' => '<front>',
     ], 'Save');
 
-    // Standard ships two shortcuts; ensure they exist.
-    $this->assertCount(2, Shortcut::loadMultiple());
-
     // The installer logs you in.
     $this->drupalLogout();
 
     $this->doTestStandard();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUpProfile(): void {
-    // Noop. This form is skipped due the parameters set on the URL.
   }
 
   /**

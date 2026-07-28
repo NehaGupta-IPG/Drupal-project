@@ -1,10 +1,14 @@
 variables:
+  aggregate_target:
+    css: 'claro'
   version: VERSION
   css:
     base:
       css/base/variables.css: { }
 
 global-styling:
+  aggregate_target:
+    css: claro
   version: VERSION
   css:
     base:
@@ -213,16 +217,6 @@ autocomplete:
     - core/once
     - claro/claro.jquery.ui
 
-drupal.shortcut:
-  version: VERSION
-  css:
-    # @todo move this to components after
-    #   https://www.drupal.org/project/drupal/issues/3045467 is in.
-    theme:
-      css/components/shortcut.css: {}
-  dependencies:
-    - claro/variables
-
 details-focus:
   js:
     js/details.js: {}
@@ -257,21 +251,6 @@ status.report:
       css/components/system-status-counter.css: {}
   dependencies:
     - claro/variables
-  moved_files:
-    claro/global-styling:
-      deprecation_version: 11.2.0
-      removed_version: 12.0.0
-      deprecation_link: https://www.drupal.org/node/3432346
-      css:
-        component:
-          css/components/system-status-report.css:
-            base: css/components/system-status-report.css
-          css/components/system-status-counter.css:
-            base: css/components/system-status-counter.css
-          css/components/system-status-report-counters.css:
-            base: css/components/system-status-report-counters.css
-          css/components/system-status-report-general-info.css:
-            base: css/components/system-status-report-general-info.css
 
 views:
   css:

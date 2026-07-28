@@ -11,6 +11,7 @@ use Drupal\Core\Recipe\RecipeFileException;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -31,7 +32,6 @@ class ConfigActionValidationTest extends KernelTestBase {
     'block_content',
     'link',
     'node',
-    'shortcut',
     'system',
     'user',
   ];
@@ -42,23 +42,13 @@ class ConfigActionValidationTest extends KernelTestBase {
    * This test requires that we save invalid config, so we can test that it gets
    * validated after applying a recipe.
    */
-  protected $strictConfigSchema = FALSE;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->installConfig('shortcut');
-    $this->installEntitySchema('shortcut');
-  }
+  protected bool $strictConfigSchema = FALSE;
 
   /**
  * Tests config actions are validated.
  */
   #[TestWith(["block_content_type"])]
   #[TestWith(["node_type"])]
-  #[TestWith(["shortcut_set"])]
   #[TestWith(["menu"])]
   public function testConfigActionsAreValidated(string $entity_type_id): void {
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
@@ -111,6 +101,7 @@ YAML;
   #[TestWith(["direct_dependency"])]
   #[TestWith(["indirect_dependency_one_level_down"])]
   #[TestWith(["indirect_dependency_two_levels_down"])]
+  #[DoesNotPerformAssertions]
   public function testConfigActionDependenciesAreValidated(string $name): void {
     Recipe::createFromDirectory("core/tests/fixtures/recipes/config_actions_dependency_validation/$name");
   }
