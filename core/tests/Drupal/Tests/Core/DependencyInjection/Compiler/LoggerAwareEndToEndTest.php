@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * End-to-end coverage of LoggerAwarePass, through a real compile().
  *
- * self::registerPipeline() must stay in sync with CoreServiceProvider.
+ * Test self::registerPipeline() must stay in sync with CoreServiceProvider.
  */
 #[CoversClass(LoggerAwarePass::class)]
 #[Group('DependencyInjection')]
@@ -115,11 +115,17 @@ class LoggerAwareEndToEndTest extends UnitTestCase {
 
 }
 
+/**
+ * Class LoggerAwareEndToEndStub.
+ */
 class LoggerAwareEndToEndStub implements LoggerAwareInterface {
   use LoggerAwareTrait;
 
 }
 
+/**
+ * Class LoggerAwareEndToEndPlainDecorator.
+ */
 class LoggerAwareEndToEndPlainDecorator {
 
   public function __construct(
@@ -128,6 +134,9 @@ class LoggerAwareEndToEndPlainDecorator {
 
 }
 
+/**
+ * Class LoggerAwareEndToEndDecorator.
+ */
 class LoggerAwareEndToEndDecorator implements LoggerAwareInterface {
   use LoggerAwareTrait;
 
@@ -137,6 +146,9 @@ class LoggerAwareEndToEndDecorator implements LoggerAwareInterface {
 
 }
 
+/**
+ * Class LoggerAwareEndToEndChannelLogger.
+ */
 class LoggerAwareEndToEndChannelLogger extends AbstractLogger {
 
   public function log($level, $message, array $context = []): void {}
