@@ -85,7 +85,7 @@ class ModerationStateMultipleWorkflowFilter extends ManyToOne {
       ];
       $join = Views::pluginManager('join')->createInstance('standard', $configuration);
       $this->query->addRelationship('content_moderation_state_field_data', $join, 'node_field_data');
-      $this->query->addWhere('AND', 'content_moderation_state_field_data.moderation_state', $this->value, '=');
+      $this->query->addWhere('AND', 'content_moderation_state_field_data.moderation_state', $this->value, 'IN');
       $this->query->addWhere('AND', 'content_moderation_state_field_data.content_entity_type_id', 'node', '=');
     }
   }
