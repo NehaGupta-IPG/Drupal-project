@@ -51,6 +51,11 @@ class CronRunTest extends BrowserTestBase {
     $key = \Drupal::state()->get('system.cron_key');
     $this->drupalGet('cron/' . $key);
     $this->assertSession()->statusCodeEquals(204);
+
+    // Cron can run with the valid key while the site is in maintenance mode.
+    \Drupal::state()->set('system.maintenance_mode', TRUE);
+    $this->drupalGet('cron/' . $key);
+    $this->assertSession()->statusCodeEquals(204);
   }
 
   /**

@@ -3,6 +3,7 @@ system.cron:
   defaults:
     _controller: '\Drupal\system\CronController::run'
   options:
+    _maintenance_access: TRUE
     no_cache: TRUE
   requirements:
     _access_system_cron: 'TRUE'
