@@ -116,7 +116,7 @@ class LoggerAwareEndToEndTest extends UnitTestCase {
 }
 
 /**
- * Class LoggerAwareEndToEndStub.
+ * Trivial logger aware stub.
  */
 class LoggerAwareEndToEndStub implements LoggerAwareInterface {
   use LoggerAwareTrait;
@@ -124,7 +124,7 @@ class LoggerAwareEndToEndStub implements LoggerAwareInterface {
 }
 
 /**
- * Class LoggerAwareEndToEndPlainDecorator.
+ * Trivial logger aware decorator.
  */
 class LoggerAwareEndToEndPlainDecorator {
 
@@ -135,7 +135,7 @@ class LoggerAwareEndToEndPlainDecorator {
 }
 
 /**
- * Class LoggerAwareEndToEndDecorator.
+ * Simple logger aware stub.
  */
 class LoggerAwareEndToEndDecorator implements LoggerAwareInterface {
   use LoggerAwareTrait;
@@ -147,7 +147,7 @@ class LoggerAwareEndToEndDecorator implements LoggerAwareInterface {
 }
 
 /**
- * Class LoggerAwareEndToEndChannelLogger.
+ * Simple logger stub.
  */
 class LoggerAwareEndToEndChannelLogger extends AbstractLogger {
 
