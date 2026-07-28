@@ -46,10 +46,15 @@ class RecipeDiscoveryTest extends KernelTestBase {
     $dir = $include_test_recipes
       ? $drupal_root . '/core/tests/fixtures/recipes'
       : NULL;
-
     // Certain test recipes have validation errors on purpose, but we want to
     // skip those.
-    $discovery = new RecipeDiscovery($dir, $include_core_recipes, TRUE, ['default_content_base/']);
+    $skip_invalid = TRUE;
+    // Certain test recipes are broken on purpose, but we want to skip those as
+    // well.
+    $broken_recipes = [
+      'broken_enum_action_test/',
+    ];
+    $discovery = new RecipeDiscovery($dir, $include_core_recipes, $skip_invalid, $broken_recipes);
     $logger = new TestLogger();
     $discovery->setLogger($logger);
 
@@ -68,7 +73,7 @@ class RecipeDiscoveryTest extends KernelTestBase {
       $this->assertTrue($logger->hasWarningThatContains("Validation errors were found in $drupal_root/core/tests/fixtures/recipes/invalid_recipe/recipe.yml:"));
 
       // A specified path should have been excluded.
-      $excluded_paths = preg_grep('/\/default_content_base$/', $paths);
+      $excluded_paths = preg_grep('/\/broken_enum_action_test$/', $paths);
       $this->assertEmpty($excluded_paths);
     }
     else {
