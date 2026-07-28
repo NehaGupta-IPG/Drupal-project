@@ -625,11 +625,8 @@ class LocaleConfigManager {
    * @param array $names
    *   Optional configuration names to update. If not provided, all
    *   configuration names from the provided components will be updated.
-   * @param array $components
-   *   Optional list of components to update. If not provided, all
-   *   components will be updated.
    */
-  public function updateDefaultConfigLangcodes(array $names = [], array $components = []) {
+  public function updateDefaultConfigLangcodes(?array $names = NULL) {
     $this->isUpdatingFromLocale = TRUE;
     // Need to rewrite some default configuration language codes if the default
     // site language is not English.
@@ -640,7 +637,7 @@ class LocaleConfigManager {
       // shipped with the components just installed, because installing a
       // component such as views may bring in default configuration from prior
       // components.
-      $names = $names ?: $this->getComponentNames($components);
+      $names ??= $this->getComponentNames();
       foreach ($names as $name) {
         $config = $this->configFactory->reset($name)->getEditable($name);
         // Should only update if still exists in active configuration. If locale
