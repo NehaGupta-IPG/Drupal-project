@@ -76,6 +76,10 @@ abstract class JsonExpression {
    *
    * @return string
    *   A SQL fragment that extracts the value at the given path.
+   *
+   * @internal
+   *   This method should only be use by the database layer and should be
+   *   implemented by database drivers.
    */
   abstract public function toSql(): string;
 
@@ -95,6 +99,10 @@ abstract class JsonExpression {
    *
    * @return string
    *   A SQL fragment that casts the value to the given type.
+   *
+   * @internal
+   *   This method should only be use by the database layer and should be
+   *   implemented by database drivers.
    */
   abstract public function toCastSql(JsonCastType $type, ?string $expression = NULL): string;
 
@@ -103,6 +111,10 @@ abstract class JsonExpression {
    *
    * @return string
    *   A SQL fragment that evaluates to TRUE if the path exists.
+   *
+   * @internal
+   *   This method should only be use by the database layer and should be
+   *   implemented by database drivers.
    */
   abstract public function toHasKeySql(): string;
 
@@ -115,6 +127,10 @@ abstract class JsonExpression {
    * @return string
    *   A SQL fragment that evaluates to TRUE if the JSON array at the path
    *   contains the given value.
+   *
+   * @internal
+   *   This method should only be use by the database layer and should be
+   *   implemented by database drivers.
    */
   abstract public function toContainsSql(string $encoded_value): string;
 
@@ -135,6 +151,10 @@ abstract class JsonExpression {
    *
    * @return array{sql: string, args: array}
    *   An array with 'sql' (the SQL fragment) and 'args' (placeholder values).
+   *
+   * @internal
+   *   This method should only be use by the database layer and should be
+   *   implemented by database drivers.
    */
   public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
     ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders((array) $value, $queryPlaceholder);
@@ -173,6 +193,10 @@ abstract class JsonExpression {
 
   /**
    * Whether this expression's path contains a wildcard (*) segment.
+   *
+   * @internal
+   *   This method should only be use by the database layer and database
+   *   drivers.
    */
   public function hasWildcard(): bool {
     return in_array('*', $this->pathSegments, TRUE);
