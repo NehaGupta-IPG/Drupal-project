@@ -249,11 +249,6 @@ class SystemThemeHooks {
   #[Hook('preprocess_html')]
   public function preprocessHtml(array &$variables): void {
     $variables['html_attributes']['data-color-scheme'] = $this->currentUser->getColorScheme();
-    if ($this->currentUser->isAuthenticated()) {
-      // The color scheme varies per user, so the html markup must not be shared
-      // across users.
-      $variables['#cache']['contexts'][] = 'user';
-    }
   }
 
   /**
