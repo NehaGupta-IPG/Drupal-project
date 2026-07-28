@@ -324,6 +324,10 @@ $settings['update_free_access'] = FALSE;
  * @see https://en.wikipedia.org/wiki/Man-in-the-middle_attack
  * @see \Drupal\update\UpdateFetcher
  * @see \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. There is
+ *   no replacement.
+ * @see https://www.drupal.org/node/3591920
  */
 # $settings['update_fetch_with_http_fallback'] = TRUE;
 
@@ -778,11 +782,11 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
 # $settings['trusted_host_patterns'] = [];
 
 /**
- * The default list of directories that will be ignored by Drupal's file API.
+ * Directories that will be ignored by Drupal's file API and when scanning for
+ * extensions and hooks.
  *
- * By default ignore node_modules and bower_components folders to avoid issues
- * with common frontend tools and recursive scanning of directories looking for
- * extensions.
+ * By default, node_modules and bower_components are ignored to speed up scanning
+ * by skipping folders containing non-PHP build dependencies.
  *
  * @see \Drupal\Core\File\FileSystemInterface::scanDirectory()
  * @see \Drupal\Core\Extension\ExtensionDiscovery::scanDirectory()
@@ -811,6 +815,22 @@ $settings['entity_update_batch_size'] = 50;
  */
 $settings['entity_update_backup'] = TRUE;
 
+/**
+ * Media oEmbed discovery trusted host configuration.
+ *
+ * The oEmbed spec allows for provider/resource discovery by fetching a URL. The
+ * patterns here restrict which domains Drupal will make a request to for oEmbed
+ * discovery.
+ *
+ * For example:
+ * @code
+ * $settings['media_oembed_discovery_trusted_host_patterns'] = [
+ *   '^www\.example\.com$',
+ * ];
+ * @endcode
+ * will allow the site to make oEmbed discovery requests to www.example.com.
+ */
+# $settings['media_oembed_discovery_trusted_host_patterns'] = [];
 
 /**
  * Load local development override configuration, if available.

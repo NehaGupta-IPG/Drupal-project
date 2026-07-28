@@ -471,8 +471,11 @@ services:
     public: false
   Drupal\Core\Config\StorageManagerInterface: '@config.storage.export.manager'
   config.storage.sync:
-    class: Drupal\Core\Config\FileStorage
-    factory: Drupal\Core\Config\FileStorageFactory::getSync
+    class: Drupal\Core\Config\AutoloadingStorage
+    factory: ['@Drupal\Core\Config\SyncFactory', 'get']
+  Drupal\Core\Config\SyncFactory:
+    autowire: true
+    public: false
   config.storage.snapshot:
     class: Drupal\Core\Config\DatabaseStorage
     arguments: ['@database', config_snapshot]
@@ -1487,7 +1490,7 @@ services:
     arguments: ['@config.manager', '@config.storage', '@config.storage.snapshot']
   config_exclude_modules_subscriber:
     class: Drupal\Core\EventSubscriber\ExcludedModulesEventSubscriber
-    arguments: ['@config.storage', '@settings', '@config.manager']
+    arguments: ['@config.storage', '@settings', '@config.manager', '@Drupal\Core\Extension\ModuleWeight']
   exception.needs_installer:
     class: Drupal\Core\EventSubscriber\ExceptionDetectNeedsInstallSubscriber
     arguments: ['@database']
@@ -2060,4 +2063,6 @@ services:
     tags:
       - { name: needs_destruction }
   Drupal\Core\Extension\ThemeSettingsProvider:
+    autowire: true
+  Drupal\Core\Extension\ModuleWeight:
     autowire: true

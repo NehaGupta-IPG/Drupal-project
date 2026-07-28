@@ -17,6 +17,7 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -200,7 +201,7 @@ class UpdateFetcherTest extends UnitTestCase {
     $this->assertEmpty($data);
 
     $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record): bool {
-      return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n";
+      return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response: HTTPS failed";
     }));
   }
 
@@ -210,6 +211,7 @@ class UpdateFetcherTest extends UnitTestCase {
    * @legacy-covers ::doRequest
    * @legacy-covers ::fetchProjectData
    */
+  #[IgnoreDeprecations]
   public function testUpdateFetcherHttpFallback(): void {
     $settings = new Settings(['update_fetch_with_http_fallback' => TRUE]);
     $this->mockClient(
@@ -238,7 +240,7 @@ class UpdateFetcherTest extends UnitTestCase {
     // should return in this case.
     $this->assertEquals('HTTP worked', $data);
     $this->assertTrue($this->logger->hasErrorThatPasses(function (array $record): bool {
-      return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n";
+      return $record['context']['@message'] === "Server error: `GET https://www.example.com/update_test/current` resulted in a `500 Internal Server Error` response: HTTPS failed";
     }));
   }
 

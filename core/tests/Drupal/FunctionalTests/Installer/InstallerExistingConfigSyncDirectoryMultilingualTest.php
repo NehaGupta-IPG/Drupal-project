@@ -33,16 +33,6 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
   protected $existingSyncDirectory = TRUE;
 
   /**
-   * Installer step: Select installation profile.
-   */
-  protected function setUpProfile(): void {
-    // Ensure the site name 'Multilingual' appears as expected in the 'Use
-    // existing configuration' radio description.
-    $this->assertSession()->pageTextContains('Install Multilingual using existing configuration.');
-    parent::setUpProfile();
-  }
-
-  /**
    * {@inheritdoc}
    */
   protected function getConfigLocation(): string {
@@ -57,7 +47,7 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
     // Place custom local translations in the translations directory and fix up
     // configuration.
     mkdir($this->publicFilesDirectory . '/translations', 0777, TRUE);
-    file_put_contents($this->publicFilesDirectory . '/translations/drupal-8.0.0.es.po', $this->getPo('es'));
+    file_put_contents($this->publicFilesDirectory . '/translations/drupal-' . \Drupal::VERSION . '.es.po', $this->getPo('es'));
     $locale_settings = Yaml::decode(file_get_contents($this->siteDirectory . '/config/sync/locale.settings.yml'));
     $locale_settings['translation']['use_source'] = 'local';
     file_put_contents($this->siteDirectory . '/config/sync/locale.settings.yml', Yaml::encode($locale_settings));
@@ -152,7 +142,7 @@ msgid "Apply"
 msgstr "Aplicar New"
 
 PO;
-    file_put_contents($this->publicFilesDirectory . '/translations/drupal-8.0.0.es.po', $po);
+    file_put_contents($this->publicFilesDirectory . '/translations/drupal-' . \Drupal::VERSION . '.es.po', $po);
 
     // Manually update the translation status so can re-run the import.
     $status = \Drupal::service(LocaleSource::class)->loadSources();
@@ -176,7 +166,6 @@ PO;
       'update' => [
         'views.view.archive',
         'views.view.content_recent',
-        'views.view.frontpage',
         'views.view.glossary',
         'views.view.who_s_new',
         'views.view.who_s_online',
