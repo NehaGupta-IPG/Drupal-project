@@ -608,9 +608,9 @@ class FileWidget extends WidgetBase {
   public function flagErrors(FieldItemListInterface $items, ConstraintViolationListInterface $violations, array $form, FormStateInterface $form_state) {
     $clicked_button = end($form_state->getTriggeringElement()['#parents']);
 
-    // Don't consider potential 'FileDescriptionRequired' constraint violations
-    // when the form is posted via 'Upload' button and the file description is
-    // enforced in field settings.
+    // Ignore any 'FileDescriptionRequired' constraint violations when the form
+    // is posted via the 'Upload' button and the file description is required in
+    // the field settings.
     // @see \Drupal\file\Plugin\Validation\Constraint\FileDescriptionRequired
     if ($clicked_button === 'upload_button' && $this->getFieldSetting('description_field_required')) {
       $required_description_definition = $this->getConstraintManager()->getDefinition('FileDescriptionRequired');
