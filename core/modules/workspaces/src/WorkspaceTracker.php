@@ -74,8 +74,8 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
     }
     $id_field = static::getIdField($entity->getEntityTypeId());
 
+    $transaction = $this->database->startTransaction();
     try {
-      $transaction = $this->database->startTransaction();
       // Update all affected workspaces that were tracking the current revision.
       // This means they are inheriting content and should be updated.
       if ($tracked_revision_id) {
@@ -129,9 +129,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
       $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
-      if (isset($transaction)) {
-        $transaction->rollBack();
-      }
+      $transaction->rollBack();
       Error::logException($this->logger, $e);
       throw $e;
     }
@@ -429,9 +427,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
       $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
-      if (isset($transaction)) {
-        $transaction->rollBack();
-      }
+      $transaction->rollBack();
       Error::logException($this->logger, $e);
       throw $e;
     }

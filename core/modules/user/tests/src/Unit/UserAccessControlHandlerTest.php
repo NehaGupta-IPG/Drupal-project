@@ -141,7 +141,7 @@ class UserAccessControlHandlerTest extends UnitTestCase {
       ->willReturn($this->{$target});
 
     foreach (['view' => $view, 'edit' => $edit] as $operation => $result) {
-      $result_text = !isset($result) ? 'null' : ($result ? 'true' : 'false');
+      $result_text = $result ? 'true' : 'false';
       $message = "User '$field' field access returns '$result_text' with operation '$operation' for '$viewer' accessing '$target'";
       $this->assertSame($result, $this->accessControlHandler->fieldAccess($operation, $field_definition, $this->{$viewer}, $this->items), $message);
     }

@@ -61,7 +61,7 @@ class ProtectedUserFieldConstraintValidator extends ConstraintValidator implemen
     /** @var \Drupal\Core\Field\FieldItemListInterface $items */
     $field = $items->getFieldDefinition();
 
-    /** @var \Drupal\user\UserInterface $account */
+    /** @var \Drupal\user\UserInterface|null $account */
     $account = $items->getEntity();
     if (!isset($account) || !empty($account->_skipProtectedUserFieldConstraint)) {
       // Looks like we are validating a field not being part of a user, or the

@@ -90,8 +90,8 @@ class MatcherDumper implements MatcherDumperInterface {
     // Delete any old records first, then insert the new ones. That avoids
     // stale data. The transaction makes it atomic to avoid unstable router
     // states due to random failures.
+    $transaction = $this->connection->startTransaction();
     try {
-      $transaction = $this->connection->startTransaction();
       // We don't use truncate, because it is not guaranteed to be transaction
       // safe.
       try {
@@ -163,9 +163,7 @@ class MatcherDumper implements MatcherDumperInterface {
       $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
-      if (isset($transaction)) {
-        $transaction->rollBack();
-      }
+      $transaction->rollBack();
       Error::logException($this->logger, $e);
       throw $e;
     }

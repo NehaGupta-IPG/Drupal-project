@@ -578,7 +578,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
     $style_form = &$form['displays'][$type]['options']['style'];
     $style = $style_form['style_plugin']['#default_value'];
     $style_plugin = \Drupal::service('plugin.manager.views.style')->createInstance($style);
-    if (isset($style_plugin) && $style_plugin->usesRowPlugin()) {
+    if ($style_plugin->usesRowPlugin()) {
       $options = $this->rowStyleOptions();
       $style_form['row_plugin'] = [
         '#type' => 'select',
@@ -674,7 +674,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
         '#type' => 'select',
         '#title' => $this->t('sorted by'),
         '#options' => $sorts,
-        '#default_value' => isset($created_column) ? $created_column . ':DESC' : 'none',
+        '#default_value' => $created_column ? $created_column . ':DESC' : 'none',
       ];
     }
   }

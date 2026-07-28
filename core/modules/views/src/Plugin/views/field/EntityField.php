@@ -1124,7 +1124,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
 
     // Some bundles might not have a specific field, in which case the entity
     // (potentially a fake one) doesn't have it either.
-    /** @var \Drupal\Core\Field\FieldItemListInterface $field_item_list */
+    /** @var \Drupal\Core\Field\FieldItemListInterface|null $field_item_list */
     $field_item_list = $translated_entity->{$this->definition['field_name']} ?? NULL;
 
     if (!isset($field_item_list)) {

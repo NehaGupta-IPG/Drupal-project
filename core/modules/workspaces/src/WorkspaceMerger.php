@@ -32,8 +32,8 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
       throw new WorkspaceConflictException();
     }
 
+    $transaction = $this->database->startTransaction();
     try {
-      $transaction = $this->database->startTransaction();
       $max_execution_time = ini_get('max_execution_time');
       $step_size = Settings::get('entity_update_batch_size', 50);
       $counter = 0;
@@ -71,9 +71,7 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
       $transaction->commitOrRelease();
     }
     catch (\Throwable $e) {
-      if (isset($transaction)) {
-        $transaction->rollBack();
-      }
+      $transaction->rollBack();
       Error::logException($this->logger, $e);
       throw $e;
     }

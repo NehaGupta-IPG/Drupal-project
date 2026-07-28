@@ -3128,12 +3128,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/Condition.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/Condition.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Entity\\\\Query\\\\QueryFactory\\:\\:deleteConfigKeyStore\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -4448,12 +4442,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/ContentEntityStorageBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$current_affected in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/ContentEntityStorageBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\ContentEntityType\\:\\:checkStorageClass\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -4554,12 +4542,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/EntityAccessControlHandlerInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$string in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/EntityAutocompleteMatcher.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\EntityBase\\:\\:delete\\(\\) has no return type specified\\.$#',
@@ -5414,20 +5396,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Plugin/Validation/Constraint/EntityUntranslatableFieldsConstraintValidator.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Plugin/Validation/Constraint/ReferenceAccessConstraintValidator.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\Plugin\\\\Validation\\\\Constraint\\\\ValidReferenceConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Plugin/Validation/Constraint/ValidReferenceConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Plugin/Validation/Constraint/ValidReferenceConstraintValidator.php',
 ];
@@ -5746,12 +5716,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$entity_type of method Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorage\\:\\:getCustomTableMapping\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityTypeInterface, Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface given\\.$#',
 	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 2,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
 ];
@@ -6656,12 +6620,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Field/FieldConfigBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$callback in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/FieldDefinition.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\FieldDefinitionListener\\:\\:onFieldDefinitionCreate\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -7388,18 +7346,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Form/FormBuilder.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$form_id in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Form/FormBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$input in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Form/FormBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Form\\\\FormBuilderInterface\\:\\:prepareForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -7432,12 +7378,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Form\\\\FormCache\\:\\:setCache\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Form/FormCache.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$form in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Form/FormCache.php',
 ];
@@ -8246,12 +8186,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/Form/MenuLinkDefaultForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$parent in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Menu/Form/MenuLinkDefaultForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\Form\\\\MenuLinkFormInterface\\:\\:setMenuLinkInstance\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -8440,12 +8374,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$menu_name of method Drupal\\\\Core\\\\Menu\\\\MenuTreeStorage\\:\\:loadLinks\\(\\) expects string, null given\\.$#',
 	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
 ];
@@ -9164,12 +9092,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/RenderElementBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$sort in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Render/Element/RenderElementBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\Element\\\\Select\\:\\:preRenderSelect\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -9334,12 +9256,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\MatcherDumper\\:\\:addRoutes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/MatcherDumper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Routing/MatcherDumper.php',
 ];
@@ -10192,12 +10108,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\Validation\\\\RecursiveContextualValidator\\:\\:validateConstraints\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/Validation/RecursiveContextualValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$cache_key in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/Validation/RecursiveContextualValidator.php',
 ];
@@ -12146,12 +12056,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/content_moderation/src/Form/ContentModerationConfigureForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$state in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/content_moderation/src/Form/ContentModerationStateForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\content_moderation\\\\Form\\\\EntityModerationForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -12758,12 +12662,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/datetime/src/Plugin/Field/FieldType/DateTimeItem.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$item in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/datetime/src/Plugin/Validation/Constraint/DateTimeFormatConstraintValidator.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\datetime\\\\Plugin\\\\views\\\\filter\\\\Date\\:\\:opBetween\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -12858,12 +12756,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/dblog/src/Form/DblogFilterForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$view in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/dblog/src/Hook/DblogHooks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\dblog\\\\Plugin\\\\views\\\\field\\\\DblogMessage\\:\\:buildOptionsForm\\(\\) has no return type specified\\.$#',
@@ -14904,12 +14796,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/src/JsonapiServiceProvider.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$entity in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/src/Normalizer/EntityAccessDeniedHttpExceptionNormalizer.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\jsonapi\\\\Normalizer\\\\FieldItemNormalizer\\:\\:checkForSerializedStrings\\(\\) has no return type specified\\.$#',
@@ -16984,12 +16870,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\locale\\\\PoDatabaseWriter\\:\\:writeItems\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/locale/src/PoDatabaseWriter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$plural in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/locale/src/PoDatabaseWriter.php',
 ];
@@ -21440,12 +21320,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/src/Form/ThemeSettingsForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$default_theme in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/ThemeSettingsForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Form\\\\ThemeUninstallConfirmForm\\:\\:addDependencyListsToForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -24310,24 +24184,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/ProtectedUserFieldConstraintValidator.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$account in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/ProtectedUserFieldConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$account in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/UserMailRequiredValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$items in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Validation/Constraint/UserMailRequiredValidator.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\Plugin\\\\migrate\\\\destination\\\\EntityUser\\:\\:processStubRow\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -24772,30 +24628,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginHttpTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$name of method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserLoginHttpTest\\:\\:loginRequest\\(\\) expects string, null given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginHttpTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$pass of method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserLoginHttpTest\\:\\:loginRequest\\(\\) expects string, null given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginHttpTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$name in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginHttpTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$pass in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginHttpTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserLoginTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -24878,12 +24710,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/tests/src/Kernel/Views/UserKernelTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$result in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Unit/UserAccessControlHandlerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function user_form_process_password_confirm\\(\\) has no return type specified\\.$#',
@@ -25346,12 +25172,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/Block/ViewsBlockBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$display in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/Derivative/ViewsBlock.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\Derivative\\\\ViewsLocalTask\\:\\:alterLocalTasks\\(\\) has no return type specified\\.$#',
@@ -27280,12 +27100,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/display/DisplayPluginBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$pager in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/display/DisplayPluginBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$style in empty\\(\\) always exists and is not falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
@@ -27684,12 +27498,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\display\\\\PathPluginBase\\:\\:validateOptionsForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/display/PathPluginBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$access_plugin in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/display/PathPluginBase.php',
 ];
@@ -28126,12 +27934,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/field/EntityField.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$field_item_list in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/field/EntityField.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\field\\\\EntityLabel\\:\\:buildOptionsForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -28404,12 +28206,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$raw_items might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/field/FieldPluginBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$style in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/field/FieldPluginBase.php',
 ];
@@ -29490,12 +29286,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#3 \\$table of method Drupal\\\\views\\\\Plugin\\\\views\\\\join\\\\JoinPluginBase\\:\\:joinAddExtra\\(\\) expects array, string given\\.$#',
 	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/join/JoinPluginBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$left in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/join/JoinPluginBase.php',
 ];
@@ -30898,12 +30688,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/wizard/WizardPluginBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$created_column in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/wizard/WizardPluginBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$default_field might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 6,
@@ -30912,12 +30696,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$sorts in empty\\(\\) always exists and is not falsy\\.$#',
 	'identifier' => 'empty.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/wizard/WizardPluginBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$style_plugin in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/wizard/WizardPluginBase.php',
 ];
@@ -31208,12 +30986,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/modules/views_test_data/src/Form/ViewsTestDataErrorForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$view in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/views/tests/modules/views_test_data/src/Hook/ViewsTestDataViewsExecutionHooks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_test_data\\\\Plugin\\\\views\\\\argument_default\\\\ArgumentDefaultTest\\:\\:getArgument\\(\\) has no return type specified\\.$#',
@@ -32272,12 +32044,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views_ui/tests/src/FunctionalJavascript/PreviewTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$message in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views_ui/tests/src/FunctionalJavascript/PreviewTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workflows\\\\Entity\\\\Workflow\\:\\:preSave\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -32608,12 +32374,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workspaces/src/Plugin/Validation/Constraint/DeletedWorkspaceConstraintValidator.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Plugin/Validation/Constraint/DeletedWorkspaceConstraintValidator.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\Plugin\\\\Validation\\\\Constraint\\\\EntityReferenceSupportedNewEntitiesConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -32622,12 +32382,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\Plugin\\\\Validation\\\\Constraint\\\\EntityWorkspaceConflictConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Plugin/Validation/Constraint/EntityWorkspaceConflictConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$entity in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/src/Plugin/Validation/Constraint/EntityWorkspaceConflictConstraintValidator.php',
 ];
@@ -32678,12 +32432,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/src/WorkspacePublisherInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceTracker.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspacesServiceProvider\\:\\:alter\\(\\) has no return type specified\\.$#',

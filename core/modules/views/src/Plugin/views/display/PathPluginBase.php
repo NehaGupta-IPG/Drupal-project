@@ -183,7 +183,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
 
     // Add access check parameters to the route.
     $access_plugin = $this->getPlugin('access');
-    if (!isset($access_plugin)) {
+    if (!$access_plugin) {
       // @todo Do we want to support a default plugin in getPlugin itself?
       $access_plugin = \Drupal::service('plugin.manager.views.access')->createInstance('none');
     }

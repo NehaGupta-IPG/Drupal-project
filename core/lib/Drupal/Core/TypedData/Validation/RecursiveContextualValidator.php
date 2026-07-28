@@ -214,15 +214,13 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
     foreach ($constraints as $constraint) {
       // Prevent duplicate validation of constraints, in the case
       // that constraints belong to multiple validated groups.
-      if (isset($cache_key)) {
-        $constraint_hash = spl_object_hash($constraint);
+      $constraint_hash = spl_object_hash($constraint);
 
-        if ($this->context->isConstraintValidated($cache_key, $constraint_hash)) {
-          continue;
-        }
-
-        $this->context->markConstraintAsValidated($cache_key, $constraint_hash);
+      if ($this->context->isConstraintValidated($cache_key, $constraint_hash)) {
+        continue;
       }
+
+      $this->context->markConstraintAsValidated($cache_key, $constraint_hash);
 
       $this->context->setConstraint($constraint);
 

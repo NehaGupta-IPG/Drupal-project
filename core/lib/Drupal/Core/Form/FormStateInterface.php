@@ -305,8 +305,9 @@ interface FormStateInterface {
    * understanding of security implications. In almost all cases, code should
    * use self::getValues() and self::getValue() exclusively.
    *
-   * @return array
-   *   An associative array of values submitted to the form.
+   * @return array|null
+   *   An associative array of values submitted to the form, or NULL if no
+   *   input has been submitted yet.
    */
   public function &getUserInput();
 

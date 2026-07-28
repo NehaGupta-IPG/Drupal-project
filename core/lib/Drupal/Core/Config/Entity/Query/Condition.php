@@ -154,7 +154,7 @@ class Condition extends ConditionBase {
    *
    * @param array $condition
    *   The condition array as created by the condition() method.
-   * @param string $value
+   * @param string|null $value
    *   The value to match against.
    *
    * @return bool

@@ -357,12 +357,11 @@ class ThemeSettingsForm extends ConfigFormBase {
         $theme_keys = [$theme];
       }
 
-      // Save the name of the current theme (if any), so that we can temporarily
-      // override the current theme and allow
-      // \Drupal\Core\Extension\ThemeSettingsProvider::getSetting() to
-      // work without having to pass the theme name to it.
+      // Save the current theme so that we can temporarily override the current
+      // theme and allow
+      // \Drupal\Core\Extension\ThemeSettingsProvider::getSetting() to work
+      // without having to pass the theme name to it.
       $default_active_theme = $this->themeManager->getActiveTheme();
-      $default_theme = $default_active_theme->getName();
       /** @var \Drupal\Core\Theme\ThemeInitialization $theme_initialization */
       $theme_initialization = \Drupal::service('theme.initialization');
 
@@ -396,12 +395,7 @@ class ThemeSettingsForm extends ConfigFormBase {
       $this->themeManager->alterForTheme($editing_active_theme, 'form_system_theme_settings', $form, $form_state);
 
       // Restore the original current theme.
-      if (isset($default_theme)) {
-        $this->themeManager->setActiveTheme($default_active_theme);
-      }
-      else {
-        $this->themeManager->resetActiveTheme();
-      }
+      $this->themeManager->setActiveTheme($default_active_theme);
     }
 
     return $form;

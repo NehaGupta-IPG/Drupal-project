@@ -37,9 +37,10 @@ interface TranslatableRevisionableInterface extends TranslatableInterface, Revis
   /**
    * Checks whether the current translation is affected by the current revision.
    *
-   * @return bool
-   *   TRUE if the entity object is affected by the current revision, FALSE
-   *   otherwise.
+   * @return bool|null
+   *   TRUE if the entity object is affected by the current revision, FALSE if
+   *   it is not, or NULL if the revision translation affected flag has not been
+   *   set yet.
    */
   public function isRevisionTranslationAffected();
 

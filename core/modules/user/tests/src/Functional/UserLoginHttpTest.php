@@ -66,9 +66,9 @@ class UserLoginHttpTest extends BrowserTestBase {
   /**
    * Executes a login HTTP request for a given serialization format.
    *
-   * @param string $name
+   * @param string|null $name
    *   The username.
-   * @param string $pass
+   * @param string|null $pass
    *   The user password.
    * @param string $format
    *   The format to use to make the request.

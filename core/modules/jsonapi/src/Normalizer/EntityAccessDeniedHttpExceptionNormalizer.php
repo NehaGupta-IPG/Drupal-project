@@ -31,7 +31,7 @@ class EntityAccessDeniedHttpExceptionNormalizer extends HttpExceptionNormalizer 
 
     if ($exception instanceof EntityAccessDeniedHttpException) {
       $error = $exception->getError();
-      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      /** @var \Drupal\Core\Entity\EntityInterface|null $entity */
       $entity = $error['entity'];
       $pointer = $error['pointer'];
       $reason = $error['reason'];

@@ -246,7 +246,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         }
       }
       $pager = $this->getPlugin('pager');
-      if (isset($pager) && $pager->usesExposed()) {
+      if ($pager && $pager->usesExposed()) {
         $this->has_exposed = TRUE;
         return TRUE;
       }

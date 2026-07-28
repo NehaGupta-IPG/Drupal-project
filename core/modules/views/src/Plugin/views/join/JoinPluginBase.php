@@ -369,7 +369,7 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
    *   The right table.
    * @param \Drupal\Core\Database\Query\SelectInterface $select_query
    *   The current select query being built.
-   * @param array $left
+   * @param array|null $left
    *   The left table.
    *
    * @return string
