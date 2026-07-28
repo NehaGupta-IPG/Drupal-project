@@ -5,7 +5,6 @@ namespace Drupal\locale;
 use Drupal\Core\Config\ExtensionInstallStorage;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Config\DefaultConfigStorageInterface;
 
 /**
  * Provides access to default configuration for locale integration.

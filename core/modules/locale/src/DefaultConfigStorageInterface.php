@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Core\Config;
+namespace Drupal\locale;
 
 /**
  * Provides access to default configuration for locale integration.

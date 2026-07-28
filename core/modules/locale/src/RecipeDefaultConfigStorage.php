@@ -2,7 +2,6 @@
 
 namespace Drupal\locale;
 
-use Drupal\Core\Config\DefaultConfigStorageInterface;
 use Drupal\Core\Config\StorageInterface;
 
 /**
@@ -28,7 +27,7 @@ class RecipeDefaultConfigStorage implements DefaultConfigStorageInterface {
   /**
    * The fallback default config storage.
    *
-   * @var \Drupal\Core\Config\DefaultConfigStorageInterface
+   * @var \Drupal\locale\DefaultConfigStorageInterface
    */
   protected $defaultConfigStorage;
 
@@ -37,7 +36,7 @@ class RecipeDefaultConfigStorage implements DefaultConfigStorageInterface {
    *
    * @param \Drupal\Core\Config\StorageInterface $recipe_storage
    *   The recipe's configuration storage.
-   * @param \Drupal\Core\Config\DefaultConfigStorageInterface $default_config_storage
+   * @param \Drupal\locale\DefaultConfigStorageInterface $default_config_storage
    *   The fallback default config storage.
    */
   public function __construct(StorageInterface $recipe_storage, DefaultConfigStorageInterface $default_config_storage) {

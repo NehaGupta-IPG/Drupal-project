@@ -12,7 +12,6 @@ use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Drupal\Core\Config\DefaultConfigStorageInterface;
 
 /**
  * Manages configuration supported in part by interface translation.
@@ -243,7 +242,6 @@ class LocaleConfigManager {
         $names = array_merge($names, $this->defaultConfigStorage->getComponentNames($type, $list));
       }
       return $names;
-
     }
     else {
       return $this->defaultConfigStorage->listAll();
