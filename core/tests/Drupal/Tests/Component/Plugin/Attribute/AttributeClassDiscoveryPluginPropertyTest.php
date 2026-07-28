@@ -192,7 +192,7 @@ class AttributeClassDiscoveryPluginPropertyTest extends TestCase {
     $file_cache->set($this->pluginFilePath, $cache_item);
 
     // Install the provider. The properties are applied on top of the marked
-    // cache entry, so no reparsing was needed to pick up the attribute.
+    // cache entry, so no re-parsing was needed to pick up the attribute.
     $definitions = $this->getDiscovery(TRUE)->getDefinitions();
     $this->assertSame([
       'id' => 'property_discovery_test_1',
