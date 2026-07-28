@@ -4,6 +4,7 @@ namespace Drupal\views\Ajax;
 
 use Drupal\Core\Cache\CacheableAjaxResponse;
 use Drupal\views\ViewExecutable;
+use Drupal\views\Views;
 
 /**
  * Custom JSON response object for an ajax view response.
@@ -37,6 +38,39 @@ class ViewAjaxResponse extends CacheableAjaxResponse {
    */
   public function getView() {
     return $this->view;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __serialize(): array {
+    // Get all properties.
+    $data = get_object_vars($this);
+
+    // Replace view by values allowing to rebuild it when unserializing.
+    unset($data['view']);
+    $data['request'] = serialize($this->view->getRequest());
+    $data['view_id'] = $this->view->id();
+    $data['display_id'] = $this->view->current_display;
+
+    return $data;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __unserialize(array $data): void {
+    // Rebuild ViewExecutable instance.
+    \Drupal::requestStack()->push(unserialize($data['request']));
+    $this->view = Views::getView($data['view_id']);
+    $this->view->setDisplay($data['display_id']);
+    \Drupal::requestStack()->pop();
+
+    // Restore other properties.
+    unset($data['request'], $data['view_id'], $data['display_id']);
+    foreach ($data as $key => $value) {
+      $this->{$key} = $value;
+    }
   }
 
 }
