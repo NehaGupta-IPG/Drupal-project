@@ -129,7 +129,7 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
       $this->assertSession()->responseContains('<th>Language</th>');
 
       $this->drupalGet($base_url);
-      $this->assertSession()->linkExists('Translate test configuration');
+      $this->assertSession()->linkExists('Translate Test configuration');
     }
   }
 

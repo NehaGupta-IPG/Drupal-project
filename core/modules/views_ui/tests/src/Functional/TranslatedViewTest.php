@@ -124,9 +124,9 @@ class TranslatedViewTest extends UITestBase {
 
     // Assert that the View translation link is shown when viewing a display.
     $this->drupalGet($edit_url);
-    $this->assertSession()->linkExists('Translate view');
+    $this->assertSession()->linkExists('Translate View');
     $this->drupalGet('/admin/structure/views/view/files/edit/block_1');
-    $this->assertSession()->linkExists('Translate view');
+    $this->assertSession()->linkExists('Translate View');
   }
 
 }
