@@ -41,7 +41,7 @@ class RecipeDiscoveryTest extends KernelTestBase {
   #[TestWith([FALSE, TRUE])]
   public function testFindRecipes(bool $include_test_recipes, bool $include_core_recipes): void {
     $this->installConfig(['system', 'user']);
-    $drupal_root = $this->getDrupalRoot();
+    $drupal_root = $this->root;
 
     $dir = $include_test_recipes
       ? $drupal_root . '/core/tests/fixtures/recipes'
@@ -95,7 +95,7 @@ class RecipeDiscoveryTest extends KernelTestBase {
   public function testDiscoveryFollowsSymlinks(): void {
     $cookbook_dir = FileSystem::getOsTemporaryDirectory();
     $link_name = uniqid($cookbook_dir . '/recipe_link');
-    $target = $this->getDrupalRoot() . '/core/recipes/administrator_role';
+    $target = $this->root . '/core/recipes/administrator_role';
 
     $file_system = new SymfonyFilesystem();
     $file_system->symlink($target, $link_name);
