@@ -26,15 +26,14 @@ class HelpNoSearchUpgradeTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../system/tests/fixtures/update/drupal-11.3.0.bare.standard.php.gz',
-      __DIR__ . '/../../../../system/tests/fixtures/update/install-mysqli.php',
       __DIR__ . '/../../fixtures/uninstall-search.php',
     ];
   }
 
   /**
-   * Tests help_update_12000().
+   * Tests system_update_11400().
    *
-   * @see help_update_12000()
+   * @see system_update_11400()
    */
   public function testSearchHelpInstall(): void {
     $this->assertFalse(\Drupal::moduleHandler()->moduleExists('search_help'));

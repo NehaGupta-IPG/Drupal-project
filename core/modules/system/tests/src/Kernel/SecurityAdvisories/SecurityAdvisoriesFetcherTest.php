@@ -19,6 +19,7 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -631,6 +632,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
    * @legacy-covers ::doRequest
    * @legacy-covers ::getSecurityAdvisories
    */
+  #[IgnoreDeprecations]
   public function testHttpFallback(): void {
     $this->setSetting('update_fetch_with_http_fallback', TRUE);
     $feed_item = [
@@ -666,7 +668,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
     $this->assertCount(1, $advisories);
     $this->assertSame('http://example.com', $advisories[0]->getUrl());
     $this->assertSame('SA title', $advisories[0]->getTitle());
-    $this->assertSame(["Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n"], $this->errorMessages);
+    $this->assertSame(["Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response: HTTPS failed"], $this->errorMessages);
   }
 
   /**
@@ -685,7 +687,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
       $this->getAdvisories();
     }
     catch (ClientExceptionInterface $exception) {
-      $this->assertSame("Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n", $exception->getMessage());
+      $this->assertSame("Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response: HTTPS failed", $exception->getMessage());
       $exception_thrown = TRUE;
     }
     $this->assertTrue($exception_thrown);
