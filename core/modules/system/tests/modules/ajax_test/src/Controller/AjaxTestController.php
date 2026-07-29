@@ -9,6 +9,8 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\AlertCommand;
 use Drupal\Core\Ajax\CloseDialogCommand;
 use Drupal\Core\Ajax\HtmlCommand;
+use Drupal\Core\Ajax\InvokeCommand;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -524,6 +526,101 @@ class AjaxTestController {
   public function linkPageDialogTitle(): string {
     $title = 'Dialog link page title';
     return $title;
+  }
+
+  /**
+   * Returns a render array of elements and ajax links.
+   */
+  public function links(): array {
+    // Add a wrapper.
+    $build['content_wrapper'] = ['#markup' => '<div id="ajax-test-link-content-wrapper" tabindex="-1">Default</div><div id="ajax-test-link-ajax-response-wrapper" tabindex="-1">Default</div>'];
+
+    // Create a link to replace the wrapper content.
+    $build['link-replace'] = [
+      '#type' => 'link',
+      '#title' => 'Link 1 (test replace)',
+      '#url' => Url::fromRoute('ajax_test.link_contents'),
+      '#attributes' => [
+        'class' => ['link-one', 'use-ajax'],
+        'data-dialog-type' => 'ajax',
+        'data-ajax-wrapper' => 'ajax-test-link-content-wrapper',
+      ],
+    ];
+    // Create a link to test changing the progress type.
+    $build['link-progress'] = [
+      '#type' => 'link',
+      '#title' => 'Link 2 (test progress type)',
+      '#url' => Url::fromRoute('ajax_test.link_contents'),
+      '#attributes' => [
+        'class' => ['link-two', 'use-ajax'],
+        'data-dialog-type' => 'ajax',
+        'data-ajax-wrapper' => 'ajax-test-link-content-wrapper',
+        'data-ajax-progress' => 'fullscreen',
+      ],
+    ];
+    // Create a link to test changing the progress type to an empty string.
+    $build['link-progress-empty'] = [
+      '#type' => 'link',
+      '#title' => 'Link 3 (test progress type empty)',
+      '#url' => Url::fromRoute('ajax_test.link_contents'),
+      '#attributes' => [
+        'class' => ['link-three', 'use-ajax'],
+        'data-dialog-type' => 'ajax',
+        'data-ajax-wrapper' => 'ajax-test-link-content-wrapper',
+        'data-ajax-progress' => '',
+      ],
+    ];
+    // Create a link to test changing the focus.
+    $build['link-focus'] = [
+      '#type' => 'link',
+      '#title' => 'Link 4 (test focus change)',
+      '#url' => Url::fromRoute('ajax_test.link_contents'),
+      '#attributes' => [
+        'class' => ['link-four', 'use-ajax'],
+        'data-dialog-type' => 'ajax',
+        'data-ajax-wrapper' => 'ajax-test-link-content-wrapper',
+        'data-ajax-focus' => '#ajax-test-link-content-wrapper',
+      ],
+    ];
+    // Create a link to a URL with an AJAX response to test the AJAX response
+    // takes precedence.
+    $build['link-ajax-response'] = [
+      '#type' => 'link',
+      '#title' => 'Link 5 (test AJAX response)',
+      '#url' => Url::fromRoute('ajax_test.link_ajax_response'),
+      '#attributes' => [
+        'class' => ['link-five', 'use-ajax'],
+        'data-dialog-type' => 'ajax',
+        'data-ajax-wrapper' => 'ajax-test-link-content-wrapper',
+        'data-ajax-focus' => '#ajax-test-link-content-wrapper',
+      ],
+    ];
+    $build['#attached'] = ['library' => ['core/drupal.ajax']];
+
+    return $build;
+  }
+
+  /**
+   * Content for AJAX links testing.
+   *
+   * @return array
+   *   Renderable array with test content.
+   */
+  public static function linkContents() {
+    return ['#markup' => '<div id="ajax-test-link-content-wrapper" tabindex="-1">The content has been replaced!</div>'];
+  }
+
+  /**
+   * Replace a wrapper in the page through an AJAX response.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The JSON response object.
+   */
+  public static function linkAjaxResponse() {
+    $response = new AjaxResponse();
+    $response->addCommand(new ReplaceCommand('#ajax-test-link-ajax-response-wrapper', ['#markup' => '<div id="ajax-test-link-ajax-response-wrapper" tabindex="-1">The content has been replaced!</div>']));
+    $response->addCommand(new InvokeCommand('#ajax-test-link-ajax-response-wrapper', 'focus'));
+    return $response;
   }
 
 }

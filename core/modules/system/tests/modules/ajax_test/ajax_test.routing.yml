@@ -168,3 +168,26 @@ ajax_test.link_page.dialog_contents:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::httpMethodsDialog'
   requirements:
     _access: 'TRUE'
+
+ajax_test.links:
+  path: '/ajax-test/links'
+  defaults:
+    _controller: '\Drupal\ajax_test\Controller\AjaxTestController::links'
+  requirements:
+    _access: 'TRUE'
+
+ajax_test.link_contents:
+  path: '/ajax-test/link-contents'
+  defaults:
+    _title: 'AJAX Link contents routing'
+    _controller: '\Drupal\ajax_test\Controller\AjaxTestController::linkContents'
+  requirements:
+    _access: 'TRUE'
+
+ajax_test.link_ajax_response:
+  path: '/ajax-test/link-ajax-response'
+  defaults:
+    _title: 'AJAX Link AJAX response'
+    _controller: '\Drupal\ajax_test\Controller\AjaxTestController::linkAjaxResponse'
+  requirements:
+    _access: 'TRUE'

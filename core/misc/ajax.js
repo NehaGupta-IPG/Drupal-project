@@ -308,15 +308,22 @@
     // Bind Ajax behaviors to all items showing the class.
     once('ajax', '.use-ajax', element).forEach((ajaxLink) => {
       const $linkElement = $(ajaxLink);
+      const progressType =
+        typeof $linkElement.data('ajax-progress') !== 'undefined'
+          ? $linkElement.data('ajax-progress')
+          : 'throbber';
 
       const elementSettings = {
-        // Clicked links look better with the throbber than the progress bar.
-        progress: { type: 'throbber' },
+        wrapper: $linkElement.data('ajax-wrapper') || null,
+        method: $linkElement.data('ajax-method') || 'replaceWith',
+        replacePartial: $linkElement.data('replace-partial') || false,
+        progress: { type: progressType },
         dialogType: $linkElement.data('dialog-type'),
         dialog: $linkElement.data('dialog-options'),
         dialogRenderer: $linkElement.data('dialog-renderer'),
         base: $linkElement.attr('id'),
         element: ajaxLink,
+        focus: $linkElement.data('ajax-focus') || null,
       };
       const href = $linkElement.attr('href');
       /**
@@ -407,6 +414,7 @@
       effect: 'none',
       speed: 'none',
       method: 'replaceWith',
+      replacePartial: false,
       progress: {
         type: 'throbber',
         message: Drupal.t('Processing...'),
@@ -414,6 +422,7 @@
       submit: {
         js: true,
       },
+      focus: null,
     };
 
     $.extend(this, defaults, elementSettings);
@@ -1111,16 +1120,20 @@
                 );
               }
               if (!target && !$(this.element).data('disable-refocus')) {
-                for (
-                  let n = elementParents.length - 1;
-                  !target && n >= 0;
-                  n--
-                ) {
-                  target = document.querySelector(
-                    `[data-drupal-selector="${elementParents[n].getAttribute(
-                      'data-drupal-selector',
-                    )}"]`,
-                  );
+                if (this.focus) {
+                  target = document.querySelector(this.focus);
+                } else {
+                  for (
+                    let n = elementParents.length - 1;
+                    !target && n >= 0;
+                    n--
+                  ) {
+                    target = document.querySelector(
+                      `[data-drupal-selector="${elementParents[n].getAttribute(
+                        'data-drupal-selector',
+                      )}"]`,
+                    );
+                  }
                 }
               }
             }
@@ -1350,6 +1363,16 @@
       };
 
       let $newContent = $(parseHTML(response.data));
+
+      // If an ajax.wrapper setting is set and exist in the response we extract
+      // that part of the response, to ensure only the desired part of the
+      // content is being replaced.
+      if (ajax.wrapper !== undefined && ajax.replacePartial) {
+        const $partial = $newContent.find(ajax.wrapper);
+        if ($partial.length) {
+          $newContent = $partial;
+        }
+      }
 
       // For backward compatibility, in some cases a wrapper will be added. This
       // behavior will be removed before Drupal 9.0.0. If different behavior is
