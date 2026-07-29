@@ -42,7 +42,12 @@ class EntityDisplayFormTableDragTest extends EntityKernelTestBase {
   }
 
   /**
-   * Tests tabledrag match-parent copies parent region, not its machine name.
+   * Tests tabledrag match-parent copies correct parent source.
+   * 
+   * When a row is indented under a parent, tabledrag "match parent" rules
+   * copy values from the parent row into the child. Two separate rules exist:
+   * - field-parent: child should inherit the parent's machine name.
+   * - field-region: child should inherit the parent's region.
    */
   public function testTableDragRegionMatchParentSource(): void {
     $display = $this->container->get('entity_display.repository')
@@ -57,10 +62,6 @@ class EntityDisplayFormTableDragTest extends EntityKernelTestBase {
     $this->assertArrayHasKey('fields', $form);
     $this->assertArrayHasKey('#tabledrag', $form['fields']);
 
-    // When a row is indented under a parent, tabledrag "match parent" rules
-    // copy values from the parent row into the child. Two separate rules exist:
-    // - field-parent: child should inherit the parent's machine name.
-    // - field-region: child should inherit the parent's region.
     $region_match_rule = NULL;
     $parent_match_rule = NULL;
     foreach ($form['fields']['#tabledrag'] as $rule) {
@@ -75,8 +76,6 @@ class EntityDisplayFormTableDragTest extends EntityKernelTestBase {
       }
     }
 
-    // The region rule must copy from the parent's region select
-    // (.field-region), not from the hidden machine name input (.field-name):
     $this->assertNotNull($region_match_rule, 'Field region match-parent tabledrag rule is present.');
     $this->assertSame('field-region', $region_match_rule['source']);
     $this->assertNotNull($parent_match_rule, 'Field parent match-parent tabledrag rule is present.');
