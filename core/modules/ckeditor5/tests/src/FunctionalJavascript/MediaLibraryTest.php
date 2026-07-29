@@ -159,6 +159,83 @@ class MediaLibraryTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests that a full pager works in the media library modal.
+   *
+   * When the media library view is configured to use a full pager instead of
+   * the default mini pager, its pager links must continue to be handled by the
+   * views AJAX behavior and update the view in place. They must not be turned
+   * into modal dialog links, which would load the current page (the node form)
+   * into the modal and break the media library.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3592366
+   * @see \Drupal\Core\Pager\PagerPreprocess::preprocessPager()
+   */
+  public function testFullPagerInModal(): void {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    // Configure the media library view to use a full pager showing a single
+    // item per page, so that a second page of results exists.
+    $this->config('views.view.media_library')
+      ->set('display.default.display_options.pager', [
+        'type' => 'full',
+        'options' => [
+          'items_per_page' => 1,
+          'tags' => [
+            'next' => 'Next ›',
+            'previous' => '‹ Previous',
+            'first' => '« First',
+            'last' => 'Last »',
+          ],
+        ],
+      ])
+      ->save();
+
+    // The "Image" media type is selected by default when the library opens
+    // (see ::testButton()). setUp() created a single image media item; create
+    // a second one so the full pager has more than one page.
+    $file = File::create([
+      'uri' => $this->getTestFiles('image')[1]->uri,
+    ]);
+    $file->save();
+    Media::create([
+      'bundle' => 'image',
+      'name' => 'The spice must flow',
+      'field_media_image' => [
+        [
+          'target_id' => $file->id(),
+          'alt' => 'second alt',
+          'title' => 'second title',
+        ],
+      ],
+    ])->save();
+
+    $this->drupalGet('/node/add/blog');
+    $this->waitForEditor();
+    $this->pressEditorButton('Insert Media');
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-content'));
+
+    // The full pager links must be plain views AJAX links, not modal dialog
+    // links: turning them into modal dialog links is what caused the node form
+    // to be loaded into the dialog.
+    $assert_session->elementExists('css', '#drupal-modal .js-media-library-view .js-pager__items');
+    $assert_session->elementNotExists('css', '#drupal-modal .js-pager__items a.use-ajax');
+
+    // Navigate to the second page using the numbered pager link.
+    $page->clickLink('Go to page 2');
+
+    // The view must update in place: a link back to the first page appears in
+    // the media library pager and the media library content is still present
+    // inside the modal. Before the fix the click loaded the node form into the
+    // modal, so none of these would be true.
+    $this->assertNotEmpty($assert_session->waitForElementVisible('named', ['link', 'Go to page 1']));
+    $assert_session->elementExists('css', '#drupal-modal #media-library-content');
+    $assert_session->elementExists('css', '#drupal-modal .js-media-library-view');
+    // The node form must not have been loaded into the modal.
+    $assert_session->elementNotExists('css', '#drupal-modal #edit-title-0-value');
+  }
+
+  /**
    * Tests using drupalMedia button to embed media into CKEditor 5.
    */
   public function testButton(): void {
