@@ -8679,7 +8679,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to method __construct\\(\\) of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
-in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
   discovery instead\\.$#',
 	'identifier' => 'method.deprecatedClass',
 	'count' => 1,
@@ -8687,7 +8687,7 @@ in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
 ];
 $ignoreErrors[] = [
 	'message' => '#^Instantiation of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
-in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
   discovery instead\\.$#',
 	'identifier' => 'new.deprecatedClass',
 	'count' => 1,
@@ -18171,7 +18171,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to property \\$fileCache of deprecated class Drupal\\\\Component\\\\Annotation\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
-in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
   discovery instead\\.$#',
 	'identifier' => 'property.deprecatedClass',
 	'count' => 3,
@@ -18179,7 +18179,7 @@ in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to property \\$pluginDefinitionAnnotationName of deprecated class Drupal\\\\Component\\\\Annotation\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
-in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
   discovery instead\\.$#',
 	'identifier' => 'property.deprecatedClass',
 	'count' => 1,
@@ -18187,7 +18187,7 @@ in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to method __construct\\(\\) of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
-in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
   discovery instead\\.$#',
 	'identifier' => 'method.deprecatedClass',
 	'count' => 1,
@@ -18195,7 +18195,7 @@ in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to method getAnnotationReader\\(\\) of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
-in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
   discovery instead\\.$#',
 	'identifier' => 'method.deprecatedClass',
 	'count' => 1,
@@ -18203,7 +18203,7 @@ in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to method getPluginNamespaces\\(\\) of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
-in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
   discovery instead\\.$#',
 	'identifier' => 'method.deprecatedClass',
 	'count' => 1,
@@ -18211,7 +18211,7 @@ in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to method getProviderFromNamespace\\(\\) of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
-in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
   discovery instead\\.$#',
 	'identifier' => 'method.deprecatedClass',
 	'count' => 1,
@@ -18219,7 +18219,7 @@ in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
 ];
 $ignoreErrors[] = [
 	'message' => '#^Class Drupal\\\\migrate\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscoveryAutomatedProviders extends deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
-in drupal\\:11\\.2\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
   discovery instead\\.$#',
 	'identifier' => 'class.extendsDeprecatedClass',
 	'count' => 1,
