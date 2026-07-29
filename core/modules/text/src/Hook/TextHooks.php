@@ -46,7 +46,6 @@ class TextHooks {
         $output .= '<dd>' . $this->t('If you choose <em>Text (plain, long)</em>, <em>Text (formatted, long)</em> on the <em>Manage fields</em> page, then users can insert text of unlimited length. On the <em>Manage form display</em> page, you can set the number of rows that are displayed to users.') . '</dd>';
         $output .= '<dt>' . $this->t('Trimming the text length') . '</dt>';
         $output .= '<dd>' . $this->t('On the <em>Manage display</em> page you can choose to display a trimmed version of the text, and if so, where to cut off the text.') . '</dd>';
-        $output .= '<dt>' . $this->t('Displaying summaries instead of trimmed text') . '</dt>';
         $output .= '<dt>' . $this->t('Using text formats and editors') . '</dt>';
         $output .= '<dd>' . $this->t('If you choose <em>Text (plain)</em> or <em>Text (plain, long)</em> you restrict the input to <em>Plain text</em> only. If you choose <em>Text (formatted)</em>, or <em>Text (formatted, long)</em> you allow users to write formatted text. Which options are available to individual users depends on the settings on the <a href=":formats">Text formats and editors page</a>.', [':formats' => Url::fromRoute('filter.admin_overview')->toString()]) . '</dd>';
         $output .= '</dl>';
