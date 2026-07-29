@@ -361,7 +361,7 @@ class SortArrayTest extends TestCase {
   }
 
   /**
-   *  Tests sorting arrays with unicode strings.
+   * Tests sorting arrays with unicode strings.
    */
   public function testSortByString(): void {
     $string_a = 'Format 100x100';

@@ -108,7 +108,6 @@ class DateFormat extends ConfigEntityBase implements DateFormatInterface {
       $a_label = $a->label();
       $b_label = $b->label();
       return strnatcasecmp($a_label, $b_label);
-
     }
     return $a->isLocked() ? 1 : -1;
   }
