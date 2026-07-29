@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field_ui\Kernel;
 
-use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeAccessRebuild;
 use Drupal\taxonomy\Entity\Vocabulary;
@@ -16,12 +14,11 @@ use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeAccessTrait;
-use Drupal\Tests\user\Traits\UserCreationTrait;
 
 /**
  * Tests the Field UI "Manage fields" screen.
  */
-abstract class ManageFieldsKernelTestBase extends KernelTestBase {
+abstract class ManageFieldsKernelTestBase extends FieldUiKernelTestBase {
 
   use BlockCreationTrait {
     placeBlock as drupalPlaceBlock;
@@ -33,9 +30,6 @@ abstract class ManageFieldsKernelTestBase extends KernelTestBase {
   use FieldUiTestTrait;
   use HttpKernelFormHelperTrait;
   use NodeAccessTrait;
-  use UserCreationTrait {
-    createUser as drupalCreateUser;
-  }
 
   /**
    * {@inheritdoc}
@@ -43,18 +37,13 @@ abstract class ManageFieldsKernelTestBase extends KernelTestBase {
   protected static $modules = [
     'block',
     'entity_test',
-    'field',
     'field_test',
-    'field_ui',
     'file',
     'filter',
     'image',
     'node',
     'node_access_test',
-    'system',
     'taxonomy',
-    'text',
-    'user',
   ];
 
   /**
@@ -92,13 +81,10 @@ abstract class ManageFieldsKernelTestBase extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('node');
-    $this->installEntitySchema('user');
     $this->installEntitySchema('taxonomy_term');
     $this->installSchema('node', ['node_access']);
-    $this->installConfig(['field_ui', 'filter', 'node', 'system', 'user']);
+    $this->installConfig(['filter', 'node']);
 
-    \Drupal::service(ThemeInstallerInterface::class)->install(['stark']);
-    $this->config('system.theme')->set('default', 'stark')->save();
     $this->drupalPlaceBlock('system_breadcrumb_block');
     $this->drupalPlaceBlock('local_actions_block');
     $this->drupalPlaceBlock('local_tasks_block');

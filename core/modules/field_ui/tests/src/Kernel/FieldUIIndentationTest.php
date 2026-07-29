@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field_ui\Kernel;
 
-use Drupal\Core\Extension\ThemeInstallerInterface;
-use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
-use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,28 +13,16 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('field_ui')]
 #[RunTestsInSeparateProcesses]
-class FieldUIIndentationTest extends KernelTestBase {
+class FieldUIIndentationTest extends FieldUiKernelTestBase {
 
   use ContentTypeCreationTrait {
     createContentType as drupalCreateContentType;
-  }
-  use UserCreationTrait {
-    createUser as drupalCreateUser;
   }
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'field',
-    'field_ui',
-    'field_ui_test',
-    'filter',
-    'node',
-    'system',
-    'text',
-    'user',
-  ];
+  protected static $modules = ['field_ui_test', 'filter', 'node'];
 
   /**
    * {@inheritdoc}
@@ -46,11 +31,7 @@ class FieldUIIndentationTest extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('node');
-    $this->installEntitySchema('user');
-    $this->installConfig(['field_ui', 'filter', 'node', 'system', 'user']);
-
-    \Drupal::service(ThemeInstallerInterface::class)->install(['stark']);
-    $this->config('system.theme')->set('default', 'stark')->save();
+    $this->installConfig(['filter', 'node']);
 
     // Create a test user.
     $admin_user = $this->drupalCreateUser([
@@ -62,7 +43,6 @@ class FieldUIIndentationTest extends KernelTestBase {
 
     // Create Basic page node type.
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
-
   }
 
   /**

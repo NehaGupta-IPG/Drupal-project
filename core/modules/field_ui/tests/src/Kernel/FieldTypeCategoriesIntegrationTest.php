@@ -6,10 +6,7 @@ namespace Drupal\Tests\field_ui\Kernel;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Extension\ThemeInstallerInterface;
-use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
-use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -18,13 +15,10 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('field_ui')]
 #[RunTestsInSeparateProcesses]
-class FieldTypeCategoriesIntegrationTest extends KernelTestBase {
+class FieldTypeCategoriesIntegrationTest extends FieldUiKernelTestBase {
 
   use ContentTypeCreationTrait {
     createContentType as drupalCreateContentType;
-  }
-  use UserCreationTrait {
-    createUser as drupalCreateUser;
   }
 
   /**
@@ -32,16 +26,11 @@ class FieldTypeCategoriesIntegrationTest extends KernelTestBase {
    */
   protected static $modules = [
     'comment',
-    'field',
-    'field_ui',
     'file',
     'filter',
     'link',
     'node',
     'options',
-    'system',
-    'text',
-    'user',
   ];
 
   /**
@@ -51,11 +40,7 @@ class FieldTypeCategoriesIntegrationTest extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('node');
-    $this->installEntitySchema('user');
-    $this->installConfig(['field_ui', 'filter', 'node', 'system', 'user']);
-
-    \Drupal::service(ThemeInstallerInterface::class)->install(['stark']);
-    $this->config('system.theme')->set('default', 'stark')->save();
+    $this->installConfig(['filter', 'node']);
 
     // Create a test user.
     $admin_user = $this->drupalCreateUser(['administer node fields']);

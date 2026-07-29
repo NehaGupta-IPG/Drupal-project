@@ -11,16 +11,13 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
-use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_ui\Form\EntityDisplayModeAddForm;
-use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\HttpKernelFormHelperTrait;
-use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -30,26 +27,14 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('field_ui')]
 #[RunTestsInSeparateProcesses]
-class EntityDisplayTest extends KernelTestBase {
+class EntityDisplayTest extends FieldUiKernelTestBase {
 
   use HttpKernelFormHelperTrait;
-  use UserCreationTrait {
-    createUser as drupalCreateUser;
-  }
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'field',
-    'entity_test',
-    'field_ui',
-    'user',
-    'text',
-    'field_test',
-    'node',
-    'system',
-  ];
+  protected static $modules = ['entity_test', 'field_test', 'node'];
 
   /**
    * {@inheritdoc}
@@ -58,11 +43,7 @@ class EntityDisplayTest extends KernelTestBase {
     parent::setUp();
     $this->installEntitySchema('entity_test');
     $this->installEntitySchema('node');
-    $this->installEntitySchema('user');
-    $this->installConfig(['field', 'node', 'user']);
-
-    \Drupal::service(ThemeInstallerInterface::class)->install(['stark']);
-    $this->config('system.theme')->set('default', 'stark')->save();
+    $this->installConfig(['node']);
   }
 
   /**
