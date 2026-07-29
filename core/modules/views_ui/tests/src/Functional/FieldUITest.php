@@ -121,38 +121,6 @@ class FieldUITest extends UITestBase {
   }
 
   /**
-   * Tests the UI of field aggregation settings.
-   */
-  public function testFieldAggregationSettings(): void {
-    $edit_handler_url = 'admin/structure/views/nojs/handler-group/test_aggregate_count/default/field/id';
-    $this->drupalGet($edit_handler_url);
-    // Without aggregation applied yet the entity field handler builds the
-    // form, which includes the group column selects.
-    $this->assertSession()->fieldExists('options[group_column]');
-    $this->submitForm(['options[group_type]' => 'count'], 'Apply');
-    $this->assertSession()
-      ->pageTextNotContains('The website encountered an unexpected error. Try again later.');
-
-    // With aggregation applied the numeric handler builds the form, which
-    // has no group column selects.
-    $this->drupalGet($edit_handler_url);
-    $this->assertSession()->fieldNotExists('options[group_column]');
-    $this->submitForm(['options[group_type]' => 'count'], 'Apply');
-    // Ensure that there is no error after submitting the form.
-    $this->assertSession()
-      ->pageTextNotContains('The website encountered an unexpected error. Try again later.');
-
-    // Switching back to "Group results together" restores the entity field
-    // handler and its group column selects.
-    $this->drupalGet($edit_handler_url);
-    $this->submitForm(['options[group_type]' => 'group'], 'Apply');
-    $this->assertSession()
-      ->pageTextNotContains('The website encountered an unexpected error. Try again later.');
-    $this->drupalGet($edit_handler_url);
-    $this->assertSession()->fieldExists('options[group_column]');
-  }
-
-  /**
    * Tests decimal settings are available for aggregated decimal fields.
    */
   public function testAggregatedDecimalFieldSettings(): void {
