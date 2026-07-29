@@ -325,9 +325,16 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
     // The default cache contexts for rendered entities.
     $default_cache_contexts = ['languages:' . LanguageInterface::TYPE_INTERFACE, 'theme', 'user.permissions'];
     $entity_cache_contexts = Cache::mergeContexts($default_cache_contexts, ['url.site']);
+    // Full page responses also vary by color scheme, because the <html> element
+    // carries a data-color-scheme attribute. Rendered entities do not, so this
+    // context must not be added to $entity_cache_contexts.
     $page_cache_contexts = Cache::mergeContexts(
       $default_cache_contexts,
-      ['url.query_args:' . MainContentViewSubscriber::WRAPPER_FORMAT, 'user.roles:authenticated'],
+      [
+        'url.query_args:' . MainContentViewSubscriber::WRAPPER_FORMAT,
+        'user.color_scheme',
+        'user.roles:authenticated',
+      ],
     );
 
     // Cache tags present on every rendered page.
