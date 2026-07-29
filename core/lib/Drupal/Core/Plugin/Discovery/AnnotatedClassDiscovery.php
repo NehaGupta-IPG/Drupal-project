@@ -8,7 +8,7 @@ use Drupal\Component\Annotation\Plugin\Discovery\AnnotatedClassDiscovery as Comp
 /**
  * Defines a discovery mechanism to find annotated plugins in PSR-4 namespaces.
  *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use attribute
+ * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Use attribute
  *   discovery instead.
  *
  * @see https://www.drupal.org/node/3395582

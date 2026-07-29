@@ -15,7 +15,7 @@ use Drupal\Component\Utility\Crypt;
 /**
  * Defines a discovery mechanism to find annotated plugins in PSR-4 namespaces.
  *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use attribute
+ * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Use attribute
  *   discovery instead.
  *
  * @see https://www.drupal.org/node/3395582
@@ -82,7 +82,7 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
     $file_cache_suffix = str_replace('\\', '_', $plugin_definition_annotation_name);
     $file_cache_suffix .= ':' . Crypt::hashBase64(serialize($annotation_namespaces));
     $this->fileCache = FileCacheFactory::get('annotation_discovery:' . $file_cache_suffix);
-    @trigger_error('Annotation discovery is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use attribute discovery instead. See https://www.drupal.org/node/3395582', E_USER_DEPRECATED);
+    @trigger_error('Annotation discovery is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Use attribute discovery instead. See https://www.drupal.org/node/3395582', E_USER_DEPRECATED);
   }
 
   /**
