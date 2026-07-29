@@ -135,15 +135,21 @@ trait AssertPageCacheContextsAndTagsTrait {
       // Add the user based contexts to the list of default contexts except when
       // user is already there.
       if (!in_array('user', $expected_contexts)) {
+        // The hook_page_attachments() implementations are only called when
+        // dealing with the HtmlRenderer, so check the Content-Type header.
+        // @see \Drupal\system\Hook\PageAttachmentsHook::pageAttachments()
+        // @see \Drupal\Core\Render\MainContent\HtmlRenderer::invokePageAttachmentHooks()
+        $is_html_response = $this->getSession()->getResponseHeader('Content-Type') === 'text/html; charset=utf-8';
         $default_contexts[] = 'user.permissions';
 
-        if (!in_array('user.roles', $expected_contexts)) {
-          // The system_page_attachments() hook is only called when dealing with
-          // the HtmlRenderer, so check the Content-Type header.
-          // @see \Drupal\Core\Render\MainContent\HtmlRenderer::invokePageAttachmentHooks()
-          if ($this->getSession()->getResponseHeader('Content-Type') === 'text/html; charset=utf-8') {
-            $default_contexts[] = 'user.roles:authenticated';
-          }
+        // The <html> element carries a data-color-scheme attribute that varies
+        // per user color scheme preference.
+        if ($is_html_response) {
+          $default_contexts[] = 'user.color_scheme';
+        }
+
+        if (!in_array('user.roles', $expected_contexts) && $is_html_response) {
+          $default_contexts[] = 'user.roles:authenticated';
         }
       }
       $expected_contexts = Cache::mergeContexts($expected_contexts, $default_contexts);
