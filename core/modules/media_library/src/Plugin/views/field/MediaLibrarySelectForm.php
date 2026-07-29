@@ -3,7 +3,7 @@
 namespace Drupal\media_library\Plugin\views\field;
 
 use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\CloseDialogCommand;
+use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\MessageCommand;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -176,7 +176,7 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
     return \Drupal::service('media_library.opener_resolver')
       ->get($state)
       ->getSelectionResponse($state, $selected_ids)
-      ->addCommand(new CloseDialogCommand());
+      ->addCommand(new CloseModalDialogCommand(FALSE, $state->getModalSelector()));
   }
 
   /**

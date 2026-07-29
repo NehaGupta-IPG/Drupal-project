@@ -32,7 +32,8 @@ class ModalRenderer extends DialogRenderer {
     // Determine the dialog options for the OpenDialogCommand.
     $options = $this->getDialogOptions($request);
 
-    $response->addCommand(new OpenModalDialogCommand($title, $content, $options));
+    $modal_selector = $main_content['#modal_selector'] ?? '#drupal-modal';
+    $response->addCommand(new OpenModalDialogCommand($title, $content, $options, NULL, $modal_selector));
     return $response;
   }
 

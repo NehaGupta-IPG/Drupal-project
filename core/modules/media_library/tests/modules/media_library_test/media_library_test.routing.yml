@@ -1,0 +1,7 @@
+media_library_test.modal:
+  path: '/media-library-test-modal'
+  defaults:
+    _controller: '\Drupal\media_library_test\Controller\TestModalController::modal'
+    _title: 'Media Library modal test'
+  requirements:
+    _permission: 'access content'

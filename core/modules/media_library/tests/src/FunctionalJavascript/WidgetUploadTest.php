@@ -763,4 +763,156 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->fieldValueEquals('Alternative text', $filenames[0], $media_item_one);
   }
 
+  /**
+   * Tests if the widget is working correctly when opened from a modal.
+   */
+  public function testWidgetInModalContext(): void {
+    $page = $this->getSession()->getPage();
+
+    foreach ($this->getTestFiles('image') as $image) {
+      $extension = pathinfo($image->filename, PATHINFO_EXTENSION);
+      if (in_array($extension, ['jpg', 'png'])) {
+        $file_image = $image;
+      }
+    }
+
+    if (!isset($file_image)) {
+      $this->fail('Expected test images are missing.');
+    }
+
+    // Create a user that can create media for all media types.
+    $user = $this->drupalCreateUser([
+      'access administration pages',
+      'access content',
+      'create basic_page content',
+      'create media',
+      'view media',
+    ]);
+    $this->drupalLogin($user);
+    $this->drupalGet('/media-library-test-modal');
+    $assert_session = $this->assertSession();
+    $this->click('.modal-basic_page');
+    $assert_session->waitForElement('css', '.ui-dialog-content');
+
+    $file_storage = $this->container->get('entity_type.manager')->getStorage('file');
+    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    $file_system = $this->container->get('file_system');
+
+    // Add to the twin media field.
+    $this->openMediaLibraryForField('field_twin_media');
+
+    // Assert the upload form is now visible for default tab type_three.
+    $assert_session->elementExists('css', '.js-media-library-add-form');
+    $assert_session->fieldExists('Add files');
+
+    // Assert we can upload a file to the default tab type_three.
+    $assert_session->elementNotExists('css', '.js-media-library-add-form[data-input]');
+    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($file_image->uri));
+    $this->assertMediaAdded();
+    $assert_session->elementExists('css', '.js-media-library-add-form[data-input]');
+
+    // We do not have pre-selected items, so the container should not be added
+    // to the form.
+    $assert_session->pageTextNotContains('Additional selected media');
+    // Files are temporary until the form is saved.
+    $files = $file_storage->loadMultiple();
+    $file = array_pop($files);
+    $this->assertSame('public://type-three-dir', $file_system->dirname($file->getFileUri()));
+    $this->assertTrue($file->isTemporary());
+
+    // Assert the revision_log_message field is not shown.
+    $upload_form = $assert_session->elementExists('css', '.js-media-library-add-form');
+    $assert_session->fieldNotExists('Revision log message', $upload_form);
+
+    // Assert the name field contains the filename and the alt text is required.
+    $assert_session->fieldValueEquals('Name', $file_image->filename);
+    $page->fillField('Alternative text', $this->randomString());
+    $buttons = $this->assertElementExistsAfterWait('css', '.media-library-widget-modal .ui-dialog-buttonpane');
+
+    $buttons->pressButton('Save');
+    $this->waitForText('Insert selected');
+    $buttons->pressButton('Insert selected');
+    $assert_session->waitForElementVisible('css', '#field_twin_media-media-library-wrapper .js-media-library-selection .js-media-library-item');
+
+    // Inserting from the library closes only the library modal; the outer
+    // modal that hosts the widget stays open.
+    $this->waitForElementsCount('css', '.media-library-widget-modal', 0);
+    $assert_session->elementExists('css', '#drupal-modal');
+  }
+
+  /**
+   * Tests nested field widget media libraries in stacked modals.
+   *
+   * When a media item created in the library has its own media reference field
+   * rendered with a media library widget, that inner library opens in a second
+   * modal on top of the outer one. Inserting in the inner library must close
+   * only the inner modal and leave the outer one open. Before the modal
+   * selector was scoped per opener, both levels shared '#modal-media-library'
+   * and closing the inner modal tore down the outer one too.
+   *
+   * @see \Drupal\media_library\MediaLibraryState::getModalSelector()
+   */
+  public function testNestedFieldWidgetModals(): void {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    // A file to create the outer (type_three) media item with.
+    $file_image = NULL;
+    foreach ($this->getTestFiles('image') as $image) {
+      if (in_array(pathinfo($image->filename, PATHINFO_EXTENSION), ['jpg', 'png'], TRUE)) {
+        $file_image = $image;
+        break;
+      }
+    }
+    $this->assertNotNull($file_image, 'Expected test image is missing.');
+
+    // A type_one item to select in the inner (nested) library.
+    $this->createMediaItems(['type_one' => ['Nested item one']]);
+
+    $user = $this->drupalCreateUser([
+      'access content',
+      'create basic_page content',
+      'create type_three media',
+      'view media',
+    ]);
+    $this->drupalLogin($user);
+
+    $this->drupalGet('node/add/basic_page');
+
+    // Open the outer library and upload a file to create a type_three item. Its
+    // add form renders the nested field_media_nested media library widget.
+    $this->openMediaLibraryForField('field_twin_media');
+    $this->addMediaFileToField('Add files', $this->container->get('file_system')->realpath($file_image->uri));
+    $this->assertMediaAdded();
+
+    // Only the outer media library modal is open.
+    $this->waitForElementsCount('css', '.media-library-widget-modal', 1);
+
+    // Open the nested library from the type_three add form. It stacks a second
+    // modal on top of the outer one.
+    $nested_wrapper = $assert_session->waitForElementVisible('css', '[id^="field_media_nested-media-library-wrapper"]');
+    $this->assertNotNull($nested_wrapper);
+    $nested_wrapper->pressButton('Add media');
+    $this->waitForElementsCount('css', '.media-library-widget-modal', 2);
+
+    // Select the pre-created item and insert it from the inner (topmost) modal.
+    // The inner modal must close while the outer add form modal stays open.
+    $modals = $page->findAll('css', '.media-library-widget-modal');
+    $inner = end($modals);
+    $this->assertNotEmpty($inner);
+    // Check the item's checkbox, scoped to the inner modal so the outer add
+    // form is not touched.
+    $checkbox = $inner->waitFor(10, fn ($inner) => $inner->find('css', '.js-media-library-view .js-click-to-select-checkbox input'));
+    $this->assertNotEmpty($checkbox);
+    $checkbox->check();
+    // Press the "Insert selected" button in the dialog button pane; the copy
+    // inside the form markup is hidden and cannot be clicked.
+    $inner->find('css', '.ui-dialog-buttonpane')->pressButton('Insert selected');
+    $this->waitForElementsCount('css', '.media-library-widget-modal', 1);
+
+    // The outer add form is still open and now shows the nested selection.
+    $assert_session->elementExists('css', '.js-media-library-add-form');
+    $assert_session->waitForElementVisible('css', '[id^="field_media_nested-media-library-wrapper"] .js-media-library-item');
+  }
+
 }

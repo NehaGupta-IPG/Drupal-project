@@ -70,7 +70,7 @@ class MediaLibraryEditorOpener implements MediaLibraryOpenerInterface {
         'data-entity-uuid' => $selected_media->uuid(),
       ],
     ];
-    $response->addCommand(new EditorDialogSave($values));
+    $response->addCommand(new EditorDialogSave($values, '#modal-media-library'));
 
     return $response;
   }

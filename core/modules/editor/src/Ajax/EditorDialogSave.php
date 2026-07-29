@@ -24,8 +24,10 @@ class EditorDialogSave implements CommandInterface {
    *
    * @param array $values
    *   The values that should be passed to the form constructor in Drupal.
+   * @param string $selector
+   *   Dialog selector.
    */
-  public function __construct(array $values) {
+  public function __construct(array $values, protected readonly string $selector = '#drupal-modal') {
     $this->values = $values;
   }
 
@@ -36,6 +38,7 @@ class EditorDialogSave implements CommandInterface {
     return [
       'command' => 'editorDialogSave',
       'values' => $this->values,
+      'selector' => $this->selector,
     ];
   }
 

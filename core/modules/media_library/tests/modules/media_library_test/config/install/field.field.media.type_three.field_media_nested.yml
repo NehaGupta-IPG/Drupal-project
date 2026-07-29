@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_media_nested
+    - media.type.type_one
+    - media.type.type_three
+id: media.type_three.field_media_nested
+field_name: field_media_nested
+entity_type: media
+bundle: type_three
+label: 'Nested media'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      type_one: type_one
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

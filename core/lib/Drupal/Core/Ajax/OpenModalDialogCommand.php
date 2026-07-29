@@ -29,10 +29,13 @@ class OpenModalDialogCommand extends OpenDialogCommand {
    *   (optional) Custom settings that will be passed to the Drupal behaviors
    *   on the content of the dialog. If left empty, the settings will be
    *   populated automatically from the current request.
+   * @param string $selector
+   *   (optional) Selector to scope the modal. Only modals of the same scope
+   *   will be removed after opening a subsequent modal.
    */
-  public function __construct(string|\Stringable|null $title, $content, array $dialog_options = [], $settings = NULL) {
+  public function __construct(string|\Stringable|null $title, $content, array $dialog_options = [], $settings = NULL, string $selector = '#drupal-modal') {
     $dialog_options['modal'] = TRUE;
-    parent::__construct('#drupal-modal', $title, $content, $dialog_options, $settings);
+    parent::__construct($selector, $title, $content, $dialog_options, $settings);
   }
 
 }
