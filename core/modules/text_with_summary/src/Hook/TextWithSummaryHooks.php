@@ -69,4 +69,17 @@ class TextWithSummaryHooks {
     }
   }
 
+  /**
+   * Implements hook_library_info_alter().
+   *
+   * @todo remove hook when moved to contrib and text/drupal.text is deleted.
+   */
+  #[Hook('library_info_alter')]
+  public function libraryInfoAlter(array &$libraries, string $extension): void {
+    if ($extension === 'text' && isset($libraries['drupal.text'])) {
+      $libraries['drupal.text']['js'] = [];
+      $libraries['drupal.text']['dependencies'][] = 'text_with_summary/drupal.text';
+    }
+  }
+
 }
