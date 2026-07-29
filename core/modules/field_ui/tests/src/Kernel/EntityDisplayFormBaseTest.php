@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\field_ui\Functional;
+namespace Drupal\Tests\field_ui\Kernel;
 
+use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,17 +18,24 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('field_ui')]
 #[RunTestsInSeparateProcesses]
-class EntityDisplayFormBaseTest extends BrowserTestBase {
+class EntityDisplayFormBaseTest extends KernelTestBase {
+
+  use UserCreationTrait {
+    createUser as drupalCreateUser;
+  }
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['field_ui', 'entity_test', 'field_test'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
+  protected static $modules = [
+    'entity_test',
+    'field',
+    'field_test',
+    'field_ui',
+    'system',
+    'text',
+    'user',
+  ];
 
   /**
    * {@inheritdoc}
@@ -34,7 +43,15 @@ class EntityDisplayFormBaseTest extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installEntitySchema('user');
+    $this->installConfig(['field', 'system', 'user']);
+
+    \Drupal::service(ThemeInstallerInterface::class)->install(['stark']);
+    $this->config('system.theme')->set('default', 'stark')->save();
+
     foreach (EntityTestHelper::getEntityTypes() as $entity_type) {
+      $this->installEntitySchema($entity_type);
+
       // Auto-create fields for testing.
       FieldStorageConfig::create([
         'entity_type' => $entity_type,
@@ -58,7 +75,7 @@ class EntityDisplayFormBaseTest extends BrowserTestBase {
         ->save();
     }
 
-    $this->drupalLogin($this->drupalCreateUser([
+    $this->setCurrentUser($this->drupalCreateUser([
       'administer entity_test form display',
     ]));
   }
