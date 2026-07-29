@@ -41,6 +41,7 @@ services:
   locale.locale_translation_cache_tag:
     class: Drupal\locale\EventSubscriber\LocaleTranslationCacheTag
   Drupal\locale\EventSubscriber\ConfigSubscriber: ~
+  Drupal\locale\EventSubscriber\RecipeSubscriber: ~
   Drupal\locale\LocaleSource: ~
   Drupal\locale\LocaleFetch: ~
   Drupal\locale\File\LocaleFileManager: ~
