@@ -65,6 +65,7 @@ class EntityDisplayFormTableDragTest extends EntityKernelTestBase {
     $region_match_rule = NULL;
     $parent_match_rule = NULL;
     foreach ($form['fields']['#tabledrag'] as $rule) {
+      // Continue, if it's not a match parent rule:
       if ($rule['action'] !== 'match' || $rule['relationship'] !== 'parent') {
         continue;
       }
