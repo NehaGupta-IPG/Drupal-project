@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Datetime\Entity;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
@@ -88,12 +89,7 @@ class DateFormat extends ConfigEntityBase implements DateFormatInterface {
     if ($a->isLocked() == $b->isLocked()) {
       $a_label = $a->label();
       $b_label = $b->label();
-      if (isset($collator)) {
-        return $collator->compare($a_label, $b_label);
-      }
-      else {
-        return strnatcasecmp($a_label, $b_label);
-      }
+      return SortArray::sortByString($a_label, $b_label, $collator);
     }
     return $a->isLocked() ? 1 : -1;
   }
@@ -112,6 +108,7 @@ class DateFormat extends ConfigEntityBase implements DateFormatInterface {
       $a_label = $a->label();
       $b_label = $b->label();
       return strnatcasecmp($a_label, $b_label);
+
     }
     return $a->isLocked() ? 1 : -1;
   }

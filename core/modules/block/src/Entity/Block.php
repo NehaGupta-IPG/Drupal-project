@@ -2,6 +2,7 @@
 
 namespace Drupal\block\Entity;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\block\BlockAccessControlHandler;
 use Drupal\block\BlockForm;
 use Drupal\block\BlockListBuilder;
@@ -236,12 +237,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
     }
 
     // Sort by label.
-    if (isset($collator)) {
-      return $collator->compare($a->label(), $b->label());
-    }
-    else {
-      return strnatcasecmp($a->label(), $b->label());
-    }
+    return SortArray::sortByString($a->label(), $b->label(), $collator);
   }
 
   /**

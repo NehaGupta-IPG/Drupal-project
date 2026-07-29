@@ -2,6 +2,7 @@
 
 namespace Drupal\shortcut\Entity;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Cache\Cache;
@@ -195,12 +196,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
     $a_weight = $a->getWeight();
     $b_weight = $b->getWeight();
     if ($a_weight == $b_weight) {
-      if (isset($collator)) {
-        return $collator->compare($a->getTitle(), $b->getTitle());
-      }
-      else {
-        return strnatcasecmp($a->getTitle(), $b->getTitle());
-      }
+      return SortArray::sortByString($a->getTitle(), $b->getTitle(), $collator);
     }
     return $a_weight <=> $b_weight;
   }

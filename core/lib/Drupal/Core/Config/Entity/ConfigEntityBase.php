@@ -3,6 +3,7 @@
 namespace Drupal\Core\Config\Entity;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
@@ -262,12 +263,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
     if ($a_weight == $b_weight) {
       $a_label = $a->label() ?? '';
       $b_label = $b->label() ?? '';
-      if (isset($collator)) {
-        return $collator->compare($a_label, $b_label);
-      }
-      else {
-        return strnatcasecmp($a_label, $b_label);
-      }
+      return SortArray::sortByString($a_label, $b_label, $collator);
     }
     return $a_weight <=> $b_weight;
   }

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
@@ -66,12 +67,7 @@ abstract class EntityDisplayModeBase extends ConfigEntityBase implements EntityD
     // Sort by the type of entity the view mode is used for.
     $a_type = $a->getTargetType();
     $b_type = $b->getTargetType();
-    if (isset($collator)) {
-      $type_order = $collator->compare($a_type, $b_type);
-    }
-    else {
-      $type_order = strnatcasecmp($a_type, $b_type);
-    }
+    $type_order = SortArray::sortByString($a_type, $b_type, $collator);
     return $type_order != 0 ? $type_order : parent::compare($a, $b, $collator);
   }
 

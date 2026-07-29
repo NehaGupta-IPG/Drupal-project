@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Entity;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Plugin\ConfigurableInterface;
@@ -176,12 +177,7 @@ class Action extends ConfigEntityBase implements ActionConfigEntityInterface, En
     $a_type = $a->getType();
     $b_type = $b->getType();
     if ($a_type != $b_type) {
-      if (isset($collator)) {
-        return $collator->compare($a_type, $b_type);
-      }
-      else {
-        return strnatcasecmp($a_type, $b_type);
-      }
+      return SortArray::sortByString($a_type, $b_type, $collator);
     }
     return parent::compare($a, $b, $collator);
   }

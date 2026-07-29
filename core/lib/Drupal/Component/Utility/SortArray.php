@@ -143,4 +143,14 @@ class SortArray {
     }
   }
 
+  /**
+   * Sort helper for comparing two unicode strings.
+   */
+  public static function sortByString(string $a, string $b, ?\Collator $collator): int {
+    if (isset($collator)) {
+      return $collator->compare($a, $b);
+    }
+    return strnatcasecmp($a, $b);
+  }
+
 }
