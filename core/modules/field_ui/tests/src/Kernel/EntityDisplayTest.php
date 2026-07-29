@@ -11,6 +11,7 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
@@ -18,6 +19,8 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_ui\Form\EntityDisplayModeAddForm;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
+use Drupal\Tests\HttpKernelFormHelperTrait;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -29,12 +32,18 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class EntityDisplayTest extends KernelTestBase {
 
+  use HttpKernelFormHelperTrait;
+  use UserCreationTrait {
+    createUser as drupalCreateUser;
+  }
+
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
     'field',
     'entity_test',
+    'field_ui',
     'user',
     'text',
     'field_test',
@@ -51,6 +60,9 @@ class EntityDisplayTest extends KernelTestBase {
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
     $this->installConfig(['field', 'node', 'user']);
+
+    \Drupal::service(ThemeInstallerInterface::class)->install(['stark']);
+    $this->config('system.theme')->set('default', 'stark')->save();
   }
 
   /**
@@ -750,6 +762,41 @@ class EntityDisplayTest extends KernelTestBase {
     $display_id = $display->id();
     $message = $assertion ? "$context display '$display_id' depends on $type '$key'." : "$context display '$display_id' do not depend on $type '$key'.";
     $this->assertTrue($value, $message);
+  }
+
+  /**
+   * Tests the use of regions for entity view displays.
+   */
+  public function testEntityView(): void {
+    // Create the field that entity_test_install() would have created.
+    FieldStorageConfig::create([
+      'entity_type' => 'entity_test',
+      'field_name' => 'field_test_text',
+      'type' => 'text',
+      'cardinality' => 1,
+    ])->save();
+    FieldConfig::create([
+      'entity_type' => 'entity_test',
+      'field_name' => 'field_test_text',
+      'bundle' => 'entity_test',
+      'label' => 'Test text-field',
+      'translatable' => FALSE,
+    ])->save();
+
+    $this->setCurrentUser($this->drupalCreateUser([
+      'administer entity_test display',
+    ]));
+
+    $this->drupalGet('entity_test/structure/entity_test/display/default');
+    $this->assertSession()->elementExists('css', '.region-content-message.region-empty');
+    $this->assertTrue($this->assertSession()->optionExists('fields[field_test_text][region]', 'hidden')->isSelected());
+
+    $this->getSession()->getPage()->selectFieldOption('fields[field_test_text][region]', 'content');
+    $this->assertTrue($this->assertSession()->optionExists('fields[field_test_text][region]', 'content')->isSelected());
+
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains('Your settings have been saved.');
+    $this->assertTrue($this->assertSession()->optionExists('fields[field_test_text][region]', 'content')->isSelected());
   }
 
 }
