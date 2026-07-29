@@ -151,9 +151,6 @@ final class RecipeRunner {
    *
    * @param \Drupal\Core\Recipe\Recipe $recipe
    *   The recipe to process translations for.
-   *
-   * @return void
-   *   This function does not return a value.
    */
   protected static function processConfigTranslations(Recipe $recipe): void {
     /** @var \Drupal\locale\LocaleConfigManager $locale_config_manager */
