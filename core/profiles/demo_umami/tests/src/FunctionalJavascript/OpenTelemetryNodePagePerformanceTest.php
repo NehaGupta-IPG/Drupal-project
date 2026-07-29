@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\demo_umami\FunctionalJavascript;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -316,15 +315,6 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 40500,
     ];
     $this->assertMetrics($expected, $performance_data);
-  }
-
-  /**
-   * Clear caches.
-   */
-  protected function clearCaches(): void {
-    foreach (Cache::getBins() as $bin) {
-      $bin->deleteAll();
-    }
   }
 
 }
