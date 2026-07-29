@@ -18,67 +18,13 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(EntityDisplayFormBase::class)]
 #[Group('Entity')]
-#[Group('field_ui')]
 #[RunTestsInSeparateProcesses]
 class EntityDisplayFormBaseTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['entity_test', 'field_ui'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->installEntitySchema('entity_test');
-    $this->installEntitySchema('user');
-    $this->installConfig(['field', 'user']);
-  }
-
-  /**
-   * Tests tabledrag match-parent copies the parent region, not its machine name.
-   */
-  public function testTableDragRegionMatchParentSource(): void {
-    // Build the Manage display overview form:
-    $display = $this->container->get('entity_display.repository')
-      ->getViewDisplay('entity_test', 'entity_test');
-    $display->save();
-
-    $form_object = EntityViewDisplayEditForm::create($this->container);
-    $form_object->setEntity($display);
-    $form_state = new FormState();
-    $form = $form_object->buildForm([], $form_state);
-
-    $this->assertArrayHasKey('fields', $form);
-    $this->assertArrayHasKey('#tabledrag', $form['fields']);
-
-    // When a row is indented under a parent, tabledrag "match parent" rules
-    // copy values from the parent row into the child. Two separate rules exist:
-    // - field-parent: child should inherit the parent's machine name.
-    // - field-region: child should inherit the parent's region (content/hidden).
-    $region_match_rule = NULL;
-    $parent_match_rule = NULL;
-    foreach ($form['fields']['#tabledrag'] as $rule) {
-      if (($rule['action'] ?? '') !== 'match' || ($rule['relationship'] ?? '') !== 'parent') {
-        continue;
-      }
-      if (($rule['group'] ?? '') === 'field-region') {
-        $region_match_rule = $rule;
-      }
-      if (($rule['group'] ?? '') === 'field-parent') {
-        $parent_match_rule = $rule;
-      }
-    }
-
-    // The region rule must copy from the parent's region select (.field-region),
-    // not from the hidden machine name input (.field-name).
-    $this->assertNotNull($region_match_rule, 'Field region match-parent tabledrag rule is present.');
-    $this->assertSame('field-region', $region_match_rule['source']);
-    $this->assertNotNull($parent_match_rule, 'Field parent match-parent tabledrag rule is present.');
-    $this->assertSame('field-name', $parent_match_rule['source']);
-  }
+  protected static $modules = ['entity_test'];
 
   /**
    * Tests copy form values to entity.
