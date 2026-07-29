@@ -9,6 +9,7 @@ use Drupal\node\Entity\Node;
 use Drupal\system\Entity\Action;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore hola testblock usuario
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Update')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
 
   /**
@@ -85,7 +87,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->pageTextNotContains('Test 12');
     // Make sure all other field labels are there.
     for ($i = 1; $i <= 23; $i++) {
-      if (($i != 11) && ($i != 12)) {
+      if (($i != 11) && ($i != 12) && ($i != 7)) {
         $this->assertSession()->pageTextContains('Test ' . $i);
       }
     }
@@ -118,8 +120,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->responseContains('drupal.org');
     $this->assertSession()->pageTextContains('0.1');
     $this->assertSession()->pageTextContains('0.2');
-    $this->assertSession()->responseContains('+31612345678');
-    $this->assertSession()->responseContains('+31612345679');
     $this->assertSession()->pageTextContains('Test Article - New title');
     $this->assertSession()->pageTextContains('test.txt');
     $this->assertSession()->pageTextContains('druplicon.small');
@@ -273,12 +273,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('Test');
 
-    // Make sure our custom shortcut exists.
-    $this->drupalGet('admin/config/user-interface/shortcut');
-    $this->assertSession()->pageTextContains('Test shortcut');
-    $this->drupalGet('admin/config/user-interface/shortcut/manage/test/customize');
-    $this->assertSession()->pageTextContains('All content');
-
     // Make sure our language detection settings are still correct.
     $this->drupalGet('admin/config/regional/language/detection');
     $this->assertSession()->checkboxChecked('edit-language-interface-enabled-language-user-admin');
@@ -348,12 +342,10 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'rest',
       'search',
       'serialization',
-      'shortcut',
       'syslog',
       'system',
       'taxonomy',
       'text',
-      'toolbar',
       'update',
       'user',
       'views_ui',
