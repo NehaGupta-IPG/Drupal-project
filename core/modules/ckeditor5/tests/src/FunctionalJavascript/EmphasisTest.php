@@ -47,6 +47,7 @@ class EmphasisTest extends WebDriverTestBase {
     'ckeditor5',
     'node',
     'text',
+    'filter',
   ];
 
   /**
@@ -60,6 +61,7 @@ class EmphasisTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    // Initiate filtered test format:
     FilterFormat::create([
       'format' => 'test_format',
       'name' => 'Test format',
@@ -92,6 +94,38 @@ class EmphasisTest extends WebDriverTestBase {
         ],
       ],
     ])->save();
+
+    // Initiate unfiltered test format:
+    FilterFormat::create([
+      'format' => 'test_format_unfiltered',
+      'name' => 'Test format unfiltered',
+      'filters' => [
+        'filter_html' => [
+          'status' => FALSE,
+          'settings' => [
+            'allowed_html' => '<p> <br> <em>',
+          ],
+        ],
+      ],
+    ])->save();
+    Editor::create([
+      'editor' => 'ckeditor5',
+      'format' => 'test_format_unfiltered',
+      'settings' => [
+        'toolbar' => [
+          'items' => [
+            'italic',
+            'sourceEditing',
+          ],
+        ],
+        'plugins' => [
+          'ckeditor5_sourceEditing' => [
+            'allowed_tags' => [],
+          ],
+        ],
+      ],
+    ])->save();
+
     $this->assertSame([], array_map(
       function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
@@ -101,10 +135,9 @@ class EmphasisTest extends WebDriverTestBase {
         FilterFormat::load('test_format')
       ))
     ));
-    $this->adminUser = $this->drupalCreateUser([
-      'use text format test_format',
-      'bypass node access',
-    ]);
+    $this->adminUser = $this->drupalCreateUser([]);
+    $this->adminUser->addRole($this->createAdminRole('admin', 'admin'));
+    $this->adminUser->save();
 
     $this->drupalCreateContentType(['type' => 'blog']);
     $this->host = $this->createNode([
@@ -140,6 +173,41 @@ class EmphasisTest extends WebDriverTestBase {
     $page->pressButton('Save');
 
     $assert_session->responseContains('<p>This is a <em>test!</em></p>');
+  }
+
+  /**
+   * Ensures that CKEditor doesn't add random em's.
+   */
+  public function testEmphasisWithoutFilterHtml() {
+    $this->host = $this->createNode([
+      'type' => 'blog',
+      'title' => 'Animals with strange names',
+      'body' => [
+        'value' => '<i class="test">Test</i>',
+        'format' => 'test_format_unfiltered',
+      ],
+    ]);
+    $this->host->save();
+
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet($this->host->toUrl('edit-form'));
+    $this->waitForEditor();
+
+    $emphasis_element = $assert_session->waitForElementVisible('css', '.ck-content i');
+    $this->assertEquals('Test', $emphasis_element->getText());
+
+    $xpath = new \DOMXPath($this->getEditorDataAsDom());
+    $emphasis_source = $xpath->query('//i');
+    $this->assertNotEmpty($emphasis_source);
+    $this->assertEquals('Test', $emphasis_source[0]->textContent);
+    $page->pressButton('Save');
+
+    // Check, that the icon is generally present in the response:
+    $assert_session->responseContains('<i class="test">Test</i>');
+    // Check, that the icon is NOT wrapped in an em tag:
+    $assert_session->responseNotContains('<em><i class="test">Test</i></em>');
   }
 
   /**
