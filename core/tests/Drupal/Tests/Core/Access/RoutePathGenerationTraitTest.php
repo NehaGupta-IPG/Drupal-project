@@ -102,13 +102,11 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
   /**
    * Tests that CSRF token creation and validation is consistent.
    *
-   * This checks that our excluded parameters are correctly excluded.
-   *
    * This checks that CsrfAccessCheck() and RouteProcessorCsrf() produce the
-   * same results.
+   * same results when our js parameter is excluded from the calculation.
    *
-   * Multiple cases are provided for an optional parameter (non-empty, empty,
-   * null, undefined).
+   * Multiple cases are provided for testing all possible (usual) combinations
+   * of the excluded parameter.
    */
   #[DataProvider('providerTestCsrfTokenCompleteLifeCycleWithExcludedParams')]
   public function testCsrfTokenCompleteLifeCycleWithExcludedParams(array $params, string $js_route_param, string $js_request_param): void {
@@ -130,10 +128,12 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
       ->with('_csrf_exclude_parameters')
       ->willReturn(['js']);
 
-    // Process the route so the "token" param is generated.
+    // Add our specified 'js' route param value to the common params.
     $routeParams = $params + ['js' => $js_route_param];
+    // Process the route so the "token" param is generated.
     $this->processor->processOutbound('test.example', $route, $routeParams);
 
+    // Add our specified 'js' request param value to the common params.
     $requestParams = $params + ['token' => $routeParams['token'], 'js' => $js_request_param];
 
     // Mock Parameter bag.
@@ -177,7 +177,8 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
    * Data provider for testCsrfTokenCompleteLifeCycleWithExcludedParams().
    *
    * @return array
-   *   An array of route parameters.
+   *   An array of route parameters, and values for the route and request 'js'
+   *   param.
    */
   public static function providerTestCsrfTokenCompleteLifeCycleWithExcludedParams(): array {
     return [
