@@ -11,11 +11,13 @@ use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the output of entity reference autocomplete widgets.
  */
 #[Group('entity_reference')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceAutocompleteWidgetTest extends WebDriverTestBase {
 
   use ContentTypeCreationTrait;
@@ -214,7 +216,7 @@ class EntityReferenceAutocompleteWidgetTest extends WebDriverTestBase {
    * @param string $field_name
    *   The field name.
    */
-  protected function doAutocomplete($field_name): void {
+  protected function doAutocomplete(string $field_name): void {
     $autocomplete_field = $this->getSession()->getPage()->findField($field_name . '[0][target_id]');
     $autocomplete_field->setValue('Test');
     $this->getSession()->getDriver()->keyDown($autocomplete_field->getXpath(), ' ');

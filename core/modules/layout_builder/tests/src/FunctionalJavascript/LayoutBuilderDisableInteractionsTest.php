@@ -6,22 +6,24 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\block_content\Entity\BlockContent;
-use Drupal\block_content\Entity\BlockContentType;
 use Drupal\FunctionalJavascriptTests\JSWebAssert;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore blocknodebundle fieldbody
-
 /**
  * Tests the Layout Builder disables interactions of rendered blocks.
- *
- * @group layout_builder
- * @group #slow
  */
+#[Group('layout_builder')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
 
+  use BlockContentCreationTrait;
   use ContextualLinkClickTrait;
   use OffCanvasTestTrait;
 
@@ -37,6 +39,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     'layout_builder',
     'node',
     'search',
+    'search_node',
     'contextual',
     'off_canvas_test',
   ];
@@ -63,13 +66,11 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
       ],
     ]);
 
-    $bundle = BlockContentType::create([
+    $this->createBlockContentType([
       'id' => 'basic',
       'label' => 'Basic block',
       'revision' => 1,
-    ]);
-    $bundle->save();
-    block_content_add_body_field($bundle->id());
+    ], TRUE);
 
     BlockContent::create([
       'type' => 'basic',
@@ -113,7 +114,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
 
     $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
 
-    $this->drupalGet("{$field_ui_prefix}/display");
+    $this->drupalGet("{$field_ui_prefix}/display/default");
     $this->submitForm(['layout[enabled]' => TRUE], 'Save');
     $assert_session->linkExists('Manage layout');
     $this->clickLink('Manage layout');
@@ -317,24 +318,6 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
   protected function getElementVerticalPosition($css_selector, $position_type): int {
     $this->assertContains($position_type, ['top', 'bottom'], 'Expected position type.');
     return (int) $this->getSession()->evaluateScript("document.querySelector('$css_selector').getBoundingClientRect().$position_type + window.pageYOffset");
-  }
-
-  /**
-   * Moves mouse pointer to location of $selector.
-   *
-   * @param string $selector
-   *   CSS selector.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
-   *   $this->getSession()->getDriver()->mouseOver() instead.
-   *
-   * @see https://www.drupal.org/node/3460567
-   */
-  protected function movePointerTo($selector): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use $this->getSession()->getDriver()->mouseOver() instead. See https://www.drupal.org/node/3460567', E_USER_DEPRECATED);
-    $driver_session = $this->getSession()->getDriver()->getWebDriverSession();
-    $element = $driver_session->element('css selector', $selector);
-    $driver_session->moveto(['element' => $element->getID()]);
   }
 
 }

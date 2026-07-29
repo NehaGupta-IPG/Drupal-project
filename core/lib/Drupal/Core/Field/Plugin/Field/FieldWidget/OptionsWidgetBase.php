@@ -9,7 +9,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\OptGroup;
-use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -46,7 +45,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
   /**
    * Tracks whether the field has a value.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected bool $has_value;
 
   /**
@@ -57,8 +56,8 @@ abstract class OptionsWidgetBase extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ?ElementInfoManagerInterface $elementInfoManager = NULL) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $elementInfoManager);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $property_names = $this->fieldDefinition->getFieldStorageDefinition()->getPropertyNames();
     $this->column = $property_names[0];
   }
@@ -188,7 +187,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
       $value = $item->{$this->column};
       // Keep the value if it actually is in the list of options (needs to be
       // checked against the flat list).
-      if (isset($flat_options[$value])) {
+      if ($value !== NULL && isset($flat_options[$value])) {
         $selected_options[] = $value;
       }
     }

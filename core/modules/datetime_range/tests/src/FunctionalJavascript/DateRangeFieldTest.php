@@ -9,12 +9,14 @@ use Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Daterange field.
- *
- * @group datetime
  */
+#[Group('datetime')]
+#[RunTestsInSeparateProcesses]
 class DateRangeFieldTest extends WebDriverTestBase {
 
   /**
@@ -73,7 +75,7 @@ class DateRangeFieldTest extends WebDriverTestBase {
         ],
       ])
       ->save();
-    $this->drupalGet("admin/structure/types/manage/date_content/display");
+    $this->drupalGet("admin/structure/types/manage/date_content/display/default");
 
     $page = $this->getSession()->getPage();
     $page->pressButton("{$field_name}_settings_edit");
@@ -83,11 +85,11 @@ class DateRangeFieldTest extends WebDriverTestBase {
     $separator = $page->findField('Date separator');
 
     // Assert that date separator field is visible if 'from_to' is set to
-    // BOTH.
+    // DateTimeRangeDisplayOptions::Both.
     $this->assertSession()->fieldValueEquals($from_to_locator, DateTimeRangeDisplayOptions::Both->value);
     $this->assertTrue($separator->isVisible());
     // Assert that the date separator is not visible if 'from_to' is set to
-    // START_DATE or END_DATE.
+    // DateTimeRangeDisplayOptions::StartDate or DateTimeRangeDisplayOptions::EndDate.
     $page->selectFieldOption($from_to_locator, DateTimeRangeDisplayOptions::StartDate->value);
     $this->assertFalse($separator->isVisible());
     $page->selectFieldOption($from_to_locator, DateTimeRangeDisplayOptions::EndDate->value);

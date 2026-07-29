@@ -4,30 +4,37 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit\EventSubscriber;
 
+use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteBuildEvent;
+use Drupal\Core\State\StateInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\views\DisplayPluginCollection;
+use Drupal\views\Entity\View;
 use Drupal\views\EventSubscriber\RouteSubscriber;
+use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * @coversDefaultClass \Drupal\views\EventSubscriber\RouteSubscriber
- * @group views
+ * Tests Drupal\views\EventSubscriber\RouteSubscriber.
  */
+#[CoversClass(RouteSubscriber::class)]
+#[Group('views')]
 class RouteSubscriberTest extends UnitTestCase {
 
   /**
    * The mocked entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&MockObject $entityTypeManager;
 
   /**
    * The mocked config entity storage.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $viewStorage;
 
@@ -40,10 +47,8 @@ class RouteSubscriberTest extends UnitTestCase {
 
   /**
    * The mocked key value storage.
-   *
-   * @var \Drupal\Core\State\StateInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $state;
+  protected StateInterface&MockObject $state;
 
   /**
    * {@inheritdoc}
@@ -52,10 +57,8 @@ class RouteSubscriberTest extends UnitTestCase {
     parent::setUp();
 
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->viewStorage = $this->getMockBuilder('Drupal\Core\Config\Entity\ConfigEntityStorage')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->entityTypeManager->expects($this->any())
+    $this->viewStorage = $this->createStub(ConfigEntityStorage::class);
+    $this->entityTypeManager->expects($this->atLeastOnce())
       ->method('getStorage')
       ->with('view')
       ->willReturn($this->viewStorage);
@@ -64,7 +67,7 @@ class RouteSubscriberTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::routeRebuildFinished
+   * Tests route rebuild finished.
    */
   public function testRouteRebuildFinished(): void {
     [$display_1, $display_2] = $this->setupMocks();
@@ -106,7 +109,7 @@ class RouteSubscriberTest extends UnitTestCase {
     // should only call the second display.
     $display_1->expects($this->once())
       ->method('collectRoutes')
-      ->willReturnCallback(function () use ($collection) {
+      ->willReturnCallback(function () use ($collection): array {
         $collection->add('views.test_id.page_1', new Route('test_route', ['_controller' => 'Drupal\views\Routing\ViewPageController']));
         return ['test_id.page_1' => 'views.test_id.page_1'];
       });
@@ -116,7 +119,7 @@ class RouteSubscriberTest extends UnitTestCase {
 
     $display_2->expects($this->once())
       ->method('collectRoutes')
-      ->willReturnCallback(function () use ($collection) {
+      ->willReturnCallback(function () use ($collection): array {
         $collection->add('views.test_id.page_2', new Route('test_route', ['_controller' => 'Drupal\views\Routing\ViewPageController']));
         return ['test_id.page_2' => 'views.test_id.page_2'];
       });
@@ -148,25 +151,21 @@ class RouteSubscriberTest extends UnitTestCase {
    *   An array of two mocked view displays.
    */
   protected function setupMocks(): array {
-    $executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $view = $this->getMockBuilder('Drupal\views\Entity\View')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->viewStorage->expects($this->any())
+    $executable = $this->createStub(ViewExecutable::class);
+    $view = $this->createStub(View::class);
+    $this->viewStorage
       ->method('load')
       ->willReturn($view);
 
-    $view->expects($this->any())
+    $view
       ->method('getExecutable')
       ->willReturn($executable);
-    $view->expects($this->any())
+    $view
       ->method('id')
       ->willReturn('test_id');
     $executable->storage = $view;
 
-    $executable->expects($this->any())
+    $executable
       ->method('setDisplay')
       ->willReturnMap([
         ['page_1', TRUE],
@@ -178,10 +177,8 @@ class RouteSubscriberTest extends UnitTestCase {
     $display_1 = $this->createMock('Drupal\views\Plugin\views\display\DisplayRouterInterface');
     $display_2 = $this->createMock('Drupal\views\Plugin\views\display\DisplayRouterInterface');
 
-    $display_collection = $this->getMockBuilder('Drupal\views\DisplayPluginCollection')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $display_collection->expects($this->any())
+    $display_collection = $this->createStub(DisplayPluginCollection::class);
+    $display_collection
       ->method('get')
       ->willReturnMap([
         ['page_1', $display_1],

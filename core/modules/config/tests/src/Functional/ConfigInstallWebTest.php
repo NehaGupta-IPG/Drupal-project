@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
+use Drupal\config_enum_test\AnotherEnumValue;
+use Drupal\config_enum_test\EnumValue;
 use Drupal\config_test\Entity\ConfigTest;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\StorageInterface;
@@ -11,18 +13,19 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\Site\Settings;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore suis
-
 /**
  * Tests configuration objects before and after module install and uninstall.
  *
  * The installation and removal of configuration objects in install, disable
  * and uninstall functionality is tested.
- *
- * @group config
- * @group #slow
  */
+#[Group('config')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ConfigInstallWebTest extends BrowserTestBase {
 
   /**
@@ -205,7 +208,10 @@ class ConfigInstallWebTest extends BrowserTestBase {
     }
     catch (PreExistingConfigException $e) {
       $this->assertEquals('config_clash_test_theme', $e->getExtension());
-      $this->assertEquals([StorageInterface::DEFAULT_COLLECTION => ['config_test.dynamic.dotted.default'], 'language.fr' => ['config_test.dynamic.dotted.default']], $e->getConfigObjects());
+      $this->assertEquals([
+        StorageInterface::DEFAULT_COLLECTION => ['config_test.dynamic.dotted.default'],
+        'language.fr' => ['config_test.dynamic.dotted.default'],
+      ], $e->getConfigObjects());
       $this->assertEquals('Configuration objects (config_test.dynamic.dotted.default, language/fr/config_test.dynamic.dotted.default) provided by config_clash_test_theme already exist in active configuration', $e->getMessage());
     }
   }
@@ -254,6 +260,38 @@ class ConfigInstallWebTest extends BrowserTestBase {
     }
     $this->drupalGet('/admin/reports/status');
     $this->assertSession()->pageTextContains("The directory $directory does not exist.");
+  }
+
+  /**
+   * Tests installing modules with enums and constants in config.
+   */
+  public function testEnumsAndConstantsInModules(): void {
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('admin/modules');
+
+    // Install modules using enums at the same time. This ensures that a module
+    // can use a enum from a dependency that is not yet installed.
+    $this->assertSession()->fieldExists('edit-modules-config-enum-test-enable')->check();
+    $this->assertSession()->fieldExists('edit-modules-config-enum-dependency-test-enable')->check();
+    $this->submitForm([], 'Install');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Configuration test for enums');
+    $this->assertSession()->pageTextContains('Configuration test for enum with dependency');
+
+    // Ensure the value returned from config is an enum.
+    $this->assertSame(AnotherEnumValue::Foo, $this->config('config_enum_dependency_test.settings')->get('status'));
+    $this->assertSame(EnumValue::Maybe, $this->config('config_enum_test.settings')->get('foo'));
+
+    $this->drupalGet('admin/modules');
+
+    // Enable a module which has a constant in configuration.
+    $this->assertSession()->fieldExists('edit-modules-config-constant-test-enable')->check();
+    $this->submitForm([], 'Install');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Module Configuration test for constants has been installed.');
+
+    // Ensure the value returned from config is the expected value.
+    $this->assertSame('foo', $this->config('config_constant_test.settings')->get('foo'));
   }
 
 }

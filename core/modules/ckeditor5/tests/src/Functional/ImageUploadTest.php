@@ -13,14 +13,17 @@ use Drupal\Tests\jsonapi\Functional\JsonApiRequestTestTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * Test image upload.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class ImageUploadTest extends BrowserTestBase {
 
   use JsonApiRequestTestTrait;
@@ -102,10 +105,10 @@ class ImageUploadTest extends BrowserTestBase {
 
     $url = $this->getUploadUrl();
     $images = $this->getTestFiles('image');
-    $large_image = $this->getTestImageByStat($images, 'size', function ($size) {
+    $large_image = $this->getTestImageByStat($images, 'size', function ($size): bool {
       return $size > 30000;
     });
-    $small_image = $this->getTestImageByStat($images, 'size', function ($size) {
+    $small_image = $this->getTestImageByStat($images, 'size', function ($size): bool {
       return $size < 30000;
     });
 
@@ -136,10 +139,10 @@ class ImageUploadTest extends BrowserTestBase {
 
     $url = $this->getUploadUrl();
     $images = $this->getTestFiles('image');
-    $large_image = $this->getTestImageByStat($images, 'size', function ($size) {
+    $large_image = $this->getTestImageByStat($images, 'size', function ($size): bool {
       return $size > 30000;
     });
-    $small_image = $this->getTestImageByStat($images, 'size', function ($size) {
+    $small_image = $this->getTestImageByStat($images, 'size', function ($size): bool {
       return $size < 30000;
     });
     $response = $this->uploadRequest($url, file_get_contents($large_image->uri), 'same.jpg');
@@ -253,7 +256,7 @@ class ImageUploadTest extends BrowserTestBase {
    * @return object|bool
    *   Objects with 'uri', 'filename', and 'name' properties.
    */
-  protected function getTestImageByStat(array $images, string $stat, callable $condition) {
+  protected function getTestImageByStat(array $images, string $stat, callable $condition): mixed {
     return current(array_filter($images, function ($image) use ($condition, $stat) {
       $stats = stat($image->uri);
       return $condition($stats[$stat]);

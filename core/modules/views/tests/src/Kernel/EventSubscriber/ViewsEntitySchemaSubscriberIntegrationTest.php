@@ -9,23 +9,18 @@ use Drupal\Core\Entity\EntityTypeEvent;
 use Drupal\Core\Entity\EntityTypeEvents;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests \Drupal\views\EventSubscriber\ViewsEntitySchemaSubscriber.
- *
- * @group Views
- * @group #slow
  */
+#[Group('Views')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
   use EntityDefinitionTestTrait;
-
-  /**
-   * The entity definition update manager.
-   *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
-   */
-  protected $entityDefinitionUpdateManager;
 
   /**
    * {@inheritdoc}
@@ -33,7 +28,6 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
   protected static $modules = [
     'entity_test',
     'entity_test_update',
-    'user',
     'text',
   ];
 
@@ -57,25 +51,11 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
   protected $eventDispatcher;
 
   /**
-   * The tested event subscriber of views.
-   *
-   * @var \Drupal\views\EventSubscriber\ViewsEntitySchemaSubscriber
-   */
-  protected $eventSubscriber;
-
-  /**
    * The entity type manager service.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
-
-  /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
 
   /**
    * {@inheritdoc}
@@ -84,7 +64,6 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     parent::setUp();
 
     $this->eventDispatcher = $this->container->get('event_dispatcher');
-    $this->eventSubscriber = $this->container->get('views.entity_schema_subscriber');
     $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->state = $this->container->get('state');
@@ -332,9 +311,9 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     // base + translation <-> base + translation + revision
     // base + revision <-> base + translation + revision
     // base <-> base + revision
-    // base <-> base + translation + revision
+    // base <-> base + translation + revision.
 
-    // Base <-> base + translation
+    // Base <-> base + translation.
     $this->updateEntityTypeToTranslatable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
 
@@ -351,7 +330,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     $this->resetEntityType();
 
-    // Base + translation <-> base + translation + revision
+    // Base + translation <-> base + translation + revision.
     $this->updateEntityTypeToTranslatable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
 
@@ -375,7 +354,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     $this->resetEntityType();
 
-    // Base + revision <-> base + translation + revision
+    // Base + revision <-> base + translation + revision.
     $this->updateEntityTypeToRevisionable();
     [$view, $display] = $this->getUpdatedViewAndDisplay();
 
@@ -399,7 +378,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     $this->resetEntityType();
 
-    // Base <-> base + revision
+    // Base <-> base + revision.
     $this->updateEntityTypeToRevisionable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
 
@@ -416,7 +395,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     $this->resetEntityType();
 
-    // Base <-> base + translation + revision
+    // Base <-> base + translation + revision.
     $this->updateEntityTypeToRevisionable(TRUE);
     $this->updateEntityTypeToTranslatable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
@@ -445,7 +424,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
    * Tests some possible entity table updates for a revision view.
    */
   public function testVariousTableUpdatesForRevisionView(): void {
-    // Base + revision <-> base + translation + revision
+    // Base + revision <-> base + translation + revision.
     $this->updateEntityTypeToRevisionable(TRUE);
 
     [$view, $display] = $this->getUpdatedViewAndDisplay(TRUE);

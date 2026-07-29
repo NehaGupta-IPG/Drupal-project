@@ -6,12 +6,13 @@ namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\process\Flatten;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the flatten plugin.
- *
- * @group migrate
  */
+#[Group('migrate')]
 class FlattenTest extends MigrateProcessTestCase {
 
   /**
@@ -24,10 +25,9 @@ class FlattenTest extends MigrateProcessTestCase {
 
   /**
    * Tests that various array flatten operations work properly.
-   *
-   * @dataProvider providerTestFlatten
    */
-  public function testFlatten($value, $expected): void {
+  #[DataProvider('providerTestFlatten')]
+  public function testFlatten($value, array $expected): void {
     $flattened = $this->plugin->transform($value, $this->migrateExecutable, $this->row, 'destination_property');
     $this->assertSame($expected, $flattened);
   }
@@ -35,7 +35,7 @@ class FlattenTest extends MigrateProcessTestCase {
   /**
    * Provides data for the testFlatten.
    */
-  public static function providerTestFlatten() {
+  public static function providerTestFlatten(): array {
     $object = (object) [
       'a' => 'test',
       'b' => '1.2',
@@ -55,20 +55,19 @@ class FlattenTest extends MigrateProcessTestCase {
 
   /**
    * Tests that Flatten throws a MigrateException.
-   *
-   * @dataProvider providerTestFlattenInvalid
    */
-  public function testFlattenInvalid($value): void {
+  #[DataProvider('providerTestFlattenInvalid')]
+  public function testFlattenInvalid(string|int|float|bool|null $value): void {
     $this->expectException(MigrateException::class);
     $type = gettype($value);
-    $this->expectExceptionMessage(sprintf("Input should be an array or an object, instead it was of type '%s'", $type));
+    $this->expectExceptionMessageIs(sprintf("Input should be an array or an object, instead it was of type '%s'", $type));
     $this->plugin->transform($value, $this->migrateExecutable, $this->row, 'destination_property');
   }
 
   /**
    * Provides data for the testFlattenInvalid.
    */
-  public static function providerTestFlattenInvalid() {
+  public static function providerTestFlattenInvalid(): array {
     $xml_str = <<<XML
 <xml version='1.0'?>
 <authors>

@@ -2,13 +2,14 @@
 /* cspell:ignore imagetextalternative mediaimagetextalternative */
 /* cspell:ignore mediaimagetextalternativeediting textalternativeformview */
 
-import { Plugin } from 'ckeditor5/src/core';
-import { IconLowVision } from '@ckeditor/ckeditor5-icons';
 import {
+  Plugin,
+  IconLowVision,
   ButtonView,
   ContextualBalloon,
+  CssTransitionDisablerMixin,
   clickOutsideHandler,
-} from 'ckeditor5/src/ui';
+} from 'ckeditor5';
 
 import { getClosestSelectedDrupalMediaWidget, isDrupalMedia } from '../utils';
 import {
@@ -100,7 +101,9 @@ export default class MediaImageTextAlternativeUi extends Plugin {
     /**
      * A form containing a textarea and buttons, used to change the `alt` text value.
      */
-    this._form = new TextAlternativeFormView(editor.locale);
+    this._form = new (CssTransitionDisablerMixin(TextAlternativeFormView))(
+      editor.locale,
+    );
 
     // Render the form so its #element is available for clickOutsideHandler.
     this._form.render();

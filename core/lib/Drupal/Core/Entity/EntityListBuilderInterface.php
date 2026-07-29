@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Core\Cache\CacheableMetadata;
+
 /**
  * Defines an interface to build entity listings.
  */
@@ -33,6 +35,9 @@ interface EntityListBuilderInterface {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity the operations are for.
+   * @param \Drupal\Core\Cache\CacheableMetadata|null $cacheability
+   *   The cacheable metadata to add to if your operations vary by or depend on
+   *   something.
    *
    * @return array
    *   An associative array of operation link data for this list, keyed by
@@ -41,7 +46,7 @@ interface EntityListBuilderInterface {
    *   - url: An instance of \Drupal\Core\Url for the operation URL.
    *   - weight: The weight of this operation.
    */
-  public function getOperations(EntityInterface $entity);
+  public function getOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL);
 
   /**
    * Builds a listing of entities for the given entity type.

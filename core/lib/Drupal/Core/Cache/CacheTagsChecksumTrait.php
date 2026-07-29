@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Cache;
 
 /**
@@ -45,7 +47,7 @@ trait CacheTagsChecksumTrait {
    * @param bool $success
    *   Whether or not the transaction was successful.
    */
-  public function rootTransactionEndCallback($success) {
+  public function rootTransactionEndCallback($success): void {
     if ($success) {
       $this->doInvalidateTags($this->delayedTags);
     }
@@ -53,9 +55,9 @@ trait CacheTagsChecksumTrait {
   }
 
   /**
-   * Implements \Drupal\Core\Cache\CacheTagsInvalidatorInterface::invalidateTags()
+   * {@inheritdoc}
    */
-  public function invalidateTags(array $tags) {
+  public function invalidateTags(array $tags): void {
     foreach ($tags as $key => $tag) {
       if (isset($this->invalidatedTags[$tag])) {
         unset($tags[$key]);
@@ -84,15 +86,15 @@ trait CacheTagsChecksumTrait {
   }
 
   /**
-   * Implements \Drupal\Core\Cache\CacheTagsChecksumInterface::getCurrentChecksum()
+   * {@inheritdoc}
    */
-  public function getCurrentChecksum(array $tags) {
+  public function getCurrentChecksum(array $tags): string {
     // Any cache writes in this request containing cache tags whose invalidation
     // has been delayed due to an in-progress transaction must not be read by
     // any other request, so use a nonsensical checksum which will cause any
     // written cache items to be ignored.
     if (!empty(array_intersect($tags, $this->delayedTags))) {
-      return CacheTagsChecksumInterface::INVALID_CHECKSUM_WHILE_IN_TRANSACTION;
+      return (string) CacheTagsChecksumInterface::INVALID_CHECKSUM_WHILE_IN_TRANSACTION;
     }
 
     // Remove tags that were already invalidated during this request from the
@@ -102,13 +104,13 @@ trait CacheTagsChecksumTrait {
     foreach ($tags as $tag) {
       unset($this->invalidatedTags[$tag]);
     }
-    return $this->calculateChecksum($tags);
+    return (string) $this->calculateChecksum($tags);
   }
 
   /**
    * Implements \Drupal\Core\Cache\CacheTagsChecksumInterface::isValid()
    */
-  public function isValid($checksum, array $tags) {
+  public function isValid($checksum, array $tags): bool {
     // If there are no cache tags, then there is no cache tag to validate,
     // hence it's always valid.
     if (empty($tags)) {
@@ -124,7 +126,7 @@ trait CacheTagsChecksumTrait {
       return FALSE;
     }
 
-    return $checksum == $this->calculateChecksum($tags);
+    return (string) $checksum === (string) $this->calculateChecksum($tags);
   }
 
   /**
@@ -136,7 +138,7 @@ trait CacheTagsChecksumTrait {
    * @return int
    *   The calculated checksum.
    */
-  protected function calculateChecksum(array $tags) {
+  protected function calculateChecksum(array $tags): int {
     $checksum = 0;
 
     // If there are no cache tags, then there is no cache tag to checksum,
@@ -155,7 +157,12 @@ trait CacheTagsChecksumTrait {
       $this->preloadTags = [];
     }
 
-    $query_tags = array_diff($tags_with_preload, array_keys($this->tagCache));
+    $query_tags = [];
+    foreach ($tags_with_preload as $tag) {
+      if (!isset($this->tagCache[$tag])) {
+        $query_tags[] = $tag;
+      }
+    }
     if ($query_tags) {
       $tag_invalidations = $this->getTagInvalidationCounts($query_tags);
       $this->tagCache += $tag_invalidations;
@@ -173,7 +180,7 @@ trait CacheTagsChecksumTrait {
   /**
    * Implements \Drupal\Core\Cache\CacheTagsChecksumInterface::reset()
    */
-  public function reset() {
+  public function reset(): void {
     $this->tagCache = [];
     $this->invalidatedTags = [];
   }

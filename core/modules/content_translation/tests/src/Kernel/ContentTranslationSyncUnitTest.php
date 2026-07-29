@@ -6,12 +6,14 @@ namespace Drupal\Tests\content_translation\Kernel;
 
 use Drupal\content_translation\FieldTranslationSynchronizer;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the field synchronization logic.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationSyncUnitTest extends KernelTestBase {
 
   /**
@@ -189,19 +191,19 @@ class ContentTranslationSyncUnitTest extends KernelTestBase {
     // their delta.
     $delta_callbacks = [
       // Continuous field values: all values are equal.
-      function ($delta) {
+      function ($delta): true {
         return TRUE;
       },
       // Alternated field values: only the even ones are equal.
-      function ($delta) {
+      function ($delta): bool {
         return $delta % 2 !== 0;
       },
       // Sparse field values: only the "middle" ones are equal.
-      function ($delta) {
+      function ($delta): bool {
         return $delta === 1 || $delta === 2;
       },
       // Sparse field values: only the "extreme" ones are equal.
-      function ($delta) {
+      function ($delta): bool {
         return $delta === 0 || $delta === 3;
       },
     ];
