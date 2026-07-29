@@ -153,4 +153,16 @@ class SortArray {
     return strnatcasecmp($a, $b);
   }
 
+  /**
+   * Create collator with intl extension for sorting unicode strings.
+   */
+  public static function createSortCollator(): \Collator|null {
+    $collator = NULL;
+    if (extension_loaded('intl')) {
+      $collator = \Collator::create(\Drupal::service('language_manager')->getCurrentLanguage()->getId());
+      $collator->setAttribute(\Collator::NUMERIC_COLLATION, \Collator::ON);
+    }
+    return $collator;
+  }
+
 }

@@ -244,11 +244,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * Sorts entities using collator.
    */
   public static function sortEntities(array &$entities): bool {
-    $collator = NULL;
-    if (extension_loaded('intl')) {
-      $collator = \Collator::create(\Drupal::service('language_manager')->getCurrentLanguage()->getId());
-      $collator->setAttribute(\Collator::NUMERIC_COLLATION, \Collator::ON);
-    }
+    $collator = SortArray::createSortCollator();
     return uasort($entities, function ($a, $b) use ($collator) {
       return static::compare($a, $b, $collator);
     });
