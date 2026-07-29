@@ -37,7 +37,14 @@ function text_post_update_install_text_with_summary(): void {
  * Update field storage dependencies after text_with_summary install.
  */
 function text_post_update_update_field_storage_dependencies(array &$sandbox): void {
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'field_storage_config');
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'field_storage_config', function ($field_storage) {
+      /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
+      if ($field_storage->getType() === 'text_with_summary' && $field_storage->getTypeProvider() === 'text') {
+        $field_storage->set('module', 'text_with_summary');
+        return TRUE;
+      }
+      return FALSE;
+    });
 }
 
 /**
