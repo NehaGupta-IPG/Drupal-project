@@ -396,6 +396,9 @@ class ConfigInstaller implements ConfigInstallerInterface {
               'default_config_hash' => Crypt::hashBase64(serialize($config_to_create[$name])),
             ],
           ] + $config_to_create[$name];
+          // Remove the langcode from the configuration data as this is
+          // populated on config save.
+          unset($config_to_create[$name]['langcode']);
         }
         $new_config->setData($config_to_create[$name]);
       }
