@@ -179,7 +179,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
    * Sorts entities using collator.
    */
   public static function sortEntities(array &$entities): bool {
-    $collator = SortArray::createSortCollator();
+    $collator = SortArray::createSortCollator(\Drupal::service('language_manager')->getCurrentLanguage()->getId());
     return uasort($entities, function ($a, $b) use ($collator) {
       return static::compare($a, $b, $collator);
     });

@@ -144,7 +144,25 @@ class SortArray {
   }
 
   /**
-   * Sort helper for comparing two unicode strings.
+   * Sort helper for string comparisons using a "natural order" algorithm.
+   *
+   * Callback for uasort(). Uses language-dependent Collator::compare(),
+   * if intl extension is installed, fallback to strnatcasecmp().
+   * Usage examples:
+   * Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities()
+   * Drupal\Core\Config\Entity\ConfigEntityBase::compare()
+   *
+   * @param string $a
+   *   First string for comparison.
+   * @param string $b
+   *   Second string for comparison.
+   * @param \Collator|null $collator
+   *   Collator from createSortCollator.
+   *
+   * @return int
+   *   The comparison result for uasort().
+   *
+   * @see createSortCollator()
    */
   public static function sortByString(string $a, string $b, ?\Collator $collator): int {
     if (isset($collator)) {
@@ -154,15 +172,24 @@ class SortArray {
   }
 
   /**
-   * Create collator with intl extension for sorting unicode strings.
+   * Create collator with intl extension for sorting strings.
+   *
+   * @param string $langcode
+   *   Language code. Get it from the language manager:
+   *   \Drupal::service('language_manager')->getCurrentLanguage()->getId()
+   *
+   * @return \Collator|null
+   *   Collator, if intl extension is installed.
+   *
+   * @see sortByString()
    */
-  public static function createSortCollator(): \Collator|null {
-    $collator = NULL;
+  public static function createSortCollator(string $langcode): \Collator|null {
     if (extension_loaded('intl')) {
-      $collator = \Collator::create(\Drupal::service('language_manager')->getCurrentLanguage()->getId());
+      $collator = \Collator::create($langcode);
       $collator->setAttribute(\Collator::NUMERIC_COLLATION, \Collator::ON);
+      return $collator;
     }
-    return $collator;
+    return NULL;
   }
 
 }
