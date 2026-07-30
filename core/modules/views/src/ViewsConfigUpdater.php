@@ -67,10 +67,58 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
-      // @todo leaving this here now but new update hooks will need to update.
-      return FALSE;
-    });
+    $changed = FALSE;
+    if ($this->processDisableAjaxBookmarkingUpdate($view)) {
+      $changed = TRUE;
+    }
+    return $changed;
+  }
+
+  /**
+   * Checks for displays that need the disable_ajax_bookmarking setting.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view has any displays that need to have the
+   *   disable_ajax_bookmarking setting added.
+   */
+  public function needsDisableAjaxBookmarkingUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisableAjaxBookmarkingUpdate($view);
+  }
+
+  /**
+   * Adds the disable_ajax_bookmarking setting to displays if necessary.
+   *
+   * The setting is only added to displays that already contain the use_ajax
+   * setting, matching the configuration a save through the UI produces.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function processDisableAjaxBookmarkingUpdate(ViewEntityInterface $view): bool {
+    $changed = FALSE;
+    $displays = $view->get('display');
+
+    foreach ($displays as &$display) {
+      if (
+        isset($display['display_options']['use_ajax']) &&
+        !isset($display['display_options']['disable_ajax_bookmarking'])
+      ) {
+        $display['display_options']['disable_ajax_bookmarking'] = FALSE;
+        $changed = TRUE;
+      }
+    }
+
+    if ($changed) {
+      $view->set('display', $displays);
+    }
+
+    return $changed;
   }
 
   /**

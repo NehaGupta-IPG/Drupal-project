@@ -5,6 +5,10 @@
  * Post update functions for Views.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\views\ViewEntityInterface;
+use Drupal\views\ViewsConfigUpdater;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -60,4 +64,16 @@ function views_removed_post_updates(): array {
  */
 function views_post_update_counter_field_not_sortable(): void {
   // Empty update to trigger a cache rebuild so updated Views data is applied.
+}
+
+/**
+ * Adds the disable_ajax_bookmarking setting to views displays.
+ */
+function views_post_update_disable_ajax_bookmarking(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsDisableAjaxBookmarkingUpdate($view);
+  });
 }

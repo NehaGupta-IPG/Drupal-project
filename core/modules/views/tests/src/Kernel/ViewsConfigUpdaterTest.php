@@ -8,6 +8,7 @@ use Drupal\Core\Config\FileStorage;
 use Drupal\views\ViewsConfigUpdater;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -30,12 +31,48 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   ];
 
   /**
-   * Tests ViewsConfigUpdater.
+   * Tests the `needsDisableAjaxBookmarkingUpdate` method.
    */
-  public function testViewsConfigUpdater(): void {
-    // ViewsConfigUpdater currently contains no actual configuration update
-    // logic. Replace this method with a real test when it does.
-    $this->markTestSkipped();
+  public function testNeedsDisableAjaxBookmarkingUpdate(): void {
+    /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+    $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+    $view_config_updater->setDeprecationsEnabled(FALSE);
+
+    $test_view = $this->loadTestView('views.view.test_disable_ajax_bookmarking');
+    $this->assertTrue($view_config_updater->needsDisableAjaxBookmarkingUpdate($test_view));
+
+    // Displays containing the use_ajax setting get the new setting.
+    $display = $test_view->getDisplay('default');
+    $this->assertFalse($display['display_options']['disable_ajax_bookmarking']);
+    $display = $test_view->getDisplay('block_1');
+    $this->assertFalse($display['display_options']['disable_ajax_bookmarking']);
+
+    // Displays without the use_ajax setting are left alone.
+    $display = $test_view->getDisplay('page_1');
+    $this->assertArrayNotHasKey('disable_ajax_bookmarking', $display['display_options']);
+
+    // The update is idempotent.
+    $this->assertFalse($view_config_updater->needsDisableAjaxBookmarkingUpdate($test_view));
+  }
+
+  /**
+   * Tests that the disable_ajax_bookmarking setting is added on save.
+   */
+  #[IgnoreDeprecations]
+  public function testDisableAjaxBookmarkingUpdateOnSaveHandler(): void {
+    $this->installEntitySchema('user');
+
+    $test_view = $this->loadTestView('views.view.test_disable_ajax_bookmarking');
+
+    $this->expectUserDeprecationMessage('The update to add the disable_ajax_bookmarking setting for view "test_disable_ajax_bookmarking" is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3604351');
+    $test_view->save();
+
+    $display = $test_view->getDisplay('default');
+    $this->assertFalse($display['display_options']['disable_ajax_bookmarking']);
+    $display = $test_view->getDisplay('block_1');
+    $this->assertFalse($display['display_options']['disable_ajax_bookmarking']);
+    $display = $test_view->getDisplay('page_1');
+    $this->assertArrayNotHasKey('disable_ajax_bookmarking', $display['display_options']);
   }
 
   /**
