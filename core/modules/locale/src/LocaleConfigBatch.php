@@ -58,7 +58,7 @@ class LocaleConfigBatch {
         ->setErrorMessage($this->t('Error updating configuration translations'));
 
       if ($update_default_config_langcodes && $this->languageManager->getDefaultLanguage()->getId() !== 'en') {
-        $batch_builder->addOperation(self::class . ':batchUpdateDefaultConfigLangcodes');
+        @trigger_error('Calling ' . __METHOD__ . '() with $update_default_config_langcodes set to TRUE is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3337864', E_USER_DEPRECATED);
       }
 
       // Chunking the array of names into batches of 20 for better performance.
