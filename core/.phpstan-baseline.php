@@ -1184,12 +1184,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Access/CheckProviderInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Access\\\\CsrfRequestHeaderAccessCheck\\:\\:applies\\(\\) should return bool but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Access/CsrfRequestHeaderAccessCheck.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Access\\\\RouteProcessorCsrf\\:\\:processOutbound\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -8834,42 +8828,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Batch/BatchStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\DatabaseLockBackend\\:\\:release\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/DatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\DatabaseLockBackend\\:\\:releaseAll\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/DatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\DatabaseLockBackend\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/DatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\PersistentDatabaseLockBackend\\:\\:release\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/PersistentDatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\PersistentDatabaseLockBackend\\:\\:releaseAll\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/PersistentDatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\PersistentDatabaseLockBackend\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/PersistentDatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Menu\\\\MenuActiveTrail\\:\\:clear\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -10188,6 +10146,20 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedDataManagerInterface.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of interface Symfony\\\\Component\\\\Validator\\\\ConstraintValidatorInterface\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/Validation/RecursiveContextualValidator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of interface Symfony\\\\Component\\\\Validator\\\\ConstraintValidatorInterface\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/Validation/RecursiveContextualValidator.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\Validation\\\\RecursiveContextualValidator\\:\\:validateConstraints\\(\\) has no return type specified\\.$#',
@@ -16616,6 +16588,76 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/link/src/Plugin/Validation/Constraint/LinkAccessConstraintValidator.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkAccessConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\link\\\\Plugin\\\\Validation\\\\Constraint\\\\LinkAccessConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkAccessConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 5,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkExternalProtocolsConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\link\\\\Plugin\\\\Validation\\\\Constraint\\\\LinkExternalProtocolsConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 5,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkExternalProtocolsConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkNotExistingInternalConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\link\\\\Plugin\\\\Validation\\\\Constraint\\\\LinkNotExistingInternalConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkNotExistingInternalConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkTitleRequiredConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\link\\\\Plugin\\\\Validation\\\\Constraint\\\\LinkTitleRequiredConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkTitleRequiredConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkTypeConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\link\\\\Plugin\\\\Validation\\\\Constraint\\\\LinkTypeConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkTypeConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Function locale_string_is_safe\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17490,6 +17532,20 @@ $ignoreErrors[] = [
 	'identifier' => 'argument.unresolvableType',
 	'count' => 2,
 	'path' => __DIR__ . '/modules/media/tests/src/Kernel/MediaSourceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/media/tests/src/Kernel/OEmbedResourceConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\media\\\\Plugin\\\\Validation\\\\Constraint\\\\OEmbedResourceConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/media/tests/src/Kernel/OEmbedResourceConstraintValidatorTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\media_library\\\\Ajax\\\\UpdateSelectionCommand\\:\\:render\\(\\) has no return type specified\\.$#',
@@ -20634,30 +20690,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/search/src/ViewsSearchQuery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to method execute\\(\\) of deprecated class Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:
-in drupal\\:11\\.4\\.0 and is removed from drupal\\:12\\.0\\.0\\. Instead, use
-  \\\\Drupal\\\\search_node\\\\Plugin\\\\Search\\\\SearchNode\\.$#',
-	'identifier' => 'method.deprecatedClass',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/SearchMultilingualEntityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to method indexStatus\\(\\) of deprecated class Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:
-in drupal\\:11\\.4\\.0 and is removed from drupal\\:12\\.0\\.0\\. Instead, use
-  \\\\Drupal\\\\search_node\\\\Plugin\\\\Search\\\\SearchNode\\.$#',
-	'identifier' => 'method.deprecatedClass',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/SearchMultilingualEntityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to method updateIndex\\(\\) of deprecated class Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:
-in drupal\\:11\\.4\\.0 and is removed from drupal\\:12\\.0\\.0\\. Instead, use
-  \\\\Drupal\\\\search_node\\\\Plugin\\\\Search\\\\SearchNode\\.$#',
-	'identifier' => 'method.deprecatedClass',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/SearchMultilingualEntityTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\serialization\\\\Encoder\\\\XmlEncoder\\:\\:setBaseEncoder\\(\\) has no return type specified\\.$#',
@@ -24902,6 +24934,34 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/tests/src/Kernel/Views/UserKernelTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Unit/Plugin/Validation/Constraint/ProtectedUserFieldConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\user\\\\Plugin\\\\Validation\\\\Constraint\\\\ProtectedUserFieldConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Unit/Plugin/Validation/Constraint/ProtectedUserFieldConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Unit/Plugin/Validation/Constraint/UserMailRequiredValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\user\\\\Plugin\\\\Validation\\\\Constraint\\\\UserMailRequiredValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Unit/Plugin/Validation/Constraint/UserMailRequiredValidatorTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$result in isset\\(\\) always exists and is not nullable\\.$#',
@@ -33160,10 +33220,42 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/scripts/run-tests.sh',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Composer/Component/ComponentsIsolatedBuildTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Composer/Template/ComposerProjectTemplatesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/BuildTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
 	'identifier' => 'disallowed.function',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/BuildTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/Tests/BuildTestTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\FunctionalJavascriptTests\\\\Ajax\\\\AjaxMaintenanceModeTest\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
@@ -34706,6 +34798,34 @@ $ignoreErrors[] = [
 	'identifier' => 'includeOnce.fileNotFound',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Update/UpdateRegistryTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/PrimitiveTypeConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\Core\\\\Validation\\\\Plugin\\\\Validation\\\\Constraint\\\\PrimitiveTypeConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/PrimitiveTypeConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/SerializedConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\Core\\\\Validation\\\\Plugin\\\\Validation\\\\Constraint\\\\SerializedConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/SerializedConstraintValidatorTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\DrupalTestBrowser\\:\\:addPostFiles\\(\\) has no return type specified\\.$#',

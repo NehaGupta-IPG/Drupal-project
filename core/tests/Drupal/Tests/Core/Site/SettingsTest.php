@@ -325,6 +325,7 @@ class SettingsTest extends UnitTestCase {
    *   The expected deprecation message.
    */
   #[DataProvider('providerTestRealDeprecatedSettings')]
+  #[IgnoreDeprecations]
   public function testRealDeprecatedSettings(string $legacy_setting, string $expected_deprecation): void {
     $this->markTestSkipped('No settings to test real deprecated settings with.');
 
