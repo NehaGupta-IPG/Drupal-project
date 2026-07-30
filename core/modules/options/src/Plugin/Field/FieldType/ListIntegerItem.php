@@ -90,9 +90,6 @@ class ListIntegerItem extends ListItemBase {
       // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number
       // @see \Drupal\Core\Field\Plugin\Field\FieldWidget\NumberWidget::formElement()
       $element['allowed_values']['table'][$delta]['item']['key']['#type'] = 'number';
-      // ListItemBase::storageSettingsForm() may set an integer default value,
-      // so cast it to match values submitted by number inputs.
-      $element['allowed_values']['table'][$delta]['item']['key']['#default_value'] = (string) $element['allowed_values']['table'][$delta]['item']['key']['#default_value'];
     }
 
     return $element;
