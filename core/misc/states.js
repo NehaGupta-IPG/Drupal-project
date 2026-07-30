@@ -695,9 +695,11 @@
     const tagsSupportDisable =
       'button, fieldset, optgroup, option, select, textarea, input';
     if (e.trigger) {
+      const disabledClass =
+        drupalSettings.states_api?.classes?.disabled || 'form-disabled';
       $(e.target)
         .closest('.js-form-item, .js-form-submit, .js-form-wrapper')
-        .toggleClass('form-disabled', e.value)
+        .toggleClass(disabledClass, e.value)
         .find(tagsSupportDisable)
         .addBack(tagsSupportDisable)
         .prop('disabled', e.value);
@@ -706,9 +708,11 @@
 
   $document.on('state:readonly', (e) => {
     if (e.trigger) {
+      const readonlyClass =
+        drupalSettings.states_api?.classes?.readonly || 'form-readonly';
       $(e.target)
         .closest('.js-form-item, .js-form-submit, .js-form-wrapper')
-        .toggleClass('form-readonly', e.value)
+        .toggleClass(readonlyClass, e.value)
         .find('input, textarea')
         .prop('readonly', e.value);
     }
@@ -716,6 +720,8 @@
 
   $document.on('state:required', (e) => {
     if (e.trigger) {
+      const requiredClass =
+        drupalSettings.states_api?.classes?.required || 'form-required';
       if (e.value) {
         const label = `label${e.target.id ? `[for=${e.target.id}]` : ''}`;
         const $label = $(e.target)
@@ -723,15 +729,15 @@
           .closest('.js-form-item, .js-form-wrapper')
           .find(label);
         // Avoids duplicate required markers on initialization.
-        if (!$label.hasClass('js-form-required').length) {
-          $label.addClass('js-form-required form-required');
+        if (!$label.hasClass('js-form-required')) {
+          $label.addClass(`js-form-required ${requiredClass}`);
         }
       } else {
         $(e.target)
           .removeAttr('required')
           .closest('.js-form-item, .js-form-wrapper')
           .find('label.js-form-required')
-          .removeClass('js-form-required form-required');
+          .removeClass(`js-form-required ${requiredClass}`);
       }
     }
   });
