@@ -5746,7 +5746,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
 	'identifier' => 'isset.variable',
-	'count' => 2,
+	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
 ];
 $ignoreErrors[] = [
@@ -14532,12 +14532,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\ImageStyleFlushTest\\:\\:createSampleImage\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageStyleFlushTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$edit in empty\\(\\) always exists and is not falsy\\.$#',
-	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageStyleFlushTest.php',
 ];
@@ -33202,10 +33196,42 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/scripts/run-tests.sh',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Composer/Component/ComponentsIsolatedBuildTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Composer/Template/ComposerProjectTemplatesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/BuildTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
 	'identifier' => 'disallowed.function',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/BuildTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/Tests/BuildTestTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\FunctionalJavascriptTests\\\\Ajax\\\\AjaxMaintenanceModeTest\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
@@ -33716,12 +33742,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/DependencyInjection/ContainerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Constructor of class Symfony\\\\Component\\\\ExpressionLanguage\\\\Expression has an unused parameter \\$expression\\.$#',
-	'identifier' => 'constructor.unusedParameter',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Component/DependencyInjection/Dumper/OptimizedPhpArrayDumperTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Component\\\\DependencyInjection\\\\Dumper\\\\OptimizedPhpArrayDumperTest\\:\\:getCollection\\(\\) has no return type specified\\.$#',
@@ -34360,12 +34380,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityViewBuilderTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\EventSubscriber\\\\ActiveLinkResponseFilterTest\\:\\:providerTestSetLinkActiveClass\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/EventSubscriber/ActiveLinkResponseFilterTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function module_handler_test_hook\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34532,12 +34546,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/DefaultPluginManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Constructor of class Drupal\\\\Tests\\\\Core\\\\Plugin\\\\Discovery\\\\TestContainerDerivativeDiscovery has an unused parameter \\$example_service\\.$#',
-	'identifier' => 'constructor.unusedParameter',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/Discovery/TestContainerDerivativeDiscovery.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Plugin\\\\TestFilteredPluginManager\\:\\:getDefinitionsForContexts\\(\\) has no return type specified\\.$#',

@@ -1042,15 +1042,11 @@ class SortTestConfigEntityWithWeight extends ConfigEntityBase {
 
   /**
    * The label.
-   *
-   * @var string
    */
   public string $label;
 
   /**
    * The weight.
-   *
-   * @var int
    */
   public int $weight;
 
