@@ -1820,8 +1820,7 @@ function install_finish_translations(&$install_state): array {
     $batches[] = _install_config_locale_overrides();
   }
 
-  // Update configuration with translations. The langcode is already correctly
-  // set on them at this point.
+  // Update configuration with translations.
   $batches[] = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], array_keys($languages), []);
   return $batches;
 }
