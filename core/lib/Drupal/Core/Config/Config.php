@@ -4,6 +4,7 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\Schema\Element;
 use Drupal\Core\Config\Schema\Mapping;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -206,15 +207,17 @@ class Config extends StorableConfigBase {
     // Validate the configuration object name before saving.
     static::validateName($this->name);
 
-    $this->applyDefaultLangcodeIfMissing();
-
     // If there is a schema for this configuration object, cast all values to
     // conform to the schema.
     if (!$has_trusted_data) {
       if ($this->typedConfigManager->hasConfigSchema($this->name)) {
         // Ensure that the schema wrapper has the latest data.
         $this->schemaWrapper = NULL;
-        $this->data = $this->castValue(NULL, $this->data);
+        $is_translatable = FALSE;
+        $this->data = $this->castValue(NULL, $this->data, $is_translatable);
+        if ($is_translatable && $this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+          $this->applyDefaultLangcodeIfMissing($this->getSchemaWrapper());
+        }
         // Reclaim the memory used by the schema wrapper.
         $this->schemaWrapper = NULL;
       }
@@ -222,6 +225,14 @@ class Config extends StorableConfigBase {
         foreach ($this->data as $key => $value) {
           $this->validateValue($key, $value);
         }
+      }
+    }
+    elseif ($this->typedConfigManager->hasConfigSchema($this->name)) {
+      // Deprecated path.
+      if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+        $this->applyDefaultLangcodeIfMissing($this->getSchemaWrapper());
+        // Reclaim the memory used by the schema wrapper.
+        $this->schemaWrapper = NULL;
       }
     }
 
@@ -243,17 +254,11 @@ class Config extends StorableConfigBase {
   /**
    * Applies the site's configuration default langcode when required.
    */
-  protected function applyDefaultLangcodeIfMissing(): void {
-    // Only update the langcode if the configuration object is in the default
-    // collection, has a schema, and has a langcode key.
-    if ($this->getStorage()->getCollectionName() !== StorageInterface::DEFAULT_COLLECTION) {
-      return;
-    }
-    if (array_key_exists('langcode', $this->data) || !$this->typedConfigManager->hasConfigSchema($this->name)) {
-      return;
-    }
-    $typed_config = $this->typedConfigManager->createFromNameAndData($this->name, $this->data);
-    if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
+  protected function applyDefaultLangcodeIfMissing(Element $typed_config): void {
+    if (array_key_exists('langcode', $this->data)
+      || !$typed_config instanceof Mapping
+      || !in_array('langcode', $typed_config->getValidKeys(), TRUE)
+    ) {
       return;
     }
 
