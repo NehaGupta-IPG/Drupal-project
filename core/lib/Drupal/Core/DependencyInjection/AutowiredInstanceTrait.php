@@ -56,6 +56,7 @@ trait AutowiredInstanceTrait {
 
         $reflection = $reflection->getParentClass();
       }
+      static::$autowireData[static::class]['__construct'] ??= [];
     }
 
     $args = static::getAutowireArguments($container, '__construct', $args);
@@ -87,7 +88,7 @@ trait AutowiredInstanceTrait {
   private static function getAutowireArguments(ContainerInterface $container, string $method_name, array $args = []): array {
     $new_args = [];
 
-    foreach (static::$autowireData[static::class][$method_name] ?? [] as $entry) {
+    foreach (static::$autowireData[static::class][$method_name] as $entry) {
       if (is_null($entry)) {
         $new_args[] = NULL;
         continue;
