@@ -85,7 +85,6 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
    * @return string|null
    *   The path where Composer has installed recipes, or NULL if no recipes
    *   are installed.
-   * @throws \JsonException
    */
   private static function getRecipeDirectory(): ?string {
     // This is expensive to compute, and very unlikely to change in a request.
