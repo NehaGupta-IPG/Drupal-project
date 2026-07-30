@@ -120,9 +120,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     $this->clearCaches();
 
     $this->drupalGet('node/1');
-    sleep(1);
+    sleep(2);
     $this->drupalGet('node/1');
-    sleep(1);
+    sleep(2);
 
     $this->clearCaches();
     $performance_data = $this->collectPerformanceData(function () {
