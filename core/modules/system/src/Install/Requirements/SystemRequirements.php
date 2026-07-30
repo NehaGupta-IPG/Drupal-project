@@ -49,6 +49,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     'quickedit' => 'Quick Edit',
     'rdf' => 'RDF',
     'statistics' => 'Statistics',
+    'telephone' => 'Telephone',
     'tour' => 'Tour',
     'tracker' => 'Tracker',
   ];
@@ -61,6 +62,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     'classy' => 'Classy',
     'seven' => 'Seven',
     'stable' => 'Stable',
+    'stable9' => 'Stable 9',
   ];
 
   /**

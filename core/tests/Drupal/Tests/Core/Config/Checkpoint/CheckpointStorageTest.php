@@ -34,15 +34,11 @@ class CheckpointStorageTest extends UnitTestCase {
 
   /**
    * The memory storage containing the data.
-   *
-   * @var \Drupal\Core\Config\MemoryStorage
    */
   protected MemoryStorage $memory;
 
   /**
    * The checkpoint storage under test.
-   *
-   * @var \Drupal\Core\Config\Checkpoint\CheckpointStorage
    */
   protected CheckpointStorage $storage;
 
@@ -180,7 +176,7 @@ class CheckpointStorageTest extends UnitTestCase {
       $this->fail("exception not thrown");
     }
     catch (\BadMethodCallException $exception) {
-      $this->assertEquals(CheckpointStorage::class . '::' . $method . ' is not allowed on a CheckpointStorage', $exception->getMessage());
+      $this->assertEquals(CheckpointStorage::class . '::' . $method . '() is not allowed on a CheckpointStorage', $exception->getMessage());
     }
 
     // Assert that the memory storage has not been altered.

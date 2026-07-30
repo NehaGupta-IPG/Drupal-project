@@ -309,7 +309,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
       ->with('revision')
       ->willReturn(FALSE);
     $this->expectException('LogicException');
-    $this->expectExceptionMessage('Entity type ' . $this->entityTypeId . ' does not support revisions.');
+    $this->expectExceptionMessageIs('Entity type ' . $this->entityTypeId . ' does not support revisions.');
     $this->entity->setNewRevision();
   }
 
@@ -472,7 +472,6 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     $this->setUpMockTypedDataManager();
 
     $validator = $this->createMock(ValidatorInterface::class);
-    /** @var \Symfony\Component\Validator\ConstraintViolationList $empty_violation_list */
     $empty_violation_list = new ConstraintViolationList();
     $non_empty_violation_list = clone $empty_violation_list;
     $non_empty_violation_list->add($this->createStub(ConstraintViolationInterface::class));
@@ -498,7 +497,6 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    */
   public function testRequiredValidation(): void {
     $validator = $this->createMock(ValidatorInterface::class);
-    /** @var \Symfony\Component\Validator\ConstraintViolationList $empty_violation_list */
     $empty_violation_list = new ConstraintViolationList();
     $validator->expects($this->once())
       ->method('validate')
@@ -538,7 +536,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     // results in an exception.
     $this->assertTrue($this->entity->isValidationRequired());
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Entity validation is required, but was skipped.');
+    $this->expectExceptionMessageIs('Entity validation is required, but was skipped.');
     $this->entity->save();
   }
 
