@@ -1089,10 +1089,12 @@ default:
 # Consolidate stage jobs
 ########################
 
-'Deprecation statistics':
-  stage: 🚚 Consolidate
+'Artifacts consolidation':
+  stage: ⚡️ Tests
+  needs: ["📋 PHPUnit Unit (Core)", "📋 PHPUnit Unit (Component)", "⚙️️ PHPUnit Kernel", "🌐️️ PHPUnit Functional", "🖱️️️ PHPUnit Functional Javascript", "👷️️️ PHPUnit Build"]
+#  stage: 🚚 Consolidate
   script:
-    #- find test-artifacts
+    - find test-artifacts
     - php .gitlab-ci/scripts/statistics-consolidator.php test-artifacts $_TARGET_PHP
   artifacts:
     when: always
