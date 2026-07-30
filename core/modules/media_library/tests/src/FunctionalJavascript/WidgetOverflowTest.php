@@ -120,7 +120,7 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
     else {
       $this->pressSaveButton();
     }
-    $this->waitForElementTextContains('.messages--warning', 'There are currently 5 items selected. The maximum number of items for the field is 2. Remove 3 items from the selection.');
+    $this->waitForElementTextContains('[data-drupal-message-template]', 'There are currently 5 items selected. The maximum number of items for the field is 2. Remove 3 items from the selection.');
 
     // Assert that unchecked media items are disabled when the selection
     // exceeds the allowed maximum. This verifies the fix for the case where
@@ -137,7 +137,7 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
     // If the user tries to insert the selected items anyway, they should get
     // an error.
     $this->pressInsertSelected(NULL, FALSE);
-    $this->waitForElementTextContains('.messages--error', 'There are currently 5 items selected. The maximum number of items for the field is 2. Remove 3 items from the selection.');
+    $this->waitForElementTextContains('[data-drupal-message-template]', 'There are currently 5 items selected. The maximum number of items for the field is 2. Remove 3 items from the selection.');
     $assert_session->elementNotExists('css', '.messages--warning');
     // Once the extra items are deselected, the error message should be
     // automatically cleared.

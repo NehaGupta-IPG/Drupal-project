@@ -507,6 +507,11 @@ drupal.message:
   dependencies:
     - core/drupal
     - core/drupal.announce
+  # These placeholders will be set by system_js_settings_alter().
+  drupalSettings:
+    statusMessagesTemplate: null
+    warningMessagesTemplate: null
+    errorMessagesTemplate: null
 
 drupal.progress:
   version: VERSION
