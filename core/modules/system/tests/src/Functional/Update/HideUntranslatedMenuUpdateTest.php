@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('update')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class HideUntranslatedMenuUpdateTest extends UpdatePathTestBase {
 
   /**
