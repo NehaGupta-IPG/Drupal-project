@@ -242,6 +242,9 @@ class Config extends StorableConfigBase {
    * Applies the site's configuration default langcode when required.
    */
   protected function applyDefaultLangcodeIfMissing(): void {
+    if ($this->name === 'system.site') {
+      return;
+    }
     // Only update the langcode if the configuration object is in the default
     // collection, has a schema, and has a langcode key.
     if ($this->getStorage()->getCollectionName() !== StorageInterface::DEFAULT_COLLECTION) {

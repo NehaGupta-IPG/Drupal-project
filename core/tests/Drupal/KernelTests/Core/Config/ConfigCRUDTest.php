@@ -296,7 +296,7 @@ class ConfigCRUDTest extends KernelTestBase {
     ];
     $data = [
       '_core' => ['default_config_hash' => Crypt::hashBase64(serialize($data))],
-      'langcode' => $this->config('system.site')->get('default_config_langcode'),
+      'langcode' => 'en',
     ] + $data;
     $this->assertSame($data, $config->get());
 
