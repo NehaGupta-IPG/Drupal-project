@@ -640,9 +640,11 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   If the commit of the root transaction failed.
    */
   protected function processRootCommit(): void {
-    if (!$this->commitClientTransaction()) {
-      $this->exceptionThrown = TRUE;
-      throw new TransactionCommitFailedException('Transaction commit failed');
+    try {
+      if (!$this->commitClientTransaction()) {
+        $this->exceptionThrown = TRUE;
+        throw new TransactionCommitFailedException('Transaction commit failed');
+      }
     }
     catch (TransactionCommitFailedException $e) {
       $this->setConnectionTransactionState(ClientConnectionTransactionState::CommitFailed);
