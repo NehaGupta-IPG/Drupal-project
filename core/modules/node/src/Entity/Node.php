@@ -9,7 +9,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\field_ui\Attribute\FieldUiBaseRoute;
 use Drupal\node\Form\DeleteMultiple;
 use Drupal\node\Form\NodeDeleteForm;
 use Drupal\node\Form\NodeForm;
@@ -87,6 +86,7 @@ use Drupal\user\EntityOwnerTrait;
     'singular' => '@count content item',
     'plural' => '@count content items',
   ],
+  field_ui_base_route: 'entity.node_type.edit_form',
   common_reference_target: TRUE,
   list_cache_contexts: ['user.node_grants:view'],
   revision_metadata_keys: [
@@ -95,7 +95,6 @@ use Drupal\user\EntityOwnerTrait;
     'revision_log_message' => 'revision_log',
   ],
 )]
-#[FieldUiBaseRoute('entity.node_type.edit_form')]
 class Node extends EditorialContentEntityBase implements NodeInterface {
 
   use EntityOwnerTrait;
