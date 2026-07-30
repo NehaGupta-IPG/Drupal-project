@@ -6,6 +6,7 @@ use Drupal\Core\Template\Attribute;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Hook implementations for media.
@@ -31,6 +32,7 @@ class MediaThemeHooks {
           'resource' => NULL,
           'media' => NULL,
           'placeholder_token' => '',
+          'langcode' => '',
         ],
       ],
       'media_embed_error' => [
@@ -63,6 +65,16 @@ class MediaThemeHooks {
     foreach (Element::children($variables['elements']) as $key) {
       $variables['content'][$key] = $variables['elements'][$key];
     }
+  }
+
+  /**
+   * Implements hook_preprocess_HOOK() for media oEmbed iframes.
+   */
+  #[Hook('preprocess_media_oembed_iframe')]
+  public function preprocessMediaOembedIframe(array &$variables): void {
+    $variables['langcode'] = \Drupal::languageManager()
+      ->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)
+      ->getId();
   }
 
   /**

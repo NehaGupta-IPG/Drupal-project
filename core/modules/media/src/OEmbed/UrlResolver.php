@@ -124,18 +124,23 @@ class UrlResolver implements UrlResolverInterface {
    * {@inheritdoc}
    */
   public function getResourceUrl($url, $max_width = NULL, $max_height = NULL) {
+    // Include the current language in the cache key so that language-specific
+    // oEmbed URLs (e.g. with hl=fr for YouTube) are cached separately.
+    $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
     // Try to get the resource URL from the static cache.
-    if (isset($this->urlCache[$url])) {
-      return $this->urlCache[$url];
+    $cache_key = $url . ':lang=' . $langcode;
+    if (isset($this->urlCache[$cache_key])) {
+      return $this->urlCache[$cache_key];
     }
 
     // Try to get the resource URL from the persistent cache.
-    $cache_id = "media:oembed_resource_url:$url:$max_width:$max_height";
+    $cache_id = "media:oembed_resource_url:$url:$max_width:$max_height:lang=$langcode";
 
     $cached = $this->cacheBackend->get($cache_id);
     if ($cached) {
-      $this->urlCache[$url] = $cached->data;
-      return $this->urlCache[$url];
+      $this->urlCache[$cache_key] = $cached->data;
+      return $this->urlCache[$cache_key];
     }
 
     $provider = $this->getProviderByUrl($url);
@@ -154,7 +159,7 @@ class UrlResolver implements UrlResolverInterface {
     $this->moduleHandler->alter('oembed_resource_url', $parsed_url, $provider);
     $resource_url = $parsed_url['path'] . '?' . UrlHelper::buildQuery($parsed_url['query']);
 
-    $this->urlCache[$url] = $resource_url;
+    $this->urlCache[$cache_key] = $resource_url;
     $this->cacheBackend->set($cache_id, $resource_url);
 
     return $resource_url;

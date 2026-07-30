@@ -3,11 +3,17 @@
  * @file
  * Default theme implementation to display an oEmbed resource in an iframe.
  *
+ * Available variables:
+ * - resource: The oEmbed Resource object.
+ * - media: Markup with the resource HTML (e.g. an <iframe> from the provider).
+ * - placeholder_token: A token for the CSS placeholder.
+ * - langcode: The language code of the current content language (e.g. "fr").
+ *
  * @ingroup themeable
  */
 #}
 <!DOCTYPE html>
-<html>
+<html lang="{{ langcode }}">
   <head>
     <css-placeholder token="{{ placeholder_token }}">
   </head>

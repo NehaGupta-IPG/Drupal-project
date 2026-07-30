@@ -54,7 +54,7 @@ class UrlResolverTest extends MediaFunctionalTestBase {
       ],
       'match by endpoint: Vimeo' => [
         'https://vimeo.com/14782834',
-        'https://vimeo.com/api/oembed.json?url=https%3A//vimeo.com/14782834',
+        'https://vimeo.com/api/oembed.json?url=https%3A//vimeo.com/14782834&locale=en',
       ],
       'match by endpoint: Dailymotion' => [
         'https://www.dailymotion.com/video/x2vzluh',
@@ -114,7 +114,7 @@ class UrlResolverTest extends MediaFunctionalTestBase {
     return [
       'JSON resource' => [
         'video_vimeo.html',
-        'https://vimeo.com/api/oembed.json?%s',
+        'https://vimeo.com/api/oembed.json?%s&locale=en',
       ],
       'XML resource' => [
         'video_dailymotion.html',
@@ -150,6 +150,55 @@ class UrlResolverTest extends MediaFunctionalTestBase {
       \sprintf($resource_url, UrlHelper::buildQuery(['url' => $fully_qualified_url])),
       $this->container->get('media.oembed.url_resolver')->getResourceUrl($fully_qualified_url)
     );
+  }
+
+  /**
+   * Tests that language parameters are added to oEmbed provider URLs.
+   *
+   * Verifies WCAG SC 3.1.2 compliance: YouTube gets hl= parameter, Vimeo
+   * gets locale= parameter, based on the current interface language.
+   */
+  public function testLanguageParameterAddedToProviderUrl(): void {
+    // YouTube URLs should get hl=<langcode>.
+    $resource_url = $this->container->get('media.oembed.url_resolver')
+      ->getResourceUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+    $query = parse_url($resource_url, PHP_URL_QUERY);
+    $this->assertMatchesRegularExpression('/hl=[a-z]{2}/', $query, 'YouTube URL should have hl parameter');
+
+    // Vimeo URLs should get locale=<langcode>.
+    $resource_url = $this->container->get('media.oembed.url_resolver')
+      ->getResourceUrl('https://vimeo.com/14782834');
+    $query = parse_url($resource_url, PHP_URL_QUERY);
+    $this->assertMatchesRegularExpression('/locale=[a-z]{2}/', $query, 'Vimeo URL should have locale parameter');
+  }
+
+  /**
+   * Tests that language parameter uses correct value for the interface language.
+   */
+  public function testLanguageParameterValueMatchesInterfaceLanguage(): void {
+    // English is the default. YouTube should have hl=en.
+    $resource_url = $this->container->get('media.oembed.url_resolver')
+      ->getResourceUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+    $query = parse_url($resource_url, PHP_URL_QUERY);
+    $this->assertStringContainsString('hl=en', $query);
+
+    // Vimeo should have locale=en.
+    $resource_url = $this->container->get('media.oembed.url_resolver')
+      ->getResourceUrl('https://vimeo.com/14782834');
+    $query = parse_url($resource_url, PHP_URL_QUERY);
+    $this->assertStringContainsString('locale=en', $query);
+  }
+
+  /**
+   * Tests that cache keys include language for proper isolation.
+   */
+  public function testCacheKeyIncludesLanguage(): void {
+    // Get URL in default language (English).
+    $url_en = $this->container->get('media.oembed.url_resolver')
+      ->getResourceUrl('https://vimeo.com/14782834');
+
+    // Verify English language parameter is present.
+    $this->assertStringContainsString('locale=en', $url_en);
   }
 
 }

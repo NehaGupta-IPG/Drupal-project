@@ -15,6 +15,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\media\OEmbed\Provider;
 
 /**
  * Hook implementations for media.
@@ -444,6 +445,32 @@ class MediaHooks {
       );
 
       $form_state->setErrorByName('filters', $error_message);
+    }
+  }
+
+  /**
+   * Implements hook_oembed_resource_url_alter().
+   *
+   * Adds language parameters to oEmbed provider URLs so embedded players load
+   * in the correct interface language, addressing WCAG SC 3.1.2 (Language of
+   * Parts).
+   */
+  #[Hook('oembed_resource_url_alter')]
+  public function oembedResourceUrlAlter(array &$parsed_url, Provider $provider): void {
+    $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    if (empty($langcode)) {
+      return;
+    }
+
+    // Map provider names to their language query parameter.
+    $provider_language_params = [
+      'YouTube' => 'hl',
+      'Vimeo' => 'locale',
+    ];
+
+    $provider_name = $provider->getName();
+    if (isset($provider_language_params[$provider_name])) {
+      $parsed_url['query'][$provider_language_params[$provider_name]] = $langcode;
     }
   }
 
