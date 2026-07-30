@@ -63,8 +63,6 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
     $this->installEntitySchema('user');
 
     $test_view = $this->loadTestView('views.view.test_disable_ajax_bookmarking');
-
-    $this->expectUserDeprecationMessage('The update to add the disable_ajax_bookmarking setting for view "test_disable_ajax_bookmarking" is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3604351');
     $test_view->save();
 
     $display = $test_view->getDisplay('default');
