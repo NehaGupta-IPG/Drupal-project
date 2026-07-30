@@ -396,14 +396,6 @@ class ConfigInstaller implements ConfigInstallerInterface {
               'default_config_hash' => Crypt::hashBase64(serialize($config_to_create[$name])),
             ],
           ] + $config_to_create[$name];
-          // Remove the langcode from the configuration data as this is
-          // populated on config save.
-          // @todo Discuss the hardcoding of english here a bit more. What does
-          //   it mean to be able to install a configuration in a language that
-          //   might not exist or be the default config language.
-          if (array_key_exists('langcode', $config_to_create[$name]) && $config_to_create[$name]['langcode'] == 'en') {
-            unset($config_to_create[$name]['langcode']);
-          }
         }
         $new_config->setData($config_to_create[$name]);
       }
