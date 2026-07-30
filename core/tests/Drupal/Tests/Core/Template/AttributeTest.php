@@ -616,13 +616,13 @@ class AttributeTest extends UnitTestCase {
         ['href' => $already_escaped],
         ' href="' . Html::escape($already_escaped) . '"',
       ],
-    // Removing dangerous URLs inside CSS is not the role of
-    // stripDangerousProtocols().
+      // Removing dangerous URLs inside CSS is not the role of
+      // stripDangerousProtocols().
       'xss-in-style' => [
         ['style' => 'list-style-image: url(javascript:alert(0))'],
         ' style="list-style-image: url(javascript:alert(0))"',
       ],
-    // Ensure mailto: protocol passes through.
+      // Ensure mailto: protocol passes through.
       'mailto' => [
         ['href' => 'mailto:me@example.com'],
         ' href="mailto:me@example.com"',
@@ -631,7 +631,7 @@ class AttributeTest extends UnitTestCase {
       'javascript' => [
         ['href' => 'javascript:alert(String.fromCharCode(88,83,83))'],
         ' href="alert(String.fromCharCode(88,83,83))"',
-      ]
+      ],
     ];
   }
 

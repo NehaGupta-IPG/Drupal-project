@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Theme;
 
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Template\AttributeHelper;
 

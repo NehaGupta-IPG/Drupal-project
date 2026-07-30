@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\File\MimeType\MimeTypeMapInterface;
 use Drupal\Core\Image\ImageFactory;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
 use Drupal\image\Entity\ImageStyle;
 
@@ -334,7 +335,7 @@ class ResponsiveImageBuilder {
     if ($style_name == ResponsiveImageStyleInterface::EMPTY_IMAGE) {
       // The smallest data URI for a 1px square transparent GIF image.
       // http://probablyprogramming.com/2009/03/15/the-tiniest-gif-ever
-      return 'data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+      return Markup::create('data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
     }
 
     $entity = ImageStyle::load($style_name);
