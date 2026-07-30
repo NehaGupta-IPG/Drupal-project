@@ -253,7 +253,6 @@ class TransactionManagerTest extends UnitTestCase {
    * Tests rolling back a transaction to a savepoint.
    */
   public function testTransactionRollbackToSavepoint(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction('foo');
     $savepoint->rollback();
