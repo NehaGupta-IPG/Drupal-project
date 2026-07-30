@@ -19,6 +19,8 @@ use PHPUnit\Framework\Attributes\Group;
 use Twig\Environment;
 use Twig\Markup as TwigMarkup;
 
+// cspell:ignore dynsrc
+
 /**
  * Tests Drupal\Core\Template\Attribute.
  */
@@ -570,74 +572,67 @@ class AttributeTest extends UnitTestCase {
    * Provides tests data for testAttributesWithUrls().
    */
   public static function providerTestAttributesWithUrls(): array {
-    // cSpell:disable
-    $data = [];
-    $data['normal-external-url'] = [
-      ['href' => "http://example.com/foo"],
-      ' href="http://example.com/foo"',
-    ];
-    $data['url-with-query-string-fragment'] = [
-      ['href' => "http://example.com/com?foo=bar#baz;&lt"],
-      ' href="http://example.com/com?foo=bar#baz;&amp;lt"',
-    ];
-
-    $data['data-value'] = [
-      ['data-example' => 'http://example.com/foo'],
-      ' data-example="http://example.com/foo"',
-    ];
-    $data['data-xss-value'] = [
-      ['data-example' => "javascript:alert('xss');"],
-      ' data-example="' . Html::escape("javascript:alert('xss');") . '"',
-    ];
-
-    $escaped = Html::escape("alert('xss');");
-    $data['xss-scheme-href'] = [
-      ['href' => "javascript:alert('xss');"],
-      ' href="' . $escaped . '"',
-    ];
-    $data['xss-scheme-src'] = [
-      ['src' => "javascript:alert('xss');"],
-      ' src="' . $escaped . '"',
-    ];
-    $data['xss-scheme-dynsrc'] = [
-      ['dynsrc' => "javascript:alert('xss');"],
-      ' dynsrc="' . $escaped . '"',
-    ];
-    $data['xss-scheme-background'] = [
-      ['background' => "javascript:alert('xss');"],
-      ' background="' . $escaped . '"',
-    ];
-    $data['xss-scheme-src-case'] = [
-      ['src' => "jaVaSCriPt:alert('xss');"],
-      ' src="' . $escaped . '"',
-    ];
-
     $already_escaped = '&lt;script defer&gt;alert(0)&lt;/script&gt;';
-    $data['xss-already-escaped'] = [
-      ['href' => $already_escaped],
-      ' href="' . Html::escape($already_escaped) . '"',
-    ];
+    $escaped = Html::escape("alert('xss');");
 
+    return [
+      'normal-external-url' => [
+        ['href' => "http://example.com/foo"],
+        ' href="http://example.com/foo"',
+      ],
+      'url-with-query-string-fragment' => [
+        ['href' => "http://example.com/com?foo=bar#baz;&lt"],
+        ' href="http://example.com/com?foo=bar#baz;&amp;lt"',
+      ],
+      'data-value' => [
+        ['data-example' => 'http://example.com/foo'],
+        ' data-example="http://example.com/foo"',
+      ],
+      'data-xss-value' => [
+        ['data-example' => "javascript:alert('xss');"],
+        ' data-example="' . Html::escape("javascript:alert('xss');") . '"',
+      ],
+      'xss-scheme-href' => [
+        ['href' => "javascript:alert('xss');"],
+        ' href="' . $escaped . '"',
+      ],
+      'xss-scheme-src' => [
+        ['src' => "javascript:alert('xss');"],
+        ' src="' . $escaped . '"',
+      ],
+      'xss-scheme-dynsrc' => [
+        ['dynsrc' => "javascript:alert('xss');"],
+        ' dynsrc="' . $escaped . '"',
+      ],
+      'xss-scheme-background' => [
+        ['background' => "javascript:alert('xss');"],
+        ' background="' . $escaped . '"',
+      ],
+      'xss-scheme-src-case' => [
+        ['src' => "jaVaSCriPt:alert('xss');"],
+        ' src="' . $escaped . '"',
+      ],
+      'xss-already-escaped' => [
+        ['href' => $already_escaped],
+        ' href="' . Html::escape($already_escaped) . '"',
+      ],
     // Removing dangerous URLs inside CSS is not the role of
     // stripDangerousProtocols().
-    $data['xss-in-style'] = [
-      ['style' => 'list-style-image: url(javascript:alert(0))'],
-      ' style="list-style-image: url(javascript:alert(0))"',
-    ];
-
+      'xss-in-style' => [
+        ['style' => 'list-style-image: url(javascript:alert(0))'],
+        ' style="list-style-image: url(javascript:alert(0))"',
+      ],
     // Ensure mailto: protocol passes through.
-    $data['mailto'] = [
-      ['href' => 'mailto:me@example.com'],
-      ' href="mailto:me@example.com"',
+      'mailto' => [
+        ['href' => 'mailto:me@example.com'],
+        ' href="mailto:me@example.com"',
+      ],
+      // Ensure people don't try to work around escaping quotes.
+      'javascript' => [
+        ['href' => 'javascript:alert(String.fromCharCode(88,83,83))'],
+        ' href="alert(String.fromCharCode(88,83,83))"',
+      ]
     ];
-    // Ensure people don't try to work around escaping quotes.
-    $data['javascript'] = [
-      ['href' => 'javascript:alert(String.fromCharCode(88,83,83))'],
-      ' href="alert(String.fromCharCode(88,83,83))"',
-    ];
-    // cSpell:enable
-
-    return $data;
   }
 
 }
