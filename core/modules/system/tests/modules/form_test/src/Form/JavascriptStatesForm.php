@@ -765,6 +765,111 @@ class JavascriptStatesForm extends FormBase {
       ],
     ];
 
+    // Custom element tests.
+    // Registers two minimal custom elements via inline script so the States
+    // API tests can run without any external component library:
+    //
+    // - <my-input>: exposes .value as a string, dispatches 'change'.
+    //   Tests state:disabled and empty trigger with a string value.
+    // - <search-field>: exposes .value as an array, dispatches 'change'.
+    //   Tests empty trigger with an array value (e.g. multi-value selector).
+    $form['custom_element_definitions'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'script',
+      '#value' => <<<JS
+        customElements.define('my-input', class extends HTMLElement {
+          constructor() { super(); this._value = ''; }
+          get value() { return this._value; }
+          set value(v) {
+            this._value = v;
+            this.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+          get disabled() { return this.hasAttribute('disabled'); }
+          set disabled(v) { v ? this.setAttribute('disabled', '') : this.removeAttribute('disabled'); }
+        });
+        customElements.define('search-field', class extends HTMLElement {
+          constructor() { super(); this._value = []; }
+          get value() { return this._value; }
+          set value(v) {
+            this._value = v;
+            this.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+          get disabled() { return this.hasAttribute('disabled'); }
+          set disabled(v) { v ? this.setAttribute('disabled', '') : this.removeAttribute('disabled'); }
+        });
+      JS,
+    ];
+    $form['header_custom_elements'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'h3',
+      '#value' => 'Custom element tests',
+    ];
+    // A <my-input> custom element used as a dependee: other elements react to
+    // its empty/filled state.
+    $form['my_input_trigger'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'my-input',
+      '#attributes' => [
+        'id' => 'edit-my-input-trigger',
+        'data-drupal-selector' => 'edit-my-input-trigger',
+      ],
+      '#value' => '',
+    ];
+    // A <search-field> custom element whose .value is an array, used as a
+    // dependee: tests empty trigger with array values.
+    $form['search_field_trigger'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'search-field',
+      '#attributes' => [
+        'id' => 'edit-search-field-trigger',
+        'data-drupal-selector' => 'edit-search-field-trigger',
+      ],
+      '#value' => '',
+    ];
+    // Item visible when <my-input> is filled (tests empty trigger, string).
+    $form['item_visible_when_my_input_filled'] = [
+      '#type' => 'item',
+      '#title' => 'Item visible when my-input is filled',
+      '#states' => [
+        'visible' => [
+          '[data-drupal-selector="edit-my-input-trigger"]' => ['empty' => FALSE],
+        ],
+      ],
+    ];
+    // Item visible when <search-field> is filled (tests empty trigger, array).
+    $form['item_visible_when_search_field_filled'] = [
+      '#type' => 'item',
+      '#title' => 'Item visible when search-field is filled',
+      '#states' => [
+        'visible' => [
+          '[data-drupal-selector="edit-search-field-trigger"]' => ['empty' => FALSE],
+        ],
+      ],
+    ];
+    // A <my-element> custom element that is a dependent: it should become
+    // disabled via state:disabled when the checkbox is unchecked.
+    $form['my_element_disabled_container'] = [
+      '#type' => 'container',
+    ];
+    $form['my_element_disabled_container']['checkbox_enable_my_element'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Enable my-element',
+    ];
+    $form['my_element_disabled_container']['my_element_disabled'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'my-input',
+      '#attributes' => [
+        'id' => 'edit-my-element-disabled',
+        'data-drupal-selector' => 'edit-my-element-disabled',
+        'data-drupal-states' => json_encode([
+          'disabled' => [
+            ':input[name="checkbox_enable_my_element"]' => ['checked' => FALSE],
+          ],
+        ]),
+      ],
+      '#value' => '',
+    ];
+
     return $form;
   }
 

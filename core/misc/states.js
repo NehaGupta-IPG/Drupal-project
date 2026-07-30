@@ -534,11 +534,29 @@
       // 'keyup' is the (native DOM) event that we watch for.
       keyup() {
         // The function associated with that trigger returns the new value for
-        // the state.
+        // the state. For custom elements whose .value is an array (e.g. a
+        // multi-value selector), check array length instead of strict equality.
+        // Custom elements are identified by a hyphen in their tag name per the
+        // HTML spec.
+        if (this[0]?.tagName?.includes('-')) {
+          const val = this[0].value;
+          if (Array.isArray(val)) {
+            return val.length === 0;
+          }
+          return !val;
+        }
         return this.val() === '';
       },
-      // Listen to 'change' for number native "spinner" widgets.
+      // Listen to 'change' for number native "spinner" widgets and for custom
+      // elements that dispatch a native change event.
       change() {
+        if (this[0]?.tagName?.includes('-')) {
+          const val = this[0].value;
+          if (Array.isArray(val)) {
+            return val.length === 0;
+          }
+          return !val;
+        }
         return this.val() === '';
       },
     },
@@ -695,6 +713,15 @@
     const tagsSupportDisable =
       'button, fieldset, optgroup, option, select, textarea, input';
     if (e.trigger) {
+      // Custom elements (identified by a hyphen in the tag name per the HTML
+      // spec) manage their own disabled state. Disable them directly and return
+      // early to avoid the ancestor traversal below, which would otherwise
+      // search upward to the nearest .js-form-wrapper and disable any standard
+      // inputs found there — including the dependee that controls this element.
+      if (e.target.tagName?.includes('-')) {
+        e.target.disabled = e.value;
+        return;
+      }
       $(e.target)
         .closest('.js-form-item, .js-form-submit, .js-form-wrapper')
         .toggleClass('form-disabled', e.value)
