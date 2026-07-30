@@ -40,7 +40,7 @@ return Rector\Config\RectorConfig::configure()
 #    TypedPropertyFromStrictSetUpRector::class,
 #  ])
   ->withImportNames(
-    importDocBlockNames: true, #false,
+    importDocBlockNames: false,
     importShortClasses: false,
-    removeUnusedImports: true, #false,
+    removeUnusedImports: false,
   );
