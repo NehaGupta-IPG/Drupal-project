@@ -222,7 +222,7 @@ class SelectTest extends DatabaseTestBase {
 
     $names = $this->connection->select('test_null', 'tn')
       ->fields('tn', ['name'])
-      ->condition('age', NULL)
+      ->condition('age')
       ->execute()->fetchCol();
 
     $this->assertCount(0, $names, 'No records found when comparing to NULL.');
@@ -622,7 +622,7 @@ class SelectTest extends DatabaseTestBase {
   #[DataProvider('providerNonArrayOperatorWithArrayValueCondition')]
   public function testNonArrayOperatorWithArrayValueCondition(?string $operator, string $operator_in_exception_message): void {
     $this->expectException(InvalidQueryException::class);
-    $this->expectExceptionMessage("Query condition 'age " . $operator_in_exception_message . " 26, 27' must have an array compatible operator.");
+    $this->expectExceptionMessageIs("Query condition 'age " . $operator_in_exception_message . " 26, 27' must have an array compatible operator.");
 
     $this->connection->select('test', 't')
       ->fields('t')

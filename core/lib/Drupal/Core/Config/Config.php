@@ -209,30 +209,28 @@ class Config extends StorableConfigBase {
 
     // If there is a schema for this configuration object, cast all values to
     // conform to the schema.
-    if (!$has_trusted_data) {
-      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
-        // Ensure that the schema wrapper has the latest data.
-        $this->schemaWrapper = NULL;
-        $is_translatable = FALSE;
-        $this->data = $this->castValue(NULL, $this->data, $is_translatable);
-        if ($is_translatable && $this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
-          $this->applyDefaultLangcodeIfMissing($this->getSchemaWrapper());
-        }
-        // Reclaim the memory used by the schema wrapper.
-        $this->schemaWrapper = NULL;
-      }
-      else {
-        foreach ($this->data as $key => $value) {
-          $this->validateValue($key, $value);
-        }
-      }
-    }
-    elseif ($this->typedConfigManager->hasConfigSchema($this->name)) {
-      // Deprecated path.
-      if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+    if (!$has_trusted_data && $this->typedConfigManager->hasConfigSchema($this->name)) {
+      // Ensure that the schema wrapper has the latest data.
+      $this->schemaWrapper = NULL;
+      $is_translatable = FALSE;
+      $this->data = $this->castValue(NULL, $this->data, $is_translatable);
+      if ($is_translatable && $this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
         $this->applyDefaultLangcodeIfMissing($this->getSchemaWrapper());
-        // Reclaim the memory used by the schema wrapper.
-        $this->schemaWrapper = NULL;
+      }
+      // Reclaim the memory used by the schema wrapper.
+      $this->schemaWrapper = NULL;
+    }
+    else {
+      foreach ($this->data as $key => $value) {
+        $this->validateValue($key, $value);
+      }
+      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
+        // Deprecated path.
+        if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+          $this->applyDefaultLangcodeIfMissing($this->getSchemaWrapper());
+          // Reclaim the memory used by the schema wrapper.
+          $this->schemaWrapper = NULL;
+        }
       }
     }
 
