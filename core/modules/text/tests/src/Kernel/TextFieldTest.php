@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\text\Functional;
+namespace Drupal\Tests\text\Kernel;
 
 use Drupal\Component\Utility\Html;
 use Drupal\entity_test\Entity\EntityTest;
