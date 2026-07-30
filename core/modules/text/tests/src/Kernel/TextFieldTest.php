@@ -11,7 +11,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\filter\Render\FilteredMarkup;
-use Drupal\Tests\field\Functional\FunctionalString\StringFieldTest;
+use Drupal\Tests\field\Kernel\FunctionalString\StringFieldTest;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
