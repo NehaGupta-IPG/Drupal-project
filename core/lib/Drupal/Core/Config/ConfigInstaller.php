@@ -398,7 +398,10 @@ class ConfigInstaller implements ConfigInstallerInterface {
           ] + $config_to_create[$name];
           // Remove the langcode from the configuration data as this is
           // populated on config save.
-          unset($config_to_create[$name]['langcode']);
+          // @todo Discuss this more.
+          if (array_key_exists('langcode', $config_to_create[$name]) && $config_to_create[$name]['langcode'] == 'en') {
+            unset($config_to_create[$name]['langcode']);
+          }
         }
         $new_config->setData($config_to_create[$name]);
       }
