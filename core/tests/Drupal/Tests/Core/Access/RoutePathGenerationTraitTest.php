@@ -143,12 +143,7 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
     });
     $parameterBag->method('all')->willReturn($requestParams);
 
-    // Get a real InputBag because it is a final class.
-    $inputBag = new InputBag($requestParams);
-
-    // Mock Request.
-    $request = $this->createStub(Request::class);
-    $request->query = $inputBag;
+    $request = new Request($requestParams);
 
     // Mock RouteMatch.
     $routeMatch = $this->createStub(RouteMatchInterface::class);
