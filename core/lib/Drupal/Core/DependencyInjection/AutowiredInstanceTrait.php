@@ -64,7 +64,7 @@ trait AutowiredInstanceTrait {
     foreach (static::$autowireData[static::class] as $method_name => $args) {
       if ($method_name != '__construct') {
         $args = static::getAutowireArguments($container, $method_name);
-        call_user_func([$instance, $method_name], $args);
+        call_user_func([$instance, $method_name], ...$args);
       }
     }
 
@@ -88,7 +88,6 @@ trait AutowiredInstanceTrait {
     $new_args = [];
 
     foreach (static::$autowireData[static::class][$method_name] as $entry) {
-
       if (is_null($entry)) {
         $new_args[] = NULL;
         continue;
@@ -127,7 +126,7 @@ trait AutowiredInstanceTrait {
    * @throws \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
    *   When a service cannot be resolved.
    */
-  private static function getAutowireData(ContainerInterface $container, array $parameters, string $method_name) {
+  private static function getAutowireData(ContainerInterface $container, array $parameters, string $method_name): void {
     foreach ($parameters as $parameter) {
       $type = 'service';
       $argument = ltrim((string) $parameter->getType(), '?');
