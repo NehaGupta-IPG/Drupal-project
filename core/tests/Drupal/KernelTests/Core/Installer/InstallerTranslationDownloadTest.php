@@ -75,13 +75,6 @@ class InstallerTranslationDownloadTest extends KernelTestBase {
   }
 
   /**
-   * Ensures install_drupal() starts without existing site config.
-   */
-  protected function prepareFreshInstall(): void {
-    $this->container->get('config.storage')->delete('system.site');
-  }
-
-  /**
    * {@inheritdoc}
    */
   protected function tearDown(): void {
@@ -146,7 +139,6 @@ EOF;
     // Expose our fake profile directly to the installer.
     $this->installParameters['profiles']['foo'] = new Extension($this->root, 'profile', $pathname);
     $this->installParameters['parameters']['profile'] = 'foo';
-    $this->prepareFreshInstall();
     install_drupal($this->classLoader, $this->installParameters);
 
     // Four requests should have been made: a HEAD and a GET request for each
@@ -189,7 +181,6 @@ EOF;
    */
   public function testCoreProfileTranslationsAreNotDownloaded(): void {
     $this->installParameters['parameters']['profile'] = 'testing';
-    $this->prepareFreshInstall();
     install_drupal($this->classLoader, $this->installParameters);
 
     $this->assertCount(2, $this->requests);

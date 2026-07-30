@@ -31,11 +31,6 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
   use RfcLoggerTrait;
 
   /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
-
-  /**
    * Tests that routes are rebuilt during install and uninstall of modules.
    *
    * @legacy-covers ::install
