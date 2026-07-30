@@ -61,6 +61,7 @@ class ThemeCommonElements {
         'variables' => [
           'status_headings' => [],
           'message_list' => NULL,
+          'attributes' => [],
         ],
       ],
       'links' => [
