@@ -45,7 +45,13 @@ final class NamedPlaceholderConverter {
   private const string MULTICHAR = ':{2,}';
   private const string NAMED_PARAMETER = ':[a-zA-Z0-9_]+';
   private const string POSITIONAL_PARAMETER = '(?<!\\?)\\?(?!\\?)';
-  private const string ONE_LINE_COMMENT = '--[^\r\n]*';
+  // In MySQL and MariaDB a one line comment only starts when the second dash is
+  // followed by a whitespace or control character. Without that, '1--2' is a
+  // subtraction of a negative number, and treating it as a comment discards the
+  // rest of the line, including any placeholder in it. The character is matched
+  // with a lookahead so that a comment ending immediately at a newline does not
+  // consume the newline, which would take the next line with it.
+  private const string ONE_LINE_COMMENT = '--(?=[\s\x00-\x08\x0B\x0C\x0E-\x1F])[^\r\n]*';
   private const string MULTI_LINE_COMMENT = '/\*([^*]+|\*+[^/*])*\**\*/';
   private const string SPECIAL = '[' . self::SPECIAL_CHARS . ']';
   private const string OTHER = '[^' . self::SPECIAL_CHARS . ']+';
@@ -89,8 +95,8 @@ final class NamedPlaceholderConverter {
   public function __construct() {
     // Builds the combined regex pattern for parsing.
     $this->sqlPattern = sprintf('(%s)', implode('|', [
-      $this->getAnsiSQLStringLiteralPattern("'"),
-      $this->getAnsiSQLStringLiteralPattern('"'),
+      $this->getMySQLStringLiteralPattern("'"),
+      $this->getMySQLStringLiteralPattern('"'),
       self::BACKTICK_IDENTIFIER,
       self::BRACKET_IDENTIFIER,
       self::MULTICHAR,
@@ -168,14 +174,28 @@ final class NamedPlaceholderConverter {
   /**
    * Helper to return a regex pattern from a delimiter character.
    *
+   * MySQL and MariaDB treat a backslash as an escape character inside string
+   * literals, so a literal does not end at a delimiter preceded by a backslash.
+   * Values are escaped with \mysqli::real_escape_string(), which produces such
+   * literals. An ANSI pattern ends the literal at the escaped delimiter and
+   * mistakes the rest of the literal for SQL, which leaves any placeholder that
+   * follows it unconverted.
+   *
+   * A delimiter escaped by doubling it is matched as well.
+   *
+   * This does not account for the NO_BACKSLASH_ESCAPES SQL mode, which is not
+   * part of the SQL mode Drupal sets.
+   *
    * @param string $delimiter
    *   A delimiter character.
    *
    * @return string
    *   The regex pattern.
+   *
+   * @see \Drupal\mysqli\Driver\Database\mysqli\Connection::getConnectionOptions()
    */
-  private function getAnsiSQLStringLiteralPattern(string $delimiter): string {
-    return $delimiter . '[^' . $delimiter . ']*' . $delimiter;
+  private function getMySQLStringLiteralPattern(string $delimiter): string {
+    return $delimiter . '(?:[^' . $delimiter . '\\\\]|\\\\.|' . $delimiter . $delimiter . ')*' . $delimiter;
   }
 
   /**

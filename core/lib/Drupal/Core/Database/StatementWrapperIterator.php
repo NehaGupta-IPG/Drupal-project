@@ -117,6 +117,7 @@ class StatementWrapperIterator extends StatementBase {
    * @param bool $strict
    *   (Optional) Whether strict typing should be used. Defaults to FALSE.
    *
+   * @see \Drupal\Core\Database\StatementPrefetchIterator::bindArguments()
    * @see \Drupal\mysqli\Driver\Database\mysqli\Statement::bindStrictParams()
    */
   protected function bindArguments(array $arguments, bool $strict = FALSE): void {
