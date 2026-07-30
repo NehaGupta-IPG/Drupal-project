@@ -96,7 +96,6 @@ variables:
 stages:
   - 🪄 Lint
   - ⚡️ Tests
-  - 🚚 Consolidate
   - 🗜️ Additional tests
 
 #############
@@ -1086,15 +1085,27 @@ default:
     - if [ ! -f core/.twigcsfixercache ]; then exit 1; fi
 
 ########################
-# Consolidate stage jobs
+# Consolidation jobs
 ########################
 
 'Artifacts consolidation':
   stage: ⚡️ Tests
-  needs: ["📋 PHPUnit Unit (Core)", "📋 PHPUnit Unit (Component)", "⚙️️ PHPUnit Kernel", "🌐️️ PHPUnit Functional", "🖱️️️ PHPUnit Functional Javascript", "👷️️️ PHPUnit Build"]
-#  stage: 🚚 Consolidate
+  needs:
+    - job: '🧹 PHP Coding standards (PHPCS)'
+      optional: true
+    - job: '🧹 PHP Static Analysis (phpstan)'
+      optional: true
+    - job: '📦 Composer'
+      optional: true
+    - job: "📋 PHPUnit Unit (Core)"
+      optional: true
+    - job: "📋 PHPUnit Unit (Component)"
+      optional: true
+    - job: "⚙️️ PHPUnit Kernel"
+    - job: "🌐️️ PHPUnit Functional"
+    - job: "🖱️️️ PHPUnit Functional Javascript"
+    - job: "👷️️️ PHPUnit Build"
   script:
-    - find test-artifacts
     - php .gitlab-ci/scripts/statistics-consolidator.php test-artifacts $_TARGET_PHP
   artifacts:
     when: always
