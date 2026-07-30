@@ -37,11 +37,14 @@ class TransactionManagerTest extends UnitTestCase {
    * Tests starting a transaction.
    */
   public function testStartTransaction(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
     $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
     $this->assertTrue($this->connection->transactionManager()->has('drupal_transaction'));
     $this->assertTrue($this->connection->inTransaction());
+    $tx->commitOrRelease();
+    $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
+    $this->assertFalse($this->connection->transactionManager()->has('drupal_transaction'));
+    $this->assertFalse($this->connection->inTransaction());
   }
 
   /**
@@ -76,13 +79,16 @@ class TransactionManagerTest extends UnitTestCase {
    * Tests starting a savepoint.
    */
   public function testStartSavepoint(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $tx = $this->connection->startTransaction();
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
     $savepoint = $this->connection->startTransaction('foo');
     $this->assertSame(2, $this->connection->transactionManager()->stackDepth());
     $this->assertTrue($this->connection->transactionManager()->has('foo'));
     $this->assertTrue($this->connection->inTransaction());
+    $savepoint->commitOrRelease();
+    $tx->commitOrRelease();
+    $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
+    $this->assertFalse($this->connection->transactionManager()->has('foo'));
+    $this->assertFalse($this->connection->inTransaction());
   }
 
   /**
@@ -255,6 +261,11 @@ class TransactionManagerTest extends UnitTestCase {
     $this->assertFalse($this->connection->transactionManager()->has('foo'));
     $this->assertTrue($this->connection->transactionManager()->has('drupal_transaction'));
     $this->assertTrue($this->connection->inTransaction());
+    $tx->commitOrRelease();
+    $this->assertSame(0, $this->connection->transactionManager()->stackDepth());
+    $this->assertFalse($this->connection->transactionManager()->has('foo'));
+    $this->assertFalse($this->connection->transactionManager()->has('drupal_transaction'));
+    $this->assertFalse($this->connection->inTransaction());
   }
 
   /**
