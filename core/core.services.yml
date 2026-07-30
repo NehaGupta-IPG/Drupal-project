@@ -1358,6 +1358,11 @@ services:
     arguments: ['@title_resolver', '@renderer', '@render_cache', '%renderer.config%']
     tags:
       - { name: render.main_content_renderer, format: drupal_htmx }
+  main_content_renderer.htmx_dialog:
+    class: Drupal\Core\Render\MainContent\HtmxDialogRenderer
+    arguments: [ '@title_resolver', '@renderer', '@render_cache', '%renderer.config%' ]
+    tags:
+      - { name: render.main_content_renderer, format: drupal_htmx_dialog.dialog }
   main_content_renderer.ajax:
     class: Drupal\Core\Render\MainContent\AjaxRenderer
     arguments: ['@element_info', '@renderer']
@@ -1547,6 +1552,10 @@ services:
     class: Drupal\Core\PathProcessor\PathProcessorDecode
     tags:
       - { name: path_processor_inbound, priority: 1000 }
+  path_processor_dialog:
+    class: \Drupal\Core\Htmx\HtmxDialogPathProcessor
+    tags:
+      - { name: path_processor_inbound, priority: 350 }
   path_processor_front:
     class: Drupal\Core\PathProcessor\PathProcessorFront
     tags:
