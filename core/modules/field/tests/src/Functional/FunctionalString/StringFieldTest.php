@@ -56,6 +56,7 @@ class StringFieldTest extends BrowserTestBase {
    */
   public function testTextfieldWidgets(): void {
     $this->_testTextfieldWidgets('string', 'string_textfield');
+    $this->_testTextfieldWidgets('string', 'string_textarea');
     $this->_testTextfieldWidgets('string_long', 'string_textarea');
   }
 
@@ -97,6 +98,11 @@ class StringFieldTest extends BrowserTestBase {
     $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", '');
     $this->assertSession()->fieldNotExists("{$field_name}[0][format]");
     $this->assertSession()->responseContains('placeholder="A placeholder on ' . $widget_type . '"');
+    // Verify string fields' maxlength setting is an attribute.
+    if ($field_type == 'string') {
+      $element = $this->assertSession()->elementExists('css', "[name='{$field_name}[0][value]']");
+      $this->assertEquals(255, $element->getAttribute('maxlength'));
+    }
 
     // Submit with some value.
     $value = $this->randomMachineName();
@@ -117,48 +123,38 @@ class StringFieldTest extends BrowserTestBase {
   }
 
   /**
-   * Tests the textarea widget with a string field respects max_length.
+   * Tests string field validation.
    */
-  public function testStringFieldWithTextareaWidget(): void {
+  public function testStringFieldValidation(): void {
+    // Create a field with settings to validate.
+    $max_length = 3;
     $field_name = $this->randomMachineName();
-    $max_length = 50;
-
-    FieldStorageConfig::create([
+    $field_storage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'string',
       'settings' => [
         'max_length' => $max_length,
       ],
-    ])->save();
+    ]);
+    $field_storage->save();
     FieldConfig::create([
-      'field_name' => $field_name,
-      'entity_type' => 'entity_test',
+      'field_storage' => $field_storage,
       'bundle' => 'entity_test',
-      'label' => 'Test textarea string',
     ])->save();
 
-    \Drupal::service('entity_display.repository')
-      ->getFormDisplay('entity_test', 'entity_test')
-      ->setComponent($field_name, [
-        'type' => 'string_textarea',
-        'settings' => [
-          'rows' => 3,
-        ],
-      ])
-      ->save();
-
-    $this->drupalGet('entity_test/add');
-    $this->assertSession()->fieldExists("{$field_name}[0][value]");
-    // Verify the textarea has the maxlength attribute.
-    $element = $this->assertSession()->elementExists('css', "textarea[name='{$field_name}[0][value]']");
-    $this->assertEquals($max_length, $element->getAttribute('maxlength'));
-
-    // Submit a value within the limit.
-    $value = $this->randomMachineName(20);
-    $this->submitForm(["{$field_name}[0][value]" => $value], 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
-    $this->assertSession()->pageTextContains('entity_test ' . $match[1] . ' has been created.');
+    // Test validation with valid and invalid values.
+    $entity = EntityTest::create();
+    for ($i = 0; $i <= $max_length + 2; $i++) {
+      $entity->{$field_name}->value = str_repeat('x', $i);
+      $violations = $entity->{$field_name}->validate();
+      if ($i <= $max_length) {
+        $this->assertCount(0, $violations, "Length $i does not cause validation error when max_length is $max_length");
+      }
+      else {
+        $this->assertCount(1, $violations, "Length $i causes validation error when max_length is $max_length");
+      }
+    }
   }
 
 }
