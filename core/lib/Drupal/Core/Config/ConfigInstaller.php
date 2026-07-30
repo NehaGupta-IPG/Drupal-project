@@ -398,8 +398,6 @@ class ConfigInstaller implements ConfigInstallerInterface {
             ],
           ] + $config_to_create[$name];
         }
-        // Apply the default configuration langcode if necessary.
-        $config_to_create[$name] = $this->applyDefaultConfigLangcode($name, $config_to_create[$name]);
         $new_config->setData($config_to_create[$name]);
       }
       if ($collection == StorageInterface::DEFAULT_COLLECTION && $entity_type = $this->configManager->getEntityTypeIdByName($name)) {
@@ -439,38 +437,6 @@ class ConfigInstaller implements ConfigInstallerInterface {
         $new_config->save();
       }
     }
-  }
-
-  /**
-   * Applies the configured default langcode to installed configuration.
-   *
-   * @param string $name
-   *   The configuration name.
-   * @param array $data
-   *   The configuration data.
-   *
-   * @return array
-   *   Configuration data with langcode adjusted if applicable.
-   */
-  protected function applyDefaultConfigLangcode(string $name, array $data): array {
-    if (!array_key_exists('langcode', $data)) {
-      if (!$this->typedConfig->hasConfigSchema($name)) {
-        // @todo Revisit whether config without schema should skip default
-        //   config langcode normalization here.
-        return $data;
-      }
-      $typed_config = $this->typedConfig->createFromNameAndData($name, $data);
-      if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
-        return $data;
-      }
-    }
-
-    // If there was not an explicit language code or it was English,
-    // rewrite the configuration to be in the site configuration language.
-    if (empty($data['langcode']) || $data['langcode'] === 'en') {
-      $data['langcode'] = $this->configFactory->get('system.site')->get('default_config_langcode');
-    }
-    return $data;
   }
 
   /**

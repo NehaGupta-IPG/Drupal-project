@@ -340,17 +340,6 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     // Setup the destination to the be frontpage by default.
     \Drupal::destination()->set('/');
 
-    // Seed a minimal system.site config so early config saves, such as
-    // core.extension writes or config form submissions that touch system.site,
-    // have a storage-backed configuration default language available even
-    // before system config is installed.
-    $this->container->get('config.storage')->write('system.site', [
-      'uuid' => '11111111-1111-4111-8111-111111111111',
-      'langcode' => 'en',
-      'default_langcode' => 'en',
-      'default_config_langcode' => 'en',
-    ]);
-
     // Write the core.extension configuration.
     // Required for ConfigInstaller::installDefaultConfig() to work.
     $this->container->get('config.storage')->write('core.extension', [
