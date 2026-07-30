@@ -30,19 +30,72 @@ trait AutowiredInstanceTrait {
    * @return static
    */
   public static function createInstanceAutowired(ContainerInterface $container, mixed ...$args): static {
-    $new_args = [];
-    if (!static::$autowireData) {
-      static::getServices($container, static::class, count($args));
+    if (empty(static::$autowireData[static::class])) {
+      $reflection = new \ReflectionClass(static::class);
+
+      foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+        if (!empty($method->getAttributes(Required::class))) {
+          static::getAutowireData($container, $method->getParameters(), $method->getName());
+        }
+      }
+
+      while ($reflection->hasMethod('__construct')) {
+        $method = $reflection->getMethod('__construct');
+        $parameters = $method->getParameters();
+
+        if ($method->isVariadic()) {
+          array_pop($parameters);
+          static::getAutowireData($container, $parameters, '__construct');
+        }
+        else {
+          $parameters = array_slice($parameters, count($args));
+          static::$autowireData[static::class]['__construct'][] = 'args';
+          static::getAutowireData($container, $parameters, '__construct');
+          break;
+        }
+
+        $reflection = $reflection->getParentClass();
+      }
     }
 
-    foreach (static::$autowireData as $type => $entry) {
+    $args = static::getAutowireArguments($container, '__construct', $args);
+    $instance = new static(...$args);
+
+    foreach (static::$autowireData[static::class] as $method_name => $args) {
+      if ($method_name != '__construct') {
+        $args = static::getAutowireArguments($container, $method_name);
+        call_user_func([$instance, $method_name], $args);
+      }
+    }
+
+    return $instance;
+  }
+
+  /**
+   * Resolves arguments for a method using autowiring.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The service container.
+   * @param string $method_name
+   *   The name of the method being called.
+   * @param array $args
+   *   Array of predefined arguments to pass.
+   *
+   * @return array
+   *   The resolved arguments.
+   */
+  private static function getAutowireArguments(ContainerInterface $container, string $method_name, array $args = []): array {
+    $new_args = [];
+
+    foreach (static::$autowireData[static::class][$method_name] as $entry) {
+
       if (is_null($entry)) {
         $new_args[] = NULL;
         continue;
       }
 
       if ($entry == 'args') {
-        array_merge($new_args, $args);
+        $new_args = array_merge($new_args, $args);
         continue;
       }
 
@@ -56,66 +109,52 @@ trait AutowiredInstanceTrait {
       }
     }
 
-    foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-      if (!empty($method->getAttributes(Required::class))) {
-        $method->invoke($instance, ...self::getAutowireArguments($container, $method->getParameters(), $method->getName()));
-      }
-    }
-
-    return $instance;
+    return $new_args;
   }
 
   /**
-   * Gets the services to use for the constructor of the specified class.
+   * Analyses arguments for a method using autowiring.
    *
-   * The services are added to the static array.
+   * The results are added to the static array.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The service container.
-   * @param string $class
-   *   The class to construct.
-   * @param int $num_args
-   *   The number of predefined arguments.
+   * @param \ReflectionParameter[] $parameters
+   *   The parameters to resolve.
+   * @param string $method_name
+   *   The name of the method being called.
+   *
+   * @throws \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
+   *   When a service cannot be resolved.
    */
-  protected static function getServices(ContainerInterface $container, string $class, int $num_args) {
-    if (method_exists($class, '__construct')) {
-      $constructor = new \ReflectionMethod($class, '__construct');
-      $params = $constructor->getParameters();
-
-      if ($num_args && !$constructor->isVariadic()) {
-        // Add the predefined arguments to the final base class.
-        $params = array_slice($params, $num_args);
-        static::$autowireData[] = 'args';
+  private static function getAutowireData(ContainerInterface $container, array $parameters, string $method_name) {
+    foreach ($parameters as $parameter) {
+      $type = 'service';
+      $argument = ltrim((string) $parameter->getType(), '?');
+      foreach ($parameter->getAttributes(Autowire::class) as $attribute) {
+        $argument = (string) $attribute->newInstance()->value;
       }
 
-      foreach ($params as $parameter) {
-        if ($parameter->isVariadic()) {
-          // Continue to parent class.
-          $declaring_class = $constructor->getDeclaringClass()->getName();
-          static::getServices($container, get_parent_class($declaring_class), $num_args);
-          break;
-        }
-
-        // Check if the value is a container parameter (wrapped in %).
-        if (preg_match('/^%([^%]+)%$/', $argument, $matches)) {
-          $argument = $matches[1];
-          if ($container->hasParameter($argument)) {
-            static::$autowireData[] = "parameter:$argument";
-            continue;
-          }
-        }
-        elseif ($container->has($argument)) {
-          static::$autowireData[] = "service:$service";
+      // Check if the value is a container parameter (wrapped in %).
+      if (preg_match('/^%([^%]+)%$/', $argument, $matches)) {
+        $type = 'parameter';
+        $argument = $matches[1];
+        if ($container->hasParameter($argument)) {
+          static::$autowireData[static::class][$method_name][] = "$type:$argument";
           continue;
         }
-
-        if ($parameter->getType()?->allowsNull() || $parameter->getType() === NULL) {
-          $args[] = NULL;
-          continue;
-        }
-
-        throw new AutowiringFailedException($argument, sprintf('Cannot autowire %s "%s": argument "$%s" of method "%s::%s()". Check that either the argument type is correct or the Autowire attribute is passed a valid identifier. Otherwise configure its value explicitly if possible.', $type, $argument, $parameter->getName(), static::class, $method_name));
       }
+      elseif ($container->has($argument)) {
+        static::$autowireData[static::class][$method_name][] = "$type:$argument";
+        continue;
+      }
+
+      if ($parameter->getType()?->allowsNull() || $parameter->getType() === NULL) {
+        static::$autowireData[static::class][$method_name][] = NULL;
+        continue;
+      }
+
+      throw new AutowiringFailedException($argument, sprintf('Cannot autowire %s "%s": argument "$%s" of method "%s::%s()". Check that either the argument type is correct or the Autowire attribute is passed a valid identifier. Otherwise configure its value explicitly if possible.', $type, $argument, $parameter->getName(), static::class, $method_name));
     }
   }
 
