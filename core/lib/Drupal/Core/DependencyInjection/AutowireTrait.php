@@ -6,9 +6,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a trait for automatically wiring dependencies from the container.
- *
- * This trait uses reflection and may cause performance issues with classes
- * that will be instantiated multiple times.
  */
 trait AutowireTrait {
 
