@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\taxonomy\Functional;
+namespace Drupal\Tests\taxonomy\Kernel;
 
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermInterface;
-use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,13 +15,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('taxonomy')]
 #[RunTestsInSeparateProcesses]
 class TermAccessTest extends TaxonomyTestBase {
-
-  use AssertPageCacheContextsAndTagsTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
 
   /**
    * Tests access control functionality for taxonomy terms.
@@ -47,7 +39,7 @@ class TermAccessTest extends TaxonomyTestBase {
     $unpublished_term->save();
 
     // Start off logged in as admin.
-    $this->drupalLogin($this->drupalCreateUser(['administer taxonomy']));
+    $this->setCurrentUser($this->drupalCreateUser(['administer taxonomy']));
 
     // Test the 'administer taxonomy' permission.
     $this->drupalGet('taxonomy/term/' . $published_term->id());
@@ -72,7 +64,8 @@ class TermAccessTest extends TaxonomyTestBase {
     $this->assertTermAccess($unpublished_term, 'delete', TRUE);
 
     // Test the 'access content' permission.
-    $this->drupalLogin($this->drupalCreateUser(['access content']));
+    $access_content_user = $this->drupalCreateUser(['access content']);
+    $this->setCurrentUser($access_content_user);
 
     $this->drupalGet('taxonomy/term/' . $published_term->id());
     $assert_session->statusCodeEquals(200);
@@ -98,7 +91,6 @@ class TermAccessTest extends TaxonomyTestBase {
 
     // Install the Views module and repeat the checks for the 'view' permission.
     \Drupal::service('module_installer')->install(['views'], TRUE);
-    $this->rebuildContainer();
 
     $this->drupalGet('taxonomy/term/' . $published_term->id());
     $assert_session->statusCodeEquals(200);
