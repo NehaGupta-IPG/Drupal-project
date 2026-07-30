@@ -255,7 +255,10 @@ class Config extends StorableConfigBase {
    * Applies the site's configuration default langcode when required.
    */
   protected function applyDefaultLangcodeIfMissing(Element $typed_config): void {
-    if (array_key_exists('langcode', $this->data)
+    // @todo Discuss the hardcoding of english here a bit more. What does
+    //   it mean to be able to install a configuration in a language that
+    //   might not exist or be the default config language.
+    if ((array_key_exists('langcode', $this->data) && $this->data['langcode'] !== 'en')
       || !$typed_config instanceof Mapping
       || !in_array('langcode', $typed_config->getValidKeys(), TRUE)
     ) {
