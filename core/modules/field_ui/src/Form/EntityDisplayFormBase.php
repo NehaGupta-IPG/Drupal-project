@@ -198,13 +198,9 @@ abstract class EntityDisplayFormBase extends EntityForm {
           'subgroup' => 'field-parent',
           'source' => 'field-name',
         ],
-        [
-          'action' => 'match',
-          'relationship' => 'parent',
-          'group' => 'field-region',
-          'subgroup' => 'field-region',
-          'source' => 'field-region',
-        ],
+        // Region is updated by field_ui.js from the row's table section, not
+        // via tabledrag parent matching (which copies the wrong value on
+        // indent/outdent).
       ],
     ];
 
