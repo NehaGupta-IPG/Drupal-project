@@ -121,6 +121,8 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
     // are no unclaimed items left.
     while (TRUE) {
       try {
+        // We only get the item ID here and get the data in a separate query
+        // because retrieving both in the same query is inefficient with large data.
         $item = $this->connection->queryRange('SELECT [created], [item_id] FROM {' . static::TABLE_NAME . '} q WHERE [expire] = 0 AND [name] = :name ORDER BY [created], [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
       }
       catch (\Exception $e) {
