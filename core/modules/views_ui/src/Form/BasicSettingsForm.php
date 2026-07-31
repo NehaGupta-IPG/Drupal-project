@@ -3,6 +3,7 @@
 namespace Drupal\views_ui\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\ConfigSchemaFormTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -24,6 +25,7 @@ use Symfony\Component\Routing\Attribute\Route;
   ],
 )]
 class BasicSettingsForm extends ConfigFormBase {
+  use ConfigSchemaFormTrait;
   use RedundantEditableConfigNamesTrait;
 
   /**
@@ -38,6 +40,10 @@ class BasicSettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
+
+    $form = $this->buildFormForConfig($form, 'views.settings');
+
+    return $form;
 
     // This is not currently a fieldset but we may want it to be later,
     // so this will make it easier to change if we do.

@@ -278,6 +278,8 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $definition = $definitions[$type];
     // Check whether this type is an extension of another one and compile it.
     if (isset($definition['type'])) {
+      $definition['original_type'] = $definition['type'];
+
       $merge = $this->getDefinition($definition['type'], $exception_on_invalid);
       // Preserve integer keys on merge, so sequence item types can override
       // parent settings as opposed to adding unused second, third, etc. items.
