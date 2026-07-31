@@ -224,7 +224,7 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
     $fields['revision_log']->setDescription(t('The log entry explaining the changes in this revision.'));
 
     $fields['info'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Block description'))
+      ->setLabel(t('Description'))
       ->setDescription(t('A brief description of your block.'))
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)

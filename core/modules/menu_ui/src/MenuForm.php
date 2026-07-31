@@ -127,7 +127,7 @@ class MenuForm extends EntityForm {
     ];
     $form['description'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Administrative summary'),
+      '#title' => $this->t('Description'),
       '#maxlength' => 512,
       '#default_value' => $menu->getDescription(),
     ];

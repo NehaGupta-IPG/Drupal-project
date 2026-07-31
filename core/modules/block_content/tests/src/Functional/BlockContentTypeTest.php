@@ -150,7 +150,7 @@ class BlockContentTypeTest extends BlockContentTestBase {
 
     // Verify that title and body fields are displayed.
     $this->drupalGet('block/add/basic');
-    $this->assertSession()->pageTextContains('Block description');
+    $this->assertSession()->pageTextContains('Description');
     $this->assertNotEmpty($this->cssSelect('#edit-body-0-value'), 'Body field was found.');
 
     // Change the block type name.
