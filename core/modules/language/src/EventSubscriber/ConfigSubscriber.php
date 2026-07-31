@@ -94,6 +94,13 @@ class ConfigSubscriber implements EventSubscriberInterface {
         $this->languageDefault->set(new Language($default_language->get()));
         $this->languageManager->reset();
 
+        // Update configuration language codes to match the new default
+        // language. This ensures that when the default language is changed,
+        // all configuration entities are updated to reflect the new default.
+        if (\Drupal::hasService('locale.config_manager')) {
+          \Drupal::service('locale.config_manager')->updateDefaultConfigLangcodes();
+        }
+
         // Directly update language negotiation settings instead of calling
         // \Drupal\language\Entity\ConfigurableLanguage::updateUrlPrefixes()
         // to ensure that the code obeys the hook_update_N() restrictions.

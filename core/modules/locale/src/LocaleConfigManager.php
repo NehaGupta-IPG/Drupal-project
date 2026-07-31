@@ -685,9 +685,10 @@ class LocaleConfigManager {
           $typed_config = $this->typedConfigManager->createFromNameAndData($config->getName(), $config->getRawData());
           $langcode = $config->get('langcode');
           // Only set a `langcode` if this config actually contains translatable
-          // data.
+          // data. Update to the new default language if the current langcode
+          // differs from it (handles cases where default language was changed).
           // @see \Drupal\Core\Config\Plugin\Validation\Constraint\LangcodeRequiredIfTranslatableValuesConstraint
-          if (!empty($this->getTranslatableData($typed_config)) && (empty($langcode) || $langcode == 'en')) {
+          if (!empty($this->getTranslatableData($typed_config)) && (empty($langcode) || $langcode != $default_langcode)) {
             $config->set('langcode', $default_langcode)->save();
           }
         }
