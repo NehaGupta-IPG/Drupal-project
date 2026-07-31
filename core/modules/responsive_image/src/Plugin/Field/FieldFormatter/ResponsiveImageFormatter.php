@@ -233,6 +233,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
       if (isset($link_file)) {
         $url = $this->fileUrlGenerator->generate($file->getFileUri());
       }
+      $cache_tags = Cache::mergeTags($cache_tags, $file->getCacheTags());
       // Extract field item attributes for the theme function, and unset them
       // from the $item so that the field template does not re-render them.
       $item = $file->_referringItem;
