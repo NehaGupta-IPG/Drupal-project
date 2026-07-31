@@ -8,6 +8,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\text\Plugin\Field\FieldFormatter\TextTrimmedFormatter;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -95,6 +96,33 @@ class TextFormatterTest extends EntityKernelTestBase {
       $this->assertSame("<p>Hello, world!</p>\n", (string) $build[0]['#markup']);
       $this->assertEquals(FilterFormat::load('my_text_format')->getCacheTags(), $build[0]['#cache']['tags'], "The $formatter formatter has the expected cache tags when formatting a formatted text field.");
     }
+  }
+
+  /**
+   * Tests the exclude_html_tags setting on the text_trimmed formatter.
+   */
+  public function testExcludeHtmlTagsSetting(): void {
+    // Twenty visible characters wrapped in <p> tags. With tags excluded from
+    // the length count, more visible text survives a trim of the same width.
+    $entity = $this->container->get('entity_type.manager')
+      ->getStorage($this->entityType)
+      ->create(['name' => $this->randomMachineName()]);
+    $entity->formatted_text = [
+      'value' => '<p>abcdefghijklmnopqrst</p>',
+      'format' => 'my_text_format',
+    ];
+    $entity->save();
+
+    $build = $entity->get('formatted_text')->view([
+      'type' => 'text_trimmed',
+      'settings' => [
+        'trim_length' => 10,
+        'exclude_html_tags' => TRUE,
+      ],
+    ]);
+    $output = \Drupal::service('renderer')->renderRoot($build);
+    // With tags stripped should get the first 10 letters.
+    $this->assertStringContainsString('abcdefghij', $output);
   }
 
 }
