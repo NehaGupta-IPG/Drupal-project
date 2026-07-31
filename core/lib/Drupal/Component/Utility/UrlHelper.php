@@ -54,8 +54,9 @@ class UrlHelper {
         $params[] = $key;
       }
       else {
-        // For better readability of paths in query strings, we decode slashes.
-        $params[] = $key . '=' . str_replace('%2F', '/', rawurlencode($value));
+        // For better readability of paths in query strings, we decode
+        // slashes and colons.
+        $params[] = $key . '=' . str_replace(['%2F', '%3A'], ['/', ':'], rawurlencode($value));
       }
     }
 

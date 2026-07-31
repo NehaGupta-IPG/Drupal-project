@@ -54,6 +54,16 @@ class UrlHelperTest extends TestCase {
         'foo',
         'Simple parameters are properly added.',
       ],
+      [
+        ['a' => 'foo:bar'],
+        'a=foo:bar',
+        'Colon in value is decoded for readability.',
+      ],
+      [
+        ['foo:bar' => 'a'],
+        'foo%3Abar=a',
+        'Colon in key is not decoded.',
+      ],
     ];
   }
 
