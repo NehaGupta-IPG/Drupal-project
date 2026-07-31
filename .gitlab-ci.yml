@@ -10,7 +10,7 @@ variables:
   COMPOSER_ROOT_VERSION: dev-main
   COMPOSER_ALLOW_SUPERUSER: 1
   GIT_DEPTH: "50"
-  _TARGET_PHP: "8.4-ubuntu"
+  _TARGET_PHP: "8.5-ubuntu"
   PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: false
 
 stages:
