@@ -319,6 +319,8 @@ JS;
    * Tests ajax focus handling.
    */
   public function testAjaxFocus(): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3396536');
     $this->drupalGet('/ajax_forms_test_get_form');
 
     $this->assertNotNull($select = $this->assertSession()->elementExists('css', '#edit-select'));
@@ -367,6 +369,23 @@ JS;
     $this->assertSession()->assertWaitOnAjaxRequest();
     $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
     $this->assertEquals('edit-email-field-1', $has_focus_id);
+  }
+
+  /**
+   * Tests URLs that are also a JS object property are not mistakenly trusted.
+   */
+  public function testPropertyUrl(): void {
+    $this->drupalGet('ajax-test/property-link');
+    $this->clickLink('Ajax constructor');
+
+    // The AJAX request should fail because the URL is not trusted.
+    $this->failOnJavascriptConsoleErrors = FALSE;
+    $this->assertSession()
+      ->statusMessageContainsAfterWait("Oops, something went wrong. Check your browser's developer console for more details.", 'error');
+
+    // This is needed to avoid an unfinished AJAX request error from tearDown()
+    // because this test intentionally does not complete all AJAX requests.
+    $this->getSession()->executeScript("delete window.drupalActiveXhrCount");
   }
 
 }

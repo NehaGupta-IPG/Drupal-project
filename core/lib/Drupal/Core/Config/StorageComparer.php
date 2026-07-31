@@ -116,9 +116,9 @@ class StorageComparer implements StorageComparerInterface {
     }
 
     $time = \Drupal::hasService(TimeInterface::class) ? \Drupal::service(TimeInterface::class) : new Time();
-    if ($source_storage instanceof FileStorage) {
-      // FileStorage has its own static cache so that multiple reads of the
-      // same raw configuration object are not costly.
+    if ($source_storage instanceof FileStorage || $source_storage instanceof AutoloadingStorage) {
+      // FileStorage and AutoloadingStorage have their own static cache so that
+      // multiple reads of the same raw configuration object are not costly.
       $this->sourceCacheStorage = new NullBackend('storage_comparer');
       $this->sourceStorage = $source_storage;
     }
@@ -300,7 +300,7 @@ class StorageComparer implements StorageComparerInterface {
       $source_data = $this->getSourceStorage($collection)->read($name);
       $target_data = $this->getTargetStorage($collection)->read($name);
       if ($source_data !== $target_data) {
-        if (isset($source_data['uuid']) && $source_data['uuid'] !== $target_data['uuid']) {
+        if (isset($source_data['uuid']) && $source_data['uuid'] !== ($target_data['uuid'] ?? NULL)) {
           // The entity has the same file as an existing entity but the UUIDs do
           // not match. This means that the entity has been recreated so config
           // synchronization should do the same.
