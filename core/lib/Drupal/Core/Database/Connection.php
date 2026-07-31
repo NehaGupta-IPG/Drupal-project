@@ -7,6 +7,7 @@ use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\Core\Database\Exception\EventException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
+use Drupal\Core\Database\Query\JsonCondition;
 use Drupal\Core\Database\Query\JsonExpression;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Query\Select;
@@ -1020,6 +1021,37 @@ abstract class Connection {
       throw new \LogicException('Driver does not provide JSON support.');
     }
     return new $class($this, $field, $path);
+  }
+
+  /**
+   * Creates a condition on a value inside a JSON column.
+   *
+   * The returned object is a condition group, so it can be nested in another
+   * condition group. Query builders that hold a condition provide a
+   * jsonCondition() method that adds the condition for you.
+   *
+   * @param string $field
+   *   The name of the JSON column.
+   * @param string $path
+   *   The JSONPath expression (e.g. "$.status").
+   * @param string|int|float|array|bool|null $value
+   *   The value to compare against. Ignored for unary operators (IS NULL,
+   *   IS NOT NULL, HAS KEY).
+   * @param string $operator
+   *   The comparison operator.
+   *
+   * @return \Drupal\Core\Database\Query\JsonCondition
+   *   A driver-specific JsonCondition instance, or the generic one when the
+   *   driver does not provide a subclass.
+   *
+   * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()
+   */
+  public function jsonCondition(string $field, string $path, string|int|float|array|bool|null $value = NULL, string $operator = '='): JsonCondition {
+    $class = $this->getDriverClass('JsonCondition');
+    if ($class === 'JsonCondition') {
+      $class = JsonCondition::class;
+    }
+    return new $class($field, $path, $value, $operator);
   }
 
   /**
