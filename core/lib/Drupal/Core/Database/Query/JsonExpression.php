@@ -11,13 +11,13 @@ use Drupal\Core\Database\InvalidQueryException;
  * Generates a SQL fragment for extracting a scalar value from a JSON column.
  *
  * Each database driver provides its own subclass with driver-specific SQL.
- * Used internally by JsonCondition and Select::jsonOrderBy(). Can also be
- * used directly to add JSON extractions to a SELECT field list:
+ * Used internally by JsonCondition, Select::jsonOrderBy() and
+ * Select::addJsonExpression(). To add a JSON extraction to a SELECT field list,
+ * use the query builder instead of this class:
  * @code
- * $expr = $connection->jsonExpression('field_data', '$.status');
- * $query->addExpression($expr->toSql(), 'status');
+ * $alias = $query->addJsonExpression('field_data', '$.status', 'status');
  * // With a type cast:
- * $query->addExpression($expr->toCastSql(JsonCastType::Int), 'score');
+ * $alias = $query->addJsonExpression('field_data', '$.score', 'score', JsonCastType::Int);
  * @endcode
  */
 abstract class JsonExpression {

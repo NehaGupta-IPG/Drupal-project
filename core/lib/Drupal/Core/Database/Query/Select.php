@@ -626,6 +626,37 @@ class Select extends Query implements SelectInterface {
   }
 
   /**
+   * Adds a value extracted from a JSON column to the SELECT list.
+   *
+   * The extracted value is always cast, so that its type is the same on all
+   * database backends. Comparing an uncast extraction against a placeholder is
+   * not portable.
+   *
+   * @param string $field
+   *   The JSON column name, optionally table-qualified (e.g. "j.data").
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string|null $alias
+   *   The alias for the expression. Defaults to 'expression'. As with
+   *   addExpression(), a numeric suffix is added if the alias is already taken.
+   * @param \Drupal\Core\Database\Query\JsonCastType $cast
+   *   The type to cast the extracted value to. Defaults to text, which returns
+   *   the value unquoted. On MySQL and MariaDB a text cast truncates the value
+   *   to 255 characters.
+   *
+   * @return string
+   *   The alias of the expression, to use in addField() or orderBy().
+   *
+   * @see \Drupal\Core\Database\Query\Select::addExpression()
+   * @see \Drupal\Core\Database\Query\Select::jsonOrderBy()
+   * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()
+   */
+  public function addJsonExpression(string $field, string $jsonpath, ?string $alias = NULL, JsonCastType $cast = JsonCastType::Text): string {
+    $expression = $this->connection->jsonExpression($field, $jsonpath);
+    return $this->addExpression($expression->toCastSql($cast), $alias);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function join($table, $alias = NULL, $condition = NULL, $arguments = []) {

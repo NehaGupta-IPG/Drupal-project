@@ -928,4 +928,41 @@ class SelectTest extends DatabaseTestBase {
     $this->assertEqualsCanonicalizing([1, 2, 3, 4, 6, 7, 9, 10], array_slice($ids, 2));
   }
 
+  /**
+   * Tests adding a JSON extraction to the SELECT list.
+   */
+  public function testAddJsonExpression(): void {
+    // The default cast returns text without the quotes of the JSON string.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $alias = $query->addJsonExpression('test_field', '$.key', 'key_value');
+    $this->assertEquals('key_value', $alias);
+    $query->jsonCondition('test_field', '$.key', NULL, 'IS NOT NULL');
+    $values = [];
+    foreach ($query->execute() as $row) {
+      $values[(int) $row->id] = $row->key_value;
+    }
+    $this->assertEquals([3 => 'some text', 4 => 'some other text'], $values);
+
+    // An integer cast returns a number.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->addJsonExpression('test_field', '$.number', 'number_value', JsonCastType::Int);
+    $query->condition('j.id', 1);
+    $this->assertEquals(5, $query->execute()->fetchObject()->number_value);
+
+    // The alias can be ordered by, and duplicate aliases are suffixed the same
+    // way as in addExpression().
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $first = $query->addJsonExpression('test_field', '$.number', 'num', JsonCastType::Int);
+    $second = $query->addJsonExpression('test_field', '$.float', 'num', JsonCastType::Float);
+    $this->assertEquals('num', $first);
+    $this->assertEquals('num_2', $second);
+    $query->condition('j.id', 5);
+    $row = $query->execute()->fetchObject();
+    $this->assertNull($row->num);
+    $this->assertEquals(1.5, $row->num_2);
+  }
+
 }
