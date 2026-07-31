@@ -6,6 +6,7 @@ namespace Drupal\navigation\Attribute;
 
 use Drupal\Component\Plugin\Attribute\PluginPropertyInterface;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Core\Block\BlockPluginInterface;
 
 /**
  * Marks a block as available for placement in the navigation.
@@ -38,6 +39,9 @@ class AllowInNavigation implements PluginPropertyInterface {
   public function addToDefinition(string $id, array|object $definition): array {
     if (!is_array($definition)) {
       throw new InvalidPluginDefinitionException($id, sprintf('The %s attribute can only be used on plugins with an array definition, but the definition of plugin %s is an object.', static::class, $id));
+    }
+    if (!is_a($definition['class'], BlockPluginInterface::class, TRUE)) {
+      throw new InvalidPluginDefinitionException($id, sprintf('The %s attribute can only be used on block plugins, but the definition of plugin %s is not a block plugin.', static::class, $id));
     }
     $definition['allow_in_navigation'] = TRUE;
     return $definition;

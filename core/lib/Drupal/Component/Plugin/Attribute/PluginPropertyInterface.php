@@ -10,9 +10,9 @@ namespace Drupal\Component\Plugin\Attribute;
  * Plugin definitions are normally described by a single attribute, provided by
  * the module that defines the plugin type. That is a problem when an optional
  * module needs a property on a plugin it does not own. For example, the
- * 'field_ui_base_route' property of entity types is only meaningful to the
- * optional field_ui module, but it can only be declared by the module that
- * provides the entity type.
+ * 'allow_in_navigation' property of block plugins is only meaningful to the
+ * optional navigation module, but it can only be declared by the module that
+ * provides the block plugin.
  *
  * Attributes implementing this interface are additional, repeatable attributes
  * placed on a plugin class alongside the plugin definition attribute. Plugin
