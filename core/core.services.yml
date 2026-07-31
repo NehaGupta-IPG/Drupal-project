@@ -861,7 +861,7 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@plugin.manager.field.field_type']
   plugin.manager.action:
     class: Drupal\Core\Action\ActionManager
-    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@language_manager']
   plugin.manager.menu.link:
     class: Drupal\Core\Menu\MenuLinkManager
     arguments: ['@menu.tree_storage', '@menu_link.static.overrides', '@module_handler']
