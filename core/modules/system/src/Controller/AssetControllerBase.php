@@ -2,7 +2,6 @@
 
 namespace Drupal\system\Controller;
 
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Asset\AssetCollectionGrouperInterface;
 use Drupal\Core\Asset\AssetCollectionOptimizerInterface;
 use Drupal\Core\Asset\AssetDumperUriInterface;
@@ -11,6 +10,7 @@ use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\LibraryDependencyResolverInterface;
+use Drupal\Core\Asset\LibraryUrlHelper;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -82,6 +82,8 @@ abstract class AssetControllerBase extends FileDownloadController {
    *   The asset collection optimizer.
    * @param \Drupal\Core\Asset\AssetDumperUriInterface $dumper
    *   The asset dumper.
+   * @param \Drupal\Core\Asset\LibraryUrlHelper $libraryUrlHelper
+   *   The Url helper for (un)compressing the library names.
    */
   public function __construct(
     StreamWrapperManagerInterface $streamWrapperManager,
@@ -92,6 +94,7 @@ abstract class AssetControllerBase extends FileDownloadController {
     protected readonly AssetCollectionGrouperInterface $grouper,
     protected readonly AssetCollectionOptimizerInterface $optimizer,
     protected readonly AssetDumperUriInterface $dumper,
+    protected readonly LibraryUrlHelper $libraryUrlHelper,
   ) {
     parent::__construct($streamWrapperManager);
     $this->fileExtension = $this->assetType;
@@ -162,10 +165,10 @@ abstract class AssetControllerBase extends FileDownloadController {
     $attached_assets = new AttachedAssets();
 
     if ($request->query->has('include')) {
-      $include_libraries = explode(',', UrlHelper::uncompressQueryParameter($request->query->get('include')));
+      $include_libraries = explode(',', $this->libraryUrlHelper->uncompress($request->query->get('include')));
     }
     else {
-      $include_libraries = explode(',', UrlHelper::uncompressQueryParameter($request->query->get('libraries')));
+      $include_libraries = explode(',', $this->libraryUrlHelper->uncompress($request->query->get('libraries')));
     }
 
     // Check that library names are in the correct format.
@@ -180,7 +183,7 @@ abstract class AssetControllerBase extends FileDownloadController {
     $attached_assets->setLibraries($include_libraries);
 
     if ($request->query->has('exclude')) {
-      $exclude_libraries = explode(',', UrlHelper::uncompressQueryParameter($request->query->get('exclude')));
+      $exclude_libraries = explode(',', $this->libraryUrlHelper->uncompress($request->query->get('exclude')));
       $validate($exclude_libraries);
       $attached_assets->setAlreadyLoadedLibraries($exclude_libraries);
     }

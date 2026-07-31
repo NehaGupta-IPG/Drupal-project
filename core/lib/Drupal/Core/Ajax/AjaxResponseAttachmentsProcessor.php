@@ -5,6 +5,7 @@ namespace Drupal\Core\Ajax;
 use Drupal\Core\Asset\AssetCollectionRendererInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
+use Drupal\Core\Asset\LibraryUrlHelper;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -48,6 +49,8 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    *   The module handler.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
+   * @param \Drupal\Core\Asset\LibraryUrlHelper $libraryUrlHelper
+   *   The Url helper for (un)compressing the library names.
    */
   public function __construct(
     protected AssetResolverInterface $assetResolver,
@@ -58,6 +61,7 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     protected RendererInterface $renderer,
     protected ModuleHandlerInterface $moduleHandler,
     protected LanguageManagerInterface $languageManager,
+    protected LibraryUrlHelper $libraryUrlHelper,
   ) {
     $this->config = $config_factory->get('system.performance');
   }
@@ -160,6 +164,12 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
 
     $commands = $response->getCommands();
     $this->moduleHandler->alter('ajax_render', $commands);
+
+    foreach ($commands as $command) {
+      if ($command['command'] === 'settings' && isset($command['settings']['ajax_page_state']['libraries'])) {
+        $command['settings']['ajax_page_state']['libraries'] = $this->libraryUrlHelper->compress($command['settings']['ajax_page_state']['libraries']);
+      }
+    }
 
     return $commands;
   }

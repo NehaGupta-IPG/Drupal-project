@@ -39,6 +39,7 @@ class CssAssetController extends AssetControllerBase {
       $container->get('asset.css.collection_grouper'),
       $container->get('asset.css.collection_optimizer'),
       $container->get('asset.css.dumper'),
+      $container->get('Drupal\Core\Asset\LibraryUrlHelper'),
     );
   }
 
