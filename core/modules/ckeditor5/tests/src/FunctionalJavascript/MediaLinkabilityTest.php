@@ -149,7 +149,7 @@ class MediaLinkabilityTest extends MediaTestBase {
     // exists, then assert the link exists. Then assert the expected DOM
     // structure in detail.
     $assert_session->elementExists('css', '.ck-content a[href="http://linking-embedded-media.com"]');
-    $assert_session->elementExists('css', '.ck-content .drupal-media.ck-widget > a[href="http://linking-embedded-media.com"] > div[aria-label] > article > div > img[src*="image-test.png"]');
+    $assert_session->elementExists('css', '.ck-content .drupal-media.ck-widget > a[href="http://linking-embedded-media.com"] > div[aria-label] > div > div > img[src*="image-test.png"]');
 
     // Assert the "dataDowncast" HTML after making changes.
     $xpath = new \DOMXPath($this->getEditorDataAsDom());
@@ -214,7 +214,7 @@ class MediaLinkabilityTest extends MediaTestBase {
     // exists, then assert no link exists. Then assert the expected DOM
     // structure in detail.
     $assert_session->elementNotExists('css', '.ck-content a');
-    $assert_session->elementExists('css', '.ck-content .drupal-media.ck-widget > div[aria-label] > article > div > img[src*="image-test.png"]');
+    $assert_session->elementExists('css', '.ck-content .drupal-media.ck-widget > div[aria-label] > div > div > img[src*="image-test.png"]');
 
     // Ensure that figcaption exists.
     // @see https://www.drupal.org/project/drupal/issues/3268318
@@ -374,7 +374,7 @@ class MediaLinkabilityTest extends MediaTestBase {
     $this->submitForm([], 'Save');
 
     // Assert the rendered markup links to the correct place.
-    $selector = sprintf('a[href="%s"] > article', $content_to_add->toUrl('canonical')->toString());
+    $selector = sprintf('a[href="%s"] > div', $content_to_add->toUrl('canonical')->toString());
     $link_around_media = $assert_session->elementExists('css', $selector);
     $link_around_media->click();
     $h1 = $page->find('css', 'h1');
