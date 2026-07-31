@@ -158,7 +158,9 @@ class JsonCondition extends Condition {
         $type = JsonCastType::fromPhpValue($values[0]);
         $p1 = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
         $p2 = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
-        $this->stringVersion = "{$expression->toCastSql($type)} {$this->operator} {$p1} AND {$p2}";
+        $range = "{$expression->toCastSql($type)} {$this->operator} {$p1} AND {$p2}";
+        $type_guard = $expression->toTypeGuardSql($type);
+        $this->stringVersion = $type_guard === '' ? $range : "({$type_guard}{$range})";
         $this->arguments = [$p1 => $values[0], $p2 => $values[1]];
         return;
     }

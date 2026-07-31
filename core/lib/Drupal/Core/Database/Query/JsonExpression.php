@@ -135,6 +135,37 @@ abstract class JsonExpression {
   abstract public function toContainsSql(string $encoded_value): string;
 
   /**
+   * Generates SQL restricting a comparison to values of the expected JSON type.
+   *
+   * Casting a JSON value to a type it does not hold is not portable. MySQL and
+   * MariaDB raise truncation warning 1292, which becomes an error in a
+   * statement that writes data, PostgreSQL raises SQLSTATE 22P02, and SQLite
+   * silently returns 0. Comparing only the values that already hold the
+   * expected type avoids all three, and gives the same result on every
+   * backend, because a value of another type equals no value of the compared
+   * type.
+   *
+   * The guard is combined with AND, so a value of another type matches no
+   * operator, including a negated one such as <> or NOT BETWEEN. This is what
+   * PostgreSQL's type aware jsonpath comparison does for scalar values.
+   *
+   * @param \Drupal\Core\Database\Query\JsonCastType $type
+   *   The cast type the comparison uses.
+   * @param string|null $type_expression
+   *   A SQL expression returning the JSON type name of the value to check. If
+   *   NULL, the type of the value at this expression's JSON path is used.
+   *
+   * @return string
+   *   A SQL fragment ending in ' AND ', or an empty string when the cast
+   *   cannot fail, as is the case for a text cast.
+   *
+   * @internal
+   *   This method should only be use by the database layer and should be
+   *   implemented by database drivers.
+   */
+  abstract public function toTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string;
+
+  /**
    * Generates SQL for a comparison against a scalar or array value.
    *
    * For scalar values, produces a simple comparison (e.g. extract = :p).
@@ -158,8 +189,10 @@ abstract class JsonExpression {
    */
   public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
     ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders((array) $value, $queryPlaceholder);
+    $sql = "{$this->toCastSql($cast_type)} {$operator} ({$placeholders})";
+    $type_guard = $this->toTypeGuardSql($cast_type);
     return [
-      'sql' => "{$this->toCastSql($cast_type)} {$operator} ({$placeholders})",
+      'sql' => $type_guard === '' ? $sql : "({$type_guard}{$sql})",
       'args' => $args,
     ];
   }

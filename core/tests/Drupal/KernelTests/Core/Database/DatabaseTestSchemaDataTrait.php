@@ -215,6 +215,23 @@ trait DatabaseTestSchemaDataTrait {
       'Non-matching text' => ['$.key', 'nothing to see here', '=', []],
       'String instead of number' => ['$.number', 'stringy', '=', []],
 
+      // A value of another JSON type than the compared value matches no
+      // operator. Rows 3 and 4 hold a string at $.key, so a numeric or boolean
+      // comparison skips them instead of casting their value. Casting is
+      // either an error or a silent 0, depending on the backend.
+      'Number against string value' => ['$.key', 42, '=', []],
+      'Number against string value negated' => ['$.key', 42, '<>', []],
+      'Number against string value LT' => ['$.key', 42, '<', []],
+      'Float against string value' => ['$.key', 1.5, '=', []],
+      'Number IN against string value' => ['$.key', [42], 'IN', []],
+      'Number NOT IN against string value' => ['$.key', [42], 'NOT IN', []],
+      'Number BETWEEN against string value' => ['$.key', [1, 100], 'BETWEEN', []],
+      'Number NOT BETWEEN against string value' => ['$.key', [1, 100], 'NOT BETWEEN', []],
+      'Boolean against string value' => ['$.key', FALSE, '=', []],
+      'Boolean IN against string value' => ['$.key', [FALSE], 'IN', []],
+      'Boolean against number value' => ['$.number', FALSE, '=', []],
+      'Boolean IN against number value' => ['$.number', [FALSE], 'IN', []],
+
       // IN / NOT IN.
       'IN with matching' => ['$.number', [5, 10], 'IN', [1, 2, 3]],
       'IN with partial matching' => ['$.number', [5], 'IN', [1]],

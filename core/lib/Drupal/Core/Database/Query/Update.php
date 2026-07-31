@@ -118,6 +118,12 @@ class Update extends Query implements ConditionInterface {
    * database backends. Assigning an uncast extraction to a column is not
    * portable.
    *
+   * Unlike a comparison, an assignment cannot skip the rows holding a value of
+   * another type. The path must hold a value of the cast type in every updated
+   * row, because MySQL and PostgreSQL reject a numeric cast of a JSON string.
+   * Restrict the query with a jsonCondition() when the column holds mixed
+   * types.
+   *
    * @param string $field
    *   The field to set.
    * @param string $json_field

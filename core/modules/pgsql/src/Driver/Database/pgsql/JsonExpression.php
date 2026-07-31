@@ -19,11 +19,22 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   public function toSql(): string {
-    // Uses the #>> operator to extract a JSON value as text. Uses ARRAY[]
-    // constructor instead of '{a,b}' literal so the curly braces don't need to
-    // survive prefixTables() and quoteIdentifiers().
+    // Uses the #>> operator to extract a JSON value as text.
+    return "{$this->field} #>> {$this->pathArraySql()}";
+  }
+
+  /**
+   * Builds the path array the #> and #>> operators take.
+   *
+   * Uses an ARRAY[] constructor instead of a '{a,b}' literal so the curly
+   * braces don't need to survive prefixTables() and quoteIdentifiers().
+   *
+   * @return string
+   *   A SQL text array of the path segments.
+   */
+  protected function pathArraySql(): string {
     $segments = array_map(fn($s) => $this->connection->quote($s), $this->pathSegments);
-    return "{$this->field} #>> ARRAY[" . implode(',', $segments) . "]::text[]";
+    return 'ARRAY[' . implode(',', $segments) . ']::text[]';
   }
 
   /**
@@ -76,7 +87,7 @@ class JsonExpression extends BaseJsonExpression {
     if (is_array($value)) {
       $escaped_path = str_replace("'", "''", $this->path);
       ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders($value, $queryPlaceholder);
-      $type_guard = $this->typeGuard($cast_type);
+      $type_guard = $this->toTypeGuardSql($cast_type, 'JSONB_TYPEOF(v)');
       return [
         'sql' => "EXISTS (SELECT 1 FROM jsonb_path_query({$this->field}::jsonb, '{$escaped_path}') AS v WHERE {$type_guard}{$this->toCastSql($cast_type, "v #>> '{}'")} {$operator} ({$placeholders}))",
         'args' => $args,
@@ -104,27 +115,23 @@ class JsonExpression extends BaseJsonExpression {
   }
 
   /**
-   * Restricts a wildcard comparison to the elements of the expected JSON type.
-   *
-   * Casting a JSON string to a number or a boolean raises SQLSTATE 22P02.
-   * Elements of another type never equal the compared value anyway, so they are
-   * filtered out before the cast. The scalar comparison above needs no guard,
-   * because jsonpath comparisons are type aware.
-   *
-   * @param \Drupal\Core\Database\Query\JsonCastType $type
-   *   The cast type of the comparison.
-   *
-   * @return string
-   *   A SQL fragment ending in ' AND ', or an empty string for a text cast,
-   *   which every JSON type survives.
+   * {@inheritdoc}
    */
-  protected function typeGuard(JsonCastType $type): string {
+  public function toTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
+    // PostgreSQL reports every number as 'number', so one type name covers
+    // both numeric casts.
     $json_type = match ($type) {
       JsonCastType::Int, JsonCastType::Float => 'number',
       JsonCastType::Bool => 'boolean',
       JsonCastType::Text => '',
     };
-    return $json_type === '' ? '' : "JSONB_TYPEOF(v) = '{$json_type}' AND ";
+    if ($json_type === '') {
+      return '';
+    }
+    // JSONB_TYPEOF() needs a jsonb value, so the #> operator is used here
+    // instead of the #>> operator toSql() uses to extract text.
+    $type_expression ??= "JSONB_TYPEOF({$this->field}::jsonb #> {$this->pathArraySql()})";
+    return "{$type_expression} = '{$json_type}' AND ";
   }
 
 }

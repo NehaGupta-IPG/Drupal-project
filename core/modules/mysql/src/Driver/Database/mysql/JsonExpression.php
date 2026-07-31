@@ -72,7 +72,7 @@ class JsonExpression extends BaseJsonExpression {
     $json_table_path = $this->connection->quote($prefix . '.*');
 
     ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders((array) $value, $queryPlaceholder);
-    $type_guard = $this->typeGuard($cast_type, $extract);
+    $type_guard = $this->toTypeGuardSql($cast_type, "JSON_TYPE({$extract})");
     return [
       'sql' => "(SELECT COUNT(*) FROM JSON_TABLE({$this->field}, {$json_table_path} COLUMNS (val JSON PATH '$')) jt WHERE {$type_guard}{$this->toCastSql($cast_type, $extract)} {$operator} ({$placeholders})) > 0",
       'args' => $args,
@@ -80,32 +80,23 @@ class JsonExpression extends BaseJsonExpression {
   }
 
   /**
-   * Restricts a wildcard comparison to the elements of the expected JSON type.
-   *
-   * A numeric CAST() of a JSON string raises warning 1292, which MySQL and
-   * MariaDB turn into an error in a statement that writes data. Elements of
-   * another type never equal a number anyway, so they are filtered out before
-   * the cast.
-   *
-   * The boolean cast needs no guard, because it compares against the JSON
-   * literal true instead of casting.
-   *
-   * @param \Drupal\Core\Database\Query\JsonCastType $type
-   *   The cast type of the comparison.
-   * @param string $extract
-   *   The SQL expression that extracts the element.
-   *
-   * @return string
-   *   A SQL fragment ending in ' AND ', or an empty string for casts that
-   *   cannot truncate.
+   * {@inheritdoc}
    */
-  protected function typeGuard(JsonCastType $type, string $extract): string {
+  public function toTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
+    // MySQL reports an unsigned integer and a high precision number as their
+    // own type, MariaDB reports both as INTEGER and DOUBLE. A whole number
+    // satisfies a float comparison, so it is accepted for both numeric casts.
     $json_types = match ($type) {
       JsonCastType::Int => "'INTEGER', 'UNSIGNED INTEGER'",
       JsonCastType::Float => "'DOUBLE', 'DECIMAL', 'INTEGER', 'UNSIGNED INTEGER'",
-      JsonCastType::Bool, JsonCastType::Text => '',
+      JsonCastType::Bool => "'BOOLEAN'",
+      JsonCastType::Text => '',
     };
-    return $json_types === '' ? '' : "JSON_TYPE({$extract}) IN ({$json_types}) AND ";
+    if ($json_types === '') {
+      return '';
+    }
+    $type_expression ??= "JSON_TYPE({$this->toSql()})";
+    return "{$type_expression} IN ({$json_types}) AND ";
   }
 
 }
