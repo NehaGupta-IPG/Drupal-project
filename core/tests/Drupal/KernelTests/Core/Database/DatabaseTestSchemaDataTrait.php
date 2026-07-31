@@ -121,6 +121,16 @@ trait DatabaseTestSchemaDataTrait {
       ])
       ->execute();
 
+    $this->addSampleJsonData();
+  }
+
+  /**
+   * Inserts the sample data of the 'json' table.
+   *
+   * This is separate from addSampleData(), so a test can empty the 'json'
+   * table and fill it again without touching the other tables.
+   */
+  protected function addSampleJsonData(): void {
     $this->connection->insert('json')
       ->fields(['id', 'status', 'test_field'])
       ->values([
