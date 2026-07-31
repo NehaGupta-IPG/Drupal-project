@@ -304,13 +304,12 @@ class SectionComponentTest extends UnitTestCase {
   /**
    * Tests that deprecation notices are triggered.
    *
-   * @todo Remove below test when the drupal:12.x branch is opened.
-   * @see https://www.drupal.org/project/drupal/issues/3160644
+   * @todo Remove below test in https://www.drupal.org/project/drupal/issues/3160644
    */
   #[IgnoreDeprecations]
   public function testDeprecationNotices(): void {
-    $this->expectUserDeprecationMessage('Setting random section component properties is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Component properties should be set via dedicated setters. See https://www.drupal.org/node/3100177');
-    $this->expectUserDeprecationMessage('Getting additional properties is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Additional component properties should be gotten via ::getThirdPartySetting(). See https://www.drupal.org/node/3100177');
+    $this->expectUserDeprecationMessage('Setting random section component properties is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Component properties should be set via dedicated setters. See https://www.drupal.org/node/3100177');
+    $this->expectUserDeprecationMessage('Getting additional properties is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Additional component properties should be gotten via ::getThirdPartySetting(). See https://www.drupal.org/node/3100177');
 
     // Instantiate SectionComponent with additional settings is deprecated.
     new SectionComponent(
