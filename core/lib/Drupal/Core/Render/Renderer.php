@@ -267,7 +267,7 @@ class Renderer implements RendererInterface {
     // Early-return nothing if user does not have access.
     if (isset($elements['#access'])) {
       if (!is_bool($elements['#access']) && !($elements['#access'] instanceof AccessResultInterface)) {
-        @trigger_error(
+        trigger_error(
           'Using a #access value other than a boolean or an AccessResultInterface object is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3549344',
           E_USER_WARNING
         );
