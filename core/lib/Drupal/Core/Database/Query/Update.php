@@ -109,6 +109,40 @@ class Update extends Query implements ConditionInterface {
   }
 
   /**
+   * Sets a field to a value extracted from a JSON column.
+   *
+   * This is the JSON counterpart of expression(), and takes precedence over
+   * fields() in the same way.
+   *
+   * The extracted value is always cast, so that its type is the same on all
+   * database backends. Assigning an uncast extraction to a column is not
+   * portable.
+   *
+   * @param string $field
+   *   The field to set.
+   * @param string $json_field
+   *   The JSON column to extract the value from.
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param \Drupal\Core\Database\Query\JsonCastType $cast
+   *   The type to cast the extracted value to. Defaults to text, which returns
+   *   the value unquoted. On MySQL and MariaDB a text cast truncates the value
+   *   to 255 characters.
+   *
+   * @return $this
+   *   The called object.
+   *
+   * @see \Drupal\Core\Database\Query\Update::expression()
+   * @see \Drupal\Core\Database\Query\Select::addJsonExpression()
+   * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()
+   */
+  public function jsonExpression(string $field, string $json_field, string $jsonpath, JsonCastType $cast = JsonCastType::Text): static {
+    $expression = $this->connection->jsonExpression($json_field, $jsonpath);
+    $this->expression($field, $expression->toCastSql($cast));
+    return $this;
+  }
+
+  /**
    * Executes the UPDATE query.
    *
    * @return int|null

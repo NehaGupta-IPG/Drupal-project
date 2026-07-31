@@ -358,6 +358,9 @@ function database_test_schema(): array {
       'id' => ['type' => 'serial', 'not null' => TRUE],
       'status' => ['type' => 'int', 'not null' => TRUE, 'default' => 0, 'size' => 'small'],
       'test_field' => ['type' => 'json'],
+      // Targets for Update::jsonExpression(), one per non-integer cast type.
+      'name' => ['type' => 'varchar', 'length' => 255],
+      'score' => ['type' => 'float'],
     ],
     'primary key' => ['id'],
   ];

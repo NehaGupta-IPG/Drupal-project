@@ -76,8 +76,9 @@ class JsonExpression extends BaseJsonExpression {
     if (is_array($value)) {
       $escaped_path = str_replace("'", "''", $this->path);
       ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders($value, $queryPlaceholder);
+      $type_guard = $this->typeGuard($cast_type);
       return [
-        'sql' => "EXISTS (SELECT 1 FROM jsonb_path_query({$this->field}::jsonb, '{$escaped_path}') AS v WHERE {$this->toCastSql($cast_type, "v #>> '{}'")} {$operator} ({$placeholders}))",
+        'sql' => "EXISTS (SELECT 1 FROM jsonb_path_query({$this->field}::jsonb, '{$escaped_path}') AS v WHERE {$type_guard}{$this->toCastSql($cast_type, "v #>> '{}'")} {$operator} ({$placeholders}))",
         'args' => $args,
       ];
     }
@@ -100,6 +101,30 @@ class JsonExpression extends BaseJsonExpression {
       'sql' => "{$this->field} @?? '{$escaped_path} ? (@ {$op} {$sql_value})'",
       'args' => [],
     ];
+  }
+
+  /**
+   * Restricts a wildcard comparison to the elements of the expected JSON type.
+   *
+   * Casting a JSON string to a number or a boolean raises SQLSTATE 22P02.
+   * Elements of another type never equal the compared value anyway, so they are
+   * filtered out before the cast. The scalar comparison above needs no guard,
+   * because jsonpath comparisons are type aware.
+   *
+   * @param \Drupal\Core\Database\Query\JsonCastType $type
+   *   The cast type of the comparison.
+   *
+   * @return string
+   *   A SQL fragment ending in ' AND ', or an empty string for a text cast,
+   *   which every JSON type survives.
+   */
+  protected function typeGuard(JsonCastType $type): string {
+    $json_type = match ($type) {
+      JsonCastType::Int, JsonCastType::Float => 'number',
+      JsonCastType::Bool => 'boolean',
+      JsonCastType::Text => '',
+    };
+    return $json_type === '' ? '' : "JSONB_TYPEOF(v) = '{$json_type}' AND ";
   }
 
 }
