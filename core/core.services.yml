@@ -471,8 +471,11 @@ services:
     public: false
   Drupal\Core\Config\StorageManagerInterface: '@config.storage.export.manager'
   config.storage.sync:
-    class: Drupal\Core\Config\FileStorage
-    factory: Drupal\Core\Config\FileStorageFactory::getSync
+    class: Drupal\Core\Config\AutoloadingStorage
+    factory: ['@Drupal\Core\Config\SyncFactory', 'get']
+  Drupal\Core\Config\SyncFactory:
+    autowire: true
+    public: false
   config.storage.snapshot:
     class: Drupal\Core\Config\DatabaseStorage
     arguments: ['@database', config_snapshot]
@@ -1102,13 +1105,11 @@ services:
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
-    lazy: true
   lock.persistent:
     class: Drupal\Core\Lock\PersistentDatabaseLockBackend
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
-    lazy: true
   router.request_context:
     class: Drupal\Core\Routing\RequestContext
     tags:
@@ -1445,7 +1446,7 @@ services:
     class: Drupal\Core\Access\CsrfRequestHeaderAccessCheck
     arguments: ['@session_configuration', '@csrf_token']
     tags:
-      - { name: access_check, needs_incoming_request: TRUE }
+      - { name: access_check, applies_to: _csrf_request_header_token, needs_incoming_request: TRUE }
   maintenance_mode:
     class: Drupal\Core\Site\MaintenanceMode
     arguments: ['@state', '@config.factory']
