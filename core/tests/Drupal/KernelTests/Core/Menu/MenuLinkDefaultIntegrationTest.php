@@ -57,11 +57,7 @@ class MenuLinkDefaultIntegrationTest extends KernelTestBase {
   }
 
   /**
-   * Tests that MenuLinkDefaultForm serialization works correctly.
-   *
-   * Without DependencySerializationTrait, service objects are serialized
-   * directly instead of being replaced by their service IDs. This can cause
-   * "database connection serialization errors" during AJAX form operations.
+   * Tests MenuLinkDefaultForm serialization.
    */
   public function testMenuLinkDefaultFormSerialization(): void {
     $container = \Drupal::getContainer();
@@ -69,9 +65,9 @@ class MenuLinkDefaultIntegrationTest extends KernelTestBase {
     $this->assertInstanceOf(MenuLinkDefaultForm::class, $form_object);
 
     $serialized = @serialize($form_object);
-    $this->assertNotFalse($serialized, 'MenuLinkDefaultForm must be serializable without errors.');
+    $this->assertNotFalse($serialized);
 
-    $restored_form = @unserialize($serialized);
+    $restored_form = @unserialize($serialized, ['allowed_classes' => [MenuLinkDefaultForm::class]]);
     $this->assertInstanceOf(MenuLinkDefaultForm::class, $restored_form);
   }
 
