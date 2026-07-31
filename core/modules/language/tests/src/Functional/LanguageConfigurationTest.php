@@ -151,7 +151,9 @@ class LanguageConfigurationTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/language/add');
     $this->submitForm($edit, 'Add language');
     $language = $this->config('language.entity.de')->get();
-    $this->assertEquals('fr', $language['langcode']);
+    // @todo revisit, although this is the new expected behavior, check if
+    // we want to modify this test or expand it.
+    $this->assertEquals('en', $language['langcode']);
 
     // Ensure that German language has a weight of 5 after being created through
     // the UI.

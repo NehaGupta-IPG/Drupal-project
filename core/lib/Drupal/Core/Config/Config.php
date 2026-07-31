@@ -4,6 +4,8 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\Schema\Element;
+use Drupal\Core\Config\Schema\Mapping;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -210,13 +212,25 @@ class Config extends StorableConfigBase {
     if (!$has_trusted_data && $this->typedConfigManager->hasConfigSchema($this->name)) {
       // Ensure that the schema wrapper has the latest data.
       $this->schemaWrapper = NULL;
-      $this->data = $this->castValue(NULL, $this->data);
+      $is_translatable = FALSE;
+      $this->data = $this->castValue(NULL, $this->data, $is_translatable);
+      if ($is_translatable && $this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+        $this->applyDefaultLangcodeIfMissing($this->getSchemaWrapper());
+      }
       // Reclaim the memory used by the schema wrapper.
       $this->schemaWrapper = NULL;
     }
     else {
       foreach ($this->data as $key => $value) {
         $this->validateValue($key, $value);
+      }
+      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
+        // Deprecated path.
+        if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+          $this->applyDefaultLangcodeIfMissing($this->getSchemaWrapper());
+          // Reclaim the memory used by the schema wrapper.
+          $this->schemaWrapper = NULL;
+        }
       }
     }
 
@@ -233,6 +247,29 @@ class Config extends StorableConfigBase {
     $this->eventDispatcher->dispatch(new ConfigCrudEvent($this), $event_name);
     $this->originalData = $this->data;
     return $this;
+  }
+
+  /**
+   * Applies the site's configuration default langcode when required.
+   */
+  protected function applyDefaultLangcodeIfMissing(Element $typed_config): void {
+    // @todo Discuss the hardcoding of english here a bit more. What does
+    //   it mean to be able to install a configuration in a language that
+    //   might not exist or be the default config language.
+    if ((array_key_exists('langcode', $this->data) && $this->data['langcode'] !== 'en')
+      || !$typed_config instanceof Mapping
+      || !in_array('langcode', $typed_config->getValidKeys(), TRUE)
+    ) {
+      return;
+    }
+
+    $system_site = $this->name === 'system.site' ? $this->get() : $this->storage->read('system.site');
+    // Unfortunately we need to rely fallbacks too because on existing sites
+    // when this code was added configuration operations may run before the
+    // update that adds the default_config_langcode key to system.site.
+    $default_config_langcode = $system_site['default_config_langcode'] ?? $system_site['default_langcode'] ?? 'en';
+
+    $this->set('langcode', $default_config_langcode);
   }
 
   /**

@@ -113,11 +113,6 @@ class StandardRecipeTest extends StandardTest {
         unset($active_data['_core']);
         $active->write($name, $active_data);
       }
-      // @todo Remove this once https://drupal.org/i/3427564 lands.
-      if ($name === 'node.settings') {
-        unset($active_data['langcode']);
-        $active->write($name, $active_data);
-      }
     }
 
     // Ensure we have truly rebuilt the standard profile using recipes.
