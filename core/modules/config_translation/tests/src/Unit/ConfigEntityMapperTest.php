@@ -10,10 +10,9 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Url;
-use Drupal\locale\LocaleConfigManager;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -72,12 +71,11 @@ class ConfigEntityMapperTest extends UnitTestCase {
       $definition,
       $this->getConfigFactoryStub(),
       $this->createStub(TypedConfigManagerInterface::class),
-      $this->createStub(LocaleConfigManager::class),
       $this->createStub(ConfigMapperManagerInterface::class),
       $this->routeProvider,
       $this->getStringTranslationStub(),
       $this->entityTypeManager,
-      $this->createStub(LanguageManagerInterface::class),
+      $this->createStub(ConfigurableLanguageManagerInterface::class),
       $this->createStub(EventDispatcherInterface::class)
     );
   }

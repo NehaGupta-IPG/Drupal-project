@@ -34,6 +34,7 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
     'node',
     'views',
     'views_ui',
+    'locale'
   ];
 
   /**

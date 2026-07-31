@@ -5,4 +5,4 @@ package: Multilingual
 version: VERSION
 configure: config_translation.mapper_list
 dependencies:
-  - drupal:locale
+  drupal:language

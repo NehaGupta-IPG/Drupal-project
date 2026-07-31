@@ -9,11 +9,10 @@ use Drupal\config_translation\ConfigMapperManagerInterface;
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldStorageConfigInterface;
-use Drupal\locale\LocaleConfigManager;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -69,12 +68,11 @@ class ConfigFieldMapperTest extends UnitTestCase {
       $definition,
       $this->getConfigFactoryStub(),
       $this->createStub(TypedConfigManagerInterface::class),
-      $this->createStub(LocaleConfigManager::class),
       $this->createStub(ConfigMapperManagerInterface::class),
       $this->createStub(RouteProviderInterface::class),
       $this->getStringTranslationStub(),
       $this->entityTypeManager,
-      $this->createStub(LanguageManagerInterface::class),
+      $this->createStub(ConfigurableLanguageManagerInterface::class),
       $this->createStub(EventDispatcherInterface::class)
     );
   }

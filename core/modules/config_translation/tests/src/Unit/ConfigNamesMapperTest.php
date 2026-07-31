@@ -10,12 +10,11 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Language\Language;
-use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
-use Drupal\locale\LocaleConfigManager;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -103,8 +102,6 @@ class ConfigNamesMapperTest extends UnitTestCase {
 
     $this->typedConfigManager = $this->createStub(TypedConfigManagerInterface::class);
 
-    $this->localeConfigManager = $this->createStub(LocaleConfigManager::class);
-
     $this->configMapperManager = $this->createStub(ConfigMapperManagerInterface::class);
 
     $this->baseRoute = new Route('/admin/config/system/site-information');
@@ -118,7 +115,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
       $this->configMapperManager,
       $this->routeProvider,
       $this->getStringTranslationStub(),
-      $this->createStub(LanguageManagerInterface::class),
+      $this->createStub(ConfigurableLanguageManagerInterface::class),
       $this->createStub(EventDispatcherInterface::class)
     );
   }
