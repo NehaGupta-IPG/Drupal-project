@@ -73,6 +73,9 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
   public function settingsSummary() {
     $summary = [];
     $summary[] = $this->t('Trimmed limit: @trim_length characters', ['@trim_length' => $this->getSetting('trim_length')]);
+    $summary[] = $this->t('Exclude HTML: @exclude_html_tags', [
+      '@exclude_html_tags' => $this->getSetting('exclude_html_tags') ? $this->t('Yes') : $this->t('No'),
+    ]);
     return $summary;
   }
 
