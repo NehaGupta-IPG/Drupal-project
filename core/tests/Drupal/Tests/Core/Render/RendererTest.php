@@ -1225,8 +1225,10 @@ class RendererTest extends RendererTestBase {
 
     // PHPUnit cannot expect warnings, so we have to catch them ourselves.
     $messages = [];
-    set_error_handler(function (int $errno, string $errstr) use (&$messages): void {
+    set_error_handler(function (int $errno, string $errstr) use (&$messages): bool {
       $messages[] = [$errno, $errstr];
+
+      return FALSE;
     });
 
     $this->renderer->renderRoot($build);
