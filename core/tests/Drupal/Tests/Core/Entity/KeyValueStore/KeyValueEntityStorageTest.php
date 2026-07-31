@@ -266,7 +266,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @legacy-covers ::doSave
    */
   public function testSaveInsert(): EntityInterface&MockObject {
-    $this->setUpKeyValueEntityStorage('uuid', 4);
+    $this->setUpKeyValueEntityStorage();
     $this->setUpMockKeyValueStore();
     $this->setUpMockModuleHandler();
 
@@ -316,7 +316,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->entityType->expects($this->once())
       ->method('getClass')
       ->willReturn(get_class($entity));
-    $this->setUpKeyValueEntityStorage('uuid', 4);
+    $this->setUpKeyValueEntityStorage();
     $this->setUpMockKeyValueStore();
     $this->setUpMockModuleHandler();
 
@@ -353,7 +353,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @legacy-covers ::doSave
    */
   public function testSaveConfigEntity(): MockObject {
-    $this->setUpKeyValueEntityStorage('uuid', 2);
+    $this->setUpKeyValueEntityStorage();
     $this->setUpMockKeyValueStore();
 
     $entity = $this->getMockEntity('Drupal\Core\Config\Entity\ConfigEntityBase', [['id' => 'foo']], [
@@ -395,7 +395,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->entityType->expects($this->once())
       ->method('getClass')
       ->willReturn(get_class($entity));
-    $this->setUpKeyValueEntityStorage('uuid', 2);
+    $this->setUpKeyValueEntityStorage();
     $this->setUpMockKeyValueStore();
 
     $expected = ['id' => 'foo'];
@@ -439,7 +439,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
       ->willReturn([
         'id' => 'id',
       ]);
-    $this->setUpKeyValueEntityStorage('uuid', 10);
+    $this->setUpKeyValueEntityStorage();
     $this->setUpMockKeyValueStore();
 
     $expected = ['id' => 'foo'];
@@ -614,7 +614,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   public function testDelete(): void {
     $entities['foo'] = new EntityBaseTest(['id' => 'foo'], 'test_entity_type');
     $entities['bar'] = new EntityBaseTest(['id' => 'bar'], 'test_entity_type');
-    $this->setUpKeyValueEntityStorage('uuid', 4);
+    $this->setUpKeyValueEntityStorage();
     $this->setUpMockKeyValueStore();
     $this->setUpMockModuleHandler();
 

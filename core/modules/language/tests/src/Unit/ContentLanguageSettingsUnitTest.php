@@ -278,7 +278,7 @@ class ContentLanguageSettingsUnitTest extends UnitTestCase {
       ->method('create')
       ->willReturn($nullConfig);
 
-    $this->entityTypeManager->expects($this->exactly($getStorageCallsCount))
+    $this->entityTypeManager
       ->method('getStorage')
       ->willReturn($this->configEntityStorageInterface);
 

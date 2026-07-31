@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests;
 
 use Drupal\TestTools\Extension\Dump\DebugDump;
-use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Component\VarDumper\VarDumper;
 
