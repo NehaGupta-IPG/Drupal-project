@@ -32,6 +32,7 @@ class InstallTest extends KernelTestBase {
     $this->moduleInstaller = $this->container->get('module_installer');
     $this->moduleInstaller->install([
       'module_test',
+      'system',
       'user',
     ]);
   }
