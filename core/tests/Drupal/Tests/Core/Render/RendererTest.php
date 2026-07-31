@@ -21,7 +21,7 @@ use Drupal\Core\Theme\ThemeManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
 use PHPUnit\Framework\MockObject\MockObject;
 
 // cspell:ignore fooalert
@@ -1216,7 +1216,6 @@ class RendererTest extends RendererTestBase {
     $this->assertEquals(Markup::create('foo'), $return);
   }
 
-  #[IgnoreDeprecations]
   public function testDeprecatedAccess(): void {
     $build = [
       '#markup' => 'foo',
@@ -1228,7 +1227,7 @@ class RendererTest extends RendererTestBase {
     set_error_handler(function (int $errno, string $errstr) use (&$messages): bool {
       $messages[] = [$errno, $errstr];
 
-      return FALSE;
+      return TRUE;
     });
 
     $this->renderer->renderRoot($build);
