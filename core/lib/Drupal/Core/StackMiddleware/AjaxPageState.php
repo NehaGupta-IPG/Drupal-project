@@ -3,6 +3,7 @@
 namespace Drupal\Core\StackMiddleware;
 
 use Drupal\Component\Utility\UrlHelper;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -28,14 +29,24 @@ class AjaxPageState implements HttpKernelInterface {
     if ($type === static::MAIN_REQUEST) {
       $request_ajax_page_state = [];
       if ($request->request->has('ajax_page_state')) {
-        $request_ajax_page_state = $this->parseAjaxPageState($request->request->all('ajax_page_state'));
-        $request->request->set('ajax_page_state', $request_ajax_page_state);
+        try {
+          $request_ajax_page_state = $this->parseAjaxPageState($request->request->all('ajax_page_state'));
+          $request->request->set('ajax_page_state', $request_ajax_page_state);
+        }
+        catch (BadRequestException) {
+          $request->request->remove('ajax_page_state');
+        }
       }
 
       $query_ajax_page_state = [];
       if ($request->query->has('ajax_page_state')) {
-        $query_ajax_page_state = $this->parseAjaxPageState($request->query->all('ajax_page_state'));
-        $request->query->set('ajax_page_state', $query_ajax_page_state);
+        try {
+          $query_ajax_page_state = $this->parseAjaxPageState($request->query->all('ajax_page_state'));
+          $request->query->set('ajax_page_state', $query_ajax_page_state);
+        }
+        catch (BadRequestException) {
+          $request->query->remove('ajax_page_state');
+        }
       }
 
       // If libraries are present in both the request and the query, ensure they
