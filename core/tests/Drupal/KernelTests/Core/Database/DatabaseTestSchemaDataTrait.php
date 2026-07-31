@@ -122,7 +122,7 @@ trait DatabaseTestSchemaDataTrait {
       ->execute();
 
     $this->connection->insert('json')
-      ->fields(['id', 'status', 'test_field'])
+      ->fields(['id', 'test_field'])
       ->values([
         'id' => 1,
         'test_field' => '{"boolean": true, "number": 5}',
