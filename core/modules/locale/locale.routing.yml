@@ -45,3 +45,11 @@ locale.translate_status:
     _title: 'Available translation updates'
   requirements:
     _permission: 'translate interface'
+
+locale.default_language_confirm:
+  path: '/admin/config/regional/language/default-language-confirm'
+  defaults:
+    _form: '\Drupal\locale\Form\DefaultLanguageConfirmForm'
+    _title: 'Confirm default language change'
+  requirements:
+    _permission: 'administer languages'

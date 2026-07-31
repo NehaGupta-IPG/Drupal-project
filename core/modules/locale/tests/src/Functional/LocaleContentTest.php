@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -58,6 +59,8 @@ class LocaleContentTest extends BrowserTestBase {
     ];
     $this->drupalGet('admin/config/regional/language');
     $this->submitForm($edit, 'Save configuration');
+    $this->assertSession()->addressEquals(Url::fromRoute('locale.default_language_confirm'));
+    $this->submitForm([], 'Proceed');
 
     // Verify that the machine name field is still LTR for a new content type.
     $this->drupalGet('admin/structure/types/add');
