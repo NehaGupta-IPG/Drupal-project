@@ -140,6 +140,21 @@ class InsertTest extends DatabaseTestBase {
   }
 
   /**
+   * Confirms executing the query without values causes no exception.
+   */
+  public function testInsertNoValues(): void {
+    $query = $this->connection->insert('test');
+
+    $query->fields(['name', 'age']);
+
+    // Check no records are queued for insertion.
+    $this->assertCount(0, $query, 'No records are queued for insertion.');
+
+    $result = $query->execute();
+    $this->assertNull($result);
+  }
+
+  /**
    * Tests that inserts return the proper auto-increment ID.
    */
   public function testInsertLastInsertID(): void {

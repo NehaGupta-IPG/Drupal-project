@@ -63,6 +63,19 @@ class UpsertTest extends DatabaseTestBase {
   }
 
   /**
+   * Confirms executing the query without values causes no exception.
+   */
+  public function testUpsertNoValues(): void {
+    // Define fields only but no values.
+    $upsert = $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job', 'age', 'name']);
+
+    $result = $upsert->execute();
+    $this->assertNull($result);
+  }
+
+  /**
    * Confirms that we can upsert records with keywords successfully.
    */
   public function testUpsertWithKeywords(): void {

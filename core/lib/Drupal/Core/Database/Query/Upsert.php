@@ -81,7 +81,7 @@ abstract class Upsert extends Query implements \Countable {
     // If no values have been added, silently ignore this query. This can happen
     // if values are added conditionally, so we don't want to throw an
     // exception.
-    return isset($this->insertValues[0]) || $this->insertFields;
+    return isset($this->insertValues[0]) && count($this->insertFields) > 0;
   }
 
   /**
