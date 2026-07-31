@@ -90,7 +90,10 @@ trait DrupalTestCaseTrait {
    */
   #[Before]
   public function checkLegacySymfonyDeprecationHelperEnvVariable(): void {
-    if (getenv('SYMFONY_DEPRECATIONS_HELPER') !== FALSE) {
+    if (
+      getenv('SYMFONY_DEPRECATIONS_HELPER') !== FALSE
+      && getenv('DRUPAL_DEPRECATION_FILTER_CONFIG') === FALSE
+    ) {
       @trigger_error("Using the SYMFONY_DEPRECATIONS_HELPER environment variable to configure test runs is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3594014", E_USER_DEPRECATED);
     }
   }
