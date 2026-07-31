@@ -466,6 +466,50 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
   }
 
   /**
+   * Tests that an empty synchronized field item is not detected as a change.
+   */
+  public function testEmptySynchronizedFieldItems(): void {
+    $this->setUntranslatableFieldWidgetsDisplay(TRUE);
+
+    // An entity with an empty synchronized field and one translation.
+    $entity = EntityTestMulRev::create(['uid' => 1, 'langcode' => 'en']);
+    $this->contentTranslationManager->getTranslationMetadata($entity)
+      ->setSource(LanguageInterface::LANGCODE_NOT_SPECIFIED);
+    $this->storage->save($entity);
+    $it_translation = $entity->addTranslation('it', $entity->toArray());
+    $this->contentTranslationManager->getTranslationMetadata($it_translation)->setSource('en');
+    $this->storage->save($it_translation);
+
+    // A pending revision for the translation, carrying an empty item where the
+    // stored revision has none. Entity forms produce this for empty widgets.
+    $revision = $this->createRevision($entity->getTranslation('it'), FALSE);
+    $revision->get($this->fieldName)->appendItem();
+
+    $this->assertCount(0, $revision->validate());
+  }
+
+  /**
+   * Tests adding a translation when computed properties are not set yet.
+   */
+  public function testSynchronizedFieldMissingProperties(): void {
+    $this->setUntranslatableFieldWidgetsDisplay(FALSE);
+    $entity = $this->saveNewEntity();
+
+    // Entity forms submit the file reference and its alt text, but not the
+    // width and height, which are only populated when the item is saved.
+    $it_translation = $entity->addTranslation('it', [
+      'uid' => 1,
+      $this->fieldName => [
+        'target_id' => 1,
+        'alt' => 'Alt 1 IT',
+      ],
+    ]);
+    $this->contentTranslationManager->getTranslationMetadata($it_translation)->setSource('en');
+
+    $this->assertCount(0, $it_translation->validate());
+  }
+
+  /**
    * Sets untranslatable field widgets' display status.
    *
    * @param bool $display
