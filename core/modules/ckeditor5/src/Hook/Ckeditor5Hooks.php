@@ -162,6 +162,10 @@ class Ckeditor5Hooks {
       ],
       'event' => 'change',
       'ckeditor5_only' => 'true',
+      'progress' => [
+        'type' => 'throbber',
+        'message' => $this->t('Your editor configuration settings are being updated.'),
+      ],
     ];
     foreach (Element::children($form['filters']['status']) as $filter_type) {
       $form['filters']['status'][$filter_type]['#ajax'] = [

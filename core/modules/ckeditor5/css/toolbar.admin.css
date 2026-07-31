@@ -97,3 +97,23 @@
 .ckeditor5-toolbar-button[data-expanded="true"] + .ckeditor5-toolbar-tooltip {
   visibility: visible;
 }
+
+.js-form-item-editor-settings-toolbar-items {
+  visibility: hidden;
+  position: relative !important;
+  width: 100%;
+  height: 0.15rem;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  overflow: visible;
+  padding: 5px 0;
+}
+
+[data-drupal-selector="ckeditor5-toolbar-buttons-selected"] + .ajax-progress {
+  visibility: visible;
+  z-index: 1000;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+

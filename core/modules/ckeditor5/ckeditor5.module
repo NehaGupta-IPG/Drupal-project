@@ -52,6 +52,9 @@ function _update_ckeditor5_html_filter(array $form, FormStateInterface $form_sta
   $response = new AjaxResponse();
   $renderer = \Drupal::service('renderer');
 
+  // Remove 'disabled' attribute from the form submit button. The attribute was
+  // set inside javascript that responds to toolbar items update.
+  $response->addCommand(new InvokeCommand('[data-drupal-selector="edit-actions-submit"]', 'removeAttr', ['disabled']));
   // Replace the editor settings with the settings for the currently selected
   // editor. This is the default behavior of editor.module. Except when using
   // CKEditor 5: then we only want CKEditor 5's plugin settings to be updated:
