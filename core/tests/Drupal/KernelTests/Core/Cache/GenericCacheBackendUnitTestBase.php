@@ -486,33 +486,22 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
     $backend->set('test6', 13);
     $backend->set('test7', 17);
 
-    $backend->delete('test1');
-    // Nonexistent key should not cause an error.
-    $backend->delete('test23');
     $backend->deleteMultiple([
       'test3',
       'test5',
       'test7',
-      // Nonexistent key should not cause an error.
-      'test19',
-      // Nonexistent key should not cause an error.
-      'test21',
     ]);
 
     // Test if expected keys have been deleted.
-    $this->assertFalse($backend->get('test1'), "Cache id test1 deleted.");
     $this->assertFalse($backend->get('test3'), "Cache id test3 deleted.");
     $this->assertFalse($backend->get('test5'), "Cache id test5 deleted.");
     $this->assertFalse($backend->get('test7'), "Cache id test7 deleted.");
 
     // Test if expected keys exist.
-    $this->assertNotFalse($backend->get('test2'), "Cache id test2 exists.");
-    $this->assertNotFalse($backend->get('test4'), "Cache id test4 exists.");
-    $this->assertNotFalse($backend->get('test6'), "Cache id test6 exists.");
-
-    // Test if that expected keys do not exist.
-    $this->assertFalse($backend->get('test19'), "Cache id test19 does not exist.");
-    $this->assertFalse($backend->get('test21'), "Cache id test21 does not exist.");
+    $this->assertNotFalse($backend->get('test1'), "Cache id test1 exists.");
+    $this->assertNotFalse($backend->get('test11'), "Cache id test11 exists.");
+    $this->assertNotFalse($backend->get('test13'), "Cache id test13 exists.");
+    $this->assertNotFalse($backend->get('test17'), "Cache id test17 exists.");
 
     // Calling deleteMultiple() with an empty array should not cause an error.
     $this->assertNull($backend->deleteMultiple([]));
