@@ -426,8 +426,8 @@ interface PhpStreamWrapperInterface {
    * This method is called in response to fseek() to determine the current
    * position.
    *
-   * @return int
-   *   Should return the current position of the stream.
+   * @return int|false
+   *   Should return the current position of the stream or FALSE on error.
    *
    * @see PhpStreamWrapperInterface::stream_tell()
    * @see http://php.net/manual/en/streamwrapper.stream-tell.php

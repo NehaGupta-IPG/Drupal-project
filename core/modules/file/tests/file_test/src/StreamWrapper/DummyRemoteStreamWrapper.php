@@ -29,6 +29,9 @@ class DummyRemoteStreamWrapper extends PublicStream {
     return 'Dummy wrapper for testing (remote).';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function realpath() {
     return FALSE;
   }

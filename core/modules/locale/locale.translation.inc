@@ -163,7 +163,7 @@ function locale_translation_build_sources(array $projects = [], array $langcodes
  * @param object $source
  *   Translation source object.
  *
- * @return object
+ * @return object|false
  *   Source file object of the po file, updated with:
  *   - "uri": File name and path.
  *   - "timestamp": Last updated time of the po file.

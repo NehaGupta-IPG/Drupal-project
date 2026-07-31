@@ -122,8 +122,8 @@ abstract class Updater {
    * @param string $directory
    *   Directory to search in.
    *
-   * @return string
-   *   Path to the info file.
+   * @return string|false
+   *   Path to the info file or FALSE if no info file could be found.
    */
   public static function findInfoFile($directory) {
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */

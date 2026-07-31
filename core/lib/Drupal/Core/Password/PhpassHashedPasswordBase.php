@@ -120,7 +120,7 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
    *   An existing hash or the output of $this->generateSalt(). Must be at least
    *   12 characters (the settings and salt).
    *
-   * @return string
+   * @return string|false
    *   A string containing the hashed password (and salt) or FALSE on failure.
    *   The return string will be truncated at HASH_LENGTH characters max.
    */
