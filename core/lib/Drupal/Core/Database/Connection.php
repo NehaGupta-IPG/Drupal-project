@@ -696,12 +696,16 @@ abstract class Connection {
     // compared to '' does not match 0 on SQLite, and PostgreSQL rejects it.
     // Expanded array arguments are normalized as well, so the values of an IN
     // condition behave the same as a scalar one.
-    foreach ($args as &$arg) {
+    // Do not iterate by reference. That turns every element of $args into a PHP
+    // reference, which is shared with each copy of the array, including the one
+    // held by the statement execution event. \PDOStatement::execute() converts
+    // bound parameters to strings in place, so integer arguments would show up
+    // as strings in the event, and in anything reading the event.
+    foreach ($args as $placeholder => $arg) {
       if (is_bool($arg)) {
-        $arg = (int) $arg;
+        $args[$placeholder] = (int) $arg;
       }
     }
-    unset($arg);
     $statement = $this->prepareStatement($query, $options);
     try {
       $statement->execute($args, $options);

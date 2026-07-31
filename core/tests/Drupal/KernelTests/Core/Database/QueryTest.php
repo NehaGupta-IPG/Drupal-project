@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Event\StatementEvent;
+use Drupal\Core\Database\Event\StatementExecutionEndEvent;
+use Drupal\Core\Database\Event\StatementExecutionStartEvent;
 use Drupal\Core\Database\InvalidQueryException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -190,6 +193,38 @@ class QueryTest extends DatabaseTestBase {
     $query->condition('t.age', FALSE);
     $query->condition('t.job', 'Boolean');
     $this->assertEquals(['Zero'], $query->execute()->fetchCol());
+  }
+
+  /**
+   * Tests that executing a query does not change the type of its arguments.
+   *
+   * \PDOStatement::execute() converts bound parameters to strings. When an
+   * argument is a PHP reference, that conversion happens in place, and is
+   * visible in every copy of the arguments array, including the readonly one
+   * held by the statement execution events.
+   *
+   * @see \Drupal\Core\Database\Connection::query()
+   */
+  public function testArgumentTypesInStatementEvents(): void {
+    $args = [];
+    $this->container->get('event_dispatcher')->addListener(
+      StatementExecutionEndEvent::class,
+      function (StatementExecutionEndEvent $event) use (&$args): void {
+        $args[] = $event->args;
+      },
+    );
+    $this->connection->enableEvents([
+      StatementExecutionStartEvent::class,
+      StatementExecutionEndEvent::class,
+    ]);
+
+    $this->connection->query('SELECT [name] FROM {test} WHERE [age] > :age AND [name] <> :name', [
+      ':age' => 25,
+      ':name' => 'Ringo',
+    ])->fetchCol();
+    $this->connection->disableEvents(StatementEvent::all());
+
+    $this->assertSame([[':age' => 25, ':name' => 'Ringo']], $args);
   }
 
   /**
