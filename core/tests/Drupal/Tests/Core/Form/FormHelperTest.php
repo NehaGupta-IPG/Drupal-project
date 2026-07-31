@@ -10,12 +10,14 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests Drupal\Core\Form\FormHelper.
  */
 #[CoversClass(FormHelper::class)]
 #[Group('Form')]
+#[IgnoreDeprecations]
 class FormHelperTest extends UnitTestCase {
 
   /**
@@ -91,8 +93,11 @@ class FormHelperTest extends UnitTestCase {
    * Tests process states.
    */
   #[DataProvider('providerElements')]
-  public function testProcessStates(array $elements, string $key): void {
+  public function testProcessStates(array $elements, string $key, $expect_deprecation = FALSE): void {
     $json = Json::encode($elements['#states']);
+    if ($expect_deprecation) {
+      $this->expectUserDeprecationMessage('Automatic detection of the #states attribute target is deprecated in drupal:11.5.0 and removed in drupal:13.0.0. Set the #states_attributes_target_key explicitly. See https://www.drupal.org/node/3572685');
+    }
     FormHelper::processStates($elements);
     $this->assertEquals(['core/drupal.states'], $elements['#attached']['library']);
     $this->assertEquals($json, $elements[$key]['data-drupal-states']);
@@ -236,6 +241,8 @@ class FormHelperTest extends UnitTestCase {
         // still works, this test case can be removed when that heuristic is
         // also removed, see: https://www.drupal.org/node/3490435
         '#wrapper_attributes',
+        // Flag that we expect a deprecation from this code.
+        TRUE,
       ],
       'item with markup no target key' => [
         [
