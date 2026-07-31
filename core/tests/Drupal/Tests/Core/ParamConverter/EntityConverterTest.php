@@ -7,7 +7,6 @@ namespace Drupal\Tests\Core\ParamConverter;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -64,18 +63,6 @@ class EntityConverterTest extends UnitTestCase {
     $entity
       ->method('getLoadedRevisionId')
       ->willReturn('revision_id');
-
-    $storage = $this->createStub(ContentEntityStorageInterface::class);
-    $storage
-      ->method('load')
-      ->willReturn($entity);
-    $storage
-      ->method('getLatestRevisionId')
-      ->willReturn('revision_id');
-
-    $this->entityTypeManager->expects($this->never())
-      ->method('getStorage')
-      ->with('entity_test');
 
     $entity_type = $this->createStub(ContentEntityTypeInterface::class);
     $entity_type

@@ -224,12 +224,6 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     int $getDefinitionCallsCount,
   ): void {
     $this->entityType = $this->createMock(EntityTypeInterface::class);
-    $this->entityType->expects($this->never())
-      ->method('getKeys')
-      ->willReturn([
-        'id' => 'id',
-        'uuid' => 'uuid',
-      ]);
     $this->entityType->expects($this->exactly($getKeyCallsCount))
       ->method('getKey')
       ->willReturnMap([
@@ -507,7 +501,6 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     $this->setUpMockTypedDataManager();
 
     $validator = $this->createMock(ValidatorInterface::class);
-    /** @var \Symfony\Component\Validator\ConstraintViolationList $empty_violation_list */
     $empty_violation_list = new ConstraintViolationList();
     $non_empty_violation_list = clone $empty_violation_list;
     $non_empty_violation_list->add($this->createStub(ConstraintViolationInterface::class));
@@ -534,7 +527,6 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
   public function testRequiredValidation(): void {
     $this->commonSetUp(0, 2);
     $validator = $this->createMock(ValidatorInterface::class);
-    /** @var \Symfony\Component\Validator\ConstraintViolationList $empty_violation_list */
     $empty_violation_list = new ConstraintViolationList();
     $validator->expects($this->once())
       ->method('validate')

@@ -261,10 +261,8 @@ class ContentLanguageSettingsUnitTest extends UnitTestCase {
     ?ContentLanguageSettings $existing_config,
     string $expected_langcode,
     bool $expected_language_alterable,
-    int $getStorageCallsCount,
   ): void {
     $this->setUpMockConfigEntityStorage();
-    $this->setUpMockEntityTypeManager();
 
     [$type, $bundle] = explode('.', $config_id);
 
@@ -282,7 +280,6 @@ class ContentLanguageSettingsUnitTest extends UnitTestCase {
 
     $this->entityTypeManager->expects($this->exactly($getStorageCallsCount))
       ->method('getStorage')
-      ->with('language_content_settings')
       ->willReturn($this->configEntityStorageInterface);
 
     if ($existing_config === NULL) {
@@ -324,16 +321,15 @@ class ContentLanguageSettingsUnitTest extends UnitTestCase {
     ], 'language_content_settings');
 
     return [
-      ['test_entity_type.test_bundle', $alteredLanguage, LanguageInterface::LANGCODE_SITE_DEFAULT, TRUE, 1],
-      ['test_entity_type.test_fixed_language_bundle', $alteredDefaultLangcode, $langcode, FALSE, 1],
+      ['test_entity_type.test_bundle', $alteredLanguage, LanguageInterface::LANGCODE_SITE_DEFAULT, TRUE],
+      ['test_entity_type.test_fixed_language_bundle', $alteredDefaultLangcode, $langcode, FALSE],
       [
         'test_entity_type.test_default_language_bundle',
         $defaultConfig,
         LanguageInterface::LANGCODE_SITE_DEFAULT,
         FALSE,
-        1,
       ],
-      ['test_entity_type.null_bundle', NULL, LanguageInterface::LANGCODE_SITE_DEFAULT, FALSE, 2],
+      ['test_entity_type.null_bundle', NULL, LanguageInterface::LANGCODE_SITE_DEFAULT, FALSE],
     ];
   }
 

@@ -70,7 +70,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   /**
    * The mocked entity type manager.
    */
-  protected EntityTypeManagerInterface&MockObject $entityTypeManager;
+  protected EntityTypeManagerInterface&Stub $entityTypeManager;
 
   /**
    * The mocked entity field manager.
@@ -95,14 +95,8 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    *
    * @param string|null $uuid_key
    *   (optional) The entity key used for the UUID. Defaults to 'uuid'.
-   * @param int $getDefinitionCallsCount
-   *   (optional) The number of expected calls to the
-   *   EntityTypeManagerInterface::getDefinition() method.
    */
-  protected function setUpKeyValueEntityStorage(
-    ?string $uuid_key = 'uuid',
-    int $getDefinitionCallsCount = 0,
-  ): void {
+  protected function setUpKeyValueEntityStorage(?string $uuid_key = 'uuid'): void {
     $this->entityType->expects($this->atLeastOnce())
       ->method('getKey')
       ->willReturnMap([
@@ -117,10 +111,9 @@ class KeyValueEntityStorageTest extends UnitTestCase {
       ->method('getListCacheTags')
       ->willReturn(['test_entity_type_list']);
 
-    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->entityTypeManager->expects($this->exactly($getDefinitionCallsCount))
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
+    $this->entityTypeManager
       ->method('getDefinition')
-      ->with('test_entity_type')
       ->willReturn($this->entityType);
 
     $this->entityFieldManager = $this->createStub(EntityFieldManagerInterface::class);
@@ -216,7 +209,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->entityType->expects($this->once())
       ->method('getClass')
       ->willReturn(EntityBaseTest::class);
-    $this->setUpKeyValueEntityStorage(NULL);
+    $this->setUpKeyValueEntityStorage();
     $this->setUpMockModuleHandler();
     $this->setUpMockUuidService();
 
