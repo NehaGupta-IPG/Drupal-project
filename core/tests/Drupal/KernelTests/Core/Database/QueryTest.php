@@ -156,6 +156,43 @@ class QueryTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests that boolean arguments are normalized to integers.
+   *
+   * Clients bind parameters as strings, which turns TRUE into '1' and FALSE
+   * into ''. An integer column compared to '' does not match 0 on SQLite, and
+   * PostgreSQL rejects the comparison.
+   *
+   * @see \Drupal\Core\Database\Connection::query()
+   */
+  public function testBooleanSubstitution(): void {
+    $this->connection->insert('test')
+      ->fields(['name', 'age', 'job'])
+      ->values(['name' => 'Zero', 'age' => 0, 'job' => 'Boolean'])
+      ->values(['name' => 'One', 'age' => 1, 'job' => 'Boolean'])
+      ->execute();
+
+    $query = 'SELECT [name] FROM {test} WHERE [age] = :age AND [job] = :job';
+    $this->assertEquals('Zero', $this->connection->query($query, [':age' => FALSE, ':job' => 'Boolean'])->fetchField());
+    $this->assertEquals('One', $this->connection->query($query, [':age' => TRUE, ':job' => 'Boolean'])->fetchField());
+
+    // Arguments expanded from an array are normalized as well.
+    $names = $this->connection
+      ->query('SELECT [name] FROM {test} WHERE [age] IN ( :ages[] ) AND [job] = :job ORDER BY [age]', [
+        ':ages[]' => [FALSE, TRUE],
+        ':job' => 'Boolean',
+      ])
+      ->fetchCol();
+    $this->assertEquals(['Zero', 'One'], $names);
+
+    // The query builder passes its arguments through the same method.
+    $query = $this->connection->select('test', 't');
+    $query->addField('t', 'name');
+    $query->condition('t.age', FALSE);
+    $query->condition('t.job', 'Boolean');
+    $this->assertEquals(['Zero'], $query->execute()->fetchCol());
+  }
+
+  /**
    * Tests quoting identifiers in queries.
    */
   public function testQuotingIdentifiers(): void {

@@ -208,14 +208,12 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   public function query($query, array $args = [], $options = []) {
     $options += $this->defaultOptions();
 
-    // The PDO PostgreSQL driver has a bug which doesn't type cast booleans
-    // correctly when parameters are bound using associative arrays.
+    // Boolean arguments used to be cast to integers here, to work around the
+    // PDO PostgreSQL driver not type casting them correctly when parameters are
+    // bound using associative arrays. Connection::query() now does this for all
+    // drivers.
+    // @see \Drupal\Core\Database\Connection::query()
     // @see http://bugs.php.net/bug.php?id=48383
-    foreach ($args as &$value) {
-      if (is_bool($value)) {
-        $value = (int) $value;
-      }
-    }
 
     // We need to wrap queries with a savepoint if:
     // - Currently in a transaction.

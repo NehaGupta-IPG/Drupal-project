@@ -696,6 +696,17 @@ abstract class Connection {
     $options += $this->defaultOptions();
 
     $this->expandArguments($query, $args);
+    // Normalize boolean arguments to integers. Clients bind parameters as
+    // strings, which turns TRUE into '1' and FALSE into ''. An integer column
+    // compared to '' does not match 0 on SQLite, and PostgreSQL rejects it.
+    // Expanded array arguments are normalized as well, so the values of an IN
+    // condition behave the same as a scalar one.
+    foreach ($args as &$arg) {
+      if (is_bool($arg)) {
+        $arg = (int) $arg;
+      }
+    }
+    unset($arg);
     $statement = $this->prepareStatement($query, $options);
     try {
       $statement->execute($args, $options);
