@@ -455,7 +455,7 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
    */
   public function hasTranslation(LanguageInterface $language) {
     foreach ($this->getConfigNames() as $name) {
-      if (($translation = $this->languageManager->getLanguageConfigOverride($language->getId(), $name)) && !$translation->isNew())) {
+      if (($translation = $this->languageManager->getLanguageConfigOverride($language->getId(), $name)) && !$translation->isNew()) {
         return TRUE;
       }
     }

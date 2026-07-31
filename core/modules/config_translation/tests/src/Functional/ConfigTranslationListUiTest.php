@@ -38,7 +38,7 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
     'taxonomy',
     'image',
     'responsive_image',
-    'locale'
+    'locale',
   ];
 
   /**
