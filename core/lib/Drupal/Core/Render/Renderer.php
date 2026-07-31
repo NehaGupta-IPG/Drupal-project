@@ -269,7 +269,7 @@ class Renderer implements RendererInterface {
       if (!is_bool($elements['#access']) && !($elements['#access'] instanceof AccessResultInterface)) {
         @trigger_error(
           'Using a #access value other than a boolean or an AccessResultInterface object is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3549344',
-          E_USER_DEPRECATED
+          E_USER_WARNING
         );
       }
       // If #access is an AccessResultInterface object, we must apply its
