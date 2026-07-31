@@ -115,6 +115,7 @@ class PreviewTest extends UITestBase {
     $this->assertSession()->pageTextContains('Query execute time');
     $this->assertSession()->pageTextContains('View render time');
     $this->assertSession()->responseNotContains('<strong>Query</strong>');
+    $this->assertSession()->responseNotContains('<strong>Explain</strong>');
 
     // Statistics and query.
     $settings->set('ui.show.sql_query.enabled', TRUE)->save();
@@ -130,6 +131,7 @@ FROM
 WHERE (views_test_data.id = '100')
 SQL;
     $this->assertSession()->assertEscaped($query_string);
+    $this->assertSession()->responseContains('<strong>Explain</strong>');
 
     // Test that the statistics and query are rendered above the preview.
     $this->assertLessThan(strpos($this->getSession()->getPage()->getContent(), 'js-view-dom-id'), strpos($this->getSession()->getPage()->getContent(), 'views-query-info'));

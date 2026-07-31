@@ -13,8 +13,8 @@ use Drupal\views\Views;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewEntityInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
@@ -524,6 +524,55 @@ class ViewUI implements ViewEntityInterface {
     $this->additionalQueries = $queries;
   }
 
+  /**
+   * Gets the EXPLAIN output for a query.
+   *
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
+   * @param string|\Drupal\views\Plugin\views\query\Sql $query_string
+   *   The query string or SQL query object.
+   *
+   * @return array
+   *   Renderable array containing the explain output.
+   */
+  protected function getExplainOutput($connection, $query_string) {
+    $args = [];
+    if ($query_string instanceof SelectInterface) {
+      $args = $query_string->getArguments();
+    }
+
+    try {
+      $explain_results = $connection->query('EXPLAIN ' . $query_string, $args)->fetchAll();
+    }
+    catch (\Exception $e) {
+      return [
+        '#markup' => t('Unable to execute EXPLAIN: @message', ['@message' => $e->getMessage()]),
+      ];
+    }
+    if (empty($explain_results)) {
+      return [
+        '#markup' => t('No EXPLAIN results available.'),
+      ];
+    }
+
+    $headers = array_keys((array) $explain_results[0]);
+
+    // Format rows
+    $table_rows = [];
+    foreach ($explain_results as $row) {
+      $table_rows[] = array_values((array) $row);
+    }
+
+    return [
+      '#theme' => 'table',
+      '#header' => $headers,
+      '#rows' => $table_rows,
+      '#attributes' => [
+        'class' => ['explain-query-table'],
+      ],
+    ];
+  }
+
   public function renderPreview($display_id, $args = []) {
     // Save the current path so it can be restored before returning from this function.
     $request_stack = \Drupal::requestStack();
@@ -630,14 +679,16 @@ class ViewUI implements ViewEntityInterface {
       if ($show_info || $show_query || $show_stats) {
         // Get information from the preview for display.
         if (!empty($executable->build_info['query'])) {
+          $connection = Database::getConnection();
+
           if ($show_query) {
             $query_string = $executable->build_info['query'];
+
             // Only the sql default class has a method getArguments.
             $quoted = [];
 
-            if ($executable->query instanceof Sql) {
+            if ($query_string instanceof SelectInterface) {
               $quoted = $query_string->getArguments();
-              $connection = Database::getConnection();
               foreach ($quoted as $key => $val) {
                 if (is_array($val)) {
                   $quoted[$key] = implode(', ', array_map([$connection, 'quote'], $val));
@@ -662,6 +713,25 @@ class ViewUI implements ViewEntityInterface {
                 ],
               ],
             ];
+
+            $explain_output = $this->getExplainOutput($connection, $query_string);
+
+            $rows['query'][] = [
+              [
+                'data' => [
+                  '#type' => 'inline_template',
+                  '#template' => "<strong>{% trans 'Explain' %}</strong>",
+                ],
+              ],
+              [
+                'data' => [
+                  '#type' => 'inline_template',
+                  '#template' => '<pre>{{ explain }}</pre>',
+                  '#context' => ['explain' => $explain_output],
+                ],
+              ],
+            ];
+
             if (!empty($this->additionalQueries)) {
               $queries[] = [
                 '#prefix' => '<strong>',
