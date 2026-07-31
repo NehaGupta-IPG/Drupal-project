@@ -338,6 +338,11 @@ drupal.batch:
     - core/drupal.progress
     - core/once
 
+drupal.body-scroll-lock:
+  version: VERSION
+  js:
+    assets/vendor/tua-body-scroll-lock/tua-bsl.umd.min.js: { minified: true }
+
 drupal.checkbox:
   version: VERSION
   js:
@@ -383,7 +388,6 @@ drupal.dialog:
     assets/vendor/jquery.ui/ui/widgets/controlgroup-min.js: { weight: -11.7, minified: true }
     assets/vendor/jquery.ui/ui/form-reset-mixin-min.js: { weight: -11.7, minified: true }
     assets/vendor/jquery.ui/ui/widgets/mouse-min.js: { weight: -11.7, minified: true }
-    assets/vendor/tua-body-scroll-lock/tua-bsl.umd.min.js: { weight: -1,  minified: true }
   # All CSS assets previously came from core/jquery.ui, a deprecated library.
   # @todo replace with solution found in https://drupal.org/node/2158943
   css:
@@ -398,6 +402,7 @@ drupal.dialog:
     - core/internal.jquery_ui
     - core/drupal
     - core/drupalSettings
+    - core/drupal.body-scroll-lock
     - core/drupal.debounce
     - core/drupal.displace
     - core/once
