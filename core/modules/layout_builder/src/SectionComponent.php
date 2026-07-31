@@ -327,8 +327,7 @@ class SectionComponent implements ThirdPartySettingsInterface {
       'region' => $this->getRegion(),
       'configuration' => $this->getConfiguration(),
       'weight' => $this->getWeight(),
-      // @todo Remove below key/value when the drupal:12.0.x branch is opened.
-      // @see https://www.drupal.org/project/drupal/issues/3160644
+      // @todo Remove below key/value in https://www.drupal.org/project/drupal/issues/3160644.
       // @phpstan-ignore-next-line
       'additional' => $this->additional,
       'third_party_settings' => $this->thirdPartySettings,
@@ -352,8 +351,7 @@ class SectionComponent implements ThirdPartySettingsInterface {
       'uuid' => '',
       'region' => '',
       'configuration' => [],
-      // @todo Remove below key/value when the drupal:12.0.x branch is opened.
-      // @see https://www.drupal.org/project/drupal/issues/3160644
+      // @todo Remove below key/value in https://www.drupal.org/project/drupal/issues/3160644.
       'additional' => [],
       'third_party_settings' => [],
     ];
@@ -361,8 +359,7 @@ class SectionComponent implements ThirdPartySettingsInterface {
       $component['uuid'],
       $component['region'],
       $component['configuration'],
-      // @todo Remove below argument when the drupal:12.0.x branch is opened.
-      // @see https://www.drupal.org/project/drupal/issues/3160644
+      // @todo Remove below key/value in https://www.drupal.org/project/drupal/issues/3160644.
       $component['additional'],
       $component['third_party_settings']
     ))->setWeight($component['weight']);
