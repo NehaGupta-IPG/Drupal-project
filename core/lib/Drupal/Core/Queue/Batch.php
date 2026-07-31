@@ -26,6 +26,8 @@ class Batch extends DatabaseQueue {
    */
   public function claimItem($lease_time = 0) {
     try {
+      // We only get the item ID here and get the data in a separate query
+      // because retrieving both in the same query is inefficient with large data.
       $item = $this->connection->queryRange('SELECT [item_id] FROM {queue} q WHERE [name] = :name ORDER BY [item_id] ASC', 0, 1, [':name' => $this->name])->fetchObject();
       if ($item) {
         $data = $this->connection->query('SELECT [data] FROM {queue} q WHERE [item_id] = :item_id ', [':item_id' => $item->item_id])->fetchField();
