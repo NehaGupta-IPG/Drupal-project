@@ -87,9 +87,7 @@ class DateFormat extends ConfigEntityBase implements DateFormatInterface {
    */
   public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, ?\Collator $collator): int {
     if ($a->isLocked() == $b->isLocked()) {
-      $a_label = $a->label();
-      $b_label = $b->label();
-      return SortArray::sortByString($a_label, $b_label, $collator);
+      return SortArray::sortByString($a->label(), $b->label(), $collator);
     }
     return $a->isLocked() ? 1 : -1;
   }

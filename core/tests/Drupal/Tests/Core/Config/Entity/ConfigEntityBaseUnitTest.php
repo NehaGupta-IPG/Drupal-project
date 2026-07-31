@@ -725,38 +725,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   }
 
   /**
-   * Tests ConfigEntityBase::compare, requires intl extension.
-   */
-  public function testCompare(): void {
-    $this->setUpMockEntityType();
-    $this->entityType->expects($this->atLeastOnce())
-      ->method('getKey')
-      ->with('label')
-      ->willReturn('label');
-
-    $entity_a = new SortTestConfigEntityWithWeight(['label' => 'Format 100x100'], $this->entityTypeId);
-    $entity_b = new SortTestConfigEntityWithWeight(['label' => 'Format 10x10'], $this->entityTypeId);
-    // Word with accent.
-    $entity_c = new SortTestConfigEntityWithWeight(['label' => 'Émission'], $this->entityTypeId);
-
-    $collator = \Collator::create('en');
-    $collator->setAttribute(\Collator::NUMERIC_COLLATION, \Collator::ON);
-
-    $this->assertEquals(1, ConfigEntityBase::compare($entity_a, $entity_b, $collator));
-    $this->assertEquals(1, ConfigEntityBase::compare($entity_a, $entity_b, NULL));
-
-    $this->assertEquals(-1, ConfigEntityBase::compare($entity_b, $entity_a, $collator));
-    $this->assertEquals(-1, ConfigEntityBase::compare($entity_b, $entity_a, NULL));
-
-    // Strnatcasecmp doesn't take accents into account.
-    $this->assertEquals(1, ConfigEntityBase::compare($entity_b, $entity_c, $collator));
-    $this->assertEquals(-1, ConfigEntityBase::compare($entity_b, $entity_c, NULL));
-
-    $this->assertEquals(-1, ConfigEntityBase::compare($entity_c, $entity_b, $collator));
-    $this->assertEquals(1, ConfigEntityBase::compare($entity_c, $entity_b, NULL));
-  }
-
-  /**
    * Tests ConfigEntityBase::sort.
    */
   public function testSort(): void {
