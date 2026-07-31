@@ -50,6 +50,10 @@ class FlattenTest extends MigrateProcessTestCase {
         $object,
         ['test', '1.2', 'NULL'],
       ],
+      'NULL' => [
+        NULL,
+        [],
+      ],
     ];
   }
 
@@ -87,9 +91,6 @@ XML;
       ],
       'float' => [
         1.2,
-      ],
-      'NULL' => [
-        NULL,
       ],
       'boolean' => [
         TRUE,
