@@ -827,6 +827,66 @@
           updateUiStateStorage({ focusSelector });
         });
 
+        /**
+         * Sets aria-invalid="true" on the appropriate input field when validation errors occur.
+         * This ensures screen readers can properly announce which field has errors.
+         */
+        const setupRealtimeValidationAnnounce = () => {
+          // Find the validation error message container.
+          const validationErrorContainer = document.querySelector(
+            '.ckeditor5-realtime-validation-messages-container',
+          );
+          if (!validationErrorContainer) return;
+
+          // Monitor for changes in validation error messages.
+          const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === 'childList' && mutation.addedNodes.length) {
+                // Check if the added node is a validation error message.
+                let hasValidationErrors = false;
+                let targetField = null;
+                mutation.addedNodes.forEach((node) => {
+                  if (node.nodeType === Node.ELEMENT_NODE) {
+                    // Check if it's a validation error alert.
+                    if (node.hasAttribute('role') && node.getAttribute('role') === 'alert') {
+                      hasValidationErrors = true;
+                      // Try to find the related input field by looking for the closest form item.
+                      const formItem = node.closest('.form-item');
+                      if (formItem) {
+                        // Look for input or select elements within the form item.
+                        const inputField = formItem.querySelector('input, select, textarea');
+                        if (inputField) {
+                          targetField = inputField;
+                        }
+                      }
+                    }
+                  }
+                });
+
+                if (hasValidationErrors && targetField) {
+                  // Set aria-invalid="true" on the field.
+                  targetField.setAttribute('aria-invalid', 'true');
+                  // Also add error class for styling.
+                  targetField.classList.add('error');
+                } else if (!hasValidationErrors && targetField) {
+                  // Clear aria-invalid when validation passes.
+                  targetField.removeAttribute('aria-invalid');
+                  targetField.classList.remove('error');
+                }
+              }
+            });
+          });
+
+          // Start observing the validation error container.
+          observer.observe(validationErrorContainer, {
+            childList: true,
+            subtree: true,
+          });
+        };
+
+        // Initialize real-time validation announcement.
+        setupRealtimeValidationAnnounce();
+
         textarea.addEventListener('focus', () => {
           // The selector that should receive focus is stored in the parent
           // form element. Move focus to that selector.
