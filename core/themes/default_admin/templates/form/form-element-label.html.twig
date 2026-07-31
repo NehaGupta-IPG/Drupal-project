@@ -16,7 +16,7 @@
   set classes = [
     'form-item__label',
     title_display == 'after' ? 'option',
-    title_display == 'invisible' ? 'visually-hidden',
+    title_display == 'invisible' and errors is empty ? 'visually-hidden',
     required ? 'js-form-required',
     required ? 'form-required',
   ]
