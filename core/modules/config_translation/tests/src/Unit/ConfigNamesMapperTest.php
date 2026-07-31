@@ -111,7 +111,6 @@ class ConfigNamesMapperTest extends UnitTestCase {
       $this->pluginDefinition,
       $this->getConfigFactoryStub(),
       $this->typedConfigManager,
-      $this->localeConfigManager,
       $this->configMapperManager,
       $this->routeProvider,
       $this->getStringTranslationStub(),
