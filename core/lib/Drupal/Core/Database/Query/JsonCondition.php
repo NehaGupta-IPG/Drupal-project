@@ -92,13 +92,6 @@ class JsonCondition extends Condition {
   /**
    * {@inheritdoc}
    */
-  public function usesStrictParameters(): bool {
-    return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function compile(Connection $connection, PlaceholderInterface $queryPlaceholder): void {
     if (!$this->changed) {
       return;

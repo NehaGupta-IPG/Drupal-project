@@ -266,10 +266,6 @@ abstract class Connection {
    *   database type. In rare cases, such as creating an SQL function, []
    *   characters might be needed and can be allowed by changing this option to
    *   TRUE.
-   * - strict_params: By default, parameters are bound as strings, which most
-   *   database servers will coerce as necessary. Some types of queries may
-   *   require strict comparison, e.g. on values in JSON-backed columns. When
-   *   set to TRUE, Drupal will bind parameters strictly (if supported).
    * - pdo: By default, queries will execute with the client connection options
    *   set on the connection. In particular cases, it could be necessary to
    *   override the driver options on the statement level. In such case, pass
@@ -284,7 +280,6 @@ abstract class Connection {
       'fetch' => FetchAs::Object,
       'allow_delimiter_in_query' => FALSE,
       'allow_square_brackets' => FALSE,
-      'strict_params' => FALSE,
       'pdo' => [],
     ];
   }

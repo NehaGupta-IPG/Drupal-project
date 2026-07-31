@@ -250,21 +250,6 @@ class Select extends Query implements SelectInterface {
       }
     }
 
-    // Enable strict parameter binding if any condition group contains a
-    // JsonCondition (or other StrictSqlParamsConditionInterface).
-    foreach ([$this->condition, $this->having] as $conditionGroup) {
-      if ($conditionGroup instanceof StrictSqlParamsConditionInterface && $conditionGroup->usesStrictParameters()) {
-        $this->queryOptions['strict_params'] = TRUE;
-        break;
-      }
-    }
-    foreach ($this->tables as $table) {
-      if (!empty($table['condition']) && $table['condition'] instanceof StrictSqlParamsConditionInterface && $table['condition']->usesStrictParameters()) {
-        $this->queryOptions['strict_params'] = TRUE;
-        break;
-      }
-    }
-
     // If there are any dependent queries to UNION, compile it recursively.
     foreach ($this->union as $union) {
       $union['query']->compile($connection, $queryPlaceholder);
@@ -728,22 +713,26 @@ class Select extends Query implements SelectInterface {
    * This adds the JSON extraction as an expression in the SELECT list and
    * orders by its alias. NULLs are sorted last regardless of direction.
    *
+   * The extracted value is always cast, so that the sort order is the same on
+   * all database backends. An uncast extraction sorts by MySQL's JSON rules,
+   * PostgreSQL's text rules and SQLite's type affinity rules.
+   *
    * @param string $field
    *   The JSON column name.
    * @param string $jsonpath
    *   The JSONPath expression (must start with '$').
    * @param string $direction
    *   The sort direction: 'ASC' or 'DESC'.
-   * @param \Drupal\Core\Database\Query\JsonCastType|null $cast
-   *   Optional type cast for correct ordering. Without a cast, the extracted
-   *   JSON value retains its native type which may produce unexpected sort
-   *   order (e.g. string "10" before "9").
+   * @param \Drupal\Core\Database\Query\JsonCastType $cast
+   *   The type to cast the extracted value to before sorting. Defaults to
+   *   JsonCastType::Text. Pass Int or Float to sort numerically, otherwise
+   *   "10" sorts before "9".
    *
    * @return $this
    */
-  public function jsonOrderBy(string $field, string $jsonpath, string $direction = 'ASC', ?JsonCastType $cast = NULL): self {
+  public function jsonOrderBy(string $field, string $jsonpath, string $direction = 'ASC', JsonCastType $cast = JsonCastType::Text): self {
     $expression = $this->connection->jsonExpression($field, $jsonpath);
-    $sql = $cast !== NULL ? $expression->toCastSql($cast) : $expression->toSql();
+    $sql = $expression->toCastSql($cast);
 
     // NULLS LAST: rows where the JSON value is NULL sort after non-NULL.
     $nullAlias = $this->addExpression("({$sql} IS NULL)");

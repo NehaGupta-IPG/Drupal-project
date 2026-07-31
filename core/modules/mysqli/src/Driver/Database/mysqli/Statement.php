@@ -100,16 +100,8 @@ class Statement extends StatementBase {
       }
 
       // In mysqli, the results of the statement execution are returned in a
-      // different object than the statement itself. mysqli_stmt::execute()
-      // treats all array values as strings. When strict_params is set, use
-      // bind_param() to preserve PHP types (needed for JSON comparisons).
-      if (!empty($options['strict_params']) && $args) {
-        $this->bindStrictParams($args);
-        $return = $this->getClientStatement()->execute();
-      }
-      else {
-        $return = $this->getClientStatement()->execute($args);
-      }
+      // different object than the statement itself.
+      $return = $this->getClientStatement()->execute($args);
       $this->result = new Result(
         $this->fetchMode,
         $this->fetchOptions,
@@ -126,27 +118,6 @@ class Statement extends StatementBase {
     $this->dispatchStatementExecutionEndEvent($startEvent);
 
     return $return;
-  }
-
-  /**
-   * Binds parameters with explicit type specifiers.
-   *
-   * @param array $args
-   *   Positional parameter values.
-   *
-   * @see \Drupal\Core\Database\StatementWrapperIterator::bindArguments()
-   */
-  protected function bindStrictParams(array $args): void {
-    $types = '';
-    foreach ($args as $value) {
-      $types .= match (gettype($value)) {
-        'integer' => 'i',
-        'double' => 'd',
-        'boolean' => 'i',
-        default => 's',
-      };
-    }
-    $this->getClientStatement()->bind_param($types, ...array_values($args));
   }
 
 }

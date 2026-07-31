@@ -72,15 +72,7 @@ class StatementPrefetchIterator extends StatementBase {
     // Prepare and execute the statement.
     try {
       $this->clientStatement = $this->getStatement($this->queryString, $args);
-      // Arguments are bound before executing, so that strict typing can be
-      // applied. getStatement() may have removed arguments that it inlined in
-      // the query string, so bind what is left of them.
-      $strict = !empty($options['strict_params']);
-      $this->bindArguments($args ?? [], $strict);
-      // When strict params are active, arguments were already bound with
-      // explicit types via bindValue(). Passing them to execute() would
-      // re-bind everything as PDO::PARAM_STR, defeating strict typing.
-      $return = $this->clientExecute($strict ? NULL : $args, $options);
+      $return = $this->clientExecute($args, $options);
     }
     catch (\Exception $e) {
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
@@ -117,40 +109,6 @@ class StatementPrefetchIterator extends StatementBase {
     $this->dispatchStatementExecutionEndEvent($startEvent);
 
     return $return;
-  }
-
-  /**
-   * Binds arguments to the client statement object.
-   *
-   * Works the same way as in StatementWrapperIterator, so that queries needing
-   * strict typing (for example those with a JSON condition) behave the same on
-   * drivers that prefetch their results.
-   *
-   * getStatement() may have replaced arguments with a literal in the query
-   * string, in which case they are no longer part of $arguments.
-   *
-   * @param mixed[] $arguments
-   *   The arguments to bind to the statement object.
-   * @param bool $strict
-   *   (Optional) Whether strict typing should be used. Defaults to FALSE.
-   *
-   * @see \Drupal\Core\Database\StatementWrapperIterator::bindArguments()
-   */
-  protected function bindArguments(array $arguments, bool $strict = FALSE): void {
-    foreach ($arguments as $param_name => $param_value) {
-      $this->getClientStatement()->bindValue(
-        array_is_list($arguments) ? $param_name + 1 : $param_name,
-        $param_value,
-        $strict
-          // Explicitly bind named arguments to match their PDO param type.
-          ? match(gettype($param_value)) {
-            'boolean' => \PDO::PARAM_BOOL,
-            'integer' => \PDO::PARAM_INT,
-            default => \PDO::PARAM_STR,
-          }
-          : \PDO::PARAM_STR
-      );
-    }
   }
 
   /**

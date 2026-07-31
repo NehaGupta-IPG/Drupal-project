@@ -125,52 +125,42 @@ trait DatabaseTestSchemaDataTrait {
       ->fields(['id', 'status', 'test_field'])
       ->values([
         'id' => 1,
-        'status' => 1,
         'test_field' => '{"boolean": true, "number": 5}',
       ])
       ->values([
         'id' => 2,
-        'status' => 1,
         'test_field' => '{"number": 10, "boolean": false}',
       ])
       ->values([
         'id' => 3,
-        'status' => 1,
         'test_field' => '{"number": 10, "key": "some text"}',
       ])
       ->values([
         'id' => 4,
-        'status' => 1,
         'test_field' => '{"boolean": true, "key": "some other text"}',
       ])
       ->values([
         'id' => 5,
-        'status' => 1,
         'test_field' => '{"array": [32, 41], "float": 1.5}',
       ])
       ->values([
         'id' => 6,
-        'status' => 1,
         'test_field' => '{"associative": {"mountain": "Handies"}}',
       ])
       ->values([
         'id' => 7,
-        'status' => 1,
         'test_field' => NULL,
       ])
       ->values([
         'id' => 8,
-        'status' => 1,
         'test_field' => '{"float": 3.14, "nested": {"inner": "deep value"}, "items": [10, 20, 30], "special": "100% off_sale"}',
       ])
       ->values([
         'id' => 9,
-        'status' => 1,
         'test_field' => '{"hyphen-key": "hyphen value", "nested-obj": {"inner-key": 42}}',
       ])
       ->values([
         'id' => 10,
-        'status' => 1,
         'test_field' => '{"deps": {"a": {"status": "enabled"}, "b": {"status": "disabled"}, "c": {"status": "enabled"}}}',
       ])
       ->execute();
