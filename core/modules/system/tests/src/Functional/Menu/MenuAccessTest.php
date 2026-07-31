@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Functional\Menu;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -351,6 +352,30 @@ class MenuAccessTest extends BrowserTestBase {
     // This test validates the cases where the child link has a url attribute.
     $this->drupalLogin($noParentAccessUser);
     $this->assertMenuItemRoutesAccess(200, Url::fromRoute('menu_test.parent_url_test'));
+  }
+
+  /**
+   * Tests a custom menu link pointing to the same route as an admin page.
+   *
+   * A custom link to /admin in the admin menu must not change the access
+   * result for the /admin route.
+   */
+  public function testDuplicateMenuLinkOnAdminRoute(): void {
+    $this->container->get('module_installer')->install(['menu_link_content']);
+    $menuAdmin = $this->drupalCreateUser([
+      'access administration pages',
+      'administer menu',
+    ]);
+    $this->drupalLogin($menuAdmin);
+    $this->assertMenuItemRoutesAccess(200, 'admin', 'admin/structure');
+
+    MenuLinkContent::create([
+      'title' => 'Custom admin link',
+      'link' => ['uri' => 'internal:/admin'],
+      'menu_name' => 'admin',
+    ])->save();
+
+    $this->assertMenuItemRoutesAccess(200, 'admin', 'admin/structure');
   }
 
   /**
