@@ -46,8 +46,10 @@ class ConfigNamesMapperTest extends UnitTestCase {
 
   /**
    * The language manager used for testing.
+   * 
+   * @var \Drupal\language\ConfigurableLanguageManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected ConfigurableLanguageManagerInterface&MockObject $languageManager;
+  protected $languageManager;
 
   /**
    * The typed configuration manager.
@@ -104,7 +106,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
 
     $this->baseRoute = new Route('/admin/config/system/site-information');
 
-    $this->languageManager = $this->createMock(ConfigurableLanguageManagerInterface::class);
+    $this->languageManager = $this->createStub(ConfigurableLanguageManagerInterface::class);
 
     $this->configNamesMapper = new TestConfigNamesMapper(
       'system.site_information_settings',
