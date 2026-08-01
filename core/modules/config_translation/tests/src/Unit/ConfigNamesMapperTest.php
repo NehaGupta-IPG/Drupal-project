@@ -618,7 +618,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
     $result = $this->configNamesMapper->hasTranslation($language);
     $this->assertSame($expected, $result);
   }
-  
+
   /**
    * Provides data for ConfigNamesMapperTest::testHasTranslation().
    *
