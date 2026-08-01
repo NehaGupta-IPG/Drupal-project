@@ -119,7 +119,7 @@ class TextFormatterTest extends EntityKernelTestBase {
         'exclude_html_tags' => TRUE,
       ],
     ]);
-    $output = (string) \Drupal::service('renderer')->renderRoot($build);
+    $output = (string) $this->container->get('renderer')->renderRoot($build);
     // With tags stripped should get the first 10 letters.
     $this->assertStringContainsString('abcdefghij', $output);
   }
