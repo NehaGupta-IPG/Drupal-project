@@ -22,6 +22,8 @@ display:
     position: 0
     display_options:
       title: test_argument_summary
+      link_display: page_1
+      link_url: ''
       fields:
         title:
           id: title
