@@ -22,6 +22,7 @@ class TranslatedViewTest extends UITestBase {
   protected static $modules = [
     'config_translation',
     'views_ui',
+    'locale',
   ];
 
   /**
@@ -55,6 +56,7 @@ class TranslatedViewTest extends UITestBase {
       'administer site configuration',
       'administer views',
       'translate configuration',
+      'translate interface',
     ];
 
     $this->drupalPlaceBlock('local_tasks_block', ['id' => 'test_role_admin_test_local_tasks_block']);
