@@ -88,6 +88,11 @@ class ElementsLabelsTest extends KernelTestBase {
     // Verify that no label tag exists when title set not to display.
     $this->assertSession()->elementNotExists('xpath', '//label[@for="edit-form-textfield-test-title-no-show"]');
 
+    // Verify that a #type 'item' renders with a span instead of a label
+    // element. The wrapping div uses aria-describedby to refer to the span.
+    $this->assertSession()->elementNotExists('xpath', '//div[@id="form-item-test-no-label-wrapper"]//label');
+    $this->assertSession()->elementExists('xpath', '//div[@id="form-item-test-no-label-wrapper" and @aria-describedby="form-item-test-no-label-label"]/span[@id="form-item-test-no-label-label"]');
+
     // Verify that field class is form-no-label when there is no label.
     $this->assertSession()->elementExists('xpath', '//div[contains(@class, "js-form-item-form-textfield-test-title-invisible") and contains(@class, "form-no-label")]');
 

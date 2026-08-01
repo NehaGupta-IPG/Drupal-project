@@ -448,7 +448,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     // Find trigger and target elements.
     $trigger = $page->findField('select_trigger');
     $this->assertNotEmpty($trigger);
-    $item_visible_value2 = $this->assertSession()->elementExists('css', '#edit-item-visible-when-select-trigger-has-value2');
+    $item_visible_value2 = $this->assertSession()->elementExists('css', '#item-visible-when-select-trigger-has-value2-wrapper');
     $textfield_visible_value3 = $page->findField('textfield_visible_when_select_trigger_has_value3');
     $this->assertNotEmpty($textfield_visible_value3);
     $textfield_visible_value2_or_value3 = $page->findField('textfield_visible_when_select_trigger_has_value2_or_value3');
@@ -488,8 +488,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
     // Find trigger and target elements.
     $trigger = $page->findField('multiple_select_trigger[]');
     $this->assertNotEmpty($trigger);
-    $item_visible_value2 = $this->assertSession()->elementExists('css', '#edit-item-visible-when-multiple-select-trigger-has-value2');
-    $item_visible_no_value = $this->assertSession()->elementExists('css', '#edit-item-visible-when-multiple-select-trigger-has-no-value');
+    $item_visible_value2 = $this->assertSession()->elementExists('css', '#item-visible-when-multiple-select-trigger-has-value2-wrapper');
+    $item_visible_no_value = $this->assertSession()->elementExists('css', '#item-visible-when-multiple-select-trigger-has-no-value-wrapper');
     $textfield_visible_value3 = $page->findField('textfield_visible_when_multiple_select_trigger_has_value3');
     $this->assertNotEmpty($textfield_visible_value3);
     $textfield_visible_value2_or_value3 = $page->findField('textfield_visible_when_multiple_select_trigger_has_value2_or_value3');
@@ -548,7 +548,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertNotEmpty($select_trigger);
     $textfield_trigger = $page->findField('textfield_trigger');
     $this->assertNotEmpty($textfield_trigger);
-    $item_visible_value2_and_textfield = $this->assertSession()->elementExists('css', '#edit-item-visible-when-select-trigger-has-value2-and-textfield-trigger-filled');
+    $item_visible_value2_and_textfield = $this->assertSession()->elementExists('css', '#item-visible-when-select-trigger-has-value2-and-textfield-trigger-filled-wrapper');
 
     // Verify initial state.
     $this->assertFalse($item_visible_value2_and_textfield->isVisible());

@@ -348,7 +348,7 @@ class TermTest extends TaxonomyTestBase {
     $this->submitForm(["status[value]" => 0], 'Save');
     // Check that the term is now unpublished in the list.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
-    $this->assertSession()->elementTextContains('css', "#edit-terms-tid{$term->id()}0-status", 'Unpublished');
+    $this->assertSession()->elementTextContains('css', "#terms-tid{$term->id()}0-status-wrapper", 'Unpublished');
 
     // Check the term link can be clicked through to the term page.
     $this->clickLink($edit['name[0][value]']);

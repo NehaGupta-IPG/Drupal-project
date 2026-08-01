@@ -26,6 +26,9 @@ class Item extends FormElementBase {
       // assigned by Form API based on the #default_value or #value properties.
       '#input' => TRUE,
       '#markup' => '',
+      // An item exposes its #id on the wrapping div, which is not a labelable
+      // element, so its title must not be rendered as a label element.
+      '#non_labelable' => TRUE,
       '#theme_wrappers' => ['form_element'],
     ];
   }
