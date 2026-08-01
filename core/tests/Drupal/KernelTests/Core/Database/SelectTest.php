@@ -791,6 +791,65 @@ class SelectTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests JSON conditions in the HAVING clause.
+   *
+   * The queries group by the primary key, so every row forms a group of its
+   * own and the JSON column stays functionally dependent on the grouped
+   * column. HAVING then filters the same rows a WHERE would.
+   *
+   * @see \Drupal\Core\Database\Query\Select::havingJsonCondition()
+   */
+  public function testHavingJsonCondition(): void {
+    // Rows 2 and 3 both hold 10 at $.number.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->groupBy('j.id');
+    $this->assertSame($query, $query->havingJsonCondition('test_field', '$.number', 10, '='));
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([2, 3], $ids);
+
+    // Unary operators take no value. Rows 3 and 4 hold $.key.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->groupBy('j.id');
+    $query->havingJsonCondition('test_field', '$.key', NULL, 'HAS KEY');
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([3, 4], $ids);
+
+    // Two HAVING conditions are ANDed. Boolean false holds for row 2 only.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->groupBy('j.id');
+    $query->havingJsonCondition('test_field', '$.number', 10, '=');
+    $query->havingJsonCondition('test_field', '$.boolean', FALSE, '=');
+    $this->assertEquals([2], array_map('intval', $query->execute()->fetchCol()));
+
+    // The placeholders of a HAVING condition collide neither with the ones of
+    // the WHERE conditions nor with the ones of the other HAVING parts.
+    // BETWEEN binds two placeholders and matches rows 1, 2 and 3; CONTAINS
+    // binds one and matches rows 3 and 4.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->addExpression('COUNT(*)', 'total');
+    $query->condition('j.status', 1);
+    $query->jsonCondition('test_field', '$.number', [5, 10], 'BETWEEN');
+    $query->groupBy('j.id');
+    $query->having('COUNT(*) = :count', [':count' => 1]);
+    $query->havingJsonCondition('test_field', '$.key', 'some', 'CONTAINS');
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([3], $ids);
+  }
+
+  /**
+   * Tests that a HAVING JSON condition validates its arguments.
+   */
+  public function testHavingJsonConditionValidation(): void {
+    $this->expectException(InvalidQueryException::class);
+    $this->connection->select('json', 'j')
+      ->havingJsonCondition('test_field', '$.number', [1], 'BETWEEN');
+  }
+
+  /**
    * Tests JSON ORDER BY with different types and directions.
    */
   public function testJsonOrderBy(): void {

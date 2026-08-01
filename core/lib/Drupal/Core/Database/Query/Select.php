@@ -370,6 +370,44 @@ class Select extends Query implements SelectInterface {
   }
 
   /**
+   * Sets a HAVING condition on a value inside a JSON column.
+   *
+   * SQL evaluates a HAVING clause per group, so the JSON column must be part
+   * of the GROUP BY, or be functionally dependent on a column that is, such as
+   * the primary key:
+   * @code
+   * $query = $connection->select('node_field_data', 'n');
+   * $query->addField('n', 'nid');
+   * $query->addExpression('COUNT(*)', 'total');
+   * $query->groupBy('n.nid');
+   * $query->havingJsonCondition('data', '$.status', 'active');
+   * @endcode
+   *
+   * @param string $field
+   *   The name of the JSON column, optionally table-qualified (e.g. "n.data").
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string|int|float|array|bool|null $value
+   *   The value to compare against. Ignored for unary operators (IS NULL,
+   *   IS NOT NULL, HAS KEY).
+   * @param string $operator
+   *   The comparison operator.
+   *
+   * @return static
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the operator is not supported, or the value does not suit it.
+   *
+   * @see \Drupal\Core\Database\Query\Condition::jsonCondition()
+   * @see \Drupal\Core\Database\Query\Select::addJsonExpression()
+   */
+  public function havingJsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static {
+    $this->having->jsonCondition($field, $jsonpath, $value, $operator);
+    return $this;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function forUpdate($set = TRUE) {
