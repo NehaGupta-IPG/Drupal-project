@@ -923,6 +923,7 @@ class SelectTest extends DatabaseTestBase {
     $query = $this->connection->select('json', 'j');
     $query->addField('j', 'id');
     $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
     $this->assertSame($query, $query->havingJsonCondition('test_field', '$.number', 10, '='));
     $ids = array_map('intval', $query->execute()->fetchCol());
     $this->assertEqualsCanonicalizing([2, 3], $ids);
@@ -931,6 +932,7 @@ class SelectTest extends DatabaseTestBase {
     $query = $this->connection->select('json', 'j');
     $query->addField('j', 'id');
     $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
     $query->havingJsonCondition('test_field', '$.key', NULL, 'HAS KEY');
     $ids = array_map('intval', $query->execute()->fetchCol());
     $this->assertEqualsCanonicalizing([3, 4], $ids);
@@ -939,6 +941,7 @@ class SelectTest extends DatabaseTestBase {
     $query = $this->connection->select('json', 'j');
     $query->addField('j', 'id');
     $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
     $query->havingJsonCondition('test_field', '$.number', 10, '=');
     $query->havingJsonCondition('test_field', '$.boolean', FALSE, '=');
     $this->assertEquals([2], array_map('intval', $query->execute()->fetchCol()));
@@ -953,6 +956,7 @@ class SelectTest extends DatabaseTestBase {
     $query->condition('j.status', 1);
     $query->jsonCondition('test_field', '$.number', [5, 10], 'BETWEEN');
     $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
     $query->having('COUNT(*) = :count', [':count' => 1]);
     $query->havingJsonCondition('test_field', '$.key', 'some', 'CONTAINS');
     $ids = array_map('intval', $query->execute()->fetchCol());
@@ -994,11 +998,12 @@ class SelectTest extends DatabaseTestBase {
     $ids = array_map('intval', $query->execute()->fetchCol());
     $this->assertEqualsCanonicalizing([2, 3], $ids);
 
-    // HAVING works the same way. Grouping by the primary key keeps the JSON
-    // column functionally dependent on the grouped column.
+    // HAVING works the same way. The JSON column is grouped, so a HAVING
+    // clause may name it.
     $query = $this->connection->select('json', 'j')->extend(SelectExtender::class);
     $query->addField('j', 'id');
     $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
     $this->assertSame($query, $query->havingJsonCondition('test_field', '$.number', 10, '='));
     $ids = array_map('intval', $query->execute()->fetchCol());
     $this->assertEqualsCanonicalizing([2, 3], $ids);
@@ -1010,6 +1015,7 @@ class SelectTest extends DatabaseTestBase {
       ->extend(SelectExtender::class);
     $query->addField('j', 'id');
     $query->groupBy('j.id');
+    $query->groupBy('j.test_field');
     $this->assertSame($query, $query->jsonCondition('test_field', '$.number', 5, '>='));
     $this->assertSame($query, $query->havingJsonCondition('test_field', '$.key', NULL, 'HAS KEY'));
     $this->assertEquals([3], array_map('intval', $query->execute()->fetchCol()));

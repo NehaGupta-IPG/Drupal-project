@@ -373,15 +373,20 @@ class Select extends Query implements SelectInterface {
    * Sets a HAVING condition on a value inside a JSON column.
    *
    * SQL evaluates a HAVING clause per group, so the JSON column must be part
-   * of the GROUP BY, or be functionally dependent on a column that is, such as
-   * the primary key:
+   * of the GROUP BY:
    * @code
    * $query = $connection->select('node_field_data', 'n');
    * $query->addField('n', 'nid');
    * $query->addExpression('COUNT(*)', 'total');
    * $query->groupBy('n.nid');
+   * $query->groupBy('n.data');
    * $query->havingJsonCondition('data', '$.status', 'active');
    * @endcode
+   *
+   * Grouping by a column the JSON column is functionally dependent on, such as
+   * the primary key, is not enough. MySQL and PostgreSQL accept that, MariaDB
+   * resolves a HAVING clause against the grouped columns and the select list
+   * only, and reports the JSON column as unknown.
    *
    * @param string $field
    *   The name of the JSON column, optionally table-qualified (e.g. "n.data").
