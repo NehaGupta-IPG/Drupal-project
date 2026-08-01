@@ -727,6 +727,57 @@ class SelectTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests one JsonCondition instance used by more than one query.
+   *
+   * Each query numbers its placeholders from 0, so a condition object that is
+   * compiled against a second query has to take the placeholder names of that
+   * query. Keeping the names of the first compilation binds the values of one
+   * condition to the placeholders of another.
+   *
+   * @see \Drupal\Core\Database\Query\JsonCondition::compile()
+   */
+  public function testJsonConditionReusedAcrossQueries(): void {
+    $condition = $this->connection->jsonCondition('test_field', '$.number', 5);
+
+    // The condition is the only one, so it takes placeholder 0.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->condition($condition);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([1], $ids);
+
+    // Here the condition on the regular column takes placeholder 0, so the
+    // JSON condition has to move to placeholder 1.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->condition('j.id', 1);
+    $query->condition($condition);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([1], $ids);
+
+    // The same instance in two groups of one query. Both compile against the
+    // query, so the second use keeps its own placeholder.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $or = $query->orConditionGroup();
+    $or->condition($condition);
+    $or->condition('j.id', 4);
+    $query->condition($or);
+    $query->condition('j.id', 1, '>=');
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([1, 4], $ids);
+
+    // A count query compiles the conditions of the query it clones.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->condition('j.id', 1);
+    $query->condition($condition);
+    $this->assertSame('1', (string) $query->countQuery()->execute()->fetchField());
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([1], $ids);
+  }
+
+  /**
    * Tests JSON conditions added to a condition group.
    *
    * @see \Drupal\Core\Database\Query\Condition::jsonCondition()

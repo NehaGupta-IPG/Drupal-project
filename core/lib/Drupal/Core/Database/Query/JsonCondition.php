@@ -93,9 +93,14 @@ class JsonCondition extends Condition {
    * {@inheritdoc}
    */
   public function compile(Connection $connection, PlaceholderInterface $queryPlaceholder): void {
-    if (!$this->changed) {
+    // Re-compile if this condition changed or if we are compiled against a
+    // different query placeholder object. The second case gives the condition
+    // the placeholder names of that object, instead of keeping the names of
+    // an earlier compilation.
+    if (!$this->changed && isset($this->queryPlaceholderIdentifier) && $this->queryPlaceholderIdentifier == $queryPlaceholder->uniqueIdentifier()) {
       return;
     }
+    $this->queryPlaceholderIdentifier = $queryPlaceholder->uniqueIdentifier();
     $this->changed = FALSE;
 
     $expression = $connection->jsonExpression($this->field, $this->path);
