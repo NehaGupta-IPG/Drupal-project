@@ -4,6 +4,8 @@ namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\InvalidQueryException;
 
+// cspell:ignore uncast
+
 /**
  * General class for an abstracted INSERT query.
  *

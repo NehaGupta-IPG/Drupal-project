@@ -234,7 +234,6 @@ isam
 javascripts
 jessebeach
 jqueryui
-jsonlint
 jsonpath
 justinrainbow
 keypresses
@@ -525,7 +524,6 @@ ufffd
 uids
 unban
 uncacheable
-uncast
 uncategorized
 undoable
 unfieldable

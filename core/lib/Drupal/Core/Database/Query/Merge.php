@@ -5,6 +5,8 @@ namespace Drupal\Core\Database\Query;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 
+// cspell:ignore uncast
+
 /**
  * General class for an abstracted MERGE query operation.
  *
