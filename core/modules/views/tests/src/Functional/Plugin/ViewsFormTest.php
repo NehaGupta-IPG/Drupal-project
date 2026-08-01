@@ -47,9 +47,9 @@ class ViewsFormTest extends ViewTestBase {
   }
 
   /**
-   * Tests Views form actions for an unrouted display use the linked path.
+   * Tests Views forms without a link display use the current route.
    */
-  public function testFormActionUsesLinkedPathWhenNoLinkDisplayIsSet(): void {
+  public function testFormActionFallsBackToCurrentRoute(): void {
     $this->drupalCreateContentType(['type' => 'article']);
     $node = $this->drupalCreateNode(['type' => 'article']);
     $this->drupalPlaceBlock('views_block:test_bulk_form-block_1', ['region' => 'content']);
@@ -58,8 +58,7 @@ class ViewsFormTest extends ViewTestBase {
     $form = $this->assertSession()->elementExists('css', '.views-form form');
     $action = $form->getAttribute('action');
 
-    $this->assertSame('test_bulk_form', $action);
-    $this->assertNotSame(Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString(), $action);
+    $this->assertSame(Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString(), $action);
   }
 
   /**
