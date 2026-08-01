@@ -41,7 +41,7 @@ class ExcludeHtmlTagsSettingUpdatePathTest extends UpdatePathTestBase {
     $display = \Drupal::config('core.entity_view_display.node.article.teaser');
     $components = $display->get('content');
     $this->assertArrayHasKey('exclude_html_tags', $components['body']['settings']);
-    $this->assertTrue($components['body']['settings']['exclude_html_tags']);
+    $this->assertFalse($components['body']['settings']['exclude_html_tags']);
   }
 
 }

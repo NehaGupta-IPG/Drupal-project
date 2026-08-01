@@ -26,8 +26,8 @@ function text_post_update_add_exclude_html_tags_setting(array &$sandbox): void {
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display */
     $changed = FALSE;
     foreach ($display->getComponents() as $name => $component) {
-      if (isset($component['type']) && in_array($component['type'], ['text_trimmed', 'text_summary_or_trimmed'], TRUE) && !isset($component['settings']['exclude_html_tags'])) {
-        $component['settings']['exclude_html_tags'] = TRUE;
+      if (isset($component['type']) && in_array($component['type'], ['text_trimmed', 'text_summary_or_trimmed']) && !isset($component['settings']['exclude_html_tags'])) {
+        $component['settings']['exclude_html_tags'] = FALSE;
         $display->setComponent($name, $component);
         $changed = TRUE;
       }
