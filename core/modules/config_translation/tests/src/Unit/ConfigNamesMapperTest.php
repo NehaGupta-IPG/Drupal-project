@@ -46,7 +46,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
 
   /**
    * The language manager used for testing.
-   * 
+   *
    * @var \Drupal\language\ConfigurableLanguageManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $languageManager;
@@ -606,8 +606,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
         $index = array_search($name, $config_names);
         $has_translation = $mock_return_values[$index];
 
-        // Create a mock of the LanguageConfigOverride object.
-        $config_override = $this->createMock('\Drupal\language\Config\LanguageConfigOverride');
+        $config_override = $this->createStub('\Drupal\language\Config\LanguageConfigOverride');
 
         // If a translation is expected to exist, isNew() should return FALSE.
         // If no translation exists, isNew() returns TRUE.
@@ -619,7 +618,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
     $result = $this->configNamesMapper->hasTranslation($language);
     $this->assertSame($expected, $result);
   }
-
+  
   /**
    * Provides data for ConfigNamesMapperTest::testHasTranslation().
    *
