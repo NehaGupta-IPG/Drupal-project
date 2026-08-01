@@ -341,30 +341,32 @@ class UpdateJsonTest extends DatabaseTestBase {
    *
    * This is the JSON counterpart of an expression that takes a subselect. The
    * subquery compiles against the update query, so its placeholders have to be
-   * numbered next to the ones of the condition of the update.
+   * numbered next to the ones of the condition of the update. The subquery
+   * reads from the 'json' table while the update targets the 'test' table,
+   * because MySQL rejects a subquery on the table an UPDATE writes to.
    *
    * @see \Drupal\KernelTests\Core\Database\UpdateComplexTest::testSubSelectUpdate()
    */
   public function testJsonExpressionSubSelect(): void {
     $subselect = $this->connection->select('json', 'j');
-    $subselect->addJsonExpression('test_field', '$.float', 'float_value', JsonCastType::Float);
+    $subselect->addJsonExpression('test_field', '$.items[1]', 'item_value', JsonCastType::Int);
     $subselect->condition('j.id', 8);
     // Clone this to make sure we are running a different query when asserting.
     $select = clone $subselect;
 
-    $num_updated = $this->connection->update('json')
-      ->expression('score', $subselect)
-      ->condition('id', 1)
+    $num_updated = $this->connection->update('test')
+      ->expression('age', $subselect)
+      ->condition('name', 'Ringo')
       ->execute();
     $this->assertSame(1, $num_updated);
 
-    $score = $this->connection->select('json', 'j')
-      ->fields('j', ['score'])
-      ->condition('j.id', 1)
+    $age = $this->connection->select('test', 't')
+      ->fields('t', ['age'])
+      ->condition('t.name', 'Ringo')
       ->execute()
       ->fetchField();
-    $this->assertEquals(3.14, (float) $score);
-    $this->assertEquals((float) $select->execute()->fetchField(), (float) $score);
+    $this->assertSame(20, (int) $age);
+    $this->assertSame((int) $select->execute()->fetchField(), (int) $age);
   }
 
   /**
