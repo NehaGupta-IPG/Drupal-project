@@ -135,7 +135,7 @@ class ViewsConfigUpdater {
   }
 
   /**
-   * Checks for unrouted displays with form actions missing link_display.
+   * Checks for unrouted displays missing link_display.
    *
    * @param \Drupal\views\ViewEntityInterface $view
    *   The view entity.
@@ -143,8 +143,8 @@ class ViewsConfigUpdater {
    * @return bool
    *   TRUE if the view needed updates.
    */
-  public function needsUnroutedFormLinkDisplayUpdate(ViewEntityInterface $view): bool {
-    return $this->processUnroutedFormLinkDisplayUpdate($view);
+  public function needsUnroutedLinkDisplayUpdate(ViewEntityInterface $view): bool {
+    return $this->processUnroutedLinkDisplayUpdate($view);
   }
 
   /**
@@ -156,7 +156,7 @@ class ViewsConfigUpdater {
    * @return bool
    *   TRUE if the view was updated.
    */
-  public function processUnroutedFormLinkDisplayUpdate(ViewEntityInterface $view): bool {
+  public function processUnroutedLinkDisplayUpdate(ViewEntityInterface $view): bool {
     $displays = $view->get('display');
     $changed = FALSE;
 
@@ -179,7 +179,11 @@ class ViewsConfigUpdater {
       }
 
       $linked_display_id = $display_handler->getOption('link_display');
-      if (!empty($linked_display_id) && $linked_display_id !== 'custom_url' && $executable->displayHandlers->has($linked_display_id)) {
+      if ($linked_display_id === 'custom_url') {
+        // Keep explicit custom URLs as-is.
+        continue;
+      }
+      if (!empty($linked_display_id) && $executable->displayHandlers->has($linked_display_id)) {
         $linked_display = $executable->displayHandlers->get($linked_display_id);
         if ($linked_display instanceof DisplayRouterInterface) {
           // Keep explicit routed link displays as-is.
@@ -187,13 +191,16 @@ class ViewsConfigUpdater {
         }
       }
 
-      $executable->initHandlers();
-      if (!$display_handler->usesExposed() && !$executable->hasFormElements()) {
-        // Only adjust displays that render exposed filters or views forms.
-        continue;
+      // Reproduce the previous fallback once during the update so existing
+      // behavior is preserved as explicit configuration. Runtime resolution
+      // no longer guesses based on display order.
+      $guessed_display_id = NULL;
+      foreach ($executable->displayHandlers as $candidate_display_id => $candidate_display) {
+        if (!empty($candidate_display) && $candidate_display->hasPath()) {
+          $guessed_display_id = $candidate_display_id;
+          break;
+        }
       }
-
-      $guessed_display_id = $display_handler->getLinkDisplay();
       if (empty($guessed_display_id) || $guessed_display_id === 'custom_url' || !$executable->displayHandlers->has($guessed_display_id)) {
         // No prior routed guess to preserve.
         continue;

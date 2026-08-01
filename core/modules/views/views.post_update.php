@@ -67,7 +67,7 @@ function views_post_update_counter_field_not_sortable(): void {
 }
 
 /**
- * Backfills link_display for unrouted displays with form actions.
+ * Backfills link_display for unrouted displays.
  */
 function views_post_update_unrouted_display_link_display(?array &$sandbox = NULL): void {
   /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
@@ -76,6 +76,6 @@ function views_post_update_unrouted_display_link_display(?array &$sandbox = NULL
   // changing the fallback behavior for unrouted displays.
   $view_config_updater->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
-    return $view_config_updater->needsUnroutedFormLinkDisplayUpdate($view);
+    return $view_config_updater->needsUnroutedLinkDisplayUpdate($view);
   });
 }
