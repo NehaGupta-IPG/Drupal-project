@@ -145,8 +145,8 @@ class Update extends Query implements ConditionInterface {
    *   any number of values, and an assignment takes one.
    *
    * @see \Drupal\Core\Database\Query\Update::expression()
-   * @see \Drupal\Core\Database\Query\Select::addJsonExpression()
-   * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()
+   * @see \Drupal\Core\Database\Query\SelectInterface::addJsonExpression()
+   * @see \Drupal\Core\Database\Query\ConditionInterface::jsonCondition()
    */
   public function jsonExpression(string $field, string $json_field, string $jsonpath, JsonCastType $cast = JsonCastType::Text): static {
     $expression = $this->connection->jsonExpression($json_field, $jsonpath);

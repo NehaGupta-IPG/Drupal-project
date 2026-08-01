@@ -75,7 +75,7 @@ abstract class Insert extends Query implements \Countable {
    *   If the query has no select query to insert the result of.
    *
    * @see \Drupal\Core\Database\Query\Insert::from()
-   * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()
+   * @see \Drupal\Core\Database\Query\ConditionInterface::jsonCondition()
    */
   public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static {
     $this->validateFromQuery('condition');
@@ -120,7 +120,7 @@ abstract class Insert extends Query implements \Countable {
    *   number of values, and an inserted column takes one.
    *
    * @see \Drupal\Core\Database\Query\Insert::from()
-   * @see \Drupal\Core\Database\Query\Select::addJsonExpression()
+   * @see \Drupal\Core\Database\Query\SelectInterface::addJsonExpression()
    * @see \Drupal\Core\Database\Query\Update::jsonExpression()
    */
   public function jsonExpression(string $field, string $json_field, string $jsonpath, JsonCastType $cast = JsonCastType::Text): static {

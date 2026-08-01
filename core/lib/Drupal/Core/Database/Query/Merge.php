@@ -237,7 +237,7 @@ class Merge extends Query implements ConditionInterface {
    *
    * @see \Drupal\Core\Database\Query\Merge::expression()
    * @see \Drupal\Core\Database\Query\Update::jsonExpression()
-   * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()
+   * @see \Drupal\Core\Database\Query\ConditionInterface::jsonCondition()
    */
   public function jsonExpression(string $field, string $json_field, string $jsonpath, JsonCastType $cast = JsonCastType::Text): static {
     $expression = $this->connection->jsonExpression($json_field, $jsonpath);

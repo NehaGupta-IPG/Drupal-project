@@ -1044,7 +1044,7 @@ abstract class Connection {
    *   A driver-specific JsonCondition instance, or the generic one when the
    *   driver does not provide a subclass.
    *
-   * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()
+   * @see \Drupal\Core\Database\Query\ConditionInterface::jsonCondition()
    */
   public function jsonCondition(string $field, string $path, string|int|float|array|bool|null $value = NULL, string $operator = '='): JsonCondition {
     $class = $this->getDriverClass('JsonCondition');

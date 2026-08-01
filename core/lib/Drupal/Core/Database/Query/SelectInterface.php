@@ -255,6 +255,38 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
   public function addExpression($expression, $alias = NULL, $arguments = []);
 
   /**
+   * Adds a value extracted from a JSON column to the SELECT list.
+   *
+   * The extracted value is always cast, so that its type is the same on all
+   * database backends. Comparing an uncast extraction against a placeholder is
+   * not portable.
+   *
+   * @param string $field
+   *   The JSON column name, optionally table-qualified (e.g. "j.data").
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string|null $alias
+   *   The alias for the expression. Defaults to 'expression'. As with
+   *   addExpression(), a numeric suffix is added if the alias is already taken.
+   * @param \Drupal\Core\Database\Query\JsonCastType $cast
+   *   The type to cast the extracted value to. Defaults to text, which returns
+   *   the value unquoted. On MySQL and MariaDB a text cast truncates the value
+   *   to 255 characters.
+   *
+   * @return string
+   *   The alias of the expression, to use in addField() or orderBy().
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the jsonpath is invalid, or contains a wildcard. A wildcard matches
+   *   any number of values, and a SELECT expression holds one.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::addExpression()
+   * @see \Drupal\Core\Database\Query\SelectInterface::jsonOrderBy()
+   * @see \Drupal\Core\Database\Query\ConditionInterface::jsonCondition()
+   */
+  public function addJsonExpression(string $field, string $jsonpath, ?string $alias = NULL, JsonCastType $cast = JsonCastType::Text): string;
+
+  /**
    * Default Join against another table in the database.
    *
    * This method is a convenience method for innerJoin().
@@ -403,6 +435,38 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    *   The called object.
    */
   public function orderBy($field, $direction = 'ASC');
+
+  /**
+   * Orders the result set by a value extracted from a JSON column.
+   *
+   * This adds the JSON extraction as an expression in the SELECT list and
+   * orders by its alias. NULLs are sorted last regardless of direction.
+   *
+   * The extracted value is always cast, so that the sort order is the same on
+   * all database backends. An uncast extraction sorts by MySQL's JSON rules,
+   * PostgreSQL's text rules and SQLite's type affinity rules.
+   *
+   * @param string $field
+   *   The JSON column name.
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string $direction
+   *   The sort direction: 'ASC' or 'DESC'.
+   * @param \Drupal\Core\Database\Query\JsonCastType $cast
+   *   The type to cast the extracted value to before sorting. Defaults to
+   *   JsonCastType::Text. Pass Int or Float to sort numerically, otherwise
+   *   "10" sorts before "9".
+   *
+   * @return static
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the jsonpath is invalid, or contains a wildcard. A wildcard matches
+   *   any number of values, and a sort key is one value.
+   *
+   * @see \Drupal\Core\Database\Query\SelectInterface::addJsonExpression()
+   */
+  public function jsonOrderBy(string $field, string $jsonpath, string $direction = 'ASC', JsonCastType $cast = JsonCastType::Text): static;
 
   /**
    * Orders the result set by a random value.
@@ -617,6 +681,51 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    * @return $this
    */
   public function havingNotExists(SelectInterface $select);
+
+  /**
+   * Sets a HAVING condition on a value inside a JSON column.
+   *
+   * SQL evaluates a HAVING clause per group, so the JSON column must be part
+   * of the GROUP BY:
+   * @code
+   * $query = $connection->select('node_field_data', 'n');
+   * $query->addField('n', 'nid');
+   * $query->addExpression('COUNT(*)', 'total');
+   * $query->groupBy('n.nid');
+   * $query->groupBy('n.data');
+   * $query->havingJsonCondition('data', '$.status', 'active');
+   * @endcode
+   *
+   * Grouping by a column the JSON column is functionally dependent on, such as
+   * the primary key, is not enough. MySQL and PostgreSQL accept that, MariaDB
+   * resolves a HAVING clause against the grouped columns and the select list
+   * only, and reports the JSON column as unknown.
+   *
+   * @param string $field
+   *   The name of the JSON column, optionally table-qualified (e.g. "n.data").
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string|int|float|array|bool|null $value
+   *   The value to compare against. Ignored for unary operators (IS NULL,
+   *   IS NOT NULL, HAS KEY).
+   * @param string $operator
+   *   The comparison operator. A jsonpath with a wildcard segment matches any
+   *   number of values, and asks whether any of them satisfies the operator.
+   *   Only the comparison operators expand a wildcard that way, see
+   *   JsonCondition::WILDCARD_OPERATORS.
+   *
+   * @return static
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the operator is not supported, or the value does not suit it. The
+   *   jsonpath is validated when the query is compiled, which also rejects a
+   *   wildcard under an operator that cannot expand one.
+   *
+   * @see \Drupal\Core\Database\Query\ConditionInterface::jsonCondition()
+   * @see \Drupal\Core\Database\Query\SelectInterface::addJsonExpression()
+   */
+  public function havingJsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static;
 
   /**
    * Clone magic method.

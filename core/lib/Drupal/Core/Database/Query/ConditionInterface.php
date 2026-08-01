@@ -73,6 +73,44 @@ interface ConditionInterface {
   public function condition($field, $value = NULL, $operator = '=');
 
   /**
+   * Adds a condition on a value inside a JSON column.
+   *
+   * A condition group implements this method too, so a JSON condition can be
+   * mixed with regular conditions inside an AND or an OR group:
+   * @code
+   * $or = $query->orConditionGroup()
+   *   ->jsonCondition('data', '$.status', 'active')
+   *   ->condition('uid', 1);
+   * $query->condition($or);
+   * @endcode
+   *
+   * @param string $field
+   *   The name of the JSON column, optionally table-qualified (e.g. "n.data").
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string|int|float|array|bool|null $value
+   *   The value to compare against. Ignored for unary operators (IS NULL,
+   *   IS NOT NULL, HAS KEY).
+   * @param string $operator
+   *   The comparison operator. A jsonpath with a wildcard segment matches any
+   *   number of values, and asks whether any of them satisfies the operator.
+   *   Only the comparison operators expand a wildcard that way, see
+   *   JsonCondition::WILDCARD_OPERATORS.
+   *
+   * @return static
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the operator is not supported, or the value does not suit it. The
+   *   jsonpath is validated when the query is compiled, which also rejects a
+   *   wildcard under an operator that cannot expand one.
+   *
+   * @see \Drupal\Core\Database\Query\JsonCondition
+   * @see \Drupal\Core\Database\Connection::jsonCondition()
+   */
+  public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static;
+
+  /**
    * Adds an arbitrary WHERE clause to the query.
    *
    * @param string $snippet
