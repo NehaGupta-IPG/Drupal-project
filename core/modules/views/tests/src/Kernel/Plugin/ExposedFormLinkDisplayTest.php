@@ -91,4 +91,28 @@ class ExposedFormLinkDisplayTest extends ViewsKernelTestBase {
     $this->assertNotSame($current_path, $form['#action']);
   }
 
+  /**
+   * Tests unrouted displays only resolve explicitly configured displays.
+   */
+  public function testUnroutedDisplayUsesOnlyExplicitLinkDisplay(): void {
+    $view = Views::getView('test_exposed_block_link_display');
+    $view->setDisplay('block_1');
+    $view->initHandlers();
+
+    $block_display = $view->displayHandlers->get('block_1');
+    $page_display = $view->displayHandlers->get('page_1');
+
+    $block_display->overrideOption('link_display', NULL);
+    $this->assertNull($block_display->getLinkDisplay());
+    $this->assertNull($block_display->getRoutedDisplay());
+
+    $block_display->overrideOption('link_display', 'page_1');
+    $this->assertSame('page_1', $block_display->getLinkDisplay());
+    $this->assertSame($page_display, $block_display->getRoutedDisplay());
+
+    $block_display->overrideOption('link_display', 'missing_display');
+    $this->assertNull($block_display->getLinkDisplay());
+    $this->assertNull($block_display->getRoutedDisplay());
+  }
+
 }
