@@ -199,6 +199,47 @@ class Merge extends Query implements ConditionInterface {
   }
 
   /**
+   * Sets a field to a value extracted from a JSON column.
+   *
+   * This is the JSON counterpart of expression(). It applies to the UPDATE
+   * query part only, and takes precedence over MergeQuery::updateFields() and
+   * its wrappers in the same way expression() does.
+   *
+   * The extracted value is always cast, so that its type is the same on all
+   * database backends. Assigning an uncast extraction to a column is not
+   * portable.
+   *
+   * Unlike a comparison, an assignment cannot skip the rows holding a value of
+   * another type. The path must hold a value of the cast type in every updated
+   * row, because MySQL and PostgreSQL reject a numeric cast of a JSON string.
+   * Restrict the query with a jsonCondition() when the column holds mixed
+   * types.
+   *
+   * @param string $field
+   *   The field to set.
+   * @param string $json_field
+   *   The JSON column to extract the value from.
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param \Drupal\Core\Database\Query\JsonCastType $cast
+   *   The type to cast the extracted value to. Defaults to text, which returns
+   *   the value unquoted. On MySQL and MariaDB a text cast truncates the value
+   *   to 255 characters.
+   *
+   * @return $this
+   *   The called object.
+   *
+   * @see \Drupal\Core\Database\Query\Merge::expression()
+   * @see \Drupal\Core\Database\Query\Update::jsonExpression()
+   * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()
+   */
+  public function jsonExpression(string $field, string $json_field, string $jsonpath, JsonCastType $cast = JsonCastType::Text): static {
+    $expression = $this->connection->jsonExpression($json_field, $jsonpath);
+    $this->expression($field, $expression->toCastSql($cast));
+    return $this;
+  }
+
+  /**
    * Adds a set of field->value pairs to be inserted.
    *
    * @param array $fields

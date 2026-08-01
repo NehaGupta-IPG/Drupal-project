@@ -264,6 +264,111 @@ class UpdateJsonTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests a JSON expression next to an expression that binds arguments.
+   *
+   * An update query numbers the placeholders of fields(), of expression()
+   * arguments and of the condition separately. A JSON expression binds no
+   * arguments of its own, so all three have to survive next to it.
+   *
+   * @see \Drupal\KernelTests\Core\Database\UpdateComplexTest::testUpdateExpression()
+   */
+  public function testJsonExpressionWithExpression(): void {
+    $num_updated = $this->connection->update('json')
+      ->fields(['score' => 9.5])
+      ->jsonExpression('name', 'test_field', '$.key')
+      ->expression('status', '[status] + :increment', [':increment' => 5])
+      ->condition('id', 3)
+      ->execute();
+    $this->assertSame(1, $num_updated);
+
+    $row = $this->connection->select('json', 'j')
+      ->fields('j', ['name', 'score', 'status'])
+      ->condition('j.id', 3)
+      ->execute()
+      ->fetchObject();
+    $this->assertSame('some text', $row->name);
+    $this->assertEquals(9.5, (float) $row->score);
+    $this->assertSame(6, (int) $row->status);
+  }
+
+  /**
+   * Tests several JSON expressions in one update query.
+   */
+  public function testJsonExpressionMultiple(): void {
+    // Row 8 holds a nested string, a float and an array of numbers.
+    $num_updated = $this->connection->update('json')
+      ->jsonExpression('name', 'test_field', '$.nested.inner')
+      ->jsonExpression('score', 'test_field', '$.float', JsonCastType::Float)
+      ->jsonExpression('status', 'test_field', '$.items[1]', JsonCastType::Int)
+      ->condition('id', 8)
+      ->execute();
+    $this->assertSame(1, $num_updated);
+
+    $row = $this->connection->select('json', 'j')
+      ->fields('j', ['name', 'score', 'status'])
+      ->condition('j.id', 8)
+      ->execute()
+      ->fetchObject();
+    $this->assertSame('deep value', $row->name);
+    $this->assertEquals(3.14, (float) $row->score);
+    $this->assertSame(20, (int) $row->status);
+  }
+
+  /**
+   * Tests that a second JSON expression for the same column wins.
+   *
+   * Expression fields are keyed by column, the same way fields() is, so the
+   * later call replaces the earlier one.
+   */
+  public function testJsonExpressionOverride(): void {
+    // Row 9 holds a string at $.hyphen-key and a number below $.nested-obj.
+    $num_updated = $this->connection->update('json')
+      ->jsonExpression('name', 'test_field', '$.hyphen-key')
+      ->jsonExpression('name', 'test_field', '$.nested-obj.inner-key')
+      ->condition('id', 9)
+      ->execute();
+    $this->assertSame(1, $num_updated);
+
+    $name = $this->connection->select('json', 'j')
+      ->fields('j', ['name'])
+      ->condition('j.id', 9)
+      ->execute()
+      ->fetchField();
+    $this->assertSame('42', $name);
+  }
+
+  /**
+   * Tests an expression whose subquery extracts a JSON value.
+   *
+   * This is the JSON counterpart of an expression that takes a subselect. The
+   * subquery compiles against the update query, so its placeholders have to be
+   * numbered next to the ones of the condition of the update.
+   *
+   * @see \Drupal\KernelTests\Core\Database\UpdateComplexTest::testSubSelectUpdate()
+   */
+  public function testJsonExpressionSubSelect(): void {
+    $subselect = $this->connection->select('json', 'j');
+    $subselect->addJsonExpression('test_field', '$.float', 'float_value', JsonCastType::Float);
+    $subselect->condition('j.id', 8);
+    // Clone this to make sure we are running a different query when asserting.
+    $select = clone $subselect;
+
+    $num_updated = $this->connection->update('json')
+      ->expression('score', $subselect)
+      ->condition('id', 1)
+      ->execute();
+    $this->assertSame(1, $num_updated);
+
+    $score = $this->connection->select('json', 'j')
+      ->fields('j', ['score'])
+      ->condition('j.id', 1)
+      ->execute()
+      ->fetchField();
+    $this->assertEquals(3.14, (float) $score);
+    $this->assertEquals((float) $select->execute()->fetchField(), (float) $score);
+  }
+
+  /**
    * Tests that a JSON expression assigns NULL when the path does not exist.
    */
   public function testJsonExpressionMissingPath(): void {

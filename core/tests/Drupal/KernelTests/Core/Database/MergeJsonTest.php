@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\InvalidQueryException;
+use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Query\JsonCondition;
 use Drupal\Core\Database\Query\Merge;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests JSON conditions in the merge query builder.
+ * Tests JSON conditions and JSON expressions in the merge query builder.
  *
  * A merge compiles its condition twice: once for the SELECT that looks for an
  * existing row, and once for the UPDATE that follows when that row is found.
- * Every test therefore covers both compilations of the same condition object.
+ * Every condition test therefore covers both compilations of the same
+ * condition object. A JSON expression belongs to the UPDATE query part only.
  *
  * @see \Drupal\Core\Database\Query\Merge::execute()
  */
@@ -59,6 +61,26 @@ class MergeJsonTest extends DatabaseTestBase {
       ->execute()
       ->fetchCol();
     return array_map('intval', $ids);
+  }
+
+  /**
+   * Returns the value of a column of a single row of the 'json' table.
+   *
+   * @param int $id
+   *   The ID of the row to read.
+   * @param string $column
+   *   The column to read.
+   *
+   * @return string|null
+   *   The column value.
+   */
+  protected function fieldValue(int $id, string $column): ?string {
+    $value = $this->connection->select('json', 'j')
+      ->fields('j', [$column])
+      ->condition('j.id', $id)
+      ->execute()
+      ->fetchField();
+    return $value === FALSE ? NULL : $value;
   }
 
   /**
@@ -319,6 +341,217 @@ class MergeJsonTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests setting a column to a value extracted from a JSON column.
+   *
+   * The merge sets 'name' twice, once as a literal and once as a JSON
+   * expression. The expression has to win, the same way expression() wins over
+   * fields().
+   *
+   * @see \Drupal\KernelTests\Core\Database\MergeTest::testMergeUpdateExpression()
+   */
+  public function testJsonExpression(): void {
+    $result = $this->connection->merge('json')
+      ->key('id', 3)
+      ->fields(['name' => 'from fields', 'score' => 9.5])
+      ->jsonExpression('name', 'test_field', '$.key')
+      ->execute();
+
+    $this->assertSame(Merge::STATUS_UPDATE, $result);
+    $this->assertSame(10, $this->countRows());
+    // The default cast returns text without the quotes of the JSON string.
+    $this->assertSame('some text', $this->fieldValue(3, 'name'));
+    // The field that the expression does not target is still written.
+    $this->assertEquals(9.5, (float) $this->fieldValue(3, 'score'));
+  }
+
+  /**
+   * Tests that a JSON expression makes the merge run its UPDATE part.
+   *
+   * A merge that holds no update fields is a no-op on a matching row. A JSON
+   * expression alone has to be enough to make it update, because expression()
+   * sets the flag that updateFields() sets.
+   *
+   * @see \Drupal\KernelTests\Core\Database\MergeJsonTest::testJsonConditionMergeWithoutUpdate()
+   */
+  public function testJsonExpressionWithoutUpdateFields(): void {
+    $result = $this->connection->merge('json')
+      ->key('id', 3)
+      ->jsonExpression('name', 'test_field', '$.key')
+      ->execute();
+
+    $this->assertSame(Merge::STATUS_UPDATE, $result);
+    $this->assertSame('some text', $this->fieldValue(3, 'name'));
+  }
+
+  /**
+   * Tests that a JSON expression applies to the UPDATE query part only.
+   *
+   * The first merge inserts, so the expression is not applied. The inserted
+   * row satisfies the condition, so the second merge updates it and the
+   * expression takes effect.
+   */
+  public function testJsonExpressionInsert(): void {
+    $json = '{"key": "inserted text", "number": 999}';
+    for ($i = 0; $i < 2; $i++) {
+      $result = $this->connection->merge('json')
+        ->jsonCondition('test_field', '$.number', 999, '=')
+        ->jsonExpression('name', 'test_field', '$.key')
+        ->insertFields([
+          'id' => static::INSERT_ID,
+          'test_field' => $json,
+        ])
+        ->execute();
+
+      if ($i === 0) {
+        $this->assertSame(Merge::STATUS_INSERT, $result);
+        $this->assertNull($this->fieldValue(static::INSERT_ID, 'name'));
+      }
+      else {
+        $this->assertSame(Merge::STATUS_UPDATE, $result);
+        $this->assertSame('inserted text', $this->fieldValue(static::INSERT_ID, 'name'));
+      }
+    }
+    $this->assertSame(11, $this->countRows());
+  }
+
+  /**
+   * Tests the integer, float and text casts of a JSON expression.
+   *
+   * Each merge is restricted to the rows that hold a value at the path, because
+   * an assignment cannot skip the rows holding a value of another type.
+   *
+   * @see \Drupal\KernelTests\Core\Database\UpdateJsonTest::testJsonExpression()
+   */
+  public function testJsonExpressionCasts(): void {
+    // A text cast assigns the string without its quotes: rows 3 and 4.
+    $result = $this->connection->merge('json')
+      ->jsonCondition('test_field', '$.key', NULL, 'HAS KEY')
+      ->jsonExpression('name', 'test_field', '$.key')
+      ->insertFields(['id' => static::INSERT_ID])
+      ->execute();
+    $this->assertSame(Merge::STATUS_UPDATE, $result);
+    $this->assertSame(10, $this->countRows());
+    $this->assertSame('some text', $this->fieldValue(3, 'name'));
+    $this->assertSame('some other text', $this->fieldValue(4, 'name'));
+
+    // An integer cast assigns a number: rows 1, 2 and 3.
+    $result = $this->connection->merge('json')
+      ->jsonCondition('test_field', '$.number', NULL, 'HAS KEY')
+      ->jsonExpression('status', 'test_field', '$.number', JsonCastType::Int)
+      ->insertFields(['id' => static::INSERT_ID])
+      ->execute();
+    $this->assertSame(Merge::STATUS_UPDATE, $result);
+    $this->assertSame([1], $this->idsWithStatus(5));
+    $this->assertEqualsCanonicalizing([2, 3], $this->idsWithStatus(10));
+
+    // A float cast assigns a fractional number: rows 5 and 8.
+    $result = $this->connection->merge('json')
+      ->jsonCondition('test_field', '$.float', NULL, 'HAS KEY')
+      ->jsonExpression('score', 'test_field', '$.float', JsonCastType::Float)
+      ->insertFields(['id' => static::INSERT_ID])
+      ->execute();
+    $this->assertSame(Merge::STATUS_UPDATE, $result);
+    $this->assertEquals(1.5, (float) $this->fieldValue(5, 'score'));
+    $this->assertEquals(3.14, (float) $this->fieldValue(8, 'score'));
+  }
+
+  /**
+   * Tests that a boolean cast assigns 1 or 0 on every backend.
+   */
+  public function testJsonExpressionBooleanCast(): void {
+    // Start from a status that cannot be confused with a cast boolean.
+    $this->connection->update('json')
+      ->fields(['status' => 9])
+      ->execute();
+
+    $result = $this->connection->merge('json')
+      ->jsonCondition('test_field', '$.boolean', NULL, 'HAS KEY')
+      ->jsonExpression('status', 'test_field', '$.boolean', JsonCastType::Bool)
+      ->insertFields(['id' => static::INSERT_ID])
+      ->execute();
+
+    $this->assertSame(Merge::STATUS_UPDATE, $result);
+    // Rows 1 and 4 hold true, row 2 holds false, the rest are untouched.
+    $this->assertEqualsCanonicalizing([1, 4], $this->idsWithStatus(1));
+    $this->assertSame([2], $this->idsWithStatus(0));
+    $this->assertEqualsCanonicalizing([3, 5, 6, 7, 8, 9, 10], $this->idsWithStatus(9));
+  }
+
+  /**
+   * Tests two JSON expressions and a nested path in one merge.
+   */
+  public function testJsonExpressionMultiple(): void {
+    $result = $this->connection->merge('json')
+      ->key('id', 8)
+      ->jsonExpression('name', 'test_field', '$.nested.inner')
+      ->jsonExpression('score', 'test_field', '$.float', JsonCastType::Float)
+      ->execute();
+
+    $this->assertSame(Merge::STATUS_UPDATE, $result);
+    $this->assertSame('deep value', $this->fieldValue(8, 'name'));
+    $this->assertEquals(3.14, (float) $this->fieldValue(8, 'score'));
+  }
+
+  /**
+   * Tests a JSON expression next to an expression that binds arguments.
+   *
+   * A JSON expression binds no arguments of its own, so the named placeholder
+   * of the other expression has to survive both query parts.
+   */
+  public function testJsonExpressionWithExpression(): void {
+    $result = $this->connection->merge('json')
+      ->key('id', 3)
+      ->jsonExpression('name', 'test_field', '$.key')
+      ->expression('status', '[status] + :increment', [':increment' => 5])
+      ->execute();
+
+    $this->assertSame(Merge::STATUS_UPDATE, $result);
+    $this->assertSame('some text', $this->fieldValue(3, 'name'));
+    $this->assertSame([3], $this->idsWithStatus(6));
+  }
+
+  /**
+   * Tests a JSON expression restricted by a JSON condition.
+   */
+  public function testJsonExpressionWithJsonCondition(): void {
+    // Rows 3 and 4 hold a string at $.key, row 4 is the only one that matches.
+    $result = $this->connection->merge('json')
+      ->jsonCondition('test_field', '$.key', 'other', 'CONTAINS')
+      ->jsonExpression('name', 'test_field', '$.key')
+      ->insertFields(['id' => static::INSERT_ID])
+      ->execute();
+
+    $this->assertSame(Merge::STATUS_UPDATE, $result);
+    $this->assertSame(10, $this->countRows());
+    $this->assertSame('some other text', $this->fieldValue(4, 'name'));
+    $this->assertNull($this->fieldValue(3, 'name'));
+  }
+
+  /**
+   * Tests that a JSON expression assigns NULL when the path does not exist.
+   */
+  public function testJsonExpressionMissingPath(): void {
+    $this->connection->update('json')
+      ->fields(['name' => 'placeholder'])
+      ->execute();
+
+    $result = $this->connection->merge('json')
+      ->jsonCondition('test_field', '$.number', NULL, 'HAS KEY')
+      ->jsonExpression('name', 'test_field', '$.nonexistent')
+      ->insertFields(['id' => static::INSERT_ID])
+      ->execute();
+
+    $this->assertSame(Merge::STATUS_UPDATE, $result);
+    // Rows 1, 2 and 3 hold a number, so only they lose their name.
+    $named = $this->connection->select('json', 'j')
+      ->fields('j', ['id'])
+      ->isNotNull('j.name')
+      ->execute()
+      ->fetchCol();
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10], array_map('intval', $named));
+  }
+
+  /**
    * Tests that a merge query with a JSON condition is not string-able.
    */
   public function testJsonConditionMergeToString(): void {
@@ -350,6 +583,15 @@ class MergeJsonTest extends DatabaseTestBase {
     $this->expectException(InvalidQueryException::class);
     $this->connection->merge('json')
       ->jsonCondition('test_field', '$.number', 10, 'LIKE');
+  }
+
+  /**
+   * Tests that a JSON expression rejects an invalid jsonpath.
+   */
+  public function testJsonExpressionPathValidation(): void {
+    $this->expectException(InvalidQueryException::class);
+    $this->connection->merge('json')
+      ->jsonExpression('name', 'test_field', "$.key' OR 1=1--");
   }
 
   /**
