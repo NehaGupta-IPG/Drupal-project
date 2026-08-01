@@ -606,7 +606,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
 
         // Create a mock of the LanguageConfigOverride object.
         $config_override = $this->createMock('\Drupal\language\Config\LanguageConfigOverride');
-        
+
         // If a translation is expected to exist, isNew() should return FALSE.
         // If no translation exists, isNew() returns TRUE.
         $config_override->method('isNew')->willReturn(!$has_translation);
