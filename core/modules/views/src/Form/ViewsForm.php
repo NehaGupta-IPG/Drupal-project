@@ -11,7 +11,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
-use Drupal\views\Plugin\views\display\DisplayRouterInterface;
 use Drupal\views\ViewExecutable;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -165,34 +164,24 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
     $query = UrlHelper::filterQueryParameters($query, ['_wrapper_format'], '');
 
     $options = ['query' => $query];
-    // A routed display with an available route builds its own URL.
-    if ($view->display_handler instanceof DisplayRouterInterface && $view->hasUrl()) {
+
+    // Custom URLs do not have a route, so handle them separately.
+    $custom_url = $view->display_handler->getOption('link_display') === 'custom_url'
+      ? $view->display_handler->getPath()
+      : NULL;
+
+    if ($view->hasUrl()) {
       $form_action = $view->getUrl()->setOptions($options)->toString();
     }
+    elseif ($custom_url) {
+      $form_action = $custom_url;
+    }
+    elseif ($this->requestStack->getCurrentRequest()->attributes->get('_route') === 'views.ajax') {
+      // Preserve the original page path during AJAX rebuilds.
+      $form_action = Url::fromUserInput($this->currentPath->getPath())->setOptions($options)->toString();
+    }
     else {
-      // An unrouted display uses its explicitly configured link display. With
-      // no such display, fall back to the current page instead of guessing
-      // based on display order.
-      $form_action = NULL;
-      $linked_display_id = $view->display_handler->getOption('link_display');
-      if (!empty($linked_display_id) && $linked_display_id !== 'custom_url' && $view->displayHandlers->has($linked_display_id) && $view->hasUrl(NULL, $linked_display_id)) {
-        $linked_display = $view->displayHandlers->get($linked_display_id);
-        if ($linked_display instanceof DisplayRouterInterface) {
-          $form_action = $view->getUrl(NULL, $linked_display_id)->setOptions($options)->toString();
-        }
-      }
-
-      if (!$form_action) {
-        // During AJAX rebuilds the route is views.ajax, so preserve the
-        // original page path to keep the post-submit destination stable.
-        $route_name = $this->requestStack->getCurrentRequest()->attributes->get('_route');
-        if ($route_name === 'views.ajax') {
-          $form_action = Url::fromUserInput($this->currentPath->getPath())->setOptions($options)->toString();
-        }
-        else {
-          $form_action = $view->display_handler->getPath() ?: Url::fromRoute('<current>')->toString();
-        }
-      }
+      $form_action = Url::fromRoute('<current>')->setOptions($options)->toString();
     }
 
     $form['#action'] = $form_action;

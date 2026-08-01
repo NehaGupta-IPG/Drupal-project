@@ -10,7 +10,6 @@ use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Render\Element\Checkboxes;
 use Drupal\Core\Url;
 use Drupal\views\ExposedFormCache;
-use Drupal\views\Plugin\views\display\DisplayRouterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -122,33 +121,23 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       '#id' => Html::getUniqueId('edit-submit-' . $view->storage->id()),
     ];
 
-    // A routed display with an available route builds its own URL.
-    if ($view->display_handler instanceof DisplayRouterInterface && $view->hasUrl()) {
+    // Custom URLs do not have a route, so handle them separately.
+    $custom_url = $view->display_handler->getOption('link_display') === 'custom_url'
+      ? $view->display_handler->getPath()
+      : NULL;
+
+    if ($view->hasUrl()) {
       $form_action = $view->getUrl()->toString();
     }
+    elseif ($custom_url) {
+      $form_action = $custom_url;
+    }
+    elseif ($this->getRouteMatch()->getRouteName() === 'views.ajax') {
+      // On the views.ajax route, set the action to the page we were on.
+      $form_action = Url::fromUserInput($this->currentPathStack->getPath())->toString();
+    }
     else {
-      // An unrouted display uses its explicitly configured link display. With
-      // no such display, fall back to the current page instead of guessing
-      // based on display order.
-      $form_action = NULL;
-      $linked_display_id = $view->display_handler->getOption('link_display');
-      if (!empty($linked_display_id) && $linked_display_id !== 'custom_url' && $view->displayHandlers->has($linked_display_id) && $view->hasUrl(NULL, $linked_display_id)) {
-        $linked_display = $view->displayHandlers->get($linked_display_id);
-        if ($linked_display instanceof DisplayRouterInterface) {
-          $form_action = $view->getUrl(NULL, $linked_display_id)->toString();
-        }
-      }
-
-      if (!$form_action) {
-        // On any non views.ajax route, use current route for the form action.
-        if ($this->getRouteMatch()->getRouteName() !== 'views.ajax') {
-          $form_action = $view->display_handler->getPath() ?: Url::fromRoute('<current>')->toString();
-        }
-        else {
-          // On the views.ajax route, set the action to the page we were on.
-          $form_action = Url::fromUserInput($this->currentPathStack->getPath())->toString();
-        }
-      }
+      $form_action = Url::fromRoute('<current>')->toString();
     }
 
     $form['#action'] = $form_action;
