@@ -123,8 +123,8 @@ class InsertJsonTest extends DatabaseTestBase {
     $this->resetInsertedRows();
     $select = $this->sampleSelect();
     $or = $select->orConditionGroup();
-    $or->condition($this->connection->jsonCondition('test_field', '$.key', 'some text'));
-    $or->condition($this->connection->jsonCondition('test_field', '$.number', 5));
+    $or->jsonCondition('test_field', '$.key', 'some text');
+    $or->jsonCondition('test_field', '$.number', 5);
     $this->connection->insert('json')
       ->from($select->condition($or))
       ->execute();

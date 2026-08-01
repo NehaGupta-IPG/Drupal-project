@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\JsonCastType;
-use Drupal\Core\Database\Query\JsonCondition;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -77,8 +76,8 @@ class UpdateJsonTest extends DatabaseTestBase {
     // OR: key = "some text" OR number = 5 → rows 1, 3.
     $update = $this->connection->update('json')->fields(['status' => 3]);
     $or = $update->orConditionGroup();
-    $or->condition(new JsonCondition('test_field', '$.key', 'some text'));
-    $or->condition(new JsonCondition('test_field', '$.number', 5));
+    $or->jsonCondition('test_field', '$.key', 'some text');
+    $or->jsonCondition('test_field', '$.number', 5);
     $num_updated = $update->condition($or)->execute();
     $this->assertSame(2, $num_updated);
     $this->assertEqualsCanonicalizing([1, 3], $this->idsWithStatus(3));

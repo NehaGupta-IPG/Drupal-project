@@ -128,6 +128,48 @@ class Condition implements ConditionInterface, \Countable {
   }
 
   /**
+   * Adds a condition on a value inside a JSON column.
+   *
+   * This is the condition group counterpart of the jsonCondition() method the
+   * query builders provide. It lets a JSON condition be mixed with regular
+   * conditions inside an AND or an OR group:
+   * @code
+   * $or = $query->orConditionGroup()
+   *   ->jsonCondition('data', '$.status', 'active')
+   *   ->condition('uid', 1);
+   * $query->condition($or);
+   * @endcode
+   *
+   * @param string $field
+   *   The name of the JSON column.
+   * @param string $jsonpath
+   *   The JSONPath expression (e.g. "$.status").
+   * @param string|int|float|array|bool|null $value
+   *   The value to compare against. Ignored for unary operators (IS NULL,
+   *   IS NOT NULL, HAS KEY).
+   * @param string $operator
+   *   The comparison operator.
+   *
+   * @return static
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the operator is not supported, or the value does not suit it.
+   *
+   * @see \Drupal\Core\Database\Query\JsonCondition
+   * @see \Drupal\Core\Database\Connection::jsonCondition()
+   */
+  public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static {
+    // A condition group holds no connection, so it cannot use the
+    // Connection::jsonCondition() factory. All driver-specific SQL comes from
+    // the JsonExpression that JsonCondition::compile() resolves from the
+    // connection it is handed. A driver that ships its own JsonCondition
+    // overrides this method along with the Condition class.
+    $this->condition(new JsonCondition($field, $jsonpath, $value, $operator));
+    return $this;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function where($snippet, $args = []) {

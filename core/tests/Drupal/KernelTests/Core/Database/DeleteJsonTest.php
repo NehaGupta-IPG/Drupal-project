@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\InvalidQueryException;
-use Drupal\Core\Database\Query\JsonCondition;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -88,8 +87,8 @@ class DeleteJsonTest extends DatabaseTestBase {
     $this->resetJsonTable();
     $delete = $this->connection->delete('json');
     $or = $delete->orConditionGroup();
-    $or->condition(new JsonCondition('test_field', '$.key', 'some text'));
-    $or->condition(new JsonCondition('test_field', '$.number', 5));
+    $or->jsonCondition('test_field', '$.key', 'some text');
+    $or->jsonCondition('test_field', '$.number', 5);
     $num_deleted = $delete->condition($or)->execute();
     $this->assertSame(2, $num_deleted);
     $this->assertEqualsCanonicalizing([2, 4, 5, 6, 7, 8, 9, 10], $this->remainingIds());

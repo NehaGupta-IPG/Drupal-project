@@ -710,8 +710,8 @@ class SelectTest extends DatabaseTestBase {
     $query = $this->connection->select('json', 'j');
     $query->addField('j', 'id');
     $or = $query->orConditionGroup();
-    $or->condition(new JsonCondition('test_field', '$.key', 'some text'));
-    $or->condition(new JsonCondition('test_field', '$.number', 5));
+    $or->jsonCondition('test_field', '$.key', 'some text');
+    $or->jsonCondition('test_field', '$.number', 5);
     $query->condition($or);
     $ids = array_map('intval', $query->execute()->fetchCol());
     sort($ids);
@@ -724,6 +724,70 @@ class SelectTest extends DatabaseTestBase {
     $query->condition('j.id', 3);
     $ids = array_map('intval', $query->execute()->fetchCol());
     $this->assertEquals([3], $ids);
+  }
+
+  /**
+   * Tests JSON conditions added to a condition group.
+   *
+   * @see \Drupal\Core\Database\Query\Condition::jsonCondition()
+   */
+  public function testJsonConditionInConditionGroup(): void {
+    // A group mixes JSON conditions with conditions on regular columns. Row 1
+    // holds 5 at $.number, row 4 is matched by its id.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $or = $query->orConditionGroup();
+    $or->jsonCondition('test_field', '$.number', 5);
+    $or->condition('j.id', 4);
+    $query->condition($or);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([1, 4], $ids);
+
+    // The method returns the group, so calls chain.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $group = $query->andConditionGroup();
+    $this->assertSame($group, $group->jsonCondition('test_field', '$.number', 5, '>='));
+    $query->condition($group->jsonCondition('test_field', '$.boolean', TRUE));
+    $this->assertEquals([1], array_map('intval', $query->execute()->fetchCol()));
+
+    // A group nested in another group keeps the JSON conditions grouped.
+    // Boolean true holds for rows 1 and 4, "some" is contained in $.key of
+    // rows 3 and 4, so the OR matches 1, 3 and 4. The id narrows that to 1
+    // and 3.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $and = $query->andConditionGroup();
+    $and->condition('j.id', [1, 2, 3], 'IN');
+    $nested = $and->orConditionGroup();
+    $nested->jsonCondition('test_field', '$.boolean', TRUE);
+    $nested->jsonCondition('test_field', '$.key', 'some', 'CONTAINS');
+    $query->condition($and->condition($nested));
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([1, 3], $ids);
+
+    // The placeholders a group generates do not collide with the ones of the
+    // query it is added to. BETWEEN binds two of them and matches rows 1, 2
+    // and 3; the id in the same group and the status outside it narrow that
+    // to row 3.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->condition('j.status', 1);
+    $and = $query->andConditionGroup();
+    $and->jsonCondition('test_field', '$.number', [5, 10], 'BETWEEN');
+    $and->condition('j.id', 3);
+    $query->condition($and);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([3], $ids);
+  }
+
+  /**
+   * Tests that a JSON condition in a group validates its arguments.
+   */
+  public function testJsonConditionInConditionGroupValidation(): void {
+    $this->expectException(InvalidQueryException::class);
+    $this->connection->condition('AND')
+      ->jsonCondition('test_field', '$.number', 'string', 'IN');
   }
 
   /**

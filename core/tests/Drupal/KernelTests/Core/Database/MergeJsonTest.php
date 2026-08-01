@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\JsonCastType;
-use Drupal\Core\Database\Query\JsonCondition;
 use Drupal\Core\Database\Query\Merge;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -242,8 +241,8 @@ class MergeJsonTest extends DatabaseTestBase {
       ->updateFields(['status' => 6])
       ->insertFields(['id' => static::INSERT_ID]);
     $or = $merge->orConditionGroup();
-    $or->condition(new JsonCondition('test_field', '$.key', 'some text'));
-    $or->condition(new JsonCondition('test_field', '$.number', 5));
+    $or->jsonCondition('test_field', '$.key', 'some text');
+    $or->jsonCondition('test_field', '$.number', 5);
     $result = $merge->condition($or)->execute();
     $this->assertSame(Merge::STATUS_UPDATE, $result);
     $this->assertEqualsCanonicalizing([1, 3], $this->idsWithStatus(6));
