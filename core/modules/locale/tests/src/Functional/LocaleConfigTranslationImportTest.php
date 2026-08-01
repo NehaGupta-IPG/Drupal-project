@@ -110,7 +110,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
   public function testConfigTranslationModuleInstall(): void {
 
     // Enable locale, block and config_translation modules.
-    $this->container->get('module_installer')->install(['block', 'config_translation']);
+    $this->container->get('module_installer')->install(['locale', 'block', 'config_translation']);
     $this->resetAll();
 
     // The testing profile overrides locale.settings to disable translation
