@@ -4,6 +4,8 @@ namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
 
+// cspell:ignore uncast
+
 /**
  * Interface definition for a Select Query object.
  *
