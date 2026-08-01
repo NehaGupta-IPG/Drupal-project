@@ -850,6 +850,96 @@ class SelectTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests JSON conditions on an extended query.
+   *
+   * @see \Drupal\Core\Database\Query\SelectExtender::jsonCondition()
+   * @see \Drupal\Core\Database\Query\SelectExtender::havingJsonCondition()
+   */
+  public function testJsonConditionOnExtender(): void {
+    // The extender returns itself, so a chain does not drop the extender
+    // layer. Rows 1, 2 and 3 hold 5 or more at $.number.
+    $query = $this->connection->select('json', 'j')->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $this->assertSame($query, $query->jsonCondition('test_field', '$.number', 5, '>='));
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([1, 2, 3], $ids);
+
+    // An extender numbers placeholders with its own counter, so a JSON
+    // condition and a condition on a regular column must not collide.
+    // BETWEEN binds two placeholders and matches rows 1, 2 and 3; the id
+    // narrows that to 2 and 3.
+    $query = $this->connection->select('json', 'j')->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $query->jsonCondition('test_field', '$.number', [5, 10], 'BETWEEN');
+    $query->condition('j.id', [2, 3], 'IN');
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([2, 3], $ids);
+
+    // HAVING works the same way. Grouping by the primary key keeps the JSON
+    // column functionally dependent on the grouped column.
+    $query = $this->connection->select('json', 'j')->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $query->groupBy('j.id');
+    $this->assertSame($query, $query->havingJsonCondition('test_field', '$.number', 10, '='));
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([2, 3], $ids);
+
+    // One extender wrapping another passes both methods down to the query.
+    // The WHERE keeps rows 1, 2 and 3, the HAVING keeps 2 and 3.
+    $query = $this->connection->select('json', 'j')
+      ->extend(SelectExtender::class)
+      ->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $query->groupBy('j.id');
+    $this->assertSame($query, $query->jsonCondition('test_field', '$.number', 5, '>='));
+    $this->assertSame($query, $query->havingJsonCondition('test_field', '$.key', NULL, 'HAS KEY'));
+    $this->assertEquals([3], array_map('intval', $query->execute()->fetchCol()));
+  }
+
+  /**
+   * Tests JSON expressions on an extended query.
+   *
+   * @see \Drupal\Core\Database\Query\SelectExtender::addJsonExpression()
+   * @see \Drupal\Core\Database\Query\SelectExtender::jsonOrderBy()
+   */
+  public function testJsonExpressionOnExtender(): void {
+    // The alias comes back from the wrapped query, so the extender returns a
+    // string here, not itself.
+    $query = $this->connection->select('json', 'j')->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $alias = $query->addJsonExpression('test_field', '$.number', 'num', JsonCastType::Int);
+    $this->assertSame('num', $alias);
+    $query->condition('j.id', 1);
+    $this->assertEquals(5, $query->execute()->fetchObject()->num);
+
+    // Ordering returns the extender, so a chain does not drop the extender
+    // layer. Row 1 holds 5 at $.number, rows 2 and 3 hold 10, and the rows
+    // without the key sort last.
+    $query = $this->connection->select('json', 'j')->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $this->assertSame($query, $query->jsonOrderBy('test_field', '$.number', 'ASC', JsonCastType::Int));
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals(1, $ids[0]);
+    $this->assertEqualsCanonicalizing([2, 3], array_slice($ids, 1, 2));
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10], array_slice($ids, 3));
+
+    // One extender wrapping another passes both methods down to the query.
+    // Rows 3 and 4 hold $.key, and "some other text" sorts before "some text".
+    $query = $this->connection->select('json', 'j')
+      ->extend(SelectExtender::class)
+      ->extend(SelectExtender::class);
+    $query->addField('j', 'id');
+    $this->assertSame('key_value', $query->addJsonExpression('test_field', '$.key', 'key_value'));
+    $this->assertSame($query, $query->jsonOrderBy('test_field', '$.key', 'ASC'));
+    $query->jsonCondition('test_field', '$.key', NULL, 'IS NOT NULL');
+    $values = [];
+    foreach ($query->execute() as $row) {
+      $values[(int) $row->id] = $row->key_value;
+    }
+    $this->assertSame([4 => 'some other text', 3 => 'some text'], $values);
+  }
+
+  /**
    * Tests JSON ORDER BY with different types and directions.
    */
   public function testJsonOrderBy(): void {

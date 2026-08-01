@@ -110,6 +110,32 @@ class SelectExtender implements SelectInterface {
   }
 
   /**
+   * Sets a condition on a value inside a JSON column.
+   *
+   * @param string $field
+   *   The name of the JSON column, optionally table-qualified (e.g. "n.data").
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string|int|float|array|bool|null $value
+   *   The value to compare against. Ignored for unary operators (IS NULL,
+   *   IS NOT NULL, HAS KEY).
+   * @param string $operator
+   *   The comparison operator.
+   *
+   * @return static
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the operator is not supported, or the value does not suit it.
+   *
+   * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()
+   */
+  public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static {
+    $this->query->jsonCondition($field, $jsonpath, $value, $operator);
+    return $this;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function &conditions() {
@@ -211,6 +237,32 @@ class SelectExtender implements SelectInterface {
    */
   public function havingNotExists(SelectInterface $select) {
     $this->query->havingNotExists($select);
+    return $this;
+  }
+
+  /**
+   * Sets a HAVING condition on a value inside a JSON column.
+   *
+   * @param string $field
+   *   The name of the JSON column, optionally table-qualified (e.g. "n.data").
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string|int|float|array|bool|null $value
+   *   The value to compare against. Ignored for unary operators (IS NULL,
+   *   IS NOT NULL, HAS KEY).
+   * @param string $operator
+   *   The comparison operator.
+   *
+   * @return static
+   *   The called object.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the operator is not supported, or the value does not suit it.
+   *
+   * @see \Drupal\Core\Database\Query\Select::havingJsonCondition()
+   */
+  public function havingJsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): static {
+    $this->query->havingJsonCondition($field, $jsonpath, $value, $operator);
     return $this;
   }
 
@@ -367,6 +419,28 @@ class SelectExtender implements SelectInterface {
   }
 
   /**
+   * Adds a value extracted from a JSON column to the SELECT list.
+   *
+   * @param string $field
+   *   The JSON column name, optionally table-qualified (e.g. "j.data").
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string|null $alias
+   *   The alias for the expression. Defaults to 'expression'. As with
+   *   addExpression(), a numeric suffix is added if the alias is already taken.
+   * @param \Drupal\Core\Database\Query\JsonCastType $cast
+   *   The type to cast the extracted value to. Defaults to text.
+   *
+   * @return string
+   *   The alias of the expression, to use in addField() or orderBy().
+   *
+   * @see \Drupal\Core\Database\Query\Select::addJsonExpression()
+   */
+  public function addJsonExpression(string $field, string $jsonpath, ?string $alias = NULL, JsonCastType $cast = JsonCastType::Text): string {
+    return $this->query->addJsonExpression($field, $jsonpath, $alias, $cast);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function join($table, $alias = NULL, $condition = NULL, $arguments = []) {
@@ -399,6 +473,30 @@ class SelectExtender implements SelectInterface {
    */
   public function orderBy($field, $direction = 'ASC') {
     $this->query->orderBy($field, $direction);
+    return $this;
+  }
+
+  /**
+   * Orders the result set by a value extracted from a JSON column.
+   *
+   * @param string $field
+   *   The JSON column name.
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string $direction
+   *   The sort direction: 'ASC' or 'DESC'.
+   * @param \Drupal\Core\Database\Query\JsonCastType $cast
+   *   The type to cast the extracted value to before sorting. Defaults to
+   *   JsonCastType::Text. Pass Int or Float to sort numerically, otherwise
+   *   "10" sorts before "9".
+   *
+   * @return static
+   *   The called object.
+   *
+   * @see \Drupal\Core\Database\Query\Select::jsonOrderBy()
+   */
+  public function jsonOrderBy(string $field, string $jsonpath, string $direction = 'ASC', JsonCastType $cast = JsonCastType::Text): static {
+    $this->query->jsonOrderBy($field, $jsonpath, $direction, $cast);
     return $this;
   }
 
