@@ -391,13 +391,18 @@ class Select extends Query implements SelectInterface {
    *   The value to compare against. Ignored for unary operators (IS NULL,
    *   IS NOT NULL, HAS KEY).
    * @param string $operator
-   *   The comparison operator.
+   *   The comparison operator. A jsonpath with a wildcard segment matches any
+   *   number of values, and asks whether any of them satisfies the operator.
+   *   Only the comparison operators expand a wildcard that way, see
+   *   JsonCondition::WILDCARD_OPERATORS.
    *
    * @return static
    *   The called object.
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
-   *   If the operator is not supported, or the value does not suit it.
+   *   If the operator is not supported, or the value does not suit it. The
+   *   jsonpath is validated when the query is compiled, which also rejects a
+   *   wildcard under an operator that cannot expand one.
    *
    * @see \Drupal\Core\Database\Query\Condition::jsonCondition()
    * @see \Drupal\Core\Database\Query\Select::addJsonExpression()
@@ -670,6 +675,10 @@ class Select extends Query implements SelectInterface {
    * @return string
    *   The alias of the expression, to use in addField() or orderBy().
    *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the jsonpath is invalid, or contains a wildcard. A wildcard matches
+   *   any number of values, and a SELECT expression holds one.
+   *
    * @see \Drupal\Core\Database\Query\Select::addExpression()
    * @see \Drupal\Core\Database\Query\Select::jsonOrderBy()
    * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()
@@ -767,6 +776,10 @@ class Select extends Query implements SelectInterface {
    *   "10" sorts before "9".
    *
    * @return $this
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the jsonpath is invalid, or contains a wildcard. A wildcard matches
+   *   any number of values, and a sort key is one value.
    */
   public function jsonOrderBy(string $field, string $jsonpath, string $direction = 'ASC', JsonCastType $cast = JsonCastType::Text): self {
     $expression = $this->connection->jsonExpression($field, $jsonpath);

@@ -594,6 +594,20 @@ class MergeJsonTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests that a JSON expression rejects a wildcard path.
+   *
+   * A wildcard matches any number of values, and an assignment takes one.
+   * testJsonConditionMergeWildcard() covers the condition, which does expand
+   * a wildcard.
+   */
+  public function testJsonExpressionWildcard(): void {
+    $this->expectException(InvalidQueryException::class);
+    $this->expectExceptionMessage('contains a wildcard, which is not supported when casting a value');
+    $this->connection->merge('json')
+      ->jsonExpression('name', 'test_field', '$.deps.*.status');
+  }
+
+  /**
    * Tests that an invalid jsonpath is rejected when the query is compiled.
    */
   public function testJsonConditionMergePathValidation(): void {

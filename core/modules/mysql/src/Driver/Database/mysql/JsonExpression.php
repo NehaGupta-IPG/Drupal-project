@@ -16,14 +16,14 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toSql(): string {
+  protected function doToSql(): string {
     return "JSON_EXTRACT({$this->field}, {$this->connection->quote($this->path)})";
   }
 
   /**
    * {@inheritdoc}
    */
-  public function toCastSql(JsonCastType $type, ?string $expression = NULL): string {
+  protected function doToCastSql(JsonCastType $type, ?string $expression = NULL): string {
     $extract = $expression ?? $this->toSql();
     return match ($type) {
       // MariaDB's CAST(<JSON boolean> AS SIGNED) returns 0 for both true and
@@ -39,14 +39,14 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toHasKeySql(): string {
+  protected function doToHasKeySql(): string {
     return "JSON_CONTAINS_PATH({$this->field}, 'one', {$this->connection->quote($this->path)})";
   }
 
   /**
    * {@inheritdoc}
    */
-  public function toContainsSql(string $encoded_value): string {
+  protected function doToContainsSql(string $encoded_value): string {
     $quoted = $this->connection->quote($encoded_value);
     return "JSON_CONTAINS({$this->field}, {$quoted}, {$this->connection->quote($this->path)})";
   }
@@ -82,7 +82,7 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
+  protected function doToTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
     // MySQL reports an unsigned integer and a high precision number as their
     // own type, MariaDB reports both as INTEGER and DOUBLE. A whole number
     // satisfies a float comparison, so it is accepted for both numeric casts.

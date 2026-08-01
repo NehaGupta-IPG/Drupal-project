@@ -260,6 +260,19 @@ class InsertJsonTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests that a JSON expression rejects a wildcard path.
+   *
+   * A wildcard matches any number of values, and an inserted column takes one.
+   */
+  public function testJsonExpressionWildcard(): void {
+    $this->expectException(InvalidQueryException::class);
+    $this->expectExceptionMessage('contains a wildcard, which is not supported when casting a value');
+    $this->connection->insert('json')
+      ->from($this->sampleSelect())
+      ->jsonExpression('name', 'test_field', '$.deps.*.status');
+  }
+
+  /**
    * Tests that a second expression for the same column is rejected.
    */
   public function testJsonExpressionDuplicateField(): void {

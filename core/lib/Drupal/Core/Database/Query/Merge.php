@@ -229,6 +229,10 @@ class Merge extends Query implements ConditionInterface {
    * @return $this
    *   The called object.
    *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the jsonpath is invalid, or contains a wildcard. A wildcard matches
+   *   any number of values, and an assignment takes one.
+   *
    * @see \Drupal\Core\Database\Query\Merge::expression()
    * @see \Drupal\Core\Database\Query\Update::jsonExpression()
    * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()

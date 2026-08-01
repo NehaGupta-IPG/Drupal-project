@@ -138,6 +138,10 @@ class Update extends Query implements ConditionInterface {
    * @return $this
    *   The called object.
    *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the jsonpath is invalid, or contains a wildcard. A wildcard matches
+   *   any number of values, and an assignment takes one.
+   *
    * @see \Drupal\Core\Database\Query\Update::expression()
    * @see \Drupal\Core\Database\Query\Select::addJsonExpression()
    * @see \Drupal\Core\Database\Query\QueryConditionTrait::jsonCondition()

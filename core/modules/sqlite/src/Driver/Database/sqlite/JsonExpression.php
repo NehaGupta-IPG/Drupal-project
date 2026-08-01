@@ -16,14 +16,14 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toSql(): string {
+  protected function doToSql(): string {
     return "json_extract({$this->field}, {$this->connection->quote($this->path)})";
   }
 
   /**
    * {@inheritdoc}
    */
-  public function toCastSql(JsonCastType $type, ?string $expression = NULL): string {
+  protected function doToCastSql(JsonCastType $type, ?string $expression = NULL): string {
     $sql = $expression ?? $this->toSql();
     return match ($type) {
       JsonCastType::Bool, JsonCastType::Int => "CAST({$sql} AS INTEGER)",
@@ -35,14 +35,14 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toHasKeySql(): string {
+  protected function doToHasKeySql(): string {
     return "json_type({$this->field}, {$this->connection->quote($this->path)}) IS NOT NULL";
   }
 
   /**
    * {@inheritdoc}
    */
-  public function toContainsSql(string $encoded_value): string {
+  protected function doToContainsSql(string $encoded_value): string {
     $quoted = $this->connection->quote($encoded_value);
     return "EXISTS (SELECT 1 FROM json_each({$this->field}, {$this->connection->quote($this->path)}) WHERE json_each.value IN (SELECT value FROM json_each({$quoted})))";
   }
@@ -83,7 +83,7 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
+  protected function doToTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
     // SQLite has no boolean JSON type, it reports the literals true and false
     // as their own type. A whole number satisfies a float comparison, so
     // 'integer' is accepted for both numeric casts.

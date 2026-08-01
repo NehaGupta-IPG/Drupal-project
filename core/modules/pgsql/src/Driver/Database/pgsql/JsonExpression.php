@@ -18,7 +18,7 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toSql(): string {
+  protected function doToSql(): string {
     // Uses the #>> operator to extract a JSON value as text.
     return "{$this->field} #>> {$this->pathArraySql()}";
   }
@@ -40,7 +40,7 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toCastSql(JsonCastType $type, ?string $expression = NULL): string {
+  protected function doToCastSql(JsonCastType $type, ?string $expression = NULL): string {
     $sql = $expression ?? $this->toSql();
     return match ($type) {
       JsonCastType::Bool => "({$sql})::boolean::integer",
@@ -55,7 +55,7 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toHasKeySql(): string {
+  protected function doToHasKeySql(): string {
     // @? checks if the jsonpath returns any items. PDO requires doubling the ?
     // to avoid placeholder interpretation.
     return "{$this->field} @?? {$this->connection->quote($this->path)}";
@@ -64,7 +64,7 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toContainsSql(string $encoded_value): string {
+  protected function doToContainsSql(string $encoded_value): string {
     // Values are embedded inside single-quoted SQL string literals (jsonpath
     // expressions). Use quote() for driver-correct escaping, then strip the
     // surrounding quotes it adds since we're inside an existing literal.
@@ -117,7 +117,7 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
+  protected function doToTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
     // PostgreSQL reports every number as 'number', so one type name covers
     // both numeric casts.
     $json_type = match ($type) {

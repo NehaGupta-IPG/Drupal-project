@@ -694,6 +694,74 @@ class SelectTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests that operators which cannot expand a wildcard path reject one.
+   *
+   * A wildcard matches any number of values. Only the comparison operators
+   * expand it into a row set, and ask whether any matched value satisfies the
+   * comparison. The other operators build their SQL from a form that returns
+   * a single value.
+   *
+   * @see \Drupal\Core\Database\Query\JsonCondition::WILDCARD_OPERATORS
+   */
+  public function testJsonWildcardUnsupportedOperator(): void {
+    $cases = [
+      'CONTAINS' => 'enabled',
+      'STARTS_WITH' => 'en',
+      'ENDS_WITH' => 'ed',
+      'BETWEEN' => [1, 5],
+      'NOT BETWEEN' => [1, 5],
+      'JSON_CONTAINS' => ['enabled'],
+      'IS NULL' => NULL,
+      'IS NOT NULL' => NULL,
+      'HAS KEY' => NULL,
+    ];
+    foreach ($cases as $operator => $value) {
+      $query = $this->connection->select('json', 'j');
+      $query->addField('j', 'id');
+      $query->jsonCondition('test_field', '$.deps.*.status', $value, $operator);
+      try {
+        $query->execute();
+        $this->fail("Expected exception for operator: $operator");
+      }
+      catch (InvalidQueryException $e) {
+        $this->assertStringContainsString("Operator {$operator} does not support the wildcard", $e->getMessage());
+      }
+    }
+
+    // The comparison operators keep working on the same path.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonCondition('test_field', '$.deps.*.status', 'enabled');
+    $this->assertSame([10], array_map('intval', $query->execute()->fetchCol()));
+  }
+
+  /**
+   * Tests that the JSON expression surfaces reject a wildcard path.
+   *
+   * A SELECT expression and a sort key hold one value, so there is nowhere to
+   * expand the wildcard into. Without this each backend degrades differently:
+   * PostgreSQL looks for a literal "*" key, SQLite raises an error, and MySQL
+   * returns the whole matched set.
+   *
+   * @see \Drupal\Core\Database\Query\JsonExpression::assertNoWildcard()
+   */
+  public function testJsonWildcardUnsupportedExpression(): void {
+    $query = $this->connection->select('json', 'j');
+    try {
+      $query->addJsonExpression('test_field', '$.deps.*.status', 'st');
+      $this->fail('Expected exception for addJsonExpression().');
+    }
+    catch (InvalidQueryException $e) {
+      $this->assertStringContainsString('contains a wildcard, which is not supported when casting a value', $e->getMessage());
+    }
+
+    $query = $this->connection->select('json', 'j');
+    $this->expectException(InvalidQueryException::class);
+    $this->expectExceptionMessage('contains a wildcard');
+    $query->jsonOrderBy('test_field', '$.deps.*.status');
+  }
+
+  /**
    * Tests combining JSON conditions with AND, OR, and regular conditions.
    */
   public function testJsonConditionCombined(): void {

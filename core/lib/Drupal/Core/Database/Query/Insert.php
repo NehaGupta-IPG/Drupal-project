@@ -112,8 +112,10 @@ abstract class Insert extends Query implements \Countable {
    *   The called object.
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
-   *   If the query has no select query to insert the result of, or if the
-   *   select query already has an expression named after the target column.
+   *   If the query has no select query to insert the result of, if the select
+   *   query already has an expression named after the target column, or if the
+   *   jsonpath is invalid or contains a wildcard. A wildcard matches any
+   *   number of values, and an inserted column takes one.
    *
    * @see \Drupal\Core\Database\Query\Insert::from()
    * @see \Drupal\Core\Database\Query\Select::addJsonExpression()

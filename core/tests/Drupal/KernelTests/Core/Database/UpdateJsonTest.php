@@ -397,4 +397,16 @@ class UpdateJsonTest extends DatabaseTestBase {
       ->jsonExpression('name', 'test_field', "$.key' OR 1=1--");
   }
 
+  /**
+   * Tests that a JSON expression rejects a wildcard path.
+   *
+   * A wildcard matches any number of values, and an assignment takes one.
+   */
+  public function testJsonExpressionWildcard(): void {
+    $this->expectException(InvalidQueryException::class);
+    $this->expectExceptionMessage('contains a wildcard, which is not supported when casting a value');
+    $this->connection->update('json')
+      ->jsonExpression('name', 'test_field', '$.deps.*.status');
+  }
+
 }

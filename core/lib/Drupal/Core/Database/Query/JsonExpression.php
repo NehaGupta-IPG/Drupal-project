@@ -77,11 +77,28 @@ abstract class JsonExpression {
    * @return string
    *   A SQL fragment that extracts the value at the given path.
    *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the path contains a wildcard.
+   *
+   * @internal
+   *   This method should only be use by the database layer.
+   */
+  public function toSql(): string {
+    $this->assertNoWildcard('extracting a value');
+    return $this->doToSql();
+  }
+
+  /**
+   * Generates the SQL extraction expression.
+   *
+   * @return string
+   *   A SQL fragment that extracts the value at the given path.
+   *
    * @internal
    *   This method should only be use by the database layer and should be
    *   implemented by database drivers.
    */
-  abstract public function toSql(): string;
+  abstract protected function doToSql(): string;
 
   /**
    * Generates a SQL expression with a type cast.
@@ -100,11 +117,53 @@ abstract class JsonExpression {
    * @return string
    *   A SQL fragment that casts the value to the given type.
    *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the path contains a wildcard and $expression is NULL.
+   *
+   * @internal
+   *   This method should only be use by the database layer.
+   */
+  public function toCastSql(JsonCastType $type, ?string $expression = NULL): string {
+    if ($expression === NULL) {
+      $this->assertNoWildcard('casting a value');
+    }
+    return $this->doToCastSql($type, $expression);
+  }
+
+  /**
+   * Generates a SQL expression with a type cast.
+   *
+   * @param \Drupal\Core\Database\Query\JsonCastType $type
+   *   The cast type.
+   * @param string|null $expression
+   *   A SQL expression to cast. If NULL, uses toSql() to extract from the
+   *   JSON column.
+   *
+   * @return string
+   *   A SQL fragment that casts the value to the given type.
+   *
    * @internal
    *   This method should only be use by the database layer and should be
    *   implemented by database drivers.
    */
-  abstract public function toCastSql(JsonCastType $type, ?string $expression = NULL): string;
+  abstract protected function doToCastSql(JsonCastType $type, ?string $expression = NULL): string;
+
+  /**
+   * Generates SQL to check if the JSON path exists (has a key/element).
+   *
+   * @return string
+   *   A SQL fragment that evaluates to TRUE if the path exists.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the path contains a wildcard.
+   *
+   * @internal
+   *   This method should only be use by the database layer.
+   */
+  public function toHasKeySql(): string {
+    $this->assertNoWildcard('testing whether a key exists');
+    return $this->doToHasKeySql();
+  }
 
   /**
    * Generates SQL to check if the JSON path exists (has a key/element).
@@ -116,7 +175,28 @@ abstract class JsonExpression {
    *   This method should only be use by the database layer and should be
    *   implemented by database drivers.
    */
-  abstract public function toHasKeySql(): string;
+  abstract protected function doToHasKeySql(): string;
+
+  /**
+   * Generates SQL for JSON array containment check.
+   *
+   * @param string $encoded_value
+   *   The JSON-encoded value to check for containment.
+   *
+   * @return string
+   *   A SQL fragment that evaluates to TRUE if the JSON array at the path
+   *   contains the given value.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the path contains a wildcard.
+   *
+   * @internal
+   *   This method should only be use by the database layer.
+   */
+  public function toContainsSql(string $encoded_value): string {
+    $this->assertNoWildcard('testing array containment');
+    return $this->doToContainsSql($encoded_value);
+  }
 
   /**
    * Generates SQL for JSON array containment check.
@@ -132,7 +212,7 @@ abstract class JsonExpression {
    *   This method should only be use by the database layer and should be
    *   implemented by database drivers.
    */
-  abstract public function toContainsSql(string $encoded_value): string;
+  abstract protected function doToContainsSql(string $encoded_value): string;
 
   /**
    * Generates SQL restricting a comparison to values of the expected JSON type.
@@ -159,11 +239,37 @@ abstract class JsonExpression {
    *   A SQL fragment ending in ' AND ', or an empty string when the cast
    *   cannot fail, as is the case for a text cast.
    *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the path contains a wildcard and $type_expression is NULL.
+   *
+   * @internal
+   *   This method should only be use by the database layer.
+   */
+  public function toTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
+    if ($type_expression === NULL) {
+      $this->assertNoWildcard('testing the type of a value');
+    }
+    return $this->doToTypeGuardSql($type, $type_expression);
+  }
+
+  /**
+   * Generates SQL restricting a comparison to values of the expected JSON type.
+   *
+   * @param \Drupal\Core\Database\Query\JsonCastType $type
+   *   The cast type the comparison uses.
+   * @param string|null $type_expression
+   *   A SQL expression returning the JSON type name of the value to check. If
+   *   NULL, the type of the value at this expression's JSON path is used.
+   *
+   * @return string
+   *   A SQL fragment ending in ' AND ', or an empty string when the cast
+   *   cannot fail, as is the case for a text cast.
+   *
    * @internal
    *   This method should only be use by the database layer and should be
    *   implemented by database drivers.
    */
-  abstract public function toTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string;
+  abstract protected function doToTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string;
 
   /**
    * Generates SQL for a comparison against a scalar or array value.
@@ -233,6 +339,33 @@ abstract class JsonExpression {
    */
   public function hasWildcard(): bool {
     return in_array('*', $this->pathSegments, TRUE);
+  }
+
+  /**
+   * Throws when the path holds a wildcard the SQL form cannot express.
+   *
+   * A wildcard matches any number of values. toComparisonSql() expands it into
+   * a row set and asks whether any of the matched values satisfies the
+   * comparison. The other forms produce a single value, so they have nowhere
+   * to expand the wildcard into. Without this check each backend degrades in
+   * its own way: PostgreSQL looks for a literal "*" key and returns NULL,
+   * SQLite raises an error, and MySQL returns the whole matched set.
+   *
+   * @param string $form
+   *   What the caller asked the expression for, used in the message.
+   *
+   * @throws \Drupal\Core\Database\InvalidQueryException
+   *   If the path contains a wildcard.
+   */
+  protected function assertNoWildcard(string $form): void {
+    if ($this->hasWildcard()) {
+      throw new InvalidQueryException(sprintf(
+        'The jsonpath "%s" contains a wildcard, which is not supported when %s. A wildcard path is supported in a comparison condition only, with one of the operators: %s.',
+        $this->path,
+        $form,
+        implode(', ', JsonCondition::WILDCARD_OPERATORS),
+      ));
+    }
   }
 
   /**

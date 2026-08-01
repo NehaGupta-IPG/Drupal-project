@@ -38,6 +38,20 @@ class JsonCondition extends Condition {
   ];
 
   /**
+   * The operators that accept a path with a wildcard segment.
+   *
+   * These are the operators JsonExpression::toComparisonSql() handles, which
+   * is the only place a wildcard is expanded into a row set. Every other form
+   * produces a single value.
+   *
+   * @see \Drupal\Core\Database\Query\JsonExpression::assertNoWildcard()
+   */
+  public const WILDCARD_OPERATORS = [
+    '=', '<>', '!=', '<', '<=', '>', '>=',
+    'IN', 'NOT IN',
+  ];
+
+  /**
    * Constructs a JsonCondition object.
    *
    * @param string $field
@@ -104,6 +118,19 @@ class JsonCondition extends Condition {
     $this->changed = FALSE;
 
     $expression = $connection->jsonExpression($this->field, $this->path);
+
+    // A wildcard is expanded into a row set by toComparisonSql() only. The
+    // other operators build their SQL from forms that return a single value,
+    // so they cannot express one. JsonExpression rejects those forms as well;
+    // this check names the operator that reached them.
+    if ($expression->hasWildcard() && !in_array($this->operator, self::WILDCARD_OPERATORS, TRUE)) {
+      throw new InvalidQueryException(sprintf(
+        'Operator %s does not support the wildcard in jsonpath "%s". Operators that support a wildcard path: %s.',
+        $this->operator,
+        $this->path,
+        implode(', ', self::WILDCARD_OPERATORS),
+      ));
+    }
 
     // All operators are handled generically via the driver-specific
     // JsonExpression methods: toSql(), toCastSql(), toHasKeySql(),
