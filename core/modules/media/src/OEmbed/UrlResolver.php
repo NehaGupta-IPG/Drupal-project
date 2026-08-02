@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Site\Settings;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -35,6 +36,7 @@ class UrlResolver implements UrlResolverInterface {
     protected ModuleHandlerInterface $moduleHandler,
     #[Autowire(service: 'cache.default')]
     protected CacheBackendInterface $cacheBackend,
+    protected LanguageManagerInterface $languageManager,
   ) {}
 
   /**
@@ -126,7 +128,7 @@ class UrlResolver implements UrlResolverInterface {
   public function getResourceUrl($url, $max_width = NULL, $max_height = NULL) {
     // Include the current language in the cache key so that language-specific
     // oEmbed URLs (e.g. with hl=fr for YouTube) are cached separately.
-    $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $langcode = $this->languageManager->getCurrentLanguage()->getId();
 
     // Try to get the resource URL from the static cache.
     $cache_key = $url . ':lang=' . $langcode;

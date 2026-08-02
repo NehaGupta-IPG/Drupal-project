@@ -160,16 +160,14 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    */
   public function testLanguageParameterAddedToProviderUrl(): void {
     // YouTube URLs should get hl=<langcode>.
-    $resource_url = $this->container->get('media.oembed.url_resolver')
-      ->getResourceUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+    $resource_url = $this->container->get('media.oembed.url_resolver')->getResourceUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
     $query = parse_url($resource_url, PHP_URL_QUERY);
-    $this->assertMatchesRegularExpression('/hl=[a-z]{2}/', $query, 'YouTube URL should have hl parameter');
+    $this->assertMatchesRegularExpression('/hl=[a-z]{2}/', $query);
 
     // Vimeo URLs should get locale=<langcode>.
-    $resource_url = $this->container->get('media.oembed.url_resolver')
-      ->getResourceUrl('https://vimeo.com/14782834');
+    $resource_url = $this->container->get('media.oembed.url_resolver')->getResourceUrl('https://vimeo.com/14782834');
     $query = parse_url($resource_url, PHP_URL_QUERY);
-    $this->assertMatchesRegularExpression('/locale=[a-z]{2}/', $query, 'Vimeo URL should have locale parameter');
+    $this->assertMatchesRegularExpression('/locale=[a-z]{2}/', $query);
   }
 
   /**

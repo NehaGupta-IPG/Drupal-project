@@ -3,6 +3,12 @@
 namespace Drupal\media\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Field\FieldTypePluginManagerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\ViewExecutable;
@@ -23,6 +29,16 @@ use Drupal\media\OEmbed\Provider;
 class MediaHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected FieldTypePluginManagerInterface $fieldTypePluginManager,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected ConfigFactoryInterface $configFactory,
+    protected AccountInterface $currentUser,
+    protected LanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * Implements hook_help().
@@ -83,7 +99,7 @@ class MediaHooks {
   public function entityAccess(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
     if ($operation === 'delete' && $entity instanceof FieldConfigInterface && $entity->getTargetEntityTypeId() === 'media') {
       /** @var \Drupal\media\MediaTypeInterface $media_type */
-      $media_type = \Drupal::entityTypeManager()->getStorage('media_type')->load($entity->getTargetBundle());
+      $media_type = $this->entityTypeManager->getStorage('media_type')->load($entity->getTargetBundle());
       return AccessResult::forbiddenIf($entity->id() === 'media.' . $media_type->id() . '.' . $media_type->getSource()->getConfiguration()['source_field']);
     }
     return AccessResult::neutral();
@@ -95,9 +111,7 @@ class MediaHooks {
   #[Hook('field_ui_preconfigured_options_alter')]
   public function fieldUiPreconfiguredOptionsAlter(array &$options, $field_type): void {
     // If the field is not an "entity_reference"-based field, bail out.
-    /** @var \Drupal\Core\Field\FieldTypePluginManager $field_type_manager */
-    $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
-    $class = $field_type_manager->getPluginClass($field_type);
+    $class = $this->fieldTypePluginManager->getPluginClass($field_type);
     if (!is_a($class, 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem', TRUE)) {
       return;
     }
@@ -119,7 +133,7 @@ class MediaHooks {
    */
   protected function fileMediaHelpText(): string|TranslatableMarkup {
     $help_text = $this->t('Use <em>Media</em> reference fields for most files, images, audio, videos, and remote media. Use <em>File</em> or <em>Image</em> reference fields when creating your own media types, or for legacy files and images created before installing the Media module.');
-    if (\Drupal::moduleHandler()->moduleExists('help')) {
+    if ($this->moduleHandler->moduleExists('help')) {
       $help_text .= ' ' . $this->t('For more information, see the <a href="@help_url">Media help page</a>.', [
         '@help_url' => Url::fromRoute('help.page', [
           'name' => 'media',
@@ -212,7 +226,7 @@ class MediaHooks {
       if ($overview_url->access()) {
         $elements['#media_help']['#media_list_link'] = $this->t('See the <a href=":list_url" target="_blank">media list</a> (opens a new window) to help locate media.', [':list_url' => $overview_url->toString()]);
       }
-      $bundle_labels = array_intersect_key(\Drupal::service('entity_type.bundle.info')->getBundleLabels('media'), $allowed_bundles);
+      $bundle_labels = array_intersect_key($this->entityTypeBundleInfo->getBundleLabels('media'), $allowed_bundles);
       $elements['#media_help']['#allowed_types_help'] = $this->t('Allowed media types: %types', ['%types' => implode(", ", $bundle_labels)]);
     }
   }
@@ -222,7 +236,7 @@ class MediaHooks {
    */
   #[Hook('entity_type_alter')]
   public function entityTypeAlter(array &$entity_types) : void {
-    if (\Drupal::config('media.settings')->get('standalone_url')) {
+    if ($this->configFactory->get('media.settings')->get('standalone_url')) {
       /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type */
       $entity_type = $entity_types['media'];
       $entity_type->setLinkTemplate('canonical', '/media/{media}');
@@ -274,10 +288,9 @@ class MediaHooks {
    */
   #[Hook('views_query_substitutions')]
   public function viewsQuerySubstitutions(ViewExecutable $view): array {
-    $account = \Drupal::currentUser();
     return [
-      '***VIEW_OWN_UNPUBLISHED_MEDIA***' => (int) $account->hasPermission('view own unpublished media'),
-      '***ADMINISTER_MEDIA***' => (int) $account->hasPermission('administer media'),
+      '***VIEW_OWN_UNPUBLISHED_MEDIA***' => (int) $this->currentUser->hasPermission('view own unpublished media'),
+      '***ADMINISTER_MEDIA***' => (int) $this->currentUser->hasPermission('administer media'),
     ];
   }
 
@@ -315,7 +328,7 @@ class MediaHooks {
    *   This function is internal and may be removed in a minor release.
    */
   protected function addUrl(array $allowed_bundles): string|false {
-    $access_handler = \Drupal::entityTypeManager()->getAccessControlHandler('media');
+    $access_handler = $this->entityTypeManager->getAccessControlHandler('media');
     $create_bundles = array_filter($allowed_bundles, [$access_handler, 'createAccess']);
 
     // Add a section about how to create media if the user has access to do so.
@@ -433,7 +446,7 @@ class MediaHooks {
     }
 
     if (!empty($error_filters)) {
-      $error_message = \Drupal::translation()->formatPlural(
+      $error_message = $this->formatPlural(
         count($error_filters),
         'The %media-embed-filter-label filter needs to be placed after the %filter filter.',
         'The %media-embed-filter-label filter needs to be placed after the following filters: %filters.',
@@ -457,7 +470,7 @@ class MediaHooks {
    */
   #[Hook('oembed_resource_url_alter')]
   public function oembedResourceUrlAlter(array &$parsed_url, Provider $provider): void {
-    $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $langcode = $this->languageManager->getCurrentLanguage()->getId();
     if (empty($langcode)) {
       return;
     }
