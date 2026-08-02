@@ -19,21 +19,6 @@ function text_removed_post_updates(): array {
 }
 
 /**
- * Installs text_with_summary for text_with_summary field.
- */
-function text_post_update_install_text_with_summary(): void {
-  if (\Drupal::moduleHandler()->moduleExists('text_with_summary')) {
-    return;
-  }
-  $storages = \Drupal::entityTypeManager()
-    ->getStorage('field_storage_config')
-    ->loadByProperties(['type' => 'text_with_summary']);
-  if ($storages !== []) {
-    \Drupal::service('module_installer')->install(['text_with_summary']);
-  }
-}
-
-/**
  * Update field storage dependencies after text_with_summary install.
  */
 function text_post_update_update_field_storage_dependencies(array &$sandbox): void {
