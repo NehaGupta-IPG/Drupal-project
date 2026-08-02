@@ -27,6 +27,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use Prophecy\Argument;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -96,6 +97,11 @@ class LocalTaskManagerTest extends UnitTestCase {
   protected AccountInterface&Stub $account;
 
   /**
+   * The logger service.
+   */
+  protected LoggerInterface&Stub $logger;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -110,6 +116,7 @@ class LocalTaskManagerTest extends UnitTestCase {
     $this->accessManager = $this->createStub(AccessManagerInterface::class);
     $this->routeMatch = $this->createStub(RouteMatchInterface::class);
     $this->account = $this->createStub(AccountInterface::class);
+    $this->logger = $this->createStub(LoggerInterface::class);
 
     $this->setupLocalTaskManager();
     $this->setupNullCacheabilityMetadataValidation();
@@ -259,7 +266,7 @@ class LocalTaskManagerTest extends UnitTestCase {
       ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => 'en']));
 
-    $this->manager = new LocalTaskManager($this->argumentResolver, $request_stack, $this->routeMatch, $this->routeProvider, $module_handler, $this->cacheBackend->reveal(), $language_manager, $this->accessManager, $this->account);
+    $this->manager = new LocalTaskManager($this->argumentResolver, $request_stack, $this->routeMatch, $this->routeProvider, $module_handler, $this->cacheBackend->reveal(), $language_manager, $this->accessManager, $this->account, $this->logger);
 
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'discovery');
     $property->setValue($this->manager, $this->pluginDiscovery);

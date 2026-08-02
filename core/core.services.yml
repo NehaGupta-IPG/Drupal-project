@@ -891,7 +891,7 @@ services:
   Drupal\Core\Menu\LocalActionManagerInterface: '@plugin.manager.menu.local_action'
   plugin.manager.menu.local_task:
     class: Drupal\Core\Menu\LocalTaskManager
-    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user']
+    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user', '@logger.channel.default']
   Drupal\Core\Menu\LocalTaskManagerInterface: '@plugin.manager.menu.local_task'
   plugin.manager.menu.contextual_link:
     class: Drupal\Core\Menu\ContextualLinkManager
