@@ -135,11 +135,10 @@ class FormErrorHandlerTest extends UnitTestCase {
       ->method('renderInIsolation')
       ->willReturnCallback(function ($render_array): string {
         $links = [];
-        foreach ($render_array[1]['#items'] as $item) {
+        foreach ($render_array['#errors']['#items'] as $item) {
           $links[] = htmlspecialchars($item['#title']);
         }
-
-        return $render_array[0]['#markup'] . '<ul-comma-list-mock><li-mock>' . implode('</li-mock><li-mock>', $links) . '</li-mock></ul-comma-list-mock>';
+        return $render_array['#message'] . ' <ul-comma-list-mock><li-mock>' . implode('</li-mock><li-mock>', $links) . '</li-mock></ul-comma-list-mock>';
       });
 
     $form_state = new FormState();
@@ -159,6 +158,28 @@ class FormErrorHandlerTest extends UnitTestCase {
     $this->assertSame('no error message', $this->testForm['test4']['#errors']);
     $this->assertSame('no title given', $this->testForm['test5']['#errors']);
     $this->assertSame('element is invisible', $this->testForm['test6']['#errors']);
+  }
+
+  /**
+   * Tests that the summary render array exposes message, count, and form_id.
+   */
+  public function testSummaryRenderArrayVariables(): void {
+    $this->messenger->expects($this->atLeastOnce())->method('addError');
+
+    $this->renderer->expects($this->once())
+      ->method('renderInIsolation')
+      ->with($this->callback(function ($render_array): bool {
+        $this->assertSame('inline_form_errors_summary', $render_array['#theme']);
+        $this->assertSame('test_form', $render_array['#form_id']);
+        $this->assertSame(1, $render_array['#count']);
+        $this->assertNotEmpty($render_array['#message']);
+        return TRUE;
+      }))
+      ->willReturn('hello');
+
+    $form_state = new FormState();
+    $form_state->setErrorByName('test1', 'invalid');
+    $this->formErrorHandler->handleFormErrors($this->testForm, $form_state);
   }
 
   /**

@@ -108,17 +108,17 @@ class FormErrorHandler extends CoreFormErrorHandler {
 
     if (!empty($error_links)) {
       $render_array = [
-        [
-          '#markup' => $this->formatPlural(count($error_links), '1 error has been found: ', '@count errors have been found: '),
-        ],
-        [
+        '#theme' => 'inline_form_errors_summary',
+        '#message' => $this->formatPlural(count($error_links), '1 error has been found:', '@count errors have been found:'),
+        '#errors' => [
           '#theme' => 'item_list',
           '#items' => $error_links,
           '#context' => ['list_style' => 'comma-list'],
         ],
+        '#count' => count($error_links),
+        '#form_id' => $form['#form_id'] ?? NULL,
       ];
-      $message = $this->renderer->renderInIsolation($render_array);
-      $this->messenger->addError($message);
+      $this->messenger->addError($this->renderer->renderInIsolation($render_array));
     }
   }
 
