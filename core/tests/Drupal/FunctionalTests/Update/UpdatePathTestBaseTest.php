@@ -184,7 +184,7 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
    * Tests that setup is done correctly.
    */
   public function testSetup(): void {
-    $this->assertCount(4, $this->databaseDumpFiles);
+    $this->assertCount(3, $this->databaseDumpFiles);
     $this->assertSame(1, Settings::get('entity_update_batch_size'));
   }
 
