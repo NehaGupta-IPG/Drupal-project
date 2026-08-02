@@ -113,7 +113,7 @@ JS;
     $this->getSession()->evaluateScript($javascript);
 
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-sticky-panel__placeholder'));
-    $toolbar_height = (int) $this->getSession()->evaluateScript('document.getElementById("toolbar-bar").offsetHeight');
+    $toolbar_height = (int) $this->getSession()->evaluateScript('document.getElementById("toolbar-bar").offsetHeight + document.querySelector(".toolbar-tray.is-active").offsetHeight');
     $ckeditor5_toolbar_position = (int) $this->getSession()->evaluateScript("document.querySelector('.ck-toolbar').getBoundingClientRect().top");
     $this->assertEqualsWithDelta($toolbar_height, $ckeditor5_toolbar_position, 2);
   }

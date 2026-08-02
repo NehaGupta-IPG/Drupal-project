@@ -74,7 +74,7 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests that the orientation toggle is not shown for empty toolbar items.
+   * Tests that the tab is not shown items with an empty tray.
    */
   public function testEmptyTray(): void {
     // Granting access to the toolbar but not any administrative menu links will
@@ -84,20 +84,31 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     ]);
     $this->drupalLogin($admin_user);
 
+    $assert_session = $this->assertSession();
+
     // Set size for horizontal toolbar.
     $this->getSession()->resizeWindow(1200, 600);
     $this->drupalGet('<front>');
-    $this->assertNotEmpty($this->assertSession()->waitForElement('css', 'body.toolbar-horizontal'));
-    $this->assertNotEmpty($this->assertSession()->waitForElementVisible('css', '.toolbar-tray'));
+    $this->assertNotEmpty($assert_session->waitForElement('css', 'body.toolbar-horizontal'));
+    $assert_session->elementsCount('css', '.toolbar-tray', 2);
 
-    // Test that the orientation toggle does not appear.
-    $page = $this->getSession()->getPage();
-    $tray = $page->findById('toolbar-item-administration-tray');
-    $this->assertTrue($tray->hasClass('toolbar-tray-horizontal'), 'Toolbar tray is horizontally oriented by default.');
-    $this->assertSession()->elementNotExists('css', '#toolbar-item-administration-tray .toolbar-menu');
-    $this->assertSession()->elementNotExists('css', '#toolbar-item-administration-tray .toolbar-toggle-orientation');
-    $button = $page->findButton('Vertical orientation');
-    $this->assertFalse($button->isVisible(), 'Orientation toggle from other tray is not visible');
+    // The admin tray is empty due to the user having no permissions to access
+    // any items it would provide. In those instances, the tab will have the
+    // `.toolbar-tab--inert` class, so it and the child elements can be hidden.
+    $admin_tab = $assert_session->elementExists('css', '.toolbar-tab.toolbar-tab--inert #toolbar-item-administration.toolbar-item');
+    $admin_tray = $assert_session->elementExists('css', '.toolbar-tab.toolbar-tab--inert #toolbar-item-administration-tray.toolbar-tray');
+    $this->assertFalse($admin_tab->isVisible());
+    $this->assertFalse($admin_tray->isVisible());
+    $this->assertEmpty(trim($admin_tray->find('css', '.toolbar-menu-administration')->getHtml()));
+
+    // Confirm the user tray has content and thus is visible and does not have
+    // the `.toolbar-tab--inert` class added to its corresponding tab.
+    $user_tab = $assert_session->elementExists('css', '.toolbar-tab #toolbar-item-user.toolbar-item');
+    $user_tray = $assert_session->elementExists('css', '.toolbar-tab #toolbar-item-user-tray.toolbar-tray');
+    $this->assertTrue($user_tab->isVisible());
+    $this->assertNotEmpty(trim($user_tray->find('css', '.toolbar-menu')->getHtml()));
+    $assert_session->elementNotExists('css', '.toolbar-tab.toolbar-tab--inert #toolbar-item-user-tray.toolbar-tray');
+    $assert_session->elementNotExists('css', '.toolbar-tab.toolbar-tab--inert #toolbar-item-user.toolbar-item');
   }
 
   /**

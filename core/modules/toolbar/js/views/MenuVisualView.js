@@ -14,6 +14,11 @@
        * @augments Backbone.View
        */
       initialize() {
+        if (this.el.innerHTML.trim().length === 0) {
+          // If the menu is empty, add a class to indicate the tab is inert.
+          this.el.closest('.toolbar-tab').classList.add('toolbar-tab--inert');
+        }
+
         this.listenTo(this.model, 'change:subtrees', this.render);
 
         // Render the view immediately on initialization.

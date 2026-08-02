@@ -278,6 +278,12 @@
   }
 }
 
+.toolbar-tab--inert {
+  /* Important is required as this is set to display: block with very high
+   * specificity. */
+  display: none !important;
+}
+
 /* Anti flicker styling. */
 .toolbar-anti-flicker.toolbar-loading.toolbar-fixed body {
   padding-top: 2.4375rem;

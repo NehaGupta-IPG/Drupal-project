@@ -200,7 +200,7 @@
         ) {
           Drupal.toolbar.models.toolbarModel.set({
             activeTab: $(
-              '.toolbar-bar .toolbar-tab:not(.home-toolbar-tab) a',
+              '.toolbar-bar .toolbar-tab:not(.home-toolbar-tab):not(.toolbar-tab--inert) a',
             ).get(0),
           });
         }
