@@ -2,6 +2,7 @@
 
 namespace Drupal\media\Hook;
 
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element;
@@ -12,6 +13,10 @@ use Drupal\Core\Language\LanguageInterface;
  * Hook implementations for media.
  */
 class MediaThemeHooks {
+
+  public function __construct(
+    protected LanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * Implements hook_theme().
@@ -72,7 +77,7 @@ class MediaThemeHooks {
    */
   #[Hook('preprocess_media_oembed_iframe')]
   public function preprocessMediaOembedIframe(array &$variables): void {
-    $variables['langcode'] = \Drupal::languageManager()
+    $variables['langcode'] = $this->languageManager
       ->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)
       ->getId();
   }
