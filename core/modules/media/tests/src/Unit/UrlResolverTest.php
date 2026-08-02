@@ -6,6 +6,7 @@ namespace Drupal\Tests\media\Unit;
 
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\media\OEmbed\ProviderRepositoryInterface;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
@@ -51,6 +52,7 @@ class UrlResolverTest extends UnitTestCase {
       $client,
       $this->createStub(ModuleHandlerInterface::class),
       new NullBackend('default'),
+      $this->createStub(LanguageManagerInterface::class),
     ) extends UrlResolver {
 
       /**
