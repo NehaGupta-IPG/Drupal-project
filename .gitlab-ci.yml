@@ -251,8 +251,9 @@ default:
 .run-on-mr: &run-on-mr
   needs: [ '🧹 PHP Coding standards (PHPCS)' ]
   rules:
+    # Run automatically on merge requests so that every supported database is
+    # covered without having to trigger the jobs manually.
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: manual
       allow_failure: true
 
 ################
@@ -466,7 +467,7 @@ default:
   script:
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/test-only.sh
 
-# Main listing of jobs. All of these are available on Merge Requests.
+# Main listing of jobs. All of these run automatically on Merge Requests.
 'MariaDB (via PDO)':
   <<: [ *recursive-trigger, *run-on-mr ]
   parallel:
@@ -499,9 +500,6 @@ default:
 
 'PostgreSQL':
   <<: [ *recursive-trigger, *run-on-mr ]
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      allow_failure: true
   parallel:
     matrix:
       - _TARGET_PHP: !reference [.php_versions]
@@ -509,9 +507,6 @@ default:
 
 'SQLite':
   <<: [ *recursive-trigger, *run-on-mr ]
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      allow_failure: true
   parallel:
     matrix:
       - _TARGET_PHP: !reference [.php_versions]
