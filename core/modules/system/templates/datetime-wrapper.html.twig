@@ -4,6 +4,7 @@
  * Default theme implementation of a datetime form wrapper.
  *
  * Available variables:
+ * - attributes: HTML attributes for the datetime wrapper element.
  * - content: The form element to be output, usually a datelist, or datetime.
  * - title: The title of the form element.
  * - title_attributes: HTML attributes for the title wrapper.
@@ -21,6 +22,7 @@
     required ? 'form-required',
   ]
 %}
+<div{{ attributes }}>
 {% if title %}
   <h4{{ title_attributes.addClass(title_classes) }}>{{ title }}</h4>
 {% endif %}
@@ -35,3 +37,4 @@
     {{ description }}
   </div>
 {% endif %}
+</div>

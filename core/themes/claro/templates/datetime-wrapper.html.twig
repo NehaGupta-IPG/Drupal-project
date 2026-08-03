@@ -7,6 +7,12 @@
  */
 #}
 {%
+  set classes = [
+    'form-item',
+    'form-datetime-wrapper',
+  ]
+%}
+{%
   set title_classes = [
     'form-item__label',
     required ? 'js-form-required',
@@ -14,7 +20,7 @@
     errors ? 'has-error',
   ]
 %}
-<div class="form-item form-datetime-wrapper">
+<div{{ attributes.addClass(classes) }}>
 {% if title %}
   <h4{{ title_attributes.addClass(title_classes) }}>{{ title }}</h4>
 {% endif %}
