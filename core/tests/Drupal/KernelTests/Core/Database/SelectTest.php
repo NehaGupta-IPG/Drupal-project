@@ -762,7 +762,7 @@ class SelectTest extends DatabaseTestBase {
     $query->jsonCondition('test_field', '$.deps.*.status', $value, $operator);
 
     $this->expectException(InvalidQueryException::class);
-    $this->expectExceptionMessage("Operator {$operator} does not support the wildcard");
+    $this->expectExceptionMessage("JSON operator {$operator} does not support the wildcard");
     $query->execute();
   }
 

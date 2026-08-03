@@ -83,7 +83,7 @@ class JsonCondition extends Condition {
   protected function validateOperator(): void {
     if (!in_array($this->operator, self::SUPPORTED_OPERATORS, TRUE)) {
       throw new InvalidQueryException(sprintf(
-        'Operator %s is not supported by %s. Allowed operators include: %s',
+        'JSON operator %s is not supported by %s. Allowed operators include: %s',
         $this->operator,
         __CLASS__,
         implode(', ', self::SUPPORTED_OPERATORS),
@@ -91,13 +91,13 @@ class JsonCondition extends Condition {
     }
     if (in_array($this->operator, ['IN', 'NOT IN', 'JSON_CONTAINS'], TRUE) && !is_array($this->value)) {
       throw new InvalidQueryException(sprintf(
-        'Operator %s requires an array value.',
+        'JSON operator %s requires an array value.',
         $this->operator,
       ));
     }
     if (in_array($this->operator, ['BETWEEN', 'NOT BETWEEN'], TRUE) && (!is_array($this->value) || count($this->value) !== 2)) {
       throw new InvalidQueryException(sprintf(
-        'Operator %s requires an array of exactly two values.',
+        'JSON operator %s requires an array of exactly two values.',
         $this->operator,
       ));
     }
@@ -125,7 +125,7 @@ class JsonCondition extends Condition {
     // this check names the operator that reached them.
     if ($expression->hasWildcard() && !in_array($this->operator, self::WILDCARD_OPERATORS, TRUE)) {
       throw new InvalidQueryException(sprintf(
-        'Operator %s does not support the wildcard in jsonpath "%s". Operators that support a wildcard path: %s.',
+        'JSON operator %s does not support the wildcard in jsonpath "%s". Operators that support a wildcard path: %s.',
         $this->operator,
         $this->path,
         implode(', ', self::WILDCARD_OPERATORS),
