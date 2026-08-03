@@ -1503,7 +1503,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   public function testJsonSchema(): void {
     $class = $this->connection->getDriverClass('JsonExpression');
     if ($class === 'JsonExpression') {
-      @trigger_error('Not implementing JsonExpression in database drivers is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Implement JsonExpression to provide JSON support. See https://www.drupal.org/node/3389682', E_USER_DEPRECATED);
+      @trigger_error('Not implementing JsonExpression in database drivers is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Implement JsonExpression to provide JSON support. See https://www.drupal.org/node/3389682', E_USER_DEPRECATED);
       $this->markTestSkipped('Driver does not provide JSON support.');
     }
 
