@@ -371,6 +371,7 @@ drupal.dialog:
     misc/dialog/dialog.js: {}
     misc/dialog/dialog.position.js: {}
     misc/dialog/dialog.jquery-ui.js: {}
+    misc/resize/resize.mjs: { attributes: { type: module } }
     # The remaining JavaScript assets previously came from core/jquery.ui, a
     # deprecated library.
     # All weights are based on the requirements defined within each file.
@@ -379,7 +380,6 @@ drupal.dialog:
     assets/vendor/jquery.ui/ui/widgets/button-min.js: { weight: -11.5, minified: true }
     assets/vendor/jquery.ui/ui/widgets/checkboxradio-min.js: { weight: -11.6, minified: true }
     assets/vendor/jquery.ui/ui/widgets/draggable-min.js: { weight: -11.6, minified: true }
-    assets/vendor/jquery.ui/ui/widgets/resizable-min.js: { weight: -11.6, minified: true }
     assets/vendor/jquery.ui/ui/widgets/controlgroup-min.js: { weight: -11.7, minified: true }
     assets/vendor/jquery.ui/ui/form-reset-mixin-min.js: { weight: -11.7, minified: true }
     assets/vendor/jquery.ui/ui/widgets/mouse-min.js: { weight: -11.7, minified: true }
@@ -391,7 +391,6 @@ drupal.dialog:
       assets/vendor/jquery.ui/themes/base/dialog.css: { weight: -11.4 }
       assets/vendor/jquery.ui/themes/base/button.css: { weight: -11.5 }
       assets/vendor/jquery.ui/themes/base/checkboxradio.css: { weight: -11.6 }
-      assets/vendor/jquery.ui/themes/base/resizable.css: { weight: -11.6 }
       assets/vendor/jquery.ui/themes/base/controlgroup.css: { weight: -11.7 }
   dependencies:
     - core/jquery
