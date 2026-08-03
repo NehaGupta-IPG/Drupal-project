@@ -204,14 +204,21 @@ class TaxonomyIndexTid extends ManyToOne {
       }
     }
     else {
+      $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
       if (!empty($this->options['hierarchy']) && $this->options['limit']) {
         $tree = $this->termStorage->loadTree($vocabulary->id(), 0, NULL, TRUE);
         $options = [];
 
         if ($tree) {
           foreach ($tree as $term) {
-            if (!$term->isPublished() && !$this->currentUser->hasPermission('administer taxonomy')) {
-              continue;
+            if (!$this->currentUser->hasPermission('administer taxonomy')) {
+              if (!$term->hasTranslation($langcode)) {
+                continue;
+              }
+              $translation = $term->getTranslation($langcode);
+              if (!$translation->isPublished()) {
+                continue;
+              }
             }
             $choice = new \stdClass();
             $choice->option = [$term->id() => str_repeat('-', $term->depth) . \Drupal::service('entity.repository')->getTranslationFromContext($term)->label()];
@@ -228,18 +235,23 @@ class TaxonomyIndexTid extends ManyToOne {
           ->sort('weight')
           ->sort('name')
           ->addTag('taxonomy_term_access');
-        if (!$this->currentUser->hasPermission('administer taxonomy')) {
-          $query->condition('status', 1);
-        }
         if ($this->options['limit']) {
           $query->condition('vid', $vocabulary->id());
         }
         $terms = Term::loadMultiple($query->execute());
         foreach ($terms as $term) {
+          if (!$this->currentUser->hasPermission('administer taxonomy')) {
+            if (!$term->hasTranslation($langcode)) {
+              continue;
+            }
+            $translation = $term->getTranslation($langcode);
+            if (!$translation->isPublished()) {
+              continue;
+            }
+          }
           $options[$term->id()] = \Drupal::service('entity.repository')->getTranslationFromContext($term)->label();
         }
       }
-
       $default_value = (array) $this->value;
 
       if ($exposed = $form_state->get('exposed')) {
