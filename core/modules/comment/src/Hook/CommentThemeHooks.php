@@ -232,8 +232,12 @@ class CommentThemeHooks {
       $variables['attributes'] += $variables['items'][0]['attributes']->storage();
 
       // Create separate variables for the comments and comment form.
-      $variables['comments'] = $element[0]['comments'];
-      $variables['comment_form'] = $element[0]['comment_form'];
+      if (isset($element[0]['comments'])) {
+        $variables['comments'] = $element[0]['comments'];
+      }
+      if (isset($element[0]['comment_form'])) {
+        $variables['comment_form'] = $element[0]['comment_form'];
+      }
     }
   }
 
