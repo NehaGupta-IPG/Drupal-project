@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Routing;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Routing\AttributeRouteDiscovery;
 use Drupal\Core\Routing\RouteBuildEvent;
 use Drupal\Core\Routing\RouteCompiler;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\router_test\Controller\TestAttributes;
 use Drupal\router_test\Controller\TestClassAttribute;
+use Drupal\router_test\Controller\TestClassAttributeClassOnly;
 use Drupal\router_test\Form\TestRouteAttributeForm;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
@@ -156,7 +159,7 @@ EOF
     $additionalClassLoader->register(TRUE);
     $discovery = new AttributeRouteDiscovery($namespaces);
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('Route attributes can not target methods on class Drupal\router_test_invalid\Form\TestRouteInvalidAttributeForm. Use the attribute on the form class itself.');
+    $this->expectExceptionMessageIs('Route attributes can not target methods on class Drupal\router_test_invalid\Form\TestRouteInvalidAttributeForm. Use the attribute on the form class itself.');
     $discovery->onRouteBuild($event);
   }
 
@@ -194,6 +197,33 @@ EOF
 
     // Auto-generated class::method alias.
     $this->assertSame($route, $this->routeCollection->get(TestAttributes::class . '::allProperties'));
+  }
+
+  /**
+   * Tests that class-only #[Route] registers a route for invokable controllers.
+   */
+  public function testClassOnlyRouteWithInvoke(): void {
+    $route = $this->routeCollection->get('router_test.class_only');
+    $this->assertNotNull($route);
+    $this->assertSame('/test_class_attribute_class_only', $route->getPath());
+    $this->assertSame(TestClassAttributeClassOnly::class, $route->getDefault('_controller'));
+    $this->assertSame('TRUE', $route->getRequirement('_access'));
+    // Aliases for invokable controllers must also be registered.
+    $this->assertSame($route, $this->routeCollection->get(TestClassAttributeClassOnly::class . '::__invoke'));
+  }
+
+  /**
+   * Tests that the "title" property and a "_title" default cannot both be set.
+   */
+  public function testTitleConflictsWithTitleDefault(): void {
+    $this->expectException(\AssertionError::class);
+    $this->expectExceptionMessage('The "title" property cannot be used together with a "_title" default on the Route attribute.');
+    new Route(
+      path: '/test',
+      name: 'router_test.title_conflict',
+      title: new TranslatableMarkup('Title from property'),
+      defaults: ['_title' => 'Title from default'],
+    );
   }
 
   /**
