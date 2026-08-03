@@ -365,6 +365,22 @@ drupal.debounce:
     # @todo Remove Drupal dependency.
     - core/drupal
 
+drupal.dialogNative:
+  version: VERSION
+  js:
+    misc/dialogNative/dialogNative.js: {}
+
+drupal.dialogNative.ajax:
+  version: VERSION
+  js:
+    misc/dialogNative/dialogNative.ajax.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.ajax
+    - core/drupal.dialogNative
+    - core/tabbable
+
 drupal.dialog:
   version: VERSION
   js:

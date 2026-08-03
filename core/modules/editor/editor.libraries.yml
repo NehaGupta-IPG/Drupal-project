@@ -7,7 +7,7 @@ drupal.editor:
     - core/drupal
     - core/drupalSettings
     - core/once
-    - core/drupal.dialog
+    - core/drupal.dialogNative
 
 drupal.editor.dialog:
   version: VERSION
@@ -15,6 +15,6 @@ drupal.editor.dialog:
     js/editor.dialog.js: {}
   dependencies:
     - core/jquery
-    - core/drupal.dialog
+    - core/drupal.dialogNative
     - core/drupal.ajax
     - core/drupalSettings

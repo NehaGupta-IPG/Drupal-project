@@ -53,7 +53,7 @@ class DialogRenderer implements MainContentRendererInterface {
 
     // Attach the library necessary for using the OpenDialogCommand and set the
     // attachments for this Ajax response.
-    $main_content['#attached']['library'][] = 'core/drupal.dialog.ajax';
+    $main_content['#attached']['library'][] = 'core/drupal.dialogNative.ajax';
     $response->setAttachments($main_content['#attached']);
 
     // Determine the title.

@@ -11,7 +11,7 @@ drupal.field_ui:
     - core/drupalSettings
     - core/once
     - core/drupal.ajax
-    - core/drupal.dialog
+    - core/drupal.dialogNative
 
 drupal.field_ui.manage_fields:
   version: VERSION
