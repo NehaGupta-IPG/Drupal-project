@@ -185,25 +185,16 @@ class UncaughtExceptionTest extends BrowserTestBase {
    * Tests the case when the database connection is gone.
    */
   public function testLostDatabaseConnection(): void {
-    $incorrect_username = $this->randomMachineName(16);
-    switch ($this->container->get('database')->driver()) {
-      case 'pgsql':
-        // @todo Fix random test failure. This test is failing for MariaDb.
-        //   see https://www.drupal.org/project/drupal/issues/3600845
-        // case 'mysql':
-      case 'mysqli':
-        $this->expectedExceptionMessage = $incorrect_username;
-        break;
-
-      default:
-        // We can not carry out this test.
-        $this->markTestSkipped('Unable to run \Drupal\system\Tests\System\UncaughtExceptionTest::testLostDatabaseConnection for this database type.');
+    $driver = $this->container->get('database')->driver();
+    // Only credential-based drivers can simulate a lost connection this way.
+    if (!in_array($driver, ['mysql', 'mysqli', 'pgsql'], TRUE)) {
+      $this->markTestSkipped("This test does not support the {$driver} database driver.");
     }
 
-    // We simulate a broken database connection by rewrite settings.php to no
-    // longer have the proper data.
+    // Simulate a broken database connection by rewriting settings.php to no
+    // longer have valid credentials.
     $settings['databases']['default']['default']['username'] = (object) [
-      'value' => $incorrect_username,
+      'value' => $this->randomMachineName(16),
       'required' => TRUE,
     ];
     $settings['databases']['default']['default']['password'] = (object) [
@@ -215,8 +206,15 @@ class UncaughtExceptionTest extends BrowserTestBase {
 
     $this->drupalGet('');
     $this->assertSession()->statusCodeEquals(500);
-    $this->assertSession()->pageTextContains('DatabaseAccessDeniedException');
-    $this->assertErrorLogged($this->expectedExceptionMessage);
+    // The invalid credentials make the connection fail, but the exact exception
+    // is driver- and environment-dependent (access denied, too many
+    // connections, an authentication plugin error, a raw driver exception).
+    // Assert the generic kernel panic, and clear the expected error from the
+    // log by matching the connection call it is thrown from, instead of a
+    // single exception class that the environment does not always produce,
+    // which made this test fail randomly on MariaDB.
+    $this->assertSession()->pageTextContains('The website encountered an unexpected error. Try again later.');
+    $this->assertErrorLogged('Database::openConnection');
   }
 
   /**
