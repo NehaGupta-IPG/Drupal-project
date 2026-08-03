@@ -11,6 +11,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\locale\CurrentImportStorage;
 use Drupal\locale\LocaleProjectRepository;
 use Drupal\locale\LocaleSource;
 use Drupal\locale\StreamWrapper\TranslationsStream;
@@ -35,6 +36,7 @@ class LocaleFileManager {
     protected readonly ClientInterface $httpClient,
     protected readonly LoggerChannelFactoryInterface $loggerFactory,
     protected readonly MessengerInterface $messenger,
+    protected readonly CurrentImportStorage $currentImportStorage,
   ) {}
 
   /**
@@ -51,7 +53,6 @@ class LocaleFileManager {
    *   An array of interface translation files keyed by their URI.
    */
   public function getInterfaceTranslationFiles(array $projects = [], array $langcodes = []): array {
-    \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.compare');
     $files = [];
     $projects = $projects ?: array_keys($this->localeProjectRepository->getAll());
     $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
@@ -94,7 +95,7 @@ class LocaleFileManager {
    */
   public function deleteTranslationFiles(array $projects = [], array $langcodes = []): bool {
     $fail = FALSE;
-    locale_translation_file_history_delete($projects, $langcodes);
+    $this->currentImportStorage->delete($projects, $langcodes);
 
     // Delete all translation files from the translations directory.
     if ($files = $this->getInterfaceTranslationFiles($projects, $langcodes)) {
@@ -193,7 +194,7 @@ class LocaleFileManager {
    */
   public function downloadTranslationSource(LocaleFile $source_file, string $directory = 'translations://'): LocaleFile|false {
     try {
-      $data = (string) $this->httpClient->request('get', $source_file->uri)->getBody();
+      $data = (string) $this->httpClient->request('GET', $source_file->uri)->getBody();
       $filename = basename($source_file->uri);
       if ($uri = $this->fileSystem->saveData($data, $directory . $filename, FileExists::Replace)) {
         $hash = hash_file(LocaleSource::LOCAL_FILE_HASH_ALGO, $uri);
