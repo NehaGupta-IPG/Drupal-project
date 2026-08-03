@@ -127,6 +127,7 @@ class FieldAccessTest extends KernelTestBase {
     $entity = EntityTest::create($values);
 
     // Create a dummy user account for testing access with.
+    $values = ['name' => 'test'];
     $account = User::create($values);
 
     $this->assertFalse($entity->field_test_text->access('view', $account), 'Access to field_test_text was denied by the first hook implementation.');
