@@ -15,7 +15,7 @@ use Drupal\Core\Database\InvalidQueryException;
  * Select::addJsonExpression(). To add a JSON extraction to a SELECT field list,
  * use the query builder instead of this class:
  * @code
- * $alias = $query->addJsonExpression('field_data', '$.status', 'status');
+ * $alias = $query->addJsonExpression('field_data', '$.status', TRUE);
  * // With a type cast:
  * $alias = $query->addJsonExpression('field_data', '$.score', 'score', JsonCastType::Int);
  * @endcode
@@ -81,7 +81,7 @@ abstract class JsonExpression {
    *   If the path contains a wildcard.
    *
    * @internal
-   *   This method should only be use by the database layer.
+   *   This method should only be used by the database layer.
    */
   public function toSql(): string {
     $this->assertNoWildcard('extracting a value');
@@ -93,10 +93,6 @@ abstract class JsonExpression {
    *
    * @return string
    *   A SQL fragment that extracts the value at the given path.
-   *
-   * @internal
-   *   This method should only be use by the database layer and should be
-   *   implemented by database drivers.
    */
   abstract protected function doToSql(): string;
 
@@ -121,7 +117,7 @@ abstract class JsonExpression {
    *   If the path contains a wildcard and $expression is NULL.
    *
    * @internal
-   *   This method should only be use by the database layer.
+   *   This method should only be used by the database layer.
    */
   public function toCastSql(JsonCastType $type, ?string $expression = NULL): string {
     if ($expression === NULL) {
@@ -141,10 +137,6 @@ abstract class JsonExpression {
    *
    * @return string
    *   A SQL fragment that casts the value to the given type.
-   *
-   * @internal
-   *   This method should only be use by the database layer and should be
-   *   implemented by database drivers.
    */
   abstract protected function doToCastSql(JsonCastType $type, ?string $expression = NULL): string;
 
@@ -158,7 +150,7 @@ abstract class JsonExpression {
    *   If the path contains a wildcard.
    *
    * @internal
-   *   This method should only be use by the database layer.
+   *   This method should only be used by the database layer.
    */
   public function toHasKeySql(): string {
     $this->assertNoWildcard('testing whether a key exists');
@@ -170,10 +162,6 @@ abstract class JsonExpression {
    *
    * @return string
    *   A SQL fragment that evaluates to TRUE if the path exists.
-   *
-   * @internal
-   *   This method should only be use by the database layer and should be
-   *   implemented by database drivers.
    */
   abstract protected function doToHasKeySql(): string;
 
@@ -191,7 +179,7 @@ abstract class JsonExpression {
    *   If the path contains a wildcard.
    *
    * @internal
-   *   This method should only be use by the database layer.
+   *   This method should only be used by the database layer.
    */
   public function toContainsSql(string $encoded_value): string {
     $this->assertNoWildcard('testing array containment');
@@ -207,10 +195,6 @@ abstract class JsonExpression {
    * @return string
    *   A SQL fragment that evaluates to TRUE if the JSON array at the path
    *   contains the given value.
-   *
-   * @internal
-   *   This method should only be use by the database layer and should be
-   *   implemented by database drivers.
    */
   abstract protected function doToContainsSql(string $encoded_value): string;
 
@@ -243,7 +227,7 @@ abstract class JsonExpression {
    *   If the path contains a wildcard and $type_expression is NULL.
    *
    * @internal
-   *   This method should only be use by the database layer.
+   *   This method should only be used by the database layer.
    */
   public function toTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
     if ($type_expression === NULL) {
@@ -264,10 +248,6 @@ abstract class JsonExpression {
    * @return string
    *   A SQL fragment ending in ' AND ', or an empty string when the cast
    *   cannot fail, as is the case for a text cast.
-   *
-   * @internal
-   *   This method should only be use by the database layer and should be
-   *   implemented by database drivers.
    */
   abstract protected function doToTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string;
 
@@ -290,8 +270,7 @@ abstract class JsonExpression {
    *   An array with 'sql' (the SQL fragment) and 'args' (placeholder values).
    *
    * @internal
-   *   This method should only be use by the database layer and should be
-   *   implemented by database drivers.
+   *   This method should only be used by the database layer.
    */
   public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
     ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders((array) $value, $queryPlaceholder);
@@ -334,7 +313,7 @@ abstract class JsonExpression {
    * Whether this expression's path contains a wildcard (*) segment.
    *
    * @internal
-   *   This method should only be use by the database layer and database
+   *   This method should only be used by the database layer and database
    *   drivers.
    */
   public function hasWildcard(): bool {

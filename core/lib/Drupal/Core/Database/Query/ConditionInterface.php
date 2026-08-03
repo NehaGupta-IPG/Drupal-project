@@ -79,7 +79,7 @@ interface ConditionInterface {
    * mixed with regular conditions inside an AND or an OR group:
    * @code
    * $or = $query->orConditionGroup()
-   *   ->jsonCondition('data', '$.status', 'active')
+   *   ->jsonCondition('data', '$.status', TRUE)
    *   ->condition('uid', 1);
    * $query->condition($or);
    * @endcode
