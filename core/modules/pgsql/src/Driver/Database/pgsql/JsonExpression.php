@@ -44,7 +44,10 @@ class JsonExpression extends BaseJsonExpression {
     $sql = $expression ?? $this->toSql();
     return match ($type) {
       JsonCastType::Bool => "({$sql})::boolean::integer",
-      JsonCastType::Int => "({$sql})::integer",
+      // bigint, not integer: MySQL's SIGNED and SQLite's INTEGER are both
+      // 64-bit, and PostgreSQL raises an out of range error instead of
+      // truncating. Entity and revision IDs come from bigserial columns.
+      JsonCastType::Int => "({$sql})::bigint",
       JsonCastType::Float => "({$sql})::double precision",
       // Parentheses prevent PgSQL's prepareStatement() from appending ::text to
       // the ARRAY[]::text[] portion when used before LIKE/ILIKE.

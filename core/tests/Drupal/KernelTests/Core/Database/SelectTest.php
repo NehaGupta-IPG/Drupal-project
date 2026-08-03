@@ -1207,4 +1207,35 @@ class SelectTest extends DatabaseTestBase {
     $this->assertEquals(1.5, $row->num_2);
   }
 
+  /**
+   * Tests that an integer cast holds values wider than 32 bits.
+   *
+   * Entity and revision IDs come from bigserial columns, so the integer cast
+   * has to be 64-bit on every driver.
+   */
+  public function testJsonIntCastIs64Bit(): void {
+    // Above the 2147483647 limit of a 32-bit signed integer.
+    $big = 4294967296;
+    $this->connection->insert('json')
+      ->fields([
+        'id' => 11,
+        'status' => 1,
+        'test_field' => '{"big": ' . $big . '}',
+      ])
+      ->execute();
+
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->addJsonExpression('test_field', '$.big', 'big_value', JsonCastType::Int);
+    $query->condition('j.id', 11);
+    $this->assertEquals($big, $query->execute()->fetchObject()->big_value);
+
+    // Ordering casts the same way, so it must not error either. Row 11 holds
+    // the only $.big value, the rows without the key sort as NULL.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.big', 'DESC', JsonCastType::Int);
+    $this->assertEquals(11, (int) $query->execute()->fetchCol()[0]);
+  }
+
 }
