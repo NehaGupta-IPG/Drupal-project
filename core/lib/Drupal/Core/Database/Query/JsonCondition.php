@@ -177,10 +177,14 @@ class JsonCondition extends Condition {
           'STARTS_WITH' => $escaped . '%',
           'ENDS_WITH' => '%' . $escaped,
         };
+        // Take the driver's mapping of LIKE. PostgreSQL maps it to ILIKE, so
+        // that these operators are case-insensitive on every driver, like a
+        // regular LIKE condition is.
         $like_operator = $connection->mapConditionOperator('LIKE')
           ?? $this->mapConditionOperator('LIKE');
+        $keyword = $like_operator['operator'] ?? 'LIKE';
         $escape = $like_operator['postfix'] ?? '';
-        $this->stringVersion = "{$expression->toCastSql(JsonCastType::Text)} LIKE {$placeholder}{$escape}";
+        $this->stringVersion = "{$expression->toCastSql(JsonCastType::Text)} {$keyword} {$placeholder}{$escape}";
         $this->arguments = [$placeholder => $like_value];
         return;
 
