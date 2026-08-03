@@ -34,15 +34,29 @@ abstract class JsonExpression {
    * - Simple alphanumeric keys use dot notation: $.key
    * - Keys with special characters use double-quoted dot notation: $."key"
    * - Array indices are unchanged: $[0]
+   * - Both wildcard accessors are unchanged: $.* and $[*]
    */
   protected readonly string $path;
 
   /**
    * The parsed path segments (key names and array indices as strings).
    *
+   * A wildcard segment keeps its accessor apart: self::WILDCARD_MEMBER for
+   * $.*, self::WILDCARD_ELEMENT for $[*].
+   *
    * @var string[]
    */
   protected readonly array $pathSegments;
+
+  /**
+   * The path segment of the object member wildcard, written as $.* in a path.
+   */
+  protected const WILDCARD_MEMBER = '*';
+
+  /**
+   * The path segment of the array element wildcard, written as $[*].
+   */
+  protected const WILDCARD_ELEMENT = '[*]';
 
   /**
    * Constructs a JsonExpression object.
@@ -317,7 +331,26 @@ abstract class JsonExpression {
    *   drivers.
    */
   public function hasWildcard(): bool {
-    return in_array('*', $this->pathSegments, TRUE);
+    return in_array(self::WILDCARD_MEMBER, $this->pathSegments, TRUE)
+      || in_array(self::WILDCARD_ELEMENT, $this->pathSegments, TRUE);
+  }
+
+  /**
+   * Returns the wildcard accessor the path holds, as it appears in the path.
+   *
+   * The two accessors select different values, so a driver that rebuilds a
+   * path around the wildcard has to put back the one the caller wrote. On an
+   * array of objects, $.rows[*].uid reads the uid of every row, while
+   * $.rows.*.uid reads the members of every row and finds no uid.
+   *
+   * @return string
+   *   ".*" for an object member wildcard, "[*]" for an array element wildcard.
+   *   The return value is meaningless when hasWildcard() returns FALSE.
+   */
+  protected function wildcardAccessor(): string {
+    return in_array(self::WILDCARD_ELEMENT, $this->pathSegments, TRUE)
+      ? self::WILDCARD_ELEMENT
+      : '.' . self::WILDCARD_MEMBER;
   }
 
   /**
@@ -354,11 +387,14 @@ abstract class JsonExpression {
    * - prefix: $.level1
    * - suffix: $.level2.level3
    *
+   * The accessor itself is dropped. A driver that needs it back in the prefix
+   * gets it from wildcardAccessor().
+   *
    * @return array{string, string}
    *   A tuple of [prefix, suffix] raw paths.
    */
   protected function splitAtWildcard(): array {
-    $parts = explode('.*', $this->path, 2);
+    $parts = explode($this->wildcardAccessor(), $this->path, 2);
     return [$parts[0], '$' . $parts[1]];
   }
 
@@ -398,11 +434,15 @@ abstract class JsonExpression {
    * Normalizes a JSONPath for use in SQL across all database drivers.
    *
    * Converts bracket-quoted strings and dot-notation segments with special
-   * characters to double-quoted dot notation. Simple alphanumeric keys and
-   * array indices are left unchanged.
+   * characters to double-quoted dot notation. Simple alphanumeric keys, array
+   * indices and both wildcard accessors are left unchanged.
    *
    * Example: $.foo.bar-baz[0]["already quoted"] becomes
    *          $.foo."bar-baz"[0]."already quoted"
+   *
+   * The two wildcard accessors are kept apart. Every backend reads $.* as the
+   * object member wildcard and $[*] as the array element wildcard, so folding
+   * one into the other selects different values.
    *
    * @param string $path
    *   The validated JSONPath expression.
@@ -411,8 +451,6 @@ abstract class JsonExpression {
    *   The normalized JSONPath.
    */
   protected function normalizePath(string $path): string {
-    // Convert bracket wildcards to dot notation.
-    $path = str_replace('[*]', '.*', $path);
     // Convert bracket-quoted strings to double-quoted dot notation.
     // Only unescape \" → " and \\ → \. Other escape sequences like \0, \n,
     // \xNN must not be decoded as they can produce unsafe characters in SQL.
@@ -447,8 +485,11 @@ abstract class JsonExpression {
     // indices.
     preg_match_all('/\.?([\w-]+)|\.?\*|\[\*]|\["((?:[^"\\\\]|\\\\.)*)"]|\[(\d+)]/', $path, $matches, PREG_SET_ORDER);
     foreach ($matches as $match) {
-      if ($match[0] === '.*' || $match[0] === '*' || $match[0] === '[*]') {
-        $segments[] = '*';
+      if ($match[0] === '[*]') {
+        $segments[] = self::WILDCARD_ELEMENT;
+      }
+      elseif ($match[0] === '.*' || $match[0] === '*') {
+        $segments[] = self::WILDCARD_MEMBER;
       }
       elseif ($match[1] !== '') {
         // Dot notation key.

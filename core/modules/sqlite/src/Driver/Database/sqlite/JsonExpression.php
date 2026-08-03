@@ -57,7 +57,9 @@ class JsonExpression extends BaseJsonExpression {
 
     // SQLite doesn't support wildcards in json_extract. Use json_each to
     // iterate the wildcard level and check each element's value for the
-    // remaining suffix path.
+    // remaining suffix path. json_each walks the members of an object and the
+    // elements of an array alike, so the prefix alone covers both the .* and
+    // the [*] accessor.
     [$prefix, $suffix] = $this->splitAtWildcard();
     if ($suffix === '$') {
       $extract = 'je.value';

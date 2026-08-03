@@ -69,7 +69,9 @@ class JsonExpression extends BaseJsonExpression {
     $extract = $suffix === '$'
       ? 'jt.val'
       : "JSON_EXTRACT(jt.val, {$this->connection->quote($suffix)})";
-    $json_table_path = $this->connection->quote($prefix . '.*');
+    // JSON_TABLE iterates what the accessor selects: .* the members of an
+    // object, [*] the elements of an array.
+    $json_table_path = $this->connection->quote($prefix . $this->wildcardAccessor());
 
     ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders((array) $value, $queryPlaceholder);
     $type_guard = $this->toTypeGuardSql($cast_type, "JSON_TYPE({$extract})");

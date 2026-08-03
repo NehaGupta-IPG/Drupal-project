@@ -705,6 +705,8 @@ class SelectTest extends DatabaseTestBase {
       'space in path' => ['$.key OR true'],
       'parenthesis in path' => ['$.key)'],
       'multiple wildcards' => ['$.level1.*.level2.*.level3'],
+      'multiple element wildcards' => ['$.level1[*].level2[*].level3'],
+      'mixed wildcards' => ['$.level1[*].level2.*.level3'],
     ];
   }
 
@@ -776,6 +778,21 @@ class SelectTest extends DatabaseTestBase {
     $query->addField('j', 'id');
     $query->jsonCondition('test_field', '$.deps.*.status', 'enabled');
     $this->assertSame([10], array_map('intval', $query->execute()->fetchCol()));
+  }
+
+  /**
+   * Tests that the element wildcard is rejected by the same operators.
+   *
+   * @see \Drupal\KernelTests\Core\Database\SelectTest::testJsonWildcardUnsupportedOperator()
+   */
+  public function testJsonElementWildcardUnsupportedOperator(): void {
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonCondition('test_field', '$.revs[*].uid', NULL, 'HAS KEY');
+
+    $this->expectException(InvalidQueryException::class);
+    $this->expectExceptionMessage('JSON operator HAS KEY does not support the wildcard');
+    $query->execute();
   }
 
   /**

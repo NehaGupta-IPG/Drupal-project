@@ -181,7 +181,7 @@ trait DatabaseTestSchemaDataTrait {
       ->values([
         'id' => 10,
         'status' => 1,
-        'test_field' => '{"deps": {"a": {"status": "enabled"}, "b": {"status": "disabled"}, "c": {"status": "enabled"}}, "counts": {"a": 7, "b": 8}}',
+        'test_field' => '{"deps": {"a": {"status": "enabled"}, "b": {"status": "disabled"}, "c": {"status": "enabled"}}, "counts": {"a": 7, "b": 8}, "revs": [{"uid": 3, "name": "editor"}, {"uid": 5, "name": "author"}]}',
       ])
       ->execute();
   }
@@ -355,6 +355,33 @@ trait DatabaseTestSchemaDataTrait {
       'Wildcard numeric IN' => ['$.counts.*', [7, 8], 'IN', [10]],
       'Wildcard numeric IN no match' => ['$.counts.*', [98, 99], 'IN', []],
       'Wildcard numeric IN against strings' => ['$.deps.*.status', [42], 'IN', []],
+
+      // Array element wildcard. The [*] accessor selects the elements of an
+      // array, where the .* accessor selects the members of an object. Row 8
+      // holds an array of numbers at $.items, row 5 one at $.array.
+      'Element wildcard equals' => ['$.items[*]', 20, '=', [8]],
+      'Element wildcard first element' => ['$.items[*]', 10, '=', [8]],
+      'Element wildcard no match' => ['$.items[*]', 99, '=', []],
+      'Element wildcard greater than' => ['$.items[*]', 25, '>', [8]],
+      'Element wildcard on other array' => ['$.array[*]', 41, '=', [5]],
+      'Element wildcard IN' => ['$.items[*]', [20, 99], 'IN', [8]],
+      'Element wildcard IN no match' => ['$.items[*]', [98, 99], 'IN', []],
+      'Element wildcard text against numbers' => ['$.items[*]', 'twenty', '=', []],
+
+      // Array of objects, the shape a table of rows takes in a JSON document.
+      // Row 10 holds [{"uid": 3, ...}, {"uid": 5, ...}] at $.revs, so
+      // $.revs[*].uid reads the uid of every element.
+      'Element wildcard nested equals' => ['$.revs[*].uid', 3, '=', [10]],
+      'Element wildcard nested other value' => ['$.revs[*].uid', 5, '=', [10]],
+      'Element wildcard nested no match' => ['$.revs[*].uid', 4, '=', []],
+      'Element wildcard nested greater than' => ['$.revs[*].uid', 4, '>', [10]],
+      'Element wildcard nested text' => ['$.revs[*].name', 'editor', '=', [10]],
+      'Element wildcard nested IN' => ['$.revs[*].uid', [3, 7], 'IN', [10]],
+      'Element wildcard nested IN no match' => ['$.revs[*].uid', [7, 9], 'IN', []],
+      'Element wildcard nested NOT IN' => ['$.revs[*].uid', [3], 'NOT IN', [10]],
+      'Element wildcard nested NOT IN excludes all' => ['$.revs[*].uid', [3, 5], 'NOT IN', []],
+      'Element wildcard nested text against numbers' => ['$.revs[*].uid', 'three', '=', []],
+      'Element wildcard nested zero against strings' => ['$.revs[*].name', 0, '=', []],
     ];
   }
 
