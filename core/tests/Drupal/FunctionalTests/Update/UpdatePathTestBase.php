@@ -6,13 +6,13 @@ namespace Drupal\FunctionalTests\Update;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Site\Settings;
-use Drupal\Tests\BrowserTestBase;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,11 +57,11 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
   /**
    * The file path(s) to the dumped database(s) to load into the child site.
    *
-   * The file system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz is
+   * The file system/tests/fixtures/update/drupal-11.3.0.bare.standard.php.gz is
    * normally included first -- this sets up the base database from a bare
    * standard Drupal installation.
    *
-   * The file system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz
+   * The file system/tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz
    * can also be used in case we want to test with a database filled with
    * content, and with all core modules enabled.
    *
@@ -93,7 +93,7 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
    * then needed to set various things such as the config directories and the
    * container that would normally be done via the installer.
    */
-  public function installDrupal() {
+  public function installDrupal(): void {
     // Set the update URL. This must be set here rather than in
     // self::__construct() or the old URL generator will leak additional test
     // sites. Additionally, we need to prevent the path alias processor from
@@ -124,13 +124,23 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
 
     $this->replaceUser1();
 
+    // Ensure the locale.settings:translation.path config is set to the dynamic
+    // files folder.
+    // @todo remove this part when BC support for the config is removed.
+    $config = $this->config('locale.settings');
+    if (!$config->isNew() && $config->get('translation.path')) {
+      $translation_path_config = $this->publicFilesDirectory . '/translations';
+      \Drupal::service('file_system')->prepareDirectory($translation_path_config, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+      $config->set('translation.path', $translation_path_config)->save();
+    }
+
     require_once $this->root . '/core/includes/update.inc';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function doInstall() {
+  protected function doInstall(): void {
     $this->runDbTasks();
     // Allow classes to set database dump files.
     $this->setDatabaseDumpFiles();
@@ -157,19 +167,19 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function initFrontPage() {
+  protected function initFrontPage(): void {
     // Do nothing as Drupal is not installed yet.
   }
 
   /**
    * Set database dump files to be used.
    */
-  abstract protected function setDatabaseDumpFiles();
+  abstract protected function setDatabaseDumpFiles(): void;
 
   /**
    * Add settings that are missed since the installer isn't run.
    */
-  protected function prepareSettings() {
+  protected function prepareSettings(): void {
     parent::prepareSettings();
 
     // Generate a hash salt.
@@ -202,14 +212,14 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
   /**
    * Helper function to run pending database updates.
    */
-  protected function runUpdates() {
+  protected function runUpdates(): void {
     $this->doRunUpdates($this->updateUrl);
   }
 
   /**
    * Runs the install database tasks for the driver used by the test runner.
    */
-  protected function runDbTasks() {
+  protected function runDbTasks(): void {
     // Create a minimal container so that t() works.
     // @see install_begin_request()
     $container = new ContainerBuilder();
@@ -233,7 +243,7 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
   /**
    * Replace User 1 with the user created here.
    */
-  protected function replaceUser1() {
+  protected function replaceUser1(): void {
     // We try not to save content entities in hook_update_N() because the schema
     // might be out of sync, or hook invocations might rely on other schemas
     // that also aren't updated yet. Hence we are directly updating the database
@@ -251,13 +261,13 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
   /**
    * Tests that the database was properly loaded.
    */
-  protected function testDatabaseLoaded() {
+  protected function testDatabaseLoaded(): void {
     // Set a value in the cache to prove caches are cleared.
     \Drupal::service('cache.default')->set(__CLASS__, 'Test');
 
     /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
     $update_registry = \Drupal::service('update.update_hook_registry');
-    foreach (['user' => 10000, 'node' => 8700, 'system' => 10201, 'update_test_schema' => 8000] as $module => $schema) {
+    foreach (['user' => 10000, 'node' => 8700, 'system' => 11300, 'update_test_schema' => 8000] as $module => $schema) {
       $this->assertEquals($schema, $update_registry->getInstalledVersion($module), "Module $module schema is $schema");
     }
 
@@ -270,7 +280,7 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
       ->fetchAllKeyed(0, 1);
     // For the purpose of fetching the notices and displaying more helpful error
     // messages, let's override the error handler temporarily.
-    set_error_handler(function ($severity, $message, $filename, $lineno) {
+    set_error_handler(function ($severity, $message, $filename, $lineno): void {
       throw new \ErrorException($message, 0, $severity, $filename, $lineno);
     });
     foreach ($result as $route_name => $route) {

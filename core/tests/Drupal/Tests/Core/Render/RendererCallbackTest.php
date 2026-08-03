@@ -22,7 +22,7 @@ class RendererCallbackTest extends RendererTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->callableResolver->expects($this->any())
+    $this->callableResolver
       ->method('getCallableFromDefinition')
       ->willReturnArgument(0);
   }
@@ -38,7 +38,7 @@ class RendererCallbackTest extends RendererTestBase {
   #[DataProvider('providerTestCallback')]
   public function testCallback(array $render_array, string $expected_deprecation): void {
     $this->expectException(UntrustedCallbackException::class);
-    $this->expectExceptionMessage($expected_deprecation);
+    $this->expectExceptionMessageIs($expected_deprecation);
     $this->renderer->renderRoot($render_array);
   }
 

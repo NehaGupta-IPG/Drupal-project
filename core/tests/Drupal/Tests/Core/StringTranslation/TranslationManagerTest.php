@@ -40,7 +40,7 @@ class TranslationManagerTest extends UnitTestCase {
    * @return array
    *   An array of test data for formatPlural().
    */
-  public static function providerTestFormatPlural() {
+  public static function providerTestFormatPlural(): array {
     return [
       [1, 'Singular', '@count plural', [], [], 'Singular'],
       [2, 'Singular', '@count plural', [], [], '2 plural'],
@@ -56,7 +56,7 @@ class TranslationManagerTest extends UnitTestCase {
  * Tests format plural.
  */
   #[DataProvider('providerTestFormatPlural')]
-  public function testFormatPlural($count, $singular, $plural, array $args, array $options, $expected): void {
+  public function testFormatPlural(int $count, string $singular, string $plural, array $args, array $options, string $expected): void {
     $langcode = empty($options['langcode']) ? 'fr' : $options['langcode'];
     $translator = $this->createMock('\Drupal\Core\StringTranslation\Translator\TranslatorInterface');
     $translator->expects($this->once())
@@ -83,7 +83,7 @@ class TranslationManagerTest extends UnitTestCase {
    *   The expected translated string value.
    */
   #[DataProvider('providerTestTranslatePlaceholder')]
-  public function testTranslatePlaceholder($string, array $args, $expected_string): void {
+  public function testTranslatePlaceholder(string $string, array $args, string $expected_string): void {
     $actual = $this->translationManager->translate($string, $args);
     $this->assertInstanceOf(MarkupInterface::class, $actual);
     $this->assertEquals($expected_string, (string) $actual);
@@ -95,7 +95,7 @@ class TranslationManagerTest extends UnitTestCase {
    * @return array
    *   An array of test data for translate().
    */
-  public static function providerTestTranslatePlaceholder() {
+  public static function providerTestTranslatePlaceholder(): array {
     return [
       ['foo @bar', ['@bar' => 'bar'], 'foo bar'],
       ['bar %baz', ['%baz' => 'baz'], 'bar <em class="placeholder">baz</em>'],

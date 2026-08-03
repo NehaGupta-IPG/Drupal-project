@@ -8,6 +8,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
@@ -115,7 +116,7 @@ class NodeRevisionsTest extends NodeTestBase {
       $node->title = $this->randomMachineName();
       $node->body = [
         'value' => $this->randomMachineName(32),
-        'format' => filter_default_format(),
+        'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
       ];
       $node->untranslatable_string_field->value = $this->randomString();
       $node->setNewRevision();
@@ -453,7 +454,9 @@ class NodeRevisionsTest extends NodeTestBase {
     $node = $node_storage->load($node->id());
     $this->assertGreaterThan($latest_revision_id, $node->getRevisionId());
     $this->assertEquals($initial_title, $node->label());
-    $this->assertFalse($node->hasTranslation('it'));
+    // The node should retain the translations from the last default revision.
+    // @see \Drupal\Core\Entity\ContentEntityStorageBase::createRevision.
+    $this->assertTrue($node->hasTranslation('it'));
   }
 
   /**
@@ -471,6 +474,40 @@ class NodeRevisionsTest extends NodeTestBase {
       $node->setNewRevision(TRUE);
       $node->save();
     }
+  }
+
+  /**
+   * Tests the Set as current revision link.
+   *
+   * This operation appears on the revision list when there is a more recent
+   * revision than the current revision.
+   */
+  public function testSetAsCurrentRevision(): void {
+    $node = $this->drupalCreateNode();
+    // Create a non-default revision.
+    $node->setNewRevision();
+    $node->isDefaultRevision(FALSE);
+    $node->body->value = '<p>new body</p>';
+    $node->setRevisionLogMessage('non default revision message');
+    $node->save();
+
+    $this->drupalGet($node->toUrl('version-history'));
+    $this->assertSession()->linkExists('Set as current revision');
+    $this->clickLink('Set as current revision');
+    $this->submitForm([], 'Revert');
+
+    $this->assertSession()->pageTextContains(sprintf('Basic page %s has been reverted', $node->label()));
+
+    // Reverting the non-default revision should create a new revision and set
+    // it as the default, meaning there should be 3 revisions displayed and no
+    // Set as current revision link.
+    $this->assertSession()->elementsCount('css', '.node-revision-table tbody tr', 3);
+    $this->assertSession()->linkNotExists('Set as current revision');
+    $this->assertSession()->pageTextContains('Copy of the revision from');
+    // The first row (the revision we just reverted to) should be displayed as
+    // the current revision.
+    $firstRowSecondColumnText = $this->getSession()->getPage()->find('xpath', '//tbody/tr[1]/td[2]/em')->getText();
+    $this->assertEquals('Current revision', $firstRowSecondColumnText);
   }
 
 }

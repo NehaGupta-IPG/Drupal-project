@@ -7,6 +7,7 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @internal
  */
-class NodeRevisionDeleteForm extends ConfirmFormBase {
+class NodeRevisionDeleteForm extends ConfirmFormBase implements WorkspaceSafeFormInterface {
 
   /**
    * The node revision.
@@ -97,7 +98,12 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
     $storage = $this->nodeStorage;
     $storage->deleteRevision($this->revision->getRevisionId());
 
-    $this->logger('content')->info('@type: deleted %title revision %revision.', ['@type' => $this->revision->bundle(), '%title' => $this->revision->label(), '%revision' => $this->revision->getRevisionId()]);
+    $this->logger('content')
+      ->info('@type: deleted %title revision %revision.', [
+        '@type' => $this->revision->bundle(),
+        '%title' => $this->revision->label(),
+        '%revision' => $this->revision->getRevisionId(),
+      ]);
     $node_type = $this->nodeTypeStorage->load($this->revision->bundle())->label();
     $this->messenger()
       ->addStatus($this->t('Revision from %revision-date of @type %title has been deleted.', [

@@ -1,5 +1,6 @@
 # Configuration file for PHPStan static code checking, see https://phpstan.org .
 # The PHPStan check is executed as a job in the CI pipeline.
+
 includes:
   - .phpstan-baseline.php
 
@@ -9,14 +10,21 @@ parameters:
 
   level: 1
 
+  checkFunctionArgumentTypes: true
   checkInternalClassCaseSensitivity: true
+
+  parallel:
+    minimumNumberOfJobsPerProcess: 1
 
   fileExtensions:
     - sh
+    - ''
 
   paths:
     - .
     - ../composer
+    - scripts/dr
+    - scripts/drupal
 
   bootstrapFiles:
     # Load aliases.
@@ -27,12 +35,14 @@ parameters:
     - ../sites
     # Skip test fixtures.
     - ../*/node_modules/*
-    - */tests/fixtures/*.php
-    - */tests/fixtures/*.php.gz
+    - */fixtures/*.php
+    - */fixtures/*.php.gz
     # Skip the phpstan tmpDir
     - phpstan-tmp/*
     # Skip Drupal's own PHPStan rules test fixtures.
     - tests/PHPStan/fixtures/*
+    # Skip Drupal's own PHPStan vendor directory
+    - tests/PHPStan/vendor/*
     # Skip Drupal 6 & 7 code.
     - scripts/dump-database-d?.sh
     - scripts/generate-d?-content.sh
@@ -44,6 +54,10 @@ parameters:
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/fruit/ExtendingNonInstalledClass.php
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/custom_annotation/UsingNonInstalledTraitClass.php
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/custom_annotation/ExtendingNonInstalledClass.php
+    - modules/system/tests/modules/router_test_directory/src/Controller/TestInvalidController.php
+    - modules/system/tests/modules/router_test_directory/src/Controller/TestMissingDependency.php
+    # The following class is only for PHPCS.
+    - tests/phpcs/PhpScriptFilter.php
 
   ignoreErrors:
     # new static() is a best practice in Drupal, so we cannot fix that.
@@ -54,11 +68,47 @@ parameters:
     - "#^Class .* extends @internal class#"
     - identifier: missingType.iterableValue
 
+  disallowedFunctionCalls:
+    -
+       function: 'crc32()'
+       message: 'use hash() with an xxHash algorithm instead'
+       errorTip: 'See https://www.drupal.org/node/3581605'
+    -
+       function: 'md5()'
+       message: 'use hash() with an xxHash algorithm instead'
+       errorTip: 'See https://www.drupal.org/node/3581605'
+    -
+       function: 'sha1()'
+       message: 'use sha256() or hash() with an xxHash algorithm instead'
+       errorTip: 'See https://www.drupal.org/node/3581605'
+    -
+       function: 'hash()'
+       message: "with 'md5'|'sha1'|'crc32'|'crc32b' encryption algorithms. Use hash() with an xxHash algorithm instead"
+       errorTip: 'See https://www.drupal.org/node/3581605'
+       allowExceptCaseInsensitiveParams:
+         -
+            position: 1
+            name: 'algo'
+            typeString: "'md5'|'sha1'|'crc32'|'crc32b'"
+
 rules:
+  # The rules below are Drupal custom ones.
   - Drupal\PHPStan\Rules\ComponentTestDoesNotExtendCoreTest
   - Drupal\PHPStan\Rules\TestClassClassMetadata
   - Drupal\PHPStan\Rules\TestClassMethodMetadata
-  - PHPStan\Rules\Functions\MissingFunctionReturnTypehintRule
-  - PHPStan\Rules\Methods\MissingMethodReturnTypehintRule
+  # ----------------------------------------------------------
   # The rule below can be removed when we increase level to 2.
   - PHPStan\Rules\Classes\AccessPrivateConstantThroughStaticRule
+  # The rules below can be removed when we increase level to 6.
+  - PHPStan\Rules\Functions\MissingFunctionReturnTypehintRule
+  - PHPStan\Rules\Methods\MissingMethodReturnTypehintRule
+
+services:
+  errorFormatter.multiplex:
+    class: Drupal\PHPStan\ErrorFormatter\MultiplexErrorFormatter
+    arguments:
+      basePath: ::getenv(_ARTIFACTS_DIR)
+      outputs:
+        gitlab: phpstan-gitlab.json
+        junit: phpstan-junit.xml
+        table: null

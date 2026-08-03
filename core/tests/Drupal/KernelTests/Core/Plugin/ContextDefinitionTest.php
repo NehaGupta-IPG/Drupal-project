@@ -29,8 +29,6 @@ class ContextDefinitionTest extends KernelTestBase {
 
   /**
    * Tests is satisfied by.
-   *
-   * @legacy-covers ::isSatisfiedBy
    */
   public function testIsSatisfiedBy(): void {
     $this->installEntitySchema('user');
@@ -62,14 +60,12 @@ class ContextDefinitionTest extends KernelTestBase {
    */
   public function testEntityContextDefinitionAssert(): void {
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('assert(!str_starts_with($data_type, \'entity:\') || $this instanceof EntityContextDefinition)');
+    $this->expectExceptionMessageIs('assert(!str_starts_with($data_type, \'entity:\') || $this instanceof EntityContextDefinition)');
     new ContextDefinition('entity:entity_test');
   }
 
   /**
    * Tests create with entity data type.
-   *
-   * @legacy-covers ::create
    */
   public function testCreateWithEntityDataType(): void {
     $this->assertInstanceOf(EntityContextDefinition::class, ContextDefinition::create('entity:user'));

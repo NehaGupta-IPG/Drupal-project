@@ -54,7 +54,7 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
         'parent' => '',
       ],
     );
-    $block = $this->drupalPlaceBlock('system_menu_block:llama', [
+    $this->drupalPlaceBlock('system_menu_block:llama', [
       'label' => 'Llama',
       'provider' => 'system',
       'region' => 'footer',
@@ -67,9 +67,7 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
     $expected_tags = [
       'http_response',
       'rendered',
-      'block_view',
       'config:block_list',
-      'config:block.block.' . $block->id(),
       'config:system.menu.llama',
       // The cache contexts associated with the (in)accessible menu links are
       // bubbled.
@@ -111,7 +109,7 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
 
     // Verify that after resetting the first menu link, there is a cache miss.
     $this->assertTrue($menu_link->isResettable(), 'First link can be reset');
-    $menu_link = $menu_link_manager->resetLink($menu_link->getPluginId());
+    $menu_link_manager->resetLink($menu_link->getPluginId());
     $this->verifyPageCache($url, 'MISS');
 
     // Verify a cache hit.

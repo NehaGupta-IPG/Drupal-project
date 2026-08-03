@@ -21,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests schema API for the MySQL driver.
  */
 #[Group('Database')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 #[CoversClass(Schema::class)]
 class SchemaTest extends DriverSpecificSchemaTestBase {
@@ -306,7 +307,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
    */
   public function testSchemaTableColumnSizeTooLargeException(): void {
     $this->expectException(SchemaTableColumnSizeTooLargeException::class);
-    $this->expectExceptionMessage("Column length too big for column 'too_large' (max = 16383); use BLOB or TEXT instead");
+    $this->expectExceptionMessageIsOrContains("Column length too big for column 'too_large' (max = 16383); use BLOB or TEXT instead");
     $this->schema->createTable('test_schema', [
       'description' => 'Tests SchemaTableColumnSizeTooLargeException.',
       'fields' => [

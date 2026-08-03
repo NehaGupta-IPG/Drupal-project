@@ -11,7 +11,6 @@ use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Hook\ImplementationList;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Utility\CallableResolver;
-use Drupal\Tests\Core\GroupIncludesTestTrait;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -28,8 +27,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class ModuleHandlerTest extends UnitTestCase {
 
-  use GroupIncludesTestTrait;
-
   /**
    * Get a module handler object to test.
    *
@@ -44,17 +41,13 @@ class ModuleHandlerTest extends UnitTestCase {
    *   Module paths by module name.
    * @param array<string, array<callable-string, string>> $implementations
    *   Module names by function name implementing hook_hook().
-   * @param array<string, array<string, string>> $includes
-   *   Include files per hook.
-   * @param array<string, array<string, string>> $group_includes
-   *   Group include files per hook.
    * @param bool $loadAll
    *   TRUE to call ModuleHandler->loadAll() on the new module handler.
    *
    * @return \Drupal\Core\Extension\ModuleHandler
    *   The module handler to test.
    */
-  protected function getModuleHandler($modules = [], $implementations = [], array $includes = [], array $group_includes = [], $loadAll = TRUE) {
+  protected function getModuleHandler(array $modules = [], array $implementations = [], bool $loadAll = TRUE): ModuleHandler {
     // This only works if there's a single $hook.
     $modules['module_handler_test'] = 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test';
     $moduleList = [];
@@ -69,10 +62,8 @@ class ModuleHandlerTest extends UnitTestCase {
     $keyvalue = new KeyValueMemoryFactory();
     $cache = new NullBackend('bootstrap');
     $keyvalue->get('hook_data')->set('hook_list', $implementations);
-    $keyvalue->get('hook_data')->set('includes', $includes);
-    $keyvalue->get('hook_data')->set('group_includes', $group_includes);
-    $callableResolver = $this->createMock(CallableResolver::class);
-    $callableResolver->expects($this->any())
+    $callableResolver = $this->createStub(CallableResolver::class);
+    $callableResolver
       ->method('getCallableFromDefinition')
       ->willReturnCallback(fn ($definition) => $definition);
     $moduleHandler = new ModuleHandler($this->root, $moduleList, $keyvalue, $callableResolver, $cache);
@@ -84,8 +75,6 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Tests loading a module.
-   *
-   * @legacy-covers ::load
    */
   public function testLoadModule(): void {
     $moduleList = [
@@ -104,10 +93,7 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Tests loading all modules.
-   *
-   * @legacy-covers ::loadAll
    */
-  #[IgnoreDeprecations]
   public function testLoadAllModules(): void {
     $moduleList = [
       'module_handler_test_all1' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1',
@@ -136,7 +122,7 @@ class ModuleHandlerTest extends UnitTestCase {
           ],
         ],
         new KeyValueMemoryFactory(),
-        $this->createMock(CallableResolver::class),
+        $this->createStub(CallableResolver::class),
         new NullBackend('bootstrap'),
       ])
       ->onlyMethods(['load'])
@@ -154,8 +140,6 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Tests isLoaded accessor.
-   *
-   * @legacy-covers ::isLoaded
    */
   public function testIsLoaded(): void {
     $module_handler = $this->getModuleHandler(loadAll: FALSE);
@@ -166,8 +150,6 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Confirm we get back the modules set in the constructor.
-   *
-   * @legacy-covers ::getModuleList
    */
   public function testGetModuleList(): void {
     $this->assertEquals($this->getModuleHandler()->getModuleList(), [
@@ -177,8 +159,6 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Confirm we get back a module from the module list.
-   *
-   * @legacy-covers ::getModule
    */
   public function testGetModuleWithExistingModule(): void {
     $this->assertEquals($this->getModuleHandler()->getModule('module_handler_test'), new Extension($this->root, 'module', 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test/module_handler_test.info.yml', 'module_handler_test.module'));
@@ -186,8 +166,6 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Tests get module with non existing module.
-   *
-   * @legacy-covers ::getModule
    */
   public function testGetModuleWithNonExistingModule(): void {
     $this->expectException(UnknownExtensionException::class);
@@ -196,8 +174,6 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Ensure setting the module list replaces the module list and resets internal structures.
-   *
-   * @legacy-covers ::setModuleList
    */
   public function testSetModuleList(): void {
     $fixture_module_handler = $this->getModuleHandler();
@@ -206,7 +182,7 @@ class ModuleHandlerTest extends UnitTestCase {
         $this->root,
         [],
         new KeyValueMemoryFactory(),
-        $this->createMock(CallableResolver::class),
+        $this->createStub(CallableResolver::class),
         new NullBackend('bootstrap'),
       ])
       ->onlyMethods(['resetImplementations'])
@@ -227,8 +203,6 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Tests module exists returns correct module status.
-   *
-   * @legacy-covers ::moduleExists
    */
   public function testModuleExists(): void {
     $module_handler = $this->getModuleHandler();
@@ -238,12 +212,10 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Tests load all includes.
-   *
-   * @legacy-covers ::loadAllIncludes
    */
   #[IgnoreDeprecations]
   public function testLoadAllIncludes(): void {
-    $this->expectDeprecation('ModuleHandler::loadAllIncludes() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3536432');
+    $this->expectUserDeprecationMessage('ModuleHandler::loadAllIncludes() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3536432');
     $this->assertTrue(TRUE);
     $module_handler = $this->getMockBuilder(ModuleHandler::class)
       ->setConstructorArgs([
@@ -256,7 +228,7 @@ class ModuleHandlerTest extends UnitTestCase {
           ],
         ],
         new KeyValueMemoryFactory(),
-        $this->createMock(CallableResolver::class),
+        $this->createStub(CallableResolver::class),
         new NullBackend('bootstrap'),
       ])
       ->onlyMethods(['loadInclude'])
@@ -271,8 +243,6 @@ class ModuleHandlerTest extends UnitTestCase {
    * Tests loadInclude().
    *
    * Note we load code, so isolate the test.
-   *
-   * @legacy-covers ::loadInclude
    */
   #[PreserveGlobalState(FALSE)]
   #[RunInSeparateProcess]
@@ -287,8 +257,6 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Tests invoke methods when module is enabled.
-   *
-   * @legacy-covers ::invoke
    */
   public function testInvokeModuleEnabled(): void {
     $module_handler = $this->getModuleHandler();
@@ -299,39 +267,8 @@ class ModuleHandlerTest extends UnitTestCase {
   }
 
   /**
-   * Tests implementations methods when module is enabled.
-   *
-   * @legacy-covers ::hasImplementations
-   */
-  public function testImplementsHookModuleEnabled(): void {
-    $implementations = [
-      'hook' => [
-        'module_handler_test_hook' => 'module_handler_test',
-        'module_handler_test_added_hook' => 'module_handler_test_added',
-      ],
-    ];
-    $moduleList = [
-      'module_handler_test_added' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_added',
-      'module_handler_test_no_hook' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_no_hook',
-    ];
-    $includes_per_function = [
-      'hook' => [
-        'module_handler_test_added_hook' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_added/module_handler_test_added.hook.inc',
-      ],
-    ];
-    $module_handler = $this->getModuleHandler($moduleList, $implementations, $includes_per_function);
-
-    $this->assertTrue($module_handler->hasImplementations('hook', 'module_handler_test'), 'Installed module implementation found.');
-    $this->assertTrue($module_handler->hasImplementations('hook', 'module_handler_test_added'), 'Runtime added module with implementation in include found.');
-    $this->assertFalse($module_handler->hasImplementations('hook', 'module_handler_test_no_hook'), 'Missing implementation not found.');
-  }
-
-  /**
    * Tests invoke all.
-   *
-   * @legacy-covers ::invokeAll
    */
-  #[IgnoreDeprecations]
   public function testInvokeAll(): void {
     $implementations = [
       'hook' => [
@@ -350,8 +287,6 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Tests hasImplementations.
-   *
-   * @legacy-covers ::hasImplementations
    */
   public function testHasImplementations(): void {
     $implementations = [
@@ -367,7 +302,7 @@ class ModuleHandlerTest extends UnitTestCase {
     $module_handler = $this->getModuleHandler([], $implementations);
     $module_handler->setModuleList(['some_module' => TRUE]);
     $r = new \ReflectionObject($module_handler);
-    $get_lists = fn () => $r->getProperty('hookImplementationLists')->getValue($module_handler);
+    $get_lists = fn (): mixed => $r->getProperty('hookImplementationLists')->getValue($module_handler);
 
     $this->assertSame([], $get_lists());
     $this->assertTrue($module_handler->hasImplementations('some_hook'));
@@ -398,8 +333,6 @@ class ModuleHandlerTest extends UnitTestCase {
 
   /**
    * Tests get module directories.
-   *
-   * @legacy-covers ::getModuleDirectories
    */
   public function testGetModuleDirectories(): void {
     $moduleList = [
@@ -411,19 +344,6 @@ class ModuleHandlerTest extends UnitTestCase {
       'module_handler_test' => $this->root . '/core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test',
     ];
     $this->assertEquals($moduleDirectories, $module_handler->getModuleDirectories());
-  }
-
-  /**
-   * Tests group includes.
-   */
-  #[IgnoreDeprecations]
-  public function testGroupIncludes(): void {
-    self::setupGroupIncludes();
-    $this->expectDeprecation('Autoloading hooks in the file (vfs://drupal_root/test_module.tokens.inc) is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Move the functions in this file to either the .module file or other appropriate location. See https://www.drupal.org/node/3489765');
-    $moduleHandler = $this->getModuleHandler([], ['token_info' => ['test_module_token_info' => 'test_module']], [], ['token_info' => self::GROUP_INCLUDES['token_info']]);
-    $this->assertFalse(function_exists('_test_module_helper'));
-    $moduleHandler->invokeAll('token_info');
-    $this->assertTrue(function_exists('_test_module_helper'));
   }
 
 }

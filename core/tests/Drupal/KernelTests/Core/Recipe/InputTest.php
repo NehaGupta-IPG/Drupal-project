@@ -11,6 +11,7 @@ use Drupal\Core\Recipe\InputCollectorInterface;
 use Drupal\Core\Recipe\InputConfigurator;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeRunner;
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
@@ -62,7 +63,7 @@ class InputTest extends KernelTestBase {
       ->set('uuid', $this->container->get(UuidInterface::class)->generate())
       ->save();
 
-    $this->recipe = Recipe::createFromDirectory($this->getDrupalRoot() . '/core/tests/fixtures/recipes/input_test');
+    $this->recipe = Recipe::createFromDirectory($this->root . '/core/tests/fixtures/recipes/input_test');
   }
 
   /**
@@ -71,10 +72,9 @@ class InputTest extends KernelTestBase {
   public function testDefaultValueFromConfig(): void {
     // Collect the input values before processing the recipe, using a mocked
     // collector that will always return the default value.
-    $collector = $this->createMock(InputCollectorInterface::class);
-    $collector->expects($this->any())
+    $collector = $this->createStub(InputCollectorInterface::class);
+    $collector
       ->method('collectValue')
-      ->withAnyParameters()
       ->willReturnArgument(2);
 
     $this->recipe->input->collectAll($collector);
@@ -90,7 +90,7 @@ class InputTest extends KernelTestBase {
     $collector = $this->createMock(InputCollectorInterface::class);
     $collector->expects($this->atLeastOnce())
       ->method('collectValue')
-      ->willReturnCallback(function (string $name) {
+      ->willReturnCallback(function (string $name): string {
         return match($name) {
           'create_node_type.node_type' => 'test',
           'input_test.owner' => 'hack',
@@ -139,7 +139,7 @@ input:
 YAML
     );
     $collector = new ConsoleInputCollector(
-      $this->createMock(InputInterface::class),
+      $this->createStub(InputInterface::class),
       $io,
     );
     $recipe->input->collectAll($collector);
@@ -166,12 +166,12 @@ input:
 YAML
     );
     $collector = new ConsoleInputCollector(
-      $this->createMock(InputInterface::class),
-      $this->createMock(StyleInterface::class),
+      $this->createStub(InputInterface::class),
+      $this->createStub(StyleInterface::class),
     );
 
     $this->expectException(\ArgumentCountError::class);
-    $this->expectExceptionMessage('Argument #1 ($question) not passed');
+    $this->expectExceptionMessageIsOrContains('::ask(): Argument #1 ($question) not passed');
     $recipe->input->collectAll($collector);
   }
 
@@ -216,7 +216,7 @@ YAML
     unset($recipe_data['input']['capital']['default']['fallback']);
     $recipe = $this->createRecipe($recipe_data);
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage("The 'foo.baz' config object does not exist.");
+    $this->expectExceptionMessageIs("The 'foo.baz' config object does not exist.");
     $recipe->input->collectAll($collector);
   }
 
@@ -267,10 +267,9 @@ config:
 YAML
     );
     // Mock a collector that only returns the default value.
-    $collector = $this->createMock(InputCollectorInterface::class);
-    $collector->expects($this->any())
+    $collector = $this->createStub(InputCollectorInterface::class);
+    $collector
       ->method('collectValue')
-      ->withAnyParameters()
       ->willReturnArgument(2);
     $recipe->input->collectAll($collector);
 
@@ -323,7 +322,7 @@ YAML
     ]);
     $recipe->input->collectAll($collector);
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("The entity type for the config name 'node.\${anything}.test' could not be identified.");
+    $this->expectExceptionMessageIs("The entity type for the config name 'node.\${anything}.test' could not be identified.");
     RecipeRunner::processRecipe($recipe);
   }
 
@@ -331,8 +330,8 @@ YAML
    * Tests that the askHidden prompt forwards arguments correctly.
    */
   public function testAskHiddenPromptArgumentsForwarded(): void {
-    $input = $this->createMock(InputInterface::class);
-    $output = $this->createMock(OutputInterface::class);
+    $input = $this->createStub(InputInterface::class);
+    $output = $this->createStub(OutputInterface::class);
     $io = new SymfonyStyle($input, $output);
 
     $recipe = $this->createRecipe(<<<YAML
@@ -383,10 +382,9 @@ YAML
     putenv('SITE_NAME=Input Test');
 
     // Mock a collector that only returns the default value.
-    $collector = $this->createMock(InputCollectorInterface::class);
-    $collector->expects($this->any())
+    $collector = $this->createStub(InputCollectorInterface::class);
+    $collector
       ->method('collectValue')
-      ->withAnyParameters()
       ->willReturnArgument(2);
     $recipe->input->collectAll($collector);
 
@@ -436,8 +434,30 @@ YAML
     unset($recipe_data['input']['capital']['default']['fallback']);
     $recipe = $this->createRecipe($recipe_data);
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage("The 'NO_SUCH_THING' environment variable is not defined.");
+    $this->expectExceptionMessageIs("The 'NO_SUCH_THING' environment variable is not defined.");
     $recipe->input->collectAll($collector);
+  }
+
+  /**
+   * Tests that the ask prompt for integer value doesn't fail with an error.
+   */
+  public function testAskPromptArgumentsInteger(): void {
+    $input = $this->createStub(InputInterface::class);
+    $io = $this->createMock(StyleInterface::class);
+    $io->expects($this->once())
+      ->method('ask')
+      ->with('Who are you?', '123', NULL);
+
+    $data_definition = DataDefinition::create('string')
+      ->setSetting('prompt', [
+        'method' => 'ask',
+        'arguments' => [
+          'question' => 'Who are you?',
+        ],
+      ]);
+
+    (new ConsoleInputCollector($input, $io))
+      ->collectValue('test.one', $data_definition, 123);
   }
 
 }

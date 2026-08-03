@@ -27,6 +27,8 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
     'node',
     'search',
     'search_extra_type',
+    'search_node',
+    'search_user',
     'test_page_test',
   ];
 
@@ -440,7 +442,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
    * @param string $entity_id
    *   The search page entity ID to enable.
    */
-  protected function setDefaultThroughUi($entity_id): void {
+  protected function setDefaultThroughUi(string $entity_id): void {
     $this->drupalGet('admin/config/search/pages');
     preg_match('|href="([^"]+' . $entity_id . '/set-default[^"]+)"|', $this->getSession()->getPage()->getContent(), $matches);
 

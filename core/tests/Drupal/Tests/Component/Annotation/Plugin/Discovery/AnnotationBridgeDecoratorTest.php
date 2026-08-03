@@ -23,7 +23,7 @@ class AnnotationBridgeDecoratorTest extends TestCase {
   use ProphecyTrait;
 
   /**
-   * @legacy-covers ::getDefinitions
+   * Tests get definitions.
    */
   public function testGetDefinitions(): void {
     $definitions = [];
@@ -51,7 +51,7 @@ class TestAnnotation extends Plugin {
   /**
    * {@inheritdoc}
    */
-  public function get() {
+  public function get(): ObjectDefinition {
     return new ObjectDefinition($this->definition);
   }
 

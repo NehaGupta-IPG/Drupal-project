@@ -1,4 +1,6 @@
 base:
+  aggregate_target:
+    css: 'global'
   version: VERSION
   css:
     # Adjust the weights to load these early.
@@ -33,19 +35,6 @@ status.report:
       css/components/system-status-counter.css: { weight: -10 }
       css/components/system-status-report-counters.css: { weight: -10 }
       css/components/system-status-report-general-info.css: { weight: -10 }
-  moved_files:
-    system/base:
-      deprecation_version: 11.2.0
-      removed_version: 12.0.0
-      deprecation_link: https://www.drupal.org/node/3432346
-      css:
-        component:
-          css/components/system-status-counter.css:
-            base: css/components/system-status-counter.css
-          css/components/system-status-reports-counters.css:
-            base: css/components/system-status-reports-counters.css
-          css/components/system-status-report-general-info.css:
-            base: css/components/system-status-report-general-info.css
 
 drupal.system:
   version: VERSION

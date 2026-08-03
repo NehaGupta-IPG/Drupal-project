@@ -8,12 +8,14 @@ use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Hook\HookCollectorKeyValueWritePass;
 use Drupal\Core\Hook\HookCollectorPass;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
+use Drupal\hook_collector_depends_test\Hook\DependsOnModuleClassHooks;
+use Drupal\hook_collector_depends_test\Hook\DependsOnModuleMethodHooks;
+use Drupal\hook_collector_depends_test\Hook\DependsOnModuleMultipleHooks;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\module_handler_test_all1\Hook\ModuleHandlerTestAll1Hooks;
 use Drupal\user_hooks_test\Hook\UserHooksTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -60,9 +62,33 @@ class HookCollectorPassTest extends KernelTestBase {
   }
 
   /**
+   * Tests ignoring of directories when collecting hooks using the file_scan_ignore_directories setting.
+   */
+  public function testIgnoreDirectories(): void {
+    $container = new ContainerBuilder();
+    $module_filenames = [
+      'ignored_directories_hook_collector_test' => ['pathname' => "core/modules/system/tests/modules/HookCollector/ignored_directories_hook_collector_test/ignored_directories_hook_collector_test.info.yml"],
+    ];
+    $container->setParameter('container.modules', $module_filenames);
+    (new HookCollectorPass())->process($container);
+    $implementations = $container->getParameter('.hook_data')['hook_list'];
+    $this->assertSame([
+      'ignored_alter' => [
+        'ignored_directories_hook_collector_test_ignored_alter' => 'ignored_directories_hook_collector_test',
+      ],
+    ], $implementations);
+
+    // After setting the ignored directory the hook in ignored directory should
+    // no longer be registered.
+    $this->setSetting('file_scan_ignore_directories', ['ignored_directory']);
+    (new HookCollectorPass())->process($container);
+    $implementations = $container->getParameter('.hook_data')['hook_list'];
+    $this->assertSame([], $implementations);
+  }
+
+  /**
    * Test that ordering works.
    */
-  #[IgnoreDeprecations]
   public function testOrdering(): void {
     $container = new ContainerBuilder();
     $module_filenames = [
@@ -81,9 +107,6 @@ class HookCollectorPassTest extends KernelTestBase {
         'module_handler_test_all1_hook' => 'module_handler_test_all1',
         'module_handler_test_all2_hook' => 'module_handler_test_all2',
       ],
-      'module_implements_alter' => [
-        'module_handler_test_all1_module_implements_alter' => 'module_handler_test_all1',
-      ],
       'order1' => [
         'module_handler_test_all2_order1' => 'module_handler_test_all2',
         ModuleHandlerTestAll1Hooks::class . '::order' => 'module_handler_test_all1',
@@ -93,25 +116,6 @@ class HookCollectorPassTest extends KernelTestBase {
         'module_handler_test_all2_order2' => 'module_handler_test_all2',
       ],
     ], $container);
-  }
-
-  /**
-   * Test LegacyModuleImplementsAlter.
-   */
-  public function testLegacyModuleImplementsAlter(): void {
-    $container = new ContainerBuilder();
-    $module_filenames = [
-      'module_implements_alter_test_legacy' => ['pathname' => "core/tests/Drupal/Tests/Core/Extension/modules/module_implements_alter_test_legacy/module_implements_alter_test_legacy.info.yml"],
-    ];
-    include_once 'core/tests/Drupal/Tests/Core/Extension/modules/module_implements_alter_test_legacy/module_implements_alter_test_legacy.module';
-    $container->setParameter('container.modules', $module_filenames);
-    $keyvalue = new KeyValueMemoryFactory();
-    $container->set('keyvalue', $keyvalue);
-    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
-    (new HookCollectorPass())->process($container);
-
-    // This test will also fail if the deprecation notice shows up.
-    $this->assertFalse(isset($GLOBALS['ShouldNotRunLegacyModuleImplementsAlter']));
   }
 
   /**
@@ -154,6 +158,19 @@ class HookCollectorPassTest extends KernelTestBase {
     $this->assertTrue(isset($GLOBALS['procedural_attribute_skip_find']));
     $this->assertTrue(isset($GLOBALS['skipped_procedural_oop_cache_flush']));
     $this->assertFalse($this->container->hasParameter('hook_collector_skip_procedural.skip_procedural_hook_scan'));
+  }
+
+  /**
+   * Test Hook attribute with named arguments, and class with invoke method.
+   */
+  public function testHookAttribute(): void {
+    $module_installer = $this->container->get('module_installer');
+    $this->assertTrue($module_installer->install(['hook_collector_hook_attribute']));
+    $this->assertFalse(isset($GLOBALS['hook_named_arguments']));
+    $this->assertFalse(isset($GLOBALS['hook_invoke_method']));
+    drupal_flush_all_caches();
+    $this->assertTrue(isset($GLOBALS['hook_named_arguments']));
+    $this->assertTrue(isset($GLOBALS['hook_invoke_method']));
   }
 
   /**
@@ -318,6 +335,51 @@ class HookCollectorPassTest extends KernelTestBase {
     ];
     $calls = $module_handler->invokeAll('custom_hook_override');
     $this->assertEquals($expected_calls, $calls);
+  }
+
+  /**
+   * Tests hook dependencies.
+   */
+  public function testHookDependsOn(): void {
+    $this->container->get('module_installer')->install(['hook_collector_depends_test']);
+    $module_handler = $this->container->get('module_handler');
+
+    // Hook implementations for this hook must not be invoked as they depend on
+    // an unavailable module.
+    $calls = $module_handler->invokeAll('with_dependency');
+    $this->assertSame([], $calls);
+
+    // The hook without dependency is invoked.
+    $expected_calls = [
+      'Drupal\hook_collector_depends_test\Hook\DependsOnModuleMultipleHooks::noDependency',
+    ];
+    $calls = $module_handler->invokeAll('no_dependency');
+    $this->assertSame($expected_calls, $calls);
+
+    // Hook classes that have no available hooks must not be registered.
+    $this->assertFalse($this->container->has(DependsOnModuleClassHooks::class));
+    $this->assertFalse($this->container->has(DependsOnModuleMethodHooks::class));
+    $this->assertTrue($this->container->has(DependsOnModuleMultipleHooks::class));
+
+    // Install the module that the with dependency hooks depend on.
+    $this->container->get('module_installer')->install(['aaa_hook_collector_test']);
+    $module_handler = $this->container->get('module_handler');
+
+    // The hook with dependency is invoked.
+    $expected_calls = [
+      'Drupal\hook_collector_depends_test\Hook\DependsOnModuleClassHooks::withDependency',
+      'Drupal\hook_collector_depends_test\Hook\DependsOnModuleMethodHooks::withDependency',
+      'Drupal\hook_collector_depends_test\Hook\DependsOnModuleMultipleHooks::withDependency',
+    ];
+    $calls = $module_handler->invokeAll('with_dependency');
+    // Hook order is not relevant here, sort them.
+    sort($calls);
+    $this->assertSame($expected_calls, $calls);
+
+    // All hook classes are now registered as a service.
+    $this->assertTrue($this->container->has(DependsOnModuleClassHooks::class));
+    $this->assertTrue($this->container->has(DependsOnModuleMethodHooks::class));
+    $this->assertTrue($this->container->has(DependsOnModuleMultipleHooks::class));
   }
 
   /**
