@@ -6,7 +6,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-sizing: border-box;
   width: 100%;
   height: var(--admin-theme-toolbar-secondary-height);
   padding: 0;
@@ -31,10 +30,6 @@
   .gin--navigation & {
     width: calc(100% - var(--admin-theme-toolbar-x-offset));
     margin-inline-start: var(--admin-theme-toolbar-x-offset);
-  }
-
-  .gin-layout-container {
-    box-sizing: border-box;
   }
 
   .node-preview-backlink,
@@ -93,7 +88,6 @@
 
   .form-element {
     all: revert;
-    box-sizing: border-box;
     color: var(--admin-color-text);
     border: 1px solid var(--admin-color-border-input);
     border-radius: var(--admin-radius-s);

@@ -73,7 +73,6 @@
 .media-library-views-form,
 .user-admin-permissions,
 .field-config-form {
-  box-sizing: border-box;
   width: 100%;
   padding: var(--admin-space-s);
   border: 1px solid var(--admin-color-border-soft);

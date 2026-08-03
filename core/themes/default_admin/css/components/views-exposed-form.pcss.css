@@ -8,7 +8,6 @@
 .views-exposed-form {
   display: flex;
   flex-wrap: wrap;
-  box-sizing: border-box;
   padding: var(--admin-space-xs) var(--admin-space-s) var(--admin-space-s);
   border: 1px solid var(--admin-color-border-soft);
   border-radius: var(--admin-radius-l);

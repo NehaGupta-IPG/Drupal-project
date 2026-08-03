@@ -181,7 +181,6 @@
 }
 
 .system-status-report__entry__value {
-  box-sizing: border-box;
   padding-block: 0 1em;
   padding-inline: 3em 1em;
   font-size: var(--admin-font-size-s);

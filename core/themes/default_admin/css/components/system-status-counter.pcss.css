@@ -5,7 +5,6 @@
 .system-status-counter {
   display: inline-block;
   overflow-y: hidden;
-  box-sizing: border-box;
   height: auto;
   padding: var(--admin-space-m) 0;
   white-space: nowrap;

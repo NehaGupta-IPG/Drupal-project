@@ -12,15 +12,8 @@
  * This wrapper div is added by JavaScript.
  */
 .vertical-tabs {
-  box-sizing: border-box;
   margin-block: var(--vertical-tabs-margin-vertical);
   border-block-start: 1px solid transparent; /* Hide the pane wrapper clearfix's height. */
-
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
 }
 
 /**
@@ -227,7 +220,6 @@
  * Wrapper of vertical tabs panes.
  */
 .vertical-tabs__items {
-  box-sizing: border-box;
   margin-block: var(--vertical-tabs-margin-vertical);
   color: var(--admin-color-text);
   border: var(--vertical-tabs-border);

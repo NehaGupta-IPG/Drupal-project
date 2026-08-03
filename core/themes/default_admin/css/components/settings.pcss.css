@@ -122,7 +122,6 @@
 
   .form-item__label {
     display: inline-block;
-    box-sizing: border-box;
     margin: var(--admin-space-2xs) 0;
     padding: 0.375rem var(--admin-space-m);
     border: 2px solid transparent;

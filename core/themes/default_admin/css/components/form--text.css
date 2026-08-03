@@ -112,7 +112,6 @@
 
 .form-element--type-search[type="search"] {
   appearance: none;
-  box-sizing: border-box;
 }
 
 /**

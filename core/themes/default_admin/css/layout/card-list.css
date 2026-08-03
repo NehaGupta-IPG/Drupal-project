@@ -31,7 +31,6 @@
 }
 
 .card-list__item {
-  box-sizing: border-box;
   margin-bottom: var(--card-list-spacing);
 }
 

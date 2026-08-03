@@ -93,7 +93,6 @@ tr.color-error,
 .color-warning,
 .color-error,
 .color-checked {
-  box-sizing: border-box;
   color: var(--admin-color-text);
 }
 
