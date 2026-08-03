@@ -316,6 +316,9 @@ class EntityTestHooks {
    */
   #[Hook('entity_field_access')]
   public function entityFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL): AccessResultInterface {
+    if (\Drupal::state()->get('entity_test_field_access_multiple_hooks')) {
+      return AccessResult::forbidden();
+    }
     if ($field_definition->getName() == 'field_test_text') {
       if ($items) {
         if ($items->value == 'no access value') {
@@ -340,6 +343,23 @@ class EntityTestHooks {
       }
     }
     // No opinion.
+    return AccessResult::neutral();
+  }
+
+  /**
+   * Implements hook_entity_field_access().
+   *
+   * A second implementation in the same module, to test that multiple
+   * entity_field_access() results from one module are combined rather than
+   * the last one silently overwriting the others.
+   *
+   * @see \Drupal\KernelTests\Core\Field\FieldAccessTest::testFieldAccessMultipleImplementationsSameModule()
+   */
+  #[Hook('entity_field_access')]
+  public function entityFieldAccessSecond($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL): AccessResultInterface {
+    if (\Drupal::state()->get('entity_test_field_access_multiple_hooks') && $field_definition->getName() == 'field_test_text_2') {
+      return AccessResult::forbidden();
+    }
     return AccessResult::neutral();
   }
 

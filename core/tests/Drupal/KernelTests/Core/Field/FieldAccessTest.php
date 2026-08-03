@@ -6,6 +6,8 @@ namespace Drupal\KernelTests\Core\Field;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
@@ -85,6 +87,50 @@ class FieldAccessTest extends KernelTestBase {
     $entity->field_test_text = 'standard value';
     $this->assertTrue($entity->field_test_text->access('view', $account), 'Access to the field was granted.');
     $this->assertEquals(AccessResult::allowed(), $entity->field_test_text->access('view', $account, TRUE), 'Access to the field was granted.');
+  }
+
+  /**
+   * Tests that multiple hook_entity_field_access() implementations in the same module are respected.
+   *
+   * @see \Drupal\entity_test\Hook\EntityTestHooks::entityFieldAccess()
+   * @see \Drupal\entity_test\Hook\EntityTestHooks::entityFieldAccessSecond()
+   */
+  public function testFieldAccessMultipleImplementationsSameModule(): void {
+    FieldStorageConfig::create([
+      'entity_type' => 'entity_test',
+      'field_name' => 'field_test_text_2',
+      'type' => 'text',
+      'cardinality' => 1,
+    ])->save();
+    FieldConfig::create([
+      'entity_type' => 'entity_test',
+      'field_name' => 'field_test_text_2',
+      'bundle' => 'entity_test',
+      'label' => 'Test text-field 2',
+      'translatable' => FALSE,
+    ])->save();
+
+    \Drupal::state()->set('entity_test_field_access_multiple_hooks', TRUE);
+
+    $values = [
+      'name' => $this->randomMachineName(),
+      'user_id' => 1,
+      'field_test_text' => [
+        'value' => 'multiple hooks value',
+        'format' => 'full_html',
+      ],
+      'field_test_text_2' => [
+        'value' => 'multiple hooks value',
+        'format' => 'full_html',
+      ],
+    ];
+    $entity = EntityTest::create($values);
+
+    // Create a dummy user account for testing access with.
+    $account = User::create($values);
+
+    $this->assertFalse($entity->field_test_text->access('view', $account), 'Access to field_test_text was denied by the first hook implementation.');
+    $this->assertFalse($entity->field_test_text_2->access('view', $account), 'Access to field_test_text_2 was denied by the second hook implementation.');
   }
 
 }
