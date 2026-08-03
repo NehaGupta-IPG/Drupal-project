@@ -5,122 +5,143 @@
  * Install, update, and uninstall functions for the Search module.
  */
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
+
 /**
  * Implements hook_schema().
  */
-function search_schema(): array {
-  $schema['search_dataset'] = [
-    'description' => 'Stores items that will be searched.',
-    'fields' => [
-      'sid' => [
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Search item ID, e.g. node ID for nodes.',
-      ],
-      'langcode' => [
-        'type' => 'varchar_ascii',
-        'length' => '12',
-        'not null' => TRUE,
-        'description' => 'The {languages}.langcode of the item variant.',
-        'default' => '',
-      ],
-      'type' => [
-        'type' => 'varchar_ascii',
-        'length' => 64,
-        'not null' => TRUE,
-        'description' => 'Type of item, e.g. node.',
-      ],
-      'data' => [
-        'type' => 'text',
-        'not null' => TRUE,
-        'size' => 'big',
-        'description' => 'List of space-separated words from the item.',
-      ],
-      'reindex' => [
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Set to force node reindexing.',
-      ],
+function search_schema(): Schema {
+  $search_dataset = new Table(
+    name: 'search_dataset',
+    description: 'Stores items that will be searched.',
+    columns: [
+      Column::int(
+        name: 'sid',
+        description: 'Search item ID, e.g. node ID for nodes.',
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      Column::varcharAscii(
+        name: 'langcode',
+        description: 'The {languages}.langcode of the item variant.',
+        length: 12,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      Column::varcharAscii(
+        name: 'type',
+        description: 'Type of item, e.g. node.',
+        length: 64,
+        notNull: TRUE,
+      ),
+      Column::text(
+        name: 'data',
+        description: 'List of space-separated words from the item.',
+        size: ColumnSize::Big,
+        notNull: TRUE,
+      ),
+      Column::int(
+        name: 'reindex',
+        description: 'Set to force node reindexing.',
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
     ],
-    'primary key' => ['sid', 'langcode', 'type'],
-  ];
+    primaryKey: new PrimaryKey(['sid', 'langcode', 'type']),
+  );
 
-  $schema['search_index'] = [
-    'description' => 'Stores the search index, associating words, items and scores.',
-    'fields' => [
-      'word' => [
-        'type' => 'varchar',
-        'length' => 50,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'The {search_total}.word that is associated with the search item.',
-      ],
-      'sid' => [
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'The {search_dataset}.sid of the searchable item to which the word belongs.',
-      ],
-      'langcode' => [
-        'type' => 'varchar_ascii',
-        'length' => '12',
-        'not null' => TRUE,
-        'description' => 'The {languages}.langcode of the item variant.',
-        'default' => '',
-      ],
-      'type' => [
-        'type' => 'varchar_ascii',
-        'length' => 64,
-        'not null' => TRUE,
-        'description' => 'The {search_dataset}.type of the searchable item to which the word belongs.',
-      ],
-      'score' => [
-        'type' => 'float',
-        'not null' => FALSE,
-        'description' => 'The numeric score of the word, higher being more important.',
-      ],
+  $search_index = new Table(
+    name: 'search_index',
+    description: 'Stores the search index, associating words, items and scores.',
+    columns: [
+      Column::varchar(
+        name: 'word',
+        description: 'The {search_total}.word that is associated with the search item.',
+        length: 50,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      Column::int(
+        name: 'sid',
+        description: 'The {search_dataset}.sid of the searchable item to which the word belongs.',
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      Column::varcharAscii(
+        name: 'langcode',
+        description: 'The {languages}.langcode of the item variant.',
+        length: 12,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      Column::varcharAscii(
+        name: 'type',
+        description: 'The {search_dataset}.type of the searchable item to which the word belongs.',
+        length: 64,
+        notNull: TRUE,
+      ),
+      Column::float(
+        name: 'score',
+        description: 'The numeric score of the word, higher being more important.',
+        notNull: FALSE,
+      ),
     ],
-    'indexes' => [
-      'sid_type' => ['sid', 'langcode', 'type'],
+    primaryKey: new PrimaryKey(['word', 'sid', 'langcode', 'type']),
+    indexes: [
+      new Index(name: 'sid_type', columns: ['sid', 'langcode', 'type']),
     ],
-    'foreign keys' => [
-      'search_dataset' => [
-        'table' => 'search_dataset',
-        'columns' => [
-          'sid' => 'sid',
-          'langcode' => 'langcode',
-          'type' => 'type',
-        ],
-      ],
+    foreignKeys: [
+      new ForeignKey(
+        name: 'search_dataset',
+        foreignTable: 'search_dataset',
+        columns: ['sid', 'langcode', 'type'],
+        foreignColumns: ['sid', 'langcode', 'type'],
+      ),
     ],
-    'primary key' => ['word', 'sid', 'langcode', 'type'],
-  ];
+  );
 
-  $schema['search_total'] = [
-    'description' => 'Stores search totals for words.',
-    'fields' => [
-      'word' => [
-        'description' => 'Primary Key: Unique word in the search index.',
-        'type' => 'varchar',
-        'length' => 50,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'count' => [
-        'description' => "The count of the word in the index using Zipf's law to equalize the probability distribution.",
-        'type' => 'float',
-        'not null' => FALSE,
-      ],
+  $search_total = new Table(
+    name: 'search_total',
+    description: 'Stores search totals for words.',
+    columns: [
+      Column::varchar(
+        name: 'word',
+        description: 'Primary Key: Unique word in the search index.',
+        length: 50,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      Column::float(
+        name: 'count',
+        description: "The count of the word in the index using Zipf's law to equalize the probability distribution.",
+        type: ColumnType::Float,
+        notNull: FALSE,
+      ),
     ],
-    'primary key' => ['word'],
-  ];
+    primaryKey: new PrimaryKey(['word']),
+  );
 
-  return $schema;
+  return new Schema(
+    type: SchemaDefinitionType::Module,
+    name: 'schema',
+    tables: [
+      $search_dataset,
+      $search_index,
+      $search_total,
+    ],
+  );
 }
 
 /**

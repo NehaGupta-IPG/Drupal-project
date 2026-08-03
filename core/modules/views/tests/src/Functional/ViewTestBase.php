@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Functional;
 
 use Behat\Mink\Exception\ElementNotFoundException;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Tests\ViewTestData;
@@ -141,7 +142,7 @@ abstract class ViewTestBase extends BrowserTestBase {
    *
    * @internal
    */
-  protected function schemaDefinition() {
+  protected function schemaDefinition(): Schema {
     return ViewTestData::schemaDefinition();
   }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\views\Tests\ViewResultAssertionTrait;
 use Drupal\views\Tests\ViewTestData;
@@ -76,8 +77,8 @@ abstract class ViewsKernelTestBase extends KernelTestBase {
     $this->container->get('views.views_data')->clear();
 
     $this->installConfig(['views', 'views_test_config', 'views_test_data']);
-    foreach ($this->schemaDefinition() as $table => $schema) {
-      $this->installSchema('views_test_data', $table);
+    foreach ($this->schemaDefinition() as $table) {
+      $this->installSchema('views_test_data', $table->name);
     }
 
     $this->container->get('router.builder')->rebuild();
@@ -134,7 +135,7 @@ abstract class ViewsKernelTestBase extends KernelTestBase {
    *
    * @internal
    */
-  protected function schemaDefinition() {
+  protected function schemaDefinition(): Schema {
     return ViewTestData::schemaDefinition();
   }
 

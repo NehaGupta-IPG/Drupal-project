@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Kernel\Views;
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
@@ -34,16 +38,32 @@ abstract class LanguageTestBase extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function schemaDefinition() {
-    $schema = parent::schemaDefinition();
-    $schema['views_test_data']['fields']['langcode'] = [
-      'description' => 'The {language}.langcode of this beatle.',
-      'type' => 'varchar',
-      'length' => 12,
-      'default' => '',
-    ];
+  protected function schemaDefinition(): Schema {
+    $parentSchema = parent::schemaDefinition();
+    $table = $parentSchema->getTableDefinition('views_test_data');
+    $columns = $table->columns;
+    $columns[] = Column::varchar(
+      name: 'langcode',
+      description: 'The {language}.langcode of this beatle.',
+      type: ColumnType::Varchar,
+      length: 12,
+      default: new StringValue(''),
+    );
 
-    return $schema;
+    return new Schema(
+      type: $parentSchema->type,
+      name: $parentSchema->name,
+      tables: [
+        new Table(
+          name: $table->name,
+          description: $table->description,
+          columns: $columns,
+          primaryKey: $table->primaryKey,
+          uniqueKeys: $table->uniqueKeys,
+          indexes: $table->indexes,
+        ),
+      ]
+    );
   }
 
   /**

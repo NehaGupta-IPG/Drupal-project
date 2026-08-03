@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\views\filter\Combine;
 use Drupal\views\Views;
@@ -768,10 +773,31 @@ class FilterCombineTest extends ViewsKernelTestBase {
    *
    * @internal
    */
-  protected function schemaDefinition() {
-    $schema = parent::schemaDefinition();
-    unset($schema['views_test_data']['fields']['job']['not null']);
-    return $schema;
+  protected function schemaDefinition(): Schema {
+    $parentSchema = parent::schemaDefinition();
+    $table = $parentSchema->getTableDefinition('views_test_data');
+    $columns = array_filter($table->columns, fn (Column $column): bool => $column->name !== 'job');
+    $columns[] = new Column(
+      name: 'job',
+      description: "The person's job",
+      type: ColumnType::Varchar,
+      length: 255,
+      default: new StringValue('Undefined'),
+    );
+
+    return new Schema(
+      name: $parentSchema->name,
+      tables: [
+        new Table(
+          name: $table->name,
+          description: $table->description,
+          columns: $columns,
+          primaryKey: $table->primaryKey,
+          uniqueKeys: $table->uniqueKeys,
+          indexes: $table->indexes,
+        ),
+      ]
+    );
   }
 
 }

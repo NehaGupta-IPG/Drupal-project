@@ -7,6 +7,11 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
@@ -41,20 +46,25 @@ function entity_test_install(): void {
 /**
  * Implements hook_schema().
  */
-function entity_test_schema(): array {
+function entity_test_schema(): Schema {
   // Schema for simple entity.
-  $schema['entity_test_example'] = [
-    'description' => 'Stores entity_test items.',
-    'fields' => [
-      'id' => [
-        'type' => 'serial',
-        'not null' => TRUE,
-        'description' => 'Primary Key: Unique entity-test item ID.',
-      ],
+  return new Schema(
+    name: 'entity_test',
+    tables: [
+      new Table(
+        name: 'entity_test_example',
+        description: 'Stores entity_test items.',
+        columns: [
+          new Column(
+            name: 'id',
+            description: 'Primary Key: Unique entity-test item ID.',
+            type: ColumnType::Serial,
+          ),
+        ],
+        primaryKey: new PrimaryKey(['id']),
+      ),
     ],
-    'primary key' => ['id'],
-  ];
-  return $schema;
+  );
 }
 
 $module_handler = \Drupal::moduleHandler();

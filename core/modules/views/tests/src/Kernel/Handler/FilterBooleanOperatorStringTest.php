@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
@@ -37,18 +42,32 @@ class FilterBooleanOperatorStringTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function schemaDefinition() {
-    $schema = parent::schemaDefinition();
+  protected function schemaDefinition(): Schema {
+    $parentSchema = parent::schemaDefinition();
+    $table = $parentSchema->getTableDefinition('views_test_data');
+    $columns = array_filter($table->columns, fn (Column $column): bool => $column->name !== 'status');
+    $columns[] = new Column(
+      name: 'status',
+      description: 'The status of this record',
+      type: ColumnType::Varchar,
+      length: 255,
+      notNull: TRUE,
+      default: new StringValue(''),
+    );
 
-    $schema['views_test_data']['fields']['status'] = [
-      'description' => 'The status of this record',
-      'type' => 'varchar',
-      'length' => 255,
-      'not null' => TRUE,
-      'default' => '',
-    ];
-
-    return $schema;
+    return new Schema(
+      name: $parentSchema->name,
+      tables: [
+        new Table(
+          name: $table->name,
+          description: $table->description,
+          columns: $columns,
+          primaryKey: $table->primaryKey,
+          uniqueKeys: $table->uniqueKeys,
+          indexes: $table->indexes,
+        ),
+      ]
+    );
   }
 
   /**

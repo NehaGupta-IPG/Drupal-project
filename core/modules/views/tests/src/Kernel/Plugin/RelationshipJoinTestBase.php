@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\Entity\User;
 use Drupal\views\Views;
@@ -48,18 +53,32 @@ abstract class RelationshipJoinTestBase extends PluginKernelTestBase {
    *
    * @internal
    */
-  protected function schemaDefinition() {
-    $schema = parent::schemaDefinition();
+  protected function schemaDefinition(): Schema {
+    $parentSchema = parent::schemaDefinition();
+    $table = $parentSchema->getTableDefinition('views_test_data');
+    $columns = $table->columns;
+    $columns[] = new Column(
+      name: 'uid',
+      description: "The {users_field_data}.uid of the author of the beatle entry.",
+      type: ColumnType::Int,
+      unsigned: TRUE,
+      notNull: TRUE,
+      default: new IntValue(0),
+    );
 
-    $schema['views_test_data']['fields']['uid'] = [
-      'description' => "The {users_field_data}.uid of the author of the beatle entry.",
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => TRUE,
-      'default' => 0,
-    ];
-
-    return $schema;
+    return new Schema(
+      name: $parentSchema->name,
+      tables: [
+        new Table(
+          name: $table->name,
+          description: $table->description,
+          columns: $columns,
+          primaryKey: $table->primaryKey,
+          uniqueKeys: $table->uniqueKeys,
+          indexes: $table->indexes,
+        ),
+      ]
+    );
   }
 
   /**

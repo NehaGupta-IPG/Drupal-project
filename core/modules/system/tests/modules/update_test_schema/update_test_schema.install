@@ -7,30 +7,52 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\Database\Database;
-use Drupal\Core\Url;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_schema().
  *
  * The schema defined here will vary on state to allow for update hook testing.
  */
-function update_test_schema_schema(): array {
+function update_test_schema_schema(): Schema {
   $schema_version = \Drupal::state()->get('update_test_schema_version', 8000);
-  $table = [
-    'fields' => [
-      'a' => ['type' => 'int', 'not null' => TRUE],
-      'b' => ['type' => 'blob', 'not null' => FALSE],
+  $tableArgs = [
+    'name' => 'update_test_schema_table',
+    'columns' => [
+      new Column(
+        name: 'a',
+        type: ColumnType::Int,
+        notNull: TRUE,
+      ),
+      new Column(
+        name: 'b',
+        type: ColumnType::Blob,
+        notNull: FALSE,
+      ),
     ],
   ];
   switch ($schema_version) {
     case 8001:
       // Add the index.
-      $table['indexes']['test'] = ['a'];
+      $tableArgs['indexes'] = [
+        new Index(name: 'test', columns: ['a']),
+      ];
       break;
   }
-  return ['update_test_schema_table' => $table];
+
+  return new Schema(
+    name: 'update_test_schema',
+    tables: [
+      new Table(...$tableArgs),
+    ],
+  );
 }
 
 // Update hooks are defined depending on state as well.

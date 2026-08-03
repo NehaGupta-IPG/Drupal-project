@@ -7,6 +7,16 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\UniqueKey;
+
 /**
  * Implements hook_schema().
  *
@@ -15,343 +25,439 @@ declare(strict_types=1);
  * Therefore, the schema must actually be declared in a normal module
  * like any other, not directly in the test file.
  */
-function database_test_schema(): array {
-  $schema['test'] = [
-    'description' => 'Basic test table for the database unit tests.',
-    'fields' => [
-      'id' => [
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ],
-      'name' => [
-        'description' => "A person's name",
-        'type' => 'varchar_ascii',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-        'binary' => TRUE,
-      ],
-      'age' => [
-        'description' => "The person's age",
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ],
-      'job' => [
-        'description' => "The person's job",
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => 'Undefined',
-      ],
+function database_test_schema(): Schema {
+  $test_table = new Table(
+    name: 'test',
+    description: 'Basic test table for the database unit tests.',
+    columns: [
+      new Column(
+        name: 'id',
+        type: ColumnType::Serial,
+      ),
+      new Column(
+        name: 'name',
+        description: "A person's name",
+        type: ColumnType::VarcharAscii,
+        length: 255,
+        notNull: TRUE,
+        binary: TRUE,
+        default: new StringValue(''),
+      ),
+      new Column(
+        name: 'age',
+        description: "The person's age",
+        type: ColumnType::Int,
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      new Column(
+        name: 'job',
+        description: "The person's job",
+        type: ColumnType::Varchar,
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue('Undefined'),
+      ),
     ],
-    'primary key' => ['id'],
-    'unique keys' => [
-      'name' => ['name'],
+    primaryKey: new PrimaryKey(['id']),
+    uniqueKeys: [
+      new UniqueKey(name: 'name', columns: ['name']),
     ],
-    'indexes' => [
-      'ages' => ['age'],
+    indexes: [
+      new Index(name: 'ages', columns: ['age']),
     ],
-  ];
+  );
 
-  $schema['test_classtype'] = [
-    'description' => 'A duplicate version of the test table, used for obsolete fetch_style PDO::FETCH_CLASSTYPE tests.',
-    'fields' => [
-      'classname' => [
-        'description' => "A custom class name",
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'name' => [
-        'description' => "A person's name",
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'age' => [
-        'description' => "The person's age",
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ],
-      'job' => [
-        'description' => "The person's job",
-        'type' => 'varchar_ascii',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ],
+  $test_classtype_table = new Table(
+    name: 'test_classtype',
+    description: 'A duplicate version of the test table, used for obsolete fetch_style PDO::FETCH_CLASSTYPE tests.',
+    columns: [
+      new Column(
+        name: 'classname',
+        description: "A custom class name",
+        type: ColumnType::Varchar,
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      new Column(
+        name: 'name',
+        description: "A person's name",
+        type: ColumnType::VarcharAscii,
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      new Column(
+        name: 'age',
+        description: "The person's age",
+        type: ColumnType::Int,
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      new Column(
+        name: 'job',
+        description: "The person's job",
+        type: ColumnType::VarcharAscii,
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
     ],
-    'primary key' => ['job'],
-    'indexes' => [
-      'ages' => ['age'],
+    primaryKey: new PrimaryKey(['job']),
+    indexes: [
+      new Index(name: 'ages', columns: ['age']),
     ],
-  ];
+  );
 
   // This is an alternate version of the same table that is structured the same
   // but has a non-serial Primary Key.
-  $schema['test_people'] = [
-    'description' => 'A duplicate version of the test table, used for additional tests.',
-    'fields' => [
-      'name' => [
-        'description' => "A person's name",
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'age' => [
-        'description' => "The person's age",
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ],
-      'job' => [
-        'description' => "The person's job",
-        'type' => 'varchar_ascii',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ],
+  $test_people_table = new Table(
+    name: 'test_people',
+    description: 'A duplicate version of the test table, used for additional tests.',
+    columns: [
+      new Column(
+        name: 'name',
+        description: "A person's name",
+        type: ColumnType::Varchar,
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      new Column(
+        name: 'age',
+        description: "The person's age",
+        type: ColumnType::Int,
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      new Column(
+        name: 'job',
+        description: "The person's job",
+        type: ColumnType::VarcharAscii,
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
     ],
-    'primary key' => ['job'],
-    'indexes' => [
-      'ages' => ['age'],
+    primaryKey: new PrimaryKey(['job']),
+    indexes: [
+      new Index(name: 'ages', columns: ['age']),
     ],
-  ];
+  );
 
-  $schema['test_people_copy'] = [
-    'description' => 'A duplicate version of the test_people table, used for additional tests.',
-    'fields' => [
-      'name' => [
-        'description' => "A person's name",
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'age' => [
-        'description' => "The person's age",
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ],
-      'job' => [
-        'description' => "The person's job",
-        'type' => 'varchar_ascii',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ],
+  $test_people_copy_table = new Table(
+    name: 'test_people_copy',
+    description: 'A duplicate version of the test_people table, used for additional tests.',
+    columns: [
+      new Column(
+        name: 'name',
+        description: "A person's name",
+        type: ColumnType::Varchar,
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      new Column(
+        name: 'age',
+        description: "The person's age",
+        type: ColumnType::Int,
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      new Column(
+        name: 'job',
+        description: "The person's job",
+        type: ColumnType::VarcharAscii,
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
     ],
-    'primary key' => ['job'],
-    'indexes' => [
-      'ages' => ['age'],
+    primaryKey: new PrimaryKey(['job']),
+    indexes: [
+      new Index(name: 'ages', columns: ['age']),
     ],
-  ];
+  );
 
-  $schema['test_one_blob'] = [
-    'description' => 'A simple table including a BLOB field for testing BLOB behavior.',
-    'fields' => [
-      'id' => [
-        'description' => 'Simple unique ID.',
-        'type' => 'serial',
-        'not null' => TRUE,
-      ],
-      'blob1' => [
-        'description' => 'A BLOB field.',
-        'type' => 'blob',
-      ],
+  $test_one_blob_table = new Table(
+    name: 'test_one_blob',
+    description: 'A simple table including a BLOB field for testing BLOB behavior.',
+    columns: [
+      new Column(
+        name: 'id',
+        description: 'Simple unique ID.',
+        type: ColumnType::Serial,
+      ),
+      new Column(
+        name: 'blob1',
+        description: 'A BLOB field.',
+        type: ColumnType::Blob,
+      ),
     ],
-    'primary key' => ['id'],
-  ];
+    primaryKey: new PrimaryKey(['id']),
+  );
 
-  $schema['test_two_blobs'] = [
-    'description' => 'A simple test table with two BLOB fields.',
-    'fields' => [
-      'id' => [
-        'description' => 'Simple unique ID.',
-        'type' => 'serial',
-        'not null' => TRUE,
-      ],
-      'blob1' => [
-        'description' => 'A dummy BLOB field.',
-        'type' => 'blob',
-      ],
-      'blob2' => [
-        'description' => 'A second BLOB field.',
-        'type' => 'blob',
-      ],
+  $test_two_blobs_table = new Table(
+    name: 'test_two_blobs',
+    description: 'A simple test table with two BLOB fields.',
+    columns: [
+      new Column(
+        name: 'id',
+        description: 'Simple unique ID.',
+        type: ColumnType::Serial,
+      ),
+      new Column(
+        name: 'blob1',
+        description: 'A dummy BLOB field.',
+        type: ColumnType::Blob,
+      ),
+      new Column(
+        name: 'blob2',
+        description: 'A second BLOB field.',
+        type: ColumnType::Blob,
+      ),
     ],
-    'primary key' => ['id'],
-  ];
+    primaryKey: new PrimaryKey(['id']),
+  );
 
-  $schema['test_task'] = [
-    'description' => 'A task list for people in the test table.',
-    'fields' => [
-      'tid' => [
-        'description' => 'Task ID, primary key.',
-        'type' => 'serial',
-        'not null' => TRUE,
-      ],
-      'pid' => [
-        'description' => 'The {test_people}.pid, foreign key for the test table.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ],
-      'task' => [
-        'description' => 'The task to be completed.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'priority' => [
-        'description' => 'The priority of the task.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ],
+  $test_task_table = new Table(
+    name: 'test_task',
+    description: 'A task list for people in the test table.',
+    columns: [
+      new Column(
+        name: 'tid',
+        description: 'Task ID, primary key.',
+        type: ColumnType::Serial,
+      ),
+      new Column(
+        name: 'pid',
+        description: 'The {test_people}.pid, foreign key for the test table.',
+        type: ColumnType::Int,
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      new Column(
+        name: 'task',
+        description: 'The task to be completed.',
+        type: ColumnType::Varchar,
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      new Column(
+        name: 'priority',
+        description: 'The priority of the task.',
+        type: ColumnType::Int,
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
     ],
-    'primary key' => ['tid'],
-  ];
+    primaryKey: new PrimaryKey(['tid']),
+  );
 
-  $schema['test_null'] = [
-    'description' => 'Basic test table for NULL value handling.',
-    'fields' => [
-      'id' => [
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ],
-      'name' => [
-        'description' => "A person's name.",
-        'type' => 'varchar_ascii',
-        'length' => 255,
-        'not null' => FALSE,
-        'default' => '',
-      ],
-      'age' => [
-        'description' => "The person's age.",
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => FALSE,
-        'default' => 0,
-      ],
+  $test_null_table = new Table(
+    name: 'test_null',
+    description: 'Basic test table for NULL value handling.',
+    columns: [
+      new Column(
+        name: 'id',
+        type: ColumnType::Serial,
+      ),
+      new Column(
+        name: 'name',
+        description: "A person's name",
+        type: ColumnType::VarcharAscii,
+        length: 255,
+        notNull: FALSE,
+        default: new StringValue(''),
+      ),
+      new Column(
+        name: 'age',
+        description: "The person's age",
+        type: ColumnType::Int,
+        unsigned: TRUE,
+        notNull: FALSE,
+        default: new IntValue(0),
+      ),
     ],
-    'primary key' => ['id'],
-    'unique keys' => [
-      'name' => ['name'],
+    primaryKey: new PrimaryKey(['id']),
+    uniqueKeys: [
+      new UniqueKey(name: 'name', columns: ['name']),
     ],
-    'indexes' => [
-      'ages' => ['age'],
+    indexes: [
+      new Index(name: 'ages', columns: ['age']),
     ],
-  ];
+  );
 
-  $schema['test_serialized'] = [
-    'description' => 'Basic test table for NULL value handling.',
-    'fields' => [
-      'id' => [
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ],
-      'name' => [
-        'description' => "A person's name.",
-        'type' => 'varchar_ascii',
-        'length' => 255,
-        'not null' => FALSE,
-        'default' => '',
-      ],
-      'info' => [
-        'description' => "The person's data in serialized form.",
-        'type' => 'blob',
-        'serialize' => TRUE,
-      ],
+  $test_serialized_table = new Table(
+    name: 'test_serialized',
+    description: 'Basic test table for NULL value handling.',
+    columns: [
+      new Column(
+        name: 'id',
+        type: ColumnType::Serial,
+      ),
+      new Column(
+        name: 'name',
+        description: "A person's name",
+        type: ColumnType::VarcharAscii,
+        length: 255,
+        notNull: FALSE,
+        default: new StringValue(''),
+      ),
+      new Column(
+        name: 'info',
+        description: "The person's data in serialized form.",
+        type: ColumnType::Blob,
+        serialize: TRUE,
+      ),
     ],
-    'primary key' => ['id'],
-    'unique keys' => [
-      'name' => ['name'],
+    primaryKey: new PrimaryKey(['id']),
+    uniqueKeys: [
+      new UniqueKey(name: 'name', columns: ['name']),
     ],
-  ];
+  );
 
-  $schema['test_composite_primary'] = [
-    'description' => 'Basic test table with a composite primary key',
-    'fields' => [
-      'name' => [
-        'description' => "A person's name",
-        'type' => 'varchar',
-        'length' => 50,
-        'not null' => TRUE,
-        'default' => '',
-        'binary' => TRUE,
-      ],
-      'age' => [
-        'description' => "The person's age",
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-      ],
-      'job' => [
-        'description' => "The person's job",
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => 'Undefined',
-      ],
+  $test_composite_primary_table = new Table(
+    name: 'test_composite_primary',
+    description: 'Basic test table with a composite primary key',
+    columns: [
+      new Column(
+        name: 'name',
+        description: "A person's name",
+        type: ColumnType::Varchar,
+        length: 50,
+        notNull: TRUE,
+        binary: TRUE,
+        default: new StringValue(''),
+      ),
+      new Column(
+        name: 'age',
+        description: "The person's age",
+        type: ColumnType::Int,
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      new Column(
+        name: 'job',
+        description: "The person's job",
+        type: ColumnType::Varchar,
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue('Undefined'),
+      ),
     ],
-    'primary key' => ['name', 'age'],
-  ];
+    primaryKey: new PrimaryKey(['name', 'age']),
+  );
 
   // Hopefully no-one will ever name a table 'select' but this example is a
   // reserved keyword in all supported SQL databases so it is a good test.
-  $schema['select'] = [
-    'description' => 'A test table with an ANSI reserved keyword as its name and one of its column names.',
-    'fields' => [
-      'id' => [
-        'description' => 'Simple unique ID.',
+  $select_table = new Table(
+    name: 'select',
+    description: 'A test table with an ANSI reserved keyword as its name and one of its column names.',
+    columns: [
+      new Column(
+        name: 'id',
+        description: 'Simple unique ID.',
         // Using a serial as an ID properly tests
         // \Drupal\pgsql\Driver\Database\pgsql\Upsert.
-        'type' => 'serial',
-        'not null' => TRUE,
-      ],
-      'update' => [
-        'description' => 'A column with reserved name.',
-        'type' => 'text',
-      ],
+        type: ColumnType::Serial,
+      ),
+      new Column(
+        name: 'update',
+        description: 'A column with reserved name.',
+        type: ColumnType::Text,
+      ),
     ],
-    'primary key' => ['id'],
-  ];
+    primaryKey: new PrimaryKey(['id']),
+  );
 
-  $schema['virtual'] = [
-    'description' => 'A simple table with reserved name in MySQL 8.',
-    'fields' => [
-      'id' => [
-        'description' => 'Simple unique ID.',
-        'type' => 'int',
-        'not null' => TRUE,
-      ],
-      'function' => [
-        'description' => 'A column with reserved name in MySQL 8.',
-        'type' => 'text',
-      ],
+  $virtual_table = new Table(
+    name: 'virtual',
+    description: 'A simple table with reserved name in MySQL 8.',
+    columns: [
+      new Column(
+        name: 'id',
+        description: 'Simple unique ID.',
+        type: ColumnType::Int,
+        notNull: TRUE,
+      ),
+      new Column(
+        name: 'function',
+        description: 'A column with reserved name in MySQL 8.',
+        type: ColumnType::Text,
+      ),
     ],
-    'primary key' => ['id'],
-  ];
+    primaryKey: new PrimaryKey(['id']),
+  );
 
-  $schema['TEST_UPPERCASE'] = $schema['test'];
+  $uppercase_test_table = new Table(
+    name: 'TEST_UPPERCASE',
+    description: 'Basic test table for the database unit tests.',
+    columns: [
+      new Column(
+        name: 'id',
+        type: ColumnType::Serial,
+      ),
+      new Column(
+        name: 'name',
+        description: "A person's name",
+        type: ColumnType::VarcharAscii,
+        length: 255,
+        notNull: TRUE,
+        binary: TRUE,
+        default: new StringValue(''),
+      ),
+      new Column(
+        name: 'age',
+        description: "The person's age",
+        type: ColumnType::Int,
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      new Column(
+        name: 'job',
+        description: "The person's job",
+        type: ColumnType::Varchar,
+        length: 255,
+        notNull: TRUE,
+        default: new StringValue('Undefined'),
+      ),
+    ],
+    primaryKey: new PrimaryKey(['id']),
+    uniqueKeys: [
+      new UniqueKey(name: 'name', columns: ['name']),
+    ],
+    indexes: [
+      new Index(name: 'ages', columns: ['age']),
+    ],
+  );
 
-  return $schema;
+  return new Schema(
+    name: 'database_test',
+    tables: [
+      $test_table,
+      $test_classtype_table,
+      $test_people_table,
+      $test_people_copy_table,
+      $test_one_blob_table,
+      $test_two_blobs_table,
+      $test_task_table,
+      $test_null_table,
+      $test_serialized_table,
+      $test_composite_primary_table,
+      $uppercase_test_table,
+      $select_table,
+      $virtual_table,
+    ],
+  );
 }

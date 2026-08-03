@@ -5,6 +5,16 @@ declare(strict_types=1);
 namespace Drupal\views\Tests;
 
 use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 
 /**
  * Provides tests view data and the base test schema with sample data records.
@@ -63,61 +73,70 @@ class ViewTestData {
    *
    * @internal
    */
-  public static function schemaDefinition() {
-    $schema['views_test_data'] = [
-      'description' => 'Basic test table for Views tests.',
-      'fields' => [
-        'id' => [
-          'type' => 'serial',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ],
-        'name' => [
-          'description' => "A person's name",
-          'type' => 'varchar_ascii',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'age' => [
-          'description' => "The person's age",
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 0,
-        ],
-        'job' => [
-          'description' => "The person's job",
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => 'Undefined',
-        ],
-        'created' => [
-          'description' => "The creation date of this record",
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 0,
-          'size' => 'big',
-        ],
-        'status' => [
-          'description' => "The status of this record",
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 0,
-        ],
+  public static function schemaDefinition(): Schema {
+    return new Schema(
+      name: 'views_test_data',
+      tables: [
+        new Table(
+          name: 'views_test_data',
+          description: 'Basic test table for Views tests.',
+          columns: [
+            new Column(
+              name: 'id',
+              type: ColumnType::Serial,
+            ),
+            new Column(
+              name: 'name',
+              description: "A person's name",
+              type: ColumnType::VarcharAscii,
+              length: 255,
+              notNull: TRUE,
+              default: new StringValue(''),
+            ),
+            new Column(
+              name: 'age',
+              description: "The person's age",
+              type: ColumnType::Int,
+              unsigned: TRUE,
+              notNull: TRUE,
+              default: new IntValue(0),
+            ),
+            new Column(
+              name: 'job',
+              description: "The person's job",
+              type: ColumnType::Varchar,
+              length: 255,
+              notNull: TRUE,
+              default: new StringValue('Undefined'),
+            ),
+            new Column(
+              name: 'created',
+              description: "The creation date of this record",
+              type: ColumnType::Int,
+              size: ColumnSize::Big,
+              unsigned: TRUE,
+              notNull: TRUE,
+              default: new IntValue(0),
+            ),
+            new Column(
+              name: 'status',
+              description: "The status of this record",
+              type: ColumnType::Int,
+              unsigned: TRUE,
+              notNull: TRUE,
+              default: new IntValue(0),
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+          uniqueKeys: [
+            new UniqueKey(name: 'name', columns: ['name']),
+          ],
+          indexes: [
+            new Index(name: 'ages', columns: ['age']),
+          ],
+        ),
       ],
-      'primary key' => ['id'],
-      'unique keys' => [
-        'name' => ['name'],
-      ],
-      'indexes' => [
-        'ages' => ['age'],
-      ],
-    ];
-    return $schema;
+    );
   }
 
   /**

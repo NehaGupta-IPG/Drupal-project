@@ -8,34 +8,44 @@
 declare(strict_types=1);
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
 
 /**
  * Implements hook_schema().
  */
-function module_test_schema(): array {
-  $schema['module_test'] = [
-    'description' => 'Dummy table to test the behavior of hook_schema() during module installation.',
-    'fields' => [
-      'data' => [
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'An example data column for the module.',
-      ],
+function module_test_schema(): Schema {
+  return new Schema(
+    name: 'module_test',
+    tables: [
+      new Table(
+        name: 'module_test',
+        description: 'Dummy table to test the behavior of hook_schema() during module installation.',
+        columns: [
+          new Column(
+            name: 'data',
+            description: 'An example data column for the module.',
+            type: ColumnType::Varchar,
+            length: 255,
+            notNull: TRUE,
+            default: new StringValue(''),
+          ),
+        ],
+      ),
     ],
-  ];
-  return $schema;
+  );
 }
 
 /**
  * Implements hook_install().
  */
 function module_test_install(): void {
-  $schema = module_test_schema()['module_test'];
   Database::getConnection()->insert('module_test')
     ->fields([
-      'data' => $schema['fields']['data']['type'],
+      'data' => ColumnType::Varchar->value,
     ])
     ->execute();
   if (\Drupal::state()->get('module_test_install:rebuild_container')) {

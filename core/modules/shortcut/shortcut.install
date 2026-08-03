@@ -5,45 +5,65 @@
  * Install, update and uninstall functions for the shortcut module.
  */
 
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
+
 /**
  * Implements hook_schema().
  */
-function shortcut_schema(): array {
-  $schema['shortcut_set_users'] = [
-    'description' => 'Maps users to shortcut sets.',
-    'fields' => [
-      'uid' => [
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'The {users}.uid for this set.',
-      ],
-      'set_name' => [
-        'type' => 'varchar_ascii',
-        'length' => 32,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => "The {shortcut_set}.set_name that will be displayed for this user.",
-      ],
+function shortcut_schema(): Schema {
+  return new Schema(
+    name: 'shortcut',
+    tables: [
+      new Table(
+        name: 'shortcut_set_users',
+        description: 'Maps users to shortcut sets.',
+        columns: [
+          new Column(
+            name: 'uid',
+            description: 'The {users}.uid for this set.',
+            type: ColumnType::Int,
+            unsigned: TRUE,
+            notNull: TRUE,
+            default: new IntValue(0),
+          ),
+          new Column(
+            name: 'set_name',
+            description: "The {shortcut_set}.set_name that will be displayed for this user.",
+            type: ColumnType::VarcharAscii,
+            length: 32,
+            notNull: TRUE,
+            default: new StringValue(''),
+          ),
+        ],
+        primaryKey: new PrimaryKey(['uid']),
+        indexes: [
+          new Index(name: 'set_name', columns: ['set_name']),
+        ],
+        foreignKeys: [
+          new ForeignKey(
+            name: 'set_user',
+            foreignTable: 'users',
+            columns: ['uid'],
+            foreignColumns: ['uid'],
+          ),
+          new ForeignKey(
+            name: 'set_name',
+            foreignTable: 'shortcut_set',
+            columns: ['set_name'],
+            foreignColumns: ['set_name'],
+          ),
+        ],
+      ),
     ],
-    'primary key' => ['uid'],
-    'indexes' => [
-      'set_name' => ['set_name'],
-    ],
-    'foreign keys' => [
-      'set_user' => [
-        'table' => 'users',
-        'columns' => ['uid' => 'uid'],
-      ],
-      'set_name' => [
-        'table' => 'shortcut_set',
-        'columns' => ['set_name' => 'set_name'],
-      ],
-    ],
-  ];
-
-  return $schema;
+  );
 }
 
 /**
