@@ -316,9 +316,6 @@ class EntityTestHooks {
    */
   #[Hook('entity_field_access')]
   public function entityFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL): AccessResultInterface {
-    if (\Drupal::state()->get('entity_test_field_access_multiple_hooks')) {
-      return AccessResult::forbidden();
-    }
     if ($field_definition->getName() == 'field_test_text') {
       if ($items) {
         if ($items->value == 'no access value') {
@@ -358,8 +355,9 @@ class EntityTestHooks {
   #[Hook('entity_field_access')]
   public function entityFieldAccessSecond($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL): AccessResultInterface {
     if (\Drupal::state()->get('entity_test_field_access_multiple_hooks') && $field_definition->getName() == 'field_test_text_2') {
-      return AccessResult::forbidden();
+      return AccessResult::forbidden()->addCacheableDependency($items->getEntity())->addCacheTags(['entity_test_access:field_test_text_2']);
     }
+    // No opinion.
     return AccessResult::neutral();
   }
 

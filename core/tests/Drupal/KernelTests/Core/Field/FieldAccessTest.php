@@ -116,11 +116,11 @@ class FieldAccessTest extends KernelTestBase {
       'name' => $this->randomMachineName(),
       'user_id' => 1,
       'field_test_text' => [
-        'value' => 'multiple hooks value',
+        'value' => 'no access value',
         'format' => 'full_html',
       ],
       'field_test_text_2' => [
-        'value' => 'multiple hooks value',
+        'value' => 'no access value',
         'format' => 'full_html',
       ],
     ];
@@ -130,8 +130,12 @@ class FieldAccessTest extends KernelTestBase {
     $values = ['name' => 'test'];
     $account = User::create($values);
 
-    $this->assertFalse($entity->field_test_text->access('view', $account), 'Access to field_test_text was denied by the first hook implementation.');
-    $this->assertFalse($entity->field_test_text_2->access('view', $account), 'Access to field_test_text_2 was denied by the second hook implementation.');
+    $expectedFromFirstHook = AccessResult::forbidden()->addCacheableDependency($entity);
+    $expectedFromSecondHook = AccessResult::forbidden()->addCacheableDependency($entity)->addCacheTags(['entity_test_access:field_test_text_2']);
+    $this->assertNotEquals($expectedFromFirstHook, $expectedFromSecondHook, 'The two hook expectations must be distinguishable, or this test cannot prove which hook produced which denial.');
+
+    $this->assertEquals($expectedFromFirstHook, $entity->field_test_text->access('view', $account, TRUE), 'Access to field_test_text was denied by the first hook implementation.');
+    $this->assertEquals($expectedFromSecondHook, $entity->field_test_text_2->access('view', $account, TRUE), 'Access to field_test_text_2 was denied by the second hook implementation.');
   }
 
 }
