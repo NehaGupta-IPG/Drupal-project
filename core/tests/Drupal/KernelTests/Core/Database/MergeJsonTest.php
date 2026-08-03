@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Query\Merge;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -100,28 +101,34 @@ class MergeJsonTest extends DatabaseTestBase {
    * condition returns in a SELECT. A condition that matches nothing makes the
    * merge insert instead.
    *
+   * @param string $jsonpath
+   *   The jsonpath to compare.
+   * @param mixed $value
+   *   The value to compare against.
+   * @param string $operator
+   *   The comparison operator.
+   * @param array $expected_ids
+   *   The IDs of the sample rows the condition matches.
+   *
    * @see \Drupal\KernelTests\Core\Database\SelectTest::testJsonCondition()
    */
-  public function testJsonConditionMerge(): void {
-    foreach (static::providerJsonConditionOperators() as $label => [$jsonpath, $value, $operator, $expected_ids]) {
-      $this->resetJsonTable();
+  #[DataProvider('providerJsonConditionOperators')]
+  public function testJsonConditionMerge(string $jsonpath, mixed $value, string $operator, array $expected_ids): void {
+    $result = $this->connection->merge('json')
+      ->jsonCondition('test_field', $jsonpath, $value, $operator)
+      ->updateFields(['status' => 2])
+      ->insertFields(['id' => static::INSERT_ID, 'status' => 3])
+      ->execute();
 
-      $result = $this->connection->merge('json')
-        ->jsonCondition('test_field', $jsonpath, $value, $operator)
-        ->updateFields(['status' => 2])
-        ->insertFields(['id' => static::INSERT_ID, 'status' => 3])
-        ->execute();
-
-      if ($expected_ids === []) {
-        $this->assertSame(Merge::STATUS_INSERT, $result, "Wrong status for: $label");
-        $this->assertSame([], $this->idsWithStatus(2), "Rows updated for: $label");
-        $this->assertSame([static::INSERT_ID], $this->idsWithStatus(3), "No row inserted for: $label");
-      }
-      else {
-        $this->assertSame(Merge::STATUS_UPDATE, $result, "Wrong status for: $label");
-        $this->assertEqualsCanonicalizing($expected_ids, $this->idsWithStatus(2), "Wrong rows updated for: $label");
-        $this->assertSame(10, $this->countRows(), "Row inserted for: $label");
-      }
+    if ($expected_ids === []) {
+      $this->assertSame(Merge::STATUS_INSERT, $result);
+      $this->assertSame([], $this->idsWithStatus(2));
+      $this->assertSame([static::INSERT_ID], $this->idsWithStatus(3));
+    }
+    else {
+      $this->assertSame(Merge::STATUS_UPDATE, $result);
+      $this->assertEqualsCanonicalizing($expected_ids, $this->idsWithStatus(2));
+      $this->assertSame(10, $this->countRows());
     }
   }
 

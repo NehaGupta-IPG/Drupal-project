@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Query\SelectInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -88,23 +89,25 @@ class InsertJsonTest extends DatabaseTestBase {
    * the rows an INSERT selects can be compared against the rows the same
    * condition returns in a SELECT.
    *
+   * @param string $jsonpath
+   *   The jsonpath to compare.
+   * @param mixed $value
+   *   The value to compare against.
+   * @param string $operator
+   *   The comparison operator.
+   * @param array $expected_ids
+   *   The IDs of the sample rows the condition matches.
+   *
    * @see \Drupal\KernelTests\Core\Database\SelectTest::testJsonCondition()
    */
-  public function testJsonConditionInsert(): void {
-    foreach (static::providerJsonConditionOperators() as $label => [$jsonpath, $value, $operator, $expected_ids]) {
-      $this->resetInsertedRows();
+  #[DataProvider('providerJsonConditionOperators')]
+  public function testJsonConditionInsert(string $jsonpath, mixed $value, string $operator, array $expected_ids): void {
+    $this->connection->insert('json')
+      ->from($this->sampleSelect())
+      ->jsonCondition('test_field', $jsonpath, $value, $operator)
+      ->execute();
 
-      $this->connection->insert('json')
-        ->from($this->sampleSelect())
-        ->jsonCondition('test_field', $jsonpath, $value, $operator)
-        ->execute();
-
-      $this->assertEqualsCanonicalizing(
-        $expected_ids,
-        array_keys($this->insertedRows()),
-        "Wrong rows inserted for: $label",
-      );
-    }
+    $this->assertEqualsCanonicalizing($expected_ids, array_keys($this->insertedRows()));
   }
 
   /**
@@ -197,26 +200,24 @@ class InsertJsonTest extends DatabaseTestBase {
 
   /**
    * Tests JSON expressions on nested, hyphenated and indexed paths.
+   *
+   * @param string $jsonpath
+   *   The jsonpath to extract.
+   * @param int $id
+   *   The ID of the sample row to extract from.
+   * @param string $expected
+   *   The value the extraction writes.
    */
-  public function testJsonExpressionPaths(): void {
-    $cases = [
-      'nested' => ['$.nested.inner', 8, 'deep value'],
-      'hyphenated' => ['$.hyphen-key', 9, 'hyphen value'],
-      'bracket notation' => ['$["hyphen-key"]', 9, 'hyphen value'],
-      'array index' => ['$.items[1]', 8, '20'],
-    ];
-    foreach ($cases as $label => [$jsonpath, $id, $expected]) {
-      $this->resetInsertedRows();
+  #[DataProvider('providerJsonExpressionPaths')]
+  public function testJsonExpressionPaths(string $jsonpath, int $id, string $expected): void {
+    $select = $this->sampleSelect();
+    $select->condition('j.id', $id);
+    $this->connection->insert('json')
+      ->from($select)
+      ->jsonExpression('name', 'test_field', $jsonpath)
+      ->execute();
 
-      $select = $this->sampleSelect();
-      $select->condition('j.id', $id);
-      $this->connection->insert('json')
-        ->from($select)
-        ->jsonExpression('name', 'test_field', $jsonpath)
-        ->execute();
-
-      $this->assertSame([$id => $expected], $this->insertedRows('name'), "Wrong value for: $label");
-    }
+    $this->assertSame([$id => $expected], $this->insertedRows('name'));
   }
 
   /**

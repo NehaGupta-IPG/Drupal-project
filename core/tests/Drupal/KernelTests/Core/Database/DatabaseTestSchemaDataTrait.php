@@ -358,4 +358,23 @@ trait DatabaseTestSchemaDataTrait {
     ];
   }
 
+  /**
+   * Data provider of JSON expression test cases.
+   *
+   * The expectations describe the rows of the 'json' table that addSampleData()
+   * inserts, so they apply to any query type that supports jsonExpression().
+   *
+   * @return array[]
+   *   Test cases, each an array of a jsonpath, the ID of the sample row to
+   *   extract from and the value the extraction writes.
+   */
+  public static function providerJsonExpressionPaths(): array {
+    return [
+      'nested' => ['$.nested.inner', 8, 'deep value'],
+      'hyphenated' => ['$.hyphen-key', 9, 'hyphen value'],
+      'bracket notation' => ['$["hyphen-key"]', 9, 'hyphen value'],
+      'array index' => ['$.items[1]', 8, '20'],
+    ];
+  }
+
 }
