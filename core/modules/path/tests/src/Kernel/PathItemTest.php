@@ -76,7 +76,7 @@ class PathItemTest extends KernelTestBase {
 
     $stored_alias = $alias_repository->lookupBySystemPath('/' . $node->toUrl()->getInternalPath(), $node->language()->getId());
     $this->assertEquals('/foo', $stored_alias['alias']);
-    $this->assertEquals($node->language()->getId(), $stored_alias['langcode']);
+    $this->assertEquals(LanguageInterface::LANGCODE_NOT_SPECIFIED, $stored_alias['langcode']);
 
     $node_storage->resetCache();
     $loaded_node = $node_storage->load($node->id());
