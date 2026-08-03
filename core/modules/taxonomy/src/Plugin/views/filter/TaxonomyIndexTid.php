@@ -211,7 +211,7 @@ class TaxonomyIndexTid extends ManyToOne {
 
         if ($tree) {
           foreach ($tree as $term) {
-            if (!$this->currentUser->hasPermission('administer taxonomy')) {
+            if ($term->isTranslatable() && !$this->currentUser->hasPermission('administer taxonomy')) {
               if (!$term->hasTranslation($langcode)) {
                 continue;
               }
@@ -240,7 +240,7 @@ class TaxonomyIndexTid extends ManyToOne {
         }
         $terms = Term::loadMultiple($query->execute());
         foreach ($terms as $term) {
-          if (!$this->currentUser->hasPermission('administer taxonomy')) {
+          if ($term->isTranslatable() && !$this->currentUser->hasPermission('administer taxonomy')) {
             if (!$term->hasTranslation($langcode)) {
               continue;
             }
