@@ -6,7 +6,6 @@ namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Query\JsonExpression as BaseJsonExpression;
-use Drupal\Core\Database\Query\PlaceholderInterface;
 
 /**
  * MySQL implementation of JsonExpression.
@@ -54,17 +53,9 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
-    if (!$this->hasWildcard()) {
-      return parent::toComparisonSql($operator, $value, $queryPlaceholder);
-    }
-
-    // JSON_EXTRACT with a wildcard path returns a JSON array. Use JSON_TABLE
-    // to iterate the elements so any comparison operator can be applied.
-    // A scalar subquery with COUNT(*) > 0 is used instead of EXISTS because
-    // MySQL 8.0 has a bug where EXISTS with correlated JSON_TABLE returns
-    // incorrect results when evaluating multiple rows.
-    // @see https://bugs.mysql.com/bug.php?id=110819
+  protected function wildcardRowSet(): array {
+    // JSON_EXTRACT with a wildcard path returns a JSON array. JSON_TABLE
+    // iterates the elements instead, so a test can be applied to each of them.
     [$prefix, $suffix] = $this->splitAtWildcard();
     $extract = $suffix === '$'
       ? 'jt.val'
@@ -72,13 +63,23 @@ class JsonExpression extends BaseJsonExpression {
     // JSON_TABLE iterates what the accessor selects: .* the members of an
     // object, [*] the elements of an array.
     $json_table_path = $this->connection->quote($prefix . $this->wildcardAccessor());
-
-    ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders((array) $value, $queryPlaceholder);
-    $type_guard = $this->toTypeGuardSql($cast_type, "JSON_TYPE({$extract})");
     return [
-      'sql' => "(SELECT COUNT(*) FROM JSON_TABLE({$this->field}, {$json_table_path} COLUMNS (val JSON PATH '$')) jt WHERE {$type_guard}{$this->toCastSql($cast_type, $extract)} {$operator} ({$placeholders})) > 0",
-      'args' => $args,
+      'from' => "JSON_TABLE({$this->field}, {$json_table_path} COLUMNS (val JSON PATH '$')) jt",
+      'value' => $extract,
+      'type' => "JSON_TYPE({$extract})",
+      'filter' => '',
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function wildcardMatchSql(string $from, string $where): string {
+    // A scalar subquery with COUNT(*) > 0 is used instead of EXISTS because
+    // MySQL 8.0 has a bug where EXISTS with correlated JSON_TABLE returns
+    // incorrect results when evaluating multiple rows.
+    // @see https://bugs.mysql.com/bug.php?id=110819
+    return "(SELECT COUNT(*) FROM {$from} WHERE {$where}) > 0";
   }
 
   /**

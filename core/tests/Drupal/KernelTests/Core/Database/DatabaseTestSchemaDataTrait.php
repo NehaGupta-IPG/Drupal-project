@@ -356,6 +356,35 @@ trait DatabaseTestSchemaDataTrait {
       'Wildcard numeric IN no match' => ['$.counts.*', [98, 99], 'IN', []],
       'Wildcard numeric IN against strings' => ['$.deps.*.status', [42], 'IN', []],
 
+      // Wildcard string operators. The operators apply to every value the
+      // wildcard matches, so row 10 matches when one of the three $.deps
+      // members holds a status the pattern fits.
+      'Wildcard CONTAINS matching one' => ['$.deps.*.status', 'dis', 'CONTAINS', [10]],
+      'Wildcard CONTAINS matching all' => ['$.deps.*.status', 'able', 'CONTAINS', [10]],
+      'Wildcard CONTAINS no match' => ['$.deps.*.status', 'xyz', 'CONTAINS', []],
+      'Wildcard STARTS_WITH matching' => ['$.deps.*.status', 'dis', 'STARTS_WITH', [10]],
+      'Wildcard STARTS_WITH no match' => ['$.deps.*.status', 'able', 'STARTS_WITH', []],
+      'Wildcard ENDS_WITH matching' => ['$.deps.*.status', 'bled', 'ENDS_WITH', [10]],
+      'Wildcard ENDS_WITH no match' => ['$.deps.*.status', 'dis', 'ENDS_WITH', []],
+      'Wildcard top-level CONTAINS' => ['$.*.inner', 'deep', 'CONTAINS', [8]],
+      // The LIKE pattern of a string operator is escaped, so % and _ compare
+      // as literals under a wildcard path as well.
+      'Wildcard CONTAINS percent no false positive' => ['$.deps.*.status', '%', 'CONTAINS', []],
+      'Wildcard CONTAINS underscore no false positive' => ['$.deps.*.status', '_', 'CONTAINS', []],
+      'Wildcard CONTAINS quotes' => ['$.deps.*.status', "' OR '1'='1", 'CONTAINS', []],
+
+      // Wildcard BETWEEN / NOT BETWEEN. Row 10 holds 7 and 8 at $.counts.
+      'Wildcard BETWEEN matching both' => ['$.counts.*', [7, 8], 'BETWEEN', [10]],
+      'Wildcard BETWEEN matching one' => ['$.counts.*', [8, 9], 'BETWEEN', [10]],
+      'Wildcard BETWEEN no match' => ['$.counts.*', [9, 10], 'BETWEEN', []],
+      'Wildcard NOT BETWEEN matching one' => ['$.counts.*', [8, 9], 'NOT BETWEEN', [10]],
+      'Wildcard NOT BETWEEN excludes all' => ['$.counts.*', [7, 8], 'NOT BETWEEN', []],
+      'Wildcard float BETWEEN against integers' => ['$.counts.*', [7.5, 8.5], 'BETWEEN', [10]],
+      // A value of another JSON type than the compared value is skipped, so it
+      // matches neither BETWEEN nor NOT BETWEEN.
+      'Wildcard BETWEEN against strings' => ['$.deps.*.status', [1, 100], 'BETWEEN', []],
+      'Wildcard NOT BETWEEN against strings' => ['$.deps.*.status', [1, 100], 'NOT BETWEEN', []],
+
       // Array element wildcard. The [*] accessor selects the elements of an
       // array, where the .* accessor selects the members of an object. Row 8
       // holds an array of numbers at $.items, row 5 one at $.array.
@@ -382,6 +411,16 @@ trait DatabaseTestSchemaDataTrait {
       'Element wildcard nested NOT IN excludes all' => ['$.revs[*].uid', [3, 5], 'NOT IN', []],
       'Element wildcard nested text against numbers' => ['$.revs[*].uid', 'three', '=', []],
       'Element wildcard nested zero against strings' => ['$.revs[*].name', 0, '=', []],
+      'Element wildcard BETWEEN' => ['$.items[*]', [15, 25], 'BETWEEN', [8]],
+      'Element wildcard BETWEEN no match' => ['$.items[*]', [40, 50], 'BETWEEN', []],
+      'Element wildcard NOT BETWEEN' => ['$.items[*]', [10, 25], 'NOT BETWEEN', [8]],
+      'Element wildcard nested BETWEEN' => ['$.revs[*].uid', [4, 6], 'BETWEEN', [10]],
+      'Element wildcard nested BETWEEN no match' => ['$.revs[*].uid', [6, 9], 'BETWEEN', []],
+      'Element wildcard nested NOT BETWEEN' => ['$.revs[*].uid', [3, 4], 'NOT BETWEEN', [10]],
+      'Element wildcard nested CONTAINS' => ['$.revs[*].name', 'edit', 'CONTAINS', [10]],
+      'Element wildcard nested CONTAINS no match' => ['$.revs[*].name', 'reviewer', 'CONTAINS', []],
+      'Element wildcard nested STARTS_WITH' => ['$.revs[*].name', 'auth', 'STARTS_WITH', [10]],
+      'Element wildcard nested ENDS_WITH' => ['$.revs[*].name', 'thor', 'ENDS_WITH', [10]],
     ];
   }
 

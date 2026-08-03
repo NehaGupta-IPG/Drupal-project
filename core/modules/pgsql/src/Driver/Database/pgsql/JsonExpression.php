@@ -8,7 +8,7 @@ use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Query\JsonExpression as BaseJsonExpression;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 
-// cSpell:ignore ilike
+// cSpell:ignore bigserial ilike
 
 /**
  * PostgreSQL implementation of JsonExpression.
@@ -80,21 +80,10 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
-    // Non-wildcard arrays delegate to the base class.
-    if (is_array($value) && !$this->hasWildcard()) {
-      return parent::toComparisonSql($operator, $value, $queryPlaceholder);
-    }
-
-    // Wildcard IN/NOT IN: use jsonb_path_query to expand the wildcard into a
-    // set of values, then cast and compare each value.
+    // An IN/NOT IN comparison is built from placeholders on a cast value by the
+    // base class, which expands a wildcard path through wildcardRowSet().
     if (is_array($value)) {
-      $escaped_path = str_replace("'", "''", $this->path);
-      ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders($value, $queryPlaceholder);
-      $type_guard = $this->toTypeGuardSql($cast_type, 'JSONB_TYPEOF(v)');
-      return [
-        'sql' => "EXISTS (SELECT 1 FROM jsonb_path_query({$this->field}::jsonb, '{$escaped_path}') AS v WHERE {$type_guard}{$this->toCastSql($cast_type, "v #>> '{}'")} {$operator} ({$placeholders}))",
-        'args' => $args,
-      ];
+      return parent::toComparisonSql($operator, $value, $queryPlaceholder);
     }
 
     // PgSQL uses jsonpath operators for scalar comparisons, which bake the
@@ -114,6 +103,22 @@ class JsonExpression extends BaseJsonExpression {
     return [
       'sql' => "{$this->field} @?? '{$escaped_path} ? (@ {$op} {$sql_value})'",
       'args' => [],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function wildcardRowSet(): array {
+    // jsonb_path_query returns one row per value the jsonpath matches, so the
+    // wildcard needs no rewriting. The #>> operator reads the value of a row as
+    // text, with an empty path array addressing the value itself.
+    $escaped_path = str_replace("'", "''", $this->path);
+    return [
+      'from' => "jsonb_path_query({$this->field}::jsonb, '{$escaped_path}') AS v",
+      'value' => "v #>> '{}'",
+      'type' => 'JSONB_TYPEOF(v)',
+      'filter' => '',
     ];
   }
 

@@ -713,7 +713,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    * @param string $operator
    *   The comparison operator. A jsonpath with a wildcard segment matches any
    *   number of values, and asks whether any of them satisfies the operator.
-   *   Only the comparison operators expand a wildcard that way, see
+   *   Not every operator can expand a wildcard that way, see
    *   JsonCondition::WILDCARD_OPERATORS.
    *
    * @return static

@@ -14,6 +14,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cSpell:ignore bigserial
+
 /**
  * Tests the Select query builder.
  */
@@ -730,11 +732,6 @@ class SelectTest extends DatabaseTestBase {
    */
   public static function providerJsonWildcardUnsupportedOperator(): array {
     return [
-      'CONTAINS' => ['CONTAINS', 'enabled'],
-      'STARTS_WITH' => ['STARTS_WITH', 'en'],
-      'ENDS_WITH' => ['ENDS_WITH', 'ed'],
-      'BETWEEN' => ['BETWEEN', [1, 5]],
-      'NOT BETWEEN' => ['NOT BETWEEN', [1, 5]],
       'JSON_CONTAINS' => ['JSON_CONTAINS', ['enabled']],
       'IS NULL' => ['IS NULL', NULL],
       'IS NOT NULL' => ['IS NOT NULL', NULL],
@@ -745,10 +742,10 @@ class SelectTest extends DatabaseTestBase {
   /**
    * Tests that operators which cannot expand a wildcard path reject one.
    *
-   * A wildcard matches any number of values. Only the comparison operators
-   * expand it into a row set, and ask whether any matched value satisfies the
-   * comparison. The other operators build their SQL from a form that returns
-   * a single value.
+   * A wildcard matches any number of values. The operators that test one
+   * extracted value expand it into a row set, and ask whether any matched
+   * value satisfies the test. The operators listed here read the document at
+   * the path itself, which a wildcard does not address.
    *
    * @param string $operator
    *   The comparison operator.

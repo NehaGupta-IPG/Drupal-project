@@ -7,6 +7,8 @@ namespace Drupal\Core\Database\Query;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\InvalidQueryException;
 
+// cSpell:ignore ilike
+
 /**
  * Represents a condition on a JSON-backed field.
  *
@@ -40,15 +42,18 @@ class JsonCondition extends Condition {
   /**
    * The operators that accept a path with a wildcard segment.
    *
-   * These are the operators JsonExpression::toComparisonSql() handles, which
-   * is the only place a wildcard is expanded into a row set. Every other form
-   * produces a single value.
+   * These are the operators that test one extracted value, so the same test
+   * can be applied to every value a wildcard matches. The remaining operators
+   * read the document at the path itself, which a wildcard does not address.
    *
+   * @see \Drupal\Core\Database\Query\JsonExpression::toPredicateSql()
    * @see \Drupal\Core\Database\Query\JsonExpression::assertNoWildcard()
    */
   public const WILDCARD_OPERATORS = [
     '=', '<>', '!=', '<', '<=', '>', '>=',
     'IN', 'NOT IN',
+    'CONTAINS', 'STARTS_WITH', 'ENDS_WITH',
+    'BETWEEN', 'NOT BETWEEN',
   ];
 
   /**
@@ -119,7 +124,7 @@ class JsonCondition extends Condition {
 
     $expression = $connection->jsonExpression($this->field, $this->path);
 
-    // A wildcard is expanded into a row set by toComparisonSql() only. The
+    // A wildcard is expanded into a row set by toPredicateSql() only. The
     // other operators build their SQL from forms that return a single value,
     // so they cannot express one. JsonExpression rejects those forms as well;
     // this check names the operator that reached them.
@@ -184,7 +189,10 @@ class JsonCondition extends Condition {
           ?? $this->mapConditionOperator('LIKE');
         $keyword = $like_operator['operator'] ?? 'LIKE';
         $escape = $like_operator['postfix'] ?? '';
-        $this->stringVersion = "{$expression->toCastSql(JsonCastType::Text)} {$keyword} {$placeholder}{$escape}";
+        $this->stringVersion = $expression->toPredicateSql(
+          JsonCastType::Text,
+          fn(string $extract) => "{$extract} {$keyword} {$placeholder}{$escape}",
+        );
         $this->arguments = [$placeholder => $like_value];
         return;
 
@@ -194,9 +202,10 @@ class JsonCondition extends Condition {
         $type = JsonCastType::fromPhpValue($values[0]);
         $p1 = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
         $p2 = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
-        $range = "{$expression->toCastSql($type)} {$this->operator} {$p1} AND {$p2}";
-        $type_guard = $expression->toTypeGuardSql($type);
-        $this->stringVersion = $type_guard === '' ? $range : "({$type_guard}{$range})";
+        $this->stringVersion = $expression->toPredicateSql(
+          $type,
+          fn(string $extract) => "{$extract} {$this->operator} {$p1} AND {$p2}",
+        );
         $this->arguments = [$p1 => $values[0], $p2 => $values[1]];
         return;
     }

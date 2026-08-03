@@ -6,7 +6,6 @@ namespace Drupal\sqlite\Driver\Database\sqlite;
 
 use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Query\JsonExpression as BaseJsonExpression;
-use Drupal\Core\Database\Query\PlaceholderInterface;
 
 /**
  * SQLite implementation of JsonExpression.
@@ -50,13 +49,9 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
-    if (!$this->hasWildcard()) {
-      return parent::toComparisonSql($operator, $value, $queryPlaceholder);
-    }
-
+  protected function wildcardRowSet(): array {
     // SQLite doesn't support wildcards in json_extract. Use json_each to
-    // iterate the wildcard level and check each element's value for the
+    // iterate the wildcard level and read each element's value at the
     // remaining suffix path. json_each walks the members of an object and the
     // elements of an array alike, so the prefix alone covers both the .* and
     // the [*] accessor.
@@ -64,21 +59,20 @@ class JsonExpression extends BaseJsonExpression {
     if ($suffix === '$') {
       $extract = 'je.value';
       $element_type = 'je.type';
-      $type_guard = '';
+      $row_filter = '';
     }
     else {
-      // json_extract on a scalar je.value (e.g. a string) causes a
-      // "malformed JSON" error. Filter to object/array values only.
       $extract = "json_extract(je.value, {$this->connection->quote($suffix)})";
       $element_type = "json_type(je.value, {$this->connection->quote($suffix)})";
-      $type_guard = "je.type IN ('object', 'array') AND ";
+      // json_extract on a scalar je.value (e.g. a string) causes a
+      // "malformed JSON" error. Filter to object/array values only.
+      $row_filter = "je.type IN ('object', 'array') AND ";
     }
-
-    ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders((array) $value, $queryPlaceholder);
-    $type_guard .= $this->toTypeGuardSql($cast_type, $element_type);
     return [
-      'sql' => "EXISTS (SELECT 1 FROM json_each({$this->field}, {$this->connection->quote($prefix)}) je WHERE {$type_guard}{$this->toCastSql($cast_type, $extract)} {$operator} ({$placeholders}))",
-      'args' => $args,
+      'from' => "json_each({$this->field}, {$this->connection->quote($prefix)}) je",
+      'value' => $extract,
+      'type' => $element_type,
+      'filter' => $row_filter,
     ];
   }
 

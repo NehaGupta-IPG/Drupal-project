@@ -266,12 +266,88 @@ abstract class JsonExpression {
   abstract protected function doToTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string;
 
   /**
+   * Generates SQL applying a test to the value or values at this path.
+   *
+   * Without a wildcard the path addresses one value, and the returned SQL
+   * tests that value. With a wildcard the path matches any number of values.
+   * The driver expands those into a row set, and the returned SQL asks whether
+   * any of the matched values satisfies the test.
+   *
+   * The test is combined with the type guard of $type, so a value of another
+   * JSON type is skipped instead of cast.
+   *
+   * @param \Drupal\Core\Database\Query\JsonCastType $type
+   *   The cast type the test compares in.
+   * @param callable $test
+   *   A callback that receives the SQL expression of one value, cast to $type,
+   *   and returns the boolean SQL testing it. For example:
+   *   @code
+   *   fn(string $value) => "{$value} LIKE :db_condition_placeholder_0"
+   *   @endcode
+   *
+   * @return string
+   *   A SQL fragment that evaluates to TRUE if a value at the path satisfies
+   *   the test.
+   *
+   * @internal
+   *   This method should only be used by the database layer.
+   */
+  public function toPredicateSql(JsonCastType $type, callable $test): string {
+    if (!$this->hasWildcard()) {
+      $sql = $test($this->toCastSql($type));
+      $type_guard = $this->toTypeGuardSql($type);
+      return $type_guard === '' ? $sql : "({$type_guard}{$sql})";
+    }
+    [
+      'from' => $from,
+      'value' => $value,
+      'type' => $type_expression,
+      'filter' => $row_filter,
+    ] = $this->wildcardRowSet();
+    $guard = $row_filter . $this->toTypeGuardSql($type, $type_expression);
+    return $this->wildcardMatchSql($from, $guard . $test($this->toCastSql($type, $value)));
+  }
+
+  /**
+   * Describes how the driver expands a wildcard path into a row set.
+   *
+   * Each backend has its own mechanism for iterating the values a wildcard
+   * matches: JSON_TABLE on MySQL, json_each on SQLite, jsonb_path_query on
+   * PostgreSQL. The pieces are combined by toPredicateSql().
+   *
+   * @return array{from: string, value: string, type: string, filter: string}
+   *   An array with:
+   *   - from: a FROM clause returning one row per matched value.
+   *   - value: the SQL expression of the matched value of a row, to be passed
+   *     to toCastSql().
+   *   - type: a SQL expression returning the JSON type name of that value, to
+   *     be passed to toTypeGuardSql().
+   *   - filter: a SQL fragment ending in ' AND ' that restricts the rows
+   *     before the value is read, or an empty string.
+   */
+  abstract protected function wildcardRowSet(): array;
+
+  /**
+   * Wraps the row set of a wildcard path in a test for a matching row.
+   *
+   * @param string $from
+   *   The FROM clause of the row set, as returned by wildcardRowSet().
+   * @param string $where
+   *   The condition a row has to satisfy.
+   *
+   * @return string
+   *   A SQL fragment that evaluates to TRUE if any row satisfies $where.
+   */
+  protected function wildcardMatchSql(string $from, string $where): string {
+    return "EXISTS (SELECT 1 FROM {$from} WHERE {$where})";
+  }
+
+  /**
    * Generates SQL for a comparison against a scalar or array value.
    *
    * For scalar values, produces a simple comparison (e.g. extract = :p).
-   * For array values, produces an IN/NOT IN clause. Drivers override this
-   * to expand wildcard paths into row sets using driver-specific mechanisms
-   * (JSON_TABLE, json_each, jsonb_path_query).
+   * For array values, produces an IN/NOT IN clause. A wildcard path is
+   * expanded into a row set by toPredicateSql().
    *
    * @param string $operator
    *   The comparison operator (=, <>, <, >, IN, NOT IN, etc.).
@@ -288,10 +364,8 @@ abstract class JsonExpression {
    */
   public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
     ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders((array) $value, $queryPlaceholder);
-    $sql = "{$this->toCastSql($cast_type)} {$operator} ({$placeholders})";
-    $type_guard = $this->toTypeGuardSql($cast_type);
     return [
-      'sql' => $type_guard === '' ? $sql : "({$type_guard}{$sql})",
+      'sql' => $this->toPredicateSql($cast_type, fn(string $extract) => "{$extract} {$operator} ({$placeholders})"),
       'args' => $args,
     ];
   }
@@ -356,12 +430,12 @@ abstract class JsonExpression {
   /**
    * Throws when the path holds a wildcard the SQL form cannot express.
    *
-   * A wildcard matches any number of values. toComparisonSql() expands it into
-   * a row set and asks whether any of the matched values satisfies the
-   * comparison. The other forms produce a single value, so they have nowhere
-   * to expand the wildcard into. Without this check each backend degrades in
-   * its own way: PostgreSQL looks for a literal "*" key and returns NULL,
-   * SQLite raises an error, and MySQL returns the whole matched set.
+   * A wildcard matches any number of values. toPredicateSql() expands it into
+   * a row set and asks whether any of the matched values satisfies the test.
+   * The other forms produce a single value, so they have nowhere to expand the
+   * wildcard into. Without this check each backend degrades in its own way:
+   * PostgreSQL looks for a literal "*" key and returns NULL, SQLite raises an
+   * error, and MySQL returns the whole matched set.
    *
    * @param string $form
    *   What the caller asked the expression for, used in the message.
