@@ -47,7 +47,14 @@ class JsonExpression extends BaseJsonExpression {
    */
   protected function doToContainsSql(string $encoded_value): string {
     $quoted = $this->connection->quote($encoded_value);
-    return "JSON_CONTAINS({$this->field}, {$quoted}, {$this->connection->quote($this->path)})";
+    // JSON_CONTAINS() reports a candidate that is not an array as contained
+    // when an element of a target array contains it. PostgreSQL and SQLite
+    // require the candidate and the value at the path to be of the same JSON
+    // type, so the type test makes an object candidate compare against an
+    // object here as well. The encoded candidate is a JSON document, which
+    // writes an array as [ ... ] and an object as { ... }.
+    $type = str_starts_with($encoded_value, '[') ? 'ARRAY' : 'OBJECT';
+    return "(JSON_TYPE({$this->toSql()}) = '{$type}' AND JSON_CONTAINS({$this->field}, {$quoted}, {$this->connection->quote($this->path)}))";
   }
 
   /**

@@ -153,6 +153,20 @@ class JsonCondition extends Condition {
         return;
 
       case 'JSON_CONTAINS':
+        // Containment compares the candidate against the value at the path as
+        // a whole:
+        // - Both have to be of the same JSON type, an array against an array
+        //   and an object against an object.
+        // - Every element of a candidate array has to be contained in some
+        //   element of the value.
+        // - Every member of a candidate object has to be present in the value
+        //   under the same name, and its value contained.
+        // - A scalar is contained when it is equal and of the same JSON type.
+        // On an array of objects this matches one element as a whole, so it
+        // tests a combination of values, where a jsonCondition() per value can
+        // match values of different elements. Nesting an array inside a
+        // candidate array is not portable, MariaDB compares the elements of
+        // those one by one.
         $encoded = json_encode($this->value, JSON_THROW_ON_ERROR);
         $this->stringVersion = $expression->toContainsSql($encoded);
         $this->arguments = [];

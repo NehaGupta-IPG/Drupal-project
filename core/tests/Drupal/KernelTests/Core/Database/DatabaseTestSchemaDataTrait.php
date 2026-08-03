@@ -260,6 +260,84 @@ trait DatabaseTestSchemaDataTrait {
       'Associative array value with no containment' => [
         '$.associative', ['mountain' => 'Uncompahgre'], 'JSON_CONTAINS', [],
       ],
+      // A member of a candidate object is compared under its own name, so the
+      // same value under another name is not contained.
+      'Associative array value with other key' => [
+        '$.associative', ['peak' => 'Handies'], 'JSON_CONTAINS', [],
+      ],
+      // Every element of a candidate array has to be contained, so a single
+      // absent element makes the condition fail.
+      'Array value with one element absent' => [
+        '$.array', [41, 81235], 'JSON_CONTAINS', [],
+      ],
+      // The candidate and the value at the path have to be of the same JSON
+      // type. Row 6 holds an object at $.associative, so an array holding its
+      // value is not contained.
+      'Array candidate against object value' => [
+        '$.associative', ['Handies'], 'JSON_CONTAINS', [],
+      ],
+
+      // JSON_CONTAINS on an array of objects, the shape a table of rows takes
+      // in a JSON document. Row 10 holds
+      // [{"uid": 3, "name": "editor"}, {"uid": 5, "name": "author"}] at $.revs.
+      // Containment matches an element as a whole, so the pairs of a candidate
+      // object are required to sit in one element. A jsonCondition() per value
+      // can match values of different elements, this cannot.
+      'Element containment' => [
+        '$.revs', [['uid' => 3, 'name' => 'editor']], 'JSON_CONTAINS', [10],
+      ],
+      'Element containment other element' => [
+        '$.revs', [['uid' => 5, 'name' => 'author']], 'JSON_CONTAINS', [10],
+      ],
+      // Members are compared by name, so their order in the candidate is free.
+      'Element containment reordered keys' => [
+        '$.revs', [['name' => 'editor', 'uid' => 3]], 'JSON_CONTAINS', [10],
+      ],
+      // An element is contained when it holds the pairs of the candidate. It is
+      // free to hold more.
+      'Element containment on subset' => [
+        '$.revs', [['uid' => 3]], 'JSON_CONTAINS', [10],
+      ],
+      'Element containment on text subset' => [
+        '$.revs', [['name' => 'author']], 'JSON_CONTAINS', [10],
+      ],
+      // The pairs of one candidate object have to sit in the same element. Row
+      // 10 holds uid 3 and name author, in two different elements.
+      'Element containment across elements' => [
+        '$.revs', [['uid' => 3, 'name' => 'author']], 'JSON_CONTAINS', [],
+      ],
+      'Element containment with no match' => [
+        '$.revs', [['uid' => 9]], 'JSON_CONTAINS', [],
+      ],
+      // Every element of the candidate array has to be contained.
+      'Element containment of both elements' => [
+        '$.revs',
+        [['uid' => 3, 'name' => 'editor'], ['uid' => 5, 'name' => 'author']],
+        'JSON_CONTAINS',
+        [10],
+      ],
+      'Element containment with one element absent' => [
+        '$.revs',
+        [['uid' => 3, 'name' => 'editor'], ['uid' => 9, 'name' => 'nobody']],
+        'JSON_CONTAINS',
+        [],
+      ],
+      // A value of another JSON type than the value in the document is not
+      // contained, so the text "3" does not compare against the number 3.
+      'Element containment of number as text' => [
+        '$.revs', [['uid' => '3']], 'JSON_CONTAINS', [],
+      ],
+      'Element containment of text as number' => [
+        '$.revs', [['name' => 3]], 'JSON_CONTAINS', [],
+      ],
+      // A candidate object compares against an object, so it does not match the
+      // elements of the array at $.revs.
+      'Object candidate against array of objects' => [
+        '$.revs', ['uid' => 3, 'name' => 'editor'], 'JSON_CONTAINS', [],
+      ],
+      'Quotes in element containment value' => [
+        '$.revs', [['name' => "' OR 1=1--"]], 'JSON_CONTAINS', [],
+      ],
 
       // String LIKE operators.
       'String CONTAINS matching' => ['$.key', 'some', 'CONTAINS', [3, 4]],
