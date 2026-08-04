@@ -44,14 +44,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   id: 'overrideMenuLinks',
   admin_label: new TranslatableMarkup('Override static menu links'),
 )]
-final readonly class OverrideMenuLinks implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
+final class OverrideMenuLinks implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
 
   use AutowiredInstanceTrait;
 
   public function __construct(
-    private MenuLinkManagerInterface $menuLinkManager,
-    private StaticMenuLinkOverridesInterface $linkOverrides,
-    #[Autowire(service: 'logger.channel.menu')] private LoggerInterface $logger,
+    private readonly MenuLinkManagerInterface $menuLinkManager,
+    private readonly StaticMenuLinkOverridesInterface $linkOverrides,
+    #[Autowire(service: 'logger.channel.menu')] private readonly LoggerInterface $logger,
   ) {}
 
   /**
