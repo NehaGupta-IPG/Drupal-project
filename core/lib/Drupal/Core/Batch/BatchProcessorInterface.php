@@ -81,15 +81,22 @@ interface BatchProcessorInterface {
    *       TRUE, or to BatchMemory if progressive is FALSE.
    *
    * @return $this
-   *
-   * @internal
    */
   public function queue(array $batch_definition): self;
 
   /**
    * Retrieves the current batch.
    *
-   * @internal
+   * The batch is returned by reference, so that code that is part of the
+   * Batch API can manipulate the stored batch directly, for example to
+   * reset it once processing has finished. Code that is not part of the
+   * Batch API should not modify the returned batch.
+   *
+   * @return array|null|false
+   *   A reference to the current batch: an associative array containing the
+   *   batch definition and its processing state, or an empty array if no
+   *   batch has been set. NULL if a finished batch has been cleared, or
+   *   FALSE if the batch could not be loaded from storage.
    */
   public function &getCurrentBatch(): null|array|false;
 
@@ -119,8 +126,6 @@ interface BatchProcessorInterface {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
    *   A redirect response if the batch is progressive. No return value
    *   otherwise.
-   *
-   * @internal
    */
   public function process(Url|string|null $redirect = NULL, ?Url $url = NULL, ?string $redirect_callback = NULL): ?RedirectResponse;
 
