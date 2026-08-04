@@ -134,7 +134,7 @@ function search_schema(): Schema {
 
   return new Schema(
     type: SchemaDefinitionType::Module,
-    name: 'schema',
+    name: 'search',
     tables: [
       $search_dataset,
       $search_index,

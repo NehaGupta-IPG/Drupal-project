@@ -77,8 +77,8 @@ abstract class ViewsKernelTestBase extends KernelTestBase {
     $this->container->get('views.views_data')->clear();
 
     $this->installConfig(['views', 'views_test_config', 'views_test_data']);
-    foreach ($this->schemaDefinition() as $table) {
-      $this->installSchema('views_test_data', $table->name);
+    foreach ($this->schemaDefinition()->tableNames() as $table) {
+      $this->installSchema('views_test_data', $table);
     }
 
     $this->container->get('router.builder')->rebuild();
