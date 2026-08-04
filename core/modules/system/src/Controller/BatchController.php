@@ -85,7 +85,7 @@ class BatchController implements ContainerInjectionInterface {
    *   The page title.
    */
   public function batchPageTitle(Request $request) {
-    $batch =& \batch_get();
+    $batch = &batch_get();
 
     if (!($request_id = $request->query->get('id'))) {
       return '';
