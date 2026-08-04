@@ -1382,8 +1382,9 @@
  * other modules. Plugin discovery methods are classes that implement
  * \Drupal\Component\Plugin\Discovery\DiscoveryInterface. Most plugin types use
  * one of the following discovery mechanisms:
- * - Annotation: Plugin classes are annotated and placed in a defined namespace
- *   subdirectory. Most Drupal Core plugins use this method of discovery.
+ * - Attribute: Plugin classes declare metadata with PHP attributes and are
+ *   placed in a defined namespace subdirectory. Most Drupal Core plugins use
+ *   this method of discovery.
  * - Hook: Plugin modules need to implement a hook to tell the manager about
  *   their plugins.
  * - YAML: Plugins are listed in YAML files. Drupal Core uses this method for
@@ -1394,22 +1395,22 @@
  *   plugins of this type (if the list of available plugins is static).
  *
  * It is also possible to define your own custom discovery mechanism or mix
- * methods together. And there are many more details, such as annotation
- * decorators, that apply to some of the discovery methods. See
+ * methods together. There are many more details, such as discovery decorators,
+ * that apply to some of the discovery methods. See
  * https://www.drupal.org/developing/api/8/plugins for more details.
  *
- * The remainder of this documentation will assume Annotation-based discovery,
+ * The remainder of this documentation will assume attribute-based discovery,
  * since this is the most common method.
  *
  * @subsection sub_manager Defining a plugin manager class and service
- * To define an annotation-based plugin manager:
+ * To define an attribute-based plugin manager:
  * - Choose a namespace subdirectory for your plugin. For example, filter
  *   plugins go in directory Plugin/Filter under the module namespace.
- * - Define an annotation class for your plugin type. This class should extend
- *   \Drupal\Component\Annotation\Plugin, and for most plugin types, it should
- *   contain member variables corresponding to the annotations plugins will
- *   need to provide. All plugins have at least $id: a unique string
- *   identifier.
+ * - Define an attribute class for your plugin type. This class should extend
+ *   \Drupal\Component\Plugin\Attribute\Plugin and be marked with
+ *   #[\Attribute(\Attribute::TARGET_CLASS)]. Its constructor parameters define
+ *   the metadata that plugin classes can provide. Every plugin attribute has
+ *   at least an $id parameter: a unique string identifier.
  * - Define an alter hook for altering the discovered plugin definitions. You
  *   should document the hook in a *.api.php file.
  * - Define a plugin manager class. This class should implement
@@ -1417,9 +1418,10 @@
  *   this by extending \Drupal\Core\Plugin\DefaultPluginManager. If you do
  *   extend the default plugin manager, the only method you will probably need
  *   to define is the class constructor, which will need to call the parent
- *   constructor to provide information about the annotation class and plugin
- *   namespace for discovery, set up the alter hook, and possibly set up
- *   caching. See classes that extend DefaultPluginManager for examples.
+ *   constructor to provide the plugin subdirectory, namespaces, interface, and
+ *   attribute class for discovery. The constructor should also set up the
+ *   alter hook and possibly caching. See classes that extend
+ *   DefaultPluginManager for examples.
  * - Define a service for your plugin manager. See the
  *   @link container Services topic for more information. @endlink Your service
  *   definition should look something like this, referencing your manager
@@ -1452,14 +1454,14 @@
  * API topic @endlink for more information about configuration entities.
  *
  * @section sec_create Creating a plugin of an existing type
- * Assuming the plugin type uses annotation-based discovery, in order to create
+ * Assuming the plugin type uses attribute-based discovery, in order to create
  * a plugin of an existing type, you will be creating a class. This class must:
  * - Implement the plugin interface, so that it has the required methods
  *   defined. Usually, you'll want to extend the plugin base class, if one has
  *   been provided.
- * - Have the right annotation in its documentation header. See the
- *   @link annotation Annotation topic @endlink for more information about
- *   annotation.
+ * - Have the right plugin attribute above its class declaration. See
+ *   \Drupal\Component\Plugin\Attribute\Plugin for the base class used by plugin
+ *   attributes.
  * - Be in the right plugin namespace, in order to be discovered.
  * Often, the easiest way to make sure this happens is to find an existing
  * example of a working plugin class of the desired type, and copy it into your
@@ -1487,7 +1489,7 @@
  *   individual plugin objects.
  * - Call methods on the plugin objects to perform the desired tasks.
  *
- * @see annotation
+ * @see \Drupal\Component\Plugin\Attribute\Plugin
  * @}
  */
 
