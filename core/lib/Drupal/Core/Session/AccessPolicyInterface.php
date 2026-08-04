@@ -52,7 +52,8 @@ interface AccessPolicyInterface {
    *
    * This should only be used to revoke permissions. If you wish to add
    * permissions, you should write another access policy that uses the
-   * calculatePermissions method instead.
+   * calculatePermissions method instead, unless your access policy depends on
+   * the account having a specific permission.
    *
    * Keep in mind that there are many ways to alter access policy results.
    * Because each access policy itself is a service, the best way to get rid of
@@ -62,6 +63,22 @@ interface AccessPolicyInterface {
    * A good example use case of alterPermissions would be to revoke a banned
    * list of permissions outside of office hours. This would make it so no-one
    * can perform any destructive actions while the help desk is offline.
+   *
+   * If you need to check whether the account has a given permission prior to
+   * performing alterations, you should use the hasPermission method available
+   * on the calculated permission item rather than the account, as the latter
+   * will result in a recursive loop.
+   *
+   * Example:
+   *   foreach ($calculated_permissions->getItemsByScope($scope) as $item) {
+   *     if ($item->isAdmin()) {
+   *       // No point in adding permissions, they have them all.
+   *       continue;
+   *     }
+   *     if ($item->hasPermission('example permission')) {
+   *       // Do stuff here
+   *     }
+   *   }
    *
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user account for which to alter the permissions.
