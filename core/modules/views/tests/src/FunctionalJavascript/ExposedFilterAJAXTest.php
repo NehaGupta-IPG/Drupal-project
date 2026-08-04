@@ -270,9 +270,8 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
 
     $this->drupalGet('admin/content', ['query' => ['type[]' => 'page']]);
-    $html = $page->getHtml();
-    $this->assertStringContainsString('Page One', $html);
-    $this->assertStringNotContainsString('Article One', $html);
+    $assert->pageTextContains('Page One');
+    $assert->pageTextNotContains('Article One');
 
     $select = $page->find('css', 'select[name="type[]"]');
     $this->assertNotNull($select);
@@ -280,9 +279,8 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $page->pressButton('Filter');
     $assert->assertWaitOnAjaxRequest();
 
-    $html = $page->getHtml();
-    $this->assertStringContainsString('Page One', $html);
-    $this->assertStringContainsString('Article One', $html);
+    $assert->pageTextContains('Page One');
+    $assert->pageTextContains('Article One');
     $url = $this->getSession()->getCurrentUrl();
     $this->assertStringNotContainsString('type%5B%5D=page', $url);
     $this->assertStringNotContainsString('type[]=page', $url);
@@ -290,9 +288,8 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $this->drupalGet('admin/content', [
       'query' => ['type[0]' => 'article', 'type[1]' => 'page'],
     ]);
-    $html = $page->getHtml();
-    $this->assertStringContainsString('Page One', $html);
-    $this->assertStringContainsString('Article One', $html);
+    $assert->pageTextContains('Page One');
+    $assert->pageTextContains('Article One');
 
     $select = $page->find('css', 'select[name="type[]"]');
     $this->assertNotNull($select);
@@ -301,10 +298,9 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $page->pressButton('Filter');
     $assert->assertWaitOnAjaxRequest();
 
-    $html = $page->getHtml();
-    $this->assertStringContainsString('Article One', $html);
-    $this->assertStringNotContainsString('Page One', $html);
-    $this->assertStringNotContainsString('Page Two', $html);
+    $assert->pageTextContains('Article One');
+    $assert->pageTextNotContains('Page One');
+    $assert->pageTextNotContains('Page Two');
     $url = $this->getSession()->getCurrentUrl();
     $this->assertStringNotContainsString('=page', $url);
   }
