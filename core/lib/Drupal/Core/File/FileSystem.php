@@ -646,7 +646,7 @@ class FileSystem implements FileSystemInterface {
       array_walk($ignore_directories, function (&$value) {
         $value = preg_quote($value, '/');
       });
-      $options['nomask'] = '/^' . implode('|', $ignore_directories) . '$/';
+      $options['nomask'] = '/^(?:' . implode('|', $ignore_directories) . ')$/';
     }
     $options['key'] = in_array($options['key'], ['uri', 'filename', 'name']) ? $options['key'] : 'uri';
     return $this->doScanDirectory($dir, $mask, $options);

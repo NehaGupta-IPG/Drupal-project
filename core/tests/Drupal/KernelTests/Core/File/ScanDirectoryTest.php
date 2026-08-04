@@ -192,6 +192,18 @@ class ScanDirectoryTest extends FileTestBase {
     $files = $this->fileSystem->scanDirectory('core/modules/system/tests/fixtures/IgnoreDirectories', '/\.txt$/');
     $this->assertCount(2, $files, '2 text files found when ignoring a directory that is not there.');
 
+    // Ensure filenames containing ignored directory names remain discoverable.
+    $this->setSetting('file_scan_ignore_directories', [
+      'node_modules',
+      'bower_components',
+      'files',
+      'composer',
+      'extras',
+    ]);
+    $files = $this->fileSystem->scanDirectory($this->path, '/^field--node--field-content-files\.html\.twig$/');
+    $uri = $this->path . '/field--node--field-content-files.html.twig';
+    $this->assertArrayHasKey($uri, $files, 'A file containing an ignored directory name was found.');
+
     $files = $this->fileSystem->scanDirectory('core/modules/system/tests/fixtures/IgnoreDirectories', '/\.txt$/', ['nomask' => '/^something_thing_else$/']);
     $this->assertCount(2, $files, '2 text files found when an "nomask" option is passed in.');
   }
