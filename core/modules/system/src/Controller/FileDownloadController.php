@@ -17,20 +17,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class FileDownloadController extends ControllerBase {
 
   /**
-   * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
-   */
-  protected $streamWrapperManager;
-
-  /**
    * FileDownloadController constructor.
    *
    * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
    *   The stream wrapper manager.
    */
-  public function __construct(StreamWrapperManagerInterface $streamWrapperManager) {
-    $this->streamWrapperManager = $streamWrapperManager;
+  public function __construct(
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+  ) {
   }
 
   /**
