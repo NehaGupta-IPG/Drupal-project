@@ -7,12 +7,12 @@
 
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 
@@ -20,68 +20,64 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  * Implements hook_schema().
  */
 function user_schema(): Schema {
-  return new Schema(
-    name: 'user',
-    tables: [
-      new Table(
-        name: 'users_data',
-        description: 'Stores module data as key/value pairs per user.',
-        columns: [
-          new Column(
-            name: 'uid',
-            description: 'The {users}.uid this record affects.',
-            type: ColumnType::Int,
-            unsigned: TRUE,
-            notNull: TRUE,
-            default: new IntValue(0),
-          ),
-          new Column(
-            name: 'module',
-            description: 'The name of the module declaring the variable.',
-            type: ColumnType::VarcharAscii,
-            length: DRUPAL_EXTENSION_NAME_MAX_LENGTH,
-            notNull: TRUE,
-            default: new StringValue(''),
-          ),
-          new Column(
-            name: 'name',
-            description: 'The identifier of the data.',
-            type: ColumnType::VarcharAscii,
-            length: 128,
-            notNull: TRUE,
-            default: new StringValue(''),
-          ),
-          new Column(
-            name: 'value',
-            description: 'The value.',
-            type: ColumnType::Blob,
-            size: ColumnSize::Big,
-            notNull: FALSE,
-          ),
-          new Column(
-            name: 'serialized',
-            description: 'Whether value is serialized.',
-            type: ColumnType::Int,
-            size: ColumnSize::Tiny,
-            unsigned: TRUE,
-            default: new IntValue(0),
-          ),
-        ],
-        primaryKey: new PrimaryKey(['uid', 'module', 'name']),
-        indexes: [
-          new Index(name: 'module', columns: ['module']),
-          new Index(name: 'name', columns: ['name']),
-        ],
-        foreignKeys: [
-          new ForeignKey(
-            name: 'data_user',
-            foreignTable: 'users',
-            columns: ['uid'],
-            foreignColumns: ['uid'],
-          ),
-        ],
+  $tables[] = new Table(
+    name: 'users_data',
+    description: 'Stores module data as key/value pairs per user.',
+    columns: [
+      Column::int(
+        name: 'uid',
+        description: 'The {users}.uid this record affects.',
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      Column::varcharAscii(
+        name: 'module',
+        description: 'The name of the module declaring the variable.',
+        length: DRUPAL_EXTENSION_NAME_MAX_LENGTH,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      Column::varcharAscii(
+        name: 'name',
+        description: 'The identifier of the data.',
+        length: 128,
+        notNull: TRUE,
+        default: new StringValue(''),
+      ),
+      Column::blob(
+        name: 'value',
+        description: 'The value.',
+        size: ColumnSize::Big,
+        notNull: FALSE,
+      ),
+      Column::int(
+        name: 'serialized',
+        description: 'Whether value is serialized.',
+        size: ColumnSize::Tiny,
+        unsigned: TRUE,
+        default: new IntValue(0),
       ),
     ],
+    primaryKey: new PrimaryKey(['uid', 'module', 'name']),
+    indexes: [
+      new Index(name: 'module', columns: ['module']),
+      new Index(name: 'name', columns: ['name']),
+    ],
+    foreignKeys: [
+      new ForeignKey(
+        name: 'data_user',
+        foreignTable: 'users',
+        columns: ['uid'],
+        foreignColumns: ['uid'],
+      ),
+    ],
+  );
+
+  return new Schema(
+    type: SchemaDefinitionType::Module,
+    name: 'user',
+    tables: $tables,
   );
 }
 

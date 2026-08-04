@@ -7,7 +7,6 @@
 
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
@@ -21,42 +20,37 @@ use Drupal\Core\Entity\EntityTypeInterface;
  */
 function workspaces_schema(): Schema {
   $columns = [
-    new Column(
+    Column::varcharAscii(
       name: 'workspace',
       description: 'The workspace ID.',
-      type: ColumnType::VarcharAscii,
       length: 128,
       notNull: TRUE,
       default: new StringValue(''),
     ),
-    new Column(
+    Column::varcharAscii(
       name: 'target_entity_type_id',
       description: 'The ID of the associated entity type.',
-      type: ColumnType::VarcharAscii,
       length: EntityTypeInterface::ID_MAX_LENGTH,
       notNull: TRUE,
       default: new StringValue(''),
     ),
-    new Column(
+    Column::int(
       name: 'target_entity_id',
       description: 'The ID of the associated entity.',
-      type: ColumnType::Int,
       unsigned: TRUE,
       notNull: TRUE,
       default: new IntValue(0),
     ),
-    new Column(
+    Column::varcharAscii(
       name: 'target_entity_id_string',
       description: 'The string ID of the associated entity.',
-      type: ColumnType::VarcharAscii,
       length: 128,
       notNull: TRUE,
       default: new StringValue(''),
     ),
-    new Column(
+    Column::int(
       name: 'target_entity_revision_id',
       description: 'The revision ID of the associated entity.',
-      type: ColumnType::Int,
       unsigned: TRUE,
       notNull: TRUE,
     ),
@@ -77,10 +71,9 @@ function workspaces_schema(): Schema {
     ],
   );
 
-  $columns[] = new Column(
+  $columns[] = Column::int(
     name: 'initial_revision',
     description: 'Whether this entity was created in the workspace.',
-    type: ColumnType::Int,
     size: ColumnSize::Tiny,
     notNull: TRUE,
     default: new IntValue(0),
@@ -103,6 +96,7 @@ function workspaces_schema(): Schema {
   );
 
   return new Schema(
+    type: SchemaDefinitionType::Module,
     name: 'workspaces',
     tables: [
       $workspace_association_table,

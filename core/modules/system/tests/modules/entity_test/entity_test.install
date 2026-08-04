@@ -8,9 +8,9 @@
 declare(strict_types=1);
 
 use Drupal\Core\Database\SchemaDefinition\Column;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -48,22 +48,22 @@ function entity_test_install(): void {
  */
 function entity_test_schema(): Schema {
   // Schema for simple entity.
-  return new Schema(
-    name: 'entity_test',
-    tables: [
-      new Table(
-        name: 'entity_test_example',
-        description: 'Stores entity_test items.',
-        columns: [
-          new Column(
-            name: 'id',
-            description: 'Primary Key: Unique entity-test item ID.',
-            type: ColumnType::Serial,
-          ),
-        ],
-        primaryKey: new PrimaryKey(['id']),
+  $tables[] = new Table(
+    name: 'entity_test_example',
+    description: 'Stores entity_test items.',
+    columns: [
+      Column::serial(
+        name: 'id',
+        description: 'Primary Key: Unique entity-test item ID.',
       ),
     ],
+    primaryKey: new PrimaryKey(['id']),
+  );
+
+  return new Schema(
+    type: SchemaDefinitionType::Test,
+    name: 'entity_test',
+    tables: $tables,
   );
 }
 

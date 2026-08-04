@@ -10,9 +10,9 @@ declare(strict_types=1);
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\SchemaDefinition\Column;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Url;
 
@@ -26,14 +26,12 @@ function update_test_schema_schema(): Schema {
   $tableArgs = [
     'name' => 'update_test_schema_table',
     'columns' => [
-      new Column(
+      Column::int(
         name: 'a',
-        type: ColumnType::Int,
         notNull: TRUE,
       ),
-      new Column(
+      Column::blob(
         name: 'b',
-        type: ColumnType::Blob,
         notNull: FALSE,
       ),
     ],
@@ -48,6 +46,7 @@ function update_test_schema_schema(): Schema {
   }
 
   return new Schema(
+    type: SchemaDefinitionType::Test,
     name: 'update_test_schema',
     tables: [
       new Table(...$tableArgs),
