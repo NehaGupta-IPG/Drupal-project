@@ -136,6 +136,32 @@ class ExperimentalThemeTest extends BrowserTestBase {
     $this->drupalGet('admin/appearance');
     $this->cssSelect('a[title="Install Experimental dependency test as default theme"]')[0]->click();
     $this->assertSession()->pageTextContains('Experimental themes are provided for testing purposes only. Use at your own risk.');
+
+    // Test confirm form messages when trying to install an experimental theme
+    // with 2 dependencies. 'Experimental dependency install test' depends on
+    // 'Experimental dependency test' which depends on 'Experimental test'.
+    // Installing the parent 'Experimental dependency install test' should
+    // result in messages for the child and the grandchild.
+    $this->drupalGet('admin/appearance');
+    $this->cssSelect('a[title="Install Experimental dependency install test theme"]')[0]->click();
+    $this->assertSession()->pageTextContains('You must install the following themes to install Experimental dependency install test:');
+    $this->assertSession()->pageTextContains('Experimental dependency test');
+    $this->assertSession()->pageTextContains('Experimental test');
+
+    // Installing the grandchild and only one dependent theme is displayed.
+    \Drupal::service('theme_installer')->install(['experimental_theme_test']);
+    $this->drupalGet('admin/appearance');
+    $this->cssSelect('a[title="Install Experimental dependency install test theme"]')[0]->click();
+    $this->assertSession()->pageTextContains('You must install the following theme to install Experimental dependency install test:');
+    $this->assertSession()->pageTextContains('Experimental dependency test');
+    $this->assertSession()->pageTextNotContains('Experimental test');
+
+    // Installing the child results in no messages about dependent modules.
+    \Drupal::service('theme_installer')->install(['experimental_theme_dependency_test']);
+    $this->drupalGet('admin/appearance');
+    $this->cssSelect('a[title="Install Experimental dependency install test theme"]')[0]->click();
+    $this->assertSession()->pageTextNotContains('Experimental dependency test');
+    $this->assertSession()->pageTextNotContains('Experimental test');
   }
 
 }
