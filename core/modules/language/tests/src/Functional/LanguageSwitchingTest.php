@@ -98,6 +98,26 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->doTestLanguageBlock404($block->label(), 'system/404');
     $this->drupalLogin($this->drupalCreateUser());
     $this->doTestLanguageBlock404($block->label(), 'system/404');
+    $this->assertHiddenLanguageBlockAccessibleName();
+  }
+
+  /**
+   * Tests the accessible name when the configured block label is hidden.
+   */
+  protected function assertHiddenLanguageBlockAccessibleName(): void {
+    $block_label = $this->randomMachineName(8);
+    $this->drupalPlaceBlock('language_block:' . LanguageInterface::TYPE_INTERFACE, [
+      'id' => 'hidden_language_block',
+      'label' => $block_label,
+      'label_display' => '0',
+    ]);
+
+    $this->drupalGet('<front>');
+    $language_switcher_nav = $this->xpath('//div[@id=:id and @role="navigation" and @aria-label=:label]', [
+      ':id' => 'block-hidden-language-block',
+      ':label' => $block_label,
+    ]);
+    $this->assertNotEmpty($language_switcher_nav);
   }
 
   /**

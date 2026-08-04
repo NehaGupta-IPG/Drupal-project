@@ -178,7 +178,8 @@ class LanguageThemeHooks {
     if ($variables['configuration']['provider'] == 'language') {
       $variables['attributes']['role'] = 'navigation';
       if (empty($variables['attributes']['aria-label']) && empty($variables['attributes']['aria-labelledby'])) {
-        $variables['attributes']['aria-label'] = !empty($variables['label']) ? $variables['label'] : $this->t('Language switcher');
+        $block_label = $variables['label'] ?: ($variables['configuration']['label'] ?? '');
+        $variables['attributes']['aria-label'] = $block_label ?: $this->t('Language switcher');
       }
     }
   }
