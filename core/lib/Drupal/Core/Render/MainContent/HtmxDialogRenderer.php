@@ -57,7 +57,7 @@ class HtmxDialogRenderer implements MainContentRendererInterface {
   public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match) {
     // Generate a target based on the route id.
     $route_name = $route_match->getRouteName();
-    $dialogId = '#' . Html::getId("drupal-dialog-$route_name");
+    $dialogId = Html::getId("drupal-dialog-$route_name");
     $title = $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject());
     // Setup the dialog component.
     $dialog = [
