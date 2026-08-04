@@ -18,6 +18,7 @@ use Drupal\Core\Render\Renderer;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Utility\Async;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -1195,7 +1196,7 @@ class RendererTest extends RendererTestBase {
       // ::renderInIsolation() calls without either having been completed.
       $fibers = [];
       foreach ([0, 1] as $key) {
-        $fibers[] = new \Fiber(static fn (): MarkupInterface|string => $fiber_callback());
+        $fibers[] = Async::createFiber(static fn (): MarkupInterface|string => $fiber_callback());
       }
       while ($fibers) {
         foreach ($fibers as $key => $fiber) {

@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Utility\Async;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\user\UserInterface;
@@ -159,8 +160,8 @@ class EntityApiTest extends EntityKernelTestBase {
     $entity->save();
     $ids[] = $entity->id();
 
-    $fiber1 = new \Fiber(fn () => $storage->load($ids[0]));
-    $fiber2 = new \Fiber(fn () => $storage->load($ids[1]));
+    $fiber1 = Async::createFiber(fn () => $storage->load($ids[0]));
+    $fiber2 = Async::createFiber(fn () => $storage->load($ids[1]));
 
     // Make sure the entity cache is empty.
     $this->container->get('entity.memory_cache')->reset();
@@ -205,8 +206,8 @@ class EntityApiTest extends EntityKernelTestBase {
     $entity->save();
     $ids[] = $entity->id();
 
-    $fiber1 = new \Fiber(fn () => $storage->loadMultiple([$ids[0]]));
-    $fiber2 = new \Fiber(fn () => $storage->loadMultiple([$ids[1]]));
+    $fiber1 = Async::createFiber(fn () => $storage->loadMultiple([$ids[0]]));
+    $fiber2 = Async::createFiber(fn () => $storage->loadMultiple([$ids[1]]));
 
     // Make sure the entity cache is empty.
     $this->container->get('entity.memory_cache')->reset();
@@ -260,11 +261,11 @@ class EntityApiTest extends EntityKernelTestBase {
     $entity->save();
     $ids[] = $entity->id();
 
-    $fiber1 = new \Fiber(function () use ($ids, $storage) {
+    $fiber1 = Async::createFiber(function () use ($ids, $storage) {
       $storage->loadMultiple([$ids[0]]);
       return $storage->loadMultiple([$ids[2]]);
     });
-    $fiber2 = new \Fiber(fn () => $storage->loadMultiple([$ids[1]]));
+    $fiber2 = Async::createFiber(fn () => $storage->loadMultiple([$ids[1]]));
 
     // Make sure the entity cache is empty.
     $this->container->get('entity.memory_cache')->reset();

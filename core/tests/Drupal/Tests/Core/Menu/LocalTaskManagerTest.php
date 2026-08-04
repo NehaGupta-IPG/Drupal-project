@@ -21,6 +21,7 @@ use Drupal\Core\Menu\LocalTaskManager;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Utility\Async;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -494,8 +495,8 @@ class LocalTaskManagerTest extends UnitTestCase {
       ->method('getRawParameters')
       ->willReturn(new InputBag());
 
-    $first_fiber = new \Fiber(fn () => $this->manager->getLocalTasks('menu_local_task_test_tasks_view', 0));
-    $second_fiber = new \Fiber(fn () => $this->manager->getLocalTasks('menu_local_task_test_tasks_view', 1));
+    $first_fiber = Async::createFiber(fn () => $this->manager->getLocalTasks('menu_local_task_test_tasks_view', 0));
+    $second_fiber = Async::createFiber(fn () => $this->manager->getLocalTasks('menu_local_task_test_tasks_view', 1));
 
     $fibers = [$first_fiber, $second_fiber];
     $suspended = FALSE;

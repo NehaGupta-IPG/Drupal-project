@@ -15,6 +15,7 @@ use Drupal\Core\Render\Element\RenderCallbackInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Utility\Async;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Core\Utility\FiberResumeType;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -616,7 +617,7 @@ class Renderer implements RendererInterface {
     // Set the provided context and call the callable, it will use that context.
     $this->setCurrentRenderContext($context);
 
-    $fiber = new \Fiber(static fn () => $callable());
+    $fiber = Async::createFiber($callable);
     $fiber->start();
     $resume_type = NULL;
     while (!$fiber->isTerminated()) {
@@ -741,9 +742,9 @@ class Renderer implements RendererInterface {
       }
       else {
         // Get the render array for the given placeholder.
-        $fibers[$placeholder] = new \Fiber(function () use ($placeholder_element) {
-          return [$this->doRenderPlaceholder($placeholder_element), $placeholder_element];
-        });
+        $fibers[$placeholder] = Async::createFiber(
+          fn() => [$this->doRenderPlaceholder($placeholder_element), $placeholder_element]
+        );
       }
     }
     $iterations = 0;

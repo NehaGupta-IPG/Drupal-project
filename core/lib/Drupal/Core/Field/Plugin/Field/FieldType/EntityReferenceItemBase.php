@@ -3,6 +3,7 @@
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldItemBase;
+use Drupal\Core\Utility\Async;
 use Drupal\Core\Utility\FiberResumeType;
 
 /**
@@ -22,7 +23,7 @@ abstract class EntityReferenceItemBase extends FieldItemBase implements EntityRe
     // __get() call can incorrectly trigger PHP's recursion guarding.
     // See https://github.com/php/php-src/issues/14983
     if ($property_name === 'entity' && \Fiber::getCurrent()) {
-      $fiber = new \Fiber(fn() => parent::__get($property_name));
+      $fiber = Async::createFiber(fn() => parent::__get($property_name));
       $fiber->start();
       while (!$fiber->isTerminated()) {
         if ($fiber->isSuspended()) {

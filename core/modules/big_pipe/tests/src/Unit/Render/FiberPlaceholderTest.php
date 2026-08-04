@@ -16,6 +16,7 @@ use Drupal\Core\Render\Renderer;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Utility\Async;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -105,7 +106,7 @@ class FiberPlaceholderTest extends UnitTestCase {
 
     // Capture the result to avoid PHPUnit complaining.
     ob_start();
-    $fiber = new \Fiber(function () use ($bigpipe, $response): void {
+    $fiber = Async::createFiber(function () use ($bigpipe, $response): void {
       $bigpipe->sendContent($response);
     });
     $fiber->start();

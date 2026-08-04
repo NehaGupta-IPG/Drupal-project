@@ -20,6 +20,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\LocalRedirectResponse;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Utility\FiberResumeType;
+use Drupal\Core\Utility\Async;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -498,7 +499,9 @@ class BigPipe {
         continue;
       }
       $placeholder_render_array = $placeholders[$placeholder_id];
-      $fibers[$placeholder_id] = new \Fiber(fn() => $this->renderPlaceholder($placeholder_id, $placeholder_render_array));
+      $fibers[$placeholder_id] = Async::createFiber(
+        fn () => $this->renderPlaceholder($placeholder_id, $placeholder_render_array)
+      );
     }
     $iterations = 0;
     while (count($fibers) > 0) {
