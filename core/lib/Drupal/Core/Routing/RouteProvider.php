@@ -237,6 +237,10 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    *   Thrown if there is no route with that name in this repository.
    */
   public function getRouteByName($name) {
+    if ($name === '') {
+      throw new \InvalidArgumentException('Route name may not be an empty string ("").');
+    }
+
     $routes = $this->getRoutesByNames([$name]);
     if (empty($routes)) {
       throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $name));
