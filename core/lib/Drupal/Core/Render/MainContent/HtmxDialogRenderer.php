@@ -33,7 +33,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @see \Drupal\Core\Render\BareHtmlPageRenderer
  * @see \Drupal\Core\Render\HtmlResponse
  * @see \Drupal\Core\Render\HtmlResponseAttachmentsProcessor
- * @see \Drupal\Core\Htmx\HtmxDialogPathProcessor
+ * @see \Drupal\Core\PathProcessor\HtmxDialogPathProcessor
  */
 class HtmxDialogRenderer implements MainContentRendererInterface {
 
@@ -55,10 +55,24 @@ class HtmxDialogRenderer implements MainContentRendererInterface {
    * processed by HTMX on the frontend.
    */
   public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match) {
-    $token = Crypt::randomBytesBase64(55);
     // Generate a target based on the route id.
     $route_name = $route_match->getRouteName();
     $dialogId = '#' . Html::getId("drupal-dialog-$route_name");
+    $title = $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject());
+    // Setup the dialog component.
+    $dialog = [
+      '#type' => 'component',
+      '#component' => 'system:drupal-dialog',
+      '#slots' => [
+        'content' => $main_content,
+      ],
+      '#props' => [
+        'id' => $dialogId,
+        'title' => $title,
+      ],
+    ];
+    // Prepare the page with placeholders for assets.
+    $token = Crypt::randomBytesBase64(55);
     $html = [
       '#type' => 'inline_template',
       // Add a noindex meta tag to make sure this response will not be indexed.
@@ -73,31 +87,17 @@ class HtmxDialogRenderer implements MainContentRendererInterface {
 <js-bottom-placeholder token="{{ placeholder_token }}">
 </head>
 <body>
-  <hx-partial hx-target="{{ id }}" hx-swap="delete"></hx-partial>
+  <hx-partial hx-target="{{ dialog_target }}" hx-swap="delete"></hx-partial>
   <hx-partial hx-target="body" hx-swap="beforeend">
-  <drupal-dialog id="{{ id }}">
-      <dialog open aria-labelledby="{{ id -}}-title">
-        <div data-dialog-titlebar>
-          <span id="{{ id -}}-title">{{ title }}</span>
-          <form method="dialog">
-            <button data-dialog-close-btn aria-label="Close">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 1L1 11M11 11L1 1" stroke="currentColor" stroke-width="1.5"/>
-              </svg>
-            </button>
-          </form>
-        </div>
-        {{ content }}
-      </dialog>
-    </drupal-dialog>
+    {{ dialog }}
   </hx-partial>
 </body>
 </html>
 HTMX_RESPONSE,
       '#context' => [
-        'title' => $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject()),
-        'id' => $dialogId,
-        'content' => $main_content,
+        'title' => $title,
+        'dialog' => $dialog,
+        'dialog_target' => '#' . $dialogId,
         'placeholder_token' => $token,
       ],
     ];

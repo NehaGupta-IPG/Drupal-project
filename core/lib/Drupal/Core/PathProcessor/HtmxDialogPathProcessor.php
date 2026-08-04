@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Core\Htmx;
+namespace Drupal\Core\PathProcessor;
 
 
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;

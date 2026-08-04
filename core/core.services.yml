@@ -1553,7 +1553,7 @@ services:
     tags:
       - { name: path_processor_inbound, priority: 1000 }
   path_processor_dialog:
-    class: \Drupal\Core\Htmx\HtmxDialogPathProcessor
+    class: \Drupal\Core\PathProcessor\HtmxDialogPathProcessor
     tags:
       - { name: path_processor_inbound, priority: 350 }
   path_processor_front:

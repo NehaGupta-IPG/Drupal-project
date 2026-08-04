@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Htmx;
 
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
-use Drupal\Core\Htmx\HtmxDialogPathProcessor;
+use Drupal\Core\PathProcessor\HtmxDialogPathProcessor;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

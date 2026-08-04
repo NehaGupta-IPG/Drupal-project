@@ -1,0 +1,28 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+
+name: Drupal Dialog
+description: A web component wrapping a dialog intended to be rendered for display using HTMX.
+status: experimental
+group: Dialog
+
+props:
+  type: object
+  required:
+    - id
+  properties:
+    id:
+      title: ID attribute.
+      type: string
+    title:
+      title: Title
+      type: string
+      description: Label for the dialog title bar
+
+slots:
+  content:
+    title: Content
+    description: The content provided for the dialog
+
+libraryOverrides:
+  dependencies:
+    - core/drupal.htmx

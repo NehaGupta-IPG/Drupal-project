@@ -1,0 +1,129 @@
+/* dialog.css — structural base, no theme */
+
+drupal-dialog {
+  display: contents;
+}
+
+dialog {
+  border: 0;
+  border-radius: 4px;
+  padding: 0;
+  max-width: min(600px, 90vw);
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0,0,0,.28), 0 2px 8px rgba(0,0,0,.18);
+  background: #fff;
+  color: #333;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+dialog:not([open]) { display: none }
+
+dialog[open] {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: fit-content;
+  height: fit-content;
+}
+
+@media (max-width: 48em) {
+  dialog { min-width: 92%; max-width: 92% }
+}
+
+@media (forced-colors: active) {
+  dialog { border: 1px solid transparent }
+}
+
+dialog::backdrop { background: rgba(0,0,0,.45) }
+
+/* Titlebar */
+[data-dialog-titlebar] {
+  position: relative;
+  padding: .75rem 3.5rem .75rem 1.25rem;
+  background: #232429;
+  color: #fff;
+  border-radius: 4px 4px 0 0;
+  font-weight: bold;
+  font-size: 1rem;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+[data-dialog-titlebar]:empty { display: none }
+
+/* Close button */
+[data-dialog-close-btn] {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 0;
+  transform: translateY(-50%);
+  margin-inline: .75rem;
+  width: 2rem;
+  height: 2rem;
+  background: none;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d3d4d9;
+}
+[data-dialog-close-btn]:hover { color: #fff }
+[data-dialog-close-btn]:focus-visible { outline: 2px solid #26a769; outline-offset: 2px }
+
+/* Content */
+[data-dialog-content] {
+  padding: 1.25rem 1.5rem;
+  overflow: auto;
+  flex: 1 1 auto;
+  background: #fff;
+}
+
+/* Footer */
+[data-dialog-footer] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  justify-content: flex-end;
+  padding: .75rem 1.5rem;
+  background: #f3f4f9;
+  border-top: 1px solid #ddd;
+  border-radius: 0 0 4px 4px;
+  flex-shrink: 0;
+}
+[data-dialog-footer]:empty { display: none }
+
+/* Danger variant — alertdialog with destructive action */
+[data-dialog-titlebar][data-dialog-danger] {
+  background: #b91c1c;
+}
+
+.button--danger {
+  background: #b91c1c;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: .4rem .9rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.button--danger:hover { background: #991b1b; }
+.button--danger:focus-visible { outline: 2px solid #fca5a5; outline-offset: 2px; }
+
+/* Off-canvas tray — anchored to inline-end of viewport */
+/*#drupal-off-canvas dialog {*/
+/*  position: fixed;*/
+/*  inset-block: 0;*/
+/*  inset-inline-end: 0;*/
+/*  inset-inline-start: auto;*/
+/*  margin: 0;*/
+/*  max-width: min(380px, 90vw);*/
+/*  max-height: 100dvh;*/
+/*  height: 100dvh;*/
+/*  border-radius: 0;*/
+/*  box-shadow: -4px 0 24px rgba(0,0,0,.18);*/
+/*}*/
