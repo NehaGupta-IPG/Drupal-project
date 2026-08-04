@@ -683,6 +683,16 @@ class RouteProviderTest extends KernelTestBase {
     }
     $this->assertTrue($exception_thrown, 'Random route was not found.');
 
+    // Test empty route string:
+    $exception_thrown = FALSE;
+    try {
+      $provider->getRouteByName('');
+    }
+    catch (\InvalidArgumentException) {
+      $exception_thrown = TRUE;
+    }
+    $this->assertTrue($exception_thrown, 'Empty route throws InvalidArgumentException.');
+
     $routes = $provider->getRoutesByNames(['route_c', 'route_d', $this->randomMachineName()]);
     $this->assertCount(2, $routes, 'Only two valid routes found.');
     $this->assertEquals('/path/two', $routes['route_c']->getPath());
