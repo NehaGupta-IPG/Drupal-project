@@ -522,12 +522,10 @@ class ModuleInstaller implements ModuleInstallerInterface {
     asort($module_list);
     $module_list = array_keys($module_list);
 
-    // Only process modules that are installed. A module is only installed if it
-    // is
-    // configured as installed. Custom or overridden module handlers might
-    // contain
-    // the module already, which means that it might be loaded, but not
-    // necessarily installed.
+    // Only process modules that are installed. A module is only installed if
+    // it is configured as installed. Custom or overridden module handlers
+    // might contain the module already, which means that it might be loaded,
+    // but not necessarily installed.
     foreach ($module_list as $module) {
 
       // Clean up all entity bundles (including fields) of every entity type
