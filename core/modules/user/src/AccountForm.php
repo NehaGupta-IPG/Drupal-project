@@ -331,7 +331,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#weight' => 7,
     ];
     $form['user_settings']['color_scheme'] = [
-      '#type' => 'select',
+      '#type' => 'radios',
       '#title' => $this->t('Light / dark mode'),
       '#options' => [
         'auto' => $this->t('Auto'),
