@@ -6,12 +6,12 @@
  */
 
 use Drupal\Core\Database\SchemaDefinition\Column;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 
@@ -19,50 +19,49 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  * Implements hook_schema().
  */
 function shortcut_schema(): Schema {
-  return new Schema(
-    name: 'shortcut',
-    tables: [
-      new Table(
-        name: 'shortcut_set_users',
-        description: 'Maps users to shortcut sets.',
-        columns: [
-          new Column(
-            name: 'uid',
-            description: 'The {users}.uid for this set.',
-            type: ColumnType::Int,
-            unsigned: TRUE,
-            notNull: TRUE,
-            default: new IntValue(0),
-          ),
-          new Column(
-            name: 'set_name',
-            description: "The {shortcut_set}.set_name that will be displayed for this user.",
-            type: ColumnType::VarcharAscii,
-            length: 32,
-            notNull: TRUE,
-            default: new StringValue(''),
-          ),
-        ],
-        primaryKey: new PrimaryKey(['uid']),
-        indexes: [
-          new Index(name: 'set_name', columns: ['set_name']),
-        ],
-        foreignKeys: [
-          new ForeignKey(
-            name: 'set_user',
-            foreignTable: 'users',
-            columns: ['uid'],
-            foreignColumns: ['uid'],
-          ),
-          new ForeignKey(
-            name: 'set_name',
-            foreignTable: 'shortcut_set',
-            columns: ['set_name'],
-            foreignColumns: ['set_name'],
-          ),
-        ],
+  $tables[] = new Table(
+    name: 'shortcut_set_users',
+    description: 'Maps users to shortcut sets.',
+    columns: [
+      Column::int(
+        name: 'uid',
+        description: 'The {users}.uid for this set.',
+        unsigned: TRUE,
+        notNull: TRUE,
+        default: new IntValue(0),
+      ),
+      Column::varcharAscii(
+        name: 'set_name',
+        description: "The {shortcut_set}.set_name that will be displayed for this user.",
+        length: 32,
+        notNull: TRUE,
+        default: new StringValue(''),
       ),
     ],
+    primaryKey: new PrimaryKey(['uid']),
+    indexes: [
+      new Index(name: 'set_name', columns: ['set_name']),
+    ],
+    foreignKeys: [
+      new ForeignKey(
+        name: 'set_user',
+        foreignTable: 'users',
+        columns: ['uid'],
+        foreignColumns: ['uid'],
+      ),
+      new ForeignKey(
+        name: 'set_name',
+        foreignTable: 'shortcut_set',
+        columns: ['set_name'],
+        foreignColumns: ['set_name'],
+      ),
+    ],
+  );
+
+  return new Schema(
+    type: SchemaDefinitionType::Module,
+    name: 'shortcut',
+    tables: $tables,
   );
 }
 

@@ -8,11 +8,11 @@
 declare(strict_types=1);
 
 use Drupal\Core\Database\SchemaDefinition\Column;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
@@ -30,31 +30,27 @@ function database_test_schema(): Schema {
     name: 'test',
     description: 'Basic test table for the database unit tests.',
     columns: [
-      new Column(
+      Column::serial(
         name: 'id',
-        type: ColumnType::Serial,
       ),
-      new Column(
+      Column::varcharAscii(
         name: 'name',
         description: "A person's name",
-        type: ColumnType::VarcharAscii,
         length: 255,
         notNull: TRUE,
         binary: TRUE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::int(
         name: 'age',
         description: "The person's age",
-        type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
         default: new IntValue(0),
       ),
-      new Column(
+      Column::varchar(
         name: 'job',
         description: "The person's job",
-        type: ColumnType::Varchar,
         length: 255,
         notNull: TRUE,
         default: new StringValue('Undefined'),
@@ -73,34 +69,30 @@ function database_test_schema(): Schema {
     name: 'test_classtype',
     description: 'A duplicate version of the test table, used for obsolete fetch_style PDO::FETCH_CLASSTYPE tests.',
     columns: [
-      new Column(
+      Column::varchar(
         name: 'classname',
         description: "A custom class name",
-        type: ColumnType::Varchar,
         length: 255,
         notNull: TRUE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::varcharAscii(
         name: 'name',
         description: "A person's name",
-        type: ColumnType::VarcharAscii,
         length: 255,
         notNull: TRUE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::int(
         name: 'age',
         description: "The person's age",
-        type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
         default: new IntValue(0),
       ),
-      new Column(
+      Column::varcharAscii(
         name: 'job',
         description: "The person's job",
-        type: ColumnType::VarcharAscii,
         length: 255,
         notNull: TRUE,
         default: new StringValue(''),
@@ -118,26 +110,23 @@ function database_test_schema(): Schema {
     name: 'test_people',
     description: 'A duplicate version of the test table, used for additional tests.',
     columns: [
-      new Column(
+      Column::varchar(
         name: 'name',
         description: "A person's name",
-        type: ColumnType::Varchar,
         length: 255,
         notNull: TRUE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::int(
         name: 'age',
         description: "The person's age",
-        type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
         default: new IntValue(0),
       ),
-      new Column(
+      Column::varcharAscii(
         name: 'job',
         description: "The person's job",
-        type: ColumnType::VarcharAscii,
         length: 255,
         notNull: TRUE,
         default: new StringValue(''),
@@ -153,26 +142,23 @@ function database_test_schema(): Schema {
     name: 'test_people_copy',
     description: 'A duplicate version of the test_people table, used for additional tests.',
     columns: [
-      new Column(
+      Column::varchar(
         name: 'name',
         description: "A person's name",
-        type: ColumnType::Varchar,
         length: 255,
         notNull: TRUE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::int(
         name: 'age',
         description: "The person's age",
-        type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
         default: new IntValue(0),
       ),
-      new Column(
+      Column::varcharAscii(
         name: 'job',
         description: "The person's job",
-        type: ColumnType::VarcharAscii,
         length: 255,
         notNull: TRUE,
         default: new StringValue(''),
@@ -188,15 +174,13 @@ function database_test_schema(): Schema {
     name: 'test_one_blob',
     description: 'A simple table including a BLOB field for testing BLOB behavior.',
     columns: [
-      new Column(
+      Column::serial(
         name: 'id',
         description: 'Simple unique ID.',
-        type: ColumnType::Serial,
       ),
-      new Column(
+      Column::blob(
         name: 'blob1',
         description: 'A BLOB field.',
-        type: ColumnType::Blob,
       ),
     ],
     primaryKey: new PrimaryKey(['id']),
@@ -206,20 +190,17 @@ function database_test_schema(): Schema {
     name: 'test_two_blobs',
     description: 'A simple test table with two BLOB fields.',
     columns: [
-      new Column(
+      Column::serial(
         name: 'id',
         description: 'Simple unique ID.',
-        type: ColumnType::Serial,
       ),
-      new Column(
+      Column::blob(
         name: 'blob1',
         description: 'A dummy BLOB field.',
-        type: ColumnType::Blob,
       ),
-      new Column(
+      Column::blob(
         name: 'blob2',
         description: 'A second BLOB field.',
-        type: ColumnType::Blob,
       ),
     ],
     primaryKey: new PrimaryKey(['id']),
@@ -229,31 +210,27 @@ function database_test_schema(): Schema {
     name: 'test_task',
     description: 'A task list for people in the test table.',
     columns: [
-      new Column(
+      Column::serial(
         name: 'tid',
         description: 'Task ID, primary key.',
-        type: ColumnType::Serial,
       ),
-      new Column(
+      Column::int(
         name: 'pid',
         description: 'The {test_people}.pid, foreign key for the test table.',
-        type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
         default: new IntValue(0),
       ),
-      new Column(
+      Column::varchar(
         name: 'task',
         description: 'The task to be completed.',
-        type: ColumnType::Varchar,
         length: 255,
         notNull: TRUE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::int(
         name: 'priority',
         description: 'The priority of the task.',
-        type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
         default: new IntValue(0),
@@ -266,22 +243,19 @@ function database_test_schema(): Schema {
     name: 'test_null',
     description: 'Basic test table for NULL value handling.',
     columns: [
-      new Column(
+      Column::serial(
         name: 'id',
-        type: ColumnType::Serial,
       ),
-      new Column(
+      Column::varcharAscii(
         name: 'name',
         description: "A person's name",
-        type: ColumnType::VarcharAscii,
         length: 255,
         notNull: FALSE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::int(
         name: 'age',
         description: "The person's age",
-        type: ColumnType::Int,
         unsigned: TRUE,
         notNull: FALSE,
         default: new IntValue(0),
@@ -300,22 +274,19 @@ function database_test_schema(): Schema {
     name: 'test_serialized',
     description: 'Basic test table for NULL value handling.',
     columns: [
-      new Column(
+      Column::serial(
         name: 'id',
-        type: ColumnType::Serial,
       ),
-      new Column(
+      Column::varcharAscii(
         name: 'name',
         description: "A person's name",
-        type: ColumnType::VarcharAscii,
         length: 255,
         notNull: FALSE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::blob(
         name: 'info',
         description: "The person's data in serialized form.",
-        type: ColumnType::Blob,
         serialize: TRUE,
       ),
     ],
@@ -329,27 +300,24 @@ function database_test_schema(): Schema {
     name: 'test_composite_primary',
     description: 'Basic test table with a composite primary key',
     columns: [
-      new Column(
+      Column::varchar(
         name: 'name',
         description: "A person's name",
-        type: ColumnType::Varchar,
         length: 50,
         notNull: TRUE,
         binary: TRUE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::int(
         name: 'age',
         description: "The person's age",
-        type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
         default: new IntValue(0),
       ),
-      new Column(
+      Column::varchar(
         name: 'job',
         description: "The person's job",
-        type: ColumnType::Varchar,
         length: 255,
         notNull: TRUE,
         default: new StringValue('Undefined'),
@@ -364,17 +332,15 @@ function database_test_schema(): Schema {
     name: 'select',
     description: 'A test table with an ANSI reserved keyword as its name and one of its column names.',
     columns: [
-      new Column(
+      // Using a serial as an ID properly tests
+      // \Drupal\pgsql\Driver\Database\pgsql\Upsert.
+      Column::serial(
         name: 'id',
         description: 'Simple unique ID.',
-        // Using a serial as an ID properly tests
-        // \Drupal\pgsql\Driver\Database\pgsql\Upsert.
-        type: ColumnType::Serial,
       ),
-      new Column(
+      Column::text(
         name: 'update',
         description: 'A column with reserved name.',
-        type: ColumnType::Text,
       ),
     ],
     primaryKey: new PrimaryKey(['id']),
@@ -384,16 +350,14 @@ function database_test_schema(): Schema {
     name: 'virtual',
     description: 'A simple table with reserved name in MySQL 8.',
     columns: [
-      new Column(
+      Column::int(
         name: 'id',
         description: 'Simple unique ID.',
-        type: ColumnType::Int,
         notNull: TRUE,
       ),
-      new Column(
+      Column::text(
         name: 'function',
         description: 'A column with reserved name in MySQL 8.',
-        type: ColumnType::Text,
       ),
     ],
     primaryKey: new PrimaryKey(['id']),
@@ -403,31 +367,27 @@ function database_test_schema(): Schema {
     name: 'TEST_UPPERCASE',
     description: 'Basic test table for the database unit tests.',
     columns: [
-      new Column(
+      Column::serial(
         name: 'id',
-        type: ColumnType::Serial,
       ),
-      new Column(
+      Column::varcharAscii(
         name: 'name',
         description: "A person's name",
-        type: ColumnType::VarcharAscii,
         length: 255,
         notNull: TRUE,
         binary: TRUE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::int(
         name: 'age',
         description: "The person's age",
-        type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
         default: new IntValue(0),
       ),
-      new Column(
+      Column::varchar(
         name: 'job',
         description: "The person's job",
-        type: ColumnType::Varchar,
         length: 255,
         notNull: TRUE,
         default: new StringValue('Undefined'),
@@ -443,6 +403,7 @@ function database_test_schema(): Schema {
   );
 
   return new Schema(
+    type: SchemaDefinitionType::Test,
     name: 'database_test',
     tables: [
       $test_table,
