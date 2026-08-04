@@ -247,7 +247,9 @@ class FileVideoFormatter extends FileMediaFormatterBase {
         // depends on this media entity as soon as it is inspected, so add its
         // cacheability now - on both the success and bail-out paths - so that a
         // later non-image to image change invalidates the host render cache.
-        CacheableMetadata::createFromObject($referenced)->applyTo($elements);
+        CacheableMetadata::createFromRenderArray($elements)
+          ->merge(CacheableMetadata::createFromObject($referenced))
+          ->applyTo($elements);
         // Resolve its source file and accept it only when it is an image. This
         // is done via duck typing (getSource()) and the file storage so that
         // the file module keeps no dependency on the media module.
@@ -278,14 +280,18 @@ class FileVideoFormatter extends FileMediaFormatterBase {
       if (!empty($poster_image_style_id)) {
         // With imagecache selected:
         $poster_image_style = $this->imageStyleStorage->load($poster_image_style_id);
-        CacheableMetadata::createFromObject($poster_image_style)->applyTo($elements);
+        CacheableMetadata::createFromRenderArray($elements)
+          ->merge(CacheableMetadata::createFromObject($poster_image_style))
+          ->applyTo($elements);
         $poster_url = $poster_image_style->buildUrl($poster_file_entity->getFileUri());
       }
       else {
         // Without imagecache:
         $poster_url = $poster_file_entity->createFileUrl();
       }
-      CacheableMetadata::createFromObject($poster_file_entity)->applyTo($elements);
+      CacheableMetadata::createFromRenderArray($elements)
+        ->merge(CacheableMetadata::createFromObject($poster_file_entity))
+        ->applyTo($elements);
 
       $poster_attributes = new Attribute();
       $poster_attributes->setAttribute('poster', $poster_url);
