@@ -20,8 +20,6 @@ class BatchKernelTest extends KernelTestBase {
   /**
    * Tests _batch_needs_update().
    */
-  #[Group('legacy')]
-  #[IgnoreDeprecations]
   public function testLegacyNeedsUpdate(): void {
     require_once $this->root . '/core/includes/batch.inc';
     // Before ever being called, the return value should be FALSE.
