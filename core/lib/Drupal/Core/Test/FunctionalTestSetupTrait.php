@@ -492,12 +492,10 @@ trait FunctionalTestSetupTrait {
   /**
    * Gets a list of modules recursively from inherited class properties.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The container.
    * @return array
    *   The modules to install, or an empty array if none are specified.
    */
-  protected function getModulesFromClassProperty(ContainerInterface $container): array {
+  protected function getModulesFromClassProperty(): array {
     $class = static::class;
     $modules = [];
     while ($class) {
@@ -525,7 +523,7 @@ trait FunctionalTestSetupTrait {
    *   The container.
    */
   protected function installModulesFromClassProperty(ContainerInterface $container) {
-    $modules = $this->getModulesFromClassProperty($container);
+    $modules = $this->getModulesFromClassProperty();
     if ($modules) {
       try {
         $success = $container->get('module_installer')->install($modules, TRUE);
@@ -565,8 +563,7 @@ trait FunctionalTestSetupTrait {
     $formInput = Database::getConnectionInfo()['default'];
     $driverName = $formInput['driver'];
     $driverNamespace = $formInput['namespace'];
-    $container = $this->initKernel(\Drupal::request());
-    $modules = $this->getModulesFromClassProperty($container);
+    $modules = $this->getModulesFromClassProperty();
     unset($formInput['driver']);
     unset($formInput['namespace']);
     unset($formInput['autoload']);
@@ -587,6 +584,7 @@ trait FunctionalTestSetupTrait {
         'profile' => $this->profile,
         'langcode' => 'en',
       ],
+      'extra_modules' => $modules,
       'forms' => [
         'install_settings_form' => [
           'driver' => $driverNamespace,
