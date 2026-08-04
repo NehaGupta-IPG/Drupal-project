@@ -71,9 +71,9 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
       $changed = FALSE;
-      if ($this->processBooleanFilterAcceptNull($handler, $handler_type, $view)) {
+      if ($this->processBooleanFilterAcceptNull($handler, $handler_type)) {
         $changed = TRUE;
       }
       return $changed;
@@ -150,8 +150,8 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function needsBooleanFilterAcceptNullUpdate(ViewEntityInterface $view): bool {
-    return $this->processDisplayHandlers($view, TRUE, function (array &$handler, string $handler_type) use ($view) {
-      return $this->processBooleanFilterAcceptNull($handler, $handler_type, $view);
+    return $this->processDisplayHandlers($view, TRUE, function (array &$handler, string $handler_type) {
+      return $this->processBooleanFilterAcceptNull($handler, $handler_type);
     });
   }
 
@@ -162,8 +162,6 @@ class ViewsConfigUpdater {
    *   A display handler.
    * @param string $handler_type
    *   The handler type.
-   * @param \Drupal\views\ViewEntityInterface $view
-   *   The View to update.
    *
    * @return bool
    *   Whether the handler was updated.
@@ -171,26 +169,17 @@ class ViewsConfigUpdater {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    *   If the filter plugin instance cannot be created.
    */
-  protected function processBooleanFilterAcceptNull(array &$handler, string $handler_type, ViewEntityInterface $view): bool {
-    $changed = FALSE;
-    $displays = $view->get('display');
-    foreach ($displays as &$display) {
-      if (isset($display['display_options']['filters'])) {
-        foreach ($display['display_options']['filters'] as &$filter) {
-          // Any of the children of the modified classes will also be inheriting
-          // the new settings.
-          $filter_instance = $this->filterPluginManager->getHandler($filter);
-          if (($filter_instance instanceof BooleanOperator) && !isset($filter['accept_null'])) {
-            $filter['accept_null'] = FALSE;
-            $changed = TRUE;
-          }
-        }
+  protected function processBooleanFilterAcceptNull(array &$handler, string $handler_type): bool {
+    if ($handler_type === 'filter' && !isset($handler['accept_null'])) {
+      // Any of the children of the modified classes will also be inheriting
+      // the new settings.
+      $filter_instance = $this->filterPluginManager->getHandler($handler);
+      if ($filter_instance instanceof BooleanOperator) {
+        $handler['accept_null'] = FALSE;
+        return TRUE;
       }
     }
-    if ($changed) {
-      $view->set('display', $displays);
-    }
-    return $changed;
+    return FALSE;
   }
 
 }
