@@ -126,7 +126,7 @@ class ViewTestData {
         new Index(name: 'ages', columns: ['age']),
       ],
     );
-  
+
     return new Schema(
       type: SchemaDefinitionType::Test,
       name: 'views_test_data',

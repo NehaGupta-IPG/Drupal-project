@@ -784,7 +784,7 @@ class FilterCombineTest extends ViewsKernelTestBase {
     );
 
     return new Schema(
-      name: $parentSchema->type,
+      type: $parentSchema->type,
       name: $parentSchema->name,
       tables: [
         new Table(
