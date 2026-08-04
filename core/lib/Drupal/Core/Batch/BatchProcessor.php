@@ -21,6 +21,10 @@ class BatchProcessor implements BatchProcessorInterface {
     #[Autowire(param: 'app.root')]
     protected readonly string $root,
   ) {
+    // \Drupal\Core\DrupalKernel::loadLegacyIncludes() loads form.inc, but
+    // not batch.inc, and only runs during HTTP request handling. Load both
+    // files here so the functions this service wraps are available in every
+    // context, such as kernel tests and the command line.
     require_once $root . '/core/includes/batch.inc';
     require_once $root . '/core/includes/form.inc';
   }
