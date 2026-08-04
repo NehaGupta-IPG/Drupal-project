@@ -65,7 +65,7 @@ class PathMatcher implements PathMatcherInterface {
       $replacements = [
         '|',
         '.*',
-        '\1' . preg_quote($this->getFrontPagePath(), '/') . '\2',
+        '\1' . preg_quote($this->getFrontPagePath() ?? '', '/') . '\2',
       ];
       $patterns_quoted = preg_quote($patterns, '/');
       $this->regexes[$patterns] = '/^(' . preg_replace($to_replace, $replacements, $patterns_quoted) . ')$/';
