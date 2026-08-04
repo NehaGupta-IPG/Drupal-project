@@ -1595,6 +1595,11 @@ function install_profile_modules(&$install_state) {
   install_core_entity_type_definitions();
 
   $modules = $install_state['profile_info']['install'];
+
+  $extra_modules = $install_state['extra_modules'] ?? [];
+  if ($extra_modules) {
+    $modules = array_merge($modules, $extra_modules);
+  }
   $files = \Drupal::service('extension.list.module')->getList();
 
   // Always install required modules first. Respect the dependencies between
