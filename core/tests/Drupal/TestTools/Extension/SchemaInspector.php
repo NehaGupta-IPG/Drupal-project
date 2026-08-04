@@ -33,7 +33,7 @@ class SchemaInspector {
   public static function getTablesSpecification(ModuleHandlerInterface $handler, string $module): Schema|array {
     if ($handler->loadInclude($module, 'install')) {
       $schema = $handler->invoke($module, 'schema') ?? [];
-      // @todo remove Schema check in drupal:43.1.0.
+      // @todo Remove Schema check in drupal:13.0.0.
       if ($schema instanceof Schema) {
         return $schema;
       }
