@@ -250,16 +250,22 @@ class FileVideoFormatter extends FileMediaFormatterBase {
         CacheableMetadata::createFromRenderArray($elements)
           ->merge(CacheableMetadata::createFromObject($referenced))
           ->applyTo($elements);
-        // Resolve its source file and accept it only when it is an image. This
-        // is done via duck typing (getSource()) and the file storage so that
-        // the file module keeps no dependency on the media module.
-        $source = $referenced->getSource();
-        if ($source !== NULL) {
-          $source_value = $source->getSourceFieldValue($referenced);
-          if ($source_value !== NULL) {
-            $file = $this->fileStorage->load($source_value);
-            if ($file instanceof FileInterface && str_starts_with((string) $file->getMimeType(), 'image/')) {
-              $poster_file_entity = $file;
+        $access = $referenced->access('view', $this->currentUser, TRUE);
+        CacheableMetadata::createFromRenderArray($elements)
+          ->merge(CacheableMetadata::createFromObject($access))
+          ->applyTo($elements);
+        if ($access->isAllowed()) {
+          // Resolve its source file and accept it only when it is an image.
+          // This is done via duck typing (getSource()) and the file storage so
+          // that the file module keeps no dependency on the media module.
+          $source = $referenced->getSource();
+          if ($source !== NULL) {
+            $source_value = $source->getSourceFieldValue($referenced);
+            if ($source_value !== NULL) {
+              $file = $this->fileStorage->load($source_value);
+              if ($file instanceof FileInterface && str_starts_with((string) $file->getMimeType(), 'image/')) {
+                $poster_file_entity = $file;
+              }
             }
           }
         }
