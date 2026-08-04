@@ -400,7 +400,7 @@ class TestLocalActionManager extends LocalActionManager {
     $this->requestStack->push($request);
     $this->routeMatch = $route_match;
     $this->moduleHandler = $module_handler;
-    $this->alterInfo('menu_local_actions');
+    $this->alterInfo('local_actions');
     $this->setCacheBackend($cache_backend, 'local_action_plugins');
   }
 

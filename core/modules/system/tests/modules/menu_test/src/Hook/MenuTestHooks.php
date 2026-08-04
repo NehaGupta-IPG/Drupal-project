@@ -7,6 +7,7 @@ namespace Drupal\menu_test\Hook;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Menu\LocalActionDefault;
 use Drupal\menu_test\MenuTestHelper;
 
 /**
@@ -61,6 +62,24 @@ class MenuTestHooks {
       ];
     }
     $cacheability->addCacheTags(['kittens:dwarf-cat']);
+  }
+
+  /**
+   * Implements hook_local_actions_alter().
+   */
+  #[Hook('local_actions_alter')]
+  public function localActionsAlter(array &$local_actions): void {
+    $local_actions['menu_test.local_action9'] = [
+      'id' => 'menu_test.local_action9',
+      'title' => 'Hook alter action',
+      'route_name' => 'menu_test.local_action9',
+      'appears_on' => [
+        'menu_test.local_action1',
+      ],
+      'class' => LocalActionDefault::class,
+      'options' => [],
+      'weight' => 50,
+    ];
   }
 
 }
