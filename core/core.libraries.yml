@@ -190,18 +190,6 @@ ckeditor5.fullscreen:
   dependencies:
     - core/ckeditor5
 
-ckeditor5.fullscreen:
-  remote: https://github.com/ckeditor/ckeditor5
-  version: "47.6.2"
-  license:
-    name: GPL-2.0-or-later
-    url: https://raw.githubusercontent.com/ckeditor/ckeditor5/v47.6.2/LICENSE.md
-    gpl-compatible: true
-  js:
-    assets/vendor/ckeditor5/fullscreen/fullscreen.js: { minified: true }
-  dependencies:
-    - core/ckeditor5
-
 drupal:
   aggregate_target:
     js: 'drupal'
@@ -667,10 +655,10 @@ internal.floating-ui:
   aggregate_target:
     js: true
   remote: https://github.com/floating-ui/floating-ui
-  version: "1.7.6"
+  version: "1.7.4"
   license:
     name: MIT
-    url: https://github.com/floating-ui/floating-ui/blob/@floating-ui/dom@1.7.6/LICENSE
+    url: https://github.com/floating-ui/floating-ui/blob/@floating-ui/dom@1.7.4/LICENSE
     gpl-compatible: true
   js:
     assets/vendor/floating-ui/floating-ui.core.umd.min.js: { minified: true }
