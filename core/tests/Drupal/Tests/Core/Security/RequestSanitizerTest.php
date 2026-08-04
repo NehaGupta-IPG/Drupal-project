@@ -278,8 +278,8 @@ class RequestSanitizerTest extends UnitTestCase {
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertSame($destination, $request->query->get('destination', NULL));
-    $this->assertNull($request->request->get('destination', NULL));
+    $this->assertSame($destination, $request->query->get('destination'));
+    $this->assertNull($request->request->get('destination'));
     $this->assertSame($destination, $_GET['destination']);
     $this->assertSame($destination, $_REQUEST['destination']);
     $this->assertArrayNotHasKey('destination', $_POST);
@@ -299,8 +299,8 @@ class RequestSanitizerTest extends UnitTestCase {
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertNull($request->request->get('destination', NULL));
-    $this->assertNull($request->query->get('destination', NULL));
+    $this->assertNull($request->request->get('destination'));
+    $this->assertNull($request->query->get('destination'));
     $this->assertArrayNotHasKey('destination', $_POST);
     $this->assertArrayNotHasKey('destination', $_REQUEST);
     $this->assertArrayNotHasKey('destination', $_GET);
@@ -308,26 +308,27 @@ class RequestSanitizerTest extends UnitTestCase {
   }
 
   /**
-   * Tests unacceptable destinations are removed from GET requests.
+   * Tests HTTP method override handling during request sanitization.
    */
-  #[TestWith(["POST", FALSE])]
-  #[TestWith(["GET", TRUE])]
-  #[TestWith(["HEAD", TRUE])]
-  #[TestWith(["PUT", FALSE])]
-  #[TestWith(["DELETE", FALSE])]
-  #[TestWith(["CONNECT", FALSE])]
-  #[TestWith(["OPTIONS", TRUE])]
-  #[TestWith(["TRACE", TRUE])]
-  #[TestWith(["PATCH", FALSE])]
-  public function testRequestMethodOverride(string $override, bool $exception): void {
+  #[TestWith(["POST", "POST"])]
+  #[TestWith(["GET", "POST"])]
+  #[TestWith(["HEAD", "POST"])]
+  #[TestWith(["PUT", "PUT"])]
+  #[TestWith(["DELETE", "DELETE"])]
+  #[TestWith(["CONNECT", "POST"])]
+  #[TestWith(["OPTIONS", NULL])]
+  #[TestWith(["QUERY", NULL])]
+  #[TestWith(["TRACE", "POST"])]
+  #[TestWith(["PATCH", "PATCH"])]
+  public function testRequestMethodOverride(string $override, ?string $expected): void {
     $request = $this->createRequestForTesting();
     $request->server->set('REQUEST_METHOD', 'POST');
     $request->headers->set('X-HTTP-Method-Override', $override);
-    if ($exception) {
+    if (!$expected) {
       $this->expectException(BadRequestHttpException::class);
     }
     $request = RequestSanitizer::sanitize($request, []);
-    $this->assertEquals($override, $request->getMethod());
+    $this->assertSame($expected, $request->getMethod());
   }
 
   /**
@@ -343,8 +344,8 @@ class RequestSanitizerTest extends UnitTestCase {
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertSame($destination, $request->request->get('destination', NULL));
-    $this->assertNull($request->query->get('destination', NULL));
+    $this->assertSame($destination, $request->request->get('destination'));
+    $this->assertNull($request->query->get('destination'));
     $this->assertSame($destination, $_POST['destination']);
     $this->assertSame($destination, $_REQUEST['destination']);
     $this->assertArrayNotHasKey('destination', $_GET);
@@ -364,8 +365,8 @@ class RequestSanitizerTest extends UnitTestCase {
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertNull($request->request->get('destination', NULL));
-    $this->assertNull($request->query->get('destination', NULL));
+    $this->assertNull($request->request->get('destination'));
+    $this->assertNull($request->query->get('destination'));
     $this->assertArrayNotHasKey('destination', $_POST);
     $this->assertArrayNotHasKey('destination', $_REQUEST);
     $this->assertArrayNotHasKey('destination', $_GET);

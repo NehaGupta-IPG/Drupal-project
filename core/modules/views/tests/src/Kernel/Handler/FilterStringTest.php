@@ -14,7 +14,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the core Drupal\views\Plugin\views\filter\StringFilter handler.
  */
 #[Group('views')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class FilterStringTest extends ViewsKernelTestBase {
 
@@ -981,7 +980,7 @@ class FilterStringTest extends ViewsKernelTestBase {
    * Returns a set of grouped exposed filters.
    */
   protected function getGroupedExposedFilters(): array {
-    $filters = [
+    return [
       'name' => [
         'id' => 'name',
         'plugin_id' => 'string',
@@ -1090,7 +1089,6 @@ class FilterStringTest extends ViewsKernelTestBase {
         ],
       ],
     ];
-    return $filters;
   }
 
 }

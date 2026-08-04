@@ -19,21 +19,17 @@ use Symfony\Component\Validator\Attribute\HasNamedArguments;
 )]
 class ExtensionNameConstraint extends RegexConstraint {
 
-  #[HasNamedArguments]
   public function __construct(
-    string|array|NULL $pattern,
     ?string $message = 'This value is not a valid extension name.',
     ?string $htmlPattern = NULL,
     ?bool $match = NULL,
     ?callable $normalizer = NULL,
     ?array $groups = NULL,
     mixed $payload = NULL,
-    ?array $options = NULL,
   ) {
     // Always use the regular expression that ExtensionDiscovery uses to find
     // valid extensions.
-    $pattern = ExtensionDiscovery::PHP_FUNCTION_PATTERN;
-    parent::__construct($pattern, $message, $htmlPattern, $match, $normalizer, $groups, $payload, $options);
+    parent::__construct(ExtensionDiscovery::PHP_FUNCTION_PATTERN, $message, $htmlPattern, $match, $normalizer, $groups, $payload);
   }
 
 }

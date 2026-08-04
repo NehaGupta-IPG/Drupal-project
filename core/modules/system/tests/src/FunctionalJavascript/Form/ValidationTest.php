@@ -30,21 +30,6 @@ class ValidationTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->writeSettings([
-      'settings' => [
-        'enable_html5_validation' => (object) [
-          'value' => FALSE,
-          'required' => TRUE,
-        ],
-      ],
-    ]);
-  }
-
-  /**
    * Tests partial form validation through #limit_validation_errors.
    */
   public function testValidateLimitErrors(): void {

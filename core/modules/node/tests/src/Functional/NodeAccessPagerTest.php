@@ -7,6 +7,7 @@ namespace Drupal\Tests\node\Functional;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\node\NodeAccessRebuild;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
 use Drupal\node\NodeAccessRebuild;
@@ -24,8 +25,6 @@ class NodeAccessPagerTest extends BrowserTestBase {
 
   /**
    * An user.
-   *
-   * @var \Drupal\user\Entity\User
    */
   protected User $webUser;
 

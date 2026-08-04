@@ -1078,7 +1078,7 @@ class MockInstantiationService {
   /**
    * @var mixed[]
    */
-  protected $arguments;
+  protected array $arguments;
 
   /**
    * Construct a mock instantiation service.
@@ -1093,7 +1093,7 @@ class MockInstantiationService {
    * @return mixed[]
    *   Return the passed arguments.
    */
-  public function getArguments() {
+  public function getArguments(): array {
     return $this->arguments;
   }
 
@@ -1126,7 +1126,7 @@ class MockService {
   protected $someOtherParameter;
 
   /**
-   * @var string
+   * A property.
    */
   public string $someProperty;
 
@@ -1219,9 +1219,8 @@ class MockService {
    */
   public static function getFactoryMethod($class, $arguments = []) {
     $r = new \ReflectionClass($class);
-    $service = ($r->getConstructor() === NULL) ? $r->newInstance() : $r->newInstanceArgs($arguments);
 
-    return $service;
+    return ($r->getConstructor() === NULL) ? $r->newInstance() : $r->newInstanceArgs($arguments);
   }
 
 }

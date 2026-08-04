@@ -100,7 +100,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     // Resize window due to bug in Chromedriver when clicking on overlays over
     // iFrames.
     // @see https://bugs.chromium.org/p/chromedriver/issues/detail?id=2758
-    $this->getSession()->resizeWindow(1200, 1200);
+    $this->getSession()->resizeWindow(1200, 1339);
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -318,24 +318,6 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
   protected function getElementVerticalPosition($css_selector, $position_type): int {
     $this->assertContains($position_type, ['top', 'bottom'], 'Expected position type.');
     return (int) $this->getSession()->evaluateScript("document.querySelector('$css_selector').getBoundingClientRect().$position_type + window.pageYOffset");
-  }
-
-  /**
-   * Moves mouse pointer to location of $selector.
-   *
-   * @param string $selector
-   *   CSS selector.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
-   *   $this->getSession()->getDriver()->mouseOver() instead.
-   *
-   * @see https://www.drupal.org/node/3460567
-   */
-  protected function movePointerTo($selector): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use $this->getSession()->getDriver()->mouseOver() instead. See https://www.drupal.org/node/3460567', E_USER_DEPRECATED);
-    $driver_session = $this->getSession()->getDriver()->getWebDriverSession();
-    $element = $driver_session->element('css selector', $selector);
-    $driver_session->moveto(['element' => $element->getID()]);
   }
 
 }

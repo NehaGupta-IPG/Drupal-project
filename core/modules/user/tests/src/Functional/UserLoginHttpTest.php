@@ -88,8 +88,7 @@ class UserLoginHttpTest extends BrowserTestBase {
     if (isset($pass)) {
       $request_body['pass'] = $pass;
     }
-
-    $result = \Drupal::httpClient()->post($user_login_url->toString(), [
+    return \Drupal::httpClient()->post($user_login_url->toString(), [
       'body' => $this->serializer->encode($request_body, $format),
       'headers' => [
         'Accept' => "application/$format",
@@ -97,7 +96,6 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ]);
-    return $result;
   }
 
   /**
@@ -224,7 +222,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       ->setRouteParameter('_format', $format)
       ->setAbsolute();
 
-    $result = \Drupal::httpClient()->post($password_reset_url->toString(), [
+    return \Drupal::httpClient()->post($password_reset_url->toString(), [
       'body' => $this->serializer->encode($request_body, $format),
       'headers' => [
         'Accept' => "application/$format",
@@ -232,8 +230,6 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ]);
-
-    return $result;
   }
 
   /**
@@ -271,7 +267,7 @@ class UserLoginHttpTest extends BrowserTestBase {
    * @return mixed
    *   The value for the key.
    */
-  protected function getResultValue(ResponseInterface $response, $key, $format) {
+  protected function getResultValue(ResponseInterface $response, mixed $key, string $format) {
     $decoded = $this->serializer->decode((string) $response->getBody(), $format);
     if (is_array($decoded)) {
       return $decoded[$key];
@@ -460,9 +456,7 @@ class UserLoginHttpTest extends BrowserTestBase {
       'http_errors' => FALSE,
       'cookies' => $this->cookies,
     ];
-
-    $response = $client->post($user_logout_url->toString(), $post_options);
-    return $response;
+    return $client->post($user_logout_url->toString(), $post_options);
   }
 
   /**

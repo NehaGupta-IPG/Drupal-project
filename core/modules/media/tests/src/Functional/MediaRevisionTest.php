@@ -203,7 +203,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
    * @return \Drupal\media\MediaInterface
    *   A media object with up to date revision information.
    */
-  protected function createMediaRevision(MediaInterface $media) {
+  protected function createMediaRevision(MediaInterface $media): MediaInterface {
     $media->setName($this->randomMachineName());
     $media->setNewRevision();
     $media->save();
@@ -303,7 +303,6 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
    * Tests reverting a revision.
    */
   public function testRevisionRevert(): void {
-    /** @var \Drupal\user\UserInterface $user */
     $user = $this->drupalCreateUser([
       'edit any test media',
       'view any test media revisions',

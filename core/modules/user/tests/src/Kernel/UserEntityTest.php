@@ -110,22 +110,6 @@ class UserEntityTest extends KernelTestBase {
   }
 
   /**
-   * Tests that accessing the password property is correctly deprecated.
-   */
-  #[IgnoreDeprecations]
-  public function testPasswordProperty(): void {
-    /** @var \Drupal\user\Entity\User $user */
-    $user = User::create([
-      'name' => $this->randomMachineName(),
-    ]);
-
-    $user->password = 'password';
-
-    $this->expectUserDeprecationMessage('Getting the password property is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3569185');
-    $this->assertEquals('password', $user->password);
-  }
-
-  /**
    * Tests that ::getLastAccessedTime() returns an integer for a loaded user.
    *
    * @legacy-covers ::getLastAccessedTime

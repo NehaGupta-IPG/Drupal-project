@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalJavascriptTests;
 
+use Behat\Mink\Session;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Tests\WebAssert;
 use PHPUnit\Framework\Attributes\PostCondition;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Runs a browser test using a driver that supports JavaScript.
@@ -51,11 +53,11 @@ abstract class WebDriverTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function initMink() {
+  protected function initMink(): Session {
     if (!is_a($this->minkDefaultDriverClass, DrupalSelenium2Driver::class, TRUE)) {
       throw new \UnexpectedValueException(sprintf("%s has to be an instance of %s", $this->minkDefaultDriverClass, DrupalSelenium2Driver::class));
     }
-    $this->minkDefaultDriverArgs = ['chrome', ['goog:chromeOptions' => ['w3c' => FALSE]], 'http://localhost:4444'];
+    $this->minkDefaultDriverArgs = ['chrome', ['goog:chromeOptions' => ['w3c' => TRUE]], 'http://localhost:4444'];
 
     try {
       return parent::initMink();
@@ -72,7 +74,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installModulesFromClassProperty(ContainerInterface $container) {
+  protected function installModulesFromClassProperty(ContainerInterface $container): void {
     self::$modules = [
       'js_testing_ajax_request_test',
       'js_testing_log_test',
@@ -86,7 +88,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function initFrontPage() {
+  protected function initFrontPage(): void {
     parent::initFrontPage();
     // Set a standard window size so that all javascript tests start with the
     // same viewport.
@@ -131,18 +133,9 @@ abstract class WebDriverTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getMinkDriverArgs() {
+  protected function getMinkDriverArgs(): string|false {
     if ($this->minkDefaultDriverClass === DrupalSelenium2Driver::class) {
-      $json = getenv('MINK_DRIVER_ARGS_WEBDRIVER') ?: parent::getMinkDriverArgs();
-      if (!($json === FALSE || $json === '')) {
-        $args = json_decode($json, TRUE);
-        if (isset($args[0]) && $args[0] === 'chrome' && empty($args[1]['goog:chromeOptions']['w3c'])) {
-          @trigger_error('The "w3c" option for Chrome is deprecated in drupal:11.4.0 and will be forced to TRUE in drupal:12.0.0. See https://www.drupal.org/node/3460567', E_USER_DEPRECATED);
-          $args[1]['goog:chromeOptions']['w3c'] = FALSE;
-        }
-        $json = json_encode($args);
-      }
-      return $json;
+      return getenv('MINK_DRIVER_ARGS_WEBDRIVER') ?: parent::getMinkDriverArgs();
     }
     return parent::getMinkDriverArgs();
   }
@@ -162,7 +155,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    *
    * @see \Behat\Mink\Driver\DriverInterface::evaluateScript()
    */
-  protected function assertJsCondition($condition, $timeout = 10000, $message = '') {
+  protected function assertJsCondition(string $condition, int $timeout = 10000, $message = ''): void {
     $message = $message ?: "JavaScript condition met:\n" . $condition;
     $result = $this->getSession()->getDriver()->wait($timeout, $condition);
     $this->assertTrue($result, $message);
@@ -183,7 +176,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    * @throws \Behat\Mink\Exception\DriverException
    *   When the operation cannot be done.
    */
-  protected function createScreenshot($filename, $set_background_color = TRUE) {
+  protected function createScreenshot($filename, $set_background_color = TRUE): void {
     $session = $this->getSession();
     if ($set_background_color) {
       $session->executeScript("document.body.style.backgroundColor = 'white';");
@@ -201,14 +194,14 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    * @return \Drupal\FunctionalJavascriptTests\WebDriverWebAssert
    *   A new web-assert option for asserting the presence of elements with.
    */
-  public function assertSession($name = NULL) {
+  public function assertSession($name = NULL): WebAssert {
     return new WebDriverWebAssert($this->getSession($name), $this->baseUrl);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function drupalGet($path, array $options = [], array $headers = []) {
+  protected function drupalGet($path, array $options = [], array $headers = []): string {
     $result = parent::drupalGet($path, $options, $headers);
 
     // Wait for all requests to finish.
@@ -252,7 +245,7 @@ EndOfScript;
   /**
    * {@inheritdoc}
    */
-  protected function getHtmlOutputHeaders() {
+  protected function getHtmlOutputHeaders(): string {
     // The webdriver API does not support fetching headers.
     return '';
   }

@@ -109,7 +109,7 @@ class EntityRevisionTestDestination extends EntityRevision {
    *
    * @var \Drupal\migrate\Plugin\migrate\destination\EntityRevision|null
    */
-  private $entity = NULL;
+  private $entity;
 
   /**
    * Sets the test entity.
@@ -128,7 +128,7 @@ class EntityRevisionTestDestination extends EntityRevision {
   /**
    * Gets the test entity ID.
    */
-  public static function getEntityTypeId($plugin_id) {
+  public static function getEntityTypeId($plugin_id): string {
     return 'foo';
   }
 

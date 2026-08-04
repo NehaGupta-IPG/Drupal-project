@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests;
 
 use Behat\Mink\Driver\BrowserKitDriver;
-use Behat\Mink\Element\Element;
 use Behat\Mink\Exception\Exception as MinkException;
 use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
@@ -23,9 +22,7 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use GuzzleHttp\Cookie\CookieJar;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Provides a test case for functional Drupal tests.
@@ -49,7 +46,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @ingroup testing
  */
-abstract class BrowserTestBase extends TestCase {
+abstract class BrowserTestBase extends DrupalTestCase {
 
   use DrupalTestCaseTrait;
   use FunctionalTestSetupTrait;
@@ -74,8 +71,6 @@ abstract class BrowserTestBase extends TestCase {
     createUser as drupalCreateUser;
   }
   use XdebugRequestTrait;
-  use PhpUnitCompatibilityTrait;
-  use ExpectDeprecationTrait;
   use ExtensionListTestTrait;
 
   /**
@@ -170,14 +165,6 @@ abstract class BrowserTestBase extends TestCase {
    * @var array
    */
   protected $originalShutdownCallbacks = [];
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(string $name) {
-    parent::__construct($name);
-    $this->setRunTestInSeparateProcess(TRUE);
-  }
 
   /**
    * Initializes Mink sessions.
@@ -294,7 +281,7 @@ abstract class BrowserTestBase extends TestCase {
    * @return string|false
    *   The JSON-encoded argument string. False if it is not set.
    */
-  protected function getMinkDriverArgs() {
+  protected function getMinkDriverArgs(): string|false {
     return getenv('MINK_DRIVER_ARGS');
   }
 
@@ -318,7 +305,7 @@ abstract class BrowserTestBase extends TestCase {
    */
   protected function setUp(): void {
     if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
-      @trigger_error('Functional/FunctionalJavascript test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and is throwing an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
+      throw new \Exception('Functional/FunctionalJavascript test classes must specify the #[RunTestsInSeparateProcesses] attribute');
     }
 
     parent::setUp();
@@ -470,10 +457,14 @@ abstract class BrowserTestBase extends TestCase {
    */
   protected function getSessionCookies() {
     $domain = parse_url($this->getUrl(), PHP_URL_HOST);
-    $session_id = $this->getSession()->getCookie($this->getSessionName());
-    $cookies = CookieJar::fromArray([$this->getSessionName() => $session_id], $domain);
+    $session_name = $this->getSessionName();
+    $session_id = $this->getSession()->getCookie($session_name);
 
-    return $cookies;
+    $cookies = [];
+    if ($session_id !== NULL) {
+      $cookies[$session_name] = $session_id;
+    }
+    return CookieJar::fromArray($cookies, $domain);
   }
 
   /**
@@ -501,37 +492,6 @@ abstract class BrowserTestBase extends TestCase {
       return $mink_driver->getClient()->getClient();
     }
     throw new \RuntimeException('The Mink client type ' . get_class($mink_driver) . ' does not support getHttpClient().');
-  }
-
-  /**
-   * Helper function to get the options of select field.
-   *
-   * @param \Behat\Mink\Element\NodeElement|string $select
-   *   Name, ID, or Label of select field to assert.
-   * @param \Behat\Mink\Element\Element $container
-   *   (optional) Container element to check against. Defaults to current page.
-   *
-   * @return array
-   *   Associative array of option keys and values.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is
-   *   no direct replacement.
-   *
-   * @see https://www.drupal.org/node/3523039
-   */
-  protected function getOptions($select, ?Element $container = NULL) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3523039', E_DEPRECATED);
-    if (is_string($select)) {
-      $select = $this->assertSession()->selectExists($select, $container);
-    }
-    $options = [];
-    /** @var \Behat\Mink\Element\NodeElement $option */
-    foreach ($select->findAll('xpath', '//option') as $option) {
-      $label = $option->getText();
-      $value = $option->getAttribute('value') ?: $label;
-      $options[$value] = $label;
-    }
-    return $options;
   }
 
   /**
@@ -630,12 +590,17 @@ abstract class BrowserTestBase extends TestCase {
     $backtrace = debug_backtrace();
     // Find the test class that has the test method.
     while ($caller = Error::getLastCaller($backtrace)) {
-      // If we match PHPUnit's TestCase::runTest, then the previously processed
-      // caller entry is where our test method sits.
-      if (isset($last_caller) && isset($caller['function']) && $caller['function'] === 'PHPUnit\Framework\TestCase->runTest()') {
-        // Return the last caller since that has to be the test class.
-        $caller = $last_caller;
-        break;
+      // If we match PHPUnit's TestCase::runTest or ::invokeTestMethod, then
+      // the previously processed caller entry is where our test method sits.
+      if (isset($last_caller) && isset($caller['function'])) {
+        if (in_array($caller['function'], [
+          'PHPUnit\Framework\TestCase->runTest()',
+          'PHPUnit\Framework\TestCase->invokeTestMethod()',
+        ], TRUE)) {
+          // Return the last caller since that has to be the test class.
+          $caller = $last_caller;
+          break;
+        }
       }
 
       // If the test method is implemented by a test class's parent then the

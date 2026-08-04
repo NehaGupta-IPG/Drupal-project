@@ -37,7 +37,7 @@ abstract class ImageStyleResourceTestBase extends ConfigEntityResourceTestBase {
   protected $effectUuid;
 
   /**
-   * Marks some tests as skipped because XML cannot be deserialized.
+   * {@inheritdoc}
    */
   protected function setUp(): void {
     if ($this->name() === 'testCrud' && static::$format === 'xml') {

@@ -16,14 +16,12 @@ use Symfony\Component\Validator\Attribute\HasNamedArguments;
 )]
 class TaxonomyTermHierarchyConstraint extends CompositeConstraintBase {
 
-  #[HasNamedArguments]
   public function __construct(
-    mixed $options = NULL,
     public string $message = 'You can only change the hierarchy for the <em>published</em> version of this term.',
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
-    parent::__construct($options, $groups, $payload);
+    parent::__construct(groups: $groups, payload: $payload);
   }
 
   /**

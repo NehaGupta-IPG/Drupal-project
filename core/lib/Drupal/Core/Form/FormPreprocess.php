@@ -34,7 +34,7 @@ class FormPreprocess {
     if (empty($element['#attributes']['accept-charset'])) {
       $element['#attributes']['accept-charset'] = "UTF-8";
     }
-    if (!Settings::get('enable_html5_validation', TRUE)) {
+    if (!Settings::get('enable_html5_validation', FALSE)) {
       // Prevent client-side HTML5 validation for usability and accessibility.
       // @see https://www.drupal.org/node/3537128
       $element['#attributes']['novalidate'] = TRUE;

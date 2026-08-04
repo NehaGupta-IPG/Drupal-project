@@ -4,63 +4,27 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Theme;
 
+use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests theme deprecations.
+ * Tests theme file extension deprecations.
  */
 #[Group('Theme')]
 #[RunTestsInSeparateProcesses]
-#[IgnoreDeprecations]
 class ThemeDeprecationTest extends KernelTestBase {
 
   /**
-   * {@inheritdoc}
+   * Tests that .theme deprecations are emitted.
    */
-  protected static $modules = ['module_test_procedural_preprocess'];
-
-  /**
-   * Tests deprecations around template_preprocess functions and include files.
-   */
-  public function testTemplatePreprocessIncludes(): void {
-    $this->expectUserDeprecationMessage('Providing a file for theme hook module_test_procedural_preprocess_theme is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use initial preprocess for template_preprocess instead. See https://www.drupal.org/node/3549500');
-    $this->expectUserDeprecationMessage('Providing template_preprocess_module_test_procedural_preprocess_theme() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use initial preprocess for template_preprocess instead. See https://www.drupal.org/node/3504125');
-    $this->expectUserDeprecationMessage('Providing includes for theme hook module_test_procedural_preprocess_includes is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use initial preprocess for template_preprocess instead. See https://www.drupal.org/node/3549500');
-    $this->expectUserDeprecationMessage('Providing template_preprocess_module_test_procedural_preprocess_includes() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use initial preprocess for template_preprocess instead. See https://www.drupal.org/node/3504125');
-
-    $registry = $this->container->get('theme.registry');
-
-    $theme = $registry->getRuntime()->get('module_test_procedural_preprocess_theme');
-    $this->assertEquals([
-      'file' => 'module_test_procedural_preprocess.theme.inc',
-      'type' => 'module',
-      'theme path' => 'core/modules/system/tests/modules/module_test_procedural_preprocess',
-      'includes' => [
-        'core/modules/system/tests/modules/module_test_procedural_preprocess/module_test_procedural_preprocess.theme.inc',
-      ],
-      'template' => 'module-test-procedural-preprocess-theme',
-      'preprocess functions' => [
-        'template_preprocess_module_test_procedural_preprocess_theme',
-      ],
-      'path' => 'core/modules/system/tests/modules/module_test_procedural_preprocess/templates',
-    ], $theme);
-
-    $theme = $registry->getRuntime()->get('module_test_procedural_preprocess_includes');
-    $this->assertEquals([
-      'type' => 'module',
-      'theme path' => 'core/modules/system/tests/modules/module_test_procedural_preprocess',
-      'includes' => [
-        'core/modules/system/tests/modules/module_test_procedural_preprocess/module_test_procedural_preprocess.additional.inc',
-      ],
-      'template' => 'module-test-procedural-preprocess-includes',
-      'preprocess functions' => [
-        'template_preprocess_module_test_procedural_preprocess_includes',
-      ],
-      'path' => 'core/modules/system/tests/modules/module_test_procedural_preprocess/templates',
-    ], $theme);
+  #[IgnoreDeprecations]
+  public function testThemeExtensionDeprecation(): void {
+    \Drupal::service('theme_installer')->install(['test_theme_discovery_deprecation']);
+    \Drupal::theme()->setActiveTheme(\Drupal::service(ThemeInitializationInterface::class)->initTheme('test_theme_discovery_deprecation'));
+    $this->expectUserDeprecationMessage('Using test_theme_discovery_deprecation.theme is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222');
   }
 
 }

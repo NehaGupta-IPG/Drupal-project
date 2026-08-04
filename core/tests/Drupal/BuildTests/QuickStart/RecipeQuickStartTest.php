@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\BuildTests\QuickStart;
 
-use Drupal\sqlite\Driver\Database\sqlite\Install\Tasks;
 use Drupal\BuildTests\Framework\BuildTestBase;
 use Drupal\Core\Test\TestDatabase;
+use Drupal\sqlite\Driver\Database\sqlite\Install\Tasks;
 use Drupal\Tests\BrowserTestBase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -32,15 +32,11 @@ class RecipeQuickStartTest extends BuildTestBase {
 
   /**
    * The PHP executable path.
-   *
-   * @var string
    */
   protected string $php;
 
   /**
    * A test database object.
-   *
-   * @var \Drupal\Core\Test\TestDatabase
    */
   protected TestDatabase $testDb;
 
@@ -108,8 +104,6 @@ class RecipeQuickStartTest extends BuildTestBase {
         return TRUE;
       }
     });
-    // The progress bar uses STDERR to write messages.
-    $this->assertStringContainsString('Congratulations, you installed Drupal!', $process->getErrorOutput());
     // Ensure the command does not trigger any PHP deprecations.
     $this->assertStringNotContainsStringIgnoringCase('deprecated', $process->getErrorOutput());
     $this->assertNotFalse($port, "Web server running on port $port");
@@ -128,8 +122,8 @@ class RecipeQuickStartTest extends BuildTestBase {
     $response = $guzzle->get('http://127.0.0.1:' . $port, ['cookies' => $cookieJar]);
     $content = (string) $response->getBody();
     $this->assertStringContainsString('Test site ' . $this->testDb->getDatabasePrefix(), $content);
-    // Test content from Standard front page.
-    $this->assertStringContainsString('Congratulations and welcome to the Drupal community.', $content);
+    // Test content from frontpage.
+    $this->assertMatchesRegularExpression('/Powered by\s+Drupal/', strip_tags($content));
 
     // Stop the web server.
     $process->stop();
@@ -154,7 +148,7 @@ class RecipeQuickStartTest extends BuildTestBase {
    *
    * @see \Drupal\Core\File\FileSystemInterface::deleteRecursive()
    */
-  protected function fileUnmanagedDeleteRecursive($path, $callback = NULL): bool {
+  protected function fileUnmanagedDeleteRecursive(string $path, $callback = NULL): bool {
     if (isset($callback)) {
       call_user_func($callback, $path);
     }

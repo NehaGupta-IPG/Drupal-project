@@ -16,15 +16,13 @@ use Symfony\Component\Validator\Attribute\HasNamedArguments;
 )]
 class UserNameUnique extends UniqueFieldConstraint {
 
-  #[HasNamedArguments]
   public function __construct(
-    mixed $options = NULL,
-    ?bool $caseSensitive = NULL,
+    bool $caseSensitive = FALSE,
     $message = 'The username %value is already taken.',
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
-    parent::__construct($options, $caseSensitive, $message, $groups, $payload);
+    parent::__construct($caseSensitive, $message, $groups, $payload);
   }
 
 }

@@ -251,6 +251,6 @@ parameters:
 
   # Can be argon2i, argon2id or 2y (bcrypt). Setting to NULL (~) will use PASSWORD_DEFAULT.
   # See https://www.php.net/password_hash
-  password.algorithm: ~
+  password.algorithm: argon2id
   # Options passed to password_hash. See https://www.php.net/password_hash
   password.options: [ ]

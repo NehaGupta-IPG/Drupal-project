@@ -24,7 +24,7 @@ class PhpPasswordDefaultIntegrationTest extends PasswordTestBase {
   public function testDefaultHashing(): void {
     $password = 'correct horse battery staple';
     $hash = $this->container->get(PasswordInterface::class)->hash($password);
-    $this->assertStringStartsWith(implode(['$', PASSWORD_BCRYPT, '$']), $hash);
+    $this->assertStringStartsWith(implode(['$', PASSWORD_ARGON2ID, '$']), $hash);
   }
 
 }

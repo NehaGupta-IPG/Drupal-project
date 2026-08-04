@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\filter\Functional;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\FilterFormatRepositoryInterface;
@@ -384,32 +383,6 @@ class FilterAdminTest extends BrowserTestBase {
     $this->drupalGet('admin/config/content/formats/manage/basic_html');
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->statusMessageNotContains('The text format Basic HTML has been updated.');
-  }
-
-  /**
-   * Tests whether filter tips page is not HTML escaped.
-   */
-  #[IgnoreDeprecations]
-  public function testFilterTipHtmlEscape(): void {
-    $this->drupalLogin($this->adminUser);
-    global $base_url;
-
-    $site_name_with_markup = 'Filter test <script>alert(\'here\');</script> site name';
-    $this->config('system.site')->set('name', $site_name_with_markup)->save();
-
-    // It is not possible to test the whole filter tip page.
-    // Therefore we test only some parts.
-    $link = '<a href="' . $base_url . '">' . Html::escape($site_name_with_markup) . '</a>';
-    $ampersand = '&amp;';
-    $link_as_code = '<code>' . Html::escape($link) . '</code>';
-    $ampersand_as_code = '<code>' . Html::escape($ampersand) . '</code>';
-
-    $this->drupalGet('filter/tips');
-
-    $this->assertSession()->responseContains('<td class="type">' . $link_as_code . '</td>');
-    $this->assertSession()->responseContains('<td class="get">' . $link . '</td>');
-    $this->assertSession()->responseContains('<td class="type">' . $ampersand_as_code . '</td>');
-    $this->assertSession()->responseContains('<td class="get">' . $ampersand . '</td>');
   }
 
   /**

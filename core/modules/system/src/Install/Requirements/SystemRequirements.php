@@ -34,15 +34,22 @@ class SystemRequirements implements InstallRequirementsInterface {
    */
   public const DRUPAL_CORE_REMOVED_MODULE_LIST = [
     'action' => 'Action UI',
+    'ban' => 'Ban',
     'book' => 'Book',
     'aggregator' => 'Aggregator',
     'ckeditor' => 'CKEditor',
     'color' => 'Color',
+    'contact' => 'Contact',
+    'field_layout' => 'Field Layout',
     'forum' => 'Forum',
     'hal' => 'HAL',
+    'history' => 'History',
+    'migrate_drupal_ui' => 'Migrate Drupal UI',
+    'migrate_drupal' => 'Migrate Drupal',
     'quickedit' => 'Quick Edit',
     'rdf' => 'RDF',
     'statistics' => 'Statistics',
+    'telephone' => 'Telephone',
     'tour' => 'Tour',
     'tracker' => 'Tracker',
   ];
@@ -55,6 +62,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     'classy' => 'Classy',
     'seven' => 'Seven',
     'stable' => 'Stable',
+    'stable9' => 'Stable 9',
   ];
 
   /**

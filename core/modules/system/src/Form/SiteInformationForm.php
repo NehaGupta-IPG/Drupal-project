@@ -5,10 +5,10 @@ namespace Drupal\system\Form;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
-use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
 use Drupal\Core\Path\PathValidatorInterface;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -22,10 +22,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(
   path: '/admin/config/system/site-information',
   name: 'system.site_information_settings',
+  title: new TranslatableMarkup('Basic site settings'),
   requirements: [
     '_permission' => 'administer site configuration',
   ],
-  defaults: ['_title' => new TranslatableMarkup('Basic site settings')],
 )]
 class SiteInformationForm extends ConfigFormBase {
   use RedundantEditableConfigNamesTrait;
@@ -106,11 +106,7 @@ class SiteInformationForm extends ConfigFormBase {
     $form['site_information']['site_mail'] = [
       '#type' => 'email',
       '#title' => $this->t('Email address'),
-      '#config_target' => new ConfigTarget(
-        'system.site',
-        'mail',
-        fromConfig: fn($value) => $value ?: ini_get('sendmail_from'),
-      ),
+      '#config_target' => 'system.site:mail',
       '#description' => $this->t("The <em>From</em> address in automated emails sent during registration and new password requests, and other notifications. (Use an address ending in your site's domain to help prevent this email being flagged as spam.)"),
       '#required' => TRUE,
     ];

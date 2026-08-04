@@ -6,7 +6,6 @@ namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Installer\Form\SelectProfileForm;
 use Drupal\Core\Extension\ModuleWeight;
 
 /**
@@ -21,7 +20,7 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
    *
    * @var string|null|bool
    */
-  protected $profile = NULL;
+  protected $profile;
 
   /**
    * @var bool
@@ -58,7 +57,7 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
 
     if ($this->profile === NULL) {
@@ -140,7 +139,7 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $parameters = parent::installParameters();
 
     // The options that change configuration are disabled when installing from
@@ -151,6 +150,26 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
     unset($parameters['forms']['install_configure_form']['enable_update_status_emails']);
 
     return $parameters;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function visitInstaller(array $query = []): void {
+    if ($this->existingSyncDirectory) {
+      $query['existing_config'] = TRUE;
+    }
+    parent::visitInstaller($query);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpLanguage(): void {
+    if ($this->existingSyncDirectory) {
+      return;
+    }
+    parent::setUpLanguage();
   }
 
   /**
@@ -168,21 +187,6 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
       'rename' => [],
     ];
     $this->assertEquals($expected, $change_list);
-  }
-
-  /**
-   * Installer step: Select installation profile.
-   */
-  protected function setUpProfile() {
-    if ($this->existingSyncDirectory) {
-      $edit = [
-        'profile' => SelectProfileForm::CONFIG_INSTALL_PROFILE_KEY,
-      ];
-      $this->submitForm($edit, $this->translations['Save and continue']);
-    }
-    else {
-      parent::setUpProfile();
-    }
   }
 
 }

@@ -1230,19 +1230,13 @@ class SystemRequirementsHooks {
         ];
       }
 
-      // Warn about HTML5 validation default change in Drupal 12.
-      $enable_html5_validation = Settings::get('enable_html5_validation');
-      if ($enable_html5_validation === TRUE || $enable_html5_validation === NULL) {
-        $description = match($enable_html5_validation) {
-          TRUE => $this->t('The enable_html5_validation setting will be removed in Drupal 13, and HTML5 validation will be disabled on all forms.  Make sure your forms will still work the way you expect before upgrading by setting the value to FALSE in a test environment. See <a href=":url">the change record</a> for more information.', [':url' => 'https://www.drupal.org/node/3537128']),
-          NULL => $this->t('The enable_html5_validation setting is not configured in settings.php. In Drupal 12 this setting will default to FALSE, which means HTML5 validation will be disabled on all forms. Make sure your forms will still work the way you expect before upgrading by setting the value to FALSE in a test environment.  See <a href=":url">the change record</a> for more information.', [':url' => 'https://www.drupal.org/node/3537128']),
-        };
-
+      // Warn about HTML5 validation setting removal in Drupal 13.
+      if (Settings::get('enable_html5_validation') === TRUE) {
         $requirements['enable_html5_validation'] = [
           'title' => $this->t('HTML5 validation'),
           'value' => $this->t('Enabled'),
           'severity' => RequirementSeverity::Warning,
-          'description' => $description,
+          'description' => $this->t('The enable_html5_validation setting will be removed in Drupal 13, and HTML5 validation will be disabled on all forms.  Make sure your forms will still work the way you expect before upgrading by setting the value to FALSE in a test environment. See <a href=":url">the change record</a> for more information.', [':url' => 'https://www.drupal.org/node/3537128']),
         ];
       }
     }
@@ -1572,15 +1566,15 @@ class SystemRequirementsHooks {
     if (count(array_intersect(['argon2id', 'argon2i'], $availableAlgorithms)) > 0) {
       return [
         'title' => $this->t('Password hashing'),
-        'value' => $this->t('Passwords are hashed with the bcrypt algorithm. Drupal 12 will use argon2id by default. It is recommended to <a href=":url">switch</a> to argon2id.', [
-          ':url' => 'https://www.drupal.org/node/3581980',
+        'value' => $this->t('Passwords are hashed with the bcrypt algorithm. It is recommended to <a href=":url">switch</a> to argon2id.', [
+          ':url' => 'https://www.drupal.org/node/3530196',
         ]),
-        'severity' => RequirementSeverity::Info,
+        'severity' => RequirementSeverity::Warning,
       ];
     }
     return [
       'title' => $this->t('Password hashing'),
-      'value' => $this->t('Passwords are hashed with the bcrypt algorithm. Drupal 12 will use argon2id by default. It is recommended to enable <a href=":url">argon2 password hashing</a> in your PHP installation and to switch to argon2id.', [
+      'value' => $this->t('Passwords are hashed with the bcrypt algorithm. It is recommended to enable <a href=":url">argon2 password hashing</a> in your PHP installation and to switch to argon2id.', [
         ':url' => 'https://www.php.net/manual/password.requirements.php',
       ]),
       'severity' => RequirementSeverity::Warning,

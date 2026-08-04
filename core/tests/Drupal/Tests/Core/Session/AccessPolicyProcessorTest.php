@@ -301,13 +301,12 @@ class AccessPolicyProcessorTest extends UnitTestCase {
    * @return array
    *   A list of testAccountSwitcher method arguments.
    */
-  public static function cachingProvider() {
-    $cases = [
+  public static function cachingProvider(): array {
+    return [
       'no-cache' => [FALSE, FALSE],
       'static-cache-hit' => [FALSE, TRUE],
       'db-cache-hit' => [TRUE, FALSE],
     ];
-    return $cases;
   }
 
   /**

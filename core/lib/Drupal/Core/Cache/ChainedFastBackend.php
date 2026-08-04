@@ -292,14 +292,6 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
   /**
    * {@inheritdoc}
    */
-  public function invalidateAll() {
-    $this->consistentBackend->invalidateAll();
-    $this->markAsOutdated();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function garbageCollection() {
     $this->consistentBackend->garbageCollection();
     $this->fastBackend->garbageCollection();

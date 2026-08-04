@@ -100,7 +100,7 @@ class HelpTopicsSyntaxTest extends KernelTestBase implements NodeVisitorInterfac
 
     // Filter out directories outside of core. If you want to run this test
     // on a contrib/custom module, remove the next line.
-    $directories = array_filter($directories, function ($directory) {
+    $directories = array_filter($directories, function ($directory): bool {
       return str_starts_with($directory, 'core');
     });
 
@@ -330,7 +330,7 @@ class HelpTopicsSyntaxTest extends KernelTestBase implements NodeVisitorInterfac
    *   An array of all of the help topic directories for this type of
    *   extension, keyed by extension short name.
    */
-  protected function listDirectories($type) {
+  protected function listDirectories(string $type): array {
     $directories = [];
 
     // Find the extensions of this type, even if they are not installed, but

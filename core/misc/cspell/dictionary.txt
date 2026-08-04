@@ -228,6 +228,7 @@ introspectable
 invalidators
 invokable
 isam
+iterability
 javascripts
 jessebeach
 jqueryui
@@ -258,7 +259,6 @@ longtext
 lrdd
 lstitle
 ltitle
-lzma
 mainpage
 maryjane
 maximumred
@@ -294,7 +294,6 @@ mysqldump
 mystarterkit
 navs
 ndocs
-necolas
 newcol
 newwin
 nids
@@ -413,6 +412,8 @@ smtps
 squaresmall
 squiz
 squizlabs
+srclang
+srcset
 ssess
 starterkit
 statuscode

@@ -15,7 +15,6 @@ use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
@@ -397,18 +396,27 @@ function install_begin_request($class_loader, &$install_state): void {
   // settings will be checked by \Drupal\system\Install\SystemRequirements.
   $install_state['settings_verified'] = $install_state['config_verified'] && $install_state['database_verified'] && (bool) Settings::get('hash_salt', FALSE);
 
+  // Query the database directly for the install_task state entry. This tells us
+  // whether a previous install request made progress, so we know whether to use
+  // the full service container (NormalInstallerServiceProvider) or the minimal
+  // one (InstallerServiceProvider).
   if ($install_state['settings_verified']) {
     try {
-      $system_schema = system_schema();
-      $table = array_key_last($system_schema);
-      $install_state['base_system_verified'] = Database::getConnection()->schema()->tableExists($table);
+      $result = Database::getConnection()
+        ->query("SELECT [value] FROM {key_value} WHERE [collection] = :collection AND [name] = :name", [
+          ':collection' => 'state',
+          ':name' => 'install_task',
+        ])
+        ->fetchField();
+      if ($result !== FALSE) {
+        $install_state['base_system_verified'] = TRUE;
+        $install_state['completed_task'] = unserialize($result);
+      }
     }
-    catch (DatabaseExceptionWrapper) {
-      // The last defined table of the base system_schema() does not exist yet.
+    catch (\Exception) {
+      // Database not set up yet, or key_value table doesn't exist.
       // $install_state['base_system_verified'] defaults to FALSE, so the code
       // following below will use the minimal installer service container.
-      // As soon as the base system is verified here, the installer operates in
-      // a full and regular Drupal environment, without any kind of exceptions.
     }
   }
 
@@ -515,7 +523,18 @@ function install_begin_request($class_loader, &$install_state): void {
     install_verify_database_ready();
   }
   // Verify the last completed task in the database, if there is one.
-  $task = install_verify_completed_task();
+  if ($install_state['base_system_verified']) {
+    // We already queried for install_task before kernel boot. Use the value
+    // we found, but still check for the 'done' state which means Drupal is
+    // already fully installed.
+    $task = $install_state['completed_task'];
+    if ($task === 'done') {
+      throw new AlreadyInstalledException($container->get('string_translation'));
+    }
+  }
+  else {
+    $task = install_verify_completed_task();
+  }
 
   // Ensure that the active configuration is empty before installation starts.
   if ($install_state['config_verified'] && empty($task)) {
@@ -759,8 +778,6 @@ function install_tasks($install_state): array {
       'run' => $needs_download ? INSTALL_TASK_RUN_IF_REACHED : INSTALL_TASK_SKIP,
     ],
     'install_select_profile' => [
-      'display_name' => t('Choose profile'),
-      'display' => empty($install_state['profile_info']['distribution']['name']) && count($install_state['profiles']) != 1,
       'run' => INSTALL_TASK_RUN_IF_REACHED,
     ],
     'install_load_profile' => [
@@ -1165,17 +1182,13 @@ function install_verify_database_settings($site_path) {
  * Verify that the database is ready (no existing Drupal installation).
  *
  * @throws \Drupal\Core\Installer\Exception\AlreadyInstalledException
- *   Thrown when the database already has a table that would be created by
- *   installing the System module.
+ *   Thrown when the database already has a Drupal key_value table.
  */
 function install_verify_database_ready(): void {
-  $system_schema = system_schema();
-  $table = array_key_last($system_schema);
-
   $existing_install = FALSE;
   if (Database::getConnectionInfo()) {
     try {
-      $existing_install = Database::getConnection()->schema()->tableExists($table);
+      $existing_install = Database::getConnection()->schema()->tableExists('key_value');
     }
     // Do not trigger an error if the database query fails, since the database
     // might not be set up yet.
@@ -1224,12 +1237,10 @@ function install_database_errors($database, $settings_file) {
  *   profile will be added here, if it was not already selected previously, as
  *   will a list of all available profiles.
  *
- * @return array|null
- *   For interactive installations, a form allowing the profile to be selected,
- *   if the user has a choice that needs to be made. Otherwise, an exception is
- *   thrown if a profile cannot be chosen automatically.
+ * @throws \Drupal\Core\Installer\Exception\InstallerException
+ *   Thrown if a profile cannot be chosen automatically.
  */
-function install_select_profile(&$install_state) {
+function install_select_profile(&$install_state): void {
   if (!array_key_exists('profile', $install_state['parameters'])) {
     // If there are no profiles at all, installation cannot proceed.
     if (empty($install_state['profiles'])) {
@@ -1244,8 +1255,8 @@ function install_select_profile(&$install_state) {
       if (!$install_state['interactive']) {
         throw new InstallerException('Missing profile parameter.');
       }
-      // Otherwise, display a form to select a profile.
-      return install_get_form('Drupal\Core\Installer\Form\SelectProfileForm', $install_state);
+      // Fall back to the Standard profile.
+      $install_state['parameters']['profile'] ??= 'standard';
     }
   }
 }
@@ -1846,11 +1857,6 @@ function install_finished(&$install_state): void {
     $account = User::load(1);
     user_login_finalize($account);
   }
-
-  $success_message = t('Congratulations, you installed @drupal!', [
-    '@drupal' => drupal_install_profile_distribution_name(),
-  ]);
-  \Drupal::messenger()->addStatus($success_message);
 
   // Record when this install ran.
   \Drupal::state()->set('install_time', \Drupal::time()->getRequestTime());

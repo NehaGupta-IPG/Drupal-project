@@ -63,7 +63,7 @@ class InfoParserUnitTest extends UnitTestCase {
    *   The expected exception message.
    */
   #[DataProvider('providerInfoException')]
-  public function testInfoException($yaml, $expected_exception_message): void {
+  public function testInfoException(string $yaml, string $expected_exception_message): void {
 
     vfsStream::setup('modules');
     vfsStream::create([
@@ -304,7 +304,7 @@ CORE;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerCoreIncompatibility')]
-  public function testCoreIncompatibility($test_case, $constraint, $expected): void {
+  public function testCoreIncompatibility(string $test_case, string $constraint, bool $expected): void {
     $core_incompatibility = <<<CORE_INCOMPATIBILITY
 core_version_requirement: $constraint
 name: common_test
@@ -416,7 +416,7 @@ UNPARSABLE_CORE_VERSION_REQUIREMENT;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerValidLifecycle')]
-  public function testValidLifecycle($lifecycle, $expected): void {
+  public function testValidLifecycle(string $lifecycle, string $expected): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'
@@ -475,7 +475,7 @@ INFO;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerInvalidLifecycle')]
-  public function testInvalidLifecycle($lifecycle, $exception_message): void {
+  public function testInvalidLifecycle(string $lifecycle, string $exception_message): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'
@@ -523,7 +523,7 @@ INFO;
    * @legacy-covers ::parse
    */
   #[DataProvider('providerLifecycleLink')]
-  public function testLifecycleLink($lifecycle, $lifecycle_link = NULL, $exception_message = NULL): void {
+  public function testLifecycleLink(string $lifecycle, ?string $lifecycle_link = NULL, ?string $exception_message = NULL): void {
     $info = <<<INFO
 package: Core
 core_version_requirement: '*'

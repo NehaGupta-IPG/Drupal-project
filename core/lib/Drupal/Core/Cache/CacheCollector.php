@@ -73,16 +73,14 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
   protected $storage = [];
 
   /**
-   * Stores the cache creation time.
+   * The cache item's data as loaded during this request, or NULL if none.
    *
-   * @var int
-   *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. If checking
-   * whether the cache item was loaded, you can check the loadedData property
-   * instead.
-   * @see https://www.drupal.org/project/drupal/issues/3496328
+   * Retained so that ::updateCache() can fingerprint it to detect a concurrent
+   * change. The fingerprint is computed lazily there, and only when there is
+   * data to write back, so that requests that only read from the collector do
+   * not pay for hashing.
    */
-  protected $cacheCreated;
+  protected ?array $loadedData = NULL;
 
   /**
    * The cache item's data as loaded during this request, or NULL if none.
@@ -349,8 +347,6 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
     $this->cacheLoaded = TRUE;
 
     if ($cache = $this->cache->get($this->getCid())) {
-      // @phpstan-ignore property.deprecated
-      $this->cacheCreated = $cache->created;
       $this->storage = $cache->data;
       // Retain the loaded data so that ::updateCache() can detect whether the
       // cache item changed during the request. The fingerprint is computed

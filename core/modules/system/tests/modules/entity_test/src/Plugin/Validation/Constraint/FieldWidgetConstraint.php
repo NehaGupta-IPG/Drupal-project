@@ -18,14 +18,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class FieldWidgetConstraint extends SymfonyConstraint {
 
-  #[HasNamedArguments]
   public function __construct(
-    mixed $options = NULL,
     public string $message = 'Widget constraint has failed.',
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
-    parent::__construct($options, $groups, $payload);
+    parent::__construct(groups: $groups, payload: $payload);
   }
 
 }

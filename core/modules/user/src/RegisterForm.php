@@ -63,8 +63,13 @@ class RegisterForm extends AccountForm {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $admin = $form_state->getValue('administer_users');
+    $notify = !$form_state->isValueEmpty('notify');
 
-    if (!\Drupal::config('user.settings')->get('verify_mail') || $admin) {
+    // Use the submitted password only when the password field is accessible:
+    // either self-registration with email verification disabled, or admin
+    // creation without the notification checkbox. In all other cases, generate
+    // a random password so the user must set their own via email.
+    if (($admin && !$notify) || !\Drupal::config('user.settings')->get('verify_mail')) {
       $pass = $form_state->getValue('pass');
     }
     else {
@@ -85,7 +90,6 @@ class RegisterForm extends AccountForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $account = $this->entity;
-    $pass = $account->getPassword();
     $admin = $form_state->getValue('administer_users');
     $notify = !$form_state->isValueEmpty('notify');
 
@@ -102,9 +106,6 @@ class RegisterForm extends AccountForm {
         '%email' => '<' . $form_state->getValue('mail') . '>',
         'type' => $account->toLink($this->t('Edit'), 'edit-form')->toString(),
       ]);
-
-    // Add plain text password into user account to generate mail tokens.
-    $account->password = $pass;
 
     // New administrative account without notification.
     if ($admin && !$notify) {

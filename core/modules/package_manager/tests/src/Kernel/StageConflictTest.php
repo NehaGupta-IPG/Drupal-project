@@ -144,7 +144,7 @@ class StageConflictTest extends PackageManagerKernelTestBase {
       $event->sandboxManager->destroy($force);
       LoggingCommitter::setException(
         PreconditionException::class,
-        $this->createMock(PreconditionInterface::class),
+        $this->createStub(PreconditionInterface::class),
         $this->createComposeStagerMessage('Stage directory does not exist'),
       );
     };
@@ -242,7 +242,7 @@ class TestTime extends Time {
   /**
    * {@inheritdoc}
    */
-  public function getRequestTime() {
+  public function getRequestTime(): float|int|array {
     return parent::getRequestTime() + static::$offset;
   }
 

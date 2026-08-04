@@ -101,7 +101,7 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertEquals(array_values($modules_enabled), $module_list);
 
     // Get the container another time, simulating a "production" environment.
-    $container = $this->getTestKernel($request, NULL)
+    $container = $this->getTestKernel($request)
       ->getContainer();
 
     $refClass = new \ReflectionClass($container);
@@ -179,7 +179,7 @@ class DrupalKernelTest extends KernelTestBase {
 
     $build_only = array_filter(
       array_keys($container->getParameterBag()->all()),
-      fn(string $name) => str_starts_with($name, '.'),
+      fn(string $name): bool => str_starts_with($name, '.'),
     );
     $this->assertEmpty($build_only, sprintf(
       'Dot-prefixed build parameters should not be in the compiled container, but found: %s',
@@ -264,7 +264,7 @@ class DrupalKernelTest extends KernelTestBase {
   #[DataProvider('providerClassLoaderAutoDetect')]
   #[PreserveGlobalState(FALSE)]
   #[RunInSeparateProcess]
-  public function testClassLoaderAutoDetect($value): void {
+  public function testClassLoaderAutoDetect(bool $value): void {
     // Create a virtual file system containing items that should be
     // excluded. Exception being modules directory.
     vfsStream::setup('root', NULL, [

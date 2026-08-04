@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Build;
 
+use Behat\Mink\Mink;
 use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
 use Drupal\BuildTests\QuickStart\QuickStartTestBase;
@@ -36,29 +37,21 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
 
   /**
    * The web root of the test site, relative to the workspace directory.
-   *
-   * @var string
    */
   private string $webRoot;
 
   /**
    * The project root of the test site, relative to the workspace directory.
-   *
-   * @var string
    */
   const string PROJECT_ROOT_RELATIVE = 'project/';
 
   /**
    * A secondary server instance, to serve XML metadata about available updates.
-   *
-   * @var \Symfony\Component\Process\Process
    */
   private Process $metadataServer;
 
   /**
    * All output that the PHP web server logs to the error buffer.
-   *
-   * @var string
    */
   private string $serverErrorLog = '';
 
@@ -89,7 +82,9 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    $this->metadataServer?->stop();
+    if (isset($this->metadataServer)) {
+      $this->metadataServer?->stop();
+    }
     parent::tearDown();
   }
 
@@ -151,7 +146,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function instantiateServer($port, $working_dir = NULL) {
+  protected function instantiateServer(int $port, ?string $working_dir = NULL): Process {
     $working_dir = $working_dir ?: $this->webRoot;
     $finder = new PhpExecutableFinder();
     $working_path = $this->getWorkingPath($working_dir);
@@ -170,7 +165,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
     $ps = new Process($server, $working_path);
     $ps->setIdleTimeout(30)
       ->setTimeout(30)
-      ->start(function ($output_type, $output): void {
+      ->start(function ($output_type, string $output): void {
         if ($output_type === Process::ERR) {
           $this->serverErrorLog .= $output;
         }
@@ -207,7 +202,7 @@ END;
   /**
    * {@inheritdoc}
    */
-  public function visit($request_uri = '/', $working_dir = NULL) {
+  public function visit(string $request_uri = '/', $working_dir = NULL): Mink {
     return parent::visit($request_uri, $working_dir ?: $this->webRoot);
   }
 
@@ -228,7 +223,7 @@ END;
    * @param string $working_directory
    *   (optional) The Composer working directory. Defaults to 'project'.
    */
-  protected function addRepository(string $name, string $path, $working_directory = 'project'): void {
+  protected function addRepository(string $name, string $path, ?string $working_directory = 'project'): void {
     $this->assertDirectoryExists($path);
 
     $repository = json_encode([
@@ -440,7 +435,7 @@ END;
       // versions that are newer than the ones being polyfilled, which means we
       // won't be able to build our test project because these polyfills aren't
       // available in the local code base. Since we're guaranteed to be on PHP
-      // 8.3 or later, no package should need to polyfill older versions.
+      // 8.5 or later, no package should need to polyfill older versions.
       unset(
         $requirements['symfony/polyfill-php72'],
         $requirements['symfony/polyfill-php73'],
@@ -449,8 +444,8 @@ END;
         $requirements['symfony/polyfill-php81'],
         $requirements['symfony/polyfill-php82'],
         $requirements['symfony/polyfill-php83'],
-        // Needed for PHP 8.4 features while PHP 8.3 is the minimum.
         $requirements['symfony/polyfill-php84'],
+        $requirements['symfony/polyfill-php85'],
       );
       // If this package requires any Drupal core packages, ensure it allows
       // any version.
@@ -743,7 +738,7 @@ END;
   /**
    * {@inheritdoc}
    */
-  public function copyCodebase(?\Iterator $iterator = NULL, $working_dir = NULL): void {
+  public function copyCodebase(?\Iterator $iterator = NULL, ?string $working_dir = NULL): void {
     parent::copyCodebase($iterator, $working_dir);
 
     // Create a local Composer repository for all third-party dependencies and

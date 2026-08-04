@@ -42,11 +42,9 @@ class SmartDefaultSettingsTest extends KernelTestBase {
    *
    * The updated Text Format & Text Editors are explicitly checked.
    *
-   * @var bool
-   *
    * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
    */
-  protected $strictConfigSchema = FALSE;
+  protected bool $strictConfigSchema = FALSE;
 
   /**
    * The manager for "CKEditor 5 plugin" plugins.
@@ -70,23 +68,12 @@ class SmartDefaultSettingsTest extends KernelTestBase {
   protected $smartDefaultSettings;
 
   /**
-   * The database connection used.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
    * The service name for a logger implementation that collects anything logged.
-   *
-   * @var string
    */
   protected string $testLogServiceName = 'smart_default_settings_test.logger';
 
   /**
    * The message's placeholders parser.
-   *
-   * @var \Drupal\Core\Logger\LogMessageParserInterface
    */
   protected LogMessageParserInterface $parser;
 
@@ -587,7 +574,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
    * @return \Generator
    *   Test scenarios.
    */
-  public static function provider() {
+  public static function provider(): \Iterator {
     $basic_html_test_case = [
       'format_id' => 'basic_html',
       'filters_to_drop' => [],

@@ -1570,45 +1570,6 @@ class ClaroHooks {
   }
 
   /**
-   * Implements hook_preprocess_HOOK() for block_content_add_list.
-   *
-   * Makes block_content_add_list variables compatible with entity_add_list.
-   *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use entity_add_list instead.
-   *
-   * @see https://www.drupal.org/node/3530643
-   */
-  #[Hook('preprocess_block_content_add_list')]
-  public function preprocessBlockContentAddList(&$variables): void {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use entity_add_list instead. See https://www.drupal.org/node/3530643', E_USER_DEPRECATED);
-    if (!empty($variables['content'])) {
-      $query = \Drupal::request()->query->all();
-      /** @var \Drupal\block_content\BlockContentTypeInterface $type */
-      foreach ($variables['content'] as $type) {
-        $label = $type->label();
-        $description = $type->getDescription();
-        $type_id = $type->id();
-        $add_url = Url::fromRoute('block_content.add_form', [
-          'block_content_type' => $type_id,
-        ], [
-          'query' => $query,
-        ]);
-        $variables['bundles'][$type_id] = [
-          'label' => $label,
-          'add_link' => Link::fromTextAndUrl($label, $add_url),
-          'description' => [],
-        ];
-
-        if (!empty($description)) {
-          $variables['bundles'][$type_id]['description'] = [
-            '#markup' => $description,
-          ];
-        }
-      }
-    }
-  }
-
-  /**
    * Helper pre-process callback for file_managed_file and image_widget.
    *
    * @param array $variables

@@ -499,7 +499,7 @@
  * There are two ways to remove an item from the cache:
  * - Deletion (using delete(), deleteMultiple() or deleteAll()) permanently
  *   removes the item from the cache.
- * - Invalidation (using invalidate(), invalidateMultiple() or invalidateAll())
+ * - Invalidation (using invalidate() or invalidateMultiple())
  *   is a "soft" delete that only marks items as "invalid", meaning "not fresh"
  *   or "not fresh enough". Invalid items are not usually returned from the
  *   cache, so in most ways they behave as if they have been deleted. However,
@@ -1621,8 +1621,7 @@
  * - Module weight.
  * - Alphabetical by module name.
  * - This order can be modified by using the order parameter on the #[Hook]
- *   attribute, using the #[ReorderHook] attribute, or implementing the legacy
- *   hook_module_implements_alter.
+ *   attribute, using the #[ReorderHook] attribute.
  *
  * @section implementing Implementing a hook
  *
@@ -1671,11 +1670,6 @@
  *
  * The following hooks can not be implemented as a class method, and must be
  * implemented as procedural:
- *
- * Legacy meta hooks:
- * - hook_hook_info()
- * - hook_module_implements_alter()
- * @see \Drupal\Core\Hook\Attribute\LegacyModuleImplementsAlter
  *
  * Install hooks:
  * - hook_install()

@@ -21,8 +21,8 @@ class NodeHelpHooks {
   use StringTranslationTrait;
 
   public function __construct(
-    protected readonly NodeAccessRebuild $nodeAccessRebuild,
     protected readonly EntityDisplayRepositoryInterface $entityDisplayRepository,
+    protected readonly NodeAccessRebuild $nodeAccessRebuild,
   ) {}
 
   /**

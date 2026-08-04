@@ -71,14 +71,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @see \Drupal\rest\Entity\RestResourceConfig::__construct()
    */
-  protected static $resourceConfigId = NULL;
+  protected static $resourceConfigId;
 
   /**
    * The account to use for authentication, if any.
    *
    * @var null|\Drupal\Core\Session\AccountInterface
    */
-  protected $account = NULL;
+  protected $account;
 
   /**
    * The REST resource config entity storage.
@@ -172,7 +172,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Refreshes the state of the tester to be in sync with the testee.
    *
    * Should be called after every change made to:
-   * - RestResourceConfig entities
+   * - RestResourceConfig entities.
    */
   protected function refreshTestStateAfterRestConfigChange() {
     // Ensure that the cache tags invalidator has its internal values reset.
@@ -216,6 +216,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param string $method
    *   The HTTP method for which to set up authentication.
    *
+   * @return void
+   *   Returns nothing.
+   *
    * @see ::grantPermissionsToAnonymousRole()
    * @see ::grantPermissionsToAuthenticatedRole()
    */
@@ -228,6 +231,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   HTTP method.
    * @param \Psr\Http\Message\ResponseInterface $response
    *   The response to assert.
+   *
+   * @return void
+   *   Returns nothing.
    */
   abstract protected function assertResponseWhenMissingAuthentication($method, ResponseInterface $response);
 
@@ -242,6 +248,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
+   *
+   * @return void
+   *   Returns nothing.
    *
    * @see \GuzzleHttp\ClientInterface::request()
    */
@@ -259,6 +268,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param array $request_options
    *   Request options to apply.
    *
+   * @return void
+   *   Returns nothing.
+   *
    * @see \GuzzleHttp\ClientInterface::request()
    */
   abstract protected function assertAuthenticationEdgeCases($method, Url $url, array $request_options);
@@ -275,6 +287,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Initializes authentication.
    *
    * E.g. for cookie authentication, we first need to get a cookie.
+   *
+   * @return void
+   *   Returns nothing.
    */
   protected function initAuthentication() {}
 

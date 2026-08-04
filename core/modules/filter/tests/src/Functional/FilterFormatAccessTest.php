@@ -160,34 +160,6 @@ class FilterFormatAccessTest extends BrowserTestBase {
   }
 
   /**
-   * Tests the filter tips functionality.
-   */
-  #[IgnoreDeprecations]
-  public function testFilterTips(): void {
-    // Check regular user access to the filter tips pages.
-    $this->drupalLogin($this->webUser);
-    $this->drupalGet('filter/tips/' . $this->allowedFormat->id());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/' . $this->disallowedFormat->id());
-    $this->assertSession()->statusCodeEquals(403);
-    $this->drupalGet('filter/tips/' . filter_fallback_format());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/invalid-format');
-    $this->assertSession()->statusCodeEquals(404);
-
-    // Check admin user access to the filter tips pages.
-    $this->drupalLogin($this->adminUser);
-    $this->drupalGet('filter/tips/' . $this->allowedFormat->id());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/' . $this->disallowedFormat->id());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/' . filter_fallback_format());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/invalid-format');
-    $this->assertSession()->statusCodeEquals(404);
-  }
-
-  /**
    * Tests if text format is available to a role.
    */
   public function testFormatRoles(): void {

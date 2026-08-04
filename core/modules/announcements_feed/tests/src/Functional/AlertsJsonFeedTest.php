@@ -33,8 +33,6 @@ class AlertsJsonFeedTest extends BrowserTestBase {
 
   /**
    * A user with permission to access toolbar and access announcements.
-   *
-   * @var \Drupal\user\UserInterface
    */
   protected UserInterface $user;
 
@@ -42,10 +40,6 @@ class AlertsJsonFeedTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   public function setUp():void {
-    if ($this->name() === 'testAnnounceFeedUpdatedAndRemoved') {
-      $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
-    }
-
     parent::setUp();
 
     $this->user = $this->drupalCreateUser(
@@ -55,6 +49,13 @@ class AlertsJsonFeedTest extends BrowserTestBase {
     );
 
     AnnounceTestHttpClientMiddleware::setAnnounceTestEndpoint('/announce-feed-json/community-feeds');
+
+    // Change the version constraint in the updated json feed.
+    $contents = file_get_contents(dirname(__DIR__, 2) . '/announce_feed/updated.json');
+    $version = explode('.', \Drupal::VERSION, 2);
+    $constraint = "^$version[0]";
+    $new_contents = str_replace("^10", $constraint, $contents);
+    file_put_contents($this->publicFilesDirectory . '/updated.json', $new_contents);
   }
 
   /**

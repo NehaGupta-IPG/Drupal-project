@@ -4,6 +4,7 @@ parameters:
 services:
   _defaults:
     autoconfigure: true
+    autowire: true
   plugin.manager.editor:
     class: Drupal\editor\Plugin\EditorManager
     parent: default_plugin_manager
@@ -11,10 +12,7 @@ services:
       $entityTypeManager: '@entity_type.manager'
   element.editor:
     class: Drupal\editor\Element
-    arguments: ['@plugin.manager.editor', '@module_handler']
   Drupal\editor\Element: '@element.editor'
   editor.config_translation_mapper_subscriber:
     class: Drupal\editor\EventSubscriber\EditorConfigTranslationSubscriber
-    arguments: ['@config.factory']
-  Drupal\editor\EditorImageUploadSettings:
-    autowire: true
+  Drupal\editor\EditorImageUploadSettings: ~

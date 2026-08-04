@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Component\Datetime\Time;
+use Drupal\Core\Access\CheckProviderInterface;
 use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Discovery\YamlDiscovery;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\Routing\MatcherDumperInterface;
 use Drupal\Core\Routing\RouteBuilder;
 use Drupal\Core\Routing\RouteBuildEvent;
 use Drupal\Core\Routing\RouteCompiler;
@@ -15,8 +20,11 @@ use Drupal\Core\Routing\RoutingEvents;
 use Drupal\Core\Routing\YamlRouteDiscovery;
 use Drupal\Core\Utility\YamlCacheCollector;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -38,18 +46,14 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
   protected $routeBuilder;
 
   /**
-   * The mocked matcher dumper.
-   *
-   * @var \Drupal\Core\Routing\MatcherDumperInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The matcher dumper.
    */
-  protected $dumper;
+  protected MatcherDumperInterface&Stub $dumper;
 
   /**
    * The mocked lock backend.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $lock;
+  protected LockBackendInterface&MockObject $lock;
 
   /**
    * The mocked event dispatcher.
@@ -60,29 +64,38 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
 
   /**
    * The mocked YAML discovery.
-   *
-   * @var \Drupal\Core\Discovery\YamlDiscovery|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $yamlDiscovery;
+  protected YamlDiscovery&MockObject $yamlDiscovery;
 
   /**
    * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * The controller resolver.
-   *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $controllerResolver;
+  protected ControllerResolverInterface&Stub $controllerResolver;
 
   /**
-   * @var \Drupal\Core\Access\CheckProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The check provider.
    */
-  protected $checkProvider;
+  protected CheckProviderInterface $checkProvider;
+
+  /**
+   * The route collection that the dynamic and alter events expect to receive.
+   */
+  protected RouteCollection $expectedRouteCollection;
+
+  /**
+   * Indicates whether the dynamic event was fired.
+   */
+  protected bool $dynamicFired = FALSE;
+
+  /**
+   * Indicates whether the alter event was fired.
+   */
+  protected bool $alterFired = FALSE;
 
   /**
    * The route collection that the dynamic and alter events expect to receive.
@@ -105,15 +118,15 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
   protected function setUp(): void {
     parent::setUp();
 
-    $this->dumper = $this->createMock('Drupal\Core\Routing\MatcherDumperInterface');
+    $this->dumper = $this->createStub(MatcherDumperInterface::class);
     $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
     $this->dispatcher = new EventDispatcher();
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $this->controllerResolver = $this->createMock('Drupal\Core\Controller\ControllerResolverInterface');
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
+    $this->controllerResolver = $this->createStub(ControllerResolverInterface::class);
     $this->yamlDiscovery = $this->getMockBuilder('\Drupal\Core\Discovery\YamlDiscovery')
       ->disableOriginalConstructor()
       ->getMock();
-    $this->checkProvider = $this->createMock('\Drupal\Core\Access\CheckProviderInterface');
+    $this->checkProvider = $this->createStub(CheckProviderInterface::class);
 
     $time = new Time();
     $cache_backend = new MemoryBackend($time);
@@ -124,6 +137,24 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
     $this->dispatcher->addSubscriber($this);
     $this->dispatcher->addSubscriber($yamlRouteDiscovery);
     $this->routeBuilder = new RouteBuilder($this->dumper, $this->lock, $this->dispatcher, $this->checkProvider);
+  }
+
+  /**
+   * Reinitializes the matcher dumper as a mock object.
+   */
+  protected function setUpMockMatcherDumper(): void {
+    $this->dumper = $this->createMock(MatcherDumperInterface::class);
+    $reflection = new \ReflectionProperty($this->routeBuilder, 'dumper');
+    $reflection->setValue($this->routeBuilder, $this->dumper);
+  }
+
+  /**
+   * Reinitializes the check provider as a mock object.
+   */
+  protected function setUpMockCheckProvider(): void {
+    $this->checkProvider = $this->createMock(CheckProviderInterface::class);
+    $reflection = new \ReflectionProperty($this->routeBuilder, 'checkProvider');
+    $reflection->setValue($this->routeBuilder, $this->checkProvider);
   }
 
   /**
@@ -140,7 +171,7 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
       ->method('release')
       ->with('router_rebuild');
 
-    $this->yamlDiscovery->expects($this->any())
+    $this->yamlDiscovery->expects($this->once())
       ->method('findAll')
       ->willReturn([]);
 
@@ -179,6 +210,9 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
    * @see \Drupal\Core\Routing\RouteBuilder::rebuild()
    */
   public function testRebuildWithStaticModuleRoutes(): void {
+    $this->setUpMockCheckProvider();
+    $this->setUpMockMatcherDumper();
+
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('router_rebuild')
@@ -221,6 +255,9 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
    * @see \Drupal\Core\Routing\RouteBuilder::rebuild()
    */
   public function testRebuildWithProviderBasedRoutes(): void {
+    $this->setUpMockCheckProvider();
+    $this->setUpMockMatcherDumper();
+
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('router_rebuild')
@@ -239,9 +276,9 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
 
     $container = new ContainerBuilder();
     $container->set('test_module.route_service', new TestRouteSubscriber());
-    $this->controllerResolver->expects($this->any())
+    $this->controllerResolver
       ->method('getControllerFromDefinition')
-      ->willReturnCallback(function ($controller) use ($container) {
+      ->willReturnCallback(function ($controller) use ($container): array {
         $count = substr_count($controller, ':');
         if ($count == 1) {
           [$service, $method] = explode(':', $controller, 2);
@@ -291,7 +328,7 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
       ->method('release')
       ->with('router_rebuild');
 
-    $this->yamlDiscovery->expects($this->any())
+    $this->yamlDiscovery->expects($this->once())
       ->method('findAll')
       ->willReturn([]);
 
@@ -351,8 +388,9 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
   }
 
   #[IgnoreDeprecations]
+  #[AllowMockObjectsWithoutExpectations]
   public function testDeprecatedConstructorArgs(): void {
-    $this->expectDeprecation('Calling Drupal\Core\Routing\RouteBuilder::__construct() with the module handler and controller resolver services is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3324751');
+    $this->expectUserDeprecationMessage('Calling Drupal\Core\Routing\RouteBuilder::__construct() with the module handler and controller resolver services is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3324751');
     new RouteBuilder($this->dumper, $this->lock, $this->dispatcher, $this->moduleHandler, $this->controllerResolver, $this->checkProvider);
   }
 

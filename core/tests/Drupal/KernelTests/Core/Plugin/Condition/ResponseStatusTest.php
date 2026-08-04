@@ -80,7 +80,7 @@ class ResponseStatusTest extends KernelTestBase {
   /**
    * Provides test data for testConditions.
    */
-  public static function providerTestConditions() {
+  public static function providerTestConditions(): \Iterator {
     // Default values with 200 response code.
     yield [
       'status_codes' => [],

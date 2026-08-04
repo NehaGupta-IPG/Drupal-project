@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Drupal\TestTools\Extension\DeprecationBridge;
 
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
+use Drupal\TestTools\ErrorHandler\DrupalDebugClassLoader;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration as PhpUnitConfiguration;
-use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 // cspell:ignore depsta bootstrapper bootstrappers
 
@@ -74,7 +74,7 @@ final class DeprecationHandler implements Extension {
     // Enable the DebugClassLoader to get deprecations for methods' signature
     // changes.
     if ($config->debugClassLoaderEnabled) {
-      DebugClassLoader::enable();
+      DrupalDebugClassLoader::enable();
     }
   }
 

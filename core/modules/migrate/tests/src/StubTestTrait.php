@@ -31,10 +31,10 @@ trait StubTestTrait {
    * @param string $entity_type_id
    *   The entity type we are stubbing.
    *
-   * @return int
+   * @return string
    *   ID of the created entity.
    */
-  protected function createEntityStub(string $entity_type_id) {
+  protected function createEntityStub(string $entity_type_id): mixed {
     // Create a dummy migration to pass to the destination plugin.
     $definition = [
       'migration_tags' => ['Stub test'],

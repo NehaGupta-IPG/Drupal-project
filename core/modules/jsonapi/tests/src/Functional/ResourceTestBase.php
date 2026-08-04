@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Random;
@@ -24,6 +23,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\BooleanItem;
 use Drupal\Core\Session\AccountInterface;
@@ -39,6 +39,7 @@ use Drupal\jsonapi\JsonApiResource\LinkCollection;
 use Drupal\jsonapi\JsonApiResource\NullIncludedData;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
 use Drupal\jsonapi\JsonApiResource\ResourceObjectData;
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\jsonapi\Normalizer\HttpExceptionNormalizer;
 use Drupal\jsonapi\ResourceResponse;
 use Drupal\path\Plugin\Field\FieldType\PathItem;
@@ -80,14 +81,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @var string
    */
-  protected static $entityTypeId = NULL;
+  protected static $entityTypeId;
 
   /**
    * The name of the tested JSON:API resource type.
    *
    * @var string
    */
-  protected static $resourceTypeName = NULL;
+  protected static $resourceTypeName;
 
   /**
    * Whether the tested JSON:API resource is versionable.
@@ -151,7 +152,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @see ::testPostIndividual()
    */
-  protected static $labelFieldName = NULL;
+  protected static $labelFieldName;
 
   /**
    * Whether new revisions of updated entities should be created by default.
@@ -413,7 +414,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function createAnotherEntity($key) {
+  protected function createAnotherEntity(string $key) {
     $duplicate = $this->getEntityDuplicate($this->entity, $key);
     // Some entity types are not stored, hence they cannot be reloaded.
     if (get_class($this->entityStorage) !== ContentEntityNullStorage::class) {
@@ -426,7 +427,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getEntityDuplicate(EntityInterface $original, $key) {
+  protected function getEntityDuplicate(EntityInterface $original, string $key) {
     $duplicate = $original->createDuplicate();
     if ($label_key = $original->getEntityType()->getKey('label')) {
       $duplicate->set($label_key, $original->label() . '_' . $key);
@@ -568,7 +569,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The expected cacheability for the given entity collection.
    */
   protected static function getExpectedCollectionCacheability(AccountInterface $account, array $collection, ?array $sparse_fieldset = NULL, $filtered = FALSE) {
-    $cacheability = array_reduce($collection, function (CacheableMetadata $cacheability, EntityInterface $entity) use ($sparse_fieldset, $account) {
+    $cacheability = array_reduce($collection, function (CacheableMetadata $cacheability, EntityInterface $entity) use ($sparse_fieldset, $account): CacheableMetadata {
       $access_result = static::entityAccess($entity, 'view', $account);
       if (!$access_result->isAllowed()) {
         $access_result = static::entityAccess($entity, 'view label', $account)->addCacheableDependency($access_result);
@@ -1058,7 +1059,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'Transfer-Encoding',
       'Vary',
     ];
-    $header_cleaner = function ($headers) use ($ignored_headers) {
+    $header_cleaner = function (array $headers) use ($ignored_headers): array {
       foreach ($headers as $header => $value) {
         if (str_starts_with($header, 'X-Drupal-Assertion-') || in_array($header, $ignored_headers)) {
           unset($headers[$header]);
@@ -1231,7 +1232,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $this->generateDynamicPageCacheExpectedHeaderValue($expected_cacheability->getCacheContexts(), $expected_cacheability->getCacheMaxAge()));
 
     // Filtered collection with includes.
-    $relationship_field_names = array_reduce($filtered_entity_collection, function ($relationship_field_names, $entity) {
+    $relationship_field_names = array_reduce($filtered_entity_collection, function (array $relationship_field_names, EntityInterface $entity): array {
       return array_unique(array_merge($relationship_field_names, $this->getRelationshipFieldNames($entity)));
     }, []);
     $include = ['include' => implode(',', $relationship_field_names)];
@@ -1267,7 +1268,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // Sorted collection with includes.
     $sorted_entity_collection = $entity_collection;
-    uasort($sorted_entity_collection, function (EntityInterface $a, EntityInterface $b) {
+    uasort($sorted_entity_collection, function (EntityInterface $a, EntityInterface $b): int {
       // Sort by ID in reverse order.
       return strcmp($b->uuid(), $a->uuid());
     });
@@ -1825,12 +1826,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
       }
 
       $resource_identifier = static::toResourceIdentifier($target_entity);
-      $resource_identifier = static::decorateResourceIdentifierWithDrupalInternalTargetId($field, $resource_identifier);
-      return $resource_identifier;
+      return static::decorateResourceIdentifierWithDrupalInternalTargetId($field, $resource_identifier);
     }
     else {
       $arity_counter = [];
-      $relation_list = array_filter(array_map(function ($item) use (&$arity_counter) {
+      $relation_list = array_filter(array_map(function (FieldItemInterface $item) use (&$arity_counter): ?array {
         $target_entity = $item->entity;
 
         if (is_null($target_entity)) {
@@ -1852,7 +1852,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       }, iterator_to_array($field)));
 
       $arity_map = [];
-      $relation_list = array_map(function ($identifier) use ($arity_counter, &$arity_map) {
+
+      return array_map(function (array $identifier) use ($arity_counter, &$arity_map): array {
         $type = $identifier['type'];
         $id = $identifier['id'];
         // Only add an arity value if there are two or more resource identifiers
@@ -1869,8 +1870,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
         }
         return $identifier;
       }, $relation_list);
-
-      return $relation_list;
     }
   }
 
@@ -1992,7 +1991,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
           ? [$relationship_document['data']]
           : $relationship_document['data'];
         // Remove any relationships to 'virtual' resources.
-        $resource_identifiers = array_filter($resource_identifiers, function ($resource_identifier) {
+        $resource_identifiers = array_filter($resource_identifiers, function (array $resource_identifier): bool {
           return $resource_identifier['id'] !== 'virtual';
         });
         if (!empty($resource_identifiers)) {
@@ -2927,7 +2926,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $published_key = $this->entity->getEntityType()->getKey('published');
     $revision_translation_affected_key = $this->entity->getEntityType()->getKey('revision_translation_affected');
 
-    $amend_relationship_urls = function (array &$document, $revision_id) {
+    $amend_relationship_urls = function (array &$document, $revision_id): void {
       if (!empty($document['data']['relationships'])) {
         foreach ($document['data']['relationships'] as &$relationship) {
           $pattern = '/resourceVersion=id%3A\d/';
@@ -3533,7 +3532,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   An array of nested include paths.
    */
   protected function getNestedIncludePaths($depth = 3) {
-    $get_nested_relationship_field_names = function (EntityInterface $entity, $depth, $path = "") use (&$get_nested_relationship_field_names) {
+    $get_nested_relationship_field_names = function (EntityInterface $entity, $depth, $path = "") use (&$get_nested_relationship_field_names): array {
       $relationship_field_names = $this->getRelationshipFieldNames($entity);
       if ($depth > 0) {
         $paths = [];
@@ -3550,7 +3549,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         }
         return $paths;
       }
-      return array_map(function ($target_name) use ($path) {
+      return array_map(function ($target_name) use ($path): string {
         return "$path.$target_name";
       }, $relationship_field_names);
     };

@@ -13,11 +13,6 @@ parameters:
   core.moved_classes:
     'Drupal\Core\StringTranslation\TranslationWrapper':
       class: 'Drupal\Core\StringTranslation\TranslatableMarkup'
-    'Doctrine\Common\Annotations\AnnotationException':
-      class: 'Drupal\Component\Annotation\Doctrine\AnnotationException'
-      deprecation_version: drupal:11.3.0
-      removed_version: drupal:12.0.0
-      change_record: https://www.drupal.org/node/3551049
   session.storage.options:
     gc_probability: 1
     gc_divisor: 100
@@ -80,7 +75,7 @@ parameters:
       - json
   # Can be argon2i, argon2id or 2y (bcrypt). Setting to NULL (~) will use PASSWORD_DEFAULT.
   # See https://www.php.net/password_hash
-  password.algorithm: ~
+  password.algorithm: argon2id
   # Options passed to password_hash. See https://www.php.net/password_hash
   password.options: []
 services:
@@ -715,10 +710,6 @@ services:
     class: Drupal\Core\Extension\ModuleInstaller
     autowire: true
   Drupal\Core\Extension\ModuleInstallerInterface: '@module_installer'
-  module_installer.uninstall_validators:
-    class: \IteratorIterator
-    arguments: [!tagged_iterator module_install.uninstall_validator]
-    deprecated: The "%service_id%" service is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject "!tagged_iterator module_install.uninstall_validator" instead. See https://www.drupal.org/node/3432595
   extension.list.module:
     class: Drupal\Core\Extension\ModuleExtensionList
     arguments: ['%app.root%', 'module', '@cache.default', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.profile', '%install_profile%', '%container.modules%']
@@ -729,19 +720,15 @@ services:
   Drupal\Core\Extension\ProfileExtensionList: '@extension.list.profile'
   extension.list.theme:
     class: Drupal\Core\Extension\ThemeExtensionList
-    arguments: ['%app.root%', 'theme', '@cache.bootstrap', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.theme_engine', '%install_profile%']
+    autowire: true
   Drupal\Core\Extension\ThemeExtensionList: '@extension.list.theme'
-  extension.list.theme_engine:
-    class: Drupal\Core\Extension\ThemeEngineExtensionList
-    arguments: ['%app.root%', 'theme_engine', '@cache.default', '@info_parser', '@module_handler', '@state', '%install_profile%']
-  Drupal\Core\Extension\ThemeEngineExtensionList: '@extension.list.theme_engine'
   extension.list.database_driver:
     class: Drupal\Core\Extension\DatabaseDriverList
     arguments: ['%app.root%', 'database_driver', '@cache.default']
   Drupal\Core\Extension\DatabaseDriverList: '@extension.list.database_driver'
   extension.path.resolver:
     class: Drupal\Core\Extension\ExtensionPathResolver
-    arguments: ['@extension.list.module', '@extension.list.profile', '@extension.list.theme', '@extension.list.theme_engine']
+    arguments: ['@extension.list.module', '@extension.list.profile', '@extension.list.theme']
   Drupal\Core\Extension\ExtensionPathResolver: '@extension.path.resolver'
   content_uninstall_validator:
     class: Drupal\Core\Entity\ContentUninstallValidator
@@ -872,11 +859,6 @@ services:
   plugin.manager.field.formatter:
     class: Drupal\Core\Field\FormatterPluginManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@plugin.manager.field.field_type']
-  plugin.manager.archiver:
-    class: Drupal\Core\Archiver\ArchiverManager
-    parent: default_plugin_manager
-    arguments: ['@file_system']
-    deprecated: 'The "%service_id%" service is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3556927'
   plugin.manager.action:
     class: Drupal\Core\Action\ActionManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
@@ -1196,10 +1178,6 @@ services:
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
-  pgsql.entity.query.sql:
-    class: Drupal\Core\Entity\Query\Sql\pgsql\QueryFactory
-    arguments: ['@database']
-    deprecated: The "%service_id%" service is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Install the pgsql module to replace this service. See https://www.drupal.org/node/3488580
   entity.query.null:
     class: Drupal\Core\Entity\Query\Null\QueryFactory
   entity.query.keyvalue:
@@ -1669,7 +1647,7 @@ services:
   Drupal\Core\Theme\ThemeInitializationInterface: '@theme.initialization'
   theme.registry:
     class: Drupal\Core\Theme\Registry
-    arguments: ['%app.root%', '@cache.default', '@lock', '@module_handler', '@theme_handler', '@theme.initialization', '@cache.bootstrap', '@extension.list.module', '@kernel', ~, '@keyvalue']
+    arguments: ['@cache.default', '@lock', '@module_handler', '@theme_handler', '@cache.bootstrap', '@extension.list.module', '@kernel', '@keyvalue']
     tags:
       - { name: needs_destruction }
     calls:
@@ -1770,7 +1748,7 @@ services:
   Drupal\Core\Session\WriteSafeSessionHandlerInterface: '@session_handler.write_safe'
   session_manager:
     class: Drupal\Core\Session\SessionManager
-    arguments: ['@request_stack', '@session_handler', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time', '@Drupal\Core\Session\UserSessionRepositoryInterface']
+    arguments: ['@request_stack', '@session_handler', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time']
   Drupal\Core\Session\SessionManagerInterface: '@session_manager'
   session_manager.metadata_bag:
     class: Drupal\Core\Session\MetadataBag
@@ -1810,10 +1788,6 @@ services:
     tags:
       - { name: needs_destruction }
   Drupal\Core\Asset\LibraryDiscoveryInterface: '@library.discovery'
-  library.discovery.collector:
-    arguments: ['@cache.discovery', '@lock', '@library.discovery.parser', '@theme.manager']
-    class: Drupal\Core\Asset\LibraryDiscoveryCollector
-    deprecated: The "%service_id%" service is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use LibraryDiscovery instead. See https://www.drupal.org/node/3462970
   library.discovery.parser:
     class: Drupal\Core\Asset\LibraryDiscoveryParser
     arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc', '@library.parsing_cache']
@@ -1935,8 +1909,6 @@ services:
     public: false
   Drupal\Core\File\MimeType\MimeTypeMapInterface:
     factory: ['@Drupal\Core\File\MimeType\MimeTypeMapFactory', create]
-  Drupal\Core\File\EventSubscriber\LegacyMimeTypeMapLoadedSubscriber:
-    autowire: true
   # Currently needs to be public as it is called by
   # \Drupal\Core\Render\Element\StatusMessages.
   # @todo Consider making this service private again after
@@ -2049,7 +2021,6 @@ services:
   Drupal\Core\Template\Loader\ComponentLoader:
     arguments:
       - '@plugin.manager.sdc'
-      - '@logger.channel.default'
     tags:
       - { name: twig.loader, priority: 5 }
   Drupal\Core\EventSubscriber\CsrfExceptionSubscriber: ~

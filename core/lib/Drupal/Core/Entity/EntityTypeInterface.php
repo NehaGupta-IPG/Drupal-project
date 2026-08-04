@@ -57,23 +57,6 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
   public function set($property, $value);
 
   /**
-   * Gets the name of the original entity type class.
-   *
-   * In case the class name was changed with setClass(), this will return
-   * the initial value. Useful when trying to identify the entity type ID based
-   * on the class.
-   *
-   * @return string
-   *   The name of the original entity type class.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
-   *   getDecoratedClasses() instead.
-   *
-   * @see https://www.drupal.org/node/3557464
-   */
-  public function getOriginalClass();
-
-  /**
    * Gets the list of all the classes for this entity type.
    *
    * In case the class name was changed with setClass(), this will return
@@ -838,7 +821,7 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *
    * @return $this
    */
-  public function addConstraint($constraint_name, /* ?array */$options = NULL);
+  public function addConstraint(string $constraint_name, ?array $options = NULL): static;
 
   /**
    * Gets the config dependency info for this entity, if any exists.

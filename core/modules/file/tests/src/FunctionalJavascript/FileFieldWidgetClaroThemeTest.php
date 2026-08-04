@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * @see \Drupal\claro\Hook\ClaroHooks->fileAndImageWidgetHelper()
  */
 #[Group('file')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class FileFieldWidgetClaroThemeTest extends FileFieldWidgetTest {
 

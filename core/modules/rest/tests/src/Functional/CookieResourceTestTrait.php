@@ -81,7 +81,7 @@ trait CookieResourceTestTrait {
   /**
    * {@inheritdoc}
    */
-  protected function getAuthenticationRequestOptions($method) {
+  protected function getAuthenticationRequestOptions($method): array {
     $request_options = [];
     if (isset($this->sessionCookie)) {
       $request_options[RequestOptions::HEADERS]['Cookie'] = $this->sessionCookie;

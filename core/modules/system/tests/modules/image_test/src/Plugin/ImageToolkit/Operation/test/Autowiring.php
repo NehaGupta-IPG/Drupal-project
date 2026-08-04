@@ -30,7 +30,7 @@ class Autowiring extends OperationBase {
     LoggerInterface $logger,
     #[Autowire(service: 'messenger')]
     protected $messenger,
-    protected StateInterface $state,
+    private readonly StateInterface $state,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $logger);
   }

@@ -19,7 +19,6 @@ use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Ajax\InsertCommand;
 use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Ajax\OpenDialogCommand;
-use Drupal\Core\Ajax\OpenOffCanvasDialogCommand;
 use Drupal\Core\Ajax\PrependCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\RemoveCommand;
@@ -125,7 +124,7 @@ class AjaxCommandsTest extends UnitTestCase {
    * @legacy-covers \Drupal\Core\Ajax\AddCssCommand
    */
   #[DataProvider('providerCss')]
-  public function testAddCssCommand($css, $expected): void {
+  public function testAddCssCommand(array $css, array $expected): void {
     $command = new AddCssCommand($css);
 
     $this->assertEquals($expected, $command->render());
@@ -171,7 +170,7 @@ class AjaxCommandsTest extends UnitTestCase {
    * @legacy-covers \Drupal\Core\Ajax\AnnounceCommand
    */
   #[DataProvider('announceCommandProvider')]
-  public function testAnnounceCommand($message, $priority, array $expected): void {
+  public function testAnnounceCommand(string $message, ?string $priority, array $expected): void {
     if ($priority === NULL) {
       $command = new AnnounceCommand($message);
     }
@@ -487,78 +486,6 @@ class AjaxCommandsTest extends UnitTestCase {
     $command->setDialogTitle('New title');
     $expected['dialogOptions']['title'] = 'New title';
     $this->assertEquals($expected, $command->render());
-  }
-
-  /**
-   * Tests dialogClass for OpenDialogCommand and OpenOffCanvasDialogCommand.
-   *
-   * This is a regression test for https://www.drupal.org/node/3474018.
-   *
-   * @legacy-covers \Drupal\Core\Ajax\OpenDialogCommand
-   * @legacy-covers \Drupal\Core\Ajax\OpenOffCanvasDialogCommand
-   */
-  #[IgnoreDeprecations]
-  #[DataProvider('dialogCommandProvider')]
-  public function testOpenDialogCommandClass(string $class, array $args, array $expected): void {
-    $short = (new \ReflectionClass($class))->getShortName();
-    $this->expectUserDeprecationMessage("Passing \$dialog_options['dialogClass'] to {$short}::__construct() is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Use \$dialog_options['classes'] instead. See https://www.drupal.org/node/3440844");
-    $reflection = new \ReflectionClass($class);
-    $command = $reflection->newInstanceArgs($args);
-    $this->assertEquals($expected, $command->getDialogOptions());
-  }
-
-  /**
-   * Data provider for testOpenDialogCommandClass.
-   */
-  public static function dialogCommandProvider(): array {
-    return [
-      'OpenDialogCommand with only dialogClass' => [
-        OpenDialogCommand::class,
-        ['#some-dialog', 'Title', '', ['dialogClass' => 'foo bar']],
-        ['title' => 'Title', 'classes' => ['ui-dialog' => 'foo bar']],
-      ],
-      'OpenDialogCommand with dialogClass and classes' => [
-        OpenDialogCommand::class,
-        ['#some-dialog', 'Title', '', ['dialogClass' => 'foo bar', 'classes' => ['ui-dialog' => 'baz qux']]],
-        ['title' => 'Title', 'classes' => ['ui-dialog' => 'baz qux foo bar']],
-      ],
-      'OpenOffCanvasDialogCommand with only dialogClass' => [
-        OpenOffCanvasDialogCommand::class,
-        ['Title', '', ['dialogClass' => 'foo bar']],
-        [
-          'title' => 'Title',
-          'classes' => [
-            'ui-dialog' => 'foo bar ui-dialog-off-canvas ui-dialog-position-side',
-            'ui-dialog-content' => 'drupal-off-canvas-reset',
-          ],
-          'modal' => FALSE,
-          'autoResize' => FALSE,
-          'resizable' => 'w',
-          'draggable' => FALSE,
-          'drupalAutoButtons' => FALSE,
-          'drupalOffCanvasPosition' => 'side',
-          'width' => 300,
-        ],
-      ],
-      'OpenOffCanvasDialogCommand with dialogClass and classes' => [
-        OpenOffCanvasDialogCommand::class,
-        ['Title', '', ['dialogClass' => 'foo bar', 'classes' => ['ui-dialog' => 'baz qux']]],
-        [
-          'title' => 'Title',
-          'classes' => [
-            'ui-dialog' => 'baz qux foo bar ui-dialog-off-canvas ui-dialog-position-side',
-            'ui-dialog-content' => 'drupal-off-canvas-reset',
-          ],
-          'modal' => FALSE,
-          'autoResize' => FALSE,
-          'resizable' => 'w',
-          'draggable' => FALSE,
-          'drupalAutoButtons' => FALSE,
-          'drupalOffCanvasPosition' => 'side',
-          'width' => 300,
-        ],
-      ],
-    ];
   }
 
   /**

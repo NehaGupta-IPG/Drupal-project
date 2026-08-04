@@ -145,16 +145,6 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
   /**
    * {@inheritdoc}
    */
-  public function invalidateAll(): void {
-    $start = microtime(TRUE);
-    $this->cacheBackend->invalidateAll();
-    $stop = microtime(TRUE);
-    $this->logCacheOperation([], $start, $stop, 'invalidateAll');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function garbageCollection(): void {
     $this->cacheBackend->garbageCollection();
   }

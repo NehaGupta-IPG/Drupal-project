@@ -8,21 +8,20 @@ use Drupal\Core\Layout\Attribute\Layout;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests the Layout attribute.
  */
 #[CoversClass(Layout::class)]
 #[Group('Layout')]
-#[IgnoreDeprecations]
 class LayoutAttributeTest extends UnitTestCase {
 
   /**
    * Test deprecating plugins without a label or category.
    */
-  public function testDeprecatedMissingProperties(): void {
-    $this->expectUserDeprecationMessage('A layout plugin not having at least one of the label or deriver properties is deprecated in drupal:11.4.0 and having at least one of these properties will be enforced in drupal:12.0.0. See https://www.drupal.org/node/3464076');
+  public function testMissingProperties(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessageIs('The "layout_without_label" layout plugin must have at least one of the label or deriver properties.');
     new Layout('layout_without_label');
   }
 

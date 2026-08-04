@@ -206,12 +206,12 @@ class HelpTest extends KernelTestBase {
    * @return array
    *   A list of enabled modules.
    */
-  protected function getModuleList() {
+  protected function getModuleList(): array {
     $modules = [];
     $module_data = $this->container->get('extension.list.module')->getList();
     \Drupal::moduleHandler()->invokeAllWith(
       'help',
-      function (callable $hook, string $module) use (&$modules, $module_data) {
+      function (callable $hook, string $module) use (&$modules, $module_data): void {
         $modules[$module] = $module_data[$module]->info['name'];
       }
     );

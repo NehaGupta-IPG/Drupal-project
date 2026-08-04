@@ -19,15 +19,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class ContentTranslationSynchronizedFieldsConstraint extends SymfonyConstraint {
 
-  #[HasNamedArguments]
   public function __construct(
-    mixed $options = NULL,
     public string $defaultRevisionMessage = 'Non-translatable field elements can only be changed when updating the current revision.',
     public string $defaultTranslationMessage = 'Non-translatable field elements can only be changed when updating the original language.',
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
-    parent::__construct($options, $groups, $payload);
+    parent::__construct(groups: $groups, payload: $payload);
   }
 
 }

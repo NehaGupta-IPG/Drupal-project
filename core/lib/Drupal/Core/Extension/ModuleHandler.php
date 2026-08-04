@@ -75,20 +75,6 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected ?array $hookLists = NULL;
 
   /**
-   * List of include files keyed by hook.
-   *
-   * @var array<string, list<string>>|null
-   */
-  protected ?array $hookIncludes = NULL;
-
-  /**
-   * List of group include files keyed by hook.
-   *
-   * @var array<string, list<string>>|null
-   */
-  protected ?array $hookGroupIncludes = NULL;
-
-  /**
    * Ordering rules by hook name, packed.
    *
    * @param array<string, list<string>>
@@ -208,38 +194,6 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public function addModule($name, $path) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method does nothing. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addProfile($name, $path) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method does nothing. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
-  }
-
-  /**
-   * Adds a module or profile to the list of currently active modules.
-   *
-   * @param string $type
-   *   The extension type; either 'module' or 'profile'.
-   * @param string $name
-   *   The module name; e.g., 'node'.
-   * @param string $path
-   *   The module path; e.g., 'core/modules/node'.
-   *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
-   * There is no direct replacement.
-   * @see https://www.drupal.org/node/3491200
-   */
-  protected function add($type, $name, $path) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. This method does nothing. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildModuleDependencies(array $modules) {
     foreach ($modules as $module) {
       $graph[$module->getName()]['edges'] = [];
@@ -303,13 +257,6 @@ class ModuleHandler implements ModuleHandlerInterface {
       }
     }
     return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getHookInfo() {
-    return [];
   }
 
   /**
@@ -512,11 +459,20 @@ class ModuleHandler implements ModuleHandlerInterface {
       }
     }
     // First we get the the modules in moduleList order, this order is module
-    // weight then alphabetical. Then we apply legacy ordering using
-    // hook_module_implements_alter(). Finally we order using order attributes.
+    // weight then alphabetical. Finally we order using order attributes.
     $modules = array_keys($identifiers_by_module);
-    $modules = $this->reOrderModulesForAlter($modules, $hooks[0]);
-    // Create a flat list of identifiers, using the new module order.
+    // Order by module order first, this preserves expected order for alter
+    // hooks implemented on behalf of other modules. The module that hooks
+    // implementations in kernel test classes are grouped by is 'core'. Since
+    // 'core' is not actually a module, add 'core' as a key to the module list,
+    // so core implementations are not filtered out. 'Core' is added last to
+    // match how kernel test hooks are added last by KernelTestCompilerPass.
+    // @todo Determine whether 'core' should still be ordered last by default
+    //   when any service, including in the Drupal\Core namespace, can have
+    //   hook implementations.
+    // @see https://www.drupal.org/i/3481903.
+    $modules = array_intersect(array_keys($this->moduleList + ['core' => '']), $modules);
+    // Create a flat list of identifiers.
     $identifiers = array_merge(...array_map(
       fn (string $module) => $identifiers_by_module[$module],
       $modules,
@@ -608,41 +564,6 @@ class ModuleHandler implements ModuleHandlerInterface {
   }
 
   /**
-   * Reorder modules for alters.
-   *
-   * @param list<string> $modules
-   *   A list of module names.
-   * @param string $hook
-   *   The hook being worked on, for example form_alter.
-   *
-   * @return list<string>
-   *   The list, potentially reordered and changed by
-   *   hook_module_implements_alter().
-   */
-  protected function reOrderModulesForAlter(array $modules, string $hook): array {
-    // Order by module order first, this preserves expected order for alter
-    // hooks implemented on behalf of other modules. The module that hooks
-    // implementations in kernel test classes are grouped by is 'core'. Since
-    // 'core' is not actually a module, add 'core' as a key to the module list,
-    // so core implementations are not filtered out. 'Core' is added last to
-    // match how kernel test hooks are added last by KernelTestCompilerPass.
-    // @todo Determine whether 'core' should still be ordered last by default
-    //   when any service, including in the Drupal\Core namespace, can have
-    //   hook implementations.
-    // @see https://www.drupal.org/i/3481903.
-    $modules = array_intersect(array_keys($this->moduleList + ['core' => '']), $modules);
-    // Alter expects the module list to be in the keys.
-    $implementations = array_fill_keys($modules, FALSE);
-    // Let modules adjust the order solely based on the primary hook. This
-    // ensures the same module order regardless of whether this block
-    // runs. Calling $this->alter() recursively in this way does not
-    // result in an infinite loop, because this call is for a single
-    // $type, so we won't end up in this method again.
-    $this->alter('module_implements', $implementations, $hook);
-    return array_keys($implementations);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function alterDeprecated($description, $type, &$data, &$context1 = NULL, &$context2 = NULL) {
@@ -685,21 +606,6 @@ class ModuleHandler implements ModuleHandlerInterface {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function getName($module) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Extension\ModuleExtensionList::getName($module) instead. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
-    return \Drupal::service('extension.list.module')->getName($module);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function writeCache() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no need to call this method so there is no replacement. See https://www.drupal.org/node/3442349', E_USER_DEPRECATED);
-  }
-
-  /**
    * Gets a hook implementation list for a specific hook.
    *
    * @param string $hook
@@ -717,29 +623,17 @@ class ModuleHandler implements ModuleHandlerInterface {
         else {
           $hook_data = $this->keyValueFactory->get('hook_data')->getMultiple([
             'hook_list',
-            'includes',
-            'group_includes',
             'packed_order_operations',
           ]);
           $this->cache->set('hook_data', $hook_data);
         }
         $this->hookLists = $hook_data['hook_list'] ?? [];
-        $this->hookIncludes = $hook_data['includes'] ?? [];
-        $this->hookGroupIncludes = $hook_data['group_includes'] ?? [];
         $this->packedOrderOperations = $hook_data['packed_order_operations'] ?? [];
       }
       $hook_list = $this->hookLists[$hook] ?? [];
       if ($hook_list) {
         $listeners = [];
         $modules = [];
-
-        foreach ($this->hookIncludes[$hook] ?? [] as $include) {
-          include_once $include;
-        }
-        foreach ($this->hookGroupIncludes[$hook] ?? [] as $include) {
-          @trigger_error('Autoloading hooks in the file (' . $include . ') is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Move the functions in this file to either the .module file or other appropriate location. See https://www.drupal.org/node/3489765', E_USER_DEPRECATED);
-          include_once $include;
-        }
 
         foreach ($hook_list as $identifier => $module) {
           // Remove implementations from "other" modules.

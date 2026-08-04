@@ -75,4 +75,14 @@ PO
     $this->assertEquals('Test string correct', (string) new TranslatableMarkup('Test string', [], ['langcode' => 'es']));
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpLanguage(): void {
+    // This step is skipped because of an incredibly fiddly logic chain. In
+    // install_load_profile(), the language is automatically detected from the
+    // config sync directory included in the profile that was generated for this
+    // test (see ::prepareEnvironment() and its parents).
+  }
+
 }

@@ -90,9 +90,6 @@ Authentication and Authorization
 Automated Cron
 - ?
 
-Ban
-- ?
-
 Base system
 - See "Framework managers" above.
 
@@ -153,11 +150,6 @@ Configuration UI
 Configuration Translation
 - Gábor Hojtsy 'Gábor Hojtsy' https://www.drupal.org/u/gábor-hojtsy
 - Vijayachandran Mani 'vijaycs85' https://www.drupal.org/u/vijaycs85
-
-Contact
-- Lee Rowlands 'larowlan' https://www.drupal.org/u/larowlan
-- Jibran Ijaz 'jibran' https://www.drupal.org/u/jibran
-- Andrey Postnikov 'andypost' https://www.drupal.org/u/andypost
 
 Content Moderation
 - Andrei Mateescu 'amateescu' https://www.drupal.org/u/amateescu
@@ -237,9 +229,6 @@ Form API
 - Alex Bronstein 'effulgentsia' https://www.drupal.org/u/effulgentsia
 - Tim Plunkett 'tim.plunkett' https://www.drupal.org/u/tim.plunkett
 - Lee Rowlands 'larowlan' https://www.drupal.org/u/larowlan
-
-History
-- Andrey Postnikov 'andypost' https://www.drupal.org/u/andypost
 
 Help
 - Amber Matz 'Amber Himes Matz' https://www.drupal.org/u/amber-himes-matz
@@ -388,9 +377,6 @@ Settings Tray
 Shortcut
 - Jibran Ijaz 'jibran' https://www.drupal.org/u/jibran
 
-Stable9
-- Mark Conroy 'markconroy' https://www.drupal.org/u/markconroy
-
 Stark
 - John Albin Wilkins 'JohnAlbin' https://www.drupal.org/u/johnalbin
 
@@ -402,9 +388,6 @@ System (module)
 
 Taxonomy
 - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
-
-Telephone
-- Stephen Mustgrave 'smustgrave' https://www.drupal.org/u/smustgrave
 
 Text Field
 - Stephen Mustgrave 'smustgrave' https://www.drupal.org/u/smustgrave

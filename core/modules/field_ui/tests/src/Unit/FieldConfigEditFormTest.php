@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Drupal\Tests\field_ui\Unit;
 
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\TempStore\PrivateTempStore;
+use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\field_ui\Form\FieldConfigEditForm;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -34,12 +36,12 @@ class FieldConfigEditFormTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $entity_type_bundle_info = $this->createMock('\Drupal\Core\Entity\EntityTypeBundleInfoInterface');
-    $typed_data = $this->createMock('\Drupal\Core\TypedData\TypedDataManagerInterface');
-    $temp_store = $this->createMock(PrivateTempStore::class);
-    $element_info_manager = $this->createMock(ElementInfoManagerInterface::class);
-    $entity_display_repository = $this->createMock(EntityDisplayRepositoryInterface::class);
-    $field_type_plugin_manager = $this->createMock(FieldTypePluginManagerInterface::class);
+    $entity_type_bundle_info = $this->createStub(EntityTypeBundleInfoInterface::class);
+    $typed_data = $this->createStub(TypedDataManagerInterface::class);
+    $temp_store = $this->createStub(PrivateTempStore::class);
+    $element_info_manager = $this->createStub(ElementInfoManagerInterface::class);
+    $entity_display_repository = $this->createStub(EntityDisplayRepositoryInterface::class);
+    $field_type_plugin_manager = $this->createStub(FieldTypePluginManagerInterface::class);
     $this->fieldConfigEditForm = new FieldConfigEditForm($entity_type_bundle_info, $typed_data, $entity_display_repository, $temp_store, $element_info_manager, $field_type_plugin_manager);
   }
 

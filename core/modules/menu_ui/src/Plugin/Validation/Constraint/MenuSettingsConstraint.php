@@ -22,9 +22,7 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class MenuSettingsConstraint extends SymfonyConstraint {
 
-  #[HasNamedArguments]
   public function __construct(
-    mixed $options = NULL,
     public $message = 'You can only change the menu settings for the <em>published</em> version of this content.',
     public $messageWeight = 'You can only change the menu link weight for the <em>published</em> version of this content.',
     public $messageParent = 'You can only change the parent menu link for the <em>published</em> version of this content.',
@@ -32,7 +30,7 @@ class MenuSettingsConstraint extends SymfonyConstraint {
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
-    parent::__construct($options, $groups, $payload);
+    parent::__construct(groups: $groups, payload: $payload);
   }
 
 }

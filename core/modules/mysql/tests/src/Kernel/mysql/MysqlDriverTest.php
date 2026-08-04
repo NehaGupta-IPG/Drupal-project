@@ -23,7 +23,7 @@ class MysqlDriverTest extends DriverSpecificKernelTestBase {
    * @legacy-covers \Drupal\mysql\Driver\Database\mysql\Connection
    */
   public function testConnection(): void {
-    $connection = new Connection($this->createMock(\PHP_VERSION_ID >= 80400 ? Mysql::class : \PDO::class), []);
+    $connection = new Connection($this->createStub(Mysql::class), []);
     $this->assertInstanceOf(Connection::class, $connection);
   }
 

@@ -67,9 +67,8 @@ interface StatementInterface extends \Traversable {
   /**
    * Sets the default fetch mode for this statement.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs|int $mode
-   *   One of the cases of the FetchAs enum, or (deprecated) a \PDO::FETCH_*
-   *   constant.
+   * @param \Drupal\Core\Database\Statement\FetchAs $mode
+   *   One of the cases of the FetchAs enum.
    * @param string|int|null $a1
    *   (Optional) An option depending of the fetch mode specified by $mode:
    *   - for FetchAs::Column, the index of the column to fetch;
@@ -86,25 +85,16 @@ interface StatementInterface extends \Traversable {
   /**
    * Fetches the next row from a result set.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs|int|null $mode
-   *   (Optional) one of the cases of the FetchAs enum, or (deprecated) a
-   *   \PDO::FETCH_* constant. If not specified, defaults to what is specified
-   *   by setFetchMode().
-   * @param int|null $cursor_orientation
-   *   (deprecated) Not implemented in all database drivers, don't use. The
-   *   $cursor_orientation parameter is deprecated in drupal:11.4.0 and will be
-   *   removed in drupal:12.0.0. There is no replacement.
-   * @param int|null $cursor_offset
-   *   (deprecated) Not implemented in all database drivers, don't use. The
-   *   $cursor_offset parameter is deprecated in drupal:11.4.0 and will be
-   *   removed in drupal:12.0.0. There is no replacement.
+   * @param \Drupal\Core\Database\Statement\FetchAs|null $mode
+   *   (Optional) one of the cases of the FetchAs enum. If not specified,
+   *   defaults to what is specified by setFetchMode().
    *
    * @return array|object|false
    *   A result, formatted according to $mode, or FALSE on failure.
    *
    * @see https://www.drupal.org/node/3551924
    */
-  public function fetch(?FetchAs $mode = NULL, $cursor_orientation = NULL, $cursor_offset = NULL);
+  public function fetch(?FetchAs $mode = NULL);
 
   /**
    * Returns a single column value from the next record of a result set.
@@ -154,10 +144,9 @@ interface StatementInterface extends \Traversable {
   /**
    * Returns an array containing all of the result set rows.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs|int|null $mode
-   *   (Optional) one of the cases of the FetchAs enum, or (deprecated) a
-   *   \PDO::FETCH_* constant. If not specified, defaults to what is specified
-   *   by setFetchMode().
+   * @param \Drupal\Core\Database\Statement\FetchAs|null $mode
+   *   (Optional) one of the cases of the FetchAs enum. If not specified,
+   *   defaults to what is specified by setFetchMode().
    * @param int|null $column_index
    *   (Optional) If $mode is FetchAs::Column, the index of the column to
    *   fetch.

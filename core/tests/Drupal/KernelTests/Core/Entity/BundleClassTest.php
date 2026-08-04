@@ -15,6 +15,7 @@ use Drupal\entity_test\EntityTestHelper;
 use Drupal\entity_test_attribute_bundle_class\Entity\EntityTestBundleClassOverrideA;
 use Drupal\entity_test_attribute_bundle_class\Entity\EntityTestBundleClassOverrideB;
 use Drupal\entity_test_attribute_bundle_class\Entity\EntityTestWithBundleTypeNewBundle;
+use Drupal\entity_test_attribute_bundle_class\Entity\Subdir\EntityTestSubdirBundleClass;
 use Drupal\entity_test_bundle_class\Entity\EntityTestAmbiguousBundleClass;
 use Drupal\entity_test_bundle_class\Entity\EntityTestBundleClass;
 use Drupal\entity_test_bundle_class\Entity\EntityTestUserClass;
@@ -47,8 +48,6 @@ class BundleClassTest extends EntityKernelTestBase {
 
   /**
    * Controls whether ::entityBundleInfoAlter() will alter bundle information.
-   *
-   * @var bool
    */
   protected bool $alterAttributeBundleInfo = FALSE;
 
@@ -207,7 +206,7 @@ class BundleClassTest extends EntityKernelTestBase {
 
     // Verify that getEntityClass without bundle returns the default entity
     // class.
-    $entity_class = $this->storage->getEntityClass(NULL);
+    $entity_class = $this->storage->getEntityClass();
     $this->assertEquals(EntityTest::class, $entity_class);
 
     // Verify that getEntityClass with a bundle returns the proper class.

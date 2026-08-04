@@ -32,8 +32,8 @@ class ImportForm extends FormBase {
     protected ModuleHandlerInterface $moduleHandler,
     #[Autowire('language_manager')]
     protected ConfigurableLanguageManagerInterface $languageManager,
-    protected LocaleImportBatch $localeImportBatch,
-    protected LocaleConfigBatch $localeConfigBatch,
+    protected readonly LocaleImportBatch $localeImportBatch,
+    protected readonly LocaleConfigBatch $localeConfigBatch,
   ) {}
 
   /**

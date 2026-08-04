@@ -40,7 +40,7 @@ class PluginBaseTest extends UnitTestCase {
    * Tests the getAvailableGlobalTokens method.
    */
   #[DataProvider('providerTestGetAvailableGlobalTokens')]
-  public function testGetAvailableGlobalTokens($info, $types, $expected): void {
+  public function testGetAvailableGlobalTokens(array $info, array $types, array $expected): void {
     // Get the token service and set the container.
     $token = $this->createStub(Token::class);
     $token
@@ -153,7 +153,7 @@ class PluginBaseTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestUnpackOptions() {
+  public static function providerTestUnpackOptions(): array {
     $test_parameters = [];
     // Set a storage but no value, so the storage value should be kept.
     $test_parameters[] = [
@@ -302,7 +302,7 @@ class PluginBaseTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestSetOptionDefault() {
+  public static function providerTestSetOptionDefault(): array {
     $test_parameters = [];
     // No definition should change anything on the storage.
     $test_parameters[] = [
@@ -371,7 +371,7 @@ class PluginBaseTest extends UnitTestCase {
   /**
    * Provides data to testFilterByDefinedOptions().
    */
-  public static function providerTestFilterByDefinedOptions() {
+  public static function providerTestFilterByDefinedOptions(): array {
     $data = [];
 
     // A simple defined option.

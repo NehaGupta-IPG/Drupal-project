@@ -22,13 +22,6 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
   protected static $modules = ['entity_schema_test', 'entity_test_update'];
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * The database connection used.
    *
    * @var \Drupal\Core\Database\Connection
@@ -42,7 +35,6 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     parent::setUp();
     $this->installSchema('user', ['users_data']);
     $this->installEntitySchema('entity_test_update');
-    $this->moduleHandler = $this->container->get('module_handler');
     $this->database = $this->container->get('database');
   }
 

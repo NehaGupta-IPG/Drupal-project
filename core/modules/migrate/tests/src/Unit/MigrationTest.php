@@ -7,6 +7,8 @@ namespace Drupal\Tests\migrate\Unit;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\Plugin\MigrateDestinationInterface;
+use Drupal\migrate\Plugin\MigrateDestinationPluginManager;
+use Drupal\migrate\Plugin\MigratePluginManagerInterface;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
 use Drupal\migrate\Plugin\Migration;
 use Drupal\migrate\Plugin\MigrationInterface;
@@ -16,7 +18,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\migrate\Plugin\Migration.
@@ -38,11 +40,11 @@ class MigrationTest extends UnitTestCase {
 
     $configuration = ['migration_dependencies' => $dependencies];
     $plugin_id = 'test_migration';
-    $migration_plugin_manager = $this->createMock('\Drupal\migrate\Plugin\MigrationPluginManagerInterface');
-    $source_plugin_manager = $this->createMock('\Drupal\migrate\Plugin\MigratePluginManagerInterface');
-    $process_plugin_manager = $this->createMock('\Drupal\migrate\Plugin\MigratePluginManagerInterface');
-    $destination_plugin_manager = $this->createMock('\Drupal\migrate\Plugin\MigrateDestinationPluginManager');
-    $id_map_plugin_manager = $this->createMock('\Drupal\migrate\Plugin\MigratePluginManagerInterface');
+    $migration_plugin_manager = $this->createStub(MigrationPluginManagerInterface::class);
+    $source_plugin_manager = $this->createStub(MigratePluginManagerInterface::class);
+    $process_plugin_manager = $this->createStub(MigratePluginManagerInterface::class);
+    $destination_plugin_manager = $this->createStub(MigrateDestinationPluginManager::class);
+    $id_map_plugin_manager = $this->createStub(MigratePluginManagerInterface::class);
 
     $this->expectException(InvalidPluginDefinitionException::class);
     $this->expectExceptionMessageIs("Invalid migration dependencies configuration for migration test_migration");
@@ -61,7 +63,7 @@ class MigrationTest extends UnitTestCase {
     $source_plugin->expects($this->once())
       ->method('checkRequirements')
       ->willThrowException(new RequirementsException('Missing source requirement', ['key' => 'value']));
-    $destination_plugin = $this->createMock('Drupal\Tests\migrate\Unit\RequirementsAwareDestinationInterface');
+    $destination_plugin = $this->createStub(RequirementsAwareDestinationInterface::class);
 
     $migration->setSourcePlugin($source_plugin);
     $migration->setDestinationPlugin($destination_plugin);
@@ -79,7 +81,7 @@ class MigrationTest extends UnitTestCase {
   public function testRequirementsForDestinationPlugin(): void {
     $migration = new TestMigration();
 
-    $source_plugin = $this->createMock('Drupal\migrate\Plugin\MigrateSourceInterface');
+    $source_plugin = $this->createStub(MigrateSourceInterface::class);
     $destination_plugin = $this->createMock('Drupal\Tests\migrate\Unit\RequirementsAwareDestinationInterface');
     $destination_plugin->expects($this->once())
       ->method('checkRequirements')
@@ -102,8 +104,8 @@ class MigrationTest extends UnitTestCase {
     $migration = new TestMigration();
 
     // Setup source and destination plugins without any requirements.
-    $source_plugin = $this->createMock('Drupal\migrate\Plugin\MigrateSourceInterface');
-    $destination_plugin = $this->createMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $source_plugin = $this->createStub(MigrateSourceInterface::class);
+    $destination_plugin = $this->createStub(MigrateDestinationInterface::class);
     $migration->setSourcePlugin($source_plugin);
     $migration->setDestinationPlugin($destination_plugin);
 
@@ -164,7 +166,7 @@ class MigrationTest extends UnitTestCase {
    * @legacy-covers ::getMigrationDependencies
    */
   #[DataProvider('getValidMigrationDependenciesProvider')]
-  public function testMigrationDependenciesWithValidConfig($source, array $expected_value): void {
+  public function testMigrationDependenciesWithValidConfig(?array $source, array $expected_value): void {
     $migration = new TestMigration();
 
     // Set the plugin manager to support getMigrationDependencies().
@@ -189,7 +191,6 @@ class MigrationTest extends UnitTestCase {
    * @legacy-covers ::getMigrationDependencies
    */
   #[DataProvider('getInvalidMigrationDependenciesProvider')]
-  #[IgnoreDeprecations]
   public function testMigrationDependenciesWithInvalidConfig(array $dependencies): void {
     $migration = new TestMigration();
 
@@ -208,7 +209,7 @@ class MigrationTest extends UnitTestCase {
   /**
    * Provides data for valid migration configuration test.
    */
-  public static function getValidMigrationDependenciesProvider() {
+  public static function getValidMigrationDependenciesProvider(): array {
     return [
       [
         'source' => NULL,
@@ -236,7 +237,7 @@ class MigrationTest extends UnitTestCase {
   /**
    * Provides invalid migration dependencies.
    */
-  public static function getInvalidMigrationDependenciesProvider() {
+  public static function getInvalidMigrationDependenciesProvider(): array {
     return [
       'invalid key' => [
         'dependencies' => ['bogus' => []],
@@ -426,7 +427,7 @@ class MigrationTest extends UnitTestCase {
    * @return \Drupal\migrate\Plugin\MigrationPluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    *   A configured MigrationPluginManager test mock.
    */
-  public function getMockPluginManager() {
+  public function getMockPluginManager(): MockObject {
     $plugin_manager = $this->createMock('Drupal\migrate\Plugin\MigrationPluginManagerInterface');
     $plugin_manager->expects($this->exactly(2))
       ->method('expandPluginIds')

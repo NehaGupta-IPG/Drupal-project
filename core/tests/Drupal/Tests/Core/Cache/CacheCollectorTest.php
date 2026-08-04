@@ -525,7 +525,7 @@ class CacheCollectorTest extends UnitTestCase {
     $allow_invalid = [FALSE, TRUE];
     $this->cacheBackend->expects($this->exactly(2))
       ->method('get')
-      ->with($this->cid, $this->callback(function ($value) use (&$allow_invalid) {
+      ->with($this->cid, $this->callback(function ($value) use (&$allow_invalid): bool {
         return array_shift($allow_invalid) === $value;
       }))
       ->willReturn($cache);

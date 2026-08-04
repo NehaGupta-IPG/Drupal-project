@@ -14,7 +14,6 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 
@@ -271,13 +270,13 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
   /**
    * Tests that the simpleConfigUpdate action cannot be used on entities.
    */
-  #[IgnoreDeprecations]
   public function testSimpleConfigUpdateFailsOnEntities(): void {
     $view_display = $this->container->get(EntityDisplayRepositoryInterface::class)
       ->getViewDisplay('entity_test_with_bundle', 'test');
     $view_display->save();
 
-    $this->expectUserDeprecationMessage('Using the simpleConfigUpdate config action on config entities is deprecated in drupal:11.2.0 and throws an exception in drupal:12.0.0. Use the setProperties action instead. See https://www.drupal.org/node/3515543');
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessageIs('Using the simpleConfigUpdate config action on config entities is not supported. Use the setProperties action instead. See https://www.drupal.org/node/3515543');
     $this->configActionManager->applyAction(
       'simpleConfigUpdate',
       $view_display->getConfigDependencyName(),

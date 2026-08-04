@@ -268,7 +268,7 @@ JS;
    */
   protected function assertWaitPageContains(string $expected): void {
     $page = $this->getSession()->getPage();
-    $this->assertTrue($page->waitFor(10, function () use ($page, $expected) {
+    $this->assertTrue($page->waitFor(10, function () use ($page, $expected): bool {
       // Clear content from empty styles and "processed" classes after effect.
       $content = str_replace([' class="processed"', ' processed', ' style=""'], '', $page->getContent());
       return stripos($content, $expected) !== FALSE;
@@ -319,6 +319,8 @@ JS;
    * Tests ajax focus handling.
    */
   public function testAjaxFocus(): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3396536');
     $this->drupalGet('/ajax_forms_test_get_form');
 
     $this->assertNotNull($select = $this->assertSession()->elementExists('css', '#edit-select'));

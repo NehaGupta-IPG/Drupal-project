@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\editor\Entity\Editor;
@@ -235,7 +236,7 @@ JS;
       $assert_session->assertWaitOnAjaxRequest();
     }
     $page->pressButton('Save configuration');
-    $assert_session->responseContains('The text format <em class="placeholder">ckeditor5</em> has been updated.');
+    $this->assertNotEmpty($assert_session->waitForText('The text format ckeditor5 has been updated.'));
   }
 
   /**
@@ -612,7 +613,7 @@ JS;
     $editor->setSettings($settings)->save();
 
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -711,7 +712,7 @@ JS;
         // While this is a bit of an indirect way to find the correct button, it
         // accounts for the mixed dash characters and worked better than other
         // attempts.
-        $toolbar_button_tips = array_map(fn($item) => str_replace('–', '-', $item->getAttribute('data-cke-tooltip-text')), $toolbar_buttons);
+        $toolbar_button_tips = array_map(fn(NodeElement $item): string => str_replace('–', '-', $item->getAttribute('data-cke-tooltip-text')), $toolbar_buttons);
         $this->assertNotFalse(array_search($type, $toolbar_button_tips));
         $toolbar_buttons[array_search($type, $toolbar_button_tips)]->click();
         $widget_selector = '.ck-editor__editable_inline > ' . $list_tag . '[type="' . $type_attribute . '"]';
@@ -764,7 +765,7 @@ JS;
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -785,7 +786,7 @@ JS;
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -804,7 +805,7 @@ JS;
     $editor = $page->find('css', '.ck-content');
     $editor->setValue('Very important information');
     $page->pressButton('Save');
-    $this->assertSession()->responseContains('Very important information');
+    $this->assertTrue($this->assertSession()->waitForText('Very important information'));
 
     // Test that changes only in source are saved.
     $this->drupalGet('node/1/edit');
@@ -814,7 +815,7 @@ JS;
     $editor = $page->find('css', '.ck-source-editing-area textarea');
     $editor->setValue('Text hidden in the source');
     $page->pressButton('Save');
-    $this->assertSession()->responseContains('Text hidden in the source');
+    $this->assertTrue($this->assertSession()->waitForText('Text hidden in the source'));
   }
 
 }

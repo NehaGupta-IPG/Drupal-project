@@ -189,10 +189,10 @@ class EntityFieldManagerTest extends UnitTestCase {
   /**
    * Sets up the entity type manager to be tested.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
+   * @param array<\Prophecy\Prophecy\ProphecyInterface<\Drupal\Core\Entity\EntityTypeInterface>> $definitions
    *   (optional) An array of entity type definitions.
    */
-  protected function setUpEntityTypeDefinitions($definitions = []): void {
+  protected function setUpEntityTypeDefinitions(array $definitions = []): void {
     foreach ($definitions as $key => $entity_type) {
       // \Drupal\Core\Entity\EntityTypeInterface::getLinkTemplates() is called
       // by \Drupal\Core\Entity\EntityTypeManager::processDefinition() so it
@@ -203,7 +203,7 @@ class EntityFieldManagerTest extends UnitTestCase {
     }
 
     $this->entityTypeManager->getDefinition(Argument::type('string'))
-      ->will(function ($args) use ($definitions) {
+      ->will(function (array $args) use ($definitions): EntityTypeInterface {
         if (isset($definitions[$args[0]])) {
           return $definitions[$args[0]];
         }
@@ -322,7 +322,7 @@ class EntityFieldManagerTest extends UnitTestCase {
       ->will(function ($arguments) use ($definitions): void {
         [, $callback] = $arguments;
         $callback(
-          function () use ($definitions) {
+          function () use ($definitions): array {
             return $definitions;
           },
           'example_module',
@@ -345,7 +345,7 @@ class EntityFieldManagerTest extends UnitTestCase {
    * @legacy-covers ::buildBaseFieldDefinitions
    */
   #[DataProvider('providerTestGetBaseFieldDefinitionsTranslatableEntityTypeDefaultLangcode')]
-  public function testGetBaseFieldDefinitionsTranslatableEntityTypeDefaultLangcode($default_langcode_key): void {
+  public function testGetBaseFieldDefinitionsTranslatableEntityTypeDefaultLangcode(string $default_langcode_key): void {
     $this->setUpEntityWithFieldDefinition(FALSE, 'id', [
       'langcode' => 'langcode',
       'default_langcode' => $default_langcode_key,
@@ -384,7 +384,7 @@ class EntityFieldManagerTest extends UnitTestCase {
    * @legacy-covers ::buildBaseFieldDefinitions
    */
   #[DataProvider('providerTestGetBaseFieldDefinitionsTranslatableEntityTypeLangcode')]
-  public function testGetBaseFieldDefinitionsTranslatableEntityTypeLangcode($provide_key, $provide_field, $translatable): void {
+  public function testGetBaseFieldDefinitionsTranslatableEntityTypeLangcode(bool $provide_key, bool $provide_field, bool $translatable): void {
     $keys = $provide_key ? ['langcode' => 'langcode'] : [];
     $this->setUpEntityWithFieldDefinition(FALSE, 'id', $keys);
 
@@ -496,7 +496,7 @@ class EntityFieldManagerTest extends UnitTestCase {
       ->will(function ($arguments) use ($definitions): void {
         [, $callback] = $arguments;
         $callback(
-          function () use ($definitions) {
+          function () use ($definitions): array {
             return $definitions;
           },
           'example_module',
@@ -578,7 +578,7 @@ class EntityFieldManagerTest extends UnitTestCase {
       ->will(function ($arguments) use ($field_definition, $module): void {
         [, $callback] = $arguments;
         $callback(
-          function () use ($field_definition) {
+          function () use ($field_definition): array {
             return [$field_definition->reveal()];
           },
           $module,
@@ -600,7 +600,7 @@ class EntityFieldManagerTest extends UnitTestCase {
    *   (optional) An array of entity keys for the mocked entity type. Defaults
    *   to an empty array.
    *
-   * @return \Drupal\Core\Field\BaseFieldDefinition|\Prophecy\Prophecy\ProphecyInterface
+   * @return \Prophecy\Prophecy\ProphecyInterface<\Drupal\Core\Field\BaseFieldDefinition>
    *   A field definition object.
    */
   protected function setUpEntityWithFieldDefinition($custom_invoke_all = FALSE, $field_definition_id = 'id', $entity_keys = []) {

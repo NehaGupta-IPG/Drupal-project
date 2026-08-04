@@ -16,14 +16,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class EntityReferenceSupportedNewEntitiesConstraint extends SymfonyConstraint {
 
-  #[HasNamedArguments]
   public function __construct(
-    mixed $options = NULL,
     public $message = '%collection_label can only be created in the default workspace.',
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
-    parent::__construct($options, $groups, $payload);
+    parent::__construct(groups: $groups, payload: $payload);
   }
 
 }

@@ -21,24 +21,24 @@ final class Configuration {
   /**
    * Indicates if the project deprecation ignores are enabled.
    */
-  public bool $projectIgnoresEnabled = FALSE;
+  public private(set) bool $projectIgnoresEnabled = FALSE;
 
   /**
    * Path to the deprecation ignore file.
    */
-  public string $projectIgnoreFile;
+  public private(set) string $projectIgnoreFile;
 
   /**
    * Indicates if the debug class loader is enabled.
    */
-  public bool $debugClassLoaderEnabled = FALSE;
+  public private(set) bool $debugClassLoaderEnabled = FALSE;
 
   /**
    * The list of deprecation message patterns that should be ignored.
    *
    * @var list<string>
    */
-  public array $deprecationIgnorePatterns = [];
+  public private(set) array $deprecationIgnorePatterns = [];
 
   /**
    * Returns the singleton.
@@ -85,7 +85,7 @@ final class Configuration {
       throw new \RuntimeException(sprintf('Invalid pattern found in "%s" on line %d', $path, 1 + $line));
     });
     try {
-      foreach (file($path) as $line => $pattern) {
+      foreach (file($path) as $pattern) {
         if ((trim($pattern)[0] ?? '#') !== '#') {
           preg_match($pattern, '');
           $this->deprecationIgnorePatterns[] = $pattern;

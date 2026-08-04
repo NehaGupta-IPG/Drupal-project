@@ -4,7 +4,6 @@ namespace Drupal\language;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\LanguageItem;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
 
@@ -17,7 +16,7 @@ use Drupal\language\Entity\ContentLanguageSettings;
  * Required settings are:
  *  - target_type: The entity type to reference.
  *
- * @see language_field_info_alter().
+ * @see \Drupal\language\Hook\LanguageHooks::fieldInfoAlter().
  */
 class DefaultLanguageItem extends LanguageItem {
 
@@ -25,11 +24,7 @@ class DefaultLanguageItem extends LanguageItem {
    * {@inheritdoc}
    */
   public function applyDefaultValue($notify = TRUE) {
-    // Default to LANGCODE_NOT_SPECIFIED.
-    $langcode = Language::LANGCODE_NOT_SPECIFIED;
-    if ($entity = $this->getEntity()) {
-      $langcode = $this->getDefaultLanguageCode($entity->getEntityTypeId(), $entity->bundle());
-    }
+    $langcode = $this->getDefaultLanguageCode($this->getEntity()->getEntityTypeId(), $this->getEntity()->bundle());
     // Always notify otherwise default langcode will not be set correctly.
     $this->setValue(['value' => $langcode], TRUE);
     return $this;

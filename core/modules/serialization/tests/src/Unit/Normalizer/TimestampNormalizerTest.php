@@ -106,18 +106,18 @@ class TimestampNormalizerTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestDenormalizeValidFormats() {
+  public static function providerTestDenormalizeValidFormats(): array {
     $expected_stamp = 1478422920;
 
     $data = [];
 
     $data['U'] = [$expected_stamp, $expected_stamp];
     $data['RFC3339'] = ['2016-11-06T09:02:00+00:00', $expected_stamp];
-    $data['RFC3339 +0100'] = ['2016-11-06T09:02:00+01:00', $expected_stamp - 1 * 3600];
+    $data['RFC3339 +0100'] = ['2016-11-06T09:02:00+01:00', $expected_stamp - 3600];
     $data['RFC3339 -0600'] = ['2016-11-06T09:02:00-06:00', $expected_stamp + 6 * 3600];
 
     $data['ISO8601'] = ['2016-11-06T09:02:00+0000', $expected_stamp];
-    $data['ISO8601 +0100'] = ['2016-11-06T09:02:00+0100', $expected_stamp - 1 * 3600];
+    $data['ISO8601 +0100'] = ['2016-11-06T09:02:00+0100', $expected_stamp - 3600];
     $data['ISO8601 -0600'] = ['2016-11-06T09:02:00-0600', $expected_stamp + 6 * 3600];
 
     return $data;
@@ -174,8 +174,8 @@ class TimestampNormalizerTestDrupalDateTime extends DrupalDateTime {
   /**
    * Sets the timezone.
    */
-  public function setTimezone(\DateTimeZone $timezone) {
-    parent::setTimezone($timezone);
+  public function setTimezone(\DateTimeZone $timezone): static {
+    return parent::setTimezone($timezone);
   }
 
 }

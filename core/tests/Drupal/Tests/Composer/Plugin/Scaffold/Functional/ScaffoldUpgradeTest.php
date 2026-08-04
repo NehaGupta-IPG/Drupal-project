@@ -38,8 +38,6 @@ class ScaffoldUpgradeTest extends TestCase {
 
   /**
    * The Fixtures directory.
-   *
-   * @var string
    */
   protected string $fixturesDir;
 
@@ -62,6 +60,8 @@ class ScaffoldUpgradeTest extends TestCase {
    * Tests upgrading the Composer Scaffold plugin.
    */
   public function testScaffoldUpgrade(): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3150040');
     $this->fixturesDir = $this->fixtures->tmpDir($this->name());
     $replacements = ['SYMLINK' => 'false', 'PROJECT_ROOT' => $this->fixtures->projectRoot()];
     $this->fixtures->cloneFixtureProjects($this->fixturesDir, $replacements);
@@ -230,7 +230,7 @@ PHP;
    * @return string
    *   Path to temporary git repository.
    */
-  protected function createTmpRepo($source, $destParent, $version): string {
+  protected function createTmpRepo(string $source, string $destParent, $version): string {
     $target = $destParent . '/' . basename($source);
     $filesystem = new Filesystem();
     $filesystem->copy($source, $target);

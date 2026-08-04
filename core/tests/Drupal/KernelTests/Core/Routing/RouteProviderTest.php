@@ -90,8 +90,6 @@ class RouteProviderTest extends KernelTestBase {
 
   /**
    * The test logger.
-   *
-   * @var \ColinODell\PsrTestLogger\TestLogger
    */
   protected TestLogger $logger;
 
@@ -233,7 +231,7 @@ class RouteProviderTest extends KernelTestBase {
    * Confirms that we find routes using a case-insensitive path match.
    */
   #[DataProvider('providerMixedCaseRoutePaths')]
-  public function testMixedCasePaths($path, $expected_route_name, $method = 'GET'): void {
+  public function testMixedCasePaths(string $path, ?string $expected_route_name, string $method = 'GET'): void {
     $connection = Database::getConnection();
     $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, $this->cache, 'test_routes');
 
@@ -276,7 +274,7 @@ class RouteProviderTest extends KernelTestBase {
    * Confirms that we find all routes with the same path.
    */
   #[DataProvider('providerDuplicateRoutePaths')]
-  public function testDuplicateRoutePaths($path, $number, $expected_route_name = NULL): void {
+  public function testDuplicateRoutePaths(string $path, int $number, ?string $expected_route_name = NULL): void {
     $connection = Database::getConnection();
     $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, $this->cache, 'test_routes');
 
@@ -774,6 +772,14 @@ class RouteProviderTest extends KernelTestBase {
     $this->assertEquals('drupal/core', $deprecation['package']);
     $this->assertEquals('11.2.0', $deprecation['version']);
     $this->assertEquals('route_c is deprecated!', $deprecation['message']);
+  }
+
+  /**
+   * Performs basic smoke test on the lazy route provider used in kernel tests.
+   */
+  public function testKernelTestLazyRouteProvider(): void {
+    $routes = \iterator_to_array(\Drupal::service('router.route_provider')->getAllRoutes());
+    self::assertArrayHasKey('language.negotiation_url', $routes);
   }
 
 }

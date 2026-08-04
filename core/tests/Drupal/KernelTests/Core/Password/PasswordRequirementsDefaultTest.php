@@ -31,7 +31,7 @@ class PasswordRequirementsDefaultTest extends PasswordTestBase {
     $this->assertArrayHasKey('password_hashing', $requirements);
     $this->assertSame(RequirementSeverity::Info, $requirements['password_hashing']['severity']);
     $this->assertEquals(
-      'Passwords are hashed with the bcrypt algorithm. Drupal 12 will use argon2id by default. It is recommended to <a href="https://www.drupal.org/node/3581980">switch</a> to argon2id.',
+      'Passwords are hashed with the <em class="placeholder">argon2id</em> algorithm.',
       (string) $requirements['password_hashing']['value']
     );
   }

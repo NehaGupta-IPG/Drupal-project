@@ -118,7 +118,7 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
    *   singular strings are supported, no plurals. No double quotes are allowed
    *   in source and translations strings.
    */
-  protected function makePoFile($path, $filename, $timestamp = NULL, array $translations = []) {
+  protected function makePoFile($path, string $filename, $timestamp = NULL, array $translations = []) {
     $timestamp = $timestamp ?: \Drupal::time()->getRequestTime();
     $path = 'public://' . $path;
     $text = '';
@@ -134,11 +134,9 @@ msgstr ""
 EOF;
 
     // Convert array of translations to Gettext source and translation strings.
-    if ($translations) {
-      foreach ($translations as $source => $target) {
-        $text .= 'msgid "' . $source . '"' . "\n";
-        $text .= 'msgstr "' . $target . '"' . "\n";
-      }
+    foreach ($translations as $source => $target) {
+      $text .= 'msgid "' . $source . '"' . "\n";
+      $text .= 'msgstr "' . $target . '"' . "\n";
     }
 
     \Drupal::service('file_system')->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY);

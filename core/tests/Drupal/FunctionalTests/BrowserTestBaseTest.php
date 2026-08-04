@@ -275,7 +275,6 @@ class BrowserTestBaseTest extends BrowserTestBase {
 
     // *** 1. fieldNotExists().
     $this->assertSession()->fieldNotExists('invalid_name_and_id');
-
     // Test that the assertion fails correctly when searching by name.
     try {
       $this->assertSession()->fieldNotExists('name');
@@ -284,7 +283,6 @@ class BrowserTestBaseTest extends BrowserTestBase {
     catch (ExpectationException) {
       // Expected exception; just continue testing.
     }
-
     // Test that the assertion fails correctly when searching by id.
     try {
       $this->assertSession()->fieldNotExists('edit-name');
@@ -297,7 +295,6 @@ class BrowserTestBaseTest extends BrowserTestBase {
     // *** 2. fieldExists().
     $this->assertSession()->fieldExists('name');
     $this->assertSession()->fieldExists('edit-name');
-
     // Test that the assertion fails correctly if the field does not exist.
     try {
       $this->assertSession()->fieldExists('invalid_name_and_id');
@@ -306,7 +303,8 @@ class BrowserTestBaseTest extends BrowserTestBase {
     catch (ElementNotFoundException) {
       // Expected exception; just continue testing.
     }
-    // *** 3. assertNoFieldById().
+
+    // *** 3. fieldNotExists().
     $this->assertSession()->fieldValueNotEquals('name', 'not the value');
     $this->assertSession()->fieldNotExists('nonexisting');
     // Test that the assertion fails correctly if no value is passed in.
@@ -317,22 +315,20 @@ class BrowserTestBaseTest extends BrowserTestBase {
     catch (ExpectationException) {
       // Expected exception; just continue testing.
     }
-
     // Test that the assertion fails correctly if a NULL value is passed in.
     try {
-      $this->assertSession()->fieldNotExists('name', NULL);
+      $this->assertSession()->fieldNotExists('name');
       $this->fail('The "name" field was not found.');
     }
     catch (ExpectationException) {
       // Expected exception; just continue testing.
     }
 
-    // *** 4. assertFieldById().
+    // *** 4. fieldValueNotEquals().
     $this->assertSession()->fieldExists('edit-name');
     $this->assertSession()->fieldValueEquals('edit-name', 'Test name');
     $this->assertSession()->fieldExists('edit-description');
     $this->assertSession()->fieldValueEquals('edit-description', '');
-
     // Test that the assertion fails correctly if no value is passed in.
     try {
       $this->assertSession()->fieldValueNotEquals('edit-name', '');
@@ -340,7 +336,6 @@ class BrowserTestBaseTest extends BrowserTestBase {
     catch (ExpectationFailedException) {
       // Expected exception; just continue testing.
     }
-
     // Test that the assertion fails correctly if the wrong value is passed in.
     try {
       $this->assertSession()->fieldValueNotEquals('edit-name', 'not the value');
@@ -351,7 +346,6 @@ class BrowserTestBaseTest extends BrowserTestBase {
 
     // *** 5. fieldValueNotEquals().
     $this->assertSession()->fieldValueNotEquals('name', 'not the value');
-
     // Test that the assertion fails correctly if given the right value.
     try {
       $this->assertSession()->fieldValueNotEquals('name', 'Test name');
@@ -364,7 +358,6 @@ class BrowserTestBaseTest extends BrowserTestBase {
     // *** 6. fieldValueEquals().
     $this->assertSession()->fieldValueEquals('name', 'Test name');
     $this->assertSession()->fieldValueEquals('description', '');
-
     // Test that the assertion fails correctly if given the wrong value.
     try {
       $this->assertSession()->fieldValueEquals('name', 'not the value');
@@ -373,7 +366,6 @@ class BrowserTestBaseTest extends BrowserTestBase {
     catch (ExpectationException) {
       // Expected exception; just continue testing.
     }
-
     // Test that text areas can contain new lines.
     $this->assertSession()->fieldValueEquals('edit-test-textarea-with-newline', "Test text with\nnewline");
   }
@@ -430,7 +422,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
 
     // Test that the assertion fails correctly when using NULL to ignore state.
     try {
-      $this->assertSession()->fieldNotExists('edit-checkbox-disabled', NULL);
+      $this->assertSession()->fieldNotExists('edit-checkbox-disabled');
       $this->fail('The "edit-checkbox-disabled" field was not found by ID, using NULL value.');
     }
     catch (ExpectationException) {
@@ -602,7 +594,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
     }
 
     $this->assertContains('Test deprecation message', $deprecation_messages);
-    $test_deprecation_messages = array_filter($deprecation_messages, function ($message) {
+    $test_deprecation_messages = array_filter($deprecation_messages, function (string $message): bool {
       return $message === 'Test deprecation message';
     });
     $this->assertCount(1, $test_deprecation_messages);

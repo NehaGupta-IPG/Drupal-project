@@ -64,7 +64,7 @@ class ContextualUnitTest extends KernelTestBase {
       [
         'views_ui_edit' => [
           'route_parameters' => [
-            'view' => 'frontpage',
+            'view' => 'promoted_content',
           ],
           'metadata' => [
             'location' => 'page',
@@ -73,7 +73,7 @@ class ContextualUnitTest extends KernelTestBase {
           ],
         ],
       ],
-      'views_ui_edit:view=frontpage:location=page&display=page_1&langcode=en',
+      'views_ui_edit:view=promoted_content:location=page&display=page_1&langcode=en',
       'olivero',
     ];
 
@@ -115,7 +115,7 @@ class ContextualUnitTest extends KernelTestBase {
    * @param string $theme
    *   The name of the theme the placeholder should pass to the controller.
    *
-   * @legacy-covers ::_contextual_links_to_id
+   * @legacy-covers \Drupal\contextual\ContextualLinksSerializer::linksToId()
    */
   #[DataProvider('contextualLinksDataProvider')]
   public function testContextualLinksToId(array $links, string $id, string $theme): void {
@@ -132,7 +132,7 @@ class ContextualUnitTest extends KernelTestBase {
    * @param string $theme
    *   The name of the theme the placeholder should pass to the controller.
    *
-   * @legacy-covers ::_contextual_id_to_links
+   * @legacy-covers \Drupal\contextual\ContextualLinksSerializer::idToLinks()
    */
   #[DataProvider('contextualLinksDataProvider')]
   public function testContextualIdToLinks(array $links, string $id, string $theme): void {

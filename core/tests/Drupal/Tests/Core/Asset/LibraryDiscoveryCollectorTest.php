@@ -5,12 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Asset;
 
 use Drupal\Core\Asset\LibraryDiscoveryCollector;
+use Drupal\Core\Asset\LibraryDiscoveryParser;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Theme\ActiveTheme;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\Asset\LibraryDiscoveryCollector.
@@ -20,25 +26,19 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 class LibraryDiscoveryCollectorTest extends UnitTestCase {
 
   /**
-   * The mock cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The cache backend.
    */
-  protected $cache;
+  protected CacheBackendInterface&Stub $cache;
 
   /**
-   * The mock lock backend.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The lock backend.
    */
-  protected $lock;
+  protected LockBackendInterface&Stub $lock;
 
   /**
    * The mock library discovery parser.
-   *
-   * @var \Drupal\Core\Asset\LibraryDiscoveryParser|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $libraryDiscoveryParser;
+  protected LibraryDiscoveryParser&MockObject $libraryDiscoveryParser;
 
   /**
    * The library discovery collector under test.
@@ -48,11 +48,9 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
   protected $libraryDiscoveryCollector;
 
   /**
-   * The mocked theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The theme manager.
    */
-  protected $themeManager;
+  protected ThemeManagerInterface&Stub $themeManager;
 
   /**
    * Test library data.
@@ -89,10 +87,8 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
 
   /**
    * The active theme.
-   *
-   * @var \Drupal\Core\Theme\ActiveTheme|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $activeTheme;
+  protected ActiveTheme&MockObject $activeTheme;
 
   /**
    * {@inheritdoc}
@@ -100,11 +96,9 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
-    $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
-    $this->themeManager = $this->getMockBuilder('Drupal\Core\Theme\ThemeManagerInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->cache = $this->createStub(CacheBackendInterface::class);
+    $this->lock = $this->createStub(LockBackendInterface::class);
+    $this->themeManager = $this->createStub(ThemeManagerInterface::class);
     $this->libraryDiscoveryParser = $this->getMockBuilder('Drupal\Core\Asset\LibraryDiscoveryParser')
       ->disableOriginalConstructor()
       ->getMock();
@@ -117,6 +111,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
       ->disableOriginalConstructor()
       ->getMock();
+    $this->themeManager = $this->createMock(ThemeManagerInterface::class);
     $this->themeManager->expects($this->exactly(5))
       ->method('getActiveTheme')
       ->willReturn($this->activeTheme);
@@ -141,6 +136,9 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
       ->disableOriginalConstructor()
       ->getMock();
+    $this->cache = $this->createMock(CacheBackendInterface::class);
+    $this->lock = $this->createMock(LockBackendInterface::class);
+    $this->themeManager = $this->createMock(ThemeManagerInterface::class);
     $this->themeManager->expects($this->exactly(5))
       ->method('getActiveTheme')
       ->willReturn($this->activeTheme);
@@ -185,7 +183,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $this->themeManager->expects($this->any())
+    $this->themeManager
       ->method('getActiveTheme')
       ->willReturn($this->activeTheme);
     $this->activeTheme->expects($this->once())
@@ -230,7 +228,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $this->themeManager->expects($this->any())
+    $this->themeManager
       ->method('getActiveTheme')
       ->willReturn($this->activeTheme);
     $this->activeTheme->expects($this->atLeastOnce())

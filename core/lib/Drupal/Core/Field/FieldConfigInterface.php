@@ -256,7 +256,7 @@ interface FieldConfigInterface extends FieldDefinitionInterface, ConfigEntityInt
    * @see \Drupal\Core\Field\FieldConfigInterface::addPropertyConstraints()
    * @see hook_entity_bundle_field_info_alter()
    */
-  public function addConstraint($constraint_name, /* ?array */$options = NULL);
+  public function addConstraint(string $constraint_name, ?array $options = NULL): static;
 
   /**
    * Sets the array of validation constraints for the FieldItemList.

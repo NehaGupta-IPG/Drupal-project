@@ -14,7 +14,6 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
@@ -44,7 +43,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests get.
    */
   #[DataProvider('providerTestGet')]
-  public function testGet(array $definition, $key, $expected): void {
+  public function testGet(array $definition, string $key, ?string $expected): void {
     $entity_type = $this->setUpEntityType($definition);
     $this->assertSame($expected, $entity_type->get($key));
   }
@@ -56,7 +55,7 @@ class EntityTypeTest extends UnitTestCase {
    * @legacy-covers ::get
    */
   #[DataProvider('providerTestSet')]
-  public function testSet($key, $value): void {
+  public function testSet(string $key, ?string $value): void {
     $entity_type = $this->setUpEntityType([]);
     $this->assertInstanceOf('Drupal\Core\Entity\EntityTypeInterface', $entity_type->set($key, $value));
     $this->assertSame($value, $entity_type->get($key));
@@ -67,7 +66,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests the getKeys() method.
    */
   #[DataProvider('providerTestGetKeys')]
-  public function testGetKeys($entity_keys, $expected): void {
+  public function testGetKeys(array $entity_keys, array $expected): void {
     $entity_type = $this->setUpEntityType(['entity_keys' => $entity_keys]);
     $expected += [
       'default_langcode' => 'default_langcode',
@@ -80,7 +79,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests the getKey() method.
    */
   #[DataProvider('providerTestGetKeys')]
-  public function testGetKey($entity_keys, $expected): void {
+  public function testGetKey(array $entity_keys, array $expected): void {
     $entity_type = $this->setUpEntityType(['entity_keys' => $entity_keys]);
     $this->assertSame($expected['bundle'], $entity_type->getKey('bundle'));
     $this->assertFalse($entity_type->getKey('bananas'));
@@ -90,7 +89,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests the hasKey() method.
    */
   #[DataProvider('providerTestGetKeys')]
-  public function testHasKey($entity_keys, $expected): void {
+  public function testHasKey(array $entity_keys, array $expected): void {
     $entity_type = $this->setUpEntityType(['entity_keys' => $entity_keys]);
     $this->assertSame(!empty($expected['bundle']), $entity_type->hasKey('bundle'));
     $this->assertSame(!empty($expected['id']), $entity_type->hasKey('id'));
@@ -323,32 +322,6 @@ class EntityTypeTest extends UnitTestCase {
   }
 
   /**
-   * Tests get original class unchanged.
-   */
-  #[IgnoreDeprecations]
-  public function testGetOriginalClassUnchanged(): void {
-    $this->expectUserDeprecationMessage('The "getOriginalClass" method is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. Use getDecoratedClasses() instead. See https://www.drupal.org/node/3557464');
-    $class = $this->randomMachineName();
-    $entity_type = $this->setUpEntityType(['class' => $class]);
-    $this->assertEquals($class, $entity_type->getOriginalClass());
-  }
-
-  /**
-   * Tests get original class changed.
-   *
-   * @legacy-covers ::setClass
-   * @legacy-covers ::getOriginalClass
-   */
-  #[IgnoreDeprecations]
-  public function testGetOriginalClassChanged(): void {
-    $this->expectUserDeprecationMessage('The "getOriginalClass" method is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. Use getDecoratedClasses() instead. See https://www.drupal.org/node/3557464');
-    $class = $this->randomMachineName();
-    $entity_type = $this->setUpEntityType(['class' => $class]);
-    $entity_type->setClass($this->randomMachineName());
-    $this->assertEquals($class, $entity_type->getOriginalClass());
-  }
-
-  /**
    * Tests get decorated classes through setClass.
    *
    * @legacy-covers ::setClass
@@ -540,7 +513,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests the ::getBundleLabel() method.
    */
   #[DataProvider('providerTestGetBundleLabel')]
-  public function testGetBundleLabel($definition, $expected): void {
+  public function testGetBundleLabel(array $definition, string $expected): void {
     $entity_type = $this->setUpEntityType($definition);
     $entity_type->setStringTranslation($this->getStringTranslationStub());
     $this->assertEquals($expected, $entity_type->getBundleLabel());

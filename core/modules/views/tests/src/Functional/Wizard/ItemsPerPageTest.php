@@ -136,7 +136,7 @@ class ItemsPerPageTest extends WizardTestBase {
     // Asserts that the 3 newest articles are listed, which is the configuration
     // for the `block` display in the view. In other words: the `items_per_page`
     // setting in the `View` config entity is respected.
-    $assert_3_newest_nodes = function () use ($node5, $node4, $node3, $node2, $node1, $page_node) {
+    $assert_3_newest_nodes = function () use ($node5, $node4, $node3, $node2, $node1, $page_node): void {
       $this->drupalGet('user');
       $content = $this->getSession()->getPage()->getContent();
       $this->assertSession()->pageTextContains($node5->label());
@@ -197,7 +197,6 @@ class ItemsPerPageTest extends WizardTestBase {
       'items_per_page' => 'none',
       'label' => 'Test',
     ])->save();
-    $this->expectUserDeprecationMessage('Saving a views block with "none" items per page is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. To use the items per page defined by the view, use NULL. See https://www.drupal.org/node/3522240');
     self::assertNull($block->get('settings')['items_per_page']);
     self::assertSame(4, View::load($view['id'])->toArray()['display']['default']['display_options']['pager']['options']['items_per_page']);
     self::assertSame(3, View::load($view['id'])->toArray()['display']['block_1']['display_options']['pager']['options']['items_per_page']);

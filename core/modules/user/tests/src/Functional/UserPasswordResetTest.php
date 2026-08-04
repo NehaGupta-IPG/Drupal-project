@@ -309,7 +309,7 @@ class UserPasswordResetTest extends BrowserTestBase {
    * @return array
    *   An array of scenarios.
    */
-  protected function languagePrefixTestProvider() {
+  protected function languagePrefixTestProvider(): array {
     return [
       'Test language prefix set as \'\', visiting default with preferred language as en' => [
         'setPreferredLangcode' => 'en',
@@ -341,7 +341,7 @@ class UserPasswordResetTest extends BrowserTestBase {
   /**
    * Retrieves password reset email and extracts the login link.
    */
-  public function getResetURL() {
+  public function getResetURL(): string {
     // Assume the most recent email.
     $_emails = $this->drupalGetMails();
     $email = end($_emails);
@@ -569,11 +569,6 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->drupalGet('user/' . $this->account->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->drupalLogout();
-
-    $edit = [
-      'name' => $this->account->getAccountName(),
-      'pass' => $password,
-    ];
 
     // The next request should *not* trigger flood control, since the
     // password change should have cleared flood events for this user.

@@ -276,7 +276,7 @@ class HelpTopicTest extends KernelTestBase {
    *   - name: Displayed name.
    *   - tags: Cache tags to test for.
    */
-  protected function getTopicList() {
+  protected function getTopicList(): array {
     return [
       'help_topics_test.test' => [
         'name' => 'ABC Help Test module',

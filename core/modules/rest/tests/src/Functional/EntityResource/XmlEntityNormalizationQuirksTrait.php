@@ -17,7 +17,6 @@ use Drupal\options\Plugin\Field\FieldType\ListIntegerItem;
 use Drupal\path\Plugin\Field\FieldType\PathItem;
 use Drupal\Tests\rest\Functional\XmlNormalizationQuirksTrait;
 use Drupal\user\StatusItem;
-use PHPUnit\Framework\Attributes\Before;
 
 /**
  * Trait for EntityResourceTestBase subclasses testing $format='xml'.
@@ -25,16 +24,6 @@ use PHPUnit\Framework\Attributes\Before;
 trait XmlEntityNormalizationQuirksTrait {
 
   use XmlNormalizationQuirksTrait;
-
-  /**
-   * Marks some tests as skipped because XML cannot be deserialized.
-   */
-  #[Before]
-  public function xmlEntityNormalizationQuirksTraitSkipTests(): void {
-    if (in_array($this->name(), ['testPatch', 'testPost'], TRUE)) {
-      $this->markTestSkipped('Deserialization of the XML format is not supported.');
-    }
-  }
 
   /**
    * {@inheritdoc}
@@ -62,9 +51,8 @@ trait XmlEntityNormalizationQuirksTrait {
     else {
       $normalization = $this->applyXmlConfigEntityDecodingQuirks($default_normalization);
     }
-    $normalization = $this->applyXmlDecodingQuirks($normalization);
 
-    return $normalization;
+    return $this->applyXmlDecodingQuirks($normalization);
   }
 
   /**
