@@ -297,7 +297,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 6,
+      'CacheTagLookupQueryCount' => 7,
       'CacheTagGroupedLookups' => [
         // Form submission and login.
         [

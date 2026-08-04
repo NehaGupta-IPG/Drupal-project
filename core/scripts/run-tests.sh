@@ -504,9 +504,6 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
   $process_runner = PhpUnitTestRunner::create(\Drupal::getContainer())
     ->setConfigurationFilePath(Config::get('phpunit-configuration'));
 
-  $process_runner = PhpUnitTestRunner::create(\Drupal::getContainer())
-    ->setConfigurationFilePath(Config::get('phpunit-configuration'));
-
   // Multi-process execution.
   $children = [];
   while (!empty($test_classes) || !empty($children)) {

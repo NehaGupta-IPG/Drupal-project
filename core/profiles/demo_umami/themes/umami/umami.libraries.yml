@@ -57,13 +57,6 @@ global_tweaks:
       css/components/forms/form.css: { weight: -10}
     layout:
       css/layout/layout.css: {}
-  fonts:
-    fonts/source-sans-pro-v21-latin-regular.woff2:
-      preload: true
-    fonts/scope-one-v14-latin-regular.woff2:
-      preload: true
-    fonts/source-sans-pro-v21-latin-700.woff2:
-      preload: true
 
 messages:
   css:

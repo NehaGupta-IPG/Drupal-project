@@ -8,7 +8,6 @@ use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\RegexConstraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 
 /**
  * Checks that the value is a valid extension name.
