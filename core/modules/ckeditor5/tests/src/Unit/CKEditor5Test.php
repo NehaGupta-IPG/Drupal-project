@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\Unit;
 
-use Drupal\ckeditor5\LanguageMapper;
 use Drupal\ckeditor5\Hook\Ckeditor5Hooks;
+use Drupal\ckeditor5\LanguageMapper;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\Core\Asset\AttachedAssets;
+use Drupal\Core\Asset\LibraryDependencyResolver;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\ckeditor5\Traits\PrivateMethodUnitTestTrait;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -59,7 +64,7 @@ class CKEditor5Test extends UnitTestCase {
   public function testPathsToFormNames(string $property_path, string $expected_form_item_name, bool $expect_exception = FALSE): void {
     $mapMethod = self::getMethod(CKEditor5::class, 'mapViolationPropertyPathsToFormNames');
     if ($expect_exception) {
-      $this->expectExceptionMessage('assert($shifted === \'settings\')');
+      $this->expectExceptionMessageIs('assert($shifted === \'settings\')');
     }
 
     $form_item_name = $mapMethod->invokeArgs(NULL, [$property_path, static::SIMULATED_FORM_STRUCTURE]);
@@ -125,11 +130,25 @@ class CKEditor5Test extends UnitTestCase {
     $language_mapper->expects($this->any())
       ->method('getMapping')
       ->willReturn('en');
-    $hooks = new Ckeditor5Hooks($language_mapper);
+    $module_handler = $this->prophesize(ModuleHandlerInterface::class);
+    $module_handler->moduleExists('locale')->willReturn(TRUE);
+    $library_resolver = $this->createMock(LibraryDependencyResolver::class);
+    $library_resolver->expects($this->any())
+      ->method('getLibrariesWithDependencies')
+      ->willReturn(['core/ckeditor5.translations.en', 'core/ckeditor5.translations', 'core/ckeditor5.anything']);
+    $hooks = new Ckeditor5Hooks(
+      $language_mapper,
+      $module_handler->reveal(),
+      $library_resolver,
+      $this->createStub(RendererInterface::class),
+      $this->createStub(ConfigFactoryInterface::class),
+      $this->createStub(ThemeExtensionList::class),
+      $this->createStub(MessengerInterface::class),
+    );
     $assets = new AttachedAssets();
     $assets->setLibraries([
-      'core/ckeditor5.translations',
       'core/ckeditor5.translations.en',
+      'core/ckeditor5.anything',
     ]);
     $language = new Language([
       'id' => 'en',
@@ -176,7 +195,7 @@ class CKEditor5Test extends UnitTestCase {
       'core/ckeditor5.translations.en',
     ]);
     $assets->setAlreadyLoadedLibraries([
-      'core/ckeditor5.translations',
+      'core/ckeditor5.translations.anything',
     ]);
     $javascript = $original_javascript;
     $hooks->jsAlter($javascript, $assets, $language);

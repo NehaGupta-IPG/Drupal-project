@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Kernel\Extension;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleUninstallValidatorException;
+use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
@@ -45,7 +46,7 @@ class ModuleHandlerTest extends KernelTestBase {
     $this->assertModuleList($module_list, 'After adding a module');
 
     // Try to mess with the module weights.
-    module_set_weight('dependency_foo_test', 20);
+    \Drupal::service(ModuleWeight::class)->set('dependency_foo_test', 20);
 
     // Move dependency_foo_test to the end of the array.
     unset($module_list[array_search('dependency_foo_test', $module_list)]);
@@ -256,7 +257,7 @@ class ModuleHandlerTest extends KernelTestBase {
 
     // Try uninstalling the dependencies.
     $this->expectException(ModuleUninstallValidatorException::class);
-    $this->expectExceptionMessage("The following reasons prevent the modules from being uninstalled: The 'Testing install profile all dependencies' install profile requires 'Database Logging'; The 'Testing install profile all dependencies' install profile requires 'Dependency foo test module'");
+    $this->expectExceptionMessageIs("The following reasons prevent the modules from being uninstalled: The 'Testing install profile all dependencies' install profile requires 'Database Logging'; The 'Testing install profile all dependencies' install profile requires 'Dependency foo test module'");
     $this->moduleInstaller()->uninstall($dependencies);
   }
 
@@ -439,7 +440,7 @@ class ModuleHandlerTest extends KernelTestBase {
    */
   #[IgnoreDeprecations]
   public function testAutoloadHookInfoFiles(): void {
-    $this->expectDeprecation('Autoloading hooks in the file (core/modules/system/tests/modules/module_test/module_test.tokens.inc) is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Move the functions in this file to either the .module file or other appropriate location. See https://www.drupal.org/node/3489765');
+    $this->expectUserDeprecationMessage('Autoloading hooks in the file (core/modules/system/tests/modules/module_test/module_test.tokens.inc) is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Move the functions in this file to either the .module file or other appropriate location. See https://www.drupal.org/node/3489765');
     $this->moduleInstaller()->install(['module_test']);
     $testToken = [];
     $testToken['types']['token_info_invoked'] = [

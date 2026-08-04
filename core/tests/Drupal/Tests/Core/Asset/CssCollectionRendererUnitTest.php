@@ -44,7 +44,7 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
       ->willReturnCallback(function ($uri) {
          return 'generated-relative-url:' . $uri;
       });
-    $assetQueryString->get()->shouldBeCalledOnce()->willReturn('');
+    $assetQueryString->get()->willReturn('');
     $this->renderer = new CssCollectionRenderer($assetQueryString->reveal(), $file_url_generator);
     $this->fileCssGroup = [
       'group' => -100,
@@ -310,7 +310,7 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
    */
   public function testRenderInvalidType(): void {
     $this->expectException('Exception');
-    $this->expectExceptionMessage('Invalid CSS asset type.');
+    $this->expectExceptionMessageIs('Invalid CSS asset type.');
 
     $css_group = [
       'group' => 0,

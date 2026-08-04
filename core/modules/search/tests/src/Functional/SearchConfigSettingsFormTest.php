@@ -27,6 +27,8 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
     'node',
     'search',
     'search_extra_type',
+    'search_node',
+    'search_user',
     'test_page_test',
   ];
 

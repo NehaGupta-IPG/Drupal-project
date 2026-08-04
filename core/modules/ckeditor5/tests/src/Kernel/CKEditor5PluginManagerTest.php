@@ -209,7 +209,7 @@ YAML,
       $this->expectException($expected_exception);
     }
     if ($expected_message) {
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessageIs($expected_message);
     }
     $container = $this->mockModuleInVfs('ckeditor5_invalid_plugin', $yaml, $additional_files);
     $pluginManager = $container->get('plugin.manager.ckeditor5.plugin');
@@ -1097,7 +1097,7 @@ PHP,
     // editor config entity is passed: only then can a subset be generated based
     // on configuration.
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageIs($expected_exception_message);
     $this->manager->getProvidedElements([$sneaky_plugin_id], $text_editor);
   }
 
@@ -1609,7 +1609,7 @@ PHP,
    */
   public function testAutomaticLinkDecoratorsDisallowed(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "ckeditor5_automatic_link_decorator_test_llamaClass" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
+    $this->expectExceptionMessageIs('The "ckeditor5_automatic_link_decorator_test_llamaClass" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
 
     $this->enableModules(['ckeditor5_automatic_link_decorator_test']);
 
@@ -1623,7 +1623,7 @@ PHP,
    */
   public function testExternalLinkAutomaticLinkDecoratorDisallowed(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "ckeditor5_automatic_link_decorator_test_2_addTargetToExternalLinks" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
+    $this->expectExceptionMessageIs('The "ckeditor5_automatic_link_decorator_test_2_addTargetToExternalLinks" CKEditor 5 plugin definition specifies an automatic decorator, this is not supported. Use the Drupal filter system instead.');
 
     $this->enableModules(['ckeditor5_automatic_link_decorator_test_2']);
 
@@ -1642,10 +1642,10 @@ PHP,
       $this->expectException($expected_exception);
     }
     if ($expected_message) {
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessageIs($expected_message);
     }
     if ($expected_deprecation_message) {
-      $this->expectDeprecation($expected_deprecation_message);
+      $this->expectUserDeprecationMessage($expected_deprecation_message);
     }
 
     $container = $this->mockModuleInVfs('ckeditor5_derived_plugin', $yaml, $additional_files);
@@ -2072,11 +2072,11 @@ PHP,
    */
   #[IgnoreDeprecations]
   public function testDeprecatedIcons(): void {
-    $this->expectDeprecation('The icon configuration value "objectBlockLeft" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectLeft" instead. See https://www.drupal.org/node/3528806');
-    $this->expectDeprecation('The icon configuration value "objectBlockRight" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectRight" instead. See https://www.drupal.org/node/3528806');
-    $this->expectDeprecation('The icon configuration value "objectLeft" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectInlineLeft" instead. See https://www.drupal.org/node/3528806');
-    $this->expectDeprecation('The icon configuration value "objectRight" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectInlineRight" instead. See https://www.drupal.org/node/3528806');
-    $this->expectDeprecation('The icon configuration value "threeVerticalDots" in drupalElementStyles group threeVerticalDots for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconThreeVerticalDots" instead. See https://www.drupal.org/node/3528806');
+    $this->expectUserDeprecationMessage('The icon configuration value "objectBlockLeft" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectLeft" instead. See https://www.drupal.org/node/3528806');
+    $this->expectUserDeprecationMessage('The icon configuration value "objectBlockRight" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectRight" instead. See https://www.drupal.org/node/3528806');
+    $this->expectUserDeprecationMessage('The icon configuration value "objectLeft" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectInlineLeft" instead. See https://www.drupal.org/node/3528806');
+    $this->expectUserDeprecationMessage('The icon configuration value "objectRight" in drupalElementStyles group align for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconObjectInlineRight" instead. See https://www.drupal.org/node/3528806');
+    $this->expectUserDeprecationMessage('The icon configuration value "threeVerticalDots" in drupalElementStyles group threeVerticalDots for CKEditor5 plugin ckeditor5_icon_deprecation_test_plugin is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "IconThreeVerticalDots" instead. See https://www.drupal.org/node/3528806');
     \Drupal::service('module_installer')->install(['ckeditor5_icon_deprecation_test']);
     $definitions = \Drupal::service('plugin.manager.ckeditor5.plugin')->getDefinitions();
     $config = $definitions['ckeditor5_icon_deprecation_test_plugin']->toArray()['ckeditor5']['config']['drupalElementStyles'];

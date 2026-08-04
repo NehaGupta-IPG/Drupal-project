@@ -18,12 +18,16 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\ExpectationFailedException;
 
 // cspell:ignore htkey
+
 /**
  * Tests BrowserTestBase functionality.
+ *
+ * @final
  */
 #[Group('browsertestbase')]
 #[RunTestsInSeparateProcesses]
 class BrowserTestBaseTest extends BrowserTestBase {
+
   use PathAliasTestTrait;
   use CronRunTrait;
 
@@ -35,6 +39,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
     'form_test',
     'system_test',
     'node',
+    'deprecation_test',
   ];
 
   /**
@@ -227,7 +232,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
 
   public function testError(): void {
     $this->expectException('\Exception');
-    $this->expectExceptionMessage('User notice: foo');
+    $this->expectExceptionMessageIsOrContains('User notice: foo');
     $this->drupalGet('test-error');
   }
 
@@ -537,7 +542,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
    */
   public function testProfileModules(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('The module demo_umami_content does not exist.');
+    $this->expectExceptionMessageIs('The module demo_umami_content does not exist.');
     $this->assertFileExists('core/profiles/demo_umami/modules/demo_umami_content/demo_umami_content.info.yml');
     \Drupal::service('extension.list.module')->getPathname('demo_umami_content');
   }
@@ -604,6 +609,22 @@ class BrowserTestBaseTest extends BrowserTestBase {
   }
 
   /**
+   * Tests deprecation message from deprecated route.
+   *
+   * This test verifies that TestHttpClientMiddleware is properly re-throwing
+   * deprecations occurred in the SUT and collected in the response header.
+   *
+   * @see \Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware
+   * @see _drupal_error_handler
+   * @see _drupal_error_handler_real
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecationTriggeredInSystemUnderTest(): void {
+    $this->expectUserDeprecationMessage('This is the deprecation message for deprecation_test_function().');
+    $this->drupalGet(Url::fromRoute('deprecation_test.route'));
+  }
+
+  /**
    * Tests the dump() function provided by the var-dumper Symfony component.
    */
   public function testVarDump(): void {
@@ -646,7 +667,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   public function testSimpleTestBaseUrlValidation(): void {
     putenv('SIMPLETEST_BASE_URL=mysql://user:pass@localhost/database');
     $this->expectException(\Exception::class);
-    $this->expectExceptionMessage('You must provide valid scheme for the SIMPLETEST_BASE_URL environment variable. Valid schema are: http, https.');
+    $this->expectExceptionMessageIs('You must provide valid scheme for the SIMPLETEST_BASE_URL environment variable. Valid schema are: http, https.');
     $this->setupBaseUrl();
   }
 

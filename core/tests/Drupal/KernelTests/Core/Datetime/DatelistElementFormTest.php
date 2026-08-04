@@ -118,11 +118,28 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
   #[IgnoreDeprecations]
   public function testDatelistElementUntrustedCallbacks() : void {
     $this->expectException(UntrustedCallbackException::class);
-    $this->expectExceptionMessage(sprintf(
+    $this->expectExceptionMessageIs(sprintf(
       'Datelist element #date_date_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966',
       Variable::callableToString([$this, 'datelistDateCallback'])
     ));
     \Drupal::formBuilder()->getForm($this, 'datelistDateCallback');
+  }
+
+  /**
+   * Tests proper timezone handling of the Datelist element.
+   */
+  public function testTimezoneHandling(): void {
+    // Render the form once with the site's timezone.
+    $form = \Drupal::formBuilder()->getForm($this);
+    $this->render($form);
+    $this->assertEquals('Australia/Sydney', $form['datelist_element']['#date_timezone']);
+
+    // Mimic a user with a different timezone than Australia/Sydney.
+    date_default_timezone_set('UTC');
+
+    $form = \Drupal::formBuilder()->getForm($this);
+    $this->render($form);
+    $this->assertEquals('UTC', $form['datelist_element']['#date_timezone']);
   }
 
   /**

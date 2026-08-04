@@ -189,6 +189,7 @@ class MappingTest extends KernelTestBase {
         'level',
         'depth',
         'expand_all_items',
+        'ignore_active_trail',
       ],
       'block.settings.local_tasks_block' => [
         'primary',
@@ -405,14 +406,15 @@ class MappingTest extends KernelTestBase {
         // @see core/config/schema/core.data_types.schema.yml
         'id',
         'negate',
-        'uuid',
         'context_mapping',
         // Keys defined locally, in `type: condition.plugin.response_status`.
         // @see core/modules/system/config/schema/system.schema.yml
         'status_codes',
       ],
-      [],
-      // Note the presence of `id`, `negate`, `uuid` and `context_mapping` here.
+      // This key is optional, see `type: condition.plugin`.
+      // @see core.data_types.schema.yml
+      ['context_mapping'],
+      // Note the presence of `id`, `negate`, and `context_mapping` here.
       // That's because there is no `condition.plugin.*` type that specifies
       // defaults. Each individual condition plugin has the freedom to deviate
       // from this approach!
@@ -420,28 +422,24 @@ class MappingTest extends KernelTestBase {
         'condition.plugin.entity_bundle:*' => [
           'id',
           'negate',
-          'uuid',
           'context_mapping',
           'bundles',
         ],
         'condition.plugin.request_path' => [
           'id',
           'negate',
-          'uuid',
           'context_mapping',
           'pages',
         ],
         'condition.plugin.response_status' => [
           'id',
           'negate',
-          'uuid',
           'context_mapping',
           'status_codes',
         ],
         'condition.plugin.current_theme' => [
           'id',
           'negate',
-          'uuid',
           'context_mapping',
           'theme',
         ],
@@ -457,14 +455,15 @@ class MappingTest extends KernelTestBase {
         // @see core/config/schema/core.data_types.schema.yml
         'id',
         'negate',
-        'uuid',
         'context_mapping',
         // Keys defined locally, in `type: condition.plugin.response_status`.
         // @see core/modules/system/config/schema/system.schema.yml
         'status_codes',
       ],
-      [],
-      // Note the ABSENCE of `id`, `negate`, `uuid` and `context_mapping`
+      // This key is optional, see `type: condition.plugin`.
+      // @see core.data_types.schema.yml
+      ['context_mapping'],
+      // Note the ABSENCE of `id`, `negate`, and `context_mapping`
       // compared to the previous test case, because now the
       // `condition.plugin.*` type does exist.
       [
@@ -543,7 +542,7 @@ class MappingTest extends KernelTestBase {
       );
     }
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage($expected_message);
+    $this->expectExceptionMessageIs($expected_message);
     new Mapping($definition, 'foobar', $parent);
   }
 
@@ -557,7 +556,7 @@ class MappingTest extends KernelTestBase {
   #[TestWith(["false"])]
   public function testInvalidRequiredKeyFlag(mixed $required_key_flag_value): void {
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('The `requiredKey` flag must either be omitted or have `false` as the value.');
+    $this->expectExceptionMessageIs('The `requiredKey` flag must either be omitted or have `false` as the value.');
     new Mapping(new MapDataDefinition([
       'type' => 'mapping',
       'mapping' => [

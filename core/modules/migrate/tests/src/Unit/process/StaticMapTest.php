@@ -55,7 +55,7 @@ class StaticMapTest extends MigrateProcessTestCase {
    */
   public function testMapWithInvalidSource(): void {
     $this->expectException(MigrateSkipRowException::class);
-    $this->expectExceptionMessage(sprintf("No static mapping found for '%s' and no default value provided for destination '%s'.", Variable::export(['bar']), 'destination_property'));
+    $this->expectExceptionMessageIs(sprintf("No static mapping found for '%s' and no default value provided for destination '%s'.", Variable::export(['bar']), 'destination_property'));
     $this->plugin->transform(['bar'], $this->migrateExecutable, $this->row, 'destination_property');
   }
 
@@ -90,7 +90,7 @@ class StaticMapTest extends MigrateProcessTestCase {
     $configuration['bypass'] = TRUE;
     $this->plugin = new StaticMap($configuration, 'map', []);
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('Setting both default_value and bypass is invalid.');
+    $this->expectExceptionMessageIs('Setting both default_value and bypass is invalid.');
     $this->plugin->transform(['bar'], $this->migrateExecutable, $this->row, 'destination_property');
   }
 
@@ -99,7 +99,7 @@ class StaticMapTest extends MigrateProcessTestCase {
    */
   public function testWithNullSourceNotInMap(): void {
     $this->expectException(MigrateSkipRowException::class);
-    $this->expectExceptionMessage("No static mapping possible for NULL and no default value provided for destination 'destination_property'");
+    $this->expectExceptionMessageIs("No static mapping possible for NULL and no default value provided for destination 'destination_property'.");
     $this->plugin->transform(NULL, $this->migrateExecutable, $this->row, 'destination_property');
   }
 
@@ -111,7 +111,7 @@ class StaticMapTest extends MigrateProcessTestCase {
     $configuration['map']['foo']['bar'] = 'baz';
     $configuration['map'][''] = 'mapped NULL';
     $this->plugin = new StaticMap($configuration, 'map', []);
-    $this->expectDeprecation('Relying on mapping NULL values via an empty string map key in Drupal\migrate\Plugin\migrate\process\StaticMap::transform() is deprecated in drupal:11.3.0 and will trigger a Drupal\migrate\MigrateSkipRowException from drupal:12.0.0. Set the empty string map value as the "default_value" in the plugin configuration. See https://www.drupal.org/node/3557003');
+    $this->expectUserDeprecationMessage('Relying on mapping NULL values via an empty string map key in Drupal\migrate\Plugin\migrate\process\StaticMap::transform() is deprecated in drupal:11.3.0 and will trigger a Drupal\migrate\MigrateSkipRowException from drupal:12.0.0. Set the empty string map value as the "default_value" in the plugin configuration. See https://www.drupal.org/node/3557003');
     $value = $this->plugin->transform(NULL, $this->migrateExecutable, $this->row, 'destination_property');
     $this->assertSame('mapped NULL', $value);
   }

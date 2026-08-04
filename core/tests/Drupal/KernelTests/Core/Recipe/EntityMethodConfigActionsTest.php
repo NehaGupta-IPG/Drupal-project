@@ -238,7 +238,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
     // We should get an exception if we try to set a nested value on a property
     // that isn't an array.
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage('The setProperties config action can only set nested values on arrays.');
+    $this->expectExceptionMessageIs('The setProperties config action can only set nested values on arrays.');
     $this->configActionManager->applyAction(
       'setProperties',
       $block->getConfigDependencyName(),
@@ -260,7 +260,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
     $this->assertNotEmpty($property_name);
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("Entity key '$property_name' cannot be changed by the setProperties config action.");
+    $this->expectExceptionMessageIs("Entity key '$property_name' cannot be changed by the setProperties config action.");
     $this->configActionManager->applyAction(
       'setProperties',
       $view_display->getConfigDependencyName(),
@@ -277,7 +277,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
       ->getViewDisplay('entity_test_with_bundle', 'test');
     $view_display->save();
 
-    $this->expectDeprecation('Using the simpleConfigUpdate config action on config entities is deprecated in drupal:11.2.0 and throws an exception in drupal:12.0.0. Use the setProperties action instead. See https://www.drupal.org/node/3515543');
+    $this->expectUserDeprecationMessage('Using the simpleConfigUpdate config action on config entities is deprecated in drupal:11.2.0 and throws an exception in drupal:12.0.0. Use the setProperties action instead. See https://www.drupal.org/node/3515543');
     $this->configActionManager->applyAction(
       'simpleConfigUpdate',
       $view_display->getConfigDependencyName(),

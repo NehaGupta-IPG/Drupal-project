@@ -173,7 +173,7 @@ default:
 
 .run-on-commit: &run-on-commit
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "11.x"
       allow_failure: true
 
 .run-daily: &run-daily
@@ -212,7 +212,7 @@ default:
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
   script:
-    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "PHPUnit-Unit" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --verbose --non-html --all || EXIT_CODE=$?
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "PHPUnit-Unit" --concurrency "$CONCURRENCY" --repeat "1" --sqlite ":memory:" --verbose --non-html --all || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == $NEXT_PHP_MAJOR ]] && exit 100
@@ -549,20 +549,13 @@ default:
       fi
   script:
     - vendor/bin/phpstan --version
-    # Rely on PHPStan caching to execute analysis multiple times without performance drawback.
-    # Output a copy in junit.
-    - php vendor/bin/phpstan -vvv analyze --configuration=$_PHPSTAN_NEON --error-format=gitlab > $_ARTIFACTS_DIR/phpstan-quality-report.json || EXIT_CODE=$?
-    - php vendor/bin/phpstan -vvv analyze --configuration=$_PHPSTAN_NEON --no-progress --error-format=junit > $_ARTIFACTS_DIR/phpstan-junit.xml || true
-    # When the PHPStan scan fails, output a human readable copy of the errors,
-    # and regenerate a full baseline.
+    - php vendor/bin/phpstan -vvv analyze --configuration=$_PHPSTAN_NEON --error-format=multiplex || EXIT_CODE=$?
+    # When the PHPStan scan fails, regenerate a full baseline.
     # In order to regenerate a baseline artifact that can be copied and pasted
     # to a MR branch, we first need to void the current baseline file, then
-    # run PHPStan with the --generate-baseline option, and finally edit the
-    # generated file to convert absolute paths into relative ones.
+    # run PHPStan with the --generate-baseline option.
     - |
       if [ -n "$EXIT_CODE" ]; then
-        # Output a copy in plain text for human logs.
-        php vendor/bin/phpstan analyze --configuration=$_PHPSTAN_NEON --no-progress || true
         # Generate a new baseline.
         echo "Generating a PHPStan baseline file (available as job artifact)."
         cp $CI_PROJECT_DIR/.gitlab-ci/scripts/.empty-phpstan-baseline.php $_PHPSTAN_BASELINE
@@ -577,7 +570,7 @@ default:
     - php $CI_PROJECT_DIR/.gitlab-ci/scripts/phpstan-baseline-statistics.php $_PHPSTAN_BASELINE $_ARTIFACTS_DIR/phpstan-metrics.txt
   artifacts:
     reports:
-      codequality: $_ARTIFACTS_DIR/phpstan-quality-report.json
+      codequality: $_ARTIFACTS_DIR/phpstan-gitlab.json
       junit: $_ARTIFACTS_DIR/phpstan-junit.xml
       metrics: $_ARTIFACTS_DIR/phpstan-metrics.txt
     when: always
@@ -715,7 +708,7 @@ default:
     # Composer-install Drush & the Config Inspector module.
     - composer require drush/drush drupal/config_inspector || exit 100
     # Install Drupal's Standard install profile + all core modules (except obsolete ones) + the config inspector module.
-    - php core/scripts/drupal install standard
+    - vendor/bin/dr install standard
     - ls core/modules | grep -v sdc | xargs vendor/bin/drush pm:install --yes
     - vendor/bin/drush pm:install config_inspector --yes --quiet || exit 101
     # Compute statistics for coverage of validatable config for HEAD.
@@ -738,6 +731,26 @@ default:
          $impact = array_map(fn (float $h, float $m) => $m-$h, $head, $mr);
          exit((int) (min($impact) < 0));
       '
+
+'📦 Yarn install on minimum Node.js version':
+  stage: 🪄 Lint
+  image: node:20
+  variables:
+    KUBERNETES_CPU_REQUEST: "1"
+  # Run on push, or on MRs if package.json or yarn.lock have changed, or manually.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - core/package.json
+        - core/yarn.lock
+    - when: manual
+      allow_failure: true
+  script:
+    - cd core
+    - corepack enable
+    - echo -e "Node version $(node --version)\nYarn version $(corepack yarn --version)"
+    - yarn install
 
 # This job should be real quick and run at the very end of the pipeline.
 'Write lint caches':

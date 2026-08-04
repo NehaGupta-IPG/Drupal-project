@@ -26,7 +26,7 @@
         "drupal/coder": "^8.3.30",
         "lullabot/mink-selenium2-driver": "^1.7.3",
         "lullabot/php-webdriver": "^2.0.7",
-        "mglaman/phpstan-drupal": "^1.3.9 || ^2.0.9",
+        "mglaman/phpstan-drupal": "^1.3.9 || ^2.0.15",
         "micheh/phpcs-gitlab": "^1.1 || ^2.0",
         "mikey179/vfsstream": "^1.6.11",
         "open-telemetry/exporter-otlp": "^1",
@@ -35,15 +35,16 @@
         "phpspec/prophecy": "^1.23",
         "phpspec/prophecy-phpunit": "^2",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan": "^1.12.27 || ^2.1.26",
-        "phpstan/phpstan-phpunit": "^1.4.2 || ^2.0.7",
-        "phpunit/phpunit": "^11.5.42",
+        "phpstan/phpstan": "^1.12.27 || ^2.2.0",
+        "phpstan/phpstan-phpunit": "^1.4.2 || ^2.0.16",
+        "phpunit/phpunit": "^11.5.50",
         "symfony/browser-kit": "^7.4",
         "symfony/css-selector": "^7.4",
-        "symfony/dom-crawler": "^7.4",
+        "symfony/dom-crawler": "^7.4.12",
         "symfony/error-handler": "^7.4",
         "symfony/lock": "^7.4",
-        "symfony/var-dumper": "^7.4"
+        "symfony/var-dumper": "^7.4",
+        "vincentlanglet/twig-cs-fixer": "^4.0"
     },
     "replace": {
         "symfony/polyfill-php72": "*",
@@ -71,6 +72,7 @@
             "drupal/core-vendor-hardening": true,
             "php-http/discovery": true,
             "phpstan/extension-installer": true,
+            "symfony/runtime": true,
             "tbachert/spi": false
         }
     },
@@ -119,6 +121,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Drupal\\PHPStan\\ErrorFormatter\\": "core/tests/PHPStan/ErrorFormatter",
             "Drupal\\PHPStan\\Rules\\": "core/tests/PHPStan/Rules"
         }
     },
@@ -134,8 +137,12 @@
             "Drupal\\Composer\\Composer::generateMetapackages",
             "Drupal\\Composer\\Composer::generateComponentPackages"
         ],
-        "phpcs": "phpcs --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --",
-        "phpcbf": "phpcbf --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --"
+        "phpcs": "phpcs -d memory_limit=-1 --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --",
+        "phpcbf": "phpcbf -d memory_limit=-1 --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --",
+        "phpstan": "phpstan analyze --memory-limit=-1 --configuration=core/phpstan.neon.dist --",
+        "phpstan-baseline": "phpstan analyze --memory-limit=-1 --configuration=core/phpstan.neon.dist --generate-baseline=core/.phpstan-baseline.php",
+        "twigcs": "twig-cs-fixer lint -c core/.twig-cs-fixer.php",
+        "twigcs-fix": "twig-cs-fixer lint -c core/.twig-cs-fixer.php --fix"
     },
     "repositories": [
         {

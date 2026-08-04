@@ -46,6 +46,7 @@ class InstallerTest extends InstallerTestBase {
     $module_extension_list = \Drupal::service('extension.list.module');
     $extensions = $module_extension_list->getList();
 
+    // By default, the profile should remain installed.
     $this->assertArrayHasKey('testing', $extensions);
     $this->assertEquals(1000, $extensions['testing']->weight);
     // Ensures that router is not rebuilt unnecessarily during the install.
@@ -96,7 +97,7 @@ class InstallerTest extends InstallerTestBase {
 
     // Assert that we use the by core supported database drivers by default and
     // not the ones from the driver_test module.
-    $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupalmysqldriverdatabasemysql"]', 'MySQL, MariaDB, Percona Server, or equivalent');
+    $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupalmysqldriverdatabasemysql"]', 'MySQL, MariaDB, or equivalent');
     $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupalpgsqldriverdatabasepgsql"]', 'PostgreSQL');
 
     parent::setUpSettings();

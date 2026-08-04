@@ -123,7 +123,7 @@ class RecipeRunnerTest extends KernelTestBase {
     $type->save();
 
     $this->expectException(RecipePreExistingConfigException::class);
-    $this->expectExceptionMessage("The configuration 'node.type.test' exists already and does not match the recipe's configuration");
+    $this->expectExceptionMessageIs("The configuration 'node.type.test' exists already and does not match the recipe's configuration");
     Recipe::createFromDirectory('core/tests/fixtures/recipes/install_node_with_config');
   }
 
@@ -255,7 +255,7 @@ YAML;
 
     $recipe = $this->createRecipe($recipe_data);
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage('The "setFoo" plugin does not exist.');
+    $this->expectExceptionMessageIsOrContains('The "setFoo" plugin does not exist.');
     RecipeRunner::processRecipe($recipe);
   }
 
@@ -277,7 +277,7 @@ YAML;
 
     $recipe = $this->createRecipe($recipe_data);
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage('The "config_test" entity does not support the "setBody" config action.');
+    $this->expectExceptionMessageIsOrContains('The "config_test" entity does not support the "setBody" config action.');
     RecipeRunner::processRecipe($recipe);
   }
 
@@ -297,7 +297,7 @@ config:
         label: 'Created by recipe'
 YAML;
     $recipe = $this->createRecipe($recipe_data);
-    $this->expectDeprecation('The plugin ID "entity_create:ensure_exists" is deprecated in drupal:10.3.1 and will be removed in drupal:12.0.0. Use "entity_create:createIfNotExists" instead. See https://www.drupal.org/node/3458273.');
+    $this->expectUserDeprecationMessage('The plugin ID "entity_create:ensure_exists" is deprecated in drupal:10.3.1 and will be removed in drupal:12.0.0. Use "entity_create:createIfNotExists" instead. See https://www.drupal.org/node/3458273.');
     RecipeRunner::processRecipe($recipe);
   }
 
@@ -323,17 +323,17 @@ YAML;
     $this->assertSame('Another test content type', NodeType::load('another_test')?->label());
 
     $operations = RecipeRunner::toBatchOperations($recipe);
+    $this->assertSame('triggerEvent', $operations[2][0][1]);
+    $this->assertSame('Install node with config', $operations[2][1][0]->name);
+    $this->assertStringEndsWith('core/tests/fixtures/recipes/install_node_with_config', $operations[2][1][0]->path);
+
+    $this->assertSame('triggerEvent', $operations[5][0][1]);
+    $this->assertSame('Recipe include', $operations[5][1][0]->name);
+    $this->assertStringEndsWith('core/tests/fixtures/recipes/recipe_include', $operations[5][1][0]->path);
+
     $this->assertSame('triggerEvent', $operations[7][0][1]);
-    $this->assertSame('Install node with config', $operations[7][1][0]->name);
-    $this->assertStringEndsWith('core/tests/fixtures/recipes/install_node_with_config', $operations[7][1][0]->path);
-
-    $this->assertSame('triggerEvent', $operations[10][0][1]);
-    $this->assertSame('Recipe include', $operations[10][1][0]->name);
-    $this->assertStringEndsWith('core/tests/fixtures/recipes/recipe_include', $operations[10][1][0]->path);
-
-    $this->assertSame('triggerEvent', $operations[12][0][1]);
-    $this->assertSame('Recipe include', $operations[12][1][0]->name);
-    $this->assertSame($this->siteDirectory . '/recipes/recipe_include', $operations[12][1][0]->path);
+    $this->assertSame('Recipe include', $operations[7][1][0]->name);
+    $this->assertSame($this->siteDirectory . '/recipes/recipe_include', $operations[7][1][0]->path);
   }
 
 }

@@ -98,7 +98,7 @@ class EntityUrlTest extends UnitTestCase {
     $entity = $this->getEntity(StubEntityBase::class, []);
 
     $this->expectException(EntityMalformedException::class);
-    $this->expectExceptionMessage('The "' . static::ENTITY_TYPE_ID . '" entity cannot have a URI as it does not have an ID');
+    $this->expectExceptionMessageIs('The "' . static::ENTITY_TYPE_ID . '" entity cannot have a URI as it does not have an ID');
     $entity->toUrl();
   }
 
@@ -111,10 +111,11 @@ class EntityUrlTest extends UnitTestCase {
   public function testToUrlDefaultException(): void {
     $values = ['id' => static::ENTITY_ID];
     $entity = $this->getEntity(StubEntityBase::class, $values);
+    // @phpstan-ignore method.deprecated
     $this->entityType->getUriCallback()->willReturn(NULL);
 
     $this->expectException(UndefinedLinkTemplateException::class);
-    $this->expectExceptionMessage("Cannot generate default URL because no link template 'canonical' or 'edit-form' was found for the '" . static::ENTITY_TYPE_ID . "' entity type");
+    $this->expectExceptionMessageIs("Cannot generate default URL because no link template 'canonical' or 'edit-form' was found for the '" . static::ENTITY_TYPE_ID . "' entity type");
     $entity->toUrl();
   }
 
@@ -364,11 +365,12 @@ class EntityUrlTest extends UnitTestCase {
     $entity = $this->getEntity(StubEntityBase::class, ['id' => static::ENTITY_ID]);
 
     $this->registerBundleInfo($bundle_info);
+    // @phpstan-ignore method.deprecated
     $this->entityType->getUriCallback()->willReturn($uri_callback);
 
     $link_template = 'canonical';
     $this->expectException(UndefinedLinkTemplateException::class);
-    $this->expectExceptionMessage("No link template '$link_template' found for the '" . static::ENTITY_TYPE_ID . "' entity type");
+    $this->expectExceptionMessageIs("No link template '$link_template' found for the '" . static::ENTITY_TYPE_ID . "' entity type");
     $entity->toUrl($link_template);
   }
 
@@ -404,6 +406,7 @@ class EntityUrlTest extends UnitTestCase {
     $entity = $this->getEntity(StubEntityBase::class, ['id' => static::ENTITY_ID, 'langcode' => $this->langcode]);
 
     $this->registerBundleInfo($bundle_info);
+    // @phpstan-ignore method.deprecated
     $this->entityType->getUriCallback()->willReturn($uri_callback);
 
     /** @var \Drupal\Core\Url $url */

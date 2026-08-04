@@ -223,8 +223,15 @@ abstract class Connection {
    *   This method exists only to work around a bug caused by Drupal incorrectly
    *   relying on object destruction order to commit transactions. Xdebug 3.3.0
    *   changes the order of object destruction when the develop mode is enabled.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3524461
    */
   public function commitAll() {
+    // Only soft deprecation (no @trigger_error) to avoid thousands of
+    // occurrences per test run. PHPStan reports usage errors anyway.
     $manager = $this->transactionManager();
     if ($manager->inTransaction() && method_exists($manager, 'commitAll')) {
       $this->transactionManager()->commitAll();
@@ -821,6 +828,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Connection::defaultOptions()
    */
   public function insert($table, array $options = []) {
+    @trigger_error('Calling ' . __METHOD__ . '() as a concrete method is deprecated in drupal:11.5.0 and it is made abstract in drupal:12.0.0. Each database driver should should provide its own implementation. See https://www.drupal.org/node/3612421', E_USER_DEPRECATED);
     return new Insert($this, $table, $options);
   }
 

@@ -278,7 +278,7 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   The expected result.
    */
   #[DataProvider('providerTestGetFieldColumnName')]
-  public function testGetFieldColumnName($base_field, $columns, $column, $expected): void {
+  public function testGetFieldColumnName(bool $base_field, array $columns, string $column, string $expected): void {
     $definitions['test'] = $this->setUpDefinition('test', $columns, $base_field);
     $table_mapping = new TestDefaultTableMapping($this->entityType, $definitions);
     $result = $table_mapping->getFieldColumnName($definitions['test'], $column);
@@ -295,9 +295,11 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   An array of available field column names.
    * @param string $column
    *   The name of the column to be processed.
+   * @param string $expected
+   *   The expected result.
    */
   #[DataProvider('providerTestGetFieldColumnName')]
-  public function testGetFieldColumnNameInvalid($base_field, $columns, $column): void {
+  public function testGetFieldColumnNameInvalid(bool $base_field, array $columns, string $column, string $expected): void {
     $definitions['test'] = $this->setUpDefinition('test', $columns, $base_field);
 
     // Mark field storage definition as custom storage.
@@ -307,7 +309,7 @@ class DefaultTableMappingTest extends UnitTestCase {
 
     $table_mapping = new TestDefaultTableMapping($this->entityType, $definitions);
     $this->expectException(SqlContentEntityStorageException::class);
-    $this->expectExceptionMessage("Column information not available for the 'test' field.");
+    $this->expectExceptionMessageIs("Column information not available for the 'test' field.");
     $table_mapping->getFieldColumnName($definitions['test'], $column);
   }
 
@@ -438,7 +440,7 @@ class DefaultTableMappingTest extends UnitTestCase {
   public function testGetFieldTableNameInvalid(): void {
     $table_mapping = new TestDefaultTableMapping($this->entityType, []);
     $this->expectException(SqlContentEntityStorageException::class);
-    $this->expectExceptionMessage("Table information not available for the 'invalid_field_name' field.");
+    $this->expectExceptionMessageIs("Table information not available for the 'invalid_field_name' field.");
     $table_mapping->getFieldTableName('invalid_field_name');
   }
 

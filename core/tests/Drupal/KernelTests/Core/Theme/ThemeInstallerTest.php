@@ -175,7 +175,7 @@ class ThemeInstallerTest extends KernelTestBase {
     $this->moduleInstaller()->install([$name]);
     $message = "Theme name {$name} is already in use by an installed module.";
     $this->expectException(ExtensionNameReservedException::class);
-    $this->expectExceptionMessage($message);
+    $this->expectExceptionMessageIs($message);
     $this->themeInstaller()->install([$name]);
   }
 
@@ -188,7 +188,7 @@ class ThemeInstallerTest extends KernelTestBase {
     $themes = $this->themeHandler()->listInfo();
     $this->assertEmpty($themes);
     $this->expectException(MissingDependencyException::class);
-    $this->expectExceptionMessage($message);
+    $this->expectExceptionMessageIs($message);
     $this->themeInstaller()->install([$theme_name]);
   }
 
@@ -199,7 +199,7 @@ class ThemeInstallerTest extends KernelTestBase {
    */
   #[IgnoreDeprecations]
   public function testInstallDeprecated(): void {
-    $this->expectDeprecation("The theme 'deprecated_theme_test' is deprecated. See https://example.com/deprecated");
+    $this->expectUserDeprecationMessage("The theme 'deprecated_theme_test' is deprecated. See https://example.com/deprecated");
     $this->themeInstaller()->install(['deprecated_theme_test']);
     $this->assertTrue(\Drupal::service('theme_handler')->themeExists('deprecated_theme_test'));
   }
@@ -237,7 +237,7 @@ class ThemeInstallerTest extends KernelTestBase {
       'theme depending on a module that does not exist' => [
         'test_theme_depending_on_nonexisting_module',
         [],
-        "Unable to install theme: 'test_theme_depending_on_nonexisting_module' due to unmet module dependencies: 'test_module_non_existing",
+        "Unable to install theme: 'test_theme_depending_on_nonexisting_module' due to unmet module dependencies: 'test_module_non_existing'.",
       ],
       'theme depending on an installed but incompatible module' => [
         'test_theme_depending_on_constrained_modules',
@@ -259,7 +259,7 @@ class ThemeInstallerTest extends KernelTestBase {
     $themes = $this->themeHandler()->listInfo();
     $this->assertArrayHasKey($name, $themes);
     $this->expectException(ModuleUninstallValidatorException::class);
-    $this->expectExceptionMessage('The following reasons prevent the modules from being uninstalled: Required by the theme: Test Theme Depending on Modules');
+    $this->expectExceptionMessageIs('The following reasons prevent the modules from being uninstalled: Required by the theme: Test Theme Depending on Modules');
     $this->moduleInstaller()->uninstall(['test_module_required_by_theme']);
   }
 
@@ -436,7 +436,7 @@ class ThemeInstallerTest extends KernelTestBase {
     // @see https://www.drupal.org/node/2228093
     $info = \Drupal::service('extension.list.theme')->getExtensionInfo($name);
     $this->assertTrue(isset($info['regions']['test_region']));
-    $regions = system_region_list($name);
+    $regions = $this->themeHandler()->getTheme($name)->listAllRegions();
     $this->assertTrue(isset($regions['test_region']));
     $theme_list = \Drupal::service('theme_handler')->listInfo();
     $this->assertTrue(isset($theme_list[$name]->info['regions']['test_region']));
@@ -452,7 +452,7 @@ class ThemeInstallerTest extends KernelTestBase {
     // @see https://www.drupal.org/node/2228093
     $info = \Drupal::service('extension.list.theme')->getExtensionInfo($name);
     $this->assertFalse(isset($info['regions']['test_region']));
-    $regions = system_region_list($name);
+    $regions = $this->themeHandler()->getTheme($name)->listAllRegions();
     $this->assertFalse(isset($regions['test_region']));
     $theme_list = \Drupal::service('theme_handler')->listInfo();
     $this->assertFalse(isset($theme_list[$name]->info['regions']['test_region']));
