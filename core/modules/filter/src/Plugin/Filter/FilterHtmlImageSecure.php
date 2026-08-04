@@ -5,6 +5,7 @@ namespace Drupal\filter\Plugin\Filter;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\filter\Attribute\Filter;
@@ -36,6 +37,11 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
   protected ModuleHandlerInterface $moduleHandler;
 
   /**
+   * The image factory service.
+   */
+  protected ImageFactory $imageFactory;
+
+  /**
    * The app root directory path.
    */
   protected string $root;
@@ -48,6 +54,7 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
     ?ModuleHandlerInterface $module_handler = NULL,
     #[Autowire(param: 'app.root')]
     ?string $root = NULL,
+    ?ImageFactory $image_factory = NULL,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
@@ -66,6 +73,11 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
       $root = \Drupal::root();
     }
     $this->root = $root;
+    if (!$image_factory) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $image_factory argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+      $image_factory = \Drupal::service('image.factory');
+    }
+    $this->imageFactory = $image_factory;
   }
 
   /**
@@ -75,6 +87,10 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
     // Find the path (e.g. '/') to Drupal root.
     $base_path = base_path();
     $base_path_length = mb_strlen($base_path);
+
+    // Find the private path.
+    $private_path = $base_path . 'system/files/';
+    $private_path_length = mb_strlen($private_path);
 
     // Find the directory on the server where index.php resides.
     $local_dir = $this->root . '/';
@@ -88,15 +104,24 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
       // on multisite set-ups and prevent mixed content errors.
       $image->setAttribute('src', $this->fileUrlGenerator->transformRelative($src));
 
-      // Verify that $src starts with $base_path.
+      // Verify that $src starts with $base_path or $private_base_path.
       // This also ensures that external images cannot be referenced.
       $src = $image->getAttribute('src');
-      if (mb_substr($src, 0, $base_path_length) === $base_path) {
+      if ($this->isPrivateImage($src, $private_path, $private_path_length)) {
+        if ($this->isSecurePrivateImage($src, $private_path, $private_path_length)) {
+          continue;
+        }
+      }
+      elseif (mb_substr($src, 0, $base_path_length) === $base_path) {
         // Remove the $base_path to get the path relative to the Drupal root.
         // Ensure the path refers to an actual image by prefixing the image
         // source with the Drupal root and running getimagesize() on it.
         $local_image_path = $local_dir . mb_substr($src, $base_path_length);
         $local_image_path = rawurldecode($local_image_path);
+
+        // Remove any query string before checking the file on disk.
+        $local_image_path = explode('?', $local_image_path, 2)[0];
+
         if (@getimagesize($local_image_path)) {
           // The image has the right path. Invalid images are handled below.
           continue;
@@ -109,6 +134,52 @@ class FilterHtmlImageSecure extends FilterBase implements ContainerFactoryPlugin
     }
 
     return new FilterProcessResult(Html::serialize($html_dom));
+  }
+
+  /**
+   * Check whether image is private.
+   *
+   * @param string $src
+   *   The image source.
+   * @param string $private_path
+   *   Drupal private file system path.
+   * @param int $private_path_length
+   *   Private path length.
+   *
+   * @return bool
+   *   Whether image is private.
+   */
+  protected function isPrivateImage(string $src, string $private_path, int $private_path_length): bool {
+    return (mb_substr($src, 0, $private_path_length) === $private_path);
+  }
+
+  /**
+   * Check whether private image is secure.
+   *
+   * @param string $src
+   *   The image source.
+   * @param string $private_path
+   *   Drupal private file system path.
+   * @param int $private_path_length
+   *   Private path length.
+   *
+   * @return bool
+   *   Whether private image is secure.
+   */
+  protected function isSecurePrivateImage(string $src, string $private_path, int $private_path_length): bool {
+    $private_image_path = mb_substr($src, $private_path_length);
+    $private_image_path = 'private://' . $private_image_path;
+    $private_image_path = rawurldecode($private_image_path);
+
+    // Remove any query string before checking the file on disk.
+    $private_image_path = explode('?', $private_image_path, 2)[0];
+
+    $image_object = $this->imageFactory->get($private_image_path);
+    if ($image_object->getFileSize()) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**
