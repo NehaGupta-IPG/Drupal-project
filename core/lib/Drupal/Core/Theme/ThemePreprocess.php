@@ -14,6 +14,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
@@ -37,6 +38,7 @@ class ThemePreprocess {
     protected RouteMatchInterface $routeMatch,
     protected ThemeManagerInterface $themeManager,
     protected ThemeSettingsProvider $themeSettingsProvider,
+    protected AccountInterface $currentUser,
   ) {
   }
 
@@ -262,6 +264,11 @@ class ThemePreprocess {
     $language_interface = $this->languageManager->getCurrentLanguage();
     $variables['html_attributes']['lang'] = $language_interface->getId();
     $variables['html_attributes']['dir'] = $language_interface->getDirection();
+    // The color scheme is exposed as a variable for theme developers. The
+    // data-color-scheme attribute is the rendered counterpart of that value.
+    $color_scheme = $this->currentUser->getColorScheme();
+    $variables['color_scheme'] = $color_scheme;
+    $variables['html_attributes']['data-color-scheme'] = $color_scheme;
 
     if (isset($variables['db_is_active']) && !$variables['db_is_active']) {
       $variables['db_offline'] = TRUE;

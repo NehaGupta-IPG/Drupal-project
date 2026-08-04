@@ -21,7 +21,7 @@ final class PageAttachmentsHook {
    *
    * @see \Drupal\Core\Theme\ThemePreprocess::preprocessMaintenancePage()
    * @see \Drupal\Core\EventSubscriber\ActiveLinkResponseFilter
-   * @see \Drupal\system\Hook\SystemThemeHooks::preprocessHtml()
+   * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
    */
   #[Hook('page_attachments')]
   public function pageAttachments(array &$page): void {
@@ -29,7 +29,7 @@ final class PageAttachmentsHook {
 
     // The <html> element carries a data-color-scheme attribute that varies per
     // user preference. That attribute is set in
-    // \Drupal\system\Hook\SystemThemeHooks::preprocessHtml(), but cacheability
+    // \Drupal\Core\Theme\ThemePreprocess::preprocessHtml(), but cacheability
     // cannot be declared in a preprocess function because the renderer collects
     // cacheability from the render array before theming happens. Declare the
     // cache context here instead, so that it bubbles up correctly.
