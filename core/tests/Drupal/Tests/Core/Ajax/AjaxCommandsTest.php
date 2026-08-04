@@ -32,7 +32,6 @@ use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Test coverage for various classes in the \Drupal\Core\Ajax namespace.

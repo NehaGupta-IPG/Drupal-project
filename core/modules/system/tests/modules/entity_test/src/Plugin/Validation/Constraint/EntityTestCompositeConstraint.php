@@ -7,7 +7,6 @@ namespace Drupal\entity_test\Plugin\Validation\Constraint;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 
 /**
  * Constraint with multiple fields.

@@ -91,8 +91,6 @@ interface StatementInterface extends \Traversable {
    *
    * @return array|object|false
    *   A result, formatted according to $mode, or FALSE on failure.
-   *
-   * @see https://www.drupal.org/node/3551924
    */
   public function fetch(?FetchAs $mode = NULL);
 

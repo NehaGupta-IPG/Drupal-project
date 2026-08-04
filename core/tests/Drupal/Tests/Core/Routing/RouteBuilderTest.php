@@ -98,21 +98,6 @@ class RouteBuilderTest extends UnitTestCase implements EventSubscriberInterface 
   protected bool $alterFired = FALSE;
 
   /**
-   * The route collection that the dynamic and alter events expect to receive.
-   */
-  protected RouteCollection $expectedRouteCollection;
-
-  /**
-   * Indicates whether the dynamic event was fired.
-   */
-  protected bool $dynamicFired = FALSE;
-
-  /**
-   * Indicates whether the alter event was fired.
-   */
-  protected bool $alterFired = FALSE;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {

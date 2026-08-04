@@ -7,7 +7,6 @@ namespace Drupal\Tests\node\Functional;
 use Drupal\Core\Database\Database;
 use Drupal\node\NodeAccessRebuild;
 use Drupal\user\Entity\User;
-use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 

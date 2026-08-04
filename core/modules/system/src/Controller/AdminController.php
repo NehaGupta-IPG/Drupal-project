@@ -8,7 +8,6 @@ use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\ModuleAdminLinksHelper;
 use Drupal\user\ModulePermissionsLinkHelper;
-use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Controller for admin section.

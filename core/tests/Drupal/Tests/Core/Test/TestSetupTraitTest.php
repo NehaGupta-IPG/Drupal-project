@@ -39,27 +39,7 @@ class TestSetupTraitTest extends UnitTestCase {
     // used to avoid unnecessary set up.
     $test_setup = new #[Group('Testing')] class('test') extends DrupalTestCase {
 
-      use DrupalTestCaseTrait;
       use TestSetupTrait;
-
-      /**
-       * Returns the test class name.
-       *
-       * @return string
-       *   The test class name.
-       */
-      public function name(): string {
-        return 'test';
-      }
-
-      /**
-       * Expects an exception message.
-       *
-       * @param string $message
-       *   The expected exception message.
-       */
-      protected function expectExceptionMessage(string $message): void {
-      }
 
     };
 

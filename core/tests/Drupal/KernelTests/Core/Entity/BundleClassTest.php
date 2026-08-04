@@ -22,7 +22,6 @@ use Drupal\entity_test_bundle_class\Entity\EntityTestUserClass;
 use Drupal\entity_test_bundle_class\Entity\EntityTestVariant;
 use Drupal\entity_test_bundle_class\Entity\SharedEntityTestBundleClassA;
 use Drupal\entity_test_bundle_class\Entity\SharedEntityTestBundleClassB;
-use Drupal\entity_test_attribute_bundle_class\Entity\Subdir\EntityTestSubdirBundleClass;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;

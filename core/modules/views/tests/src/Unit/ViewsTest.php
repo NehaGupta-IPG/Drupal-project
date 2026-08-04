@@ -207,13 +207,6 @@ class ViewsTest extends UnitTestCase {
       ->willReturn($definitions);
     $this->container->set('plugin.manager.views.display', $display_manager);
 
-    $locator = $this->createMock('\Symfony\Component\DependencyInjection\ServiceLocator');
-    $locator->expects($this->any())
-      ->method('get')
-      ->with('display')
-      ->willReturn($display_manager);
-    $this->container->set('views.plugin_managers', $locator);
-
     $result = Views::getApplicableViews($applicable_type);
     $this->assertEquals($expected, $result);
   }

@@ -71,15 +71,3 @@ function system_update_12001(): TranslatableMarkup|null {
   }
   return NULL;
 }
-
-/**
- * Moved to search_update_11401().
- */
-function system_update_11400(): void {
-}
-
-/**
- * Moved to search_update_11402().
- */
-function system_update_11401(): void {
-}

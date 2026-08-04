@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\ParamConverter;
 
-use Drupal\Core\ParamConverter\ParamConverterInterface;
 use Drupal\Core\ParamConverter\ParamConverterManager;
 use Drupal\Core\ParamConverter\ParamConverterInterface;
 use Drupal\Core\ParamConverter\ParamNotConvertedException;

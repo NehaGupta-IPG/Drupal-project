@@ -83,16 +83,6 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
   protected ?array $loadedData = NULL;
 
   /**
-   * The cache item's data as loaded during this request, or NULL if none.
-   *
-   * Retained so that ::updateCache() can fingerprint it to detect a concurrent
-   * change. The fingerprint is computed lazily there, and only when there is
-   * data to write back, so that requests that only read from the collector do
-   * not pay for hashing.
-   */
-  protected ?array $loadedData = NULL;
-
-  /**
    * Flag that indicates of the cache has been invalidated.
    *
    * @var bool

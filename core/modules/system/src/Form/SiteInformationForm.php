@@ -12,7 +12,6 @@ use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Configure site information settings for this site.

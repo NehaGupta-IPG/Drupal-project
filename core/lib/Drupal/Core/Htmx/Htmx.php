@@ -496,13 +496,9 @@ class Htmx {
    * @return static
    *   Self for chaining.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead,
-   *   use \Drupal\Core\Htmx\Htmx::triggerHeader().
-   * @see https://www.drupal.org/node/3583674
    * @see https://htmx.org/headers/hx-trigger/
    */
   public function triggerAfterSettleHeader(string|array $data): static {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Use ::triggerHeader() instead. See https://www.drupal.org/node/3583674', E_USER_DEPRECATED);
     if (is_array($data)) {
       $data = json_encode($data);
     }
@@ -521,13 +517,9 @@ class Htmx {
    * @return static
    *   Self for chaining.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead,
-   *    use \Drupal\Core\Htmx\Htmx::triggerHeader().
-   * @see https://www.drupal.org/node/3583674
    * @see https://htmx.org/headers/hx-trigger/
    */
   public function triggerAfterSwapHeader(string|array $data): static {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Use ::triggerHeader() instead. See https://www.drupal.org/node/3583674', E_USER_DEPRECATED);
     if (is_array($data)) {
       $data = json_encode($data);
     }
@@ -941,13 +933,9 @@ class Htmx {
    * @return static
    *   Returns this object to allow chaining methods.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead,
-   *   use the approach given in the change record.
-   * @see https://www.drupal.org/node/3583674
    * @see https://htmx.org/attributes/hx-disabled-elt/
    */
   public function disabledElt(string $descriptor): static {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead, use the approach given in the change record. See https://www.drupal.org/node/3583674', E_USER_DEPRECATED);
     $this->createStringAttribute('hx-disabled-elt', $descriptor);
     return $this;
   }
@@ -964,13 +952,9 @@ class Htmx {
    * @return static
    *   Returns this object to allow chaining methods.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead,
-   *   use the approach given in the change record.
-   * @see https://www.drupal.org/node/3583674
    * @see https://htmx.org/attributes/hx-disinherit/
    */
   public function disinherit(string $names): static {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead, use the approach given in the change record. See https://www.drupal.org/node/3583674', E_USER_DEPRECATED);
     $this->createStringAttribute('hx-disinherit', $names);
     return $this;
   }
@@ -1005,13 +989,9 @@ class Htmx {
    * @return static
    *   Returns this object to allow chaining methods.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead,
-   *  use the approach given in the change record.
-   * @see https://www.drupal.org/node/3583674
    * @see https://htmx.org/attributes/hx-ext/
    */
   public function ext(string $names): static {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead, use the approach given in the change record. See https://www.drupal.org/node/3583674', E_USER_DEPRECATED);
     $this->createStringAttribute('hx-ext', $names);
     return $this;
   }
@@ -1047,13 +1027,9 @@ class Htmx {
    * @return static
    *   Returns this object to allow chaining methods.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead,
-   *   use the approach given in the change record.
-   * @see https://www.drupal.org/node/3583674
    * @see https://htmx.org/attributes/hx-history/
    */
   public function history(): static {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead, use the approach given in the change record. See https://www.drupal.org/node/3583674', E_USER_DEPRECATED);
     $this->createStringAttribute('hx-history', 'false');
     return $this;
   }
@@ -1065,6 +1041,7 @@ class Htmx {
    * during history navigation.
    *
    * @return static
+   *   Returns this object to allow chaining methods.
    *   Returns this object to allow chaining methods.
    *
    * @see https://htmx.org/attributes/hx-history-elt/
@@ -1134,13 +1111,9 @@ class Htmx {
    * @return static
    *   Returns this object to allow chaining methods.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead,
-   *   use the approach given in the change record.
-   * @see https://www.drupal.org/node/3583674
    * @see https://htmx.org/attributes/hx-inherit/
    */
   public function inherit(string $attributes): static {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead, use the approach given in the change record. See https://www.drupal.org/node/3583674', E_USER_DEPRECATED);
     $this->createStringAttribute('hx-inherit', $attributes);
     return $this;
   }
@@ -1158,6 +1131,7 @@ class Htmx {
    *   the first name with `not`, as in ['not param1', 'param2', 'param3'].
    * - To only submit some parameters, use an array of parameter names as in
    *   ['param1', 'param2', 'param3'].
+   * parameters use an array, pre
    *
    * @param string|string[] $filter
    *   The filter string or strings.
@@ -1165,13 +1139,9 @@ class Htmx {
    * @return static
    *   Returns this object to allow chaining methods.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead,
-   *   use the approach given in the change record.
-   * @see https://www.drupal.org/node/3583674
    * @see https://htmx.org/attributes/hx-params/
    */
   public function params(string|array $filter): static {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead, use the approach given in the change record. See https://www.drupal.org/node/3583674', E_USER_DEPRECATED);
     if (is_array($filter)) {
       $filter = implode(',', $filter);
     }
@@ -1208,13 +1178,9 @@ class Htmx {
    * @return static
    *   Returns this object to allow chaining methods.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead,
-   *   use the approach given in the change record.
-   * @see https://www.drupal.org/node/3583674
    * @see https://htmx.org/attributes/hx-prompt/
    */
   public function prompt(string $message): static {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead, use the approach given in the change record. See https://www.drupal.org/node/3583674', E_USER_DEPRECATED);
     $this->createStringAttribute('hx-prompt', $message);
     return $this;
   }
@@ -1269,13 +1235,9 @@ class Htmx {
    * @return static
    *   Returns this object to allow chaining methods.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Instead,
-   *   use the approach given in the change record.
-   * @see https://www.drupal.org/node/3583674
    * @see https://htmx.org/attributes/hx-request/
    */
   public function request(array $configValues): static {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. The corresponding attribute is removed from htmx v.4. An alternate approach is available and outlined in the change record. See https://www.drupal.org/node/3583674', E_USER_DEPRECATED);
     $this->createJsonAttribute('hx-request', $configValues);
     return $this;
   }

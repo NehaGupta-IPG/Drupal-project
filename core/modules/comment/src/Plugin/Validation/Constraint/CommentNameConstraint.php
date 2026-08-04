@@ -5,7 +5,6 @@ namespace Drupal\comment\Plugin\Validation\Constraint;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 
 /**
  * Supports validating comment author names.

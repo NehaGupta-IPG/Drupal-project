@@ -9,7 +9,6 @@ use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Composer\InstalledVersions;
 use Drupal\Component\FileSystem\FileSystem as DrupalFilesystem;
-use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\Tests\DrupalTestBrowser;
 use Drupal\Tests\DrupalTestCase;
 use Drupal\TestTools\Extension\RequiresComposerTrait;
@@ -61,7 +60,6 @@ use Symfony\Component\Process\Process;
  */
 abstract class BuildTestBase extends DrupalTestCase {
 
-  use DrupalTestCaseTrait;
   use RequiresComposerTrait;
 
   /**

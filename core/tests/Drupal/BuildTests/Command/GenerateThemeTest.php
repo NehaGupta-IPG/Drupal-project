@@ -230,7 +230,7 @@ FIXTURE;
   }
 
   /**
-   * Delete the generated theme.
+   * Tests the generate-theme command.
    */
   public function testGenerateTheme(): void {
     $this->doTestGenerateTheme();

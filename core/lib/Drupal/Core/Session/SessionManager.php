@@ -58,20 +58,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     protected SessionConfigurationInterface $sessionConfiguration,
     protected TimeInterface $time,
   ) {
-    // The second parameter ($handler) used to be the database connection. And
-    // the last parameter ($session_repository) used to be $handler. Rearrange
-    // the parameters if constructor was called like this.
-    if ($handler instanceof Connection && !$session_repository instanceof UserSessionRepositoryInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() with a database $connection as the second argument is deprecated in drupal:11.4.0 and it will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3570851', E_USER_DEPRECATED);
-      $handler = $session_repository;
-    }
     parent::__construct([], $handler, $metadata_bag);
-    if ($session_repository instanceof UserSessionRepositoryInterface) {
-      $this->sessionRepository = $session_repository;
-    }
-    else {
-      $this->sessionRepository = \Drupal::service(UserSessionRepositoryInterface::class);
-    }
   }
 
   /**

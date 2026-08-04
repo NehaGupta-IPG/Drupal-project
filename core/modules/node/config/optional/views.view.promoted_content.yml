@@ -10,7 +10,7 @@ dependencies:
 id: promoted_content
 label: 'Promoted Content'
 module: node
-description: 'All promoted content.'
+description: 'All content promoted to the front page.'
 tag: default
 base_table: node_field_data
 base_field: nid

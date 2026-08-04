@@ -4,7 +4,6 @@ namespace Drupal\media\Plugin\Validation\Constraint;
 
 use Drupal\Core\Validation\Attribute\Constraint;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**

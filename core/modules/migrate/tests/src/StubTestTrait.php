@@ -31,7 +31,7 @@ trait StubTestTrait {
    * @param string $entity_type_id
    *   The entity type we are stubbing.
    *
-   * @return string
+   * @return int
    *   ID of the created entity.
    */
   protected function createEntityStub(string $entity_type_id): mixed {

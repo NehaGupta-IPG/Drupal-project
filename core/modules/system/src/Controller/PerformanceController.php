@@ -7,7 +7,6 @@ use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\Form\ClearCacheForm;
 use Drupal\system\Form\PerformanceForm;
-use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Controller for performance admin.

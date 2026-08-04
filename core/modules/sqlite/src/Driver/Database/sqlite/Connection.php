@@ -182,8 +182,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
             unlink($this->connectionOptions['database'] . '-' . $prefix);
           }
         }
-        // phpcs:ignore SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch.NonCapturingCatchRequired
-        catch (\Exception $e) {
+        catch (\Exception) {
           // Ignore the exception and continue. There is nothing we can do here
           // to report the error or fail safe.
         }

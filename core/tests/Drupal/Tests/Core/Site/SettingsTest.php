@@ -352,10 +352,6 @@ class SettingsTest extends UnitTestCase {
         '',
         '',
       ],
-      'update_fetch_with_http_fallback' => [
-        'update_fetch_with_http_fallback',
-        'The update_fetch_with_http_fallback setting is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3591920',
-      ],
     ];
   }
 

@@ -228,11 +228,6 @@ class PhpUnitTestDiscovery {
           continue;
         }
 
-        // Skip tests whose groups are not in the required ones.
-        if (!empty($testGroups) && empty(array_intersect($item['groups'], $testGroups))) {
-          continue;
-        }
-
         foreach ($item['groups'] as $group) {
           $list[$group][$item['name']] = $item;
         }

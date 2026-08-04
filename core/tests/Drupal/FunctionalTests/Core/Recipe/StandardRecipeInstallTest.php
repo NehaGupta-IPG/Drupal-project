@@ -95,13 +95,6 @@ class StandardRecipeInstallTest extends InstallerTestBase {
     // Recipe installation is not affected by requirements.
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUpRequirementsProblem(): void {
-    // Recipe installation is not affected by requirements.
-  }
-
   protected function installDefaultThemeFromClassProperty(ContainerInterface $container): void {
     // In this context a default theme makes no sense.
   }

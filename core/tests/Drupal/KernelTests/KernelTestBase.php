@@ -98,7 +98,6 @@ use Symfony\Component\Routing\Route;
  */
 abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderInterface {
 
-  use DrupalTestCaseTrait;
   use AssertContentTrait;
   use RandomGeneratorTrait;
   use ConfigTestTrait;

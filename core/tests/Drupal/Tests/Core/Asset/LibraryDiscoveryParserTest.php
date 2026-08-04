@@ -97,11 +97,6 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   protected YamlCacheCollector $yamlCacheCollector;
 
   /**
-   * The YAML cache collector.
-   */
-  protected YamlCacheCollector $yamlCacheCollector;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {

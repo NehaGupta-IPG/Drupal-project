@@ -4,7 +4,6 @@ namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
@@ -37,18 +36,6 @@ class UniqueFieldConstraint extends SymfonyConstraint {
     mixed $payload = NULL,
   ) {
     parent::__construct(groups: $groups, payload: $payload);
-  }
-
-  #[HasNamedArguments]
-  public function __construct(
-    mixed $options = NULL,
-    ?bool $caseSensitive = NULL,
-    public $message = 'A @entity_type with @field_name %value already exists.',
-    ?array $groups = NULL,
-    mixed $payload = NULL,
-  ) {
-    parent::__construct($options, $groups, $payload);
-    $this->caseSensitive = $caseSensitive ?? $this->caseSensitive;
   }
 
   /**

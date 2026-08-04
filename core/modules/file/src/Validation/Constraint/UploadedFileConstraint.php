@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\file\Validation\Constraint;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**

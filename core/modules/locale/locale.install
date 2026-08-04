@@ -308,20 +308,3 @@ function locale_update_11401(): void {
     $schema->addField('locale_file', 'hash', $spec);
   }
 }
-
-/**
- * Add a hash column to the {locale_file} table.
- */
-function locale_update_11401(): void {
-  $spec = [
-    'type' => 'varchar_ascii',
-    'length' => 32,
-    'not null' => TRUE,
-    'default' => '',
-    'description' => 'The hash of the imported file.',
-  ];
-  $schema = \Drupal::database()->schema();
-  if (!$schema->fieldExists('locale_file', 'hash')) {
-    $schema->addField('locale_file', 'hash', $spec);
-  }
-}

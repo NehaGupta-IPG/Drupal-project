@@ -5,7 +5,6 @@ namespace Drupal\taxonomy\Plugin\Validation\Constraint;
 use Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 
 /**
  * Validation constraint for changing the term hierarchy in pending revisions.

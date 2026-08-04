@@ -48,7 +48,6 @@ use GuzzleHttp\Cookie\CookieJar;
  */
 abstract class BrowserTestBase extends DrupalTestCase {
 
-  use DrupalTestCaseTrait;
   use FunctionalTestSetupTrait;
   use UiHelperTrait {
     FunctionalTestSetupTrait::refreshVariables insteadof UiHelperTrait;
