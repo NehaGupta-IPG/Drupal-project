@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Database\SchemaDefinition\Column;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\Table;
@@ -69,16 +68,16 @@ class FieldTimeIntervalTest extends ViewsKernelTestBase {
     $parentSchema = parent::schemaDefinition();
     $table = $parentSchema->getTableDefinition('views_test_data');
     $columns = array_filter($table->columns, fn (Column $column): bool => $column->name !== 'age');
-    $columns[] = new Column(
+    $columns[] = Column::int(
       name: 'age',
       description: "The person's age",
-      type: ColumnType::Int,
       unsigned: TRUE,
       notNull: FALSE,
       default: new IntValue(0),
     );
 
     return new Schema(
+      type: $parentSchema->type,
       name: $parentSchema->name,
       tables: [
         new Table(

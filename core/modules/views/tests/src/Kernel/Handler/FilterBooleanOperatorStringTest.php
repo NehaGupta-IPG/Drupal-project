@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Database\SchemaDefinition\Column;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
@@ -46,16 +45,16 @@ class FilterBooleanOperatorStringTest extends ViewsKernelTestBase {
     $parentSchema = parent::schemaDefinition();
     $table = $parentSchema->getTableDefinition('views_test_data');
     $columns = array_filter($table->columns, fn (Column $column): bool => $column->name !== 'status');
-    $columns[] = new Column(
+    $columns[] = Column::varchar(
       name: 'status',
       description: 'The status of this record',
-      type: ColumnType::Varchar,
       length: 255,
       notNull: TRUE,
       default: new StringValue(''),
     );
 
     return new Schema(
+      type: $parentSchema->type,
       name: $parentSchema->name,
       tables: [
         new Table(

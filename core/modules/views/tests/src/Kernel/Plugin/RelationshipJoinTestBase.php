@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel\Plugin;
 
 use Drupal\Core\Database\SchemaDefinition\Column;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\Table;
@@ -57,16 +56,16 @@ abstract class RelationshipJoinTestBase extends PluginKernelTestBase {
     $parentSchema = parent::schemaDefinition();
     $table = $parentSchema->getTableDefinition('views_test_data');
     $columns = $table->columns;
-    $columns[] = new Column(
+    $columns[] = Column::int(
       name: 'uid',
       description: "The {users_field_data}.uid of the author of the beatle entry.",
-      type: ColumnType::Int,
       unsigned: TRUE,
       notNull: TRUE,
       default: new IntValue(0),
     );
 
     return new Schema(
+      type: $parentSchema->type,
       name: $parentSchema->name,
       tables: [
         new Table(

@@ -7,7 +7,6 @@ namespace Drupal\Tests\views\Kernel\Handler;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
@@ -57,15 +56,15 @@ class FilterStringTest extends ViewsKernelTestBase {
     $parentSchema = parent::schemaDefinition();
     $table = $parentSchema->getTableDefinition('views_test_data');
     $columns = $table->columns;
-    $columns[] = new Column(
+    $columns[] = Column::text(
       name: 'description',
       description: "A person's description",
-      type: ColumnType::Text,
       size: ColumnSize::Big,
       notNull: FALSE,
     );
 
     return new Schema(
+      type: $parentSchema->type,
       name: $parentSchema->name,
       tables: [
         new Table(

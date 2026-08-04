@@ -6,7 +6,6 @@ namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\Table;
@@ -37,10 +36,9 @@ class FieldDateTest extends ViewsKernelTestBase {
     $parentSchema = parent::schemaDefinition();
     $table = $parentSchema->getTableDefinition('views_test_data');
     $columns = $table->columns;
-    $columns[] = new Column(
+    $columns[] = Column::int(
       name: 'destroyed',
       description: "The destruction date of this record",
-      type: ColumnType::Int,
       size: ColumnSize::Big,
       unsigned: TRUE,
       notNull: FALSE,
@@ -48,6 +46,7 @@ class FieldDateTest extends ViewsKernelTestBase {
     );
 
     return new Schema(
+      type: $parentSchema->type,
       name: $parentSchema->name,
       tables: [
         new Table(

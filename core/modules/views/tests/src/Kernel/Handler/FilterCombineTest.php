@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Database\SchemaDefinition\Column;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
@@ -777,15 +776,15 @@ class FilterCombineTest extends ViewsKernelTestBase {
     $parentSchema = parent::schemaDefinition();
     $table = $parentSchema->getTableDefinition('views_test_data');
     $columns = array_filter($table->columns, fn (Column $column): bool => $column->name !== 'job');
-    $columns[] = new Column(
+    $columns[] = Column::varchar(
       name: 'job',
       description: "The person's job",
-      type: ColumnType::Varchar,
       length: 255,
       default: new StringValue('Undefined'),
     );
 
     return new Schema(
+      name: $parentSchema->type,
       name: $parentSchema->name,
       tables: [
         new Table(
