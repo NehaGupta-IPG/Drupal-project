@@ -41,7 +41,8 @@ class BatchControllerTest extends UnitTestCase {
     // Verify BatchProcessor OOP API can access the batch loaded by controller.
     $batch_ref = &$batch_processor->getCurrentBatch();
     $this->assertSame($batch['sets'][$current_set]['title'], $batch_ref['sets'][$current_set]['title']);
-    $this->assertSame($batch['sets'][$current_set], $batch_processor->getCurrentSet());
+    $get_current_set = new \ReflectionMethod($batch_processor, 'getCurrentSet');
+    $this->assertSame($batch['sets'][$current_set], $get_current_set->invoke($batch_processor));
     // Test batch returned by &$batch_processor->getCurrentBatch() call.
     $batch_ref['sets'][$current_set]['title'] = 'Updated title';
     $this->assertSame('Updated title', $controller->batchPageTitle(new Request(['id' => 1234])));

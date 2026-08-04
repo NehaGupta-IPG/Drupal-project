@@ -41,17 +41,18 @@ class BatchKernelTest extends KernelTestBase {
    */
   public function testNeedsUpdate(): void {
     $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+    $needs_update = new \ReflectionMethod($batch_processor, 'needsUpdate');
     // Before ever being called, the return value should be FALSE.
-    $this->assertEquals(FALSE, $batch_processor->needsUpdate());
+    $this->assertFalse($needs_update->invoke($batch_processor));
 
     // Set the value to TRUE.
-    $this->assertEquals(TRUE, $batch_processor->needsUpdate(TRUE));
+    $this->assertTrue($needs_update->invoke($batch_processor, TRUE));
     // Check that without a parameter TRUE is returned.
-    $this->assertEquals(TRUE, $batch_processor->needsUpdate());
+    $this->assertTrue($needs_update->invoke($batch_processor));
 
     // Set the value to FALSE.
-    $this->assertEquals(FALSE, $batch_processor->needsUpdate(FALSE));
-    $this->assertEquals(FALSE, $batch_processor->needsUpdate());
+    $this->assertFalse($needs_update->invoke($batch_processor, FALSE));
+    $this->assertFalse($needs_update->invoke($batch_processor));
   }
 
 }

@@ -52,65 +52,128 @@ class BatchProcessor implements BatchProcessorInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Appends a batch set to a running batch.
+   *
+   * Inserts the new set right after the current one to ensure execution order,
+   * and stores its operations in a queue. If the current batch has already
+   * inserted a new set, additional sets will be inserted after the last
+   * inserted set.
+   *
+   * @param array &$batch
+   *   The batch array.
+   * @param array $batch_set
+   *   The batch set.
    */
-  public function appendSet(array &$batch, array $batch_set): void {
+  protected function appendSet(array &$batch, array $batch_set): void {
     _batch_append_set($batch, $batch_set);
   }
 
   /**
-   * {@inheritdoc}
+   * Populates a job queue with the operations of a batch set.
+   *
+   * Depending on whether the batch is progressive or not, the
+   * Drupal\Core\Queue\Batch or Drupal\Core\Queue\BatchMemory handler classes
+   * will be used. The name and class of the queue are added by reference to the
+   * batch set.
+   *
+   * @param array $batch
+   *   The batch array.
+   * @param string $set_id
+   *   The id of the set to process.
    */
-  public function queuePopulate(array &$batch, string $set_id): void {
+  protected function queuePopulate(array &$batch, string $set_id): void {
     _batch_populate_queue($batch, $set_id);
   }
 
   /**
-   * {@inheritdoc}
+   * Returns a queue object for a batch set.
+   *
+   * @param array $batch_set
+   *   The batch set.
+   *
+   * @return \Drupal\Core\Queue\QueueInterface|null
+   *   The queue object.
    */
-  public function getQueue(array $batch_set): ?QueueInterface {
+  protected function getQueue(array $batch_set): ?QueueInterface {
     return _batch_queue($batch_set);
   }
 
   /**
-   * {@inheritdoc}
+   * Processes sets in a batch.
+   *
+   * If the batch was marked for progressive execution (default), this executes
+   * as many operations in batch sets until an execution time of 1 second has
+   * been exceeded. It will continue with the next operation of the same batch
+   * set in the next request.
+   *
+   * @return array
+   *   An array containing a completion value (in percent) and a status message.
    */
-  public function processQueue(): array|NULL|RedirectResponse|JsonResponse {
+  protected function processQueue(): array|NULL|RedirectResponse|JsonResponse {
     return _batch_process();
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the batch set being currently processed.
+   *
+   * @return array
+   *   The current batch set.
    */
-  public function &getCurrentSet(): array {
+  protected function &getCurrentSet(): array {
     return _batch_current_set();
   }
 
   /**
-   * {@inheritdoc}
+   * Retrieves the next set in a batch.
+   *
+   * If there is a subsequent set in this batch, assign it as the new set to
+   * process and execute its form submit handler (if defined), which may add
+   * further sets to this batch.
+   *
+   * @return bool
+   *   TRUE if a subsequent set was found in the batch; FALSE will be returned
+   *   if no subsequent set was found.
    */
-  public function nextSet(): bool {
+  protected function nextSet(): bool {
     return _batch_next_set();
   }
 
   /**
-   * {@inheritdoc}
+   * Ends the batch processing.
+   *
+   * Call the 'finished' callback of each batch set to allow custom handling of
+   * the results and resolve page redirection.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
+   *   A redirect response to the completed page or NULL to stay at the current
+   *   URL.
+   *
+   * @see \Drupal\Core\Form\FormSubmitter::submitForm()
    */
-  public function finishedProcessing(): ?RedirectResponse {
+  protected function finishedProcessing(): ?RedirectResponse {
     return _batch_finished();
   }
 
   /**
-   * {@inheritdoc}
+   * Shutdown function: Stores the current batch data for the next request.
+   *
+   * @see _batch_page()
+   * @see drupal_register_shutdown_function()
    */
-  public function shutdown(): void {
+  protected function shutdown(): void {
     _batch_shutdown();
   }
 
   /**
-   * {@inheritdoc}
+   * Checks whether the batch information needs to be updated in the storage.
+   *
+   * @param bool $new_value
+   *   (optional) A new value to set.
+   *
+   * @return bool
+   *   TRUE if the batch information needs to be updated; FALSE otherwise.
    */
-  public function needsUpdate(?bool $new_value = NULL): bool {
+  protected function needsUpdate(?bool $new_value = NULL): bool {
     return _batch_needs_update($new_value);
   }
 
