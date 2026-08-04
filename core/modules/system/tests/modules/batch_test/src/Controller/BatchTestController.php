@@ -9,7 +9,7 @@ use Drupal\batch_test\BatchTestCallbacks;
 use Drupal\batch_test\BatchTestDefinitions;
 use Drupal\batch_test\BatchTestHelper;
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Batch\BatchProcessor;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Form\FormState;
 
 /**
@@ -43,7 +43,7 @@ class BatchTestController {
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
 
-    return \Drupal::service(BatchProcessor::class)
+    return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch_test_definitions->batch5())
         ->process('batch-test/redirect');
   }
@@ -63,7 +63,7 @@ class BatchTestController {
     // Set the batch and process it.
     $batch_builder = (new BatchBuilder())
       ->addOperation([$batch_test_helper, 'nestedDrupalFormSubmitCallback'], [$value]);
-    return \Drupal::service(BatchProcessor::class)
+    return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch_builder->toArray())
         ->process('batch-test/redirect');
   }
@@ -79,7 +79,7 @@ class BatchTestController {
     $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
-    return \Drupal::service(BatchProcessor::class)
+    return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch_test_definitions->batch1())
         ->process('batch-test/redirect');
 
@@ -98,7 +98,7 @@ class BatchTestController {
     $batch_test_helper->stack(NULL, TRUE);
     $batch = $batch_test_definitions->batch1();
     $batch['finished'] = BatchTestCallbacks::class . ':finished1Finished';
-    return \Drupal::service(BatchProcessor::class)
+    return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch)
         ->process('batch-test/redirect');
   }
@@ -140,7 +140,7 @@ class BatchTestController {
     $batch = [
       'operations' => [[BatchInjectionCallbacks::class . ':themeCallback', []]],
     ];
-    return \Drupal::service(BatchProcessor::class)
+    return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch)
         ->process('batch-test/redirect');
   }
@@ -159,7 +159,7 @@ class BatchTestController {
       'title' => 'Batch Test',
       'operations' => [[BatchInjectionCallbacks::class . ':titleCallback', []]],
     ];
-    return \Drupal::service(BatchProcessor::class)
+    return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch)
         ->process('batch-test/redirect');
   }

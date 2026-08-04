@@ -1619,6 +1619,7 @@ services:
   Drupal\Core\Batch\BatchProcessor:
     class: Drupal\Core\Batch\BatchProcessor
     autowire: true
+  Drupal\Core\Batch\BatchProcessorInterface: '@Drupal\Core\Batch\BatchProcessor'
   batch.storage:
     class: Drupal\Core\Batch\BatchStorage
     arguments: ['@database', '@session', '@csrf_token', '@datetime.time']

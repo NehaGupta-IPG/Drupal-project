@@ -6,7 +6,7 @@ namespace Drupal\batch_test\Form;
 
 use Drupal\batch_test\BatchTestDefinitions;
 use Drupal\batch_test\BatchTestHelper;
-use Drupal\Core\Batch\BatchProcessor;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -123,11 +123,11 @@ class BatchTestChainedForm extends FormBase {
    * Moved batch processor in to the static method to keep test submit handler
    * static.
    *
-   * @return \Drupal\Core\Batch\BatchProcessor
+   * @return \Drupal\Core\Batch\BatchProcessorInterface
    *   The batch processor.
    */
-  public static function getBatchProcessor(): BatchProcessor {
-    return \Drupal::service(BatchProcessor::class);
+  public static function getBatchProcessor(): BatchProcessorInterface {
+    return \Drupal::service(BatchProcessorInterface::class);
   }
 
 }
