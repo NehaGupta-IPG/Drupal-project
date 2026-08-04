@@ -16,7 +16,7 @@
     position: relative;
     display: inline-block;
     overflow: hidden;
-    box-sizing: border-box;
+    box-sizing: border-box; /* all: unset overrides the global box-sizing rule — must restate locally */
     width: 2.5rem;
     height: 1.5rem;
     cursor: pointer;

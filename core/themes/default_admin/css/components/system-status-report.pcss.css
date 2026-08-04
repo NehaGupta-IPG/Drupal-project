@@ -24,7 +24,7 @@
 
 .system-status-report__status-title {
   position: relative;
-  box-sizing: border-box;
+  box-sizing: border-box; /* required: width: 18rem below assumes padding is included */
   width: 100%;
   vertical-align: top;
   color: var(--admin-color-text-loud);

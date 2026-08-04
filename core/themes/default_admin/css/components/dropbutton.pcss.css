@@ -141,7 +141,6 @@
     > .button {
       display: block;
       overflow: hidden;
-      box-sizing: border-box;
       width: 100%;
       max-width: 320px;
       margin: 0;
@@ -415,7 +414,6 @@
   & > * {
     display: inline-flex;
     align-items: center;
-    box-sizing: border-box;
     margin: 0;
     padding: calc(0.875rem - 1px) calc(var(--admin-space-l) - 1px);
     cursor: pointer;
@@ -523,7 +521,6 @@
 .dropbutton > .dropbutton__item > a,
 .dropbutton > .dropbutton__item > .button {
   display: block;
-  box-sizing: border-box;
   width: 100%;
   margin: 0;
   text-align: left;
@@ -653,7 +650,6 @@ html.js {
   }
 
   .dropbutton {
-    box-sizing: border-box;
     height: 3rem;
     min-height: 3rem;
   }

@@ -17,7 +17,6 @@
 }
 
 .tabs-wrapper {
-  box-sizing: border-box;
   padding: 0 var(--admin-space-xs);
   margin-inline: calc(var(--admin-space-xs) * -1);
 

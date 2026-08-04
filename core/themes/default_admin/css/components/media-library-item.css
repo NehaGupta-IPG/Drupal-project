@@ -65,7 +65,6 @@
 
 .media-library-item--grid {
   justify-content: center;
-  box-sizing: border-box;
   padding: 0.5rem;
   vertical-align: top;
   border-radius: var(--admin-radius-xl);
