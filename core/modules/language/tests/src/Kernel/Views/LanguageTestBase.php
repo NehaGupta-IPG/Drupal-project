@@ -45,7 +45,6 @@ abstract class LanguageTestBase extends ViewsKernelTestBase {
     $columns[] = Column::varchar(
       name: 'langcode',
       description: 'The {language}.langcode of this beatle.',
-      type: ColumnType::Varchar,
       length: 12,
       default: new StringValue(''),
     );

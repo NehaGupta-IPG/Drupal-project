@@ -126,7 +126,6 @@ function search_schema(): Schema {
       Column::float(
         name: 'count',
         description: "The count of the word in the index using Zipf's law to equalize the probability distribution.",
-        type: ColumnType::Float,
         notNull: FALSE,
       ),
     ],

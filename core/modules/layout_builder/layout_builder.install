@@ -26,7 +26,6 @@ function layout_builder_schema(): Schema {
       Column::int(
         name: 'block_content_id',
         description: 'The block_content entity ID.',
-        type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
       ),
