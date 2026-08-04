@@ -35,8 +35,6 @@ class SchemaInspector {
       $schema = $handler->invoke($module, 'schema') ?? [];
       // @todo remove Schema check in drupal:43.1.0.
       if ($schema instanceof Schema) {
-        assert($schema->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
-        assert($schema->name === $module, 'Invalid schema definition name, must be equal to the module name');
         return $schema;
       }
       elseif ($schema === []) {
