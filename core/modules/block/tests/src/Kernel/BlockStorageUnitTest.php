@@ -71,7 +71,7 @@ class BlockStorageUnitTest extends KernelTestBase {
 
     // Create a block with only required values.
     $entity = $this->controller->create([
-      'id' => 'test_block',
+      'id' => 'test_block_0',
       'theme' => 'stark',
       'region' => 'content',
       'plugin' => 'test_html',
@@ -81,7 +81,7 @@ class BlockStorageUnitTest extends KernelTestBase {
     $this->assertInstanceOf(Block::class, $entity);
 
     // Verify all of the block properties.
-    $actual_properties = $this->config('block.block.test_block')->get();
+    $actual_properties = $this->config('block.block.test_block_0')->get();
     $this->assertNotEmpty($actual_properties['uuid'], 'The block UUID is set.');
     unset($actual_properties['uuid']);
 
@@ -90,7 +90,7 @@ class BlockStorageUnitTest extends KernelTestBase {
       'langcode' => \Drupal::languageManager()->getDefaultLanguage()->getId(),
       'status' => TRUE,
       'dependencies' => ['module' => ['block_test'], 'theme' => ['stark']],
-      'id' => 'test_block',
+      'id' => 'test_block_0',
       'theme' => 'stark',
       'region' => 'content',
       'weight' => 0,
@@ -114,7 +114,7 @@ class BlockStorageUnitTest extends KernelTestBase {
    * Tests the loading of blocks.
    */
   protected function loadTests(): void {
-    $entity = $this->controller->load('test_block');
+    $entity = $this->controller->load('test_block_0');
 
     $this->assertInstanceOf(Block::class, $entity);
 
@@ -129,7 +129,7 @@ class BlockStorageUnitTest extends KernelTestBase {
    * Tests the deleting of blocks.
    */
   protected function deleteTests(): void {
-    $entity = $this->controller->load('test_block');
+    $entity = $this->controller->load('test_block_0');
 
     // Ensure that the storage isn't currently empty.
     $config_storage = $this->container->get('config.storage');
@@ -157,7 +157,7 @@ class BlockStorageUnitTest extends KernelTestBase {
 
     $entities = Block::loadMultiple();
     $entity = reset($entities);
-    $this->assertEquals('test_block', $entity->id(), 'The default test block was loaded.');
+    $this->assertEquals('test_block_0', $entity->id(), 'The default test block was loaded.');
   }
 
 }
