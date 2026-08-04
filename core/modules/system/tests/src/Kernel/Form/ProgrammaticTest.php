@@ -26,12 +26,6 @@ class ProgrammaticTest extends KernelTestBase {
    * Tests the programmatic form submission workflow.
    */
   public function testSubmissionWorkflow(): void {
-    $batch_processor = \Drupal::service(BatchProcessor::class);
-    // Backup the current batch status and reset it to avoid conflicts while
-    // processing the dummy form submit handler.
-    $current_batch = $batch =& $batch_processor->getCurrentBatch();
-    $batch = [];
-
     // Test that a programmatic form submission is rejected when a required
     // textfield is omitted and correctly processed when it is provided.
     $this->doSubmitForm([], FALSE);
@@ -54,9 +48,6 @@ class ProgrammaticTest extends KernelTestBase {
     $this->doSubmitForm(['op' => 'Submit with limited validation', 'field_to_validate' => 'all'], FALSE);
     $this->doSubmitForm(['op' => 'Submit with limited validation', 'field_to_validate' => 'textfield'], FALSE);
     $this->doSubmitForm(['op' => 'Submit with limited validation', 'field_to_validate' => 'field_to_validate'], TRUE);
-
-    // Restore the current batch status.
-    $batch = $current_batch;
   }
 
   /**
