@@ -686,6 +686,34 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
+   * Tests adding a GIN index that already exists.
+   */
+  public function testAddGinIndexAlreadyExists(): void {
+    $table_specification = [
+      'fields' => [
+        'search' => [
+          'pgsql_type' => 'tsvector',
+        ],
+      ],
+    ];
+    $this->schema->createTable('test_add_specialized_index', $table_specification);
+    $this->schema->addGinIndex('test_add_specialized_index', 'gin_search', ['search']);
+
+    $this->expectException(SchemaObjectExistsException::class);
+    $this->expectExceptionMessage("Cannot add GIN index 'gin_search' to table 'test_add_specialized_index': index already exists.");
+    $this->schema->addGinIndex('test_add_specialized_index', 'gin_search', ['search']);
+  }
+
+  /**
+   * Tests adding a GiST index to a table that does not exist.
+   */
+  public function testAddGistIndexOnNonExistingTable(): void {
+    $this->expectException(SchemaObjectDoesNotExistException::class);
+    $this->expectExceptionMessage("Cannot add GiST index 'gist_search' to table 'test_missing_table': table doesn't exist.");
+    $this->schema->addGistIndex('test_missing_table', 'gist_search', ['search']);
+  }
+
+  /**
    * Tests adding a GiST index that already exists.
    */
   public function testAddGistIndexAlreadyExists(): void {
