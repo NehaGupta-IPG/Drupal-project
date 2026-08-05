@@ -903,6 +903,60 @@ EOD;
   }
 
   /**
+   * Adds a GIN (Generalized Inverted Index) index.
+   *
+   * @param string $table
+   *   The table to be altered.
+   * @param string $name
+   *   The name of the index.
+   * @param list<\Drupal\Core\Database\SchemaDefinition\KeyColumn|string> $fields
+   *   A mix of key column specifiers, being KeyColumn objects or strings
+   *   naming columns. Limited length columns are not allowed.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   *   If the specified table doesn't exist.
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified table already has an index by that name.
+   */
+  public function addGinIndex(string $table, string $name, array $fields): void {
+    if (!$this->tableExists($table)) {
+      throw new SchemaObjectDoesNotExistException("Cannot add GIN index '$name' to table '$table': table doesn't exist.");
+    }
+    if ($this->indexExists($table, $name)) {
+      throw new SchemaObjectExistsException("Cannot add GIN index '$name' to table '$table': index already exists.");
+    }
+
+    $this->createSpecializedIndex($table, new GinIndex($name, $fields));
+  }
+
+  /**
+   * Adds a GiST (Generalized Search Tree) index.
+   *
+   * @param string $table
+   *   The table to be altered.
+   * @param string $name
+   *   The name of the index.
+   * @param list<\Drupal\Core\Database\SchemaDefinition\KeyColumn|string> $fields
+   *   A mix of key column specifiers, being KeyColumn objects or strings
+   *   naming columns. Limited length columns are not allowed.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   *   If the specified table doesn't exist.
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified table already has an index by that name.
+   */
+  public function addGistIndex(string $table, string $name, array $fields): void {
+    if (!$this->tableExists($table)) {
+      throw new SchemaObjectDoesNotExistException("Cannot add GiST index '$name' to table '$table': table doesn't exist.");
+    }
+    if ($this->indexExists($table, $name)) {
+      throw new SchemaObjectExistsException("Cannot add GiST index '$name' to table '$table': index already exists.");
+    }
+
+    $this->createSpecializedIndex($table, new GistIndex($name, $fields));
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function dropIndex($table, $name) {

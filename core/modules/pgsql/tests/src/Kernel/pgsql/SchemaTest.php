@@ -11,6 +11,8 @@ use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaObjectDoesNotExistException;
+use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 use Drupal\pgsql\Driver\Database\pgsql\GinIndex;
 use Drupal\pgsql\Driver\Database\pgsql\GistIndex;
@@ -487,6 +489,70 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->assertSame('gist', $this->getIndexMethod('test_specialized_indexes', 'gist_search'));
     // The GIN index is preferred over the regular index alternative.
     $this->assertSame('gin', $this->getIndexMethod('test_specialized_indexes', 'alternative_search'));
+  }
+
+  /**
+   * Tests creating a specialized index from an unsupported definition class.
+   */
+  public function testCreateSpecializedIndexWithUnsupportedClass(): void {
+    $index = new Index(name: 'ages', columns: ['age']);
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('Unsupported index definition class ' . Index::class);
+    (new \ReflectionMethod($this->schema, 'createSpecializedIndex'))->invoke($this->schema, 'test_specialized_indexes', $index);
+  }
+
+  /**
+   * Tests adding GIN and GiST indexes to an existing table.
+   */
+  public function testAddGinAndGistIndex(): void {
+    $table_specification = [
+      'fields' => [
+        'search' => [
+          'pgsql_type' => 'tsvector',
+        ],
+      ],
+    ];
+    $this->schema->createTable('test_add_specialized_index', $table_specification);
+
+    $this->schema->addGinIndex('test_add_specialized_index', 'gin_search', ['search']);
+    $this->assertTrue($this->schema->indexExists('test_add_specialized_index', 'gin_search'));
+    $this->assertSame('gin', $this->getIndexMethod('test_add_specialized_index', 'gin_search'));
+    $this->assertTrue($this->schema->dropIndex('test_add_specialized_index', 'gin_search'));
+    $this->assertFalse($this->schema->indexExists('test_add_specialized_index', 'gin_search'));
+
+    $this->schema->addGistIndex('test_add_specialized_index', 'gist_search', ['search']);
+    $this->assertTrue($this->schema->indexExists('test_add_specialized_index', 'gist_search'));
+    $this->assertSame('gist', $this->getIndexMethod('test_add_specialized_index', 'gist_search'));
+    $this->assertTrue($this->schema->dropIndex('test_add_specialized_index', 'gist_search'));
+    $this->assertFalse($this->schema->indexExists('test_add_specialized_index', 'gist_search'));
+  }
+
+  /**
+   * Tests adding a GIN index to a table that does not exist.
+   */
+  public function testAddGinIndexOnNonExistingTable(): void {
+    $this->expectException(SchemaObjectDoesNotExistException::class);
+    $this->expectExceptionMessage("Cannot add GIN index 'gin_search' to table 'test_missing_table': table doesn't exist.");
+    $this->schema->addGinIndex('test_missing_table', 'gin_search', ['search']);
+  }
+
+  /**
+   * Tests adding a GiST index that already exists.
+   */
+  public function testAddGistIndexAlreadyExists(): void {
+    $table_specification = [
+      'fields' => [
+        'search' => [
+          'pgsql_type' => 'tsvector',
+        ],
+      ],
+    ];
+    $this->schema->createTable('test_add_specialized_index', $table_specification);
+    $this->schema->addGistIndex('test_add_specialized_index', 'gist_search', ['search']);
+
+    $this->expectException(SchemaObjectExistsException::class);
+    $this->expectExceptionMessage("Cannot add GiST index 'gist_search' to table 'test_add_specialized_index': index already exists.");
+    $this->schema->addGistIndex('test_add_specialized_index', 'gist_search', ['search']);
   }
 
   /**
