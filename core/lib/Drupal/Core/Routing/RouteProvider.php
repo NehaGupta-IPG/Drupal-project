@@ -161,6 +161,10 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       $this->languageManager = $table instanceof LanguageManagerInterface ? $table : \Drupal::languageManager();
     }
     else {
+      // The route table is always 'router'; only tests passed another name.
+      if ($table !== 'router') {
+        @trigger_error('The $table argument of ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and the argument is removed from drupal:13.0.0. See https://www.drupal.org/node/3614851', E_USER_DEPRECATED);
+      }
       $this->fastCache = $fast_cache;
       $this->tableName = $table;
       $this->languageManager = $language_manager ?: \Drupal::languageManager();
