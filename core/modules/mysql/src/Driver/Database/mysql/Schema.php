@@ -414,6 +414,12 @@ class Schema extends DatabaseSchema {
 
     [$keys_new, $specialized_indexes] = $this->prepareKeysSpecification($keys_new);
 
+    if (!empty($keys_new['indexes'])) {
+      // Normalizing the indexes requires the specification of each indexed
+      // field; provide the specification of the field being added.
+      $keys_new['fields'][$field] ??= $spec;
+    }
+
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
     $is_primary_key = isset($keys_new['primary key']) && in_array($field, $keys_new['primary key'], TRUE);
     if ($is_primary_key) {
@@ -647,6 +653,12 @@ class Schema extends DatabaseSchema {
     }
 
     [$keys_new, $specialized_indexes] = $this->prepareKeysSpecification($keys_new);
+
+    if (!empty($keys_new['indexes'])) {
+      // Normalizing the indexes requires the specification of each indexed
+      // field; provide the specification of the field being changed.
+      $keys_new['fields'][$field_new] ??= $spec;
+    }
 
     if (isset($keys_new['primary key']) && in_array($field_new, $keys_new['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field_new => $spec]);
