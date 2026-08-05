@@ -5,7 +5,6 @@ namespace Drupal\file\Plugin\Field\FieldFormatter;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -20,6 +19,7 @@ use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\image\ImageDerivativeUtilities;
+use Drupal\media\MediaInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -70,10 +70,8 @@ class FileVideoFormatter extends FileMediaFormatterBase {
     protected ?EntityStorageInterface $fileStorage = NULL,
   ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
-    // The last two arguments are optional to avoid a BC break for subclasses
-    // that call the parent constructor positionally. They will be required in
-    // the next major. Trigger a deprecation when they are omitted and fall back
-    // to the container.
+    // The last two arguments are optional to avoid a BC break; they become
+    // required next major. Deprecate omission and fall back to the container.
     if ($this->moduleHandler === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
       $this->moduleHandler = \Drupal::moduleHandler();
@@ -111,11 +109,8 @@ class FileVideoFormatter extends FileMediaFormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $fields = $this->entityFieldManager->getFieldDefinitions($form['#entity_type'], $form['#bundle']);
 
-    // Get all eligible fields for the html5 poster: image fields, and - when
-    // the media module is enabled - entity reference fields targeting media.
-    // The media's image is resolved at render time. The media module is only
-    // consulted via the module handler so that the file module keeps no
-    // dependency on the media module.
+    // Eligible poster fields are image fields, plus media reference fields when
+    // the media module is enabled, kept optional to avoid a media dependency.
     $poster_fields = [];
     $media_enabled = $this->moduleHandler->moduleExists('media');
     foreach ($fields as $field) {
@@ -242,22 +237,20 @@ class FileVideoFormatter extends FileMediaFormatterBase {
         // The selected field references the poster file directly (image field).
         $poster_file_entity = $referenced;
       }
-      elseif ($referenced instanceof FieldableEntityInterface && $referenced->getEntityTypeId() === 'media' && method_exists($referenced, 'getSource')) {
-        // The selected field references a media entity. The rendered output
-        // depends on this media entity as soon as it is inspected, so add its
-        // cacheability now - on both the success and bail-out paths - so that a
-        // later non-image to image change invalidates the host render cache.
+      elseif ($referenced instanceof MediaInterface) {
+        // Depend on the media now so a later non-image to image change
+        // invalidates the host render cache on both success and bail-out paths.
         CacheableMetadata::createFromRenderArray($elements)
           ->merge(CacheableMetadata::createFromObject($referenced))
           ->applyTo($elements);
+        // Loading the source file directly bypasses media access control, so
+        // check 'view' access and bubble its cacheability before resolving it.
         $access = $referenced->access('view', $this->currentUser, TRUE);
         CacheableMetadata::createFromRenderArray($elements)
           ->merge(CacheableMetadata::createFromObject($access))
           ->applyTo($elements);
         if ($access->isAllowed()) {
           // Resolve its source file and accept it only when it is an image.
-          // This is done via duck typing (getSource()) and the file storage so
-          // that the file module keeps no dependency on the media module.
           $source = $referenced->getSource();
           if ($source !== NULL) {
             $source_value = $source->getSourceFieldValue($referenced);
@@ -346,9 +339,8 @@ class FileVideoFormatter extends FileMediaFormatterBase {
     if ($style_id && $style = ImageStyle::load($style_id)) {
       if (!empty($dependencies[$style->getConfigDependencyKey()][$style->getConfigDependencyName()])) {
         $replacement_id = $this->imageStyleStorage->getReplacementId($style_id);
-        // If a valid replacement has been provided in the storage, replace the
-        // image style with the replacement and signal that the formatter plugin
-        // settings were updated.
+        // If the storage provides a valid replacement, swap the image style and
+        // signal that the formatter plugin settings were updated.
         if (!empty($replacement_id) && ImageStyle::load($replacement_id)) {
           $this->setSetting('poster_image_style', $replacement_id);
           $changed = TRUE;
