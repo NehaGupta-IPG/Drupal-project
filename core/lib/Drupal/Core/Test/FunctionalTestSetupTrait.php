@@ -590,7 +590,6 @@ trait FunctionalTestSetupTrait {
         'langcode' => 'en',
       ],
       'extra_modules' => $modules,
-      'default_theme' => $this->defaultTheme,
       'forms' => [
         'install_settings_form' => [
           'driver' => $driverNamespace,
@@ -615,6 +614,9 @@ trait FunctionalTestSetupTrait {
         ],
       ],
     ];
+    if (isset($this->defaultTheme)) {
+      $parameters['default_theme'] = $this->defaultTheme;
+    }
 
     // If we only have one db driver available, we cannot set the driver.
     if (count(Database::getDriverList()->getInstallableList()) == 1) {
