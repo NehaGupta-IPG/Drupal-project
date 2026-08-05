@@ -15,11 +15,6 @@ use Symfony\Contracts\Service\Attribute\Required;
 trait AutowiredInstanceTrait {
 
   /**
-   * Array of data to use when calling the constructor.
-   */
-  protected static array $autowireData = [];
-
-  /**
    * Instantiates a new instance of the implementing class using autowiring.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
@@ -30,42 +25,15 @@ trait AutowiredInstanceTrait {
    * @return static
    */
   public static function createInstanceAutowired(ContainerInterface $container, mixed ...$args): static {
-    if (empty(static::$autowireData[static::class])) {
-      $reflection = new \ReflectionClass(static::class);
+    $data = static::autowireLoadClass($container, static::class, $args);
 
-      foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-        if (!empty($method->getAttributes(Required::class))) {
-          static::getAutowireData($container, $method->getParameters(), $method->getName());
-        }
-      }
-
-      while ($reflection->hasMethod('__construct')) {
-        $method = $reflection->getMethod('__construct');
-        $parameters = $method->getParameters();
-
-        if ($method->isVariadic()) {
-          array_pop($parameters);
-          static::getAutowireData($container, $parameters, '__construct');
-        }
-        else {
-          $parameters = array_slice($parameters, count($args));
-          static::$autowireData[static::class]['__construct'][] = 'args';
-          static::getAutowireData($container, $parameters, '__construct');
-          break;
-        }
-
-        $reflection = $reflection->getParentClass();
-      }
-      static::$autowireData[static::class]['__construct'] ??= [];
-    }
-
-    $args = static::getAutowireArguments($container, '__construct', $args);
+    $args = static::autowireGetArguments($container, $data['__construct'], $args);
     $instance = new static(...$args);
 
-    foreach (static::$autowireData[static::class] as $method_name => $args) {
-      if ($method_name != '__construct') {
-        $args = static::getAutowireArguments($container, $method_name);
-        call_user_func([$instance, $method_name], ...$args);
+    foreach ($data as $methodName => $args) {
+      if ($methodName != '__construct') {
+        $args = static::autowireGetArguments($container, $data[$methodName]);
+        call_user_func([$instance, $methodName], ...$args);
       }
     }
 
@@ -77,18 +45,18 @@ trait AutowiredInstanceTrait {
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The service container.
-   * @param string $method_name
-   *   The name of the method being called.
+   * @param array $data
+   *   Data for the method as returned by autowireLoadMethod().
    * @param array $args
    *   Array of predefined arguments to pass.
    *
    * @return array
    *   The resolved arguments.
    */
-  private static function getAutowireArguments(ContainerInterface $container, string $method_name, array $args = []): array {
+  private static function autowireGetArguments(ContainerInterface $container, array $data, array $args = []): array {
     $new_args = [];
 
-    foreach (static::$autowireData[static::class][$method_name] as $entry) {
+    foreach ($data as $entry) {
       if (is_null($entry)) {
         $new_args[] = NULL;
         continue;
@@ -113,21 +81,87 @@ trait AutowiredInstanceTrait {
   }
 
   /**
-   * Analyses arguments for a method using autowiring.
+   * Gets data for autowiring a class.
    *
-   * The results are added to the static array.
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The service container.
+   * @param string $className
+   *   The name of the class.
+   * @param array $args
+   *   Any predefined arguments to pass to the constructor.
+   *
+   * @return array
+   *   Array with an entry for each method, as defined in autowireLoadMethod().
+   *
+   * @throws \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
+   *   When a service cannot be resolved.
+   */
+  private static function autowireLoadClass(ContainerInterface $container, string $className, array $args): array {
+    $cache = $container->get('cache.memory');
+    $cid = 'autowire__' . static::class;
+
+    if ($cached = $cache->get($cid)) {
+      $data = $cached->data;
+    }
+    else {
+      $reflection = new \ReflectionClass($className);
+
+      foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+        if (!empty($method->getAttributes(Required::class))) {
+          $mathod_name = $method->getName();
+          $data[$methodName] = static::autowireLoadMethod($container, $method->getParameters(), $methodName);
+        }
+      }
+
+      $data['__construct'] = [];
+
+      if ($reflection->hasMethod('__construct')) {
+        $method = $reflection->getMethod('__construct');
+        $parameters = $method->getParameters();
+
+        if ($method->isVariadic()) {
+          array_pop($parameters);
+        }
+        else {
+          $parameters = array_slice($parameters, count($args));
+          $data['__construct'][] = 'args';
+          $stop = TRUE;
+        }
+
+        $data['__construct'] = array_merge($data['__construct'], static::autowireLoadMethod($container, $parameters, '__construct'));
+      }
+
+      if (empty($stop) && $parent_name = get_parent_class($className)) {
+        $parent_data = static::autowireLoadClass($container, $parent_name, $args);
+        $data['__construct'] = array_merge($data['__construct'], $parent_data['__construct']);
+      }
+
+      // Choose a cache tag that will be cleared if new modules are loaded.
+      $cache->set($cid, $data, tags: ['library_info']);
+    }
+
+    return $data;
+  }
+
+  /**
+   * Gets data for autowiring a method.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The service container.
    * @param \ReflectionParameter[] $parameters
    *   The parameters to resolve.
-   * @param string $method_name
+   * @param string $methodName
    *   The name of the method being called.
+   *
+   * @return array
+   *   Array of method arguments, either parameters or types.
    *
    * @throws \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
    *   When a service cannot be resolved.
    */
-  private static function getAutowireData(ContainerInterface $container, array $parameters, string $method_name): void {
+  private static function autowireLoadMethod(ContainerInterface $container, array $parameters, string $methodName): array {
+    $data = [];
+
     foreach ($parameters as $parameter) {
       $type = 'service';
       $argument = ltrim((string) $parameter->getType(), '?');
@@ -140,22 +174,24 @@ trait AutowiredInstanceTrait {
         $type = 'parameter';
         $argument = $matches[1];
         if ($container->hasParameter($argument)) {
-          static::$autowireData[static::class][$method_name][] = "$type:$argument";
+          $data[] = "$type:$argument";
           continue;
         }
       }
       elseif ($container->has($argument)) {
-        static::$autowireData[static::class][$method_name][] = "$type:$argument";
+        $data[] = "$type:$argument";
         continue;
       }
 
       if ($parameter->getType()?->allowsNull() || $parameter->getType() === NULL) {
-        static::$autowireData[static::class][$method_name][] = NULL;
+        $data[] = NULL;
         continue;
       }
 
-      throw new AutowiringFailedException($argument, sprintf('Cannot autowire %s "%s": argument "$%s" of method "%s::%s()". Check that either the argument type is correct or the Autowire attribute is passed a valid identifier. Otherwise configure its value explicitly if possible.', $type, $argument, $parameter->getName(), static::class, $method_name));
+      throw new AutowiringFailedException($argument, sprintf('Cannot autowire %s "%s": argument "$%s" of method "%s::%s()". Check that either the argument type is correct or the Autowire attribute is passed a valid identifier. Otherwise configure its value explicitly if possible.', $type, $argument, $parameter->getName(), static::class, $methodName));
     }
+
+    return $data;
   }
 
 }
