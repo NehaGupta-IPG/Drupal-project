@@ -87,6 +87,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
       'image_link' => '',
       'image_loading' => [
         'attribute' => 'lazy',
+        'fetchpriority' => NULL,
       ],
     ] + parent::defaultSettings();
   }
@@ -142,6 +143,20 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
         ':link' => 'https://html.spec.whatwg.org/multipage/urls-and-fetching.html#lazy-loading-attributes',
       ]),
     ];
+    $fetchpriority_options = [
+      '' => $this->t('Unspecified (let browser decide)'),
+      'high' => $this->t('High (for LCP-critical images)'),
+      'low' => $this->t('Low (for images above the fold but not visible initially)'),
+    ];
+    $elements['image_loading']['fetchpriority'] = [
+      '#title' => $this->t('Fetch Priority'),
+      '#type' => 'select',
+      '#default_value' => $image_loading['fetchpriority'],
+      '#options' => $fetchpriority_options,
+      '#description' => $this->t('Select the fetch priority for images. <a href=":link">Learn more.</a>', [
+        ':link' => 'https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/fetchPriority',
+      ]),
+    ];
 
     $link_types = [
       'content' => $this->t('Content'),
@@ -185,6 +200,11 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
     $summary[] = $this->t('Loading attribute: @attribute', [
       '@attribute' => $image_loading['attribute'],
     ]);
+    if (!empty($image_loading['fetchpriority'])) {
+      $summary[] = $this->t('Fetch Priority: @fetchpriority', [
+        '@fetchpriority' => $image_loading['fetchpriority'],
+      ]);
+    }
 
     return array_merge($summary, parent::settingsSummary());
   }
@@ -241,6 +261,9 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
 
       $image_loading_settings = $this->getSetting('image_loading');
       $attributes['loading'] = $image_loading_settings['attribute'];
+      if (!empty($image_loading_settings['fetchpriority'])) {
+        $attributes['fetchpriority'] = $image_loading_settings['fetchpriority'];
+      }
 
       $elements[$delta] = [
         '#theme' => 'responsive_image_formatter',
