@@ -453,13 +453,8 @@ trait FunctionalTestSetupTrait {
    *
    * @throws \Exception
    *   If the test case does not initialize default theme.
-   *
-   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no
-   * replacement.
-   * @see https://www.drupal.org/project/drupal/issues/3614825
    */
   protected function installDefaultThemeFromClassProperty(ContainerInterface $container) {
-    trigger_error(__METHOD__ . 'is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/project/drupal/issues/3614825', E_USER_DEPRECATED);
     // Use the install profile to determine the default theme if configured and
     // not already specified.
     $profile = $container->getParameter('install_profile');
