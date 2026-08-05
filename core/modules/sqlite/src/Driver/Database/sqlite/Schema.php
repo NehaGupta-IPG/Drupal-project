@@ -323,6 +323,9 @@ class Schema extends DatabaseSchema {
     if ($this->fieldExists($table, $field)) {
       throw new SchemaObjectExistsException("Cannot add field '$table.$field': field already exists.");
     }
+
+    [$keys_new, $specialized_indexes] = $this->prepareKeysSpecification($keys_new);
+
     if (isset($keys_new['primary key']) && in_array($field, $keys_new['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field => $specification]);
     }
@@ -398,6 +401,9 @@ class Schema extends DatabaseSchema {
       $new_schema = array_merge($new_schema, $keys_new);
 
       $this->alterTable($table, $old_schema, $new_schema, $mapping);
+    }
+    foreach ($specialized_indexes as $index) {
+      $this->createSpecializedIndex($table, $index);
     }
   }
 

@@ -528,6 +528,60 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
+   * Tests adding a field with specialized indexes.
+   *
+   * PostgreSQL supports GIN and GiST index definitions in the $new_keys
+   * argument of addField(); the indexes are created along with the field,
+   * with the corresponding index access method, and preferred over regular
+   * index alternatives.
+   */
+  public function testAddFieldWithSpecializedIndexes(): void {
+    $table_specification = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+        ],
+      ],
+      'primary key' => ['id'],
+    ];
+    $this->schema->createTable('test_add_field_index', $table_specification);
+
+    $this->schema->addField('test_add_field_index', 'search', ['pgsql_type' => 'tsvector'], [
+      'indexes' => [
+        'id_legacy' => ['id'],
+        'id_object' => new Index(name: 'id_object', columns: ['id']),
+        'gin_search' => new GinIndex(name: 'gin_search', columns: ['search']),
+        'gist_search' => new GistIndex(name: 'gist_search', columns: ['search']),
+        'alternative_search' => new AlternativeIndexes(
+          name: 'alternative_search',
+          indexes: [
+            new GinIndex(name: 'alternative_search', columns: ['search']),
+            new Index(name: 'alternative_search', columns: ['id']),
+          ],
+        ),
+      ],
+    ]);
+    $this->assertTrue($this->schema->fieldExists('test_add_field_index', 'search'));
+
+    // The legacy array-based index specification and the regular index
+    // definition are created as regular indexes.
+    $this->assertTrue($this->schema->indexExists('test_add_field_index', 'id_legacy'));
+    $this->assertSame('btree', $this->getIndexMethod('test_add_field_index', 'id_legacy'));
+    $this->assertTrue($this->schema->indexExists('test_add_field_index', 'id_object'));
+    $this->assertSame('btree', $this->getIndexMethod('test_add_field_index', 'id_object'));
+
+    $this->assertTrue($this->schema->indexExists('test_add_field_index', 'gin_search'));
+    $this->assertSame('gin', $this->getIndexMethod('test_add_field_index', 'gin_search'));
+    $this->assertTrue($this->schema->indexExists('test_add_field_index', 'gist_search'));
+    $this->assertSame('gist', $this->getIndexMethod('test_add_field_index', 'gist_search'));
+
+    // The GIN index is preferred over the regular index alternative.
+    $this->assertTrue($this->schema->indexExists('test_add_field_index', 'alternative_search'));
+    $this->assertSame('gin', $this->getIndexMethod('test_add_field_index', 'alternative_search'));
+  }
+
+  /**
    * Tests adding a GIN index to a table that does not exist.
    */
   public function testAddGinIndexOnNonExistingTable(): void {

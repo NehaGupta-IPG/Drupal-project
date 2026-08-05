@@ -412,6 +412,8 @@ class Schema extends DatabaseSchema {
       throw new SchemaObjectExistsException("Cannot add field '$table.$field': field already exists.");
     }
 
+    [$keys_new, $specialized_indexes] = $this->prepareKeysSpecification($keys_new);
+
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
     $is_primary_key = isset($keys_new['primary key']) && in_array($field, $keys_new['primary key'], TRUE);
     if ($is_primary_key) {
@@ -471,6 +473,9 @@ class Schema extends DatabaseSchema {
     if ($fix_null) {
       $spec['not null'] = TRUE;
       $this->changeField($table, $field, $field, $spec);
+    }
+    foreach ($specialized_indexes as $index) {
+      $this->createSpecializedIndex($table, $index);
     }
   }
 

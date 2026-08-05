@@ -671,6 +671,8 @@ EOD;
       throw new SchemaObjectExistsException("Cannot add field '$table.$field': field already exists.");
     }
 
+    [$new_keys, $specialized_indexes] = $this->prepareKeysSpecification($new_keys);
+
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
     $is_primary_key = isset($new_keys['primary key']) && in_array($field, $new_keys['primary key'], TRUE);
     if ($is_primary_key) {
@@ -714,6 +716,9 @@ EOD;
         $this->dropPrimaryKey($table);
       }
       $this->_createKeys($table, $new_keys);
+    }
+    foreach ($specialized_indexes as $index) {
+      $this->createSpecializedIndex($table, $index);
     }
     // Add column comment.
     if (!empty($spec['description'])) {
