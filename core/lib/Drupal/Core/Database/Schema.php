@@ -628,7 +628,12 @@ abstract class Schema implements PlaceholderInterface {
    * @param array|null $keys_new
    *   (optional) Keys and indexes specification to be created on the
    *   table along with changing the field. The format is the same as a
-   *   table specification but without the 'fields' element.
+   *   table specification but without the 'fields' element. The values
+   *   of the 'indexes' element may also be index definition objects,
+   *   being IndexBase or AlternativeIndexes objects. Index definitions
+   *   of a technology not supported by the driver are skipped, and
+   *   alternative indexes fall back to their most preferred supported
+   *   definition.
    *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table or source field doesn't exist.
@@ -752,17 +757,19 @@ abstract class Schema implements PlaceholderInterface {
   /**
    * Prepares a keys specification containing index definition objects.
    *
-   * The 'indexes' element of a keys specification, as passed to ::addField(),
-   * may contain index definition objects next to legacy array-based index
-   * specifications. Regular Index definitions are converted to legacy arrays,
-   * keyed by the index name. Specialized index definitions supported by this
-   * driver are removed from the specification and returned separately, to be
-   * created with ::createSpecializedIndex(). Definitions of an index
-   * technology not supported by this driver are skipped, and alternative
-   * indexes fall back to their most preferred supported definition.
+   * The 'indexes' element of a keys specification, as passed to ::addField()
+   * or ::changeField(), may contain index definition objects next to legacy
+   * array-based index specifications. Regular Index definitions are
+   * converted to legacy arrays, keyed by the index name. Specialized index
+   * definitions supported by this driver are removed from the specification
+   * and returned separately, to be created with ::createSpecializedIndex().
+   * Definitions of an index technology not supported by this driver are
+   * skipped, and alternative indexes fall back to their most preferred
+   * supported definition.
    *
    * @param array|null $keys_new
-   *   A keys and indexes specification, as passed to ::addField().
+   *   A keys and indexes specification, as passed to ::addField() or
+   *   ::changeField().
    *
    * @return array{array|null, list<\Drupal\Core\Database\SchemaDefinition\IndexBase>}
    *   The keys specification with all index definition objects converted or

@@ -21,8 +21,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cSpell:ignore attname attnum attrelid indexdef objid refobjid refobjsubid
-// cspell:ignore regclass relkind relname tsvector
+// cSpell:ignore attname attnum attrelid indexdef jsonb objid refobjid
+// cspell:ignore refobjsubid regclass relkind relname tsvector
 
 /**
  * Tests schema API for the PostgreSQL driver.
@@ -461,11 +461,20 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
             ],
           ],
         ),
+        Column::create(
+          name: 'data',
+          dbSpecificExtra: [
+            'pgsql' => [
+              'pgsql_type' => 'jsonb',
+            ],
+          ],
+        ),
       ],
       primaryKey: new PrimaryKey(['id']),
       indexes: [
         new Index(name: 'ages', columns: ['age']),
         new GinIndex(name: 'gin_search', columns: ['search']),
+        new GinIndex(name: 'gin_data', columns: ['data']),
         new GistIndex(name: 'gist_search', columns: ['search']),
         new AlternativeIndexes(
           name: 'alternative_search',
@@ -481,11 +490,14 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->assertTrue($this->schema->tableExists('test_specialized_indexes'));
     $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'ages'));
     $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'gin_search'));
+    $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'gin_data'));
     $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'gist_search'));
     $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'alternative_search'));
 
     $this->assertSame('btree', $this->getIndexMethod('test_specialized_indexes', 'ages'));
+    // The GIN index is supported on both tsvector and jsonb columns.
     $this->assertSame('gin', $this->getIndexMethod('test_specialized_indexes', 'gin_search'));
+    $this->assertSame('gin', $this->getIndexMethod('test_specialized_indexes', 'gin_data'));
     $this->assertSame('gist', $this->getIndexMethod('test_specialized_indexes', 'gist_search'));
     // The GIN index is preferred over the regular index alternative.
     $this->assertSame('gin', $this->getIndexMethod('test_specialized_indexes', 'alternative_search'));
@@ -510,16 +522,28 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
         'search' => [
           'pgsql_type' => 'tsvector',
         ],
+        'data' => [
+          'pgsql_type' => 'jsonb',
+        ],
       ],
     ];
     $this->schema->createTable('test_add_specialized_index', $table_specification);
 
+    // A GIN index can be added on a tsvector column.
     $this->schema->addGinIndex('test_add_specialized_index', 'gin_search', ['search']);
     $this->assertTrue($this->schema->indexExists('test_add_specialized_index', 'gin_search'));
     $this->assertSame('gin', $this->getIndexMethod('test_add_specialized_index', 'gin_search'));
     $this->assertTrue($this->schema->dropIndex('test_add_specialized_index', 'gin_search'));
     $this->assertFalse($this->schema->indexExists('test_add_specialized_index', 'gin_search'));
 
+    // A GIN index can be added on a jsonb column.
+    $this->schema->addGinIndex('test_add_specialized_index', 'gin_data', ['data']);
+    $this->assertTrue($this->schema->indexExists('test_add_specialized_index', 'gin_data'));
+    $this->assertSame('gin', $this->getIndexMethod('test_add_specialized_index', 'gin_data'));
+    $this->assertTrue($this->schema->dropIndex('test_add_specialized_index', 'gin_data'));
+    $this->assertFalse($this->schema->indexExists('test_add_specialized_index', 'gin_data'));
+
+    // A GiST index can be added on a tsvector column.
     $this->schema->addGistIndex('test_add_specialized_index', 'gist_search', ['search']);
     $this->assertTrue($this->schema->indexExists('test_add_specialized_index', 'gist_search'));
     $this->assertSame('gist', $this->getIndexMethod('test_add_specialized_index', 'gist_search'));
@@ -542,6 +566,9 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
           'type' => 'serial',
           'not null' => TRUE,
         ],
+        'data' => [
+          'pgsql_type' => 'jsonb',
+        ],
       ],
       'primary key' => ['id'],
     ];
@@ -552,6 +579,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
         'id_legacy' => ['id'],
         'id_object' => new Index(name: 'id_object', columns: ['id']),
         'gin_search' => new GinIndex(name: 'gin_search', columns: ['search']),
+        'gin_data' => new GinIndex(name: 'gin_data', columns: ['data']),
         'gist_search' => new GistIndex(name: 'gist_search', columns: ['search']),
         'alternative_search' => new AlternativeIndexes(
           name: 'alternative_search',
@@ -571,14 +599,81 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->assertTrue($this->schema->indexExists('test_add_field_index', 'id_object'));
     $this->assertSame('btree', $this->getIndexMethod('test_add_field_index', 'id_object'));
 
+    // The GIN index is supported on both tsvector and jsonb columns.
     $this->assertTrue($this->schema->indexExists('test_add_field_index', 'gin_search'));
     $this->assertSame('gin', $this->getIndexMethod('test_add_field_index', 'gin_search'));
+    $this->assertTrue($this->schema->indexExists('test_add_field_index', 'gin_data'));
+    $this->assertSame('gin', $this->getIndexMethod('test_add_field_index', 'gin_data'));
     $this->assertTrue($this->schema->indexExists('test_add_field_index', 'gist_search'));
     $this->assertSame('gist', $this->getIndexMethod('test_add_field_index', 'gist_search'));
 
     // The GIN index is preferred over the regular index alternative.
     $this->assertTrue($this->schema->indexExists('test_add_field_index', 'alternative_search'));
     $this->assertSame('gin', $this->getIndexMethod('test_add_field_index', 'alternative_search'));
+  }
+
+  /**
+   * Tests changing a field with specialized indexes.
+   *
+   * PostgreSQL supports GIN and GiST index definitions in the $new_keys
+   * argument of changeField(); the indexes are created along with changing
+   * the field, with the corresponding index access method, and preferred
+   * over regular index alternatives.
+   */
+  public function testChangeFieldWithSpecializedIndexes(): void {
+    $table_specification = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+        ],
+        'search' => [
+          'pgsql_type' => 'tsvector',
+        ],
+        'data' => [
+          'pgsql_type' => 'jsonb',
+        ],
+      ],
+      'primary key' => ['id'],
+    ];
+    $this->schema->createTable('test_change_field_index', $table_specification);
+
+    $this->schema->changeField('test_change_field_index', 'search', 'search_new', ['pgsql_type' => 'tsvector'], [
+      'indexes' => [
+        'id_legacy' => ['id'],
+        'id_object' => new Index(name: 'id_object', columns: ['id']),
+        'gin_search' => new GinIndex(name: 'gin_search', columns: ['search_new']),
+        'gin_data' => new GinIndex(name: 'gin_data', columns: ['data']),
+        'gist_search' => new GistIndex(name: 'gist_search', columns: ['search_new']),
+        'alternative_search' => new AlternativeIndexes(
+          name: 'alternative_search',
+          indexes: [
+            new GinIndex(name: 'alternative_search', columns: ['search_new']),
+            new Index(name: 'alternative_search', columns: ['id']),
+          ],
+        ),
+      ],
+    ]);
+    $this->assertTrue($this->schema->fieldExists('test_change_field_index', 'search_new'));
+
+    // The legacy array-based index specification and the regular index
+    // definition are created as regular indexes.
+    $this->assertTrue($this->schema->indexExists('test_change_field_index', 'id_legacy'));
+    $this->assertSame('btree', $this->getIndexMethod('test_change_field_index', 'id_legacy'));
+    $this->assertTrue($this->schema->indexExists('test_change_field_index', 'id_object'));
+    $this->assertSame('btree', $this->getIndexMethod('test_change_field_index', 'id_object'));
+
+    // The GIN index is supported on both tsvector and jsonb columns.
+    $this->assertTrue($this->schema->indexExists('test_change_field_index', 'gin_search'));
+    $this->assertSame('gin', $this->getIndexMethod('test_change_field_index', 'gin_search'));
+    $this->assertTrue($this->schema->indexExists('test_change_field_index', 'gin_data'));
+    $this->assertSame('gin', $this->getIndexMethod('test_change_field_index', 'gin_data'));
+    $this->assertTrue($this->schema->indexExists('test_change_field_index', 'gist_search'));
+    $this->assertSame('gist', $this->getIndexMethod('test_change_field_index', 'gist_search'));
+
+    // The GIN index is preferred over the regular index alternative.
+    $this->assertTrue($this->schema->indexExists('test_change_field_index', 'alternative_search'));
+    $this->assertSame('gin', $this->getIndexMethod('test_change_field_index', 'alternative_search'));
   }
 
   /**

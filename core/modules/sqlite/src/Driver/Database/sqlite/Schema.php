@@ -620,6 +620,9 @@ class Schema extends DatabaseSchema {
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
+
+    [$keys_new, $specialized_indexes] = $this->prepareKeysSpecification($keys_new);
+
     if (isset($keys_new['primary key']) && in_array($field_new, $keys_new['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field_new => $spec]);
     }
@@ -658,6 +661,9 @@ class Schema extends DatabaseSchema {
     }
 
     $this->alterTable($table, $old_schema, $new_schema, $mapping);
+    foreach ($specialized_indexes as $index) {
+      $this->createSpecializedIndex($table, $index);
+    }
   }
 
   /**

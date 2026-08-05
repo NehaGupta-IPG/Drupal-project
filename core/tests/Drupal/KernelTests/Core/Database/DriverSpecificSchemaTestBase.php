@@ -1601,4 +1601,70 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertFalse($this->schema->indexExists('test_add_field_index', 'alternative_skipped'));
   }
 
+  /**
+   * Tests changing a field with specialized indexes.
+   *
+   * The $keys_new argument of changeField() may contain index definition
+   * objects. By default, drivers only support regular indexes: GIN and GiST
+   * index definitions are skipped, and alternative indexes fall back to
+   * their regular index definition. Drivers supporting specialized indexes
+   * override this method.
+   */
+  public function testChangeFieldWithSpecializedIndexes(): void {
+    $table_specification = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+        ],
+        'age' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+      ],
+      'primary key' => ['id'],
+    ];
+    $this->schema->createTable('test_change_field_index', $table_specification);
+
+    $this->schema->changeField('test_change_field_index', 'age', 'age_new', [
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+    ], [
+      'indexes' => [
+        'age_legacy' => ['age_new'],
+        'ages' => new Index(name: 'ages', columns: ['age_new']),
+        'gin_age' => new GinIndex(name: 'gin_age', columns: ['age_new']),
+        'gist_age' => new GistIndex(name: 'gist_age', columns: ['age_new']),
+        'alternative_ages' => new AlternativeIndexes(
+          name: 'alternative_ages',
+          indexes: [
+            new GinIndex(name: 'alternative_ages', columns: ['age_new']),
+            new Index(name: 'alternative_ages', columns: ['age_new']),
+          ],
+        ),
+        'alternative_skipped' => new AlternativeIndexes(
+          name: 'alternative_skipped',
+          indexes: [
+            new GistIndex(name: 'alternative_skipped', columns: ['age_new']),
+          ],
+        ),
+      ],
+    ]);
+
+    $this->assertTrue($this->schema->fieldExists('test_change_field_index', 'age_new'));
+    // The legacy array-based index specification and the regular index
+    // definition are created.
+    $this->assertTrue($this->schema->indexExists('test_change_field_index', 'age_legacy'));
+    $this->assertTrue($this->schema->indexExists('test_change_field_index', 'ages'));
+    // The GIN and GiST indexes are not supported and are skipped.
+    $this->assertFalse($this->schema->indexExists('test_change_field_index', 'gin_age'));
+    $this->assertFalse($this->schema->indexExists('test_change_field_index', 'gist_age'));
+    // The regular index alternative is created in place of the GIN index.
+    $this->assertTrue($this->schema->indexExists('test_change_field_index', 'alternative_ages'));
+    // None of the alternatives is supported, so the index is skipped.
+    $this->assertFalse($this->schema->indexExists('test_change_field_index', 'alternative_skipped'));
+  }
+
 }

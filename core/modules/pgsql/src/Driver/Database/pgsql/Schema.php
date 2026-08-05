@@ -1018,6 +1018,9 @@ EOD;
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
+
+    [$new_keys, $specialized_indexes] = $this->prepareKeysSpecification($new_keys);
+
     if (isset($new_keys['primary key']) && in_array($field_new, $new_keys['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($new_keys['primary key'], [$field_new => $spec]);
     }
@@ -1126,6 +1129,9 @@ EOD;
 
     if (isset($new_keys)) {
       $this->_createKeys($table, $new_keys);
+    }
+    foreach ($specialized_indexes as $index) {
+      $this->createSpecializedIndex($table, $index);
     }
     $this->resetTableInformation($table);
   }
