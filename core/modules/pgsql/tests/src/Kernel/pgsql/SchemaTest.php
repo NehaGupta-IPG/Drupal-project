@@ -13,6 +13,7 @@ use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
+use Drupal\Core\Language\Language;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 use Drupal\pgsql\Driver\Database\pgsql\GinIndex;
 use Drupal\pgsql\Driver\Database\pgsql\GistIndex;
@@ -22,7 +23,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore attname attnum attrelid indexdef jsonb objid refobjid
-// cspell:ignore refobjsubid regclass relkind relname tsvector
+// cSpell:ignore refobjsubid regclass regconfig relkind relname tsvector
 
 /**
  * Tests schema API for the PostgreSQL driver.
@@ -525,6 +526,13 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
         'data' => [
           'pgsql_type' => 'jsonb',
         ],
+        'body' => [
+          'type' => 'text',
+        ],
+        'title' => [
+          'type' => 'varchar',
+          'length' => 255,
+        ],
       ],
     ];
     $this->schema->createTable('test_add_specialized_index', $table_specification);
@@ -543,12 +551,178 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->assertTrue($this->schema->dropIndex('test_add_specialized_index', 'gin_data'));
     $this->assertFalse($this->schema->indexExists('test_add_specialized_index', 'gin_data'));
 
+    // A GIN index on a "text" column is created as an expression index on
+    // the text search vector of the column.
+    $this->schema->addGinIndex('test_add_specialized_index', 'gin_body', ['body']);
+    $this->assertTrue($this->schema->indexExists('test_add_specialized_index', 'gin_body'));
+    $this->assertSame('gin', $this->getIndexMethod('test_add_specialized_index', 'gin_body'));
+    $this->assertStringContainsString("to_tsvector('english'::regconfig, body)", $this->getIndexDefinition('test_add_specialized_index', 'gin_body'));
+    $this->assertTrue($this->schema->dropIndex('test_add_specialized_index', 'gin_body'));
+    $this->assertFalse($this->schema->indexExists('test_add_specialized_index', 'gin_body'));
+
+    // A GIN index on a "character varying" column is created as an
+    // expression index on the text search vector of the column.
+    $this->schema->addGinIndex('test_add_specialized_index', 'gin_title', ['title']);
+    $this->assertTrue($this->schema->indexExists('test_add_specialized_index', 'gin_title'));
+    $this->assertSame('gin', $this->getIndexMethod('test_add_specialized_index', 'gin_title'));
+    $this->assertStringContainsString("to_tsvector('english'::regconfig, (title)::text)", $this->getIndexDefinition('test_add_specialized_index', 'gin_title'));
+    $this->assertTrue($this->schema->dropIndex('test_add_specialized_index', 'gin_title'));
+    $this->assertFalse($this->schema->indexExists('test_add_specialized_index', 'gin_title'));
+
     // A GiST index can be added on a tsvector column.
     $this->schema->addGistIndex('test_add_specialized_index', 'gist_search', ['search']);
     $this->assertTrue($this->schema->indexExists('test_add_specialized_index', 'gist_search'));
     $this->assertSame('gist', $this->getIndexMethod('test_add_specialized_index', 'gist_search'));
     $this->assertTrue($this->schema->dropIndex('test_add_specialized_index', 'gist_search'));
     $this->assertFalse($this->schema->indexExists('test_add_specialized_index', 'gist_search'));
+
+    // A GiST index on a "text" column is created as an expression index on
+    // the text search vector of the column.
+    $this->schema->addGistIndex('test_add_specialized_index', 'gist_body', ['body']);
+    $this->assertTrue($this->schema->indexExists('test_add_specialized_index', 'gist_body'));
+    $this->assertSame('gist', $this->getIndexMethod('test_add_specialized_index', 'gist_body'));
+    $this->assertStringContainsString("to_tsvector('english'::regconfig, body)", $this->getIndexDefinition('test_add_specialized_index', 'gist_body'));
+    $this->assertTrue($this->schema->dropIndex('test_add_specialized_index', 'gist_body'));
+    $this->assertFalse($this->schema->indexExists('test_add_specialized_index', 'gist_body'));
+
+    // A GiST index on a "character varying" column is created as an
+    // expression index on the text search vector of the column.
+    $this->schema->addGistIndex('test_add_specialized_index', 'gist_title', ['title']);
+    $this->assertTrue($this->schema->indexExists('test_add_specialized_index', 'gist_title'));
+    $this->assertSame('gist', $this->getIndexMethod('test_add_specialized_index', 'gist_title'));
+    $this->assertStringContainsString("to_tsvector('english'::regconfig, (title)::text)", $this->getIndexDefinition('test_add_specialized_index', 'gist_title'));
+    $this->assertTrue($this->schema->dropIndex('test_add_specialized_index', 'gist_title'));
+    $this->assertFalse($this->schema->indexExists('test_add_specialized_index', 'gist_title'));
+  }
+
+  /**
+   * Tests the text search configuration of indexes on character columns.
+   *
+   * For GIN and GiST indexes on character type columns, the text search
+   * configuration matching the site default language is used when it exists
+   * in the pg_ts_config catalog, with 'english' as the fallback.
+   */
+  public function testSpecializedIndexTextSearchConfiguration(): void {
+    $table_specification = [
+      'fields' => [
+        'body' => [
+          'type' => 'text',
+        ],
+      ],
+    ];
+    $this->schema->createTable('test_ts_config', $table_specification);
+
+    // Dutch has a matching text search configuration in pg_ts_config.
+    \Drupal::service('language.default')->set(new Language(['id' => 'nl']));
+    $this->schema->addGinIndex('test_ts_config', 'gin_body_nl', ['body']);
+    $this->assertStringContainsString("to_tsvector('dutch'::regconfig, body)", $this->getIndexDefinition('test_ts_config', 'gin_body_nl'));
+    $this->assertTrue($this->schema->dropIndex('test_ts_config', 'gin_body_nl'));
+    $this->schema->addGistIndex('test_ts_config', 'gist_body_nl', ['body']);
+    $this->assertStringContainsString("to_tsvector('dutch'::regconfig, body)", $this->getIndexDefinition('test_ts_config', 'gist_body_nl'));
+    $this->assertTrue($this->schema->dropIndex('test_ts_config', 'gist_body_nl'));
+
+    // Japanese has no text search configuration in pg_ts_config, so the
+    // index falls back to the 'english' configuration.
+    \Drupal::service('language.default')->set(new Language(['id' => 'ja']));
+    $this->schema->addGinIndex('test_ts_config', 'gin_body_ja', ['body']);
+    $this->assertStringContainsString("to_tsvector('english'::regconfig, body)", $this->getIndexDefinition('test_ts_config', 'gin_body_ja'));
+    $this->assertTrue($this->schema->dropIndex('test_ts_config', 'gin_body_ja'));
+
+    // A langcode without a standard language list entry falls back to the
+    // 'english' configuration.
+    \Drupal::service('language.default')->set(new Language(['id' => 'xx-unknown']));
+    $this->schema->addGinIndex('test_ts_config', 'gin_body_xx', ['body']);
+    $this->assertStringContainsString("to_tsvector('english'::regconfig, body)", $this->getIndexDefinition('test_ts_config', 'gin_body_xx'));
+    $this->assertTrue($this->schema->dropIndex('test_ts_config', 'gin_body_xx'));
+  }
+
+  /**
+   * Tests the column types supported by GIN indexes.
+   *
+   * GIN indexes support tsvector and jsonb columns natively. The character
+   * types from the field type map are supported through an expression index
+   * on the text search vector of the column.
+   */
+  public function testGinIndexColumnTypes(): void {
+    $character_fields = $this->getCharacterTypeFieldSpecifications();
+    $table_specification = [
+      'fields' => [
+        'search' => ['pgsql_type' => 'tsvector'],
+        'data' => ['pgsql_type' => 'jsonb'],
+      ] + $character_fields,
+    ];
+    $this->schema->createTable('test_gin_types', $table_specification);
+
+    foreach (array_keys($table_specification['fields']) as $column) {
+      $index_name = 'gin_' . $column;
+      $this->schema->addGinIndex('test_gin_types', $index_name, [$column]);
+      $this->assertTrue($this->schema->indexExists('test_gin_types', $index_name));
+      $this->assertSame('gin', $this->getIndexMethod('test_gin_types', $index_name));
+      // Character type columns are indexed by their text search vector, the
+      // tsvector and jsonb columns are indexed directly.
+      if (isset($character_fields[$column])) {
+        $this->assertStringContainsString("to_tsvector('english'::regconfig", $this->getIndexDefinition('test_gin_types', $index_name));
+      }
+      else {
+        $this->assertStringNotContainsString('to_tsvector', $this->getIndexDefinition('test_gin_types', $index_name));
+      }
+    }
+  }
+
+  /**
+   * Tests the column types supported by GiST indexes.
+   *
+   * GiST indexes support tsvector columns natively. The character types from
+   * the field type map are supported through an expression index on the text
+   * search vector of the column.
+   */
+  public function testGistIndexColumnTypes(): void {
+    $character_fields = $this->getCharacterTypeFieldSpecifications();
+    $table_specification = [
+      'fields' => [
+        'search' => ['pgsql_type' => 'tsvector'],
+      ] + $character_fields,
+    ];
+    $this->schema->createTable('test_gist_types', $table_specification);
+
+    foreach (array_keys($table_specification['fields']) as $column) {
+      $index_name = 'gist_' . $column;
+      $this->schema->addGistIndex('test_gist_types', $index_name, [$column]);
+      $this->assertTrue($this->schema->indexExists('test_gist_types', $index_name));
+      $this->assertSame('gist', $this->getIndexMethod('test_gist_types', $index_name));
+      // Character type columns are indexed by their text search vector, the
+      // tsvector column is indexed directly.
+      if (isset($character_fields[$column])) {
+        $this->assertStringContainsString("to_tsvector('english'::regconfig", $this->getIndexDefinition('test_gist_types', $index_name));
+      }
+      else {
+        $this->assertStringNotContainsString('to_tsvector', $this->getIndexDefinition('test_gist_types', $index_name));
+      }
+    }
+  }
+
+  /**
+   * Returns field specifications for the character types of the driver.
+   *
+   * @return array<string, array<string, string|int>>
+   *   Field specifications for a table specification, keyed by column name,
+   *   with one column for each type and size combination in the field type
+   *   map that maps to a character data type.
+   */
+  protected function getCharacterTypeFieldSpecifications(): array {
+    $fields = [];
+    foreach ($this->schema->getFieldTypeMap() as $type_size => $pgsql_type) {
+      if (!in_array($pgsql_type, ['varchar', 'character', 'text'], TRUE)) {
+        continue;
+      }
+      [$type, $size] = explode(':', $type_size);
+      $field = ['type' => $type, 'size' => $size];
+      if ($pgsql_type !== 'text') {
+        $field['length'] = 255;
+      }
+      $fields[str_replace(':', '_', $type_size)] = $field;
+    }
+    return $fields;
   }
 
   /**
@@ -744,11 +918,26 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
    *   The index access method, for example 'btree', 'gin' or 'gist'.
    */
   protected function getIndexMethod(string $table, string $name): string {
+    preg_match('/ USING ([a-z]+) /', $this->getIndexDefinition($table, $name), $matches);
+    return $matches[1];
+  }
+
+  /**
+   * Returns the CREATE INDEX statement of an index.
+   *
+   * @param string $table
+   *   The name of the table.
+   * @param string $name
+   *   The name of the index.
+   *
+   * @return string
+   *   The CREATE INDEX statement of the index.
+   */
+  protected function getIndexDefinition(string $table, string $name): string {
     $indexName = $this->connection->getPrefix() . $table . '__' . $name . '__idx';
     $indexDef = $this->connection->query('SELECT indexdef FROM pg_indexes WHERE indexname = :name', [':name' => $indexName])->fetchField();
     $this->assertIsString($indexDef);
-    preg_match('/ USING ([a-z]+) /', $indexDef, $matches);
-    return $matches[1];
+    return $indexDef;
   }
 
 }

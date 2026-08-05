@@ -7,13 +7,13 @@ use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IndexBase;
-use Drupal\Core\Database\SchemaDefinition\KeyColumn;
+use Drupal\Core\Language\LanguageManager;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
-// cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
-// cSpell:ignore contype fillfactor indexname indexrelid indisprimary indkey
-// cSpell:ignore indrelid nextval nspname regclass relkind relname relnamespace
-// cSpell:ignore schemaname setval
+// cSpell:ignore attrelid atttypid atttypmod bigserial cfgname conkey conname
+// cSpell:ignore conrelid contype fillfactor indexname indexrelid indisprimary
+// cSpell:ignore indkey indrelid nextval nspname regclass relkind relname
+// cSpell:ignore relnamespace schemaname setval tsquery tsvector
 
 /**
  * @addtogroup schemaapi
@@ -901,14 +901,104 @@ EOD;
       GistIndex::class => 'gist',
       default => throw new \InvalidArgumentException('Unsupported index definition class ' . $index::class),
     };
-    $columns = array_map(fn (KeyColumn $column) => '"' . $column->name . '"', $index->columns);
+    $columns = [];
+    foreach ($index->columns as $column) {
+      $columnSql = '"' . $column->name . '"';
+      // GIN and GiST indexes have no operator class for character type
+      // columns. Index the text search vector of such columns instead.
+      // Queries must repeat the same expression in order to use the index,
+      // for example:
+      // @code
+      // WHERE to_tsvector('english', body) @@ to_tsquery('english', 'foo')
+      // @endcode
+      if ($this->isCharacterColumn($tableName, $column->name)) {
+        $textSearchConfiguration ??= $this->getTextSearchConfiguration();
+        $columnSql = "to_tsvector('" . $textSearchConfiguration . "', " . $columnSql . ')';
+      }
+      $columns[] = $columnSql;
+    }
     $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($tableName, $index->name, 'idx') . ' ON {' . $tableName . '} USING ' . $indexMethod . ' (' . implode(', ', $columns) . ')';
     $this->executeDdlStatement($query);
     $this->resetTableInformation($tableName);
   }
 
   /**
+   * Determines whether a table column has a character data type.
+   *
+   * @param string $table
+   *   The non-prefixed name of the table.
+   * @param string $column
+   *   The name of the column.
+   *
+   * @return bool
+   *   TRUE if the column is of the "text", "character varying" or
+   *   "character" data type, FALSE if not or if the column does not exist.
+   */
+  protected function isCharacterColumn(string $table, string $column): bool {
+    // Take into account that temporary tables are stored in a different
+    // schema.
+    $prefixed_table = $this->connection->getPrefix() . $table;
+    if (str_contains($table, 'db_temporary_')) {
+      $quoted_key = $this->getTempNamespaceName() . '.' . $prefixed_table;
+    }
+    else {
+      $quoted_key = '"' . $this->defaultSchema . '"."' . $prefixed_table . '"';
+    }
+
+    $data_type = $this->connection->query('SELECT format_type(atttypid, atttypmod) FROM pg_attribute WHERE attrelid = :key::regclass AND attname = :column AND attnum > 0 AND NOT attisdropped', [
+      ':key' => $quoted_key,
+      ':column' => $column,
+    ])->fetchField();
+    return $data_type === 'text' || str_starts_with((string) $data_type, 'character');
+  }
+
+  /**
+   * Returns the text search configuration for text search vector indexes.
+   *
+   * Uses the PostgreSQL text search configuration matching the site default
+   * language, when one exists. Falls back to 'english' when the site default
+   * language cannot be determined or no matching text search configuration
+   * exists.
+   *
+   * @return string
+   *   The name of a text search configuration from the pg_ts_config catalog.
+   */
+  protected function getTextSearchConfiguration(): string {
+    // The site default language is not available when the container has not
+    // been initialized yet, for example when creating tables before the
+    // installer has booted the kernel.
+    if (!\Drupal::hasContainer()) {
+      return 'english';
+    }
+
+    $langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
+    $standard_languages = LanguageManager::getStandardLanguageList();
+    if (!isset($standard_languages[$langcode])) {
+      return 'english';
+    }
+
+    // Text search configurations are named after the lowercased English name
+    // of the language. For language variants such as 'Portuguese, Brazil'
+    // only the part before the comma matters.
+    $configuration = strtolower(explode(',', $standard_languages[$langcode][0])[0]);
+    $exists = (bool) $this->connection->query('SELECT 1 FROM pg_catalog.pg_ts_config WHERE cfgname = :name', [
+      ':name' => $configuration,
+    ])->fetchField();
+    return $exists ? $configuration : 'english';
+  }
+
+  /**
    * Adds a GIN (Generalized Inverted Index) index.
+   *
+   * GIN indexes have no operator class for character type columns ("text",
+   * "character varying" and "character"). For such columns an expression
+   * index on the text search vector is created instead, using to_tsvector()
+   * with the text search configuration matching the site default language,
+   * falling back to 'english' when no matching configuration exists. Queries
+   * must repeat the same expression in order to use the index, for example:
+   * @code
+   * WHERE to_tsvector('english', body) @@ to_tsquery('english', 'foo')
+   * @endcode
    *
    * @param string $table
    *   The table to be altered.
@@ -936,6 +1026,16 @@ EOD;
 
   /**
    * Adds a GiST (Generalized Search Tree) index.
+   *
+   * GiST indexes have no operator class for character type columns ("text",
+   * "character varying" and "character"). For such columns an expression
+   * index on the text search vector is created instead, using to_tsvector()
+   * with the text search configuration matching the site default language,
+   * falling back to 'english' when no matching configuration exists. Queries
+   * must repeat the same expression in order to use the index, for example:
+   * @code
+   * WHERE to_tsvector('english', body) @@ to_tsquery('english', 'foo')
+   * @endcode
    *
    * @param string $table
    *   The table to be altered.
