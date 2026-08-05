@@ -1700,6 +1700,9 @@ function install_core_entity_type_definitions(): void {
 function install_profile_themes(&$install_state): void {
   // Install the themes specified by the installation profile.
   $themes = $install_state['profile_info']['themes'];
+  if (isset($install_state['default_theme'])) {
+    $themes = array_unique(array_merge($themes, [$install_state['default_theme']]));
+  }
   \Drupal::service('theme_installer')->install($themes);
 
   // Ensure that the install profile's theme is used.
@@ -1724,6 +1727,13 @@ function install_install_profile(&$install_state): void {
   \Drupal::service('config.installer')->installOptionalConfig();
 
   \Drupal::service('module_installer')->install([$install_state['parameters']['profile']], FALSE);
+
+  if (isset($install_state['default_theme'])) {
+    $system_theme_config = \Drupal::service('config.factory')->getEditable('system.theme');
+    $system_theme_config
+      ->set('default', $install_state['default_theme'])
+      ->save();
+  }
 
   // Ensure that the install profile's theme is used.
   // @see _drupal_maintenance_theme()
