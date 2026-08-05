@@ -9,7 +9,6 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityConstraintViolationList;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -27,8 +26,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   deriver: ModerationStateChangeDeriver::class
 )]
 class ModerationStateChange extends ConfigurableActionBase implements ContainerFactoryPluginInterface {
-
-  use DependencyTrait;
 
   /**
    * The moderation info service.
@@ -219,24 +216,28 @@ class ModerationStateChange extends ConfigurableActionBase implements ContainerF
    * {@inheritdoc}
    */
   public function calculateDependencies(): array {
+    $dependencies = [];
     if (!empty($this->configuration['workflow'])) {
-      $this->addDependency('config', 'workflows.workflow.' . $this->configuration['workflow']);
+      $dependencies['config'][] = 'workflows.workflow.' . $this->configuration['workflow'];
     }
-    return $this->dependencies;
+    return $dependencies;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function execute(?ContentEntityInterface $entity = NULL): void {
-    /** @var \Drupal\node\Entity\Node $revision */
+  public function execute(?object $entity = NULL): void {
+    if (!$entity instanceof ContentEntityInterface) {
+      return;
+    }
+    /** @var \Drupal\Core\Entity\ContentEntityInterface&\Drupal\Core\Entity\RevisionLogInterface $revision */
     $revision = $this->loadLatestRevision($entity);
     // Create a new revision if the states don't match.
-    if ($revision->moderation_state->value != $this->configuration['state']) {
+    if ($revision->get('moderation_state')->value != $this->configuration['state']) {
       $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
       $revision = $storage->createRevision($revision);
     }
-    $revision->moderation_state->value = $this->configuration['state'];
+    $revision->set('moderation_state', $this->configuration['state']);
     if ($revision instanceof EntityChangedInterface) {
       $revision->setChangedTime(time());
     }
@@ -299,9 +300,9 @@ class ModerationStateChange extends ConfigurableActionBase implements ContainerF
     $object = $this->loadLatestRevision($object);
     // Let content moderation do its job. See content_moderation_entity_access()
     // for more details.
-
+    $account = $account ?: $this->currentUser;
     $to_state_id = $this->configuration['state'];
-    $from_state = $workflow->getTypePlugin()->getState($object->moderation_state->value);
+    $from_state = $workflow->getTypePlugin()->getState($object->get('moderation_state')->value);
     // Make sure we can make the transition.
     if ($from_state->canTransitionTo($to_state_id)) {
       $to_state = $workflow->getTypePlugin()->getState($to_state_id);

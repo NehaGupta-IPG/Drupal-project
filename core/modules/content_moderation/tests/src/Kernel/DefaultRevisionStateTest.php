@@ -33,6 +33,7 @@ class DefaultRevisionStateTest extends KernelTestBase {
     'language',
     'content_translation',
     'workflows',
+    'system',
   ];
 
   /**

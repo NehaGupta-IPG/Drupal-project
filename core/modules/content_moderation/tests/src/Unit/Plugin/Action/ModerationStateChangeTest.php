@@ -7,7 +7,6 @@ namespace Drupal\Tests\content_moderation\Unit\Plugin\Action;
 use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\content_moderation\Plugin\Action\ModerationStateChange;
 use Drupal\content_moderation\Plugin\Field\ModerationStateFieldItemList;
-use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -124,10 +123,14 @@ class ModerationStateChangeTest extends UnitTestCase {
       ->getMockBuilder(ModerationStateFieldItemList::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $moderation_state->expects($this->once())
-      ->method('__set')
-      ->with('value', 'foobar');
-    $this->node->moderation_state = $moderation_state;
+    $moderation_state->method('__get')->willReturn('draft');
+    $this->node->method('get')
+      ->with('moderation_state')
+      ->willReturn($moderation_state);
+
+    $this->node->expects($this->once())
+      ->method('set')
+      ->with('moderation_state', 'foobar');
 
     $config = ['state' => 'foobar'];
     $plugin = $this->getModerationStateChangeMock($config, $this->moderationInfo, $this->node);
@@ -192,7 +195,8 @@ class ModerationStateChangeTest extends UnitTestCase {
 
     $data['different-workflow'] = [$moderation_info, $node, FALSE];
 
-    // Same workflow but no node update access.
+    // The transition is not allowed, so access is denied without ever
+    // checking the entity's own access.
     $workflow = clone $instance->workflow;
 
     $workflow->expects($instance->once())
@@ -207,49 +211,11 @@ class ModerationStateChangeTest extends UnitTestCase {
       ->with($node)
       ->willReturn($workflow);
 
-    $node->moderation_state = (object) ['value' => 'foobar'];
-
-    $workflow_type = $instance->createMock(WorkflowTypeInterface::class);
-    $state = $instance->createMock(StateInterface::class);
-
-    $workflow_type->expects($instance->once())
-      ->method('getState')
-      ->with('foobar')
-      ->willReturn($state);
-
-    $state->expects($instance->once())
-      ->method('canTransitionTo')
-      ->with('bar')
-      ->willReturn(FALSE);
-
-    $workflow->expects($instance->once())
-      ->method('getTypePlugin')
-      ->willReturn($workflow_type);
-
-    $data['no-update-access'] = [$moderation_info, $node, FALSE];
-
-    // Same workflow with node update access and no valid transition.
-    $workflow = clone $instance->workflow;
-
-    $workflow->expects($instance->once())
-      ->method('id')
-      ->willReturn('foo');
-
-    $moderation_info = clone $instance->moderationInfo;
-    $node = clone $instance->node;
-
-    $moderation_info->expects($instance->once())
-      ->method('getWorkflowForEntity')
-      ->with($node)
-      ->willReturn($workflow);
-
-    $node->moderation_state = (object) ['value' => 'foobar'];
-
-    $allowed_access = new AccessResultAllowed();
-    $node->expects($instance->once())
-      ->method('access')
-      ->with('update', NULL, TRUE)
-      ->willReturn($allowed_access);
+    $moderation_state = $instance->getMockBuilder(ModerationStateFieldItemList::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $moderation_state->method('__get')->willReturn('foobar');
+    $node->method('get')->with('moderation_state')->willReturn($moderation_state);
 
     $workflow_type = $instance->createMock(WorkflowTypeInterface::class);
     $state = $instance->createMock(StateInterface::class);
@@ -270,10 +236,11 @@ class ModerationStateChangeTest extends UnitTestCase {
 
     $data['invalid-transition'] = [$moderation_info, $node, FALSE];
 
-    // Same workflow with update access, with valid transition and no transition
-    // access.
+    // The transition is valid, but the validator denies it (e.g. a missing
+    // transition permission), so the entity's own access is never checked
+    // either.
     $workflow = clone $instance->workflow;
-    $workflow->expects($instance->exactly(2))
+    $workflow->expects($instance->once())
       ->method('id')
       ->willReturn('foo');
 
@@ -285,14 +252,13 @@ class ModerationStateChangeTest extends UnitTestCase {
       ->with($node)
       ->willReturn($workflow);
 
-    $node->moderation_state = (object) ['value' => 'foobar'];
+    $moderation_state = $instance->getMockBuilder(ModerationStateFieldItemList::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $moderation_state->method('__get')->willReturn('foobar');
+    $node->method('get')->with('moderation_state')->willReturn($moderation_state);
 
     $account = $instance->createMock(AccountInterface::class);
-
-    $node->expects($instance->once())
-      ->method('access')
-      ->with('update', $account, TRUE)
-      ->willReturn($allowed_access);
 
     $workflow_type = $instance->createMock(WorkflowTypeInterface::class);
     $state = $instance->createMock(StateInterface::class);
@@ -300,11 +266,10 @@ class ModerationStateChangeTest extends UnitTestCase {
 
     $workflow_type->expects($instance->exactly(2))
       ->method('getState')
-      ->willReturnOnConsecutiveCalls(
-        ['foobar'],
-        ['bar'],
-      )
-      ->willReturn($state);
+      ->willReturnMap([
+        ['foobar', $state],
+        ['bar', $toState],
+      ]);
 
     $state->expects($instance->once())
       ->method('canTransitionTo')
@@ -329,8 +294,8 @@ class ModerationStateChangeTest extends UnitTestCase {
       $validator,
     ];
 
-    // Same workflow with no update access, with valid transition and transition
-    // access.
+    // The transition is valid and the validator allows it, so access is
+    // granted.
     $workflow = clone $instance->workflow;
     $workflow->expects($instance->exactly(2))
       ->method('id')
@@ -344,7 +309,11 @@ class ModerationStateChangeTest extends UnitTestCase {
       ->with($node)
       ->willReturn($workflow);
 
-    $node->moderation_state = (object) ['value' => 'foobar'];
+    $moderation_state = $instance->getMockBuilder(ModerationStateFieldItemList::class)
+      ->disableOriginalConstructor()
+      ->getMock();
+    $moderation_state->method('__get')->willReturn('foobar');
+    $node->method('get')->with('moderation_state')->willReturn($moderation_state);
 
     $account = $instance->createMock(AccountInterface::class);
 
@@ -354,70 +323,10 @@ class ModerationStateChangeTest extends UnitTestCase {
 
     $workflow_type->expects($instance->exactly(2))
       ->method('getState')
-      ->willReturnOnConsecutiveCalls(
-        ['foobar'],
-        ['bar'],
-      )
-      ->willReturn($state);
-
-    $state->expects($instance->once())
-      ->method('canTransitionTo')
-      ->with('bar')
-      ->willReturn(TRUE);
-
-    $validator = clone $instance->validator;
-    $validator->expects($instance->once())
-      ->method('isTransitionValid')
-      ->with($workflow, $state, $toState, $account, $node)
-      ->willReturn(FALSE);
-
-    $workflow->expects($instance->exactly(2))
-      ->method('getTypePlugin')
-      ->willReturn($workflow_type);
-
-    $data['no-update-access-transition-access'] = [
-      $moderation_info,
-      $node,
-      FALSE,
-      $account,
-      $validator,
-    ];
-
-    // Same workflow with update access, with valid transition and transition
-    // access.
-    $workflow = clone $instance->workflow;
-    $workflow->expects($instance->exactly(2))
-      ->method('id')
-      ->willReturn('foo');
-
-    $moderation_info = clone $instance->moderationInfo;
-    $node = clone $instance->node;
-
-    $moderation_info->expects($instance->once())
-      ->method('getWorkflowForEntity')
-      ->with($node)
-      ->willReturn($workflow);
-
-    $node->moderation_state = (object) ['value' => 'foobar'];
-
-    $account = $instance->createMock(AccountInterface::class);
-
-    $node->expects($instance->once())
-      ->method('access')
-      ->with('update', $account, TRUE)
-      ->willReturn($allowed_access);
-
-    $workflow_type = $instance->createMock(WorkflowTypeInterface::class);
-    $state = $instance->createMock(StateInterface::class);
-    $toState = $instance->createMock(StateInterface::class);
-
-    $workflow_type->expects($instance->exactly(2))
-      ->method('getState')
-      ->willReturnOnConsecutiveCalls(
-        ['foobar'],
-        ['bar'],
-      )
-      ->willReturn($state);
+      ->willReturnMap([
+        ['foobar', $state],
+        ['bar', $toState],
+      ]);
 
     $state->expects($instance->once())
       ->method('canTransitionTo')

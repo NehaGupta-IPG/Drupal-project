@@ -31,6 +31,7 @@ class EntityOperationsTest extends KernelTestBase {
     'node',
     'user',
     'workflows',
+    'system',
   ];
 
   /**

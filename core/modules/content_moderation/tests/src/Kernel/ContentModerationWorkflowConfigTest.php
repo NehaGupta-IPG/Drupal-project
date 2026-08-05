@@ -112,17 +112,25 @@ class ContentModerationWorkflowConfigTest extends KernelTestBase {
 
     \Drupal::service('config.storage.sync')->delete('workflows.workflow.editorial');
 
-    // An error should be thrown when trying to delete an in use workflow.
+    // An error should be thrown when trying to delete an in use workflow. The
+    // moderation state change actions also depend on the workflow, so they are
+    // flagged too.
+    $expected = [
+      'Configuration <em class="placeholder">system.action.content_moderation_editorial_node_change_to_archived</em> depends on the <em class="placeholder">workflows.workflow.editorial</em> configuration that will not exist after import.',
+      'Configuration <em class="placeholder">system.action.content_moderation_editorial_node_change_to_draft</em> depends on the <em class="placeholder">workflows.workflow.editorial</em> configuration that will not exist after import.',
+      'Configuration <em class="placeholder">system.action.content_moderation_editorial_node_change_to_published</em> depends on the <em class="placeholder">workflows.workflow.editorial</em> configuration that will not exist after import.',
+      'Configuration <em class="placeholder">system.action.content_moderation_editorial_node_change_to_test1</em> depends on the <em class="placeholder">workflows.workflow.editorial</em> configuration that will not exist after import.',
+      'Configuration <em class="placeholder">system.action.content_moderation_editorial_node_change_to_test2</em> depends on the <em class="placeholder">workflows.workflow.editorial</em> configuration that will not exist after import.',
+      'Configuration <em class="placeholder">system.action.content_moderation_editorial_node_change_to_test3</em> depends on the <em class="placeholder">workflows.workflow.editorial</em> configuration that will not exist after import.',
+      'The workflow Editorial is being used, and cannot be deleted.',
+    ];
     try {
       $this->configImporter()->reset()->import();
       $this->fail('ConfigImporterException not thrown, invalid import was not stopped due to deleted workflow.');
     }
     catch (ConfigImporterException $e) {
-      $this->assertEquals('There were errors validating the config synchronization.' . PHP_EOL . 'The workflow Editorial is being used, and cannot be deleted.', $e->getMessage());
-      $error_log = $this->configImporter->getErrors();
-      $expected = [
-        'The workflow Editorial is being used, and cannot be deleted.',
-      ];
+      $this->assertEquals('There were errors validating the config synchronization.' . PHP_EOL . implode(PHP_EOL, $expected), (string) $e->getMessage());
+      $error_log = array_map(strval(...), $this->configImporter->getErrors());
       $this->assertEquals($expected, $error_log);
     }
   }
