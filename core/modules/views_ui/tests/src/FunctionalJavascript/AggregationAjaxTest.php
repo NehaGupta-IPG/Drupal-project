@@ -10,8 +10,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests that editing a field's aggregation function does not trigger an
- * AJAX error.
+ * Tests that editing a field's aggregation function does not trigger an AJAX error.
  *
  * Regression test for a fatal error thrown by
  * \Drupal\views_ui\Form\Ajax\ConfigHandlerGroup::buildForm() when it
@@ -37,12 +36,12 @@ class AggregationAjaxTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static array $modules = ['node', 'views', 'views_ui'];
+  protected static $modules = ['node', 'views', 'views_ui'];
 
   /**
    * {@inheritdoc}
    */
-  protected string $defaultTheme = 'stark';
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
@@ -91,8 +90,7 @@ class AggregationAjaxTest extends WebDriverTestBase {
   }
 
   /**
-   * The exact message Drupal core shows in the page when an AJAX request
-   * fails and is not otherwise handled.
+   * The exact message Drupal core shows in the page when an AJAX request fails and is not otherwise handled.
    *
    * @see \Drupal\Core\Ajax\AjaxResponse
    * @see https://www.drupal.org/project/drupal/issues/2987444
@@ -147,8 +145,7 @@ class AggregationAjaxTest extends WebDriverTestBase {
   }
 
   /**
-   * Opens the aggregation settings dialog and applies an aggregation
-   * function to the 'changed' field.
+   * Opens the aggregation settings dialog and applies an aggregation function to the 'changed' field.
    *
    * Encapsulates the full click-configure-apply cycle so it can be run
    * twice: once to create the aggregation handler, and once to edit it,
