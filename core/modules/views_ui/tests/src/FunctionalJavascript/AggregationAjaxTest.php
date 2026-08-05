@@ -44,6 +44,14 @@ class AggregationAjaxTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
+   * The exact message Drupal core shows in the page when an AJAX request fails and is not otherwise handled.
+   *
+   * @see \Drupal\Core\Ajax\AjaxResponse
+   * @see https://www.drupal.org/project/drupal/issues/2987444
+   */
+  protected const AJAX_ERROR_MESSAGE = "Oops, something went wrong. Check your browser's developer console for more details.";
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -90,14 +98,6 @@ class AggregationAjaxTest extends WebDriverTestBase {
   }
 
   /**
-   * The exact message Drupal core shows in the page when an AJAX request fails and is not otherwise handled.
-   *
-   * @see \Drupal\Core\Ajax\AjaxResponse
-   * @see https://www.drupal.org/project/drupal/issues/2987444
-   */
-  protected const AJAX_ERROR_MESSAGE = "Oops, something went wrong. Check your browser's developer console for more details.";
-
-  /**
    * Tests switching a field's aggregation function via the AJAX dialog.
    *
    * The regression only manifests when *re-editing* an aggregation handler
@@ -112,14 +112,10 @@ class AggregationAjaxTest extends WebDriverTestBase {
 
     $this->drupalGet('admin/structure/views/view/' . static::$testViewId);
 
-    // Enable aggregation for the display via the "Use aggregation" link in
-    // the advanced settings column. This opens
+    // Enable aggregation for the display via the "Use aggregation" setting
+    // in the advanced settings column. This opens
     // \Drupal\views_ui\Form\Ajax\Display.
-    $page->clickLink('Use aggregation');
-    $this->assertNotEmpty(
-      $assert_session->waitForElementVisible('css', '.views-ui-dialog'),
-      'The "Use aggregation" dialog did not open.'
-    );
+    $this->openDisplayOptionDialog('group_by');
     $page->checkField('group_by');
     $this->pressDialogButton('Apply');
     $this->assertNotEmpty(
@@ -142,6 +138,42 @@ class AggregationAjaxTest extends WebDriverTestBase {
     // confirming the display tab rebuilt correctly after the AJAX
     // submission.
     $assert_session->linkExists('Aggregation settings');
+  }
+
+  /**
+   * Opens the AJAX dialog for a display-level "Advanced" setting.
+   *
+   * These settings (e.g. "Use aggregation") are rendered by
+   * \Drupal\views_ui\ViewEditForm::buildOptionForm() as a non-clickable
+   * label (the setting's title, e.g. "Use aggregation") immediately
+   * followed by a *separate* link whose own text is only the setting's
+   * current value (e.g. "No" or "Yes"). That link text is therefore not
+   * stable enough to click by, and is not necessarily unique on the page.
+   *
+   * The link itself is built by
+   * \Drupal\views\Plugin\views\display\DisplayPluginBase::optionLink(),
+   * which gives it an HTML id via Html::getUniqueId('views-' . $display_id
+   * . '-' . $section); that function appends a random suffix on every page
+   * load, so the id cannot be matched exactly either. Its href is fully
+   * deterministic, though: optionLink() always builds it from the
+   * views_ui.form_display route ('/admin/structure/views/{js}/display/
+   * {view}/{display_id}/{type}'), so it always ends in "/{$option_id}".
+   * The link is targeted through that instead.
+   *
+   * @param string $option_id
+   *   The machine name of the display option to open, e.g. 'group_by'.
+   */
+  protected function openDisplayOptionDialog(string $option_id): void {
+    $assert_session = $this->assertSession();
+
+    $link = $assert_session->waitForElementVisible('css', sprintf('a[href$="/%s"]', $option_id));
+    $this->assertNotEmpty($link, sprintf('The link for the "%s" display option was not found.', $option_id));
+    $link->click();
+
+    $this->assertNotEmpty(
+      $assert_session->waitForElementVisible('css', '.views-ui-dialog'),
+      sprintf('The dialog for the "%s" display option did not open.', $option_id)
+    );
   }
 
   /**
