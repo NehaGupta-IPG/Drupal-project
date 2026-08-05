@@ -109,7 +109,7 @@ trait AutowiredInstanceTrait {
       foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
         if (!empty($method->getAttributes(Required::class))) {
           $method_name = $method->getName();
-          $data[$methodName] = static::autowireLoadMethod($container, $method->getParameters(), $methodName);
+          $data[$method_name] = static::autowireLoadMethod($container, $method->getParameters(), $method_name);
         }
       }
 
