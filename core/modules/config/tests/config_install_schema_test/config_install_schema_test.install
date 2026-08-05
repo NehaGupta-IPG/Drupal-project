@@ -42,7 +42,7 @@ function config_install_schema_test_schema(): Schema {
   );
 
   return new Schema(
-    type: SchemaDefinitionType::Module,
+    type: SchemaDefinitionType::Test,
     name: 'config_install_schema_test',
     tables: $tables,
   );

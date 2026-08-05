@@ -70,7 +70,7 @@ class SchemaInspector {
    */
   public static function getTableNames(ModuleHandlerInterface $handler, string $module): array {
     $schema = self::getTablesSpecification($handler, $module);
-    // @todo remove check on Schema in drupal:43.1.0 when only Schema objects
+    // @todo Remove check on Schema in drupal:13.0.0 when only Schema objects
     //   are returned.
     return $schema instanceof Schema ? $schema->tableNames() : array_keys($schema);
   }
