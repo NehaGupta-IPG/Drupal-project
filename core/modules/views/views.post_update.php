@@ -70,7 +70,8 @@ function views_post_update_counter_field_not_sortable(): void {
  * Updates existing table style settings with sortable result counters.
  */
 function views_post_update_counter_field_table_sortable(?array &$sandbox = NULL): void {
-  /** @var \Drupal\views\ViewsConfigUpdater $views_config_updater */
-  $views_config_updater = \Drupal::service(ViewsConfigUpdater::class);
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', static fn (ViewEntityInterface $view): bool => $views_config_updater->updateTableSortableCounter($view));
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', static fn (ViewEntityInterface $view): bool => $view_config_updater->updateTableSortableCounter($view));
 }

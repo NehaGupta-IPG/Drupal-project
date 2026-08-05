@@ -67,9 +67,7 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
-      return $this->updateTableSortableCounter($view);
-    });
+    return $this->updateTableSortableCounter($view);
   }
 
   /**
@@ -106,6 +104,12 @@ class ViewsConfigUpdater {
     }
     if ($changed) {
       $view->set('display', $displays);
+    }
+
+    $deprecations_triggered = &$this->triggeredDeprecations['counter_field_table_sortable'][$view->id()];
+    if ($this->areDeprecationsEnabled() && $changed && !$deprecations_triggered) {
+      $deprecations_triggered = TRUE;
+      @trigger_error(sprintf('The update to make the result counter field non-sortable in table displays for view "%s" is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3588188', $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;
