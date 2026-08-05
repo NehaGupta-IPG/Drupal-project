@@ -74,14 +74,12 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function getModulesFromClassProperty(): array {
-    self::$modules = [
-      'js_testing_ajax_request_test',
-      'js_testing_log_test',
-    ];
+    $modules = parent::getModulesFromClassProperty();
+    $modules = array_merge($modules, ['js_testing_ajax_request_test', 'js_testing_log_test']);
     if ($this->disableCssAnimations) {
-      self::$modules[] = 'css_disable_transitions_test';
+      $modules[] = 'css_disable_transitions_test';
     }
-    return parent::getModulesFromClassProperty();
+    return $modules;
   }
 
   /**
