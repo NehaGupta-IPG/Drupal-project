@@ -555,7 +555,7 @@ class SchemaDefinitionTest extends UnitTestCase {
   public function testMissingVarcharColumnLength(): void {
     $this->expectException(SchemaDefinitionException::class);
     $this->expectExceptionMessageIs('Missing \'length\' for varchar column \'id\'');
-    $table = new Table(
+    new Table(
       name: 'test',
       columns: [
         Column::varchar(
