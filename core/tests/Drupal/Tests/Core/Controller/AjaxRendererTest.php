@@ -61,6 +61,39 @@ class AjaxRendererTest extends UnitTestCase {
   }
 
   /**
+   * Tests renderResponse() when the render array has no #attached key.
+   */
+  public function testRenderWithoutAttached(): void {
+    $element_info_manager = $this->createStub(ElementInfoManagerInterface::class);
+    $renderer = $this->createMock(RendererInterface::class);
+    $renderer->expects($this->atLeastOnce())
+      ->method('renderRoot')
+      ->willReturnCallback(function (array &$elements, $is_root_call = FALSE) {
+        if (isset($elements['#markup'])) {
+          return $elements['#markup'];
+        }
+        elseif (isset($elements['#type'])) {
+          return $elements['#type'];
+        }
+        else {
+          return 'Markup';
+        }
+      });
+
+    $ajax_renderer = new AjaxRenderer($element_info_manager, $renderer);
+    $main_content = ['#markup' => 'example content'];
+    $request = new Request();
+    $route_match = $this->createStub(RouteMatchInterface::class);
+
+    $result = $ajax_renderer->renderResponse($main_content, $request, $route_match);
+
+    $this->assertInstanceOf('Drupal\Core\Ajax\AjaxResponse', $result);
+    $commands = $result->getCommands();
+    $this->assertEquals('insert', $commands[0]['command']);
+    $this->assertEquals('example content', $commands[0]['data']);
+  }
+
+  /**
    * Tests the content method.
    *
    * @legacy-covers ::renderResponse
