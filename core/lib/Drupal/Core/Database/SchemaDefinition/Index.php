@@ -7,7 +7,7 @@ namespace Drupal\Core\Database\SchemaDefinition;
 /**
  * Describes a database index.
  */
-final class Index extends KeyBase {
+final class Index extends IndexBase {
 
   /**
    * Constructor.
@@ -20,10 +20,10 @@ final class Index extends KeyBase {
    *   prefix of the named column.
    */
   public function __construct(
-    public readonly string $name,
+    string $name,
     array $columns,
   ) {
-    parent::__construct($columns, TRUE);
+    parent::__construct($name, $columns, TRUE);
   }
 
 }

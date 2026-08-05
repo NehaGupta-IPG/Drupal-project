@@ -5,6 +5,9 @@ namespace Drupal\pgsql\Driver\Database\pgsql;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IndexBase;
+use Drupal\Core\Database\SchemaDefinition\KeyColumn;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
@@ -875,6 +878,28 @@ EOD;
 
     $this->executeDdlStatement($this->_createIndexSql($table, $name, $fields));
     $this->resetTableInformation($table);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getSupportedIndexDefinitionClasses(): array {
+    return [Index::class, GinIndex::class, GistIndex::class];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function createSpecializedIndex(string $tableName, IndexBase $index): void {
+    $indexMethod = match ($index::class) {
+      GinIndex::class => 'gin',
+      GistIndex::class => 'gist',
+      default => throw new \InvalidArgumentException('Unsupported index definition class ' . $index::class),
+    };
+    $columns = array_map(fn (KeyColumn $column) => '"' . $column->name . '"', $index->columns);
+    $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($tableName, $index->name, 'idx') . ' ON {' . $tableName . '} USING ' . $indexMethod . ' (' . implode(', ', $columns) . ')';
+    $this->executeDdlStatement($query);
+    $this->resetTableInformation($tableName);
   }
 
   /**

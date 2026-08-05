@@ -4,14 +4,23 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
+use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
+use Drupal\pgsql\Driver\Database\pgsql\GinIndex;
+use Drupal\pgsql\Driver\Database\pgsql\GistIndex;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cSpell:ignore attname attnum attrelid objid refobjid refobjsubid regclass
-// cspell:ignore relkind relname
+// cSpell:ignore attname attnum attrelid indexdef objid refobjid refobjsubid
+// cspell:ignore regclass relkind relname tsvector
 
 /**
  * Tests schema API for the PostgreSQL driver.
@@ -420,6 +429,83 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     ];
     $this->schema->createTable($table_name, $table_spec);
     $this->assertTrue($this->schema->tableExists($table_name));
+  }
+
+  /**
+   * Tests creating a table from a definition with specialized indexes.
+   *
+   * PostgreSQL supports GIN and GiST indexes; they are created with the
+   * corresponding index access method, and preferred over regular index
+   * alternatives.
+   */
+  public function testCreateTableFromDefinitionWithSpecializedIndexes(): void {
+    $tableDefinition = new Table(
+      name: 'test_specialized_indexes',
+      description: 'Table with specialized indexes.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
+        Column::create(
+          name: 'search',
+          dbSpecificExtra: [
+            'pgsql' => [
+              'pgsql_type' => 'tsvector',
+            ],
+          ],
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      indexes: [
+        new Index(name: 'ages', columns: ['age']),
+        new GinIndex(name: 'gin_search', columns: ['search']),
+        new GistIndex(name: 'gist_search', columns: ['search']),
+        new AlternativeIndexes(
+          name: 'alternative_search',
+          indexes: [
+            new GinIndex(name: 'alternative_search', columns: ['search']),
+            new Index(name: 'alternative_search', columns: ['age']),
+          ],
+        ),
+      ],
+    );
+    $this->schema->createTableFromDefinition(SchemaDefinitionType::Test, 'database_test', $tableDefinition);
+
+    $this->assertTrue($this->schema->tableExists('test_specialized_indexes'));
+    $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'ages'));
+    $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'gin_search'));
+    $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'gist_search'));
+    $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'alternative_search'));
+
+    $this->assertSame('btree', $this->getIndexMethod('test_specialized_indexes', 'ages'));
+    $this->assertSame('gin', $this->getIndexMethod('test_specialized_indexes', 'gin_search'));
+    $this->assertSame('gist', $this->getIndexMethod('test_specialized_indexes', 'gist_search'));
+    // The GIN index is preferred over the regular index alternative.
+    $this->assertSame('gin', $this->getIndexMethod('test_specialized_indexes', 'alternative_search'));
+  }
+
+  /**
+   * Returns the access method used by an index.
+   *
+   * @param string $table
+   *   The table the index belongs to.
+   * @param string $name
+   *   The index name.
+   *
+   * @return string
+   *   The index access method, for example 'btree', 'gin' or 'gist'.
+   */
+  protected function getIndexMethod(string $table, string $name): string {
+    $indexName = $this->connection->getPrefix() . $table . '__' . $name . '__idx';
+    $indexDef = $this->connection->query('SELECT indexdef FROM pg_indexes WHERE indexname = :name', [':name' => $indexName])->fetchField();
+    $this->assertIsString($indexDef);
+    preg_match('/ USING ([a-z]+) /', $indexDef, $matches);
+    return $matches[1];
   }
 
 }

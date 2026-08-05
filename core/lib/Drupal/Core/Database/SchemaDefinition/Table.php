@@ -30,8 +30,11 @@ final class Table implements SchemaDefinitionInterface {
    *   (Optional) The primary key of the table.
    * @param ?UniqueKey[] $uniqueKeys
    *   (Optional) An array of unique keys for the table.
-   * @param ?Index[] $indexes
-   *   (Optional) An array of indexes for the table.
+   * @param array<IndexBase|AlternativeIndexes>|null $indexes
+   *   (Optional) An array of indexes for the table. Indexes of a technology
+   *   not supported by the database engine, like driver-specific GIN or GiST
+   *   indexes, are skipped by drivers that cannot create them; use
+   *   AlternativeIndexes to specify a fallback index for that case.
    * @param ?ForeignKey[] $foreignKeys
    *   (Optional) An array of foreign keys for the table. This argument is for
    *   documentation purposes only; foreign keys are not created in the
@@ -69,8 +72,8 @@ final class Table implements SchemaDefinitionInterface {
     if ($this->uniqueKeys && !Inspector::assertAllObjects($this->uniqueKeys, UniqueKey::class)) {
       throw new SchemaDefinitionException("All members of the 'uniqueKeys' argument of the '{$this->name}' Table must be UniqueKey objects");
     }
-    if ($this->indexes && !Inspector::assertAllObjects($this->indexes, Index::class)) {
-      throw new SchemaDefinitionException("All members of the 'indexes' argument of the '{$this->name}' Table must be Index objects");
+    if ($this->indexes && !Inspector::assertAllObjects($this->indexes, IndexBase::class, AlternativeIndexes::class)) {
+      throw new SchemaDefinitionException("All members of the 'indexes' argument of the '{$this->name}' Table must be IndexBase or AlternativeIndexes objects");
     }
     if ($this->foreignKeys && !Inspector::assertAllObjects($this->foreignKeys, ForeignKey::class)) {
       throw new SchemaDefinitionException("All members of the 'foreignKeys' argument of the '{$this->name}' Table must be ForeignKey objects");
@@ -100,8 +103,19 @@ final class Table implements SchemaDefinitionInterface {
       }
     }
     if ($this->indexes !== NULL) {
+      // The legacy array-based specifications cannot describe specialized
+      // indexes like GIN or GiST. They are skipped, and alternative indexes
+      // are resolved to their regular Index definition, if any.
       foreach ($this->indexes as $index) {
-        $spec['indexes'][$index->name] = $index->toArray();
+        if ($index instanceof AlternativeIndexes) {
+          $index = $index->firstOfClasses([Index::class]);
+        }
+        elseif (!$index instanceof Index) {
+          $index = NULL;
+        }
+        if ($index !== NULL) {
+          $spec['indexes'][$index->name] = $index->toArray();
+        }
       }
     }
     if ($this->foreignKeys !== NULL) {

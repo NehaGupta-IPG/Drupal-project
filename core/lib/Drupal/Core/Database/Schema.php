@@ -3,6 +3,9 @@
 namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Query\PlaceholderInterface;
+use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
+use Drupal\Core\Database\SchemaDefinition\Index as IndexDefinition;
+use Drupal\Core\Database\SchemaDefinition\IndexBase;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
@@ -663,7 +666,71 @@ abstract class Schema implements PlaceholderInterface {
    *   When concrete driver class is missing implementations.
    */
   final public function createTableFromDefinition(SchemaDefinitionType $schemaDefinitionType, string $schemaName, TableDefinition $table): void {
-    $this->createTable($table->name, $table->toArray());
+    $supportedIndexClasses = $this->getSupportedIndexDefinitionClasses();
+    $indexes = [];
+    $specializedIndexes = [];
+    foreach ($table->indexes ?? [] as $index) {
+      if ($index instanceof AlternativeIndexes) {
+        $index = $index->firstOfClasses($supportedIndexClasses);
+      }
+      elseif (!in_array($index::class, $supportedIndexClasses, TRUE)) {
+        // Skip indexes of a technology not supported by this driver.
+        $index = NULL;
+      }
+      if ($index === NULL) {
+        continue;
+      }
+      if ($index instanceof IndexDefinition) {
+        $indexes[] = $index;
+      }
+      else {
+        $specializedIndexes[] = $index;
+      }
+    }
+
+    $spec = $table->toArray();
+    unset($spec['indexes']);
+    foreach ($indexes as $index) {
+      $spec['indexes'][$index->name] = $index->toArray();
+    }
+    $this->createTable($table->name, $spec);
+    foreach ($specializedIndexes as $index) {
+      $this->createSpecializedIndex($table->name, $index);
+    }
+  }
+
+  /**
+   * Returns the index definition classes supported by this driver.
+   *
+   * By default only regular indexes are supported. Drivers for database
+   * engines that can create specialized indexes, like GIN or GiST, override
+   * this method to declare them. Index definitions of an unsupported class
+   * are skipped when a table is created from a table schema definition.
+   *
+   * @return list<class-string<\Drupal\Core\Database\SchemaDefinition\IndexBase>>
+   *   The supported index definition classes.
+   */
+  protected function getSupportedIndexDefinitionClasses(): array {
+    return [IndexDefinition::class];
+  }
+
+  /**
+   * Creates a specialized index from an index definition.
+   *
+   * Drivers declaring support for specialized index definition classes in
+   * ::getSupportedIndexDefinitionClasses() must override this method to
+   * create the corresponding indexes.
+   *
+   * @param string $tableName
+   *   The name of the table the index belongs to.
+   * @param \Drupal\Core\Database\SchemaDefinition\IndexBase $index
+   *   The index definition.
+   *
+   * @throws \BadMethodCallException
+   *   When the method is not implemented in the concrete driver class.
+   */
+  protected function createSpecializedIndex(string $tableName, IndexBase $index): void {
+    throw new \BadMethodCallException(get_class($this) . '::createSpecializedIndex() not implemented.');
   }
 
   /**

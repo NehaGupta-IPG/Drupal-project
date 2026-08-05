@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\pgsql\Driver\Database\pgsql;
+
+use Drupal\Core\Database\SchemaDefinition\IndexBase;
+
+/**
+ * Describes a database GIN (Generalized Inverted Index) index.
+ *
+ * GIN indexes are specific to PostgreSQL. Drivers for databases that do not
+ * support them skip the index. Use AlternativeIndexes to specify a fallback
+ * index to be created in that case.
+ */
+final class GinIndex extends IndexBase {
+
+  /**
+   * Constructor.
+   *
+   * @param string $name
+   *   The index name.
+   * @param list<\Drupal\Core\Database\SchemaDefinition\KeyColumn|string> $columns
+   *   A mix of key column specifiers, being KeyColumn objects or strings
+   *   naming columns. Limited length columns are not allowed.
+   */
+  public function __construct(
+    string $name,
+    array $columns,
+  ) {
+    parent::__construct($name, $columns, FALSE);
+  }
+
+}

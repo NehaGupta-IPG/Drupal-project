@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Database;
 
+use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\FloatValue;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
@@ -17,6 +19,8 @@ use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Drupal\Core\Database\Exception\SchemaDefinitionException;
+use Drupal\pgsql\Driver\Database\pgsql\GinIndex;
+use Drupal\pgsql\Driver\Database\pgsql\GistIndex;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -28,6 +32,9 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(Schema::class)]
 #[CoversClass(Table::class)]
 #[CoversClass(Column::class)]
+#[CoversClass(AlternativeIndexes::class)]
+#[CoversClass(GinIndex::class)]
+#[CoversClass(GistIndex::class)]
 class SchemaDefinitionTest extends UnitTestCase {
 
   /**
@@ -499,6 +506,145 @@ class SchemaDefinitionTest extends UnitTestCase {
       primaryKey: new PrimaryKey(['id']),
     );
     $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
+   * Tests specialized and alternative indexes in a table definition.
+   */
+  public function testSpecializedIndexesInTable(): void {
+    $table = new Table(
+      name: 'test',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      indexes: [
+        new Index(name: 'ages', columns: ['age']),
+        new GinIndex(name: 'gin_ages', columns: ['age']),
+        new GistIndex(name: 'gist_ages', columns: ['age']),
+        new AlternativeIndexes(
+          name: 'alternative_ages',
+          indexes: [
+            new GinIndex(name: 'alternative_ages', columns: ['age']),
+            new Index(name: 'alternative_ages', columns: ['age']),
+          ],
+        ),
+      ],
+    );
+    $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
+   * Tests passing a non index array member to Table::$indexes.
+   */
+  public function testInvalidIndexInTable(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('All members of the \'indexes\' argument of the \'test\' Table must be IndexBase or AlternativeIndexes objects');
+    new Table(
+      name: 'test',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      // @phpstan-ignore argument.type
+      indexes: [
+        'ages' => ['age'],
+      ],
+    );
+  }
+
+  /**
+   * Tests passing limited length columns to a GIN index.
+   */
+  public function testInvalidGinIndexForPartialLengthColumn(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Limited length columns not allowed in this context');
+    new GinIndex(
+      name: 'invalid',
+      // @phpstan-ignore argument.type
+      columns: [['name', 10]],
+    );
+  }
+
+  /**
+   * Tests passing limited length columns to a GiST index.
+   */
+  public function testInvalidGistIndexForPartialLengthColumn(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Limited length columns not allowed in this context');
+    new GistIndex(
+      name: 'invalid',
+      // @phpstan-ignore argument.type
+      columns: [['name', 10]],
+    );
+  }
+
+  /**
+   * Tests passing no indexes to AlternativeIndexes.
+   */
+  public function testEmptyAlternativeIndexes(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('The \'indexes\' argument of the \'invalid\' AlternativeIndexes must not be empty');
+    new AlternativeIndexes(
+      name: 'invalid',
+      indexes: [],
+    );
+  }
+
+  /**
+   * Tests passing a non index array member to AlternativeIndexes::$indexes.
+   */
+  public function testInvalidIndexInAlternativeIndexes(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('All members of the \'indexes\' argument of the \'invalid\' AlternativeIndexes must be IndexBase objects');
+    new AlternativeIndexes(
+      name: 'invalid',
+      // @phpstan-ignore argument.type
+      indexes: [
+        new AlternativeIndexes(
+          name: 'invalid',
+          indexes: [
+            new Index(name: 'invalid', columns: ['age']),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /**
+   * Tests passing a mismatching index name to AlternativeIndexes::$indexes.
+   */
+  public function testMismatchingIndexNameInAlternativeIndexes(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('The \'foo\' index does not match the name of the \'invalid\' AlternativeIndexes');
+    new AlternativeIndexes(
+      name: 'invalid',
+      indexes: [
+        new GinIndex(name: 'foo', columns: ['age']),
+      ],
+    );
+  }
+
+  /**
+   * Tests AlternativeIndexes::firstOfClasses().
+   */
+  public function testAlternativeIndexesFirstOfClasses(): void {
+    $ginIndex = new GinIndex(name: 'ages', columns: ['age']);
+    $index = new Index(name: 'ages', columns: ['age']);
+    $alternativeIndexes = new AlternativeIndexes(
+      name: 'ages',
+      indexes: [$ginIndex, $index],
+    );
+    $this->assertSame($ginIndex, $alternativeIndexes->firstOfClasses([Index::class, GinIndex::class, GistIndex::class]));
+    $this->assertSame($index, $alternativeIndexes->firstOfClasses([Index::class]));
+    $this->assertNull($alternativeIndexes->firstOfClasses([GistIndex::class]));
   }
 
   /**

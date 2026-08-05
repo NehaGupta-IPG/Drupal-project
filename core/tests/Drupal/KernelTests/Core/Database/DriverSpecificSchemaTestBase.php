@@ -9,6 +9,15 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaException;
+use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\pgsql\Driver\Database\pgsql\GinIndex;
+use Drupal\pgsql\Driver\Database\pgsql\GistIndex;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -1470,6 +1479,65 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     ])->execute();
 
     $this->assertEquals($id + 1, $id_two);
+  }
+
+  /**
+   * Tests creating a table from a definition with specialized indexes.
+   *
+   * By default, drivers only support regular indexes: GIN and GiST index
+   * definitions are skipped, and alternative indexes fall back to their
+   * regular index definition. Drivers supporting specialized indexes
+   * override this method.
+   */
+  public function testCreateTableFromDefinitionWithSpecializedIndexes(): void {
+    $tableDefinition = new Table(
+      name: 'test_specialized_indexes',
+      description: 'Table with specialized indexes.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
+        Column::varchar(
+          name: 'name',
+          length: 255,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      indexes: [
+        new Index(name: 'ages', columns: ['age']),
+        new GinIndex(name: 'gin_name', columns: ['name']),
+        new GistIndex(name: 'gist_name', columns: ['name']),
+        new AlternativeIndexes(
+          name: 'alternative_ages',
+          indexes: [
+            new GinIndex(name: 'alternative_ages', columns: ['age']),
+            new Index(name: 'alternative_ages', columns: ['age']),
+          ],
+        ),
+        new AlternativeIndexes(
+          name: 'alternative_name',
+          indexes: [
+            new GistIndex(name: 'alternative_name', columns: ['name']),
+          ],
+        ),
+      ],
+    );
+    $this->schema->createTableFromDefinition(SchemaDefinitionType::Test, 'database_test', $tableDefinition);
+
+    $this->assertTrue($this->schema->tableExists('test_specialized_indexes'));
+    $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'ages'));
+    // The GIN and GiST indexes are not supported and are skipped.
+    $this->assertFalse($this->schema->indexExists('test_specialized_indexes', 'gin_name'));
+    $this->assertFalse($this->schema->indexExists('test_specialized_indexes', 'gist_name'));
+    // The regular index alternative is created in place of the GIN index.
+    $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'alternative_ages'));
+    // None of the alternatives is supported, so the index is skipped.
+    $this->assertFalse($this->schema->indexExists('test_specialized_indexes', 'alternative_name'));
   }
 
 }

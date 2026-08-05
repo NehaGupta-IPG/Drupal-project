@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Database;
 
+use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 
@@ -18,6 +19,8 @@ use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
+use Drupal\pgsql\Driver\Database\pgsql\GinIndex;
+use Drupal\pgsql\Driver\Database\pgsql\GistIndex;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -243,6 +246,95 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
     );
 
     $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
+  }
+
+  /**
+   * Tests Table::toArray() with specialized and alternative indexes.
+   *
+   * The legacy array-based specifications cannot describe specialized
+   * indexes: GIN and GiST indexes are skipped, and alternative indexes are
+   * resolved to their regular Index definition, if any.
+   */
+  public function testConvertTableDefinitionWithSpecializedIndexes(): void {
+    $arraySpecification = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'age' => [
+          'type' => 'int',
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => [
+        'ages' => ['age'],
+        'alternative_ages' => ['age'],
+      ],
+    ];
+
+    $schemaDefinition = new Table(
+      name: 'test',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      indexes: [
+        new Index(name: 'ages', columns: ['age']),
+        new GinIndex(name: 'gin_ages', columns: ['age']),
+        new GistIndex(name: 'gist_ages', columns: ['age']),
+        new AlternativeIndexes(
+          name: 'alternative_ages',
+          indexes: [
+            new GinIndex(name: 'alternative_ages', columns: ['age']),
+            new Index(name: 'alternative_ages', columns: ['age']),
+          ],
+        ),
+        new AlternativeIndexes(
+          name: 'alternative_no_fallback',
+          indexes: [
+            new GistIndex(name: 'alternative_no_fallback', columns: ['age']),
+          ],
+        ),
+      ],
+    );
+
+    $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
+  }
+
+  /**
+   * Tests AlternativeIndexes::toArray().
+   */
+  public function testConvertAlternativeIndexes(): void {
+    $alternativeIndexes = new AlternativeIndexes(
+      name: 'ages',
+      indexes: [
+        new GinIndex(name: 'ages', columns: ['age']),
+        new Index(name: 'ages', columns: ['age']),
+      ],
+    );
+    $this->assertEquals(['age'], $alternativeIndexes->toArray());
+  }
+
+  /**
+   * Tests AlternativeIndexes::toArray() without a regular Index alternative.
+   */
+  public function testConvertAlternativeIndexesWithoutRegularIndex(): void {
+    $this->expectException(\LogicException::class);
+    $this->expectExceptionMessage("The 'ages' AlternativeIndexes cannot be converted to legacy array-based specifications");
+    $alternativeIndexes = new AlternativeIndexes(
+      name: 'ages',
+      indexes: [
+        new GinIndex(name: 'ages', columns: ['age']),
+      ],
+    );
+    $alternativeIndexes->toArray();
   }
 
 }
