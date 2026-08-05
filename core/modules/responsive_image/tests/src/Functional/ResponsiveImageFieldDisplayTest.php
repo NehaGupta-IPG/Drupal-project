@@ -542,6 +542,49 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   }
 
   /**
+   * Tests responsive image formatter output for the fetchpriority setting.
+   */
+  public function testResponsiveImageFieldFormatterFetchPriority(): void {
+    $this->responsiveImgStyle
+      ->addImageStyleMapping('responsive_image_test_module.empty', '1x', [
+        'image_mapping_type' => 'image_style',
+        'image_mapping' => 'thumbnail',
+      ])
+      ->save();
+    $field_name = $this->randomMachineName();
+    $this->createImageField($field_name, 'node', 'article', ['uri_scheme' => 'public']);
+    $test_image = current($this->getTestFiles('image'));
+    $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $this->randomMachineName());
+
+    $display_repository = \Drupal::service('entity_display.repository');
+
+    // The default setting does not add a fetchpriority attribute.
+    $display_options = [
+      'type' => 'responsive_image',
+      'settings' => [
+        'image_link' => '',
+        'responsive_image_style' => 'style_one',
+      ],
+    ];
+    $display_repository->getViewDisplay('node', 'article')
+      ->setComponent($field_name, $display_options)
+      ->save();
+    $this->drupalGet('node/' . $nid);
+    $this->assertSession()->responseNotContains('fetchpriority=');
+
+    // Setting fetchpriority to 'high' adds the attribute to the image tag.
+    $display_options['settings']['image_loading'] = [
+      'attribute' => 'eager',
+      'fetchpriority' => 'high',
+    ];
+    $display_repository->getViewDisplay('node', 'article')
+      ->setComponent($field_name, $display_options)
+      ->save();
+    $this->drupalGet('node/' . $nid);
+    $this->assertSession()->responseContains('fetchpriority="high"');
+  }
+
+  /**
    * Tests responsive image formatters linked to the file or node.
    *
    * @param string $link_type
