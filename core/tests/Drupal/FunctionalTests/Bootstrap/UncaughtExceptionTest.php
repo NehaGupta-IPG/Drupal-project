@@ -185,36 +185,28 @@ class UncaughtExceptionTest extends BrowserTestBase {
    * Tests the case when the database connection is gone.
    */
   public function testLostDatabaseConnection(): void {
-    $driver = $this->container->get('database')->driver();
-    // Only credential-based drivers can simulate a lost connection this way.
-    if (!in_array($driver, ['mysql', 'mysqli', 'pgsql'], TRUE)) {
-      $this->markTestSkipped("This test does not support the {$driver} database driver.");
+    // SQLite has no credentials, so break its file path instead.
+    $sqlite = $this->container->get('database')->driver() === 'sqlite';
+    $broken = $sqlite
+      ? ['database' => '/nonexistent/' . $this->randomMachineName(16) . '.sqlite']
+      : ['username' => $this->randomMachineName(16), 'password' => $this->randomMachineName(16)];
+    foreach ($broken as $key => $value) {
+      $settings['databases']['default']['default'][$key] = (object) [
+        'value' => $value,
+        'required' => TRUE,
+      ];
     }
-
-    // Simulate a broken database connection by rewriting settings.php to no
-    // longer have valid credentials.
-    $settings['databases']['default']['default']['username'] = (object) [
-      'value' => $this->randomMachineName(16),
-      'required' => TRUE,
-    ];
-    $settings['databases']['default']['default']['password'] = (object) [
-      'value' => $this->randomMachineName(16),
-      'required' => TRUE,
-    ];
 
     $this->writeSettings($settings);
 
     $this->drupalGet('');
     $this->assertSession()->statusCodeEquals(500);
-    // The invalid credentials make the connection fail, but the exact exception
-    // is driver- and environment-dependent (access denied, too many
-    // connections, an authentication plugin error, a raw driver exception).
-    // Assert the generic kernel panic, and clear the expected error from the
-    // log by matching the connection call it is thrown from, instead of a
-    // single exception class that the environment does not always produce,
-    // which made this test fail randomly on MariaDB.
+    // The exception differs per driver, so just assert the panic page.
     $this->assertSession()->pageTextContains('The website encountered an unexpected error. Try again later.');
-    $this->assertErrorLogged('Database::openConnection');
+    if (!$sqlite) {
+      // SQLite doesn't log the failed connect.
+      $this->assertErrorLogged('Database::openConnection');
+    }
   }
 
   /**
