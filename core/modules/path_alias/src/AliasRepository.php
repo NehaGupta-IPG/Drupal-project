@@ -125,7 +125,7 @@ class AliasRepository implements AliasRepositoryInterface {
         ->execute()
         ->fetchField();
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       return FALSE;
     }
   }
