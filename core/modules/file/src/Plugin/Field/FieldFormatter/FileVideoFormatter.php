@@ -250,6 +250,10 @@ class FileVideoFormatter extends FileMediaFormatterBase {
           ->merge(CacheableMetadata::createFromObject($access))
           ->applyTo($elements);
         if ($access->isAllowed()) {
+          // Use the media translation matching the display language
+          if ($referenced instanceof TranslatableInterface && $referenced->hasTranslation($langcode)) {
+            $referenced = $referenced->getTranslation($langcode);
+          }
           // Resolve its source file and accept it only when it is an image.
           $source = $referenced->getSource();
           if ($source !== NULL) {
