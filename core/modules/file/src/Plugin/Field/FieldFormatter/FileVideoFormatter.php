@@ -73,11 +73,11 @@ class FileVideoFormatter extends FileMediaFormatterBase {
     // The last two arguments are optional to avoid a BC break; they become
     // required next major. Deprecate omission and fall back to the container.
     if ($this->moduleHandler === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleHandler argument is deprecated in drupal:11.5.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
       $this->moduleHandler = \Drupal::moduleHandler();
     }
     if ($this->fileStorage === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $fileStorage argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $fileStorage argument is deprecated in drupal:11.5.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3604036', E_USER_DEPRECATED);
       $this->fileStorage = \Drupal::entityTypeManager()->getStorage('file');
     }
   }
@@ -250,7 +250,8 @@ class FileVideoFormatter extends FileMediaFormatterBase {
           ->merge(CacheableMetadata::createFromObject($access))
           ->applyTo($elements);
         if ($access->isAllowed()) {
-          // Use the media translation matching the display language
+          // Use the media translation matching the display language so a
+          // per-translation poster source field value is honored.
           if ($referenced instanceof TranslatableInterface && $referenced->hasTranslation($langcode)) {
             $referenced = $referenced->getTranslation($langcode);
           }
