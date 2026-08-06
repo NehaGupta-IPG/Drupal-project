@@ -68,7 +68,10 @@ class Upsert extends QueryUpsert {
     }
     foreach ($this->updateExpressions as $update_expression) {
       foreach ($update_expression->arguments as $argument => $value) {
-        $stmt->getClientStatement()->bindParam($argument, $value);
+        // Bind the arguments by value. With a by-reference binding, such as
+        // bindParam(), all placeholders would share the loop variable and
+        // read its final value when the statement executes.
+        $stmt->getClientStatement()->bindValue($argument, $value);
       }
     }
 

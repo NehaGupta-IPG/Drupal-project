@@ -33,7 +33,7 @@ abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoi
    * manipulate that - typically, counters or the like. This array contains
    * such overrides.
    *
-   * @var array<string,\Drupal\Core\Database\Query\Expression>
+   * @var array<string,\Drupal\Core\Database\Query\UpsertUpdateExpression>
    */
   protected array $updateExpressions = [];
 
@@ -84,12 +84,20 @@ abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoi
    *   If associative, the keys of the array are taken to be the columns and
    *   the values are taken to be corresponding values to insert. If a
    *   $values argument is provided, $fields must be indexed.
+   *   In the indexed form, an entry may map a column name to an
+   *   UpsertUpdateExpression. When the row already exists, that expression is
+   *   run for the column in place of overwriting it with the insert value.
    * @param list<string|int|float|bool|array> $values
    *   (optional) An array of values to insert into the database. The values
    *   must be specified in the same order as the $fields array.
    *
    * @return $this
    *   The called object.
+   *
+   * @throws \InvalidArgumentException
+   *   If an update expression is not keyed by its column name, or if a column
+   *   name maps to an insert value while the $fields array is not fully
+   *   associative.
    */
   public function fields(array $fields, array $values = []): static {
     if (empty($this->insertFields)) {
@@ -107,8 +115,14 @@ abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoi
       }
       foreach ($fields as $key => $def) {
         if ($def instanceof UpsertUpdateExpression) {
+          if (!is_string($key)) {
+            throw new \InvalidArgumentException('An update expression must be keyed by its column name.');
+          }
           $this->insertFields[] = $key;
           $this->updateExpressions[$key] = $def;
+        }
+        elseif (is_string($key)) {
+          throw new \InvalidArgumentException(sprintf('The entry for "%s" must be a column name or an update expression keyed by column name. Pass insert values via the $values argument or the values() method.', $key));
         }
         else {
           $this->insertFields[] = $def;
@@ -187,16 +201,13 @@ abstract class Upsert extends Query implements \Countable /* , QueryExecutionVoi
     $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions, TRUE);
     try {
       $stmt->execute($values, $this->queryOptions);
-      $affected_rows = $stmt->rowCount();
+      // Re-initialize the values array so that we can re-use this query.
+      $this->insertValues = [];
+      this->queryOptions['void_execute_return'] ? NULL : $stmt->rowCount();
     }
     catch (\Exception $e) {
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $values, $this->queryOptions);
     }
-
-    // Re-initialize the values array so that we can re-use this query.
-    $this->insertValues = [];
-
-    return $this->queryOptions['void_execute_return'] ? NULL : $affected_rows;
   }
 
 }

@@ -72,7 +72,9 @@ class UpsertTest extends DatabaseTestBase {
       ->key('job')
       ->fields([
         'job',
-        'age' => new UpsertUpdateExpression('{test_people}.[age] + 5'),
+        // Use two placeholder arguments to cover the argument binding done by
+        // each driver.
+        'age' => new UpsertUpdateExpression('{test_people}.[age] + :one + :two', [':one' => 2, ':two' => 3]),
         'name',
       ]);
 
@@ -105,6 +107,35 @@ class UpsertTest extends DatabaseTestBase {
     $this->assertSame('Speaker', $person->job);
     $this->assertSame('35', $person->age, 'Age should have been updated to 35.');
     $this->assertSame('Meredith', $person->name);
+
+    // An associative $fields array cannot mix insert values with update
+    // expressions, because the values cannot be told apart from column names.
+    try {
+      $this->connection->upsert('test_people', ['void_execute_return' => TRUE])
+        ->key('job')
+        ->fields([
+          'job' => 'Speaker',
+          'age' => new UpsertUpdateExpression('{test_people}.[age] + 1'),
+        ]);
+      $this->fail('Expected exception when mixing insert values with an update expression.');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertStringContainsString('The entry for "job"', $e->getMessage());
+    }
+
+    // An update expression needs a column name key.
+    try {
+      $this->connection->upsert('test_people', ['void_execute_return' => TRUE])
+        ->key('job')
+        ->fields([
+          'job',
+          new UpsertUpdateExpression('{test_people}.[age] + 1'),
+        ]);
+      $this->fail('Expected exception for an update expression without a column name key.');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertStringContainsString('must be keyed by its column name', $e->getMessage());
+    }
   }
 
   /**
