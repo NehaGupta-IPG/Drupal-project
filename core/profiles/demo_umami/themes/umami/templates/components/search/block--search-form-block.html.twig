@@ -23,7 +23,7 @@
  * - title_suffix: Additional output populated by modules, intended to be
  *   displayed after the main title tag that appears in the template.
  *
- * @see template_preprocess_block()
+ * @see \Drupal\block\Hook\BlockHooks::preprocessBlock()
  * @see search_preprocess_block()
  */
 #}
@@ -37,7 +37,7 @@
 
 <div class="search-iconwrap">
   <a class="search-link" title="{{ 'Go to the search page'|t }}" href="{{ path('search.view') }}">
-    <span class="search-icon" aria-hidden="true">{% include active_theme_path() ~ '/images/svg/search.svg' %}</span>
+    <span class="search-icon" aria-hidden="true">{{ include(active_theme_path() ~ '/images/svg/search.svg') }}</span>
     <span class="visually-hidden">{{ 'Search'|t }}</span>
   </a>
 </div>

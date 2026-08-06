@@ -165,8 +165,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     ClassResolverInterface $class_resolver,
     ElementInfoManagerInterface $element_info,
     ThemeManagerInterface $theme_manager,
-    ?CsrfTokenGenerator $csrf_token = NULL,
-    ?CallableResolver $callableResolver = NULL,
+    CsrfTokenGenerator $csrf_token,
+    CallableResolver $callableResolver,
   ) {
     $this->formValidator = $form_validator;
     $this->formSubmitter = $form_submitter;
@@ -178,10 +178,6 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     $this->elementInfo = $element_info;
     $this->csrfToken = $csrf_token;
     $this->themeManager = $theme_manager;
-    if (!$callableResolver) {
-      @trigger_error(sprintf('Calling %s() without the $callableResolver param is deprecated in drupal:11.3.0 and is required in drupal:12.0.0. See https://www.drupal.org/node/3548821', __METHOD__), E_USER_DEPRECATED);
-      $callableResolver = \Drupal::service(CallableResolver::class);
-    }
     $this->callableResolver = $callableResolver;
   }
 
@@ -349,7 +345,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // In case the post request exceeds the configured allowed size
     // (post_max_size), the post request is potentially broken. Add some
     // protection against that and at the same time have a nice error message.
-    if ($ajax_form_request && !$request->get('form_id')) {
+    $request_form_id = $request->query->get('form_id', $request->request->get('form_id'));
+    if ($ajax_form_request && !$request_form_id) {
       throw new BrokenPostRequestException($this->getFileUploadMaxSize());
     }
 
@@ -362,7 +359,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // build a proper AJAX response.
     // Only do this when the form ID matches, since there is no guarantee from
     // $ajax_form_request that it's an AJAX request for this particular form.
-    if ($ajax_form_request && $form_state->isProcessingInput() && $request->get('form_id') == $form_id) {
+    if ($ajax_form_request && $form_state->isProcessingInput() && $request_form_id == $form_id) {
       throw new FormAjaxException($form, $form_state);
     }
 

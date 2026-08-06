@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
@@ -98,37 +97,33 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
       name: 'test',
       description: 'Basic test table for the database unit tests.',
       columns: [
-        new Column(
+        Column::serial(
           name: 'id',
-          type: ColumnType::Serial,
         ),
-        new Column(
+        Column::varcharAscii(
           name: 'name',
           description: "A person's name",
-          type: ColumnType::VarcharAscii,
           length: 255,
           notNull: TRUE,
           default: new StringValue(''),
           binary: TRUE,
         ),
-        new Column(
+        Column::int(
           name: 'age',
           description: "The person's age",
-          type: ColumnType::Int,
           size: ColumnSize::Small,
           unsigned: TRUE,
           notNull: TRUE,
           default: new IntValue(0),
         ),
-        new Column(
+        Column::varchar(
           name: 'job',
           description: "The person's job",
-          type: ColumnType::Varchar,
           length: 255,
           notNull: TRUE,
           default: new StringValue('Undefined'),
         ),
-        new Column(
+        Column::create(
           name: 'db_timestamp',
           description: "The database timestamp",
           dbSpecificExtra: [
@@ -227,9 +222,8 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
           name: 'foo',
           description: 'Foo table for the database unit tests.',
           columns: [
-            new Column(
+            Column::serial(
               name: 'id',
-              type: ColumnType::Serial,
             ),
           ],
           primaryKey: new PrimaryKey(['id']),
@@ -238,9 +232,8 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
           name: 'bar',
           description: 'Bar table for the database unit tests.',
           columns: [
-            new Column(
+            Column::serial(
               name: 'id',
-              type: ColumnType::Serial,
             ),
           ],
           primaryKey: new PrimaryKey(['id']),

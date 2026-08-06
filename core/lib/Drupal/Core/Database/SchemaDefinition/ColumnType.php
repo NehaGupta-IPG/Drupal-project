@@ -31,4 +31,29 @@ enum ColumnType: string {
   // Other types.
   case Blob = 'blob';
 
+  /**
+   * Checks if a default value is compatible with a column type.
+   *
+   * @return bool
+   *   TRUE or FALSE.
+   */
+  public function isValidDefaultValue(StringValue|IntValue|FloatValue|NullValue $defaultValue): bool {
+    $allowed = match ($this) {
+      ColumnType::Char, ColumnType::Varchar, ColumnType::VarcharAscii, ColumnType::Text, ColumnType::Blob => [
+        StringValue::class,
+        NullValue::class,
+      ],
+      ColumnType::Int => [
+        IntValue::class,
+        NullValue::class,
+      ],
+      ColumnType::Serial => [],
+      ColumnType::Float, ColumnType::Numeric => [
+        FloatValue::class,
+        NullValue::class,
+      ],
+    };
+    return in_array(get_class($defaultValue), $allowed, TRUE);
+  }
+
 }

@@ -9,6 +9,7 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\filter\Render\FilteredMarkup;
 use Drupal\Tests\field\Functional\FunctionalString\StringFieldTest;
 use Drupal\Tests\TestFileCreationTrait;
@@ -243,7 +244,7 @@ class TextFieldTest extends StringFieldTest {
     // Display the creation form.
     $this->drupalLogin($this->webUser);
     $this->drupalGet('entity_test/add');
-    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format1->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format2->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format3->id());
@@ -275,7 +276,7 @@ class TextFieldTest extends StringFieldTest {
     $this->drupalLogin($this->webUser);
     // We shouldn't have the 'format' selector since only one format is allowed.
     $this->drupalGet('entity_test/add');
-    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
     $this->assertSession()->fieldNotExists("{$field_name}[0][format]");
 
     // Retest the entity renders fine even though filter2 is disabled.
@@ -290,7 +291,7 @@ class TextFieldTest extends StringFieldTest {
     $field->save();
     $this->drupalGet('entity_test/add');
     // We should see the 'format' selector again.
-    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format1->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format2->id());
     $this->assertSession()->optionNotExists("{$field_name}[0][format]", $format3->id());
@@ -300,7 +301,7 @@ class TextFieldTest extends StringFieldTest {
     $field->save();
     $this->drupalGet('entity_test/add');
     // We should see the 'format' selector again.
-    $this->assertSession()->fieldExists("{$field_name}[0][value]", NULL);
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format1->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format2->id());
     $this->assertSession()->optionExists("{$field_name}[0][format]", $format3->id());
@@ -336,7 +337,7 @@ class TextFieldTest extends StringFieldTest {
 
     // Disable all text formats besides the plain text fallback format.
     $this->drupalLogin($this->adminUser);
-    foreach (filter_formats() as $format) {
+    foreach (\Drupal::service(FilterFormatRepositoryInterface::class)->getAllFormats() as $format) {
       if (!$format->isFallbackFormat()) {
         $this->drupalGet('admin/config/content/formats/manage/' . $format->id() . '/disable');
         $this->submitForm([], 'Disable');
@@ -377,7 +378,6 @@ class TextFieldTest extends StringFieldTest {
     ];
     $this->drupalGet('admin/config/content/formats/add');
     $this->submitForm($edit, 'Save configuration');
-    filter_formats_reset();
     $format = FilterFormat::load($edit['format']);
     $format_id = $format->id();
     $permission = $format->getPermissionName();

@@ -42,8 +42,6 @@ class ThemeTest extends BrowserTestBase {
 
   /**
    * A test node.
-   *
-   * @var \Drupal\node\Entity\Node
    */
   protected Node $node;
 
@@ -51,10 +49,6 @@ class ThemeTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    if ($this->name() === 'testInstallAndSetAsDefault') {
-      $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
-    }
-
     parent::setUp();
 
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
@@ -72,6 +66,27 @@ class ThemeTest extends BrowserTestBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function prepareEnvironment(): void {
+    parent::prepareEnvironment();
+    // Create theme for testing semver.
+    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/../themes/test_core_semver', NULL, TRUE);
+    $contents = <<<INFO
+name: 'Theme test with semver core version'
+type: theme
+base theme: false
+description: 'Test theme which has semver core version.'
+version: VERSION
+
+INFO;
+    // Add the core_version_requirement key.
+    $version = explode('.', \Drupal::VERSION, 2);
+    $contents .= "core_version_requirement: ^$version[0]\n";
+    file_put_contents($this->publicFilesDirectory . '/../themes/test_core_semver/test_core_semver.info.yml', $contents);
+  }
+
+  /**
    * Tests the theme settings form.
    */
   public function testThemeSettings(): void {
@@ -82,8 +97,8 @@ class ThemeTest extends BrowserTestBase {
     $this->drupalGet('admin/appearance/settings/' . $this->randomMachineName());
     $this->assertSession()->statusCodeEquals(404);
     // Ensure a hidden theme settings form URL returns 404.
-    $this->assertTrue(\Drupal::service('theme_installer')->install(['stable9']));
-    $this->drupalGet('admin/appearance/settings/stable9');
+    $this->assertTrue(\Drupal::service('theme_installer')->install(['test_base_theme']));
+    $this->drupalGet('admin/appearance/settings/test_base_theme');
     $this->assertSession()->statusCodeEquals(404);
 
     // Specify a filesystem path to be used for the logo.
@@ -231,15 +246,15 @@ class ThemeTest extends BrowserTestBase {
     $theme_handler = \Drupal::service('theme_handler');
     $this->assertSession()->linkExists($theme_handler->getName('starterkit_theme'));
     $this->assertSession()->linkExists($theme_handler->getName('olivero'));
-    $this->assertSession()->linkNotExists($theme_handler->getName('stable9'));
+    $this->assertSession()->linkNotExists($theme_handler->getName('test_base_theme'));
 
     // If a hidden theme is an admin theme it should be viewable.
-    \Drupal::configFactory()->getEditable('system.theme')->set('admin', 'stable9')->save();
+    \Drupal::configFactory()->getEditable('system.theme')->set('admin', 'test_base_theme')->save();
     \Drupal::service('router.builder')->rebuildIfNeeded();
-    $this->drupalPlaceBlock('local_tasks_block', ['region' => 'header', 'theme' => 'stable9']);
+    $this->drupalPlaceBlock('local_tasks_block', ['region' => 'header', 'theme' => 'test_base_theme']);
     $this->drupalGet('admin/appearance/settings');
-    $this->assertSession()->linkExists($theme_handler->getName('stable9'));
-    $this->drupalGet('admin/appearance/settings/stable9');
+    $this->assertSession()->linkExists($theme_handler->getName('test_base_theme'));
+    $this->drupalGet('admin/appearance/settings/test_base_theme');
     $this->assertSession()->statusCodeEquals(200);
 
     // Ensure default logo and favicons are not triggering custom path
@@ -524,8 +539,10 @@ class ThemeTest extends BrowserTestBase {
 
     // Uninstall each of the two themes starting with Olivero.
     $this->cssSelect('a[title="Uninstall Olivero theme"]')[0]->click();
+    $this->submitForm([], 'Uninstall');
     $this->assertSession()->responseContains('The <em class="placeholder">Olivero</em> theme has been uninstalled');
     $this->cssSelect('a[title="Uninstall Claro theme"]')[0]->click();
+    $this->submitForm([], 'Uninstall');
     $this->assertSession()->responseContains('The <em class="placeholder">Claro</em> theme has been uninstalled');
   }
 

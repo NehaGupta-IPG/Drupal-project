@@ -10,6 +10,11 @@ namespace Drupal\Core\Database\SchemaDefinition;
 class NullValue {
 
   /**
+   * Human readable name.
+   */
+  public readonly string $name;
+
+  /**
    * A null value.
    *
    * @var null
@@ -17,6 +22,7 @@ class NullValue {
   public readonly null $value;
 
   public function __construct() {
+    $this->name = 'null';
     $this->value = NULL;
   }
 

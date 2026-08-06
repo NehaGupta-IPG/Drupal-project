@@ -32,7 +32,7 @@ abstract class EntityFormModeResourceTestBase extends ConfigEntityResourceTestBa
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer display modes']);
   }
 
@@ -63,7 +63,7 @@ abstract class EntityFormModeResourceTestBase extends ConfigEntityResourceTestBa
       ],
       'id' => 'user.test',
       'label' => 'Test',
-      'description' => '',
+      'description' => NULL,
       'langcode' => 'en',
       'status' => TRUE,
       'targetEntityType' => 'user',

@@ -8,16 +8,9 @@ use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Exception\SchemaDefinitionException;
 
 /**
- * Describes a database schema as a collection of Table objects.
- *
- * @implements \Iterator<int,Table>
+ * Describes a database schema as a collection of database objects.
  */
-final class Schema implements SchemaDefinitionInterface, \Iterator {
-
-  /**
-   * The position in the iteration when object is accessed via iterator.
-   */
-  private int $position = 0;
+final class Schema implements SchemaDefinitionInterface {
 
   /**
    * Constructor.
@@ -97,41 +90,6 @@ final class Schema implements SchemaDefinitionInterface, \Iterator {
       $spec[$table->name] = $table->toArray();
     }
     return $spec;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function rewind(): void {
-    $this->position = 0;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function current(): Table {
-    return $this->tables[$this->position];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function key(): int {
-    return $this->position;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function next(): void {
-    ++$this->position;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function valid(): bool {
-    return isset($this->tables[$this->position]);
   }
 
 }

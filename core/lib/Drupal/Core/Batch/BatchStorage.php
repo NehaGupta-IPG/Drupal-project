@@ -5,9 +5,9 @@ namespace Drupal\Core\Batch;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
@@ -133,10 +133,7 @@ class BatchStorage implements BatchStorageInterface {
   }
 
   /**
-   * Returns a new batch id.
-   *
-   * @return int
-   *   A batch id.
+   * {@inheritdoc}
    */
   public function getId(): int {
     $try_again = FALSE;
@@ -184,28 +181,24 @@ class BatchStorage implements BatchStorageInterface {
       name: static::TABLE_NAME,
       description: 'Stores details about batches (processes that run in multiple HTTP requests).',
       columns: [
-        new Column(
+        Column::serial(
           name: 'bid',
           description: 'Primary Key: Unique batch ID.',
-          type: ColumnType::Serial,
         ),
-        new Column(
+        Column::varcharAscii(
           name: 'token',
           description: "A string token generated against the current user's session id and the batch id, used to ensure that only the user who submitted the batch can effectively access it.",
-          type: ColumnType::VarcharAscii,
           length: 64,
           notNull: TRUE,
         ),
-        new Column(
+        Column::int(
           name: 'timestamp',
           description: 'A Unix timestamp indicating when this batch was submitted for processing. Stale batches are purged at cron time.',
-          type: ColumnType::Int,
           notNull: TRUE,
         ),
-        new Column(
+        Column::blob(
           name: 'batch',
           description: 'A serialized array containing the processing data for the batch.',
-          type: ColumnType::Blob,
           size: ColumnSize::Big,
           notNull: FALSE,
         ),

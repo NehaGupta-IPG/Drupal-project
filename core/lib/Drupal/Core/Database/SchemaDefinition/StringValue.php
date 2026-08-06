@@ -9,7 +9,13 @@ namespace Drupal\Core\Database\SchemaDefinition;
  */
 class StringValue {
 
+  /**
+   * Human readable name.
+   */
+  public readonly string $name;
+
   public function __construct(public readonly string $value) {
+    $this->name = 'string';
   }
 
 }

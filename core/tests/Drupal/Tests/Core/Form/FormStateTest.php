@@ -26,7 +26,7 @@ class FormStateTest extends UnitTestCase {
    * Tests the getRedirect() method.
    */
   #[DataProvider('providerTestGetRedirect')]
-  public function testGetRedirect($form_state_additions, $expected): void {
+  public function testGetRedirect(array $form_state_additions, $expected): void {
     $form_state = (new FormState())->setFormState($form_state_additions);
     $redirect = $form_state->getRedirect();
     $this->assertEquals($expected, $redirect);
@@ -68,7 +68,7 @@ class FormStateTest extends UnitTestCase {
    * Tests the getError() method.
    */
   #[DataProvider('providerTestGetError')]
-  public function testGetError($errors, $parents, $error = NULL): void {
+  public function testGetError(array $errors, array $parents, ?string $error = NULL): void {
     $element['#parents'] = $parents;
     $form_state = (new FormState())->setFormState([
       'errors' => $errors,
@@ -95,7 +95,7 @@ class FormStateTest extends UnitTestCase {
    * Tests set error by name.
    */
   #[DataProvider('providerTestSetErrorByName')]
-  public function testSetErrorByName($limit_validation_errors, $expected_errors): void {
+  public function testSetErrorByName(?array $limit_validation_errors, array $expected_errors): void {
     $form_state = new FormState();
     $form_state->setLimitValidationErrors($limit_validation_errors);
     $form_state->clearErrors();
@@ -129,7 +129,7 @@ class FormStateTest extends UnitTestCase {
     $form_state = new FormState();
     $form_state->setValidationComplete();
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Form errors cannot be set after form validation has finished.');
+    $this->expectExceptionMessageIs('Form errors cannot be set after form validation has finished.');
     $form_state->setErrorByName('test', 'message');
   }
 
@@ -310,7 +310,7 @@ class FormStateTest extends UnitTestCase {
     $form_state = new FormState();
     $form_state->setRequestMethod('GET');
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Form state caching on GET requests is not allowed.');
+    $this->expectExceptionMessageIs('Form state caching on GET requests is not allowed.');
     $form_state->setCached();
   }
 

@@ -70,7 +70,7 @@ final class Column implements SchemaDefinitionInterface {
    * @see \Drupal\Core\Database\SchemaDefinition\ColumnType
    * @see \Drupal\Core\Database\SchemaDefinition\ColumnSize
    */
-  public function __construct(
+  private function __construct(
     public readonly string $name,
     public readonly ?ColumnType $type = NULL,
     public readonly ?string $description = NULL,
@@ -85,7 +85,43 @@ final class Column implements SchemaDefinitionInterface {
     public readonly ?bool $binary = NULL,
     public readonly ?array $dbSpecificExtra = NULL,
   ) {
-    $this->validate();
+  }
+
+  /**
+   * Returns new a Column object.
+   */
+  public static function create(
+    string $name,
+    ?ColumnType $type = NULL,
+    ?string $description = NULL,
+    ?bool $serialize = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|IntValue|FloatValue|NullValue|null $default = NULL,
+    ?int $length = NULL,
+    ?bool $unsigned = NULL,
+    ?int $precision = NULL,
+    ?int $scale = NULL,
+    ?bool $binary = NULL,
+    ?array $dbSpecificExtra = NULL,
+  ): self {
+    $instance = new self(
+      name: $name,
+      type: $type,
+      description: $description,
+      serialize: $serialize,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      length: $length,
+      unsigned: $unsigned,
+      precision: $precision,
+      scale: $scale,
+      binary: $binary,
+      dbSpecificExtra: $dbSpecificExtra,
+    );
+    $instance->validate();
+    return $instance;
   }
 
   /**
@@ -97,7 +133,7 @@ final class Column implements SchemaDefinitionInterface {
 
     // If no column type specified, a db specific one should be set.
     if ($this->type === NULL && $this->dbSpecificExtra === NULL) {
-      throw new SchemaDefinitionException("Neither 'type' not 'dbSpecificExtra' for column '{$this->name}'");
+      throw new SchemaDefinitionException("Neither 'type' nor 'dbSpecificExtra' for column '{$this->name}'");
     }
 
     // Cannot set notNull for serial columns.
@@ -153,48 +189,15 @@ final class Column implements SchemaDefinitionInterface {
     }
 
     // Check validity of default type.
-    if ($this->type !== NULL && $this->default !== NULL) {
-      $typeClass = get_class($this->default);
-      $allowedTypes = $this->allowedDefaultTypes();
-      if (!in_array($typeClass, $allowedTypes)) {
-        throw new SchemaDefinitionException("Cannot set a $typeClass default for column '{$this->name}'");
-      }
+    if ($this->type !== NULL && $this->default !== NULL && !$this->type->isValidDefaultValue($this->default)) {
+      throw new SchemaDefinitionException("Cannot set a {$this->default->name} default for column '{$this->name}'");
     }
 
     // Cannot set a null value if notNull is true.
-    if ($this->notNull && $this->default && get_class($this->default) === NullValue::class) {
+    if ($this->notNull && $this->default && $this->default->value === NULL) {
       throw new SchemaDefinitionException("Cannot set a null default for column '{$this->name}': notNull is true");
     }
 
-  }
-
-  /**
-   * Returns the valid default value types for the column.
-   *
-   * @return list<class-string>
-   *   The valid value classes.
-   *
-   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
-   */
-  private function allowedDefaultTypes(): array {
-    if ($this->type === NULL) {
-      throw new SchemaDefinitionException("Cannot determine allowed default types for column '{$this->name}'");
-    }
-    return match ($this->type) {
-      ColumnType::Char, ColumnType::Varchar, ColumnType::VarcharAscii, ColumnType::Text, ColumnType::Blob => [
-        StringValue::class,
-        NullValue::class,
-      ],
-      ColumnType::Int => [
-        IntValue::class,
-        NullValue::class,
-      ],
-      ColumnType::Serial => [],
-      ColumnType::Float, ColumnType::Numeric => [
-        FloatValue::class,
-        NullValue::class,
-      ],
-    };
   }
 
   /**
@@ -247,6 +250,212 @@ final class Column implements SchemaDefinitionInterface {
       }
     }
     return $spec;
+  }
+
+  /**
+   * Returns a Column object for a char column.
+   */
+  public static function char(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|NullValue|null $default = NULL,
+    ?int $length = NULL,
+    ?bool $binary = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Char,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      length: $length,
+      binary: $binary,
+    );
+  }
+
+  /**
+   * Returns a Column object for a varchar column.
+   */
+  public static function varchar(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|NullValue|null $default = NULL,
+    ?int $length = NULL,
+    ?bool $binary = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Varchar,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      length: $length,
+      binary: $binary,
+    );
+  }
+
+  /**
+   * Returns a Column object for a varcharAscii column.
+   */
+  public static function varcharAscii(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|NullValue|null $default = NULL,
+    ?int $length = NULL,
+    ?bool $binary = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::VarcharAscii,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      length: $length,
+      binary: $binary,
+    );
+  }
+
+  /**
+   * Returns a Column object for a text column.
+   */
+  public static function text(
+    string $name,
+    ?string $description = NULL,
+    ?bool $serialize = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|NullValue|null $default = NULL,
+    ?int $length = NULL,
+    ?bool $binary = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Text,
+      name: $name,
+      description: $description,
+      serialize: $serialize,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      length: $length,
+      binary: $binary,
+    );
+  }
+
+  /**
+   * Returns a Column object for an int column.
+   */
+  public static function int(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    IntValue|NullValue|null $default = NULL,
+    ?bool $unsigned = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Int,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      unsigned: $unsigned,
+    );
+  }
+
+  /**
+   * Returns a Column object for a serial column.
+   */
+  public static function serial(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Serial,
+      name: $name,
+      description: $description,
+      size: $size,
+    );
+  }
+
+  /**
+   * Returns a Column object for an float column.
+   */
+  public static function float(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    FloatValue|NullValue|null $default = NULL,
+    ?bool $unsigned = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Float,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      unsigned: $unsigned,
+    );
+  }
+
+  /**
+   * Returns a Column object for an numeric column.
+   */
+  public static function numeric(
+    string $name,
+    ?string $description = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    FloatValue|NullValue|null $default = NULL,
+    ?bool $unsigned = NULL,
+    ?int $precision = NULL,
+    ?int $scale = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Numeric,
+      name: $name,
+      description: $description,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+      unsigned: $unsigned,
+      precision: $precision,
+      scale: $scale,
+    );
+  }
+
+  /**
+   * Returns a Column object for a blob column.
+   */
+  public static function blob(
+    string $name,
+    ?string $description = NULL,
+    ?bool $serialize = NULL,
+    ?ColumnSize $size = NULL,
+    ?bool $notNull = NULL,
+    StringValue|NullValue|null $default = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Blob,
+      name: $name,
+      description: $description,
+      serialize: $serialize,
+      size: $size,
+      notNull: $notNull,
+      default: $default,
+    );
   }
 
 }

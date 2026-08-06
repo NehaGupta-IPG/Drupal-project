@@ -8,7 +8,6 @@
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
@@ -170,18 +169,16 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  * @endcode
  *
  * @section sec_transaction Transactions
- * Drupal supports transactions, including a transparent fallback for
- * databases that do not support transactions. To start a new transaction,
- * call startTransaction(), like this:
+ * Drupal supports transactions. To start a new transaction, call
+ * startTransaction(), like this:
  * @code
  * $transaction = \Drupal::database()->startTransaction();
  * @endcode
- * The transaction will remain open for as long as the variable $transaction
- * remains in scope; when $transaction is destroyed, the transaction will be
- * committed. If your transaction is nested inside of another then Drupal will
- * track each transaction and only commit the outer-most transaction when the
- * last transaction object goes out of scope (when all relevant queries have
- * completed successfully).
+ * The transaction needs to be explicitly committed or rolled back once you
+ * have completed the database operations requested. If your transaction is
+ * nested inside of another then Drupal will track each transaction and only
+ * commit the outer-most transaction when the last transaction object is
+ * committed (when all relevant queries have completed successfully).
  *
  * Example:
  * @code
@@ -200,6 +197,9 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *       ->execute();
  *
  *     my_other_function($id);
+ *
+ *     // The transaction has completed, commit it here.
+ *     $transaction->commitOrRelease();
  *
  *     return $id;
  *   }
@@ -581,51 +581,46 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  * only; foreign keys are not created in the database, nor are they enforced by
  * Drupal.
  *
- * @return \Drupal\Core\Database\SchemaDefinition\Schema|array<string<array<string,mixed>>>
- *   A schema definition structure array.
+ * @return \Drupal\Core\Database\SchemaDefinition\Schema
+ *   A schema definition.
  *
  * @ingroup schemaapi
  */
-function hook_schema(): Schema|array {
+function hook_schema(): Schema {
   $tables[] = new Table(
     name: 'users_data',
     description: 'Stores module data as key/value pairs per user.',
     columns: [
-      new Column(
+      Column::int(
         name: 'uid',
         description: 'The {users}.uid this record affects.',
-        type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
         default: new IntValue(0),
       ),
-      new Column(
+      Column::varcharAscii(
         name: 'module',
         description: 'The name of the module declaring the variable.',
-        type: ColumnType::VarcharAscii,
         length: DRUPAL_EXTENSION_NAME_MAX_LENGTH,
         notNull: TRUE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::varcharAscii(
         name: 'name',
         description: 'The identifier of the data.',
-        type: ColumnType::VarcharAscii,
         length: 128,
         notNull: TRUE,
         default: new StringValue(''),
       ),
-      new Column(
+      Column::blob(
         name: 'value',
         description: 'The value.',
-        type: ColumnType::Blob,
         size: ColumnSize::Big,
         notNull: FALSE,
       ),
-      new Column(
+      Column::int(
         name: 'serialized',
         description: 'Whether value is serialized.',
-        type: ColumnType::Int,
         size: ColumnSize::Tiny,
         unsigned: TRUE,
         default: new IntValue(0),

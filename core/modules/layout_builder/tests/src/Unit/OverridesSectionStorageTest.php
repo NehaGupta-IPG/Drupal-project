@@ -123,7 +123,7 @@ class OverridesSectionStorageTest extends UnitTestCase {
   /**
    * Provides data for ::testExtractEntityFromRoute().
    */
-  public static function providerTestExtractEntityFromRoute() {
+  public static function providerTestExtractEntityFromRoute(): array {
     // Data provider values are:
     // - whether a successful result is expected
     // - the expected entity ID
@@ -164,7 +164,6 @@ class OverridesSectionStorageTest extends UnitTestCase {
    * Tests build routes.
    *
    * @legacy-covers ::buildRoutes
-   * @legacy-covers ::hasIntegerId
    * @legacy-covers ::getEntityTypes
    * @legacy-covers \Drupal\layout_builder\Routing\LayoutBuilderRoutesTrait::buildLayoutRoutes
    */
