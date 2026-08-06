@@ -425,11 +425,12 @@ class FormPreprocess {
    * @param array $variables
    *   An associative array containing:
    *   - element: An associative array containing the properties and children of
-   *     the details element. Properties used: #children.
+   *     the details element. Properties used: #children, #menu_items.
    */
   public function preprocessVerticalTabs(array &$variables): void {
     $element = $variables['element'];
     $variables['children'] = (!empty($element['#children'])) ? $element['#children'] : '';
+    $variables['menu_items'] = $element['#menu_items'] ?? [];
   }
 
 }

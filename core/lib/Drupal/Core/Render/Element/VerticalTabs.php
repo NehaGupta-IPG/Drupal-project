@@ -78,9 +78,71 @@ class VerticalTabs extends RenderElementBase {
   public static function preRenderVerticalTabs($element) {
     // Do not render the vertical tabs element if it is empty.
     $group = implode('][', $element['#parents']);
-    if (!Element::getVisibleChildren($element['group']['#groups'][$group])) {
+    $visible_children = Element::getVisibleChildren($element['group']['#groups'][$group]);
+    if (!$visible_children) {
       $element['#printed'] = TRUE;
+      return $element;
     }
+
+    // Build the tab menu server side so the vertical tabs widget is complete
+    // at first paint, before vertical-tabs.js adopts it. Only visible details
+    // children become panes. Sort by weight, as rendering the group does, so
+    // the menu order matches the pane order and the first menu item is the
+    // pane vertical-tabs.js falls back to.
+    $pane_keys = [];
+    foreach (Element::children($element['group']['#groups'][$group], TRUE) as $key) {
+      $child = $element['group']['#groups'][$group][$key];
+      if (($child['#type'] ?? NULL) === 'details' && Element::isVisibleElement($child)) {
+        $pane_keys[] = $key;
+      }
+    }
+    if (!$pane_keys) {
+      return $element;
+    }
+
+    // Determine the selected tab the same way vertical-tabs.js does: the
+    // #default_tab pane (which processVerticalTabs() has set to the persisted
+    // active tab when one was submitted), or the first pane. HTML IDs gain
+    // "--" suffixes when they are regenerated during AJAX rebuilds, so when
+    // no pane matches exactly, compare with the suffixes removed.
+    $default_tab = (string) $element['#default_tab'];
+    $strip_suffix = fn (string $id): string => preg_replace('/--.+$/', '', $id);
+    $selected_key = NULL;
+    foreach ($pane_keys as $key) {
+      $id = $element['group']['#groups'][$group][$key]['#id'] ?? NULL;
+      if ($id !== NULL && $id === $default_tab) {
+        $selected_key = $key;
+        break;
+      }
+    }
+    if ($selected_key === NULL && $default_tab !== '') {
+      foreach ($pane_keys as $key) {
+        $id = $element['group']['#groups'][$group][$key]['#id'] ?? NULL;
+        if ($id !== NULL && $strip_suffix($id) === $strip_suffix($default_tab)) {
+          $selected_key = $key;
+          break;
+        }
+      }
+    }
+    $selected_key ??= $pane_keys[0];
+
+    // The selected pane is marked with an attribute instead of #open: the
+    // pre-enhancement CSS uses it to show only the selected pane, while the
+    // #open states the form defined are kept intact for rendering, so users
+    // without JavaScript keep the expanded panes the form intended.
+    $menu_items = [];
+    foreach ($pane_keys as $key) {
+      $child = &$element['group']['#groups'][$group][$key];
+      if ($key === $selected_key) {
+        $child['#attributes']['data-vertical-tabs-selected'] = 'true';
+      }
+      $menu_items[] = [
+        'id' => $child['#id'] ?? '',
+        'title' => $child['#title'] ?? '',
+        'selected' => $key === $selected_key,
+      ];
+    }
+    $element['#menu_items'] = $menu_items;
     return $element;
   }
 

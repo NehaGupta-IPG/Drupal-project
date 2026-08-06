@@ -186,7 +186,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $this->assertCount(1, $this->assetResolver->getCssAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage()), 'There is a sole aggregated CSS asset.');
 
     [$header_js, $footer_js] = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage());
-    $this->assertEquals([], \Drupal::service('asset.js.collection_renderer')->render($header_js), 'There are 0 JavaScript assets in the header.');
+    $this->assertCount(1, \Drupal::service('asset.js.collection_renderer')->render($header_js), 'There is a sole aggregated JavaScript asset in the header.');
     $rendered_footer_js = \Drupal::service('asset.js.collection_renderer')->render($footer_js);
     $this->assertCount(5, $rendered_footer_js, 'There are 5 JavaScript assets in the footer.');
     $this->assertEquals('drupal-settings-json', $rendered_footer_js[0]['#attributes']['data-drupal-selector'], 'The first of the five JavaScript assets in the footer has drupal settings.');

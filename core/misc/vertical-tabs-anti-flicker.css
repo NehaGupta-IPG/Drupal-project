@@ -1,0 +1,83 @@
+/**
+ * @file
+ * Progressive enhancement styling for vertical tabs.
+ *
+ * The default vertical tabs template renders the complete widget markup,
+ * including the tab menu, so the widget is correct at first paint. These
+ * rules present the matching state for every situation vertical-tabs.js has
+ * not handled yet: before it adopts the widget, without JavaScript, and on
+ * narrow viewports where the details stack is the final UI.
+ *
+ * This file is intentionally separate from vertical-tabs.css: themes such as
+ * Claro and Olivero replace the vertical tabs theming stylesheet but must
+ * keep these rules.
+ */
+
+/**
+ * Without JavaScript the tab menu cannot operate: hide it and neutralize the
+ * widget wrapper so the panes render as the plain stack of details elements.
+ */
+html:not(.js) .vertical-tabs {
+  display: block;
+  margin-inline-start: 0;
+  border: 0;
+}
+html:not(.js) .vertical-tabs__menu {
+  display: none;
+}
+html:not(.js) .vertical-tabs .vertical-tabs__panes {
+  width: auto;
+  margin-inline-start: 0;
+}
+
+/**
+ * Wide viewports, before vertical-tabs.js has adopted the widget: show it in
+ * its final shape, with only the selected pane visible and the pane
+ * summaries hidden. The selected pane is marked server side; the #open
+ * states of the panes are left as the form defined them, since they drive
+ * the no-JavaScript presentation. The media query mirrors the viewport check
+ * in vertical-tabs.js (drupalSettings.widthBreakpoint, 640px by default).
+ * The behavior adds the vertical-tabs--enhanced class when it takes over.
+ */
+@media not all and (max-width: 640px) {
+  .js .vertical-tabs:not(.vertical-tabs--enhanced) [data-vertical-tabs-panes] > details:not([data-vertical-tabs-selected]) {
+    display: none;
+  }
+  .js .vertical-tabs:not(.vertical-tabs--enhanced) [data-vertical-tabs-panes] > details > summary {
+    display: none;
+  }
+  /* Fallback for overridden templates that render only the details group:
+     hide the group until the behavior has run, so the stacked details never
+     paint. The behavior adds the vertical-tabs-processed class on every
+     attach, including on viewports too narrow to enhance. */
+  .js :not(.vertical-tabs) > [data-vertical-tabs-panes]:not(.vertical-tabs-processed) {
+    display: none;
+  }
+}
+
+/**
+ * Narrow viewports: vertical-tabs.js intentionally leaves the details stack
+ * in place, so present the stack unless the widget was already enhanced on a
+ * wider viewport.
+ */
+@media (max-width: 640px) {
+  .js .vertical-tabs:not(.vertical-tabs--enhanced) {
+    display: block;
+    margin-inline-start: 0;
+    border: 0;
+  }
+  .js .vertical-tabs:not(.vertical-tabs--enhanced) .vertical-tabs__menu {
+    display: none;
+  }
+  .js .vertical-tabs:not(.vertical-tabs--enhanced) .vertical-tabs__panes {
+    width: auto;
+    margin-inline-start: 0;
+  }
+  /* Keep the details summaries usable in the stack: theme rules such as
+     Claro's hide summaries inside the widget wrapper without a viewport
+     condition, because before the widget markup was rendered server side the
+     wrapper could not exist ahead of enhancement. */
+  .js .vertical-tabs:not(.vertical-tabs--enhanced) [data-vertical-tabs-panes] > details > summary {
+    display: revert;
+  }
+}

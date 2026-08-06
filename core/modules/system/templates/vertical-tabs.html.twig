@@ -3,13 +3,37 @@
  * @file
  * Default theme implementation for vertical tabs.
  *
+ * The tab menu and the surrounding widget markup are rendered server side so
+ * the vertical tabs widget is complete at first paint. vertical-tabs.js
+ * adopts this markup and attaches the tab behavior to it. Without JavaScript
+ * the menu is hidden by CSS and the panes render as a stack of details
+ * elements.
+ *
  * Available variables
- * - attributes: A list of HTML attributes for the wrapper element.
+ * - attributes: A list of HTML attributes for the panes wrapper element.
  * - children: The rendered tabs.
+ * - menu_items: A list of tab menu items. Each item has:
+ *   - id: The HTML ID of the pane the menu item belongs to.
+ *   - title: The title of the tab.
+ *   - selected: Whether the tab is the initially selected one.
  *
  * @see \Drupal\Core\Form\FormPreprocess::preprocessVerticalTabs()
  *
  * @ingroup themeable
  */
 #}
-<div{{ attributes.setAttribute('data-vertical-tabs-panes', TRUE) }}>{{ children }}</div>
+<div class="vertical-tabs clearfix">
+  <ul class="vertical-tabs__menu">
+    {% for item in menu_items %}
+      <li class="vertical-tabs__menu-item{{ item.selected ? ' is-selected' }}{{ loop.first ? ' first' }}{{ loop.last ? ' last' }}" tabindex="-1">
+        <a href="#{{ item.id }}" class="vertical-tabs__menu-link">
+          <span class="vertical-tabs__menu-link-content">
+            <strong class="vertical-tabs__menu-item-title">{{ item.title }}</strong>
+            <span class="vertical-tabs__menu-item-summary vertical-tabs__menu-link-summary"></span>
+          </span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+  <div{{ attributes.setAttribute('data-vertical-tabs-panes', TRUE).addClass('vertical-tabs__panes') }}>{{ children }}</div>
+</div>
