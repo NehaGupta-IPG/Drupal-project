@@ -645,6 +645,7 @@ services:
   Drupal\Core\Queue\QueueFactory: '@queue'
   queue.database:
     class: Drupal\Core\Queue\QueueDatabaseFactory
+    arguments: ['@database']
   Drupal\Core\Queue\QueueDatabaseFactory: '@queue.database'
   path.current:
     class: Drupal\Core\Path\CurrentPathStack
