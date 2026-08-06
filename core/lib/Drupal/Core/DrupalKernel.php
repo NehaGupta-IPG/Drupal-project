@@ -12,6 +12,7 @@ use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
+use Drupal\Core\DependencyInjection\AutowireFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
@@ -1366,6 +1367,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $source_storage = $this->container->get('config.installer')->getSourceStorage();
     $persist = $this->getServicesToPersist($this->container);
     $this->container->reset();
+    AutowireFactory::reset();
+
     $this->persistServices($this->container, $persist);
     // Restore syncing flag to new container.
     if ($config_is_syncing) {

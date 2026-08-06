@@ -9,8 +9,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 trait AutowireTrait {
 
-  use AutowiredInstanceTrait;
-
   /**
    * Instantiates a new instance of the implementing class using autowiring.
    *
@@ -20,7 +18,7 @@ trait AutowireTrait {
    * @return static
    */
   public static function create(ContainerInterface $container) {
-    return static::createInstanceAutowired($container);
+    return AutowireFactory::createInstanceAutowired($container, static::class);
   }
 
 }
