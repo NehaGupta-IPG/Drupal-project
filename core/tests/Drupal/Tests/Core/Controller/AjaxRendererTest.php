@@ -41,9 +41,8 @@ class AjaxRendererTest extends UnitTestCase {
     parent::setUp();
 
     $element_info_manager = $this->createStub(ElementInfoManagerInterface::class);
-    $renderer = $this->createMock(RendererInterface::class);
-    $renderer->expects($this->atLeastOnce())
-      ->method('renderRoot')
+    $renderer = $this->createStub(RendererInterface::class);
+    $renderer->method('renderRoot')
       ->willReturnCallback(function (array &$elements, $is_root_call = FALSE) {
         $elements += ['#attached' => []];
         if (isset($elements['#markup'])) {
@@ -65,9 +64,8 @@ class AjaxRendererTest extends UnitTestCase {
    */
   public function testRenderWithoutAttached(): void {
     $element_info_manager = $this->createStub(ElementInfoManagerInterface::class);
-    $renderer = $this->createMock(RendererInterface::class);
-    $renderer->expects($this->atLeastOnce())
-      ->method('renderRoot')
+    $renderer = $this->createStub(RendererInterface::class);
+    $renderer->method('renderRoot')
       ->willReturnCallback(function (array &$elements, $is_root_call = FALSE) {
         if (isset($elements['#markup'])) {
           return $elements['#markup'];
