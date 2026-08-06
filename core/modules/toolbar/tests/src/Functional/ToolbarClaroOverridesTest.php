@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\system\Functional\Theme;
+namespace Drupal\Tests\toolbar\Functional;
 
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Tests\BrowserTestBase;
@@ -38,8 +38,6 @@ class ToolbarClaroOverridesTest extends BrowserTestBase {
 
   /**
    * The theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
    */
   protected ThemeManagerInterface $themeManager;
 
