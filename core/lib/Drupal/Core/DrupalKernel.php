@@ -1367,7 +1367,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $source_storage = $this->container->get('config.installer')->getSourceStorage();
     $persist = $this->getServicesToPersist($this->container);
     $this->container->reset();
-    AutowireFactory::reset();
+    AutowireFactory::clearCache();
 
     $this->persistServices($this->container, $persist);
     // Restore syncing flag to new container.

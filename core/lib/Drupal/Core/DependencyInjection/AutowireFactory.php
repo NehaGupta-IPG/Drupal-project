@@ -28,21 +28,21 @@ class AutowireFactory {
    *   The service container this instance should use.
    * @param string $className
    *   The name of the class.
-   * @param mixed ...$args
+   * @param array $args
    *   Any predefined arguments to pass to the constructor.
    *
    * @return static
    */
-  public static function createInstanceAutowired(ContainerInterface $container, string $className, mixed ...$args): object {
+  public static function createInstanceAutowired(ContainerInterface $container, string $className, array $args = []): object {
     $data = static::loadClass($container, $className, $args);
 
     $args = static::getArguments($container, $data['__construct'], $args);
     $instance = new $className(...$args);
 
-    foreach ($data as $methodName => $args) {
-      if ($methodName != '__construct') {
-        $args = static::getArguments($container, $data[$methodName]);
-        call_user_func([$instance, $methodName], ...$args);
+    foreach ($data as $method_name => $method_data) {
+      if ($method_name != '__construct') {
+        $args = static::getArguments($container, $method_data);
+        call_user_func([$instance, $method_name], ...$args);
       }
     }
 
@@ -122,7 +122,7 @@ class AutowireFactory {
     foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
       if (!empty($method->getAttributes(Required::class))) {
         $method_name = $method->getName();
-        $data[$method_name] = static::loadMethod($container, $method->getParameters(), $method_name);
+        $data[$method_name] = static::loadMethod($container, $method->getParameters(), "$className::$method_name");
       }
     }
 
@@ -141,7 +141,7 @@ class AutowireFactory {
         $stop = TRUE;
       }
 
-      $data['__construct'] = array_merge($data['__construct'], static::loadMethod($container, $parameters, '__construct'));
+      $data['__construct'] = array_merge($data['__construct'], static::loadMethod($container, $parameters, "$className::__construct"));
     }
 
     if (empty($stop) && $parent_name = get_parent_class($className)) {
@@ -198,7 +198,7 @@ class AutowireFactory {
         continue;
       }
 
-      throw new AutowiringFailedException($argument, sprintf('Cannot autowire %s "%s": argument "$%s" of method "%s::%s()". Check that either the argument type is correct or the Autowire attribute is passed a valid identifier. Otherwise configure its value explicitly if possible.', $type, $argument, $parameter->getName(), static::class, $methodName));
+      throw new AutowiringFailedException($argument, sprintf('Cannot autowire %s "%s": argument "$%s" of method "%s()". Check that either the argument type is correct or the Autowire attribute is passed a valid identifier. Otherwise configure its value explicitly if possible.', $type, $argument, $parameter->getName(), $methodName));
     }
 
     return $data;
