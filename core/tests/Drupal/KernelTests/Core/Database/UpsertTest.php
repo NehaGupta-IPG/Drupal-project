@@ -187,7 +187,7 @@ class UpsertTest extends DatabaseTestBase {
    */
   #[IgnoreDeprecations]
   public function testDeprecatedUpsertExecuteReturningValue(): void {
-    $this->expectUserDeprecationMessage('Drupal\Core\Database\Query\Upsert::execute() returning a value is deprecated in drupal:42.1.0 and is removed in drupal:43.0.0. Pass \'void_execute_return\' => TRUE in the $options for now to silence the deprecation, and adjust any code handling a returned value to not rely on it. See https://www.drupal.org/node/7654123');
+    $this->expectUserDeprecationMessage('Drupal\Core\Database\Query\Upsert::execute() returning a value is deprecated in drupal:11.5.0 and is removed in drupal:13.0.0. Pass \'void_execute_return\' => TRUE in the $options for now to silence the deprecation, and adjust any code handling a returned value to not rely on it. See https://www.drupal.org/node/3615151');
 
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {select}')->fetchField();
 
