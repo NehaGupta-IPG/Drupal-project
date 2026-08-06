@@ -184,11 +184,45 @@ class DatabaseStorage implements StorageInterface {
   }
 
   /**
+   * Check if the config table exists and create it if not.
+   *
+   * @return bool
+   *   TRUE if the table was created, FALSE otherwise.
+   *
+   * @throws \Drupal\Core\Config\StorageException
+   *   If a database error occurs.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   ::ensureSchemaStorage() instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::ensureSchemaStorage() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    try {
+      $this->connection->schema()->createTable(
+        $this->table,
+        $this->schemaDefinition()->getTableDefinition(static::TABLE_NAME)->toArray(),
+      );
+    }
+    // If another process has already created the config table, attempting to
+    // recreate it will throw an exception. In this case just catch the
+    // exception and do nothing.
+    catch (DatabaseException) {
+      return TRUE;
+    }
+    catch (\Exception) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
    * Defines the schema for the configuration table.
    *
    * @internal
    */
-  public static function schemaDefinition(): Schema {
+  public function schemaDefinition(): Schema {
     $tables[] = new Table(
       name: $this->table,
       description: 'The base table for configuration data.',
