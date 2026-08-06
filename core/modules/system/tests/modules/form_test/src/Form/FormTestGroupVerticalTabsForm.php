@@ -46,6 +46,14 @@ class FormTestGroupVerticalTabsForm extends FormBase {
       '#type' => 'textfield',
       '#title' => 'Second nested element in details element',
     ];
+    // An optional details element without children is not rendered, so it
+    // must not get a tab either.
+    $form['meta_3'] = [
+      '#type' => 'details',
+      '#title' => 'Third group element',
+      '#group' => 'vertical_tabs',
+      '#optional' => TRUE,
+    ];
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => 'Save',

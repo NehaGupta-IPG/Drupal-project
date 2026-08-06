@@ -288,8 +288,8 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'ScriptBytes' => 7000,
-      'ScriptCount' => 3,
+      'ScriptBytes' => 6500,
+      'ScriptCount' => 2,
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
       'QueryCount' => 15,

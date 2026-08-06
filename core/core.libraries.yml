@@ -199,7 +199,6 @@ drupal:
     misc/drupal.init.js: {}
   dependencies:
     - core/drupalSettings
-    - core/drupal.js-class
   drupalSettings:
     suppressDeprecationErrors: true
 
@@ -490,6 +489,10 @@ drupal.js-class:
   # styling the state of markup that a behavior will transform later applies
   # before any content can paint. This prevents a flash of untransformed
   # content.
+  #
+  # This is a render blocking request, so depend on it only from libraries
+  # that need the class before the first paint. Pages that do not need it
+  # keep getting the class from misc/drupal.init.js in the footer.
   version: VERSION
   header: true
   js:
@@ -650,6 +653,7 @@ drupal.vertical-tabs:
     - core/jquery
     - core/once
     - core/drupal
+    - core/drupal.js-class
     - core/drupalSettings
     - core/drupal.form
   before:

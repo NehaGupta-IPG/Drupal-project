@@ -92,9 +92,19 @@ class VerticalTabs extends RenderElementBase {
     $pane_keys = [];
     foreach (Element::children($element['group']['#groups'][$group], TRUE) as $key) {
       $child = $element['group']['#groups'][$group][$key];
-      if (($child['#type'] ?? NULL) === 'details' && Element::isVisibleElement($child)) {
-        $pane_keys[] = $key;
+      if (($child['#type'] ?? NULL) !== 'details' || !Element::isVisibleElement($child)) {
+        continue;
       }
+      // An optional details element with no visible children of its own is
+      // not printed, so it never becomes a pane.
+      // @see \Drupal\Core\Render\Element\Details::preRenderDetails()
+      if (!empty($child['#optional']) && isset($child['#parents'])) {
+        $child_group = implode('][', $child['#parents']);
+        if (!Element::getVisibleChildren($element['group']['#groups'][$child_group] ?? [])) {
+          continue;
+        }
+      }
+      $pane_keys[] = $key;
     }
     if (!$pane_keys) {
       return $element;

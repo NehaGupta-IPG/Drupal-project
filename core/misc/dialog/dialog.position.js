@@ -63,6 +63,13 @@
    * @fires event:dialogContentResize
    */
   function resetSize(eventData) {
+    // The resize handlers are unbound when a dialog closes, but a call that
+    // was already scheduled still runs after the debounce delay, by which
+    // time the dialog it was scheduled for may be gone. jQuery UI throws when
+    // a dialog method is called on an element that has no dialog.
+    if (!eventData.$element.data('ui-dialog')) {
+      return;
+    }
     const positionOptions = [
       'width',
       'height',

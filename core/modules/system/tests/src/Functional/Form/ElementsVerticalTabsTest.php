@@ -68,6 +68,20 @@ class ElementsVerticalTabsTest extends BrowserTestBase {
   }
 
   /**
+   * Ensures the server rendered tab menu matches the rendered panes.
+   */
+  public function testMenuMatchesPanes(): void {
+    $this->drupalGet('form-test/group-vertical-tabs');
+    $links = $this->xpath('//ul[contains(@class, "vertical-tabs__menu")]/li/a');
+    // The third group element is optional and has no children, so it is not
+    // rendered as a pane and must not get a menu item.
+    $this->assertSame(
+      ['#edit-meta', '#edit-meta-2'],
+      array_map(fn ($link) => $link->getAttribute('href'), $links)
+    );
+  }
+
+  /**
    * Ensures that default vertical tab is correctly selected.
    */
   public function testDefaultTab(): void {

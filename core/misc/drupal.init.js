@@ -3,6 +3,11 @@ if (window.jQuery) {
   jQuery.noConflict();
 }
 
+// Class indicating that JS is enabled; used for styling purpose. Pages that
+// need the class before the first paint load misc/js-class.js in the header
+// as well, which adds the same class earlier.
+document.documentElement.classList.add('js');
+
 // JavaScript should be made compatible with libraries other than jQuery by
 // wrapping it in an anonymous closure.
 (function (Drupal, drupalSettings) {
