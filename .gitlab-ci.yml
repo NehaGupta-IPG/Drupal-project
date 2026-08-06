@@ -511,6 +511,20 @@ default:
       - _TARGET_PHP: !reference [.php_versions]
         _TARGET_DB: [sqlite-3]
 
+# Run the test suite against PostgreSQL automatically on every merge request,
+# in addition to the default MySQL pipeline. The 'PostgreSQL' job above stays
+# manual and covers the full PHP version matrix.
+'PostgreSQL (every MR)':
+  <<: *recursive-trigger
+  needs:
+    - job: '🧹 PHP Coding standards (PHPCS)'
+      optional: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $PERFORMANCE_TEST != "1"
+  variables:
+    _TARGET_PHP: $PRIMARY_PHP
+    _TARGET_DB: "pgsql-18"
+
 # Jobs running on commits.
 # The value set in the "needs" property will determine the order in the sequence.
 '[Commit] PHP 8.5 PostgreSQL 18':
