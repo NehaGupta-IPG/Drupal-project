@@ -4,9 +4,8 @@ parameters:
 services:
   _defaults:
     autoconfigure: true
+    autowire: true
   pgsql.entity.query.sql:
     class: Drupal\pgsql\EntityQuery\QueryFactory
-    autowire: true
   queue.database:
     class: Drupal\pgsql\Queue\QueueDatabaseFactory
-    autowire: true
