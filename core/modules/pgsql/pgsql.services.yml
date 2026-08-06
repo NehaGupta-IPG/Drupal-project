@@ -9,4 +9,4 @@ services:
     autowire: true
   queue.database:
     class: Drupal\pgsql\Queue\QueueDatabaseFactory
-    arguments: ['@database']
+    autowire: true
