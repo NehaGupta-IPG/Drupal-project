@@ -12,6 +12,8 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  *
  * @todo in drupal:13.0.0, do not drop this test but rather test full length
  *   columns.
+ *
+ * @see https://www.drupal.org/project/drupal/issues/3615136
  */
 abstract class SchemaUniquePrefixedKeysIndexTestBase extends DriverSpecificDatabaseTestBase {
 
@@ -33,7 +35,7 @@ abstract class SchemaUniquePrefixedKeysIndexTestBase extends DriverSpecificDatab
    */
   #[IgnoreDeprecations]
   public function testCreateTable(): void {
-    $this->expectUserDeprecationMessage('Specification of unique keys with column length is deprecated in drupal:11.3.0 and will throw a SchemaException from drupal:13.0.0. Specify full columns for an unique key, or use an index for columns with partial length. See https://www.drupal.org/node/3375071');
+    $this->expectUserDeprecationMessage('Specification of unique keys with column length is deprecated in drupal:11.5.0 and will throw a SchemaException from drupal:13.0.0. Specify full columns for an unique key, or use an index for columns with partial length. See https://www.drupal.org/node/3375071');
     $this->connection->schema()->createTable('test_unique', [
       'fields' => [
         'field' => [
@@ -54,7 +56,7 @@ abstract class SchemaUniquePrefixedKeysIndexTestBase extends DriverSpecificDatab
    */
   #[IgnoreDeprecations]
   public function testAddUniqueKey(): void {
-    $this->expectUserDeprecationMessage('Specification of unique keys with column length is deprecated in drupal:11.3.0 and will throw a SchemaException from drupal:13.0.0. Specify full columns for an unique key, or use an index for columns with partial length. See https://www.drupal.org/node/3375071');
+    $this->expectUserDeprecationMessage('Specification of unique keys with column length is deprecated in drupal:11.5.0 and will throw a SchemaException from drupal:13.0.0. Specify full columns for an unique key, or use an index for columns with partial length. See https://www.drupal.org/node/3375071');
     $this->connection->schema()
       ->addUniqueKey('test_people', 'job', [['job', 10]]);
 
@@ -66,7 +68,7 @@ abstract class SchemaUniquePrefixedKeysIndexTestBase extends DriverSpecificDatab
    */
   #[IgnoreDeprecations]
   public function testAddField(): void {
-    $this->expectUserDeprecationMessage('Specification of unique keys with column length is deprecated in drupal:11.3.0 and will throw a SchemaException from drupal:13.0.0. Specify full columns for an unique key, or use an index for columns with partial length. See https://www.drupal.org/node/3375071');
+    $this->expectUserDeprecationMessage('Specification of unique keys with column length is deprecated in drupal:11.5.0 and will throw a SchemaException from drupal:13.0.0. Specify full columns for an unique key, or use an index for columns with partial length. See https://www.drupal.org/node/3375071');
     $field_spec = [
       'type' => 'varchar',
       'length' => 50,
@@ -87,7 +89,7 @@ abstract class SchemaUniquePrefixedKeysIndexTestBase extends DriverSpecificDatab
    */
   #[IgnoreDeprecations]
   public function testChangeField(): void {
-    $this->expectUserDeprecationMessage('Specification of unique keys with column length is deprecated in drupal:11.3.0 and will throw a SchemaException from drupal:13.0.0. Specify full columns for an unique key, or use an index for columns with partial length. See https://www.drupal.org/node/3375071');
+    $this->expectUserDeprecationMessage('Specification of unique keys with column length is deprecated in drupal:11.5.0 and will throw a SchemaException from drupal:13.0.0. Specify full columns for an unique key, or use an index for columns with partial length. See https://www.drupal.org/node/3375071');
     $field_spec = [
       'description' => "The person's job",
       'type' => 'varchar_ascii',
