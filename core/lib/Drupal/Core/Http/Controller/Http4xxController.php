@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\system\Controller;
+namespace Drupal\Core\Http\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;

@@ -1497,8 +1497,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $namespaces += $this->getExtensionNamespacesPsr4(
       $this->getExtensionFileNames($this->themeList ?? [], [$this, 'themeExtensions'])
     );
-    // Add all components in \Drupal\Core and \Drupal\Component that have one or
-    // more of Element, Entity and Plugin directories.
+    // Add all components in \Drupal\Core and \Drupal\Component that have
+    // one or more of the below directories.
     foreach (['Core', 'Component'] as $parent_directory) {
       $path = 'core/lib/Drupal/' . $parent_directory;
       $parent_namespace = 'Drupal\\' . $parent_directory;
@@ -1507,9 +1507,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $pathname = $component->getPathname();
         if (!$component->isDot() && $component->isDir() && (
           is_dir($pathname . '/Command') ||
+          is_dir($pathname . '/Controller') ||
           is_dir($pathname . '/Plugin') ||
           is_dir($pathname . '/Entity') ||
-          is_dir($pathname . '/Element')
+          is_dir($pathname . '/Element') ||
+          is_dir($pathname . '/Form')
         )) {
           $namespaces[$parent_namespace . '\\' . $component->getFilename()] = $path . '/' . $component->getFilename();
         }

@@ -1,10 +1,11 @@
 <?php
 
-namespace Drupal\system\Controller;
+namespace Drupal\Core\Access\Controller;
 
 use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Routing\Attribute\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -33,7 +34,7 @@ class CsrfTokenController implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('csrf_token')
     );
@@ -45,6 +46,11 @@ class CsrfTokenController implements ContainerInjectionInterface {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
+  #[Route(
+    path: '/session/token',
+    name: 'system.csrftoken',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function csrfToken() {
     return new Response($this->tokenGenerator->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY), 200, ['Content-Type' => 'text/plain']);
   }

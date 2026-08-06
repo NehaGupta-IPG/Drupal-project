@@ -1,9 +1,10 @@
 <?php
 
-namespace Drupal\system\Controller;
+namespace Drupal\Core\Batch\Controller;
 
 use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,7 +31,7 @@ class BatchController implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->getParameter('app.root'),
       $container->get('batch.storage'),
@@ -48,7 +49,20 @@ class BatchController implements ContainerInjectionInterface {
    *
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    */
-  public function batchPage(Request $request) {
+  #[Route(
+    path: '/batch',
+    name: 'system.batch_page.html',
+    requirements: ['_access' => 'TRUE', '_format' => 'html'],
+    options: ['_admin_route' => TRUE],
+    defaults: ['_title_callback' => '\Drupal\Core\Batch\Controller\BatchController::batchPageTitle'],
+  )]
+  #[Route(
+    path: '/batch',
+    name: 'system.batch_page.json',
+    requirements: ['_access' => 'TRUE', '_format' => 'json'],
+    options: ['_admin_route' => TRUE],
+  )]
+  public function batchPage(Request $request): Response|array {
     $output = _batch_page($request);
 
     if ($output === FALSE) {

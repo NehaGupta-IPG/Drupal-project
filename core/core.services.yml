@@ -13,6 +13,36 @@ parameters:
   core.moved_classes:
     'Drupal\Core\StringTranslation\TranslationWrapper':
       class: 'Drupal\Core\StringTranslation\TranslatableMarkup'
+    'Drupal\system\Controller\EntityAutocompleteController':
+      class: 'Drupal\Core\Entity\Controller\EntityAutocompleteController'
+      deprecation_version: drupal:11.5.0
+      removed_version: drupal:12.0.0
+      change_record: https://www.drupal.org/node/3615109
+    'Drupal\system\Controller\TimezoneController':
+      class: 'Drupal\Core\Datetime\Controller\TimezoneController'
+      deprecation_version: drupal:11.5.0
+      removed_version: drupal:12.0.0
+      change_record: https://www.drupal.org/node/3615109
+    'Drupal\system\Controller\CsrfTokenController':
+      class: 'Drupal\Core\Access\Controller\CsrfTokenController'
+      deprecation_version: drupal:11.5.0
+      removed_version: drupal:12.0.0
+      change_record: https://www.drupal.org/node/3615109
+    'Drupal\system\Controller\Http4xxController':
+      class: 'Drupal\Core\Http\Controller\Http4xxController'
+      deprecation_version: drupal:11.5.0
+      removed_version: drupal:12.0.0
+      change_record: https://www.drupal.org/node/3615109
+    'Drupal\system\Controller\BatchController':
+      class: 'Drupal\Core\Batch\Controller\BatchController'
+      deprecation_version: drupal:11.5.0
+      removed_version: drupal:12.0.0
+      change_record: https://www.drupal.org/node/3615109
+    'Drupal\system\CronController':
+      class: 'Drupal\Core\Cron\Controller\CronController'
+      deprecation_version: drupal:11.5.0
+      removed_version: drupal:12.0.0
+      change_record: https://www.drupal.org/node/3615109
   session.storage.options:
     gc_probability: 1
     gc_divisor: 100

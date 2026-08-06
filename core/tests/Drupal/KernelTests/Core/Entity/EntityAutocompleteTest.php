@@ -9,7 +9,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Site\Settings;
-use Drupal\system\Controller\EntityAutocompleteController;
+use Drupal\Core\Entity\Controller\EntityAutocompleteController;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
