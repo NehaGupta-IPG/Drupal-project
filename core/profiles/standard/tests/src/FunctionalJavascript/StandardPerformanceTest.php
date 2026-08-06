@@ -103,9 +103,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 10,
-      'CacheGetCount' => 43,
+      'CacheGetCount' => 47,
       'CacheGetCountByBin' => [
         'page' => 1,
+        'chained_fast_invalidation' => 4,
         'config' => 10,
         'data' => 3,
         'bootstrap' => 8,
@@ -182,8 +183,8 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 25,
-      'CacheGetCount' => 73,
-      'CacheSetCount' => 42,
+      'CacheGetCount' => 77,
+      'CacheSetCount' => 43,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 7,
@@ -238,7 +239,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 10,
-      'CacheGetCount' => 56,
+      'CacheGetCount' => 60,
       'CacheSetCount' => 17,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -293,7 +294,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
       'QueryCount' => 15,
-      'CacheGetCount' => 71,
+      'CacheGetCount' => 79,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
@@ -382,7 +383,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 15,
-      'CacheGetCount' => 98,
+      'CacheGetCount' => 106,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
@@ -432,8 +433,9 @@ class StandardPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 5,
-      'CacheGetCount' => 59,
+      'CacheGetCount' => 63,
       'CacheGetCountByBin' => [
+        'chained_fast_invalidation' => 4,
         'config' => 11,
         'data' => 4,
         'discovery' => 19,
