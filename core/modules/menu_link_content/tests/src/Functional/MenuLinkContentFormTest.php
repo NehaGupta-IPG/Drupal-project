@@ -135,15 +135,43 @@ class MenuLinkContentFormTest extends BrowserTestBase {
   }
 
   /**
-   * Tests absolute URL conversion.
+   * Tests that absolute URLs pointing at this site are saved as internal.
    */
   public function testReformatInternalLinkIfEnteredAsExternal(): void {
-    $this->drupalGet('admin/structure/menu/manage/admin/add');
-    $this->submitForm([
-      'title[0][value]' => 'Test page',
-      'link[0][uri]' => $this->getAbsoluteUrl('/test'),
-    ], 'Save');
-    $this->assertSession()->fieldValueEquals('link[0][uri]', '/test');
+    $base_url = rtrim($this->getAbsoluteUrl('/'), '/');
+
+    // Each case is the string entered in the link field, followed by the URI
+    // the menu link is expected to be saved with.
+    $cases = [
+      // An absolute URL for this site is rewritten as an internal URI.
+      [$base_url . '/user/login', 'internal:/user/login'],
+      // The query and the fragment are preserved.
+      [$base_url . '/user/login?foo=bar#baz', 'internal:/user/login?foo=bar#baz'],
+      // The site root is rewritten as the front page.
+      [$base_url, 'internal:/'],
+      // A host that merely starts with this site's host is left untouched.
+      [$base_url . '.example.com/user/login', $base_url . '.example.com/user/login'],
+      // Genuinely external URLs are left untouched.
+      ['https://www.example.com/user/login', 'https://www.example.com/user/login'],
+      // Schemes carrying no host are left untouched, and do not error.
+      ['mailto:test@example.com', 'mailto:test@example.com'],
+      ['tel:+15551234567', 'tel:+15551234567'],
+    ];
+
+    $storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
+    foreach ($cases as $delta => [$entered, $expected]) {
+      $title = 'Test link ' . $delta;
+      $this->drupalGet('admin/structure/menu/manage/admin/add');
+      $this->submitForm([
+        'title[0][value]' => $title,
+        'link[0][uri]' => $entered,
+      ], 'Save');
+
+      $links = $storage->loadByProperties(['title' => $title]);
+      $link = reset($links);
+      $this->assertNotFalse($link, "The menu link entered as '$entered' was saved.");
+      $this->assertSame($expected, $link->link->uri, "The link entered as '$entered' was saved with the expected URI.");
+    }
   }
 
 }

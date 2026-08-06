@@ -3,6 +3,7 @@
 namespace Drupal\menu_link_content\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -129,15 +130,30 @@ class MenuLinkContentForm extends ContentEntityForm {
    *   The possibly reformatted link.
    */
   protected function reformatInternalLinkIfEnteredAsExternal(string $uri): string {
-    if (parse_url($uri, PHP_URL_SCHEME) !== 'internal') {
-      $base_url = $this->getRequest()->getSchemeAndHttpHost() . $this->getRequest()->getBasePath();
-      if (strpos($uri, $base_url) === 0) {
-        // The entered base URL matches the current request so we can drop it.
-        $path = substr($uri, strlen($base_url));
-        return 'internal:' . ($path ?: '/');
-      }
+    // Schemes such as mailto: and tel: are external but carry no host for
+    // UrlHelper::externalIsLocal() to compare, which would make it throw
+    // an exception.
+    if (!UrlHelper::isExternal($uri) || !parse_url($uri, PHP_URL_HOST)) {
+      return $uri;
     }
-    return $uri;
+
+    $request = $this->getRequest();
+    $base_path = $request->getBasePath();
+    // The trailing slash anchors the base path so that a partial match, such
+    // as /subdirectory against /subdir, is not mistaken for a local URL.
+    $base_url = $request->getSchemeAndHttpHost() . $base_path . '/';
+    if (!UrlHelper::externalIsLocal($uri, $base_url)) {
+      return $uri;
+    }
+
+    // The entered URL points at this site, so drop the base URL. It is rebuilt
+    // from the parsed parts rather than sliced off the string, because
+    // externalIsLocal() ignores the scheme and so the prefix length may differ.
+    $parts = parse_url($uri);
+    $path = substr($parts['path'] ?? '/', strlen($base_path));
+    return 'internal:' . ($path ?: '/')
+      . (isset($parts['query']) ? '?' . $parts['query'] : '')
+      . (isset($parts['fragment']) ? '#' . $parts['fragment'] : '');
   }
 
   /**
