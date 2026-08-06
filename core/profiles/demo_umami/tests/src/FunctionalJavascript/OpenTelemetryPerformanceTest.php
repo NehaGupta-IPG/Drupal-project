@@ -539,7 +539,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
         'file_parsing' => 2,
         'menu' => 22,
       ],
-      'CacheSetCount' => 266,
+      'CacheSetCount' => 274,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 29,
