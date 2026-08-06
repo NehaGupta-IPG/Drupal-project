@@ -5,7 +5,6 @@ namespace Drupal\Core\Config;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
-use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
@@ -154,7 +153,7 @@ class DatabaseStorage implements StorageInterface {
     }
     catch (\Exception $e) {
       // If there was an exception, try to create the table.
-      if ($this->ensureSchemaExists()) {
+      if ($this->ensureSchemaStorage()) {
         return $this->doWrite($name, $data);
       }
       // Some other failure that we can not recover from.
@@ -189,31 +188,28 @@ class DatabaseStorage implements StorageInterface {
    *
    * @internal
    */
-  protected function schemaDefinition(): Schema {
+  public static function schemaDefinition(): Schema {
     $tables[] = new Table(
       name: $this->table,
       description: 'The base table for configuration data.',
       columns: [
-        new Column(
+        Column::varcharAscii(
           name: 'collection',
           description: 'Primary Key: Config object collection.',
-          type: ColumnType::VarcharAscii,
           length: 255,
           notNull: TRUE,
           default: new StringValue(''),
         ),
-        new Column(
+        Column::varcharAscii(
           name: 'name',
           description: 'Primary Key: Config object name.',
-          type: ColumnType::VarcharAscii,
           length: 255,
           notNull: TRUE,
           default: new StringValue(''),
         ),
-        new Column(
+        Column::blob(
           name: 'data',
           description: 'A serialized configuration object data.',
-          type: ColumnType::Blob,
           size: ColumnSize::Big,
           notNull: FALSE,
         ),

@@ -32,7 +32,7 @@ trait DatabaseStorageSchemaTrait {
    * @return bool
    *   TRUE if the schema was created, FALSE otherwise.
    */
-  protected function ensureSchemaExists(): bool {
+  protected function ensureSchemaStorage(): bool {
     // If another process has already created a table, attempting to recreate
     // it will throw an exception. In this case just catch the exception and do
     // nothing. Other exceptions let the method return FALSE.

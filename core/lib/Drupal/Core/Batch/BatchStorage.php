@@ -5,7 +5,6 @@ namespace Drupal\Core\Batch;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\Index;
@@ -143,7 +142,7 @@ class BatchStorage implements BatchStorageInterface {
     }
     catch (\Exception $e) {
       // If there was an exception, try to create the table.
-      if (!$try_again = $this->ensureSchemaExists()) {
+      if (!$try_again = $this->ensureSchemaStorage()) {
         // If the exception happened for other reason than the missing table,
         // propagate the exception.
         throw $e;
@@ -176,7 +175,7 @@ class BatchStorage implements BatchStorageInterface {
    *
    * @internal
    */
-  public function schemaDefinition(): Schema {
+  public static function schemaDefinition(): Schema {
     $tables[] = new Table(
       name: static::TABLE_NAME,
       description: 'Stores details about batches (processes that run in multiple HTTP requests).',
