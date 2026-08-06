@@ -21160,24 +21160,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/syslog/tests/modules/syslog_test/src/Logger/SysLogFile.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Controller\\\\BatchController\\:\\:batchPage\\(\\) should return array\\|Symfony\\\\Component\\\\HttpFoundation\\\\Response but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Controller/BatchController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Controller\\\\BatchController\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Controller/BatchController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Controller\\\\CsrfTokenController\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Controller/CsrfTokenController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Controller\\\\DbUpdateController\\:\\:batchFinished\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
