@@ -5,6 +5,7 @@ namespace Drupal\Core\Batch;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\Index;
@@ -182,15 +183,14 @@ class BatchStorage implements BatchStorageInterface {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::ensureSchemaStorage() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     try {
       $this->connection->schema()->createTable(
-        $this->table,
+        static::TABLE_NAME,
         $this->schemaDefinition()->getTableDefinition(static::TABLE_NAME)->toArray(),
       );
     }
-    // If another process has already created the config table, attempting to
+    // If another process has already created the batch table, attempting to
     // recreate it will throw an exception. In this case just catch the
     // exception and do nothing.
     catch (DatabaseException) {
-      return TRUE;
     }
     catch (\Exception) {
       return FALSE;

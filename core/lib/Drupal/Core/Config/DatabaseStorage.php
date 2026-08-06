@@ -3,6 +3,7 @@
 namespace Drupal\Core\Config;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
@@ -202,7 +203,7 @@ class DatabaseStorage implements StorageInterface {
     try {
       $this->connection->schema()->createTable(
         $this->table,
-        $this->schemaDefinition()->getTableDefinition(static::TABLE_NAME)->toArray(),
+        $this->schemaDefinition()->getTableDefinition($this->table)->toArray(),
       );
     }
     // If another process has already created the config table, attempting to
