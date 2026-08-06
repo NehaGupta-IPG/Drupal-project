@@ -5,3 +5,6 @@ services:
   pgsql.entity.query.sql:
     class: Drupal\pgsql\EntityQuery\QueryFactory
     autowire: true
+  queue.database:
+    class: Drupal\pgsql\Queue\QueueDatabaseFactory
+    arguments: ['@database']
