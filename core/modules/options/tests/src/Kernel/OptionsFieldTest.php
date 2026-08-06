@@ -8,6 +8,7 @@ use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -108,6 +109,81 @@ class OptionsFieldTest extends OptionsFieldUnitTestBase {
     $entity = EntityTest::create();
     $value = $entity->{$this->fieldName}->generateSampleItems();
     $this->assertNull($value);
+  }
+
+  /**
+   * Tests the 'option_label' property for 'Options' field types.
+   */
+  #[DataProvider('providerOptions')]
+  public function testOptionLabelProperty(string $type, array $allowed_values): void {
+    // Remove field storage set by OptionsFieldUnitTestBase() to allow for
+    // field storage to be dynamically created with data
+    // from providerOptions().
+    $this->fieldStorage->delete();
+
+    $this->fieldStorageDefinition = [
+      'field_name' => $this->fieldName,
+      'entity_type' => 'entity_test',
+      'type' => $type,
+      'cardinality' => 1,
+      'settings' => [
+        'allowed_values' => $allowed_values,
+      ],
+    ];
+    $this->fieldStorage = FieldStorageConfig::create($this->fieldStorageDefinition);
+    $this->fieldStorage->save();
+
+    $field = FieldConfig::create([
+      'field_storage' => $this->fieldStorage,
+      'bundle' => 'entity_test',
+    ]);
+    $field->save();
+
+    $first_option_key = array_key_first($allowed_values);
+
+    $entity = EntityTest::create();
+    $entity->{$this->fieldName}->value = $first_option_key;
+    $entity->save();
+
+    $this->assertSame($entity->{$this->fieldName}->option_label, $allowed_values[$first_option_key]);
+  }
+
+  /**
+   * The dataProvider for testOptionLabelProperty().
+   */
+  public static function providerOptions(): array {
+    return [
+      'list_float' => [
+        // Field type.
+        'list_float',
+        // Allowed values.
+        [
+          1 => 'One',
+          2 => 'Two',
+          3 => 'Three',
+        ],
+      ],
+      'list_integer' => [
+        // Field type.
+        'list_integer',
+        // Allowed values.
+        [
+          1 => 'One',
+          2 => 'Two',
+          3 => 'Three',
+        ],
+      ],
+      'list_string' => [
+        // Field type.
+        'list_string',
+        // Allowed values.
+        [
+          'key1' => 'One',
+          'key2' => 'Two',
+          'key3' => 'Three',
+        ],
+      ],
+    ];
   }
 
 }

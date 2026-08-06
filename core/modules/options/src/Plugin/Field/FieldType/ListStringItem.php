@@ -37,6 +37,7 @@ class ListStringItem extends ListItemBase {
       ->setLabel(new TranslatableMarkup('Text value'))
       ->addConstraint('Length', ['max' => 255])
       ->setRequired(TRUE);
+    $properties += parent::propertyDefinitions($field_definition);
 
     return $properties;
   }

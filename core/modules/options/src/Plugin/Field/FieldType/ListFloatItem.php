@@ -35,6 +35,7 @@ class ListFloatItem extends ListItemBase {
     $properties['value'] = DataDefinition::create('float')
       ->setLabel(new TranslatableMarkup('Float value'))
       ->setRequired(TRUE);
+    $properties += parent::propertyDefinitions($field_definition);
 
     return $properties;
   }

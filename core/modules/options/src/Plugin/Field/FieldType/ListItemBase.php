@@ -9,17 +9,34 @@ use Drupal\Core\Ajax\FocusFirstCommand;
 use Drupal\Core\Ajax\InsertCommand;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\OptGroup;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\OptionsProviderInterface;
+use Drupal\options\OptionLabelComputed;
 
 /**
  * Plugin base class inherited by the options field types.
  */
 abstract class ListItemBase extends FieldItemBase implements OptionsProviderInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+    $properties['option_label'] = DataDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('Option label'))
+      ->setDescription(new TranslatableMarkup('The label of the option.'))
+      ->setComputed(TRUE)
+      ->setInternal(TRUE)
+      ->setClass(OptionLabelComputed::class);
+
+    return $properties;
+  }
 
   /**
    * {@inheritdoc}
