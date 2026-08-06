@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * Defines a base trait for automatically wiring dependency arguments.
  */
