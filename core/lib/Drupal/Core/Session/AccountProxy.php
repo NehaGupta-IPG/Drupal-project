@@ -74,7 +74,6 @@ class AccountProxy implements AccountProxyInterface {
         // After the container is rebuilt, DrupalKernel sets the initial
         // account to the id of the logged in user. This is necessary in order
         // to refresh the user account reference here.
-        $this->setAccount($this->loadUserEntity($this->id));
         $account = $this->loadUserEntity($this->id);
         if (!empty($account)) {
           $this->setAccount($account);
