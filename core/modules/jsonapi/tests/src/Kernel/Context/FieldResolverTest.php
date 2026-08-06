@@ -140,7 +140,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
     $path_parts = explode('.', $external_path);
     $this->expectException(CacheableBadRequestHttpException::class);
     if (!empty($expected_message)) {
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessageIs($expected_message);
     }
     $resource_type = $this->resourceTypeRepository->get($entity_type, $bundle);
     $this->sut->resolveInternalIncludePath($resource_type, $path_parts);
@@ -165,12 +165,12 @@ class FieldResolverTest extends JsonapiKernelTestBase {
       // field name.
       [
         'entity_test_with_bundle', 'bundle1', 'field_test1',
-        '`field_test1` is not a valid relationship field name.',
+        '`field_test1` is not a valid relationship field name. Possible values: entity_test_with_bundle_type, field_test_ref1, field_test_ref2.',
       ],
       // Should fail because the nested fields is not a valid include path.
       [
         'entity_test_with_bundle', 'bundle1', 'field_test_ref1.field_test3',
-        '`field_test_ref1.field_test3` is not a valid include path.',
+        '`field_test_ref1.field_test3` is not a valid include path. `field_test3` is not a valid relationship field name. Possible values: entity_test_with_bundle_type, field_test_alias, field_test_ref3. `field_test3` is not a valid relationship field name. Possible values: entity_test_with_bundle_type, field_test_ref3, field_test_alias.',
       ],
     ];
   }
@@ -318,7 +318,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
   public function testResolveInternalEntityQueryPathError(string $entity_type, string $bundle, string $external_path, string $expected_message = ''): void {
     $this->expectException(CacheableBadRequestHttpException::class);
     if (!empty($expected_message)) {
-      $this->expectExceptionMessage($expected_message);
+      $this->expectExceptionMessageIs($expected_message);
     }
     $resource_type = $this->resourceTypeRepository->get($entity_type, $bundle);
     $this->sut->resolveInternalEntityQueryPath($resource_type, $external_path);

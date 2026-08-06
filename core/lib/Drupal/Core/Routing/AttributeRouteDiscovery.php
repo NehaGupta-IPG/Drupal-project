@@ -83,7 +83,7 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
    * @return \Symfony\Component\Routing\RouteCollection
    *   The route collection.
    */
-  private function createControllerRouteCollection(\ReflectionClass $class): RouteCollection {
+  protected function createControllerRouteCollection(\ReflectionClass $class): RouteCollection {
     $collection = new RouteCollection();
     $globals = $this->getGlobals($class);
     $fqcnAlias = FALSE;
@@ -151,7 +151,7 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
    *   otherwise NULL. A class is invalid if there is an error on Reflection or
    *   if it is abstract.
    */
-  private function getReflectionClass(string $className): ?\ReflectionClass {
+  protected function getReflectionClass(string $className): ?\ReflectionClass {
     try {
       $exists = class_exists($className);
     }
@@ -211,7 +211,7 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
       if ($attribute->defaults !== NULL) {
         $globals['defaults'] = $attribute->defaults;
         if (!empty($attribute->defaults['_locale'])) {
-          throw new UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute is not supported in class "%s""', "locale", $class->getName()));
+          throw new UnsupportedRouteAttributePropertyException(sprintf('The "%s" route attribute is not supported in class "%s"', "locale", $class->getName()));
         }
       }
 
@@ -367,8 +367,24 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
    *   The attributes.
    */
   private function getAttributes(\ReflectionClass|\ReflectionMethod $reflection): \Generator {
-    foreach ($reflection->getAttributes(RouteAttribute::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-      yield $attribute->newInstance();
+    foreach ($reflection->getAttributes(RouteAttribute::class, \ReflectionAttribute::IS_INSTANCEOF) as $index => $reflected_attribute) {
+      $attribute = $reflected_attribute->newInstance();
+
+      // Closures cannot be serialized into the router table, so store a
+      // reference to the attribute instead.
+      if (isset($attribute->defaults['_title']) && $attribute->defaults['_title'] instanceof \Closure) {
+        if ($reflection instanceof \ReflectionClass) {
+          throw new InvalidArgumentException(\sprintf('Title closures cannot be used on class Route attributes in "%s". Use a method Route attribute, or the "_title_callback" default.', $reflection->getName()));
+        }
+        $attribute->defaults['_title_closure'] = [
+          $reflection->getDeclaringClass()->getName(),
+          $reflection->getName(),
+          $index,
+        ];
+        unset($attribute->defaults['_title']);
+      }
+
+      yield $attribute;
     }
   }
 
