@@ -1935,18 +1935,6 @@ function install_check_translations($langcode, $server_pattern, string $project 
   $languages = LanguageManager::getStandardLanguageList();
   $language = isset($languages[$langcode]) ? $languages[$langcode][0] : $langcode;
 
-  // Check if any of the desired translation files are available or if the
-  // translation server can be reached. In other words, check if we are online
-  // and have an internet connection.
-  if ($translation_available = install_check_localization_server($translation_url)) {
-    $online = TRUE;
-  }
-  if (!$translation_available) {
-    if (install_check_localization_server($server_url)) {
-      $online = TRUE;
-    }
-  }
-
   // If the translations directory does not exist, throw an error.
   if (!$translations_directory_exists) {
     $requirements['translations directory exists'] = [
@@ -1996,6 +1984,24 @@ function install_check_translations($langcode, $server_pattern, string $project 
     }
   }
 
+  // The locale module is not installed yet when the installer downloads the
+  // translation for its own language, so there is no configuration to honor.
+  if (\Drupal::moduleHandler()->moduleExists('locale') && !locale_translation_use_remote_source()) {
+    return $requirements;
+  }
+
+  // Check if any of the desired translation files are available or if the
+  // translation server can be reached. In other words, check if we are online
+  // and have an internet connection.
+  if ($translation_available = install_check_localization_server($translation_url)) {
+    $online = TRUE;
+  }
+  if (!$translation_available) {
+    if (install_check_localization_server($server_url)) {
+      $online = TRUE;
+    }
+  }
+
   // If the translations server can not be contacted, throw an error.
   if (!$online) {
     $requirements['online'] = [
@@ -2034,8 +2040,7 @@ function install_check_translations($langcode, $server_pattern, string $project 
     }
   }
 
-  $locale_use_remote = \Drupal::moduleHandler()->moduleExists('locale') && locale_translation_use_remote_source();
-  if ($locale_use_remote && $translations_directory_exists && $readable && $writable && $translation_available) {
+  if ($translations_directory_exists && $readable && $writable && $translation_available) {
     $translation_downloaded = install_retrieve_file($translation_url, $translations_directory);
 
     if (!$translation_downloaded) {
