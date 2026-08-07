@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Mail\Plugin\Mail;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Mail\Plugin\Mail\SymfonyMailer;
+use Drupal\Core\Render\Markup;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -35,12 +35,15 @@ class SymfonyMailerTest extends UnitTestCase {
     $variables = [
       '@form-url' => 'https://www.example.com/contact',
       '@sender-url' => 'https://www.example.com/user/123',
-      '@sender-name' => $this->randomString(),
+      // The sender name is put into HTML markup and must not contain HTML
+      // special characters: MailFormatHelper::htmlToText() would strip or
+      // decode them, while the expected value below uses the raw string.
+      '@sender-name' => $this->randomMachineName(),
     ];
 
     $plain = "In HTML, ampersand must be written as &amp;.\nI saw your house and <wow> it is great. There is too much to say about that beautiful building, it will never fit on one line of text.\nIf a<b and b<c then a<c.";
     $template = "@sender-name (@sender-url) sent a message using the contact form at @form-url.";
-    $markup = new FormattableMarkup($template, $variables);
+    $markup = Markup::create(strtr($template, $variables));
 
     $message = [
       'body' => [
@@ -50,10 +53,10 @@ class SymfonyMailerTest extends UnitTestCase {
     ];
 
     /** @var \Symfony\Component\Mailer\MailerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    $mailer = $this->getMockBuilder(MailerInterface::class)->getMock();
+    $mailer = $this->createStub(MailerInterface::class);
 
     /** @var \Psr\Log\LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+    $logger = $this->createStub(LoggerInterface::class);
 
     $plugin = new SymfonyMailer($logger, $mailer);
     $message = $plugin->format($message);
@@ -141,7 +144,7 @@ class SymfonyMailerTest extends UnitTestCase {
       );
 
     /** @var \Psr\Log\LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+    $logger = $this->createStub(LoggerInterface::class);
 
     $plugin = new SymfonyMailer($logger, $mailer);
     $this->assertTrue($plugin->mail($message));

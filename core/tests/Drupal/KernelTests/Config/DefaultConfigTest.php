@@ -20,17 +20,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests that the installed config matches the default config.
  */
 #[Group('Config')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class DefaultConfigTest extends KernelTestBase {
 
   use AssertConfigTrait;
   use FileSystemModuleDiscoveryDataProviderTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $timeLimit = 500;
 
   /**
    * {@inheritdoc}
@@ -61,7 +55,7 @@ class DefaultConfigTest extends KernelTestBase {
    * Tests if installed config is equal to the exported config.
    */
   #[DataProvider('themeListDataProvider')]
-  public function testThemeConfig($theme): void {
+  public function testThemeConfig(string $theme): void {
     $this->assertExtensionConfig($theme, 'theme');
   }
 
@@ -101,19 +95,18 @@ class DefaultConfigTest extends KernelTestBase {
       $this->markTestSkipped("The $type '$name' is deprecated.");
     }
 
+    $extension_path = \Drupal::service('extension.path.resolver')->getPath($type, $name) . '/';
+    $extension_config_storage = new FileStorage($extension_path . InstallStorage::CONFIG_INSTALL_DIRECTORY, StorageInterface::DEFAULT_COLLECTION);
+    $optional_config_storage = new FileStorage($extension_path . InstallStorage::CONFIG_OPTIONAL_DIRECTORY, StorageInterface::DEFAULT_COLLECTION);
+    if (empty($optional_config_storage->listAll()) && empty($extension_config_storage->listAll())) {
+      $this->markTestSkipped("$name has no configuration to test");
+    }
+
     // System and user are required in order to be able to install some of the
     // other modules. Therefore they are put into static::$modules, which though
     // doesn't install config files, so import those config files explicitly. Do
     // this for all tests in case optional configuration depends on it.
     $this->installConfig(['system', 'user']);
-
-    $extension_path = \Drupal::service('extension.path.resolver')->getPath($type, $name) . '/';
-    $extension_config_storage = new FileStorage($extension_path . InstallStorage::CONFIG_INSTALL_DIRECTORY, StorageInterface::DEFAULT_COLLECTION);
-    $optional_config_storage = new FileStorage($extension_path . InstallStorage::CONFIG_OPTIONAL_DIRECTORY, StorageInterface::DEFAULT_COLLECTION);
-
-    if (empty($optional_config_storage->listAll()) && empty($extension_config_storage->listAll())) {
-      $this->markTestSkipped("$name has no configuration to test");
-    }
 
     // Work out any additional modules and themes that need installing to create
     // an optional config.
@@ -149,7 +142,7 @@ class DefaultConfigTest extends KernelTestBase {
   public static function themeListDataProvider(): array {
     $prefix = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'themes';
     $theme_dirs = array_keys(iterator_to_array(new \FilesystemIterator($prefix)));
-    $theme_names = array_map(function ($path) use ($prefix) {
+    $theme_names = array_map(function (string $path) use ($prefix): string {
       return str_replace($prefix . DIRECTORY_SEPARATOR, '', $path);
     }, $theme_dirs);
     $themes_keyed = array_combine($theme_names, $theme_names);
@@ -160,7 +153,7 @@ class DefaultConfigTest extends KernelTestBase {
     // Add a deprecated theme with config.
     $themes_keyed['test_deprecated_theme'] = 'test_deprecated_theme';
 
-    return array_map(function ($theme) {
+    return array_map(function ($theme): array {
       return [$theme];
     }, $themes_keyed);
   }
@@ -224,7 +217,7 @@ class DefaultConfigTest extends KernelTestBase {
         $result = $config_manager->diff($default_config_storage, $active_config_storage, $config_name);
         // ::assertConfigDiff will throw an exception if the configuration is
         // different.
-        $this->assertNull($this->assertConfigDiff($result, $config_name, static::$skippedConfig));
+        $this->assertConfigDiff($result, $config_name, static::$skippedConfig);
       }
       else {
         $data = $default_config_storage->read($config_name);

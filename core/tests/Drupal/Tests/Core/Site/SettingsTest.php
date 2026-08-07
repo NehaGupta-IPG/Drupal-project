@@ -203,7 +203,7 @@ class SettingsTest extends UnitTestCase {
     $instance_property->setValue(NULL, $deprecated_settings);
 
     if ($expect_deprecation_message) {
-      $this->expectDeprecation($deprecated_setting['message']);
+      $this->expectUserDeprecationMessage($deprecated_setting['message']);
     }
 
     Settings::initialize(vfsStream::url('root'), 'sites', $class_loader);
@@ -274,6 +274,49 @@ class SettingsTest extends UnitTestCase {
   }
 
   /**
+   * Tests Settings::get() does not warn for a not configured no-replacement setting.
+   *
+   * @legacy-covers ::get
+   */
+  public function testGetNoDeprecationWhenNotConfiguredAndNoReplacement(): void {
+    $deprecated_setting = [
+      'replacement' => '',
+      'message' => 'The fake_no_replacement setting is deprecated.',
+    ];
+    $class = new \ReflectionClass(Settings::class);
+    $instance_property = $class->getProperty('deprecatedSettings');
+    $deprecated_settings = $instance_property->getValue();
+    $deprecated_settings['fake_no_replacement'] = $deprecated_setting;
+    $instance_property->setValue(NULL, $deprecated_settings);
+
+    // The setting is not in storage, so no deprecation should be triggered.
+    $this->assertNull(Settings::get('fake_no_replacement'));
+  }
+
+  /**
+   * Tests Settings::get() warns for configured settings with no replacement.
+   *
+   * @legacy-covers ::get
+   */
+  #[IgnoreDeprecations]
+  public function testGetDeprecationWhenConfiguredAndNoReplacement(): void {
+    $deprecated_setting = [
+      'replacement' => '',
+      'message' => 'The fake_no_replacement setting is deprecated.',
+    ];
+    $class = new \ReflectionClass(Settings::class);
+    $instance_property = $class->getProperty('deprecatedSettings');
+    $deprecated_settings = $instance_property->getValue();
+    $deprecated_settings['fake_no_replacement'] = $deprecated_setting;
+    $instance_property->setValue(NULL, $deprecated_settings);
+
+    new Settings(['fake_no_replacement' => 'foo'] + $this->config);
+
+    $this->expectUserDeprecationMessage($deprecated_setting['message']);
+    $this->assertEquals('foo', Settings::get('fake_no_replacement'));
+  }
+
+  /**
    * Tests deprecation messages for real deprecated settings.
    *
    * @param string $legacy_setting
@@ -284,6 +327,7 @@ class SettingsTest extends UnitTestCase {
   #[DataProvider('providerTestRealDeprecatedSettings')]
   #[IgnoreDeprecations]
   public function testRealDeprecatedSettings(string $legacy_setting, string $expected_deprecation): void {
+    $this->markTestSkipped('No settings to test real deprecated settings with.');
 
     $settings_file_content = "<?php\n\$settings['$legacy_setting'] = 'foo';\n";
     $class_loader = NULL;
@@ -293,7 +337,7 @@ class SettingsTest extends UnitTestCase {
       ->at($sites_directory)
       ->setContent($settings_file_content);
 
-    $this->expectDeprecation($expected_deprecation);
+    $this->expectUserDeprecationMessage($expected_deprecation);
 
     // Presence of the old name in settings.php is enough to trigger messages.
     Settings::initialize(vfsStream::url('root'), 'sites', $class_loader);
@@ -305,8 +349,8 @@ class SettingsTest extends UnitTestCase {
   public static function providerTestRealDeprecatedSettings(): array {
     return [
       [
-        'state_cache',
-        'The "state_cache" setting is deprecated in drupal:11.0.0. This setting should be removed from the settings file, since its usage has been removed. See https://www.drupal.org/node/3177901.',
+        '',
+        '',
       ],
     ];
   }

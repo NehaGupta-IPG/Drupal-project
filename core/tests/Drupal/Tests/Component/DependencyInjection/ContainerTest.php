@@ -6,7 +6,6 @@ namespace Drupal\Tests\Component\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\Container;
 use Drupal\Component\Utility\Crypt;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +25,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 #[CoversClass(Container::class)]
 #[Group('DependencyInjection')]
 class ContainerTest extends TestCase {
-  use ExpectDeprecationTrait;
+
   use ProphecyTrait;
 
   /**
@@ -1057,8 +1056,6 @@ class ContainerTest extends TestCase {
 
 /**
  * Helper interface to test Container::get() with configurator.
- *
- * @group DependencyInjection
  */
 interface MockConfiguratorInterface {
 
@@ -1075,15 +1072,13 @@ interface MockConfiguratorInterface {
 
 /**
  * Helper class to test Container::get() method for varying number of parameters.
- *
- * @group DependencyInjection
  */
 class MockInstantiationService {
 
   /**
    * @var mixed[]
    */
-  protected $arguments;
+  protected array $arguments;
 
   /**
    * Construct a mock instantiation service.
@@ -1098,7 +1093,7 @@ class MockInstantiationService {
    * @return mixed[]
    *   Return the passed arguments.
    */
-  public function getArguments() {
+  public function getArguments(): array {
     return $this->arguments;
   }
 
@@ -1107,8 +1102,6 @@ class MockInstantiationService {
 
 /**
  * Helper class to test Container::get() method.
- *
- * @group DependencyInjection
  */
 class MockService {
 
@@ -1133,7 +1126,7 @@ class MockService {
   protected $someOtherParameter;
 
   /**
-   * @var string
+   * A property.
    */
   public string $someProperty;
 
@@ -1226,9 +1219,8 @@ class MockService {
    */
   public static function getFactoryMethod($class, $arguments = []) {
     $r = new \ReflectionClass($class);
-    $service = ($r->getConstructor() === NULL) ? $r->newInstance() : $r->newInstanceArgs($arguments);
 
-    return $service;
+    return ($r->getConstructor() === NULL) ? $r->newInstance() : $r->newInstanceArgs($arguments);
   }
 
 }

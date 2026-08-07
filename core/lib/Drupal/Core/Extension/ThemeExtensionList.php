@@ -5,6 +5,7 @@ namespace Drupal\Core\Extension;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\State\StateInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides a list of available themes.
@@ -63,46 +64,27 @@ class ThemeExtensionList extends ExtensionList {
   protected $configFactory;
 
   /**
-   * The theme engine list needed by this theme list.
-   *
-   * @var \Drupal\Core\Extension\ThemeEngineExtensionList
-   */
-  protected $engineList;
-
-  /**
    * The list of installed themes.
    *
    * @var string[]
    */
   protected $installedThemes;
 
-  /**
-   * Constructs a new ThemeExtensionList instance.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $type
-   *   The extension type.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache.
-   * @param \Drupal\Core\Extension\InfoParserInterface $info_parser
-   *   The info parser.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Extension\ThemeEngineExtensionList $engine_list
-   *   The theme engine extension listing.
-   * @param string $install_profile
-   *   The install profile used by the site.
-   */
-  public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, ConfigFactoryInterface $config_factory, ThemeEngineExtensionList $engine_list, $install_profile) {
-    parent::__construct($root, $type, $cache, $info_parser, $module_handler, $state, $install_profile);
+  public function __construct(
+    #[Autowire(param: 'app.root')]
+    $root,
+    #[Autowire(service: 'cache.bootstrap')]
+    CacheBackendInterface $cache,
+    InfoParserInterface $info_parser,
+    ModuleHandlerInterface $module_handler,
+    StateInterface $state,
+    ConfigFactoryInterface $config_factory,
+    #[Autowire(param: 'install_profile')]
+    $install_profile,
+  ) {
+    parent::__construct($root, 'theme', $cache, $info_parser, $module_handler, $state, $install_profile);
 
     $this->configFactory = $config_factory;
-    $this->engineList = $engine_list;
   }
 
   /**
@@ -112,7 +94,6 @@ class ThemeExtensionList extends ExtensionList {
     // Find themes.
     $themes = parent::doList();
 
-    $engines = $this->engineList->getList();
     // Always get the freshest list of themes (rather than the already cached
     // list in $this->installedThemes) when building the theme listing because a
     // theme could have just been installed or uninstalled.
@@ -121,12 +102,6 @@ class ThemeExtensionList extends ExtensionList {
     $sub_themes = [];
     // Read info files for each theme.
     foreach ($themes as $name => $theme) {
-      // Defaults to 'twig' (see self::defaults above).
-      $engine = $theme->info['engine'];
-      if (isset($engines[$engine])) {
-        $theme->owner = $engines[$engine]->getExtensionPathname();
-        $theme->prefix = $engines[$engine]->getName();
-      }
       // Add this theme as a sub-theme if it has a base theme.
       if (!empty($theme->info['base theme'])) {
         $sub_themes[] = $name;
@@ -194,31 +169,6 @@ class ThemeExtensionList extends ExtensionList {
         $sub_theme->prefix = $themes[$root_key]->prefix;
       }
     }
-  }
-
-  /**
-   * Finds all the base themes for the specified theme.
-   *
-   * Themes can inherit templates and function implementations from earlier
-   * themes.
-   *
-   * @param \Drupal\Core\Extension\Extension[] $themes
-   *   An array of available themes.
-   * @param string $theme
-   *   The name of the theme whose base we are looking for.
-   *
-   * @return array
-   *   Returns an array of all of the theme's ancestors; the first element's
-   *   value will be NULL if an error occurred.
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There
-   *   is no direct replacement.
-   *
-   * @see https://www.drupal.org/node/3413187
-   */
-  public function getBaseThemes(array $themes, $theme) {
-    @trigger_error("\Drupal\Core\Extension\ThemeExtensionList::getBaseThemes() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3413187", E_USER_DEPRECATED);
-    return $this->doGetBaseThemes($themes, $theme);
   }
 
   /**
@@ -291,6 +241,13 @@ class ThemeExtensionList extends ExtensionList {
       $info['screenshot'] = $extension->getPath() . '/' . $info['screenshot'];
     }
     return $info;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function subClassExtension(Extension $extension): Theme {
+    return new Theme($this->root, $extension->getPathname(), $extension->info, $extension->getExtensionFilename());
   }
 
   /**

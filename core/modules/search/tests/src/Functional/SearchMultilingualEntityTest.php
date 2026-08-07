@@ -6,6 +6,7 @@ namespace Drupal\Tests\search\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\search\SearchIndexInterface;
 use Drupal\Tests\BrowserTestBase;
@@ -29,7 +30,7 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
   /**
    * Node search plugin.
    *
-   * @var \Drupal\node\Plugin\Search\NodeSearch
+   * @var \Drupal\node\Plugin\Search\SearchNode
    */
   protected $plugin;
 
@@ -42,6 +43,8 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
     'comment',
     'node',
     'search',
+    'search_node',
+    'search_user',
   ];
 
   /**
@@ -88,7 +91,7 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
     $field_storage->save();
 
     // Create a few page nodes with multilingual body values.
-    $default_format = filter_default_format();
+    $default_format = \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id();
     $nodes = [
       [
         'title' => 'First node en',

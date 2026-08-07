@@ -30,7 +30,7 @@ class MenuDeleteTest extends KernelTestBase {
    * @legacy-covers \Drupal\menu_ui\Hook\MenuUiHooks::menuDelete
    */
   #[DataProvider('providerMenuDelete')]
-  public function testMenuDelete($settings, $expected): void {
+  public function testMenuDelete(array $settings, array $expected): void {
     $menu = Menu::create([
       'id' => 'mock',
       'label' => $this->randomMachineName(16),
@@ -52,7 +52,7 @@ class MenuDeleteTest extends KernelTestBase {
     $this->assertEquals($settings['available_menus'], $content_type->getThirdPartySetting('menu_ui', 'available_menus'));
     $this->assertEquals($settings['parent'], $content_type->getThirdPartySetting('menu_ui', 'parent'));
 
-    $hooks = new MenuUiHooks(\Drupal::entityTypeManager());
+    $hooks = \Drupal::service(MenuUiHooks::class);
     $hooks->menuDelete($menu);
 
     $content_type = NodeType::load('test_type');
