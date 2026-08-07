@@ -744,6 +744,31 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
           'data-drupal-link-query' => Json::encode(['count' => '0']),
         ],
       ],
+      // Array query values, as produced by multi-value exposed filters.
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['f' => ['1', '2']]],
+        TRUE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['f' => ['1', '2']]),
+        ],
+      ],
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['f' => ['1', '2'], 'page' => '3']],
+        TRUE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['f' => ['1', '2']]),
+        ],
+      ],
+      [
+        ['path' => 'llama', 'front' => FALSE, 'language' => 'en', 'query' => ['f' => ['1', '2']]],
+        FALSE,
+        [
+          'data-drupal-link-system-path' => 'llama',
+          'data-drupal-link-query' => Json::encode(['f' => ['2', '1']]),
+        ],
+      ],
     ];
     foreach ($subset_cases as [$context, $is_active, $attributes]) {
       $situations[] = [

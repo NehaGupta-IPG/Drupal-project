@@ -58,7 +58,11 @@
           !activeLink.hasAttribute('data-drupal-link-query') ||
           !Object.entries(
             JSON.parse(activeLink.getAttribute('data-drupal-link-query')),
-          ).some(([key, value]) => value !== (path.currentQuery[key] ?? null));
+          ).some(
+            ([key, value]) =>
+              JSON.stringify(value) !==
+              JSON.stringify(path.currentQuery[key] ?? null),
+          );
 
         if (queryMatch) {
           activeLink.classList.add('is-active');
