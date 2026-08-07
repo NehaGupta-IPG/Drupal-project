@@ -9,7 +9,6 @@ use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\search\SearchPageRepositoryInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builds the search form for the search block.
@@ -19,51 +18,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
 
   /**
-   * The search page repository.
-   *
-   * @var \Drupal\search\SearchPageRepositoryInterface
-   */
-  protected $searchPageRepository;
-
-  /**
    * The config factory.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
 
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * Constructs a new SearchBlockForm.
-   *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
-   *   The search page repository.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
-  public function __construct(SearchPageRepositoryInterface $search_page_repository, ConfigFactoryInterface $config_factory, RendererInterface $renderer) {
-    $this->searchPageRepository = $search_page_repository;
+  public function __construct(
+    protected SearchPageRepositoryInterface $searchPageRepository,
+    ConfigFactoryInterface $config_factory,
+    protected RendererInterface $renderer,
+  ) {
     $this->configFactory = $config_factory;
-    $this->renderer = $renderer;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('search.search_page_repository'),
-      $container->get('config.factory'),
-      $container->get('renderer')
-    );
   }
 
   /**

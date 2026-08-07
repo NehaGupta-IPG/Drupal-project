@@ -10,7 +10,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Configure performance settings for this site.
@@ -19,71 +19,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class PerformanceForm extends ConfigFormBase {
 
-  /**
-   * The date formatter service.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
-   */
-  protected $dateFormatter;
-
-  /**
-   * The CSS asset collection optimizer service.
-   *
-   * @var \Drupal\Core\Asset\AssetCollectionOptimizerInterface
-   */
-  protected $cssCollectionOptimizer;
-
-  /**
-   * The JavaScript asset collection optimizer service.
-   *
-   * @var \Drupal\Core\Asset\AssetCollectionOptimizerInterface
-   */
-  protected $jsCollectionOptimizer;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * Constructs a PerformanceForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   * @param \Drupal\Core\Asset\AssetCollectionOptimizerInterface $css_collection_optimizer
-   *   The CSS asset collection optimizer service.
-   * @param \Drupal\Core\Asset\AssetCollectionOptimizerInterface $js_collection_optimizer
-   *   The JavaScript asset collection optimizer service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, DateFormatterInterface $date_formatter, AssetCollectionOptimizerInterface $css_collection_optimizer, AssetCollectionOptimizerInterface $js_collection_optimizer, ModuleHandlerInterface $module_handler) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected DateFormatterInterface $dateFormatter,
+    #[Autowire(service: 'asset.css.collection_optimizer')]
+    protected AssetCollectionOptimizerInterface $cssCollectionOptimizer,
+    #[Autowire(service: 'asset.js.collection_optimizer')]
+    protected AssetCollectionOptimizerInterface $jsCollectionOptimizer,
+    protected ModuleHandlerInterface $moduleHandler,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
-
-    $this->dateFormatter = $date_formatter;
-    $this->cssCollectionOptimizer = $css_collection_optimizer;
-    $this->jsCollectionOptimizer = $js_collection_optimizer;
-    $this->moduleHandler = $module_handler;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('config.typed'),
-      $container->get('date.formatter'),
-      $container->get('asset.css.collection_optimizer'),
-      $container->get('asset.js.collection_optimizer'),
-      $container->get('module_handler')
-    );
   }
 
   /**

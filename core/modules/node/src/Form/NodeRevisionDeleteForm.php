@@ -5,19 +5,18 @@ namespace Drupal\node\Form;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a form for deleting a node revision.
  *
  * @internal
  */
-class NodeRevisionDeleteForm extends ConfirmFormBase implements WorkspaceSafeFormInterface {
+class NodeRevisionDeleteForm extends ConfirmFormBase {
 
   /**
    * The node revision.
@@ -27,27 +26,26 @@ class NodeRevisionDeleteForm extends ConfirmFormBase implements WorkspaceSafeFor
   protected $revision;
 
   /**
-   * Constructs a new NodeRevisionDeleteForm.
+   * The node storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
+  protected EntityStorageInterface $nodeStorage;
+
+  /**
+   * The node type storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected EntityStorageInterface $nodeTypeStorage;
+
   public function __construct(
-    protected EntityStorageInterface $nodeStorage,
-    protected EntityStorageInterface $nodeTypeStorage,
+    EntityTypeManagerInterface $entity_type_manager,
     protected AccessManagerInterface $accessManager,
     protected DateFormatterInterface $dateFormatter,
   ) {
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    $entity_type_manager = $container->get('entity_type.manager');
-    return new static(
-      $entity_type_manager->getStorage('node'),
-      $entity_type_manager->getStorage('node_type'),
-      $container->get('access_manager'),
-      $container->get('date.formatter'),
-    );
+    $this->nodeStorage = $entity_type_manager->getStorage('node');
+    $this->nodeTypeStorage = $entity_type_manager->getStorage('node_type');
   }
 
   /**

@@ -9,7 +9,6 @@ use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builds a confirmation form for enabling experimental themes.
@@ -18,42 +17,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ThemeExperimentalConfirmForm extends ConfirmFormBase {
 
-  /**
-   * An extension discovery instance.
-   *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
-   */
-  protected $themeList;
-
-  /**
-   * The theme installer service.
-   *
-   * @var \Drupal\Core\Extension\ThemeInstallerInterface
-   */
-  protected $themeInstaller;
-
-  /**
-   * Constructs a ThemeExperimentalConfirmForm object.
-   *
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_list
-   *   The theme extension list.
-   * @param \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer
-   *   The theme installer.
-   */
-  public function __construct(ThemeExtensionList $theme_list, ThemeInstallerInterface $theme_installer) {
-    $this->themeList = $theme_list;
-    $this->themeInstaller = $theme_installer;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('extension.list.theme'),
-      $container->get('theme_installer')
-    );
-  }
+  public function __construct(
+    protected ThemeExtensionList $themeList,
+    protected ThemeInstallerInterface $themeInstaller,
+  ) {}
 
   /**
    * {@inheritdoc}

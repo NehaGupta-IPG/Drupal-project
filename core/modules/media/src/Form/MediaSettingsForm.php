@@ -9,7 +9,6 @@ use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\media\IFrameUrlHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a form to configure Media settings.
@@ -18,48 +17,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class MediaSettingsForm extends ConfigFormBase {
 
-  /**
-   * The iFrame URL helper service.
-   *
-   * @var \Drupal\media\IFrameUrlHelper
-   */
-  protected $iFrameUrlHelper;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * MediaSettingsForm constructor.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\media\IFrameUrlHelper $iframe_url_helper
-   *   The iFrame URL helper service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, IFrameUrlHelper $iframe_url_helper, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected IFrameUrlHelper $iFrameUrlHelper,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
-    $this->iFrameUrlHelper = $iframe_url_helper;
-    $this->entityTypeManager = $entity_type_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('config.typed'),
-      $container->get('media.oembed.iframe_url_helper'),
-      $container->get('entity_type.manager')
-    );
   }
 
   /**

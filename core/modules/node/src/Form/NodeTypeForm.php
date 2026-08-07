@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\node\NodePreviewMode;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Form handler for node type forms.
@@ -17,31 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class NodeTypeForm extends BundleEntityFormBase {
 
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
-   * Constructs the NodeTypeForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   */
-  public function __construct(EntityFieldManagerInterface $entity_field_manager) {
-    $this->entityFieldManager = $entity_field_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity_field.manager')
-    );
-  }
+  public function __construct(
+    protected EntityFieldManagerInterface $entityFieldManager,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -147,7 +124,7 @@ class NodeTypeForm extends BundleEntityFormBase {
       '#default_value' => $workflow_options,
       '#options' => [
         'status' => $this->t('Published'),
-        'promote' => $this->t('Promoted'),
+        'promote' => $this->t('Promoted to front page'),
         'sticky' => $this->t('Sticky at top of lists'),
         'revision' => $this->t('Create new revision'),
       ],

@@ -6,7 +6,6 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\search\SearchPageRepositoryInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a base form for search pages.
@@ -27,31 +26,9 @@ abstract class SearchPageFormBase extends EntityForm {
    */
   protected $plugin;
 
-  /**
-   * The search page repository.
-   *
-   * @var \Drupal\search\SearchPageRepositoryInterface
-   */
-  protected $searchPageRepository;
-
-  /**
-   * Constructs a new search form.
-   *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
-   *   The search page repository.
-   */
-  public function __construct(SearchPageRepositoryInterface $search_page_repository) {
-    $this->searchPageRepository = $search_page_repository;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('search.search_page_repository')
-    );
-  }
+  public function __construct(
+    protected SearchPageRepositoryInterface $searchPageRepository,
+  ) {}
 
   /**
    * {@inheritdoc}

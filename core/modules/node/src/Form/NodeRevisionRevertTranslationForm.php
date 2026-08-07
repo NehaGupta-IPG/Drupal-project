@@ -4,11 +4,10 @@ namespace Drupal\node\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\node\NodeInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a form for reverting a node revision for a single translation.
@@ -24,40 +23,13 @@ class NodeRevisionRevertTranslationForm extends NodeRevisionRevertForm {
    */
   protected $langcode;
 
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * Constructs a new NodeRevisionRevertTranslationForm.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_storage
-   *   The node storage.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
-  public function __construct(EntityStorageInterface $node_storage, DateFormatterInterface $date_formatter, LanguageManagerInterface $language_manager, TimeInterface $time) {
-    parent::__construct($node_storage, $date_formatter, $time);
-    $this->languageManager = $language_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity_type.manager')->getStorage('node'),
-      $container->get('date.formatter'),
-      $container->get('language_manager'),
-      $container->get('datetime.time')
-    );
+  public function __construct(
+    EntityTypeManagerInterface $entityTypeManager,
+    DateFormatterInterface $dateFormatter,
+    protected LanguageManagerInterface $languageManager,
+    TimeInterface $time,
+  ) {
+    parent::__construct($entityTypeManager, $dateFormatter, $time);
   }
 
   /**

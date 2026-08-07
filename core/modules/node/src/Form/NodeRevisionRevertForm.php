@@ -5,19 +5,18 @@ namespace Drupal\node\Form;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a form for reverting a node revision.
  *
  * @internal
  */
-class NodeRevisionRevertForm extends ConfirmFormBase implements WorkspaceSafeFormInterface {
+class NodeRevisionRevertForm extends ConfirmFormBase {
 
   /**
    * The node revision.
@@ -29,49 +28,16 @@ class NodeRevisionRevertForm extends ConfirmFormBase implements WorkspaceSafeFor
   /**
    * The node storage.
    *
-   * @var \Drupal\node\NodeStorageInterface
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $nodeStorage;
+  protected EntityStorageInterface $nodeStorage;
 
-  /**
-   * The date formatter service.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
-   */
-  protected $dateFormatter;
-
-  /**
-   * The time service.
-   *
-   * @var \Drupal\Component\Datetime\TimeInterface
-   */
-  protected $time;
-
-  /**
-   * Constructs a new NodeRevisionRevertForm.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_storage
-   *   The node storage.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
-  public function __construct(EntityStorageInterface $node_storage, DateFormatterInterface $date_formatter, TimeInterface $time) {
-    $this->nodeStorage = $node_storage;
-    $this->dateFormatter = $date_formatter;
-    $this->time = $time;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity_type.manager')->getStorage('node'),
-      $container->get('date.formatter'),
-      $container->get('datetime.time')
-    );
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    protected DateFormatterInterface $dateFormatter,
+    protected TimeInterface $time,
+  ) {
+    $this->nodeStorage = $entity_type_manager->getStorage('node');
   }
 
   /**

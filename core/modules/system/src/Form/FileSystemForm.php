@@ -14,7 +14,6 @@ use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configure file system settings for this site.
@@ -24,59 +23,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class FileSystemForm extends ConfigFormBase {
   use RedundantEditableConfigNamesTrait;
 
-  /**
-   * The date formatter service.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
-   */
-  protected $dateFormatter;
-
-  /**
-   * The stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
-   */
-  protected $streamWrapperManager;
-
-  /**
-   * The file system.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
-   * Constructs a FileSystemForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
-   *   The stream wrapper manager.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The file system.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, DateFormatterInterface $date_formatter, StreamWrapperManagerInterface $stream_wrapper_manager, FileSystemInterface $file_system) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected DateFormatterInterface $dateFormatter,
+    protected StreamWrapperManagerInterface $streamWrapperManager,
+    protected FileSystemInterface $fileSystem,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
-    $this->dateFormatter = $date_formatter;
-    $this->streamWrapperManager = $stream_wrapper_manager;
-    $this->fileSystem = $file_system;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('config.typed'),
-      $container->get('date.formatter'),
-      $container->get('stream_wrapper_manager'),
-      $container->get('file_system')
-    );
   }
 
   /**

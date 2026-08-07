@@ -5,72 +5,27 @@ namespace Drupal\system\Form;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
 use Drupal\Core\Path\PathValidatorInterface;
-use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Routing\RequestContext;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configure site information settings for this site.
  *
  * @internal
  */
-#[Route(
-  path: '/admin/config/system/site-information',
-  name: 'system.site_information_settings',
-  title: new TranslatableMarkup('Basic site settings'),
-  requirements: [
-    '_permission' => 'administer site configuration',
-  ],
-)]
 class SiteInformationForm extends ConfigFormBase {
   use RedundantEditableConfigNamesTrait;
 
-  /**
-   * The path validator.
-   *
-   * @var \Drupal\Core\Path\PathValidatorInterface
-   */
-  protected $pathValidator;
-
-  /**
-   * The request context.
-   *
-   * @var \Drupal\Core\Routing\RequestContext
-   */
-  protected $requestContext;
-
-  /**
-   * Constructs a SiteInformationForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
-   *   The path validator.
-   * @param \Drupal\Core\Routing\RequestContext $request_context
-   *   The request context.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, PathValidatorInterface $path_validator, RequestContext $request_context) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    protected PathValidatorInterface $pathValidator,
+    protected RequestContext $requestContext,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
-    $this->pathValidator = $path_validator;
-    $this->requestContext = $request_context;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('config.typed'),
-      $container->get('path.validator'),
-      $container->get('router.request_context')
-    );
   }
 
   /**
@@ -105,7 +60,11 @@ class SiteInformationForm extends ConfigFormBase {
     $form['site_information']['site_mail'] = [
       '#type' => 'email',
       '#title' => $this->t('Email address'),
-      '#config_target' => 'system.site:mail',
+      '#config_target' => new ConfigTarget(
+        'system.site',
+        'mail',
+        fromConfig: fn($value) => $value ?: ini_get('sendmail_from'),
+      ),
       '#description' => $this->t("The <em>From</em> address in automated emails sent during registration and new password requests, and other notifications. (Use an address ending in your site's domain to help prevent this email being flagged as spam.)"),
       '#required' => TRUE,
     ];
