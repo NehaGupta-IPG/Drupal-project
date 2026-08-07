@@ -119,7 +119,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       $return = $return->orIf($this->checkAccess($entity, $operation, $account));
     }
     if ($set_cache) {
-      $result = $this->setCache($return, $entity->uuid(), $operation, $langcode, $account);
+      $result = $this->setCache($return, $cid, $operation, $langcode, $account);
     }
     return $return_as_object ? $result : $result->isAllowed();
   }
