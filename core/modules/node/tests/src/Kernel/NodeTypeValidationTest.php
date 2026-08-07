@@ -87,9 +87,18 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
   /**
    * Tests third party settings menu UI.
    */
-  #[TestWith([TRUE, ["third_party_settings.menu_ui" => ["'parent' is a required key.", "'link_enabled' is a required key."]]])]
-  #[TestWith([FALSE, []])]
-  public function testThirdPartySettingsMenuUi(bool $third_party_settings_menu_ui_fully_validatable, array $expected_validation_errors): void {
+  #[TestWith([TRUE, [],
+    [
+      "third_party_settings.menu_ui" => [
+        "'parent' is a required key.",
+        "'link_enabled' is a required key.",
+      ],
+    ],
+  ])]
+  #[TestWith([FALSE, [], []])]
+  #[TestWith([TRUE, ['parent' => 'main:', 'link_enabled' => TRUE], []])]
+  #[TestWith([TRUE, ['parent' => 'main:', 'link_enabled' => FALSE], []])]
+  public function testThirdPartySettingsMenuUi(bool $third_party_settings_menu_ui_fully_validatable, array $extra_settings, array $expected_validation_errors): void {
     $this->enableModules(['menu_ui']);
 
     // Set or unset the `FullyValidatable` constraint on
@@ -102,6 +111,9 @@ class NodeTypeValidationTest extends ConfigEntityValidationTestBase {
     // @see system.menu.main.yml
     $this->installConfig(['system']);
     $this->entity->setThirdPartySetting('menu_ui', 'available_menus', ['main']);
+    foreach ($extra_settings as $key => $value) {
+      $this->entity->setThirdPartySetting('menu_ui', $key, $value);
+    }
 
     $this->assertValidationErrors($expected_validation_errors);
   }

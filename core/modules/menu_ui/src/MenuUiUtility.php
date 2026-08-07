@@ -56,7 +56,15 @@ class MenuUiUtility {
         'langcode' => $node->language()->getId(),
       ]);
     }
-    $values['link_enabled'] ?? $entity->setPublished();
+    if (isset($values['link_enabled'])) {
+      $values['link_enabled']
+        ? $entity->setPublished()
+        : $entity->setUnpublished();
+    }
+    else {
+      // Nothing in the form values; default new links to published.
+      $entity->setPublished();
+    }
     $entity->title->value = trim($values['title']);
     $entity->description->value = trim($values['description']);
     $entity->menu_name->value = $values['menu_name'];
