@@ -4,6 +4,7 @@ namespace Drupal\menu_ui\Hook;
 
 use Drupal\block\BlockInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Hook\Attribute\HookDependsOnModule;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Link;
 use Drupal\menu_ui\MenuUiUtility;
@@ -85,9 +86,6 @@ class MenuUiHooks {
   public function entityTypeBuild(array &$entity_types): void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
     $entity_types['menu']->setFormClass('add', 'Drupal\menu_ui\MenuForm')->setFormClass('edit', 'Drupal\menu_ui\MenuForm')->setFormClass('delete', 'Drupal\menu_ui\Form\MenuDeleteForm')->setListBuilderClass('Drupal\menu_ui\MenuListBuilder')->setLinkTemplate('add-form', '/admin/structure/menu/add')->setLinkTemplate('delete-form', '/admin/structure/menu/manage/{menu}/delete')->setLinkTemplate('edit-form', '/admin/structure/menu/manage/{menu}')->setLinkTemplate('add-link-form', '/admin/structure/menu/manage/{menu}/add')->setLinkTemplate('collection', '/admin/structure/menu');
-    if (isset($entity_types['node'])) {
-      $entity_types['node']->addConstraint('MenuSettings', []);
-    }
   }
 
   /**
@@ -236,6 +234,7 @@ class MenuUiHooks {
         $form['actions'][$action]['#submit'][] = static::class . ':formNodeFormSubmit';
       }
     }
+    $form['#validate'][] = static::class . ':formNodeFormValidate';
     $form['#entity_builders'][] = static::class . ':nodeBuilder';
   }
 
@@ -244,6 +243,51 @@ class MenuUiHooks {
    */
   public function nodeBuilder(string $entity_type, NodeInterface $entity, array &$form, FormStateInterface $form_state): void {
     $entity->menu = $form_state->getValue('menu');
+  }
+
+  /**
+   * Form validation handler for menu item field on the node form.
+   *
+   * Prevents changes to menu settings in pending (non-default) revisions.
+   *
+   * @see \Drupal\menu_ui\Hook\MenuUiHooks::formNodeFormAlter()
+   */
+  public function formNodeFormValidate(array &$form, FormStateInterface $form_state): void {
+    $node = $form_state->getFormObject()->getEntity();
+    if ($node->isNew() || $node->isDefaultRevision()) {
+      return;
+    }
+
+    $values = $form_state->getValue('menu');
+    if (!$values) {
+      return;
+    }
+
+    $defaults = ($this->menuUiUtility)()->getMenuLinkDefaults($node);
+
+    if (!empty($values['menu_parent'])) {
+      [$menu_name, $parent] = explode(':', $values['menu_parent'], 2);
+      $values['menu_name'] = $menu_name;
+      $values['parent'] = $parent;
+    }
+
+    // Handle the case when the menu link is deleted in a pending revision.
+    if (empty($values['enabled']) && $defaults['entity_id']) {
+      $form_state->setErrorByName('menu][enabled', $this->t('You can only remove the menu link in the <em>published</em> version of this content.'));
+    }
+    // Handle all the other non-revisionable menu link changes in a pending
+    // revision.
+    elseif ($defaults['entity_id']) {
+      if ($values['menu_name'] != $defaults['menu_name']) {
+        $form_state->setErrorByName('menu][menu_parent', $this->t('You can only change the parent menu link for the <em>published</em> version of this content.'));
+      }
+      elseif (isset($values['parent']) && ($values['parent'] != $defaults['parent'])) {
+        $form_state->setErrorByName('menu][menu_parent', $this->t('You can only change the parent menu link for the <em>published</em> version of this content.'));
+      }
+      elseif ($values['weight'] != $defaults['weight']) {
+        $form_state->setErrorByName('menu][weight', $this->t('You can only change the menu link weight for the <em>published</em> version of this content.'));
+      }
+    }
   }
 
   /**
@@ -379,11 +423,8 @@ class MenuUiHooks {
    * Implements hook_ENTITY_TYPE_delete().
    */
   #[Hook('menu_delete')]
+  #[HookDependsOnModule('node')]
   public function menuDelete(EntityInterface $entity): void {
-    if (!$this->entityTypeManager->hasDefinition('node_type')) {
-      return;
-    }
-
     // Remove the menu from content type third party settings.
     $menu_id = $entity->id();
     $parent_prefix = $menu_id . ':';

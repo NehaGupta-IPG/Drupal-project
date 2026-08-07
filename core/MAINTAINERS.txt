@@ -38,7 +38,8 @@ Framework managers
   - Cristina Chumillas 'ckrina' https://www.drupal.org/u/ckrina
   - Ben Mullins 'bnjmnm' https://www.drupal.org/u/bnjmnm
   - Sally Young 'justafish' https://www.drupal.org/u/justafish
-  - (provisional) Pierre Dureau 'pdureau' https://www.drupal.org/u/pdureau
+  - Pierre Dureau 'pdureau' https://www.drupal.org/u/pdureau
+  - (provisional) Mike Herchel 'mherchel' https://www.drupal.org/u/mherchel
 
 Release managers
 - Nathaniel Catchpole 'catch' https://www.drupal.org/u/catch
@@ -128,6 +129,10 @@ Claro
 - Cristina Chumillas 'ckrina' https://www.drupal.org/u/ckrina
 - Sascha Eggenberger 'saschaeggi' https://www.drupal.org/u/saschaeggi
 - Ben Mullins 'bnjmnm' https://www.drupal.org/u/bnjmnm
+
+Command Line Interface (CLI) - `dr`
+- Moshe Weitzman 'moshe weitzman' https://www.drupal.org/u/moshe-weitzman
+- Derek Wright 'dww' https://www.drupal.org/u/dww
 
 Comment
 - Lee Rowlands 'larowlan' https://www.drupal.org/u/larowlan
@@ -373,9 +378,6 @@ Settings Tray
 Shortcut
 - Jibran Ijaz 'jibran' https://www.drupal.org/u/jibran
 
-Stable9
-- Mark Conroy 'markconroy' https://www.drupal.org/u/markconroy
-
 Stark
 - John Albin Wilkins 'JohnAlbin' https://www.drupal.org/u/johnalbin
 
@@ -387,9 +389,6 @@ System (module)
 
 Taxonomy
 - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
-
-Telephone
-- Stephen Mustgrave 'smustgrave' https://www.drupal.org/u/smustgrave
 
 Text Field
 - Stephen Mustgrave 'smustgrave' https://www.drupal.org/u/smustgrave
@@ -455,6 +454,9 @@ Accessibility
 
 Documentation
 - ?
+
+Dependency Coordination
+- Dave Long 'longwave' https://www.drupal.org/u/longwave
 
 Performance
 - Nathaniel Catchpole 'catch' https://www.drupal.org/u/catch
