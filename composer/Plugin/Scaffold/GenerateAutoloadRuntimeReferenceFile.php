@@ -129,9 +129,11 @@ if (empty(\$_SERVER['SCRIPT_NAME'])) {
   \$basename = basename(\$filename);
   if (basename(\$_SERVER['PHP_SELF'] ?? '') === \$basename) {
     \$_SERVER['SCRIPT_NAME'] = \$_SERVER['PHP_SELF'];
-  } elseif (basename(\$_SERVER['ORIG_SCRIPT_NAME'] ?? '') === \$basename) {
+  }
+  elseif (basename(\$_SERVER['ORIG_SCRIPT_NAME'] ?? '') === \$basename) {
     \$_SERVER['SCRIPT_NAME'] = \$_SERVER['ORIG_SCRIPT_NAME'];
-  } else {
+  }
+  else {
     \$docroot = rtrim(\$_SERVER['DOCUMENT_ROOT'] ?? '', DIRECTORY_SEPARATOR);
     if (!empty(\$docroot) && str_starts_with(\$filename, \$docroot)) {
       \$_SERVER['SCRIPT_NAME'] = substr(\$filename, strlen(\$docroot));
