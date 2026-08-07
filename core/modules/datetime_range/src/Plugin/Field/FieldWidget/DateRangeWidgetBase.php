@@ -5,7 +5,6 @@ namespace Drupal\datetime_range\Plugin\Field\FieldWidget;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\datetime\Plugin\Field\FieldWidget\DateTimeWidgetBase;
 use Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem;
@@ -48,22 +47,10 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
 
   /**
    * {@inheritdoc}
-   *
-   * The widget form element type may have transformed the value to a
-   * DrupalDateTime object at this point. If so we need to convert it back to
-   * the storage timezone and format.
-   *
-   * Otherwise, if the value is not a DrupalDateTime object, the submitted form
-   * value did not pass validation and will still be an array. We need to set
-   * the value to NULL to prevent issues with the expected value type in
-   * DateTimeComputed::getValue().
-   *
-   * @see \Drupal\Core\Datetime\Element\Datetime::validateDatetime()
-   * @see \Drupal\datetime\DateTimeComputed::getValue()
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     $datetime_type = $this->getFieldSetting('datetime_type');
-    if ($datetime_type === DateTimeItem::DATETIME_TYPE_DATE) {
+    if ($datetime_type === DateRangeItem::DATETIME_TYPE_DATE) {
       $storage_format = DateTimeItemInterface::DATE_STORAGE_FORMAT;
     }
     else {
@@ -89,7 +76,7 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
         $item['value'] = $start_date->setTimezone($storage_timezone)->format($storage_format);
       }
       else {
-        // Value did not pass validation as is still an array, Set to NULL.
+        // The value did not pass validation and is still an array.
         $item['value'] = NULL;
       }
 
@@ -108,7 +95,7 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
         $item['end_value'] = $end_date->setTimezone($storage_timezone)->format($storage_format);
       }
       else {
-        // Value did not pass validation as is still an array, Set to NULL.
+        // The value did not pass validation and is still an array.
         $item['end_value'] = NULL;
       }
     }

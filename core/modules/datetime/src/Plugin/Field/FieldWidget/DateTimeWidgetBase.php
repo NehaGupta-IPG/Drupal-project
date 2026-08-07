@@ -75,7 +75,7 @@ class DateTimeWidgetBase extends WidgetBase {
             ->format($storage_format);
         }
         else {
-          // Value did not pass validation as is still an array, Set to NULL.
+          // The value did not pass validation and is still an array.
           $item['value'] = NULL;
         }
       }
