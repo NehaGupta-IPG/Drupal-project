@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Plugin;
 
+use Drupal\Core\Plugin\Context\ContextDefinitionInterface;
 use Drupal\Tests\taxonomy\Functional\Views\TaxonomyTestBase;
 use Drupal\user\UserInterface;
 use Drupal\views\Tests\ViewTestData;
@@ -77,6 +78,23 @@ class EntityArgumentTest extends TaxonomyTestBase {
     $assert_session->titleEquals('test: title ' . $this->term1->label() . ' + ' . $this->term2->label() . ', input ' . $this->term1->id() . '+' . $this->term2->id() . ' | Drupal');
     $this->drupalGet('/entity-id-argument-test/2+1');
     $assert_session->titleEquals('test: title ' . $this->term2->label() . ' + ' . $this->term1->label() . ', input ' . $this->term2->id() . '+' . $this->term1->id() . ' | Drupal');
+  }
+
+  /**
+   * Tests the context definition derived when no validator is configured.
+   *
+   * @see \Drupal\views\Plugin\views\argument\EntityReferenceArgument::getContextDefinition()
+   */
+  public function testGetContextDefinition(): void {
+    $view = Views::getView('test_entity_id_argument');
+    $view->initHandlers();
+
+    $argument = $view->argument['field_views_testing_tags_target_id'];
+    $context_definition = $argument->getContextDefinition();
+
+    $this->assertInstanceOf(ContextDefinitionInterface::class, $context_definition);
+    $this->assertEquals('entity:taxonomy_term', $context_definition->getDataType());
+    $this->assertFalse($context_definition->isRequired());
   }
 
 }

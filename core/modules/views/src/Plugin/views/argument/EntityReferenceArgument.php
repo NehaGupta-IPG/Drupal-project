@@ -5,6 +5,7 @@ namespace Drupal\views\Plugin\views\argument;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\views\Attribute\ViewsArgument;
 
 /**
@@ -60,6 +61,28 @@ class EntityReferenceArgument extends NumericArgument implements ContainerFactor
       return $this->definition['empty field name'];
     }
     return $id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContextDefinition() {
+    // Deliberately bypass NumericArgument::getContextDefinition(), which
+    // falls back to a generic 'integer' context: ask the configured
+    // validator plugin directly so an entity-typed fallback below can still
+    // apply when no validator is configured.
+    if ($context_definition = $this->getPlugin('argument_validator')->getContextDefinition()) {
+      return $context_definition;
+    }
+
+    $entity_type_id = $this->definition['target_entity_type_id'] ?? NULL;
+    if (!$entity_type_id || !$this->entityTypeManager->hasDefinition($entity_type_id)) {
+      return NULL;
+    }
+
+    return EntityContextDefinition::fromEntityTypeId($entity_type_id)
+      ->setLabel($this->adminLabel())
+      ->setRequired(FALSE);
   }
 
 }

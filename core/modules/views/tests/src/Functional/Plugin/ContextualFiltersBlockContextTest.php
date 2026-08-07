@@ -163,6 +163,16 @@ class ContextualFiltersBlockContextTest extends ViewTestBase {
     $this->assertEquals('string', $context->getDataType(), 'Context definition data type is correct.');
     $this->assertEquals('Content: Title', $context->getLabel(), 'Context definition label is correct.');
     $this->assertFalse($context->isRequired(), 'Context is not required.');
+
+    // Check that an entity_id-plugin argument (node_nid) without an
+    // explicit "Entity" validator configured still derives an entity-typed
+    // context from the argument's own views data.
+    $this->assertInstanceOf(ContextDefinitionInterface::class, $definition['context_definitions']['nid']);
+    /** @var \Drupal\Core\Plugin\Context\ContextDefinitionInterface $context */
+    $context = $definition['context_definitions']['nid'];
+    $this->assertEquals('entity:node', $context->getDataType(), 'Context definition data type is correct.');
+    $this->assertEquals('Content: ID', $context->getLabel(), 'Context definition label is correct.');
+    $this->assertFalse($context->isRequired(), 'Context is not required.');
   }
 
 }
