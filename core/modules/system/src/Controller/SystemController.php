@@ -262,7 +262,7 @@ class SystemController extends ControllerBase {
   )]
   public function themesPage(?ThemeExtensionList $themeExtensionList = NULL, ?ModuleExtensionList $moduleExtensionList = NULL) {
     if ($themeExtensionList === NULL || $moduleExtensionList === NULL) {
-      @trigger_error('Not passing the theme and module extension lists to SystemController::themesPage() is deprecated in drupal:11.4.0 and will error in drupal:12.0.0. Pass the services directly to the method. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      @trigger_error('Not passing the theme and module extension lists to SystemController::themesPage() is deprecated in drupal:11.5.0 and will error in drupal:13.0.0. Pass the services directly to the method. See https://www.drupal.org/node/3570423', E_USER_DEPRECATED);
       $themeExtensionList = $this->themeExtensionList;
       $moduleExtensionList = $this->moduleExtensionList;
     }
