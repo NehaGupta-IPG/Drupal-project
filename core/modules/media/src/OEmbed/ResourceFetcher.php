@@ -117,7 +117,18 @@ class ResourceFetcher implements ResourceFetcherInterface {
 
     if ($high_resolution_thumbnail_url) {
       $data['thumbnail_url'] = $high_resolution_thumbnail_url;
-      $size = getimagesize($data['thumbnail_url']);
+
+      try {
+        $response = $this->httpClient->request('GET', $data['thumbnail_url'], [
+          RequestOptions::TIMEOUT => 5,
+          RequestOptions::HTTP_ERRORS => FALSE,
+        ]);
+        $size = getimagesizefromstring((string) $response->getBody());
+      }
+      catch (\Throwable) {
+        $size = FALSE;
+      }
+
       if ($size && count($size) > 1) {
         $data['thumbnail_width'] = $size[0];
         $data['thumbnail_height'] = $size[1];
