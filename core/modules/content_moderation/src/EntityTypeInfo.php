@@ -372,7 +372,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
     }
     elseif ($form_id === 'language_content_settings_form') {
       // We use an after build to alter the form after content_translation.
-      // @see _content_translation_form_language_content_settings_form_alter()
+      /* @see \Drupal\content_translation\Hook\ContentTranslationFormLanguageHooks::formLanguageContentSettingsFormAlter */
       $form['#after_build'][] = [$this, 'languageContentSettingsFormAfterBuild'];
     }
   }
