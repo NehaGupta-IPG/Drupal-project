@@ -1,5 +1,10 @@
+{% set close = 'closerequest' %}
+{% if variant === 'default' %}
+  {% set close = 'any' %}
+{% endif %}
+
 <drupal-dialog id="{{ id }}">
-  <dialog open aria-labelledby="{{ id -}}-title">
+  <dialog open aria-labelledby="{{ id -}}-title" closedby="{{ close }}" {% if variant === 'modal' %}data-modal{% endif %}>
     <div data-dialog-titlebar>
       <span id="{{ id -}}-title">{{ title }}</span>
       <form method="dialog">

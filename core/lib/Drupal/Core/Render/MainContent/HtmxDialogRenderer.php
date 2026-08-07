@@ -59,18 +59,7 @@ class HtmxDialogRenderer implements MainContentRendererInterface {
     $route_name = $route_match->getRouteName();
     $dialogId = Html::getId("drupal-dialog-$route_name");
     $title = $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject());
-    // Setup the dialog component.
-    $dialog = [
-      '#type' => 'component',
-      '#component' => 'system:drupal-dialog',
-      '#slots' => [
-        'content' => $main_content,
-      ],
-      '#props' => [
-        'id' => $dialogId,
-        'title' => $title,
-      ],
-    ];
+    $dialog = $this->generateDialog($main_content, $dialogId, $title);
     // Prepare the page with placeholders for assets.
     $token = Crypt::randomBytesBase64(55);
     $html = [
@@ -147,6 +136,37 @@ HTMX_RESPONSE,
     ]);
 
     return $response;
+  }
+
+  /**
+   * Generate a dialog component based on the provided main content.
+   *
+   * Provides an overridable method for generating a dialog component.
+   * This allows child classes to set a different variant.
+   *
+   * @param array $main_content
+   *   The main content to be displayed within the dialog.
+   * @param string $dialogId
+   *   The unique identifier for the dialog.
+   * @param mixed $title
+   *   The title of the dialog.
+   *
+   * @return array
+   *   The generated dialog render array..
+   */
+  protected function generateDialog(array $main_content, string $dialogId, mixed $title): array {
+    return [
+      '#type' => 'component',
+      '#component' => 'system:drupal-dialog',
+      '#variant' => 'default',
+      '#slots' => [
+        'content' => $main_content,
+      ],
+      '#props' => [
+        'id' => $dialogId,
+        'title' => $title,
+      ],
+    ];
   }
 
 }
