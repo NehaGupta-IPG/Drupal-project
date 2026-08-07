@@ -34,14 +34,12 @@ class LinkFormatterTest extends UnitTestCase {
     $entity = $this->createStub(EntityInterface::class);
 
     $linkItem = $this->createMock(LinkItemInterface::class);
-    $linkItem->expects($this->any())
-      ->method('getParent')
+    $linkItem->method('getParent')
       ->willReturn($entity);
     $linkItem->expects($this->once())
       ->method('getUrl')
       ->willThrowException(new \InvalidArgumentException());
-    $linkItem->expects($this->any())
-      ->method('__get')
+    $linkItem->method('__get')
       ->with('options')
       ->willReturn([]);
     $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
@@ -76,14 +74,12 @@ class LinkFormatterTest extends UnitTestCase {
     $entity = $this->createStub(EntityInterface::class);
 
     $linkItem = $this->createMock(LinkItemInterface::class);
-    $linkItem->expects($this->any())
-      ->method('getParent')
+    $linkItem->method('getParent')
       ->willReturn($entity);
     $linkItem->expects($this->once())
       ->method('getUrl')
       ->willThrowException(new \Exception('Unexpected!!!'));
-    $linkItem->expects($this->any())
-      ->method('__get')
+    $linkItem->method('__get')
       ->with('options')
       ->willReturn([]);
     $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
@@ -114,14 +110,12 @@ class LinkFormatterTest extends UnitTestCase {
     $expectedUrl = Url::fromUri('route:<front>');
 
     $linkItem = $this->createMock(LinkItemInterface::class);
-    $linkItem->expects($this->any())
-      ->method('getParent')
+    $linkItem->method('getParent')
       ->willReturn($entity);
     $linkItem->expects($this->once())
       ->method('getUrl')
       ->willReturn($expectedUrl);
-    $linkItem->expects($this->any())
-      ->method('__get')
+    $linkItem->method('__get')
       ->with('options')
       ->willReturn([]);
     $fieldDefinition = $this->createStub(FieldDefinitionInterface::class);
