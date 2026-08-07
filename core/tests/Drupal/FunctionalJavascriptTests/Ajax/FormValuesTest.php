@@ -117,6 +117,26 @@ class FormValuesTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests that AJAX submit reset and clear options affect form values.
+   */
+  public function testAjaxSubmitResetAndClearFormValues(): void {
+    $this->drupalGet('ajax_forms_test_get_form');
+
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+
+    $page->fillField('Ajax submit textfield', 'Changed value');
+    $page->pressButton('Reset form with Ajax');
+    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->fieldValueEquals('Ajax submit textfield', 'Ajax submit default value');
+
+    $page->fillField('Ajax submit textfield', 'Changed value');
+    $page->pressButton('Clear form with Ajax');
+    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->fieldValueEquals('Ajax submit textfield', '');
+  }
+
+  /**
    * Data provider for testSimpleAjaxFormValue.
    */
   public static function formModeProvider() {
