@@ -223,8 +223,6 @@ class TaxonomyIndexTid extends ManyToOne {
         $options = [];
         $query = \Drupal::entityQuery('taxonomy_term')
           ->accessCheck(TRUE)
-          // @todo Sorting on vocabulary properties -
-          //   https://www.drupal.org/node/1821274.
           ->sort('weight')
           ->sort('name')
           ->addTag('taxonomy_term_access');
@@ -235,6 +233,22 @@ class TaxonomyIndexTid extends ManyToOne {
           $query->condition('vid', $vocabulary->id());
         }
         $terms = Term::loadMultiple($query->execute());
+        if (!$this->options['limit']) {
+          // Terms span multiple vocabularies here, so also order them by
+          // their vocabulary's weight. This can't be expressed in the query
+          // above because taxonomy_term is a content entity and
+          // taxonomy_vocabulary is a config entity. A stable sort preserves
+          // the term weight/name order already applied within each
+          // vocabulary by the query.
+          $vids = array_unique(array_map(fn ($term) => $term->bundle(), $terms));
+          $vocabulary_weights = [];
+          foreach ($this->vocabularyStorage->loadMultiple($vids) as $voc) {
+            $vocabulary_weights[$voc->id()] = $voc->getWeight();
+          }
+          uasort($terms, function ($a, $b) use ($vocabulary_weights) {
+            return ($vocabulary_weights[$a->bundle()] ?? 0) <=> ($vocabulary_weights[$b->bundle()] ?? 0);
+          });
+        }
         foreach ($terms as $term) {
           $options[$term->id()] = \Drupal::service('entity.repository')->getTranslationFromContext($term)->label();
         }
