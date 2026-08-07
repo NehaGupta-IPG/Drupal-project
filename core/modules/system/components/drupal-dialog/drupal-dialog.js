@@ -63,6 +63,7 @@ class DrupalDialog extends HTMLElement {
         skipClose = true;
         dialog.close();
         if (dialog.hasAttribute('data-modal') || !supportsClosedBy) {
+          // Our current polyfill needs the entire screen to be a click target..
           dialog.showModal();
         } else {
           dialog.show();
