@@ -8,15 +8,20 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Url;
 use Drupal\jsonapi\Query\OffsetPage;
 use Drupal\node\Entity\Node;
+use Drupal\Tests\WaitTerminateTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * General functional test class.
  *
- * @group jsonapi
- *
  * @internal
  */
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
+
+  use WaitTerminateTestTrait;
 
   /**
    * {@inheritdoc}
@@ -192,7 +197,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     ]));
     $this->assertSession()->statusCodeEquals(200);
     $this->assertCount(1, $single_output['data']);
-    $non_help_links = array_filter(array_keys($single_output['meta']['omitted']['links']), function ($key) {
+    $non_help_links = array_filter(array_keys($single_output['meta']['omitted']['links']), function (int|string $key): bool {
       return $key !== 'help';
     });
     $this->assertCount(1, $non_help_links);
@@ -324,7 +329,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         'sort' => 'field_sort1,field_sort2',
       ],
     ]));
-    $output_uuids = array_map(function ($result) {
+    $output_uuids = array_map(function (array $result) {
       return $result['id'];
     }, $output['data']);
     $this->assertCount(6, $output_uuids);
@@ -343,7 +348,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         'sort' => 'field_sort1,-field_sort2',
       ],
     ]));
-    $output_uuids = array_map(function ($result) {
+    $output_uuids = array_map(function (array $result) {
       return $result['id'];
     }, $output['data']);
     $this->assertCount(6, $output_uuids);
@@ -362,7 +367,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         'sort' => '-field_sort1,field_sort2',
       ],
     ]));
-    $output_uuids = array_map(function ($result) {
+    $output_uuids = array_map(function (array $result) {
       return $result['id'];
     }, $output['data']);
     $this->assertCount(5, $output_uuids);
@@ -381,7 +386,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         'sort' => '-field_sort1,-field_sort2',
       ],
     ]));
-    $output_uuids = array_map(function ($result) {
+    $output_uuids = array_map(function (array $result) {
       return $result['id'];
     }, $output['data']);
     $this->assertCount(5, $output_uuids);
@@ -517,6 +522,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertCount(0, $collection_output['data']);
 
     // Request in maintenance mode returns valid JSON.
+    $this->setWaitForTerminate();
     $this->container->get('state')->set('system.maintenance_mode', TRUE);
     $response = $this->drupalGet('/jsonapi/taxonomy_term/tags');
     $this->assertSession()->statusCodeEquals(503);
@@ -580,7 +586,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'resource_meta_title' => $node->getTitle(),
     ];
     $this->assertEquals($expectedMeta, $result['data']['meta']);
-    // Test if the cache tags bubbled up
+    // Test if the cache tags bubbled up.
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'jsonapi_test_meta_events.object_meta');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Contexts', 'user.roles');
 
@@ -598,11 +604,11 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
 
     }
 
-    // Test if the cache tags bubbled up
+    // Test if the cache tags bubbled up.
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'jsonapi_test_meta_events.object_meta');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Contexts', 'user.roles');
 
-    // Now try the same requests with a superuser, see if we get other caches
+    // Now try the same requests with a superuser, see if we get other caches.
     $this->mink->resetSessions();
     $this->drupalResetSession();
     $this->drupalLogin($this->adminUser);
@@ -670,7 +676,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     // Test if the cache tags bubbled up.
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'jsonapi_test_meta_events.relationship_meta');
 
-    // Test if relationship has correct metadata when loading a single resource
+    // Test if relationship has correct metadata when loading a single resource.
     $resource = Json::decode($this->drupalGet('jsonapi/node/article/' . $node->uuid()));
     if ($resource['data']['id'] === $node->uuid()) {
       $tagNames = $resource['data']['relationships']['field_tags']['meta']['relationship_meta_name'];
@@ -683,7 +689,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
 
     }
 
-    // Test if the cache tags bubbled up
+    // Test if the cache tags bubbled up.
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'jsonapi_test_meta_events.relationship_meta');
   }
 
@@ -702,7 +708,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'fields' => ['name'],
     ]);
 
-    // Test if relationship has correct metadata when loading a single resource
+    // Test if relationship has correct metadata when loading a single resource.
     $str = $this->drupalGet('jsonapi/node/article/' . $node->uuid() . '/relationships/field_tags');
     $resource = Json::decode($str);
 
@@ -730,7 +736,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
    * Tests POST, PATCH and DELETE.
    */
   public function testWrite(): void {
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     $this->createDefaultContent(0, 3, FALSE, FALSE, static::IS_NOT_MULTILINGUAL, FALSE);
     // 1. Successful post.
@@ -745,7 +751,6 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
           'body' => [
             'value' => 'Custom value',
             'format' => 'plain_text',
-            'summary' => 'Custom summary',
           ],
         ],
         'relationships' => [
@@ -945,7 +950,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     ]);
     $updated_response = $this->getDocumentFromResponse($response, FALSE);
     $this->assertEquals(403, $response->getStatusCode());
-    $this->assertEquals("The current user is not allowed to PATCH the selected field (status). The 'administer nodes' permission is required.",
+    $this->assertEquals("The current user is not allowed to PATCH the selected field (status). The following permissions are required: 'administer node published status' OR 'administer nodes'.",
       $updated_response['errors'][0]['detail']);
 
     $node = \Drupal::service('entity.repository')->loadEntityByUuid('node', $uuid);
@@ -1027,7 +1032,6 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
           'body' => [
             'value' => 'Custom value',
             'format' => 'invalid_format',
-            'summary' => 'Custom summary',
           ],
         ],
       ],

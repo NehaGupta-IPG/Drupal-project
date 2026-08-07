@@ -76,7 +76,10 @@ class ContextualLinks extends RenderElementBase {
 
     // Transform contextual links into parameters suitable for links.html.twig.
     $links = [];
+    $use_ajax = FALSE;
     foreach ($items as $class => $item) {
+      // Check whether any of the contextual links have the use-ajax class.
+      $use_ajax = $use_ajax || in_array('use-ajax', $item['localized_options']['class'] ?? [], TRUE);
       $class = Html::getClass($class);
       $links[$class] = [
         'title' => $item['title'],
@@ -84,6 +87,10 @@ class ContextualLinks extends RenderElementBase {
       ];
     }
     $element['#links'] = $links;
+    if ($use_ajax) {
+      // Add AJAX library if any of the links need it.
+      $element['#attached']['library'][] = 'core/drupal.ajax';
+    }
 
     // Allow modules to alter the renderable contextual links element.
     static::moduleHandler()->alter('contextual_links_view', $element, $items);
@@ -101,6 +108,7 @@ class ContextualLinks extends RenderElementBase {
    * Wraps the contextual link manager.
    *
    * @return \Drupal\Core\Menu\ContextualLinkManager
+   *   The contextual link manager service.
    */
   protected static function contextualLinkManager() {
     return \Drupal::service('plugin.manager.menu.contextual_link');
@@ -110,6 +118,7 @@ class ContextualLinks extends RenderElementBase {
    * Wraps the module handler.
    *
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   *   The module handler service.
    */
   protected static function moduleHandler() {
     return \Drupal::moduleHandler();

@@ -41,14 +41,6 @@ class ActiveTheme {
   protected $engine;
 
   /**
-   * The path to the theme engine for root themes.
-   *
-   * @var string
-   */
-  protected $owner;
-
-
-  /**
    * An array of base theme extension objects keyed by name.
    *
    * @var \Drupal\Core\Extension\Extension[]
@@ -100,7 +92,6 @@ class ActiveTheme {
     $values += [
       'path' => '',
       'engine' => 'twig',
-      'owner' => 'twig',
       'logo' => '',
       'libraries' => [],
       'extension' => 'html.twig',
@@ -114,7 +105,6 @@ class ActiveTheme {
     $this->logo = $values['logo'];
     $this->path = $values['path'];
     $this->engine = $values['engine'];
-    $this->owner = $values['owner'];
     $this->libraries = $values['libraries'];
     $this->extension = $values['extension'];
     $this->baseThemeExtensions = $values['base_theme_extensions'];
@@ -151,18 +141,6 @@ class ActiveTheme {
    */
   public function getEngine() {
     return $this->engine;
-  }
-
-  /**
-   * Returns the path to the theme engine for root themes.
-   *
-   * @return mixed
-   *   The path to the theme engine for root themes.
-   *
-   * @see \Drupal\Core\Extension\ThemeExtensionList::doList()
-   */
-  public function getOwner() {
-    return $this->owner;
   }
 
   /**
@@ -215,7 +193,8 @@ class ActiveTheme {
    * @return string[]
    *   The list of region machine names supported by the theme.
    *
-   * @see system_region_list()
+   * @see \Drupal\Core\Extension\Theme::listAllRegions()
+   * @see \Drupal\Core\Extension\Theme::listVisibleRegions()
    */
   public function getRegions() {
     return array_keys($this->regions);

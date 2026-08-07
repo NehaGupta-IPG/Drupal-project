@@ -6,14 +6,15 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\File\FileExists;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore janvier lundi
-
 /**
  * Tests the exportation of locale files.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleExportTest extends BrowserTestBase {
 
   /**
@@ -31,7 +32,7 @@ class LocaleExportTest extends BrowserTestBase {
    *
    * @var \Drupal\user\Entity\User|false
    */
-  protected $adminUser = NULL;
+  protected $adminUser;
 
   /**
    * {@inheritdoc}
@@ -145,13 +146,13 @@ class LocaleExportTest extends BrowserTestBase {
   /**
    * Helper function that returns a proper .po file.
    */
-  public function getPoFile() {
+  public function getPoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 
@@ -163,13 +164,13 @@ EOF;
   /**
    * Returns a .po file that will be marked as customized.
    */
-  public function getCustomPoFile() {
+  public function getCustomPoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 
@@ -184,7 +185,7 @@ EOF;
    * @return string
    *   A .po file fragment with an untranslated string.
    */
-  public function getUntranslatedString() {
+  public function getUntranslatedString(): string {
     return <<< EOF
 msgid "February"
 msgstr ""

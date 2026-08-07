@@ -28,7 +28,7 @@ class FieldTest extends FieldPluginBase {
    * @param string $value
    *   The test value to set.
    */
-  public function setTestValue($value) {
+  public function setTestValue($value): void {
     $this->testValue = $value;
   }
 
@@ -36,6 +36,7 @@ class FieldTest extends FieldPluginBase {
    * Returns the testValue property.
    *
    * @return string
+   *   The value of the test.
    */
   public function getTestValue() {
     return $this->testValue;

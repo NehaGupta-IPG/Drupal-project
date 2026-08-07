@@ -25,7 +25,8 @@ class FormTestFormStateValuesCleanAdvancedForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    // Build an example form containing a managed file and a submit form element.
+    // Build an example form containing a managed file and a submit form
+    // element.
     $form['image'] = [
       '#type' => 'managed_file',
       '#title' => $this->t('Image'),
@@ -42,7 +43,7 @@ class FormTestFormStateValuesCleanAdvancedForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $form_state->cleanValues();
     print $this->t('You WIN!');
     exit;

@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Form;
 
+use Drupal\system\Form\RegionalForm;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the system_regional_settings form.
- *
- * @group system
- * @covers \Drupal\system\Form\RegionalForm
  */
+#[Group('system')]
+#[CoversClass(RegionalForm::class)]
+#[RunTestsInSeparateProcesses]
 class RegionalSettingsFormTest extends BrowserTestBase {
 
   /**
@@ -27,8 +31,6 @@ class RegionalSettingsFormTest extends BrowserTestBase {
 
   /**
    * A user with permission to administer site configuration.
-   *
-   * @var \Drupal\user\UserInterface
    */
   protected UserInterface $adminAccount;
 

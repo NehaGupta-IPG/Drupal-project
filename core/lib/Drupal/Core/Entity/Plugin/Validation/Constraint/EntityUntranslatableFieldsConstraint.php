@@ -16,14 +16,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class EntityUntranslatableFieldsConstraint extends SymfonyConstraint {
 
-  /**
-   * The message when updating a field but not the current revision.
-   */
-  public $defaultRevisionMessage = 'Non-translatable fields can only be changed when updating the current revision.';
-
-  /**
-   * The message when updating a field but not the original language.
-   */
-  public $defaultTranslationMessage = 'Non-translatable fields can only be changed when updating the original language.';
+  public function __construct(
+    public $defaultRevisionMessage = 'Non-translatable fields can only be changed when updating the current revision.',
+    public $defaultTranslationMessage = 'Non-translatable fields can only be changed when updating the original language.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

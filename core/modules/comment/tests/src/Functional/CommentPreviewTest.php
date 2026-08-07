@@ -5,21 +5,29 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentPreviewMode;
+use Drupal\comment\Entity\Comment;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\comment\Entity\Comment;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment preview.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentPreviewTest extends CommentTestBase {
 
   use TestFileCreationTrait {
     getTestFiles as drupalGetTestFiles;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'minimal';
 
   /**
    * {@inheritdoc}
@@ -35,7 +43,7 @@ class CommentPreviewTest extends CommentTestBase {
    * Tests comment preview.
    */
   public function testCommentPreview(): void {
-    $this->setCommentPreview(DRUPAL_OPTIONAL);
+    $this->setCommentPreview(CommentPreviewMode::Optional);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
@@ -75,14 +83,16 @@ class CommentPreviewTest extends CommentTestBase {
     $this->assertSession()->pageTextContains($edit['subject[0][value]']);
     $this->assertSession()->pageTextContains($edit['comment_body[0][value]']);
 
-    // Check that the title and body fields are displayed with the correct values.
+    // Check that the title and body fields are displayed with the correct
+    // values.
     $this->assertSession()->fieldValueEquals('subject[0][value]', $edit['subject[0][value]']);
     $this->assertSession()->fieldValueEquals('comment_body[0][value]', $edit['comment_body[0][value]']);
 
     // Check that the user picture is displayed.
     $this->assertSession()->elementExists('xpath', "//article[contains(@class, 'preview')]//div[contains(@class, 'user-picture')]//img");
 
-    // Ensure that preview node is displayed after the submit buttons of the form.
+    // Ensure that preview node is displayed after the submit buttons of the
+    // form.
     $xpath = $this->assertSession()->buildXPathQuery('//div[@id=:id]/following-sibling::article', [':id' => 'edit-actions']);
     $this->assertSession()->elementExists('xpath', $xpath);
   }
@@ -91,7 +101,7 @@ class CommentPreviewTest extends CommentTestBase {
    * Tests comment preview.
    */
   public function testCommentPreviewDuplicateSubmission(): void {
-    $this->setCommentPreview(DRUPAL_OPTIONAL);
+    $this->setCommentPreview(CommentPreviewMode::Optional);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
@@ -111,7 +121,8 @@ class CommentPreviewTest extends CommentTestBase {
     $this->assertSession()->pageTextContains($edit['subject[0][value]']);
     $this->assertSession()->pageTextContains($edit['comment_body[0][value]']);
 
-    // Check that the title and body fields are displayed with the correct values.
+    // Check that the title and body fields are displayed with the correct
+    // values.
     $this->assertSession()->fieldValueEquals('subject[0][value]', $edit['subject[0][value]']);
     $this->assertSession()->fieldValueEquals('comment_body[0][value]', $edit['comment_body[0][value]']);
 
@@ -139,7 +150,7 @@ class CommentPreviewTest extends CommentTestBase {
       'edit own comments',
     ]);
     $this->drupalLogin($this->adminUser);
-    $this->setCommentPreview(DRUPAL_OPTIONAL);
+    $this->setCommentPreview(CommentPreviewMode::Optional);
     $this->setCommentForm(TRUE);
     $this->setCommentSubject(TRUE);
     $this->setCommentSettings('default_mode', CommentManagerInterface::COMMENT_MODE_THREADED, 'Comment paging changed.');
@@ -159,14 +170,16 @@ class CommentPreviewTest extends CommentTestBase {
     $this->drupalGet('comment/' . $comment->id() . '/edit');
     $this->submitForm($edit, 'Preview');
 
-    // Check that the preview is displaying the subject, comment, author and date correctly.
+    // Check that the preview is displaying the subject, comment, author and
+    // date correctly.
     $this->assertSession()->titleEquals('Preview comment | Drupal');
     $this->assertSession()->pageTextContains($edit['subject[0][value]']);
     $this->assertSession()->pageTextContains($edit['comment_body[0][value]']);
     $this->assertSession()->pageTextContains($web_user->getAccountName());
     $this->assertSession()->pageTextContains($expected_text_date);
 
-    // Check that the subject, comment, author and date fields are displayed with the correct values.
+    // Check that the subject, comment, author and date fields are displayed
+    // with the correct values.
     $this->assertSession()->fieldValueEquals('subject[0][value]', $edit['subject[0][value]']);
     $this->assertSession()->fieldValueEquals('comment_body[0][value]', $edit['comment_body[0][value]']);
     $this->assertSession()->fieldValueEquals('uid', $edit['uid']);
@@ -178,7 +191,8 @@ class CommentPreviewTest extends CommentTestBase {
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('Your comment has been updated.');
 
-    // Check that the comment fields are correct after loading the saved comment.
+    // Check that the comment fields are correct after loading the saved
+    // comment.
     $this->drupalGet('comment/' . $comment->id() . '/edit');
     $this->assertSession()->fieldValueEquals('subject[0][value]', $edit['subject[0][value]']);
     $this->assertSession()->fieldValueEquals('comment_body[0][value]', $edit['comment_body[0][value]']);

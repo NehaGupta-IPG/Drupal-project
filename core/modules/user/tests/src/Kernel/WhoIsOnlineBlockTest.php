@@ -8,12 +8,14 @@ use Drupal\block\Entity\Block;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Who's Online Block.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class WhoIsOnlineBlockTest extends KernelTestBase {
   use UserCreationTrait;
 
@@ -119,7 +121,7 @@ class WhoIsOnlineBlockTest extends KernelTestBase {
     $this->assertText($user2->getAccountName(), 'Active user 2 found in online list.');
     $this->assertNoText($user3->getAccountName(), 'Inactive user not found in online list.');
     // Verify that online users are ordered correctly.
-    $raw_content = (string) $this->getRawContent();
+    $raw_content = $this->getRawContent();
     $this->assertGreaterThan(strpos($raw_content, $user2->getAccountName()), strpos($raw_content, $user1->getAccountName()));
   }
 

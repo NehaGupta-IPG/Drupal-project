@@ -8,12 +8,14 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the user_name formatter.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class UserNameFormatterTest extends KernelTestBase {
 
   /**
@@ -61,10 +63,9 @@ class UserNameFormatterTest extends KernelTestBase {
    * @return string
    *   The rendered entity fields.
    */
-  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display) {
+  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display): string {
     $content = $display->build($entity);
-    $content = $this->render($content);
-    return $content;
+    return $this->render($content);
   }
 
   /**

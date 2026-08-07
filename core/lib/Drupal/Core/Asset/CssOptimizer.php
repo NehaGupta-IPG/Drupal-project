@@ -90,8 +90,13 @@ class CssOptimizer implements AssetOptimizerInterface {
     // Store base path.
     $this->rewriteFileURIBasePath = $css_base_path . '/';
 
-    // Anchor all paths in the CSS with its base URL, ignoring external and absolute paths and paths starting with '#'.
-    return preg_replace_callback('/url\(\s*[\'"]?(?![a-z]+:|\/+|#|%23)([^\'")]+)[\'"]?\s*\)/i', [$this, 'rewriteFileURI'], $contents);
+    // Anchor all paths in the CSS with its base URL, ignoring external and
+    // absolute paths and paths starting with '#'.
+    return preg_replace_callback(
+      '/url\(\s*[\'"]?(?![a-z]+:|\/+|#|%23)([^\'")]+)[\'"]?\s*\)/i',
+      [$this, 'rewriteFileURI'],
+      $contents
+    );
   }
 
   /**
@@ -105,10 +110,6 @@ class CssOptimizer implements AssetOptimizerInterface {
    * when CSS aggregation is enabled. This optimization will not apply for
    * color.module enabled themes with CSS aggregation turned off.
    *
-   * Note: the only reason this method is public is so color.module can call it;
-   * it is not on the AssetOptimizerInterface, so any future refactoring can
-   * make it protected.
-   *
    * @param string $file
    *   Name of the stylesheet to be processed.
    * @param bool|null $optimize
@@ -119,14 +120,13 @@ class CssOptimizer implements AssetOptimizerInterface {
    * @return string
    *   Contents of the stylesheet, including any resolved @import commands.
    */
-  public function loadFile($file, $optimize = NULL, $reset_base_path = TRUE) {
+  protected function loadFile($file, $optimize = NULL, $reset_base_path = TRUE) {
     // These statics are not cache variables, so we don't use drupal_static().
     static $_optimize, $base_path;
     if ($reset_base_path) {
       $base_path = '';
     }
-    // Store the value of $optimize for preg_replace_callback with nested
-    // @import loops.
+    // Store $optimize for preg_replace_callback with nested @import loops.
     if (isset($optimize)) {
       $_optimize = $optimize;
     }
@@ -151,7 +151,8 @@ class CssOptimizer implements AssetOptimizerInterface {
       if ($encoding = (Unicode::encodingFromBOM($contents))) {
         $contents = mb_substr(Unicode::convertToUtf8($contents, $encoding), 1);
       }
-      // If no BOM, check for fallback encoding. Per CSS spec the regex is very strict.
+      // If no BOM, check for fallback encoding. Per CSS spec the regex is very
+      // strict.
       elseif (preg_match('/^@charset "([^"]+)";/', $contents, $matches)) {
         if ($matches[1] !== 'utf-8' && $matches[1] !== 'UTF-8') {
           $contents = substr($contents, strlen($matches[0]));
@@ -262,7 +263,12 @@ class CssOptimizer implements AssetOptimizerInterface {
     // This happens recursively but omits external files and local files
     // with supports- or media-query qualifiers, as those are conditionally
     // loaded depending on the user agent.
-    $contents = preg_replace_callback('/@import\s*(?:url\(\s*)?[\'"]?(?![a-z]+:)(?!\/\/)([^\'"\()]+)[\'"]?\s*\)?\s*;/', [$this, 'loadNestedFile'], $contents);
+    $contents = preg_replace_callback(
+      '/@import\s*(?:url\(\s*)?[\'"]?(?![a-z]+:)(?!\/\/)([^\'"\()]+)[\'"]?\s*\)?\s*;/', [
+        $this,
+        'loadNestedFile',
+      ],
+      $contents);
 
     return $contents;
   }

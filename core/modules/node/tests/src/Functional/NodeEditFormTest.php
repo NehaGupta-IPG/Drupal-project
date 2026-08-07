@@ -6,12 +6,14 @@ namespace Drupal\Tests\node\Functional;
 
 use Drupal\node\NodeInterface;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Create a node and test node edit functionality.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeEditFormTest extends NodeTestBase {
 
   /**
@@ -87,7 +89,8 @@ class NodeEditFormTest extends NodeTestBase {
     $this->clickLink('Edit');
     $this->assertSession()->addressEquals($node->toUrl('edit-form'));
 
-    // Check that the title and body fields are displayed with the correct values.
+    // Check that the title and body fields are displayed with the correct
+    // values.
     // @todo Ideally assertLink would support HTML, but it doesn't.
     $this->assertSession()->responseContains('Edit');
     $this->assertSession()->fieldValueEquals($title_key, $edit[$title_key]);
@@ -100,7 +103,8 @@ class NodeEditFormTest extends NodeTestBase {
     // Stay on the current page, without reloading.
     $this->submitForm($edit, 'Save');
 
-    // Check that the title and body fields are displayed with the updated values.
+    // Check that the title and body fields are displayed with the updated
+    // values.
     $this->assertSession()->pageTextContains($edit[$title_key]);
     $this->assertSession()->pageTextContains($edit[$body_key]);
 
@@ -111,7 +115,8 @@ class NodeEditFormTest extends NodeTestBase {
     ]);
     $this->drupalLogin($second_web_user);
     // Edit the same node, creating a new revision.
-    $this->drupalGet("node/" . $node->id() . "/edit");
+    $node_edit_url = $node->toUrl('edit-form');
+    $this->drupalGet($node_edit_url);
     $edit = [];
     $edit['title[0][value]'] = $this->randomMachineName(8);
     $edit[$body_key] = $this->randomMachineName(16);
@@ -132,12 +137,12 @@ class NodeEditFormTest extends NodeTestBase {
     $this->assertNotSame($first_node_version->getRevisionUser()->id(), $second_node_version->getRevisionUser()->id(), 'Each revision has a distinct user.');
 
     // Check if the node revision checkbox is rendered on node edit form.
-    $this->drupalGet('node/' . $node->id() . '/edit');
-    $this->assertSession()->fieldExists('edit-revision', NULL);
+    $this->drupalGet($node_edit_url);
+    $this->assertSession()->fieldExists('edit-revision');
 
     // Check that details form element opens when there are errors on child
     // elements.
-    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->drupalGet($node_edit_url);
     $edit = [];
     // This invalid date will trigger an error.
     $edit['created[0][value][date]'] = $this->randomMachineName(8);
@@ -152,11 +157,22 @@ class NodeEditFormTest extends NodeTestBase {
 
     // Edit the same node, save it and verify it's unpublished after unchecking
     // the 'Published' boolean_checkbox and clicking 'Save'.
-    $this->drupalGet("node/" . $node->id() . "/edit");
+    $this->drupalGet($node_edit_url);
     $edit = ['status[value]' => FALSE];
     $this->submitForm($edit, 'Save');
     $node = $this->nodeStorage->load($node->id());
     $this->assertFalse($node->isPublished(), 'Node is unpublished');
+
+    // Login as a user that can access the published checkbox.
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer node published status',
+      'edit any page content',
+    ]));
+    $this->drupalGet($node_edit_url);
+    $this->assertSession()->fieldExists('status[value]');
+    $this->submitForm(['status[value]' => TRUE], 'Save');
+    $node = $this->nodeStorage->load($node->id());
+    $this->assertTrue($node->isPublished());
   }
 
   /**
@@ -249,10 +265,25 @@ class NodeEditFormTest extends NodeTestBase {
     $edit['body[0][value]'] = $this->randomMachineName(16);
     $this->submitForm($edit, 'Save');
 
+    // Enable user_hooks_test to test the users display name is visible on the
+    // edit form.
+    \Drupal::service('module_installer')->install(['user_hooks_test']);
+    \Drupal::keyValue('user_hooks_test')->set('user_format_name_alter', TRUE);
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
-    $this->drupalGet("node/" . $node->id() . "/edit");
+    $this->drupalGet($node->toUrl('edit-form'));
     $this->assertSession()->pageTextContains('Published');
     $this->assertSession()->pageTextContains($this->container->get('date.formatter')->format($node->getChangedTime(), 'short'));
+    $this->assertSession()->responseContains('<em>' . $this->adminUser->id() . '</em>');
+  }
+
+  /**
+   * Tests the node form when the author is NULL.
+   */
+  public function testNodeFormNullAuthor(): void {
+    \Drupal::service('module_installer')->install(['node_no_default_author']);
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('node/add/page');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
   /**
@@ -263,7 +294,7 @@ class NodeEditFormTest extends NodeTestBase {
    * @param string $form_element_name
    *   The name of the form element to populate.
    */
-  protected function checkVariousAuthoredByValues(NodeInterface $node, $form_element_name): void {
+  protected function checkVariousAuthoredByValues(NodeInterface $node, string $form_element_name): void {
     // Try to change the 'authored by' field to an invalid user name.
     $edit = [
       $form_element_name => 'invalid-name',

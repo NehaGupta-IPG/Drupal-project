@@ -6,7 +6,9 @@
     "ignorePaths": [
       "**/.*.json",
       ".*ignore",
+      "../**/composer.json",
       "composer.lock",
+      "../composer/Plugin/VendorHardening/Config.php",
       "assets/vendor/**",
       "misc/jquery.form.js",
       "lib/Drupal/Component/Diff/**",
@@ -17,8 +19,6 @@
       "modules/**/Migrate*Test.php",
       "modules/ckeditor5/js/build/*",
       "modules/media/tests/fixtures/oembed/*",
-      "modules/migrate_drupal/tests/fixtures/drupal6.php",
-      "modules/migrate_drupal/tests/fixtures/drupal7.php",
       "modules/navigation/assets/**",
       "modules/search/tests/UnicodeTest.txt",
       "modules/system/tests/logo.svgz",
@@ -26,6 +26,7 @@
       "profiles/demo_umami/modules/demo_umami_content/default_content/languages/es/**/*",
       "tests/fixtures/config_install/*",
       "tests/fixtures/files/*",
+      "tests/fixtures/phpunit_*.xml",
       "tests/Drupal/Tests/Component/Annotation/Doctrine/**",
       "tests/PHPStan/vendor/**",
       "themes/olivero/fonts/**",
@@ -65,12 +66,18 @@
       }
      ],
     "flagWords": [
+      "blacklist",
+      "blacklisted",
       "e-mail",
       "grey",
       "hte",
+      "illegal",
       "ist",
       "please",
       "queuing",
+      "sorry",
+      "whitelist",
+      "whitelisted",
       "writeable"
     ],
     "overrides": [

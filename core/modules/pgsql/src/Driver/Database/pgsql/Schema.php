@@ -147,7 +147,10 @@ class Schema extends DatabaseSchema {
         'blob_fields' => [],
         'sequences' => [],
       ];
-      $this->connection->addSavepoint();
+
+      if ($this->connection->inTransaction()) {
+        $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
+      }
 
       try {
         // The bytea columns and sequences for a table can be found in
@@ -171,10 +174,14 @@ EOD;
         ]);
       }
       catch (\Exception $e) {
-        $this->connection->rollbackSavepoint();
+        if (isset($savepoint)) {
+          $savepoint->rollback();
+        }
         throw $e;
       }
-      $this->connection->releaseSavepoint();
+      if (isset($savepoint)) {
+        $savepoint->commitOrRelease();
+      }
 
       // If the table information does not yet exist in the PostgreSQL
       // metadata, then return the default table information here, so that it
@@ -243,6 +250,7 @@ EOD;
    *   - t: constraint trigger;
    *   - x: exclusion constraint.
    *   Defaults to 'c' for a CHECK constraint.
+   *   phpcs:ignore Drupal.Commenting.FunctionComment.ParamCommentFullStop
    *   @see https://www.postgresql.org/docs/current/catalog-pg-constraint.html
    *
    * @return array
@@ -259,7 +267,9 @@ EOD;
     $schema = $prefixInfo['schema'];
     $table_name = $prefixInfo['table'];
 
-    $this->connection->addSavepoint();
+    if ($this->connection->inTransaction()) {
+      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
+    }
 
     try {
       $checks = $this->connection->query("SELECT conname FROM pg_class cl INNER JOIN pg_constraint co ON co.conrelid = cl.oid INNER JOIN pg_attribute attr ON attr.attrelid = cl.oid AND attr.attnum = ANY (co.conkey) INNER JOIN pg_namespace ns ON cl.relnamespace = ns.oid WHERE co.contype = :constraint_type AND ns.nspname = :schema AND cl.relname = :table AND attr.attname = :column", [
@@ -270,11 +280,15 @@ EOD;
       ]);
     }
     catch (\Exception $e) {
-      $this->connection->rollbackSavepoint();
+      if (isset($savepoint)) {
+        $savepoint->rollback();
+      }
       throw $e;
     }
 
-    $this->connection->releaseSavepoint();
+    if (isset($savepoint)) {
+      $savepoint->commitOrRelease();
+    }
 
     $field_information = $checks->fetchCol();
 
@@ -513,7 +527,10 @@ EOD;
   public function tableExists($table, $add_prefix = TRUE) {
     $prefixInfo = $this->getPrefixInfo($table, $add_prefix);
 
-    return (bool) $this->connection->query("SELECT 1 FROM pg_tables WHERE schemaname = :schema AND tablename = :table", [':schema' => $prefixInfo['schema'], ':table' => $prefixInfo['table']])->fetchField();
+    return (bool) $this->connection->query("SELECT 1 FROM pg_tables WHERE schemaname = :schema AND tablename = :table", [
+      ':schema' => $prefixInfo['schema'],
+      ':table' => $prefixInfo['table'],
+    ])->fetchField();
   }
 
   /**
@@ -569,7 +586,10 @@ EOD;
     $table_name = $this->connection->getPrefix() . $table;
     // Index names and constraint names are global in PostgreSQL, so we need to
     // rename them when renaming the table.
-    $indexes = $this->connection->query('SELECT indexname FROM pg_indexes WHERE schemaname = :schema AND tablename = :table', [':schema' => $this->defaultSchema, ':table' => $table_name]);
+    $indexes = $this->connection->query('SELECT indexname FROM pg_indexes WHERE schemaname = :schema AND tablename = :table', [
+      ':schema' => $this->defaultSchema,
+      ':table' => $table_name,
+    ]);
 
     foreach ($indexes as $index) {
       // Get the index type by suffix, e.g. idx/key/pkey.
@@ -579,7 +599,7 @@ EOD;
       // exceed the 63 chars limit of PostgreSQL, we need to take care of that.
       // cSpell:disable-next-line
       // Example (drupal_Gk7Su_T1jcBHVuvSPeP22_I3Ni4GrVEgTYlIYnBJkro_idx).
-      if (str_contains($index->indexname, 'drupal_')) {
+      if (str_starts_with($index->indexname, 'drupal_')) {
         preg_match('/^drupal_(.*)_' . preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
         $index_name = $matches[1];
       }
@@ -718,7 +738,10 @@ EOD;
   public function fieldExists($table, $column) {
     $prefixInfo = $this->getPrefixInfo($table);
 
-    return (bool) $this->connection->query("SELECT 1 FROM pg_attribute WHERE attrelid = :key::regclass AND attname = :column AND NOT attisdropped AND attnum > 0", [':key' => $prefixInfo['schema'] . '.' . $prefixInfo['table'], ':column' => $column])->fetchField();
+    return (bool) $this->connection->query("SELECT 1 FROM pg_attribute WHERE attrelid = :key::regclass AND attname = :column AND NOT attisdropped AND attnum > 0", [
+      ':key' => $prefixInfo['schema'] . '.' . $prefixInfo['table'],
+      ':column' => $column,
+    ])->fetchField();
   }
 
   /**
@@ -1055,23 +1078,38 @@ EOD;
   }
 
   /**
-   * Retrieve a table or column comment.
+   * Retrieves a table or column comment.
+   *
+   * @param string $table
+   *   The table name.
+   * @param string|null $column
+   *   (optional) The column name.
+   *
+   * @return string|false
+   *   The table or column comment. FALSE if the table or column does not exist.
    */
   public function getComment($table, $column = NULL) {
     $info = $this->getPrefixInfo($table);
     // Don't use {} around pg_class, pg_attribute tables.
     if (isset($column)) {
-      return $this->connection->query('SELECT col_description(oid, attnum) FROM pg_class, pg_attribute WHERE attrelid = oid AND relname = ? AND attname = ?', [$info['table'], $column])->fetchField();
+      return $this->connection->query('SELECT col_description(oid, attnum) FROM pg_class, pg_attribute WHERE attrelid = oid AND relname = ? AND attname = ?', [
+        $info['table'],
+        $column,
+      ])->fetchField() ?? FALSE;
     }
     else {
-      return $this->connection->query('SELECT obj_description(oid, ?) FROM pg_class WHERE relname = ?', ['pg_class', $info['table']])->fetchField();
+      return $this->connection->query('SELECT obj_description(oid, ?) FROM pg_class WHERE relname = ?', [
+        'pg_class',
+        $info['table'],
+      ])->fetchField() ?? FALSE;
     }
   }
 
   /**
    * Calculates a base-64 encoded PostgreSQL-safe sha-256 hash.
    *
-   * The hash is modified to according to  @link https://www.postgresql.org/docs/current/sql-syntax-lexical.html PostgreSQL Lexical Structure@endlink.
+   * The hash is modified to according to PostgreSQL Lexical Structure. See
+   * https://www.postgresql.org/docs/current/sql-syntax-lexical.html.
    *
    * @param string $data
    *   String to be hashed.
@@ -1104,7 +1142,7 @@ EOD;
   }
 
   /**
-   * Retrieves a sequence name that is owned by the table and column..
+   * Retrieves a sequence name that is owned by the table and column.
    *
    * @param string $table
    *   A table name that is not prefixed or quoted.
