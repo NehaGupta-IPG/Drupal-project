@@ -133,25 +133,32 @@ class MenuLinkContentForm extends ContentEntityForm {
     // Schemes such as mailto: and tel: are external but carry no host for
     // UrlHelper::externalIsLocal() to compare, which would make it throw
     // an exception.
-    if (!UrlHelper::isExternal($uri) || !parse_url($uri, PHP_URL_HOST)) {
+    $parts = UrlHelper::isExternal($uri) ? parse_url($uri) : FALSE;
+    if (!$parts || empty($parts['host'])) {
       return $uri;
     }
 
     $request = $this->getRequest();
     $base_path = $request->getBasePath();
+    $path = $parts['path'] ?? '';
+    // A URL pointing at the site root may be entered without its trailing
+    // slash, leaving no path for the base path to be matched against below.
+    if ($path === '' || $path === $base_path) {
+      $path .= '/';
+    }
+
     // The trailing slash anchors the base path so that a partial match, such
-    // as /subdirectory against /subdir, is not mistaken for a local URL.
+    // as /subdirectory against /subdir, is not mistaken for a local URL. Only
+    // the host and the path take part in the comparison, so passing a URL
+    // rebuilt from those two is enough.
     $base_url = $request->getSchemeAndHttpHost() . $base_path . '/';
-    if (!UrlHelper::externalIsLocal($uri, $base_url)) {
+    if (!UrlHelper::externalIsLocal('//' . $parts['host'] . $path, $base_url)) {
       return $uri;
     }
 
-    // The entered URL points at this site, so drop the base URL. It is rebuilt
-    // from the parsed parts rather than sliced off the string, because
-    // externalIsLocal() ignores the scheme and so the prefix length may differ.
-    $parts = parse_url($uri);
-    $path = substr($parts['path'] ?? '/', strlen($base_path));
-    return 'internal:' . ($path ?: '/')
+    // The entered URL points at this site, so drop the base path and keep the
+    // rest.
+    return 'internal:' . substr($path, strlen($base_path))
       . (isset($parts['query']) ? '?' . $parts['query'] : '')
       . (isset($parts['fragment']) ? '#' . $parts['fragment'] : '');
   }
