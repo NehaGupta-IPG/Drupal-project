@@ -60,8 +60,10 @@ function taxonomy_post_update_populate_taxonomy_index_langcode(&$sandbox = NULL)
   $nodes = $node_storage->loadMultiple($entity_ids);
 
   foreach ($nodes as $node) {
-    taxonomy_delete_node_index($node);
-    taxonomy_build_node_index($node);
+    // Manually call node_update hook to rebuild taxonomy index, as it's
+    // not possible to do it otherwise.
+    \Drupal::moduleHandler()
+      ->invoke('taxonomy', 'node_update', [$node]);
 
     // Update our progress information.
     $sandbox['progress']++;
