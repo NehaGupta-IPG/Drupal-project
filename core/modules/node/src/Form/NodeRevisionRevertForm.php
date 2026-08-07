@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 
@@ -16,7 +17,7 @@ use Drupal\node\NodeInterface;
  *
  * @internal
  */
-class NodeRevisionRevertForm extends ConfirmFormBase {
+class NodeRevisionRevertForm extends ConfirmFormBase implements WorkspaceSafeFormInterface {
 
   /**
    * The node revision.

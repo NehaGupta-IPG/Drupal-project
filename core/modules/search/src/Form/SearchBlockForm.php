@@ -2,7 +2,6 @@
 
 namespace Drupal\search\Form;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
@@ -17,20 +16,10 @@ use Drupal\search\SearchPageRepositoryInterface;
  */
 class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
 
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
   public function __construct(
     protected SearchPageRepositoryInterface $searchPageRepository,
-    ConfigFactoryInterface $config_factory,
     protected RendererInterface $renderer,
-  ) {
-    $this->configFactory = $config_factory;
-  }
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -51,7 +40,7 @@ class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
       // conditional return, otherwise the block would get cached without the
       // necessary cacheability metadata in case there is no default search page
       // and would not be invalidated if that changes.
-      $this->renderer->addCacheableDependency($form, $this->configFactory->get('search.settings'));
+      $this->renderer->addCacheableDependency($form, $this->config('search.settings'));
     }
 
     if (!$entity_id) {
