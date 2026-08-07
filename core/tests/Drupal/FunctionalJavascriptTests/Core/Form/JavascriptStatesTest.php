@@ -94,6 +94,15 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertNotEmpty($textfield_required_element);
     $textfield_readonly_element = $page->findField('textfield_readonly_when_checkbox_trigger_checked');
     $this->assertNotEmpty($textfield_readonly_element);
+    // A fieldset carries its required marker on the legend and details on the
+    // summary, neither of which is a label element.
+    $required_fieldset_label = $this->assertSession()->elementExists('css', '#edit-fieldset-required-when-checkbox-trigger-checked legend .js-form-label');
+    $required_details_label = $this->assertSession()->elementExists('css', '#edit-details-required-when-checkbox-trigger-checked summary');
+    $textfield_required_label = $this->assertSession()->elementExists('css', 'label[for="edit-textfield-required-when-checkbox-trigger-checked"]');
+    // A wrapper with no label of its own falls back to the label of the single
+    // form item nested inside it.
+    $required_container_label = $this->assertSession()->elementExists('css', '#edit-container-required-when-checkbox-trigger-checked legend .js-form-label');
+    $required_container_textfield_label = $this->assertSession()->elementExists('css', 'label[for="edit-textfield-in-required-container"]');
     $textarea_readonly_element = $page->findField('textarea_readonly_when_checkbox_trigger_checked');
     $this->assertNotEmpty($textarea_readonly_element);
     $details = $this->assertSession()->elementExists('css', '#edit-details-expanded-when-checkbox-trigger-checked');
@@ -173,6 +182,11 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($textfield_in_details->isVisible());
     $this->assertFalse($textfield_required_element->hasAttribute('required'));
     $this->assertFalse($textfield_required_element->hasAttribute('aria-required'));
+    $this->assertFalse($textfield_required_label->hasClass('form-required'));
+    $this->assertFalse($required_fieldset_label->hasClass('form-required'));
+    $this->assertFalse($required_details_label->hasClass('form-required'));
+    $this->assertFalse($required_container_label->hasClass('form-required'));
+    $this->assertFalse($required_container_textfield_label->hasClass('form-required'));
     $this->assertFalse($textfield_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($textarea_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($checkbox_checked_element->isChecked());
@@ -209,6 +223,11 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($textfield_invisible_element->isVisible());
     $this->assertEquals('required', $textfield_required_element->getAttribute('required'));
     $this->assertFalse($textfield_required_element->hasAttribute('aria-required'));
+    $this->assertTrue($textfield_required_label->hasClass('form-required'));
+    $this->assertTrue($required_fieldset_label->hasClass('form-required'));
+    $this->assertTrue($required_details_label->hasClass('form-required'));
+    $this->assertTrue($required_container_label->hasClass('form-required'));
+    $this->assertTrue($required_container_textfield_label->hasClass('form-required'));
     $this->assertTrue($textfield_readonly_element->hasAttribute('readonly'));
     $this->assertTrue($textarea_readonly_element->hasAttribute('readonly'));
     $this->assertTrue($details->hasAttribute('open'));
@@ -254,6 +273,11 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($details->hasAttribute('open'));
     $this->assertFalse($textfield_in_details->isVisible());
     $this->assertFalse($textfield_required_element->hasAttribute('required'));
+    $this->assertFalse($textfield_required_label->hasClass('form-required'));
+    $this->assertFalse($required_fieldset_label->hasClass('form-required'));
+    $this->assertFalse($required_details_label->hasClass('form-required'));
+    $this->assertFalse($required_container_label->hasClass('form-required'));
+    $this->assertFalse($required_container_textfield_label->hasClass('form-required'));
     $this->assertFalse($textfield_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($textarea_readonly_element->hasAttribute('readonly'));
     $this->assertFalse($checkbox_checked_element->isChecked());
