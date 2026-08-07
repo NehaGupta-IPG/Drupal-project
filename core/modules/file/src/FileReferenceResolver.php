@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\file\FileUsage\FileUsageInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -53,7 +54,8 @@ class FileReferenceResolver {
    *   A file entity.
    *
    * @return \Generator<int, \Drupal\file\FileReferenceUsage>
-   *   This yields FileReferenceUsage objects.
+   *   This yields FileReferenceUsage objects, one per translation referencing
+   *   the file.
    *
    * @ingroup file
    */
@@ -93,10 +95,13 @@ class FileReferenceResolver {
         }
 
         $default_revision_match = FALSE;
-        foreach ($file_reference_fields as $field_name => $field_column) {
-          if ($this->isFileReferencedByField($entity, $file, $field_name, $field_column)) {
-            $default_revision_match = TRUE;
-            $references[] = new FileReferenceUsage($entity->getEntityTypeId(), $field_name, id: $entity->id());
+        foreach ($entity->getTranslationLanguages() as $langcode => $language) {
+          $translation = $entity->getTranslation($langcode);
+          foreach ($file_reference_fields as $field_name => $field_column) {
+            if ($this->fieldReferencesFile($translation, $file, $field_name, $field_column)) {
+              $default_revision_match = TRUE;
+              $references[] = new FileReferenceUsage($entity->getEntityTypeId(), $field_name, id: $entity->id(), langcode: $langcode);
+            }
           }
         }
 
@@ -121,9 +126,12 @@ class FileReferenceResolver {
           }
 
           $cacheability_metadata->addCacheableDependency($revision);
-          foreach ($this->getFileReferenceFields($entity) as $field_name => $field_column) {
-            if ($this->isFileReferencedByField($revision, $file, $field_name, $field_column)) {
-              $references[] = new FileReferenceUsage($revision->getEntityTypeId(), $field_name, revisionId: $revision->getRevisionId());
+          foreach ($revision->getTranslationLanguages() as $langcode => $language) {
+            $translation = $revision->getTranslation($langcode);
+            foreach ($file_reference_fields as $field_name => $field_column) {
+              if ($this->fieldReferencesFile($translation, $file, $field_name, $field_column)) {
+                $references[] = new FileReferenceUsage($revision->getEntityTypeId(), $field_name, revisionId: $revision->getRevisionId(), langcode: $langcode);
+              }
             }
           }
         }
@@ -140,17 +148,21 @@ class FileReferenceResolver {
    *   The file reference usage with either ID or revision ID set.
    *
    * @return \Drupal\Core\Entity\FieldableEntityInterface
-   *   The entity using the file.
+   *   The entity using the file, in the language of the usage.
    */
   public function loadEntityFromUsage(FileReferenceUsage $usage): FieldableEntityInterface {
     $storage = $this->entityTypeManager->getStorage($usage->entityTypeId);
     if ($usage->id) {
-      return $storage->load($usage->id);
+      $entity = $storage->load($usage->id);
     }
     else {
       assert($storage instanceof RevisionableStorageInterface);
-      return $storage->loadRevision($usage->revisionId);
+      $entity = $storage->loadRevision($usage->revisionId);
     }
+    if ($usage->langcode !== NULL && $entity instanceof TranslatableInterface && $entity->hasTranslation($usage->langcode)) {
+      return $entity->getTranslation($usage->langcode);
+    }
+    return $entity;
   }
 
   /**
@@ -247,10 +259,10 @@ class FileReferenceResolver {
   }
 
   /**
-   * Returns whether the file is referenced by the given field.
+   * Returns whether an entity or translation references the file in a field.
    *
    * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
-   *   The entity to check.
+   *   The entity or translation to check.
    * @param \Drupal\file\FileInterface $file
    *   The file to look for.
    * @param string $field_name
@@ -261,15 +273,10 @@ class FileReferenceResolver {
    * @return bool
    *   True if the file is referenced, false if not.
    */
-  protected function isFileReferencedByField(FieldableEntityInterface $entity, FileInterface $file, string $field_name, string $field_column): bool {
-    // Iterate over the field items to find the referenced file and
-    // field name. We also iterate over all translations because a file
-    // can be linked to a language other than the default.
-    foreach ($entity->getTranslationLanguages() as $langcode => $language) {
-      foreach ($entity->getTranslation($langcode)->get($field_name) as $item) {
-        if ($file->id() == $item->{$field_column}) {
-          return TRUE;
-        }
+  protected function fieldReferencesFile(FieldableEntityInterface $entity, FileInterface $file, string $field_name, string $field_column): bool {
+    foreach ($entity->get($field_name) as $item) {
+      if ($file->id() == $item->{$field_column}) {
+        return TRUE;
       }
     }
     return FALSE;
