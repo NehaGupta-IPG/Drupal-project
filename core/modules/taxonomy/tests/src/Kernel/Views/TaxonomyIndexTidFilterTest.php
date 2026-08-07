@@ -154,7 +154,7 @@ class TaxonomyIndexTidFilterTest extends TaxonomyTestBase {
     $filter->buildOptionsForm($form, new FormState());
 
     // Confirm that terms in the lighter vocabulary sort first, and terms in
-    // the heavier vocabulary sort last while keepting the sort order within
+    // the heavier vocabulary sort last while keeping the sort order within
     // the vocabulary.
     $ordered_tids = array_map('intval', array_keys($form['value']['#options']));
     $this->assertSame([
