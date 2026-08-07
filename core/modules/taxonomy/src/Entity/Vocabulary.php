@@ -116,6 +116,21 @@ class Vocabulary extends ConfigEntityBundleBase implements VocabularyInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getWeight() {
+    return $this->get('weight');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setWeight($weight) {
+    $this->set('weight', $weight);
+    return $this;
+  }
+
+  /**
    * The default revision setting for a vocabulary.
    *
    * @var bool
