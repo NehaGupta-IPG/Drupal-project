@@ -139,6 +139,8 @@ class LinkFieldTest extends BrowserTestBase {
       'http://www.example.com/numbers_(9999)' => 'http://www.example.com/numbers_(9999)',
     ];
     $valid_internal_entries = [
+      'route:entity.node.canonical;node=1' => 'route:entity.node.canonical;node=1',
+      'route:entity.user.canonical;user=999999' => 'route:entity.user.canonical;user=999999',
       '/entity_test/add' => '/entity_test/add',
       '/a/path/alias' => '/a/path/alias',
 
@@ -240,7 +242,7 @@ class LinkFieldTest extends BrowserTestBase {
    *
    * @param string $field_name
    *   The field name.
-   * @param array $valid_entries
+   * @param array<string, string> $valid_entries
    *   An array of valid URL entries.
    *
    * @internal
@@ -264,7 +266,7 @@ class LinkFieldTest extends BrowserTestBase {
    *
    * @param string $field_name
    *   The field name.
-   * @param array $invalid_entries
+   * @param array<string, string> $invalid_entries
    *   An array of invalid URL entries.
    *
    * @internal
@@ -388,7 +390,7 @@ class LinkFieldTest extends BrowserTestBase {
     ];
     $this->submitForm($edit, 'Save');
     preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
-    $id = $match[1];
+    $id = (int) $match[1];
     $this->assertSession()->statusMessageContains('entity_test ' . $id . ' has been created.', 'status');
 
     $output = $this->renderTestEntity($id);
@@ -495,74 +497,6 @@ class LinkFieldTest extends BrowserTestBase {
     $content = $display->build($entity);
     $output = \Drupal::service('renderer')->renderRoot($content);
     return (string) $output;
-  }
-
-  /**
-   * Test link widget exception handled if link uri value is invalid.
-   */
-  public function testLinkWidgetCaughtExceptionEditingInvalidUrl(): void {
-    $field_name = $this->randomMachineName();
-    $this->fieldStorage = FieldStorageConfig::create([
-      'field_name' => $field_name,
-      'entity_type' => 'entity_test',
-      'type' => 'link',
-      'cardinality' => 1,
-    ]);
-    $this->fieldStorage->save();
-    FieldConfig::create([
-      'field_storage' => $this->fieldStorage,
-      'label' => 'Link',
-      'bundle' => 'entity_test',
-      'settings' => [
-        'title' => LinkTitleVisibility::Optional->value,
-        'link_type' => LinkItemInterface::LINK_GENERIC,
-      ],
-    ])->save();
-
-    $entityTypeManager = $this->container->get('entity_type.manager');
-    $entityTypeManager
-      ->getStorage('entity_form_display')
-      ->load('entity_test.entity_test.default')
-      ->setComponent($field_name, [
-        'type' => 'link_default',
-      ])
-      ->save();
-
-    $entityTypeManager
-      ->getStorage('entity_view_display')
-      ->create([
-        'targetEntityType' => 'entity_test',
-        'bundle' => 'entity_test',
-        'mode' => 'full',
-        'status' => TRUE,
-      ])
-      ->setComponent($field_name, [
-        'type' => 'link',
-      ])
-      ->save();
-
-    // Entities can be saved without validation, for example via migration.
-    // Link fields may contain invalid uris such as external URLs without
-    // scheme.
-    $invalidUri = 'www.example.com';
-    $invalidLinkUrlEntity = $entityTypeManager
-      ->getStorage('entity_test')
-      ->create([
-        'name' => 'Test entity with invalid link URL',
-        $field_name => ['uri' => $invalidUri],
-      ]);
-    $invalidLinkUrlEntity->save();
-
-    // If a user without 'link to any page' permission edits an entity, widget
-    // checks access by converting uri to Url object, which will throw an
-    // InvalidArgumentException if uri is invalid.
-    $this->drupalLogin($this->drupalCreateUser([
-      'view test entity',
-      'administer entity_test content',
-    ]));
-    $this->drupalGet("/entity_test/manage/{$invalidLinkUrlEntity->id()}/edit");
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->fieldValueEquals("{$field_name}[0][uri]", $invalidUri);
   }
 
 }

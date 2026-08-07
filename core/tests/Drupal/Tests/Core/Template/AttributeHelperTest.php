@@ -39,7 +39,7 @@ class AttributeHelperTest extends UnitTestCase {
    * Tests attribute exists.
    */
   #[DataProvider('providerTestAttributeExists')]
-  public function testAttributeExists(array $test_data, $test_attribute, $expected): void {
+  public function testAttributeExists(array $test_data, string $test_attribute, bool $expected): void {
     $this->assertSame($expected, AttributeHelper::attributeExists($test_attribute, $test_data));
     $attributes = new Attribute($test_data);
     $this->assertSame($expected, AttributeHelper::attributeExists($test_attribute, $attributes));
@@ -83,7 +83,7 @@ class AttributeHelperTest extends UnitTestCase {
    * Tests merge collections.
    */
   #[DataProvider('providerTestMergeCollections')]
-  public function testMergeCollections($original, $merge, $expected): void {
+  public function testMergeCollections(array $original, Attribute|array $merge, array $expected): void {
     $this->assertEquals($expected, AttributeHelper::mergeCollections($original, $merge));
     $this->assertEquals(new Attribute($expected), AttributeHelper::mergeCollections(new Attribute($original), $merge));
   }
@@ -94,10 +94,10 @@ class AttributeHelperTest extends UnitTestCase {
   public function testMergeCollectionsArgumentException(): void {
     $attributes = new Attribute(['class' => ['example-class']]);
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Invalid collection argument');
+    $this->expectExceptionMessageIs('Invalid collection argument');
     AttributeHelper::mergeCollections($attributes, 'not an array');
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Invalid collection argument');
+    $this->expectExceptionMessageIs('Invalid collection argument');
     AttributeHelper::mergeCollections('not an array', $attributes);
   }
 

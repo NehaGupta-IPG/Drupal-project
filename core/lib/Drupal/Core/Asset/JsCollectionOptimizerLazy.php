@@ -8,6 +8,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -90,6 +91,9 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
             // groups, whether or not files in a group are from a particular
             // library or not.
             $js_assets[$order]['preprocessed'] = TRUE;
+            if (!empty($js_group['libraries'])) {
+              $js_assets[$order]['libraries'] = $js_group['libraries'];
+            }
           }
           break;
 
@@ -106,17 +110,16 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
       }
     }
     if ($libraries) {
-      // All group URLs have the same query arguments apart from the delta and
-      // scope, so prepare them in advance.
+      // Language and theme are the same for all URLs, so prepare them in
+      // advance.
       $language = $this->languageManager->getCurrentLanguage()->getId();
       $query_args = [
         'language' => $language,
         'theme' => $this->themeManager->getActiveTheme()->getName(),
         'include' => UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($libraries))),
       ];
-      $ajax_page_state = $this->requestStack->getCurrentRequest()
-        ->get('ajax_page_state');
-      $already_loaded = isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : [];
+      $ajax_page_state = $this->requestStack->getCurrentRequest()->attributes->get('ajax_page_state');
+      $already_loaded = isset($ajax_page_state['libraries']) ? explode(',', $ajax_page_state['libraries']) : [];
       if ($already_loaded) {
         $query_args['exclude'] = UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($already_loaded)));
       }
@@ -129,6 +132,14 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
             'scope' => $js_asset['scope'] === 'header' ? 'header' : 'footer',
             'delta' => "$order",
           ] + $query_args;
+
+          // When an asset corresponds 1-1 with a single library, we don't need
+          // either the include or exclude query arguments. Replace this with
+          // the explicit list of libraries in the aggregate.
+          if (isset($js_asset['libraries'])) {
+            unset($query['include'], $query['exclude'], $query['delta']);
+            $query['libraries'] = UrlHelper::compressQueryParameter(implode(',', $js_asset['libraries']));
+          }
           // Add a filename prefix to mitigate ad blockers which can block
           // any script beginning with 'ad'.
           $filename = 'js_' . $this->generateHash($js_asset) . '.js';
@@ -146,7 +157,16 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
    * {@inheritdoc}
    */
   public function deleteAll() {
-    $this->fileSystem->deleteRecursive('assets://js');
+    if (!\is_dir('assets://js')) {
+      return;
+    }
+    $directory_iterator = new \DirectoryIterator('assets://js');
+    $threshold = Settings::get('aggregate_gc_threshold', 86400 * 45);
+    foreach ($directory_iterator as $file) {
+      if ($file->isFile() && $this->time->getRequestTime() - $file->getMtime() > $threshold) {
+        $this->fileSystem->delete($file->getPathName());
+      }
+    }
   }
 
   /**

@@ -59,9 +59,6 @@ abstract class ViewTestBase extends BrowserTestBase {
     \Drupal::state()->set('views_test_data_views_data', $this->viewsData());
 
     \Drupal::service('module_installer')->install(['views_test_data']);
-    $this->resetAll();
-    $this->rebuildContainer();
-    $this->container->get('module_handler')->reload();
 
     // Load the test dataset.
     $data_set = $this->dataSet();
@@ -90,7 +87,7 @@ abstract class ViewTestBase extends BrowserTestBase {
    */
   protected function orderResultSet($result_set, $column, $reverse = FALSE) {
     $order = $reverse ? -1 : 1;
-    usort($result_set, function ($a, $b) use ($column, $order) {
+    usort($result_set, function (array $a, array $b) use ($column, $order): int {
       return $order * ($a[$column] <=> $b[$column]);
     });
     return $result_set;

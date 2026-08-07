@@ -38,8 +38,6 @@ class ResponsiveImageFieldUiTest extends WebDriverTestBase {
 
   /**
    * The content type id.
-   *
-   * @var string
    */
   protected string $type;
 
@@ -75,7 +73,7 @@ class ResponsiveImageFieldUiTest extends WebDriverTestBase {
    */
   public function testResponsiveImageFormatterUi(): void {
     $manage = 'admin/structure/types/manage/' . $this->type;
-    $manage_display = $manage . '/display';
+    $manage_display = $manage . '/display/default';
     /** @var \Drupal\FunctionalJavascriptTests\JSWebAssert $assert_session */
     $assert_session = $this->assertSession();
 

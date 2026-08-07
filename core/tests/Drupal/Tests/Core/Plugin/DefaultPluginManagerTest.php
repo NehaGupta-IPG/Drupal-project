@@ -83,7 +83,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
       'provider' => 'plugin_test',
     ];
 
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
     $plugin_manager = new TestPluginManager($this->namespaces, $definitions, $module_handler, 'test_alter_hook', FruitInterface::class);
     $plugin_manager->getDefinition('plugin_test', FALSE);
     $this->assertTrue(TRUE, 'No PHP fatal error occurred when retrieving the definitions of a module with plugins that depend on a non-installed module class should not cause a PHP fatal.');
@@ -146,7 +146,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions);
 
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage('The "missing" plugin does not exist. Valid plugin IDs for Drupal\Tests\Core\Plugin\TestPluginManager are: apple, banana');
+    $this->expectExceptionMessageIs('The "missing" plugin does not exist. Valid plugin IDs for Drupal\Tests\Core\Plugin\TestPluginManager are: apple, banana');
     $plugin_manager->getDefinition('missing');
   }
 
@@ -291,7 +291,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   public function testCreateInstanceWithInvalidInterfaces(): void {
     $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
 
-    $module_handler->expects($this->any())
+    $module_handler->expects($this->never())
       ->method('moduleExists')
       ->with('plugin_test')
       ->willReturn(TRUE);
@@ -308,7 +308,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler, NULL, FruitInterface::class);
     $this->expectException(PluginException::class);
-    $this->expectExceptionMessage('Plugin "kale" (Drupal\plugin_test\Plugin\plugin_test\fruit\Kale) must implement interface Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
+    $this->expectExceptionMessageIs('Plugin "kale" (Drupal\plugin_test\Plugin\plugin_test\fruit\Kale) must implement interface Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface.');
     $plugin_manager->createInstance('kale');
   }
 
@@ -318,7 +318,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   public function testGetDefinitionsWithoutRequiredInterface(): void {
     $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
 
-    $module_handler->expects($this->any())
+    $module_handler->expects($this->exactly(3))
       ->method('moduleExists')
       ->with('plugin_test')
       ->willReturn(FALSE);
@@ -333,7 +333,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $this->expectedDefinitions['apple']['provider'] = 'plugin_test';
     $this->expectedDefinitions['banana']['provider'] = 'plugin_test';
 
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler, NULL);
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler);
     $this->assertIsArray($plugin_manager->getDefinitions());
   }
 
@@ -342,10 +342,10 @@ class DefaultPluginManagerTest extends UnitTestCase {
    */
   public function testGetCacheContexts(): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler->reveal(), NULL);
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler->reveal());
     $cache_contexts = $plugin_manager->getCacheContexts();
     $this->assertIsArray($cache_contexts);
-    array_map(function ($cache_context): void {
+    array_map(function (string $cache_context): void {
       $this->assertIsString($cache_context);
     }, $cache_contexts);
   }
@@ -355,10 +355,10 @@ class DefaultPluginManagerTest extends UnitTestCase {
    */
   public function testGetCacheTags(): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler->reveal(), NULL);
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler->reveal());
     $cache_tags = $plugin_manager->getCacheTags();
     $this->assertIsArray($cache_tags);
-    array_map(function ($cache_tag): void {
+    array_map(function (string $cache_tag): void {
       $this->assertIsString($cache_tag);
     }, $cache_tags);
   }
@@ -368,7 +368,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
    */
   public function testGetCacheMaxAge(): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
-    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler->reveal(), NULL);
+    $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler->reveal());
     $cache_max_age = $plugin_manager->getCacheMaxAge();
     $this->assertIsInt($cache_max_age);
   }
@@ -407,13 +407,13 @@ class DefaultPluginManagerTest extends UnitTestCase {
   #[DataProvider('providerTestProcessDefinition')]
   public function testProcessDefinition($definition, $expected): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
-    $plugin_manager = new TestPluginManagerWithDefaults($this->namespaces, $this->expectedDefinitions, $module_handler->reveal(), NULL);
+    $plugin_manager = new TestPluginManagerWithDefaults($this->namespaces, $this->expectedDefinitions, $module_handler->reveal());
 
     $plugin_manager->processDefinition($definition, 'the_plugin_id');
     $this->assertEquals($expected, $definition);
   }
 
-  public static function providerTestProcessDefinition() {
+  public static function providerTestProcessDefinition(): array {
     $data = [];
 
     $data['merge'][] = [

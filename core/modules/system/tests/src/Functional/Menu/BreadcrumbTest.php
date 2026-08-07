@@ -6,8 +6,10 @@ namespace Drupal\Tests\system\Functional\Menu;
 
 use Drupal\block\Entity\Block;
 use Drupal\Core\Url;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -21,6 +23,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 class BreadcrumbTest extends BrowserTestBase {
 
   use AssertBreadcrumbTrait;
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -68,7 +71,9 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->container->get('theme_installer')->install(['claro']);
     $this->config('system.theme')->set('admin', 'claro')->save();
 
+    $this->enablePromotedContentView();
     $this->config('system.site')->set('page.front', '/node')->save();
+
     $perms = array_keys(\Drupal::service('user.permissions')->getPermissions());
     $this->adminUser = $this->drupalCreateUser($perms);
     $this->drupalLogin($this->adminUser);
@@ -152,7 +157,7 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->assertBreadcrumb("admin/structure/types/manage/$type/fields/node.$type.body", $trail);
 
     // Verify Filter text format administration breadcrumbs.
-    $filter_formats = filter_formats();
+    $filter_formats = \Drupal::service(FilterFormatRepositoryInterface::class)->getAllFormats();
     $format = reset($filter_formats);
     $format_id = $format->id();
     $trail = $config + [
@@ -235,6 +240,7 @@ class BreadcrumbTest extends BrowserTestBase {
 
     $edit = [
       'menu[menu_parent]' => $link->getMenuName() . ':' . $link->getPluginId(),
+      'field_multiple_value_form_field[0][value]' => 'test',
     ];
     $this->drupalGet('node/' . $parent->id() . '/edit');
     $this->submitForm($edit, 'Save');
@@ -247,6 +253,7 @@ class BreadcrumbTest extends BrowserTestBase {
     ];
     $edit = [
       'field_tags[target_id]' => implode(',', array_keys($tags)),
+      'field_multiple_value_form_field[0][value]' => 'test',
     ];
     $this->drupalGet('node/' . $parent->id() . '/edit');
     $this->submitForm($edit, 'Save');
@@ -293,7 +300,7 @@ class BreadcrumbTest extends BrowserTestBase {
     // Logout the user because we want to check the active class as well, which
     // is just rendered as anonymous user.
     $this->drupalLogout();
-    foreach ($tags as $name => $data) {
+    foreach ($tags as $data) {
       $term = $data['term'];
       /** @var \Drupal\menu_link_content\MenuLinkContentInterface $link */
       $link = $data['link'];

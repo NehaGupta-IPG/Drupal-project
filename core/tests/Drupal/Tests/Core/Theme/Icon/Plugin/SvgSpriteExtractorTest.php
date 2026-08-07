@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Theme\Icon\Plugin;
 
+// cspell:ignore corge
+
 use Drupal\Core\Theme\Icon\IconDefinition;
 use Drupal\Core\Theme\Icon\IconFinder;
 use Drupal\Core\Theme\Plugin\IconExtractor\SvgSpriteExtractor;
 use Drupal\Tests\Core\Theme\Icon\IconTestTrait;
 use Drupal\Tests\UnitTestCase;
-// cspell:ignore corge
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\Theme\Plugin\IconExtractor\SvgSpriteExtractor.
@@ -30,24 +32,20 @@ class SvgSpriteExtractorTest extends UnitTestCase {
 
   /**
    * The SvgSpriteExtractor instance.
-   *
-   * @var \Drupal\Core\Theme\Plugin\IconExtractor\SvgSpriteExtractor
    */
   private SvgSpriteExtractor $svgSpriteExtractorPlugin;
 
   /**
    * The IconFinder instance.
-   *
-   * @var \Drupal\Core\Theme\Icon\IconFinder|\PHPUnit\Framework\MockObject\MockObject
    */
-  private IconFinder $iconFinder;
+  private IconFinder&Stub $iconFinder;
 
   /**
    * {@inheritdoc}
    */
   public function setUp():void {
     parent::setUp();
-    $this->iconFinder = $this->createMock(IconFinder::class);
+    $this->iconFinder = $this->createStub(IconFinder::class);
     $this->svgSpriteExtractorPlugin = new SvgSpriteExtractor(
       [
         'id' => $this->pluginId,
