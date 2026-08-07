@@ -693,11 +693,11 @@ trait FunctionalTestSetupTrait {
     $kernel->preHandle($request);
     $this->prepareDatabasePrefix();
 
-    $this->originalSite = $kernel->findSitePath($request);
+    $this->originalSite = $kernel::findSitePath($request);
 
     // Create test directory ahead of installation so fatal errors and debug
     // information can be logged during installation process.
-    \Drupal::service('file_system')->prepareDirectory($this->siteDirectory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+    mkdir($this->siteDirectory);
 
     // Prepare filesystem directory paths.
     $this->publicFilesDirectory = $this->siteDirectory . '/files';
@@ -706,12 +706,6 @@ trait FunctionalTestSetupTrait {
 
     // Ensure the configImporter is refreshed for each test.
     $this->configImporter = NULL;
-
-    // Unregister all custom stream wrappers of the parent site.
-    $wrappers = \Drupal::service('stream_wrapper_manager')->getWrappers(StreamWrapperInterface::ALL);
-    foreach ($wrappers as $scheme => $info) {
-      stream_wrapper_unregister($scheme);
-    }
 
     // Reset statics.
     // @phpstan-ignore function.deprecated
