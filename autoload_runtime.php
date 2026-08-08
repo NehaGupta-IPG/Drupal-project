@@ -36,8 +36,8 @@ if (empty($_SERVER['SCRIPT_NAME'])) {
 // remove it from the beginning of SCRIPT_NAME, if present. The path prefix
 // should contain directories between an .htaccess file redirecting requests
 // into Drupal's /web directory, and the directory itself.
-$webroot = getenv('DRUPAL_WEBROOT');
-if ($webroot !== FALSE && str_starts_with($_SERVER['SCRIPT_NAME'], $webroot)) {
+$webroot = getenv('DRUPAL_WEBROOT') ?? '';
+if (!empty($webroot) && str_starts_with($_SERVER['SCRIPT_NAME'], $webroot)) {
   $_SERVER['SCRIPT_NAME'] = substr($_SERVER['SCRIPT_NAME'], strlen($webroot));
 }
 
