@@ -48,7 +48,7 @@ class AccessManager implements AccessManagerInterface {
       // @see \Drupal\Core\ParamConverter\EntityConverter::convert()
       // @see \Drupal\Core\ParamConverter\EntityRevisionParamConverter::convert()
       // @see \Drupal\Core\Access\AccessArgumentResolverFactory::getArgumentsResolver()
-      foreach ($this->languageManager->getLanguageTypes() as $type) {
+      foreach ($this->languageManager->getDefinedLanguageTypes() as $type) {
         $param_name = $type . '_';
         if (isset($parameters[$param_name])) {
           $route->setDefault($param_name, $parameters[$param_name]);

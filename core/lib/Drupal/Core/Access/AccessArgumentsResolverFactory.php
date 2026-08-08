@@ -34,7 +34,7 @@ readonly class AccessArgumentsResolverFactory implements AccessArgumentsResolver
     // manager. Note that the default or parameter name is the language type
     // with an underscore appended to it. This naming is used to make the chance
     // of a collision with other parameters or defaults defined on a route.
-    foreach ($this->languageManager->getLanguageTypes() as $type) {
+    foreach ($this->languageManager->getDefinedLanguageTypes() as $type) {
       $param_name = $type . '_';
       $language = isset($raw_route_arguments[$param_name]) ? $this->languageManager->getLanguage($raw_route_arguments[$param_name]) : $this->languageManager->getCurrentLanguage($type);
       // Match arguments for both snake- and camel-cased names.

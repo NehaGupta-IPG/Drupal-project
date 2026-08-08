@@ -47,7 +47,7 @@ class AccessArgumentsResolverFactoryTest extends KernelTestBase {
         [LanguageInterface::TYPE_CONTENT, $languages['en']],
         [LanguageInterface::TYPE_INTERFACE, $languages['de']],
       ]);
-    $languageManager->method('getLanguageTypes')
+    $languageManager->method('getDefinedLanguageTypes')
       ->willReturn([
         LanguageInterface::TYPE_CONTENT,
         LanguageInterface::TYPE_INTERFACE,

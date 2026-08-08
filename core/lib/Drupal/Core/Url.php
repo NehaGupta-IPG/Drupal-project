@@ -836,7 +836,7 @@ class Url implements TrustedCallbackInterface {
     $parameters = $this->getRouteParameters();
     $language = $this->getOption('language');
     if ($language instanceof LanguageInterface) {
-      foreach ($this->languageManager()->getLanguageTypes() as $type) {
+      foreach ($this->languageManager()->getDefinedLanguageTypes() as $type) {
         // Provide the langcode as a route parameter that can be upcasted for
         // entity translation or passed as languages to access callbacks.
         // @see \Drupal\Core\ParamConverter\EntityConverter::convert()

@@ -80,11 +80,6 @@ class ConfigurableLanguageManagerTest extends LanguageTestBase {
     $config = $this->config('language.negotiation');
     $config->set('url.prefixes', ['en' => 'en', 'es' => 'es', 'fr' => 'fr'])
       ->save();
-
-    // Use language-content-entity negotiation.
-    $config = $this->config('language.types');
-    $config->set('configurable', [LanguageInterface::TYPE_INTERFACE, LanguageInterface::TYPE_CONTENT])
-      ->save();
   }
 
   /**
