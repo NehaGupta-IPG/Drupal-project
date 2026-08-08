@@ -207,18 +207,25 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
     $links = [];
     $query = [];
     parse_str($request->getQueryString() ?? '', $query);
-
+    $language_list = $this->languageManager->getStandardLanguageList();
     foreach ($this->languageManager->getNativeLanguages() as $language) {
-      $links[$language->getId()] = [
+      $id = $language->getId();
+      $links[$id] = [
         // We need to clone the $url object to avoid using the same one for all
         // links. When the links are rendered, options are set on the $url
         // object, so if we use the same one, they would be set for all links.
         'url' => clone $url,
-        'title' => $language->getName(),
+        'title' => $language->getLocal(),
         'language' => $language,
-        'attributes' => ['class' => ['language-link'], 'lang' => $language->getId()],
+        'attributes' => ['class' => ['language-link']],
         'query' => $query,
       ];
+
+      // Add 'lang' attribute is a known translated name and is not the
+      // current active item.
+      if ($language->getLocal() !== $language->getName() && $this->languageManager->getCurrentLanguage()->getId() !== $id){
+        $links[$id]['attributes']['lang'] = $id;
+      }
     }
 
     return $links;

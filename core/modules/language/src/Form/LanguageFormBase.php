@@ -71,6 +71,13 @@ abstract class LanguageFormBase extends EntityForm {
       '#default_value' => $language->label(),
       '#required' => TRUE,
     ];
+    $form['local'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Local name'),
+      '#maxlength' => 512,
+      '#default_value' => $language->getLocal(),
+      '#required' => TRUE,
+    ];
     $form['direction'] = [
       '#type' => 'radios',
       '#title' => $this->t('Direction'),
@@ -99,6 +106,9 @@ abstract class LanguageFormBase extends EntityForm {
     }
     if ($form_state->getValue('label') != Html::escape($form_state->getValue('label'))) {
       $form_state->setErrorByName('label', $this->t('%field cannot contain any markup.', ['%field' => $form['label']['#title']]));
+    }
+    if ($form_state->getValue('local') != Html::escape($form_state->getValue('local'))) {
+      $form_state->setErrorByName('local', $this->t('%field cannot contain any markup.', ['%field' => $form['local']['#title']]));
     }
   }
 

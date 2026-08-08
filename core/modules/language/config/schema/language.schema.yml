@@ -102,6 +102,9 @@ language.entity.*:
     label:
       type: required_label
       label: 'Label'
+    native:
+      type: label
+      label: 'Local name'
     direction:
       type: string
       label: 'Direction'

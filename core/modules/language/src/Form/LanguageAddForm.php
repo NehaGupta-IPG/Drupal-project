@@ -70,6 +70,9 @@ class LanguageAddForm extends LanguageFormBase {
     $form['custom_language']['label']['#states'] = [
       'required' => $custom_language_states_conditions,
     ];
+    $form['custom_language']['local']['#states'] = [
+      'required' => $custom_language_states_conditions,
+    ];
     $form['custom_language']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Add custom language'),
@@ -154,6 +157,7 @@ class LanguageAddForm extends LanguageFormBase {
     if ($langcode == 'custom') {
       $langcode = $form_state->getValue('langcode');
       $label = $form_state->getValue('label');
+      $local = $form_state->getValue('local');
       $direction = $form_state->getValue('direction');
     }
     else {
@@ -163,10 +167,12 @@ class LanguageAddForm extends LanguageFormBase {
       // \Drupal\language\ConfigurableLanguageManager::getStandardLanguageListWithoutConfigured().
       // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $label = $this->t($standard_languages[$langcode][0]);
+      $local = $standard_languages[$langcode][1];
       $direction = $standard_languages[$langcode][2] ?? ConfigurableLanguage::DIRECTION_LTR;
     }
     $entity->set('id', $langcode);
     $entity->set('label', $label);
+    $entity->set('local', $local);
     $entity->set('direction', $direction);
     // There is no weight on the edit form. Fetch all configurable languages
     // ordered by weight and set the new language to be placed after them.

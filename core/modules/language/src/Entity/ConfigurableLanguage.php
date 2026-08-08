@@ -54,6 +54,7 @@ use Drupal\language\LanguageListBuilder;
   config_export: [
     'id',
     'label',
+    'local',
     'direction',
     'weight',
     'locked',
@@ -74,6 +75,13 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
    * @var string
    */
   protected $label;
+
+  /**
+   * The local (Autonym) name for the language.
+   *
+   * @var string
+   */
+  protected $local = '';
 
   /**
    * The direction of language, either DIRECTION_LTR or DIRECTION_RTL.
@@ -241,6 +249,29 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
   /**
    * {@inheritdoc}
    */
+  public function getLocal(): string {
+    if ($this->local !== NULL && $this->local !== '') {
+      return $this->local;
+    }
+    $standard_languages = LanguageManager::getStandardLanguageList();
+    $langcode = $this->id();
+    if ($langcode && isset($standard_languages[$langcode][1])) {
+      return $standard_languages[$langcode][1];
+    }
+    return $this->label() ?? $langcode ?? '';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setLocal(string $name): static {
+    $this->local = $name;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getId() {
     return $this->id();
   }
@@ -286,6 +317,7 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
       return static::create([
         'id' => $langcode,
         'label' => $langcode,
+        'local' => $langcode,
       ]);
     }
     else {
@@ -293,6 +325,7 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
       return static::create([
         'id' => $langcode,
         'label' => $standard_languages[$langcode][0],
+        'local' => $standard_languages[$langcode][1],
         'direction' => $standard_languages[$langcode][2] ?? static::DIRECTION_LTR,
       ]);
     }

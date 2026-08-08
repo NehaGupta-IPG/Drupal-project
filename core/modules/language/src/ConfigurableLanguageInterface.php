@@ -21,6 +21,24 @@ interface ConfigurableLanguageInterface extends ConfigEntityInterface, LanguageI
   public function setName($name);
 
   /**
+   * Gets the local (Autonym) name of the language.
+   *
+   * @return string
+   *   The local name of the language, in the language itself.
+   */
+  public function getLocal(): string;
+
+  /**
+   * Sets the local (Autonym) name of the language.
+   *
+   * @param string $name
+   *   The local name of the language, in the language itself.
+   *
+   * @return $this
+   */
+  public function setLocal(string $name): static;
+
+  /**
    * Sets the weight of the language.
    *
    * @param int $weight
