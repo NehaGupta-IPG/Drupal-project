@@ -181,12 +181,12 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase implement
       else {
         $links[$langcode]['attributes']['class'][] = 'session-active';
       }
-    }
 
-    // Add 'lang' attribute is a known translated name and is not the
-    // current active item.
-    if ($this->languageManager->getCurrentLanguage()->getId() !== $langcode) {
-      $links[$langcode]['attributes']['lang'] = $langcode;
+      // Add 'lang' attribute is a known translated name and is not the
+      // current active item.
+      if ($this->languageManager->getCurrentLanguage()->getId() !== $langcode) {
+        $links[$langcode]['attributes']['lang'] = $langcode;
+      }
     }
 
     return $links;
