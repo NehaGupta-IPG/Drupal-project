@@ -207,8 +207,9 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
     $links = [];
     $query = [];
     parse_str($request->getQueryString() ?? '', $query);
+
     foreach ($this->languageManager->getNativeLanguages() as $language) {
-      $id = $language->getId();
+      $langcode = $language->getId();
       $links[$id] = [
         // We need to clone the $url object to avoid using the same one for all
         // links. When the links are rendered, options are set on the $url
@@ -222,8 +223,8 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
 
       // Add 'lang' attribute is a known translated name and is not the
       // current active item.
-      if ($language->getLocal() !== $language->getName() && $this->languageManager->getCurrentLanguage()->getId() !== $id){
-        $links[$id]['attributes']['lang'] = $id;
+      if ($language->getLocal() !== $language->getName() && $this->languageManager->getCurrentLanguage()->getId() !== $langcode){
+        $links[$langcode]['attributes']['lang'] = $langcode;
       }
     }
 
