@@ -61,9 +61,16 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
     $this->entityFieldManager = $this->container->get('entity_field.manager');
     $this->database = $this->container->get('database');
 
+    $this->installEntitySchema('entity_test_update');
+  }
+
+  /**
+   * Install all available entity type schemas.
+   */
+  protected function installAllEntitySchemas(): void {
     // Install every entity type's schema that wasn't installed in the parent
     // method.
-    foreach (array_diff_key($this->entityTypeManager->getDefinitions(), array_flip(['user', 'entity_test'])) as $entity_type_id => $entity_type) {
+    foreach (array_diff_key($this->entityTypeManager->getDefinitions(), array_flip(['user'])) as $entity_type_id => $entity_type) {
       $this->installEntitySchema($entity_type_id);
     }
   }
@@ -72,6 +79,8 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * Tests when no definition update is needed.
    */
   public function testNoUpdates(): void {
+    $this->installAllEntitySchemas();
+
     // Ensure that the definition update manager reports no updates.
     $this->assertFalse($this->entityDefinitionUpdateManager->needsUpdates(), 'EntityDefinitionUpdateManager reports that no updates are needed.');
     $this->assertSame([], $this->entityDefinitionUpdateManager->getChangeSummary(), 'EntityDefinitionUpdateManager reports an empty change summary.');
@@ -82,6 +91,10 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * Tests updating entity schema when there are no existing entities.
    */
   public function testEntityTypeUpdateWithoutData(): void {
+    $this->installEntitySchema('user_role');
+    $this->installEntitySchema('action');
+    $this->installEntitySchema('field_storage_config');
+
     // The 'entity_test_update' entity type starts out non-revisionable, so
     // ensure the revision table hasn't been created during setUp().
     $this->assertFalse($this->database->schema()->tableExists('entity_test_update_revision'), 'Revision table not created for entity_test_update.');
@@ -100,7 +113,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
         'The Default revision field needs to be installed.',
       ],
     ];
-    $this->assertEquals($expected, $this->entityDefinitionUpdateManager->getChangeSummary(), 'EntityDefinitionUpdateManager reports the expected change summary.');
+    $this->assertEquals($expected['entity_test_update'], $this->entityDefinitionUpdateManager->getChangeSummary()['entity_test_update'], 'EntityDefinitionUpdateManager reports the expected change summary.');
 
     // Run the update and ensure the revision table is created.
     $this->updateEntityTypeToRevisionable(TRUE);
@@ -216,6 +229,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * Tests creating, updating, and deleting a base field if no entities exist.
    */
   public function testBaseFieldCreateUpdateDeleteWithoutData(): void {
+    $this->installAllEntitySchemas();
     // Add a base field, ensure the update manager reports it, and the update
     // creates its schema.
     $this->addBaseField();
@@ -277,6 +291,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * See testBaseFieldCreateUpdateDeleteWithoutData() for more details.
    */
   public function testBaseFieldWithoutLabelCreateUpdateDelete(): void {
+    $this->installAllEntitySchemas();
     // Add a base field, ensure the update manager reports it with the
     // field id.
     $this->addBaseField('string', 'entity_test_update', FALSE, FALSE);
@@ -310,6 +325,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * @see testBaseFieldDeleteWithExistingData()
    */
   public function testBaseFieldCreateDeleteWithExistingEntities(): void {
+    $this->installAllEntitySchemas();
     // Save an entity.
     $name = $this->randomString();
     $storage = $this->entityTypeManager->getStorage('entity_test_update');
@@ -361,6 +377,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * Tests updating a base field when it has existing data.
    */
   public function testBaseFieldUpdateWithExistingData(): void {
+    $this->installAllEntitySchemas();
     // Add the base field and run the update.
     $this->addBaseField();
     $this->applyEntityUpdates();
@@ -384,6 +401,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * Tests creating and deleting a multi-field index when there are no existing entities.
    */
   public function testEntityIndexCreateDeleteWithoutData(): void {
+    $this->installAllEntitySchemas();
     // Add an entity index and ensure the update manager reports that as an
     // update to the entity type.
     $this->addEntityIndex();
@@ -536,6 +554,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * @see Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema::createSharedTableSchema
    */
   public function testCreateFieldAndIndexOnSharedTable(): void {
+    $this->installAllEntitySchemas();
     $this->addBaseField();
     $this->addBaseFieldIndex();
     $this->applyEntityUpdates();
@@ -581,6 +600,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * Tests updating a base field when it has existing data.
    */
   public function testBaseFieldEntityKeyUpdateWithExistingData(): void {
+    $this->installAllEntitySchemas();
     // Add the base field and run the update.
     $this->addBaseField();
     $this->applyEntityUpdates();
@@ -633,6 +653,7 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * Check that field schema is correctly handled with long-named fields.
    */
   public function testLongNameFieldIndexes(): void {
+    $this->installAllEntitySchemas();
     $this->addLongNameBaseField();
     $entity_type_id = 'entity_test_update';
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
@@ -674,6 +695,8 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
    * Tests entity type and field storage definition events.
    */
   public function testDefinitionEvents(): void {
+    \Drupal::service('module_installer')->install(['entity_test']);
+    $this->installAllEntitySchemas();
     /** @var \Drupal\entity_test\EntityTestDefinitionSubscriber $event_subscriber */
     $event_subscriber = $this->container->get('entity_test.definition.subscriber');
     $event_subscriber->enableEventTracking();
