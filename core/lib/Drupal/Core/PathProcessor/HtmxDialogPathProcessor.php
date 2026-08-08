@@ -23,7 +23,7 @@ class HtmxDialogPathProcessor implements InboundPathProcessorInterface {
    */
   public function processInbound($path, Request $request) {
     // Return unmodified path if the path does not match our pattern.
-    if (!str_starts_with($path, '/htmx/dialog/') && substr_count(strtolower($path), "/") >= 4) {
+    if (!(str_starts_with($path, '/htmx/dialog/') && substr_count(strtolower($path), "/") >= 4)) {
       return $path;
     }
     // Trim our dialog prefix and type from the beginning of the path.
