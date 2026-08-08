@@ -221,7 +221,7 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
     $expectedLanguageSwitchLinksArray = [
       'de' => [
         'url' => $url,
-        'title' => $this->languages['de']->getName(),
+        'title' => $this->languages['de']->getLocal(),
         'attributes' => [
           'class' => ['language-link'],
           'lang' => 'de',
@@ -233,10 +233,9 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
       ],
       'en' => [
         'url' => $url,
-        'title' => $this->languages['en']->getName(),
+        'title' => $this->languages['en']->geLocal(),
         'attributes' => [
-          'class' => ['language-link'],
-          'lang' => 'en',
+          'class' => ['language-link is-active'],
         ],
         'query' => [
           LanguageNegotiationContentEntity::QUERY_PARAMETER => 'en',
