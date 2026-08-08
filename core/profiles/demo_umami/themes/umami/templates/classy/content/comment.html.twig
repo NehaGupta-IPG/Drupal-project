@@ -22,7 +22,7 @@
  *   'comment.changed' variable.
  * - permalink: Comment permalink.
  * - submitted: (optional) Submission information created from author and
- *   created during template_preprocess_comment().
+ *   created during \Drupal\comment\Hook\CommentThemeHooks::preprocessComment().
  * - user_picture: (optional) The comment author's profile picture.
  * - status: Comment status. Possible values are:
  *   unpublished, published, or preview.
@@ -54,7 +54,8 @@
  * - parent_title: Equivalent to title for the parent comment.
  * - parent_permalink: Equivalent to permalink for the parent comment.
  * - parent: A text string of parent comment submission information created from
- *   'parent_author' and 'parent_created' during template_preprocess_comment().
+ *   'parent_author' and 'parent_created' during
+ *   \Drupal\comment\Hook\CommentThemeHooks::preprocessComment().
  *   This information is presented to help screen readers follow lengthy
  *   discussion threads. You can hide this from sighted users using the class
  *   visually-hidden.

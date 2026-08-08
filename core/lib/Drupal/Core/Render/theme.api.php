@@ -1359,7 +1359,8 @@ function hook_theme_registry_alter(&$theme_registry) {
  * \Drupal::service('theme.manager)->resetActiveTheme()
  * @endcode
  *
- * See user_template_preprocess_default_variables_alter() for an example.
+ * See \Drupal\user\Hook\UserHooks::templatePreprocessDefaultVariablesAlter()
+ * for an example.
  *
  * @param array $variables
  *   An associative array of default template variables, as set up by
