@@ -460,7 +460,7 @@ class UpdateContribTest extends UpdateTestBase {
       'bbb_update_test' => 'does-not-exist',
       'ccc_update_test' => '1_0',
     ];
-    $this->refreshUpdateStatus($xml_mapping);
+    $this->refreshUpdateStatus($xml_mapping, 'update-test', TRUE);
 
     $this->assertSession()->pageTextContains('Up to date');
     // We're expecting the report to say most projects are up to date, so we
