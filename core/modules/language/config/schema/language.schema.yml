@@ -102,7 +102,7 @@ language.entity.*:
     label:
       type: required_label
       label: 'Label'
-    native:
+    local:
       type: label
       label: 'Local name'
     direction:
