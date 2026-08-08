@@ -188,10 +188,9 @@ function drupal_verify_profile($install_state): array {
  *   to set the default language.
  */
 function drupal_install_system($install_state): void {
-  // Set flag on the global $install_state so that when
-  // ModuleInstaller::install() triggers a container rebuild,
-  // InstallerServiceProvider::register() sees this flag and switches from
-  // early-phase services (fallback config, memory keyvalue, null routing)
+  // Set flag on the global $install_state so that the container rebuild at the
+  // end of this function makes InstallerServiceProvider::register() switch
+  // from early-phase services (fallback config, memory keyvalue, null routing)
   // to full database-backed services. We write to $GLOBALS directly rather
   // than using 'global $install_state' to avoid redeclaring the parameter.
   $GLOBALS['install_state']['base_system_verified'] = TRUE;
@@ -220,6 +219,14 @@ function drupal_install_system($install_state): void {
     $config->set('profile', $install_state['parameters']['profile']);
   }
   $config->save();
+
+  // Rebuild the container so that the remaining tasks in this request run with
+  // the database-backed services. Without this, state writes such as the
+  // install_task marker go to the in-memory key value store and are lost, and
+  // the next request restarts from the early installer phase. The request
+  // stack and the session survive the rebuild, so no reboot is needed.
+  // @see \Drupal\Core\DrupalKernel::initializeContainer()
+  $kernel->rebuildContainer();
 }
 
 /**
