@@ -687,12 +687,9 @@ trait FunctionalTestSetupTrait {
     // Bootstrap Drupal so we can use Drupal's built in functions.
     $this->classLoader = require __DIR__ . '/../../../../../autoload.php';
     $request = Request::createFromGlobals();
-    $kernel = TestRunnerKernel::createFromRequest($request, $this->classLoader);
-    $kernel->boot();
-    $kernel->preHandle($request);
     $this->prepareDatabasePrefix();
 
-    $this->originalSite = $kernel::findSitePath($request);
+    $this->originalSite = DrupalKernel::findSitePath($request);
 
     // Create test directory ahead of installation so fatal errors and debug
     // information can be logged during installation process.
