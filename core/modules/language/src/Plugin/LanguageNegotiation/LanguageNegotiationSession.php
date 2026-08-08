@@ -172,7 +172,7 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase implement
         // object, so if we use the same one, they would be set for all links.
         'url' => clone $url,
         'title' => $language->getLocal(),
-        'attributes' => ['class' => ['language-link'],],
+        'attributes' => ['class' => ['language-link']],
         'query' => $query,
       ];
       if ($language_query != $langcode) {
@@ -185,7 +185,7 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase implement
 
     // Add 'lang' attribute is a known translated name and is not the
     // current active item.
-    if ($this->languageManager->getCurrentLanguage()->getId() !== $langcode){
+    if ($this->languageManager->getCurrentLanguage()->getId() !== $langcode) {
       $links[$langcode]['attributes']['lang'] = $langcode;
     }
 

@@ -163,7 +163,7 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
 
     // Add 'lang' attribute is a known translated name and is not the
     // current active item.
-    if ($this->languageManager->getCurrentLanguage()->getId() !== $langcode){
+    if ($this->languageManager->getCurrentLanguage()->getId() !== $langcode) {
       $links[$langcode]['attributes']['lang'] = $langcode;
     }
 

@@ -223,7 +223,7 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
 
       // Add 'lang' attribute is a known translated name and is not the
       // current active item.
-      if ($language->getLocal() !== $language->getName() && $this->languageManager->getCurrentLanguage()->getId() !== $langcode){
+      if ($this->languageManager->getCurrentLanguage()->getId() !== $langcode) {
         $links[$langcode]['attributes']['lang'] = $langcode;
       }
     }
