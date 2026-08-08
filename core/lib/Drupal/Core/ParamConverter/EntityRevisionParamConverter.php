@@ -68,13 +68,12 @@ class EntityRevisionParamConverter implements ParamConverterInterface {
 
     // If the entity type is translatable, ensure we return the proper
     // translation object for the current context.
-    if ($entity instanceof EntityInterface && $entity instanceof TranslatableInterface) {
+    if ($entity instanceof TranslatableInterface) {
       // If the 'language_content_' property is set on route defaults, use that
-      // as the langcode for the entity translation to load. Fall back to the
-      // interface language if content language type is not set. The trailing
+      // as the langcode for the entity translation to load. The trailing
       // underscore is used to avoid collisions with other route parameters or
       // defaults.
-      $langcode = $defaults[LanguageInterface::TYPE_CONTENT . '_'] ?? ($defaults[LanguageInterface::TYPE_INTERFACE . '_'] ?? NULL);
+      $langcode = $defaults[LanguageInterface::TYPE_CONTENT . '_'] ?? NULL;
       $entity = $this->entityRepository->getTranslationFromContext($entity, $langcode, ['operation' => 'entity_upcast']);
     }
 

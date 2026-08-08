@@ -118,8 +118,12 @@ class AccessManagerTest extends UnitTestCase {
     $this->currentUser = $this->createStub(AccountInterface::class);
     $this->checkProvider = new CheckProvider([], $this->container);
     $this->languageManager = $this->createStub(LanguageManagerInterface::class);
-    $this->languageManager->method('getLanguageTypes')
-      ->willReturn([LanguageInterface::TYPE_INTERFACE]);
+    $this->languageManager->method('getDefinedLanguageTypesInfo')
+      ->willReturn([
+        LanguageInterface::TYPE_INTERFACE => [],
+        LanguageInterface::TYPE_CONTENT => [],
+        LanguageInterface::TYPE_URL => [],
+      ]);
   }
 
   /**
