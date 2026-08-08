@@ -156,7 +156,7 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
       $links[$langcode] = [
         'url' => $url,
         'title' => $language->getLocal(),
-        'attributes' => ['class' => ['language-link'])],
+        'attributes' => ['class' => ['language-link']],
         'query' => $query,
       ];
     }
