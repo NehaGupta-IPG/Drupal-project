@@ -233,7 +233,7 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
       ],
       'en' => [
         'url' => $url,
-        'title' => $this->languages['en']->geLocal(),
+        'title' => $this->languages['en']->getLocal(),
         'attributes' => [
           'class' => ['language-link is-active'],
         ],
