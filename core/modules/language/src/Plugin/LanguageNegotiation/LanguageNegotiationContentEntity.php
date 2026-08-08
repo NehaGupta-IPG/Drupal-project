@@ -155,10 +155,16 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
       $query[static::QUERY_PARAMETER] = $langcode;
       $links[$langcode] = [
         'url' => $url,
-        'title' => $language->getName(),
-        'attributes' => ['class' => ['language-link'], 'lang' => $language->getId()],
+        'title' => $language->getLocal(),
+        'attributes' => ['class' => ['language-link'])],
         'query' => $query,
       ];
+    }
+
+    // Add 'lang' attribute is a known translated name and is not the
+    // current active item.
+    if ($language->getLocal() !== $language->getName() && $this->languageManager->getCurrentLanguage()->getId() !== $id){
+      $links[$id]['attributes']['lang'] = $id;
     }
 
     return $links;

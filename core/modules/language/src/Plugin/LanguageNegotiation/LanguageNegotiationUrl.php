@@ -207,7 +207,6 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
     $links = [];
     $query = [];
     parse_str($request->getQueryString() ?? '', $query);
-    $language_list = $this->languageManager->getStandardLanguageList();
     foreach ($this->languageManager->getNativeLanguages() as $language) {
       $id = $language->getId();
       $links[$id] = [

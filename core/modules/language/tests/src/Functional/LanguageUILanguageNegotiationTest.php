@@ -664,16 +664,18 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $language = new Language(['id' => '']);
     $this->drupalGet('', ['language' => $language], $http_header);
 
-    // Check attribute lang exist.
-    $args = [':id' => 'block-test-language-block', ':lang' => 'en'];
-    /** @var \Behat\Mink\Element\NodeElement[] $fields */
-    $field = $this->xpath('//div[@id=:id]//a[@class="language-link is-active"]', $args);
+    // 1. Verify English link is active and does NOT have a 'lang' attribute.
+    $en_links = $this->xpath('//div[@id=:id]//a[@class="language-link is-active"]', [':id' => 'block-test-language-block']);
+    $this->assertNotEmpty($en_links, 'Active English language link was found.');
+    $this->assertFalse($en_links[0]->hasAttribute('lang'), 'The active English link does not have a lang attribute.');
 
-    if (!empty($field)) {
-      if ($field[0]->getAttribute('lang') !== 'en') {
-        $this->assertSame($field[0]->getText(), 'Drupal', "Lang attribute doesn't exist or doesn't match the value of the language.");
-      }
-    }
+    // 2. Verify Spanish link exists and DOES have the 'lang="es"' attribute.
+    $es_links = $this->xpath('//div[@id=:id]//a[contains(@href, :href)]', [
+      ':id' => 'block-test-language-block',
+      ':href' => '/es',
+    ]);
+    $this->assertNotEmpty($es_links, 'Spanish language link was found.');
+    $this->assertSame('es', $es_links[0]->getAttribute('lang'), 'The Spanish link has the correct lang="es" attribute.');
   }
 
 }
