@@ -602,7 +602,6 @@ class ThemeManager implements ThemeManagerInterface {
         'content_attributes' => [],
         'title_prefix' => [],
         'title_suffix' => [],
-        'db_is_active' => !defined('MAINTENANCE_MODE'),
         'is_admin' => FALSE,
         'logged_in' => FALSE,
       ];

@@ -263,10 +263,6 @@ class ThemePreprocess {
     $variables['html_attributes']['lang'] = $language_interface->getId();
     $variables['html_attributes']['dir'] = $language_interface->getDirection();
 
-    if (isset($variables['db_is_active']) && !$variables['db_is_active']) {
-      $variables['db_offline'] = TRUE;
-    }
-
     // Add a variable for the root path. This can be used to create a class and
     // theme the page depending on the current path (e.g. node, admin, user) as
     // well as more specific data like path-frontpage.
@@ -350,10 +346,7 @@ class ThemePreprocess {
       $variables['is_front'] = $this->pathMatcher->isFrontPage();
     }
     catch (\Exception) {
-      // If the database is not yet available, set default values for these
-      // variables.
       $variables['is_front'] = FALSE;
-      $variables['db_is_active'] = FALSE;
     }
 
     if (($node = $this->routeMatch->getParameter('node')) || ($node = $this->routeMatch->getParameter('node_preview'))) {
