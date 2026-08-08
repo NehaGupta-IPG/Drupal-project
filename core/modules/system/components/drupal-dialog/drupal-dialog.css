@@ -12,14 +12,18 @@ dialog {
   max-height: 90dvh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 32px rgba(0,0,0,.28), 0 2px 8px rgba(0,0,0,.18);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.28),
+    0 2px 8px rgba(0, 0, 0, 0.18);
   background: #fff;
   color: #333;
   font-family: inherit;
   font-size: 1rem;
 }
 
-dialog:not([open]) { display: none }
+dialog:not([open]) {
+  display: none;
+}
 
 dialog[open] {
   position: fixed;
@@ -30,19 +34,26 @@ dialog[open] {
 }
 
 @media (max-width: 48em) {
-  dialog { min-width: 92%; max-width: 92% }
+  dialog {
+    min-width: 92%;
+    max-width: 92%;
+  }
 }
 
 @media (forced-colors: active) {
-  dialog { border: 1px solid transparent }
+  dialog {
+    border: 1px solid transparent;
+  }
 }
 
-dialog::backdrop { background: rgba(0,0,0,.45) }
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
 
 /* Titlebar */
 [data-dialog-titlebar] {
   position: relative;
-  padding: .75rem 3.5rem .75rem 1.25rem;
+  padding: 0.75rem 3.5rem 0.75rem 1.25rem;
   background: #232429;
   color: #fff;
   border-radius: 4px 4px 0 0;
@@ -51,7 +62,9 @@ dialog::backdrop { background: rgba(0,0,0,.45) }
   line-height: 1.5;
   flex-shrink: 0;
 }
-[data-dialog-titlebar]:empty { display: none }
+[data-dialog-titlebar]:empty {
+  display: none;
+}
 
 /* Close button */
 [data-dialog-close-btn] {
@@ -59,7 +72,7 @@ dialog::backdrop { background: rgba(0,0,0,.45) }
   inset-block-start: 50%;
   inset-inline-end: 0;
   transform: translateY(-50%);
-  margin-inline: .75rem;
+  margin-inline: 0.75rem;
   width: 2rem;
   height: 2rem;
   background: none;
@@ -72,8 +85,13 @@ dialog::backdrop { background: rgba(0,0,0,.45) }
   justify-content: center;
   color: #d3d4d9;
 }
-[data-dialog-close-btn]:hover { color: #fff }
-[data-dialog-close-btn]:focus-visible { outline: 2px solid #26a769; outline-offset: 2px }
+[data-dialog-close-btn]:hover {
+  color: #fff;
+}
+[data-dialog-close-btn]:focus-visible {
+  outline: 2px solid #26a769;
+  outline-offset: 2px;
+}
 
 /* Content */
 [data-dialog-content] {
@@ -87,15 +105,17 @@ dialog::backdrop { background: rgba(0,0,0,.45) }
 [data-dialog-footer] {
   display: flex;
   flex-wrap: wrap;
-  gap: .5rem;
+  gap: 0.5rem;
   justify-content: flex-end;
-  padding: .75rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   background: #f3f4f9;
   border-top: 1px solid #ddd;
   border-radius: 0 0 4px 4px;
   flex-shrink: 0;
 }
-[data-dialog-footer]:empty { display: none }
+[data-dialog-footer]:empty {
+  display: none;
+}
 
 /* Danger variant — alertdialog with destructive action */
 [data-dialog-titlebar][data-dialog-danger] {
@@ -107,12 +127,17 @@ dialog::backdrop { background: rgba(0,0,0,.45) }
   color: #fff;
   border: none;
   border-radius: 3px;
-  padding: .4rem .9rem;
+  padding: 0.4rem 0.9rem;
   cursor: pointer;
   font-size: 1rem;
 }
-.button--danger:hover { background: #991b1b; }
-.button--danger:focus-visible { outline: 2px solid #fca5a5; outline-offset: 2px; }
+.button--danger:hover {
+  background: #991b1b;
+}
+.button--danger:focus-visible {
+  outline: 2px solid #fca5a5;
+  outline-offset: 2px;
+}
 
 /* Off-canvas tray — anchored to inline-end of viewport */
 /*#drupal-off-canvas dialog {*/

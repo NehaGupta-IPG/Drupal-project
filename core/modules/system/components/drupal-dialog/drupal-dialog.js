@@ -21,8 +21,7 @@ class DrupalDialog extends HTMLElement {
       const dialog = this.querySelector('dialog');
       if (dialog) {
         resolve(dialog);
-      }
-      else {
+      } else {
         const observer = new MutationObserver((mutations, observer) => {
           const element = this.querySelector('dialog');
           if (element) {
@@ -77,7 +76,8 @@ class DrupalDialog extends HTMLElement {
     // dialog.close(). Clean up and close silently if still open.
     const dialog = this.querySelector('dialog');
     if (!dialog) return;
-    if (this._backdropHandler) dialog.removeEventListener('click', this._backdropHandler);
+    if (this._backdropHandler)
+      dialog.removeEventListener('click', this._backdropHandler);
     if (dialog.open) dialog.close();
   }
 }

@@ -2,9 +2,7 @@
 
 namespace Drupal\Core\PathProcessor;
 
-
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
-use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -45,6 +43,5 @@ class HtmxDialogPathProcessor implements InboundPathProcessorInterface {
 
     return $remaining_path;
   }
-
 
 }
