@@ -9,11 +9,10 @@ use Drupal\Core\Database\DatabaseException;
 /**
  * PostgreSQL specific behavior for the database lock backends.
  *
- * ::acquire() uses a single upsert query instead of the separate update and
- * insert queries of the parent class. INSERT ... ON CONFLICT never fails
- * when two requests insert the row for the same lock at the same time: the
- * losing insert turns into a conflict update. No statement failure recovery
- * is needed for the race.
+ * ::acquire() uses an upsert query instead of the insert query of the parent
+ * class. INSERT ... ON CONFLICT never fails when two requests insert the row
+ * for the same lock at the same time: the losing insert turns into a
+ * conflict update. No statement failure recovery is needed for the race.
  *
  * On PostgreSQL a failed statement aborts the whole enclosing transaction.
  * The trait therefore makes sure the semaphore table exists before it is
@@ -54,9 +53,6 @@ trait PgsqlLockBackendTrait {
 
   /**
    * {@inheritdoc}
-   *
-   * Unlike the parent implementation, a lock that this request held before
-   * it was broken is reacquired when the lock is free again.
    */
   public function acquire($name, $timeout = 30.0) {
     $this->verifyTable();
@@ -66,14 +62,31 @@ trait PgsqlLockBackendTrait {
     $timeout = max($timeout, 0.001);
     $now = microtime(TRUE);
 
-    // A single upsert query covers every way to get the lock: it extends a
-    // lock this request already holds, takes over an expired lock, and
-    // inserts the row when the lock is free. When another request holds the
-    // lock the WHERE clause stops the conflict update, no row is returned
-    // and the lock is not acquired.
+    if (isset($this->locks[$name])) {
+      // Try to extend the expiration of a lock we already acquired. An update
+      // query cannot fail a statement, so it needs no recovery. The lock ID
+      // condition cannot be moved into the upsert below: the persistent lock
+      // backend shares one lock ID between all requests, so a matching lock
+      // ID does not prove that this request holds the lock.
+      $success = (bool) $this->database->update('semaphore')
+        ->fields(['expire' => $now + $timeout])
+        ->condition('name', $name)
+        ->condition('value', $this->getLockId())
+        ->execute();
+      if (!$success) {
+        // The lock was broken.
+        unset($this->locks[$name]);
+      }
+      return $success;
+    }
+
+    // A single upsert query inserts the row when the lock is free and takes
+    // over an expired lock. When another request holds the lock the WHERE
+    // clause stops the conflict update, no row is returned and the lock is
+    // not acquired.
     $query = 'INSERT INTO {semaphore} AS [t] ([name], [value], [expire]) VALUES (:name, :value, :expire) ';
     $query .= 'ON CONFLICT ([name]) DO UPDATE SET [value] = EXCLUDED.[value], [expire] = EXCLUDED.[expire] ';
-    $query .= 'WHERE [t].[value] = EXCLUDED.[value] OR [t].[expire] < :now RETURNING 1';
+    $query .= 'WHERE [t].[expire] < :now RETURNING 1';
     $acquired = (bool) $this->database->query($query, [
       ':name' => $name,
       ':value' => $this->getLockId(),
@@ -84,11 +97,6 @@ trait PgsqlLockBackendTrait {
     if ($acquired) {
       // We track all acquired locks in the global variable.
       $this->locks[$name] = TRUE;
-    }
-    else {
-      // Another request holds the lock. When this request was extending a
-      // lock it already held, that lock was broken.
-      unset($this->locks[$name]);
     }
     return $acquired;
   }
