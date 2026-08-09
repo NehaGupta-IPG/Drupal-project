@@ -687,6 +687,12 @@ trait FunctionalTestSetupTrait {
     // Bootstrap Drupal so we can use Drupal's built in functions.
     $this->classLoader = require __DIR__ . '/../../../../../autoload.php';
     $request = Request::createFromGlobals();
+
+    // Boot the environment without building a container. This has to happen
+    // before the test prefix is set, so that DRUPAL_TEST_IN_CHILD_SITE is
+    // defined as FALSE for the test runner itself.
+    DrupalKernel::bootEnvironment();
+
     $this->prepareDatabasePrefix();
 
     $this->originalSite = DrupalKernel::findSitePath($request);
