@@ -88,5 +88,4 @@
   }
 
   customElements.define('drupal-dialog', DrupalDialog);
-
 })(Drupal, drupalSettings);
