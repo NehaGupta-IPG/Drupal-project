@@ -466,6 +466,15 @@ default:
   script:
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/test-only.sh
 
+# Re-run the full test suite against PostgreSQL on every merge request, in
+# addition to the default MySQL run.
+'🐘 PostgreSQL 18':
+  <<: *recursive-trigger
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $PERFORMANCE_TEST != "1"
+  variables:
+    _TARGET_DB: "pgsql-18"
+
 # Main listing of jobs. All of these are available on Merge Requests.
 'MariaDB (via PDO)':
   <<: [ *recursive-trigger, *run-on-mr ]
