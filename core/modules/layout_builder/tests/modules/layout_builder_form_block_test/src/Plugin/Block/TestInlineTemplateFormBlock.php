@@ -26,7 +26,7 @@ class TestInlineTemplateFormBlock extends BlockBase {
   public function build() {
     $build['form'] = [
       '#type' => 'inline_template',
-      '#template' => '<form method="POST"><label>{{ "Keywords"|t }}<input name="keyword" type="text" required /></label><input name="submit" type="submit" value="{{ "Submit"|t }}" /></form>',
+      '#template' => '<form method="POST"><label>{{ "Keywords"|t }}<input name="keyword" type="text" required></label><input name="submit" type="submit" value="{{ "Submit"|t }}"></form>',
     ];
 
     return $build;
