@@ -105,7 +105,7 @@ class DisplayGroupTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests that outdenting a hidden field does not change its region.
+   * Tests that moving a hidden field to the root level does not change its region.
    */
   public function testOutdentHiddenFieldRegion(): void {
     $display = $this->container->get('entity_display.repository')
