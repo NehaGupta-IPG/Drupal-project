@@ -35,8 +35,10 @@ use Drupal\pgsql\Lock\PersistentDatabaseLockBackend;
 use Drupal\pgsql\Menu\MenuTreeStorage;
 use Drupal\pgsql\Queue\QueueDatabaseFactory;
 use Drupal\pgsql\Routing\MatcherDumper;
+use Drupal\pgsql\Menu\WorkspacesMenuTreeStorage;
 use Drupal\pgsql\Session\SessionHandler;
 use Drupal\pgsql\Session\UserSessionRepository;
+use Drupal\workspaces\WorkspacesMenuTreeStorage as CoreWorkspacesMenuTreeStorage;
 
 /**
  * Replaces database services with PostgreSQL implementations.
@@ -66,6 +68,10 @@ class PgsqlServiceProvider implements ServiceModifierInterface {
       'lock' => [CoreDatabaseLockBackend::class, DatabaseLockBackend::class],
       'lock.persistent' => [CorePersistentDatabaseLockBackend::class, PersistentDatabaseLockBackend::class],
       'menu.tree_storage' => [CoreMenuTreeStorage::class, MenuTreeStorage::class],
+      // The workspaces module decorates the menu.tree_storage service with
+      // its own subclass of the core menu tree storage, so the replacement
+      // above does not cover sites with the workspaces module installed.
+      'workspaces.menu.tree_storage' => [CoreWorkspacesMenuTreeStorage::class, WorkspacesMenuTreeStorage::class],
       'queue.database' => [CoreQueueDatabaseFactory::class, QueueDatabaseFactory::class],
       'flood' => [CoreFloodDatabaseBackend::class, FloodDatabaseBackend::class],
       'keyvalue.database' => [CoreKeyValueDatabaseFactory::class, KeyValueDatabaseFactory::class],

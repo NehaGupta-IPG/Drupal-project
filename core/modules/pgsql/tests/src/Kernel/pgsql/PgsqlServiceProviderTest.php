@@ -17,6 +17,7 @@ use Drupal\pgsql\KeyValueStore\DatabaseStorageExpirable as KeyValueDatabaseStora
 use Drupal\pgsql\Lock\DatabaseLockBackend;
 use Drupal\pgsql\Lock\PersistentDatabaseLockBackend;
 use Drupal\pgsql\Menu\MenuTreeStorage;
+use Drupal\pgsql\Menu\WorkspacesMenuTreeStorage;
 use Drupal\pgsql\ProxyClass\Batch\BatchStorage as BatchStorageProxy;
 use Drupal\pgsql\ProxyClass\Routing\MatcherDumper as MatcherDumperProxy;
 use Drupal\pgsql\Queue\DatabaseQueue;
@@ -81,6 +82,16 @@ class PgsqlServiceProviderTest extends DriverSpecificKernelTestBase {
     $menu_link_manager = $this->container->get('plugin.manager.menu.link');
     $tree_storage = (new \ReflectionObject($menu_link_manager))->getProperty('treeStorage')->getValue($menu_link_manager);
     $this->assertInstanceOf(MenuTreeStorage::class, $tree_storage);
+  }
+
+  /**
+   * Tests that the workspaces menu tree storage uses the pgsql class.
+   */
+  public function testWorkspacesMenuTreeStorageIsReplaced(): void {
+    $this->enableModules(['user', 'workspaces']);
+    $menu_link_manager = $this->container->get('plugin.manager.menu.link');
+    $tree_storage = (new \ReflectionObject($menu_link_manager))->getProperty('treeStorage')->getValue($menu_link_manager);
+    $this->assertInstanceOf(WorkspacesMenuTreeStorage::class, $tree_storage);
   }
 
   /**
