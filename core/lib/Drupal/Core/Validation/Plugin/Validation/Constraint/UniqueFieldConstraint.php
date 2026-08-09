@@ -24,6 +24,8 @@ class UniqueFieldConstraint extends SymfonyConstraint {
    *   would fail.
    * @param string $message
    *   The error message.
+   * @param string|NULL $bundle
+   *   Bundle to limit the check to. Optional.
    * @param array|null $groups
    *   The groups that the constraint belongs to.
    * @param mixed|null $payload
@@ -32,6 +34,7 @@ class UniqueFieldConstraint extends SymfonyConstraint {
   public function __construct(
     public bool $caseSensitive = FALSE,
     public $message = 'A @entity_type with @field_name %value already exists.',
+    public $bundle = NULL,
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
