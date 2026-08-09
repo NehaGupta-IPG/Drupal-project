@@ -31,6 +31,7 @@ use Drupal\language\LanguageListBuilder;
   entity_keys: [
     'id' => 'id',
     'label' => 'label',
+    'local' => 'local',
     'weight' => 'weight',
   ], handlers: [
     'list_builder' => LanguageListBuilder::class,
