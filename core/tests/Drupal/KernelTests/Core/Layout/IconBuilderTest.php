@@ -63,10 +63,10 @@ EOD;
     $data['two_column'][] = <<<'EOD'
 <svg width="250" height="300" class="layout-icon layout-icon--two-column"><title>Two Column</title>
 <g><title>left</title>
-<rect x="1" y="1" width="121" height="298" stroke-width="2" class="layout-icon__region layout-icon__region--left">
+<rect x="1" y="1" width="121" height="298" stroke-width="2" class="layout-icon__region layout-icon__region--left" />
 </g>
 <g><title>right</title>
-<rect x="128" y="1" width="121" height="298" stroke-width="2" class="layout-icon__region layout-icon__region--right">
+<rect x="128" y="1" width="121" height="298" stroke-width="2" class="layout-icon__region layout-icon__region--right" />
 </g>
 </svg>
 
@@ -79,10 +79,10 @@ EOD;
     $data['two_column_no_stroke'][] = [['left', 'right']];
     $data['two_column_no_stroke'][] = <<<'EOD'
 <svg width="250" height="300" class="layout-icon"><g><title>left</title>
-<rect x="0" y="0" width="123" height="300" class="layout-icon__region layout-icon__region--left">
+<rect x="0" y="0" width="123" height="300" class="layout-icon__region layout-icon__region--left" />
 </g>
 <g><title>right</title>
-<rect x="127" y="0" width="123" height="300" class="layout-icon__region layout-icon__region--right">
+<rect x="127" y="0" width="123" height="300" class="layout-icon__region layout-icon__region--right" />
 </g>
 </svg>
 
@@ -96,10 +96,10 @@ EOD;
     $data['two_column_border_collapse'][] = [['left', 'right']];
     $data['two_column_border_collapse'][] = <<<'EOD'
 <svg width="250" height="300" class="layout-icon"><g><title>left</title>
-<rect x="1" y="1" width="124" height="298" stroke-width="2" class="layout-icon__region layout-icon__region--left">
+<rect x="1" y="1" width="124" height="298" stroke-width="2" class="layout-icon__region layout-icon__region--left" />
 </g>
 <g><title>right</title>
-<rect x="125" y="1" width="124" height="298" stroke-width="2" class="layout-icon__region layout-icon__region--right">
+<rect x="125" y="1" width="124" height="298" stroke-width="2" class="layout-icon__region layout-icon__region--right" />
 </g>
 </svg>
 
@@ -116,28 +116,28 @@ EOD;
     ];
     $data['stacked'][] = <<<'EOD'
 <svg width="125" height="150" class="layout-icon"><g><title>sidebar</title>
-<rect x="1" y="1" width="37" height="86.4" stroke-width="2" class="layout-icon__region layout-icon__region--sidebar">
+<rect x="1" y="1" width="37" height="86.4" stroke-width="2" class="layout-icon__region layout-icon__region--sidebar" />
 </g>
 <g><title>top</title>
-<rect x="44" y="1" width="80" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--top">
+<rect x="44" y="1" width="80" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--top" />
 </g>
 <g><title>left</title>
-<rect x="44" y="31.8" width="37" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--left">
+<rect x="44" y="31.8" width="37" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--left" />
 </g>
 <g><title>right</title>
-<rect x="87" y="31.8" width="37" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--right">
+<rect x="87" y="31.8" width="37" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--right" />
 </g>
 <g><title>middle</title>
-<rect x="44" y="62.6" width="80" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--middle">
+<rect x="44" y="62.6" width="80" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--middle" />
 </g>
 <g><title>footer_left</title>
-<rect x="1" y="93.4" width="58.5" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--footer-left">
+<rect x="1" y="93.4" width="58.5" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--footer-left" />
 </g>
 <g><title>footer_right</title>
-<rect x="65.5" y="93.4" width="58.5" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--footer-right">
+<rect x="65.5" y="93.4" width="58.5" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--footer-right" />
 </g>
 <g><title>footer_full</title>
-<rect x="1" y="124.2" width="123" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--footer-full">
+<rect x="1" y="124.2" width="123" height="24.8" stroke-width="2" class="layout-icon__region layout-icon__region--footer-full" />
 </g>
 </svg>
 
