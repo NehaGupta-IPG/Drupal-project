@@ -717,8 +717,15 @@ trait FunctionalTestSetupTrait {
     $this->originalSite = DrupalKernel::findSitePath($request);
 
     // Create test directory ahead of installation so fatal errors and debug
-    // information can be logged during installation process.
-    mkdir($this->siteDirectory);
+    // information can be logged during installation process. The file system
+    // service is not used here to avoid building a container, so the parent
+    // directory and the permissions have to be handled explicitly.
+    foreach ([dirname($this->siteDirectory), $this->siteDirectory] as $directory) {
+      if (!is_dir($directory) && !@mkdir($directory) && !is_dir($directory)) {
+        throw new \RuntimeException("Unable to create directory: $directory");
+      }
+      @chmod($directory, 0777);
+    }
 
     // Prepare filesystem directory paths.
     $this->publicFilesDirectory = $this->siteDirectory . '/files';
