@@ -2,6 +2,8 @@ internal.navigation:
   # Internal library. Do not depend on it outside core nor add core usage
   # beyond the Navigation module.
   version: VERSION
+  aggregate_target:
+    css: navigation
   js:
     js/toolbar-menu.js: {}
     js/tooltip.js: {}
@@ -35,6 +37,8 @@ internal.navigation-workspaces:
   # Internal library. Do not depend on it outside core nor add core usage
   # beyond the Navigation module.
   version: VERSION
+  aggregate_target:
+    css: navigation
   css:
     theme:
       css/components/toolbar-workspaces.css: {}
@@ -42,6 +46,8 @@ internal.navigation-workspaces:
     - navigation/internal.navigation
 
 admin-reset-styles:
+  aggregate_target:
+    css: navigation
   css:
     base:
       css/base/admin-reset-styles.css: {}
@@ -52,11 +58,15 @@ navigation.layout:
 
 body-scroll-lock:
   version: VERSION
+  aggregate_target:
+    css: navigation
   css:
     base:
       css/components/body-scroll-lock.css: {}
 
 internal.popover:
+  aggregate_target:
+    css: navigation
   # Internal library. Do not depend on it outside core nor add core usage
   # beyond the Navigation module.
   js:
@@ -68,6 +78,8 @@ internal.popover:
     - core/once
 
 internal.tooltip:
+  aggregate_target:
+    css: navigation
   # Internal library. Do not depend on it outside core nor add core usage
   # beyond the Navigation module.
   js:
@@ -80,6 +92,8 @@ internal.tooltip:
     - core/internal.floating-ui
 
 internal.dropdown:
+  aggregate_target:
+    css: navigation
   # Internal library. Do not depend on it outside core nor add core usage
   # beyond the Navigation module.
   js:
@@ -92,11 +106,15 @@ internal.dropdown:
     - core/internal.floating-ui
 
 navigation.layoutBuilder:
+  aggregate_target:
+    css: navigation
   css:
     base:
       css/base/layout-builder.css: {}
 
 internal.safe-triangle:
+  aggregate_target:
+    css: navigation
   # Internal library. Do not depend on it outside core nor add core usage
   # beyond the Navigation module.
   js:
