@@ -142,9 +142,8 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
     $exclude_html = $element['#exclude_html_tags'] ?? TRUE;
     $summary_service = \Drupal::service(TextSummary::class);
 
-    // When a <!--break--> delimiter is present, TextSummary::generate() honors
-    // it regardless of length. Preserve that by handing over the raw text so
-    // the comment is not lost to strip_tags().
+    // When a <!--break--> delimiter is present, preserve that by handing over
+    // the raw text so the comment is not lost to strip_tags().
     if (!$exclude_html || str_contains($raw_text, '<!--break-->')) {
       $element['#markup'] = $summary_service->generate($raw_text, $element['#format'], $element['#text_summary_trim_length']);
       return $element;
