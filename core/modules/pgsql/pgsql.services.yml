@@ -5,3 +5,8 @@ services:
   pgsql.entity.query.sql:
     class: Drupal\pgsql\EntityQuery\QueryFactory
     autowire: true
+  pgsql.table_information_prewarmer:
+    class: Drupal\pgsql\TableInformationPreWarmer
+    arguments: ['@database']
+    tags:
+      - { name: cache_prewarmable }

@@ -75,6 +75,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   protected $identifierQuotes = ['"', '"'];
 
   /**
+   * The loader for the information about blob and serial columns of tables.
+   */
+  protected ?TableInformationLoader $tableInformationLoader = NULL;
+
+  /**
    * An array of transaction savepoints.
    *
    * The main use for this array is to store information about transaction
@@ -509,6 +514,20 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       $this->schema = new Schema($this);
     }
     return $this->schema;
+  }
+
+  /**
+   * Returns the loader for the blob and sequence information of tables.
+   *
+   * Every connection owns one loader, so that the schema object and the
+   * insert, update and upsert queries of a connection introspect the
+   * database they operate on and share the collected information. The
+   * loader is created directly instead of through the container, because
+   * the database layer must also work for other connections than the
+   * default one and without a container.
+   */
+  public function tableInformation(): TableInformationLoader {
+    return $this->tableInformationLoader ??= new TableInformationLoader($this);
   }
 
   /**
