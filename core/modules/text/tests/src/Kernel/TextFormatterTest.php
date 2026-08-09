@@ -8,6 +8,8 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\text\Plugin\Field\FieldFormatter\TextTrimmedFormatter;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -101,8 +103,6 @@ class TextFormatterTest extends EntityKernelTestBase {
    * Tests the exclude_html_tags setting on the text_trimmed formatter.
    */
   public function testExcludeHtmlTagsSetting(): void {
-    // Twenty visible characters wrapped in <p> tags. With tags excluded from
-    // the length count, more visible text survives a trim of the same width.
     $entity = $this->container->get('entity_type.manager')
       ->getStorage($this->entityType)
       ->create(['name' => $this->randomMachineName()]);
@@ -122,6 +122,41 @@ class TextFormatterTest extends EntityKernelTestBase {
     $output = (string) $this->container->get('renderer')->renderRoot($build);
     // With tags stripped should get the first 10 letters.
     $this->assertStringContainsString('abcdefghij', $output);
+  }
+
+  /**
+   * Tests TextTrimmedFormatter::truncateHtml() across HTML shapes.
+   */
+  #[DataProvider('providerTruncateHtml')]
+  public function testTruncateHtml(string $input, int $length, string $expected_substring): void {
+    $result = TextTrimmedFormatter::truncateHtml($input, $length);
+    $this->assertStringContainsString($expected_substring, $result);
+  }
+
+  /**
+   * Data provider for ::testTruncateHtml().
+   */
+  public static function providerTruncateHtml(): array {
+    return [
+      'input shorter than limit is returned unchanged' => [
+        '<p>Hello</p>', 100, '<p>Hello</p>',
+      ],
+      'tags are not counted toward the limit' => [
+        '<p>abcdefghij</p>', 5, '<p>abcde</p>',
+      ],
+      'nested tags are repaired when the cut lands inside them' => [
+        '<p><strong>Hello world</strong></p>', 5, '<strong>Hello</strong>',
+      ],
+      'void elements do not corrupt the counter' => [
+        '<p>before<br>after</p>', 10, 'before<br>afte',
+      ],
+      'attribute contents do not count toward the limit' => [
+        '<a href="https://example.com" title="link">click here</a>', 5, '>click</a>',
+      ],
+      'sibling tags share one continuous counter' => [
+        '<p>one</p><p>two</p><p>three</p>', 6, '<p>two</p>',
+      ],
+    ];
   }
 
 }
