@@ -7,6 +7,6 @@ services:
     autowire: true
   pgsql.table_information_prewarmer:
     class: Drupal\pgsql\TableInformationPreWarmer
-    arguments: ['@database']
+    autowire: true
     tags:
       - { name: cache_prewarmable }
