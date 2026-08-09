@@ -31,6 +31,7 @@ class UniqueFieldConstraint extends SymfonyConstraint {
     mixed $options = NULL,
     ?bool $caseSensitive = NULL,
     public $message = 'A @entity_type with @field_name %value already exists.',
+    public $bundle = NULL,
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
