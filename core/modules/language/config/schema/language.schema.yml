@@ -103,7 +103,7 @@ language.entity.*:
       type: required_label
       label: 'Label'
     local:
-      type: label
+      type: string
       label: 'Local name'
     direction:
       type: string
