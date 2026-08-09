@@ -1,0 +1,6 @@
+display_group:
+  js:
+    js/display_group.js: {}
+  dependencies:
+    - core/drupal
+    - field_ui/drupal.field_ui
