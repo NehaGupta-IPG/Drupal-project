@@ -39,7 +39,8 @@ class InstallerExistingBrokenDatabaseSettingsTest extends InstallerTestBase {
     $connection_info['default']['driver'] = 'DriverTestMysqlDeprecatedVersion';
     $namespace = 'Drupal\\driver_test\\Driver\\Database\\DriverTestMysqlDeprecatedVersion';
     $connection_info['default']['namespace'] = $namespace;
-    $connection_info['default']['autoload'] = \Drupal::service('extension.list.database_driver')
+    $connection_info['default']['autoload'] = Database::getDriverList()
+      ->includeTestDrivers(TRUE)
       ->get($namespace)
       ->getAutoloadInfo()['autoload'];
 
