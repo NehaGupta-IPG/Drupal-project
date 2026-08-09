@@ -809,19 +809,24 @@ class TransactionTest extends DatabaseTestBase {
     // Each failed statement is caught and the transaction continues. On
     // databases where a failed statement aborts the whole transaction, such
     // as PostgreSQL, that requires rolling back to a savepoint created
-    // before the statement.
+    // before the statement. On databases that do not support transactional
+    // DDL the transaction is already committed by the DDL statement above,
+    // so the failed statements run outside of a transaction and no
+    // savepoint must be created.
+    $useSavepoints = $this->connection->supportsTransactionalDDL();
+
     // Test a failed query using the query() method.
-    $savepoint = $this->connection->startTransaction();
+    $savepoint = $useSavepoints ? $this->connection->startTransaction() : NULL;
     try {
       $this->connection->query('SELECT [age] FROM {test} WHERE [name] = :name', [':name' => 'David'])->fetchField();
       $this->fail('Using the query method should have failed.');
     }
     catch (\Exception) {
-      $savepoint->rollBack();
+      $savepoint?->rollBack();
     }
 
     // Test a failed select query.
-    $savepoint = $this->connection->startTransaction();
+    $savepoint = $useSavepoints ? $this->connection->startTransaction() : NULL;
     try {
       $this->connection->select('test')
         ->fields('test', ['name'])
@@ -830,11 +835,11 @@ class TransactionTest extends DatabaseTestBase {
       $this->fail('Select query should have failed.');
     }
     catch (\Exception) {
-      $savepoint->rollBack();
+      $savepoint?->rollBack();
     }
 
     // Test a failed insert query.
-    $savepoint = $this->connection->startTransaction();
+    $savepoint = $useSavepoints ? $this->connection->startTransaction() : NULL;
     try {
       $this->connection->insert('test')
         ->fields([
@@ -846,11 +851,11 @@ class TransactionTest extends DatabaseTestBase {
       $this->fail('Insert query should have failed.');
     }
     catch (\Exception) {
-      $savepoint->rollBack();
+      $savepoint?->rollBack();
     }
 
     // Test a failed update query.
-    $savepoint = $this->connection->startTransaction();
+    $savepoint = $useSavepoints ? $this->connection->startTransaction() : NULL;
     try {
       $this->connection->update('test')
         ->fields(['name' => 'Tiffany'])
@@ -860,11 +865,11 @@ class TransactionTest extends DatabaseTestBase {
       $this->fail('Update query should have failed.');
     }
     catch (\Exception) {
-      $savepoint->rollBack();
+      $savepoint?->rollBack();
     }
 
     // Test a failed delete query.
-    $savepoint = $this->connection->startTransaction();
+    $savepoint = $useSavepoints ? $this->connection->startTransaction() : NULL;
     try {
       $this->connection->delete('test')
         ->condition('id', 1)
@@ -873,11 +878,11 @@ class TransactionTest extends DatabaseTestBase {
       $this->fail('Delete query should have failed.');
     }
     catch (\Exception) {
-      $savepoint->rollBack();
+      $savepoint?->rollBack();
     }
 
     // Test a failed merge query.
-    $savepoint = $this->connection->startTransaction();
+    $savepoint = $useSavepoints ? $this->connection->startTransaction() : NULL;
     try {
       $this->connection->merge('test')
         ->key('job', 'Presenter')
@@ -890,11 +895,11 @@ class TransactionTest extends DatabaseTestBase {
       $this->fail('Merge query should have failed.');
     }
     catch (\Exception) {
-      $savepoint->rollBack();
+      $savepoint?->rollBack();
     }
 
     // Test a failed upsert query.
-    $savepoint = $this->connection->startTransaction();
+    $savepoint = $useSavepoints ? $this->connection->startTransaction() : NULL;
     try {
       $this->connection->upsert('test')
         ->key('job')
@@ -909,7 +914,7 @@ class TransactionTest extends DatabaseTestBase {
       $this->fail('Upsert query should have failed.');
     }
     catch (\Exception) {
-      $savepoint->rollBack();
+      $savepoint?->rollBack();
     }
 
     // Create the missing schema and insert a row.
