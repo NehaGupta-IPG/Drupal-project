@@ -40,6 +40,10 @@
  * - keep_english: Boolean. When TRUE, English is kept as an available language
  *   even when another language is selected during installation. Defaults to
  *   FALSE, which removes English when a non-English language is selected.
+ * - opt_out_install: Boolean. When TRUE, the profile is not installed as a
+ *   module during the installation process. This allows lightweight profiles
+ *   that do not define hooks or custom install logic to skip the module
+ *   installation step entirely.
  * - distribution: Denotes that the profile is intended to be used as a
  *   distribution. When this key is present, the profile is auto-selected
  *   during installation and the profile selection screen is skipped. If more
