@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Cache;
 
-use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Component\Serialization\PhpSerialize;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\DatabaseBackendFactory;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -17,7 +14,6 @@ use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Tests delaying of cache tag invalidation queries to the end of transactions.
@@ -53,14 +49,10 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
   public function register(ContainerBuilder $container): void {
     parent::register($container);
 
-    $container->register('serializer', PhpSerialize::class);
-    // Register a database cache backend rather than memory-based.
-    $container->register('cache_factory', DatabaseBackendFactory::class)
-      ->addArgument(new Reference('database'))
-      ->addArgument(new Reference('cache_tags.invalidator.checksum'))
-      ->addArgument(new Reference('settings'))
-      ->addArgument(new Reference('serializer'))
-      ->addArgument(new Reference(TimeInterface::class));
+    // Use a database cache backend rather than memory-based, through the
+    // cache.backend.database service so that database drivers can replace
+    // the implementation.
+    $container->setAlias('cache_factory', 'cache.backend.database');
   }
 
   /**

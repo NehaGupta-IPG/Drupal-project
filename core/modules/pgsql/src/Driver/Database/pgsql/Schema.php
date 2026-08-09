@@ -149,7 +149,7 @@ class Schema extends DatabaseSchema {
       ];
 
       if ($this->connection->inTransaction()) {
-        $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
+        $savepoint = $this->connection->startTransaction();
       }
 
       try {
@@ -268,7 +268,7 @@ EOD;
     $table_name = $prefixInfo['table'];
 
     if ($this->connection->inTransaction()) {
-      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
+      $savepoint = $this->connection->startTransaction();
     }
 
     try {
