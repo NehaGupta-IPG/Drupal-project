@@ -130,6 +130,8 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
    *     filter_fallback_format().
    *   - #text_summary_trim_length: the desired character length of the summary
    *     (used by \Drupal\text\TextSummary::generate())
+   *   - #exclude_html_tags: (optional) whether HTML tags should be excluded
+   *     from the trim length count. Defaults to FALSE.
    *
    * @return array
    *   The passed-in element with the filtered text in '#markup' trimmed.
@@ -139,7 +141,7 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
    */
   public static function preRenderSummary(array $element) {
     $raw_text = $element['#markup'];
-    $exclude_html = $element['#exclude_html_tags'] ?? TRUE;
+    $exclude_html = $element['#exclude_html_tags'] ?? FALSE;
     $summary_service = \Drupal::service(TextSummary::class);
 
     // When a <!--break--> delimiter is present, preserve that by handing over
@@ -183,6 +185,10 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
         $visible++;
       }
       $offset++;
+    }
+    // Nothing was changed skip the normalization.
+    if ($offset >= $total) {
+      return $html;
     }
     // The fragment may end inside unclosed elements; normalize() repairs it.
     return Html::normalize(substr($html, 0, $offset));

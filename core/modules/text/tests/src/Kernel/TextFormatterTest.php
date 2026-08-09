@@ -120,9 +120,37 @@ class TextFormatterTest extends EntityKernelTestBase {
         'exclude_html_tags' => TRUE,
       ],
     ]);
-    $output = (string) $this->container->get('renderer')->renderRoot($build);
+    $this->container->get('renderer')->renderRoot($build[0]);
     // With tags stripped should get the first 10 letters.
-    $this->assertStringContainsString('abcdefghij', $output);
+    $this->assertSame('<p>abcdefghij</p>', (string) $build[0]['#markup']);
+  }
+
+  /**
+   * Tests that <!--break--> is honored when exclude_html_tags is enabled.
+   */
+  public function testExcludeHtmlTagsPreservesBreakDelimiter(): void {
+    $entity = $this->container->get('entity_type.manager')
+      ->getStorage($this->entityType)
+      ->create(['name' => $this->randomMachineName()]);
+    $entity->formatted_text = [
+      'value' => '<p>abcdefghijklmnopqrst</p><!--break--><p>ignored part</p>',
+      'format' => 'my_text_format',
+    ];
+    $entity->save();
+
+    $build = $entity->get('formatted_text')->view([
+      'type' => 'text_trimmed',
+      'settings' => [
+        'trim_length' => 10,
+        'exclude_html_tags' => TRUE,
+      ],
+    ]);
+    $this->container->get('renderer')->renderRoot($build[0]);
+    $markup = (string) $build[0]['#markup'];
+    // The delimiter path returns the substring before <!--break-->.
+    $this->assertStringContainsString('abcdefghij', $markup);
+    $this->assertStringNotContainsString('ignored part', $markup);
+    $this->assertStringNotContainsString('<!--break-->', $markup);
   }
 
   /**
