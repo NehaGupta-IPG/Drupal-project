@@ -70,18 +70,18 @@ namespace Drupal\pgsql\ProxyClass\Routing {
         /**
          * {@inheritdoc}
          */
-        public function addRoutes(\Symfony\Component\Routing\RouteCollection $routes)
+        public function dump(array $options = array (
+        )): string
         {
-            return $this->lazyLoadItself()->addRoutes($routes);
+            return $this->lazyLoadItself()->dump($options);
         }
 
         /**
          * {@inheritdoc}
          */
-        public function dump(array $options = array (
-        )): string
+        public function addRoutes(\Symfony\Component\Routing\RouteCollection $routes)
         {
-            return $this->lazyLoadItself()->dump($options);
+            return $this->lazyLoadItself()->addRoutes($routes);
         }
 
         /**

@@ -60,7 +60,7 @@ class DatabaseBackend extends CoreDatabaseBackend {
   /**
    * {@inheritdoc}
    */
-  public function setMultiple(array $items) {
+  public function setMultiple(array $items): void {
     $this->verifyBinInTransaction();
     parent::setMultiple($items);
   }
@@ -68,7 +68,7 @@ class DatabaseBackend extends CoreDatabaseBackend {
   /**
    * {@inheritdoc}
    */
-  public function deleteMultiple(array $cids) {
+  public function deleteMultiple(array $cids): void {
     $this->verifyBinInTransaction();
     parent::deleteMultiple($cids);
   }
@@ -76,7 +76,7 @@ class DatabaseBackend extends CoreDatabaseBackend {
   /**
    * {@inheritdoc}
    */
-  public function deleteAll() {
+  public function deleteAll(): void {
     $this->verifyBinInTransaction();
     parent::deleteAll();
   }
@@ -84,7 +84,7 @@ class DatabaseBackend extends CoreDatabaseBackend {
   /**
    * {@inheritdoc}
    */
-  public function invalidateMultiple(array $cids) {
+  public function invalidateMultiple(array $cids): void {
     $this->verifyBinInTransaction();
     parent::invalidateMultiple($cids);
   }
@@ -92,7 +92,7 @@ class DatabaseBackend extends CoreDatabaseBackend {
   /**
    * {@inheritdoc}
    */
-  public function garbageCollection() {
+  public function garbageCollection(): void {
     $this->verifyBinInTransaction();
     parent::garbageCollection();
   }
@@ -100,7 +100,7 @@ class DatabaseBackend extends CoreDatabaseBackend {
   /**
    * {@inheritdoc}
    */
-  public function removeBin() {
+  public function removeBin(): void {
     $this->binVerified = FALSE;
     if ($this->connection->inTransaction() && !$this->connection->schema()->tableExists($this->bin)) {
       // Nothing to drop, and a failing drop would abort the transaction.

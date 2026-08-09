@@ -91,7 +91,7 @@ class DatabaseQueue extends CoreDatabaseQueue {
   /**
    * {@inheritdoc}
    */
-  public function deleteItem($item) {
+  public function deleteItem($item): void {
     $this->verifyTableInTransaction();
     parent::deleteItem($item);
   }
@@ -99,7 +99,7 @@ class DatabaseQueue extends CoreDatabaseQueue {
   /**
    * {@inheritdoc}
    */
-  public function deleteQueue() {
+  public function deleteQueue(): void {
     $this->verifyTableInTransaction();
     parent::deleteQueue();
   }
@@ -107,7 +107,7 @@ class DatabaseQueue extends CoreDatabaseQueue {
   /**
    * {@inheritdoc}
    */
-  public function garbageCollection() {
+  public function garbageCollection(): void {
     $this->verifyTableInTransaction();
     parent::garbageCollection();
   }

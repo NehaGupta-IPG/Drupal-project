@@ -104,7 +104,7 @@ trait PgsqlLockBackendTrait {
   /**
    * {@inheritdoc}
    */
-  public function release($name) {
+  public function release($name): void {
     $this->verifyTable();
     parent::release($name);
   }

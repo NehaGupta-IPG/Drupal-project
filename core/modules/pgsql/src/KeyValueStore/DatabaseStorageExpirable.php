@@ -25,7 +25,7 @@ class DatabaseStorageExpirable extends CoreDatabaseStorageExpirable {
   /**
    * {@inheritdoc}
    */
-  public function setWithExpire($key, $value, $expire) {
+  public function setWithExpire($key, $value, $expire): void {
     $this->verifyTableInTransaction();
     parent::setWithExpire($key, $value, $expire);
   }

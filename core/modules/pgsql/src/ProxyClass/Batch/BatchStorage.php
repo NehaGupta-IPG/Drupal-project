@@ -78,33 +78,25 @@ namespace Drupal\pgsql\ProxyClass\Batch {
         /**
          * {@inheritdoc}
          */
-        public function delete($id)
+        public function delete($id): void
         {
-            return $this->lazyLoadItself()->delete($id);
+            $this->lazyLoadItself()->delete($id);
         }
 
         /**
          * {@inheritdoc}
          */
-        public function update(array $batch)
+        public function update(array $batch): void
         {
-            return $this->lazyLoadItself()->update($batch);
+            $this->lazyLoadItself()->update($batch);
         }
 
         /**
          * {@inheritdoc}
          */
-        public function cleanup()
+        public function cleanup(): void
         {
-            return $this->lazyLoadItself()->cleanup();
-        }
-
-        /**
-         * {@inheritdoc}
-         */
-        public function create(array $batch)
-        {
-            return $this->lazyLoadItself()->create($batch);
+            $this->lazyLoadItself()->cleanup();
         }
 
         /**
@@ -118,7 +110,15 @@ namespace Drupal\pgsql\ProxyClass\Batch {
         /**
          * {@inheritdoc}
          */
-        public function schemaDefinition()
+        public function create(array $batch)
+        {
+            return $this->lazyLoadItself()->create($batch);
+        }
+
+        /**
+         * {@inheritdoc}
+         */
+        public function schemaDefinition(): \Drupal\Core\Database\SchemaDefinition\Schema
         {
             return $this->lazyLoadItself()->schemaDefinition();
         }

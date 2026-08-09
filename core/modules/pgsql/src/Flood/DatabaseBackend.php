@@ -51,7 +51,7 @@ class DatabaseBackend extends CoreDatabaseBackend {
   /**
    * {@inheritdoc}
    */
-  public function register($name, $window = 3600, $identifier = NULL) {
+  public function register($name, $window = 3600, $identifier = NULL): void {
     $this->verifyTableInTransaction();
     parent::register($name, $window, $identifier);
   }
@@ -59,7 +59,7 @@ class DatabaseBackend extends CoreDatabaseBackend {
   /**
    * {@inheritdoc}
    */
-  public function clear($name, $identifier = NULL) {
+  public function clear($name, $identifier = NULL): void {
     $this->verifyTableInTransaction();
     parent::clear($name, $identifier);
   }
@@ -83,7 +83,7 @@ class DatabaseBackend extends CoreDatabaseBackend {
   /**
    * {@inheritdoc}
    */
-  public function garbageCollection() {
+  public function garbageCollection(): void {
     $this->verifyTableInTransaction();
     parent::garbageCollection();
   }

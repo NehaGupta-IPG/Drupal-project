@@ -59,7 +59,7 @@ class BatchStorage extends CoreBatchStorage {
   /**
    * {@inheritdoc}
    */
-  public function delete($id) {
+  public function delete($id): void {
     $this->verifyTableInTransaction();
     parent::delete($id);
   }
@@ -67,7 +67,7 @@ class BatchStorage extends CoreBatchStorage {
   /**
    * {@inheritdoc}
    */
-  public function update(array $batch) {
+  public function update(array $batch): void {
     $this->verifyTableInTransaction();
     parent::update($batch);
   }
@@ -75,7 +75,7 @@ class BatchStorage extends CoreBatchStorage {
   /**
    * {@inheritdoc}
    */
-  public function cleanup() {
+  public function cleanup(): void {
     $this->verifyTableInTransaction();
     parent::cleanup();
   }

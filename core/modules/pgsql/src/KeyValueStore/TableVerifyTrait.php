@@ -86,7 +86,7 @@ trait TableVerifyTrait {
   /**
    * {@inheritdoc}
    */
-  public function set($key, $value) {
+  public function set($key, $value): void {
     $this->verifyTableInTransaction();
     parent::set($key, $value);
   }
@@ -110,7 +110,7 @@ trait TableVerifyTrait {
   /**
    * {@inheritdoc}
    */
-  public function rename($key, $new_key) {
+  public function rename($key, $new_key): void {
     $this->verifyTableInTransaction();
     parent::rename($key, $new_key);
   }
@@ -118,7 +118,7 @@ trait TableVerifyTrait {
   /**
    * {@inheritdoc}
    */
-  public function deleteMultiple(array $keys) {
+  public function deleteMultiple(array $keys): void {
     $this->verifyTableInTransaction();
     parent::deleteMultiple($keys);
   }
@@ -126,7 +126,7 @@ trait TableVerifyTrait {
   /**
    * {@inheritdoc}
    */
-  public function deleteAll() {
+  public function deleteAll(): void {
     $this->verifyTableInTransaction();
     parent::deleteAll();
   }

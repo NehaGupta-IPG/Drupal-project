@@ -52,7 +52,7 @@ class DatabaseCacheTagsChecksum extends CoreDatabaseCacheTagsChecksum {
   /**
    * {@inheritdoc}
    */
-  protected function doInvalidateTags(array $tags) {
+  protected function doInvalidateTags(array $tags): void {
     $this->verifyTableInTransaction();
     parent::doInvalidateTags($tags);
   }
