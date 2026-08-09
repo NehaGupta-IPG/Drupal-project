@@ -93,12 +93,12 @@ class MenuUiNodeTest extends BrowserTestBase {
     // Verify that the menu link title has the correct maxlength.
     $title_max_length = \Drupal::service('entity_field.manager')->getBaseFieldDefinitions('menu_link_content')['title']->getSetting('max_length');
     $this->drupalGet('node/add/page');
-    $this->assertSession()->responseMatches('/<input .* id="edit-menu-title" .* maxlength="' . $title_max_length . '" .* \/>/');
+    $this->assertSession()->responseMatches('/<input .* id="edit-menu-title" .* maxlength="' . $title_max_length . '".*>/');
 
     // Verify that the menu link description has the correct maxlength.
     $description_max_length = \Drupal::service('entity_field.manager')->getBaseFieldDefinitions('menu_link_content')['description']->getSetting('max_length');
     $this->drupalGet('node/add/page');
-    $this->assertSession()->responseMatches('/<input .* id="edit-menu-description" .* maxlength="' . $description_max_length . '" .* \/>/');
+    $this->assertSession()->responseMatches('/<input .* id="edit-menu-description" .* maxlength="' . $description_max_length . '".*>/');
 
     // Disable the default main menu, so that no menus are enabled.
     $edit = [
@@ -247,10 +247,10 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->assertSession()->fieldValueEquals('edit-menu-weight', 17);
     // Verify that the menu link title field has correct maxlength in node edit
     // form.
-    $this->assertSession()->responseMatches('/<input .* id="edit-menu-title" .* maxlength="' . $title_max_length . '" .* \/>/');
+    $this->assertSession()->responseMatches('/<input .* id="edit-menu-title" .* maxlength="' . $title_max_length . '".*>/');
     // Verify that the menu link description field has correct maxlength in
     // node add form.
-    $this->assertSession()->responseMatches('/<input .* id="edit-menu-description" .* maxlength="' . $description_max_length . '" .* \/>/');
+    $this->assertSession()->responseMatches('/<input .* id="edit-menu-description" .* maxlength="' . $description_max_length . '".*>/');
 
     // Disable the menu link, then edit the node--the link should stay disabled.
     $link_id = \Drupal::service(MenuUiUtility::class)->getMenuLinkDefaults($node)['entity_id'];

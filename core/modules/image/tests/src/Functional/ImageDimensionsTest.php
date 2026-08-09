@@ -86,7 +86,7 @@ class ImageDimensionsTest extends BrowserTestBase {
 
     $style->addImageEffect($effect);
     $style->save();
-    $this->assertEquals('<img src="' . $url . '" width="120" height="60" alt="" loading="lazy" />', $this->getImageTag($variables));
+    $this->assertEquals('<img src="' . $url . '" width="120" height="60" alt="" loading="lazy">', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
     $this->assertSession()->statusCodeEquals(200);
@@ -107,7 +107,7 @@ class ImageDimensionsTest extends BrowserTestBase {
 
     $style->addImageEffect($effect);
     $style->save();
-    $this->assertEquals('<img src="' . $url . '" width="60" height="120" alt="" loading="lazy" />', $this->getImageTag($variables));
+    $this->assertEquals('<img src="' . $url . '" width="60" height="120" alt="" loading="lazy">', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
     $this->assertSession()->statusCodeEquals(200);
@@ -130,7 +130,7 @@ class ImageDimensionsTest extends BrowserTestBase {
 
     $style->addImageEffect($effect);
     $style->save();
-    $this->assertEquals('<img src="' . $url . '" width="45" height="90" alt="" loading="lazy" />', $this->getImageTag($variables));
+    $this->assertEquals('<img src="' . $url . '" width="45" height="90" alt="" loading="lazy">', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
     $this->assertSession()->statusCodeEquals(200);
@@ -152,7 +152,7 @@ class ImageDimensionsTest extends BrowserTestBase {
 
     $style->addImageEffect($effect);
     $style->save();
-    $this->assertEquals('<img src="' . $url . '" width="45" height="90" alt="" loading="lazy" />', $this->getImageTag($variables));
+    $this->assertEquals('<img src="' . $url . '" width="45" height="90" alt="" loading="lazy">', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
     $this->assertSession()->statusCodeEquals(200);
@@ -170,7 +170,7 @@ class ImageDimensionsTest extends BrowserTestBase {
 
     $style->addImageEffect($effect);
     $style->save();
-    $this->assertEquals('<img src="' . $url . '" width="45" height="90" alt="" loading="lazy" />', $this->getImageTag($variables));
+    $this->assertEquals('<img src="' . $url . '" width="45" height="90" alt="" loading="lazy">', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
     $this->assertSession()->statusCodeEquals(200);
@@ -191,7 +191,7 @@ class ImageDimensionsTest extends BrowserTestBase {
 
     $style->addImageEffect($effect);
     $style->save();
-    $this->assertEquals('<img src="' . $url . '" alt="" />', $this->getImageTag($variables));
+    $this->assertEquals('<img src="' . $url . '" alt="">', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
     $this->assertSession()->statusCodeEquals(200);
@@ -210,7 +210,7 @@ class ImageDimensionsTest extends BrowserTestBase {
 
     $style->addImageEffect($effect);
     $style->save();
-    $this->assertEquals('<img src="' . $url . '" width="30" height="30" alt="" loading="lazy" />', $this->getImageTag($variables));
+    $this->assertEquals('<img src="' . $url . '" width="30" height="30" alt="" loading="lazy">', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
     $this->assertSession()->statusCodeEquals(200);
@@ -234,7 +234,7 @@ class ImageDimensionsTest extends BrowserTestBase {
     // @todo Uncomment this once
     //   https://www.drupal.org/project/drupal/issues/2670966 is resolved.
     // phpcs:ignore
-    // $this->assertEquals('<img src="' . $url . '" width="41" height="41" alt="" class="image-style-test" />', $this->getImageTag($variables));
+    // $this->assertEquals('<img src="' . $url . '" width="41" height="41" alt="" class="image-style-test">', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
     $this->assertSession()->statusCodeEquals(200);
@@ -257,7 +257,7 @@ class ImageDimensionsTest extends BrowserTestBase {
 
     $style->addImageEffect($effect);
     $style->save();
-    $this->assertEquals('<img src="' . $url . '" alt="" />', $this->getImageTag($variables));
+    $this->assertEquals('<img src="' . $url . '" alt="">', $this->getImageTag($variables));
 
     // Test URI dependent image effect.
     $style = ImageStyle::create(['name' => 'test_uri', 'label' => 'Test URI']);
@@ -278,7 +278,7 @@ class ImageDimensionsTest extends BrowserTestBase {
     // PNG original image. Should be resized to 100x100.
     $generated_uri = 'public://styles/test_uri/public/' . basename($original_uri);
     $url = \Drupal::service('file_url_generator')->transformRelative($style->buildUrl($original_uri));
-    $this->assertEquals('<img src="' . $url . '" width="100" height="100" alt="" loading="lazy" />', $this->getImageTag($variables));
+    $this->assertEquals('<img src="' . $url . '" width="100" height="100" alt="" loading="lazy">', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
     $this->assertSession()->statusCodeEquals(200);
@@ -292,7 +292,7 @@ class ImageDimensionsTest extends BrowserTestBase {
     $generated_uri = 'public://styles/test_uri/public/' . basename($original_uri);
     $url = $file_url_generator->transformRelative($style->buildUrl($original_uri));
     $variables['#uri'] = $original_uri;
-    $this->assertEquals('<img src="' . $url . '" width="50" height="50" alt="" loading="lazy" />', $this->getImageTag($variables));
+    $this->assertEquals('<img src="' . $url . '" width="50" height="50" alt="" loading="lazy">', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
     $this->assertSession()->statusCodeEquals(200);

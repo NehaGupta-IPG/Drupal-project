@@ -161,7 +161,7 @@ class BatchTestCallbacks {
     if (!$success) {
       // A fatal error occurred during the processing.
       $error_operation = reset($operations);
-      $messages[] = $this->t('An error occurred while processing @op with arguments:<br />@args', [
+      $messages[] = $this->t('An error occurred while processing @op with arguments:<br>@args', [
         '@op' => $error_operation[0],
         '@args' => print_r($error_operation[1], TRUE),
       ]);
