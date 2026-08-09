@@ -11,6 +11,8 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore regclass
+
 /**
  * Tests Drupal\pgsql\Driver\Database\pgsql\TableInformationLoader.
  */
