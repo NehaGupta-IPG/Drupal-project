@@ -85,6 +85,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
     $this->mockReleaseHistory($xml_map);
 
     if ($ui_only) {
+      $this->drupalGet('admin/reports/updates');
       $this->clickLink('Check manually');
       $this->checkForMetaRefresh();
     }
