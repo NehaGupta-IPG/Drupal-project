@@ -633,6 +633,9 @@ trait FunctionalTestSetupTrait {
    */
   protected function setupBaseUrl() {
     global $base_url;
+    // Set and derived from $base_url below.
+    global $base_path, $base_root;
+    global $base_secure_url, $base_insecure_url;
 
     // Get and set the domain of the environment we are running our test
     // coverage against.
@@ -675,6 +678,15 @@ trait FunctionalTestSetupTrait {
     $_SERVER['SCRIPT_FILENAME'] = $path . '/index.php';
     $_SERVER['PHP_SELF'] = $path . '/index.php';
     $_SERVER['HTTP_USER_AGENT'] = 'Drupal command line';
+
+    // Derive the remaining globals, as the kernel does for an incoming request.
+    // Code running before the test site is installed relies on them.
+    // @see \Drupal\Core\DrupalKernel::initializeRequestGlobals()
+    $base_root = $parsed_url['scheme'] . '://' . $host;
+    $base_url = $base_root . $path;
+    $base_path = $path . '/';
+    $base_secure_url = str_replace('http://', 'https://', $base_url);
+    $base_insecure_url = str_replace('https://', 'http://', $base_url);
   }
 
   /**
