@@ -1266,7 +1266,8 @@
  * - Installation profiles: Installation profiles can be used to
  *   create distributions, which are complete specific-purpose packages of
  *   Drupal including additional modules, themes, and data. For more
- *   information, see https://www.drupal.org/developing/distributions.
+ *   information, see https://www.drupal.org/developing/distributions and the
+ *   @link profile_api Installation profile API @endlink.
  *
  * @section sec_alter Alteration methods for modules
  * Here is a list of the ways that modules can alter or extend Drupal's core
