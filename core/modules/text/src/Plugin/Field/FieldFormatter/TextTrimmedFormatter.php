@@ -2,6 +2,7 @@
 
 namespace Drupal\text\Plugin\Field\FieldFormatter;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FormatterBase;
@@ -139,21 +140,18 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
   public static function preRenderSummary(array $element) {
     $raw_text = $element['#markup'];
     $exclude_html = $element['#exclude_html_tags'] ?? TRUE;
+    $summary_service = \Drupal::service(TextSummary::class);
 
-    if ($exclude_html) {
-      $plain_text = strip_tags($raw_text);
+    // When a <!--break--> delimiter is present, TextSummary::generate() honors
+    // it regardless of length. Preserve that by handing over the raw text so
+    // the comment is not lost to strip_tags().
+    if (!$exclude_html || str_contains($raw_text, '<!--break-->')) {
+      $element['#markup'] = $summary_service->generate($raw_text, $element['#format'], $element['#text_summary_trim_length']);
+      return $element;
     }
-    else {
-      $plain_text = $raw_text;
-    }
-    $trimmed_plain_text = \Drupal::service(TextSummary::class)->generate($plain_text, $element['#format'], $element['#text_summary_trim_length']);
 
-    if ($exclude_html) {
-      $element['#markup'] = self::truncateHtml($raw_text, strlen($trimmed_plain_text));
-    }
-    else {
-      $element['#markup'] = $trimmed_plain_text;
-    }
+    $trimmed_plain_text = $summary_service->generate(strip_tags($raw_text), $element['#format'], $element['#text_summary_trim_length']);
+    $element['#markup'] = self::truncateHtml($raw_text, strlen($trimmed_plain_text));
 
     return $element;
   }
@@ -170,51 +168,25 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
    *   The truncated HTML string.
    */
   public static function truncateHtml(string $html, int $length): string {
-    $is_open = FALSE;
-    $ret = '';
-    $i = 0;
-    $tags = [];
-    $tag = '';
-    $stripped_text = strip_tags($html);
-
-    // If the text is shorter than the required length, return it as is.
-    if (strlen($stripped_text) <= $length) {
-      return $html;
-    }
-
-    // Use a loop to walk through the string.
-    while ($i < strlen($html) && strlen(strip_tags($ret)) < $length) {
-      $char = $html[$i];
-      $ret .= $char;
-
-      // Handle tags.
+    $visible = 0;
+    $offset = 0;
+    $in_tag = FALSE;
+    $total = strlen($html);
+    while ($offset < $total && $visible < $length) {
+      $char = $html[$offset];
       if ($char === '<') {
-        $is_open = TRUE;
-        $tag = '';
+        $in_tag = TRUE;
       }
-      elseif ($is_open && $char === '>') {
-        $is_open = FALSE;
-
-        // Add open tags to the list and handle self-closing tags.
-        if ($tag[0] != '/' && !str_ends_with($tag, '/')) {
-          $tags[] = $tag;
-        }
-        elseif ($tag[0] == '/') {
-          array_pop($tags);
-        }
+      elseif ($char === '>') {
+        $in_tag = FALSE;
       }
-      elseif ($is_open) {
-        $tag .= $char;
+      elseif (!$in_tag) {
+        $visible++;
       }
-      $i++;
+      $offset++;
     }
-
-    // Close any open tags.
-    while (count($tags) > 0) {
-      $ret .= '</' . array_pop($tags) . '>';
-    }
-
-    return $ret;
+    // The fragment may end inside unclosed elements; normalize() repairs it.
+    return Html::normalize(substr($html, 0, $offset));
   }
 
   /**
