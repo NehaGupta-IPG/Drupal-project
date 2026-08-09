@@ -160,8 +160,8 @@ JS;
     // with ::getResponseLogHandler.
     if ($this->htmlOutputEnabled && !$this->isTestUsingGuzzleClient()) {
       $html_output = 'GET request to: ' . $url .
-        '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
-      $html_output .= '<hr />' . $out;
+        '<hr>Ending URL: ' . $this->getSession()->getCurrentUrl();
+      $html_output .= '<hr>' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
       $this->htmlOutput($html_output);
     }

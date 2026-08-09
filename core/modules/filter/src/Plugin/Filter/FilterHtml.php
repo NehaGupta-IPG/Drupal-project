@@ -424,7 +424,7 @@ class FilterHtml extends FilterBase {
       ],
       'br' => [
         $this->t('By default line break tags are automatically added, so use this tag to add additional ones. Use of this tag is different because it is not used with an open/close pair like all the others. Use the extra " /" inside the tag to maintain XHTML 1.0 compatibility'),
-        $this->t('Text with <br />line break'),
+        $this->t('Text with <br>line break'),
       ],
       'p' => [
         $this->t('By default paragraph tags are automatically added, so use this tag to add additional ones.'),

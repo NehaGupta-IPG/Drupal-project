@@ -63,7 +63,7 @@ class ListStringItem extends ListItemBase {
    */
   protected function allowedValuesDescription() {
     $description = '<p>' . $this->t('The name will be used in displayed options and edit forms.');
-    $description .= '<br/>' . $this->t('The value is automatically generated machine name of the name provided and will be the stored value.');
+    $description .= '<br>' . $this->t('The value is automatically generated machine name of the name provided and will be the stored value.');
     $description .= '</p>';
     $description .= '<p>' . $this->t('Allowed HTML tags in labels: @tags', ['@tags' => FieldFilteredMarkup::displayAllowedTags()]) . '</p>';
     return $description;

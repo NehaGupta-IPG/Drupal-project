@@ -74,7 +74,7 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getDescription() {
-    return $this->t('This action cannot be undone.<br />Make a backup of your database if you want to be able to restore these items.');
+    return $this->t('This action cannot be undone.<br>Make a backup of your database if you want to be able to restore these items.');
   }
 
   /**

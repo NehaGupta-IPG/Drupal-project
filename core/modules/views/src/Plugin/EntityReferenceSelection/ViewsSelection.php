@@ -142,7 +142,7 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
         '#required' => TRUE,
         '#options' => $options,
         '#default_value' => $default,
-        '#description' => '<p>' . $this->t('Choose the view and display that select the entities that can be referenced.<br />Only views with a display of type "Entity Reference" are eligible.') . '</p>',
+        '#description' => '<p>' . $this->t('Choose the view and display that select the entities that can be referenced.<br>Only views with a display of type "Entity Reference" are eligible.') . '</p>',
       ];
 
       $default = !empty($view_settings['arguments']) ? implode(', ', $view_settings['arguments']) : '';

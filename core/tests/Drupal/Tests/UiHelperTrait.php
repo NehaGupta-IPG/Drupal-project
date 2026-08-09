@@ -126,8 +126,8 @@ trait UiHelperTrait {
     if ($this->htmlOutputEnabled && !$this->isTestUsingGuzzleClient()) {
       $out = $this->getSession()->getPage()->getContent();
       $html_output = 'POST request to: ' . $action .
-        '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
-      $html_output .= '<hr />' . $out;
+        '<hr>Ending URL: ' . $this->getSession()->getCurrentUrl();
+      $html_output .= '<hr>' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
       $this->htmlOutput($html_output);
     }
@@ -287,8 +287,8 @@ trait UiHelperTrait {
     // with ::getResponseLogHandler.
     if ($this->htmlOutputEnabled && !$this->isTestUsingGuzzleClient()) {
       $html_output = 'GET request to: ' . $url .
-        '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
-      $html_output .= '<hr />' . $out;
+        '<hr>Ending URL: ' . $this->getSession()->getCurrentUrl();
+      $html_output .= '<hr>' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
       $this->htmlOutput($html_output);
     }
@@ -427,9 +427,9 @@ trait UiHelperTrait {
       $out = $this->getSession()->getPage()->getContent();
       $html_output =
         'Clicked element with CSS selector: ' . $css_selector .
-        '<hr />Starting URL: ' . $starting_url .
-        '<hr />Ending URL: ' . $this->getSession()->getCurrentUrl();
-      $html_output .= '<hr />' . $out;
+        '<hr>Starting URL: ' . $starting_url .
+        '<hr>Ending URL: ' . $this->getSession()->getCurrentUrl();
+      $html_output .= '<hr>' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
       $this->htmlOutput($html_output);
     }

@@ -17,6 +17,6 @@
 #}
 <audio {{ attributes }}>
   {% for file in files %}
-    <source {{ file.source_attributes }} />
+    <source {{ file.source_attributes }}>
   {% endfor %}
 </audio>

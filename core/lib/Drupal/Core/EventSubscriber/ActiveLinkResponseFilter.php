@@ -189,7 +189,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
       // Parse it into a DOMDocument so we can reliably read and modify
       // attributes.
       $dom = new \DOMDocument();
-      @$dom->loadHTML('<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $tag . '</body></html>');
+      @$dom->loadHTML('<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>' . $tag . '</body></html>');
       $node = $dom->getElementsByTagName('body')->item(0)->firstChild;
 
       // Ensure we don't set the "active" class twice on the same element.

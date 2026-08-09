@@ -2321,7 +2321,7 @@ function install_display_requirements($install_state, $requirements) {
         if (isset($requirement['severity']) && $requirement['severity'] === RequirementSeverity::Error) {
           $render_array = [
             '#type' => 'inline_template',
-            '#template' => '{{ title }}:{{ value }}<br /><br />{{ description }}',
+            '#template' => '{{ title }}:{{ value }}<br><br>{{ description }}',
             '#context' => [
               'title' => $requirement['title'],
               'value' => $requirement['value'],

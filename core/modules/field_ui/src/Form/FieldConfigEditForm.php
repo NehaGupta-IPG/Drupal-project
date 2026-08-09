@@ -142,7 +142,7 @@ class FieldConfigEditForm extends EntityForm {
       '#title' => $this->t('Help text'),
       '#default_value' => $this->entity->getDescription(),
       '#rows' => 5,
-      '#description' => $this->t('Instructions to present to the user below this field on the editing form.<br />Allowed HTML tags: @tags', ['@tags' => FieldFilteredMarkup::displayAllowedTags()]) . '<br />' . $this->t('This field supports tokens.'),
+      '#description' => $this->t('Instructions to present to the user below this field on the editing form.<br>Allowed HTML tags: @tags', ['@tags' => FieldFilteredMarkup::displayAllowedTags()]) . '<br>' . $this->t('This field supports tokens.'),
       '#weight' => -10,
     ];
 
