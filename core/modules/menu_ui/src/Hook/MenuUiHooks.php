@@ -134,6 +134,9 @@ class MenuUiHooks {
     // descendants).
     // @todo This must be handled in a #process handler.
     $node = $form_state->getFormObject()->getEntity();
+    if (!$form_state->has('menu_ui_node_original_changed_time')) {
+      $form_state->set('menu_ui_node_original_changed_time', $node->getChangedTime());
+    }
     $defaults = ($this->menuUiUtility)()->getMenuLinkDefaults($node);
     /** @var \Drupal\node\NodeTypeInterface $node_type */
     $node_type = $node->type->entity;
@@ -294,8 +297,12 @@ class MenuUiHooks {
       $values = $form_state->getValue('menu');
       if (empty($values['enabled'])) {
         if ($values['entity_id']) {
-          $entity = $this->entityRepository->getActive('menu_link_content', $values['entity_id']);
-          $entity->delete();
+          $entity = !empty($values['entity_id']) ? $this->entityRepository->getActive('menu_link_content', $values['entity_id']) : NULL;
+          // Only delete the menu link when it hasn't been created or edited at
+          // the same time the node was created.
+          if ($entity instanceof EntityInterface && $form_state->get('menu_ui_node_original_changed_time') >= $entity->getChangedTime()) {
+            $entity->delete();
+          }
         }
       }
       else {

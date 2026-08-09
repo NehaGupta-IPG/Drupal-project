@@ -6,6 +6,7 @@ namespace Drupal\Tests\menu_ui\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\menu_ui\MenuUiUtility;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -507,6 +508,46 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->drupalGet('node/' . $node->id() . '/edit');
     $element = $this->assertSession()->elementExists('css', 'input[name="menu[title]"]');
     $this->assertEquals($mainLinkTitle, $element->getValue());
+  }
+
+  /**
+   * Tests there aren't race conditions when a link is creating during edit.
+   */
+  public function testMenuNodeRaceConditions(): void {
+    $node = $this->drupalCreateNode([
+      'type' => 'page',
+      'title' => 'Test',
+    ]);
+
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertSession()->fieldValueEquals('edit-menu-enabled', FALSE);
+
+    // Create menu link content created after the user has entered the
+    // edit page.
+    $time_one_minute_before = \Drupal::time()->getRequestTime() + 15;
+    $menu_link_content = MenuLinkContent::create([
+      'title' => $node->label(),
+      'link' => ['uri' => 'entity:node/' . $node->id()],
+      'langcode' => $node->language()->getId(),
+      'menu_name' => 'main',
+      'created' => $time_one_minute_before,
+      'changed' => $time_one_minute_before,
+    ]);
+
+    $menu_link_content->save();
+    $menu_link_content_id = $menu_link_content->id();
+    $this->submitForm([], 'Save');
+
+    $this->assertSession()->pageTextContains('Page Test has been updated.');
+    $menu_link_content = MenuLinkContent::load($menu_link_content_id);
+    $this->assertInstanceOf(MenuLinkContentInterface::class, $menu_link_content, "Menu link concurrently created hasn't been deleted.");
+
+    // Assert also if there are no menu items created there are no warnings
+    // shown.
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->submitForm([], 'Save');
+    $menu_link_content = MenuLinkContent::load($menu_link_content_id);
+    $this->assertInstanceOf(MenuLinkContentInterface::class, $menu_link_content);
   }
 
 }
