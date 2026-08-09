@@ -363,7 +363,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     if (!$has_non_array) {
       // The result list contains only arrays.
       // Merge the results in a single call.
-      return NestedArray::mergeDeep(...$results);
+      return NestedArray::mergeDeepArray($results);
     }
     // The result list contains arrays and non-array values.
     // Arrays will be merged, non-arrays will be appended.
