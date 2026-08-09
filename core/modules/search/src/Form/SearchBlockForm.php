@@ -99,13 +99,20 @@ class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
     $form['#action'] = Url::fromRoute($route)->toString();
     $form['#method'] = 'get';
 
+    // Set specific id attributes to avoid duplicates with other forms.
+    $id_prefix = 'search-block-';
+
     $form['keys'] = [
       '#type' => 'search',
       '#title' => $this->t('Search'),
       '#title_display' => 'invisible',
       '#size' => 15,
       '#default_value' => '',
-      '#attributes' => ['title' => $this->t('Enter the terms you wish to search for.')],
+      '#id' => $id_prefix . 'keys',
+      '#attributes' => [
+        'id' => $id_prefix . 'keys',
+        'title' => $this->t('Enter the terms you wish to search for.'),
+      ],
     ];
 
     $form['actions'] = ['#type' => 'actions'];
@@ -114,6 +121,8 @@ class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
       '#value' => $this->t('Search'),
       // Prevent op from showing up in the query string.
       '#name' => '',
+      '#id' => $id_prefix . 'submit',
+      '#attributes' => ['id' => $id_prefix . 'submit'],
     ];
 
     return $form;
