@@ -117,7 +117,7 @@ class FormattableMarkup implements MarkupInterface, \Countable {
    * $this->placeholderFormat('<a href=":foo" title="static text">link text</a>', [':foo' => $some_variable]);
    * $this->placeholderFormat('<a href=":foo">link text</a>', [':foo' => $some_variable]);
    * // Use a : placeholder inside an HTML tag.
-   * $this->placeholderFormat('<img src=":foo" />', [':foo' => '/image.png']);
+   * $this->placeholderFormat('<img src=":foo">', [':foo' => '/image.png']);
    * @endcode
    * The above are typical examples of using the placeholders correctly.
    *
