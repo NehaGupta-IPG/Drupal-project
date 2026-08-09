@@ -755,6 +755,10 @@ trait FunctionalTestSetupTrait {
       'hash_salt' => $this->databasePrefix,
     ]);
 
+    // Set the file cache prefix, which a booting kernel would otherwise set.
+    // @see \Drupal\Core\DrupalKernel::initializeSettings()
+    FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
+
     Environment::setTimeLimit($this->timeLimit);
 
     // Save and clean the shutdown callbacks array because it is static cached
