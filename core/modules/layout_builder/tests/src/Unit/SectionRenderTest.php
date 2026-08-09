@@ -9,6 +9,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Layout\LayoutDefinition;
 use Drupal\Core\Layout\LayoutInterface;
@@ -70,6 +71,13 @@ class SectionRenderTest extends UnitTestCase {
   protected $eventDispatcher;
 
   /**
+   * The layout plugin.
+   *
+   * @var \Drupal\Core\Layout\LayoutInterface
+   */
+  protected $layout;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -86,10 +94,10 @@ class SectionRenderTest extends UnitTestCase {
     $subscriber = new BlockComponentRenderArray($this->account->reveal());
     $this->eventDispatcher->addSubscriber($subscriber);
 
-    $layout = $this->prophesize(LayoutInterface::class);
-    $layout->getPluginDefinition()->willReturn(new LayoutDefinition([]));
-    $layout->build(Argument::type('array'))->willReturnArgument(0);
-    $layout_plugin_manager->createInstance('layout_onecol', [])->willReturn($layout->reveal());
+    $this->layout = $this->prophesize(LayoutInterface::class);
+    $this->layout->getPluginDefinition()->willReturn(new LayoutDefinition([]));
+    $this->layout->build(Argument::type('array'))->willReturnArgument(0);
+    $layout_plugin_manager->createInstance('layout_onecol', [])->willReturn($this->layout->reveal());
 
     $container = new ContainerBuilder();
     $container->set('current_user', $this->account->reveal());
@@ -98,6 +106,9 @@ class SectionRenderTest extends UnitTestCase {
     $container->set('context.handler', $this->contextHandler->reveal());
     $container->set('context.repository', $this->contextRepository->reveal());
     $container->set('event_dispatcher', $this->eventDispatcher);
+    $cache_contexts_manager = $this->prophesize(CacheContextsManager::class);
+    $cache_contexts_manager->assertValidTokens(Argument::any())->willReturn(TRUE);
+    $container->set('cache_contexts_manager', $cache_contexts_manager->reveal());
     \Drupal::setContainer($container);
   }
 
@@ -157,7 +168,9 @@ class SectionRenderTest extends UnitTestCase {
     $block = $this->prophesize(BlockPluginInterface::class);
     $this->blockManager->createInstance('block_plugin_id', ['id' => 'block_plugin_id'])->willReturn($block->reveal());
 
-    $access_result = AccessResult::forbidden();
+    $access_result = AccessResult::forbidden()
+      ->addCacheContexts(['user.permissions'])
+      ->addCacheTags(['foo']);
     $block->access($this->account->reveal(), TRUE)->willReturn($access_result);
     $block->build()->shouldNotBeCalled();
     $block->getCacheContexts()->willReturn([]);
@@ -167,19 +180,82 @@ class SectionRenderTest extends UnitTestCase {
     $section = [
       new SectionComponent('some_uuid', 'content', ['id' => 'block_plugin_id']),
     ];
+    // The component built nothing, so it is not placed in a region and the
+    // layout is not built. Its cacheability is kept on the section.
     $expected = [
-      'content' => [
-        'some_uuid' => [
-          '#cache' => [
-            'contexts' => [],
-            'tags' => [],
-            'max-age' => -1,
-          ],
-        ],
+      '#cache' => [
+        'contexts' => ['user.permissions'],
+        'tags' => ['foo'],
+        'max-age' => -1,
       ],
     ];
     $result = (new Section('layout_onecol', [], $section))->toRenderArray();
     $this->assertEquals($expected, $result);
+    // No region received content, so there is no layout to build.
+    $this->layout->build(Argument::any())->shouldNotHaveBeenCalled();
+  }
+
+  /**
+   * Tests that a component which built nothing is not placed in a region.
+   */
+  public function testToRenderArrayEmptyComponent(): void {
+    $block_content = ['#markup' => 'The block content.'];
+
+    $block = $this->prophesize(BlockPluginInterface::class);
+    $this->blockManager->createInstance('block_plugin_id', ['id' => 'block_plugin_id'])->willReturn($block->reveal());
+    $block->access($this->account->reveal(), TRUE)->willReturn(AccessResult::allowed());
+    $block->build()->willReturn($block_content);
+    $block->getCacheContexts()->willReturn([]);
+    $block->getCacheTags()->willReturn([]);
+    $block->getCacheMaxAge()->willReturn(Cache::PERMANENT);
+    $block->getPluginId()->willReturn('block_plugin_id');
+    $block->getBaseId()->willReturn('block_plugin_id');
+    $block->getDerivativeId()->willReturn(NULL);
+    $block->getConfiguration()->willReturn([]);
+
+    // A block that is allowed but builds nothing.
+    $empty_block = $this->prophesize(BlockPluginInterface::class);
+    $this->blockManager->createInstance('empty_block_plugin_id', ['id' => 'empty_block_plugin_id'])->willReturn($empty_block->reveal());
+    $empty_block->access($this->account->reveal(), TRUE)->willReturn(AccessResult::allowed());
+    $empty_block->build()->willReturn([]);
+    $empty_block->getCacheContexts()->willReturn(['user.permissions']);
+    $empty_block->getCacheTags()->willReturn(['bar']);
+    $empty_block->getCacheMaxAge()->willReturn(Cache::PERMANENT);
+
+    $section = [
+      new SectionComponent('some_uuid', 'content', ['id' => 'block_plugin_id']),
+      new SectionComponent('empty_uuid', 'second', ['id' => 'empty_block_plugin_id']),
+    ];
+    $result = (new Section('layout_onecol', [], $section))->toRenderArray();
+
+    // The empty component is not placed in a region, so the region it was the
+    // only component of is not handed to the layout at all.
+    $this->assertEquals(['some_uuid'], array_keys($result['content']));
+    $this->assertArrayNotHasKey('second', $result);
+    // Its cacheability is kept on the section.
+    $this->assertContains('user.permissions', $result['#cache']['contexts']);
+    $this->assertContains('bar', $result['#cache']['tags']);
+  }
+
+  /**
+   * Tests that an all empty section keeps its layout while being previewed.
+   */
+  public function testToRenderArrayEmptyComponentInPreview(): void {
+    $block = $this->prophesize(BlockPluginInterface::class);
+    $this->blockManager->createInstance('block_plugin_id', ['id' => 'block_plugin_id'])->willReturn($block->reveal());
+    $block->build()->willReturn([]);
+    $block->getCacheContexts()->willReturn([]);
+    $block->getCacheTags()->willReturn([]);
+    $block->getCacheMaxAge()->willReturn(Cache::PERMANENT);
+
+    $section = [
+      new SectionComponent('some_uuid', 'content', ['id' => 'block_plugin_id']),
+    ];
+    (new Section('layout_onecol', [], $section))->toRenderArray([], TRUE);
+
+    // Regions have to stay available in preview, so that blocks can be placed
+    // into them.
+    $this->layout->build(Argument::any())->shouldHaveBeenCalled();
   }
 
   /**
@@ -240,6 +316,9 @@ class SectionRenderTest extends UnitTestCase {
     $expected = [];
     $result = (new Section('layout_onecol', [], $section))->toRenderArray();
     $this->assertEquals($expected, $result);
+    // A section with no component to build keeps its layout, unlike one whose
+    // components all built nothing.
+    $this->layout->build([])->shouldHaveBeenCalled();
   }
 
   /**

@@ -203,9 +203,15 @@ class LayoutSectionTest extends BrowserTestBase {
     $this->container->get('keyvalue')->get('block_test')->set('access', FALSE);
 
     $this->drupalGet($node->toUrl('canonical'));
-    $this->assertLayoutSection('.layout--onecol', NULL, '', '', 'UNCACHEABLE (poor cacheability)');
+    // The block built nothing, so the section has no region to lay out and is
+    // not rendered at all. Its cacheability is still reflected on the page.
+    $this->assertSession()->elementNotExists('css', '.layout--onecol');
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Dynamic-Cache', 'UNCACHEABLE (poor cacheability)');
     // Ensure the block was not rendered.
     $this->assertSession()->pageTextNotContains('Hello test world');
+    // Fields with a configurable display are still replaced by the layout, even
+    // though the layout rendered nothing.
+    $this->assertSession()->pageTextNotContains('The node body');
 
     // Grant access to the block, and ensure it was rendered.
     $this->container->get('keyvalue')->get('block_test')->set('access', TRUE);

@@ -2,6 +2,7 @@
 
 namespace Drupal\layout_builder;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
 use Drupal\Core\Plugin\PreviewAwarePluginInterface;
 use Drupal\Core\Render\Element;
@@ -84,10 +85,18 @@ class Section implements ThirdPartySettingsInterface {
    */
   public function toRenderArray(array $contexts = [], $in_preview = FALSE) {
     $regions = [];
+    // An empty build still carries the cacheability that
+    // SectionComponent::toRenderArray() stamps on it, which is what makes it
+    // truthy. Keep that cacheability, drop the component.
+    $empty_components = NULL;
     foreach ($this->getComponents() as $component) {
-      if ($output = $component->toRenderArray($contexts, $in_preview)) {
-        $regions[$component->getRegion()][$component->getUuid()] = $output;
+      $output = $component->toRenderArray($contexts, $in_preview);
+      if (Element::isEmpty($output)) {
+        $empty_components ??= new CacheableMetadata();
+        $empty_components->addCacheableDependency(CacheableMetadata::createFromRenderArray($output));
+        continue;
       }
+      $regions[$component->getRegion()][$component->getUuid()] = $output;
     }
 
     $layout = $this->getLayout($contexts);
@@ -95,7 +104,18 @@ class Section implements ThirdPartySettingsInterface {
       $layout->setInPreview($in_preview);
     }
 
+    // A layout template cannot skip itself: 'content' always holds '#settings'
+    // and '#layout'. Preview keeps its layout so blocks can still be placed.
+    if (!$regions && !$in_preview && $empty_components) {
+      $build = [];
+      $empty_components->applyTo($build);
+      return $build;
+    }
+
     $build = $layout->build($regions);
+    if ($empty_components) {
+      $empty_components->merge(CacheableMetadata::createFromRenderArray($build))->applyTo($build);
+    }
     // If an entity was used to build the layout, store it on the build.
     if (!Element::isEmpty($build) && isset($contexts['layout_builder.entity'])) {
       $build['#entity'] = $contexts['layout_builder.entity']->getContextValue();
