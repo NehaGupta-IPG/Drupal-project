@@ -466,7 +466,6 @@ default:
   script:
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/test-only.sh
 
-
 # Main listing of jobs. All of these are available on Merge Requests.
 'MariaDB (via PDO)':
   <<: [ *recursive-trigger, *run-on-mr ]
