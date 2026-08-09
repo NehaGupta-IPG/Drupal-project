@@ -335,6 +335,10 @@ class ModuleHandler implements ModuleHandlerInterface {
     if (!$list->listeners) {
       return [];
     }
+    // Avoid the performance cost of unnecessary (repeated) calls to
+    // NestedArray::mergeDeep().
+    // Instead, optimize for the two most common cases, when the result list
+    // either contains no arrays or only arrays.
     $results = [];
     $has_array = FALSE;
     $has_non_array = FALSE;
@@ -352,11 +356,19 @@ class ModuleHandler implements ModuleHandlerInterface {
       $results[] = $result;
     }
     if (!$has_array) {
+      // The result list does not contain any arrays, or it is empty.
+      // Nothing needs to be merged.
       return $results;
     }
     if (!$has_non_array) {
+      // The result list contains only arrays.
+      // Merge the results in a single call.
       return NestedArray::mergeDeep(...$results);
     }
+    // The result list contains arrays and non-array values.
+    // Arrays will be merged, non-arrays will be appended.
+    // This case needs to be covered for completeness, but it is rare in
+    // practice.
     $merged_results = [];
     foreach ($results as $result) {
       if (is_array($result)) {
