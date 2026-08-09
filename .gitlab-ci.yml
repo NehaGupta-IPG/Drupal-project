@@ -499,6 +499,10 @@ default:
 
 'PostgreSQL':
   <<: [ *recursive-trigger, *run-on-mr ]
+  # Run automatically on merge requests while this issue changes the pgsql
+  # driver. Revert to the manual *run-on-mr rules before commit.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   parallel:
     matrix:
       - _TARGET_PHP: !reference [.php_versions]
