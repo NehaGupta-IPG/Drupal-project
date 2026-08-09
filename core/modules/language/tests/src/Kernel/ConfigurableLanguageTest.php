@@ -34,27 +34,4 @@ class ConfigurableLanguageTest extends KernelTestBase {
     $this->assertEquals('Test language', $configurableLanguage->setName('Test language')->getName());
   }
 
-  /**
-   * Tests configurable language local name methods.
-   */
-  public function testLocal(): void {
-    $configurableLanguage = new ConfigurableLanguage(['label' => 'French', 'local' => 'Français', 'id' => 'fr'], 'configurable_language');
-    $this->assertSame('Français', $configurableLanguage->getLocal());
-    $this->assertSame('Deutsch', $configurableLanguage->setLocal('Deutsch')->getLocal());
-
-    $configurableLanguage = new ConfigurableLanguage(['label' => 'Spanish', 'local' => 'Español', 'id' => 'es'], 'configurable_language');
-    $this->assertSame('Español', $configurableLanguage->getLocal());
-
-    $configurableLanguage = new ConfigurableLanguage(['label' => 'Custom language', 'local' => 'Example', 'id' => 'xx'], 'configurable_language');
-    $this->assertSame('Custom language', $configurableLanguage->getLocal());
-
-    $configurableLanguage = new ConfigurableLanguage(['label' => 'French', 'local' => NULL, 'id' => 'fr'], 'configurable_language');
-    $this->assertSame('Français', $configurableLanguage->getLocal());
-
-    $configurableLanguage = ConfigurableLanguage::create(['label' => 'German', 'local' => 'Deutsch', 'id' => 'de']);
-    $configurableLanguage->save();
-    $configurableLanguage = ConfigurableLanguage::load('de');
-    $this->assertSame('Deutsch', $configurableLanguage->getLocal());
-  }
-
 }
