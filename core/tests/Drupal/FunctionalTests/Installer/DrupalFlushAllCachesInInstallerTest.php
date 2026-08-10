@@ -96,7 +96,7 @@ EOF;
     $parameters['parameters']['langcode'] = 'de';
     // Create an empty po file so we don't attempt to download one from
     // localize.drupal.org.
-    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/translations', NULL, TRUE);
+    mkdir($this->publicFilesDirectory . '/translations', 0777, TRUE);
     $contents = <<<PO
 msgid ""
 msgstr ""
