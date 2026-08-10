@@ -65,9 +65,8 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line): v
     $recoverable = $error_level == E_RECOVERABLE_ERROR;
     _drupal_log_error([
       '%type' => isset($types[$error_level]) ? $severity_msg : 'Unknown error',
-      // The standard PHP error handler considers that the error messages
-      // are HTML. We mimic this behavior here.
-      '@message' => Markup::create(Xss::filterAdmin($message)),
+      // HTML in the message will be escaped automatically.
+      '@message' => $message,
       '%function' => $caller['function'],
       '%file' => $caller['file'],
       '%line' => $caller['line'],
