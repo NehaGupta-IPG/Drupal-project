@@ -22,7 +22,7 @@ class UserNameUnique extends UniqueFieldConstraint {
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
-    parent::__construct($caseSensitive, $message, $groups, $payload);
+    parent::__construct($caseSensitive, $message, $bundle, $groups, $payload);
   }
 
 }
