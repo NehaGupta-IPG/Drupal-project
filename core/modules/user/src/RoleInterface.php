@@ -95,7 +95,7 @@ interface RoleInterface extends ConfigEntityInterface {
    *
    * @return $this
    */
-  public function setDescription(string $description);
+  public function setDescription(string $description): static;
 
   /**
    * Returns the weight.
