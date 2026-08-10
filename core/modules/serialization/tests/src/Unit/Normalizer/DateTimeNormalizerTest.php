@@ -183,7 +183,7 @@ class DateTimeNormalizerTest extends UnitTestCase {
    */
   public function testDenormalizeException(): void {
     $this->expectException(UnexpectedValueException::class);
-    $this->expectExceptionMessage('The specified date "2016/11/06 09:02am GMT" is not in an accepted format: "Y-m-d\TH:i:sP" (RFC 3339), "Y-m-d\TH:i:sO" (ISO 8601).');
+    $this->expectExceptionMessageIs('The specified date "2016/11/06 09:02am GMT" is not in an accepted format: "Y-m-d\TH:i:sP" (RFC 3339), "Y-m-d\TH:i:sO" (ISO 8601).');
 
     $normalized = '2016/11/06 09:02am GMT';
 
@@ -232,8 +232,8 @@ class DateTimeNormalizerTestDrupalDateTime extends DrupalDateTime {
   /**
    * Sets the timezone.
    */
-  public function setTimezone(\DateTimeZone $timezone) {
-    parent::setTimezone($timezone);
+  public function setTimezone(\DateTimeZone $timezone): static {
+    return parent::setTimezone($timezone);
   }
 
 }

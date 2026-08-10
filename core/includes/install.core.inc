@@ -33,6 +33,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -170,6 +171,7 @@ function install_drupal($class_loader, $settings = [], ?callable $callback = NUL
         $finish_url = $install_state['profile_info']['distribution']['install']['finish_url'];
       }
       install_goto($finish_url);
+      \Drupal::service('cache_prewarmer')->preWarmAllCaches();
     }
   }
 }
@@ -346,7 +348,6 @@ function install_begin_request($class_loader, &$install_state): void {
 
   // Ensure that procedural dependencies are loaded as early as possible,
   // since the error/exception handlers depend on them.
-  require_once __DIR__ . '/../modules/system/system.install';
   require_once __DIR__ . '/common.inc';
   require_once __DIR__ . '/install.inc';
   require_once __DIR__ . '/form.inc';
@@ -458,7 +459,7 @@ function install_begin_request($class_loader, &$install_state): void {
   }
   /** @var \Drupal\Core\File\FileSystemInterface $file_system */
   $file_system = $container->get('file_system');
-  $container->set('string_translator.file_translation', new FileTranslation($directory, $file_system));
+  $container->set('string_translator.file_translation', new FileTranslation($directory, $file_system, $install_state['parameters']['profile'] ?? NULL));
   $container->get('string_translation')
     ->addTranslator($container->get('string_translator.file_translation'));
 
@@ -777,8 +778,6 @@ function install_tasks($install_state): array {
       'run' => $needs_download ? INSTALL_TASK_RUN_IF_REACHED : INSTALL_TASK_SKIP,
     ],
     'install_select_profile' => [
-      'display_name' => t('Choose profile'),
-      'display' => empty($install_state['profile_info']['distribution']['name']) && count($install_state['profiles']) != 1,
       'run' => INSTALL_TASK_RUN_IF_REACHED,
     ],
     'install_load_profile' => [
@@ -1120,7 +1119,6 @@ function install_verify_requirements(&$install_state) {
  *   An array of information about the current installation state.
  */
 function install_base_system(&$install_state): void {
-  // Install system.module.
   drupal_install_system($install_state);
 
   // Call HtaccessWriter::ensure() to ensure that all of Drupal's standard
@@ -1238,12 +1236,10 @@ function install_database_errors($database, $settings_file) {
  *   profile will be added here, if it was not already selected previously, as
  *   will a list of all available profiles.
  *
- * @return array|null
- *   For interactive installations, a form allowing the profile to be selected,
- *   if the user has a choice that needs to be made. Otherwise, an exception is
- *   thrown if a profile cannot be chosen automatically.
+ * @throws \Drupal\Core\Installer\Exception\InstallerException
+ *   Thrown if a profile cannot be chosen automatically.
  */
-function install_select_profile(&$install_state) {
+function install_select_profile(&$install_state): void {
   if (!array_key_exists('profile', $install_state['parameters'])) {
     // If there are no profiles at all, installation cannot proceed.
     if (empty($install_state['profiles'])) {
@@ -1258,8 +1254,8 @@ function install_select_profile(&$install_state) {
       if (!$install_state['interactive']) {
         throw new InstallerException('Missing profile parameter.');
       }
-      // Otherwise, display a form to select a profile.
-      return install_get_form('Drupal\Core\Installer\Form\SelectProfileForm', $install_state);
+      // Fall back to the Standard profile.
+      $install_state['parameters']['profile'] ??= 'standard';
     }
   }
 }
@@ -1419,14 +1415,23 @@ function install_select_language(&$install_state) {
  */
 function install_download_translation(&$install_state) {
   // Check whether all conditions are met to download. Download the translation
-  // if possible.
+  // for core if possible.
   $requirements = install_check_translations($install_state['parameters']['langcode'], $install_state['server_pattern']);
   // Render requirements if any warnings or errors returned.
   if ($output = install_display_requirements($install_state, $requirements)) {
     return $output;
   }
 
-  // The download was successful, reload the page in the new language.
+  $profile = $install_state['parameters']['profile'] ?? NULL;
+  $profile_path = $install_state['profiles'][$profile]?->getPath();
+  $profile_version = $install_state['profiles'][$profile]?->info['version'] ?? NULL;
+  // If we're using a custom profile and we know its version, try to download
+  // that translation too. If we can't, proceed without it.
+  if (isset($profile, $profile_path, $profile_version) && !str_starts_with($profile_path, 'core/')) {
+    install_check_translations($install_state['parameters']['langcode'], $install_state['server_pattern'], $profile, $profile_version);
+  }
+
+  // At least one download was successful, reload the page in the new language.
   $install_state['translations'][$install_state['parameters']['langcode']] = TRUE;
   if ($install_state['interactive']) {
     install_goto(install_redirect_url($install_state));
@@ -1603,8 +1608,7 @@ function install_profile_modules(&$install_state) {
       $modules = array_merge($modules, array_keys($files[$module]->requires));
     }
   }
-  // The System module has already been installed by install_base_system().
-  $modules = array_diff(array_unique($modules), ['system']);
+
   foreach ($modules as $module) {
     if (!empty($files[$module]->info['required'])) {
       $required[$module] = $files[$module]->sort;
@@ -1645,12 +1649,24 @@ function install_profile_modules(&$install_state) {
     }
     $batch_builder->addOperation(
       '_install_module_batch',
-      [$module_group, $names],
+      [$module_group, $names, $install_state],
     );
   }
   $batch_builder
     ->setTitle(t('Installing @drupal', ['@drupal' => drupal_install_profile_distribution_name()]))
     ->setErrorMessage(t('The installation has encountered an error.'));
+
+  // If the profile has a list of recipes to apply, add them to the batch job.
+  $recipes = array_map(
+    Recipe::createFromDirectory(...),
+    $install_state['profile_info']['recipes'] ?? [],
+  );
+  foreach ($recipes as $recipe) {
+    foreach (RecipeRunner::toBatchOperations($recipe) as [$callback, $arguments]) {
+      $batch_builder->addOperation($callback, $arguments);
+    }
+  }
+
   return $batch_builder->toArray();
 }
 
@@ -1764,7 +1780,7 @@ function install_import_translations(&$install_state) {
   // should import translations.
   $languages = \Drupal::languageManager()->getLanguages();
   if (count($languages) > 1 || !isset($languages['en'])) {
-    return \Drupal::service(LocaleFetch::class)->buildUpdateBatch();
+    return \Drupal::service(LocaleFetch::class)->buildUpdateBatch(['drupal']);
   }
 }
 
@@ -1818,8 +1834,14 @@ function install_finish_translations(&$install_state): array {
 function install_finished(&$install_state): void {
   $profile = $install_state['parameters']['profile'];
 
-  // Installation profiles are always loaded last.
-  module_set_weight($profile, 1000);
+  // If the profile has asked to be automatically uninstalled, do that.
+  if ($install_state['profile_info']['keep_profile'] ?? TRUE) {
+    // Installation profiles are always loaded last.
+    \Drupal::service(ModuleWeight::class)->set($profile, 1000);
+  }
+  else {
+    \Drupal::service('module_installer')->uninstall([$profile]);
+  }
 
   // Build the router once after installing all modules.
   // This would normally happen upon KernelEvents::TERMINATE, but since the
@@ -1834,11 +1856,6 @@ function install_finished(&$install_state): void {
     user_login_finalize($account);
   }
 
-  $success_message = t('Congratulations, you installed @drupal!', [
-    '@drupal' => drupal_install_profile_distribution_name(),
-  ]);
-  \Drupal::messenger()->addStatus($success_message);
-
   // Record when this install ran.
   \Drupal::state()->set('install_time', \Drupal::time()->getRequestTime());
 }
@@ -1848,10 +1865,21 @@ function install_finished(&$install_state): void {
  *
  * Performs batch installation of modules.
  */
-function _install_module_batch(array $modules, array $module_names, array &$context): void {
+function _install_module_batch(array $modules, array $module_names, array $install_state, array &$context): void {
   \Drupal::service('module_installer')->install($modules, FALSE);
   $context['results'] = array_merge($context['results'], $modules);
   $context['message'] = \Drupal::translation()->formatPlural(count($module_names), 'Installed %module module.', 'Installed %module modules.', ['%module' => implode(', ', $module_names)]);
+
+  // If installing system module, set the langcode to the one chosen in the
+  // installer.
+  if (in_array('system', $modules)) {
+    if (isset($install_state['parameters']['langcode'])) {
+      \Drupal::configFactory()->getEditable('system.site')
+        ->set('langcode', (string) $install_state['parameters']['langcode'])
+        ->set('default_langcode', (string) $install_state['parameters']['langcode'])
+        ->save();
+    }
+  }
 }
 
 /**
@@ -1861,12 +1889,18 @@ function _install_module_batch(array $modules, array $module_names, array &$cont
  *   Language code to check for download.
  * @param string $server_pattern
  *   Server access pattern (to replace language code, version number, etc. in).
+ * @param string $project
+ *   (optional) The name of the project for which to download translations.
+ *   Defaults to `drupal` (i.e., core).
+ * @param string $version
+ *   (optional) The version of the project for which to download translations.
+ *   Defaults to \Drupal::VERSION.
  *
  * @return array
  *   Requirements compliance array. If the translation cannot be downloaded this
  *   will contain a requirements error with detailed information.
  */
-function install_check_translations($langcode, $server_pattern): array {
+function install_check_translations($langcode, $server_pattern, string $project = 'drupal', string $version = \Drupal::VERSION): array {
   $requirements = [];
 
   $readable = FALSE;
@@ -1893,18 +1927,9 @@ function install_check_translations($langcode, $server_pattern): array {
     $translations_directory_exists = TRUE;
   }
 
-  $version = \Drupal::VERSION;
-  // For dev releases, remove the '-dev' part and trust the translation server
-  // to fall back to the latest stable release for that branch.
-  // @see \Drupal\locale\LocaleProjectRepository::buildProjects()
-  if (preg_match("/^(\d+\.\d+\.).*-dev$/", $version, $matches)) {
-    // Example match: 8.0.0-dev => 8.0.x (Drupal core)
-    $version = $matches[1] . 'x';
-  }
-
   // Build URL for the translation file and the translation server.
   $variables = [
-    '%project' => 'drupal',
+    '%project' => $project,
     '%version' => $version,
     '%core' => 'all',
     '%language' => $langcode,
@@ -2312,17 +2337,6 @@ function install_config_import_batch() {
 
   // Get the sync storage.
   $sync = \Drupal::service('config.storage.sync');
-  // Match up the site UUIDs, the install_base_system install task will have
-  // installed the system module and created a new UUID.
-  $system_site = $sync->read('system.site');
-  // When installing from configuration it is possible that system.site
-  // configuration is not present. If this occurs a ConfigImporterException will
-  // by thrown when $config_importer->initialize() is called below and the error
-  // will be reported to the user.
-  if ($system_site !== FALSE) {
-    \Drupal::configFactory()->getEditable('system.site')->set('uuid', $system_site['uuid'])->save();
-  }
-
   // Create the storage comparer and the config importer.
   $storage_comparer = new StorageComparer($sync, \Drupal::service('config.storage'));
   $storage_comparer->createChangelist();
@@ -2508,7 +2522,7 @@ function _install_config_locale_overrides_process_batch(array $names, array $lan
  * @internal
  *   All installer code is internal.
  */
-function install_recipe_required_modules() {
+function install_recipe_required_modules(array $install_state) {
   // We need to manually trigger the installation of core-provided entity types,
   // as those will not be handled by the module installer.
   // @see install_profile_modules()
@@ -2533,9 +2547,6 @@ function install_recipe_required_modules() {
   }
   arsort($required);
 
-  // The system module is already installed. See install_base_system().
-  unset($required['system']);
-
   $modules = [];
   $names = [];
   foreach ($required as $module => $weight) {
@@ -2543,7 +2554,7 @@ function install_recipe_required_modules() {
     $names[] = $files[$module]->info['name'];
   }
   $batch_builder->addOperation('_install_module_batch',
-    [$modules, $names]
+    [$modules, $names, $install_state]
   );
   return $batch_builder->toArray();
 }
