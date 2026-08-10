@@ -62,11 +62,22 @@ class DatabaseLockBackend extends LockBackendAbstract {
       return $success;
     }
     else {
-      // Optimistically try to acquire the lock, then retry once if it fails.
       // The first time through the loop cannot be a retry.
       $retry = FALSE;
       // We always want to do this code at least once.
       do {
+        // Check whether the lock is available before trying to insert it.
+        // Inserting unconditionally and relying on the resulting constraint
+        // violation would be one query less in the uncontended case, but the
+        // contended case is common - a single page load can bootstrap Drupal
+        // several times - and databases such as PostgreSQL write every failed
+        // insert to their server log, which floods the log with errors that
+        // are expected and handled. lockMayBeAvailable() also clears the
+        // offending row from the database table in case it has expired.
+        if (!$this->lockMayBeAvailable($name)) {
+          // Another request holds the lock and it has not expired yet.
+          break;
+        }
         try {
           $this->database->insert('semaphore')
             ->fields([
@@ -81,12 +92,10 @@ class DatabaseLockBackend extends LockBackendAbstract {
           $retry = FALSE;
         }
         catch (IntegrityConstraintViolationException) {
-          // Suppress the error. If this is our first pass through the loop,
-          // then $retry is FALSE. In this case, the insert failed because some
-          // other request acquired the lock but did not release it. We decide
-          // whether to retry by checking lockMayBeAvailable(). This will clear
-          // the offending row from the database table in case it has expired.
-          $retry = $retry ? FALSE : $this->lockMayBeAvailable($name);
+          // Suppress the error. Another request acquired the lock between the
+          // check above and this insert, so the lock is not available after
+          // all and there is no point in retrying.
+          $retry = FALSE;
         }
         catch (\Exception $e) {
           // Create the semaphore table if it does not exist and retry.
@@ -98,8 +107,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
             throw $e;
           }
         }
-        // We only retry in case the first attempt failed, but we then broke
-        // an expired lock.
+        // We only retry in case the table had to be created first.
       } while ($retry);
     }
     return isset($this->locks[$name]);
