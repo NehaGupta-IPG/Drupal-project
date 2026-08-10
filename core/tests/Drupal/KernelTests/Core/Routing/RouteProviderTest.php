@@ -90,8 +90,6 @@ class RouteProviderTest extends KernelTestBase {
 
   /**
    * The test logger.
-   *
-   * @var \ColinODell\PsrTestLogger\TestLogger
    */
   protected TestLogger $logger;
 
@@ -774,6 +772,14 @@ class RouteProviderTest extends KernelTestBase {
     $this->assertEquals('drupal/core', $deprecation['package']);
     $this->assertEquals('11.2.0', $deprecation['version']);
     $this->assertEquals('route_c is deprecated!', $deprecation['message']);
+  }
+
+  /**
+   * Performs basic smoke test on the lazy route provider used in kernel tests.
+   */
+  public function testKernelTestLazyRouteProvider(): void {
+    $routes = \iterator_to_array(\Drupal::service('router.route_provider')->getAllRoutes());
+    self::assertArrayHasKey('language.negotiation_url', $routes);
   }
 
   /**
