@@ -119,7 +119,7 @@ class FileImageDimensionsConstraintValidatorTest extends FileValidatorTestBase {
       $validators = [
         'FileImageDimensions' => [
           'maxDimensions' => '1x1',
-          'resizePolicy' => ImageResizePolicy::RejectLargerImagesWithError->value,
+          'resizePolicy' => ImageResizePolicy::RejectLargerImagesWithError,
         ],
       ];
       $violations = $this->validator->validate($this->image, $validators);

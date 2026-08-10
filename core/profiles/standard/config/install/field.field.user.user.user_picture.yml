@@ -23,7 +23,7 @@ settings:
   file_extensions: 'png gif jpg jpeg webp'
   max_filesize: ''
   max_resolution: ''
-  resize_policy: '!php/enum Drupal\Core\Image\ImageResizePolicy::ResizeLargerImages'
+  resize_policy: !php/enum Drupal\Core\Image\ImageResizePolicy::ResizeLargerImages
   min_resolution: ''
   alt_field: false
   alt_field_required: false
