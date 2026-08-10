@@ -38,16 +38,4 @@ class UniqueFieldConstraintTestHooks {
     $query->condition('entity_test.id', 0);
   }
 
-  /**
-  * Prevent duplicates in my_bundle.
-  */
-  #[Hook('entity_bundle_field_info_alter')]
-  public function uniqueBundleField(&$fields, EntityTypeInterface $entity_type, $bundle): void {
-
-    $my_bundle = 'my_bundle';
-    if ($entity_type->id() === 'entity_type' && $bundle === $my_bundle) {
-      $fields['name']->addConstraint('UniqueField', ['bundle' => $my_bundle]);
-    }
-  }
-
 }
