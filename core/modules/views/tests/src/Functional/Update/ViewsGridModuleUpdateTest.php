@@ -63,7 +63,6 @@ class ViewsGridModuleUpdateTest extends UpdatePathTestBase {
 
     // The view should have the grid style plugin.
     $this->assertInstanceOf(
-      // @phpstan-ignore-next-line classConstant.deprecatedClass (Testing deprecated functionality)
       Grid::class,
       $executable->style_plugin
     );
