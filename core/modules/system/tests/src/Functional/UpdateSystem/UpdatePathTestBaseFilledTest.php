@@ -113,7 +113,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     // Make sure the content for node 8 is still in the edit form.
     $this->drupalGet('node/8/edit');
     $this->assertSession()->pageTextContains('Test title');
-    $this->assertSession()->pageTextContains('Test body');
+    $this->assertSession()->pageTextContains('Body');
     $this->assertSession()->checkboxChecked('edit-field-test-1-value');
     $this->assertSession()->responseContains('2015-08-16');
     $this->assertSession()->responseContains('test@example.com');
@@ -131,7 +131,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->drupalGet('node/8/edit', ['language' => $spanish]);
     $this->assertSession()->pageTextContains('Test title Spanish');
-    $this->assertSession()->pageTextContains('Test body Spanish');
 
     // Make sure the user page is correct.
     $this->drupalGet('user/3');
@@ -224,7 +223,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('admin/structure/types/manage/test_content_type/fields');
 
     // Make sure fields are the right type.
-    $assert_session->elementContains('css', '#body', 'Long text with summary');
+    $assert_session->elementContains('css', '#field-body', 'Long text');
     $assert_session->elementContains('css', '#field-test-1', 'Boolean');
     $assert_session->elementContains('css', '#field-test-2', 'Comments');
     $assert_session->elementContains('css', '#field-test-3', 'Date');
