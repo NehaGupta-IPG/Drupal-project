@@ -132,6 +132,7 @@ field.field_settings.image:
       label: 'Maximum image dimensions'
     resize_policy:
       type: enum
+      enum_class: 'Drupal\Core\Image\ImageResizePolicy'
       label: 'Image resize policy'
       constraints:
         Choice:
