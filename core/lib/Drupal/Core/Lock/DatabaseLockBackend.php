@@ -68,8 +68,8 @@ class DatabaseLockBackend extends LockBackendAbstract {
       do {
         // Check whether the lock is available before trying to insert it.
         // Inserting unconditionally and relying on the resulting constraint
-        // violation would be one query less in the uncontended case, but the
-        // contended case is common - a single page load can bootstrap Drupal
+        // violation saves a query when the lock is free, but failing to
+        // acquire a lock is common - a single page load can bootstrap Drupal
         // several times - and databases such as PostgreSQL write every failed
         // insert to their server log, which floods the log with errors that
         // are expected and handled. lockMayBeAvailable() also clears the
