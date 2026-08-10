@@ -19,6 +19,76 @@ use Drupal\Core\Database\Database;
 
 $connection = Database::getConnection();
 
+// Create the field storage tables. Drupal's field schema reconciliation
+// probes these tables during updates ("does any row have data?"), so they
+// must exist even though the test never writes rows.
+$body_table = [
+  'description' => 'Data storage for node field body.',
+  'fields' => [
+    'bundle' => [
+      'type' => 'varchar_ascii',
+      'length' => 128,
+      'not null' => TRUE,
+      'default' => '',
+    ],
+    'deleted' => [
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => TRUE,
+      'default' => 0,
+    ],
+    'entity_id' => [
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+    ],
+    'revision_id' => [
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+    ],
+    'langcode' => [
+      'type' => 'varchar_ascii',
+      'length' => 32,
+      'not null' => TRUE,
+      'default' => '',
+    ],
+    'delta' => [
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+    ],
+    'body_value' => [
+      'type' => 'text',
+      'size' => 'big',
+      'not null' => TRUE,
+    ],
+    'body_summary' => [
+      'type' => 'text',
+      'size' => 'big',
+      'not null' => FALSE,
+    ],
+    'body_format' => [
+      'type' => 'varchar_ascii',
+      'length' => 255,
+      'not null' => FALSE,
+    ],
+  ],
+  'primary key' => ['entity_id', 'deleted', 'delta', 'langcode'],
+  'indexes' => [
+    'bundle' => ['bundle'],
+    'revision_id' => ['revision_id'],
+    'body_format' => ['body_format'],
+  ],
+];
+$schema = $connection->schema();
+if (!$schema->tableExists('node__body')) {
+  $schema->createTable('node__body', $body_table);
+}
+if (!$schema->tableExists('node_revision__body')) {
+  $schema->createTable('node_revision__body', $body_table);
+}
+
 $field_storage = [
   'uuid' => 'ed2b1eb9-b633-4f00-9006-6b70e0ffa5a0',
   'langcode' => 'en',
