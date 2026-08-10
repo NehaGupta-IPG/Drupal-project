@@ -25,8 +25,8 @@ class EntityReferenceSelectionValidateTest extends EntityKernelTestBase {
    * Such IDs never match an entity, but strict database backends throw an
    * exception when they are used in a query instead of returning no results.
    */
-  #[DataProvider('providerUnstorableIds')]
-  public function testUnstorableIds(string|int $id): void {
+  #[DataProvider('providerNonStorableIds')]
+  public function testNonStorableIds(string|int $id): void {
     $handler = $this->container->get('plugin.manager.entity_reference_selection')
       ->getInstance(['target_type' => 'entity_test']);
 
@@ -39,7 +39,7 @@ class EntityReferenceSelectionValidateTest extends EntityKernelTestBase {
    * @return array<string, array{string|int}>
    *   Test cases, keyed by a description of the ID.
    */
-  public static function providerUnstorableIds(): array {
+  public static function providerNonStorableIds(): array {
     return [
       'non-numeric string' => ['test'],
       'partially numeric string' => ['1test'],
