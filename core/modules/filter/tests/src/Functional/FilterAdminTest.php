@@ -375,6 +375,11 @@ class FilterAdminTest extends BrowserTestBase {
    * Tests the URL filter settings form is properly validated.
    */
   public function testUrlFilterAdmin(): void {
+    $this->drupalGet('admin/config/content/formats/manage/basic_html');
+    $this->assertSession()->pageTextContains('Use https:// for links without a protocol');
+    $this->assertSession()->fieldExists('filters[filter_url][settings][filter_url_secure_links]');
+    $this->assertSession()->checkboxNotChecked('filters[filter_url][settings][filter_url_secure_links]');
+
     // The form does not save with an invalid filter URL length.
     $edit = [
       'filters[filter_url][settings][filter_url_length]' => $this->randomMachineName(4),
@@ -382,6 +387,13 @@ class FilterAdminTest extends BrowserTestBase {
     $this->drupalGet('admin/config/content/formats/manage/basic_html');
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->statusMessageNotContains('The text format Basic HTML has been updated.');
+
+    $this->drupalGet('admin/config/content/formats/manage/basic_html');
+    $this->submitForm([
+      'filters[filter_url][settings][filter_url_secure_links]' => TRUE,
+    ], 'Save configuration');
+    $this->drupalGet('admin/config/content/formats/manage/basic_html');
+    $this->assertSession()->checkboxChecked('filters[filter_url][settings][filter_url_secure_links]');
   }
 
   /**

@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
   type: FilterInterface::TYPE_MARKUP_LANGUAGE,
   settings: [
     "filter_url_length" => 72,
+    "filter_url_secure_links" => false,
   ]
 )]
 class FilterUrl extends FilterBase implements ContainerFactoryPluginInterface {
@@ -63,6 +64,12 @@ class FilterUrl extends FilterBase implements ContainerFactoryPluginInterface {
       '#min' => 1,
       '#field_suffix' => $this->t('characters'),
       '#description' => $this->t('URLs longer than this number of characters will be truncated to prevent long strings that break formatting. The link itself will be retained; just the text portion of the link will be truncated.'),
+    ];
+    $form['filter_url_secure_links'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use https:// for links without a protocol'),
+      '#default_value' => $this->settings['filter_url_secure_links'] ?? FALSE,
+      '#description' => $this->t('If checked, URLs without protocol will be converted into links using the https:// protocol.'),
     ];
     return $form;
   }
@@ -274,7 +281,8 @@ class FilterUrl extends FilterBase implements ContainerFactoryPluginInterface {
     $match[$i] = Html::decodeEntities($match[$i]);
     $caption = Html::escape($this->trimUrl($match[$i]));
     $match[$i] = Html::escape($match[$i]);
-    return '<a href="http://' . $match[$i] . '">' . $caption . '</a>';
+    $protocol = !empty($this->settings['filter_url_secure_links']) ? 'https://' : 'http://';
+    return '<a href="' . $protocol . $match[$i] . '">' . $caption . '</a>';
   }
 
   /**

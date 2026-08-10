@@ -72,7 +72,10 @@ class FilterDefaultConfigTest extends KernelTestBase {
     $this->assertEquals(1, $filters['filter_url']['status']);
     $this->assertEquals(0, $filters['filter_url']['weight']);
     $this->assertEquals('filter', $filters['filter_url']['provider']);
-    $this->assertEquals(['filter_url_length' => 72], $filters['filter_url']['settings']);
+    $this->assertEquals([
+      'filter_url_length' => 72,
+      'filter_url_secure_links' => FALSE,
+    ], $filters['filter_url']['settings']);
   }
 
   /**
