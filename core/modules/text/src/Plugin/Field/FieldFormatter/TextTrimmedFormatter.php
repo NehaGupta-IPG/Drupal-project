@@ -186,7 +186,7 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
       }
       $offset++;
     }
-    // Nothing was changed skip the normalization.
+    // Nothing was truncated, so skip the normalization.
     if ($offset >= $total) {
       return $html;
     }
