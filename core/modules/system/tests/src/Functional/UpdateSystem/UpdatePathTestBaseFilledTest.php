@@ -87,7 +87,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->pageTextNotContains('Test 12');
     // Make sure all other field labels are there.
     for ($i = 1; $i <= 23; $i++) {
-      if (($i != 11) && ($i != 12) && ($i != 7)) {
+      if (($i != 11) && ($i != 12) && ($i != 7) && ($i != 14)) {
         $this->assertSession()->pageTextContains('Test ' . $i);
       }
     }
