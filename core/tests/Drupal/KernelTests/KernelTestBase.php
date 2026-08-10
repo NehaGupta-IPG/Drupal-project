@@ -729,7 +729,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    * @param string $module
    *   The name of the module the default configuration is from.
    * @param string ...$config_names
-   *   One or more config names. Does not support config entities.
+   *   One or more config names.
    */
   protected function installSpecificConfig(string $module, string ...$config_names): void {
     $default_install_path = $this->container->get('extension.path.resolver')->getPath('module', $module) . '/' . InstallStorage::CONFIG_INSTALL_DIRECTORY;
@@ -739,9 +739,28 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $config_to_create = $storage->readMultiple($config_names);
 
     foreach ($config_names as $name) {
+      // Do the same work as
+      // \Drupal\Core\Config\ConfigInstaller::createConfiguration().
       $new_config = new Config($name, $this->container->get('config.storage'), $this->container->get('event_dispatcher'), $this->container->get('config.typed'));
       $new_config->setData($config_to_create[$name]);
-      $new_config->save();
+
+      if ($entity_type_id = $this->container->get('config.manager')->getEntityTypeIdByName($name)) {
+        $entity_storage = $this->container->get('entity_type.manager')->getStorage($entity_type_id);
+
+        $id = $entity_storage->getIDFromConfigName($name, $entity_storage->getEntityType()->getConfigPrefix());
+
+        $entity = $entity_storage->createFromStorageRecord($new_config->get());
+
+        if ($entity->isInstallable()) {
+          $entity->save();
+          if ($id !== $entity->id()) {
+            throw new \LogicException(sprintf('The configuration name "%s" does not match the ID "%s"', $name, $entity->id()));
+          }
+        }
+      }
+      else {
+        $new_config->save();
+      }
     }
   }
 
