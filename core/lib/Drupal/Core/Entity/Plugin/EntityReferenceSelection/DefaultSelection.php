@@ -384,16 +384,18 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     if ($ids) {
       $target_type = $this->configuration['target_type'];
       $entity_type = $this->entityTypeManager->getDefinition($target_type);
-      // Filter out IDs that are incompatible with the entity's ID field type
-      // to prevent database errors on PostgreSQL (e.g., passing a non-numeric
-      // string such as "test" to a bigint column causes an
-      // "invalid input syntax for type bigint" error).
+      // Filter out IDs that the entity's ID column cannot store, to prevent
+      // database errors on PostgreSQL. Passing a non-numeric string such as
+      // "test" causes an "invalid input syntax for type bigint" error, and
+      // passing a value that exceeds the column range causes a "value is out
+      // of range for type integer" error.
       $id_key = $entity_type->getKey('id');
       if ($id_key) {
         $field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions($target_type);
         if (isset($field_storage_definitions[$id_key])
           && $field_storage_definitions[$id_key]->getType() === 'integer') {
-          $ids = array_values(array_filter($ids, 'ctype_digit'));
+          $size = $field_storage_definitions[$id_key]->getSetting('size') ?: 'normal';
+          $ids = array_values(array_filter($ids, fn ($id) => static::isStorableIntegerId($id, $size)));
         }
       }
       if (!$ids) {
@@ -406,6 +408,45 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     }
 
     return $result;
+  }
+
+  /**
+   * Checks whether an ID can be stored in an integer ID column.
+   *
+   * An ID that does not fit the column can never match an existing entity, but
+   * sending it to the database anyway makes strict backends such as PostgreSQL
+   * throw an exception instead of returning an empty result.
+   *
+   * @param mixed $id
+   *   The ID to check.
+   * @param string $size
+   *   The 'size' storage setting of the ID field.
+   *
+   * @return bool
+   *   TRUE if the ID fits the column, FALSE otherwise.
+   */
+  protected static function isStorableIntegerId(mixed $id, string $size): bool {
+    if (!is_int($id) && !is_string($id)) {
+      return FALSE;
+    }
+    // Entity ID columns are unsigned, so only digits are acceptable.
+    $id = (string) $id;
+    if ($id === '' || !ctype_digit($id)) {
+      return FALSE;
+    }
+    // Use the widest limit that any core database driver applies for the given
+    // size, so that IDs which a site can actually store are never filtered
+    // out. PostgreSQL has no tiny or medium integers and stores those as
+    // smallint and integer respectively.
+    $limit = match ($size) {
+      'tiny', 'small' => '32767',
+      'medium', 'normal' => '2147483647',
+      default => '9223372036854775807',
+    };
+    // The value can exceed PHP_INT_MAX, so compare the digits as strings.
+    $digits = ltrim($id, '0');
+    return strlen($digits) < strlen($limit)
+      || (strlen($digits) === strlen($limit) && strcmp($digits, $limit) <= 0);
   }
 
   /**
