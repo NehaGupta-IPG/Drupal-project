@@ -35,11 +35,15 @@
  * - install: An array of additional module machine names to install that are
  *   not hard dependencies of the profile. These modules are installed but the
  *   profile does not declare a dependency on them.
+ * - recipes: An array of recipe directory paths, relative to the Drupal root,
+ *   to apply during installation.
  * - themes: An array of theme machine names to install. Defaults to ['stark']
  *   if not specified.
  * - keep_english: Boolean. When TRUE, English is kept as an available language
  *   even when another language is selected during installation. Defaults to
  *   FALSE, which removes English when a non-English language is selected.
+ * - keep_profile: Boolean. When FALSE, the profile is automatically
+ *   uninstalled once the installation is complete. Defaults to TRUE.
  * - opt_out_install: Boolean. When TRUE, the profile is not installed as a
  *   module during the installation process. This allows lightweight profiles
  *   that do not define hooks or custom install logic to skip the module
