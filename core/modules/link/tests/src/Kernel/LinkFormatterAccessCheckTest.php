@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\link\Kernel;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\entity_test\Entity\EntityTest;
@@ -134,6 +135,28 @@ final class LinkFormatterAccessCheckTest extends FieldKernelTestBase {
     $this->revokeViewAccess();
     $build = $this->buildField($items, ['access_check' => TRUE]);
     $this->assertContains('user.permissions', $build['#cache']['contexts']);
+  }
+
+  /**
+   * Tests that a link to a deleted entity does not disable caching.
+   *
+   * @todo Unblock once a failed conversion can express a stable "not found".
+   */
+  public function testDanglingReferenceIsCacheable(): void {
+    $target = EntityTest::create(['name' => 'Target']);
+    $target->save();
+    $items = [['uri' => 'entity:entity_test/' . $target->id(), 'title' => 'Gone']];
+    $target->delete();
+
+    // Without the check the build is cacheable, and the broken link renders.
+    $build = $this->buildField($items);
+    $this->assertSame(Cache::PERMANENT, $build['#cache']['max-age']);
+    $this->assertStringContainsString('Gone', (string) $this->renderer->renderRoot($build));
+
+    // With it the link is removed, and the build stays cacheable.
+    $build = $this->buildField($items, ['access_check' => TRUE]);
+    $this->assertSame(Cache::PERMANENT, $build['#cache']['max-age']);
+    $this->assertSame('', trim((string) $this->renderer->renderRoot($build)));
   }
 
   /**
