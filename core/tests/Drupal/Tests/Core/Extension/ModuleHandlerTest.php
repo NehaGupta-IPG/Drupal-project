@@ -39,8 +39,8 @@ class ModuleHandlerTest extends UnitTestCase {
    *
    * @param list<string, string> $modules
    *   Module paths by module name.
-   * @param array<string, array<callable-string, string>> $implementations
-   *   Module names by function name implementing hook_hook().
+   * @param array<string, array<string, string>> $implementations
+   *   Module names by hook implementation identifier.
    * @param bool $loadAll
    *   TRUE to call ModuleHandler->loadAll() on the new module handler.
    *
