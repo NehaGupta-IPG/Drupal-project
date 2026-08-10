@@ -162,18 +162,8 @@ class LinkFormatter extends FormatterBase {
 
     foreach ($items as $delta => $item) {
       $url = $this->buildUrl($item);
-
-      // Run access check if specified.
-      if (!empty($settings['access_check'])) {
-        $access = $this->checkUrlAccess($url);
-        CacheableMetadata::createFromRenderArray($element)
-          ->merge(CacheableMetadata::createFromObject($access))
-          ->applyTo($element);
-
-        if (!$access->isAllowed()) {
-          // Access is not allowed, skip this item.
-          continue;
-        }
+      if (!$this->checkItemAccess($url, $element)) {
+        continue;
       }
 
       // By default use the full URL as the link text.
@@ -262,6 +252,30 @@ class LinkFormatter extends FormatterBase {
 
     $url->setOptions($options);
     return $url;
+  }
+
+  /**
+   * Checks whether a link item may be rendered.
+   *
+   * @param \Drupal\Core\Url $url
+   *   The URL of the link item.
+   * @param array $element
+   *   The formatter build, which the access cacheability is merged into.
+   *
+   * @return bool
+   *   TRUE if the item may be rendered, FALSE to skip it.
+   */
+  protected function checkItemAccess(Url $url, array &$element): bool {
+    if (empty($this->getSetting('access_check'))) {
+      return TRUE;
+    }
+
+    $access = $this->checkUrlAccess($url);
+    CacheableMetadata::createFromRenderArray($element)
+      ->merge(CacheableMetadata::createFromObject($access))
+      ->applyTo($element);
+
+    return $access->isAllowed();
   }
 
   /**
