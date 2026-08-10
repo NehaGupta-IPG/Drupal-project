@@ -633,7 +633,6 @@ trait FunctionalTestSetupTrait {
    */
   protected function setupBaseUrl() {
     global $base_url;
-    // Set and derived from $base_url below.
     global $base_path, $base_root;
     global $base_secure_url, $base_insecure_url;
 
@@ -679,8 +678,6 @@ trait FunctionalTestSetupTrait {
     $_SERVER['PHP_SELF'] = $path . '/index.php';
     $_SERVER['HTTP_USER_AGENT'] = 'Drupal command line';
 
-    // Derive the remaining globals, as the kernel does for an incoming request.
-    // Code running before the test site is installed relies on them.
     // @see \Drupal\Core\DrupalKernel::initializeRequestGlobals()
     $base_root = $parsed_url['scheme'] . '://' . $host;
     $base_url = $base_root . $path;
@@ -700,13 +697,10 @@ trait FunctionalTestSetupTrait {
     $this->classLoader = require __DIR__ . '/../../../../../autoload.php';
     $request = Request::createFromGlobals();
 
-    // Boot the environment without building a container. This has to happen
-    // before the test prefix is set, so that DRUPAL_TEST_IN_CHILD_SITE is
-    // defined as FALSE for the test runner itself.
+    // Runs before the test prefix, so DRUPAL_TEST_IN_CHILD_SITE stays FALSE.
     DrupalKernel::bootEnvironment();
 
-    // Remove Drupal's error/exception handlers; they are designed for HTML and
-    // there is no storage nor a (watchdog) logger here.
+    // The test runner has no storage or logger for Drupal's handlers.
     if (get_error_handler() === '_drupal_error_handler') {
       restore_error_handler();
     }
@@ -717,9 +711,7 @@ trait FunctionalTestSetupTrait {
     $this->originalSite = DrupalKernel::findSitePath($request);
 
     // Create test directory ahead of installation so fatal errors and debug
-    // information can be logged during installation process. The file system
-    // service is not used here to avoid building a container, so the parent
-    // directory and the permissions have to be handled explicitly.
+    // information can be logged during installation process.
     foreach ([dirname($this->siteDirectory), $this->siteDirectory] as $directory) {
       if (!is_dir($directory) && !@mkdir($directory) && !is_dir($directory)) {
         throw new \RuntimeException("Unable to create directory: $directory");
@@ -762,7 +754,6 @@ trait FunctionalTestSetupTrait {
       'hash_salt' => $this->databasePrefix,
     ]);
 
-    // Set the file cache prefix, which a booting kernel would otherwise set.
     // @see \Drupal\Core\DrupalKernel::initializeSettings()
     FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
 

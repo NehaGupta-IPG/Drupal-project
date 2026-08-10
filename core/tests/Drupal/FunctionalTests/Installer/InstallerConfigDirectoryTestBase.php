@@ -114,7 +114,6 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
         foreach (array_keys($info['dependencies'] ?? []) as $dependency) {
           $core_extension['module'][$dependency] = 0;
         }
-        // The container is not available here.
         // @see \Drupal\Core\Extension\ModuleWeight::sort()
         $sort = [];
         foreach ($core_extension['module'] as $name => $weight) {
