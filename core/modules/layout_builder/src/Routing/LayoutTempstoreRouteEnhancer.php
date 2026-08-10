@@ -46,9 +46,11 @@ class LayoutTempstoreRouteEnhancer implements EnhancerInterface {
         $temp_store_entity = $temp_store_section_storage->getContextValue('entity');
 
         // Don't use the section storage from the temp store if it has been
-        // created on a different revision.
-        $use_temp_store_section_storage = !$entity instanceof RevisionableInterface
-          || ($entity->getRevisionId() == $temp_store_entity->getRevisionId());
+        // created on a different revision OR of the current revision does not
+        // have a layout yet.
+        $use_temp_store_section_storage =
+          (($entity instanceof RevisionableInterface) && ($entity->getRevisionId() === $temp_store_entity->getRevisionId()))
+          || ($entity->hasField('layout_builder__layout') && $entity->get('layout_builder__layout')->isEmpty());
       }
 
       if ($use_temp_store_section_storage) {
