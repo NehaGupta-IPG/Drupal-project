@@ -86,14 +86,15 @@ class Section implements ThirdPartySettingsInterface {
   public function toRenderArray(array $contexts = [], $in_preview = FALSE) {
     $regions = [];
     // An empty build still carries the cacheability that
-    // SectionComponent::toRenderArray() stamps on it, which is what makes it
-    // truthy. Keep that cacheability, drop the component.
-    $empty_components = NULL;
+    // SectionComponent::toRenderArray() stamps on it. Keep that cacheability,
+    // drop the component. Preview keeps every component: its regions reflect
+    // what is configured, not what renders.
+    $empty_cacheability = NULL;
     foreach ($this->getComponents() as $component) {
       $output = $component->toRenderArray($contexts, $in_preview);
-      if (Element::isEmpty($output)) {
-        $empty_components ??= new CacheableMetadata();
-        $empty_components->addCacheableDependency(CacheableMetadata::createFromRenderArray($output));
+      if (!$in_preview && Element::isEmpty($output)) {
+        $empty_cacheability ??= new CacheableMetadata();
+        $empty_cacheability->addCacheableDependency(CacheableMetadata::createFromRenderArray($output));
         continue;
       }
       $regions[$component->getRegion()][$component->getUuid()] = $output;
@@ -104,17 +105,17 @@ class Section implements ThirdPartySettingsInterface {
       $layout->setInPreview($in_preview);
     }
 
-    // A layout template cannot skip itself: 'content' always holds '#settings'
-    // and '#layout'. Preview keeps its layout so blocks can still be placed.
-    if (!$regions && !$in_preview && $empty_components) {
+    // A layout's build array always contains '#theme' and '#settings', so it
+    // can never be considered empty. Skip building it entirely.
+    if (!$regions && $empty_cacheability) {
       $build = [];
-      $empty_components->applyTo($build);
+      $empty_cacheability->applyTo($build);
       return $build;
     }
 
     $build = $layout->build($regions);
-    if ($empty_components) {
-      $empty_components->merge(CacheableMetadata::createFromRenderArray($build))->applyTo($build);
+    if ($empty_cacheability) {
+      $empty_cacheability->merge(CacheableMetadata::createFromRenderArray($build))->applyTo($build);
     }
     // If an entity was used to build the layout, store it on the build.
     if (!Element::isEmpty($build) && isset($contexts['layout_builder.entity'])) {

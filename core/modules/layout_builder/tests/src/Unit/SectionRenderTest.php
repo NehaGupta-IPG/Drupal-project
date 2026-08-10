@@ -238,9 +238,10 @@ class SectionRenderTest extends UnitTestCase {
   }
 
   /**
-   * Tests that an all empty section keeps its layout while being previewed.
+   * Tests that a component building nothing is kept while being previewed.
    */
   public function testToRenderArrayEmptyComponentInPreview(): void {
+    // A block without a preview fallback, so its preview build is empty too.
     $block = $this->prophesize(BlockPluginInterface::class);
     $this->blockManager->createInstance('block_plugin_id', ['id' => 'block_plugin_id'])->willReturn($block->reveal());
     $block->build()->willReturn([]);
@@ -251,11 +252,9 @@ class SectionRenderTest extends UnitTestCase {
     $section = [
       new SectionComponent('some_uuid', 'content', ['id' => 'block_plugin_id']),
     ];
-    (new Section('layout_onecol', [], $section))->toRenderArray([], TRUE);
+    $result = (new Section('layout_onecol', [], $section))->toRenderArray([], TRUE);
 
-    // Regions have to stay available in preview, so that blocks can be placed
-    // into them.
-    $this->layout->build(Argument::any())->shouldHaveBeenCalled();
+    $this->assertEquals(['some_uuid'], array_keys($result['content']));
   }
 
   /**
