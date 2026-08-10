@@ -11,6 +11,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\EntityOwnerTrait;
 use Drupal\views\EntityViewsData;
+use Drupal\workspaces\Entity\Handler\CancellationHandler;
 use Drupal\workspaces\Entity\Handler\IgnoredWorkspaceHandler;
 use Drupal\workspaces\Hook\WorkspacesHooks;
 use Drupal\workspaces\Provider\DefaultWorkspaceProvider;
@@ -39,6 +40,7 @@ use Drupal\workspaces\WorkspaceInterface;
   handlers: [
     'access' => WorkspaceAccessControlHandler::class,
     'views_data' => EntityViewsData::class,
+    'user_cancel' => CancellationHandler::class,
     'workspace' => IgnoredWorkspaceHandler::class,
   ],
   admin_permission: 'administer workspaces',

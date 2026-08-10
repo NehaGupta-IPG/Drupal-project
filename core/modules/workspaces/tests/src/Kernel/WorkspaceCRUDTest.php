@@ -9,6 +9,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\user\CancellationHandlerInterface;
 use Drupal\workspaces\Entity\Workspace;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -61,6 +62,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
     $this->setUpCurrentUser();
 
     $this->installSchema('node', ['node_access']);
+    $this->installSchema('user', ['users_data']);
 
     $this->installEntitySchema('workspace');
     $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
@@ -359,6 +361,169 @@ class WorkspaceCRUDTest extends KernelTestBase {
     $stage->delete();
     $this->assertNull(Workspace::load('dev'));
     $this->assertNull(Workspace::load('stage'));
+  }
+
+  /**
+   * Tests that account deletion preserves an owned workspace hierarchy.
+   */
+  public function testAccountDeletionPreservesWorkspaceHierarchy(): void {
+    $owner = $this->createUser();
+
+    $stage = Workspace::create([
+      'id' => 'stage',
+      'label' => 'Stage',
+      'uid' => $owner->id(),
+    ]);
+    $stage->save();
+    $dev = Workspace::create([
+      'id' => 'dev',
+      'label' => 'Dev',
+      'parent' => 'stage',
+      'uid' => $owner->id(),
+    ]);
+    $dev->save();
+
+    $this->workspaceManager->setActiveWorkspace($dev);
+    $node = $this->createNode(['title' => 'Workspace content']);
+    /** @var \Drupal\workspaces\WorkspaceTrackerInterface $workspace_tracker */
+    $workspace_tracker = \Drupal::service('workspaces.tracker');
+    $this->assertCount(
+      1,
+      $workspace_tracker->getTrackedEntities($dev->id())['node'],
+    );
+    $this->workspaceManager->switchToLive();
+
+    user_cancel(
+      [],
+      (int) $owner->id(),
+      CancellationHandlerInterface::METHOD_DELETE,
+    );
+
+    $batch = &batch_get();
+    $batch['progressive'] = FALSE;
+    batch_process();
+
+    $storage = $this->entityTypeManager->getStorage('workspace');
+    $storage->resetCache();
+    $stage = $storage->load('stage');
+    $dev = $storage->load('dev');
+    $this->assertNotNull($stage);
+    $this->assertNotNull($dev);
+    $this->assertSame('0', $stage->getOwnerId());
+    $this->assertSame('0', $dev->getOwnerId());
+    $this->assertSame('stage', $dev->parent->target_id);
+
+    $user_storage = $this->entityTypeManager->getStorage('user');
+    $user_storage->resetCache([$owner->id()]);
+    $this->assertNull($user_storage->load($owner->id()));
+
+    $node_storage = $this->entityTypeManager->getStorage('node');
+    $this->workspaceManager->setActiveWorkspace($dev);
+    $node_storage->resetCache([$node->id()]);
+    $this->assertNotNull($node_storage->load($node->id()));
+    $this->assertCount(
+      1,
+      $workspace_tracker->getTrackedEntities($dev->id())['node'],
+    );
+  }
+
+  /**
+   * Tests account deletion with a workspace owned by another account.
+   */
+  public function testAccountDeletionPreservesForeignWorkspaceChild(): void {
+    $owner = $this->createUser();
+    $child_owner = $this->createUser();
+
+    Workspace::create([
+      'id' => 'stage',
+      'label' => 'Stage',
+      'uid' => $owner->id(),
+    ])->save();
+    Workspace::create([
+      'id' => 'dev',
+      'label' => 'Dev',
+      'parent' => 'stage',
+      'uid' => $child_owner->id(),
+    ])->save();
+
+    user_cancel(
+      [],
+      (int) $owner->id(),
+      CancellationHandlerInterface::METHOD_DELETE,
+    );
+
+    $batch = &batch_get();
+    $batch['progressive'] = FALSE;
+    batch_process();
+
+    $storage = $this->entityTypeManager->getStorage('workspace');
+    $storage->resetCache();
+    $stage = $storage->load('stage');
+    $dev = $storage->load('dev');
+    $this->assertNotNull($stage);
+    $this->assertNotNull($dev);
+    $this->assertSame('0', $stage->getOwnerId());
+    $this->assertSame($child_owner->id(), $dev->getOwnerId());
+    $this->assertSame('stage', $dev->parent->target_id);
+
+    $user_storage = $this->entityTypeManager->getStorage('user');
+    $user_storage->resetCache([$owner->id(), $child_owner->id()]);
+    $this->assertNull($user_storage->load($owner->id()));
+    $this->assertNotNull($user_storage->load($child_owner->id()));
+  }
+
+  /**
+   * Tests that block-unpublish updates Live from an active workspace.
+   */
+  public function testBlockUnpublishUpdatesLiveRevisionFromWorkspace(): void {
+    $source = $this->createUser();
+    $workspace_owner = $this->createUser();
+    $node = $this->createNode([
+      'title' => 'Live title',
+      'status' => TRUE,
+      'uid' => $source->id(),
+    ]);
+    $live_revision_id = $node->getRevisionId();
+
+    $workspace = Workspace::create([
+      'id' => 'stage',
+      'label' => 'Stage',
+    ]);
+    $workspace->save();
+    $this->workspaceManager->setActiveWorkspace($workspace);
+
+    $node_storage = $this->entityTypeManager->getStorage('node');
+    $node_storage->resetCache([$node->id()]);
+    $workspace_node = $node_storage->load($node->id());
+    $workspace_node->setTitle('Workspace title');
+    $workspace_node->setOwnerId($workspace_owner->id());
+    $workspace_node->save();
+    $workspace_revision_id = $workspace_node->getRevisionId();
+    $this->assertNotSame($live_revision_id, $workspace_revision_id);
+
+    $handler = $this->entityTypeManager->getHandler('node', 'user_cancel');
+    $this->assertInstanceOf(CancellationHandlerInterface::class, $handler);
+    $handler->cancelAccount(
+      $source,
+      CancellationHandlerInterface::METHOD_BLOCK_UNPUBLISH,
+    );
+
+    $node_storage->resetCache([$node->id()]);
+    $live_revision = $node_storage->loadRevision($live_revision_id);
+    $workspace_revision = $node_storage->loadRevision($workspace_revision_id);
+    $this->assertTrue($live_revision->isDefaultRevision());
+    $this->assertFalse($live_revision->isPublished());
+    $this->assertSame($source->id(), $live_revision->getOwnerId());
+    $this->assertFalse($workspace_revision->isDefaultRevision());
+    $this->assertTrue($workspace_revision->isPublished());
+    $this->assertSame(
+      $workspace_owner->id(),
+      $workspace_revision->getOwnerId(),
+    );
+
+    $this->workspaceManager->switchToLive();
+    $node_storage->resetCache([$node->id()]);
+    $this->assertFalse($node_storage->load($node->id())->isPublished());
   }
 
   /**

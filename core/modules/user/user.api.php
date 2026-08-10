@@ -6,7 +6,6 @@
  */
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\node\NodeBulkUpdate;
 use Drupal\user\UserInterface;
 
 /**
@@ -17,15 +16,18 @@ use Drupal\user\UserInterface;
 /**
  * Act on user account cancellations.
  *
- * This hook is invoked from user_cancel() before a user account is canceled.
- * Depending on the account cancellation method, the module should either do
- * nothing, unpublish content, or anonymize content. See user_cancel_methods()
- * for the list of default account cancellation methods provided by User module.
+ * This hook is invoked from user_cancel() after registered "user_cancel"
+ * entity handlers and before a user account is canceled. Handlers run by
+ * descending priority, with ties resolved by entity type ID. Content entity
+ * types should register a handler instead of using this hook.
+ *
+ * See user_cancel_methods() for the default account cancellation methods.
  * Modules may add further methods via hook_user_cancel_methods_alter().
  *
  * This hook is NOT invoked for the 'user_cancel_delete' account cancellation
- * method. To react to that method, implement hook_ENTITY_TYPE_predelete() or
- * hook_ENTITY_TYPE_delete() for user entities instead.
+ * method, although registered entity handlers are. Other reactions to account
+ * deletion should use hook_ENTITY_TYPE_predelete() or hook_ENTITY_TYPE_delete()
+ * for user entities.
  *
  * Expensive operations should be added to the global account cancellation batch
  * by using batch_set().
@@ -38,33 +40,14 @@ use Drupal\user\UserInterface;
  *   The account cancellation method.
  *
  * @see user_cancel_methods()
+ * @see \Drupal\user\CancellationHandlerInterface
  * @see hook_user_cancel_methods_alter()
  */
 function hook_user_cancel($edit, UserInterface $account, $method): void {
-  switch ($method) {
-    case 'user_cancel_block_unpublish':
-      // Unpublish nodes (current revisions).
-      $nodes = \Drupal::entityQuery('node')
-        ->accessCheck(FALSE)
-        ->condition('uid', $account->id())
-        ->execute();
-      \Drupal::service(NodeBulkUpdate::class)->process($nodes, ['status' => 0], NULL, TRUE);
-      break;
-
-    case 'user_cancel_reassign':
-      // Anonymize nodes (current revisions).
-      $nodes = \Drupal::entityQuery('node')
-        ->accessCheck(FALSE)
-        ->condition('uid', $account->id())
-        ->execute();
-      \Drupal::service(NodeBulkUpdate::class)->process($nodes, ['uid' => 0], NULL, TRUE);
-      // Anonymize old revisions.
-      \Drupal::database()->update('node_field_revision')
-        ->fields(['uid' => 0])
-        ->condition('uid', $account->id())
-        ->execute();
-      break;
-  }
+  \Drupal::logger('my_module')->notice(
+    'Cancellation method %method was requested for account %id.',
+    ['%method' => $method, '%id' => $account->id()],
+  );
 }
 
 /**

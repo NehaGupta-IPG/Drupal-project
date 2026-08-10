@@ -21,6 +21,7 @@ use Drupal\taxonomy\TermStorage;
 use Drupal\taxonomy\TermStorageSchema;
 use Drupal\taxonomy\TermTranslationHandler;
 use Drupal\taxonomy\TermViewsData;
+use Drupal\user\Entity\Handler\DefaultCancellationHandler;
 use Drupal\user\StatusItem;
 
 /**
@@ -58,6 +59,7 @@ use Drupal\user\StatusItem;
       'revision' => RevisionHtmlRouteProvider::class,
     ],
     'translation' => TermTranslationHandler::class,
+    'user_cancel' => DefaultCancellationHandler::class,
   ],
   links: [
     'canonical' => '/taxonomy/term/{taxonomy_term}',

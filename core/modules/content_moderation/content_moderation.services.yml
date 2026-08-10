@@ -23,3 +23,4 @@ services:
   content_moderation.workspace_subscriber:
     class: Drupal\content_moderation\EventSubscriber\WorkspaceSubscriber
   Drupal\content_moderation\EventSubscriber\DefaultContentSubscriber: ~
+  Drupal\content_moderation\EventSubscriber\EntityCancellationSubscriber: ~

@@ -19,6 +19,7 @@ use Drupal\menu_link_content\MenuLinkContentInterface;
 use Drupal\menu_link_content\MenuLinkContentStorage;
 use Drupal\menu_link_content\MenuLinkContentStorageSchema;
 use Drupal\menu_link_content\MenuLinkListBuilder;
+use Drupal\user\Entity\Handler\DefaultCancellationHandler;
 
 /**
  * Defines the menu link content entity class.
@@ -51,6 +52,7 @@ use Drupal\menu_link_content\MenuLinkListBuilder;
     ],
     'link_target' => ['view' => MenuLinkContentLinkTarget::class],
     'list_builder' => MenuLinkListBuilder::class,
+    'user_cancel' => DefaultCancellationHandler::class,
   ],
   links: [
     'canonical' => '/admin/structure/menu/item/{menu_link_content}/edit',

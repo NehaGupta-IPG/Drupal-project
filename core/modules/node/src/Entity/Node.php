@@ -20,6 +20,7 @@ use Drupal\node\NodeStorageSchema;
 use Drupal\node\NodeTranslationHandler;
 use Drupal\node\NodeViewBuilder;
 use Drupal\node\NodeViewsData;
+use Drupal\user\Entity\Handler\DefaultCancellationHandler;
 use Drupal\user\EntityOwnerTrait;
 
 /**
@@ -60,6 +61,7 @@ use Drupal\user\EntityOwnerTrait;
     ],
     'list_builder' => NodeListBuilder::class,
     'translation' => NodeTranslationHandler::class,
+    'user_cancel' => DefaultCancellationHandler::class,
   ],
   links: [
     'canonical' => '/node/{node}',

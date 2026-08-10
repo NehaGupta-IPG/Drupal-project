@@ -18,6 +18,7 @@ use Drupal\file\FileInterface;
 use Drupal\file\FileStorage;
 use Drupal\file\FileStorageSchema;
 use Drupal\file\FileViewsData;
+use Drupal\user\Entity\Handler\ReassignOnDeleteCancellationHandler;
 use Drupal\user\EntityOwnerTrait;
 
 /**
@@ -43,6 +44,7 @@ use Drupal\user\EntityOwnerTrait;
     'storage_schema' => FileStorageSchema::class,
     'access' => FileAccessControlHandler::class,
     'views_data' => FileViewsData::class,
+    'user_cancel' => ReassignOnDeleteCancellationHandler::class,
     'list_builder' => EntityListBuilder::class,
     'form' => ['delete' => ContentEntityDeleteForm::class],
     'route_provider' => ['html' => FileRouteProvider::class],

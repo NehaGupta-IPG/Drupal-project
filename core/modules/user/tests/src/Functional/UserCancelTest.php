@@ -398,8 +398,6 @@ class UserCancelTest extends BrowserTestBase {
 
   /**
    * Delete account and anonymize all content using a batch process.
-   *
-   * @see \Drupal\node\NodeBulkUpdate::process()
    */
   public function testUserAnonymizeBatch(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
@@ -412,7 +410,7 @@ class UserCancelTest extends BrowserTestBase {
     // Load a real user object.
     $account = $user_storage->load($account->id());
 
-    // Create 11 nodes in order to trigger batch processing.
+    // Create enough nodes to exercise multiple processor chunks.
     $nodes = [];
     for ($i = 0; $i < 11; $i++) {
       $node = $this->drupalCreateNode(['uid' => $account->id()]);
@@ -641,14 +639,28 @@ class UserCancelTest extends BrowserTestBase {
   public function testUserDeleteWithContentAndNodeAccess(): void {
 
     \Drupal::service('module_installer')->install(['node_access_test']);
+    $this->addDefaultCommentField('node', 'page');
     // Rebuild node access.
     \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
     $account = $this->drupalCreateUser(['access content']);
     $node = $this->drupalCreateNode(['type' => 'page', 'uid' => $account->id()]);
+    $commented_node = $this->drupalCreateNode(['type' => 'page', 'uid' => 1]);
+    $comment = Comment::create([
+      'subject' => $this->randomMachineName(),
+      'entity_id' => $commented_node->id(),
+      'entity_type' => 'node',
+      'field_name' => 'comment',
+      'uid' => $account->id(),
+    ]);
+    $comment->save();
+
     $account->delete();
-    $load2 = \Drupal::entityTypeManager()->getStorage('node')->load($node->id());
-    $this->assertEmpty($load2);
+
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+    $this->assertNull($node_storage->load($node->id()));
+    $this->assertNotNull($node_storage->load($commented_node->id()));
+    $this->assertNull(Comment::load($comment->id()));
   }
 
   /**
