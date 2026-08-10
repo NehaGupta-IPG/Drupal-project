@@ -1489,7 +1489,6 @@
  *   individual plugin objects.
  * - Call methods on the plugin objects to perform the desired tasks.
  *
- * @see \Drupal\Component\Plugin\Attribute\Plugin
  * @}
  */
 
