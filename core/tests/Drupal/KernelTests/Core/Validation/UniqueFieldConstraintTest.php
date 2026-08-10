@@ -163,13 +163,13 @@ class UniqueFieldConstraintTest extends KernelTestBase {
     // the unique constraint in this bundle.
     EntityTest::create([
       'name' => 'A totally unique entity name',
-      'type' => 'my_bundle'
+      'type' => 'my_bundle',
     ])->save();
 
     // Prepare a second entity with the same value in the unique field.
     $entity = EntityTest::create([
       'name' => 'A totally unique entity name',
-      'type' => 'my_bundle'
+      'type' => 'my_bundle',
     ]);
     /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
     $violations = $entity->get('name')->validate();
@@ -188,19 +188,18 @@ class UniqueFieldConstraintTest extends KernelTestBase {
     // the unique constraint in this bundle.
     EntityTest::create([
       'name' => 'A totally unique entity name',
-      'type' => 'another_bundle'
+      'type' => 'another_bundle',
     ])->save();
 
     // Prepare a second entity with the same value in the unique field.
     $entity = EntityTest::create([
       'name' => 'A totally unique entity name',
-      'type' => 'another_bundle'
+      'type' => 'another_bundle',
     ]);
     /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
     $violations = $entity->get('name')->validate();
     // Check that there are no violations for other bundles.
     $this->assertCount(0, $violations);
   }
-
 
 }

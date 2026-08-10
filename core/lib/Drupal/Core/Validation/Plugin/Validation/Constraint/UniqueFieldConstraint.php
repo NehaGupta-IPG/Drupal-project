@@ -24,7 +24,7 @@ class UniqueFieldConstraint extends SymfonyConstraint {
    *   would fail.
    * @param string $message
    *   The error message.
-   * @param string|NULL $bundle
+   * @param string|null $bundle
    *   Bundle to limit the check to. Optional.
    * @param array|null $groups
    *   The groups that the constraint belongs to.
