@@ -44,7 +44,7 @@ class CommentTypePostUpdateTest extends UpdatePathTestBase {
 
     // Check that default comment type does not depend on the node module.
     $dependencies = $this->config($default_comment_type)->get('dependencies.module') ?: [];
-    $this->assertFalse(in_array('node', $dependencies));
+    $this->assertNotContains('node', $dependencies);
 
     $this->runUpdates();
 
