@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\help\Functional;
 
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\Traits\Core\Locale\InstallerLanguageTrait;
 
 // cspell:ignore hilfetestmodul übersetzung
 
@@ -16,7 +15,6 @@ use Drupal\Tests\Traits\Core\Locale\InstallerLanguageTrait;
  * page title blocks.
  */
 abstract class HelpTopicTranslatedTestBase extends BrowserTestBase {
-  use InstallerLanguageTrait;
 
   /**
    * {@inheritdoc}
@@ -61,15 +59,15 @@ abstract class HelpTopicTranslatedTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getInstallLangcode(): string {
-    return 'de';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getTranslationFileContents(): string {
-    return <<<PO
+  protected function installParameters(): array {
+    $parameters = parent::installParameters();
+    // Install in German. This will ensure the language and locale modules are
+    // installed.
+    $parameters['parameters']['langcode'] = 'de';
+    // Create a po file so we don't attempt to download one from
+    // localize.drupal.org and to have a test translation that will not change.
+    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/translations', NULL, TRUE);
+    $contents = <<<PO
 msgid ""
 msgstr ""
 
@@ -83,6 +81,8 @@ msgid "Non-word-item to translate."
 msgstr "Non-word-german sdfwedrsdf."
 
 PO;
+    file_put_contents($this->publicFilesDirectory . '/translations/drupal-' . \Drupal::VERSION . '.de.po', $contents);
+    return $parameters;
   }
 
 }

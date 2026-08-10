@@ -27,7 +27,7 @@ class DependencyTest extends ModuleTestBase {
   protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     // Create a module for testing semver support.
-    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/../modules/system_core_semver_test', NULL, TRUE);
+    mkdir($this->publicFilesDirectory . '/../modules/system_core_semver_test', 0777, TRUE);
     $contents = <<<INFO
 name: 'System core ^8 version test'
 type: module
