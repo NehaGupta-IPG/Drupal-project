@@ -53,12 +53,12 @@ class ResourceIdentifierNormalizerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $target_resource_type = new ResourceType('lorem', 'dummy_bundle', NULL);
+    $target_resource_type = new ResourceType('lorem', 'dummy_bundle', \stdClass::class);
     $relationship_fields = [
       'field_dummy' => new ResourceTypeRelationship('field_dummy'),
       'field_dummy_single' => new ResourceTypeRelationship('field_dummy_single'),
     ];
-    $this->resourceType = new ResourceType('fake_entity_type', 'dummy_bundle', NULL, FALSE, TRUE, TRUE, FALSE, $relationship_fields);
+    $this->resourceType = new ResourceType('fake_entity_type', 'dummy_bundle', \stdClass::class, FALSE, TRUE, TRUE, FALSE, $relationship_fields);
     $this->resourceType->setRelatableResourceTypes([
       'field_dummy' => [$target_resource_type],
       'field_dummy_single' => [$target_resource_type],
@@ -113,11 +113,9 @@ class ResourceIdentifierNormalizerTest extends UnitTestCase {
 
   /**
    * Tests denormalize.
-   *
-   * @legacy-covers ::denormalize
    */
   #[DataProvider('denormalizeProvider')]
-  public function testDenormalize($input, $field_name, $expected): void {
+  public function testDenormalize(array $input, string $field_name, array $expected): void {
     $entity = $this->prophesize(FieldableEntityInterface::class);
     $context = [
       'resource_type' => $this->resourceType,
@@ -134,7 +132,7 @@ class ResourceIdentifierNormalizerTest extends UnitTestCase {
    * @return array
    *   The data for the test method.
    */
-  public static function denormalizeProvider() {
+  public static function denormalizeProvider(): array {
     return [
       [
         ['data' => [['type' => 'lorem--dummy_bundle', 'id' => '4e6cb61d-4f04-437f-99fe-42c002393658']]],
@@ -156,11 +154,9 @@ class ResourceIdentifierNormalizerTest extends UnitTestCase {
 
   /**
    * Tests denormalize invalid resource.
-   *
-   * @legacy-covers ::denormalize
    */
   #[DataProvider('denormalizeInvalidResourceProvider')]
-  public function testDenormalizeInvalidResource($data, $field_name): void {
+  public function testDenormalizeInvalidResource(array $data, string $field_name): void {
     $context = [
       'resource_type' => $this->resourceType,
       'related' => $field_name,
@@ -176,7 +172,7 @@ class ResourceIdentifierNormalizerTest extends UnitTestCase {
    * @return array
    *   The input data for the test method.
    */
-  public static function denormalizeInvalidResourceProvider() {
+  public static function denormalizeInvalidResourceProvider(): array {
     return [
       [
         [

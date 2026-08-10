@@ -32,14 +32,11 @@ class EntityReferenceSupportedNewEntitiesConstraintValidatorTest extends KernelT
   protected static $modules = [
     'system',
     'user',
-    'workspaces',
     'entity_test',
   ];
 
   /**
    * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManager
    */
   protected EntityTypeManager $entityTypeManager;
 

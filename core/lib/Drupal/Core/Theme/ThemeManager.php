@@ -11,6 +11,9 @@ use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\Core\Utility\CallableResolver;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+use Symfony\Contracts\Service\ServiceCollectionInterface;
 
 /**
  * Provides the default implementation of a theme manager.
@@ -53,22 +56,18 @@ class ThemeManager implements ThemeManagerInterface {
   protected ?array $themeHookImplementations = NULL;
 
   public function __construct(
+    #[Autowire(param: 'app.root')]
     protected string $root,
     protected ThemeNegotiatorInterface $themeNegotiator,
     protected ThemeInitializationInterface $themeInitialization,
     protected ModuleHandlerInterface $moduleHandler,
     protected CallableResolver $callableResolver,
-    protected ?KeyValueFactoryInterface $keyValueFactory = NULL,
-    protected ?CacheBackendInterface $cache = NULL,
+    #[AutowireLocator('theme_engine', 'engine_name')]
+    protected ServiceCollectionInterface $themeEngines,
+    protected KeyValueFactoryInterface $keyValueFactory,
+    #[Autowire(service: 'cache.bootstrap')]
+    protected CacheBackendInterface $cache,
   ) {
-    if ($this->keyValueFactory === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $keyValueFactory argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
-      $this->keyValueFactory = \Drupal::service('keyvalue');
-    }
-    if ($this->cache === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $cache argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
-      $this->cache = \Drupal::service('cache.bootstrap');
-    }
   }
 
   /**
@@ -232,24 +231,10 @@ class ThemeManager implements ThemeManagerInterface {
       }
     }
 
-    // Include a file if the variable preprocessor is held elsewhere.
-    if (!empty($info['includes'])) {
-      foreach ($info['includes'] as $include_file) {
-        include_once $this->root . '/' . $include_file;
-      }
-    }
-
     // Invoke the variable preprocessors, if any.
     if (isset($info['base hook'])) {
       $base_hook = $info['base hook'];
       $base_hook_info = $theme_registry->get($base_hook);
-      // Include files required by the base hook, since its variable
-      // preprocessors might reside there.
-      if (!empty($base_hook_info['includes'])) {
-        foreach ($base_hook_info['includes'] as $include_file) {
-          include_once $this->root . '/' . $include_file;
-        }
-      }
       if (isset($base_hook_info['preprocess functions'])) {
         // Set a variable for the 'theme_hook_suggestion'. This is used to
         // maintain backwards compatibility with template engines.
@@ -360,23 +345,12 @@ class ThemeManager implements ThemeManagerInterface {
       \Drupal::service('renderer')->render($preprocess_bubbleable);
     }
 
-    // Generate the output using a template.
-    $render_function = 'twig_render_template';
-    $extension = '.html.twig';
-
-    // The theme engine may use a different extension and a different
-    // renderer.
-    $theme_engine = $active_theme->getEngine();
-    if (isset($theme_engine)) {
-      if ($info['type'] != 'module') {
-        if (function_exists($theme_engine . '_render_template')) {
-          $render_function = $theme_engine . '_render_template';
-        }
-        $extension_function = $theme_engine . '_extension';
-        if (function_exists($extension_function)) {
-          $extension = $extension_function();
-        }
-      }
+    // Module provided templates must use the Twig engine.
+    if ($info['type'] != 'module') {
+      $theme_engine = $active_theme->getEngine();
+    }
+    else {
+      $theme_engine = 'twig';
     }
 
     if (!isset($default_attributes)) {
@@ -395,7 +369,7 @@ class ThemeManager implements ThemeManagerInterface {
     }
 
     // Render the output using the template file.
-    $template_file = $info['template'] . $extension;
+    $template_file = $info['template'];
     if (isset($info['path'])) {
       $template_file = $info['path'] . '/' . $template_file;
     }
@@ -411,7 +385,7 @@ class ThemeManager implements ThemeManagerInterface {
     if (isset($theme_hook_suggestion)) {
       $variables['theme_hook_suggestion'] = $theme_hook_suggestion;
     }
-    $output = $render_function($template_file, $variables);
+    $output = $this->getThemeEngine($theme_engine)->renderTemplate($template_file, $variables);
     return ($output instanceof MarkupInterface) ? $output : (string) $output;
   }
 
@@ -639,6 +613,13 @@ class ThemeManager implements ThemeManagerInterface {
       $this->defaultVariables['directory'] = $this->getActiveTheme()->getPath();
     }
     return $this->defaultVariables;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getThemeEngine(string $name): ?ThemeEngineInterface {
+    return $this->themeEngines->has($name) ? $this->themeEngines->get($name) : NULL;
   }
 
 }

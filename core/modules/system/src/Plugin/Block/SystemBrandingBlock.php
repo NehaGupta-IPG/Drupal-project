@@ -11,8 +11,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
-use Drupal\system\Form\SystemBrandingOffCanvasForm;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a block to display 'Site branding' elements.
@@ -20,7 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 #[Block(
   id: "system_branding_block",
   admin_label: new TranslatableMarkup("Site branding"),
-  forms: ['settings_tray' => SystemBrandingOffCanvasForm::class]
 )]
 class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
@@ -32,26 +29,9 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
     $plugin_id,
     $plugin_definition,
     protected ConfigFactoryInterface $configFactory,
-    protected ?ThemeSettingsProvider $themeSettingsProvider = NULL,
+    protected ThemeSettingsProvider $themeSettingsProvider,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    if ($themeSettingsProvider === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $themeSettingsProvider argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3035289', E_USER_DEPRECATED);
-      $this->themeSettingsProvider = \Drupal::service(ThemeSettingsProvider::class);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('config.factory'),
-      $container->get(ThemeSettingsProvider::class),
-    );
   }
 
   /**
@@ -62,7 +42,7 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
       'use_site_logo' => TRUE,
       'use_site_name' => TRUE,
       'use_site_slogan' => TRUE,
-      'label_display' => FALSE,
+      'label_display' => '0',
     ];
   }
 
@@ -174,6 +154,13 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
       parent::getCacheTags(),
       $this->configFactory->get('system.site')->getCacheTags()
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createPlaceholder(): bool {
+    return TRUE;
   }
 
 }

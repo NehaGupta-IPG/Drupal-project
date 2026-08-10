@@ -25,7 +25,7 @@ class SettingsConfigValidationTest extends KernelTestBase {
    * Tests that the preview_image setting must be an existing image file.
    */
   public function testPreviewImagePathIsValidated(): void {
-    $this->installConfig('image');
+    $this->installConfig(['system', 'image']);
 
     // Drupal does not have a hard dependency on the fileinfo extension and
     // implements an extension-based mimetype guesser. Therefore, we must use
@@ -35,7 +35,7 @@ class SettingsConfigValidationTest extends KernelTestBase {
     file_put_contents($file, 'Not an image!');
 
     $this->expectException(SchemaIncompleteException::class);
-    $this->expectExceptionMessage('[preview_image] This file is not a valid image.');
+    $this->expectExceptionMessageIs('Schema errors for image.settings with the following errors: 0 [preview_image] This file is not a valid image.');
     $this->config('image.settings')
       ->set('preview_image', $file)
       ->save();

@@ -48,8 +48,6 @@ class NestedArrayTest extends TestCase {
 
   /**
    * Tests getting nested array values.
-   *
-   * @legacy-covers ::getValue
    */
   public function testGetValue(): void {
     // Verify getting a value of a nested element.
@@ -78,8 +76,6 @@ class NestedArrayTest extends TestCase {
 
   /**
    * Tests setting nested array values.
-   *
-   * @legacy-covers ::setValue
    */
   public function testSetValue(): void {
     $new_value = [
@@ -99,8 +95,6 @@ class NestedArrayTest extends TestCase {
 
   /**
    * Tests force-setting values.
-   *
-   * @legacy-covers ::setValue
    */
   public function testSetValueForce(): void {
     $new_value = [
@@ -114,8 +108,6 @@ class NestedArrayTest extends TestCase {
 
   /**
    * Tests unsetting nested array values.
-   *
-   * @legacy-covers ::unsetValue
    */
   public function testUnsetValue(): void {
     // Verify unsetting a non-existing nested element throws no errors and the
@@ -265,21 +257,21 @@ class NestedArrayTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::filter
+   * Tests filter.
    */
   #[DataProvider('providerTestFilter')]
-  public function testFilter($array, $callable, $expected): void {
+  public function testFilter(array $array, ?callable $callable, $expected): void {
     $this->assertEquals($expected, NestedArray::filter($array, $callable));
   }
 
-  public static function providerTestFilter() {
+  public static function providerTestFilter(): array {
     $data = [];
     $data['1d-array'] = [
       [0, 1, '', TRUE], NULL, [1 => 1, 3 => TRUE],
     ];
     $data['1d-array-callable'] = [
       [0, 1, '', TRUE],
-      function ($element) {
+      function ($element): bool {
         return $element === '';
       },
       [2 => ''],
@@ -289,7 +281,7 @@ class NestedArrayTest extends TestCase {
     ];
     $data['2d-array-callable'] = [
       [[0, 1, '', TRUE], [0, 1, 2, 3]],
-      function ($element) {
+      function ($element): bool {
         return is_array($element) || $element === 3;
       },
       [0 => [], 1 => [3 => 3]],

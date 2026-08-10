@@ -1,5 +1,16 @@
 global-styling:
+  aggregate_target:
+    css: true
   version: VERSION
+  fonts:
+    fonts/metropolis/Metropolis-Regular.woff2:
+      preload: true
+    fonts/metropolis/Metropolis-SemiBold.woff2:
+      preload: true
+    fonts/metropolis/Metropolis-Bold.woff2:
+      preload: true
+    fonts/lora/lora-v14-latin-regular.woff2:
+      preload: true
   css:
     base:
       css/base/fonts.css: {}
@@ -41,7 +52,6 @@ global-styling:
       css/components/navigation/nav-button-mobile.css: {}
       css/components/node.css: {}
       css/components/node-teaser.css: {}
-      css/components/page-title.css: {}
       css/components/site-header.css: {}
       css/components/skip-link.css: {}
       css/components/pager.css: {}
@@ -82,6 +92,9 @@ comments:
       css/components/comments.css: {}
   js:
     js/comments.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
 
 content-below:
   version: VERSION
@@ -278,6 +291,9 @@ tabs:
       css/components/tabs.css: {}
   js:
     js/tabs.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
 
 tabledrag:
   version: VERSION
@@ -296,12 +312,3 @@ olivero.table:
   css:
     component:
       css/components/table.css: {}
-  moved_files:
-    olivero/global-styling:
-      deprecation_version: 11.3.0
-      removed_version: 12.0.0
-      deprecation_link: https://www.drupal.org/node/3517675
-      css:
-        component:
-          css/components/table.css:
-            base: css/components/table.css

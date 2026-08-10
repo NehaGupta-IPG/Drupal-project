@@ -11,6 +11,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Test\RefreshVariablesTrait;
 use Drupal\Core\Url;
+use Drupal\user\OneTimeAuthentication;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
@@ -24,7 +25,7 @@ trait UiHelperTrait {
   /**
    * The current user logged in using the Mink controlled browser.
    *
-   * @var \Drupal\user\UserInterface
+   * @var \Drupal\user\UserInterface|false
    */
   protected $loggedInUser = FALSE;
 
@@ -38,7 +39,7 @@ trait UiHelperTrait {
    *
    * @var null|int
    */
-  protected $maximumMetaRefreshCount = NULL;
+  protected $maximumMetaRefreshCount;
 
   /**
    * The number of meta refresh redirects followed during ::drupalGet().
@@ -170,7 +171,10 @@ trait UiHelperTrait {
       $storage = \Drupal::entityTypeManager()->getStorage('user');
       /** @var \Drupal\user\UserInterface $accountUnchanged */
       $accountUnchanged = $storage->loadUnchanged($account->id());
-      $login = user_pass_reset_url($accountUnchanged) . '/login?destination=user/' . $account->id();
+      $login = \Drupal::service(OneTimeAuthentication::class)
+        ->generateOneTimeLoginUrl($accountUnchanged, immediate: TRUE)
+        ->mergeOptions(['query' => ['destination' => 'user/' . $account->id()]])
+        ->toString();
       $this->drupalGet($login);
     }
     else {
@@ -229,7 +233,7 @@ trait UiHelperTrait {
    * @return \Drupal\Tests\WebAssert
    *   A new web-assert option for asserting the presence of elements with.
    */
-  public function assertSession($name = NULL) {
+  public function assertSession($name = NULL): WebAssert {
     $this->addToAssertionCount(1);
     return new WebAssert($this->getSession($name), $this->baseUrl);
   }
@@ -255,7 +259,7 @@ trait UiHelperTrait {
    *
    * @see \Drupal\Tests\BrowserTestBase::getHttpClient()
    */
-  protected function drupalGet($path, array $options = [], array $headers = []) {
+  protected function drupalGet($path, array $options = [], array $headers = []): string {
     $options['absolute'] = TRUE;
     $url = $this->buildUrl($path, $options);
 
@@ -263,14 +267,6 @@ trait UiHelperTrait {
 
     $this->prepareRequest();
     foreach ($headers as $header_name => $header_value) {
-      if (is_int($header_name)) {
-        @trigger_error('Passing an integer as header name to ' . __METHOD__ . '() is deprecated in drupal:11.1.0 and will be removed from drupal:12.0.0. Update the calling code to pass the header name as a key. See https://www.drupal.org/node/3456178', E_USER_DEPRECATED);
-        [$header_name, $header_value] = explode(':', $header_value);
-      }
-      if (is_null($header_value)) {
-        @trigger_error('Using null as a header value to ' . __METHOD__ . '() is deprecated in drupal:11.1.0 and will be removed from drupal:12.0.0. Use an empty string instead. See https://www.drupal.org/node/3456233', E_USER_DEPRECATED);
-        $header_value = '';
-      }
       $session->setRequestHeader($header_name, $header_value);
     }
 
@@ -422,7 +418,7 @@ trait UiHelperTrait {
    * @param string $css_selector
    *   The CSS selector identifying the element to click.
    */
-  protected function click($css_selector) {
+  protected function click(string $css_selector) {
     $starting_url = $this->getSession()->getCurrentUrl();
     $this->getSession()->getDriver()->click($this->cssSelectToXpath($css_selector));
     // Log only for WebDriverTestBase tests because for BrowserKitDriver we log
@@ -528,7 +524,7 @@ trait UiHelperTrait {
    * @return string
    *   The equivalent XPath of a CSS expression.
    */
-  protected function cssSelectToXpath($selector, $html = TRUE, $prefix = 'descendant-or-self::'): string {
+  protected function cssSelectToXpath(string $selector, $html = TRUE, string $prefix = 'descendant-or-self::'): string {
     return (new CssSelectorConverter($html))->toXPath($selector, $prefix);
   }
 

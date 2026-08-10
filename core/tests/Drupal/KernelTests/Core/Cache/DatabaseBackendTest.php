@@ -29,7 +29,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
    * @return \Drupal\Core\Cache\DatabaseBackend
    *   A new DatabaseBackend object.
    */
-  protected function createCacheBackend($bin) {
+  protected function createCacheBackend($bin): DatabaseBackend {
     return new DatabaseBackend(
       $this->container->get('database'),
       $this->container->get('cache_tags.invalidator.checksum'),
@@ -76,7 +76,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
     $backend = $this->getCacheBackend();
     $max_rows = static::$maxRows;
 
-    $this->assertSame(0, (int) $this->getNumRows());
+    $this->assertSame(0, $this->getNumRows());
 
     // Fill to just the limit.
     for ($i = 0; $i < $max_rows; $i++) {

@@ -3,6 +3,7 @@
 namespace Drupal\user\Hook;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\filter\FilterFormatInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -19,6 +20,7 @@ use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\user\OneTimeAuthentication;
 
 /**
  * Hook implementations for user.
@@ -231,7 +233,11 @@ class UserHooks {
     $original_language = $language_manager->getConfigOverrideLanguage();
     $language_manager->setConfigOverrideLanguage($language);
     $mail_config = \Drupal::config('user.mail');
-    $token_options = ['langcode' => $langcode, 'callback' => 'user_mail_tokens', 'clear' => TRUE];
+    $token_options = [
+      'langcode' => $langcode,
+      'callback' => \Drupal::service(OneTimeAuthentication::class)->tokens(...),
+      'clear' => TRUE,
+    ];
     $message['subject'] .= PlainTextOutput::renderFromHtml($token_service->replace($mail_config->get($key . '.subject'), $variables, $token_options));
     $message['body'][] = $token_service->replacePlain($mail_config->get($key . '.body'), $variables, $token_options);
     $language_manager->setConfigOverrideLanguage($original_language);
@@ -263,7 +269,7 @@ class UserHooks {
         ],
         'plugin' => 'user_add_role_action',
       ]);
-      $action->trustData()->save();
+      $action->save();
     }
     $remove_id = 'user_remove_role_action.' . $role->id();
     if (!Action::load($remove_id)) {
@@ -278,7 +284,7 @@ class UserHooks {
         ],
         'plugin' => 'user_remove_role_action',
       ]);
-      $action->trustData()->save();
+      $action->save();
     }
   }
 
@@ -304,16 +310,6 @@ class UserHooks {
   }
 
   /**
-   * Implements hook_element_info_alter().
-   */
-  #[Hook('element_info_alter')]
-  public function elementInfoAlter(array &$types): void {
-    if (isset($types['password_confirm'])) {
-      $types['password_confirm']['#process'][] = 'user_form_process_password_confirm';
-    }
-  }
-
-  /**
    * Implements hook_modules_uninstalled().
    */
   #[Hook('modules_uninstalled')]
@@ -323,96 +319,14 @@ class UserHooks {
   }
 
   /**
-   * Implements hook_toolbar().
-   */
-  #[Hook('toolbar')]
-  public function toolbar(): array {
-    $user = \Drupal::currentUser();
-    $items['user'] = [
-      '#type' => 'toolbar_item',
-      'tab' => [
-        '#type' => 'link',
-        '#title' => $user->getDisplayName(),
-        '#url' => Url::fromRoute('user.page'),
-        '#attributes' => [
-          'title' => $this->t('My account'),
-          'class' => [
-            'toolbar-icon',
-            'toolbar-icon-user',
-          ],
-        ],
-        '#cache' => [
-                  // Vary cache for anonymous and authenticated users.
-          'contexts' => [
-            'user.roles:anonymous',
-          ],
-        ],
-      ],
-      'tray' => [
-        '#heading' => $this->t('User account actions'),
-      ],
-      '#weight' => 100,
-      '#attached' => [
-        'library' => [
-          'user/drupal.user.icons',
-        ],
-      ],
-    ];
-    if ($user->isAnonymous()) {
-      $links = [
-        'login' => [
-          'title' => $this->t('Log in'),
-          'url' => Url::fromRoute('user.page'),
-        ],
-      ];
-      $items['user']['tray']['user_links'] = [
-        '#theme' => 'links__toolbar_user',
-        '#links' => $links,
-        '#attributes' => [
-          'class' => [
-            'toolbar-menu',
-          ],
-        ],
-      ];
-    }
-    else {
-      $items['user']['tab']['#title'] = [
-        '#lazy_builder' => [
-          'user.toolbar_link_builder:renderDisplayName',
-                [],
-        ],
-        '#create_placeholder' => TRUE,
-        '#lazy_builder_preview' => [
-        // Add a line of whitespace to the placeholder to ensure the icon is
-        // positioned in the same place it will be when the lazy loaded content
-        // appears.
-          '#markup' => '&nbsp;',
-        ],
-      ];
-      $items['user']['tray']['user_links'] = [
-        '#lazy_builder' => [
-          'user.toolbar_link_builder:renderToolbarLinks',
-                [],
-        ],
-        '#create_placeholder' => TRUE,
-        '#lazy_builder_preview' => [
-          '#markup' => '<a href="#" class="toolbar-tray-lazy-placeholder-link">&nbsp;</a>',
-        ],
-      ];
-    }
-    return $items;
-  }
-
-  /**
    * Implements hook_form_FORM_ID_alter() for \Drupal\system\Form\RegionalForm.
    */
   #[Hook('form_system_regional_settings_alter')]
   public function formSystemRegionalSettingsAlter(&$form, FormStateInterface $form_state) : void {
-    $config = \Drupal::config('system.date');
     $form['timezone']['configurable_timezones'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Users may set their own time zone'),
-      '#default_value' => $config->get('timezone.user.configurable'),
+      '#config_target' => 'system.date:timezone.user.configurable',
     ];
     $form['timezone']['configurable_timezones_wrapper'] = [
       '#type' => 'container',
@@ -429,13 +343,13 @@ class UserHooks {
     $form['timezone']['configurable_timezones_wrapper']['empty_timezone_message'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Remind users at login if their time zone is not set'),
-      '#default_value' => $config->get('timezone.user.warn'),
+      '#config_target' => 'system.date:timezone.user.warn',
       '#description' => $this->t('Only applied if users may set their own time zone.'),
     ];
     $form['timezone']['configurable_timezones_wrapper']['user_default_timezone'] = [
       '#type' => 'radios',
       '#title' => $this->t('Time zone for new users'),
-      '#default_value' => $config->get('timezone.user.default'),
+      '#config_target' => new ConfigTarget('system.date', 'timezone.user.default', toConfig: fn($v) => (int) $v),
       '#options' => [
         UserInterface::TIMEZONE_DEFAULT => $this->t('Default time zone'),
         UserInterface::TIMEZONE_EMPTY => $this->t('Empty time zone'),
@@ -443,7 +357,6 @@ class UserHooks {
       ],
       '#description' => $this->t('Only applied if users may set their own time zone.'),
     ];
-    $form['#submit'][] = 'user_form_system_regional_settings_submit';
   }
 
   /**

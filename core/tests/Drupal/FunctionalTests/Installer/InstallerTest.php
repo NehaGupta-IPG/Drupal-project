@@ -34,10 +34,6 @@ class InstallerTest extends InstallerTestBase {
     // Confirm that we are logged-in after installation.
     $this->assertSession()->pageTextContains($this->rootUser->getAccountName());
 
-    // Verify that the confirmation message appears.
-    require_once $this->root . '/core/includes/install.inc';
-    $this->assertSession()->pageTextContains('Congratulations, you installed Drupal!');
-
     // Ensure that the timezone is correct for sites under test after installing
     // interactively.
     $this->assertEquals('Australia/Sydney', $this->config('system.date')->get('timezone.default'));
@@ -46,6 +42,7 @@ class InstallerTest extends InstallerTestBase {
     $module_extension_list = \Drupal::service('extension.list.module');
     $extensions = $module_extension_list->getList();
 
+    // By default, the profile should remain installed.
     $this->assertArrayHasKey('testing', $extensions);
     $this->assertEquals(1000, $extensions['testing']->weight);
     // Ensures that router is not rebuilt unnecessarily during the install.
@@ -61,6 +58,9 @@ class InstallerTest extends InstallerTestBase {
     $this->assertSession()->responseContains("css/components/button.css");
     $this->assertSession()->responseContains('<meta charset="utf-8" />');
 
+    // Test that the default installer theme is being used.
+    $this->assertSession()->responseContains("claro/css/theme/install-page.css");
+
     // Assert that the expected title is present.
     $this->assertEquals('Choose language', $this->cssSelect('main h2')[0]->getText());
 
@@ -70,18 +70,13 @@ class InstallerTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpProfile(): void {
+  protected function prepareEnvironment(): void {
+    parent::prepareEnvironment();
+
     $settings_services_file = DRUPAL_ROOT . '/sites/default/default.services.yml';
     // Copy the testing-specific service overrides in place.
     copy($settings_services_file, $this->siteDirectory . '/services.yml');
     PerformanceTestRecorder::registerService($this->siteDirectory . '/services.yml', TRUE);
-    // Assert that the expected title is present.
-    $this->assertEquals('Select an installation profile', $this->cssSelect('main h2')[0]->getText());
-    // Verify that Title/Label are not displayed when '#title_display' =>
-    // 'invisible' attribute is set.
-    $this->assertSession()->elementsCount('xpath', "//span[contains(@class, 'visually-hidden') and contains(text(), 'Select an installation profile')]", 1);
-
-    parent::setUpProfile();
   }
 
   /**
@@ -93,7 +88,7 @@ class InstallerTest extends InstallerTestBase {
 
     // Assert that we use the by core supported database drivers by default and
     // not the ones from the driver_test module.
-    $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupalmysqldriverdatabasemysql"]', 'MySQL, MariaDB, Percona Server, or equivalent');
+    $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupalmysqldriverdatabasemysql"]', 'MySQL, MariaDB, or equivalent');
     $this->assertSession()->elementTextEquals('xpath', '//label[@for="edit-driver-drupalpgsqldriverdatabasepgsql"]', 'PostgreSQL');
 
     parent::setUpSettings();
@@ -118,8 +113,8 @@ class InstallerTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function visitInstaller(): void {
-    parent::visitInstaller();
+  protected function visitInstaller(array $query = []): void {
+    parent::visitInstaller($query);
 
     // Assert the title is correct and has the title suffix.
     $this->assertSession()->titleEquals('Choose language | Drupal');

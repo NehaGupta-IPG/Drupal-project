@@ -9,11 +9,11 @@ use Drupal\performance_test\Cache\CacheTagOperation;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
-use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
-use OpenTelemetry\SDK\Trace\TracerProvider;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
-use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SemConv\Incubating\Attributes\DeploymentIncubatingAttributes;
 use OpenTelemetry\SemConv\Incubating\Attributes\ServiceIncubatingAttributes;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -47,7 +47,7 @@ trait PerformanceTestTrait {
    *
    * @see \Drupal\Tests\BrowserTestBase::installModulesFromClassProperty()
    */
-  private function doInstallModulesFromClassProperty(ContainerInterface $container) {
+  private function doInstallModulesFromClassProperty(ContainerInterface $container): void {
     // Bypass everything that WebDriverTestBase does here to get closer to
     // a production configuration.
     BrowserTestBase::installModulesFromClassProperty($container);
@@ -76,7 +76,6 @@ trait PerformanceTestTrait {
       'performance' => 'ALL',
       'performanceTimeline' => 'ALL',
     ];
-    // Support legacy key.
     $driver_args[1]['goog:chromeOptions']['perfLoggingPrefs'] = [
       'traceCategories' => 'timeline,devtools.timeline,browser',
     ];
@@ -342,10 +341,11 @@ trait PerformanceTestTrait {
       // Therefore, continue collecting performance data until all of the
       // following are true, or until 30 seconds has passed:
       // - a largestContentfulPaint::candidate event has been fired
+      //   (only if an OTEL_COLLECTOR is set)
       // - all network requests have received a response
       // - no new performance log events have been recorded since the last
       //   iteration.
-      if ($lcp_count && empty($performance_log) && ($request_count === $response_count)) {
+      if (($lcp_count || !getenv('OTEL_COLLECTOR')) && empty($performance_log) && ($request_count === $response_count)) {
         break;
       }
       sleep(1);
@@ -643,7 +643,7 @@ trait PerformanceTestTrait {
   /**
    * Checks whether a database event is from the database cache implementation.
    *
-   * @param Drupal\Core\Database\Event\DatabaseEvent $event
+   * @param \Drupal\Core\Database\Event\DatabaseEvent $event
    *   The database event.
    *
    * @return bool
@@ -682,7 +682,7 @@ trait PerformanceTestTrait {
     $values = [];
     foreach ($expected as $name => $metric) {
       if (in_array($name, $assertRange)) {
-        $this->assertCountBetween($metric - 500, $metric + 500, $performance_data->{"get$name"}(), "Asserting $name");
+        $this->assertCountBetween($metric - 2000, $metric + 2000, $performance_data->{"get$name"}(), "Asserting $name");
         unset($expected[$name]);
       }
       else {

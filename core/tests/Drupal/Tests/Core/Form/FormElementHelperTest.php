@@ -20,18 +20,16 @@ class FormElementHelperTest extends UnitTestCase {
 
   /**
    * Tests the getElementByName() method.
-   *
-   * @legacy-covers ::getElementByName
    */
   #[DataProvider('getElementByNameProvider')]
-  public function testGetElementByName($name, $form, $expected): void {
+  public function testGetElementByName($name, array $form, $expected): void {
     $this->assertSame($expected, FormElementHelper::getElementByName($name, $form));
   }
 
   /**
    * Provides test data.
    */
-  public static function getElementByNameProvider() {
+  public static function getElementByNameProvider(): array {
     $data = [];
     $data[] = ['id', [], []];
     $data[] = [
@@ -104,11 +102,9 @@ class FormElementHelperTest extends UnitTestCase {
 
   /**
    * Tests the getElementTitle() method.
-   *
-   * @legacy-covers ::getElementTitle
    */
   #[DataProvider('getElementTitleProvider')]
-  public function testGetElementTitle($name, $form, $expected): void {
+  public function testGetElementTitle($name, array $form, $expected): void {
     $element = FormElementHelper::getElementByName($name, $form);
     $this->assertSame($expected, FormElementHelper::getElementTitle($element));
   }
@@ -116,7 +112,7 @@ class FormElementHelperTest extends UnitTestCase {
   /**
    * Provides test data.
    */
-  public static function getElementTitleProvider() {
+  public static function getElementTitleProvider(): array {
     $data = [];
     $data[] = ['id', [], ''];
     $data[] = [

@@ -19,7 +19,7 @@ class SelectLeastTest extends DatabaseTestBase {
    * Tests the SQL LEAST operator.
    */
   #[DataProvider('selectLeastProvider')]
-  public function testSelectLeast($values, $expected): void {
+  public function testSelectLeast(array $values, int|string $expected): void {
     $least = $this->connection->query("SELECT LEAST(:values[])", [':values[]' => $values])->fetchField();
     $this->assertEquals($expected, $least);
   }
@@ -27,7 +27,7 @@ class SelectLeastTest extends DatabaseTestBase {
   /**
    * Provides data for testing the LEAST operator.
    */
-  public static function selectLeastProvider() {
+  public static function selectLeastProvider(): array {
     return [
       [[1, 2, 3, 4, 5, 6], 1],
       [['A', 'B', 'C', 'NULL', 'F'], 'A'],

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Unit\Views\Argument;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Entity\Role;
@@ -21,8 +23,6 @@ class RolesRidTest extends UnitTestCase {
 
   /**
    * Tests the titleQuery method.
-   *
-   * @legacy-covers ::titleQuery
    */
   public function testTitleQuery(): void {
     $role1 = new Role([
@@ -35,8 +35,8 @@ class RolesRidTest extends UnitTestCase {
     ], 'user_role');
 
     // Creates a stub entity storage.
-    $role_storage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
-    $role_storage->expects($this->any())
+    $role_storage = $this->createStub(EntityStorageInterface::class);
+    $role_storage
       ->method('loadMultiple')
       ->willReturnMap([
         [[], []],
@@ -47,14 +47,14 @@ class RolesRidTest extends UnitTestCase {
         ],
       ]);
 
-    $entity_type = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
-    $entity_type->expects($this->any())
+    $entity_type = $this->createMock(EntityTypeInterface::class);
+    $entity_type->expects($this->atLeastOnce())
       ->method('getKey')
       ->with('label')
       ->willReturn('label');
 
     $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
-    $entity_type_manager->expects($this->any())
+    $entity_type_manager
       ->method('getDefinition')
       ->with($this->equalTo('user_role'))
       ->willReturn($entity_type);

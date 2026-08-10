@@ -8,6 +8,7 @@ use Drupal\Core\Asset\JsOptimizer;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Psr\Log\LoggerInterface;
 
 /**
  * Tests the JS asset optimizer.
@@ -27,8 +28,7 @@ class JsOptimizerUnitTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $logger = $this->createMock('\Psr\Log\LoggerInterface');
-    $this->optimizer = new JsOptimizer($logger);
+    $this->optimizer = new JsOptimizer($this->createStub(LoggerInterface::class));
   }
 
   /**
@@ -39,7 +39,7 @@ class JsOptimizerUnitTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestClean() {
+  public static function providerTestClean(): array {
     $path = dirname(__FILE__) . '/js_test_files/';
     return [
       // File. Tests:
@@ -73,7 +73,7 @@ class JsOptimizerUnitTest extends UnitTestCase {
    * Tests cleaning of a JS asset group containing 'type' => 'file'.
    */
   #[DataProvider('providerTestClean')]
-  public function testClean($js_asset, $expected): void {
+  public function testClean(string|bool $js_asset, string|bool $expected): void {
     $this->assertEquals($expected, $this->optimizer->clean($js_asset));
   }
 
@@ -85,7 +85,7 @@ class JsOptimizerUnitTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestOptimize() {
+  public static function providerTestOptimize(): array {
     $path = dirname(__FILE__) . '/js_test_files/';
     return [
       0 => [
@@ -138,7 +138,7 @@ class JsOptimizerUnitTest extends UnitTestCase {
    * Tests cleaning of a JS asset group containing 'type' => 'file'.
    */
   #[DataProvider('providerTestOptimize')]
-  public function testOptimize($js_asset, $expected): void {
+  public function testOptimize(array $js_asset, string|bool $expected): void {
     $this->assertEquals($expected, $this->optimizer->optimize($js_asset));
   }
 

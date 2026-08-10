@@ -54,7 +54,7 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
   /**
    * Data provider for testGetSectionStorageForEntity().
    */
-  public static function providerTestGetSectionStorageForEntity() {
+  public static function providerTestGetSectionStorageForEntity(): array {
     $data = [];
     $data['entity_view_display'] = [
       'entity_view_display',
@@ -81,8 +81,6 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
 
   /**
    * Tests get section storage for entity.
-   *
-   * @legacy-covers ::getSectionStorageForEntity
    */
   #[DataProvider('providerTestGetSectionStorageForEntity')]
   public function testGetSectionStorageForEntity($entity_type_id, $values, $expected_context_keys): void {
@@ -128,7 +126,7 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
   /**
    * Data provider for testOriginalEntityUsesDefaultStorage().
    */
-  public static function providerTestOriginalEntityUsesDefaultStorage() {
+  public static function providerTestOriginalEntityUsesDefaultStorage(): array {
     return [
       'original uses default' => [
         [
@@ -186,11 +184,9 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
 
   /**
    * Tests original entity uses default storage.
-   *
-   * @legacy-covers ::originalEntityUsesDefaultStorage
    */
   #[DataProvider('providerTestOriginalEntityUsesDefaultStorage')]
-  public function testOriginalEntityUsesDefaultStorage($entity_storages, $is_new, $has_original, $expected): void {
+  public function testOriginalEntityUsesDefaultStorage(array $entity_storages, bool $is_new, bool $has_original, bool $expected): void {
     $this->assertFalse($is_new && $has_original);
     $entity = EntityTest::create(['name' => 'updated']);
     if (!$is_new) {
@@ -225,8 +221,6 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
 
   /**
    * Tests get entity sections.
-   *
-   * @legacy-covers ::getEntitySections
    */
   public function testGetEntitySections(): void {
     $entity = EntityTest::create(['name' => 'updated']);

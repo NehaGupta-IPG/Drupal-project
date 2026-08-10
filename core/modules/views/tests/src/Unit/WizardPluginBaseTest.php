@@ -20,8 +20,6 @@ class WizardPluginBaseTest extends UnitTestCase {
 
   /**
    * Tests get selected.
-   *
-   * @legacy-covers ::getSelected
    */
   #[DataProvider('providerTestGetSelected')]
   public function testGetSelected($expected, $element = [], $parents = [], $user_input = [], $not_rebuilding_expected = NULL): void {
@@ -42,7 +40,7 @@ class WizardPluginBaseTest extends UnitTestCase {
   /**
    * Provides test data for testGetSelected().
    */
-  public static function providerTestGetSelected() {
+  public static function providerTestGetSelected(): array {
     $data = [];
     // A form element with an invalid #type.
     $data['invalid_type'] = [

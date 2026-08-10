@@ -21,7 +21,7 @@ class EntityKeysTest extends EntityKernelTestBase {
    * Tests the cache when multiple keys reference a single field.
    */
   #[DataProvider('multipleKeysCacheTestCases')]
-  public function testMultipleKeysCache($translatable): void {
+  public function testMultipleKeysCache(bool $translatable): void {
     $this->state->set('entity_test.additional_base_field_definitions', [
       'test_field' => BaseFieldDefinition::create('string')->setTranslatable($translatable),
     ]);
@@ -46,7 +46,7 @@ class EntityKeysTest extends EntityKernelTestBase {
   /**
    * Data provider for ::testMultipleKeysCache.
    */
-  public static function multipleKeysCacheTestCases() {
+  public static function multipleKeysCacheTestCases(): array {
     return [
       'translatable Entity Key' => [
         TRUE,

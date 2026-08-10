@@ -33,7 +33,6 @@ use Symfony\Component\HttpFoundation\Response;
  * @see \Drupal\views\ViewExecutable
  */
 #[Group('views')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ViewExecutableTest extends ViewsKernelTestBase {
 
@@ -56,22 +55,6 @@ class ViewExecutableTest extends ViewsKernelTestBase {
    * @var array
    */
   public static $testViews = ['test_destroy', 'test_executable_displays', 'test_argument_dependency'];
-
-  /**
-   * Properties that should be stored in the configuration.
-   *
-   * @var array
-   */
-  protected $configProperties = [
-    'disabled',
-    'name',
-    'description',
-    'tag',
-    'base_table',
-    'label',
-    'core',
-    'display',
-  ];
 
   /**
    * Properties that should be stored in the executable.
@@ -412,7 +395,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
    * @return mixed
    *   The instance property value.
    */
-  protected function getProtectedProperty($instance, $property) {
+  protected function getProtectedProperty($instance, $property): mixed {
     $reflection = new \ReflectionProperty($instance, $property);
     return $reflection->getValue($instance);
   }
@@ -463,7 +446,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
 
     $count = 0;
     foreach ($view->displayHandlers as $id => $display) {
-      $match = function ($value) use ($display) {
+      $match = function ($value) use ($display): bool {
         return str_contains((string) $value, $display->display['display_title']);
       };
       $this->assertNotEmpty(array_filter($validate[$id], $match), "Error message found for $id display");
@@ -490,10 +473,8 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $executable->newDisplay('display_test');
     $executable->newDisplay('display_test');
     $errors = $executable->validate();
-    $total_error_count = array_reduce($errors, function ($carry, $item) {
-      $carry += count($item);
-
-      return $carry;
+    $total_error_count = array_reduce($errors, function (float|int|null $carry, $item): float|int {
+      return $carry + count($item);
     });
     // Assert that there were 9 total errors across 3 displays.
     $this->assertSame(9, $total_error_count);
@@ -565,10 +546,17 @@ class ViewExecutableTest extends ViewsKernelTestBase {
 
     $view = Views::getView('test_argument_dependency');
     $view->setDisplay('page_1');
-    $view->setArguments([(string) $account->id(), 'this value should be replaced']);
+    // The view has two arguments: uid_touch (comment module) and uid (with
+    // argument_validator_test as its validator). Both are needed to verify
+    // that calculateDependencies() picks up dependencies from both default
+    // and validator plugins. uid receives the value the validator intercepts
+    // and overrides to '1'.
+    $view->setArguments([$account->id(), 'this value should be replaced']);
     $view->execute();
     $account = User::load(1);
     $expected = [
+      '{{ arguments.uid_touch }}' => $account->label(),
+      '{{ raw_arguments.uid_touch }}' => (string) $account->id(),
       '{{ arguments.uid }}' => $account->label(),
       '{{ raw_arguments.uid }}' => (string) $account->id(),
     ];

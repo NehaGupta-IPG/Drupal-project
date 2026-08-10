@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Enhancer;
 
+use Drupal\Core\ParamConverter\ParamConverterManagerInterface;
 use Drupal\Core\Routing\Enhancer\ParamConversionEnhancer;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
@@ -26,9 +28,9 @@ class ParamConversionEnhancerTest extends UnitTestCase {
   protected $paramConversionEnhancer;
 
   /**
-   * @var \Drupal\Core\ParamConverter\ParamConverterManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The mocked converter manager.
    */
-  protected $paramConverterManager;
+  protected ParamConverterManagerInterface&MockObject $paramConverterManager;
 
   /**
    * {@inheritdoc}
@@ -42,8 +44,6 @@ class ParamConversionEnhancerTest extends UnitTestCase {
 
   /**
    * Tests enhance.
-   *
-   * @legacy-covers ::enhance
    */
   public function testEnhance(): void {
     $route = new Route('/test/{id}/{literal}/{null}');
@@ -63,7 +63,7 @@ class ParamConversionEnhancerTest extends UnitTestCase {
 
     $this->paramConverterManager->expects($this->once())
       ->method('convert')
-      ->with($this->isType('array'))
+      ->with($this->isArray())
       ->willReturn($expected);
 
     $result = $this->paramConversionEnhancer->enhance($defaults, new Request());
@@ -79,8 +79,6 @@ class ParamConversionEnhancerTest extends UnitTestCase {
 
   /**
    * Tests copy raw variables.
-   *
-   * @legacy-covers ::copyRawVariables
    */
   public function testCopyRawVariables(): void {
     $route = new Route('/test/{id}');
@@ -91,10 +89,10 @@ class ParamConversionEnhancerTest extends UnitTestCase {
     ];
     // Set one default to mirror another by reference.
     $defaults['bar'] = &$defaults['id'];
-    $this->paramConverterManager->expects($this->any())
+    $this->paramConverterManager->expects($this->once())
       ->method('convert')
-      ->with($this->isType('array'))
-      ->willReturnCallback(function ($defaults) {
+      ->with($this->isArray())
+      ->willReturnCallback(function (array $defaults): array {
         // Convert the mirrored default to another value.
         $defaults['bar'] = '2';
 

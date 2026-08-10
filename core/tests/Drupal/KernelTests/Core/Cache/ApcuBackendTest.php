@@ -21,7 +21,7 @@ class ApcuBackendTest extends GenericCacheBackendUnitTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function createCacheBackend($bin) {
+  protected function createCacheBackend($bin): ApcuBackend {
     return new ApcuBackend($bin, $this->databasePrefix, \Drupal::service('cache_tags.invalidator.checksum'), \Drupal::service(TimeInterface::class));
   }
 
@@ -46,6 +46,7 @@ class ApcuBackendTest extends GenericCacheBackendUnitTestBase {
     $key = $backend->getApcuKey('TEST8');
 
     $iterator = new \APCUIterator('/^' . $key . '/');
+    $found = FALSE;
     foreach ($iterator as $item) {
       $this->assertEquals(0, $item['ttl']);
       $found = TRUE;

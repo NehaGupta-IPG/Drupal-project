@@ -27,7 +27,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the entity content source plugin.
  */
 #[Group('migrate')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ContentEntityTest extends KernelTestBase {
 
@@ -49,9 +48,7 @@ class ContentEntityTest extends KernelTestBase {
     'media',
     'media_test_source',
     'text',
-    'filter',
     'language',
-    'content_translation',
   ];
 
   /**

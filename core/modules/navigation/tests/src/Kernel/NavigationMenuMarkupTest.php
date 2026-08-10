@@ -34,8 +34,6 @@ class NavigationMenuMarkupTest extends KernelTestBase {
     'navigation',
     'menu_test',
     'menu_link_content',
-    'field',
-    'block',
     'user',
     'link',
     'layout_builder',
@@ -47,13 +45,6 @@ class NavigationMenuMarkupTest extends KernelTestBase {
    * @var \Drupal\system\MenuInterface
    */
   protected $menu;
-
-  /**
-   * The menu link tree service.
-   *
-   * @var \Drupal\Core\Menu\MenuLinkTree
-   */
-  protected $linkTree;
 
   /**
    * The menu link plugin manager service.
@@ -77,7 +68,6 @@ class NavigationMenuMarkupTest extends KernelTestBase {
     $this->installEntitySchema('menu_link_content');
 
     $this->menuLinkManager = $this->container->get('plugin.manager.menu.link');
-    $this->linkTree = $this->container->get('menu.link_tree');
     $this->blockManager = $this->container->get('plugin.manager.block');
 
     $routes = new RouteCollection();
@@ -143,8 +133,13 @@ class NavigationMenuMarkupTest extends KernelTestBase {
     $block_build = $block->build();
     $render = \Drupal::service('renderer')->renderRoot($block_build);
 
+    // The error flags need to be added to avoid errors when parsing HTML5 tags,
+    // like nav. This trick could be replaced with
+    // Dom\HTMLDocument::createFromString(), introduced in PHP 8.4 once PHP 8.3
+    // support is dropped.
     $dom = new \DOMDocument();
-    $dom->loadHTML((string) $render);
+    // cspell:disable-next-line
+    $dom->loadHTML((string) $render, LIBXML_NOWARNING | LIBXML_NOERROR);
     $xpath = new \DOMXPath($dom);
 
     $items_query = [
