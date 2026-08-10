@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\Validation;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldValueValidator;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\entity_test\Entity\EntityTestStringId;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\TestTools\Random;

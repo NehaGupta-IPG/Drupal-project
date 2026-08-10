@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\unique_bundle_constraint_test\Hook;
 
-use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
