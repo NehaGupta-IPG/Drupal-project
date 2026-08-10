@@ -63,6 +63,9 @@ class PgsqlServiceProvider implements ServiceModifierInterface {
     // so that sites and tests using another backend are not affected.
     $replacements = [
       'cache.backend.database' => [CoreDatabaseBackendFactory::class, DatabaseBackendFactory::class],
+      // Sites and tests may point the cache factory directly at the database
+      // cache backend factory instead of using a per-bin backend service.
+      'cache_factory' => [CoreDatabaseBackendFactory::class, DatabaseBackendFactory::class],
       'cache_tags.invalidator.checksum' => [CoreDatabaseCacheTagsChecksum::class, DatabaseCacheTagsChecksum::class],
       'batch.storage' => [CoreBatchStorage::class, BatchStorage::class],
       'lock' => [CoreDatabaseLockBackend::class, DatabaseLockBackend::class],
