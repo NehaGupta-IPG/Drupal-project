@@ -845,6 +845,14 @@ class FilterKernelTest extends KernelTestBase {
       $filter->process($input, Language::LANGCODE_NOT_SPECIFIED)->getProcessedText()
     );
 
+    // Restore the default for the remaining URL filter assertions.
+    $filter->setConfiguration([
+      'settings' => [
+        'filter_url_length' => 496,
+        'filter_url_secure_links' => FALSE,
+      ],
+    ]);
+
     // Surrounding text/punctuation.
     $tests = [
       'Partial URL with trailing period www.partial.com.
