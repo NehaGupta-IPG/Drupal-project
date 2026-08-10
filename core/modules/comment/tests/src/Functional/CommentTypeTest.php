@@ -236,7 +236,7 @@ class CommentTypeTest extends CommentTestBase {
     $comment_type = $this->createCommentType('dep_test');
     $target_entity_type = \Drupal::entityTypeManager()->getDefinition($comment_type->getTargetEntityTypeId());
     $dependencies = $comment_type->getDependencies() + ['module' => []];
-    $this->assertTrue(in_array($target_entity_type->getProvider(), $dependencies['module']));
+    $this->assertContains($target_entity_type->getProvider(), $dependencies['module']);
   }
 
 }
