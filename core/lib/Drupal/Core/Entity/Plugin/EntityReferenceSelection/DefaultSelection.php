@@ -390,7 +390,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       // passing a value that exceeds the column range causes a "value is out
       // of range for type integer" error.
       $id_key = $entity_type->getKey('id');
-      if ($id_key) {
+      if ($id_key && $entity_type->entityClassImplements(FieldableEntityInterface::class)) {
         $field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions($target_type);
         if (isset($field_storage_definitions[$id_key])
           && $field_storage_definitions[$id_key]->getType() === 'integer') {
