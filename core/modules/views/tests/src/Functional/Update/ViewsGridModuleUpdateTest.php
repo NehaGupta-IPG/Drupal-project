@@ -7,12 +7,14 @@ namespace Drupal\Tests\views\Functional\Update;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\views_grid\Plugin\views\style\Grid;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the upgrade path for enabling views_grid module automatically.
  */
 #[Group('Update')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class ViewsGridModuleUpdateTest extends UpdatePathTestBase {
 
