@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
   type: FilterInterface::TYPE_MARKUP_LANGUAGE,
   settings: [
     "filter_url_length" => 72,
-    "filter_url_secure_links" => false,
+    "filter_url_secure_links" => FALSE,
   ]
 )]
 class FilterUrl extends FilterBase implements ContainerFactoryPluginInterface {
