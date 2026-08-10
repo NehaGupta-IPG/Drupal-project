@@ -131,13 +131,13 @@ field.field_settings.image:
       type: string
       label: 'Maximum image dimensions'
     resize_policy:
-      type: string
+      type: enum
       label: 'Image resize policy'
       constraints:
         Choice:
           choices:
-            - 'resize_larger_images'
-            - 'reject_larger_images_with_error'
+            - !php/enum Drupal\Core\Image\ImageResizePolicy::ResizeLargerImages
+            - !php/enum Drupal\Core\Image\ImageResizePolicy::RejectLargerImagesWithError
     min_resolution:
       type: string
       label: 'Minimum image dimensions'

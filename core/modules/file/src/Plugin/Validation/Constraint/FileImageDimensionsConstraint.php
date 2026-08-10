@@ -26,7 +26,7 @@ class FileImageDimensionsConstraint extends SymfonyConstraint {
     public string $messageImageTooSmall = 'The image is too small. The minimum dimensions are %dimensions pixels and the image size is %widthx%height pixels.',
     public string $messageResizeFailed = 'The image exceeds the maximum allowed dimensions and an attempt to resize it failed.',
     public string $messageImageTooLarge = 'The image is too large. The maximum dimensions are %dimensions pixels and the image size is %widthx%height pixels.',
-    public string $resizePolicy = ImageResizePolicy::ResizeLargerImages->value,
+    public ImageResizePolicy $resizePolicy = ImageResizePolicy::ResizeLargerImages,
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {

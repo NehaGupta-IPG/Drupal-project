@@ -86,7 +86,7 @@ class ImageItem extends FileItem {
       'title_field' => 0,
       'title_field_required' => 0,
       'max_resolution' => '',
-      'resize_policy' => ImageResizePolicy::ResizeLargerImages->value,
+      'resize_policy' => ImageResizePolicy::ResizeLargerImages,
       'min_resolution' => '',
       'default_image' => [
         'uuid' => NULL,
@@ -287,11 +287,9 @@ class ImageItem extends FileItem {
     ];
     $element['resize']['resize_policy'] = [
       '#type' => 'radios',
-      '#default_value' => $settings['resize_policy'] ?? ImageResizePolicy::ResizeLargerImages->value,
-      '#options' => [
-        ImageResizePolicy::ResizeLargerImages->value => $this->t('Resize proportionally'),
-        ImageResizePolicy::RejectLargerImagesWithError->value => $this->t('Reject'),
-      ],
+      '#default_value' => (isset($settings['resize_policy']) && $settings['resize_policy'] instanceof ImageResizePolicy) ? $settings['resize_policy']->value : ImageResizePolicy::ResizeLargerImages->value,
+      '#options' => ImageResizePolicy::asOptions(),
+      '#element_validate' => [[static::class, 'fieldSettingsFormResizeValidate']],
     ];
 
     // Remove the description option.
@@ -341,6 +339,14 @@ class ImageItem extends FileItem {
     $element['default_image']['#description'] = $this->t("If no image is uploaded, this image will be shown on display and will override the field's default image.");
 
     return $element;
+  }
+
+  /**
+   * Convert resize policy form-submitted string value to respective enum.
+   * */
+  public static function fieldSettingsFormResizeValidate(array $form, FormStateInterface $form_state): void {
+    $resize_policy = ImageResizePolicy::tryFrom($form_state->getValue(['settings', 'resize_policy']));
+    $form_state->setValue(['settings', 'resize_policy'], $resize_policy);
   }
 
   /**
