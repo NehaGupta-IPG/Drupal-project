@@ -17,10 +17,10 @@ class UniqueFieldConstraintTestHooks {
   */
   #[Hook('entity_bundle_field_info_alter')]
   public function uniqueBundleField(&$fields, EntityTypeInterface $entity_type, $bundle): void {
-
-    $my_bundle = 'my_bundle';
-    if ($entity_type->id() === 'entity_type' && $bundle === $my_bundle) {
-      $fields['name']->addConstraint('UniqueField', ['bundle' => $my_bundle]);
+    $my_bundle = 'one';
+    $my_field = 'custom_id';
+    if ($entity_type->id() === 'entity_test_with_bundle' && $bundle === $my_bundle && isset($fields[$my_field])) {
+      $fields[$my_field]->addConstraint('UniqueField', ['bundle' => $my_bundle]);
     }
   }
 
