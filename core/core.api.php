@@ -1411,9 +1411,10 @@
  *   need to provide.
  *     - All plugins have at least an ID, which is a unique string within
  *       plugins of the same type. There are no restrictions on the characters
- *       that can be used. However, it is recommended that the colon, ':',
- *       character is not used. The colon is used internally to build the ID of
- *       derived plugins.
+ *       that can be used. However, the colon, ':', is used internally to build
+ *       the ID of derived plugins. You should only use the colon in a plugin ID
+ *       if you are intentionally overriding a derived plugin ID.
+ *
  *   identifier.
  * - Define an alter hook for altering the discovered plugin definitions. You
  *   should document the hook in a *.api.php file.
