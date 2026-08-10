@@ -73,7 +73,7 @@ class ImageConfigUpdater {
       $deprecations_triggered = &$this->triggeredDeprecations['3325551'][$field->id()];
       if ($this->deprecationsEnabled && !$deprecations_triggered) {
         $deprecations_triggered = TRUE;
-        @trigger_error('Image fields without "resize_policy" setting is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. This new setting default value is "resize_larger_images". Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3467820', E_USER_DEPRECATED);
+        @trigger_error('Image fields without "resize_policy" setting is deprecated in drupal:11.5.0 and will be removed in drupal:13.0.0. This new setting default value is "resize_larger_images". Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3467820', E_USER_DEPRECATED);
       }
     }
 
