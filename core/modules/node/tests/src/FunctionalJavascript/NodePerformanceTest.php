@@ -122,19 +122,23 @@ class NodePerformanceTest extends PerformanceTestBase {
       'SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "core.entity_view_display.user.user.compact", "core.entity_view_display.user.user.default" )',
       'SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "filter.format.plain_text" )',
       'SELECT "name", "route" FROM "router" WHERE "name" IN ( "view.promoted_content.page_1" )',
+      'SELECT "expire", "value" FROM "semaphore" WHERE "name" = "state:Drupal\Core\Cache\CacheCollector"',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("state:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "state:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
+      'SELECT "expire", "value" FROM "semaphore" WHERE "name" = "theme_registry:runtime:stark:Drupal\Core\Cache\CacheCollector"',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("theme_registry:runtime:stark:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "theme_registry:runtime:stark:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
+      'SELECT "expire", "value" FROM "semaphore" WHERE "name" = "library_info:stark:Drupal\Core\Cache\CacheCollector"',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("library_info:stark:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "library_info:stark:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
+      'SELECT "expire", "value" FROM "semaphore" WHERE "name" = "path_alias_prefix_list:Drupal\Core\Cache\CacheCollector"',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("path_alias_prefix_list:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "path_alias_prefix_list:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
     ];
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'QueryCount' => 34,
+      'QueryCount' => 38,
       'CacheGetCount' => 82,
       'CacheGetCountByBin' => [
         'page' => 1,

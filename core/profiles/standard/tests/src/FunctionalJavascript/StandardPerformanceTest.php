@@ -172,8 +172,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN (SELECT "subquery_base_table"."nid" AS "nid", MAX(subquery_base_table.vid) AS "maximum_revision_id" FROM "node_revision" "subquery_base_table" WHERE "nid" = "1" GROUP BY "subquery_base_table"."nid") "sq_base_table" ON base_table.nid = sq_base_table.nid AND base_table.vid = sq_base_table.maximum_revision_id INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" WHERE "node_field_data"."nid" = "1"',
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/node" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "name", "route", "fit" FROM "router" WHERE "pattern_outline" IN ( "/node" ) AND "number_parts" >= 1',
+      'SELECT "expire", "value" FROM "semaphore" WHERE "name" = "theme_registry:runtime:stark:Drupal\Core\Cache\CacheCollector"',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("theme_registry:runtime:stark:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "theme_registry:runtime:stark:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
+      'SELECT "expire", "value" FROM "semaphore" WHERE "name" = "path_alias_prefix_list:Drupal\Core\Cache\CacheCollector"',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("path_alias_prefix_list:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "path_alias_prefix_list:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
     ];
@@ -181,7 +183,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'QueryCount' => 25,
+      'QueryCount' => 27,
       'CacheGetCount' => 73,
       'CacheSetCount' => 42,
       'CacheDeleteCount' => 0,
