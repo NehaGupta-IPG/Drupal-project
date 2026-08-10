@@ -107,6 +107,14 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       $attachment_placeholders = $attached['html_response_attachment_placeholders'];
       unset($attached['html_response_attachment_placeholders']);
 
+      // Always load the core/drupalSettings library so that the
+      // window.drupalSettings global is always created. Without it, the global
+      // would not exist on pages where no other library depends on
+      // core/drupalSettings, leaving it open to being faked through DOM
+      // clobbering.
+      // @see https://www.drupal.org/project/drupal/issues/3591821
+      $attached['library'][] = 'core/drupalSettings';
+
       $assets = AttachedAssets::createFromRenderArray(['#attached' => $attached]);
       // Take Ajax page state into account, to allow for something like
       // Turbolinks to be implemented without altering core.
