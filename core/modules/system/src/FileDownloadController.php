@@ -49,7 +49,7 @@ class FileDownloadController extends ControllerBase {
    *   Thrown when the user does not have access to the file.
    */
   public function download(Request $request, $scheme = 'private') {
-    $target = $request->query->get('file');
+    $target = $request->query->get('file', '');
     return $this->downloadPath($target, $scheme);
   }
 
