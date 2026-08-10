@@ -97,4 +97,3 @@ function user_install(): void {
 function user_update_last_removed(): int {
   return 10000;
 }
-
