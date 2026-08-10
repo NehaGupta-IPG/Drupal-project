@@ -98,15 +98,3 @@ function user_update_last_removed(): int {
   return 10000;
 }
 
-/**
- * Add an empty description to existing user roles.
- */
-function user_update_12001(): void {
-  $config_factory = \Drupal::configFactory();
-  foreach ($config_factory->listAll('user.role.') as $config_name) {
-    $role_config = $config_factory->getEditable($config_name);
-    if ($role_config->get('description') === NULL) {
-      $role_config->set('description', '')->save();
-    }
-  }
-}
