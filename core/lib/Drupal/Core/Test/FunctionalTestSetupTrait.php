@@ -691,6 +691,10 @@ trait FunctionalTestSetupTrait {
    *
    * Also sets up new resources for the testing environment, such as the public
    * filesystem and configuration directories.
+   *
+   * No kernel is booted and no container is built here. The calls below
+   * replace the parts of the test runner kernel boot that later code relies
+   * on. Do not reintroduce the boot to simplify them.
    */
   protected function prepareEnvironment() {
     // Bootstrap Drupal so we can use Drupal's built in functions.
@@ -711,7 +715,8 @@ trait FunctionalTestSetupTrait {
     $this->originalSite = DrupalKernel::findSitePath($request);
 
     // Create test directory ahead of installation so fatal errors and debug
-    // information can be logged during installation process.
+    // information can be logged during installation process. The file system
+    // service is not used, as it would need a container.
     foreach ([dirname($this->siteDirectory), $this->siteDirectory] as $directory) {
       if (!is_dir($directory) && !@mkdir($directory) && !is_dir($directory)) {
         throw new \RuntimeException("Unable to create directory: $directory");
