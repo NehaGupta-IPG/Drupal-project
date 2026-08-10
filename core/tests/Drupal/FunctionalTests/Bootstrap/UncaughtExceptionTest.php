@@ -95,7 +95,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
   public function testUncaughtFatalError(): void {
     $this->drupalGet('error-test/generate-fatal-errors');
     $this->assertSession()->statusCodeEquals(500);
-    $message = '@<em class="placeholder">TypeError</em>: Drupal\\\error_test\\\Controller\\\ErrorTestController::{closure:Drupal\\\error_test\\\Controller\\\ErrorTestController::generateFatalErrors\(\):64}\(\): Argument #1 \(\$test\) must be of type array, string given, called in .*core/modules/system/tests/modules/error_test/src/Controller/ErrorTestController.php on line 67 in <em class="placeholder">Drupal\\\error_test\\\Controller\\\ErrorTestController-&gt;{closure:Drupal\\\error_test\\\Controller\\\ErrorTestController::generateFatalErrors\(\):64}\(\)</em>@';
+    $message = '@<em class="placeholder">TypeError</em>: Drupal\\\error_test\\\Controller\\\ErrorTestController::{closure:Drupal\\\error_test\\\Controller\\\ErrorTestController::generateFatalErrors\(\):73}\(\): Argument #1 \(\$test\) must be of type array, string given, called in .*core/modules/system/tests/modules/error_test/src/Controller/ErrorTestController.php on line 76 in <em class="placeholder">Drupal\\\error_test\\\Controller\\\ErrorTestController-&gt;{closure:Drupal\\\error_test\\\Controller\\\ErrorTestController::generateFatalErrors\(\):73}\(\)</em>@';
     $this->drupalGet('error-test/generate-fatal-errors');
     $this->assertSession()->responseMatches($message);
     $this->assertSession()->responseContains('<pre class="backtrace">');
