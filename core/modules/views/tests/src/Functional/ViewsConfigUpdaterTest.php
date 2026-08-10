@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Functional;
 use Drupal\Core\Database\Database;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -60,10 +61,10 @@ class ViewsConfigUpdaterTest extends BrowserTestBase {
   /**
    * Tests ViewsConfigUpdater.
    */
+  #[Skip]
   public function testViewsConfigUpdater(): void {
     // ViewsConfigUpdater currently contains no actual configuration update
     // logic. Replace this method with a real test when it does.
-    $this->markTestSkipped();
   }
 
 }

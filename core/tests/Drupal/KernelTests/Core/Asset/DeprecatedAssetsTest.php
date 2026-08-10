@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Asset;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -26,11 +27,11 @@ class DeprecatedAssetsTest extends KernelTestBase {
    * @param string $deprecation_suffix
    *   The part of the deprecation message after the extension/name.
    * @param string $expected_hashed_library_definition
-   *   The expected MD5 hash of the library.
+   *   The expected xxHash of the library.
    */
   #[DataProvider('deprecatedLibrariesProvider')]
+  #[Skip('There are currently no deprecated libraries.')]
   public function testDeprecatedLibraries(string $extension, string $name, string $deprecation_suffix, string $expected_hashed_library_definition): void {
-    $this->markTestSkipped('There are currently no deprecated libraries.');
     /** @var \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery */
     $library_discovery = $this->container->get('library.discovery');
 
@@ -40,7 +41,7 @@ class DeprecatedAssetsTest extends KernelTestBase {
 
     $this->expectUserDeprecationMessage("The $extension/$name " . $deprecation_suffix);
     $library_definition = $library_discovery->getLibraryByName($extension, $name);
-    $this->assertEquals($expected_hashed_library_definition, md5(serialize($library_definition)));
+    $this->assertEquals($expected_hashed_library_definition, hash('xxh128', serialize($library_definition)));
   }
 
   /**
@@ -53,7 +54,7 @@ class DeprecatedAssetsTest extends KernelTestBase {
    *      (string) extension - The name of the extension that registered a library, usually 'core'
    *      (string) name - The name of a registered library
    *      (string) deprecation_suffix - The part of the deprecation message after the extension/name
-   *      (string) expected_hashed_library_definition -  The expected MD5 hash of the library
+   *      (string) expected_hashed_library_definition -  The expected xxHash of the library
    *    ]
    *  ]
    * @endcode

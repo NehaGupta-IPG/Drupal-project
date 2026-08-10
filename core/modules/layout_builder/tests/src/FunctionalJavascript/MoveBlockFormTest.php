@@ -8,6 +8,7 @@ use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -40,8 +41,6 @@ class MoveBlockFormTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    $this->markTestSkipped("Skipped temporarily for random fails.");
-
     parent::setUp();
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
@@ -101,6 +100,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
   /**
    * Tests moving a block.
    */
+  #[Skip('Skipped temporarily for random fails.')]
   public function testMoveBlock(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
@@ -121,7 +121,6 @@ class MoveBlockFormTest extends WebDriverTestBase {
     // Move the body block into the first region above existing block.
     $this->openBodyMoveForm(1, 'content', ['Body (current)', 'Links']);
     $page->selectFieldOption('Region', '0:first');
-    $this->markTestSkipped("Skipped temporarily for random fails.");
     $this->assertBlockTable(['Powered by Drupal', 'Body (current)']);
     $this->moveBlockWithKeyboard('up', 'Body', ['Body (current)*', 'Powered by Drupal']);
     $page->pressButton('Move');

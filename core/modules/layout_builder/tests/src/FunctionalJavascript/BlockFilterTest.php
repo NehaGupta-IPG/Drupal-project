@@ -7,6 +7,7 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -55,9 +56,9 @@ class BlockFilterTest extends WebDriverTestBase {
   /**
    * Tests block filter.
    */
+  #[Skip]
   public function testBlockFilter(): void {
     // @todo skipped due to random test failures, re-enable in https://www.drupal.org/project/drupal/issues/3028968.
-    $this->markTestSkipped();
     $assert_session = $this->assertSession();
     $session = $this->getSession();
     $page = $session->getPage();

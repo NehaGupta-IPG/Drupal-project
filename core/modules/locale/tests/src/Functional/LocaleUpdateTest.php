@@ -11,6 +11,7 @@ use Drupal\locale\CurrentImportStorage;
 use Drupal\locale\LocaleProjectRepository;
 use Drupal\locale\CurrentImport;
 use Drupal\locale\LocaleSource;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -130,9 +131,9 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *  - Source: remote and local files
    *  - Import overwrite: all existing translations.
    */
+  #[Skip('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3393477')]
   public function testUpdateImportSourceRemote(): void {
     // @todo Fix random test failure.
-    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3393477');
     $config = $this->config('locale.settings');
 
     // Build the test environment.

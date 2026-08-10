@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -42,9 +43,9 @@ class ModuleFilterTest extends WebDriverTestBase {
   /**
    * Tests that filter results announcement has correct pluralization.
    */
+  #[Skip]
   public function testModuleFilter(): void {
     // @todo skipped due to random test failures, re-enable in https://www.drupal.org/project/drupal/issues/3028968.
-    $this->markTestSkipped();
     // Find the module filter field.
     $this->drupalGet('admin/modules');
     $assertSession = $this->assertSession();

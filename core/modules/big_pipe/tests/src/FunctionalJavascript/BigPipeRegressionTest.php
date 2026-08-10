@@ -8,6 +8,7 @@ use Drupal\big_pipe\Render\BigPipe;
 use Drupal\big_pipe_regression_test\BigPipeRegressionTestController;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -119,9 +120,9 @@ JS;
    *
    * @see https://www.drupal.org/node/3390178
    */
+  #[Skip]
   public function testMultipleReplacements(): void {
     // @todo re-enable this test in https://www.drupal.org/project/drupal/issues/3590200
-    $this->markTestSkipped();
     $assert_session = $this->assertSession();
 
     $this->drupalGet(Url::fromRoute('big_pipe_test_multiple_replacements'));

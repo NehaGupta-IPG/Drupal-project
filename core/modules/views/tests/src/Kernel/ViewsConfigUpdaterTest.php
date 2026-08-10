@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\Config\FileStorage;
+use Drupal\TestTools\Attribute\Skip;
 use Drupal\views\ViewsConfigUpdater;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -32,10 +33,10 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   /**
    * Tests ViewsConfigUpdater.
    */
+  #[Skip]
   public function testViewsConfigUpdater(): void {
     // ViewsConfigUpdater currently contains no actual configuration update
     // logic. Replace this method with a real test when it does.
-    $this->markTestSkipped();
   }
 
   /**

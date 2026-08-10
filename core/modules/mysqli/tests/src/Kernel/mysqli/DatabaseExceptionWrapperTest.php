@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\mysqli\Kernel\mysqli;
 
 use Drupal\Tests\mysql\Kernel\mysql\DatabaseExceptionWrapperTest as BaseMySqlTest;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -24,8 +25,8 @@ class DatabaseExceptionWrapperTest extends BaseMySqlTest {
    * connection not to emulate statement preparation. Still, this is only valid
    * for the MySql driver.
    */
+  #[Skip('mysqli is not a pdo driver.')]
   public function testPrepareStatementFailOnPreparation(): void {
-    $this->markTestSkipped('mysqli is not a pdo driver.');
   }
 
   /**

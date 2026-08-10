@@ -6,6 +6,7 @@ namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -25,16 +26,6 @@ class AjaxTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    if ($this->name() === 'testAjaxFocus') {
-      $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3396536");
-    }
-    parent::setUp();
-  }
 
   public function testAjaxWithAdminRoute(): void {
     \Drupal::service('theme_installer')->install(['stark', 'claro']);
@@ -318,9 +309,9 @@ JS;
   /**
    * Tests ajax focus handling.
    */
+  #[Skip('Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3396536')]
   public function testAjaxFocus(): void {
     // @todo Fix random test failure.
-    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3396536');
     $this->drupalGet('/ajax_forms_test_get_form');
 
     $this->assertNotNull($select = $this->assertSession()->elementExists('css', '#edit-select'));

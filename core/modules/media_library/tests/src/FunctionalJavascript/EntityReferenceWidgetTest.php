@@ -7,6 +7,7 @@ namespace Drupal\Tests\media_library\FunctionalJavascript;
 use Behat\Mink\Element\NodeElement;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\FunctionalJavascriptTests\SortableTestTrait;
+use Drupal\TestTools\Attribute\Skip;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -611,9 +612,9 @@ JS;
   /**
    * Tests the preview displayed by the field widget.
    */
+  #[Skip('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3569225')]
   public function testWidgetPreview(): void {
     // @todo Fix random test failure.
-    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3569225');
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

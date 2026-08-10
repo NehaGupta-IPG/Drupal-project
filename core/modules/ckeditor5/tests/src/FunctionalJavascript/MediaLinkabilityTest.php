@@ -8,6 +8,7 @@ use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -28,9 +29,9 @@ class MediaLinkabilityTest extends MediaTestBase {
    * Ensures arbitrary attributes can be added on links wrapping media via GHS.
    */
   #[DataProvider('providerLinkability')]
+  #[Skip('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3397387')]
   public function testLinkedMediaArbitraryHtml(bool $unrestricted): void {
     // @todo Fix random test failure.
-    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3397387');
     $assert_session = $this->assertSession();
 
     $editor = Editor::load('test_format');

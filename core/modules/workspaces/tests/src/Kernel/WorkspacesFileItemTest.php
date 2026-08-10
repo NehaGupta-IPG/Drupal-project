@@ -7,6 +7,7 @@ namespace Drupal\Tests\workspaces\Kernel;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\file\Kernel\FileItemTest;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\TestTools\Attribute\Skip;
 use Drupal\workspaces\Entity\Workspace;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -65,8 +66,8 @@ class WorkspacesFileItemTest extends FileItemTest {
   /**
    * {@inheritdoc}
    */
+  #[Skip("This is already implemented and tested in base class. We don't require in child class.")]
   public function testGenerateSampleValue(): void {
-    $this->markTestSkipped("This is already implemented and tested in base class. We don't require in child class.");
   }
 
 }

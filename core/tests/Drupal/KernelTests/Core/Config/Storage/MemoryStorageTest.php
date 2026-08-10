@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Config\Storage;
 
 use Drupal\Core\Config\MemoryStorage;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -54,8 +55,8 @@ class MemoryStorageTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
+  #[Skip('MemoryStorage cannot be invalid.')]
   public function testInvalidStorage(): void {
-    $this->markTestSkipped('MemoryStorage cannot be invalid.');
   }
 
 }

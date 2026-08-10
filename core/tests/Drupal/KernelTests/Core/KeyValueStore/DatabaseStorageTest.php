@@ -8,6 +8,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\KeyValueStore\KeyValueDatabaseFactory;
 use Drupal\Core\KeyValueStore\KeyValueFactory;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -39,8 +40,8 @@ class DatabaseStorageTest extends StorageTestBase {
   /**
    * Tests asynchronous table creation.
    */
+  #[Skip('Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3398063')]
   public function testConcurrent(): void {
-    $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3398063");
     if (!function_exists('pcntl_fork')) {
       $this->markTestSkipped('Requires the pcntl_fork() function');
     }

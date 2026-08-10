@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Config\Storage;
 use Drupal\Core\Config\CachedStorage;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\StreamWrapper\PublicStream;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -46,8 +47,8 @@ class CachedStorageTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
+  #[Skip('No-op as this test does not make sense')]
   public function testInvalidStorage(): void {
-    $this->markTestSkipped('No-op as this test does not make sense');
   }
 
   /**
