@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Update;
 
-use Drupal\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Update\DatabaseUpdate;
 use Drupal\Core\Update\UpdateHookRegistry;
+use Drupal\Core\Update\UpdateRegistry;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
@@ -32,11 +35,17 @@ class UpdateOrderingTest extends UnitTestCase {
   public static array $updateDependenciesHookReturn = [];
 
   /**
+   * The database update class.
+   *
+   * @var \Drupal\Core\Update\DatabaseUpdate
+   */
+  protected DatabaseUpdate $databaseUpdate;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    require_once $this->root . '/core/includes/update.inc';
     // Load a hook_update_dependencies() implementation that allows this test
     // to control the update ordering.
     require_once $this->root . '/core/tests/fixtures/test_update_ordering/test_update_ordering.php';
@@ -49,21 +58,32 @@ class UpdateOrderingTest extends UnitTestCase {
     $registry->getInstalledVersion('a_module')->willReturn(8000);
     $registry->getAvailableUpdates('z_module')->willReturn([9000, 9001]);
     $registry->getInstalledVersion('z_module')->willReturn(8000);
+    $post_update_registry = $this->prophesize(UpdateRegistry::class);
     $extension_list = $this->prophesize(ModuleExtensionList::class);
     $extension_list->exists(Argument::any())->willReturn(TRUE);
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
-    $container = $this->prophesize(ContainerInterface::class);
-    $container->get('extension.list.module')->willReturn($extension_list->reveal());
-    $container->get('update.update_hook_registry')->willReturn($registry->reveal());
-    $container->get('module_handler')->willReturn($module_handler->reveal());
-    \Drupal::setContainer($container->reveal());
+    $messenger = $this->prophesize(MessengerInterface::class);
+    $logger_factory = $this->prophesize(LoggerChannelFactoryInterface::class);
+
+    $this->databaseUpdate = new DatabaseUpdate(
+      $registry->reveal(),
+      $post_update_registry->reveal(),
+      $extension_list->reveal(),
+      $module_handler->reveal(),
+      $messenger->reveal(),
+      $logger_factory->reveal(),
+    );
   }
 
   /**
    * Tests updates to ensure without dependencies system updates come first.
    */
   public function testUpdateOrdering(): void {
-    $updates = update_resolve_dependencies(['a_module' => 9000, 'system' => '9000', 'z_module' => 9000]);
+    $updates = $this->databaseUpdate->resolveDependencies([
+      'a_module' => 9000,
+      'system' => '9000',
+      'z_module' => 9000,
+    ]);
     $this->assertSame([
       'system_update_9000',
       'system_update_9001',
@@ -82,7 +102,11 @@ class UpdateOrderingTest extends UnitTestCase {
     static::$updateDependenciesHookReturn['system'][9000] = [
       'a_module' => 9000,
     ];
-    $updates = update_resolve_dependencies(['a_module' => 9000, 'system' => '9000', 'z_module' => 9000]);
+    $updates = $this->databaseUpdate->resolveDependencies([
+      'a_module' => 9000,
+      'system' => '9000',
+      'z_module' => 9000,
+    ]);
     $this->assertSame([
       'a_module_update_9000',
       'system_update_9000',
@@ -106,7 +130,11 @@ class UpdateOrderingTest extends UnitTestCase {
     static::$updateDependenciesHookReturn['system'][9000] = [
       'a_module' => 9000,
     ];
-    $updates = update_resolve_dependencies(['a_module' => 9000, 'system' => '9000', 'z_module' => 9000]);
+    $updates = $this->databaseUpdate->resolveDependencies([
+      'a_module' => 9000,
+      'system' => '9000',
+      'z_module' => 9000,
+    ]);
     $this->assertSame([
       'z_module_update_9000',
       'a_module_update_9000',
@@ -125,7 +153,11 @@ class UpdateOrderingTest extends UnitTestCase {
     static::$updateDependenciesHookReturn['z_module'][9000] = [
       'a_module' => 9000,
     ];
-    $updates = update_resolve_dependencies(['a_module' => 9000, 'system' => '9000', 'z_module' => 9000]);
+    $updates = $this->databaseUpdate->resolveDependencies([
+      'a_module' => 9000,
+      'system' => '9000',
+      'z_module' => 9000,
+    ]);
     $this->assertSame([
       'system_update_9000',
       'system_update_9001',
@@ -144,7 +176,11 @@ class UpdateOrderingTest extends UnitTestCase {
     static::$updateDependenciesHookReturn['system'][9001] = [
       'z_module' => 9000,
     ];
-    $updates = update_resolve_dependencies(['a_module' => 9000, 'system' => '9000', 'z_module' => 9000]);
+    $updates = $this->databaseUpdate->resolveDependencies([
+      'a_module' => 9000,
+      'system' => '9000',
+      'z_module' => 9000,
+    ]);
     $this->assertSame([
       'system_update_9000',
       'z_module_update_9000',
@@ -169,7 +205,11 @@ class UpdateOrderingTest extends UnitTestCase {
     static::$updateDependenciesHookReturn['z_module'][9000] = [
       'a_module' => 9000,
     ];
-    $updates = update_resolve_dependencies(['a_module' => 9000, 'system' => '9000', 'z_module' => 9000]);
+    $updates = $this->databaseUpdate->resolveDependencies([
+      'a_module' => 9000,
+      'system' => '9000',
+      'z_module' => 9000,
+    ]);
     $this->assertSame([
       'system_update_9000',
       'system_update_9001',
@@ -198,7 +238,11 @@ class UpdateOrderingTest extends UnitTestCase {
     static::$updateDependenciesHookReturn['system'][9001] = [
       'a_module' => 9000,
     ];
-    $updates = update_resolve_dependencies(['a_module' => 9000, 'system' => '9000', 'z_module' => 9000]);
+    $updates = $this->databaseUpdate->resolveDependencies([
+      'a_module' => 9000,
+      'system' => '9000',
+      'z_module' => 9000,
+    ]);
     $this->assertSame([
       'z_module_update_9000',
       'system_update_9000',

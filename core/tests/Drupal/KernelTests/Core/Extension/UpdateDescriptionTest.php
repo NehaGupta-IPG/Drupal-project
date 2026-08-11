@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Extension;
 
+use Drupal\Core\Update\DatabaseUpdate;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -23,14 +24,13 @@ class UpdateDescriptionTest extends KernelTestBase {
   /**
    * Tests the list of pending database updates.
    *
-   * @see update_get_update_list()
+   * @see \Drupal\Core\Update\DatabaseUpdate::getUpdateList()
    */
   public function testUpdateGetUpdateList(): void {
-    require_once $this->root . '/core/includes/update.inc';
     \Drupal::service('update.update_hook_registry')->setInstalledVersion('update_test_description', 8000);
     \Drupal::moduleHandler()->loadInclude('update_test_description', 'install');
 
-    $updates = update_get_update_list();
+    $updates = \Drupal::service(DatabaseUpdate::class)->getUpdateList();
     $expected = [
       'pending' => [
         8001 => '8001 - Update test of slash in description and/or.',

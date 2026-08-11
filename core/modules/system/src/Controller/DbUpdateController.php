@@ -307,7 +307,7 @@ class DbUpdateController extends ControllerBase {
     foreach (['update', 'post_update'] as $update_type) {
       switch ($update_type) {
         case 'update':
-          $updates = update_get_update_list();
+          $updates = $this->databaseUpdate->getUpdateList();
           break;
 
         case 'post_update':
@@ -352,7 +352,7 @@ class DbUpdateController extends ControllerBase {
     }
 
     // Find and label any incompatible updates.
-    foreach (update_resolve_dependencies($starting_updates) as $data) {
+    foreach ($this->databaseUpdate->resolveDependencies($starting_updates) as $data) {
       if (!$data['allowed']) {
         $incompatible_updates_exist = TRUE;
         $incompatible_count++;
@@ -635,7 +635,7 @@ class DbUpdateController extends ControllerBase {
     // Resolve any update dependencies to determine the actual updates that will
     // be run and the order they will be run in.
     $start = $this->getModuleUpdates();
-    $updates = update_resolve_dependencies($start);
+    $updates = $this->databaseUpdate->resolveDependencies($start);
 
     // Store the dependencies for each update function in an array which the
     // batch API can pass in to the batch operation each time it is called. (We
@@ -670,7 +670,10 @@ class DbUpdateController extends ControllerBase {
       // functions.
       $batch_builder->addOperation('drupal_flush_all_caches', []);
       foreach ($post_updates as $function) {
-        $batch_builder->addOperation('update_invoke_post_update', [$function]);
+        $batch_builder->addOperation(
+          DatabaseUpdate::class . ':invokePostUpdate',
+          [$function],
+        );
       }
     }
 
@@ -756,7 +759,7 @@ class DbUpdateController extends ControllerBase {
    */
   protected function getModuleUpdates() {
     $return = [];
-    $updates = update_get_update_list();
+    $updates = $this->databaseUpdate->getUpdateList();
     foreach ($updates as $module => $update) {
       $return[$module] = $update['start'];
     }

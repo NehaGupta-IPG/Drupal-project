@@ -8,6 +8,7 @@ use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Update\DatabaseUpdate;
 use Drupal\Core\Update\UpdateRegistry;
 use Drupal\Core\Url;
 use Drupal\package_manager\Event\StatusCheckEvent;
@@ -28,6 +29,7 @@ final class PendingUpdatesValidator implements EventSubscriberInterface {
   public function __construct(
     private readonly string $appRoot,
     private readonly UpdateRegistry $updateRegistry,
+    private readonly DatabaseUpdate $databaseUpdate,
   ) {}
 
   /**
@@ -51,10 +53,9 @@ final class PendingUpdatesValidator implements EventSubscriberInterface {
    */
   public function updatesExist(): bool {
     require_once $this->appRoot . '/core/includes/install.inc';
-    require_once $this->appRoot . '/core/includes/update.inc';
 
     drupal_load_updates();
-    $hook_updates = update_get_update_list();
+    $hook_updates = $this->databaseUpdate->getUpdateList();
     $post_updates = $this->updateRegistry->getPendingUpdateFunctions();
 
     return $hook_updates || $post_updates;
