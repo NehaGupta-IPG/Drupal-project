@@ -382,23 +382,48 @@ default:
   stage: 🗜️ Additional tests
   when: manual
   allow_failure: true
-  variables:
-    REPEAT_TEST_CLASS: 'Drupal\Tests\Change\Me'
-    REPEAT_COUNT: 100
+  # Click the job name (not the play button) to fill in these inputs.
+  inputs:
+    test_class:
+      description: 'Test class to repeat, for example Drupal\Tests\ckeditor5\FunctionalJavascript\MediaLinkabilityTest. Leave empty to repeat the test classes changed by this merge request.'
+      default: ''
+      # Also prevents the interpolated value below from escaping its quotes.
+      regex: '^$|^Drupal\\[A-Za-z0-9_\\]+$'
+    repeat_count:
+      description: 'How many times to run each test class.'
+      type: number
+      default: 100
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
   script:
-    - echo "ℹ️ Running class ${REPEAT_TEST_CLASS}"
+    - REPEAT_TEST_CLASS='${{ job.inputs.test_class }}'
     - |
-      if [[ $REPEAT_TEST_CLASS == "Drupal\Tests\Change\Me" ]]; then
-        echo '❗ You need to change the REPEAT_TEST_CLASS variable to an existing class before running the job.'
-        echo '   You just need to click on the job that you want to run (do not press the play button straight away) and then set the following:'
-        echo '   "Key" to "REPEAT_TEST_CLASS" and "Value" to "Drupal\Tests\ckeditor5\FunctionalJavascript\MediaLinkabilityTest"';
-        exit 1;
+      # Repeat the class given as an input, otherwise fall back to the test
+      # classes this merge request changes, so that the common case of checking
+      # a test for flakiness needs no input at all.
+      if [[ -n $REPEAT_TEST_CLASS ]]; then
+        echo "ℹ️ Using the test_class input."
+        SELECTOR="--class"
+        TESTS="$REPEAT_TEST_CLASS"
       else
-        sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --color --keep-results --concurrency "$CONCURRENCY" --repeat "$REPEAT_COUNT" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --class $REPEAT_TEST_CLASS
+        BASELINE=${CI_MERGE_REQUEST_TARGET_BRANCH_SHA:-$CI_MERGE_REQUEST_DIFF_BASE_SHA}
+        if [[ -z $BASELINE ]]; then
+          echo '❗ No test_class input was set, and this pipeline has no merge request to take changed tests from.'
+          echo '   Click on the job that you want to run (do not press the play button straight away) and fill in the form.'
+          exit 1;
+        fi
+        echo "ℹ️ No test_class input set, using the tests changed since ${BASELINE}."
+        SELECTOR="--file"
+        TESTS=$(git diff "$BASELINE" --diff-filter=AMR --name-only | grep -E 'Test\.php$' | paste -sd, -)
+        if [[ -z $TESTS ]]; then
+          echo '❗ This merge request does not change any test classes, so there is nothing to repeat.'
+          echo '   Set the test_class input to choose a class explicitly.'
+          exit 1;
+        fi
       fi
+      echo "ℹ️ Repeating ${TESTS} ${{ job.inputs.repeat_count }} times"
+      sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --color --keep-results --concurrency "$CONCURRENCY" --repeat "${{ job.inputs.repeat_count }}" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html $SELECTOR "$TESTS"
 
 '🚲 Performance tests':
   <<: [ *test-setup ]
