@@ -12,14 +12,15 @@
  * @ingroup themeable
  */
 #}
-{% set count = error_links|length %}
-{% trans %}
-  {{ count }} error has been found:
-{% plural count %}
-  {{ count }} errors have been found:
-{% endtrans %}
-<ul class="item-list__comma-list">
-  {% for link in error_links %}
-    <li>{{ link }}</li>
-  {% endfor %}
-</ul>
+{% if error_links %}
+  {%- set count = error_links|length -%}
+  {%- trans -%}
+    {{ count }} error has been found:
+  {%- plural count -%}
+    {{ count }} errors have been found:
+  {%- endtrans %} <ul class="item-list__comma-list">
+    {%- for link in error_links -%}
+      <li>{{ link }}</li>
+    {%- endfor -%}
+  </ul>
+{% endif %}
