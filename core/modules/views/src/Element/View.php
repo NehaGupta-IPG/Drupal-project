@@ -93,9 +93,9 @@ class View extends RenderElementBase {
           \Drupal::service(ContextualLinksHelper::class)->addLinks($element, 'view', $view->current_display);
         }
       }
-      if (empty($view->display_handler->getPluginDefinition()['returns_response'])) {
+      if (empty($view->display_handler->getPluginDefinition()['returns_response']) && !empty($element['view_build'])) {
         $element['#attributes']['class'][] = 'views-element-container';
-        $element['#theme_wrappers'] = ['container'];
+        $element['#theme_wrappers'] = ['views_element_container'];
       }
     }
 
