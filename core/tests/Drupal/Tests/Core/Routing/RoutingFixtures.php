@@ -266,7 +266,7 @@ class RoutingFixtures {
    */
   public function routingTableDefinition(): array {
 
-    $tables['test_routes'] = [
+    $tables['router'] = [
       'description' => 'Maps paths to various callbacks (access, page and title)',
       'fields' => [
         'name' => [

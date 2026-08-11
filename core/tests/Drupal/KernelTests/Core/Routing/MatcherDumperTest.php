@@ -123,7 +123,7 @@ class MatcherDumperTest extends KernelTestBase {
    */
   public function testDump(): void {
     $connection = Database::getConnection();
-    $dumper = new MatcherDumper($connection, $this->state, $this->logger, 'test_routes');
+    $dumper = new MatcherDumper($connection, $this->state, $this->logger);
 
     $route = new Route('/test/{my}/path');
     $route->setOption('compiler_class', RouteCompiler::class);
@@ -136,7 +136,7 @@ class MatcherDumperTest extends KernelTestBase {
 
     $dumper->dump(['provider' => 'test']);
 
-    $record = $connection->select('test_routes', 'tr')
+    $record = $connection->select('router', 'tr')
       ->fields('tr')
       ->condition('name', 'test_route')
       ->execute()
@@ -158,7 +158,7 @@ class MatcherDumperTest extends KernelTestBase {
    */
   public function testMenuMasksGeneration(): void {
     $connection = Database::getConnection();
-    $dumper = new MatcherDumper($connection, $this->state, $this->logger, 'test_routes');
+    $dumper = new MatcherDumper($connection, $this->state, $this->logger);
 
     $collection = new RouteCollection();
     $collection->add('test_route_1', new Route('/test-length-3/{my}/path'));
@@ -179,7 +179,7 @@ class MatcherDumperTest extends KernelTestBase {
       bindec('111'),
       bindec('101'),
     ];
-    $this->assertEquals($expected, $this->state->get('routing.menu_masks.test_routes'));
+    $this->assertEquals($expected, $this->state->get('routing.menu_masks.router'));
   }
 
 }
