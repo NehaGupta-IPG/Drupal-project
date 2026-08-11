@@ -158,6 +158,55 @@ class MenuLinkContentFormTest extends BrowserTestBase {
       ['tel:+15551234567', 'tel:+15551234567'],
     ];
 
+    $this->assertLinksSavedAs($cases);
+  }
+
+  /**
+   * Tests that absolute URLs for a trusted host are saved as internal.
+   */
+  public function testReformatInternalLinkIfEnteredForATrustedHost(): void {
+    // A site can be served from more than one domain, in which case all of
+    // them are listed in the trusted host patterns. The host being browsed
+    // has to stay among them for the rest of the test to be served.
+    $settings['settings']['trusted_host_patterns'] = (object) [
+      'value' => [
+        '^' . preg_quote(\Drupal::request()->getHost()) . '$',
+        '^static\.example\.com$',
+      ],
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+
+    // The other domain serves the same site, so it carries the same base path.
+    $base_path = rtrim(parse_url($this->getAbsoluteUrl('/'), PHP_URL_PATH), '/');
+    $trusted_base_url = 'http://static.example.com' . $base_path;
+
+    $this->assertLinksSavedAs([
+      // A URL for the other domain is rewritten as an internal URI, whether or
+      // not the site is being browsed on that domain.
+      [$trusted_base_url . '/user/login', 'internal:/user/login'],
+      [$trusted_base_url . '/user/login?foo=bar#baz', 'internal:/user/login?foo=bar#baz'],
+      // The scheme plays no part in the comparison.
+      ['https://static.example.com' . $base_path . '/user/login', 'internal:/user/login'],
+      // Hosts are matched case-insensitively.
+      ['http://STATIC.example.com' . $base_path . '/user/login', 'internal:/user/login'],
+      // The root of the other domain is rewritten as the front page.
+      [$trusted_base_url, 'internal:/'],
+      // A domain the site is not served from is left untouched, even when it
+      // is close to a trusted one.
+      ['http://untrusted.example.com/user/login', 'http://untrusted.example.com/user/login'],
+      ['http://static.example.com.evil.com/user/login', 'http://static.example.com.evil.com/user/login'],
+    ]);
+  }
+
+  /**
+   * Asserts that entered links are saved with the URI that is expected.
+   *
+   * @param array $cases
+   *   Each case is the string entered in the link field, followed by the URI
+   *   the menu link is expected to be saved with.
+   */
+  protected function assertLinksSavedAs(array $cases): void {
     $storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
     foreach ($cases as $delta => [$entered, $expected]) {
       $title = 'Test link ' . $delta;
