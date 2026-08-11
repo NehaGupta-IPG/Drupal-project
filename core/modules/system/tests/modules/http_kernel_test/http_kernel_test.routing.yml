@@ -18,10 +18,3 @@ http_kernel_test.sub_sub_request:
     _controller: '\Drupal\http_kernel_test\Controller\TestController::get'
   requirements:
     _access: 'TRUE'
-
-http_kernel_test.content:
-  path: '/http-kernel-test-content'
-  defaults:
-    _controller: '\Drupal\http_kernel_test\Controller\TestController::testPageContent'
-  requirements:
-    _access: 'TRUE'

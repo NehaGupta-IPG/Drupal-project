@@ -28,7 +28,6 @@ class KernelTestHttpRequestTest extends KernelTestBase {
   protected static $modules = [
     'system',
     'system_test',
-    'http_kernel_test',
     'test_page_test',
   ];
 
@@ -43,7 +42,7 @@ class KernelTestHttpRequestTest extends KernelTestBase {
    * Tests making a request.
    */
   public function testRequest(): void {
-    $this->drupalGet('/http-kernel-test-content');
+    $this->drupalGet('/kernel-test-query-link');
     $this->assertEquals(Response::HTTP_OK, $this->getSession()->getStatusCode());
     $this->assertSession()->pageTextContains('This is a test page');
 
@@ -138,6 +137,29 @@ class KernelTestHttpRequestTest extends KernelTestBase {
   )]
   public function exampleRoute(): array {
     return ['#markup' => $this->testMarkup];
+  }
+
+  /**
+   * Route with a relative query link.
+   */
+  #[Route(
+    path: '/kernel-test-query-link',
+    name: 'kernel_test.query_link',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['_title' => 'Test route'],
+  )]
+  public function routeWithQueryLink(): array {
+    $build = [];
+
+    $build['test_message'] = ['#markup' => 'This is a test page.'];
+
+    $build['link'] = [
+      '#type' => 'link',
+      '#title' => 'Query link',
+      '#url' => Url::fromUri('internal:?query=cake'),
+    ];
+
+    return $build;
   }
 
 }

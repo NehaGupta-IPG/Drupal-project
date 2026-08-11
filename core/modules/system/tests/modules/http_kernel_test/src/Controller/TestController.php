@@ -36,21 +36,4 @@ class TestController implements ContainerInjectionInterface {
     return $this->kernel->handle($sub_request, KernelInterface::SUB_REQUEST);
   }
 
-  /**
-   * Returns a test page.
-   */
-  public function testPageContent(): array {
-    $build = [];
-
-    $build['test_message'] = ['#markup' => 'This is a test page.'];
-
-    $build['link'] = [
-      '#type' => 'link',
-      '#title' => 'Query link',
-      '#url' => Url::fromUri('internal:?query=cake'),
-    ];
-
-    return $build;
-  }
-
 }
