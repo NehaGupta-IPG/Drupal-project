@@ -18,6 +18,7 @@ use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\PrimitiveInterface;
+use Drupal\path\Plugin\Field\FieldType\PathItem; 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -86,6 +87,18 @@ final class Exporter implements LoggerAwareInterface {
     $event->setCallback('field_item:entity_reference', $this->exportReference(...));
     $event->setCallback('field_item:file', $this->exportReference(...));
     $event->setCallback('field_item:image', $this->exportReference(...));
+
+    $event->setCallback('field_item:path', function (PathItem $item): array {
+      $values = $this->exportFieldItem($item);
+      // Omit the langcode property when it matches the entity's own langcode.
+      // PathItem::preSave() falls back to the entity langcode when this property
+      // is absent, so exporting it is redundant and causes it to be hardcoded
+      // rather than following the entity on import into a different-language site.
+      if (isset($values['langcode']) && $values['langcode'] === $item->getLangcode()) {
+          unset($values['langcode']);
+      }
+      return $values;
+    });
 
     // Dispatch the event so modules can add and customize export callbacks, and
     // mark certain fields as ignored.
