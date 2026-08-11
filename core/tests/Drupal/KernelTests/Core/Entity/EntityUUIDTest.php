@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\entity_test\EntityTestHelper;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -130,6 +131,57 @@ class EntityUUIDTest extends EntityKernelTestBase {
     }
     $entity_duplicate->save();
     $this->assertNotEquals($entity_duplicate->id(), $entity->id());
+  }
+
+  /**
+   * Tests that changing the UUID on an existing entity throws an exception.
+   */
+  public function testUuidChangeException(): void {
+    foreach (EntityTestHelper::getEntityTypes() as $entity_type) {
+      $this->assertUuidChangeException($entity_type);
+    }
+  }
+
+  /**
+   * Asserts UUID change exception for the given entity type.
+   *
+   * @param string $entity_type
+   *   The entity type to run the tests with.
+   *
+   * @internal
+   */
+  protected function assertUuidChangeException(string $entity_type): void {
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage($entity_type);
+
+    // Create a new entity.
+    $entity = $storage->create(['name' => $this->randomMachineName()]);
+    $entity->save();
+
+    // Changing the UUID on a new entity before it is saved must be allowed.
+    $new_entity = $storage->create(['name' => 'new entity with custom UUID']);
+    $new_entity->set('uuid', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890');
+    $this->assertSame('a1b2c3d4-e5f6-7890-abcd-ef1234567890', $new_entity->uuid());
+
+    // Reload the saved entity and change its UUID.
+    $storage->resetCache([$entity->id()]);
+    $loaded_entity = $storage->load($entity->id());
+    $original_uuid = $loaded_entity->uuid();
+    $this->assertNotEmpty($original_uuid);
+
+    // Attempt to save with a different UUID should throw an exception.
+    $new_uuid = $this->container->get('uuid')->generate();
+    $loaded_entity->set('uuid', $new_uuid);
+    $this->assertNotEquals($original_uuid, $loaded_entity->uuid());
+    $this->assertSame($new_uuid, $loaded_entity->uuid());
+
+    $this->expectException(EntityStorageException::class);
+    $loaded_entity->save();
+
+    // Verify that the original UUID is still intact.
+    $storage->resetCache([$entity->id()]);
+    $reloaded = $storage->load($entity->id());
+    $this->assertSame($original_uuid, $reloaded->uuid());
   }
 
 }

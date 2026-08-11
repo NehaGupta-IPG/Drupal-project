@@ -890,9 +890,15 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     }
 
     if (!$entity->isNew()) {
+      // If the UUID changed, throw an exception.
+      $original = $entity->getOriginal();
+      if ($this->uuidKey && $original && $original->uuid() !== NULL && $original->uuid() !== $entity->uuid()) {
+        throw new EntityStorageException("The UUID of the '{$this->entityTypeId}' entity cannot be changed from '{$original->uuid()}' to '{$entity->uuid()}'.");
+      }
+
       // If the ID changed then original can't be loaded, throw an exception
       // in that case.
-      if (!$entity->getOriginal() || $entity->id() != $entity->getOriginal()->id()) {
+      if (!$original || $entity->id() != $original->id()) {
         throw new EntityStorageException("Update existing '{$this->entityTypeId}' entity while changing the ID is not supported.");
       }
       // Do not allow changing the revision ID when resaving the current
