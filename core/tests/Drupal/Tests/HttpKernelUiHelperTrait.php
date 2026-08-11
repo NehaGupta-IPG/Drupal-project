@@ -255,8 +255,8 @@ trait HttpKernelUiHelperTrait {
    * Gets the current URL from the browser.
    *
    * @return string
-   *   The current URL as an absolute path, that is, with the scheme and host
-   *   omitted. This is so that it can be used with static::drupalGet().
+   *   The current URL as a root-relative path, that is, with the scheme and
+   *   host omitted. This is so that it can be used with static::drupalGet().
    *
    * @see \Drupal\Tests\UiHelperTrait::getUrl
    */
