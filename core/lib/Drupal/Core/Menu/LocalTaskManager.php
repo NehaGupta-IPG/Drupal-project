@@ -151,7 +151,11 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
    */
   public function getLocalTasksForRoute($route_name) {
     if (!isset($this->instances[$route_name])) {
-      $this->instances[$route_name] = [];
+      // Built up locally and only assigned to $this->instances once complete.
+      // Publishing an empty array here would hand it to anybody asking for the
+      // same route while this build is suspended in a fiber, and because the
+      // key exists they would take it for the route's tasks.
+      $instances = [];
       if ($cache = $this->cacheBackend->get($this->cacheKey . ':' . $route_name)) {
         $base_routes = $cache->data['base_routes'];
         $parents = $cache->data['parents'];
@@ -216,7 +220,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
           $next_parent = FALSE;
           foreach ($children[$parent] as $plugin_id => $task_info) {
             $plugin = $this->createInstance($plugin_id);
-            $this->instances[$route_name][$level][$plugin_id] = $plugin;
+            $instances[$level][$plugin_id] = $plugin;
             // Normally, the link generator compares the href of every link with
             // the current path and sets the active class accordingly. But the
             // parents of the current local task may be on a different route in
@@ -233,7 +237,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
           $level++;
         } while ($next_parent);
       }
-
+      $this->instances[$route_name] = $instances;
     }
     return $this->instances[$route_name];
   }

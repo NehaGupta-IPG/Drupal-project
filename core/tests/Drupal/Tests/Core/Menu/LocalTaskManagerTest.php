@@ -532,6 +532,81 @@ class LocalTaskManagerTest extends UnitTestCase {
     $this->assertEquals(['menu_local_task_test_tasks_view_child1', 'menu_local_task_test_tasks_view_child2'], array_keys($second_fiber->getReturn()['tabs']));
   }
 
+  /**
+   * Tests parallel calls with a fiber suspended while the tree is built.
+   *
+   * The instances for a route are assigned before they are built, so a fiber
+   * suspended anywhere inside that build leaves an empty array behind. The next
+   * caller finds the key set, skips the build and takes it for the route's
+   * tasks, which empties a tab bar that LocalTasksBlock then drops entirely.
+   * Unlike testGetTasksBuildWithFibers(), which suspends in the access check
+   * afterwards, this suspends during instance creation.
+   */
+  public function testGetLocalTasksForRouteWithFiberSuspendedInBuild(): void {
+    $definitions = $this->getLocalTaskFixtures();
+
+    $this->pluginDiscovery->expects($this->once())
+      ->method('getDefinitions')
+      ->willReturn($definitions);
+
+    $mocks = [];
+    foreach ($definitions as $info) {
+      $mock = $this->prophesize(LocalTaskInterface::class);
+      $mock->getRouteName()->willReturn($info['route_name']);
+      $mock->getTitle()->willReturn($info['title']);
+      $mock->getRouteParameters(Argument::cetera())->willReturn([]);
+      $mock->getOptions(Argument::cetera())->willReturn([]);
+      $mock->getWeight()->willReturn($info['weight'] ?? 0);
+      $mock->setActive()->willReturn(NULL);
+      $mocks[$info['id']] = $mock->reveal();
+    }
+
+    // Suspend once while the tree is being built, before it is complete.
+    $parked = FALSE;
+    $this->factory
+      ->method('createInstance')
+      ->willReturnCallback(function (string $plugin_id) use ($mocks, &$parked) {
+        if (!$parked && \Fiber::getCurrent() !== NULL) {
+          $parked = TRUE;
+          \Fiber::suspend();
+        }
+        return $mocks[$plugin_id];
+      });
+
+    $this->setupLocalTaskManager();
+
+    $route = 'menu_local_task_test_tasks_view';
+    $first_fiber = new \Fiber(fn () => $this->manager->getLocalTasksForRoute($route));
+    $second_fiber = new \Fiber(fn () => $this->manager->getLocalTasksForRoute($route));
+
+    $fibers = [$first_fiber, $second_fiber];
+    $suspended = FALSE;
+    do {
+      foreach ($fibers as $key => $fiber) {
+        if (!$fiber->isStarted()) {
+          $fiber->start();
+        }
+        elseif ($fiber->isSuspended()) {
+          $suspended = TRUE;
+          $fiber->resume();
+        }
+        elseif ($fiber->isTerminated()) {
+          unset($fibers[$key]);
+        }
+      }
+    } while (!empty($fibers));
+
+    // Ensure the build really was suspended, or the scenario is not tested.
+    $this->assertTrue($suspended);
+
+    // Neither caller may be handed an empty or partial tree.
+    $first = $first_fiber->getReturn();
+    $second = $second_fiber->getReturn();
+    $this->assertNotSame([], $second);
+    $this->assertNotSame([], $first);
+    $this->assertSame(array_keys($first[0]), array_keys($second[0]));
+  }
+
   protected function setupFactoryAndLocalTaskPlugins(array $definitions, $active_plugin_id): void {
     $map = [];
     $access_manager_map = [];
