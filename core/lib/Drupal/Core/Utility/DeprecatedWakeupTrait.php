@@ -35,7 +35,7 @@ trait DeprecatedWakeupTrait {
    */
   public function __unserialize(array $data): void {
     if ($this->overridesWakeup()) {
-      // If an extending class implements its own __wakeup() method, make 
+      // If an extending class implements its own __wakeup() method, make
       // it gets called, otherwise PHP will ignore __wakeup() in any class
       // that has __unserialize().
       @trigger_error('Implementing __wakeup() in a subclass of ' . __CLASS__ . ' is deprecated in drupal:11.4.0 and is not supported in drupal:13.0.0. Implement __unserialize() instead. See https://www.drupal.org/node/3578423', E_USER_DEPRECATED);
