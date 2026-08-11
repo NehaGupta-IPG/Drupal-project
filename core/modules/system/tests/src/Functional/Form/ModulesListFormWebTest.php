@@ -89,8 +89,8 @@ class ModulesListFormWebTest extends BrowserTestBase {
     $edit = ['modules[content_moderation][enable]' => 'content_moderation'];
     $this->submitForm($edit, 'Install');
     $this->submitForm([], 'Continue');
-    $this->assertSession()->elementTextContains('xpath', "//div[@role='contentinfo' and h2[text()='Status message']]", '2 modules have been installed: Content Moderation, Workflows.');
-    $this->assertSession()->elementExists('xpath', "//div[@role='contentinfo' and h2[text()='Status message']]//a[contains(@href, '/admin/people/permissions/module/content_moderation%2Cworkflows')]");
+    $this->assertSession()->elementTextContains('xpath', "//div[@role='contentinfo' and h2[text()='Status message']]", '4 modules have been installed: Content Moderation, Views, Filter, Workflows.');
+    $this->assertSession()->elementExists('xpath', "//div[@role='contentinfo' and h2[text()='Status message']]//a[contains(@href, '/admin/people/permissions/module/content_moderation%2Cviews%2Cfilter%2Cworkflows')]");
   }
 
   /**

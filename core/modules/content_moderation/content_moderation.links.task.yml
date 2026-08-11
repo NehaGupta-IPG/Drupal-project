@@ -6,3 +6,15 @@ content_moderation.content:
   title: 'Overview'
   route_name: system.admin_content
   parent_id: system.admin_content
+
+content_moderation.moderated_block_content:
+  title: 'Moderated blocks'
+  route_name: view.moderated_blocks.moderated_blocks
+  parent_id: entity.block_content.collection
+  weight: 1
+
+content_moderation.moderated_block_list:
+  title: 'Overview'
+  route_name: entity.block_content.collection
+  parent_id: entity.block_content.collection
+  weight: 0

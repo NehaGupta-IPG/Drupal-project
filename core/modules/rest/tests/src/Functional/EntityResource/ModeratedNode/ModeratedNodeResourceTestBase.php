@@ -7,6 +7,7 @@ namespace Drupal\Tests\rest\Functional\EntityResource\ModeratedNode;
 use Drupal\Core\Cache\Cache;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\node\Functional\Rest\NodeResourceTestBase;
+use Drupal\views\Entity\View;
 
 /**
  * Extend the Node resource test base and apply moderation to the entity.
@@ -26,6 +27,15 @@ abstract class ModeratedNodeResourceTestBase extends NodeResourceTestBase {
    * @var \Drupal\workflows\WorkflowInterface
    */
   protected $workflow;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(): void {
+    parent::setUp();
+    View::load('frontpage')->delete();
+    drupal_flush_all_caches();
+  }
 
   /**
    * {@inheritdoc}
