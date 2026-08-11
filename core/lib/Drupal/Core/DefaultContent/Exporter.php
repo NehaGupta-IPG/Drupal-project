@@ -90,14 +90,13 @@ final class Exporter implements LoggerAwareInterface {
 
     $event->setCallback('field_item:path', function (PathItem $item): array {
       $values = $this->exportFieldItem($item);
-      // Omit the langcode property when it matches the entity's own langcode.
-      // PathItem::preSave() falls back to the entity langcode when this 
+      // Omit the langcode property as there could only ever be aliases
+      // in the same language for each translation. When imported,
+      // PathItem::preSave() falls back to the entity langcode when this
       // property is absent, so exporting it is redundant and causes it to be
-      // hardcoded rather than following the entity on import into a 
+      // hardcoded rather than following the entity on import into a
       // different-language site.
-      if (isset($values['langcode']) && $values['langcode'] === $item->getLangcode()) {
-          unset($values['langcode']);
-      }
+      unset($values['langcode']);
       return $values;
     });
 
