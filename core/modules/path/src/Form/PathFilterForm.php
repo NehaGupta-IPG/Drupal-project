@@ -30,15 +30,14 @@ class PathFilterForm extends FormBase implements WorkspaceSafeFormInterface {
       '#type' => 'details',
       '#title' => $this->t('Filter aliases'),
       '#open' => TRUE,
-      '#attributes' => ['class' => ['container-inline']],
+      '#attributes' => ['class' => ['details-content-inline']],
     ];
     $form['basic']['alias'] = [
       '#type' => 'search',
-      '#title' => $this->t('Path alias'),
+      '#title' => $this->t('Alias'),
       '#attributes' => [
-        'placeholder' => $this->t('Path alias'),
+        'placeholder' => $this->t('eg. /my-custom-path/my-custom-alias'),
       ],
-      '#title_display' => 'invisible',
       '#default_value' => $query['alias'] ?? NULL,
       '#maxlength' => 128,
       '#size' => 25,
@@ -47,26 +46,30 @@ class PathFilterForm extends FormBase implements WorkspaceSafeFormInterface {
       '#type' => 'search',
       '#title' => $this->t('System path'),
       '#attributes' => [
-        'placeholder' => $this->t('System path'),
+        'placeholder' => $this->t('eg. /node/1234'),
       ],
-      '#title_display' => 'invisible',
       '#default_value' => $query['path'] ?? NULL,
       '#maxlength' => 128,
       '#size' => 25,
     ];
     $form['basic']['langcode'] = [
       '#type' => 'language_select',
-      '#languages' => LanguageInterface::STATE_ALL,
+      '#languages' => LanguageInterface::STATE_CONFIGURABLE,
       '#empty_option' => $this->t('- Any -'),
       '#title' => $this->t('Language'),
-      '#title_display' => 'invisible',
-      '#default_value' => $query['langcode'] ?? 'und',
+      '#default_value' => $query['langcode'],
+      '#pre_render' => [
+        function (array $element) {
+          $element['#options'][LanguageInterface::LANGCODE_NOT_SPECIFIED] = $this->t('- None -');
+          return $element;
+        },
+      ],
     ];
     $form['basic']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Filter'),
     ];
-    if ($query) {
+    if (!empty(array_filter($query))) {
       $form['basic']['reset'] = [
         '#type' => 'submit',
         '#value' => $this->t('Reset'),

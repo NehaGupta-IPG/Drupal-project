@@ -243,6 +243,19 @@ details {
   & summary {
     padding: var(--admin-space-m);
   }
+
+  &.details-content-inline {
+    & .details-wrapper {
+      align-items: end;
+      display: flex;
+      flex-flow: row wrap;
+      gap: 0.5rem;
+
+      & > * {
+        margin: 0;
+      }
+    }
+  }
 }
 
 img {
