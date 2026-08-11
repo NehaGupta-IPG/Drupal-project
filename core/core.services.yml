@@ -1537,7 +1537,7 @@ services:
     class: Drupal\Core\PathProcessor\PathProcessorFront
     tags:
       - { name: path_processor_inbound, priority: 200 }
-    arguments: ['@config.factory']
+    arguments: ['@config.factory', '@language_manager']
   route_processor_current:
     class: Drupal\Core\RouteProcessor\RouteProcessorCurrent
     arguments: ['@current_route_match']
