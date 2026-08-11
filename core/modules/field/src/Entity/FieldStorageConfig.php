@@ -753,9 +753,6 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    * {@inheritdoc}
    */
   protected function doSerialize(): array {
-    // Using the Serialize interface and serialize() / unserialize() methods
-    // breaks entity forms in PHP 5.4.
-    // @todo Investigate in https://www.drupal.org/node/1977206.
     // Only serialize necessary properties, excluding those that can be
     // recalculated.
     $properties = get_object_vars($this);
