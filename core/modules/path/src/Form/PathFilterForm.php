@@ -57,6 +57,7 @@ class PathFilterForm extends FormBase implements WorkspaceSafeFormInterface {
     $form['basic']['langcode'] = [
       '#type' => 'language_select',
       '#languages' => LanguageInterface::STATE_ALL,
+      '#empty_option' => $this->t('- Any -'),
       '#title' => $this->t('Language'),
       '#title_display' => 'invisible',
       '#default_value' => $query['langcode'] ?? 'und',
