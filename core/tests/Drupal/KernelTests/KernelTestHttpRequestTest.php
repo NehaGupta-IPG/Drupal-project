@@ -46,7 +46,7 @@ class KernelTestHttpRequestTest extends KernelTestBase {
     $this->assertEquals(Response::HTTP_OK, $this->getSession()->getStatusCode());
     $this->assertSession()->pageTextContains('This is a test page');
 
-    // Test reloading the current page.
+    // Test reloading the current page using getUrl().
     $this->drupalGet($this->getUrl());
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('This is a test page');
