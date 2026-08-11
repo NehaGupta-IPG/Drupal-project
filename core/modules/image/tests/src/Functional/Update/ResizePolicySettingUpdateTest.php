@@ -7,6 +7,7 @@ namespace Drupal\Tests\image\Functional\Update;
 use Drupal\Core\Image\ImageResizePolicy;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('image')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class ResizePolicySettingUpdateTest extends UpdatePathTestBase {
 
   /**
