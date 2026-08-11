@@ -201,9 +201,10 @@ class UserPermissionsForm extends FormBase {
         }
         $form['permissions'][$perm]['description'] = [
           '#theme' => 'user_permission_info',
-          '#permission' => [
-            'title' => $perm_item['title'],
-          ],
+          '#deprecated' => $perm_item['deprecated'] ?? '',
+          '#description' => $perm_item['description'] ?? '',
+          '#title' => $perm_item['title'],
+          '#warning' => $perm_item['warning'] ?? '',
         ];
         // Show the permission description.
         if (!$hide_descriptions) {

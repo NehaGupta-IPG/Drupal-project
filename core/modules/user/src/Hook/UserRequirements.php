@@ -70,16 +70,11 @@ class UserRequirements {
     }
 
     // Load all permissions.
+    /** @var array<string, array{title: string, deprecated?: string, ...}> $permissions */
     $permissions = $this->permissionHandler->getPermissions();
 
     // Find all deprecated permissions.
-    $deprecated_permissions = [];
-    /** @var array<string, array{title: string, deprecated?: string, ...}> $permissions */
-    foreach ($permissions as $name => $permission) {
-      if (isset($permission['deprecated']) && (strlen($permission['deprecated']) > 0)) {
-        $deprecated_permissions[$name] = $permission;
-      }
-    }
+    $deprecated_permissions = array_filter($permissions, fn (array $permission): bool => !empty($permission['deprecated']));
 
     $used_deprecated_permissions = [];
     if (count($deprecated_permissions) > 0) {

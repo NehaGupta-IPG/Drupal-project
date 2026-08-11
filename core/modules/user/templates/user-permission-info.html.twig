@@ -17,7 +17,8 @@
  * @ingroup themeable
  */
 #}
-<div {{ wrapper_attributes.addClass('permission') }}>
+
+<div{{ attributes.addClass('permission') }}>
   <span class="title table-filter-text-source">{{ title }}</span>
   {% if description or warning or deprecated %}
     <div class="description" data-admin-compact-collapsible>
