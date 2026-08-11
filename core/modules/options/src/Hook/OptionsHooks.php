@@ -69,10 +69,10 @@ class OptionsHooks {
         $allowed_values = $field_storage->getSetting('allowed_values');
         $lost_keys = array_keys(array_diff_key($prior_allowed_values, $allowed_values));
       }
-      $lost_keys = array_keys(array_diff_key($prior_allowed_values, $allowed_values));
       if ($this->hasValuesInUse($field_storage->getTargetEntityTypeId(), $field_storage->getName(), $lost_keys)) {
         $lost_keys_string = implode(', ', $lost_keys);
-        throw new FieldStorageDefinitionUpdateForbiddenException("A list field '{$field_storage->getName()}' with existing data cannot have its keys changed. The keys that would be removed are '{$lost_keys_string}'.");      }
+        throw new FieldStorageDefinitionUpdateForbiddenException("A list field '{$field_storage->getName()}' with existing data cannot have its keys changed. The keys that would be removed are '{$lost_keys_string}'.");
+      }
     }
   }
 
