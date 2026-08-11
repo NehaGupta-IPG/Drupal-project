@@ -54,15 +54,12 @@ class PathFilterForm extends FormBase implements WorkspaceSafeFormInterface {
     ];
     $form['basic']['langcode'] = [
       '#type' => 'language_select',
-      '#languages' => LanguageInterface::STATE_CONFIGURABLE,
+      '#languages' => LanguageInterface::STATE_ALL,
       '#empty_option' => $this->t('- Any -'),
       '#title' => $this->t('Language'),
       '#default_value' => $query['langcode'],
       '#pre_render' => [
-        function (array $element) {
-          $element['#options'][LanguageInterface::LANGCODE_NOT_SPECIFIED] = $this->t('- None -');
-          return $element;
-        },
+        static::class . '::filterLanguageOptions',
       ],
     ];
     $form['basic']['submit'] = [
@@ -77,6 +74,20 @@ class PathFilterForm extends FormBase implements WorkspaceSafeFormInterface {
       ];
     }
     return $form;
+  }
+
+  /**
+   * Removes the 'Not applicable' option in the language selector element.
+   *
+   * @param array $element
+   *   The language selector element.
+   *
+   * @return array
+   *   The element with its options filtered.
+   */
+  public function filterLanguageOptions(array $element): array {
+    unset($element['#options'][LanguageInterface::LANGCODE_NOT_APPLICABLE]);
+    return $element;
   }
 
   /**
