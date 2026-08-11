@@ -13,3 +13,12 @@
  */
 #}
 {{ content }}
+
+<template id="drupal-messages-template">
+  <h2 part="heading">
+    <slot name="title"></slot>
+  </h2>
+  <div part="content">
+    <slot name="content"></slot>
+  </div>
+</template>

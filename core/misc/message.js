@@ -1,8 +1,23 @@
+/* eslint max-classes-per-file: ["error", 2] */
 /**
  * @file
  * Message API.
  */
 ((Drupal) => {
+  customElements.define(
+    'drupal-messages',
+    class extends HTMLElement {
+      constructor() {
+        super();
+        const template = document.getElementById('drupal-messages-template');
+        const templateContent = template.content;
+
+        const shadowRoot = this.attachShadow({ mode: 'open' });
+        shadowRoot.appendChild(templateContent.cloneNode(true));
+      }
+    },
+  );
+
   /**
    * @typedef {class} Drupal.Message~messageDefinition
    */
@@ -248,7 +263,7 @@
    */
   Drupal.theme.message = ({ text }, { type, id }) => {
     const messagesTypes = Drupal.Message.getMessageTypeLabels();
-    const messageWrapper = document.createElement('div');
+    const messageWrapper = document.createElement('drupal-messages');
 
     messageWrapper.setAttribute('class', `messages messages--${type}`);
     messageWrapper.setAttribute(
@@ -260,7 +275,14 @@
 
     messageWrapper.setAttribute('aria-label', messagesTypes[type]);
 
-    messageWrapper.innerHTML = `${text}`;
+    messageWrapper.innerHTML = `
+      <span slot="title">
+        ${messagesTypes[type]}
+      </span>
+      <span slot="content">
+        ${text}
+      </span>
+    `;
 
     return messageWrapper;
   };

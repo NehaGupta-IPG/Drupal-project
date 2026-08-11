@@ -23,25 +23,23 @@
 #}
 <div data-drupal-messages>
 {% for type, messages in message_list %}
-  <div role="contentinfo" aria-label="{{ status_headings[type] }}"{{ attributes|without('role', 'aria-label') }}>
-    {% if type == 'error' %}
-      <div role="alert">
-    {% endif %}
-    {% if status_headings[type] %}
-      <h2 class="visually-hidden">{{ status_headings[type] }}</h2>
-    {% endif %}
-    {% if messages|length > 1 %}
-      <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      {{ messages|first }}
-    {% endif %}
-    {% if type == 'error' %}
-      </div>
-    {% endif %}
-  </div>
+    <drupal-messages
+      aria-label="{{ status_headings[type] }}"
+      role={{ type == 'error' or type == 'warning' ? 'alert' : 'status' }}
+      {{ attributes.addClass(classes)|without('aria-label') }}
+    >
+      {% if status_headings[type] %}
+        <span slot="title">{{ status_headings[type] }}</span>
+      {% endif %}
+      {% if messages|length > 0 %}
+        <ul slot="content">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <span slot="content">{{ messages|first }}</span>
+      {% endif %}
+    </drupal-messages>
 {% endfor %}
 </div>
