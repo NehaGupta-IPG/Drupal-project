@@ -55,12 +55,12 @@ class PathFilterForm extends FormBase implements WorkspaceSafeFormInterface, Tru
     ];
     $form['basic']['langcode'] = [
       '#type' => 'language_select',
-      '#languages' => LanguageInterface::STATE_ALL,
+      '#languages' => LanguageInterface::STATE_CONFIGURABLE,
       '#empty_option' => $this->t('- Any -'),
       '#title' => $this->t('Language'),
       '#default_value' => $query['langcode'] ?? NULL,
       '#pre_render' => [
-        static::class . '::filterLanguageOptions',
+        static::class . '::finalizeLanguageOptions',
       ],
     ];
     $form['basic']['submit'] = [
@@ -78,16 +78,16 @@ class PathFilterForm extends FormBase implements WorkspaceSafeFormInterface, Tru
   }
 
   /**
-   * Removes the 'Not applicable' option in the language selector element.
+   * Adds the '- None -' option in the language selector element.
    *
    * @param array $element
    *   The language selector element.
    *
    * @return array
-   *   The element with its options filtered.
+   *   The element with its final options.
    */
-  public function filterLanguageOptions(array $element): array {
-    unset($element['#options'][LanguageInterface::LANGCODE_NOT_APPLICABLE]);
+  public function finalizeLanguageOptions(array $element): array {
+    $element['#options'][LanguageInterface::LANGCODE_NOT_SPECIFIED] = $this->t('- None -');
     return $element;
   }
 
@@ -115,7 +115,7 @@ class PathFilterForm extends FormBase implements WorkspaceSafeFormInterface, Tru
    * {@inheritdoc}
    */
   public static function trustedCallbacks() {
-    return ['filterLanguageOptions'];
+    return ['finalizeLanguageOptions'];
   }
 
 }
