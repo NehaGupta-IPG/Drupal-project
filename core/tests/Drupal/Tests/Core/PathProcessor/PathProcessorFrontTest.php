@@ -89,20 +89,17 @@ class PathProcessorFrontTest extends UnitTestCase {
    * Tests inbound processing with a language-specific frontpage config override.
    */
   public function testProcessInboundWithLanguageConfigOverride(): void {
-    $config_factory = $this->createStub(ConfigFactoryInterface::class);
+    $config_factory = $this->prophesize(ConfigFactoryInterface::class);
 
-    $override_config = $this->createStub(ImmutableConfig::class);
-    $override_config->method('get')
-      ->with('page.front')
+    $override_config = $this->prophesize(ImmutableConfig::class);
+    $override_config->get('page.front')
       ->willReturn('/node/111');
 
-    $language_manager = $this->createMock(ConfigurableLanguageManagerInterface::class);
-    $language_manager->expects($this->once())
-      ->method('getLanguageConfigOverride')
-      ->with('fr', 'system.site')
-      ->willReturn($override_config);
+    $language_manager = $this->prophesize(ConfigurableLanguageManagerInterface::class);
+    $language_manager->getLanguageConfigOverride('fr', 'system.site')
+      ->willReturn($override_config->reveal());
 
-    $processor = new PathProcessorFront($config_factory, $language_manager);
+    $processor = new PathProcessorFront($config_factory->reveal(), $language_manager->reveal());
     $request = new Request();
     $request->attributes->set('path_langcode', 'fr');
 
