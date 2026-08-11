@@ -49,6 +49,52 @@ trait UiHelperTrait {
   protected $metaRefreshCount = 0;
 
   /**
+   * Methods a test calls to make a request or submit a form.
+   *
+   * Used to find the line a request was written on.
+   *
+   * @var list<string>
+   *
+   * @see \Drupal\Tests\UiHelperTrait::callerLocation()
+   */
+  private const CALLER_METHODS = [
+    'drupalGet',
+    'reloadPage',
+    'submitForm',
+    'drupalLogin',
+    'drupalLogout',
+  ];
+
+  /**
+   * The arguments of the most recent ::drupalGet() call.
+   *
+   * @var array{string|\Drupal\Core\Url, array<string, mixed>, string[]}|null
+   *
+   * @see \Drupal\Tests\UiHelperTrait::reloadPage()
+   */
+  private ?array $lastRequest = NULL;
+
+  /**
+   * The URL requested by the most recent ::drupalGet() call.
+   *
+   * NULL when there is nothing to compare the next request with, either because
+   * no request has been made yet or because ::reloadPage() is repeating one.
+   */
+  private ?string $lastRequestUrl = NULL;
+
+  /**
+   * Where the most recent ::drupalGet() call was made, as 'file.php:line'.
+   */
+  private ?string $lastRequestLocation = NULL;
+
+  /**
+   * Where a form was submitted since the most recent ::drupalGet() call.
+   *
+   * NULL when no form has been submitted since, as 'file.php:line' otherwise.
+   */
+  private ?string $lastFormSubmissionLocation = NULL;
+
+  /**
    * Fills and submits a form.
    *
    * @param array $edit
@@ -72,6 +118,7 @@ trait UiHelperTrait {
    *   underscores.
    */
   protected function submitForm(array $edit, $submit, $form_html_id = NULL) {
+    $this->lastFormSubmissionLocation = $this->callerLocation();
     $assert_session = $this->assertSession();
     $submit_button = $assert_session->buttonExists($submit);
     // Check if button has a form attribute set.
@@ -241,6 +288,12 @@ trait UiHelperTrait {
   /**
    * Retrieves a Drupal path or an absolute path.
    *
+   * Requesting a page that is already loaded triggers a deprecation, since the
+   * request costs a full bootstrap and asserts nothing new. That covers both
+   * repeating the previous request and requesting the page a form submission
+   * just left loaded. Use ::reloadPage() where the page has to be requested
+   * again on purpose.
+   *
    * @param string|\Drupal\Core\Url $path
    *   Drupal path or URL to load into Mink controlled browser.
    * @param array $options
@@ -258,12 +311,37 @@ trait UiHelperTrait {
    *   The retrieved HTML string, also available as $this->getRawContent()
    *
    * @see \Drupal\Tests\BrowserTestBase::getHttpClient()
+   * @see \Drupal\Tests\UiHelperTrait::reloadPage()
    */
   protected function drupalGet($path, array $options = [], array $headers = []): string {
+    // Details of the previous request, to compare this one with.
+    $previousUrl = $this->lastRequestUrl;
+    $previousLocation = $this->lastRequestLocation;
+    $formSubmissionLocation = $this->lastFormSubmissionLocation;
+
+    $this->lastRequest = [$path, $options, $headers];
+    $location = $this->callerLocation();
+    $this->lastRequestLocation = $location;
+    $this->lastFormSubmissionLocation = NULL;
+
     $options['absolute'] = TRUE;
     $url = $this->buildUrl($path, $options);
+    $this->lastRequestUrl = $url;
 
     $session = $this->getSession();
+
+    // Requesting a page that is already loaded costs a full bootstrap and
+    // asserts nothing new. Which comparison applies depends on whether a form
+    // was submitted since the last request: if one was, that submission decided
+    // which page is loaded now, and only the site knows where it went.
+    if ($formSubmissionLocation !== NULL) {
+      if ($session->getCurrentUrl() === $url) {
+        @trigger_error(sprintf('Requesting a page that the form submitted on it left loaded is deprecated in drupal:11.4.0 and will throw an exception in drupal:13.0.0. Remove the request, or call ::reloadPage() when the page has to be requested again on purpose. Requested %s at %s, after submitting a form at %s. See https://www.drupal.org/node/9999999', $this->describeUrl($url), $location, $formSubmissionLocation), E_USER_DEPRECATED);
+      }
+    }
+    elseif ($previousUrl === $url) {
+      @trigger_error(sprintf('Requesting a page that the previous ::drupalGet() already requested is deprecated in drupal:11.4.0 and will throw an exception in drupal:13.0.0. Remove the request, or call ::reloadPage() when the page has to be requested again on purpose. Requested %s at %s, already requested at %s. See https://www.drupal.org/node/9999999', $this->describeUrl($url), $location, $previousLocation), E_USER_DEPRECATED);
+    }
 
     $this->prepareRequest();
     foreach ($headers as $header_name => $header_value) {
@@ -294,6 +372,77 @@ trait UiHelperTrait {
     }
 
     return $out;
+  }
+
+  /**
+   * Requests the page loaded by the most recent ::drupalGet() again.
+   *
+   * Use this when a test needs the same page twice on purpose, for example to
+   * assert that a response is served from a cache the second time, or to get a
+   * freshly built form after submitting one. Repeating the ::drupalGet() call
+   * itself works just as well, but says nothing about why, and reads as an
+   * oversight to both reviewers and static analysis.
+   *
+   * The original path, URL options and request headers are reused, so this is
+   * equivalent to writing that ::drupalGet() call again. It deliberately does
+   * not request the URL the browser ended up on, which for a request that
+   * redirected is a different page.
+   *
+   * @return string
+   *   The retrieved HTML string, also available as $this->getRawContent().
+   *
+   * @see \Drupal\Tests\UiHelperTrait::drupalGet()
+   */
+  protected function reloadPage(): string {
+    if ($this->lastRequest === NULL) {
+      throw new \LogicException('::reloadPage() can only be called after ::drupalGet().');
+    }
+    $request = $this->lastRequest;
+    // Repeating the request is the point here, so leave ::drupalGet() nothing
+    // to compare with. It records the request again.
+    $this->lastRequestUrl = NULL;
+    $this->lastFormSubmissionLocation = NULL;
+    return $this->drupalGet(...$request);
+  }
+
+  /**
+   * Returns where the test called into this trait, as 'file.php:line'.
+   *
+   * @return string
+   *   The file name and line the request or submission was written on.
+   */
+  private function callerLocation(): string {
+    $location = NULL;
+    foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
+      // A frame records where its call was made from, so the outermost call to
+      // one of these methods is the one written in the test. Anything nearer is
+      // a subclass override delegating to this trait, as UITestBase does, or
+      // this trait calling itself.
+      if (in_array($frame['function'] ?? '', self::CALLER_METHODS, TRUE)
+        && isset($frame['file'], $frame['line'])
+        && $frame['file'] !== __FILE__) {
+        $location = basename($frame['file']) . ':' . $frame['line'];
+      }
+    }
+    return $location ?? 'an unknown location';
+  }
+
+  /**
+   * Reduces an absolute URL to the part worth reading in a message.
+   *
+   * @param string $url
+   *   The absolute URL that was requested.
+   *
+   * @return string
+   *   The path and query string, or the whole URL if it has no path.
+   */
+  private function describeUrl(string $url): string {
+    $path = parse_url($url, PHP_URL_PATH);
+    if ($path === FALSE || $path === NULL) {
+      return $url;
+    }
+    $query = parse_url($url, PHP_URL_QUERY);
+    return is_string($query) ? $path . '?' . $query : $path;
   }
 
   /**
