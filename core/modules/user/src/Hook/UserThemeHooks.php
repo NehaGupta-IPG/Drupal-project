@@ -13,7 +13,6 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 
 /**
