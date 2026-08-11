@@ -15,7 +15,7 @@ class OptionsAllowedValues {
   /**
    * Implements callback_allowed_values_function().
    *
-   * @see options_allowed_values()
+   * @see \Drupal\options\OptionsAllowedValuesInterface::allowedValues()
    */
   public static function simpleValues(FieldStorageDefinitionInterface $definition, ?FieldableEntityInterface $entity = NULL): array {
     return [
@@ -35,7 +35,7 @@ class OptionsAllowedValues {
   /**
    * Implements callback_allowed_values_function().
    *
-   * @see options_allowed_values()
+   * @see \Drupal\options\OptionsAllowedValuesInterface::allowedValues()
    */
   public static function allowedValues(FieldStorageDefinitionInterface $definition, ?FieldableEntityInterface $entity = NULL): array {
     return [1 => 'One', 2 => 'Two', 3 => 'Three'];
@@ -46,7 +46,7 @@ class OptionsAllowedValues {
    *
    * Returns integer keys 2 and 3, deliberately omitting key 1.
    *
-   * @see options_allowed_values()
+   * @see \Drupal\options\OptionsAllowedValuesInterface::allowedValues()
    */
   public static function allowedValuesExcludingKey1(FieldStorageDefinitionInterface $definition, ?FieldableEntityInterface $entity = NULL): array {
     return [2 => 'Two', 3 => 'Three'];
@@ -55,12 +55,7 @@ class OptionsAllowedValues {
   /**
    * Implements callback_allowed_values_function().
    *
-   * @todo This function violates the recommendation in options_allowed_values()
-   *   to return a list of all possible values in any context when $items is
-   *   NULL. Since this is not yet used for testing Views integration, that is
-   *   alright for now. Fix this in https://www.drupal.org/node/2012130.
-   *
-   * @see options_allowed_values()
+   * @see \Drupal\options\OptionsAllowedValuesInterface::allowedValues()
    */
   public static function dynamicValues(FieldStorageDefinitionInterface $definition, ?FieldableEntityInterface $entity = NULL, &$cacheable = NULL): array {
     $values = [];
