@@ -48,12 +48,12 @@ class KernelTestHttpRequestTest extends KernelTestBase {
 
     // Test reloading the current page using getUrl().
     $this->drupalGet($this->getUrl());
-    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->statusCodeEquals(Response::HTTP_OK);
     $this->assertSession()->pageTextContains('This is a test page');
 
     // Test clicking a link with a relative query.
     $this->clickLink('Query link');
-    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->statusCodeEquals(Response::HTTP_OK);
     $this->assertSession()->pageTextContains('This is a test page');
 
     // Test drupalGet() with Url options.
