@@ -34,7 +34,7 @@ class LibraryDiscoveryParser {
    * libraries-override behavior where overriding of already overridden paths
    * required using the full Drupal-root-relative path of the last override.
    *
-   * @todo Remove BC layer in Drupal 10.0.0 https://www.drupal.org/node/2852314.
+   * @todo Remove BC layer in Drupal 12.0.0 https://www.drupal.org/node/2852314.
    */
   protected array $originalLibraryPaths = [];
 

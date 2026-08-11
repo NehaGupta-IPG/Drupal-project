@@ -918,14 +918,39 @@ class TestLibraryDiscoveryParser extends LibraryDiscoveryParser {
   }
 
   /**
-   * Exposes the parent method for testing.
+   * Only exists so tests can call the parent's protected method directly.
+   *
+   * @param string $original_path
+   *   The original library asset source path.
+   * @param string $type
+   *   The type of library asset -- 'js' or 'css'.
+   * @param string $library_name
+   *   The library name or ID string.
+   * @param string $extension
+   *   The extension name.
+   *
+   * @return string|false
+   *   The override path or $original_path if there isn't one. Otherwise,
+   *   false to remove the asset.
    */
   public function getLatestOverridePath(string $original_path, string $type, string $library_name, string $extension): string|false {
     return parent::getLatestOverridePath($original_path, $type, $library_name, $extension);
   }
 
   /**
-   * Exposes the parent method for testing.
+   * Only exists so tests can call the parent's protected method directly.
+   *
+   * @param string|false $new_path
+   *   The override path or $original_path if there isn't one. Otherwise,
+   *   false to remove the asset.
+   * @param string $original_path
+   *   The original library asset source path.
+   * @param string $type
+   *   The type of library asset -- 'js' or 'css'.
+   * @param string $library_name
+   *   The library name or ID string.
+   * @param string $extension
+   *   The extension name.
    */
   public function setLatestOverridePath(bool|string $new_path, string $original_path, string $type, string $library_name, string $extension): void {
     parent::setLatestOverridePath($new_path, $original_path, $type, $library_name, $extension);
