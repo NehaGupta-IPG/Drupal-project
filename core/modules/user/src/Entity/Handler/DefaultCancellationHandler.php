@@ -15,11 +15,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Maps account cancellation methods to standard content entity operations.
  *
- * Reassignment updates ownership and revision authors across every revision.
- * Deletion removes owned entities and owned historical revisions, while
- * anonymizing revision authors on content that belongs to another account.
- * Block-unpublish only changes current, owned entities. Plain account blocking
- * does not alter content.
+ * Cancellation methods are mapped as follows:
+ * - CancellationHandlerInterface::METHOD_REASSIGN updates ownership and
+ *   revision authors across every revision.
+ * - CancellationHandlerInterface::METHOD_DELETE removes owned entities and
+ *   owned historical revisions, while anonymizing revision authors on content
+ *   that belongs to another account.
+ * - CancellationHandlerInterface::METHOD_BLOCK_UNPUBLISH only changes current,
+ *   owned entities.
+ * - CancellationHandlerInterface::METHOD_BLOCK does not alter content.
  */
 class DefaultCancellationHandler implements
   CancellationHandlerInterface,
@@ -38,13 +42,7 @@ class DefaultCancellationHandler implements
     ContainerInterface $container,
     EntityTypeInterface $entity_type,
   ) {
-    if (!$entity_type instanceof ContentEntityTypeInterface) {
-      throw new \InvalidArgumentException(sprintf(
-        'The %s user cancellation handler requires a content entity type.',
-        $entity_type->id(),
-      ));
-    }
-
+    assert($entity_type instanceof ContentEntityTypeInterface);
     return new static(
       $entity_type,
       $container->get(EntityCancellationProcessor::class),

@@ -191,7 +191,7 @@ final class RevisionSafeCancellationBatchTest extends KernelTestBase {
       ->get('user.settings')
       ->get('anonymous');
 
-    $french_author_name = 'Visiteur français';
+    $existing_anonymous_author_name = 'Existing anonymous author';
     $comment = Comment::create([
       'comment_type' => 'test',
       'entity_type' => 'node',
@@ -202,7 +202,7 @@ final class RevisionSafeCancellationBatchTest extends KernelTestBase {
     ]);
     $comment->addTranslation('fr', [
       'uid' => 0,
-      'name' => $french_author_name,
+      'name' => $existing_anonymous_author_name,
     ]);
     $comment->save();
 
@@ -224,7 +224,7 @@ final class RevisionSafeCancellationBatchTest extends KernelTestBase {
     self::assertSame('0', $reloaded->getOwnerId());
     self::assertSame($anonymous_name, $reloaded->getAuthorName());
     self::assertSame('0', $french->getOwnerId());
-    self::assertSame($french_author_name, $french->getAuthorName());
+    self::assertSame($existing_anonymous_author_name, $french->getAuthorName());
   }
 
   /**
