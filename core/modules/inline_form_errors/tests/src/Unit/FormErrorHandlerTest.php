@@ -119,7 +119,7 @@ class FormErrorHandlerTest extends UnitTestCase {
       'no title given',
       'element is invisible',
       'this missing element is invalid',
-      '3 errors have been found: <ul-comma-list-mock><li-mock>Test 1</li-mock><li-mock>Test 2 &amp; a half</li-mock><li-mock>Test 3</li-mock></ul-comma-list-mock>',
+      '<ul-comma-list-mock><li-mock>Test 1</li-mock><li-mock>Test 2 &amp; a half</li-mock><li-mock>Test 3</li-mock></ul-comma-list-mock>',
     ];
 
     $this->messenger->expects($this->exactly(count($messages)))
@@ -135,10 +135,10 @@ class FormErrorHandlerTest extends UnitTestCase {
       ->method('renderInIsolation')
       ->willReturnCallback(function ($render_array): string {
         $links = [];
-        foreach ($render_array['#errors']['#items'] as $item) {
+        foreach ($render_array['#error_links'] as $item) {
           $links[] = htmlspecialchars($item['#title']);
         }
-        return $render_array['#message'] . ' <ul-comma-list-mock><li-mock>' . implode('</li-mock><li-mock>', $links) . '</li-mock></ul-comma-list-mock>';
+        return '<ul-comma-list-mock><li-mock>' . implode('</li-mock><li-mock>', $links) . '</li-mock></ul-comma-list-mock>';
       });
 
     $form_state = new FormState();
@@ -161,7 +161,7 @@ class FormErrorHandlerTest extends UnitTestCase {
   }
 
   /**
-   * Tests that the summary render array exposes message, count, and form_id.
+   * Tests that the summary render array exposes error_links and form_id.
    */
   public function testSummaryRenderArrayVariables(): void {
     $this->messenger->expects($this->atLeastOnce())->method('addError');
@@ -171,8 +171,7 @@ class FormErrorHandlerTest extends UnitTestCase {
       ->with($this->callback(function ($render_array): bool {
         $this->assertSame('inline_form_errors_summary', $render_array['#theme']);
         $this->assertSame('test_form', $render_array['#form_id']);
-        $this->assertSame(1, $render_array['#count']);
-        $this->assertNotEmpty($render_array['#message']);
+        $this->assertCount(1, $render_array['#error_links']);
         return TRUE;
       }))
       ->willReturn('hello');

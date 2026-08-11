@@ -17,9 +17,7 @@ class InlineFormErrorsThemeHooks {
     return [
       'inline_form_errors_summary' => [
         'variables' => [
-          'message' => NULL,
-          'errors' => [],
-          'count' => 0,
+          'error_links' => [],
           'form_id' => NULL,
         ],
       ],

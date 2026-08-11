@@ -4,14 +4,21 @@
  * Default theme implementation for the Inline Form Errors summary.
  *
  * Available variables:
- * - message: The lead line, example "3 errors have been found:".
- * - errors: A render array listing the errored elements.
- * - count: The integer number of errors. Useful for preprocess hooks or
- *   theme suggestions that vary the lead line by count.
- * - form_id: The form's machine ID; drives the template suggestion.
+ * - error_links: A list of render arrays for the errored elements, one link
+ *   per element.
+ * - form_id: The form's machine ID; drives the theme suggestion
+ *   inline_form_errors_summary__FORM_ID.
  *
  * @ingroup themeable
  */
 #}
-{{ message }}
-{{ errors }}
+{% set count = error_links|length %}
+{% trans %}
+  {{ count }} error has been found:
+{% plural count %}
+  {{ count }} errors have been found:
+{% endtrans %}
+{% include 'item-list.html.twig' with {
+  'items': error_links,
+  'context': { 'list_style': 'comma-list' }
+} %}
