@@ -6,13 +6,14 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Security\TrustedCallbackInterface;
 
 /**
  * Provides the path admin overview filter form.
  *
  * @internal
  */
-class PathFilterForm extends FormBase implements WorkspaceSafeFormInterface {
+class PathFilterForm extends FormBase implements WorkspaceSafeFormInterface, TrustedCallbackInterface {
 
   /**
    * {@inheritdoc}
@@ -108,6 +109,13 @@ class PathFilterForm extends FormBase implements WorkspaceSafeFormInterface {
    */
   public function resetForm(array &$form, FormStateInterface $form_state) {
     $form_state->setRedirect('entity.path_alias.collection');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function trustedCallbacks() {
+    return ['filterLanguageOptions'];
   }
 
 }
