@@ -917,10 +917,16 @@ class TestLibraryDiscoveryParser extends LibraryDiscoveryParser {
     $this->validUris[$source] = $valid;
   }
 
+  /**
+   * Exposes the parent method for testing.
+   */
   public function getLatestOverridePath(string $original_path, string $type, string $library_name, string $extension): string|false {
     return parent::getLatestOverridePath($original_path, $type, $library_name, $extension);
   }
 
+  /**
+   * Exposes the parent method for testing.
+   */
   public function setLatestOverridePath(bool|string $new_path, string $original_path, string $type, string $library_name, string $extension): void {
     parent::setLatestOverridePath($new_path, $original_path, $type, $library_name, $extension);
   }

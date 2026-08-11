@@ -24,10 +24,8 @@ class LibraryDiscoveryParser {
 
   /**
    * The list of asset paths / sources that have libraries-override applied.
-   *
-   * @var array
    */
-  protected $overriddenLibraryPaths = [];
+  protected array $overriddenLibraryPaths = [];
 
   /**
    * Used to retrieve original libraries-override keys from base theme paths.
@@ -36,11 +34,9 @@ class LibraryDiscoveryParser {
    * libraries-override behavior where overriding of already overridden paths
    * required using the full Drupal-root-relative path of the last override.
    *
-   * @var array
-   *
    * @todo Remove BC layer in Drupal 10.0.0 https://www.drupal.org/node/2852314.
    */
-  protected $originalLibraryPaths = [];
+  protected array $originalLibraryPaths = [];
 
   public function __construct(
     protected string $appRoot,
@@ -600,7 +596,7 @@ class LibraryDiscoveryParser {
         // base theme), so get the actual original path by which the library
         // asset was keyed.
         @trigger_error(sprintf(
-          'Overriding a library asset using an overridden path as the key is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the original path (%s) as the key. See https://www.drupal.org/node/3489303',
+          'Overriding a library asset using an overridden path as the key is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Use the original path (%s) as the key. See https://www.drupal.org/node/3489303',
           $original
         ), E_USER_DEPRECATED);
         $original = $this->originalLibraryPaths[$original];
