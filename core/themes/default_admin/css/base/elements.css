@@ -246,9 +246,9 @@ details {
 
   &.details-content-inline {
     & .details-wrapper {
-      align-items: end;
       display: flex;
       flex-flow: row wrap;
+      align-items: end;
       gap: 0.5rem;
 
       & > * {
