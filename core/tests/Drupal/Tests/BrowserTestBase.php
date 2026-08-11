@@ -73,6 +73,15 @@ abstract class BrowserTestBase extends DrupalTestCase {
   use ExtensionListTestTrait;
 
   /**
+   * Set to TRUE to strict check all configuration saved.
+   *
+   * @var bool
+   *
+   * @see \Drupal\Core\Config\Testing\ConfigSchemaChecker
+   */
+  protected $strictConfigSchema = FALSE;
+
+  /**
    * Time limit in seconds for the test.
    *
    * @var int

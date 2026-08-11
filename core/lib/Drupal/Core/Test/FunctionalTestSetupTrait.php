@@ -156,7 +156,7 @@ trait FunctionalTestSetupTrait {
       $this->usesSuperUserAccessPolicy = !str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
     }
     $services['parameters']['security.enable_super_user'] = $this->usesSuperUserAccessPolicy;
-    if ($this->strictConfigSchema) {
+    if (!empty($this->strictConfigSchema)) {
       // Add a listener to validate configuration schema on save.
       $test_file_name = (new \ReflectionClass($this))->getFileName();
       // @todo Decide in https://www.drupal.org/project/drupal/issues/3395099 when/how to trigger deprecation errors or even failures for contrib modules.
