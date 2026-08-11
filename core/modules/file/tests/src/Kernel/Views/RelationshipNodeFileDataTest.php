@@ -185,8 +185,7 @@ class RelationshipNodeFileDataTest extends ViewsKernelTestBase {
     $this->executeView($view);
 
     $nids = array_map(fn ($row) => $row->node_field_data_file_usage_nid, $view->result);
-    sort($nids, SORT_STRING);
-    $this->assertSame([NULL, $node->id()], $nids);
+    $this->assertEqualsCanonicalizing([NULL, $node->id()], $nids);
   }
 
   /**

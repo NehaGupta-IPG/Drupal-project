@@ -51,7 +51,7 @@ class MismatchedColumnTypeJoinTest extends RelationshipJoinTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function schemaDefinition() {
+  protected function schemaDefinition(): array {
     $schema = parent::schemaDefinition();
 
     // A table that stores the ID of the row it tracks as a string, the way
@@ -81,7 +81,7 @@ class MismatchedColumnTypeJoinTest extends RelationshipJoinTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function viewsData() {
+  protected function viewsData(): array {
     $data = parent::viewsData();
 
     $data['views_test_string_id']['table']['group'] = new TranslatableMarkup('Views test string ID');

@@ -16,9 +16,7 @@ class PgsqlServiceProvider extends ServiceProviderBase {
    * {@inheritdoc}
    */
   public function register(ContainerBuilder $container): void {
-    $modules = $container->getParameter('container.modules');
-
-    if (isset($modules['views'])) {
+    if (isset($container->getParameter('container.modules')['views'])) {
       $container
         ->register('pgsql.views.cast_sql', PgsqlCastSql::class)
         ->addArgument(new Reference('database'))
