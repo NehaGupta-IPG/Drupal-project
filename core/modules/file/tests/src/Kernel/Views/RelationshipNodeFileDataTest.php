@@ -129,6 +129,67 @@ class RelationshipNodeFileDataTest extends ViewsKernelTestBase {
   }
 
   /**
+   * Tests the relationships when a file is used by an entity with a string ID.
+   */
+  public function testViewsHandlerRelationshipWithStringEntityId(): void {
+    $file = File::create([
+      'filename' => 'image-test.jpg',
+      'uri' => "public://image-test.jpg",
+      'filemime' => 'image/jpeg',
+      'created' => 1,
+      'changed' => 1,
+      'status' => FileInterface::STATUS_PERMANENT,
+    ]);
+    $file->enforceIsNew();
+    file_put_contents($file->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
+    $file->save();
+
+    $node = Node::create([
+      'type' => 'file_test',
+      'title' => $this->randomMachineName(8),
+      'created' => 1,
+      'changed' => 1,
+      'status' => NodeInterface::PUBLISHED,
+      'node_file' => ['target_id' => $file->id()],
+    ]);
+    $node->save();
+
+    // Entity types are allowed to key their data by a string, and the ID of
+    // such an entity is stored in {file_usage} as it is. The relationships
+    // between files and nodes have to keep working next to those rows.
+    \Drupal::service('file.usage')->add($file, 'file_test', 'entity_test_string_id', 'a_string_id');
+
+    $expected_result = [
+      [
+        'fid' => $file->id(),
+        'nid' => $node->id(),
+      ],
+    ];
+    $column_map = ['fid' => 'fid', 'nid' => 'nid'];
+
+    $view = Views::getView('test_file_to_node');
+    $this->executeView($view);
+    $this->assertIdenticalResultset($view, $expected_result, $column_map);
+
+    $view = Views::getView('test_node_to_file');
+    $this->executeView($view);
+    $this->assertIdenticalResultset($view, $expected_result, $column_map);
+
+    // A view can also leave the relationship optional, which lists the file
+    // usage of the entity with a string ID next to the one of the node.
+    $view = Views::getView('test_file_to_node');
+    $view->setDisplay();
+    $relationships = $view->displayHandlers->get('default')->getOption('relationships');
+    $relationships['file_to_node_1']['required'] = FALSE;
+    $view->displayHandlers->get('default')->overrideOption('relationships', $relationships);
+    $this->executeView($view);
+
+    $nids = array_map(fn ($row) => $row->node_field_data_file_usage_nid, $view->result);
+    sort($nids, SORT_STRING);
+    $this->assertSame([NULL, $node->id()], $nids);
+  }
+
+  /**
    * Tests using the views node_to_file relationship.
    */
   public function testViewsHandlerRelationshipNodeToFile(): void {

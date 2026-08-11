@@ -4,6 +4,7 @@ namespace Drupal\views\Plugin\views\join;
 
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\views\Plugin\views\query\CastSqlInterface;
 
 /**
  * @defgroup views_join_handlers Views join handler plugins
@@ -291,6 +292,16 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
   }
 
   /**
+   * Returns the cast handling of the database the view queries.
+   *
+   * @return \Drupal\views\Plugin\views\query\CastSqlInterface
+   *   The cast handling of the database.
+   */
+  protected function getCastSql(): CastSqlInterface {
+    return \Drupal::service('views.cast_sql');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function buildJoin($select_query, $table, $view_query) {
@@ -312,12 +323,25 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
       $left_table = NULL;
     }
 
-    $right_field = $table['alias'] . '.' . $this->field;
-    if (\Drupal::database()->databaseType() === 'pgsql' && $this->leftField && $this->field && str_contains($this->leftField, 'id') && str_contains($this->field, 'id')) {
-      $left_field .= '::text';
-      $right_field .= '::text';
-    }
-    $condition = $left_field . ' ' . $this->configuration['operator'] . ' ' . $right_field;
+    $right_field = "$table[alias].$this->field";
+
+    // The two columns can be of a different type, for example when one entity
+    // type keys its data by an integer ID and the other by a string ID. Not
+    // every database engine compares such columns without help.
+    [$left_field, $right_field] = $this->getCastSql()->getComparableOperands(
+      [
+        'expression' => $left_field,
+        'table' => $this->leftTable && !$this->leftFormula ? ($left_table['table'] ?? NULL) : NULL,
+        'column' => $this->leftTable && !$this->leftFormula ? $this->leftField : NULL,
+      ],
+      [
+        'expression' => $right_field,
+        'table' => empty($this->configuration['table formula']) ? $this->table : NULL,
+        'column' => $this->field,
+      ],
+    );
+
+    $condition = "$left_field " . $this->configuration['operator'] . " $right_field";
     $arguments = [];
 
     // Tack on the extra.

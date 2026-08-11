@@ -77,12 +77,7 @@ class FieldOrLanguageJoinTest extends RelationshipJoinTestBase {
     $this->assertSame($join_info['join type'], 'LEFT');
     $this->assertSame($join_info['table'], $configuration['table']);
     $this->assertSame($join_info['alias'], 'users_field_data');
-    if (\Drupal::database()->databaseType() === 'pgsql') {
-      $this->assertSame($join_info['condition'], 'views_test_data.uid::text = users_field_data.uid::text');
-    }
-    else {
-      $this->assertSame($join_info['condition'], 'views_test_data.uid = users_field_data.uid');
-    }
+    $this->assertSame($join_info['condition'], 'views_test_data.uid = users_field_data.uid');
 
     // Set a different alias and make sure table info is as expected.
     $join_info = $this->buildJoin($view, $configuration, 'users1');
@@ -108,12 +103,7 @@ class FieldOrLanguageJoinTest extends RelationshipJoinTestBase {
       ],
     ];
     $join_info = $this->buildJoin($view, $configuration, 'users3');
-    if (\Drupal::database()->databaseType() === 'pgsql') {
-      $this->assertStringContainsString('views_test_data.uid::text = users3.uid::text', $join_info['condition']);
-    }
-    else {
-      $this->assertStringContainsString('views_test_data.uid = users3.uid', $join_info['condition']);
-    }
+    $this->assertStringContainsString('views_test_data.uid = users3.uid', $join_info['condition']);
     $this->assertStringContainsString('users3.name = :views_join_condition_0', $join_info['condition']);
     $this->assertStringContainsString('users3.name <> :views_join_condition_1', $join_info['condition']);
     $this->assertSame(array_values($join_info['arguments']), [$random_name_1, $random_name_2]);
@@ -134,12 +124,7 @@ class FieldOrLanguageJoinTest extends RelationshipJoinTestBase {
       ],
     ];
     $join_info = $this->buildJoin($view, $configuration, 'users4');
-    if (\Drupal::database()->databaseType() === 'pgsql') {
-      $this->assertStringContainsString('views_test_data.uid::text = users4.uid::text', $join_info['condition']);
-    }
-    else {
-      $this->assertStringContainsString('views_test_data.uid = users4.uid', $join_info['condition']);
-    }
+    $this->assertStringContainsString('views_test_data.uid = users4.uid', $join_info['condition']);
     $this->assertStringContainsString('users4.name = :views_join_condition_0', $join_info['condition']);
     $this->assertStringContainsString('users4.name IN ( :views_join_condition_1[] )', $join_info['condition']);
     $this->assertSame(
