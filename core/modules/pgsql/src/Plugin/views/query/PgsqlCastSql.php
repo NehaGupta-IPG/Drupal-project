@@ -6,6 +6,9 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\views\Plugin\views\query\CastSql;
 
+// cspell:ignore attisdropped attname attnum attrelid atttypid nspname relname
+// cspell:ignore relnamespace typcategory
+
 /**
  * PostgreSQL-specific cast handling.
  *
