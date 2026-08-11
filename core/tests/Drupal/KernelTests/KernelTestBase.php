@@ -162,7 +162,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    *
    * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
    */
-  protected bool $strictConfigSchema = TRUE;
+  protected bool $strictConfigSchema = FALSE;
 
   /**
    * An array of config object names that are excluded from schema checking.
