@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\workspaces\Hook;
 
+use Drupal\Core\Database\Query\ConditionInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -193,32 +194,39 @@ class ViewsOperations {
     }
     unset($field_info);
 
-    // Now go through the WHERE and HAVING clauses and rewrite any revisionable
-    // field references. A WHERE condition references a field directly, while a
-    // HAVING condition wraps it in an aggregate expression such as
-    // SUM(base.field), so both are handled by rewriting the references in the
-    // condition string.
+    // Rewrite revisionable field references in the WHERE and HAVING clauses. A
+    // reference can be a bare column, a column wrapped in an aggregate like
+    // SUM(base.field), or one inside a condition object built by a filter.
     foreach (['where', 'having'] as $clause_type) {
       foreach ($query->{$clause_type} as &$clauses) {
         foreach ($clauses['conditions'] as &$condition_info) {
-          if (is_string($condition_info['field'])) {
-            $condition_info['field'] = $this->rewriteRevisionableFieldReferences($condition_info['field'], $query, $entity_type, $relationships, $revisionable_fields);
-          }
+          $this->rewriteConditionField($condition_info['field'], $query, $entity_type, $relationships, $revisionable_fields);
         }
         unset($condition_info);
       }
       unset($clauses);
     }
 
-    // GROUP BY clauses derived from the fields already follow the field
-    // rewrites above, but clauses added directly to the query can still
-    // reference the base table, so rewrite those as well.
+    // GROUP BY clauses built from the selected fields already follow the
+    // rewrites above, but clauses added directly to the query can still target
+    // the base table.
     foreach ($query->groupby as &$group_field) {
       if (is_string($group_field)) {
         $group_field = $this->rewriteRevisionableFieldReferences($group_field, $query, $entity_type, $relationships, $revisionable_fields);
       }
     }
     unset($group_field);
+
+    // ORDER BY usually references a field alias, which follows the rewrites
+    // above. A click sort references the column directly (e.g.
+    // node_field_data.changed), so rewrite it too, or it won't match the
+    // SELECT list under DISTINCT.
+    foreach ($query->orderby as &$order) {
+      if (is_string($order['field'])) {
+        $order['field'] = $this->rewriteRevisionableFieldReferences($order['field'], $query, $entity_type, $relationships, $revisionable_fields);
+      }
+    }
+    unset($order);
   }
 
   /**
@@ -257,6 +265,36 @@ class ViewsOperations {
     }
 
     return $expression;
+  }
+
+  /**
+   * Rewrites revisionable field references in a WHERE or HAVING condition.
+   *
+   * @param mixed $field
+   *   The condition field, rewritten in place.
+   * @param \Drupal\views\Plugin\views\query\Sql $query
+   *   The query plugin object for the query.
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
+   * @param string[] $relationships
+   *   The relationships that point to the entity type's base table.
+   * @param string[] $revisionable_fields
+   *   The names of the revisionable fields of the entity type.
+   */
+  protected function rewriteConditionField(mixed &$field, Sql $query, EntityTypeInterface $entity_type, array $relationships, array $revisionable_fields): void {
+    if ($field instanceof ConditionInterface) {
+      $conditions = &$field->conditions();
+      foreach ($conditions as &$condition_info) {
+        // Skip the '#conjunction' element and anything without a field.
+        if (is_array($condition_info) && isset($condition_info['field'])) {
+          $this->rewriteConditionField($condition_info['field'], $query, $entity_type, $relationships, $revisionable_fields);
+        }
+      }
+      unset($condition_info);
+    }
+    elseif (is_string($field)) {
+      $field = $this->rewriteRevisionableFieldReferences($field, $query, $entity_type, $relationships, $revisionable_fields);
+    }
   }
 
   /**

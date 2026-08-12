@@ -16,6 +16,7 @@ use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Entity\View;
+use Drupal\views\Tests\ViewTestData;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 use Drupal\views_ui\ViewUI;
@@ -52,6 +53,11 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
     'views_ui',
     'workspaces',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $testViews = ['test_distinct_click_sorting'];
 
   /**
    * The entity type manager.
@@ -103,6 +109,8 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
     ])->save();
 
     $this->enablePromotedContentView(FALSE);
+
+    ViewTestData::createTestViews(static::class, ['views_test_config']);
 
     Workspace::create(['id' => 'stage', 'label' => 'Stage'])->save();
   }
@@ -253,6 +261,82 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
       ['nid' => $nodes['c']->id()],
       ['nid' => $nodes['b']->id()],
     ], ['nid' => 'nid']);
+  }
+
+  /**
+   * Tests a click sort with DISTINCT on a revisionable field in a workspace.
+   */
+  public function testViewsClickSortWithDistinct(): void {
+    $nodes = $this->createNodesEditedInWorkspace();
+
+    // A table style click sort references the column directly, e.g.
+    // 'node_field_data.title', not a field alias. With DISTINCT the ORDER BY
+    // column must also be in the SELECT list, so a stale reference fails.
+    $view = $this->titleClickSortView();
+    $view->execute();
+
+    // In the workspace node A's title is 'Z', so ascending order is B, C, A.
+    $this->assertIdenticalResultset($view, [
+      ['nid' => $nodes['b']->id()],
+      ['nid' => $nodes['c']->id()],
+      ['nid' => $nodes['a']->id()],
+    ], ['nid' => 'nid']);
+
+    // Outside the workspace the live titles order the rows A, B, C.
+    $this->switchToLive();
+    $view = $this->titleClickSortView();
+    $view->execute();
+    $this->assertIdenticalResultset($view, [
+      ['nid' => $nodes['a']->id()],
+      ['nid' => $nodes['b']->id()],
+      ['nid' => $nodes['c']->id()],
+    ], ['nid' => 'nid']);
+  }
+
+  /**
+   * Tests a filter that wraps a revisionable field in a condition object.
+   */
+  public function testViewsFilterConditionObject(): void {
+    $nodes = $this->createNodesEditedInWorkspace();
+
+    // The 'contains any/all words' string operator adds the field inside an
+    // AND/OR condition object, instead of a plain condition string.
+    $view = $this->buildNodeView('workspace_title_contains', [
+      'fields' => [
+        'nid' => [
+          'id' => 'nid',
+          'table' => 'node_field_data',
+          'field' => 'nid',
+          'entity_type' => 'node',
+          'entity_field' => 'nid',
+          'plugin_id' => 'field',
+        ],
+      ],
+      'filters' => [
+        'title' => [
+          'id' => 'title',
+          'table' => 'node_field_data',
+          'field' => 'title',
+          'entity_type' => 'node',
+          'entity_field' => 'title',
+          'plugin_id' => 'string',
+          'operator' => 'allwords',
+          'value' => 'Z',
+        ],
+      ],
+    ]);
+    $view->execute();
+
+    // Only node A has the title 'Z' in the workspace.
+    $this->assertIdenticalResultset($view, [
+      ['nid' => $nodes['a']->id()],
+    ], ['nid' => 'nid']);
+
+    // Outside the workspace no node has 'Z' in its title.
+    $this->switchToLive();
+    $view = Views::getView('workspace_title_contains');
+    $view->execute();
+    $this->assertIdenticalResultset($view, [], ['nid' => 'nid']);
   }
 
   /**
@@ -424,16 +508,35 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
    */
   protected function buildNodeAggregateView(string $id, array $fields, array $filters = []): ViewExecutable {
     $display_options = [
-      'access' => ['type' => 'none'],
-      'pager' => ['type' => 'none'],
-      'style' => ['type' => 'default'],
-      'row' => ['type' => 'fields'],
       'group_by' => TRUE,
       'fields' => $fields,
     ];
     if ($filters) {
       $display_options['filters'] = $filters;
     }
+
+    return $this->buildNodeView($id, $display_options);
+  }
+
+  /**
+   * Builds and saves a view on the 'node_field_data' table.
+   *
+   * @param string $id
+   *   The ID of the view to create.
+   * @param array $display_options
+   *   The display options. Access, pager, style and row default to a simple
+   *   fields-based view.
+   *
+   * @return \Drupal\views\ViewExecutable
+   *   The executable view.
+   */
+  protected function buildNodeView(string $id, array $display_options): ViewExecutable {
+    $display_options += [
+      'access' => ['type' => 'none'],
+      'pager' => ['type' => 'none'],
+      'style' => ['type' => 'default'],
+      'row' => ['type' => 'fields'],
+    ];
 
     \Drupal::service('workspaces.manager')->executeOutsideWorkspace(function () use ($id, $display_options) {
       View::create([
@@ -454,6 +557,22 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
     });
 
     return Views::getView($id);
+  }
+
+  /**
+   * Loads the DISTINCT click-sort test view, sorted by the title column.
+   *
+   * @return \Drupal\views\ViewExecutable
+   *   The executable view.
+   */
+  protected function titleClickSortView(): ViewExecutable {
+    $view = Views::getView('test_distinct_click_sorting');
+    $view->setDisplay('default');
+    $style = $view->displayHandlers->get('default')->getOption('style');
+    $style['options']['default'] = 'title';
+    $style['options']['order'] = 'asc';
+    $view->displayHandlers->get('default')->overrideOption('style', $style);
+    return $view;
   }
 
   /**
