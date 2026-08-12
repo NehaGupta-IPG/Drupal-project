@@ -154,15 +154,22 @@ class ModulesListForm extends FormBase {
     ];
 
     $form['filters']['text'] = [
-      '#type' => 'search',
+      '#type' => 'list_filter',
       '#title' => $this->t('Filter modules'),
       '#title_display' => 'invisible',
       '#size' => 30,
       '#placeholder' => $this->t('Filter by name or description'),
       '#description' => $this->t('Enter a part of the module name or description'),
+      '#list_container_selector' => '[data-drupal-selector="system-modules"]',
+      '#list_item' => '.package-listing table tbody tr',
+      '#list_text' => '.table-filter-text-source, .module-name, .module-description',
+      '#search_start_of_words' => TRUE,
+      '#announce' => [
+        'singular' => $this->t('1 module is available in the modified list.'),
+        'plural' => $this->t('@count modules are available in the modified list.'),
+        'all' => $this->t('All available modules are listed.'),
+      ],
       '#attributes' => [
-        'class' => ['table-filter-text'],
-        'data-table' => '#system-modules',
         'autocomplete' => 'off',
       ],
     ];
@@ -210,7 +217,10 @@ class ModulesListForm extends FormBase {
         '#title' => Markup::create(Xss::filterAdmin($this->t($package))),
         '#open' => TRUE,
         '#theme' => 'system_modules_details',
-        '#attributes' => ['class' => ['package-listing']],
+        '#attributes' => [
+          'class' => ['package-listing'],
+          'data-filter-label' => 'package-' . $package,
+        ],
         // Ensure that the "Core" package comes first.
         '#weight' => $package == 'Core' ? -10 : NULL,
       ];
@@ -226,7 +236,6 @@ class ModulesListForm extends FormBase {
     uasort($form['modules'], ['\Drupal\Component\Utility\SortArray', 'sortByTitleProperty']);
 
     $form['#attached']['library'][] = 'core/drupal.tableresponsive';
-    $form['#attached']['library'][] = 'system/drupal.system.modules';
     $form['actions'] = ['#type' => 'actions'];
     $form['actions']['submit'] = [
       '#type' => 'submit',
@@ -255,6 +264,8 @@ class ModulesListForm extends FormBase {
     $row['#required'] = [];
     $row['#requires'] = [];
     $row['#required_by'] = [];
+
+    $row['#attributes'] = ['data-filter-labelledby' => 'package-' . $module->info['package']];
 
     $lifecycle = $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
     $row['name']['#markup'] = $module->info['name'];

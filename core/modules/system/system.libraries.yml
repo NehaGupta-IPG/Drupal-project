@@ -48,14 +48,8 @@ drupal.system:
 
 drupal.system.modules:
   version: VERSION
-  js:
-    js/system.modules.js: {}
   dependencies:
-    - core/jquery
-    - core/drupal
-    - core/drupal.debounce
-    - core/once
-    - core/drupal.announce
+    - core/drupal.list-filter
 
 diff:
   version: VERSION

@@ -101,8 +101,10 @@ class FieldStorageReuseForm extends FormBase {
       '#type' => 'search',
       '#title' => $this->t('Filter by field or field type'),
       '#attributes' => [
-        'class' => ['js-table-filter-text'],
+        'class' => ['table-filter-text'],
         'data-table' => '.js-reuse-table',
+        'data-items' => 'table tbody tr',
+        'data-targets' => '.form-item',
         'autocomplete' => 'off',
       ],
     ];
