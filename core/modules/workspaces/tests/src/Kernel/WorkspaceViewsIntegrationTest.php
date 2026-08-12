@@ -12,6 +12,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Entity\View;
@@ -33,6 +34,7 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
   use ContentTypeCreationTrait;
   use EntityReferenceFieldCreationTrait;
   use NodeCreationTrait;
+  use PromotedContentViewTestTrait;
   use UserCreationTrait;
   use WorkspaceTestTrait;
 
@@ -100,7 +102,8 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
       'field_name' => 'field_reference',
     ])->save();
 
-    // Create a workspace to run the views integration tests in.
+    $this->enablePromotedContentView(FALSE);
+
     Workspace::create(['id' => 'stage', 'label' => 'Stage'])->save();
   }
 
@@ -132,7 +135,7 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
 
     $this->switchToWorkspace('stage');
 
-    $view = Views::getView('frontpage');
+    $view = Views::getView('promoted_content');
 
     // Add a filter on a field that is stored in a dedicated table in order to
     // test field joins with extra conditions (e.g. 'deleted' and 'langcode').
@@ -189,7 +192,7 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
   public function testViewsSortByField(): void {
     $nodes = $this->createNodesEditedInWorkspace();
 
-    $view = Views::getView('frontpage');
+    $view = Views::getView('promoted_content');
     $view->setDisplay('page_1');
     $display = $view->displayHandlers->get('page_1');
     $display->overrideOption('filters', []);
@@ -222,7 +225,7 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
   public function testViewsSortByFormula(): void {
     $nodes = $this->createNodesEditedInWorkspace();
 
-    $view = Views::getView('frontpage');
+    $view = Views::getView('promoted_content');
     $view->setDisplay('page_1');
     $display = $view->displayHandlers->get('page_1');
     $display->overrideOption('filters', []);
@@ -333,7 +336,7 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
   public function testViewsCountQuery(): void {
     $this->createNodesEditedInWorkspace();
 
-    $view = Views::getView('frontpage');
+    $view = Views::getView('promoted_content');
     $view->setDisplay('page_1');
     $display = $view->displayHandlers->get('page_1');
     $display->overrideOption('pager', [
