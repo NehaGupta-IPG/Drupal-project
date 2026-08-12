@@ -201,6 +201,7 @@
           Drupal.toolbar.models.toolbarModel.set({
             activeTab: $(
               '.toolbar-bar .toolbar-tab:not(.home-toolbar-tab) a',
+              '.toolbar-bar .toolbar-tab:not(.toolbar-tab--toolbar-item-shortcuts) a',
             ).get(0),
           });
         }
