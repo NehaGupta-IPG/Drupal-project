@@ -70,7 +70,7 @@ use Drupal\Core\Serialization\Attribute\JsonSchema;
  * @see \Drupal\Component\Render\PlainTextOutput::renderFromHtml()
  * @see \Drupal\Component\Utility\UrlHelper::stripDangerousProtocols()
  */
-class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
+class Attribute implements \ArrayAccess, \IteratorAggregate, \Countable, MarkupInterface {
 
   /**
    * Stores the attribute data.
@@ -389,6 +389,16 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
    */
   public function jsonSerialize(): string {
     return (string) $this;
+  }
+
+  /**
+   * Returns the number of attributes stored in the Attribute object.
+   *
+   * @return int
+   *   The number of attributes.
+   */
+  public function count(): int {
+    return count($this->storage);
   }
 
   /**
