@@ -55,6 +55,10 @@ trait TableVerifyTrait {
     if (isset($this->verifiedTables[$table])) {
       return;
     }
+    // @todo Use the to be created table information service that will be
+    // prewarmed to check if a table exists. A site in production should
+    // therefore never reach the hard table exitst round trip to the database.
+    // See: https://www.drupal.org/project/drupal/issues/3615649
     $connection = $this->verifyTableConnection();
     if (!$connection->schema()->tableExists($table)) {
       // Another process can create the table at the same time, so a failed
