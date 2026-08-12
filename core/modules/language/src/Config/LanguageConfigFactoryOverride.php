@@ -7,7 +7,6 @@ use Drupal\Core\Config\ConfigCollectionInfo;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigFactoryOverrideBase;
 use Drupal\Core\Config\ConfigRenameEvent;
-use Drupal\Core\Config\NullStorage;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Language\LanguageDefault;
@@ -57,6 +56,13 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    */
   public function loadOverrides($names) {
     if ($this->language) {
+      // Skip loading overrides when English is the default language and the
+      // negotiated language is English. Note that this only affects loading
+      // overrides; overrides can still be created and saved explicitly via
+      // ::getOverride(), for example by config translation or migrations.
+      if ($this->shouldSkipOverrides()) {
+        return [];
+      }
       $storage = $this->getStorage($this->language->getId());
       return $storage->readMultiple($names);
     }
@@ -87,15 +93,8 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    * {@inheritdoc}
    */
   public function getStorage($langcode) {
-    // Skip loading overrides when English is the default language and the
-    // passed in langcode is English.
     if (!isset($this->storages[$langcode])) {
-      if ($langcode === 'en' && $this->shouldSkipOverrides()) {
-        $this->storages[$langcode] = new NullStorage($this->createConfigCollectionName($langcode));
-      }
-      else {
-        $this->storages[$langcode] = $this->baseStorage->createCollection($this->createConfigCollectionName($langcode));
-      }
+      $this->storages[$langcode] = $this->baseStorage->createCollection($this->createConfigCollectionName($langcode));
     }
     return $this->storages[$langcode];
   }
