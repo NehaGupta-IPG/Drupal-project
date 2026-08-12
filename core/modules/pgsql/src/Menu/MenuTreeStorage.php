@@ -9,10 +9,10 @@ use Drupal\Core\Menu\MenuTreeStorage as CoreMenuTreeStorage;
 /**
  * PostgreSQL implementation of the menu tree storage.
  *
- * @see \Drupal\pgsql\Menu\TableVerifyTrait
+ * @see \Drupal\pgsql\Menu\MenuTreeStorageTrait
  */
 class MenuTreeStorage extends CoreMenuTreeStorage {
 
-  use TableVerifyTrait;
+  use MenuTreeStorageTrait;
 
 }

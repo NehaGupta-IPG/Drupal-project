@@ -15,10 +15,10 @@ use Drupal\workspaces\WorkspacesMenuTreeStorage as CoreWorkspacesMenuTreeStorage
  * installed. This class is only loaded when the workspaces module is
  * installed.
  *
- * @see \Drupal\pgsql\Menu\TableVerifyTrait
+ * @see \Drupal\pgsql\Menu\MenuTreeStorageTrait
  */
 class WorkspacesMenuTreeStorage extends CoreWorkspacesMenuTreeStorage {
 
-  use TableVerifyTrait;
+  use MenuTreeStorageTrait;
 
 }

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\pgsql\Lock;
 
-use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\Connection;
+use Drupal\pgsql\TableVerifyTrait;
 
 /**
  * PostgreSQL specific behavior for the database lock backends.
@@ -21,41 +22,27 @@ use Drupal\Core\Database\DatabaseException;
  * ::releaseAll() is not covered by the pre-flight check. It runs at request
  * shutdown for every request, and it only executes a statement when a lock
  * was acquired, which verified the table already.
+ *
+ * @see \Drupal\pgsql\TableVerifyTrait
  */
 trait PgsqlLockBackendTrait {
 
-  /**
-   * Whether the semaphore table is known to exist.
-   */
-  protected bool $tableVerified = FALSE;
+  use TableVerifyTrait;
 
   /**
-   * Makes sure the semaphore table exists before it is used.
+   * {@inheritdoc}
+   *
+   * The lock backends keep their connection in $this->database.
    */
-  protected function verifyTable(): void {
-    if ($this->tableVerified) {
-      return;
-    }
-    if (!$this->database->schema()->tableExists(static::TABLE_NAME)) {
-      // Another process can create the table at the same time. The savepoint
-      // keeps an enclosing transaction usable when that race is lost.
-      $savepoint = $this->database->startTransaction();
-      try {
-        $this->database->schema()->createTable(static::TABLE_NAME, $this->schemaDefinition());
-        $savepoint->commitOrRelease();
-      }
-      catch (DatabaseException) {
-        $savepoint->rollBack();
-      }
-    }
-    $this->tableVerified = TRUE;
+  protected function verifyTableConnection(): Connection {
+    return $this->database;
   }
 
   /**
    * {@inheritdoc}
    */
   public function acquire($name, $timeout = 30.0) {
-    $this->verifyTable();
+    $this->verifyTable(static::TABLE_NAME);
     $name = $this->normalizeName($name);
 
     // Insure that the timeout is at least 1 ms.
@@ -105,7 +92,7 @@ trait PgsqlLockBackendTrait {
    * {@inheritdoc}
    */
   public function lockMayBeAvailable($name) {
-    $this->verifyTable();
+    $this->verifyTable(static::TABLE_NAME);
     return parent::lockMayBeAvailable($name);
   }
 
@@ -113,7 +100,7 @@ trait PgsqlLockBackendTrait {
    * {@inheritdoc}
    */
   public function release($name): void {
-    $this->verifyTable();
+    $this->verifyTable(static::TABLE_NAME);
     parent::release($name);
   }
 
