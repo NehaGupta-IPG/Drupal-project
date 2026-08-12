@@ -13,6 +13,7 @@ use Drupal\Core\Update\EquivalentUpdate;
  * Implements hook_install().
  */
 function system_install(): void {
+  global $install_state;
   // Populate the cron key state variable.
   $cron_key = Crypt::randomBytesBase64(55);
   \Drupal::state()->set('system.cron_key', $cron_key);
@@ -23,6 +24,14 @@ function system_install(): void {
   if (!$site->get('name')) {
     $site->set('name', 'Drupal');
   }
+  // Ensure default language is saved.
+  if (isset($install_state['parameters']['langcode'])) {
+    $site
+      ->set('langcode', (string) $install_state['parameters']['langcode'])
+      ->set('default_langcode', (string) $install_state['parameters']['langcode'])
+      ->set('default_config_langcode', (string) $install_state['parameters']['langcode']);
+  }
+
   $site->save();
 
   // Populate the dummy query string added to all CSS and JavaScript files.
