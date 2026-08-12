@@ -137,7 +137,7 @@ abstract class RssPluginBase extends RowPluginBase {
    * @return array
    *   The main options for the summary.
    */
-  public function buildOptionsForm_summary_options() {
+  public function buildOptionsForm_summary_options(): array {
     $view_modes = $this->entityDisplayRepository->getViewModes($this->entityTypeId);
     $options = [];
 
