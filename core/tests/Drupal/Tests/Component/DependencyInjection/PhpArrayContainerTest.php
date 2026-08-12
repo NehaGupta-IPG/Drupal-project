@@ -47,10 +47,16 @@ class PhpArrayContainerTest extends ContainerTest {
   }
 
   /**
-   * Helper function to return a machine-optimized '@notation'.
+   * {@inheritdoc}
    */
-  protected function getCollection($collection, $resolve = TRUE) {
-    return $collection;
+  protected function getLiteralString($value): string {
+    // In the human-readable format, strings starting with @ are escaped
+    // by prepending another @.
+    if ($value !== '' && $value[0] === '@') {
+      return '@' . $value;
+    }
+
+    return $value;
   }
 
 }

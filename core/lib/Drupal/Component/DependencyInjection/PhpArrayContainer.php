@@ -211,8 +211,12 @@ class PhpArrayContainer extends Container {
         $arguments[$key] = $argument;
       }
 
-      // Resolve services.
+      // Resolve services. Strings starting with @@ are escaped literals.
       if ($argument[0] === '@') {
+        if (isset($argument[1]) && $argument[1] === '@') {
+          $arguments[$key] = substr($argument, 1);
+          continue;
+        }
         $id = substr($argument, 1);
         $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
         if ($id[0] === '?') {

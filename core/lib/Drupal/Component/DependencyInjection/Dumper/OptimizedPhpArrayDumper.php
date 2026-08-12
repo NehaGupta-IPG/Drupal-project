@@ -211,10 +211,6 @@ class OptimizedPhpArrayDumper extends Dumper {
       $service['class'] = $definition->getClass();
     }
 
-    if (!$definition->isPublic()) {
-      $service['public'] = FALSE;
-    }
-
     if ($definition->getFile()) {
       $service['file'] = $definition->getFile();
     }
@@ -223,17 +219,8 @@ class OptimizedPhpArrayDumper extends Dumper {
       $service['synthetic'] = TRUE;
     }
 
-    if ($definition->isLazy()) {
-      $service['lazy'] = TRUE;
-    }
-
     if ($definition->getArguments()) {
-      $arguments = $definition->getArguments();
-      $service['arguments'] = $this->dumpCollection($arguments);
-      $service['arguments_count'] = count($arguments);
-    }
-    else {
-      $service['arguments_count'] = 0;
+      $service['arguments'] = $this->dumpCollection($definition->getArguments());
     }
 
     if ($definition->getProperties()) {
@@ -294,42 +281,23 @@ class OptimizedPhpArrayDumper extends Dumper {
    *
    * @param mixed $collection
    *   A collection to process.
-   * @param bool &$resolve
-   *   Used for passing the information to the caller whether the given
-   *   collection needed to be resolved or not. This is used for optimizing
-   *   deep arrays that don't need to be traversed.
    *
-   * @return object|array
+   * @return array
    *   The collection in a suitable format.
    */
-  protected function dumpCollection($collection, &$resolve = FALSE) {
+  protected function dumpCollection($collection) {
     $code = [];
 
     foreach ($collection as $key => $value) {
       if (is_array($value)) {
-        $resolve_collection = FALSE;
-        $code[$key] = $this->dumpCollection($value, $resolve_collection);
-
-        if ($resolve_collection) {
-          $resolve = TRUE;
-        }
+        $code[$key] = $this->dumpCollection($value);
       }
       else {
         $code[$key] = $this->dumpValue($value);
-        if (is_object($code[$key])) {
-          $resolve = TRUE;
-        }
       }
     }
 
-    if (!$resolve) {
-      return $collection;
-    }
-
-    return (object) [
-      'type' => 'collection',
-      'value' => $code,
-    ];
+    return $code;
   }
 
   /**
@@ -344,7 +312,6 @@ class OptimizedPhpArrayDumper extends Dumper {
   protected function dumpCallable($callable) {
     if (is_array($callable)) {
       $callable[0] = $this->dumpValue($callable[0]);
-      $callable = [$callable[0], $callable[1]];
     }
 
     return $callable;
@@ -413,16 +380,8 @@ class OptimizedPhpArrayDumper extends Dumper {
         return $this->getParameterCall($matches[1]);
       }
       else {
-        $replaceParameters = function ($matches) {
-          return $this->getParameterCall($matches[2]);
-        };
-
-        // We cannot directly return the string value because it would
-        // potentially not always be resolved in the dumpCollection() method.
-        return (object) [
-          'type' => 'raw',
-          'value' => str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $value)),
-        ];
+        // Unescape doubled percent signs back to single percents.
+        return $this->dumpLiteralString(str_replace('%%', '%', $value));
       }
     }
     elseif ($value instanceof Expression) {
@@ -443,6 +402,12 @@ class OptimizedPhpArrayDumper extends Dumper {
     }
     elseif (is_resource($value)) {
       throw new RuntimeException('Unable to dump a service container if a parameter is a resource.');
+    }
+
+    // Wrap literal strings so they are not confused with service references
+    // during resolution, where bare strings are treated as service IDs.
+    if (is_string($value)) {
+      return $this->dumpLiteralString($value);
     }
 
     return $value;
@@ -498,11 +463,15 @@ class OptimizedPhpArrayDumper extends Dumper {
    *   A suitable representation of the service reference.
    */
   protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-    return (object) [
-      'type' => 'service',
-      'id' => $id,
-      'invalidBehavior' => $invalid_behavior,
-    ];
+    if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+      return (object) [
+        'type' => 'service',
+        'id' => $id,
+        'invalidBehavior' => $invalid_behavior,
+      ];
+    }
+
+    return $id;
   }
 
   /**
@@ -518,6 +487,25 @@ class OptimizedPhpArrayDumper extends Dumper {
     return (object) [
       'type' => 'parameter',
       'name' => $name,
+    ];
+  }
+
+  /**
+   * Wraps a literal string value for the dump format.
+   *
+   * In the machine-optimized format, bare strings are treated as service
+   * references, so literal strings must be wrapped in a stdClass object.
+   *
+   * @param string $value
+   *   The literal string value.
+   *
+   * @return object|string
+   *   The wrapped value.
+   */
+  protected function dumpLiteralString(string $value) {
+    return (object) [
+      'type' => 'raw',
+      'value' => $value,
     ];
   }
 

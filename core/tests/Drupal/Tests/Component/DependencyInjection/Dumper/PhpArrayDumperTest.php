@@ -53,8 +53,42 @@ class PhpArrayDumperTest extends OptimizedPhpArrayDumperTest {
   /**
    * {@inheritdoc}
    */
-  protected static function getCollection($collection, $resolve = TRUE) {
-    return $collection;
+  protected static function getRawValue($value): string|object {
+    // In the human-readable format, strings starting with @ are escaped
+    // by prepending another @.
+    if ($value !== '' && $value[0] === '@') {
+      return '@' . $value;
+    }
+
+    return $value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function percentsEscapeProvider(): array {
+    return [
+      ['%foo%', '%%foo%%'],
+      ['foo%bar%', 'foo%%bar%%'],
+      ['%foo%bar', '%%foo%%bar'],
+      ['%', '%'],
+      ['%', '%%'],
+      ['%%', '%%%'],
+      ['%%', '%%%%'],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function atSignEscapeProvider(): array {
+    return [
+      'at-prefixed string is escaped' => ['@@admin', '@admin'],
+      'at-question string is escaped' => ['@@?foo', '@?foo'],
+      'double at is escaped' => ['@@@bar', '@@bar'],
+      'plain string passes through' => ['plain', 'plain'],
+      'empty string passes through' => ['', ''],
+    ];
   }
 
 }

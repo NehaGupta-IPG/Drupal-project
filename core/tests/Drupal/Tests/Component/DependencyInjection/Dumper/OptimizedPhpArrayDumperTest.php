@@ -241,7 +241,6 @@ class OptimizedPhpArrayDumperTest extends TestCase {
       'synthetic' => FALSE,
       'lazy' => FALSE,
       'arguments' => [],
-      'arguments_count' => 0,
       'properties' => [],
       'calls' => [],
       'shared' => TRUE,
@@ -268,39 +267,30 @@ class OptimizedPhpArrayDumperTest extends TestCase {
       'shared' => FALSE,
     ] + $base_service_definition;
 
-    $service_definitions[] = [
-      'lazy' => TRUE,
-    ] + $base_service_definition;
-
     // Test a basic public Reference.
     $service_definitions[] = [
       'arguments' => ['foo', new Reference('bar')],
-      'arguments_count' => 2,
-      'arguments_expected' => static::getCollection(['foo', static::getServiceCall('bar')]),
+      'arguments_expected' => [static::getRawValue('foo'), static::getServiceCall('bar')],
     ] + $base_service_definition;
 
     // Test a public reference that should not throw an Exception.
     $reference = new Reference('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE);
     $service_definitions[] = [
       'arguments' => [$reference],
-      'arguments_count' => 1,
-      'arguments_expected' => static::getCollection([static::getServiceCall('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE)]),
+      'arguments_expected' => [static::getServiceCall('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE)],
     ] + $base_service_definition;
 
     // Test a private shared service, denoted by having a Reference.
     $private_definition = [
       'class' => '\stdClass',
-      'public' => FALSE,
-      'arguments_count' => 0,
     ];
 
     $service_definitions[] = [
       'arguments' => ['foo', new Reference('private_definition')],
-      'arguments_count' => 2,
-      'arguments_expected' => static::getCollection([
-        'foo',
+      'arguments_expected' => [
+        static::getRawValue('foo'),
         static::getPrivateServiceCall('private_definition', $private_definition, TRUE),
-      ]),
+      ],
     ] + $base_service_definition;
 
     // Test a service closure.
@@ -312,14 +302,13 @@ class OptimizedPhpArrayDumperTest extends TestCase {
           'alias-2' => new ServiceClosureArgument(new Reference('bar', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)),
         ],
       ],
-      'arguments_count' => 2,
-      'arguments_expected' => static::getCollection([
-        'foo',
-        static::getCollection([
+      'arguments_expected' => [
+        static::getRawValue('foo'),
+        [
           'alias-1' => static::getServiceClosureCall('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE),
           'alias-2' => static::getServiceClosureCall('bar', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE),
-        ]),
-      ]),
+        ],
+      ],
     ] + $base_service_definition;
 
     // Test a private non-shared service, denoted by having a Definition.
@@ -328,44 +317,40 @@ class OptimizedPhpArrayDumperTest extends TestCase {
 
     $service_definitions[] = [
       'arguments' => ['foo', $private_definition_object],
-      'arguments_count' => 2,
-      'arguments_expected' => static::getCollection([
-        'foo',
+      'arguments_expected' => [
+        static::getRawValue('foo'),
         static::getPrivateServiceCall(NULL, $private_definition),
-      ]),
+      ],
     ] + $base_service_definition;
 
     // Test a deep collection without a reference.
     $service_definitions[] = [
       'arguments' => [[['foo']]],
-      'arguments_count' => 1,
+      'arguments_expected' => [[[static::getRawValue('foo')]]],
     ] + $base_service_definition;
 
     // Test a deep collection with a reference to resolve.
     $service_definitions[] = [
       'arguments' => [[new Reference('bar')]],
-      'arguments_count' => 1,
-      'arguments_expected' => static::getCollection([static::getCollection([static::getServiceCall('bar')])]),
+      'arguments_expected' => [[static::getServiceCall('bar')]],
     ] + $base_service_definition;
 
     // Test an IteratorArgument collection with a reference to resolve.
     $service_definitions[] = [
       'arguments' => [new IteratorArgument([new Reference('bar')])],
-      'arguments_count' => 1,
-      'arguments_expected' => static::getCollection([static::getIterator([static::getServiceCall('bar')])]),
+      'arguments_expected' => [static::getIterator([static::getServiceCall('bar')])],
     ] + $base_service_definition;
 
     // Test a collection with a variable to resolve.
     $service_definitions[] = [
       'arguments' => [new Parameter('llama_parameter')],
-      'arguments_count' => 1,
-      'arguments_expected' => static::getCollection([static::getParameterCall('llama_parameter')]),
+      'arguments_expected' => [static::getParameterCall('llama_parameter')],
     ] + $base_service_definition;
 
     // Test getMethodCalls.
     $calls = [
-      ['method', static::getCollection([])],
-      ['method2', static::getCollection([])],
+      ['method', []],
+      ['method2', []],
     ];
     $service_definitions[] = [
       'calls' => $calls,
@@ -384,11 +369,13 @@ class OptimizedPhpArrayDumperTest extends TestCase {
     // Test invalid factory - needed to test deep dumpValue().
     $service_definitions[] = [
       'factory' => [['foo', 'llama'], 'factoryMethod'],
+      'factory_expected' => [[static::getRawValue('foo'), static::getRawValue('llama')], 'factoryMethod'],
     ] + $base_service_definition;
 
     // Test properties.
     $service_definitions[] = [
       'properties' => ['_value' => 'llama'],
+      'properties_expected' => ['_value' => static::getRawValue('llama')],
     ] + $base_service_definition;
 
     // Test configurator.
@@ -409,7 +396,6 @@ class OptimizedPhpArrayDumperTest extends TestCase {
       $definition->isPublic()->willReturn($service_definition['public']);
       $definition->getFile()->willReturn($service_definition['file']);
       $definition->isSynthetic()->willReturn($service_definition['synthetic']);
-      $definition->isLazy()->willReturn($service_definition['lazy']);
       $definition->getArguments()->willReturn($service_definition['arguments']);
       $definition->getProperties()->willReturn($service_definition['properties']);
       $definition->getMethodCalls()->willReturn($service_definition['calls']);
@@ -424,7 +410,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
         $filtered_service_definition[$key] = $service_definition[$key];
         unset($service_definition[$key]);
 
-        if ($key == 'class' || $key == 'arguments_count') {
+        if ($key == 'class') {
           continue;
         }
 
@@ -433,11 +419,14 @@ class OptimizedPhpArrayDumperTest extends TestCase {
         }
       }
 
+      // Remove keys the dumper no longer emits.
+      unset($filtered_service_definition['lazy']);
+
       // Add remaining properties.
       $filtered_service_definition += $service_definition;
 
       // Allow to set _expected values.
-      foreach (['arguments', 'factory', 'configurator'] as $key) {
+      foreach (['arguments', 'properties', 'factory', 'configurator'] as $key) {
         $expected = $key . '_expected';
         if (isset($filtered_service_definition[$expected])) {
           $filtered_service_definition[$key] = $filtered_service_definition[$expected];
@@ -475,11 +464,15 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    * Helper function to return a service definition.
    */
   protected static function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-    return (object) [
-      'type' => 'service',
-      'id' => $id,
-      'invalidBehavior' => $invalid_behavior,
-    ];
+    if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+      return (object) [
+        'type' => 'service',
+        'id' => $id,
+        'invalidBehavior' => $invalid_behavior,
+      ];
+    }
+
+    return $id;
   }
 
   /**
@@ -509,9 +502,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
     }
     else {
       $bar_definition->setPublic(FALSE);
-      $bar_definition_php_array['public'] = FALSE;
     }
-    $bar_definition_php_array['arguments_count'] = 0;
 
     $services['bar'] = $bar_definition;
 
@@ -535,10 +526,9 @@ class OptimizedPhpArrayDumperTest extends TestCase {
     }
     $data = [
       'class' => '\stdClass',
-      'arguments' => static::getCollection([
+      'arguments' => [
         $service_definition,
-      ]),
-      'arguments_count' => 1,
+      ],
     ];
     $this->assertEquals(static::serializeDefinition($data), $dump['services']['foo'], 'Expected definition matches dump.');
   }
@@ -636,10 +626,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
 
     $this->assertEquals(static::serializeDefinition([
       'class' => '\stdClass',
-      'arguments' => static::getCollection([
-        $this->getRaw($expected),
-      ]),
-      'arguments_count' => 1,
+      'arguments' => [$expected],
     ]), $dump['services']['test']);
   }
 
@@ -652,14 +639,53 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    *     - escaped value in service definition.
    */
   public static function percentsEscapeProvider(): array {
+    $raw = fn($v) => (object) ['type' => 'raw', 'value' => $v];
     return [
-      ['%foo%', '%%foo%%'],
-      ['foo%bar%', 'foo%%bar%%'],
-      ['%foo%bar', '%%foo%%bar'],
-      ['%', '%'],
-      ['%', '%%'],
-      ['%%', '%%%'],
-      ['%%', '%%%%'],
+      [$raw('%foo%'), '%%foo%%'],
+      [$raw('foo%bar%'), 'foo%%bar%%'],
+      [$raw('%foo%bar'), '%%foo%%bar'],
+      [$raw('%'), '%'],
+      [$raw('%'), '%%'],
+      [$raw('%%'), '%%%'],
+      [$raw('%%'), '%%%%'],
+    ];
+  }
+
+  /**
+   * Tests that string arguments starting with @ are escaped in the dump.
+   */
+  #[DataProvider('atSignEscapeProvider')]
+  public function testAtSignEscape($expected, $argument): void {
+    $definition = new Definition('\stdClass', [$argument]);
+    $definition->setPublic(TRUE);
+    $this->containerBuilder->getDefinitions()->willReturn([
+      'test' => $definition,
+    ]);
+
+    $dump = $this->dumper->getArray();
+
+    $this->assertEquals(static::serializeDefinition([
+      'class' => '\stdClass',
+      'arguments' => [$expected],
+    ]), $dump['services']['test']);
+  }
+
+  /**
+   * Data provider for testAtSignEscape().
+   *
+   * @return array[]
+   *   Returns data-set elements with:
+   *     - expected dumped value.
+   *     - original value in service definition.
+   */
+  public static function atSignEscapeProvider(): array {
+    $raw = fn($v) => (object) ['type' => 'raw', 'value' => $v];
+    return [
+      'at-prefixed string is wrapped' => [$raw('@admin'), '@admin'],
+      'at-question string is wrapped' => [$raw('@?foo'), '@?foo'],
+      'double at is wrapped' => [$raw('@@bar'), '@@bar'],
+      'plain string is wrapped' => [$raw('plain'), 'plain'],
+      'empty string is wrapped' => [$raw(''), ''],
     ];
   }
 
@@ -676,16 +702,6 @@ class OptimizedPhpArrayDumperTest extends TestCase {
       'id' => $id,
       'value' => $service_definition,
       'shared' => $shared,
-    ];
-  }
-
-  /**
-   * Helper function to return a machine-optimized collection.
-   */
-  protected static function getCollection($collection) {
-    return (object) [
-      'type' => 'collection',
-      'value' => $collection,
     ];
   }
 
@@ -710,9 +726,9 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   }
 
   /**
-   * Helper function to return a raw value definition.
+   * Helper function to return a wrapped literal string value.
    */
-  protected function getRaw($value) {
+  protected static function getRawValue($value): string|object {
     return (object) [
       'type' => 'raw',
       'value' => $value,

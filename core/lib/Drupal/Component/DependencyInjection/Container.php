@@ -234,11 +234,7 @@ class Container implements ContainerInterface, ResetInterface {
 
     $arguments = [];
     if (isset($definition['arguments'])) {
-      $arguments = $definition['arguments'];
-
-      if ($arguments instanceof \stdClass) {
-        $arguments = $this->resolveServicesAndParameters($arguments);
-      }
+      $arguments = $this->resolveServicesAndParameters($definition['arguments']);
     }
 
     if (isset($definition['file'])) {
@@ -249,7 +245,7 @@ class Container implements ContainerInterface, ResetInterface {
     if (isset($definition['factory'])) {
       $factory = $definition['factory'];
       if (is_array($factory)) {
-        $factory = $this->resolveServicesAndParameters([$factory[0], $factory[1]]);
+        $factory[0] = $this->resolveServicesAndParameters([$factory[0]])[0];
       }
       elseif (!is_string($factory)) {
         throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
@@ -271,19 +267,14 @@ class Container implements ContainerInterface, ResetInterface {
         $method = $call[0];
         $arguments = [];
         if (!empty($call[1])) {
-          $arguments = $call[1];
-          if ($arguments instanceof \stdClass) {
-            $arguments = $this->resolveServicesAndParameters($arguments);
-          }
+          $arguments = $this->resolveServicesAndParameters($call[1]);
         }
         call_user_func_array([$service, $method], $arguments);
       }
     }
 
     if (isset($definition['properties'])) {
-      if ($definition['properties'] instanceof \stdClass) {
-        $definition['properties'] = $this->resolveServicesAndParameters($definition['properties']);
-      }
+      $definition['properties'] = $this->resolveServicesAndParameters($definition['properties']);
       foreach ($definition['properties'] as $key => $value) {
         $service->{$key} = $value;
       }
@@ -292,7 +283,7 @@ class Container implements ContainerInterface, ResetInterface {
     if (isset($definition['configurator'])) {
       $callable = $definition['configurator'];
       if (is_array($callable)) {
-        $callable = $this->resolveServicesAndParameters($callable);
+        $callable[0] = $this->resolveServicesAndParameters([$callable[0]])[0];
       }
 
       if (!is_callable($callable)) {
@@ -374,23 +365,27 @@ class Container implements ContainerInterface, ResetInterface {
    *   If an unknown type is met while resolving parameters and services.
    */
   protected function resolveServicesAndParameters($arguments) {
-    // Check if this collection needs to be resolved.
-    if ($arguments instanceof \stdClass) {
-      if ($arguments->type !== 'collection') {
-        throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $arguments->type));
-      }
-      $arguments = $arguments->value;
-    }
-
     // Process the arguments.
     foreach ($arguments as $key => $argument) {
-      // For this machine-optimized format, only \stdClass arguments are
-      // processed and resolved. All other values are kept as is.
-      if ($argument instanceof \stdClass) {
+      // In the machine-optimized format, bare strings are service references
+      // with EXCEPTION_ON_INVALID_REFERENCE behavior. This is the most common
+      // argument type, so check it first.
+      if (is_string($argument)) {
+        if (isset($this->aliases[$argument])) {
+          $argument = $this->aliases[$argument];
+        }
+
+        $arguments[$key] = $this->services[$argument] ?? $this->get($argument);
+      }
+      // stdClass objects encode parameters, literals, service references with
+      // non-default behavior, closures, private services, and iterators.
+      elseif ($argument instanceof \stdClass) {
         $type = $argument->type;
 
-        // Check for parameter.
-        if ($type == 'parameter') {
+        if ($type == 'raw') {
+          $arguments[$key] = $argument->value;
+        }
+        elseif ($type == 'parameter') {
           $name = $argument->name;
           if (!isset($this->parameters[$name])) {
             $arguments[$key] = $this->getParameter($name);
@@ -398,39 +393,11 @@ class Container implements ContainerInterface, ResetInterface {
             // because we already checked that the parameter is not set above.
           }
 
-          // Update argument.
-          $argument = $arguments[$key] = $this->parameters[$name];
-
-          // In case there is not a machine readable value (e.g. a service)
-          // behind this resolved parameter, continue.
-          if (!($argument instanceof \stdClass)) {
-            continue;
-          }
-
-          // Fall through.
-          $type = $argument->type;
+          $arguments[$key] = $this->parameters[$name];
         }
-
-        // Create a service.
-        if ($type == 'service') {
-          $id = $argument->id;
-
-          // Does the service already exist?
-          if (isset($this->aliases[$id])) {
-            $id = $this->aliases[$id];
-          }
-
-          if (isset($this->services[$id])) {
-            $arguments[$key] = $this->services[$id];
-            continue;
-          }
-
-          // Return the service.
-          $arguments[$key] = $this->get($id, $argument->invalidBehavior);
-
-          continue;
+        elseif ($type == 'service') {
+          $arguments[$key] = $this->get($argument->id, $argument->invalidBehavior);
         }
-        // Create private service.
         elseif ($type == 'private_service') {
           $id = $argument->id;
 
@@ -445,15 +412,11 @@ class Container implements ContainerInterface, ResetInterface {
           if ($argument->shared) {
             $this->privateServices[$id] = $arguments[$key];
           }
-
-          continue;
         }
         elseif ($type == 'service_closure') {
           $arguments[$key] = function () use ($argument) {
             return $this->get($argument->id, $argument->invalidBehavior);
           };
-
-          continue;
         }
         elseif ($type == 'iterator') {
           $services = $argument->value;
@@ -462,25 +425,15 @@ class Container implements ContainerInterface, ResetInterface {
               yield $key => $this->resolveServicesAndParameters([$service])[0];
             }
           }, count($services));
-
-          continue;
         }
-        // Check for collection.
-        elseif ($type == 'collection') {
-          $arguments[$key] = $this->resolveServicesAndParameters($argument->value);
-
-          continue;
-        }
-        elseif ($type == 'raw') {
-          $arguments[$key] = $argument->value;
-
-          continue;
-        }
-
-        if ($type !== NULL) {
+        else {
           throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $type));
         }
       }
+      elseif (is_array($argument)) {
+        $arguments[$key] = $this->resolveServicesAndParameters($argument);
+      }
+      // int, bool, null, float — pass through.
     }
 
     return $arguments;
