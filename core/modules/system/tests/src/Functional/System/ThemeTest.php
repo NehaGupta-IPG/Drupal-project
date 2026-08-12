@@ -451,9 +451,9 @@ INFO;
   public function testSwitchDefaultTheme(): void {
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = \Drupal::service('theme_installer');
-    // First, install Stark and set it as the default theme programmatically.
-    $theme_installer->install(['stark']);
-    $this->config('system.theme')->set('default', 'stark')->save();
+    // First, install Claro and set it as the default theme programmatically.
+    $theme_installer->install(['claro']);
+    $this->config('system.theme')->set('default', 'claro')->save();
     $this->drupalPlaceBlock('local_tasks_block');
 
     // Install Olivero and set it as the default theme.
@@ -465,13 +465,13 @@ INFO;
     // Test the default theme on the secondary links (blocks admin page).
     $this->drupalGet('admin/structure/block');
     $this->assertSession()->pageTextContains('Olivero');
-    // Switch back to Stark and test again to test that the menu cache is
+    // Switch back to Claro and test again to test that the menu cache is
     // cleared.
     $this->drupalGet('admin/appearance');
     // Stark is the first 'Set as default' link.
     $this->clickLink('Set as default');
     $this->drupalGet('admin/structure/block');
-    $this->assertSession()->pageTextContains('Stark');
+    $this->assertSession()->pageTextContains('Claro');
   }
 
   /**

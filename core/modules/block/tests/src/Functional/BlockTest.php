@@ -300,7 +300,6 @@ class BlockTest extends BlockTestBase {
     $themes = [
       'olivero',
       'claro',
-      'stark',
     ];
     \Drupal::service('theme_installer')->install($themes);
     $theme_settings = $this->config('system.theme');
