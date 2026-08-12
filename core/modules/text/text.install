@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Text module.
+ */
+
+/**
+ * Drop the text settings config.
+ */
+function text_update_11401(): void {
+  \Drupal::configFactory()
+    ->getEditable('text.settings')
+    ->delete();
+}

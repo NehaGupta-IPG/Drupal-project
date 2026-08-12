@@ -37,7 +37,8 @@ function text_summary($text, $format = NULL, $size = NULL) {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service(TextSummary::class)->generate() instead. See https://www.drupal.org/node/3568389', E_USER_DEPRECATED);
 
   if (!isset($size)) {
-    $size = \Drupal::config('text.settings')->get('default_summary_length');
+    // 60 was the previous text setting default value.
+    $size = 60;
   }
   return \Drupal::service(TextSummary::class)->generate($text, $format, (int) $size);
 }

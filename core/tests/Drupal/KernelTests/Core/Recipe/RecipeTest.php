@@ -103,7 +103,7 @@ class RecipeTest extends KernelTestBase {
     $recipe = Recipe::createFromDirectory('core/recipes/example');
     RecipeRunner::processRecipe($recipe);
     // Verify if the 'default_summary_length' value is updated.
-    $this->assertSame($this->config('text.settings')->get('default_summary_length'), 700);
+    $this->assertSame($this->config('user.settings')->get('anonymous'), 'Anonymous Test');
   }
 
   /**
