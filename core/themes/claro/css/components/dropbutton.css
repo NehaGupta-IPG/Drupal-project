@@ -25,7 +25,7 @@
   --dropbutton-border-size: 1px;
   --dropbutton-toggle-size-spacing: var(--dropbutton-border-size);
   --dropbutton-border-radius-size: 2px;
-  --dropbutton-item-max-width: 12.5rem;
+  --dropbutton-item-max-width: auto;
   /* Variant variables: small. */
   --dropbutton-small-spacing-size: 0.625rem;
   --dropbutton-small-font-size: var(--font-size-xs);
