@@ -64,7 +64,7 @@ class Rss extends RssPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function buildOptionsForm_summary_options() {
+  public function buildOptionsForm_summary_options(): array {
     $options = parent::buildOptionsForm_summary_options();
     $options[$this::TITLE_VIEW_MODE] = $this->t('Title only');
     return $options;
