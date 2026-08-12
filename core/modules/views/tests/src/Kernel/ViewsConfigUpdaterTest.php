@@ -33,8 +33,10 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   /**
    * Tests ViewsConfigUpdater.
    */
-  #[Skip('Permanent: see https://www.drupal.org/node/3442162')]
+  #[Skip]
   public function testViewsConfigUpdater(): void {
+    // ViewsConfigUpdater currently contains no actual configuration update
+    // logic. Replace this method with a real test when it does.
   }
 
   /**
