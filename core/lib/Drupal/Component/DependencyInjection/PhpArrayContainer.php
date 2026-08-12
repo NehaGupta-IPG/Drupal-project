@@ -109,12 +109,8 @@ class PhpArrayContainer extends Container {
       if (is_array($callable)) {
         $callable = $this->resolveServicesAndParameters($callable);
       }
-
-      if (!is_callable($callable)) {
-        throw new InvalidArgumentException(sprintf('The configurator for class "%s" is not a callable.', get_class($service)));
-      }
-
-      call_user_func($callable, $service);
+      // If the configurator is not callable, PHP throws a native Error.
+      $callable($service);
     }
 
     return $service;
@@ -123,7 +119,7 @@ class PhpArrayContainer extends Container {
   /**
    * {@inheritdoc}
    */
-  protected function resolveServicesAndParameters($arguments) {
+  protected function resolveServicesAndParameters(array $arguments): array {
     // This method is different from the parent method only for the following
     // cases:
     // - A service is denoted by '@service' and not by a \stdClass object.

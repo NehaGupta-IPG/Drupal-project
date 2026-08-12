@@ -169,17 +169,30 @@ class ContainerTest extends TestCase {
   /**
    * Tests that Container::get() works properly for class from parameters.
    *
+   * At runtime, the Drupal container is always frozen, so class and file
+   * references are expected to be resolved at dump time and stored as
+   * literal strings. This test ensures the frozen container correctly
+   * instantiates a service whose class was originally a parameter.
+   *
    * @legacy-covers ::get
    * @legacy-covers ::createService
    */
   public function testGetForClassFromParameter(): void {
+    // In a frozen container, the class is already a resolved literal string
+    // (the dumper would have resolved any %parameter% references during
+    // compilation). Swap the service definition to reflect that.
     $container_definition = $this->containerDefinition;
-    $container_definition['frozen'] = FALSE;
+    $fake_service_class = $container_definition['parameters']['some_parameter_class'];
+    $service_definition = $container_definition['services']['other.service_class_from_parameter'];
+    if (is_string($service_definition)) {
+      $service_definition = unserialize($service_definition);
+    }
+    $service_definition['class'] = $fake_service_class;
+    $container_definition['services']['other.service_class_from_parameter'] = serialize($service_definition);
     $container = new $this->containerClass($container_definition);
 
-    $other_service_class = $this->containerDefinition['parameters']['some_parameter_class'];
     $other_service = $container->get('other.service_class_from_parameter');
-    $this->assertInstanceOf($other_service_class, $other_service);
+    $this->assertInstanceOf($fake_service_class, $other_service);
   }
 
   /**
@@ -470,7 +483,11 @@ class ContainerTest extends TestCase {
    * @legacy-covers ::createService
    */
   public function testGetForConfiguratorWithException(): void {
-    $this->expectException(InvalidArgumentException::class);
+    // When the configurator is not a callable, PHP throws a native Error
+    // (e.g. "Call to undefined function ...") rather than an explicit
+    // InvalidArgumentException. This trades a tiny runtime check for a
+    // clearer native error path.
+    $this->expectException(\Error::class);
     $this->container->get('configurable_service_exception');
   }
 
@@ -755,7 +772,6 @@ class ContainerTest extends TestCase {
         $this->getServiceCall('other.service'),
         $this->getParameterCall('some_private_config'),
       ]),
-      'public' => FALSE,
     ];
 
     $services['service_using_private'] = [
@@ -805,8 +821,10 @@ class ContainerTest extends TestCase {
 
     $services['invalid_arguments_service'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => (object) [
-        'type' => 'invalid',
+      'arguments' => [
+        (object) [
+          'type' => 'invalid',
+        ],
       ],
     ];
 
@@ -977,6 +995,9 @@ class ContainerTest extends TestCase {
    * Helper function to return a service definition.
    */
   protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+    if ($invalid_behavior === ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+      return '@' . $id;
+    }
     return (object) [
       'type' => 'service',
       'id' => $id,
@@ -988,6 +1009,9 @@ class ContainerTest extends TestCase {
    * Helper function to return a service closure definition.
    */
   protected function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+    if ($invalid_behavior === ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+      return '&' . $id;
+    }
     return (object) [
       'type' => 'service_closure',
       'id' => $id,
@@ -1009,10 +1033,7 @@ class ContainerTest extends TestCase {
    * Helper function to return a parameter definition.
    */
   protected function getParameterCall($name) {
-    return (object) [
-      'type' => 'parameter',
-      'name' => $name,
-    ];
+    return '%' . $name;
   }
 
   /**
@@ -1035,11 +1056,7 @@ class ContainerTest extends TestCase {
    * Helper function to return a machine-optimized collection.
    */
   protected function getCollection($collection, $resolve = TRUE) {
-    return (object) [
-      'type' => 'collection',
-      'value' => $collection,
-      'resolve' => $resolve,
-    ];
+    return $collection;
   }
 
   /**

@@ -19,7 +19,19 @@ use Symfony\Contracts\Service\ResetInterface;
  * class, but optimized for speed.
  *
  * It is based on a PHP array container definition dumped as a
- * performance-optimized machine-readable format.
+ * performance-optimized machine-readable format. To minimize object
+ * allocation during bootstrap, service arguments are encoded as prefixed
+ * strings:
+ *
+ *   '@service_id'    -> service reference
+ *   '&service_id'    -> service closure (lazy-resolved)
+ *   '%parameter'     -> container parameter reference
+ *   'literal string' -> literal string, passed through unchanged
+ *
+ * Plain arrays hold collections of arguments; collections are no longer
+ * wrapped in stdClass. Rare cases (non-default invalid behaviors, private
+ * services, iterators, and strings containing embedded parameter references)
+ * still use stdClass encoding and are handled by the resolver's cold path.
  *
  * The best way to initialize this container is to use a Container Builder,
  * compile it and then retrieve the definition via
@@ -98,6 +110,15 @@ class Container implements ContainerInterface, ResetInterface {
   protected $frozen = TRUE;
 
   /**
+   * The list of deprecated services (service id => deprecation message).
+   *
+   * Cached from parameters for fast lookup on the get() hot path.
+   *
+   * @var array
+   */
+  protected $deprecatedServices = [];
+
+  /**
    * Constructs a new Container instance.
    *
    * @param array $container_definition
@@ -119,6 +140,7 @@ class Container implements ContainerInterface, ResetInterface {
     $this->parameters = $container_definition['parameters'] ?? [];
     $this->serviceDefinitions = $container_definition['services'] ?? [];
     $this->frozen = $container_definition['frozen'] ?? FALSE;
+    $this->deprecatedServices = $this->parameters['_deprecated_service_list'] ?? [];
   }
 
   /**
@@ -185,11 +207,11 @@ class Container implements ContainerInterface, ResetInterface {
 
     unset($this->loading[$id]);
 
-    if (isset($this->parameters['_deprecated_service_list'][$id])) {
-      @trigger_error($this->parameters['_deprecated_service_list'][$id], E_USER_DEPRECATED);
+    if (isset($this->deprecatedServices[$id])) {
+      @trigger_error($this->deprecatedServices[$id], E_USER_DEPRECATED);
     }
-    if (isset($alias) && isset($this->parameters['_deprecated_service_list'][$alias])) {
-      @trigger_error($this->parameters['_deprecated_service_list'][$alias], E_USER_DEPRECATED);
+    if (isset($alias, $this->deprecatedServices[$alias])) {
+      @trigger_error($this->deprecatedServices[$alias], E_USER_DEPRECATED);
     }
 
     return $service;
@@ -220,9 +242,6 @@ class Container implements ContainerInterface, ResetInterface {
    *
    * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
    *   Thrown when the service is a synthetic service.
-   * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-   *   Thrown when the configurator callable in $definition['configurator'] is
-   *   not actually a callable.
    * @throws \ReflectionException
    *   Thrown when the service class takes more than 10 parameters to construct,
    *   and cannot be instantiated.
@@ -234,16 +253,11 @@ class Container implements ContainerInterface, ResetInterface {
 
     $arguments = [];
     if (isset($definition['arguments'])) {
-      $arguments = $definition['arguments'];
-
-      if ($arguments instanceof \stdClass) {
-        $arguments = $this->resolveServicesAndParameters($arguments);
-      }
+      $arguments = $this->resolveServicesAndParameters($definition['arguments']);
     }
 
     if (isset($definition['file'])) {
-      $file = $this->frozen ? $definition['file'] : current($this->resolveServicesAndParameters([$definition['file']]));
-      require_once $file;
+      require_once $definition['file'];
     }
 
     if (isset($definition['factory'])) {
@@ -255,36 +269,25 @@ class Container implements ContainerInterface, ResetInterface {
         throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
       }
 
-      $service = call_user_func_array($factory, $arguments);
+      $service = $factory(...$arguments);
     }
     else {
-      $class = $this->frozen ? $definition['class'] : current($this->resolveServicesAndParameters([$definition['class']]));
+      $class = $definition['class'];
       $service = new $class(...$arguments);
     }
 
-    if (!isset($definition['shared']) || $definition['shared'] !== FALSE) {
+    if (!isset($definition['shared'])) {
       $this->services[$id] = $service;
     }
 
     if (isset($definition['calls'])) {
-      foreach ($definition['calls'] as $call) {
-        $method = $call[0];
-        $arguments = [];
-        if (!empty($call[1])) {
-          $arguments = $call[1];
-          if ($arguments instanceof \stdClass) {
-            $arguments = $this->resolveServicesAndParameters($arguments);
-          }
-        }
-        call_user_func_array([$service, $method], $arguments);
+      foreach ($definition['calls'] as [$method, $call_args]) {
+        $service->{$method}(...$this->resolveServicesAndParameters($call_args ?? []));
       }
     }
 
     if (isset($definition['properties'])) {
-      if ($definition['properties'] instanceof \stdClass) {
-        $definition['properties'] = $this->resolveServicesAndParameters($definition['properties']);
-      }
-      foreach ($definition['properties'] as $key => $value) {
+      foreach ($this->resolveServicesAndParameters($definition['properties']) as $key => $value) {
         $service->{$key} = $value;
       }
     }
@@ -294,12 +297,7 @@ class Container implements ContainerInterface, ResetInterface {
       if (is_array($callable)) {
         $callable = $this->resolveServicesAndParameters($callable);
       }
-
-      if (!is_callable($callable)) {
-        throw new InvalidArgumentException(sprintf('The configurator for class "%s" is not a callable.', get_class($service)));
-      }
-
-      call_user_func($callable, $service);
+      $callable($service);
     }
 
     return $service;
@@ -360,9 +358,11 @@ class Container implements ContainerInterface, ResetInterface {
   }
 
   /**
-   * Resolves arguments that represent services or variables to the real values.
+   * Resolves arguments that represent services or parameters to real values.
    *
-   * @param array|object $arguments
+   * See the class docblock for the prefix-string encoding this recognizes.
+   *
+   * @param array $arguments
    *   The arguments to resolve.
    *
    * @return array
@@ -373,117 +373,118 @@ class Container implements ContainerInterface, ResetInterface {
    * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
    *   If an unknown type is met while resolving parameters and services.
    */
-  protected function resolveServicesAndParameters($arguments) {
-    // Check if this collection needs to be resolved.
-    if ($arguments instanceof \stdClass) {
-      if ($arguments->type !== 'collection') {
-        throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $arguments->type));
-      }
-      $arguments = $arguments->value;
-    }
-
-    // Process the arguments.
+  protected function resolveServicesAndParameters(array $arguments): array {
     foreach ($arguments as $key => $argument) {
-      // For this machine-optimized format, only \stdClass arguments are
-      // processed and resolved. All other values are kept as is.
-      if ($argument instanceof \stdClass) {
-        $type = $argument->type;
+      if (is_string($argument) && isset($argument[0])) {
+        $first = $argument[0];
 
-        // Check for parameter.
-        if ($type == 'parameter') {
-          $name = $argument->name;
-          if (!isset($this->parameters[$name])) {
+        // Service reference: '@id'.
+        if ($first === '@') {
+          $svc_id = substr($argument, 1);
+          if (isset($this->aliases[$svc_id])) {
+            $svc_id = $this->aliases[$svc_id];
+          }
+          $arguments[$key] = $this->services[$svc_id] ?? $this->get($svc_id);
+          continue;
+        }
+
+        // Service closure: '&id'.
+        if ($first === '&') {
+          $svc_id = substr($argument, 1);
+          $arguments[$key] = fn() => $this->get($svc_id);
+          continue;
+        }
+
+        // Parameter reference: '%name'.
+        if ($first === '%') {
+          $name = substr($argument, 1);
+          if (!array_key_exists($name, $this->parameters)) {
+            // getParameter() throws when the parameter is missing.
             $arguments[$key] = $this->getParameter($name);
-            // This can never be reached as getParameter() throws an Exception,
-            // because we already checked that the parameter is not set above.
-          }
-
-          // Update argument.
-          $argument = $arguments[$key] = $this->parameters[$name];
-
-          // In case there is not a machine readable value (e.g. a service)
-          // behind this resolved parameter, continue.
-          if (!($argument instanceof \stdClass)) {
             continue;
           }
-
-          // Fall through.
-          $type = $argument->type;
-        }
-
-        // Create a service.
-        if ($type == 'service') {
-          $id = $argument->id;
-
-          // Does the service already exist?
-          if (isset($this->aliases[$id])) {
-            $id = $this->aliases[$id];
+          $value = $this->parameters[$name];
+          // A parameter's value may itself be a prefix-encoded reference or a
+          // stdClass wrapper. Recurse to resolve those cases.
+          if ((is_string($value) && isset($value[0]) && ($value[0] === '@' || $value[0] === '&' || $value[0] === '%'))
+            || $value instanceof \stdClass) {
+            $arguments[$key] = $this->resolveServicesAndParameters([$value])[0];
           }
-
-          if (isset($this->services[$id])) {
-            $arguments[$key] = $this->services[$id];
-            continue;
+          else {
+            $arguments[$key] = $value;
           }
-
-          // Return the service.
-          $arguments[$key] = $this->get($id, $argument->invalidBehavior);
-
-          continue;
-        }
-        // Create private service.
-        elseif ($type == 'private_service') {
-          $id = $argument->id;
-
-          // Does the private service already exist.
-          if (isset($this->privateServices[$id])) {
-            $arguments[$key] = $this->privateServices[$id];
-            continue;
-          }
-
-          // Create the private service.
-          $arguments[$key] = $this->createService($argument->value, $id);
-          if ($argument->shared) {
-            $this->privateServices[$id] = $arguments[$key];
-          }
-
-          continue;
-        }
-        elseif ($type == 'service_closure') {
-          $arguments[$key] = function () use ($argument) {
-            return $this->get($argument->id, $argument->invalidBehavior);
-          };
-
-          continue;
-        }
-        elseif ($type == 'iterator') {
-          $services = $argument->value;
-          $arguments[$key] = new RewindableGenerator(function () use ($services) {
-            foreach ($services as $key => $service) {
-              yield $key => $this->resolveServicesAndParameters([$service])[0];
-            }
-          }, count($services));
-
-          continue;
-        }
-        // Check for collection.
-        elseif ($type == 'collection') {
-          $arguments[$key] = $this->resolveServicesAndParameters($argument->value);
-
-          continue;
-        }
-        elseif ($type == 'raw') {
-          $arguments[$key] = $argument->value;
-
           continue;
         }
 
-        if ($type !== NULL) {
-          throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $type));
-        }
+        // Literal string, pass through.
+        continue;
+      }
+
+      if (is_array($argument)) {
+        $arguments[$key] = $this->resolveServicesAndParameters($argument);
+        continue;
+      }
+
+      if ($argument instanceof \stdClass) {
+        $arguments[$key] = $this->resolveStdClassArgument($argument);
       }
     }
 
     return $arguments;
+  }
+
+  /**
+   * Resolves a stdClass-encoded argument (cold path).
+   *
+   * @param \stdClass $arg
+   *   The argument to resolve.
+   *
+   * @return mixed
+   *   The resolved value.
+   *
+   * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+   *   If the type is unknown.
+   */
+  protected function resolveStdClassArgument(\stdClass $arg): mixed {
+    return match ($arg->type) {
+      'raw' => $arg->value,
+      'service' => $this->get($arg->id, $arg->invalidBehavior),
+      'service_closure' => (function () use ($arg) {
+        $id = $arg->id;
+        $behavior = $arg->invalidBehavior;
+        return fn() => $this->get($id, $behavior);
+      })(),
+      'private_service' => $this->resolvePrivateService($arg),
+      'iterator' => $this->resolveIterator($arg->value),
+      'parameter' => $this->parameters[$arg->name] ?? $this->getParameter($arg->name),
+      'collection' => $this->resolveServicesAndParameters($arg->value),
+      default => throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $arg->type)),
+    };
+  }
+
+  /**
+   * Resolves a private service stdClass argument.
+   */
+  private function resolvePrivateService(\stdClass $arg): object {
+    if (isset($this->privateServices[$arg->id])) {
+      return $this->privateServices[$arg->id];
+    }
+    $instance = $this->createService($arg->value, $arg->id);
+    if ($arg->shared) {
+      $this->privateServices[$arg->id] = $instance;
+    }
+    return $instance;
+  }
+
+  /**
+   * Resolves an iterator of service references.
+   */
+  private function resolveIterator(array $services): RewindableGenerator {
+    return new RewindableGenerator(function () use ($services) {
+      foreach ($services as $key => $service) {
+        yield $key => $this->resolveServicesAndParameters([$service])[0];
+      }
+    }, count($services));
   }
 
   /**
