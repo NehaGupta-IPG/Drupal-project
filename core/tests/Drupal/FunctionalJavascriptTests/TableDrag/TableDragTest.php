@@ -592,11 +592,14 @@ class TableDragTest extends WebDriverTestBase {
    *   (optional) How many times to press the arrow button. Defaults to 1.
    */
   protected function moveRowWithKeyboard(NodeElement $row, $arrow, $repeat = 1): void {
+    // Passes not a key code number but a key name to NodeElement::keyDown()
+    // method because KeyboardEvent.key returns wrong value
+    // on Functional JavaScript testing.
     $keys = [
-      'left' => 37,
-      'right' => 39,
-      'up' => 38,
-      'down' => 40,
+      'left' => 'ArrowLeft',
+      'right' => 'ArrowRight',
+      'up' => 'ArrowUp',
+      'down' => 'ArrowDown',
     ];
     if (!isset($keys[$arrow])) {
       throw new \InvalidArgumentException('The arrow parameter must be one of "left", "right", "up" or "down".');

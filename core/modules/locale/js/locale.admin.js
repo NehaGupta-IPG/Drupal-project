@@ -71,7 +71,7 @@
 
         // Open/close the description details by toggling a tr class.
         $tableBodies.on('click keydown', '.description', function (e) {
-          if (e.keyCode && e.keyCode !== 13 && e.keyCode !== 32) {
+          if (e.key !== 'Enter' && e.code !== 'Space') {
             return;
           }
           e.preventDefault();
