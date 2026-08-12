@@ -17,6 +17,7 @@ use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\HttpFoundation\FileBag;
@@ -1169,9 +1170,38 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // though the user clicked the first button. Therefore, to be as
       // consistent as we can be across browsers, if no 'triggering_element' has
       // been identified yet, default it to the first button.
-      $buttons = $form_state->getButtons();
-      if (!$form_state->isProgrammed() && !$form_state->getTriggeringElement() && !empty($buttons)) {
-        $form_state->setTriggeringElement($buttons[0]);
+      // But before that, check the user input.
+      if (!$form_state->isProgrammed() && !$form_state->getTriggeringElement()) {
+        $user_input = $form_state->getUserInput();
+        $buttons = $form_state->getButtons();
+        $invalid_triggering_element = FALSE;
+
+        $request = $this->requestStack->getCurrentRequest();
+        $is_ajax = $request->query->has(static::AJAX_FORM_REQUEST) || $request->isXmlHttpRequest();
+
+        if (!$is_ajax && !empty($user_input['_triggering_element_name'])) {
+          // If a triggering element is set in the user input,
+          // but no triggering element could be determined,
+          // the user probably didn't want to submit this.
+          // See self::elementTriggeredScriptedSubmission().
+          $form_state->setError($element, new TranslatableMarkup('The form submission is invalid.'));
+          $invalid_triggering_element = TRUE;
+        }
+        elseif (!$is_ajax && !empty($buttons)) {
+          // If a button element is set in the user input,
+          // but no triggering element could be determined,
+          // the user probably didn't want to submit this.
+          // See self::buttonWasClicked().
+          foreach ($buttons as $button) {
+            if (isset($user_input[$button['#name']])) {
+              $form_state->setError($button, new TranslatableMarkup('The form submission is invalid.'));
+              $invalid_triggering_element = TRUE;
+            }
+          }
+        }
+        if (!empty($buttons) && !$invalid_triggering_element) {
+          $form_state->setTriggeringElement($buttons[0]);
+        }
       }
 
       $triggering_element = $form_state->getTriggeringElement();
