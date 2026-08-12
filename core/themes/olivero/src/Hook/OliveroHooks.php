@@ -27,7 +27,7 @@ class OliveroHooks {
     // or during site installation. Setting site_name to an empty string makes
     // the site and update pages look cleaner.
     // @see \Drupal\Core\Theme\ThemePreprocess::preprocessMaintenancePage()
-    if (!$variables['db_is_active']) {
+    if (defined('MAINTENANCE_MODE')) {
       $variables['site_name'] = '';
     }
     // Olivero has custom styling for the maintenance page.
