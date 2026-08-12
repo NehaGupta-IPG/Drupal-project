@@ -73,7 +73,11 @@
       'position',
     ];
     let adjustedOptions = {};
-    let windowHeight = $(window).height();
+    // Use visualViewport.height when available
+    let windowHeight =
+      (window.visualViewport && window.visualViewport.height) ||
+      window.innerHeight ||
+      $(window).height();
     let option;
     let optionValue;
     let adjustedValue;
@@ -118,6 +122,9 @@
       );
   }
 
+  // Store visualViewport resize handlers so they can be removed on close.
+  const visualViewportHandlers = new WeakMap();
+
   window.addEventListener('dialog:aftercreate', (e) => {
     const autoResize = debounce(resetSize, 20);
     const $element = $(e.target);
@@ -137,11 +144,25 @@
         eventData,
         autoResize,
       );
+      if (window.visualViewport) {
+        const visualViewportHandler = autoResize.bind(null, {
+          data: eventData,
+        });
+        visualViewportHandlers.set(e.target, visualViewportHandler);
+        window.visualViewport.addEventListener('resize', visualViewportHandler);
+      }
     }
   });
 
-  window.addEventListener('dialog:beforeclose', () => {
+  window.addEventListener('dialog:beforeclose', (e) => {
     $(window).off('.dialogResize');
     $(document).off('.dialogResize');
+    if (window.visualViewport) {
+      const handler = visualViewportHandlers.get(e.target);
+      if (handler) {
+        window.visualViewport.removeEventListener('resize', handler);
+        visualViewportHandlers.delete(e.target);
+      }
+    }
   });
 })(jQuery, Drupal, drupalSettings, Drupal.debounce, Drupal.displace);
