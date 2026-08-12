@@ -36,7 +36,6 @@ global-styling:
       css/components/breadcrumb.css: {}
       css/components/details.css: {}
       css/components/divider.css: {}
-      css/components/messages.css: {}
       css/components/entity-meta.css: {}
       css/components/fieldset.css: {}
       css/components/form.css: {}
@@ -267,6 +266,9 @@ views_ui:
     - claro/variables
 
 messages:
+  css:
+    component:
+      css/components/messages.css: {}
   js:
     js/messages.js: {}
 
