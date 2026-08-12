@@ -18,9 +18,12 @@
     {{ count }} error has been found:
   {%- plural count -%}
     {{ count }} errors have been found:
-  {%- endtrans %} <ul class="item-list__comma-list">
-    {%- for link in error_links -%}
-      <li>{{ link }}</li>
-    {%- endfor -%}
-  </ul>
+  {%- endtrans %}
+  {{ include('item-list.html.twig', {
+    items: error_links,
+    list_type: 'ul',
+    attributes: create_attribute(),
+    wrapper_attributes: create_attribute(),
+    context: {list_style: 'comma-list'},
+  }) }}
 {% endif %}

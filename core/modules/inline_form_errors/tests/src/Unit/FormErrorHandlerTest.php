@@ -136,7 +136,7 @@ class FormErrorHandlerTest extends UnitTestCase {
       ->willReturnCallback(function ($render_array): string {
         $links = [];
         foreach ($render_array['#error_links'] as $item) {
-          $links[] = htmlspecialchars($item['#title']);
+          $links[] = htmlspecialchars($item['value']['#title']);
         }
         return '<ul-comma-list-mock><li-mock>' . implode('</li-mock><li-mock>', $links) . '</li-mock></ul-comma-list-mock>';
       });
