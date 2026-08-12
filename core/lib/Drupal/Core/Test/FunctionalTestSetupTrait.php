@@ -524,10 +524,10 @@ trait FunctionalTestSetupTrait {
    *
    * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no
    * replacement.
-   * @see https://www.drupal.org/project/drupal/issues/3614825
+   * @see https://www.drupal.org/node/3616201
    */
   protected function installModulesFromClassProperty(ContainerInterface $container) {
-    trigger_error(__METHOD__ . 'is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/project/drupal/issues/3614825', E_USER_DEPRECATED);
+    trigger_error(__METHOD__ . 'is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3616201', E_USER_DEPRECATED);
     $modules = $this->getModulesFromClassProperty();
     if ($modules) {
       try {
