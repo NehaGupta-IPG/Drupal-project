@@ -426,6 +426,9 @@ squizlabs
 srclang
 srcset
 ssess
+sslmode
+sslkey
+sslrootcert
 starterkit
 statuscode
 stddev
