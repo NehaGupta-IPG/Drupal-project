@@ -27,6 +27,9 @@ class Block extends Plugin {
    *   (optional) The deriver class.
    * @param array<string, string|false> $forms
    *   (optional) An array of form class names or FALSE, keyed by a string.
+   * @param mixed $other
+   *   (optional) Additional properties passed in that can be used by a deriver
+   *   or other code.
    */
   public function __construct(
     public readonly string $id,
@@ -35,6 +38,9 @@ class Block extends Plugin {
     public readonly array $context_definitions = [],
     public readonly ?string $deriver = NULL,
     public readonly array $forms = [],
-  ) {}
+    ...$other,
+  ) {
+    $this->other = $other;
+  }
 
 }

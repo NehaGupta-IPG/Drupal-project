@@ -23,6 +23,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[Block(
   id: 'navigation_shortcuts',
   admin_label: new TranslatableMarkup('Navigation Shortcuts'),
+  allow_in_navigation: TRUE,
 )]
 final class NavigationShortcutsBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
