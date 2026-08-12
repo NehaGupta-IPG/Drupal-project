@@ -149,6 +149,9 @@ class PhpTransliterationTest extends TestCase {
       'Test ASCII in German language with overrides' => [
         'de', $random, $random,
       ],
+      'Test language overrides in German with decomposed characters' => [
+        'de', "Mo\u{0308}nchengladbach", 'Moenchengladbach',
+      ],
       'Test language overrides in Danish' => [
         'da', $two_byte, 'A O U Aa Oe aouaaoehello',
       ],

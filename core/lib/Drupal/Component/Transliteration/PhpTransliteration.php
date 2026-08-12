@@ -143,6 +143,11 @@ class PhpTransliteration implements TransliterationInterface {
     // be replaced by a question mark.
     $string = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
 
+    // Compose decomposed characters before transliterating them.
+    if (!\Normalizer::isNormalized($string, \Normalizer::FORM_C)) {
+      $string = \Normalizer::normalize($string, \Normalizer::FORM_C) ?: $string;
+    }
+
     // Use the provided unknown character instead of a question mark.
     if ($unknown_character != '?') {
       $string = str_replace('?', $unknown_character, $string);
