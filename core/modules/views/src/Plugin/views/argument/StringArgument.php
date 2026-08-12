@@ -55,6 +55,7 @@ class StringArgument extends ArgumentPluginBase {
     $options['path_case'] = ['default' => 'none'];
     $options['transform_dash'] = ['default' => FALSE];
     $options['break_phrase'] = ['default' => FALSE];
+    $options['not'] = ['default' => FALSE];
 
     if (!empty($this->definition['many to one'])) {
       $options['add_table'] = ['default' => FALSE];
@@ -151,6 +152,15 @@ class StringArgument extends ArgumentPluginBase {
       '#title' => $this->t('Allow multiple values'),
       '#description' => $this->t('If selected, users can enter multiple values in the form of 1+2+3 (for OR) or 1,2,3 (for AND).'),
       '#default_value' => !empty($this->options['break_phrase']),
+      '#group' => 'options][more',
+    ];
+
+    // Exclude.
+    $form['not'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Exclude'),
+      '#description' => $this->t('If selected, the values entered for the filter will be excluded rather than limiting the view.'),
+      '#default_value' => !empty($this->options['not']),
       '#group' => 'options][more',
     ];
   }
@@ -252,11 +262,11 @@ class StringArgument extends ArgumentPluginBase {
     }
 
     if (count($this->value) > 1) {
-      $operator = 'IN';
+      $operator = empty($this->options['not']) ? 'IN' : 'NOT IN';
       $argument = $this->value;
     }
     else {
-      $operator = '=';
+      $operator = empty($this->options['not']) ? '=' : '!=';
     }
 
     if ($formula) {
@@ -264,8 +274,11 @@ class StringArgument extends ArgumentPluginBase {
       if ($operator == 'IN') {
         $field .= " IN($placeholder)";
       }
+      elseif ($operator == 'NOT IN') {
+        $field .= " NOT IN($placeholder)";
+      }
       else {
-        $field .= ' = ' . $placeholder;
+        $field .= " $operator $placeholder";
       }
       $placeholders = [
         $placeholder => $argument,

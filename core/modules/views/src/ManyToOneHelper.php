@@ -304,11 +304,11 @@ class ManyToOneHelper {
     }
     elseif ($operator == 'or' && empty($options['reduce_duplicates'])) {
       if (count($value) > 1) {
-        $operator = 'IN';
+        $operator = empty($options['not']) ? 'IN' : 'NOT IN';
       }
       else {
         $value = is_array($value) ? array_pop($value) : $value;
-        $operator = '=';
+        $operator = empty($options['not']) ? '=' : '!=';
       }
       $add_condition = FALSE;
     }
@@ -316,8 +316,12 @@ class ManyToOneHelper {
     if (!$add_condition) {
       if ($formula) {
         $placeholder = $this->placeholder();
+
         if ($operator == 'IN') {
-          $operator = "$operator IN($placeholder)";
+          $operator = " IN($placeholder)";
+        }
+        elseif ($operator == 'NOT IN') {
+          $operator = " NOT IN($placeholder)";
         }
         else {
           $operator = "$operator $placeholder";

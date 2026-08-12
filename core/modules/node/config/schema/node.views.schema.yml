@@ -43,6 +43,9 @@ views.argument.node_type:
     require_value:
       type: boolean
       label: 'Do not display items with no value in summary'
+    not:
+      type: boolean
+      label: 'Exclude'
 
 views.argument.node_uid_revision:
   type: views_argument
