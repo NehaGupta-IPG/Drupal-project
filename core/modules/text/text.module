@@ -24,6 +24,15 @@ use Drupal\text\TextSummary;
  * @param int|numeric-string|null $size
  *   The desired character length of the summary. If omitted, the default value
  *   will be used. Ignored if the special delimiter is present in $text.
+ * @param bool $wordsafe
+ *   If TRUE, attempt to truncate on a word boundary.
+ * @param bool $breakpoints
+ *   If TRUE, attempt to truncate on a breakpoints as end of paragraph, line
+ *   break or end of a sentence.
+ * @param bool $add_ellipsis
+ *   If TRUE, add '...' to the end of the truncated string.
+ * @param int $min_wordsafe_length
+ *   If $wordsafe is TRUE, the minimum acceptable length for truncation.
  *
  * @return string
  *   The generated summary.
@@ -33,11 +42,11 @@ use Drupal\text\TextSummary;
  *
  * @see https://www.drupal.org/node/3568389
  */
-function text_summary($text, $format = NULL, $size = NULL) {
+function text_summary($text, $format = NULL, $size = NULL, $wordsafe = FALSE, $breakpoints = FALSE, $add_ellipsis = FALSE, $min_wordsafe_length = 1) {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service(TextSummary::class)->generate() instead. See https://www.drupal.org/node/3568389', E_USER_DEPRECATED);
 
   if (!isset($size)) {
     $size = \Drupal::config('text.settings')->get('default_summary_length');
   }
-  return \Drupal::service(TextSummary::class)->generate($text, $format, (int) $size);
+  return \Drupal::service(TextSummary::class)->generate($text, $format, (int) $size, $wordsafe, $breakpoints, $add_ellipsis, $min_wordsafe_length);
 }

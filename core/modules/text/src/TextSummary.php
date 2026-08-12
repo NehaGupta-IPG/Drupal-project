@@ -35,11 +35,20 @@ class TextSummary {
    * @param int $size
    *   The desired character length of the summary. If omitted, the default
    *   value will be used. Ignored if the special delimiter is present in $text.
+   * @param bool $wordsafe
+   *   If TRUE, attempt to truncate on a word boundary.
+   * @param bool $breakpoints
+   *   If TRUE, attempt to truncate on a breakpoints as end of paragraph, line
+   *   break or end of a sentence.
+   * @param bool $add_ellipsis
+   *   If TRUE, add '...' to the end of the truncated string.
+   * @param int $min_wordsafe_length
+   *   If $wordsafe is TRUE, the minimum acceptable length for truncation.
    *
    * @return string|\Stringable
    *   The generated summary.
    */
-  public function generate(string|\Stringable $text, string|null $format = NULL, int $size = 600): string|\Stringable {
+  public function generate(string|\Stringable $text, string|null $format = NULL, int $size = 600, $wordsafe = FALSE, $breakpoints = FALSE, $add_ellipsis = FALSE, $min_wordsafe_length = 1): string|\Stringable {
     // Find where the delimiter is in the body.
     $delimiter = strpos((string) $text, '<!--break-->');
 
@@ -51,7 +60,21 @@ class TextSummary {
 
     // If a valid delimiter has been specified, use it to chop off the summary.
     if ($delimiter !== FALSE) {
-      return substr((string) $text, 0, $delimiter);
+      $summary = substr($text, 0, $delimiter);
+      if ($add_ellipsis) {
+        // Find the last closing tag and insert the ellipse before.
+        $closing_pos = strrpos($summary, '</');
+        if ($closing_pos !== FALSE) {
+          $summary_end = substr($summary, $closing_pos);
+          // If we're adding an ellipsis, remove any trailing periods.
+          $summary = rtrim(substr($summary, 0, $closing_pos), '.');
+          $summary .= 'Ã¢â‚¬Â¦' . $summary_end;
+        }
+        else {
+          $summary .= 'Ã¢â‚¬Â¦';
+        }
+      }
+      return $summary;
     }
 
     // Retrieve the filters of the specified text format, if any.
@@ -75,55 +98,65 @@ class TextSummary {
 
     // The summary may not be longer than the maximum length specified.
     // Initial slice.
-    $summary = Unicode::truncate((string) $text, $size);
+    $summary = Unicode::truncate($text, $size, $wordsafe, $add_ellipsis, $min_wordsafe_length);
 
-    // Store the actual length of the UTF8 string -- which might not be the same
-    // as $size.
-    $max_right_pos = strlen($summary);
+    // @todo split settings to "by breakpoint end of" : paragraph, line, sentence.
+    if ($breakpoints) {
 
-    // How much to cut off the end of the summary so that it doesn't end in the
-    // middle of a paragraph, sentence, or word.
-    // Initialize it to maximum in order to find the minimum.
-    $min_right_pos = $max_right_pos;
+      // Store the actual length of the UTF8 string -- which might not be the
+      // same as $size.
+      $max_right_pos = strlen($summary);
 
-    // Store the reverse of the summary. We use strpos on the reversed needle
-    // and haystack for speed and convenience.
-    $reversed = strrev($summary);
+      // How much to cut off the end of the summary so that it doesn't end in
+      // the middle of a paragraph, sentence, or word.
+      // Initialize it to maximum in order to find the minimum.
+      $min_right_pos = $max_right_pos;
 
-    // Build an array of arrays of break points grouped by preference.
-    $break_points = [];
+      // Store the reverse of the summary. We use strpos on the reversed needle
+      // and haystack for speed and convenience.
+      $reversed = strrev($summary);
 
-    // A paragraph near the end of the sliced summary is most preferable.
-    $break_points[] = ['</p>' => 0];
+      // Build an array of arrays of break points grouped by preference.
+      $break_points = [];
 
-    // If no complete paragraph then treat line breaks as paragraphs.
-    $line_breaks = ['<br />' => 6, '<br>' => 4];
-    // Newline only indicates a line break if line break converter
-    // filter is present.
-    if (isset($format) && $filters->has('filter_autop') && $filters->get('filter_autop')->status) {
-      $line_breaks["\n"] = 1;
-    }
-    $break_points[] = $line_breaks;
+      // A paragraph near the end of sliced summary is most preferable.
+      $break_points[] = ['</p>' => 0];
 
-    // If the first paragraph is too long, split at the end of a sentence.
-    $break_points[] = ['. ' => 1, '! ' => 1, '? ' => 1, '。' => 0, '؟ ' => 1];
+      // If no complete paragraph then treat line breaks as paragraphs.
+      $line_breaks = ['<br />' => 6, '<br>' => 4];
+      // Newline only indicates a line break if line break converter
+      // filter is present.
+      if (isset($format) && $filters->has('filter_autop') && $filters->get('filter_autop')->status) {
+        $line_breaks["\n"] = 1;
+      }
+      $break_points[] = $line_breaks;
 
-    // Iterate over the groups of break points until a break point is found.
-    foreach ($break_points as $points) {
-      // Look for each break point, starting at the end of the summary.
-      foreach ($points as $point => $offset) {
-        // The summary is already reversed, but the break point isn't.
-        $right_pos = strpos($reversed, strrev($point));
-        if ($right_pos !== FALSE) {
-          $min_right_pos = min($right_pos + $offset, $min_right_pos);
-        }
+      // If the first paragraph is too long, split at the end of a sentence.
+      $break_points[] = ['. ' => 1, '! ' => 1, '? ' => 1, 'ã€‚' => 0, 'ØŸ ' => 1];
+
+      // If trim on breakpoints is used then track if ellipsis have been added
+      // and remove it so that to be added after the breakpoints trim.
+      if (($pos_ellipsis = strrpos($summary, 'Ã¢â‚¬Â¦')) !== FALSE) {
+        $summary = substr($summary, 0, $pos_ellipsis);
       }
 
-      // If a break point was found in this group, slice and stop searching.
-      if ($min_right_pos !== $max_right_pos) {
-        // Don't slice with length 0. Length must be <0 to slice from RHS.
-        $summary = ($min_right_pos === 0) ? $summary : substr($summary, 0, 0 - $min_right_pos);
-        break;
+      // Iterate over the groups of break points until a break point is found.
+      foreach ($break_points as $points) {
+        // Look for each break point, starting at the end of the summary.
+        foreach ($points as $point => $offset) {
+          // The summary is already reversed, but the break point isn't.
+          $right_pos = strpos($reversed, strrev($point));
+          if ($right_pos !== FALSE) {
+            $min_right_pos = min($right_pos + $offset, $min_right_pos);
+          }
+        }
+
+        // If a break point was found in this group, slice and stop searching.
+        if ($min_right_pos !== $max_right_pos) {
+          // Don't slice with length 0. Length must be <0 to slice from RHS.
+          $summary = ($min_right_pos === 0) ? $summary : substr($summary, 0, 0 - $min_right_pos);
+          break;
+        }
       }
     }
 
@@ -135,6 +168,11 @@ class TextSummary {
       if ($filter_enabled('filter_html') || $filter_enabled('filter_htmlcorrector')) {
         $summary = Html::normalize($summary);
       }
+    }
+
+    // Add ellipsis if it has been added before the breakpoints processing.
+    if ($breakpoints && $pos_ellipsis !== FALSE) {
+      $summary .= 'Ã¢â‚¬Â¦';
     }
 
     return $summary;
