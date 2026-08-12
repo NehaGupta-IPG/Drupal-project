@@ -510,6 +510,11 @@ class UserTest extends ResourceTestBase {
    * {@inheritdoc}
    */
   public function testCollectionFilterAccess(): void {
+    // @todo This test fails on the X-Drupal-Cache-Contexts assertion unless
+    // the front page is visited first. Find out why and remove this line.
+    // @see https://www.drupal.org/project/drupal/issues/3616376
+    $this->drupalGet('');
+
     // Set up data model.
     $this->assertTrue($this->container->get('module_installer')->install(['node'], TRUE), 'Installed modules.');
     FieldStorageConfig::create([
