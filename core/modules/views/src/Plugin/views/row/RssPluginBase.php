@@ -99,13 +99,6 @@ abstract class RssPluginBase extends RowPluginBase {
   }
 
   /**
-   * The ID of the entity type for which this is an RSS row plugin.
-   *
-   * @var string
-   */
-  protected $entityTypeId;
-
-  /**
    * {@inheritdoc}
    */
   protected function defineOptions(): array {
