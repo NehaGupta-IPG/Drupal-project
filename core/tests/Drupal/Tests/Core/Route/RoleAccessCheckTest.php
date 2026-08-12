@@ -162,17 +162,17 @@ class RoleAccessCheckTest extends UnitTestCase {
     $collection = $this->getTestRouteCollection();
 
     foreach ($grant_accounts as $account) {
-      $this->assertEquals(AccessResult::allowed()->addCacheContexts(['user.roles']), $role_access_check->access($collection->get($path), $account));
+      $this->assertEquals(AccessResult::allowed()->addCacheContexts(['user.roles']), $role_access_check->access($collection->get($path), $account), 'Test failed for UID: ' . $account->id());
     }
 
     // Check all users which don't have access.
     foreach ($deny_accounts as $account) {
       $has_access = $role_access_check->access($collection->get($path), $account);
-      $this->assertEquals(AccessResult::neutral()->addCacheContexts(['user.roles']), $has_access);
+      $this->assertEquals(AccessResult::neutral()->addCacheContexts(['user.roles']), $has_access, 'Test failed for UID: ' . $account->id());
     }
 
     foreach ($forbidden_accounts as $account) {
-      $this->assertEquals(AccessResult::forbidden('No user roles found.'), $role_access_check->access($collection->get($path), $account));
+      $this->assertEquals(AccessResult::forbidden('No user roles found.'), $role_access_check->access($collection->get($path), $account), 'Test failed for UID: ' . $account->id());
     }
   }
 
