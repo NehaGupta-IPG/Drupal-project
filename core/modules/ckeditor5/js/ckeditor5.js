@@ -378,6 +378,14 @@
         // settings and the "language" plugin.
         language: { ...pluginConfig.language, ...language },
       };
+      // Configure the editor label as the element label.
+      const elementId = element.getAttribute('id');
+      const elementLabel = elementId
+        ? document.querySelector(`label[for=${elementId}]`)
+        : false;
+      if (elementLabel) {
+        editorConfig.label = elementLabel.innerText;
+      }
       // Set the id immediately so that it is available when onChange is called.
       const id = setElementId(element);
       const { ClassicEditor } = CKEDITOR;
