@@ -223,7 +223,6 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
         'url' => $url,
         'title' => $this->languages['de']->getName(),
         'attributes' => ['class' => ['language-link']],
-        ],
         'query' => [
           LanguageNegotiationContentEntity::QUERY_PARAMETER => 'de',
           'param1' => 'xyz',
