@@ -12,7 +12,7 @@ use Drupal\Core\TypedData\Plugin\DataType\Map;
 use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests TypedDataManager prototype cache does not collide across definitions.
@@ -27,7 +27,7 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
  * @see \Drupal\Core\TypedData\TypedDataManager::getPropertyInstance()
  */
 #[Group('TypedData')]
-#[RunInSeparateProcesses]
+#[RunTestsInSeparateProcesses]
 class TypedDataManagerPrototypeCacheTest extends KernelTestBase {
 
   /**
