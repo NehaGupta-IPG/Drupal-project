@@ -7,7 +7,16 @@
 {% endif %}
 
 <drupal-dialog id="{{ id }}">
+  {% if variant === 'off-canvas' %}
+  <div id="drupal-off-canvas-wrapper"
+       class="ui-dialog ui-widget ui-front
+              ui-dialog-off-canvas ui-dialog-position-side"
+       role="dialog"
+       aria-labelledby="ui-id-1"
+       aria-describedby="drupal-off-canvas">
+  {% else %}
   <dialog open aria-labelledby="{{ id -}}-title" closedby="{{ close }}" {% if variant === 'modal' %}data-modal{% endif %}>
+  {% endif %}
     <div data-dialog-titlebar>
       <span id="{{ id -}}-title">{{ title }}</span>
       <form method="dialog">
@@ -21,5 +30,37 @@
     {% block content %}
       {{ content }}
     {% endblock %}
+  {% if variant === 'off-canvas' %}
+  </div>
+  {% else %}
   </dialog>
+  {% endif %}
 </drupal-dialog>
+
+{# markup from off-canvas test #}
+<div id="drupal-off-canvas-wrapper"
+     class="ui-dialog ui-widget ui-front
+              ui-dialog-off-canvas ui-dialog-position-side"
+     role="dialog"
+     aria-labelledby="ui-id-1"
+     aria-describedby="drupal-off-canvas">
+
+  <div class="ui-dialog-titlebar ui-widget-header">
+    <h2 id="ui-id-1" class="ui-dialog-title">
+      Dialog title
+    </h2>
+
+    <button type="button"
+            class="ui-dialog-titlebar-close">
+      <!-- close icon -->
+    </button>
+  </div>
+
+  <div id="drupal-off-canvas"
+       class="ui-dialog-content ui-widget-content
+                drupal-off-canvas-reset">
+    <!-- AJAX-rendered dialog content -->
+  </div>
+
+  <div class="ui-resizable-handle ui-resizable-w"></div>
+</div>

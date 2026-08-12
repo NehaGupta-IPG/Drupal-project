@@ -20,7 +20,7 @@
   class DrupalDialog extends HTMLElement {
     connectedCallback() {
       const waitForDialog = new Promise((resolve) => {
-        const dialog = this.querySelector('dialog');
+        let dialog = this.querySelector('dialog');
         if (dialog) {
           resolve(dialog);
         } else {
