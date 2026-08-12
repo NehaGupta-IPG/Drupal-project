@@ -133,7 +133,7 @@ final class LayoutForm extends FormBase {
    */
   public function save(array &$form, FormStateInterface $form_state): void {
     $this->sectionStorage->save();
-    $this->saveTasks($form_state, new TranslatableMarkup('Saved navigation blocks'));
+    $this->saveTasks($form_state, new TranslatableMarkup('Saved navigation layout'));
   }
 
   /**

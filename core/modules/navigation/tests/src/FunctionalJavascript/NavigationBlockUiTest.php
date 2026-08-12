@@ -56,6 +56,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->drupalPlaceBlock('page_title_block', ['id' => 'title']);
+    $this->drupalPlaceBlock('local_tasks_block', ['id' => 'primary_local_tasks']);
     // Create an administrative user.
     $this->adminUser = $this->drupalCreateUser([
       'configure navigation layout',
@@ -71,11 +72,21 @@ class NavigationBlockUiTest extends WebDriverTestBase {
    * Tests navigation block admin page exists and functions correctly.
    */
   public function testNavigationBlockAdminUiPageNestedForm(): void {
-    $layout_url = '/admin/config/user-interface/navigation-block';
+    $layout_url = '/admin/config/user-interface/navigation/layout';
     $this->drupalLogin($this->adminUser);
+    $this->drupalGet($layout_url);
+
+    // Confirm that local tasks links are present and behave as expected.
+    $this->assertSession()->elementTextEquals('css', 'h1.page-title', 'Navigation layout');
+    $this->assertSession()->elementTextEquals('css', '#block-primary-local-tasks li:not(.is-active)', 'Settings');
+    $this->assertSession()->elementTextEquals('css', '#block-primary-local-tasks li.is-active', 'Layout');
+    $this->clickLink('Settings');
+    $this->assertSession()->elementTextEquals('css', 'h1.page-title', 'Navigation settings');
+    $this->assertSession()->elementTextEquals('css', '#block-primary-local-tasks li.is-active', 'Settings');
+    $this->assertSession()->elementTextEquals('css', '#block-primary-local-tasks li:not(.is-active)', 'Layout');
+    $this->clickLink('Layout');
 
     // Edit the layout and add a block that contains a form.
-    $this->drupalGet($layout_url);
     $this->getSession()->getPage()->pressButton('Enable edit mode');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->openAddBlockForm('Layout Builder form block test form api form block');
@@ -89,7 +100,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
     $this->assertSession()->pageTextContains('Layout Builder form block test form api form block');
     $this->getSession()->getPage()->pressButton('Save');
     $unexpected_save_message = 'You have unsaved changes';
-    $expected_save_message = 'Saved navigation blocks';
+    $expected_save_message = 'Saved navigation layout';
     $this->assertSession()->statusMessageNotContains($unexpected_save_message);
     $this->assertSession()->statusMessageContains($expected_save_message);
 

@@ -217,7 +217,7 @@ class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
 
     // Confirm that Navigation Blocks page is working.
     // @see https://www.drupal.org/project/drupal/issues/3445184
-    $this->drupalGet('/admin/config/user-interface/navigation-block');
+    $this->drupalGet('/admin/config/user-interface/navigation/layout');
     $this->assertSession()->statusCodeEquals(200);
   }
 

@@ -521,7 +521,7 @@ class InlineBlockTest extends InlineBlockTestBase {
     $assert_session->fieldExists('Title');
 
     // Confirm that Create Content block opt out logic works for Navigation.
-    $this->drupalGet('/admin/config/user-interface/navigation-block');
+    $this->drupalGet('/admin/config/user-interface/navigation/layout');
     $this->getSession()->getPage()->pressButton('Enable edit mode');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $page->clickLink('Add block');
@@ -531,7 +531,7 @@ class InlineBlockTest extends InlineBlockTestBase {
 
     // Confirm that internal routes for adding blocks are not accessible when
     // inline block creation is disabled.
-    $this->drupalGet('/admin/config/user-interface/navigation-block');
+    $this->drupalGet('/admin/config/user-interface/navigation/layout');
     $this->drupalGet('/layout_builder/choose/inline-block/navigation/navigation.block_layout/0/content');
     $assert_session->pageTextContains('You are not authorized to access this page');
     $this->drupalGet('/layout_builder/add/block/navigation/navigation.block_layout/0/content/inline_block%3Abanner_block');

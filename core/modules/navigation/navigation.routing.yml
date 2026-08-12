@@ -5,3 +5,11 @@ navigation.settings:
     _form: 'Drupal\navigation\Form\SettingsForm'
   requirements:
     _permission: 'administer site configuration'
+
+layout_builder.navigation.view.bc:
+  path: '/admin/config/user-interface/navigation-block'
+  defaults:
+    _controller: 'Drupal\navigation\Controller\NavigationController::layoutBc'
+    _title: 'Navigation layout'
+  requirements:
+    _permission: 'configure navigation layout'
