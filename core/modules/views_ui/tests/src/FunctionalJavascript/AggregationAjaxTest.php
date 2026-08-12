@@ -12,16 +12,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests that editing a field's aggregation function does not trigger an AJAX error.
  *
- * Regression test for a fatal error thrown by
- * \Drupal\views_ui\Form\Ajax\ConfigHandlerGroup::buildForm() when it
- * retrieved the field handler directly from the live display handler
- * instead of instantiating it through the views plugin manager. The
- * mismatched handler instance caused
- * \Drupal\views\Plugin\views\field\EntityField::submitGroupByForm() to
- * receive a NULL 'group_columns' value, which was then passed to
- * array_filter(), resulting in an uncaught TypeError surfaced to the user
- * as an AJAX HTTP 500 error.
- *
  * @see https://www.drupal.org/project/drupal/issues/3344910
  */
 #[Group('views_ui')]
@@ -45,9 +35,6 @@ class AggregationAjaxTest extends WebDriverTestBase {
 
   /**
    * The exact message Drupal core shows in the page when an AJAX request fails and is not otherwise handled.
-   *
-   * @see \Drupal\Core\Ajax\AjaxResponse
-   * @see https://www.drupal.org/project/drupal/issues/2987444
    */
   protected const AJAX_ERROR_MESSAGE = "Oops, something went wrong. Check your browser's developer console for more details.";
 
@@ -57,9 +44,7 @@ class AggregationAjaxTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Build a minimal view with a single field whose handler is
-    // \Drupal\views\Plugin\views\field\EntityField (plugin_id 'field'),
-    // which is the handler affected by the regression under test.
+    // Build a minimal view with a single field.
     View::create([
       'id' => static::$testViewId,
       'label' => 'Test aggregation AJAX',
@@ -99,12 +84,6 @@ class AggregationAjaxTest extends WebDriverTestBase {
 
   /**
    * Tests switching a field's aggregation function via the AJAX dialog.
-   *
-   * The regression only manifests when *re-editing* an aggregation handler
-   * that was already configured and saved, not when configuring it for the
-   * first time. The test therefore configures the field twice: once to
-   * establish an initial aggregation function, and a second time to switch
-   * it, which is the step that failed before the fix.
    */
   public function testSwitchAggregationFunctionViaAjax(): void {
     $page = $this->getSession()->getPage();
@@ -112,9 +91,7 @@ class AggregationAjaxTest extends WebDriverTestBase {
 
     $this->drupalGet('admin/structure/views/view/' . static::$testViewId);
 
-    // Enable aggregation for the display via the "Use aggregation" setting
-    // in the advanced settings column. This opens
-    // \Drupal\views_ui\Form\Ajax\Display.
+    // Enable aggregation for the display.
     $this->openDisplayOptionDialog('group_by');
     $page->checkField('group_by');
     $this->pressDialogButton('Apply');
@@ -123,42 +100,19 @@ class AggregationAjaxTest extends WebDriverTestBase {
       'The "Use aggregation" dialog is still open after applying the change.'
     );
 
-    // Configure the field's aggregation function for the first time. This
-    // must succeed both before and after the fix.
+    // Configure the field's aggregation function for the first time.
     $this->setFieldAggregationFunction('count');
 
     // Re-open the same, already-configured handler and switch the
-    // aggregation function from COUNT to COUNT DISTINCT. Before the fix,
-    // this second edit triggered array_filter(NULL) in
-    // EntityField::submitGroupByForm() and the AJAX request failed with an
-    // HTTP 500 error, leaving the modal open.
+    // aggregation function from COUNT to COUNT DISTINCT.
     $this->setFieldAggregationFunction('count_distinct');
 
-    // The field row must still expose the aggregation settings link,
-    // confirming the display tab rebuilt correctly after the AJAX
-    // submission.
+    // Verify that the link to the aggregation settings is still present.
     $assert_session->linkExists('Aggregation settings');
   }
 
   /**
    * Opens the AJAX dialog for a display-level "Advanced" setting.
-   *
-   * These settings (e.g. "Use aggregation") are rendered by
-   * \Drupal\views_ui\ViewEditForm::buildOptionForm() as a non-clickable
-   * label (the setting's title, e.g. "Use aggregation") immediately
-   * followed by a *separate* link whose own text is only the setting's
-   * current value (e.g. "No" or "Yes"). That link text is therefore not
-   * stable enough to click by, and is not necessarily unique on the page.
-   *
-   * The link itself is built by
-   * \Drupal\views\Plugin\views\display\DisplayPluginBase::optionLink(),
-   * which gives it an HTML id via Html::getUniqueId('views-' . $display_id
-   * . '-' . $section); that function appends a random suffix on every page
-   * load, so the id cannot be matched exactly either. Its href is fully
-   * deterministic, though: optionLink() always builds it from the
-   * views_ui.form_display route ('/admin/structure/views/{js}/display/
-   * {view}/{display_id}/{type}'), so it always ends in "/{$option_id}".
-   * The link is targeted through that instead.
    *
    * @param string $option_id
    *   The machine name of the display option to open, e.g. 'group_by'.
@@ -179,22 +133,14 @@ class AggregationAjaxTest extends WebDriverTestBase {
   /**
    * Opens the aggregation settings dialog and applies an aggregation function to the 'changed' field.
    *
-   * Encapsulates the full click-configure-apply cycle so it can be run
-   * twice: once to create the aggregation handler, and once to edit it,
-   * which is the specific transition affected by the regression covered in
-   * this test.
-   *
    * @param string $group_type
    *   The aggregation function to select, e.g. 'count' or 'count_distinct'.
-   *   Must be a valid key from the query plugin's aggregation info (see
-   *   \Drupal\views\Plugin\views\query\Sql::getAggregationInfo()).
    */
   protected function setFieldAggregationFunction(string $group_type): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
-    // This link is rendered by \Drupal\views_ui\Form\Ajax\ConfigHandlerGroup
-    // and opens the exact form patched for this issue.
+    // Opens Aggregation settings dialog.
     $page->clickLink('Aggregation settings');
     $this->assertNotEmpty(
       $assert_session->waitForElementVisible('css', '.views-ui-dialog'),
@@ -204,22 +150,14 @@ class AggregationAjaxTest extends WebDriverTestBase {
     $page->selectFieldOption('options[group_type]', $group_type);
     $this->pressDialogButton('Apply');
 
-    // This is the primary assertion for the regression: before the fix,
-    // the AJAX request threw an uncaught TypeError and the dialog was left
-    // open, so waitForElementRemoved() times out and returns FALSE.
+    // Check if the settings dialog closes.
     $this->assertNotEmpty(
       $assert_session->waitForElementRemoved('css', '.views-ui-dialog'),
       sprintf('The aggregation settings dialog is still open after setting the aggregation function to "%s". This indicates the AJAX request failed.', $group_type)
     );
 
-    // Belt-and-braces check for the generic AJAX failure message that
-    // Drupal core prints on the main page when an AJAX request errors out.
+    // Check for the AJAX error message.
     $assert_session->pageTextNotContains(static::AJAX_ERROR_MESSAGE);
-
-    // Note: WebDriverTestBase::$failOnJavascriptConsoleErrors is TRUE by
-    // default, so an uncaught Drupal.AjaxError logged to the browser
-    // console during this request would also fail the test on its own,
-    // regardless of how verbose the site's error-display setting is.
   }
 
   /**
