@@ -11,6 +11,7 @@
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheTagsPurgeInterface;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 
 /**
  * @defgroup php_wrappers PHP wrapper functions
@@ -410,6 +411,16 @@ function drupal_flush_all_caches($kernel = NULL): void {
   }
   foreach (Cache::getBins() as $cache_backend) {
     $cache_backend->deleteAll();
+  }
+
+  // Also flush memory cache bins (e.g. cache.memory) so that long-running
+  // PHP processes (Drush daemons, Swoole, RoadRunner, PHP-PM, ReactPHP, MCP
+  // servers) do not continue serving stale data after a cache clear.
+  // Cache::getMemoryBins() was introduced in #3402850 but was never wired
+  // into this function.  In classical FPM this is a no-op because the process
+  // exits after each request anyway.
+  foreach (Cache::getMemoryBins() as $memory_backend) {
+    $memory_backend->deleteAll();
   }
 
   // Flush asset file caches.
