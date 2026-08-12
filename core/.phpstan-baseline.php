@@ -9260,12 +9260,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Routing/AccessAwareRouter.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$attribute of method Drupal\\\\Core\\\\Routing\\\\AttributeRouteDiscovery\\:\\:addRoute\\(\\) expects Symfony\\\\Component\\\\Routing\\\\Annotation\\\\Route, Symfony\\\\Component\\\\Routing\\\\Attribute\\\\Route given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/AttributeRouteDiscovery.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\CacheableRouteProviderInterface\\:\\:addExtraCacheKeyPart\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34038,12 +34032,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Access/CustomAccessCheckTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Tests\\\\Core\\\\Asset\\\\LibraryDependencyResolverTest\\:\\:getStubBuilder\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Asset/LibraryDependencyResolverTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Asset\\\\TestLibraryDiscoveryParser\\:\\:fileValidUri\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34600,12 +34588,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Routing/AccessAwareRouterTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Attribute class PHPUnit\\\\Framework\\\\Attributes\\\\AllowMockObjectsWithoutExpectations does not exist\\.$#',
-	'identifier' => 'attribute.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Routing/RouteBuilderTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, array\\{\\$this\\(Drupal\\\\Tests\\\\Core\\\\Security\\\\RequestSanitizerTest\\), \'errorHandler\'\\} given\\.$#',
