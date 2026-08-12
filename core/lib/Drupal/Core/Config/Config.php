@@ -227,12 +227,17 @@ class Config extends StorableConfigBase {
         }
       }
     }
-    elseif ($this->typedConfigManager->hasConfigSchema($this->name)) {
+    else {
       // Deprecated path.
-      if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
-        $this->applyDefaultLangcodeIfMissing($this->getSchemaWrapper());
-        // Reclaim the memory used by the schema wrapper.
-        $this->schemaWrapper = NULL;
+      foreach ($this->data as $key => $value) {
+        $this->validateValue($key, $value);
+      }
+      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
+        if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+          $this->applyDefaultLangcodeIfMissing($this->getSchemaWrapper());
+          // Reclaim the memory used by the schema wrapper.
+          $this->schemaWrapper = NULL;
+        }
       }
     }
 
