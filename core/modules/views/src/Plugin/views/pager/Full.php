@@ -103,12 +103,12 @@ class Full extends SqlBase {
       '#quantity' => $this->options['quantity'],
       '#route_name' => !empty($this->view->live_preview) ? '<current>' : '<none>',
       // When the view uses AJAX, the pager links are handled by the views
-      // AJAX JavaScript (ajax_view.js), which updates the view in place. In
-      // that case the pager links must not be turned into modal dialog links
-      // by the pager preprocess: the two mechanisms conflict and the modal
-      // link would load the current page's (relative) URL into the dialog.
+      // AJAX JavaScript (ajax_view.js), which updates the view in place. Opt
+      // out of turning them into modal dialog links inside a modal: the two
+      // mechanisms conflict, and the modal link would load the current page's
+      // (relative) URL into the dialog.
       // @see \Drupal\Core\Pager\PagerPreprocess::preprocessPager()
-      '#views_ajax_enabled' => $this->view->display_handler->ajaxEnabled(),
+      '#modal_dialog_links' => !$this->view->display_handler->ajaxEnabled(),
     ];
   }
 
