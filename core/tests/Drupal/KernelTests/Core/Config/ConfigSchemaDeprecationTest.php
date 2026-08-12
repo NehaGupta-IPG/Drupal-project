@@ -22,6 +22,7 @@ class ConfigSchemaDeprecationTest extends KernelTestBase {
    */
   protected static $modules = [
     'config_schema_deprecated_test',
+    'system',
   ];
 
   /**
@@ -35,6 +36,19 @@ class ConfigSchemaDeprecationTest extends KernelTestBase {
       ->set('complex_structure_deprecated.products', ['apricot', 'apple'])
       ->save();
     $this->assertSame(['type' => 'fruits', 'products' => ['apricot', 'apple']], $config->get('complex_structure_deprecated'));
+  }
+
+  /**
+   * Tests the country.default config schema deprecation.
+   */
+  public function testCountryDefaultConfigSchemaDeprecation(): void {
+    $this->installConfig(['system']);
+    $this->expectUserDeprecationMessage("The 'country.default' config schema is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0.");
+    $config = $this->config('system.date');
+    $config
+      ->set('country.default', 'US')
+      ->save();
+    $this->assertSame('US', $config->get('country.default'));
   }
 
 }

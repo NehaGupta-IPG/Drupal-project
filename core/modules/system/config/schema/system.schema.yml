@@ -99,6 +99,7 @@ system.date:
           max: 6
     country:
       type: mapping
+      deprecated: "The 'country.default' config schema is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0."
       label: 'Country'
       mapping:
         default:
