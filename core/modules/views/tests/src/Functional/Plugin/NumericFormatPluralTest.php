@@ -49,7 +49,7 @@ class NumericFormatPluralTest extends ViewTestBase {
     $this->drupalLogin($web_user);
     $config = $this->config('locale.settings');
     $config->set('translate_english', TRUE)->save();
-    $this->rebuildAll();
+    $this->rebuildContainer();
   }
 
   /**
