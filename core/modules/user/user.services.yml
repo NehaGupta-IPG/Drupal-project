@@ -15,6 +15,7 @@ services:
       - { name: access_check, applies_to: _access_user_register }
   access_check.user.role:
     class: Drupal\user\Access\RoleAccessCheck
+    deprecated: The "%service_id%" service is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the "_permission" route requirement instead. See https://www.drupal.org/node/3616624
     tags:
       - { name: access_check, applies_to: _role }
   access_check.user.login_status:

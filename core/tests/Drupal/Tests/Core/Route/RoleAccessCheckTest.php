@@ -13,6 +13,7 @@ use Drupal\user\Access\RoleAccessCheck;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -22,6 +23,7 @@ use Symfony\Component\Routing\RouteCollection;
 #[CoversClass(RoleAccessCheck::class)]
 #[Group('Access')]
 #[Group('Route')]
+#[IgnoreDeprecations]
 class RoleAccessCheckTest extends UnitTestCase {
 
   /**
@@ -145,6 +147,8 @@ class RoleAccessCheckTest extends UnitTestCase {
    */
   #[DataProvider('roleAccessProvider')]
   public function testRoleAccess(string $path, array $grant_accounts, array $deny_accounts): void {
+    $this->expectUserDeprecationMessage('The "_role" route requirement is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the "_permission" route requirement instead. See https://www.drupal.org/node/3616624');
+
     $cache_contexts_manager = $this->prophesize(CacheContextsManager::class);
     $cache_contexts_manager->assertValidTokens()->willReturn(TRUE);
     $cache_contexts_manager->reveal();

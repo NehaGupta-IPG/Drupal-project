@@ -13,6 +13,11 @@ use Symfony\Component\Routing\Route;
  * You can specify the '_role' key on route requirements. If you specify a
  * single role, users with that role with have access. If you specify multiple
  * ones you can conjunct them with AND by using a "," and with OR by using "+".
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the
+ *   "_permission" route requirement instead.
+ *
+ * @see https://www.drupal.org/node/3616624
  */
 class RoleAccessCheck implements AccessInterface {
 
@@ -28,6 +33,8 @@ class RoleAccessCheck implements AccessInterface {
    *   The access result.
    */
   public function access(Route $route, AccountInterface $account) {
+    @trigger_error('The "_role" route requirement is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the "_permission" route requirement instead. See https://www.drupal.org/node/3616624', E_USER_DEPRECATED);
+
     // Requirements just allow strings, so this might be a comma separated list.
     $rid_string = $route->getRequirement('_role');
 
