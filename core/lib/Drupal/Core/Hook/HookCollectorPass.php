@@ -526,6 +526,21 @@ class HookCollectorPass implements CompilerPassInterface {
   protected static function filterIterator(\SplFileInfo $fileInfo, $key, \RecursiveDirectoryIterator $iterator): bool {
     $sub_path_name = $iterator->getSubPathname();
     $extension = $fileInfo->getExtension();
+    // FilesystemIterator::SKIP_DOTS only skips '.' and '..', but not hidden
+    // directories (like '.git', or a developer's '.devenv'). ExtensionDiscovery
+    // skips them too, and a module cannot be installed from one anyway.
+    if (str_starts_with($fileInfo->getFilename(), '.')) {
+      return FALSE;
+    }
+    // Follow symlinks only at the top level of the module directory. A module
+    // may be symlinked into place, and items may be symlinked into a module
+    // directory — see HookCollectorPassTest::testSymlink — but a symlink deeper
+    // in is as likely to lead out of the module altogether, into a store
+    // closure or a package cache, and the scan has no business following it
+    // there.
+    if ($fileInfo->isLink() && str_contains($sub_path_name, '/')) {
+      return FALSE;
+    }
     if (str_starts_with($sub_path_name, 'src/Hook/')) {
       return $iterator->isDir() || $extension === 'php';
     }

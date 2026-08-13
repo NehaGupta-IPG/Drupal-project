@@ -87,6 +87,90 @@ class HookCollectorPassTest extends KernelTestBase {
   }
 
   /**
+   * Tests that hidden directories are not scanned for hooks.
+   *
+   * FilesystemIterator::SKIP_DOTS skips '.' and '..' but not '.git', or a
+   * developer's '.devenv', and the scan follows symlinks, so recursing into one
+   * can mean walking a tree that has nothing to do with the module.
+   */
+  public function testHiddenDirectoryIsNotScanned(): void {
+    mkdir($this->siteDirectory);
+    $module = "$this->siteDirectory/hidden_dir_test";
+    mkdir("$module/.hidden", 0777, TRUE);
+    file_put_contents("$module/hidden_dir_test.info.yml", "name: Hidden dir test\ntype: module\ncore_version_requirement: ^11\n");
+    // One hook where it belongs, and one where it does not.
+    file_put_contents("$module/hidden_dir_test.module", "<?php\n\nfunction hidden_dir_test_visible_thing(): void {}\n");
+    file_put_contents("$module/.hidden/hidden_dir_test.module", "<?php\n\nfunction hidden_dir_test_hidden_thing(): void {}\n");
+
+    $container = $this->collectFrom([
+      'hidden_dir_test' => ['pathname' => "$module/hidden_dir_test.info.yml"],
+    ]);
+
+    // The control: the module itself is scanned.
+    $this->assertRegisteredHooks([
+      'visible_thing' => ['hidden_dir_test_visible_thing' => 'hidden_dir_test'],
+    ], $container);
+    // The hidden directory is not.
+    $this->assertArrayNotHasKey('hidden_thing', $container->get('keyvalue')->get('hook_data')->get('hook_list'));
+  }
+
+  /**
+   * Tests that a symlink below the module directory is not followed.
+   *
+   * Symlinks at the top level are followed — see ::testSymlink() — because a
+   * module may be symlinked into place and its items may be symlinked in. One
+   * further down is as likely to lead out of the module altogether.
+   */
+  public function testSymlinkBelowModuleRootIsNotFollowed(): void {
+    mkdir($this->siteDirectory);
+    $module = "$this->siteDirectory/deep_symlink_test";
+    mkdir("$module/sub", 0777, TRUE);
+    file_put_contents("$module/deep_symlink_test.info.yml", "name: Deep symlink test\ntype: module\ncore_version_requirement: ^11\n");
+    file_put_contents("$module/deep_symlink_test.module", "<?php\n\nfunction deep_symlink_test_visible_thing(): void {}\n");
+
+    // A directory outside the module, reached by a symlink one level down.
+    $outside = "$this->siteDirectory/outside";
+    mkdir($outside);
+    file_put_contents("$outside/deep_symlink_test.module", "<?php\n\nfunction deep_symlink_test_outside_thing(): void {}\n");
+    symlink(realpath($outside), "$module/sub/outside");
+
+    // And one at the top level, which must still be followed.
+    $top = "$this->siteDirectory/top";
+    mkdir($top);
+    file_put_contents("$top/deep_symlink_test.module", "<?php\n\nfunction deep_symlink_test_top_thing(): void {}\n");
+    symlink(realpath($top), "$module/top");
+
+    $container = $this->collectFrom([
+      'deep_symlink_test' => ['pathname' => "$module/deep_symlink_test.info.yml"],
+    ]);
+
+    $this->assertRegisteredHooks([
+      'visible_thing' => ['deep_symlink_test_visible_thing' => 'deep_symlink_test'],
+      'top_thing' => ['deep_symlink_test_top_thing' => 'deep_symlink_test'],
+    ], $container);
+    $this->assertArrayNotHasKey('outside_thing', $container->get('keyvalue')->get('hook_data')->get('hook_list'));
+  }
+
+  /**
+   * Runs hook collection over a module list and returns the container.
+   *
+   * @param array $module_filenames
+   *   As container.modules: module name to ['pathname' => …].
+   *
+   * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+   *   The container the collector wrote to.
+   */
+  protected function collectFrom(array $module_filenames): ContainerBuilder {
+    $container = new ContainerBuilder();
+    $container->setParameter('container.modules', $module_filenames);
+    $container->set('keyvalue', new KeyValueMemoryFactory());
+    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
+    (new HookCollectorPass())->process($container);
+    (new HookCollectorKeyValueWritePass())->process($container);
+    return $container;
+  }
+
+  /**
    * Test that ordering works.
    */
   public function testOrdering(): void {
