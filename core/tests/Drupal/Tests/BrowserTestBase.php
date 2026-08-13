@@ -196,18 +196,6 @@ abstract class BrowserTestBase extends DrupalTestCase {
     $this->mink->setDefaultSessionName('default');
     $this->registerSessions();
 
-    $this->initFrontPage();
-
-    // Copies cookies from the current environment, for example, XDEBUG_SESSION
-    // in order to support Xdebug.
-    // @see BrowserTestBase::initFrontPage()
-    $cookies = $this->extractCookiesFromRequest(\Drupal::request());
-    foreach ($cookies as $cookie_name => $values) {
-      foreach ($values as $value) {
-        $session->setCookie($cookie_name, $value);
-      }
-    }
-
     return $session;
   }
 
@@ -223,10 +211,15 @@ abstract class BrowserTestBase extends DrupalTestCase {
    *
    * @see https://w3c.github.io/webdriver/webdriver-spec.html#add-cookie
    * @see https://www.w3.org/Bugs/Public/show_bug.cgi?id=20975
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. There
+   * is no replacement.
+   * @see https://www.drupal.org/node/3616377
    */
   protected function initFrontPage() {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3616377', E_USER_DEPRECATED);
     $session = $this->getSession();
-    $session->visit($this->baseUrl . '/core/misc/druplicon.png');
+    $session->visit($this->baseUrl);
   }
 
   /**
