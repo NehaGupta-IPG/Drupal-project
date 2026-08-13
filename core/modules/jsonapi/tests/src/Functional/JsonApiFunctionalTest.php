@@ -47,6 +47,9 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     // test expectations do not need to vary per database.
     $default_sort = ['sort' => 'drupal_internal__nid'];
 
+    // Mink requires a GET request to be made before asserting the session.
+    $this->drupalGet('core/misc/druplicon.png');
+
     // 0. HEAD request allows a client to verify that JSON:API is installed.
     $this->httpClient->request('HEAD', $this->buildUrl('/jsonapi/node/article'));
     $this->assertSession()->statusCodeEquals(200);
