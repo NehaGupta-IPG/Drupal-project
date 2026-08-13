@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use Drupal\views\Entity\View;
+use Drupal\views\Tests\ViewTestData;
+use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests that editing a field's aggregation function does not trigger an AJAX error.
+ * Tests editing a field's aggregation function via AJAX.
  *
  * @see https://www.drupal.org/project/drupal/issues/3344910
  */
@@ -19,14 +20,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class AggregationAjaxTest extends WebDriverTestBase {
 
   /**
-   * The machine name of the view created for this test.
-   */
-  protected static string $testViewId = 'test_aggregation_ajax';
-
-  /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'views', 'views_ui'];
+  protected static $modules = ['node', 'views', 'views_ui', 'views_test_config'];
 
   /**
    * {@inheritdoc}
@@ -34,7 +30,14 @@ class AggregationAjaxTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * The exact message Drupal core shows in the page when an AJAX request fails and is not otherwise handled.
+   * The views used for testing.
+   *
+   * @var array
+   */
+  public static $testViews = ['test_content_ajax'];
+
+  /**
+   * The message Drupal shows on the page for an unhandled AJAX error.
    */
   protected const AJAX_ERROR_MESSAGE = "Oops, something went wrong. Check your browser's developer console for more details.";
 
@@ -44,39 +47,10 @@ class AggregationAjaxTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Build a minimal view with a single field.
-    View::create([
-      'id' => static::$testViewId,
-      'label' => 'Test aggregation AJAX',
-      'base_table' => 'node_field_data',
-      'display' => [
-        'default' => [
-          'display_plugin' => 'default',
-          'id' => 'default',
-          'display_options' => [
-            'fields' => [
-              'changed' => [
-                'id' => 'changed',
-                'table' => 'node_field_data',
-                'field' => 'changed',
-                'entity_type' => 'node',
-                'entity_field' => 'changed',
-                'plugin_id' => 'field',
-                'relationship' => 'none',
-                'group_type' => 'group',
-              ],
-            ],
-          ],
-        ],
-        'page_1' => [
-          'display_plugin' => 'page',
-          'id' => 'page_1',
-          'display_options' => [
-            'path' => 'test-aggregation-ajax',
-          ],
-        ],
-      ],
-    ])->save();
+    // Disable automatic live preview to make the sequence of calls clearer.
+    \Drupal::configFactory()->getEditable('views.settings')->set('ui.always_live_preview', FALSE)->save();
+
+    ViewTestData::createTestViews(self::class, ['views_test_config']);
 
     $admin_user = $this->drupalCreateUser(['administer views']);
     $this->drupalLogin($admin_user);
@@ -89,7 +63,27 @@ class AggregationAjaxTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
-    $this->drupalGet('admin/structure/views/view/' . static::$testViewId);
+    // Add an isolated runtime display with a single field.
+    $view_name = static::$testViews[0];
+    $view = Views::getView($view_name);
+    $display_id = $view->storage->addDisplay('page');
+    $display = &$view->storage->getDisplay($display_id);
+    $display['display_options']['defaults']['fields'] = FALSE;
+    $display['display_options']['fields'] = [
+      'changed' => [
+        'id' => 'changed',
+        'table' => 'node_field_data',
+        'field' => 'changed',
+        'relationship' => 'none',
+        'group_type' => 'group',
+        'plugin_id' => 'field',
+        'entity_type' => 'node',
+        'entity_field' => 'changed',
+      ],
+    ];
+    $view->save();
+
+    $this->drupalGet('admin/structure/views/view/' . $view_name . '/edit/' . $display_id);
 
     // Enable aggregation for the display.
     $this->openDisplayOptionDialog('group_by');
@@ -153,7 +147,7 @@ class AggregationAjaxTest extends WebDriverTestBase {
     // Check if the settings dialog closes.
     $this->assertNotEmpty(
       $assert_session->waitForElementRemoved('css', '.views-ui-dialog'),
-      sprintf('The aggregation settings dialog is still open after setting the aggregation function to "%s". This indicates the AJAX request failed.', $group_type)
+      sprintf('The aggregation settings dialog is still open after setting "%s".', $group_type)
     );
 
     // Check for the AJAX error message.
