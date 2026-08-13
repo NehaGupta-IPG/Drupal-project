@@ -10,13 +10,16 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\Token;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\Views;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'selection' entity_reference.
@@ -66,6 +69,13 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
   protected $renderer;
 
   /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $token;
+
+  /**
    * Constructs a new ViewsSelection object.
    *
    * @param array $configuration
@@ -82,14 +92,33 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
    *   The current user.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token replacement instance.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, RendererInterface $renderer) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, RendererInterface $renderer, Token $token) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
     $this->moduleHandler = $module_handler;
     $this->currentUser = $current_user;
     $this->renderer = $renderer;
+    $this->token = $token;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager'),
+      $container->get('module_handler'),
+      $container->get('current_user'),
+      $container->get('renderer'),
+      $container->get('token')
+    );
   }
 
   /**
@@ -151,7 +180,7 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
         '#title' => $this->t('View arguments'),
         '#default_value' => $default,
         '#required' => FALSE,
-        '#description' => $this->t('Provide a comma separated list of arguments to pass to the view.'),
+        '#description' => $this->t('Provide a comma separated list of arguments to pass to the view.') . '<br />' . $this->t('This field supports tokens.'),
       ];
     }
     else {
@@ -234,18 +263,27 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
    *   indicates no limiting.
    * @param array|null $ids
    *   Array of entity IDs. Defaults to NULL.
+   * @param bool $bubble_cacheable_metadata
+   *   If TRUE the cacheability metadata emitted during token replacement will
+   *   be bubbled to the render context. If FALSE then the it will not in order
+   *   to prevent leaked cacheability metadata during early rendering.
    *
    * @return array
    *   The results.
    */
-  protected function getDisplayExecutionResults(?string $match = NULL, string $match_operator = 'CONTAINS', int $limit = 0, ?array $ids = NULL) {
+  protected function getDisplayExecutionResults(?string $match = NULL, string $match_operator = 'CONTAINS', int $limit = 0, ?array $ids = NULL, $bubble_cacheable_metadata = TRUE): array {
     $display_name = $this->getConfiguration()['view']['display_name'];
-    $arguments = $this->getConfiguration()['view']['arguments'];
+    $arguments = $this->handleArgs($this->getConfiguration()['view']['arguments'], $bubble_cacheable_metadata);
     $results = [];
     if ($this->initializeView($match, $match_operator, $limit, $ids)) {
       $results = $this->view->executeDisplay($display_name, $arguments);
     }
-    return $results;
+    if (is_null($results)) {
+      return (array) $results;
+    }
+    else {
+      return $results;
+    }
   }
 
   /**
@@ -290,7 +328,7 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
    * {@inheritdoc}
    */
   public function validateReferenceableEntities(array $ids) {
-    $entities = $this->getDisplayExecutionResults(NULL, 'CONTAINS', 0, $ids);
+    $entities = $this->getDisplayExecutionResults(NULL, 'CONTAINS', 0, $ids, FALSE);
     $result = [];
     if ($entities) {
       $result = array_keys($entities);
@@ -329,6 +367,96 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
       'arguments' => $arguments,
     ];
     $form_state->setValueForElement($element, $value);
+  }
+
+  /**
+   * Handles replacing tokens in arguments for views.
+   *
+   * Replaces tokens using Token::replace.
+   *
+   * @param array $args
+   *   An array of arguments that may contain tokens.
+   * @param bool $bubble_cacheable_metadata
+   *   If TRUE the cacheability metadata emitted during token replacement will
+   *   be bubbled to the render context. If FALSE then the it will not in order
+   *   to prevent leaked cacheability metadata during early rendering.
+   *
+   * @return array
+   *   The arguments to be sent to the View.
+   */
+  protected function handleArgs($args, $bubble_cacheable_metadata = TRUE) {
+    $entities = [];
+    if (isset($this->configuration['handler_settings']['entity'])) {
+      $entities[] = $this->configuration['handler_settings']['entity'];
+    }
+    if (isset($this->configuration['entity'])) {
+      $entities[] = $this->configuration['entity'];
+    }
+    if (isset($this->configuration['entity_info']) && !empty($this->configuration['entity_info']['id'])) {
+      $entity = $this->entityTypeManager
+        ->getStorage($this->configuration['entity_info']['type'])
+        ->load($this->configuration['entity_info']['id']);
+      if ($entity) {
+        $entity->parent_group = $this->configuration['entity_info']['parent_group'] ?: NULL;
+        $entities[] = $entity;
+      }
+    }
+    if (isset($this->configuration['parent_view'])) {
+      $view_config = $this->configuration['parent_view'];
+      $parent_view = $this->entityTypeManager
+        ->getStorage('view')
+        ->load($view_config['id']);
+      if (!$parent_view) {
+        return $args;
+      }
+      $view_executable = \Drupal::service('views.executable')
+        ->get($parent_view);
+
+      $display_id = $view_config['display'];
+      $parent_args = $view_config['args'];
+
+      $view_executable->setDisplay($display_id);
+      $view_executable->preExecute($parent_args);
+      $view_executable->execute($display_id);
+      $result = $view_executable->buildRenderable($display_id, $parent_args, FALSE);
+
+      $delta = $view_config['delta'];
+      $row = $result['#view']->result[$delta];
+      if (!$row) {
+        return $args;
+      }
+      $entities[] = $row->_entity;
+      foreach ($row->_relationship_entities as $entity) {
+        $entities[] = $entity;
+      }
+    }
+
+    $data = [];
+    foreach ($entities as $entity) {
+      $token_type = $entity->getEntityTypeId();
+
+      // Taxonomy term token type doesn't match the entity type's machine name.
+      if ($token_type === 'taxonomy_term') {
+        $token_type = 'term';
+      }
+
+      if (!isset($data[$token_type])) {
+        $data[$token_type] = $entity;
+      }
+    }
+
+    // If cacheability metadata should not be bubbled then we need to pass in
+    // our own BubbleableMetadata which will prevent any metadata generated from
+    // automatically bubbling to the render context.
+    $bubbleable_metadata = $bubble_cacheable_metadata ? NULL : new BubbleableMetadata();
+
+    // Replace tokens for each argument.
+    foreach ($args as $key => $arg) {
+      $value = $this->token->replace($arg, $data, ['clear' => TRUE], $bubbleable_metadata);
+      $args[$key] = !empty($value) ? $value : NULL;
+    }
+
+    return $args;
   }
 
 }
