@@ -344,6 +344,33 @@ class FormBuilderTest extends FormTestBase {
   }
 
   /**
+   * Tests that the 'data-drupal-selector' attribute is property set.
+   */
+  public function testDataDrupalSelector() {
+    $form_id = '\Drupal\Tests\Core\Form\TestForm';
+    $object = new TestForm();
+    $form = [];
+    $form_state = new FormState();
+    $expected_form = $object->buildForm($form, $form_state);
+
+    $form = $this->formBuilder->getForm($form_id);
+    $this->assertFormElement($expected_form, $form, 'test');
+    $this->assertSame('test-form', $form['#id']);
+    $this->assertSame('test-form', $form['#attributes']['data-drupal-selector']);
+
+    $form_id = '\Drupal\Tests\Core\Form\TestFormWithDataDrupalSelector';
+    $object = new TestForm();
+    $form = [];
+    $form_state = new FormState();
+    $expected_form = $object->buildForm($form, $form_state);
+
+    $form = $this->formBuilder->getForm($form_id);
+    $this->assertFormElement($expected_form, $form, 'test');
+    $this->assertSame('test-form-data-drupal-selector', $form['#id']);
+    $this->assertSame('test-value123', $form['#attributes']['data-drupal-selector']);
+  }
+
+  /**
    * Tests whether the triggering element is properly identified.
    *
    * @param string $element_value
