@@ -120,7 +120,6 @@ class SessionTest extends BrowserTestBase {
     $session_cookie_name = $this->getSessionName();
     $session_cookie_value = $session->getCookie($session_cookie_name);
     $session->restart();
-    $this->initFrontPage();
     // Session restart always resets all the cookies by design, so we need to
     // add the old session cookie again.
     $session->setCookie($session_cookie_name, $session_cookie_value);
@@ -199,7 +198,6 @@ class SessionTest extends BrowserTestBase {
     $initial_session_cookie_value = $mink->getCookie($session_cookie_name);
 
     $mink->restart();
-    $this->initFrontPage();
     // Session restart always resets all the cookies by design, so we
     // set an arbitrary session_id in the cookie for the next request.
     $invalid_session_cookie_value = bin2hex($this->randomMachineName(13));
