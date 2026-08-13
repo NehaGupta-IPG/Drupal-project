@@ -510,11 +510,6 @@ class UserTest extends ResourceTestBase {
    * {@inheritdoc}
    */
   public function testCollectionFilterAccess(): void {
-    // @todo This test fails on the X-Drupal-Cache-Contexts assertion unless
-    // the front page is visited first. Find out why and remove this line.
-    // @see https://www.drupal.org/project/drupal/issues/3616376
-    $this->drupalGet('');
-
     // Set up data model.
     $this->assertTrue($this->container->get('module_installer')->install(['node'], TRUE), 'Installed modules.');
     FieldStorageConfig::create([
@@ -554,6 +549,9 @@ class UserTest extends ResourceTestBase {
 
     $favorite_animal_test_url = Url::fromRoute('jsonapi.user--user.collection')->setOption('query', ['filter[field_favorite_animal]' => 'stegosaurus']);
 
+    $expected_cache_tags = ['http_response', 'node_list', 'user_list'];
+    $expected_cache_contexts = ['url.query_args', 'url.site', 'user'];
+
     // Test.
     $collection_url = Url::fromRoute('jsonapi.node--x.collection');
     $request_options = [];
@@ -561,13 +559,13 @@ class UserTest extends ResourceTestBase {
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
     // ?filter[uid.id]=OWN_UUID requires no permissions: 1 result.
     $response = $this->request('GET', $collection_url->setOption('query', ['filter[uid.id]' => $this->account->uuid()]), $request_options);
-    $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Contexts', 'user.permissions');
+    $this->assertResourceResponse(200, FALSE, $response, [...$expected_cache_tags, 'node:' . $node_auth_1->id()], $expected_cache_contexts, 'UNCACHEABLE (request policy)', TRUE);
     $doc = $this->getDocumentFromResponse($response);
     $this->assertCount(1, $doc['data']);
     $this->assertSame($node_auth_1->uuid(), $doc['data'][0]['id']);
     // ?filter[uid.id]=ANONYMOUS_UUID: 0 results.
     $response = $this->request('GET', $collection_url->setOption('query', ['filter[uid.id]' => User::load(0)->uuid()]), $request_options);
-    $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Contexts', 'user.permissions');
+    $this->assertResourceResponse(200, FALSE, $response, $expected_cache_tags, $expected_cache_contexts, 'UNCACHEABLE (request policy)', TRUE);
     $doc = $this->getDocumentFromResponse($response);
     $this->assertCount(0, $doc['data']);
     // ?filter[uid.name]=A: 0 results.
@@ -583,18 +581,18 @@ class UserTest extends ResourceTestBase {
     $this->grantPermissionsToTestedRole(['access user profiles']);
     // ?filter[uid.id]=ANONYMOUS_UUID: 0 results.
     $response = $this->request('GET', $collection_url->setOption('query', ['filter[uid.id]' => User::load(0)->uuid()]), $request_options);
-    $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Contexts', 'user.permissions');
+    $this->assertResourceResponse(200, FALSE, $response, $expected_cache_tags, $expected_cache_contexts, 'UNCACHEABLE (request policy)', TRUE);
     $doc = $this->getDocumentFromResponse($response);
     $this->assertCount(0, $doc['data']);
     // ?filter[uid.name]=A: 1 result since user A is active.
     $response = $this->request('GET', $collection_url->setOption('query', ['filter[uid.name]' => 'A']), $request_options);
-    $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Contexts', 'user.permissions');
+    $this->assertResourceResponse(200, FALSE, $response, [...$expected_cache_tags, 'node:' . $node_a->id()], $expected_cache_contexts, 'UNCACHEABLE (request policy)', TRUE);
     $doc = $this->getDocumentFromResponse($response);
     $this->assertCount(1, $doc['data']);
     $this->assertSame($node_a->uuid(), $doc['data'][0]['id']);
     // ?filter[uid.name]=B: 0 results since user B is blocked.
     $response = $this->request('GET', $collection_url->setOption('query', ['filter[uid.name]' => 'B']), $request_options);
-    $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Contexts', 'user.permissions');
+    $this->assertResourceResponse(200, FALSE, $response, $expected_cache_tags, $expected_cache_contexts, 'UNCACHEABLE (request policy)', TRUE);
     $doc = $this->getDocumentFromResponse($response);
     $this->assertCount(0, $doc['data']);
     // /jsonapi/user/user?filter[field_favorite_animal]: 0 results.
@@ -606,7 +604,9 @@ class UserTest extends ResourceTestBase {
     $this->grantPermissionsToTestedRole(['administer users']);
     // ?filter[uid.name]=B: 1 result.
     $response = $this->request('GET', $collection_url->setOption('query', ['filter[uid.name]' => 'B']), $request_options);
-    $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Contexts', 'user.permissions');
+    $admin_cache_tags = ['http_response', 'node_list', 'node:' . $node_b->id()];
+    $admin_cache_contexts = ['url.query_args', 'url.site', 'user.permissions'];
+    $this->assertResourceResponse(200, FALSE, $response, $admin_cache_tags, $admin_cache_contexts, 'UNCACHEABLE (request policy)', TRUE);
     $doc = $this->getDocumentFromResponse($response);
     $this->assertCount(1, $doc['data']);
     $this->assertSame($node_b->uuid(), $doc['data'][0]['id']);
