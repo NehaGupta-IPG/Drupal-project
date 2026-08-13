@@ -27,7 +27,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['router_test', 'views', 'block'];
+  protected static $modules = ['router_test', 'views', 'block', 'shortcut_test'];
 
   /**
    * {@inheritdoc}
@@ -246,6 +246,10 @@ class ShortcutLinksTest extends ShortcutTestBase {
     // Add shortcut to this page.
     $this->clickLink('Add to Default shortcuts');
     $this->assertSession()->pageTextContains("Added a shortcut for {$page_title}.");
+
+    $this->drupalGet('shortcut_test/no_title');
+    $this->clickLink('Add to Default shortcuts');
+    $this->assertSession()->pageTextContains("Added a shortcut for (Empty).");
   }
 
   /**

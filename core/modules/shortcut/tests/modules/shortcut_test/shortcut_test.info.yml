@@ -1,0 +1,7 @@
+name: 'Shortcut test'
+type: module
+description: 'Support module for shortcut tests.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:shortcut

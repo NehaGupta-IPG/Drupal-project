@@ -1,0 +1,6 @@
+shortcut_test.no_title_page:
+  path: '/shortcut_test/no_title'
+  defaults:
+    _controller: '\Drupal\shortcut_test\Controller\ShortcutTestController::pageNoTitle'
+  requirements:
+    _access: 'TRUE'
