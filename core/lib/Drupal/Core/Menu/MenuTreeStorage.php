@@ -50,13 +50,6 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   protected $cacheTagsInvalidator;
 
   /**
-   * The route provider.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
-   */
-  protected $routeProvider;
-
-  /**
    * The database table name.
    *
    * @var string
@@ -106,7 +99,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   The cache tags invalidator.
    * @param string $table
    *   A database table name to store configuration data in.
-   * @param \Drupal\Core\Routing\RouteProviderInterface|array|null $route_provider
+   * @param \Drupal\Core\Routing\RouteProviderInterface|array|null $routeProvider
    *   (optional) The route provider to use for loading routes.
    *   Passing an array instead is deprecated as of Drupal 11.5.0, and used to
    *   be for passing options. Use the $options parameter instead.
@@ -118,7 +111,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     CacheBackendInterface $menu_cache_backend,
     CacheTagsInvalidatorInterface $cache_tags_invalidator,
     string $table,
-    $route_provider = NULL,
+    protected RouteProviderInterface|array|null $routeProvider = NULL,
     array $options = [],
   ) {
     $this->connection = $connection;
@@ -127,18 +120,17 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $this->table = $table;
 
     // Handle backwards compatibility.
-    if (!$route_provider instanceof RouteProviderInterface) {
-      if (is_array($route_provider)) {
-        $options = $route_provider;
+    if (!$this->routeProvider instanceof RouteProviderInterface) {
+      if (is_array($this->routeProvider)) {
+        $options = $this->routeProvider;
       }
-      $route_provider = \Drupal::service('router.route_provider');
+      $this->routeProvider = \Drupal::service('router.route_provider');
       @trigger_error(
         'Calling ' . __METHOD__ . '() without the $route_provider argument is deprecated in drupal:11.5.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3364323',
         E_USER_DEPRECATED
       );
     }
 
-    $this->routeProvider = $route_provider;
     $this->options = $options;
   }
 
