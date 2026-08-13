@@ -44,7 +44,7 @@ interface PermissionHandlerInterface {
    *     permissions to have a clear, consistent security warning that is the
    *     same across the site. Use the 'description' key instead to provide any
    *     information that is specific to the permission you are defining.
-   *   - deprecated: (optiona) A translated deprecation message to display for
+   *   - deprecated: (optional) A translated deprecation message to display for
    *     this permission on the permission administration page.
    *   - dependencies: (optional) An array of dependency entities used when
    *     building this permission, structured in the same way as the return
