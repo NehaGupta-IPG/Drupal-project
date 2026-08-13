@@ -53,11 +53,14 @@ class FilterPermissions implements ContainerInjectionInterface {
     uasort($formats, 'Drupal\Core\Config\Entity\ConfigEntityBase::sort');
     foreach ($formats as $format) {
       if ($permission = $format->getPermissionName()) {
-        $permissions[$permission] = [
-          'title' => $this->t('Use the <a href=":url">@label</a> text format', [
+        $title = $format->access('update')
+          ? $this->t('Use the <a href=":url">@label</a> text format', [
             ':url' => $format->toUrl()->toString(),
             '@label' => $format->label(),
-          ]),
+          ])
+          : $this->t('Use the @label text format', ['@label' => $format->label()]);
+        $permissions[$permission] = [
+          'title' => $title,
           'description' => [
             '#prefix' => '<em>',
             '#markup' => $this->t('Warning: This permission may have security implications depending on how the text format is configured.'),
