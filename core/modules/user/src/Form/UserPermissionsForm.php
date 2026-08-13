@@ -194,24 +194,21 @@ class UserPermissionsForm extends FormBase {
           'warning' => !empty($perm_item['restrict access']) ? $this->t('Warning: Give to trusted roles only; this permission has security implications.') : '',
           'deprecated' => '',
         ];
-        // Replace permission placeholder in deprecation message.
-        $perm_item['deprecated'] = str_replace('%permission%', $perm, $perm_item['deprecated']);
-        if (strlen($perm_item['deprecated']) > 0) {
+        if (!empty($perm_item['deprecated'])) {
+          // Replace permission placeholder in deprecation message.
+          $perm_item['deprecated'] = str_replace('%permission%', $perm, $perm_item['deprecated']);
           $form['permissions'][$perm]['#attributes']['class'][] = 'deprecated';
         }
         $form['permissions'][$perm]['description'] = [
           '#theme' => 'user_permission_info',
-          '#deprecated' => $perm_item['deprecated'] ?? '',
-          '#description' => $perm_item['description'] ?? '',
+          '#deprecated' => $perm_item['deprecated'],
+          '#description' => $perm_item['description'],
           '#title' => $perm_item['title'],
-          '#warning' => $perm_item['warning'] ?? '',
+          '#warning' => $perm_item['warning'],
         ];
-        // Show the permission description.
-        if (!$hide_descriptions) {
-          $form['permissions'][$perm]['description']['#permission']['description'] = $perm_item['description'];
-          $form['permissions'][$perm]['description']['#permission']['warning'] = $perm_item['warning'];
-          $form['permissions'][$perm]['description']['#permission']['deprecated'] = $perm_item['deprecated'];
-        }
+        $form['permissions'][$perm]['description']['#permission']['description'] = $perm_item['description'];
+        $form['permissions'][$perm]['description']['#permission']['warning'] = $perm_item['warning'];
+        $form['permissions'][$perm]['description']['#permission']['deprecated'] = $perm_item['deprecated'];
         foreach ($role_names as $rid => $name) {
           $form['permissions'][$perm][$rid] = [
             '#title' => $name . ': ' . $perm_item['title'],
