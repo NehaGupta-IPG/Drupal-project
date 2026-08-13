@@ -45,8 +45,10 @@ class LocaleConfigSubscriberForeignTest extends LocaleConfigSubscriberTest {
     // change now in locale, so part of what it asserts for subscribers
     // is now default core behavior and part is not automated either.
     parent::setUpDefaultLanguage();
-    \Drupal::configFactory()->getEditable('system.site')
+    $this->config('system.site')
       ->set('default_langcode', 'hu')
+      ->save();
+    $this->config('core.language')
       ->set('default_config_langcode', 'hu')
       ->save();
   }

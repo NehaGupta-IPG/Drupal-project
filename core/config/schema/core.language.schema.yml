@@ -1,0 +1,9 @@
+core.language:
+  type: config_object
+  label: 'Language settings'
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    default_config_langcode:
+      type: langcode
+      label: 'Configuration default language code'

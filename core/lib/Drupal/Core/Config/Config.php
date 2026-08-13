@@ -257,7 +257,7 @@ class Config extends StorableConfigBase {
   }
 
   /**
-   * Applies the site's configuration default langcode when required.
+   * Applies the configuration default langcode when required.
    */
   protected function applyDefaultLangcodeIfMissing(Element $typed_config): void {
     // @todo Discuss the hardcoding of english here a bit more. What does
@@ -270,11 +270,11 @@ class Config extends StorableConfigBase {
       return;
     }
 
-    $system_site = $this->name === 'system.site' ? $this->get() : $this->storage->read('system.site');
-    // Unfortunately we need to rely fallbacks too because on existing sites
-    // when this code was added configuration operations may run before the
-    // update that adds the default_config_langcode key to system.site.
-    $default_config_langcode = $system_site['default_config_langcode'] ?? $system_site['default_langcode'] ?? 'en';
+    $core_language = $this->name === 'core.language' ? $this->get() : $this->storage->read('core.language');
+    // Unfortunately, we need to rely on fallbacks too because on existing sites
+    // when this code was added, configuration operations may run before the
+    // update that adds the default_config_langcode key to core.language.
+    $default_config_langcode = $core_language['default_config_langcode'] ?? $core_language['default_langcode'] ?? 'en';
 
     $this->set('langcode', $default_config_langcode);
   }

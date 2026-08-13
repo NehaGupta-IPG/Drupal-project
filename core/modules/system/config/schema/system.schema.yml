@@ -41,9 +41,6 @@ system.site:
     default_langcode:
       type: langcode
       label: 'Site default language code'
-    default_config_langcode:
-      type: langcode
-      label: 'Configuration default language code'
     mail_notification:
       type: string
       label: 'Notification email address'

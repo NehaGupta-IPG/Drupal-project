@@ -26,10 +26,7 @@ function system_install(): void {
   }
   // Ensure default language is saved.
   if (isset($install_state['parameters']['langcode'])) {
-    $site
-      ->set('langcode', (string) $install_state['parameters']['langcode'])
-      ->set('default_langcode', (string) $install_state['parameters']['langcode'])
-      ->set('default_config_langcode', (string) $install_state['parameters']['langcode']);
+    $site->set('default_langcode', (string) $install_state['parameters']['langcode']);
   }
 
   $site->save();
@@ -61,10 +58,10 @@ function system_update_11401(): void {
  * Backfill the configuration default language for existing sites.
  */
 function system_update_11502(): void {
-  $site_config = \Drupal::configFactory()->getEditable('system.site');
-  if ($site_config->get('default_config_langcode') === NULL) {
-    $site_config
-      ->set('default_config_langcode', $site_config->get('default_langcode'))
+  $core_language = \Drupal::configFactory()->getEditable('core.language');
+  if ($core_language->get('default_config_langcode') === NULL) {
+    $core_language
+      ->set('default_config_langcode', \Drupal::configFactory()->get('system.site')->get('default_langcode'))
       ->save();
   }
 }

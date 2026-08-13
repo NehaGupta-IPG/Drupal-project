@@ -42,6 +42,8 @@ class ConfigOverride implements ServiceProviderInterface, ConfigFactoryOverrideI
         'name' => drupal_install_profile_distribution_name(),
         'langcode' => $installer_langcode,
         'default_langcode' => $installer_langcode,
+      ];
+      $overrides['core.language'] = [
         'default_config_langcode' => $installer_langcode,
       ];
     }
