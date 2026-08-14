@@ -106,7 +106,7 @@ class ClassResolverTest extends UnitTestCase {
    * @see https://www.drupal.org/project/drupal/issues/3606822
    */
   public function testGetInstanceFromDefinitionFallsBackToLiveContainer(): void {
-    // The live container knows about the newly installed module's hook class.
+    // Define the hook class as a service in the live container.
     $dependency = new BazClass();
     $live_container = new ContainerBuilder();
     $live_container->set('test.dependency', $dependency);
@@ -114,8 +114,8 @@ class ClassResolverTest extends UnitTestCase {
       ->addArgument(new Reference('test.dependency'));
     \Drupal::setContainer($live_container);
 
-    // The resolver still holds the container from before the rebuild, which
-    // does not know about the hook class at all.
+    // The resolver has kept a reference to the container that existed before
+    // it was rebuilt. As a result the hook class cannot be resolved from it.
     $stale_container = new ContainerBuilder();
     $this->assertFalse($stale_container->has(StubHookClass::class));
 
