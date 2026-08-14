@@ -212,6 +212,48 @@ class ImageItemTest extends FieldKernelTestBase {
   }
 
   /**
+   * Tests that image items register appropriate upload validators.
+   */
+  public function testUploadValidators() {
+    $entity = EntityTest::create();
+    $items = $entity->get('image_test');
+    $item = $items->appendItem();
+    $field_definition = $items->getFieldDefinition();
+
+    $validators = $item->getUploadValidators();
+    $this->assertArrayHasKey('FileIsImage', $validators);
+    $this->assertArrayNotHasKey('FileImageDimensions', $validators);
+
+    $field_definition->setSetting('min_resolution', '32x32')->save();
+    $validators = $item->getUploadValidators();
+    $this->assertArrayHasKey('FileIsImage', $validators);
+    $this->assertSame([0, '32x32'], [
+      $validators['FileImageDimensions']['maxDimensions'],
+      $validators['FileImageDimensions']['minDimensions'],
+    ]);
+
+    $field_definition->setSetting('min_resolution', NULL)
+      ->setSetting('max_resolution', '1024x768')
+      ->save();
+    $validators = $item->getUploadValidators();
+    $this->assertArrayHasKey('FileIsImage', $validators);
+    $this->assertArrayHasKey('FileImageDimensions', $validators);
+    $this->assertSame(['1024x768', 0], [
+      $validators['FileImageDimensions']['maxDimensions'],
+      $validators['FileImageDimensions']['minDimensions'],
+    ]);
+
+    $field_definition->setSetting('min_resolution', '32x32')->save();
+    $validators = $item->getUploadValidators();
+    $this->assertArrayHasKey('FileIsImage', $validators);
+    $this->assertArrayHasKey('FileImageDimensions', $validators);
+    $this->assertSame(['1024x768', '32x32'], [
+      $validators['FileImageDimensions']['maxDimensions'],
+      $validators['FileImageDimensions']['minDimensions'],
+    ]);
+  }
+
+  /**
    * Tests image URIs for empty and custom directories.
    */
   public function testImageUriDirectories(): void {

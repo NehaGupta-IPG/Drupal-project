@@ -50,13 +50,13 @@ class ImageFieldWidgetTest extends ImageFieldTestBase {
     $field_config = FieldConfig::loadByName('node', 'article', $field_name);
     $field_config->setSetting('file_extensions', 'png gif jpg jpeg webp tiff')->save();
     $this->drupalGet('node/add/article');
-    $this->assertSession()->pageTextContains('Allowed types: png gif jpg jpeg webp.');
+    $this->assertSession()->pageTextContains('Allowed types: png gif jpg jpeg webp tiff.');
 
     // Add a supported extension and remove some supported ones, we should see
     // the intersect of those entered in field config with those supported.
     $field_config->setSetting('file_extensions', 'png jpe tiff')->save();
     $this->drupalGet('node/add/article');
-    $this->assertSession()->pageTextContains('Allowed types: png jpe.');
+    $this->assertSession()->pageTextContains('Allowed types: png jpe tiff.');
   }
 
 }
