@@ -45,8 +45,14 @@ class PathProcessorImageStyles implements InboundPathProcessorInterface {
    */
   public function processInbound($path, Request $request) {
     $directory_path = $this->streamWrapperManager->getViaScheme('public')->getDirectoryPath();
-    if (str_starts_with($path, '/' . $directory_path . '/styles/')) {
-      $path_prefix = '/' . $directory_path . '/styles/';
+    // getDirectoryPath() can legitimately return '' (e.g. a Flysystem-backed
+    // public:// scheme whose public_url_base has no path component), which
+    // would otherwise collapse this into a '//styles/' prefix. Collapse the
+    // double slash back to one so it matches the single-slash URLs Drupal
+    // actually generates for that case.
+    $public_styles_prefix = preg_replace('#^/+#', '/', '/' . $directory_path . '/styles/');
+    if (str_starts_with($path, $public_styles_prefix)) {
+      $path_prefix = $public_styles_prefix;
     }
     // Check if the string '/system/files/styles/' exists inside the path,
     // that means we have a case of private file's image style.
