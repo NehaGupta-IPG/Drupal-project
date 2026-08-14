@@ -6,11 +6,13 @@ namespace Drupal\Tests\system\Functional\Session;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests session access after the response has been sent.
  */
 #[Group('Session')]
+#[RunTestsInSeparateProcesses]
 class SessionWriteAfterResponseTest extends BrowserTestBase {
 
   /**
