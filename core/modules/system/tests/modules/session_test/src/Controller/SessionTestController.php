@@ -283,4 +283,12 @@ class SessionTestController extends ControllerBase {
     return new Response();
   }
 
+  /**
+   * Initializes the service that writes to the session on destruct.
+   */
+  public function writeOnDestruct(): Response {
+    \Drupal::service('session_test.write_on_destruct')->register();
+    return new Response('Session write scheduled on destruct');
+  }
+
 }

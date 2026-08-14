@@ -18,3 +18,8 @@ services:
     class: Drupal\session_test\Session\TestSessionBag
     tags:
       - { name: session_bag }
+  session_test.write_on_destruct:
+    class: Drupal\session_test\SessionWriteOnDestruct
+    arguments: ['@request_stack']
+    tags:
+      - { name: needs_destruction }

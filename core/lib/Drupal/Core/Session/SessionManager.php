@@ -103,7 +103,12 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    *   TRUE if the session is started.
    */
   protected function startNow() {
-    if ($this->isCli()) {
+    // A PHP session cannot be started once the response has been flushed, so
+    // return early instead of letting NativeSessionStorage::start() throw a
+    // RuntimeException. start() then falls back to a lazy session, the same
+    // path taken by anonymous users without a session cookie.
+    // @see https://www.drupal.org/project/drupal/issues/2941687
+    if ($this->isCli() || headers_sent()) {
       return FALSE;
     }
 
