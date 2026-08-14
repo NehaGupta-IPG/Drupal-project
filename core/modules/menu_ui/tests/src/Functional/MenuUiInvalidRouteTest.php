@@ -33,7 +33,6 @@ class MenuUiInvalidRouteTest extends BrowserTestBase {
    * Tests an invalid menu route does not prevent menu administration.
    */
   public function testMenuAdministrationWithEmptyRouteName(): void {
-    $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
       'administer menu',
