@@ -56,10 +56,10 @@
       {% else %}
         {{ media_list_help }} {{ media_list_link }} {{ allowed_types_help }}
       {% endif %}
-      {% if multiple and button %}
-        <div class="clearfix">{{ button }}</div>
-      {% endif %}
     </div>
+    {% if multiple and button %}
+      <div class="clearfix">{{ button }}</div>
+    {% endif %}
 
   </div>
 </fieldset>
