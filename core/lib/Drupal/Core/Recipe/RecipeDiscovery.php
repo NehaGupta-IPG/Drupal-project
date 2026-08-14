@@ -62,6 +62,10 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
    * @param array|null $pathsToExclude
    *   (optional) Paths to exclude from searching for recipes. Can be used to
    *   exclude recipes such as the example recipe included in Drupal core.
+   *
+   * @throws \LogicException
+   *    Thrown when no recipes directory is provided, core recipes are excluded,
+   *    and no recipe install path is configured in the root composer.json file.
    */
   public function __construct(
     private readonly ?string $recipesDirectory = NULL,
@@ -79,6 +83,10 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
     if ($recipesDirectory) {
       assert(is_dir($recipesDirectory));
       $this->directoriesToSearch[] = $recipesDirectory;
+    }
+
+    if (empty($this->directoriesToSearch)) {
+      throw new \LogicException('If no recipe install path is configured in your root composer.json file, you must either provide a custom recipes directory or include core recipes.');
     }
   }
 
