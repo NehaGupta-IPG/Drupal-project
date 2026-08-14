@@ -16,6 +16,7 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests derivative generation with source images using stream wrappers.
@@ -87,6 +88,17 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
     // Check that the derivative URI is the expected one.
     $expected_uri = "$expected_scheme://styles/{$this->imageStyle->id()}/$source_scheme/some/path/image.png";
     $this->assertSame($expected_uri, $derivative_uri);
+  }
+
+  /**
+   * Tests inbound processing when the public directory path is empty.
+   */
+  public function testProcessInboundEmptyPublicDirectoryPath(): void {
+    $this->setSetting('file_public_path', '');
+    $request = Request::create('/styles/thumbnail/public/example.jpg');
+    $processor = $this->container->get('path_processor.image_styles');
+    $this->assertSame('/styles/thumbnail/public', $processor->processInbound('/styles/thumbnail/public/example.jpg', $request));
+    $this->assertSame('example.jpg', $request->query->get('file'));
   }
 
   /**
