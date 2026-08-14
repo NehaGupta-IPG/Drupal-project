@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Menu;
 
+use Drupal\Component\Datetime\Time;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Core\Access\AccessManagerInterface;
@@ -12,15 +13,18 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Lock\NullLockBackend;
 use Drupal\Core\Menu\LocalTaskInterface;
 use Drupal\Core\Menu\LocalTaskManager;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Utility\YamlCacheCollector;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -258,8 +262,9 @@ class LocalTaskManagerTest extends UnitTestCase {
     $language_manager
       ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => 'en']));
+    $yaml_cache_collector = new YamlCacheCollector('test', new MemoryCache(new Time()), new NullLockBackend(), new Time());
 
-    $this->manager = new LocalTaskManager($this->argumentResolver, $request_stack, $this->routeMatch, $this->routeProvider, $module_handler, $this->cacheBackend->reveal(), $language_manager, $this->accessManager, $this->account);
+    $this->manager = new LocalTaskManager($this->argumentResolver, $request_stack, $this->routeMatch, $this->routeProvider, $module_handler, $this->cacheBackend->reveal(), $language_manager, $this->accessManager, $this->account, $yaml_cache_collector);
 
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'discovery');
     $property->setValue($this->manager, $this->pluginDiscovery);
@@ -351,7 +356,7 @@ class LocalTaskManagerTest extends UnitTestCase {
    *   The expected result, keyed by local task level.
    */
   protected function getLocalTasksForRouteResult($mock_plugin): array {
-    $result = [
+    return [
       0 => [
         'menu_local_task_test_tasks_settings' => $mock_plugin,
         'menu_local_task_test_tasks_view.tab' => $mock_plugin,
@@ -362,7 +367,6 @@ class LocalTaskManagerTest extends UnitTestCase {
         'menu_local_task_test_tasks_view_child2' => $mock_plugin,
       ],
     ];
-    return $result;
   }
 
   /**

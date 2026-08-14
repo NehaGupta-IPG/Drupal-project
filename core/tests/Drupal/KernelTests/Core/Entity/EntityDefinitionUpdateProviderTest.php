@@ -20,18 +20,10 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(EntityDefinitionUpdateManager::class)]
 #[Group('Entity')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;
-
-  /**
-   * The entity definition update manager.
-   *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
-   */
-  protected $entityDefinitionUpdateManager;
 
   /**
    * The database connection.
