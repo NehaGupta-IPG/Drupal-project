@@ -302,11 +302,11 @@ class PageCacheTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderEquals('Expires', 'Sun, 19 Nov 1978 05:00:00 GMT');
     $this->assertSession()->responseHeaderEquals('Foo', 'bar');
 
-    // Until bubbling of max-age up to the response is supported, verify that
-    // a custom #cache max-age set on an element does not affect page max-age.
+    // Verify that a custom #cache max-age set on an element affects page
+    // max-age.
     $this->drupalLogout();
     $this->drupalGet('system-test/cache_max_age_page');
-    $this->assertCacheMaxAge(300);
+    $this->assertCacheMaxAge(90);
   }
 
   /**
