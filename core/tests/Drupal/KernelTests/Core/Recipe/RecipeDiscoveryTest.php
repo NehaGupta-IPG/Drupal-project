@@ -52,19 +52,18 @@ class RecipeDiscoveryTest extends KernelTestBase {
     // Certain test recipes have validation errors on purpose, but we want to
     // skip those.
     $skip_invalid = TRUE;
-    $discovery = new RecipeDiscovery($dir, $include_core_recipes, $skip_invalid);
-    // Certain test recipes are broken on purpose, but we want to skip those as
-    // well.
-    $discovery->notPath('broken_enum_action_test/');
-    $logger = new TestLogger();
-    $discovery->setLogger($logger);
-
     // Cover the case that there is no recipe install path specified.
     $composer_recipes_directory = RecipeDiscovery::getComposerRecipesDirectory();
     if (is_null($composer_recipes_directory) && !$include_test_recipes && !$include_core_recipes) {
       $this->expectException('LogicException');
       $this->expectExceptionMessageIs('If no recipe install path is configured in your root composer.json file, you must either provide a custom recipes directory or include core recipes.');
     }
+    $discovery = new RecipeDiscovery($dir, $include_core_recipes, $skip_invalid);
+    // Certain test recipes are broken on purpose, but we want to skip those as
+    // well.
+    $discovery->notPath('broken_enum_action_test/');
+    $logger = new TestLogger();
+    $discovery->setLogger($logger);
 
     $paths = array_map(
       fn (Recipe $recipe) => $recipe->path,
