@@ -4,6 +4,7 @@ namespace Drupal\layout_builder\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\TranslatableEntityLabelMarkup;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -50,7 +51,7 @@ class InlineBlockDeriver extends DeriverBase implements ContainerDeriverInterfac
       $block_content_types = $this->entityTypeManager->getStorage('block_content_type')->loadMultiple();
       foreach ($block_content_types as $id => $type) {
         $this->derivatives[$id] = $base_plugin_definition;
-        $this->derivatives[$id]['admin_label'] = $type->label();
+        $this->derivatives[$id]['admin_label'] = new TranslatableEntityLabelMarkup('block_content_type', $id);
         $this->derivatives[$id]['config_dependencies'][$type->getConfigDependencyKey()][] = $type->getConfigDependencyName();
       }
     }

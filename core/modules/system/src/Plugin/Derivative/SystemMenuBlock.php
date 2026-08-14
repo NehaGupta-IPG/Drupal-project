@@ -4,6 +4,7 @@ namespace Drupal\system\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\TranslatableEntityLabelMarkup;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -46,7 +47,7 @@ class SystemMenuBlock extends DeriverBase implements ContainerDeriverInterface {
   public function getDerivativeDefinitions($base_plugin_definition) {
     foreach ($this->menuStorage->loadMultiple() as $menu => $entity) {
       $this->derivatives[$menu] = $base_plugin_definition;
-      $this->derivatives[$menu]['admin_label'] = $entity->label();
+      $this->derivatives[$menu]['admin_label'] = new TranslatableEntityLabelMarkup('menu', $menu);
       $this->derivatives[$menu]['config_dependencies']['config'] = [$entity->getConfigDependencyName()];
     }
     return $this->derivatives;
