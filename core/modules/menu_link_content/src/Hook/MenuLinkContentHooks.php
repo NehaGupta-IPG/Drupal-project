@@ -138,10 +138,14 @@ class MenuLinkContentHooks {
   /**
    * Helper function to update plugin definition using internal scheme.
    *
-   * @param string $path
+   * @param string|null $path
    *   The path alias.
    */
-  protected function updatePathAlias(string $path): void {
+  protected function updatePathAlias(?string $path): void {
+    if ($path === NULL || $path === '') {
+      return;
+    }
+
     /** @var \Drupal\menu_link_content\MenuLinkContentInterface[] $entities */
     $entities = $this->entityTypeManager
       ->getStorage('menu_link_content')
