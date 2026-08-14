@@ -8,7 +8,6 @@ use Composer\InstalledVersions;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 /**
  * Discovers recipes at specific locations in the file system.
@@ -33,16 +32,9 @@ use Symfony\Component\Validator\Exception\ValidationFailedException;
  * @internal
  *   This API is experimental.
  */
-final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface {
+final class RecipeDiscovery extends Finder implements LoggerAwareInterface {
 
   use LoggerAwareTrait;
-
-  /**
-   * The directories to search for recipes.
-   *
-   * @var string[]
-   */
-  private array $directoriesToSearch = [];
 
   /**
    * The directory for core recipes.
@@ -58,36 +50,44 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
    * @param bool $includeCoreRecipes
    *   (optional) Whether to include recipes provided by core.
    * @param bool $skipInvalid
-   *   (optional) Whether recipes that have validation errors should be ignored.
-   * @param array|null $pathsToExclude
-   *   (optional) Paths to exclude from searching for recipes. Can be used to
-   *   exclude recipes such as the example recipe included in Drupal core.
+   *   (optional) Whether recipes that have validation errors should be
+   *   ignored.
    *
    * @throws \LogicException
-   *    Thrown when no recipes directory is provided, core recipes are excluded,
-   *    and no recipe install path is configured in the root composer.json file.
+   *   Thrown when no recipes directory is provided, core recipes are excluded,
+   *   and no recipe install path is configured in the root composer.json file.
    */
   public function __construct(
     private readonly ?string $recipesDirectory = NULL,
     private readonly bool $includeCoreRecipes = TRUE,
     private readonly bool $skipInvalid = FALSE,
-    private readonly ?array $pathsToExclude = NULL,
   ) {
+    parent::__construct();
+    $directoriesToSearch = [];
+
     if ($includeCoreRecipes) {
-      $this->directoriesToSearch[] = \Drupal::root() . DIRECTORY_SEPARATOR . self::CORE_RECIPES_DIRECTORY;
+      $directoriesToSearch[] = \Drupal::root() . DIRECTORY_SEPARATOR . self::CORE_RECIPES_DIRECTORY;
     }
 
-    // If there are no Composer-installed recipes, we will only find core
-    // recipes.
+    // If no custom recipes directory was specified, default to the composer
+    // recipe installer path, if any.
     $recipesDirectory ??= self::getComposerRecipesDirectory();
     if ($recipesDirectory) {
       assert(is_dir($recipesDirectory));
-      $this->directoriesToSearch[] = $recipesDirectory;
+      $directoriesToSearch[] = $recipesDirectory;
     }
 
-    if (empty($this->directoriesToSearch)) {
+    if (empty($directoriesToSearch)) {
       throw new \LogicException('If no recipe install path is configured in your root composer.json file, you must either provide a custom recipes directory or include core recipes.');
     }
+
+    $this
+      ->files()
+      ->name('recipe.yml')
+      ->depth(1)
+      ->followLinks()
+      ->in($directoriesToSearch);
+
   }
 
   /**
@@ -99,7 +99,7 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
    *   The path where Composer has installed recipes, or NULL if no recipes
    *   are installed.
    */
-  private static function getComposerRecipesDirectory(): ?string {
+  public static function getComposerRecipesDirectory(): ?string {
     // This is expensive to compute, and very unlikely to change in a request.
     static $recipesDirectory;
     if (isset($recipesDirectory)) {
@@ -127,36 +127,11 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
   /**
    * {@inheritdoc}
    */
-  public function getIterator(): \Traversable {
-    $finder = Finder::create()
-      ->files()
-      ->name('recipe.yml')
-      ->depth(1)
-      ->followLinks()
-      ->in($this->directoriesToSearch);
-    if ($this->pathsToExclude) {
-      $finder->notPath($this->pathsToExclude);
-    }
-    /** @var \Symfony\Component\Finder\SplFileInfo $file */
-    foreach ($finder as $file) {
-      try {
-        yield Recipe::createFromDirectory($file->getPath());
-      }
-      catch (RecipeFileException |
-        RecipeMissingExtensionsException |
-        RecipePreExistingConfigException |
-        \RuntimeException |
-        UnknownRecipeException |
-        ValidationFailedException $e) {
-        // If we're ignoring invalid recipes, log the exception message (if a
-        // logger has been set).
-        if ($this->skipInvalid) {
-          $this->logger?->warning($e->getMessage());
-          continue;
-        }
-        throw $e;
-      }
-    }
+  public function getIterator(): \Iterator {
+    $iterator = parent::getIterator();
+    $iterator = new RecipeDiscoveryFilterIterator($iterator, $this->skipInvalid, $this->logger);
+
+    return $iterator;
   }
 
 }
