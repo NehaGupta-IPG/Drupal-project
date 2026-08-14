@@ -52,7 +52,7 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
   /**
    * Constructs a recipe discovery object.
    *
-   * @param string|null $path
+   * @param string|null $recipesDirectory
    *   (optional) A path containing directories that contain a recipe.yml file.
    *   There will be no further traversal into the directory tree.
    * @param bool $includeCoreRecipes
@@ -64,7 +64,7 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
    *   exclude recipes such as the example recipe included in Drupal core.
    */
   public function __construct(
-    ?string $path = NULL,
+    ?string $recipesDirectory = NULL,
     bool $includeCoreRecipes = TRUE,
     public bool $skipInvalid = FALSE,
     private readonly ?array $pathsToExclude = NULL,
@@ -75,10 +75,10 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
 
     // If there are no Composer-installed recipes, we will only find core
     // recipes.
-    $path ??= self::getRecipeDirectory();
-    if ($path) {
-      assert(is_dir($path));
-      $this->directoriesToSearch[] = $path;
+    $recipesDirectory ??= self::getComposerRecipesDirectory();
+    if ($recipesDirectory) {
+      assert(is_dir($recipesDirectory));
+      $this->directoriesToSearch[] = $recipesDirectory;
     }
   }
 
@@ -91,11 +91,11 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
    *   The path where Composer has installed recipes, or NULL if no recipes
    *   are installed.
    */
-  private static function getRecipeDirectory(): ?string {
+  private static function getComposerRecipesDirectory(): ?string {
     // This is expensive to compute, and very unlikely to change in a request.
-    static $cookbook;
-    if (isset($cookbook)) {
-      return $cookbook;
+    static $recipesDirectory;
+    if (isset($recipesDirectory)) {
+      return $recipesDirectory;
     }
 
     ['install_path' => $project_root] = InstalledVersions::getRootPackage();
@@ -111,9 +111,9 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
       fn (array $criteria): bool => in_array('type:' . Recipe::COMPOSER_PROJECT_TYPE, $criteria, TRUE),
     );
     if ($directory) {
-      $cookbook = $project_root . DIRECTORY_SEPARATOR . $directory;
+      $recipesDirectory = $project_root . DIRECTORY_SEPARATOR . $directory;
     }
-    return $cookbook;
+    return $recipesDirectory;
   }
 
   /**
