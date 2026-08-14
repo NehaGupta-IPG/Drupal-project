@@ -45,8 +45,8 @@ class PathProcessorImageStyles implements InboundPathProcessorInterface {
    */
   public function processInbound($path, Request $request) {
     $directory_path = $this->streamWrapperManager->getViaScheme('public')->getDirectoryPath();
-    // getDirectoryPath() can legitimately return '' (e.g. a Flysystem-backed
-    // public:// scheme whose public_url_base has no path component), which
+    // getDirectoryPath() can legitimately return '' (for example a remote
+    // public:// wrapper whose public base URL has no path component), which
     // would otherwise collapse this into a '//styles/' prefix. Collapse the
     // double slash back to one so it matches the single-slash URLs Drupal
     // actually generates for that case.
