@@ -49,7 +49,7 @@ class MenuUiInvalidRouteTest extends BrowserTestBase {
 
     $this->drupalGet('admin/structure/menu/manage/admin');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains('Administration');
+    $this->assertSession()->pageTextContains('Structure');
   }
 
 }
