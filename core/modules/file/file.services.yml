@@ -37,3 +37,4 @@ services:
   Drupal\file\FileReferenceResolver: ~
   Drupal\file\Upload\ManagedFileElementHelper: ~
   Drupal\file\Upload\FormFileUploader: ~
+  Drupal\file\Upload\ManagedFileValueResolver: ~

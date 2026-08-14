@@ -13,8 +13,8 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
-use Drupal\file\Element\ManagedFile;
 use Drupal\file\Entity\File;
+use Drupal\file\Upload\ManagedFileValueResolver;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -334,7 +334,7 @@ class FileWidget extends WidgetBase {
     }
 
     // We depend on the managed file element to handle uploads.
-    $return = ManagedFile::valueCallback($element, $input, $form_state);
+    $return = \Drupal::service(ManagedFileValueResolver::class)->resolveValue($element, $input, $form_state);
 
     // Ensure that all the required properties are returned even if empty.
     $return += [
