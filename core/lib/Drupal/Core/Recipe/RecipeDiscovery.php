@@ -64,9 +64,9 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
    *   exclude recipes such as the example recipe included in Drupal core.
    */
   public function __construct(
-    ?string $recipesDirectory = NULL,
-    bool $includeCoreRecipes = TRUE,
-    public bool $skipInvalid = FALSE,
+    private readonly ?string $recipesDirectory = NULL,
+    private readonly bool $includeCoreRecipes = TRUE,
+    private readonly bool $skipInvalid = FALSE,
     private readonly ?array $pathsToExclude = NULL,
   ) {
     if ($includeCoreRecipes) {
