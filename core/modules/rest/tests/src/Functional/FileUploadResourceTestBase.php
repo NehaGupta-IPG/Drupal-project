@@ -700,7 +700,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
    * @return array
    *   The expected normalized data array.
    */
-  protected function getExpectedNormalizedEntity($fid = 1, string $expected_filename = 'example.EXTENSION', $expected_as_filename = FALSE) {
+  protected function getExpectedNormalizedEntity($fid = 1, $expected_filename = 'example.EXTENSION', $expected_as_filename = FALSE) {
     $expected_filename = str_replace('.EXTENSION', '.' . $this->fileExtension, $expected_filename);
 
     $author = User::load(static::$auth ? $this->account->id() : 0);
@@ -800,7 +800,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
       // Set the required Content-Disposition header for the file name.
       'Content-Disposition' => 'file; filename="example.' . $this->fileExtension . '"',
     ];
-    $request_options[RequestOptions::HEADERS] = array_filter($headers, function ($value): bool {
+    $request_options[RequestOptions::HEADERS] = array_filter($headers, function ($value) {
       return $value !== FALSE;
     });
     $request_options[RequestOptions::BODY] = $file_contents;

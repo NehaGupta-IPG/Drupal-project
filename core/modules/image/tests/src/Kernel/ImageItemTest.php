@@ -214,7 +214,7 @@ class ImageItemTest extends FieldKernelTestBase {
   /**
    * Tests that image items register appropriate upload validators.
    */
-  public function testUploadValidators() {
+  public function testUploadValidators(): void {
     $entity = EntityTest::create();
     $items = $entity->get('image_test');
     $item = $items->appendItem();
