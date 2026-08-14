@@ -45,6 +45,11 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
   private array $directoriesToSearch = [];
 
   /**
+   * The directory for core recipes.
+   */
+  protected const string CORE_RECIPES_DIRECTORY = 'core/recipes';
+
+  /**
    * Constructs a recipe discovery object.
    *
    * @param string|null $path
@@ -65,7 +70,7 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
     private readonly ?array $pathsToExclude = NULL,
   ) {
     if ($includeCoreRecipes) {
-      $this->directoriesToSearch[] = \Drupal::root() . '/core/recipes';
+      $this->directoriesToSearch[] = \Drupal::root() . DIRECTORY_SEPARATOR . self::CORE_RECIPES_DIRECTORY;
     }
 
     // If there are no Composer-installed recipes, we will only find core
