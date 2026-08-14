@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\navigation\Functional;
+namespace Drupal\Tests\menu_ui\Functional;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Tests\BrowserTestBase;
@@ -10,18 +10,17 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the navigation menu in the menu administration UI.
+ * Tests menu administration with invalid routes.
  */
-#[Group('navigation')]
+#[Group('menu_ui')]
 #[RunTestsInSeparateProcesses]
-class NavigationMenuUiTest extends BrowserTestBase {
+class MenuUiInvalidRouteTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
     'menu_ui',
-    'navigation',
     'node',
   ];
 
@@ -37,7 +36,6 @@ class NavigationMenuUiTest extends BrowserTestBase {
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
-      'access navigation',
       'administer menu',
     ]));
 
@@ -45,13 +43,13 @@ class NavigationMenuUiTest extends BrowserTestBase {
     $this->container->get(Connection::class)
       ->update('menu_tree')
       ->fields(['route_name' => ''])
-      ->condition('id', 'navigation.create')
+      ->condition('id', 'system.admin_structure')
       ->execute();
     $this->container->get('cache.menu')->deleteAll();
 
-    $this->drupalGet('admin/structure/menu/manage/content');
+    $this->drupalGet('admin/structure/menu/manage/admin');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains('Content');
+    $this->assertSession()->pageTextContains('Administration');
   }
 
 }
