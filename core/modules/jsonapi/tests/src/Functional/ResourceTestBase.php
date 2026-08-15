@@ -514,6 +514,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected function getExpectedCacheTags(?array $sparse_fieldset = NULL) {
     $expected_cache_tags = [
       'http_response',
+      'route_match',
     ];
     return Cache::mergeTags($expected_cache_tags, $this->entity->getCacheTags());
   }

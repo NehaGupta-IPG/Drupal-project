@@ -254,11 +254,11 @@ class NodePerformanceTest extends PerformanceTestBase {
           'node_list',
           'node_view',
           'rendered',
+          'route_match',
           'user:0',
           'user_view',
         ],
         [
-          'route_match',
           'access_policies',
           'routes',
           'router',

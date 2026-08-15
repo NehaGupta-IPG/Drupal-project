@@ -108,6 +108,7 @@ class GlossaryTest extends ViewTestBase {
         // FinishResponseSubscriber adds this cache tag to responses that have
         // the 'user.permissions' cache context for anonymous users.
         'config:user.role.anonymous',
+        'route_match',
       ]
     );
 

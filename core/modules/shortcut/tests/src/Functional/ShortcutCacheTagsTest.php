@@ -277,6 +277,7 @@ class ShortcutCacheTagsTest extends EntityCacheTagsTestBase {
       'config:system.menu.admin',
       'config:system.theme',
       'rendered',
+      'route_match',
     ];
     $this->assertCacheTags($expected_cache_tags);
 

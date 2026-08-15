@@ -75,6 +75,7 @@ class CommentRssTest extends CommentTestBase {
       'node:1', 'node_list',
       'node_view',
       'user:3',
+      'route_match',
     ]));
 
     $raw = '<comments>' . $this->node->toUrl('canonical', ['fragment' => 'comments', 'absolute' => TRUE])->toString() . '</comments>';

@@ -48,7 +48,7 @@ abstract class EntityWithUriCacheTagsTestBase extends EntityCacheTagsTestBase {
       $cache_keys = ['entity_view', $entity_type, $this->entity->id(), $view_mode];
       $expected_cache_tags = Cache::mergeTags($cache_tag, $view_cache_tag);
       $expected_cache_tags = Cache::mergeTags($expected_cache_tags, $this->getAdditionalCacheTagsForEntity($this->entity));
-      $expected_cache_tags = Cache::mergeTags($expected_cache_tags, [$render_cache_tag]);
+      $expected_cache_tags = Cache::mergeTags($expected_cache_tags, [$render_cache_tag], ['route_match']);
       $this->verifyRenderCache($cache_keys, $expected_cache_tags, (new CacheableMetadata())->setCacheContexts($entity_cache_contexts));
     }
 

@@ -588,12 +588,13 @@ class UrlGeneratorTest extends UnitTestCase {
    * Tests generate with chained relative path segments.
    */
   public function testEncodingOfChainedRelativePathSegments(): void {
-    $this->assertGenerateFromRoute('test_path', ['path' => '../../..'], [], '/test-path/%2E%2E/%2E%2E/%2E%2E/bar', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
-    $this->assertGenerateFromRoute('test_path', ['path' => '././.'], [], '/test-path/%2E/%2E/%2E/bar', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
-    $this->assertGenerateFromRoute('test_path', ['path' => '../././..'], [], '/test-path/%2E%2E/%2E/%2E/%2E%2E/bar', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+    $cacheableMetadata = (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT)->addCacheTags(['route_match']);
+    $this->assertGenerateFromRoute('test_path', ['path' => '../../..'], [], '/test-path/%2E%2E/%2E%2E/%2E%2E/bar', $cacheableMetadata);
+    $this->assertGenerateFromRoute('test_path', ['path' => '././.'], [], '/test-path/%2E/%2E/%2E/bar', $cacheableMetadata);
+    $this->assertGenerateFromRoute('test_path', ['path' => '../././..'], [], '/test-path/%2E%2E/%2E/%2E/%2E%2E/bar', $cacheableMetadata);
 
-    $this->assertGenerateFromRoute('test_tail', ['path' => '../../..'], [], '/test-tail/%2E%2E/%2E%2E/%2E%2E', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
-    $this->assertGenerateFromRoute('test_tail', ['path' => '././.'], [], '/test-tail/%2E/%2E/%2E', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+    $this->assertGenerateFromRoute('test_tail', ['path' => '../../..'], [], '/test-tail/%2E%2E/%2E%2E/%2E%2E', $cacheableMetadata);
+    $this->assertGenerateFromRoute('test_tail', ['path' => '././.'], [], '/test-tail/%2E/%2E/%2E', $cacheableMetadata);
   }
 
   /**
@@ -654,7 +655,7 @@ class UrlGeneratorTest extends UnitTestCase {
     $this->generator->setContext($this->context);
 
     $options = [];
-    $this->assertGenerateFromRoute('test_1', ['node' => 1], $options, '/hello/world?node=1', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
+    $this->assertGenerateFromRoute('test_1', ['node' => 1], $options, '/hello/world?node=1', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT)->addCacheTags(['route_match']));
   }
 
 }

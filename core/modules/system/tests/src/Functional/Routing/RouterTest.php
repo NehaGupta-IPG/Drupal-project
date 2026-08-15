@@ -61,7 +61,7 @@ class RouterTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('test2');
     // Check expected headers from FinishResponseSubscriber.
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', implode(' ', $expected_cache_contexts));
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', 'config:user.role.anonymous http_response rendered');
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', 'config:user.role.anonymous http_response rendered route_match');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
     // Confirm that the page wrapping is being added, so we're not getting a
     // raw body returned.
@@ -80,7 +80,7 @@ class RouterTest extends BrowserTestBase {
     );
     sort($expected_cache_contexts);
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', implode(' ', $expected_cache_contexts));
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', 'config:user.role.anonymous foo http_response rendered');
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', 'config:user.role.anonymous foo http_response rendered route_match');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Max-Age', '60');
     // 2. controller result: render array, per-role cacheable route access.
     $this->drupalGet('router_test/test19');
@@ -90,7 +90,7 @@ class RouterTest extends BrowserTestBase {
     ]);
     sort($expected_cache_contexts);
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', implode(' ', $expected_cache_contexts));
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', 'config:user.role.anonymous foo http_response rendered');
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', 'config:user.role.anonymous foo http_response rendered route_match');
     // 3. controller result: Response object, globally cacheable route access.
     $this->drupalGet('router_test/test1');
     $this->assertSession()->responseHeaderDoesNotExist('X-Drupal-Cache-Contexts');

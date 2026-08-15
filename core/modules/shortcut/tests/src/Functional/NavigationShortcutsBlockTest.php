@@ -63,6 +63,7 @@ class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
       'config:system.menu.navigation-user-links',
       'http_response',
       'rendered',
+      'route_match',
     ], $admin_user->getCacheTags());
     $this->assertCacheTags($expected_cache_tags);
 

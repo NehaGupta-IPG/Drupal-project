@@ -153,6 +153,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
       // FinishResponseSubscriber adds this cache tag to responses that have the
       // 'user.permissions' cache context for anonymous users.
       'config:user.role.anonymous',
+      'route_match',
     ]);
 
     // Render the view block adds the languages cache context.
@@ -177,6 +178,7 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
       // FinishResponseSubscriber adds this cache tag to responses that have the
       // 'user.permissions' cache context for anonymous users.
       'config:user.role.anonymous',
+      'route_match',
     ]);
   }
 
