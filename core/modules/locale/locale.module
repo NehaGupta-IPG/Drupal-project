@@ -934,22 +934,22 @@ function _locale_rebuild_js($langcode = NULL) {
     }
   }
 
-  // Construct the JavaScript file, if there are translations.
+  // Construct the JavaScript file. The file is always created, even if there
+  // are no translations, so that window.drupalTranslations is always defined
+  // and cannot be replaced via DOM clobbering.
   $data_hash = NULL;
-  $data = $status = '';
-  if (!empty($translations)) {
-    $data = [
-      'strings' => $translations,
-    ];
+  $status = '';
+  $data = [
+    'strings' => $translations,
+  ];
 
-    $locale_plurals = \Drupal::service('locale.plural.formula')->getFormula($language->getId());
-    if ($locale_plurals) {
-      $data['pluralFormula'] = $locale_plurals;
-    }
-
-    $data = 'window.drupalTranslations = ' . Json::encode($data) . ';';
-    $data_hash = Crypt::hashBase64($data);
+  $locale_plurals = \Drupal::service('locale.plural.formula')->getFormula($language->getId());
+  if ($locale_plurals) {
+    $data['pluralFormula'] = $locale_plurals;
   }
+
+  $data = 'window.drupalTranslations = ' . Json::encode($data) . ';';
+  $data_hash = Crypt::hashBase64($data);
 
   // Construct the filepath where JS translation files are stored.
   // There is (on purpose) no front end to edit that variable.
