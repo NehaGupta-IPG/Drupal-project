@@ -138,12 +138,43 @@ class PoDatabaseReader implements PoReaderInterface {
         // Filter for string with translation.
         $conditions['translated'] = TRUE;
       }
-      return \Drupal::service('locale.storage')->getTranslations($conditions);
+      $strings = \Drupal::service('locale.storage')->getTranslations($conditions);
     }
     else {
       // If no language, we don't need any of the target fields.
-      return \Drupal::service('locale.storage')->getStrings($conditions);
+      $strings = \Drupal::service('locale.storage')->getStrings($conditions);
     }
+
+    return $this->sortStrings($strings);
+  }
+
+  /**
+   * Sorts strings by their source and then context.
+   *
+   * @param \Drupal\locale\StringInterface[] $strings
+   *   The strings to sort.
+   *
+   * @return \Drupal\locale\StringInterface[]
+   *   The strings sorted by their source and then context.
+   */
+  private function sortStrings(array $strings): array {
+    usort($strings, [$this, 'compareStrings']);
+    return $strings;
+  }
+
+  /**
+   * Compares two strings by their source and then context.
+   *
+   * @param \Drupal\locale\StringInterface $a
+   *   The first string to compare.
+   * @param \Drupal\locale\StringInterface $b
+   *   The second string to compare.
+   *
+   * @return int
+   *   The comparison result.
+   */
+  private function compareStrings(StringInterface $a, StringInterface $b): int {
+    return [$a->source, $a->context] <=> [$b->source, $b->context];
   }
 
   /**

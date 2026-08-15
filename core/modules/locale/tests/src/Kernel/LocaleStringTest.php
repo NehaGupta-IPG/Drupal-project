@@ -139,6 +139,7 @@ class LocaleStringTest extends KernelTestBase {
     $source1 = $this->buildSourceString(['source' => $prefix . $this->randomMachineName(100)])->save();
     $source2 = $this->buildSourceString(['source' => $prefix . $this->randomMachineName(100)])->save();
     $source3 = $this->buildSourceString()->save();
+
     // Load all source strings.
     $strings = $this->storage->getStrings([]);
     $this->assertCount(3, $strings);
@@ -199,48 +200,6 @@ class LocaleStringTest extends KernelTestBase {
     $filter_options['filters'] = ['source' => $prefix];
     $translations = $this->storage->getTranslations(['language' => 'es'], $filter_options);
     $this->assertCount(2, $translations);
-  }
-
-  /**
-   * Tests sorting of strings by their ID.
-   */
-  public function testStringSort(): void {
-    $langcode = 'es';
-    // The strings are inserted in a non-alphabetical order of their contexts,
-    // all sharing the same source. When the query filters on the source, it
-    // uses the source-context index, which returns the strings in the order
-    // of their contexts instead of the order of their IDs without an ORDER BY.
-    $sources_and_contexts = [
-      ['source_A', 'context_C'],
-      ['source_A', 'context_A'],
-      ['source_A', 'context_B'],
-    ];
-    $expected_lids = [];
-    foreach ($sources_and_contexts as [$source, $context]) {
-      $string = $this->buildSourceString([
-        'source' => $source,
-        'context' => $context,
-      ])->save();
-      $expected_lids[] = $string->lid;
-      $this->createTranslation($string, $langcode)->save();
-    }
-
-    // Assert the sort order of a string array.
-    $assert_sort_order = function (array $strings) use ($expected_lids): void {
-      // The strings are sorted by their ID.
-      $this->assertEquals($expected_lids, array_map(
-        static fn(StringInterface $string) => $string->lid,
-        $strings,
-      ));
-    };
-
-    // The source condition makes the query use the source-context index,
-    // whose natural order is by context, so the ORDER BY on the ID is
-    // required to get the insertion order.
-    $strings = $this->storage->getStrings(['source' => 'source_A']);
-    $assert_sort_order($strings);
-    $strings = $this->storage->getTranslations(['language' => $langcode, 'source' => 'source_A']);
-    $assert_sort_order($strings);
   }
 
   /**
