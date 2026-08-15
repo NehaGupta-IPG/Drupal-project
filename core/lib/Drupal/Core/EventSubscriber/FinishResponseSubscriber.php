@@ -6,6 +6,7 @@ use Drupal\Component\Datetime\DateTimePlus;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\PageCache\RequestPolicyInterface;
@@ -49,7 +50,14 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    *
    * @var \Drupal\Core\Config\Config
    */
-  protected $config;
+  protected Config $config {
+    get => $this->configFactory->get('system.performance');
+  }
+
+  /**
+   * The configuration factory.
+   */
+  protected ConfigFactoryInterface $configFactory;
 
   /**
    * Constructs a FinishResponseSubscriber object.
@@ -78,7 +86,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
     protected TimeInterface $time,
     protected bool $debugCacheabilityHeaders = FALSE,
   ) {
-    $this->config = $config_factory->get('system.performance');
+    $this->configFactory = $config_factory;
   }
 
   /**
