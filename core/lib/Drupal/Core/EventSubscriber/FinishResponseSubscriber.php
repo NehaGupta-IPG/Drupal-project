@@ -55,11 +55,6 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * The configuration factory.
-   */
-  protected ConfigFactoryInterface $configFactory;
-
-  /**
    * Constructs a FinishResponseSubscriber object.
    *
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
@@ -79,15 +74,13 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    */
   public function __construct(
     protected LanguageManagerInterface $languageManager,
-    ConfigFactoryInterface $config_factory,
+    protected ConfigFactoryInterface $configFactory,
     protected RequestPolicyInterface $requestPolicy,
     protected ResponsePolicyInterface $responsePolicy,
     protected CacheContextsManager $cacheContextsManager,
     protected TimeInterface $time,
     protected bool $debugCacheabilityHeaders = FALSE,
-  ) {
-    $this->configFactory = $config_factory;
-  }
+  ) {}
 
   /**
    * Sets extra headers on any responses, also subrequest ones.
