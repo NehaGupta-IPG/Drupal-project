@@ -84,6 +84,15 @@ class PathPluginBaseTest extends UnitTestCase {
       ->willReturn([]);
     $container->set('plugin.manager.views.display_extender', $display_extender_plugin_manager);
 
+    $locator = $this->createStub(ServiceLocator::class);
+    $locator
+      ->method('get')
+      ->willReturnMap([
+        ['access', $this->accessPluginManager],
+        ['display_extender', $display_extender_plugin_manager],
+      ]);
+    $container->set('views.plugin_managers', $locator);
+
     $language = $this->createStub(LanguageInterface::class);
     $language
       ->method('getId')
@@ -108,11 +117,13 @@ class PathPluginBaseTest extends UnitTestCase {
    * Initializes a service locator as a mock object.
    */
   protected function setUpMockServiceLocator(): void {
-    $locator = $this->createMock(ServiceLocator::class);
-    $locator->expects($this->once())
+    $locator = $this->createStub(ServiceLocator::class);
+    $locator
       ->method('get')
-      ->with('access')
-      ->willReturn($this->accessPluginManager);
+      ->willReturnMap([
+        ['access', $this->accessPluginManager],
+        ['display_extender', \Drupal::service('plugin.manager.views.display_extender')],
+      ]);
     \Drupal::getContainer()->set('views.plugin_managers', $locator);
   }
 
