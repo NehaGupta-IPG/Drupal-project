@@ -128,7 +128,10 @@
       const uiDialog = $element
         .dialog('option', { resizable: false, draggable: false })
         .dialog('widget');
-      uiDialog[0].style.position = 'fixed';
+      uiDialog.css({
+        position: 'fixed',
+        zIndex: '1260',
+      });
       $(window)
         .on('resize.dialogResize scroll.dialogResize', eventData, autoResize)
         .trigger('resize.dialogResize');
