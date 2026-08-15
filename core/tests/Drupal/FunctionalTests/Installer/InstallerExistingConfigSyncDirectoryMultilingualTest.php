@@ -61,8 +61,9 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
     $expected_changelist_default_collection = [
       'create' => [],
       // The system.mail is changed configuration because the test system
-      // changes it to ensure that mails are not sent.
-      'update' => ['system.mail'],
+      // changes it to ensure that mails are not sent. The views.settings
+      // configuration is updated by views_post_update_remove_cache_extenders().
+      'update' => ['system.mail', 'views.settings'],
       'delete' => [],
       'rename' => [],
     ];
