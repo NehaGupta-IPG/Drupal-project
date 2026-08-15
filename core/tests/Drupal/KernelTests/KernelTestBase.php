@@ -466,15 +466,17 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     }
 
     // Bootstrap the kernel. Do not use createFromRequest() to retain Settings.
-    $kernel = new DrupalKernel('testing', $this->classLoader, TRUE);
+    $kernel = new DrupalKernel('testing', $this->classLoader, $this->sharesDatabaseState());
     $kernel->setSitePath($this->siteDirectory);
     // Boot a new one-time container from scratch. Set the module list upfront
     // to avoid a subsequent rebuild or setting the kernel into the
     // pre-installer mode.
     $extensions = $modules ? $this->getExtensionsForModules($modules) : [];
     $kernel->updateModules($extensions, $extensions);
-    $kernel->setContainerNeedsRebuild(FALSE);
-    $kernel->setOverrideUseCache(TRUE);
+    if ($this->sharesDatabaseState()) {
+      $kernel->setContainerNeedsRebuild(FALSE);
+      $kernel->setOverrideUseCache(TRUE);
+    }
 
     // DrupalKernel::boot() is not sufficient as it does not invoke preHandle(),
     // which is required to initialize legacy global variables.
