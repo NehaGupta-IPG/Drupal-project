@@ -23,7 +23,6 @@ use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\KeyValueStore\KeyValueDatabaseFactory;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
-use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Site\Settings;
@@ -48,6 +47,7 @@ use PHPUnit\Framework\Exception;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -131,7 +131,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
   /**
    * The test container.
    */
-  protected ?ContainerBuilder $container;
+  protected ?ContainerInterface $container;
 
   /**
    * Modules to install.
@@ -466,13 +466,15 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     }
 
     // Bootstrap the kernel. Do not use createFromRequest() to retain Settings.
-    $kernel = new DrupalKernel('testing', $this->classLoader, FALSE);
+    $kernel = new DrupalKernel('testing', $this->classLoader, TRUE);
     $kernel->setSitePath($this->siteDirectory);
     // Boot a new one-time container from scratch. Set the module list upfront
     // to avoid a subsequent rebuild or setting the kernel into the
     // pre-installer mode.
     $extensions = $modules ? $this->getExtensionsForModules($modules) : [];
     $kernel->updateModules($extensions, $extensions);
+    $kernel->setContainerNeedsRebuild(FALSE);
+    $kernel->setOverrideUseCache(TRUE);
 
     // DrupalKernel::boot() is not sufficient as it does not invoke preHandle(),
     // which is required to initialize legacy global variables.
@@ -480,9 +482,9 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $kernel->boot();
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('<none>'));
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, '<none>');
-    $kernel->preHandle($request);
 
     $this->container = $kernel->getContainer();
+    $kernel->preHandle($request);
 
     // Run database tasks and check for errors.
     $installer_class = $namespace . "\\Install\\Tasks";
@@ -705,23 +707,6 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
       $this->usesSuperUserAccessPolicy = !str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
     }
     $container->setParameter('security.enable_super_user', $this->usesSuperUserAccessPolicy);
-
-    // Use memory for key value storages to avoid database queries. Store the
-    // key value factory on the test object so that key value storages persist
-    // container rebuilds, otherwise all state data would vanish.
-    // A test class that shares its environment reads them from the database
-    // instead: installed entity type and field storage definitions, and state,
-    // are key value data, and have to outlive the test method process together
-    // with the tables they describe.
-    if (!isset($this->keyValue)) {
-      // The container is still being compiled, so the connection is taken
-      // from the database registry rather than from the 'database' service.
-      $this->keyValue = static::sharesEnvironment()
-        ? new KeyValueDatabaseFactory(new PhpSerialize(), Database::getConnection())
-        : new KeyValueMemoryFactory();
-    }
-    $container->set('keyvalue', $this->keyValue);
-    $container->getDefinition('keyvalue')->setSynthetic(TRUE);
 
     // Set the default language on the minimal container.
     $container->setParameter('language.default_values', Language::$defaultValues);
