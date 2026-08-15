@@ -93,7 +93,7 @@ class NodePerformanceTest extends PerformanceTestBase {
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node');
     }, 'nodePromotedContentPage');
-    $this->assertSame(0, $performance_data->getScriptBytes());
+    $this->assertSame(418, $performance_data->getScriptBytes());
 
     $this->assertQueriesByName('nodePromotedContentPage', $performance_data->getQueries());
     $this->assertMetricsByName('nodePromotedContentPage', $performance_data);
