@@ -590,9 +590,8 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $response = $this->request('GET', $url, $request_options);
     $this->assertSame($expected_response_status_code, $response->getStatusCode());
     $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
-    $dynamic_page_sub_request_status = static::$auth ? 'HIT' : 'MISS';
-    $this->assertSame(["UNCACHEABLE ($expected_response_status_code, sub-request: $dynamic_page_sub_request_status)"], $response->getHeader('X-Drupal-Dynamic-Cache'));
-    $this->assertSame(static::$auth ? ['UNCACHEABLE (request policy)'] : ['HIT'], $response->getHeader('X-Drupal-Cache'));
+    $this->assertSame(["UNCACHEABLE ($expected_response_status_code, sub-request: HIT)"], $response->getHeader('X-Drupal-Dynamic-Cache'));
+    $this->assertSame(static::$auth ? ['UNCACHEABLE (request policy)'] : ['MISS'], $response->getHeader('X-Drupal-Cache'));
 
     // DX: 403 because unauthorized.
     $url->setOption('query', ['_format' => static::$format]);
