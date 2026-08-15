@@ -40,7 +40,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
   min-inline-size: var(--pager-size);
   block-size: var(--pager-size);
   padding-inline: var(--admin-space-xs);

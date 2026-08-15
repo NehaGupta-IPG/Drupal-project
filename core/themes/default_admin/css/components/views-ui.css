@@ -407,7 +407,6 @@
 }
 
 .views-display-column {
-  box-sizing: border-box;
   border: 1px solid var(--admin-color-border);
   border-radius: var(--admin-radius-2xs);
   box-shadow: var(--details-box-shadow);
@@ -1372,7 +1371,6 @@ details.fieldset-no-legend {
 .views-ui-display-tab-bucket__header {
   display: inline-flex;
   justify-content: space-between;
-  box-sizing: border-box;
   width: 100%;
   padding-block: var(--admin-space-m) var(--admin-space-xs);
   padding-inline: 0;

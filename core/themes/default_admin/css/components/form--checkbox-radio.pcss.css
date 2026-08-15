@@ -13,7 +13,6 @@
 
 .form-boolean {
   display: inline-block;
-  box-sizing: border-box;
   width: 21px;
   height: 21px;
   vertical-align: text-bottom;

@@ -20,15 +20,8 @@
   --tabs-trigger-border: 1px solid rgb(216, 217, 224, 0.8);
 }
 .tabs-wrapper {
-  box-sizing: border-box;
   padding: 0 var(--admin-space-xs);
   margin-inline: calc(var(--admin-space-xs) * -1);
-
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
 
   @media (min-width: 48rem) {
     display: flex;

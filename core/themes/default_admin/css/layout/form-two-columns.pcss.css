@@ -1,10 +1,6 @@
 /**
  * Layout overrides for the menu link add/edit form.
  */
-.layout-region {
-  box-sizing: border-box;
-}
-
 .layout-region--footer .layout-region__content {
   margin-top: var(--admin-space-l);
 }

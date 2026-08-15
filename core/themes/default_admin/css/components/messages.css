@@ -31,7 +31,6 @@
 
   position: relative;
   overflow: auto; /* Required to prevent text clipping. */
-  box-sizing: border-box;
   padding: var(--admin-space-m);
   opacity: 1;
   color: var(--messages-fg-color);

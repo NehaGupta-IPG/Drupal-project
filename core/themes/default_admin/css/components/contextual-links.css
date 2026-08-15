@@ -12,13 +12,6 @@
 
 .contextual {
   z-index: 100;
-  box-sizing: border-box;
-
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
 
   .trigger {
     overflow: clip;

@@ -21,7 +21,6 @@
 
 .form-boolean {
   display: inline-block;
-  box-sizing: border-box;
   width: 1.3125rem;
   height: 1.3125rem;
   vertical-align: text-bottom;

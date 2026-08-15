@@ -81,7 +81,6 @@
   }
 
   .toolbar-dropdown__menu {
-    box-sizing: border-box;
     padding: var(--admin-space-xs);
     border-radius: var(--admin-radius-l);
     background-color: var(--admin-color-bg-raised);
@@ -89,7 +88,6 @@
     gap: 0;
 
     .toolbar-dropdown__link {
-      box-sizing: border-box;
       width: 100%;
       max-width: 15rem;
       margin: 0 !important;

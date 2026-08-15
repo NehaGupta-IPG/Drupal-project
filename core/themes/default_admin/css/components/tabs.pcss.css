@@ -17,15 +17,8 @@
 }
 
 .tabs-wrapper {
-  box-sizing: border-box;
   padding: 0 var(--admin-space-xs);
   margin-inline: calc(var(--admin-space-xs) * -1);
-
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
 
   @media (--tabs-horizontal) {
     display: flex;

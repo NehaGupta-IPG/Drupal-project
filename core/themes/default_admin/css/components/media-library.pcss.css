@@ -142,7 +142,6 @@
 
 .media-library-select-all {
   flex-basis: 100%;
-  box-sizing: border-box;
   width: 100%;
   color: var(--admin-color-text-loud);
   border-block-end: 1px solid var(--admin-color-border-loud);

@@ -144,7 +144,6 @@ caption {
 
 th {
   position: relative;
-  box-sizing: border-box;
   height: var(--admin-space-2xl);
   padding: var(--admin-space-xs) var(--admin-space-m);
   text-align: start;
@@ -296,7 +295,6 @@ thead tr {
 }
 
 td {
-  box-sizing: border-box;
   height: 4rem;
   padding: var(--admin-space-xs) var(--admin-space-m);
   text-align: start;

@@ -2,11 +2,18 @@
  * Generic elements.
  */
 
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
 ::selection {
   background: var(--admin-color-primary-soft-hover);
 }
 
 html {
+  box-sizing: border-box;
   font-family: var(--admin-font-family);
   font-size: 100%;
   font-weight: normal;

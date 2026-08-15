@@ -37,7 +37,6 @@
 .system-status-general-info__item {
   display: block;
   overflow-x: auto;
-  box-sizing: border-box;
   margin-block-end: var(--admin-space-l);
   padding: var(--admin-space-m);
   border: 0 none;
@@ -95,7 +94,6 @@
 .system-status-general-info__item-details {
   position: relative;
   display: inline-block;
-  box-sizing: border-box;
   width: calc(100% - 60px);
   padding-inline-start: 10px;
   font-size: var(--admin-font-size-s);

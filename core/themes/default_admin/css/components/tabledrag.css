@@ -190,7 +190,6 @@ body {
   display: flex;
   overflow: visible;
   place-content: center;
-  box-sizing: border-box;
   height: 2.75rem;
   cursor: move;
   text-align: center;
@@ -200,7 +199,6 @@ body {
 
   &::after {
     display: inline-block;
-    box-sizing: border-box;
     width: var(--tabledrag-handle-icon-size);
     height: var(--tabledrag-handle-icon-size);
     padding: var(--admin-space-xs);
