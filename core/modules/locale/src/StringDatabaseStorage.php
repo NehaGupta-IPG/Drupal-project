@@ -308,7 +308,7 @@ class StringDatabaseStorage implements StringStorageInterface {
   /**
    * Loads multiple string objects.
    *
-   * The string objects are ordered by their source and context.
+   * The string objects are ordered by their ID.
    *
    * @param array $conditions
    *   Any of the conditions used by dbStringSelect().
@@ -323,8 +323,8 @@ class StringDatabaseStorage implements StringStorageInterface {
   protected function dbStringLoad(array $conditions, array $options, $class) {
     $strings = [];
     $select = $this->dbStringSelect($conditions, $options);
-    $select->orderBy('s.source');
-    $select->orderBy('s.context');
+    // Order by the string ID to get a predictable order without a filesort.
+    $select->orderBy('s.lid');
     $result = $select->execute();
     foreach ($result as $item) {
       /** @var \Drupal\locale\StringInterface $string */

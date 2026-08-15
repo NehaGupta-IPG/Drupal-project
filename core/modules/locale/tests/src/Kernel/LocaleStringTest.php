@@ -202,43 +202,44 @@ class LocaleStringTest extends KernelTestBase {
   }
 
   /**
-   * Tests sorting of strings by their source and context.
+   * Tests sorting of strings by their ID.
    */
   public function testStringSort(): void {
     $langcode = 'es';
-    $sources_and_contexts_sorted = [
+    // The strings are inserted in a non-alphabetical order of their contexts,
+    // all sharing the same source. When the query filters on the source, it
+    // uses the source-context index, which returns the strings in the order
+    // of their contexts instead of the order of their IDs without an ORDER BY.
+    $sources_and_contexts = [
+      ['source_A', 'context_C'],
       ['source_A', 'context_A'],
       ['source_A', 'context_B'],
-      ['source_A', 'context_C'],
-      ['source_B', 'context_A'],
-      ['source_B', 'context_B'],
-      ['source_B', 'context_C'],
-      ['source_C', 'context_A'],
-      ['source_C', 'context_B'],
-      ['source_C', 'context_C'],
     ];
-    foreach (array_reverse($sources_and_contexts_sorted) as $source_and_context) {
-      $string = $this->buildSourceString(
-        [
-          'source' => $source_and_context[0],
-          'context' => $source_and_context[1],
-        ],
-      )->save();
+    $expected_lids = [];
+    foreach ($sources_and_contexts as [$source, $context]) {
+      $string = $this->buildSourceString([
+        'source' => $source,
+        'context' => $context,
+      ])->save();
+      $expected_lids[] = $string->lid;
       $this->createTranslation($string, $langcode)->save();
     }
 
     // Assert the sort order of a string array.
-    $assert_sort_order = function (array $strings) use ($sources_and_contexts_sorted): void {
-      $sources_and_contexts_actual = array_map(
-        static fn(StringInterface $string) => [$string->source, $string->context],
+    $assert_sort_order = function (array $strings) use ($expected_lids): void {
+      // The strings are sorted by their ID.
+      $this->assertEquals($expected_lids, array_map(
+        static fn(StringInterface $string) => $string->lid,
         $strings,
-      );
-      $this->assertEquals($sources_and_contexts_sorted, $sources_and_contexts_actual);
+      ));
     };
 
-    $strings = $this->storage->getStrings();
+    // The source condition makes the query use the source-context index,
+    // whose natural order is by context, so the ORDER BY on the ID is
+    // required to get the insertion order.
+    $strings = $this->storage->getStrings(['source' => 'source_A']);
     $assert_sort_order($strings);
-    $strings = $this->storage->getTranslations(['language' => $langcode]);
+    $strings = $this->storage->getTranslations(['language' => $langcode, 'source' => 'source_A']);
     $assert_sort_order($strings);
   }
 
