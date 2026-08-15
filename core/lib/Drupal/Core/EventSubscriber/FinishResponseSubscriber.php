@@ -45,11 +45,6 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    */
   protected const string RESPONSE_HEADER_CACHE_ITEM_SEPARATOR = ' ';
 
-  /**
-   * A config object for the system performance configuration.
-   *
-   * @var \Drupal\Core\Config\Config
-   */
   protected Config $config {
     get => $this->configFactory->get('system.performance');
   }
@@ -59,7 +54,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager object for retrieving the correct language code.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   A config factory for retrieving required config objects.
    * @param \Drupal\Core\PageCache\RequestPolicyInterface $requestPolicy
    *   A policy rule determining the cacheability of a request.
