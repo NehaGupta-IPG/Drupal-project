@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Render;
 
+use Drupal\KernelTests\AssertContentTrait;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -14,6 +15,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Render')]
 #[RunTestsInSeparateProcesses]
 class HtmlResponseAttachmentsProcessorTest extends KernelTestBase {
+
+  use AssertContentTrait;
 
   /**
    * {@inheritdoc}
@@ -44,9 +47,9 @@ class HtmlResponseAttachmentsProcessorTest extends KernelTestBase {
 
     // The loader that creates the window.drupalSettings global and the script
     // containing the settings should both be present in the output.
-    $content = $response->getContent();
-    $this->assertStringContainsString('drupalSettingsLoader.js', $content);
-    $this->assertStringContainsString('data-drupal-selector="drupal-settings-json"', $content);
+    $this->setRawContent($response->getContent());
+    $this->assertRaw('drupalSettingsLoader.js');
+    $this->assertNotSame([], $this->getDrupalSettings());
   }
 
 }
