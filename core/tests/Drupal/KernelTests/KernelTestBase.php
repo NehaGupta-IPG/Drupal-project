@@ -486,6 +486,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, '<none>');
 
     $this->container = $kernel->getContainer();
+    $this->keyValue = $this->container->get('keyvalue');
     $kernel->preHandle($request);
 
     // Run database tasks and check for errors.
