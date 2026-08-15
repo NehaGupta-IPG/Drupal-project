@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Render\Element;
 
+use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\Html;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +21,113 @@ class TableTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = ['system', 'form_test'];
+
+  /**
+   * Tests that states are applied to table cells.
+   */
+  public function testStatesOnCells(): void {
+    $states = [
+      'visible' => [
+        ':input[name="toggle"]' => ['checked' => TRUE],
+      ],
+    ];
+    $tables = [
+      'table render element' => [
+        'tag' => 'td',
+        'build' => [
+          '#type' => 'table',
+          'row' => [
+            'cell' => [
+              '#markup' => 'Target cell',
+              '#states' => $states,
+            ],
+          ],
+        ],
+      ],
+      'table render element with plain text' => [
+        'tag' => 'td',
+        'build' => [
+          '#type' => 'table',
+          'row' => [
+            'cell' => [
+              '#plain_text' => 'Target cell',
+              '#states' => $states,
+            ],
+          ],
+        ],
+      ],
+      'table theme' => [
+        'tag' => 'td',
+        'build' => [
+          '#theme' => 'table',
+          '#rows' => [
+            [
+              [
+                'data' => [
+                  '#markup' => 'Target cell',
+                  '#states' => $states,
+                ],
+              ],
+            ],
+          ],
+        ],
+      ],
+      'table header' => [
+        'tag' => 'th',
+        'build' => [
+          '#theme' => 'table',
+          '#header' => [
+            [
+              'data' => [
+                '#markup' => 'Target cell',
+                '#states' => $states,
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    foreach ($tables as $label => ['tag' => $tag, 'build' => $table]) {
+      $markup = $this->render($table);
+      $xpath = new \DOMXPath(Html::load($markup));
+      $cell = $xpath->query("//{$tag}[@data-drupal-states]")->item(0);
+      $this->assertNotNull($cell, "$label has states data on the table cell.");
+      $this->assertContains('js-form-wrapper', explode(' ', $cell->getAttribute('class')));
+      $this->assertSame($states, Json::decode($cell->getAttribute('data-drupal-states')));
+      $this->assertStringContainsString('core/misc/states.js', $markup);
+    }
+  }
+
+  /**
+   * Tests that states remain on form elements within table cells.
+   */
+  public function testStatesOnFormElementInCell(): void {
+    $states = [
+      'required' => [
+        ':input[name="toggle"]' => ['checked' => TRUE],
+      ],
+    ];
+    $table = [
+      '#type' => 'table',
+      'row' => [
+        'cell' => [
+          '#type' => 'textfield',
+          '#title' => 'Target field',
+          '#states' => $states,
+        ],
+      ],
+    ];
+
+    $markup = $this->render($table);
+    $xpath = new \DOMXPath(Html::load($markup));
+    $cell = $xpath->query('//td')->item(0);
+    $this->assertNotNull($cell);
+    $this->assertFalse($cell->hasAttribute('data-drupal-states'));
+    $input = $xpath->query('//input')->item(0);
+    $this->assertNotNull($input);
+    $this->assertSame($states, Json::decode($input->getAttribute('data-drupal-states')));
+  }
 
   /**
    * If $sticky is TRUE, `sticky-header` class should be included.

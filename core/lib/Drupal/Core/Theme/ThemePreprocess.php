@@ -610,6 +610,7 @@ class ThemePreprocess {
 
           // TableSort::header() removes the 'sort', 'initial_click_sort' and
           // 'field' keys.
+          $this->preprocessTableCellStates($cell_content, $cell);
           $cell_attributes = new Attribute($cell);
         }
         $variables['header'][$col_key] = [];
@@ -668,6 +669,7 @@ class ThemePreprocess {
 
                 $cell_attributes = $cell;
               }
+              $this->preprocessTableCellStates($cell_content, $cell_attributes);
               // Active table sort information.
               if (isset($variables['header'][$col_key]['data']) && $variables['header'][$col_key]['data'] == $ts['name'] && !empty($variables['header'][$col_key]['field'])) {
                 $variables[$section][$row_key]['cells'][$col_key]['active_table_sort'] = TRUE;
@@ -688,6 +690,32 @@ class ThemePreprocess {
     if (empty($variables['no_striping'])) {
       $variables['attributes']['data-striping'] = 1;
     }
+  }
+
+  /**
+   * Applies states from table cell content to the table cell wrapper.
+   *
+   * @param mixed $cell_content
+   *   The table cell content.
+   * @param array $cell_attributes
+   *   The table cell attributes.
+   */
+  private function preprocessTableCellStates(mixed &$cell_content, array &$cell_attributes): void {
+    if (!is_array($cell_content) || empty($cell_content['#states'])) {
+      return;
+    }
+    $has_plain_content = isset($cell_content['#markup']) || isset($cell_content['#plain_text']);
+    $has_own_rendering = isset($cell_content['#type'])
+      || isset($cell_content['#theme'])
+      || isset($cell_content['#theme_wrappers']);
+    if (!$has_plain_content || $has_own_rendering) {
+      return;
+    }
+
+    $cell_content['#attached']['library'][] = 'core/drupal.states';
+    $cell_attributes['class'][] = 'js-form-wrapper';
+    $cell_attributes['data-drupal-states'] = Json::encode($cell_content['#states']);
+    unset($cell_content['#states']);
   }
 
   /**
