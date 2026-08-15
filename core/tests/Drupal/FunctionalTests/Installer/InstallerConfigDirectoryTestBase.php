@@ -178,17 +178,11 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
   public function testConfigSync(): void {
     // After installation there is no snapshot and nothing to import.
     $change_list = $this->configImporter()->getStorageComparer()->getChangelist();
-    $expected_updates = ['system.mail'];
-    // Legacy display extender configuration is removed during the update.
-    $source_views_settings = $this->configImporter()->getStorageComparer()->getSourceStorage()->read('views.settings');
-    if (is_array($source_views_settings) && array_key_exists('display_extenders', $source_views_settings)) {
-      $expected_updates[] = 'views.settings';
-    }
     $expected = [
       'create' => [],
       // The system.mail is changed configuration because the test system
       // changes it to ensure that mails are not sent.
-      'update' => $expected_updates,
+      'update' => ['system.mail'],
       'delete' => [],
       'rename' => [],
     ];
