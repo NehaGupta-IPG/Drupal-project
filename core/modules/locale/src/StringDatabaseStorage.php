@@ -323,7 +323,7 @@ class StringDatabaseStorage implements StringStorageInterface {
   protected function dbStringLoad(array $conditions, array $options, $class) {
     $strings = [];
     $select = $this->dbStringSelect($conditions, $options);
-    // Order by the string ID to get a predictable order without a filesort.
+    // Order by the string ID to get a predictable order without a file sort.
     $select->orderBy('s.lid');
     $result = $select->execute();
     foreach ($result as $item) {
