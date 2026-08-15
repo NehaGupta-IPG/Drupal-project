@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Component\Gettext\PoItem;
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -172,6 +173,31 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
     $this->assertSession()->responseContains($js_filename);
     // Assert translations JS is included before drupal.js.
     $this->assertLessThan(strpos($content, 'core/misc/drupal.js'), strpos($content, $js_filename));
+  }
+
+  /**
+   * Tests the JavaScript translation file is created without translations.
+   *
+   * The file is created even when there are no translations, so that
+   * window.drupalTranslations is always defined and cannot be replaced via DOM
+   * clobbering.
+   */
+  public function testJavaScriptTranslationCreatedWithoutTranslations(): void {
+    $config = $this->config('locale.settings');
+
+    // English has no JavaScript translations on a fresh install.
+    _locale_rebuild_js('en');
+
+    $locale_javascripts = \Drupal::state()->get('locale.translation.javascript', []);
+    $this->assertNotEmpty($locale_javascripts['en']);
+    $js_file = 'assets://' . $config->get('javascript.directory') . '/en_' . $locale_javascripts['en'] . '.js';
+    $this->assertFileExists($js_file);
+
+    $content = file_get_contents($js_file);
+    $this->assertStringStartsWith('window.drupalTranslations = ', $content);
+    $translations = Json::decode(str_replace('window.drupalTranslations = ', '', rtrim($content, ';')));
+    $this->assertArrayHasKey('strings', $translations);
+    $this->assertEmpty($translations['strings']);
   }
 
 }
