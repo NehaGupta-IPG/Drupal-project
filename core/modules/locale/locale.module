@@ -937,7 +937,6 @@ function _locale_rebuild_js($langcode = NULL) {
   // Construct the JavaScript file. The file is always created, even if there
   // are no translations, so that window.drupalTranslations is always defined
   // and cannot be replaced via DOM clobbering.
-  $data_hash = NULL;
   $status = '';
   $data = [
     'strings' => $translations,
