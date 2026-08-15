@@ -585,7 +585,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $this->assertSame(["UNCACHEABLE ($expected_response_status_code, sub-request: MISS)"], $response->getHeader('X-Drupal-Dynamic-Cache'));
     $this->assertSame(static::$auth ? ['UNCACHEABLE (request policy)'] : ['MISS'], $response->getHeader('X-Drupal-Cache'));
 
-    // Repeating the request yields a cache hit (either in Page Cache or for
+    // DX: Repeating the request yields a cache hit (either in Page Cache or for
     // Dynamic Page Cache sub-request).
     $response = $this->request('GET', $url, $request_options);
     $this->assertSame($expected_response_status_code, $response->getStatusCode());
