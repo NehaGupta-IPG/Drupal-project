@@ -11,6 +11,7 @@ use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\Registry;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -178,7 +179,7 @@ class RegistryTest extends UnitTestCase {
 
     // Set up a mock theme hook list for the test_stable theme. This does
     // not actually need to exist for this test.
-    $this->keyValueFactory->get('hook_data')->set('theme_hook_list', [
+    $this->keyValueFactory->get('hook_data')->set('theme_hook_list:' . Settings::get('deployment_identifier', \Drupal::VERSION), [
       'test_stable' => [
         'preprocess_theme_test_render_element' => [
           'Drupal\test_stable\Hook\TestStableHooks::preprocessThemeTestRenderElement',
