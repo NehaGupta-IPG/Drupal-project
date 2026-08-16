@@ -54,8 +54,6 @@ class OptionsHooks {
 
   /**
    * Implements hook_preprocess_HOOK().
-   *
-   * @see \Drupal\Core\Field\Plugin\Field\FieldType\ListItemBase
    */
   #[Hook('preprocess_field')]
   public function preprocessField(array &$variables): void {
