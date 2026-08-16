@@ -64,7 +64,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * The entity type's field storage definitions.
    *
-   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface[]
+   * @var \Drupal\Core\Entity\ContentEntityTypeInterface
    */
   protected $entityType {
     get {

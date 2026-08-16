@@ -5600,12 +5600,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$entity_type of method Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorage\\:\\:getCustomTableMapping\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityTypeInterface, Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
 	'identifier' => 'isset.variable',
 	'count' => 1,
