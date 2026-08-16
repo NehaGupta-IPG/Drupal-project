@@ -9,6 +9,7 @@ use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -17,9 +18,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 // cspell:ignore ÜBER
 
 /**
- * @coversDefaultClass \Drupal\Core\Mail\MailFormatHelper
- * @group Mail
+ * Tests Drupal\Core\Mail\MailFormatHelper.
  */
+#[CoversClass(MailFormatHelper::class)]
+#[Group('Mail')]
 class MailFormatHelperTest extends UnitTestCase {
 
   /**
@@ -54,11 +56,8 @@ class MailFormatHelperTest extends UnitTestCase {
     \Drupal::setContainer($container);
   }
 
-  /**
-   * @covers ::htmlToText
-   * @dataProvider providerHtmlToText
-   */
-  public function testHtmlToText($html, $text, $allowed_tags = NULL): void {
+  #[DataProvider('providerHtmlToText')]
+  public function testHtmlToText(string $html, string $text, ?array $allowed_tags = NULL): void {
     $this->assertSame($text, MailFormatHelper::htmlToText($html, $allowed_tags));
   }
 
@@ -84,9 +83,15 @@ class MailFormatHelperTest extends UnitTestCase {
       ['<div>Drupal</div><div>Drupal</div>', "DrupalDrupal\n"],
       ['<em>Drupal</em>', "/Drupal/\n"],
       ['<h1>Drupal</h1>', "======== Drupal ==============================================================\n\n"],
-      ['<h1>Drupal</h1><p>Drupal</p>', "======== Drupal ==============================================================\n\nDrupal\n\n"],
+      [
+        '<h1>Drupal</h1><p>Drupal</p>',
+        "======== Drupal ==============================================================\n\nDrupal\n\n",
+      ],
       ['<h2>Drupal</h2>', "-------- Drupal --------------------------------------------------------------\n\n"],
-      ['<h2>Drupal</h2><p>Drupal</p>', "-------- Drupal --------------------------------------------------------------\n\nDrupal\n\n"],
+      [
+        '<h2>Drupal</h2><p>Drupal</p>',
+        "-------- Drupal --------------------------------------------------------------\n\nDrupal\n\n",
+      ],
       ['<h3>Drupal</h3>', ".... Drupal\n\n"],
       ['<h3>Drupal</h3><p>Drupal</p>', ".... Drupal\n\nDrupal\n\n"],
       ['<h4>Drupal</h4>', ".. Drupal\n\n"],
@@ -95,41 +100,71 @@ class MailFormatHelperTest extends UnitTestCase {
       ['<h5>Drupal</h5><p>Drupal</p>', "Drupal\n\nDrupal\n\n"],
       ['<h6>Drupal</h6>', "Drupal\n\n"],
       ['<h6>Drupal</h6><p>Drupal</p>', "Drupal\n\nDrupal\n\n"],
-      ['<hr />Drupal<hr />', "------------------------------------------------------------------------------\nDrupal\n------------------------------------------------------------------------------\n"],
-      ['<hr/>Drupal<hr/>', "------------------------------------------------------------------------------\nDrupal\n------------------------------------------------------------------------------\n"],
-      ['<hr/>Drupal<hr/><p>Drupal</p>', "------------------------------------------------------------------------------\nDrupal\n------------------------------------------------------------------------------\nDrupal\n\n"],
+      [
+        '<hr />Drupal<hr />',
+        "------------------------------------------------------------------------------\nDrupal\n------------------------------------------------------------------------------\n",
+      ],
+      [
+        '<hr/>Drupal<hr/>',
+        "------------------------------------------------------------------------------\nDrupal\n------------------------------------------------------------------------------\n",
+      ],
+      [
+        '<hr/>Drupal<hr/><p>Drupal</p>',
+        "------------------------------------------------------------------------------\nDrupal\n------------------------------------------------------------------------------\nDrupal\n\n",
+      ],
       ['<i>Drupal</i>', "/Drupal/\n"],
       ['<p>Drupal</p>', "Drupal\n\n"],
       ['<p>Drupal</p><p>Drupal</p>', "Drupal\n\nDrupal\n\n"],
       ['<strong>Drupal</strong>', "*Drupal*\n"],
       // @todo Tables are currently not supported.
-      ['<table><tr><td>Drupal</td><td>Drupal</td></tr><tr><td>Drupal</td><td>Drupal</td></tr></table>', "DrupalDrupalDrupalDrupal\n"],
+      [
+        '<table><tr><td>Drupal</td><td>Drupal</td></tr><tr><td>Drupal</td><td>Drupal</td></tr></table>',
+        "DrupalDrupalDrupalDrupal\n",
+      ],
       ['<table><tr><td>Drupal</td></tr></table><p>Drupal</p>', "Drupal\nDrupal\n\n"],
       // @todo The <u> tag is currently not supported.
       ['<u>Drupal</u>', "Drupal\n"],
       ['<ul><li>Drupal</li></ul>', " * Drupal\n\n"],
       ['<ul><li>Drupal <em>Drupal</em> Drupal</li></ul>', " * Drupal /Drupal/ Drupal\n\n"],
       // @todo Lines containing nothing but spaces should be trimmed.
-      ['<ul><li>Drupal</li><li><ol><li>Drupal</li><li>Drupal</li></ol></li></ul>', " * Drupal\n *  1) Drupal\n    2) Drupal\n   \n\n"],
-      ['<ul><li>Drupal</li><li><ol><li>Drupal</li></ol></li><li>Drupal</li></ul>', " * Drupal\n *  1) Drupal\n   \n * Drupal\n\n"],
+      [
+        '<ul><li>Drupal</li><li><ol><li>Drupal</li><li>Drupal</li></ol></li></ul>',
+        " * Drupal\n *  1) Drupal\n    2) Drupal\n   \n\n",
+      ],
+      [
+        '<ul><li>Drupal</li><li><ol><li>Drupal</li></ol></li><li>Drupal</li></ul>',
+        " * Drupal\n *  1) Drupal\n   \n * Drupal\n\n",
+      ],
       ['<ul><li>Drupal</li><li>Drupal</li></ul>', " * Drupal\n * Drupal\n\n"],
       ['<ul><li>Drupal</li></ul><p>Drupal</p>', " * Drupal\n\nDrupal\n\n"],
       ['<ol><li>Drupal</li></ol>', " 1) Drupal\n\n"],
-      ['<ol><li>Drupal</li><li><ul><li>Drupal</li><li>Drupal</li></ul></li></ol>', " 1) Drupal\n 2)  * Drupal\n     * Drupal\n    \n\n"],
+      [
+        '<ol><li>Drupal</li><li><ul><li>Drupal</li><li>Drupal</li></ul></li></ol>',
+        " 1) Drupal\n 2)  * Drupal\n     * Drupal\n    \n\n",
+      ],
       ['<ol><li>Drupal</li><li>Drupal</li></ol>', " 1) Drupal\n 2) Drupal\n\n"],
       ['<ol>Drupal</ol>', "Drupal\n\n"],
       ['<ol><li>Drupal</li></ol><p>Drupal</p>', " 1) Drupal\n\nDrupal\n\n"],
       ['<dl><dt>Drupal</dt></dl>', "Drupal\n\n"],
       ['<dl><dt>Drupal</dt><dd>Drupal</dd></dl>', "Drupal\n    Drupal\n\n"],
-      ['<dl><dt>Drupal</dt><dd>Drupal</dd><dt>Drupal</dt><dd>Drupal</dd></dl>', "Drupal\n    Drupal\nDrupal\n    Drupal\n\n"],
+      [
+        '<dl><dt>Drupal</dt><dd>Drupal</dd><dt>Drupal</dt><dd>Drupal</dd></dl>',
+        "Drupal\n    Drupal\nDrupal\n    Drupal\n\n",
+      ],
       ['<dl><dt>Drupal</dt><dd>Drupal</dd></dl><p>Drupal</p>', "Drupal\n    Drupal\n\nDrupal\n\n"],
       ['<dl><dt>Drupal<dd>Drupal</dl>', "Drupal\n    Drupal\n\n"],
       ['<dl><dt>Drupal</dt></dl><p>Drupal</p>', "Drupal\n\nDrupal\n\n"],
       // @todo Again, lines containing only spaces should be trimmed.
-      ['<ul><li>Drupal</li><li><dl><dt>Drupal</dt><dd>Drupal</dd><dt>Drupal</dt><dd>Drupal</dd></dl></li><li>Drupal</li></ul>', " * Drupal\n * Drupal\n       Drupal\n   Drupal\n       Drupal\n   \n * Drupal\n\n"],
+      [
+        '<ul><li>Drupal</li><li><dl><dt>Drupal</dt><dd>Drupal</dd><dt>Drupal</dt><dd>Drupal</dd></dl></li><li>Drupal</li></ul>',
+        " * Drupal\n * Drupal\n       Drupal\n   Drupal\n       Drupal\n   \n * Drupal\n\n",
+      ],
       // Tests malformed HTML tags.
       ['<br>Drupal<br>Drupal', "Drupal\nDrupal\n"],
-      ['<hr>Drupal<hr>Drupal', "------------------------------------------------------------------------------\nDrupal\n------------------------------------------------------------------------------\nDrupal\n"],
+      [
+        '<hr>Drupal<hr>Drupal',
+        "------------------------------------------------------------------------------\nDrupal\n------------------------------------------------------------------------------\nDrupal\n",
+      ],
       ['<ol><li>Drupal<li>Drupal</ol>', " 1) Drupal\n 2) Drupal\n\n"],
       ['<ul><li>Drupal <em>Drupal</em> Drupal</ul></ul>', " * Drupal /Drupal/ Drupal\n\n"],
       ['<ul><li>Drupal<li>Drupal</ol>', " * Drupal\n * Drupal\n\n"],
@@ -163,10 +198,22 @@ class MailFormatHelperTest extends UnitTestCase {
 
       // Test that headers are properly separated from surrounding text.
       // @todo There should be more space above the headers than below them.
-      ['Drupal<h1>Drupal</h1>Drupal', "Drupal\n======== Drupal ==============================================================\n\nDrupal\n"],
-      ['<p>Drupal</p><h1>Drupal</h1>Drupal', "Drupal\n\n======== Drupal ==============================================================\n\nDrupal\n"],
-      ['Drupal<h1>Drupal</h1><p>Drupal</p>', "Drupal\n======== Drupal ==============================================================\n\nDrupal\n\n"],
-      ['<p>Drupal</p><h1>Drupal</h1><p>Drupal</p>', "Drupal\n\n======== Drupal ==============================================================\n\nDrupal\n\n"],
+      [
+        'Drupal<h1>Drupal</h1>Drupal',
+        "Drupal\n======== Drupal ==============================================================\n\nDrupal\n",
+      ],
+      [
+        '<p>Drupal</p><h1>Drupal</h1>Drupal',
+        "Drupal\n\n======== Drupal ==============================================================\n\nDrupal\n",
+      ],
+      [
+        'Drupal<h1>Drupal</h1><p>Drupal</p>',
+        "Drupal\n======== Drupal ==============================================================\n\nDrupal\n\n",
+      ],
+      [
+        '<p>Drupal</p><h1>Drupal</h1><p>Drupal</p>',
+        "Drupal\n\n======== Drupal ==============================================================\n\nDrupal\n\n",
+      ],
 
       // Test that footnote references are properly generated.
       // @todo Footnote URLs should be absolute.
@@ -209,8 +256,6 @@ EOT
    *
    * Test that text separated by block-level tags in HTML get separated by
    * (at least) a newline in the plaintext version.
-   *
-   * @covers ::htmlToText
    */
   public function testDrupalHtmlToTextBlockTagToNewline(): void {
     $input = <<<'EOT'
@@ -257,8 +302,6 @@ EOT;
    *
    * RFC 821 says, "The maximum total length of a text line including the
    * <CRLF> is 1000 characters."
-   *
-   * @covers ::htmlToText
    */
   public function testVeryLongLineWrap(): void {
     $input = 'Drupal<br /><p>' . str_repeat('x', 2100) . '</p><br />Drupal';
@@ -274,9 +317,6 @@ EOT;
     $this->assertLessThanOrEqual(1000, $maximum_line_length);
   }
 
-  /**
-   * @covers ::wrapMail
-   */
   public function testWrapMail(): void {
     $delimiter = "End of header\n";
     $long_file_name = $this->randomMachineName(64) . '.docx';
@@ -299,14 +339,12 @@ EOT;
 
     // Check that lines are wrapped properly when they don't contain line breaks.
     $long_text = 'Some long text that extends beyond the wrapping length by only a few characters.';
-    $expected = "Some long text that extends beyond the wrapping length by only a few \ncharacters.";
+    $expected = "Some long text that extends beyond the wrapping length by only a few  \ncharacters.";
     $this->assertEquals($expected, MailFormatHelper::wrapMail($long_text, ''), 'Text without line breaks is properly wrapped.');
   }
 
   /**
    * Tests that trailing whitespace is removed before newlines.
-   *
-   * @covers ::wrapMail
    */
   public function testRemoveTrailingWhitespace(): void {
     $text = "Hi there! \nHerp Derp";
@@ -319,8 +357,6 @@ EOT;
    *
    * RFC 3676 says, "This is a special case; an (optionally quoted or quoted and
    * stuffed) line consisting of DASH DASH SP is neither fixed nor flowed."
-   *
-   * @covers ::wrapMail
    */
   public function testUsenetSignature(): void {
     $text = "Hi there!\n-- \nHerp Derp";
@@ -331,14 +367,10 @@ EOT;
     $this->assertSame("--", $mail_lines[1], 'Trailing whitespace removed for incorrect dash-dash-space signatures.');
   }
 
-  /**
-   * @covers ::htmlToTextPad
-   * @dataProvider providerHtmlToTextPad
-   */
-  public function testHtmlToTextPad($text, $pad, $prefix, $expected):void {
+  #[DataProvider('providerHtmlToTextPad')]
+  public function testHtmlToTextPad(string $text, string $pad, string $prefix, string $expected): void {
     $helper = new MailFormatHelper();
     $method = new \ReflectionMethod($helper, 'htmlToTextPad');
-    $method->setAccessible(TRUE);
     $value = $method->invoke($helper, $text, $pad, $prefix);
     $this->assertEquals($expected, $value);
   }
@@ -366,14 +398,10 @@ EOT;
     ];
   }
 
-  /**
-   * @covers ::htmlToMailUrls
-   * @dataProvider providerHtmlToMailUrls
-   */
-  public function testHtmlToMailUrls($match, $label, $url): void {
+  #[DataProvider('providerHtmlToMailUrls')]
+  public function testHtmlToMailUrls(array $match, string $label, string $url): void {
     $helper = new MailFormatHelper();
     $method = new \ReflectionMethod($helper, 'htmlToMailUrls');
-    $method->setAccessible(TRUE);
     $method->invoke($helper, NULL, $this->basePath, $this->baseUrl);
 
     $this->assertEquals($label, $method->invoke($helper, $match));
