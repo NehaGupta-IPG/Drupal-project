@@ -38,7 +38,7 @@ use Drupal\Core\Url;
  *
  * For properties containing callables it is not recommended to use a closure
  * or anonymous function because it will trigger an error if the element is
- * serialized.
+ * serialized. Examples in which serializing occurs include form caching.
  *
  * Here is the list of the properties used during the rendering of all render
  * elements:
