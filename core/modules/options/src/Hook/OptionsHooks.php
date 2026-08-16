@@ -64,8 +64,8 @@ class OptionsHooks {
       if (!isset($variables['items'][$delta])) {
         continue;
       }
-      // 'key' is the option key (main property value); 'properties' is the
-      // full property dict, for consistency with future generic use.
+      // "key" is the option key value.
+      // 'properties' is the full property array.
       $variables['items'][$delta]['key'] = $item->value ?? NULL;
       $variables['items'][$delta]['properties'] = $item->getValue();
     }
