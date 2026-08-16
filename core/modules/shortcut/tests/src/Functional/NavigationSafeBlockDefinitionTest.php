@@ -22,6 +22,7 @@ class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
     'navigation',
     'navigation_test',
     'block',
+    'layout_builder',
     'shortcut',
     'shortcut_test',
   ];

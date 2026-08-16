@@ -79,6 +79,13 @@ $extensions = $db->insert('key_value')
 $extensions = $db->insert('key_value')
   ->fields([
     'collection' => 'system.schema',
+    'name' => 'layout_discovery',
+    'value' => 'i:8000;',
+  ])
+  ->execute();
+$extensions = $db->insert('key_value')
+  ->fields([
+    'collection' => 'system.schema',
     'name' => 'navigation',
     'value' => 'i:11002;',
   ])
@@ -112,6 +119,7 @@ $extensions = $db->select('config')
   ->fetchField();
 $extensions = unserialize($extensions);
 $extensions['module']['layout_builder'] = 0;
+$extensions['module']['layout_discovery'] = 0;
 $extensions['module']['navigation'] = 0;
 unset($extensions['module']['shortcut']);
 $db->update('config')

@@ -52,7 +52,7 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
     $config = \Drupal::config('navigation.block_layout');
     $sections = $config->get('sections') ?? [];
     $components = array_filter($sections[0]['components'], fn ($component) => $component['region'] === 'content');
-    $this->assertCount(3, $components);
+    $this->assertCount(2, $components);
     $data = [
       'delta' => $delta,
       'configuration' => [
@@ -74,7 +74,7 @@ class AddNavigationBlockConfigActionTest extends KernelTestBase {
     $config = \Drupal::config('navigation.block_layout');
     $sections = $config->get('sections') ?? [];
     $components = array_filter($sections[0]['components'], fn ($component) => $component['region'] === 'content');
-    $this->assertCount(4, $components);
+    $this->assertCount(3, $components);
     $component = array_values($components)[$computed_delta];
     $this->assertSame('content', $component['region']);
     $this->assertEquals($data['configuration'], $component['configuration']);
