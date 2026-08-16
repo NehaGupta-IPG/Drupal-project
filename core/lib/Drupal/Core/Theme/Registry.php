@@ -848,7 +848,7 @@ class Registry implements DestructableInterface {
    */
   protected function hasThemeHookImplementation(string $theme, string $hook): bool {
     if (!isset($this->themeHookList)) {
-      $this->themeHookList = $this->keyValueFactory->get('hook_data')->get('theme_hook_list:' . Settings::get('deployment_identifier', Drupal::VERSION)) ?? [];
+      $this->themeHookList = $this->keyValueFactory->get('hook_data')->get('theme_hook_list:' . Settings::get('deployment_identifier', \Drupal::VERSION)) ?? [];
     }
     return isset($this->themeHookList[$theme][$hook]);
   }
@@ -861,7 +861,7 @@ class Registry implements DestructableInterface {
    */
   protected function getPreprocessForSuggestions(): array {
     if ($this->preprocessForSuggestions === NULL) {
-      $this->preprocessForSuggestions = $this->keyValueFactory->get('hook_data')->get('preprocess_for_suggestions:' . Settings::get('deployment_identifier', DRUPAL::VERSION)) ?: [];
+      $this->preprocessForSuggestions = $this->keyValueFactory->get('hook_data')->get('preprocess_for_suggestions:' . Settings::get('deployment_identifier', \Drupal::VERSION)) ?: [];
     }
     return $this->preprocessForSuggestions;
   }
