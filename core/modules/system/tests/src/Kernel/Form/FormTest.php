@@ -153,9 +153,6 @@ class FormTest extends KernelTestBase {
         }
       }
     }
-    // Clear the expected form error messages so they don't appear as
-    // exceptions.
-    \Drupal::messenger()->deleteAll();
   }
 
 }
