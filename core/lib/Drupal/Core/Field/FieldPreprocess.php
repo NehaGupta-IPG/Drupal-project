@@ -66,13 +66,6 @@ class FieldPreprocess {
     while (!empty($element[$delta])) {
       $variables['items'][$delta]['content'] = $element[$delta];
 
-      // Expose the raw stored property values of the field item so themes can
-      // derive information from them.
-      $item = $element['#items'][$delta] ?? NULL;
-      $main_property = $item ? $item::mainPropertyName() : NULL;
-      $variables['items'][$delta]['key'] = ($item && $main_property !== NULL) ? ($item->{$main_property} ?? NULL) : NULL;
-      $variables['items'][$delta]['properties'] = $item ? $item->getValue() : [];
-
       // Modules can add field item attributes (to
       // $item->_attributes) within hook_entity_prepare_view(). Some field
       // formatters move those attributes into some nested formatter-specific
