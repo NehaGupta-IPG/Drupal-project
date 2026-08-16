@@ -51,38 +51,6 @@ class FormTest extends BrowserTestBase {
   }
 
   /**
-   * Tests the required marker markup.
-   */
-  public function testRequiredFieldMarkup(): void {
-    $required_marker_preg = '@<.*?class=".*?js-form-required.*form-required.*?">@';
-
-    foreach ([TRUE, FALSE] as $required) {
-      $form_id = $this->randomMachineName();
-      $form = [
-        'op' => ['#type' => 'submit', '#value' => 'Submit'],
-        'textfield' => [
-          '#title' => $this->randomMachineName(),
-          '#type' => 'textfield',
-          '#required' => $required,
-        ],
-        '#token' => FALSE,
-      ];
-      $form_state = new FormState();
-      $form_state->setFormObject(new StubForm($form_id, $form));
-      $form_state->setMethod('POST');
-      \Drupal::formBuilder()->prepareForm($form_id, $form, $form_state);
-      $form_output = \Drupal::service('renderer')->renderRoot($form);
-
-      if ($required) {
-        $this->assertMatchesRegularExpression($required_marker_preg, (string) $form_output);
-      }
-      else {
-        $this->assertDoesNotMatchRegularExpression($required_marker_preg, (string) $form_output);
-      }
-    }
-  }
-
-  /**
    * Tests validation for required checkbox, select, and radio elements.
    *
    * Submits a test form containing several types of form elements. The form

@@ -20,7 +20,50 @@ class FormTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['file'];
+  protected static $modules = ['file', 'system'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->container->get('theme_installer')->install(['stark']);
+    $this->container->get('theme.manager')->setActiveTheme(
+      $this->container->get('theme.initialization')->initTheme('stark')
+    );
+  }
+
+  /**
+   * Tests the required marker markup.
+   */
+  public function testRequiredFieldMarkup(): void {
+    $required_marker_preg = '@<.*?class=\".*?js-form-required.*form-required.*?\">@';
+
+    foreach ([TRUE, FALSE] as $required) {
+      $form_id = $this->randomMachineName();
+      $form = [
+        'op' => ['#type' => 'submit', '#value' => 'Submit'],
+        'textfield' => [
+          '#title' => $this->randomMachineName(),
+          '#type' => 'textfield',
+          '#required' => $required,
+        ],
+        '#token' => FALSE,
+      ];
+      $form_state = new FormState();
+      $form_state->setFormObject(new StubForm($form_id, $form));
+      $form_state->setMethod('POST');
+      \Drupal::formBuilder()->prepareForm($form_id, $form, $form_state);
+      $form_output = \Drupal::service('renderer')->renderRoot($form);
+
+      if ($required) {
+        $this->assertMatchesRegularExpression($required_marker_preg, (string) $form_output);
+      }
+      else {
+        $this->assertDoesNotMatchRegularExpression($required_marker_preg, (string) $form_output);
+      }
+    }
+  }
 
   /**
    * Check several empty values for required forms elements.
