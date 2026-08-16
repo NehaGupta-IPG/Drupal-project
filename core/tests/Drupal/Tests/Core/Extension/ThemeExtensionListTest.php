@@ -93,9 +93,9 @@ class ThemeExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * Tests that installed theme pathnames are taken from the container.
+   * Tests that installed theme path names are taken from the container.
    *
-   * The constructor seeds the pathnames of installed themes from the
+   * The constructor seeds the path names of installed themes from the
    * container so that the state cache is not consulted.
    */
   public function testGetPathnameFromContainer(): void {
