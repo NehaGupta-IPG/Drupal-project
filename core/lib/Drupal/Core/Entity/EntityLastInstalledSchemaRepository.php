@@ -57,6 +57,13 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
    * {@inheritdoc}
    */
   public function getLastInstalledDefinition($entity_type_id) {
+    if (isset($this->entityTypeDefinitions[$entity_type_id])) {
+      return $this->entityTypeDefinitions[$entity_type_id];
+    }
+    elseif ($cache = $this->cacheBackend->get($entity_type_id . '.entity_type_definitions.installed')) {
+      $this->entityTypeDefinitions[$entity_type_id] = $cache->data;
+      return $this->entityTypeDefinitions[$entity_type_id];
+    }
     return $this->getLastInstalledDefinitions()[$entity_type_id] ?? NULL;
   }
 
@@ -64,14 +71,6 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
    * {@inheritdoc}
    */
   public function getLastInstalledDefinitions() {
-    if ($this->entityTypeDefinitions) {
-      return $this->entityTypeDefinitions;
-    }
-    elseif ($cache = $this->cacheBackend->get('entity_type_definitions.installed')) {
-      $this->entityTypeDefinitions = $cache->data;
-      return $this->entityTypeDefinitions;
-    }
-
     $all_definitions = $this->keyValueFactory->get('entity.definitions.installed')->getAll();
 
     // Filter out field storage definitions.
@@ -100,6 +99,10 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
     ];
     foreach ($keys as $key) {
       $this->entityFieldStorageDefinitions[$key] = $all_definitions[$key . '.field_storage_definitions'] ?? [];
+      $items[$key . '.entity_type_definitions.installed'] = [
+        'data' => $this->entityTypeDefinitions[$key],
+        'expires' => Cache::PERMANENT,
+      ];
       $items[$key . '.field_storage_definitions.installed'] = [
         'data' => $this->entityFieldStorageDefinitions[$key],
         'expires' => Cache::PERMANENT,
@@ -116,7 +119,7 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
   public function setLastInstalledDefinition(EntityTypeInterface $entity_type) {
     $entity_type_id = $entity_type->id();
     $this->keyValueFactory->get('entity.definitions.installed')->set($entity_type_id . '.entity_type', $entity_type);
-    $this->cacheBackend->delete('entity_type_definitions.installed');
+    $this->cacheBackend->delete($entity_type_id . '.entity_type_definitions.installed');
     $this->entityTypeDefinitions = NULL;
     return $this;
   }
@@ -131,7 +134,7 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
     // empty array stored from when it was.
     $this->keyValueFactory->get('entity.definitions.installed')->delete($entity_type_id . '.field_storage_definitions');
     $this->cacheBackend->deleteMultiple([
-      'entity_type_definitions.installed',
+      $entity_type_id . '.entity_type_definitions.installed',
       $entity_type_id . '.field_storage_definitions.installed',
     ]);
     $this->entityTypeDefinitions = NULL;
