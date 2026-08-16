@@ -8,6 +8,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\Core\Utility\CallableResolver;
@@ -541,7 +542,7 @@ class ThemeManager implements ThemeManagerInterface {
         $this->allHookImplementations = $cache->data;
       }
       else {
-        $this->allHookImplementations = $this->keyValueFactory->get('hook_data')->get('theme_hook_list') ?? [];
+        $this->allHookImplementations = $this->keyValueFactory->get('hook_data')->get('theme_hook_list:' . Settings::get('deployment_identifier', \Drupal::VERSION)) ?? [];
         $this->cache->set('theme_hook_data', $this->allHookImplementations);
       }
     }

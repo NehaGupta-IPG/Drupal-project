@@ -11,6 +11,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Update\UpdateKernel;
 use Drupal\Core\Utility\ThemeRegistry;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -847,7 +848,7 @@ class Registry implements DestructableInterface {
    */
   protected function hasThemeHookImplementation(string $theme, string $hook): bool {
     if (!isset($this->themeHookList)) {
-      $this->themeHookList = $this->keyValueFactory->get('hook_data')->get('theme_hook_list') ?? [];
+      $this->themeHookList = $this->keyValueFactory->get('hook_data')->get('theme_hook_list:' . Settings::get('deployment_identifier', Drupal::VERSION)) ?? [];
     }
     return isset($this->themeHookList[$theme][$hook]);
   }
@@ -860,7 +861,7 @@ class Registry implements DestructableInterface {
    */
   protected function getPreprocessForSuggestions(): array {
     if ($this->preprocessForSuggestions === NULL) {
-      $this->preprocessForSuggestions = $this->keyValueFactory->get('hook_data')->get('preprocess_for_suggestions') ?: [];
+      $this->preprocessForSuggestions = $this->keyValueFactory->get('hook_data')->get('preprocess_for_suggestions:' . Settings::get('deployment_identifier', DRUPAL::VERSION)) ?: [];
     }
     return $this->preprocessForSuggestions;
   }

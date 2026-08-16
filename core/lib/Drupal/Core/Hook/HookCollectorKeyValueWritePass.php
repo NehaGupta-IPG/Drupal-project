@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Hook;
 
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
+use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -33,7 +34,18 @@ class HookCollectorKeyValueWritePass implements CompilerPassInterface {
     }
     $keyvalue = $container->get('keyvalue')->get('hook_data');
     assert($keyvalue instanceof KeyValueStoreInterface);
-    $keyvalue->setMultiple($hookData);
+
+    // During code deployments it is theoretically possible for one process to
+    // start rebuilding the container just before code is deployed. If this then
+    // completes after the container rebuild triggered by the deployment, it
+    // could write permanently stale hook data to the database. To protect
+    // against this, add the container cache key as a suffix to the key value
+    // entries.
+    $data_to_write = [];
+    foreach ($hookData as $key => $value) {
+      $data_to_write[$key . ':' . Settings::get('deployment_identifier', \Drupal::VERSION)] = $value;
+    }
+    $keyvalue->setMultiple($data_to_write);
     $container->get('cache.bootstrap')->deleteMultiple(['hook_data', 'theme_hook_data']);
 
     // Remove converted flags, they are only needed while building the
