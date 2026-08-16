@@ -77,7 +77,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    */
   public function __construct(EntityTypeInterface $entity_type, EntityFieldManagerInterface $entity_field_manager, CacheBackendInterface $cache, MemoryCacheInterface $memory_cache, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
     parent::__construct($entity_type, $memory_cache);
-    $this->bundleKey = $this->entityType->getKey('bundle');
+    $this->bundleKey = $entity_type->getKey('bundle');
     $this->entityFieldManager = $entity_field_manager;
     $this->cacheBackend = $cache;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;

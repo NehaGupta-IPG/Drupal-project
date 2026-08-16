@@ -41,6 +41,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * customize the generated schema; e.g., to add additional indexes.
  *
  * @ingroup entity_api
+ *
+ * phpcs:ignoreFile
  */
 class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEntityStorageInterface, DynamicallyFieldableEntityStorageSchemaInterface, EntityBundleListenerInterface {
 
@@ -64,7 +66,26 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    *
    * @var \Drupal\Core\Field\FieldStorageDefinitionInterface[]
    */
-  protected $fieldStorageDefinitions;
+  protected $entityType {
+    get {
+      $this->initialize();
+      return $this->entityType;
+    }
+    set => $value;
+  }
+
+  /**
+   * The entity type's field storage definitions.
+   *
+   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface[]
+   */
+  protected $fieldStorageDefinitions {
+    get {
+      $this->initialize();
+      return $this->fieldStorageDefinitions;
+    }
+    set => $value;
+  }
 
   /**
    * The mapping of field columns to SQL tables.
@@ -80,7 +101,13 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    *
    * @var string
    */
-  protected $revisionKey = FALSE;
+  protected $revisionKey {
+    get {
+      $this->initialize();
+      return $this->revisionKey;
+    }
+    set => $value;
+  }
 
   /**
    * The entity langcode key.
@@ -101,28 +128,52 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    *
    * @var string
    */
-  protected $baseTable;
+  protected $baseTable {
+    get {
+      $this->initialize();
+      return $this->baseTable;
+    }
+    set => $value;
+  }
 
   /**
    * The table that stores revisions, if the entity supports revisions.
    *
    * @var string
    */
-  protected $revisionTable;
+  protected $revisionTable {
+    get {
+      $this->initialize();
+      return $this->revisionTable;
+    }
+    set => $value;
+  }
 
   /**
    * The table that stores properties, if the entity has multilingual support.
    *
    * @var string
    */
-  protected $dataTable;
+  protected $dataTable {
+    get {
+      $this->initialize();
+      return $this->baseTable;
+    }
+    set => $value;
+  }
 
   /**
    * The table that stores revision field data if the entity supports revisions.
    *
    * @var string
    */
-  protected $revisionDataTable;
+  protected $revisionDataTable {
+    get {
+      $this->initialize();
+      return $this->revisionDataTable;
+    }
+    set => $value;
+  }
 
   /**
    * Active database connection.
@@ -158,6 +209,13 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @var bool
    */
   protected $temporary = FALSE;
+
+  /**
+   * Whether the lazy-initialized properties are initialized.
+   *
+   * @var bool
+   */
+  protected bool $initialized = FALSE;
 
   /**
    * {@inheritdoc}
@@ -200,8 +258,19 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $this->database = $database;
     $this->languageManager = $language_manager;
     $this->entityTypeManager = $entity_type_manager;
-    $this->entityType = $this->entityTypeManager->getActiveDefinition($entity_type->id());
-    $this->fieldStorageDefinitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($entity_type->id());
+  }
+
+  /**
+   * Ensures that various properties are initialized.
+   */
+  protected function initialize(): void {
+    if ($this->initialized) {
+      return;
+    }
+    $this->initialized = TRUE;
+
+    $this->entityType = $this->entityTypeManager->getActiveDefinition($this->entityTypeId);
+    $this->fieldStorageDefinitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($this->entityTypeId);
 
     $this->initTableLayout();
   }

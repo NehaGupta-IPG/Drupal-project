@@ -112,9 +112,9 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     $this->entityTypeId = $entity_type->id();
     $this->entityType = $entity_type;
     $this->baseEntityClass = $entity_type->getClass();
-    $this->idKey = $this->entityType->getKey('id');
-    $this->uuidKey = $this->entityType->getKey('uuid');
-    $this->langcodeKey = $this->entityType->getKey('langcode');
+    $this->idKey = $entity_type->getKey('id');
+    $this->uuidKey = $entity_type->getKey('uuid');
+    $this->langcodeKey = $entity_type->getKey('langcode');
     $this->memoryCache = $memory_cache;
     $this->memoryCacheTag = 'entity.memory_cache:' . $this->entityTypeId;
     $this->uuidMemoryCacheTag = 'entity.memory_cache:uuid:' . $this->entityTypeId;
