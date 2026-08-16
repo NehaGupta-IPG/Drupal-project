@@ -103,10 +103,13 @@ class ThemeExtensionListTest extends UnitTestCase {
     $state->get(Argument::cetera())->shouldNotBeCalled();
     $state->set(Argument::cetera())->shouldNotBeCalled();
 
+    $extension_discovery = $this->prophesize(ExtensionDiscovery::class);
+    $extension_discovery->scan(Argument::cetera())->shouldNotBeCalled();
+
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $config_factory = $this->getConfigFactoryStub([]);
 
-    $theme_list = new ThemeExtensionList(
+    $theme_list = new TestThemeExtensionList(
       $this->root,
       new NullBackend('test'),
       new InfoParser($this->root),
@@ -116,6 +119,7 @@ class ThemeExtensionListTest extends UnitTestCase {
       'test',
       ['test_theme' => ['pathname' => 'core/themes/test_theme/test_theme.info.yml']],
     );
+    $theme_list->setExtensionDiscovery($extension_discovery->reveal());
 
     $this->assertSame('core/themes/test_theme/test_theme.info.yml', $theme_list->getPathname('test_theme'));
     $this->assertSame('core/themes/test_theme', $theme_list->getPath('test_theme'));
