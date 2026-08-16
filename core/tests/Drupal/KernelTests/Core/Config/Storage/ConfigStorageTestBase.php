@@ -193,6 +193,52 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
   }
 
   /**
+   * Tests serialization of configuration data.
+   */
+  public function testSerialization(): void {
+    $config_data = [
+      // Indexed arrays; the order of elements is essential.
+      'numeric keys' => ['i', 'n', 'd', 'e', 'x', 'e', 'd'],
+      // Infinitely nested keys using arbitrary element names.
+      'nested keys' => [
+        // HTML/XML in values.
+        'HTML' => '<strong> <bold> <em> <blockquote>',
+        // UTF-8 in values.
+        // cspell:disable-next-line
+        'UTF-8' => 'FrançAIS is ÜBER-åwesome',
+        // Unicode in keys and values.
+        // cSpell:disable-next-line
+        'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΣὨ' => 'αβγδεζηθικλμνξοσὠ',
+      ],
+      'invalid xml' => '</title><script type="text/javascript">alert("Title XSS!");</script> & < > " \' ',
+    ];
+
+    // Encode and write, and reload and decode the configuration data.
+    $name = 'config_test.serialization';
+    $this->storage->write($name, $config_data);
+    $config_parsed = $this->storage->read($name);
+
+    $key = 'numeric keys';
+    $this->assertSame($config_data[$key], $config_parsed[$key]);
+
+    $key = 'nested keys';
+    $this->assertSame($config_data[$key], $config_parsed[$key]);
+
+    $key = 'HTML';
+    $this->assertSame($config_data['nested keys'][$key], $config_parsed['nested keys'][$key]);
+
+    $key = 'UTF-8';
+    $this->assertSame($config_data['nested keys'][$key], $config_parsed['nested keys'][$key]);
+
+    // cSpell:disable-next-line
+    $key = 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΣὨ';
+    $this->assertSame($config_data['nested keys'][$key], $config_parsed['nested keys'][$key]);
+
+    $key = 'invalid xml';
+    $this->assertSame($config_data[$key], $config_parsed[$key]);
+  }
+
+  /**
    * Tests that the storage supports collections.
    */
   public function testCollection(): void {

@@ -97,7 +97,7 @@ config_test.types:
       # leading zero, to comply with YAML 1.2. However PECL YAML is still YAML 1.1
       # compliant.
       # @see core/modules/config/tests/config_test/config/install/config_test.types.yml
-      # @see \Drupal\KernelTests\Core\Config\ConfigCRUDTest::testDataTypes()
+      # @see \Drupal\KernelTests\Core\Config\ConfigCrudTest::testDataTypes()
       # @todo Mark as required again in https://www.drupal.org/project/drupal/issues/3205480
       requiredKey: false
       type: integer
