@@ -26,7 +26,7 @@ class AllowInNavigationAttributeTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system', 'user', 'block', 'navigation_test_block'];
+  protected static $modules = ['system', 'user', 'block', 'shortcut', 'navigation_test_block'];
 
   /**
    * Tests that the property follows the installed state of navigation.
