@@ -157,7 +157,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   protected $dataTable {
     get {
       $this->initialize();
-      return $this->baseTable;
+      return $this->dataTable;
     }
     set => $value;
   }
@@ -2011,7 +2011,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   public function onFieldStorageDefinitionCreate(FieldStorageDefinitionInterface $storage_definition) {
     $this->wrapSchemaException(function () use ($storage_definition) {
       $this->getStorageSchema()->onFieldStorageDefinitionCreate($storage_definition);
-      $this->fieldStorageDefinitions[$storage_definition->getName()] = $storage_definition;
+      $field_storage_definitions = $this->fieldStorageDefinitions;
+      $field_storage_definitions[$storage_definition->getName()] = $storage_definition;
+      $this->fieldStorageDefinitions = $field_storage_definitions;
       $this->tableMapping = NULL;
     });
   }
@@ -2022,7 +2024,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   public function onFieldStorageDefinitionUpdate(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
     $this->wrapSchemaException(function () use ($storage_definition, $original) {
       $this->getStorageSchema()->onFieldStorageDefinitionUpdate($storage_definition, $original);
-      $this->fieldStorageDefinitions[$storage_definition->getName()] = $storage_definition;
+      $field_storage_definitions = $this->fieldStorageDefinitions;
+      $field_storage_definitions[$storage_definition->getName()] = $storage_definition;
+      $this->fieldStorageDefinitions = $field_storage_definitions;
       $this->tableMapping = NULL;
     });
   }
@@ -2049,7 +2053,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     // Update the field schema.
     $this->wrapSchemaException(function () use ($storage_definition) {
       $this->getStorageSchema()->onFieldStorageDefinitionDelete($storage_definition);
-      unset($this->fieldStorageDefinitions[$storage_definition->getName()]);
+      $field_storage_definitions = $this->fieldStorageDefinitions;
+      unset($field_storage_definitions[$storage_definition->getName()]);
+      $this->fieldStorageDefinitions = $field_storage_definitions;
       $this->tableMapping = NULL;
     });
   }
