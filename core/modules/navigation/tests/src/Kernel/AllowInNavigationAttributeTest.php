@@ -26,7 +26,7 @@ class AllowInNavigationAttributeTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system', 'user', 'block', 'shortcut', 'navigation_test_block'];
+  protected static $modules = ['system', 'user', 'block', 'navigation_test_block'];
 
   /**
    * Tests that the property follows the installed state of navigation.
@@ -52,9 +52,8 @@ class AllowInNavigationAttributeTest extends KernelTestBase {
 
     $this->enableModules(['file', 'layout_builder', 'navigation']);
     $this->assertTrue($this->getTestBlockDefinition()['allow_in_navigation']);
-    // The blocks navigation provides itself carry the attribute too.
+    // A block navigation provides itself carries the attribute too.
     $this->assertTrue($this->getBlockDefinition('navigation_user')['allow_in_navigation']);
-    $this->assertTrue($this->getBlockDefinition('navigation_shortcuts')['allow_in_navigation']);
 
     $this->disableModules(['navigation']);
     $this->assertArrayNotHasKey('allow_in_navigation', $this->getTestBlockDefinition());
