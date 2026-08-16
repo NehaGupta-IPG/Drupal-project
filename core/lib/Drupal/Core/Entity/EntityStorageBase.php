@@ -100,8 +100,14 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    */
   protected array $entityIdsToLoad = [];
 
+  /**
+   * Whether the entity type uses the static cache.
+   */
   protected bool $isStaticallyCacheable;
 
+  /**
+   * Whether the entity type uses the persistent cache.
+   */
   protected bool $isPersistentlyCacheable;
 
   /**
