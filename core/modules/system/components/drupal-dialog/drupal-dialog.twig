@@ -1,66 +1,66 @@
 {# cspell:ignore closedby #}
 {# cspell:ignore closerequest #}
 
-{% set close = 'closerequest' %}
-{% if variant === 'default' %}
-  {% set close = 'any' %}
-{% endif %}
+{# Setup base attributes #}
+{# Additional classes will be set by variant. #}
+{% set attributes = create_attribute({
+  'class': ['ui-dialog', 'ui-widget', 'ui-front'],
+  'aria-labelledby': id ~ '-title',
+ })
+%}
+
+
+{# Setup content wrapper attributes #}
+{# Additional classes will be set by variant. #}
+{% set content_wrapper_attributes = create_attribute({
+    'class': ['dialog-content', 'ui-dialog-content'],
+  })
+%}
 
 <drupal-dialog id="{{ id }}">
   {% if variant === 'off-canvas' %}
-  <div id="drupal-off-canvas-wrapper"
-       class="ui-dialog ui-widget ui-front
-              ui-dialog-off-canvas ui-dialog-position-side"
-       role="dialog"
-       aria-labelledby="ui-id-1"
-       aria-describedby="drupal-off-canvas">
+  {# Off canvas dialogs are in the layout and use a wrapper <div> #}
+  <div id="drupal-off-canvas-wrapper" role="dialog" aria-describedby="drupal-off-canvas" {{ attributes.addClass([
+  'dialog-off-canvas',
+  'dialog-position-' ~ position ?? 'side',
+  'ui-dialog-off-canvas',
+  'ui-dialog-position-' ~ position ?? 'side'
+  ]) }}>
   {% else %}
-  <dialog open aria-labelledby="{{ id -}}-title" closedby="{{ close }}" {% if variant === 'modal' %}data-modal{% endif %}>
+    {# Setup default and modal dialog attributes #}
+    {% set close = 'closerequest' %}
+    {% if variant === 'default' %}
+      {% set close = 'any' %}
+      {% set content_id = 'drupal-dialog' %}
+    {% endif %}
+    {% if variant === 'modal' %}
+      {% set content_id = 'drupal-modal' %}
+    {% endif %}
+    {# Dialogs are in the top layer so use a native <dialog> #}
+    <dialog open aria-labelledby="{{ id -}}-title" closedby="{{ close }}" {% if variant === 'modal' %} data-modal{% endif %} {{ attributes.addClass('ui-widget-content') }}>
   {% endif %}
-    <div data-dialog-titlebar>
-      <span id="{{ id -}}-title">{{ title }}</span>
+    <div class="titlebar ui-dialog-titlebar ui-widget-header">
+      <h2 id="{{ id -}}-title" class="ui-dialog-title">{{ title }}</h2>
       <form method="dialog">
-        <button data-dialog-close-btn aria-label="Close">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-            <path d="M11 1L1 11M11 11L1 1" stroke="currentColor" stroke-width="1.5"/>
-          </svg>
+        <button class="titlebar-close ui-dialog-titlebar-close" aria-label="Close">
+          <span class="ui-button-icon ui-icon ui-icon-closethick"></span>
+          <span class="ui-button-icon-space"> </span>
+          Close
         </button>
       </form>
     </div>
+    {% if variant === 'off-canvas' %}
+    <div id="drupal-off-canvas" {{ content_wrapper_attributes.addClass('drupal-off-canvas-reset') }}>
+    {% else %}
+    <div {{ content_wrapper_attributes }}>
+    {% endif %}
     {% block content %}
       {{ content }}
     {% endblock %}
+    </div>
   {% if variant === 'off-canvas' %}
   </div>
   {% else %}
   </dialog>
   {% endif %}
 </drupal-dialog>
-
-{# markup from off-canvas test #}
-<div id="drupal-off-canvas-wrapper"
-     class="ui-dialog ui-widget ui-front
-              ui-dialog-off-canvas ui-dialog-position-side"
-     role="dialog"
-     aria-labelledby="ui-id-1"
-     aria-describedby="drupal-off-canvas">
-
-  <div class="ui-dialog-titlebar ui-widget-header">
-    <h2 id="ui-id-1" class="ui-dialog-title">
-      Dialog title
-    </h2>
-
-    <button type="button"
-            class="ui-dialog-titlebar-close">
-      <!-- close icon -->
-    </button>
-  </div>
-
-  <div id="drupal-off-canvas"
-       class="ui-dialog-content ui-widget-content
-                drupal-off-canvas-reset">
-    <!-- AJAX-rendered dialog content -->
-  </div>
-
-  <div class="ui-resizable-handle ui-resizable-w"></div>
-</div>

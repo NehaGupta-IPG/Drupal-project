@@ -28,6 +28,16 @@ props:
       title: Title
       type: string
       description: Label for the dialog title bar
+    position:
+      type: string
+      title: Dialog position
+      description: Only used by core of off-canvas which is currently always set to 'side'.
+      enum:
+        - default
+        - top
+        - bottom
+        - side
+      default: default
 
 slots:
   content:
@@ -37,3 +47,22 @@ slots:
 libraryOverrides:
   dependencies:
     - core/drupal.htmx
+  css:
+    component:
+      drupal-dialog.css: {}
+      off-canvas/reset.css: { }
+      off-canvas/base.css: { }
+      off-canvas/utility.css: { }
+      off-canvas/button.css: { }
+      off-canvas/drupal.css: { }
+      off-canvas/form.css: { }
+      off-canvas/table.css: { }
+      off-canvas/details.css: { }
+      off-canvas/messages.css: { }
+      off-canvas/tabledrag.css: { }
+      off-canvas/throbber.css: { }
+      off-canvas/dropbutton.css: { }
+      off-canvas/titlebar.css: { }
+      off-canvas/wrapper.css: { }
+  js:
+    drupal-dialog.js: {}

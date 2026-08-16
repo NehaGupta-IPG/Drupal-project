@@ -11,8 +11,8 @@ dialog {
   max-height: 90dvh;
   padding: 0;
   color: #333;
-  border: 0;
-  border-radius: 4px;
+  border: 1px solid #c5c5c5;
+  border-radius: 3px;
   background: #fff;
   box-shadow:
     0 8px 32px rgb(0, 0, 0, 0.28),
@@ -51,7 +51,7 @@ dialog::backdrop {
 }
 
 /* Titlebar */
-[data-dialog-titlebar] {
+.titlebar {
   position: relative;
   flex-shrink: 0;
   padding: 0.75rem 3.5rem 0.75rem 1.25rem;
@@ -62,35 +62,55 @@ dialog::backdrop {
   font-weight: bold;
   line-height: 1.5;
 }
-[data-dialog-titlebar]:empty {
+dialog.titlebar:empty {
   display: none;
 }
 
 /* Close button */
-[data-dialog-close-btn] {
+.titlebar .titlebar-close {
   position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
+  top: 50%;
+  inset-inline: auto 0.625rem;
+  overflow: hidden;
+  width: 1.875rem;
+  height: 1.875rem;
   cursor: pointer;
   transform: translateY(-50%);
-  color: #d3d4d9;
-  border: none;
-  border-radius: 3px;
-  background: none;
-  inset-block-start: 50%;
-  inset-inline-end: 0;
-  margin-inline: 0.75rem;
-}
-[data-dialog-close-btn]:hover {
-  color: #fff;
-}
-[data-dialog-close-btn]:focus-visible {
-  outline: 2px solid #26a769;
-  outline-offset: 2px;
+  text-indent: -624.9375rem;
+  color: inherit;
+  border: 1px solid transparent;
+  background-color: transparent;
+  appearance: none;
+
+  &:focus {
+    outline: solid 2px currentColor;
+    outline-offset: 2px;
+  }
+
+  /* The plus icon. */
+  &::before,
+  &::after {
+    position: absolute;
+    top: calc(50% - 1px);
+    left: 50%;
+    width: 50%;
+    height: 0;
+    content: "";
+    border-top: solid 2px currentColor;
+  }
+
+  &::before {
+    transform: translate(-50%, 50%) rotate(-45deg);
+  }
+
+  &::after {
+    transform: translate(-50%, 50%) rotate(45deg);
+  }
+
+  /* Hide the default jQuery UI dialog close button. */
+  & .ui-icon {
+    display: none;
+  }
 }
 
 /* Content */
