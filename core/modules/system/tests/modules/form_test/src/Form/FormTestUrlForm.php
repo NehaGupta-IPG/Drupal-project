@@ -37,9 +37,9 @@ class FormTestUrlForm extends FormBase {
       '#description' => 'A required URL field.',
       '#required' => TRUE,
     ];
-    $form['anchor_link'] = [
+    $form['anchor_links'] = [
       '#type' => 'markup',
-      '#markup' => '<a href="#edit-contact/broken">This is an anchor link with a broken fragment</a>',
+      '#markup' => '<a href="#edit-url">This is an anchor link with a valid fragment</a><a href="#edit-contact/broken">This is an anchor link with a broken fragment</a>',
     ];
     $form['#attached']['library'][] = 'core/drupal.form';
     $form['submit'] = [

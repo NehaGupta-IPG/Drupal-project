@@ -26,21 +26,23 @@ class FormUrlFragmentTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->drupalLogin($this->rootUser);
-  }
-
-  /**
    * Tests that a form's complex url fragment does not give errors.
    */
   public function testFormComplexUrlFragment(): void {
+    $this->drupalLogin($this->rootUser);
     $this->drupalGet('/form-test/url');
     $this->clickLink('This is an anchor link with a broken fragment');
     $this->failOnJavaScriptErrors();
+  }
+
+  /**
+   * Tests that a form's valid URL fragment is focused.
+   */
+  public function testFormUrlFragment(): void {
+    $this->drupalLogin($this->rootUser);
+    $this->drupalGet('/form-test/url');
+    $this->clickLink('This is an anchor link with a valid fragment');
+    $this->assertJsCondition('document.activeElement.id === "edit-url"');
   }
 
 }
