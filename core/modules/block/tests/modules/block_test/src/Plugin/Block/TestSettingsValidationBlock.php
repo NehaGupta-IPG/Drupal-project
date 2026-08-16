@@ -37,6 +37,15 @@ class TestSettingsValidationBlock extends BlockBase {
   /**
    * {@inheritdoc}
    */
+  public function blockSubmit($form, FormStateInterface $form_state) {
+    if (isset($form['digits'])) {
+      \Drupal::messenger()->addMessage('This is the right $form.');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function build() {
     return ['#markup' => 'foo'];
   }

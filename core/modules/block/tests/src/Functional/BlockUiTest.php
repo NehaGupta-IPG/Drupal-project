@@ -361,6 +361,8 @@ class BlockUiTest extends BrowserTestBase {
 
     $this->assertSession()->statusMessageContains('Only digits are allowed', 'error');
     $this->assertSession()->elementExists('xpath', '//div[contains(@class,"form-item-settings-digits")]/input[contains(@class,"error")]');
+    $this->submitForm(['region' => 'content', 'settings[digits]' => 1], 'Save block');
+    $this->assertSession()->pageTextContains('This is the right $form');
   }
 
   /**

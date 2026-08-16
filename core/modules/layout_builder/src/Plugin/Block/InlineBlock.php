@@ -12,6 +12,7 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\SubformState;
 use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -118,10 +119,14 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
     // be successfully propagated to field widgets.
     $form['block_form'] = [
       '#type' => 'container',
-      '#process' => [[static::class, 'processBlockForm']],
       '#block' => $block,
       '#access' => $this->currentUser->hasPermission('create and edit custom blocks'),
+      '#tree' => TRUE,
     ];
+    $subform_state = SubformState::createForSubform($form['block_form'], $form, $form_state);
+    EntityFormDisplay::collectRenderDisplay($block, 'edit')->buildForm($block, $form['block_form'], $subform_state);
+    $form['block_form']['revision_log']['#access'] = FALSE;
+    $form['block_form']['info']['#access'] = FALSE;
 
     $options = $this->entityDisplayRepository->getViewModeOptionsByBundle('block_content', $block->bundle());
 
@@ -134,26 +139,6 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
       '#access' => count($options) > 1,
     ];
     return $form;
-  }
-
-  /**
-   * Process callback to insert a Content Block form.
-   *
-   * @param array $element
-   *   The containing element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   *
-   * @return array
-   *   The containing element, with the Content Block form inserted.
-   */
-  public static function processBlockForm(array $element, FormStateInterface $form_state) {
-    /** @var \Drupal\block_content\BlockContentInterface $block */
-    $block = $element['#block'];
-    EntityFormDisplay::collectRenderDisplay($block, 'edit')->buildForm($block, $element, $form_state);
-    $element['revision_log']['#access'] = FALSE;
-    $element['info']['#access'] = FALSE;
-    return $element;
   }
 
   /**
@@ -176,9 +161,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
     $this->configuration['view_mode'] = $form_state->getValue('view_mode');
-
-    // @todo Remove when https://www.drupal.org/project/drupal/issues/2948549 is closed.
-    $block_form = NestedArray::getValue($form, $form_state->getTemporaryValue('block_form_parents'));
+    $block_form = $form['block_form'];
     /** @var \Drupal\block_content\BlockContentInterface $block */
     $block = $block_form['#block'];
     $form_display = EntityFormDisplay::collectRenderDisplay($block, 'edit');
