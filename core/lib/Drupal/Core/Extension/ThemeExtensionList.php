@@ -90,7 +90,7 @@ class ThemeExtensionList extends ExtensionList {
 
     // Use the information from the container. This is an optimization.
     foreach ($container_themes_info as $theme_name => $info) {
-      $this->setPathname($theme_name, $info['pathname']);
+      $this->addedPathNames[$theme_name] = $info['pathname'];
     }
   }
 
