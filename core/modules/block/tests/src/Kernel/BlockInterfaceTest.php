@@ -46,6 +46,7 @@ class BlockInterfaceTest extends KernelTestBase {
       'id' => 'test_block_instantiation',
       'label' => 'Custom Display Message',
       'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
+      'label_display_type' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
       'provider' => 'block_test',
       'display_message' => 'no message set',
     ];
@@ -82,6 +83,21 @@ class BlockInterfaceTest extends KernelTestBase {
         '#title' => 'Display title',
         '#default_value' => TRUE,
         '#return_value' => 'visible',
+      ],
+      'label_display_type' => [
+        '#type' => 'select',
+        '#title' => 'Visibility Mode',
+        '#description' => 'How the block title is displayed or hidden.',
+        '#options' => [
+          BlockPluginInterface::BLOCK_LABEL_HIDDEN => 'Hidden',
+          BlockPluginInterface::BLOCK_LABEL_VISUALLY_HIDDEN => 'Visually Hidden',
+        ],
+        '#default_value' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
+        '#states' => [
+          'invisible' => [
+            ':input[name="settings[label_display]"]' => ['checked' => TRUE],
+          ],
+        ],
       ],
       'context_mapping' => [],
       'display_message' => [

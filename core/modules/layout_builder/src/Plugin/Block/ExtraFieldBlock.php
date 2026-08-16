@@ -4,6 +4,7 @@ namespace Drupal\layout_builder\Plugin\Block;
 
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -86,6 +87,7 @@ class ExtraFieldBlock extends BlockBase implements ContextAwarePluginInterface, 
   public function defaultConfiguration() {
     return [
       'label_display' => '0',
+      'label_display_type' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
       'formatter' => [
         'settings' => [],
         'third_party_settings' => [],

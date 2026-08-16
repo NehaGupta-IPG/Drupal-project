@@ -474,6 +474,9 @@ block_settings:
             - '0'
             - visible
         NotBlank: []
+    label_display_type:
+      type: string
+      label: 'Visually hidden label'
     provider:
       type: string
       label: 'Provider of this block plugin'

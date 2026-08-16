@@ -100,6 +100,7 @@ class BlockStorageUnitTest extends KernelTestBase {
         'id' => 'test_html',
         'label' => '',
         'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
+        'label_display_type' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
         'provider' => 'block_test',
       ],
       'visibility' => [],

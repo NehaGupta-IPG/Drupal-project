@@ -4,6 +4,7 @@ namespace Drupal\Core\Block\Plugin\Block;
 
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Block\TitleBlockPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -35,7 +36,10 @@ class PageTitleBlock extends BlockBase implements TitleBlockPluginInterface {
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return ['label_display' => '0'];
+    return [
+      'label_display' => '0',
+      'label_display_type' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
+    ];
   }
 
   /**

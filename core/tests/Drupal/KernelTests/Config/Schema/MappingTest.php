@@ -321,6 +321,7 @@ class MappingTest extends KernelTestBase {
         'id',
         'label',
         'label_display',
+        'label_display_type',
         'provider',
         'context_mapping',
         // Keys defined locally, in `type:
@@ -343,6 +344,7 @@ class MappingTest extends KernelTestBase {
         'id',
         'label',
         'label_display',
+        'label_display_type',
         'provider',
         'context_mapping',
         // Keys defined locally, in `type: block.settings.local_tasks_block`.

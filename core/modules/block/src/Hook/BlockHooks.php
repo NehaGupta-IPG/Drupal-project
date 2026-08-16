@@ -102,12 +102,21 @@ class BlockHooks {
     $variables['base_plugin_id'] = $variables['elements']['#base_plugin_id'];
     $variables['derivative_plugin_id'] = $variables['elements']['#derivative_plugin_id'];
     $variables['in_preview'] = $variables['elements']['#in_preview'] ?? FALSE;
-    $variables['label'] = !empty($variables['configuration']['label_display']) ? $variables['configuration']['label'] : '';
     $variables['content'] = $variables['elements']['content'];
-    // A block's label is configuration: it is static. Allow dynamic labels to
-    // be set in the render array.
-    if (isset($variables['elements']['content']['#title']) && !empty($variables['configuration']['label_display'])) {
-      $variables['label'] = $variables['elements']['content']['#title'];
+
+    $is_label_visible = ($variables['configuration']['label_display'] ?? BlockPluginInterface::BLOCK_LABEL_HIDDEN) === BlockPluginInterface::BLOCK_LABEL_VISIBLE;
+    $is_label_visually_hidden = !$is_label_visible && ($variables['configuration']['label_display_type'] ?? BlockPluginInterface::BLOCK_LABEL_HIDDEN) === BlockPluginInterface::BLOCK_LABEL_VISUALLY_HIDDEN;
+
+    // The block label can be:
+    // - The render array #title (set by modules rendering their blocks).
+    // - The text from the block configuration (e.g. Block Layout).
+    // - No text at all (none of the above, hidden, or was just blank).
+    $label_text = $variables['elements']['content']['#title'] ?? $variables['configuration']['label'] ?? '';
+    $variables['label'] = ($is_label_visible || $is_label_visually_hidden) ? $label_text : '';
+
+    // Add class visually-hidden class (if needed) to improve accessibility.
+    if (isset($variables['label']) && $is_label_visually_hidden) {
+      $variables['title_attributes']['class'] = 'visually-hidden';
     }
 
     // Create a valid HTML ID and make sure it is unique.

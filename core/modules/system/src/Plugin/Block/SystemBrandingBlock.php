@@ -4,6 +4,7 @@ namespace Drupal\system\Plugin\Block;
 
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ThemeSettingsProvider;
@@ -43,6 +44,7 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
       'use_site_name' => TRUE,
       'use_site_slogan' => TRUE,
       'label_display' => '0',
+      'label_display_type' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
     ];
   }
 

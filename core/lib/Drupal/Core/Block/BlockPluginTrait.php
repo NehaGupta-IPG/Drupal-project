@@ -95,6 +95,7 @@ trait BlockPluginTrait {
       'id' => $this->getPluginId(),
       'label' => '',
       'label_display' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
+      'label_display_type' => BlockPluginInterface::BLOCK_LABEL_HIDDEN,
       'provider' => $this->pluginDefinition['provider'],
     ];
   }
@@ -184,9 +185,35 @@ trait BlockPluginTrait {
       '#return_value' => BlockPluginInterface::BLOCK_LABEL_VISIBLE,
     ];
 
+    $form['label_display_type'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Visibility Mode'),
+      '#description' => $this->t('How the block title is displayed or hidden.'),
+      '#options' => $this->getLabelDisplayOptions(),
+      '#default_value' => $this->configuration['label_display_type'],
+      '#states' => [
+        'invisible' => [
+          ':input[name="settings[label_display]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
     // Add plugin-specific settings for this block type.
     $form += $this->blockForm($form, $form_state);
     return $form;
+  }
+
+  /**
+   * Returns an array of visibility options for the block label (title).
+   *
+   * @return array
+   *   An array of visibility options.
+   */
+  protected function getLabelDisplayOptions() {
+    return [
+      BlockPluginInterface::BLOCK_LABEL_HIDDEN => $this->t('Hidden'),
+      BlockPluginInterface::BLOCK_LABEL_VISUALLY_HIDDEN => $this->t('Visually Hidden'),
+    ];
   }
 
   /**
@@ -230,6 +257,7 @@ trait BlockPluginTrait {
     if (!$form_state->getErrors()) {
       $this->configuration['label'] = $form_state->getValue('label');
       $this->configuration['label_display'] = $form_state->getValue('label_display');
+      $this->configuration['label_display_type'] = $form_state->getValue('label_display_type');
       $this->configuration['provider'] = $form_state->getValue('provider');
       $this->blockSubmit($form, $form_state);
     }

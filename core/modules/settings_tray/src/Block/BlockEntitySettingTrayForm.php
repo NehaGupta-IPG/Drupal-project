@@ -62,10 +62,13 @@ class BlockEntitySettingTrayForm extends BlockForm {
     unset($form['id'], $form['region'], $form['settings']['admin_label']);
 
     if (isset($form['settings']['label_display']) && isset($form['settings']['label'])) {
-      // Only show the label input if the label will be shown on the page.
+      // Only show the label input if the label will be shown on the page or
+      // visually hidden for screen readers.
       $form['settings']['label_display']['#weight'] = -100;
-      $form['settings']['label']['#states']['visible'] = [
-        ':input[name="settings[label_display]"]' => ['checked' => TRUE],
+      $form['settings']['label']['#states']['invisible'] = [
+        ':input[name="settings[label_display]"]' => ['value' => 0],
+        'and',
+        ':input[name="settings[label_display_type]"]' => ['value' => BlockPluginInterface::BLOCK_LABEL_HIDDEN],
       ];
 
       // Relabel to "Block title" because on the front-end this may be confused
