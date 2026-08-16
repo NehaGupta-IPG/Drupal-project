@@ -75,7 +75,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
   protected function imageAttributesAsString($reverse = FALSE, array $excludedAttributes = []) {
     $string = [];
     foreach ($this->imageAttributes() as $key => $value) {
-      if (!in_array($key, $excludedAttributes)) {
+      if (!in_array($key, $excludedAttributes, TRUE)) {
         $string[] = $key . '="' . $value . '"';
       }
     }
