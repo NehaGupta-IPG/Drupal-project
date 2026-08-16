@@ -618,11 +618,11 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected function getHookImplementationList(string $hook): ImplementationList {
     if (!isset($this->hookImplementationLists[$hook])) {
       if ($this->hookLists === NULL) {
+        $suffix = Settings::get('deployment_identifier', \Drupal::VERSION);
         if ($cache = $this->cache->get('hook_data')) {
           $hook_data = $cache->data;
         }
         else {
-          $suffix = Settings::get('deployment_identifier', \Drupal::VERSION);
           $hook_data = $this->keyValueFactory->get('hook_data')->getMultiple([
             'hook_list:' . $suffix,
             'packed_order_operations:' . $suffix,

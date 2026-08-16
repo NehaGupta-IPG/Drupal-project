@@ -312,6 +312,14 @@ class SystemHooks {
     if (!$config_purge_batch_size = \Drupal::config('field.field_settings')->get('purge_batch_size')) {
       $config_purge_batch_size = Settings::get('field_purge_batch_size', 50);
     }
+
+    $hook_data = \Drupal::service('keyvalue')->get('hook_data');
+    $suffix = Settings::get('deployment_identifier', \Drupal::VERSION);
+    foreach ($hook_data->getAllKeys() as $key) {
+      if (!str_ends_with(':' . $suffix, $key)) {
+        $hook_data->delete($key);
+      }
+    }
     \Drupal::service(FieldPurger::class)->purgeBatch($config_purge_batch_size);
   }
 
