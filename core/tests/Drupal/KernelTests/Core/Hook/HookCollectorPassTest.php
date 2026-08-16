@@ -8,6 +8,7 @@ use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Hook\HookCollectorKeyValueWritePass;
 use Drupal\Core\Hook\HookCollectorPass;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
+use Drupal\Core\Site\Settings;
 use Drupal\hook_collector_depends_test\Hook\DependsOnModuleClassHooks;
 use Drupal\hook_collector_depends_test\Hook\DependsOnModuleMethodHooks;
 use Drupal\hook_collector_depends_test\Hook\DependsOnModuleMultipleHooks;
@@ -285,7 +286,7 @@ class HookCollectorPassTest extends KernelTestBase {
     $module_installer = $this->container->get('module_installer');
     $this->assertTrue($module_installer->install(['system_module_test', 'update', 'update_test_2']));
 
-    $map = $this->container->get('keyvalue')->get('hook_data')->get('hook_list');
+    $map = $this->container->get('keyvalue')->get('hook_data')->get('hook_list:' . Settings::get('deployment_identifier', \Drupal::VERSION));
     $this->assertArrayHasKey('help', $map);
     // Ensure that no install or update hooks are registered in the
     // implementations map, including update functions incorrectly mapped to
@@ -368,7 +369,7 @@ class HookCollectorPassTest extends KernelTestBase {
    */
   protected function assertRegisteredHooks(array $implementationsByHook, ContainerBuilder $container): void {
     foreach ($implementationsByHook as $hook => $implementations) {
-      $this->assertEquals($implementations, $container->get('keyvalue')->get('hook_data')->get('hook_list')[$hook]);
+      $this->assertEquals($implementations, $container->get('keyvalue')->get('hook_data')->get('hook_list:' . Settings::get('deployment_identifier', \Drupal::VERSION))[$hook]);
     }
   }
 
