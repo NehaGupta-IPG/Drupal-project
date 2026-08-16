@@ -23,21 +23,14 @@ class FormTest extends KernelTestBase {
   protected static $modules = ['file', 'system'];
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->container->get('theme_installer')->install(['stark']);
-    $this->container->get('theme.manager')->setActiveTheme(
-      $this->container->get('theme.initialization')->initTheme('stark')
-    );
-  }
-
-  /**
    * Tests the required marker markup.
    */
   public function testRequiredFieldMarkup(): void {
     $required_marker_preg = '@<.*?class=\".*?js-form-required.*form-required.*?\">@';
+    $this->container->get('theme_installer')->install(['stark']);
+    $this->container->get('theme.manager')->setActiveTheme(
+      $this->container->get('theme.initialization')->initTheme('stark')
+    );
 
     foreach ([TRUE, FALSE] as $required) {
       $form_id = $this->randomMachineName();
