@@ -626,50 +626,6 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
   }
 
   /**
-   * Tests http fallback.
-   *
-   * @legacy-covers ::doRequest
-   * @legacy-covers ::getSecurityAdvisories
-   */
-  public function testHttpFallback(): void {
-    $this->setSetting('update_fetch_with_http_fallback', TRUE);
-    $feed_item = [
-      'is_psa' => 1,
-      'type' => 'core',
-      'project' => 'drupal',
-      'insecure' => [\Drupal::VERSION],
-      'title' => 'SA title',
-      'link' => 'http://example.com',
-    ];
-    $this->setTestFeedResponses([
-      new Response(500, [], 'HTTPS failed'),
-      new Response(200, [], json_encode([$feed_item])),
-    ]);
-    $advisories = $this->getAdvisories();
-
-    // There should be two request / response pairs.
-    $this->assertCount(2, $this->history);
-
-    // The first request should have been HTTPS and should have failed.
-    $first_try = $this->history[0];
-    $this->assertNotEmpty($first_try);
-    $this->assertEquals('https', $first_try['request']->getUri()->getScheme());
-    $this->assertEquals(500, $first_try['response']->getStatusCode());
-
-    // The second request should have been the HTTP fallback and should have
-    // worked.
-    $second_try = $this->history[1];
-    $this->assertNotEmpty($second_try);
-    $this->assertEquals('http', $second_try['request']->getUri()->getScheme());
-    $this->assertEquals(200, $second_try['response']->getStatusCode());
-
-    $this->assertCount(1, $advisories);
-    $this->assertSame('http://example.com', $advisories[0]->getUrl());
-    $this->assertSame('SA title', $advisories[0]->getTitle());
-    $this->assertSame(["Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n"], $this->errorMessages);
-  }
-
-  /**
    * Tests no http fallback.
    *
    * @legacy-covers ::doRequest
@@ -685,7 +641,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
       $this->getAdvisories();
     }
     catch (ClientExceptionInterface $exception) {
-      $this->assertSame("Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response:\nHTTPS failed\n", $exception->getMessage());
+      $this->assertSame("Server error: `GET https://updates.drupal.org/psa.json` resulted in a `500 Internal Server Error` response: HTTPS failed", $exception->getMessage());
       $exception_thrown = TRUE;
     }
     $this->assertTrue($exception_thrown);

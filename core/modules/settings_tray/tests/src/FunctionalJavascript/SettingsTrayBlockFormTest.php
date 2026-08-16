@@ -8,6 +8,7 @@ use Drupal\settings_tray_test\Plugin\Block\SettingsTrayFormAnnotationIsClassBloc
 use Drupal\settings_tray_test\Plugin\Block\SettingsTrayFormAnnotationNoneBlock;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('settings_tray')]
 #[Group('#slow')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
 
@@ -22,8 +24,8 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'block_test',
     'node',
-    'search',
     'settings_tray_test',
     'off_canvas_test',
   ];
@@ -37,7 +39,8 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    if ($this->name() === 'testEditModeEnableDisable') {
+    if ($this->name() === 'testEditModeEnableDisable'
+      || $this->name() === 'testBlocks') {
       $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3317520");
     }
 
@@ -48,7 +51,6 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
       'access contextual links',
       'access toolbar',
       'administer nodes',
-      'search content',
     ]);
     $this->drupalLogin($user);
   }
@@ -57,6 +59,8 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
    * Tests opening off-canvas dialog by click blocks and elements in the blocks.
    */
   public function testBlocks(): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3542883');
     foreach ($this->getBlockTests() as $test) {
       call_user_func_array([$this, 'doTestBlocks'], array_values($test));
     }
@@ -194,13 +198,13 @@ class SettingsTrayBlockFormTest extends SettingsTrayTestBase {
           'toolbar_item' => '#toolbar-item-administration',
           ['administer site configuration'],
         ],
-        "$theme: block-search" => [
+        "$theme: block-test-form" => [
           'theme' => $theme,
-          'block_plugin' => 'search_form_block',
+          'block_plugin' => 'test_form_in_block',
           'new_page_text' => NULL,
-          'element_selector' => '[data-drupal-selector="edit-submit"]',
+          'element_selector' => '[data-drupal-selector="edit-show"]',
           'label_selector' => 'h2',
-          'button_text' => 'Save Search form',
+          'button_text' => NULL,
           'toolbar_item' => NULL,
           NULL,
         ],

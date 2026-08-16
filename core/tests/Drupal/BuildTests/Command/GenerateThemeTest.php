@@ -51,7 +51,19 @@ class GenerateThemeTest extends QuickStartTestBase {
     parent::setUp();
     $php_executable_finder = new PhpExecutableFinder();
     $this->php = $php_executable_finder->find();
-    $this->copyCodebase();
+    $drupal_root = $this->getWorkingPathDrupalRoot() ?? '';
+
+    $finder = $this->getCodebaseFinder();
+    $finder->notPath([
+      "#^{$drupal_root}vendor#",
+      "#^{$drupal_root}core/assets#",
+      "#^{$drupal_root}core/misc#",
+      "#^{$drupal_root}core/phpstan-tmp#",
+      "#^{$drupal_root}core/recipes#",
+      "#^{$drupal_root}(.+)/tests#",
+    ]);
+
+    $this->copyCodebase($finder->getIterator());
     $this->executeCommand('COMPOSER_DISCARD_CHANGES=true composer install --no-dev --no-interaction');
     chdir($this->getWorkingPath());
     $this->starterKitInfoYamlLocation = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/starterkit_theme.info.yml';
@@ -171,7 +183,7 @@ FIXTURE;
   private function generateThemeFromStarterkit($env = NULL) : Process {
     $install_command = [
       $this->php,
-      'core/scripts/drupal',
+      'core/scripts/dr',
       'generate-theme',
       'test_custom_theme',
       '--name="Test custom starterkit theme"',
@@ -196,8 +208,7 @@ FIXTURE;
     $theme_name = basename($theme_path_relative);
     $info_yml_filename = "$theme_name.info.yml";
     $this->assertFileExists($theme_path_absolute . '/' . $info_yml_filename);
-    $info = Yaml::decode(file_get_contents($theme_path_absolute . '/' . $info_yml_filename));
-    return $info;
+    return Yaml::decode(file_get_contents($theme_path_absolute . '/' . $info_yml_filename));
   }
 
   /**
@@ -293,7 +304,7 @@ YAML
 
     $install_command = [
       $this->php,
-      'core/scripts/drupal',
+      'core/scripts/dr',
       'generate-theme',
       'generated_from_another_theme',
       '--name="Generated from another theme"',
@@ -305,7 +316,7 @@ YAML
     $this->assertStringContainsString('Theme generated successfully to themes/generated_from_another_theme', trim($process->getOutput()), $process->getErrorOutput());
     $this->assertSame(0, $exit_code);
 
-    // Confirm new .theme file.
+    // Confirm new ThemeHooks file.
     $dot_theme_file = $this->getWorkspaceDirectory() . '/themes/generated_from_another_theme/src/Hook/GeneratedFromAnotherThemeHooks.php';
     $this->assertStringContainsString('public function preprocessImageWidget(array &$variables): void {', file_get_contents($dot_theme_file));
     $this->deleteGeneratedTheme('generated_from_another_theme');
@@ -477,7 +488,7 @@ SH;
   protected function doTestThemeDoesNotExist(): void {
     $install_command = [
       $this->php,
-      'core/scripts/drupal',
+      'core/scripts/dr',
       'generate-theme',
       'test_custom_theme',
       '--name="Test custom starterkit theme"',
@@ -485,7 +496,7 @@ SH;
       '--starterkit',
       'foobar',
     ];
-    $process = new Process($install_command, NULL);
+    $process = new Process($install_command);
     $process->setTimeout(60);
     $result = $process->run();
     $this->assertStringContainsString('Theme source theme foobar cannot be found.', trim($process->getErrorOutput()));
@@ -499,7 +510,7 @@ SH;
     // Explicitly not a starter theme.
     $install_command = [
       $this->php,
-      'core/scripts/drupal',
+      'core/scripts/dr',
       'generate-theme',
       'test_custom_theme',
       '--name="Test custom starterkit theme"',
@@ -507,7 +518,7 @@ SH;
       '--starterkit',
       'stark',
     ];
-    $process = new Process($install_command, NULL);
+    $process = new Process($install_command);
     $process->setTimeout(60);
     $result = $process->run();
     $this->assertStringContainsString('Theme source theme stark is not a valid starter kit.', trim($process->getErrorOutput()));
@@ -516,7 +527,7 @@ SH;
     // Has not defined `starterkit`.
     $install_command = [
       $this->php,
-      'core/scripts/drupal',
+      'core/scripts/dr',
       'generate-theme',
       'test_custom_theme',
       '--name="Test custom starterkit theme"',
@@ -524,7 +535,7 @@ SH;
       '--starterkit',
       'olivero',
     ];
-    $process = new Process($install_command, NULL);
+    $process = new Process($install_command);
     $process->setTimeout(60);
     $result = $process->run();
     $this->assertStringContainsString('Theme source theme olivero is not a valid starter kit.', trim($process->getErrorOutput()));
@@ -814,7 +825,7 @@ EDITED, file_get_contents($theme_path_absolute . '/src/TestCustomThemePreRender.
    *
    * @see \Drupal\Core\File\FileSystemInterface::deleteRecursive()
    */
-  protected function fileUnmanagedDeleteRecursive($path, $callback = NULL): bool {
+  protected function fileUnmanagedDeleteRecursive(string $path, $callback = NULL): bool {
     if (isset($callback)) {
       call_user_func($callback, $path);
     }

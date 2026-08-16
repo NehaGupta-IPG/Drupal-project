@@ -227,9 +227,9 @@ final class Settings implements ContainerInjectionInterface {
       '#description' => $this->t('Enables dark mode for the administration interface.'),
       '#default_value' => (string) ($account ? $this->get('enable_dark_mode', $account) : $this->getDefault('enable_dark_mode')),
       '#options' => [
+        'auto' => $this->t('Auto'),
         0 => $this->t('Light'),
         1 => $this->t('Dark'),
-        'auto' => $this->t('Auto'),
       ],
     ];
 
@@ -277,6 +277,8 @@ final class Settings implements ContainerInjectionInterface {
     // Accent color picker (helper field).
     $form['accent_group']['accent_picker'] = [
       '#type' => 'color',
+      '#title' => $this->t('Accent color picker'),
+      '#title_display' => 'invisible',
       '#placeholder' => '#777777',
       '#default_value' => $account ? $this->get('accent_color', $account) : $this->getDefault('accent_color'),
       '#process' => [[__CLASS__, 'processColorPicker']],
@@ -314,6 +316,8 @@ final class Settings implements ContainerInjectionInterface {
     // Focus color picker (helper).
     $form['focus_group']['focus_picker'] = [
       '#type' => 'color',
+      '#title' => $this->t('Focus color picker'),
+      '#title_display' => 'invisible',
       '#placeholder' => '#777777',
       '#default_value' => $account ? $this->get('focus_color', $account) : $this->getDefault('focus_color'),
       '#process' => [[__CLASS__, 'processColorPicker']],

@@ -84,6 +84,15 @@ function system_post_update_remove_non_admin_routes_state(): void {
 }
 
 /**
+ * Remove the admin_compact_mode config.
+ */
+function system_post_update_clear_admin_compact_mode_config(): void {
+  $config = \Drupal::configFactory()->getEditable('system.site');
+  $config->clear('admin_compact_mode');
+  $config->save();
+}
+
+/**
  * Set max-age for 4xx responses to null.
  */
 function system_post_update_set_max_age_4xx(): void {

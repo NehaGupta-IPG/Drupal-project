@@ -20,6 +20,7 @@ use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\user\OneTimeAuthentication;
 
 /**
  * Hook implementations for user.
@@ -232,7 +233,11 @@ class UserHooks {
     $original_language = $language_manager->getConfigOverrideLanguage();
     $language_manager->setConfigOverrideLanguage($language);
     $mail_config = \Drupal::config('user.mail');
-    $token_options = ['langcode' => $langcode, 'callback' => 'user_mail_tokens', 'clear' => TRUE];
+    $token_options = [
+      'langcode' => $langcode,
+      'callback' => \Drupal::service(OneTimeAuthentication::class)->tokens(...),
+      'clear' => TRUE,
+    ];
     $message['subject'] .= PlainTextOutput::renderFromHtml($token_service->replace($mail_config->get($key . '.subject'), $variables, $token_options));
     $message['body'][] = $token_service->replacePlain($mail_config->get($key . '.body'), $variables, $token_options);
     $language_manager->setConfigOverrideLanguage($original_language);
@@ -311,87 +316,6 @@ class UserHooks {
   public function modulesUninstalled($modules): void {
     // Remove any potentially orphan module data stored for users.
     \Drupal::service('user.data')->delete($modules);
-  }
-
-  /**
-   * Implements hook_toolbar().
-   */
-  #[Hook('toolbar')]
-  public function toolbar(): array {
-    $user = \Drupal::currentUser();
-    $items['user'] = [
-      '#type' => 'toolbar_item',
-      'tab' => [
-        '#type' => 'link',
-        '#title' => $user->getDisplayName(),
-        '#url' => Url::fromRoute('user.page'),
-        '#attributes' => [
-          'title' => $this->t('My account'),
-          'class' => [
-            'toolbar-icon',
-            'toolbar-icon-user',
-          ],
-        ],
-        '#cache' => [
-                  // Vary cache for anonymous and authenticated users.
-          'contexts' => [
-            'user.roles:anonymous',
-          ],
-        ],
-      ],
-      'tray' => [
-        '#heading' => $this->t('User account actions'),
-      ],
-      '#weight' => 100,
-      '#attached' => [
-        'library' => [
-          'user/drupal.user.icons',
-        ],
-      ],
-    ];
-    if ($user->isAnonymous()) {
-      $links = [
-        'login' => [
-          'title' => $this->t('Log in'),
-          'url' => Url::fromRoute('user.page'),
-        ],
-      ];
-      $items['user']['tray']['user_links'] = [
-        '#theme' => 'links__toolbar_user',
-        '#links' => $links,
-        '#attributes' => [
-          'class' => [
-            'toolbar-menu',
-          ],
-        ],
-      ];
-    }
-    else {
-      $items['user']['tab']['#title'] = [
-        '#lazy_builder' => [
-          'user.toolbar_link_builder:renderDisplayName',
-                [],
-        ],
-        '#create_placeholder' => TRUE,
-        '#lazy_builder_preview' => [
-        // Add a line of whitespace to the placeholder to ensure the icon is
-        // positioned in the same place it will be when the lazy loaded content
-        // appears.
-          '#markup' => '&nbsp;',
-        ],
-      ];
-      $items['user']['tray']['user_links'] = [
-        '#lazy_builder' => [
-          'user.toolbar_link_builder:renderToolbarLinks',
-                [],
-        ],
-        '#create_placeholder' => TRUE,
-        '#lazy_builder_preview' => [
-          '#markup' => '<a href="#" class="toolbar-tray-lazy-placeholder-link">&nbsp;</a>',
-        ],
-      ];
-    }
-    return $items;
   }
 
   /**
