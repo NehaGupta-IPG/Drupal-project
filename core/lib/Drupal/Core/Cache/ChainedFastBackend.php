@@ -140,9 +140,7 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
     // backend will begin to take over from the consistent backend again.
     $compare = round(microtime(TRUE), 3);
 
-    // Because clocks can drift
-
-    if ($last_write_timestamp && $compare < $last_write_timestamp) {
+    if ($last_write_timestamp && $compare > $last_write_timestamp) {
       // Items in the fast backend might be invalid based on their timestamp,
       // but we can't check the timestamp prior to getting the item, which
       // includes unserializing it. However, unserializing an invalid item can
