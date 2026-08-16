@@ -53,12 +53,7 @@ class OptionsHooks {
   }
 
   /**
-   * Implements hook_preprocess_HOOK() for field templates.
-   *
-   * Exposes the stored key and full property values of each field item on
-   * list_* fields, so themes can build CSS classes or other markup from the
-   * underlying data without a custom preprocess hook. Kept scoped to list_*
-   * to avoid adding variables to every field template.
+   * Implements hook_preprocess_HOOK().
    *
    * @see \Drupal\Core\Field\Plugin\Field\FieldType\ListItemBase
    */
