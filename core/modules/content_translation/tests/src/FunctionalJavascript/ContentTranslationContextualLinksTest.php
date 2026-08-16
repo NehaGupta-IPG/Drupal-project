@@ -69,7 +69,7 @@ class ContentTranslationContextualLinksTest extends WebDriverTestBase {
     // Check that the translate link appears on the node page.
     $this->drupalLogin($this->translator);
     $this->drupalGet('node/' . $node->id());
-    $link = $this->assertSession()->waitForElement('css', '[data-contextual-id^="node:node=1"] .contextual-links a:contains("Translate")');
+    $link = $this->assertSession()->waitForElement('css', '[data-contextual-id^="node:node=1"] .contextual-links.js-contextual-links a:contains("Translate")');
     $this->assertStringContainsString('node/1/translations', $link->getAttribute('href'));
   }
 

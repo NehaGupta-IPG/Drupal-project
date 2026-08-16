@@ -106,7 +106,7 @@ class ContextualLinksTest extends WebDriverTestBase {
 
     $this->toggleContextualTriggerVisibility('main');
     $page->find('css', 'main .contextual button')->press();
-    $links = $page->findAll('css', "main .contextual-links li a");
+    $links = $page->findAll('css', "main .contextual-links.js-contextual-links li a");
 
     $this->assertEquals('Edit', $links[0]->getText());
     $this->assertEquals('Delete', $links[1]->getText());

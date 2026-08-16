@@ -24,7 +24,12 @@ class ContextualLinks extends RenderElementBase {
       ],
       '#theme' => 'links__contextual',
       '#links' => [],
-      '#attributes' => ['class' => ['contextual-links']],
+      '#attributes' => [
+        'class' => [
+          'contextual-links',
+          'js-contextual-links',
+        ],
+      ],
       '#attached' => [
         'library' => [
           'contextual/drupal.contextual-links',

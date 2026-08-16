@@ -99,7 +99,7 @@
     const destination = `destination=${Drupal.encodePath(
       Drupal.url(drupalSettings.path.currentPath + window.location.search),
     )}`;
-    $contextual.find('.contextual-links a').each(function () {
+    $contextual.find('.js-contextual-links a').each(function () {
       const url = this.getAttribute('href');
       const glue = url.includes('?') ? '&' : '?';
       this.setAttribute('href', url + glue + destination);
@@ -316,7 +316,7 @@
             },
             'click blur touchend focus': () => this.render(),
           },
-          '.contextual-links a',
+          '.js-contextual-links a',
         );
 
         this.render();
@@ -342,7 +342,7 @@
           .find('.trigger')
           .toggleClass('visually-hidden', !isVisible);
 
-        this.$contextual.find('.contextual-links').prop('hidden', !isOpen);
+        this.$contextual.find('.js-contextual-links').prop('hidden', !isOpen);
         const trigger = this.$contextual.find('.trigger').get(0);
         trigger.textContent = Drupal.t('@action @title configuration options', {
           '@action': !isOpen ? this.strings.open : this.strings.close,

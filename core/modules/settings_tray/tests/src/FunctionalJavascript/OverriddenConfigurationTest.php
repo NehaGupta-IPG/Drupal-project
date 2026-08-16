@@ -180,7 +180,7 @@ class OverriddenConfigurationTest extends SettingsTrayTestBase {
     $block_selector = $this->getBlockSelector($overridden_block);
     $block_id = $overridden_block->id();
     // Confirm the block does not have a quick edit link.
-    $contextual_links = $page->findAll('css', "$block_selector .contextual-links li a");
+    $contextual_links = $page->findAll('css', "$block_selector .contextual-links.js-contextual-links li a");
     $this->assertNotEmpty($contextual_links);
     foreach ($contextual_links as $link) {
       $this->assertStringNotContainsString("/admin/structure/block/manage/$block_id/off-canvas", $link->getAttribute('href'));

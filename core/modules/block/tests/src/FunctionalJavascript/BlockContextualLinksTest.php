@@ -55,7 +55,7 @@ class BlockContextualLinksTest extends WebDriverTestBase {
   public function testBlockContextualRemoveLinks(): void {
     $this->drupalGet('<front>');
     $contextual_id = "[data-contextual-id^='block:block=$this->blockId:langcode=en']";
-    $this->assertSession()->waitForElement('css', "$contextual_id .contextual-links");
+    $this->assertSession()->waitForElement('css', "$contextual_id .contextual-links.js-contextual-links");
 
     $expected_configure_block_link = base_path() . 'admin/structure/block/manage/' . $this->blockId;
     $actual_configure_block_link = parse_url($this->getSession()->getPage()->findLink('Configure block')->getAttribute('href'));
