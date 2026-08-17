@@ -97,4 +97,25 @@ class TextFormatterTest extends EntityKernelTestBase {
     }
   }
 
+  /**
+   * Tests that denormalization with a processed value does not crash.
+   */
+  public function testDenormalizationSkipsProcessedProperty(): void {
+    $entity = $this->container->get('entity_type.manager')
+      ->getStorage($this->entityType)
+      ->create(['name' => $this->randomMachineName()]);
+
+    // Demoralized values.
+    $entity->formatted_text = [
+      'value' => 'Hello, world!',
+      'format' => 'my_text_format',
+      'processed' => '<p>Injected value</p>',
+    ];
+    $entity->save();
+
+    // The processed value should be computed from value + format, not the
+    // injected string.
+    $this->assertSame("<p>Hello, world!</p>\n", (string) $entity->get('formatted_text')->first()->get('processed')->getValue());
+  }
+
 }

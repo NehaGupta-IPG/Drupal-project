@@ -5,6 +5,7 @@ namespace Drupal\Core\TypedData;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\TypedData\Exception\ReadOnlyException;
 
 /**
  * The abstract base class for typed data.
@@ -99,6 +100,10 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    * {@inheritdoc}
    */
   public function setValue($value, $notify = TRUE) {
+    $data_definition = $this->getDataDefinition();
+    if ($data_definition->isReadOnly() && $data_definition->isComputed()) {
+      throw new ReadOnlyException(sprintf('Setting a value for %s is not allowed: it is read-only and computed.', $this->getPropertyPath()));
+    }
     $this->value = $value;
     // Notify the parent of any changes.
     if ($notify && isset($this->parent)) {

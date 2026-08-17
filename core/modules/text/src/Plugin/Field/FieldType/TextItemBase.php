@@ -87,6 +87,7 @@ abstract class TextItemBase extends FieldItemBase {
       ->setLabel(t('Processed text'))
       ->setDescription(t('The text with the text format applied.'))
       ->setComputed(TRUE)
+      ->setReadOnly(TRUE)
       ->setClass('\Drupal\text\TextProcessed')
       ->setSetting('text source', 'value')
       ->setInternal(FALSE);

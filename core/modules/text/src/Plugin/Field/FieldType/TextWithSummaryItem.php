@@ -50,6 +50,7 @@ class TextWithSummaryItem extends TextItemBase {
       ->setLabel(new TranslatableMarkup('Processed summary'))
       ->setDescription(new TranslatableMarkup('The summary text with the text format applied.'))
       ->setComputed(TRUE)
+      ->setReadOnly(TRUE)
       ->setClass('\Drupal\text\TextProcessed')
       ->setSetting('text source', 'summary');
 

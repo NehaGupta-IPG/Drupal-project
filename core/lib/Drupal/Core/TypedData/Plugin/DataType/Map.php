@@ -88,6 +88,18 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
 
     // Update any existing property objects.
     foreach ($this->properties as $name => $property) {
+      $data_definition = $property->getDataDefinition();
+
+      // Some computed properties are computed only because they have custom
+      // storage (e.g. path aliases); setting a value on these is necessary. But
+      // read-only computed properties don't ever need writing to.
+      // @see \Drupal\path\Hook\PathHooks::entityBaseFieldInfo()
+      if ($data_definition->isReadOnly() && $data_definition->isComputed()) {
+        // Unset the item so it doesn't try and get processed.
+        unset($this->values[$name]);
+        continue;
+      }
+
       $value = $values[$name] ?? NULL;
       $property->setValue($value, FALSE);
       // Remove the value from $this->values to ensure it does not contain any
