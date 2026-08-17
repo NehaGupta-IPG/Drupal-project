@@ -43,6 +43,8 @@ $additional_post_updates = [
   'navigation_post_update_navigation_user_links_menu',
   'navigation_post_update_uninstall_navigation_top_bar',
   'navigation_post_update_refresh_tempstore_repository',
+  'layout_discovery_post_update_recalculate_entity_form_display_dependencies',
+  'layout_discovery_post_update_recalculate_entity_view_display_dependencies',
 ];
 
 $existing_updates = array_merge(unserialize($existing_post_updates), $additional_post_updates);
