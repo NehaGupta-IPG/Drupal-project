@@ -349,23 +349,7 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
    * {@inheritdoc}
    */
   public function shouldUpdateThumbnail(MediaInterface $media, bool $is_new = FALSE): bool {
-    // Update thumbnail if we don't have a thumbnail yet or when the source
-    // field value (and any extra dependant properties) have changes.
-    if ($is_new || !$media->get('thumbnail')->entity) {
-      return TRUE;
-    }
-    $original = $media->getOriginal();
-    if (empty($original)) {
-      return FALSE;
-    }
-    return $this->hasSourceFieldChanged($media, $original, TRUE);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function hasSourceFieldChanged(MediaInterface $media, MediaInterface $original, bool $additional_properties = FALSE): bool {
-    return $this->getSourceFieldValue($media) !== $this->getSourceFieldValue($original);
+    return !$media->get('thumbnail')->entity || $is_new || $this->getSourceFieldValue($media) !== $this->getSourceFieldValue($media->getOriginal());
   }
 
   /**

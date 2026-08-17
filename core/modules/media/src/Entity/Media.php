@@ -336,28 +336,19 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
   /**
    * Determines if the source field value has changed.
    *
-   * The comparison uses MediaSourceInterface::hasSourceFieldChanged() to ensure
+   * The comparison uses MediaSourceInterface::getSourceFieldValue() to ensure
    * that the correct property from the source field is used.
-   *
-   * @param bool $additional_properties
-   *   Specifies whether additional properties in the source field should be
-   *   checked for changes. For example, the alt text within image sources.
    *
    * @return bool
    *   TRUE if the source field value changed, FALSE otherwise.
    *
-   * @see \Drupal\media\MediaSourceInterface::hasSourceFieldChanged()
    * @see \Drupal\media\MediaSourceInterface::getSourceFieldValue()
    *
    * @internal
    */
-  protected function hasSourceFieldChanged(bool $additional_properties = FALSE) {
-    $original = $this->getOriginal();
-    if (empty($original)) {
-      return FALSE;
-    }
+  protected function hasSourceFieldChanged() {
     $source = $this->getSource();
-    return $source->hasSourceFieldChanged($this, $original, $additional_properties);
+    return $this->getOriginal() && $source->getSourceFieldValue($this) !== $source->getSourceFieldValue($this->getOriginal());
   }
 
   /**
@@ -370,9 +361,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    *   TRUE if the thumbnail should be updated, FALSE otherwise.
    */
   protected function shouldUpdateThumbnail($is_new = FALSE) {
-    // Update thumbnail if we don't have a thumbnail yet or when the source
-    // determines it should be updated.
-    return $is_new || !$this->get('thumbnail')->entity || $this->getSource()->shouldUpdateThumbnail($this, $is_new);
+    return $this->getSource()->shouldUpdateThumbnail($this, $is_new);
   }
 
   /**

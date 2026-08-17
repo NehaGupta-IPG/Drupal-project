@@ -170,32 +170,7 @@ class Image extends File {
    * {@inheritdoc}
    */
   public function shouldUpdateThumbnail(MediaInterface $media, bool $is_new = FALSE): bool {
-    if (parent::shouldUpdateThumbnail($media, $is_new)) {
-      return TRUE;
-    }
-    $original = $media->getOriginal();
-    if (empty($original)) {
-      return FALSE;
-    }
-
-    // The thumbnail should also be updated when the alt text is.
-    return $this->hasAltTextChanged($media, $original);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function hasSourceFieldChanged(MediaInterface $media, MediaInterface $original, bool $additional_properties = FALSE): bool {
-    if (parent::hasSourceFieldChanged($media, $original, $additional_properties)) {
-      return TRUE;
-    }
-
-    // Not interested in any other additional properties.
-    if (!$additional_properties) {
-      return FALSE;
-    }
-
-    return $this->hasAltTextChanged($media, $original);
+    return parent::shouldUpdateThumbnail($media) || $this->hasAltTextChanged($media, $media->getOriginal());
   }
 
   /**
