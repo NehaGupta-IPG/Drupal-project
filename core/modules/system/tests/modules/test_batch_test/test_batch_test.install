@@ -7,14 +7,14 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\Batch\BatchProcessorInterface;
+use Drupal\Core\Batch\BatchProcessor;
 use Drupal\entity_test\Entity\EntityTest;
 
 /**
  * Implements hook_install().
  */
 function test_batch_test_install(): void {
-  $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+  $batch_processor = \Drupal::service(BatchProcessor::class);
   $total = 2;
   $operations = [];
   for ($i = 1; $i <= $total; $i++) {
