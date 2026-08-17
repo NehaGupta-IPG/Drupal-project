@@ -74,7 +74,10 @@ final class LayoutForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, ?SectionStorageInterface $section_storage = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, SectionStorageInterface|string|null $section_storage = NULL) {
+    if (!$section_storage instanceof SectionStorageInterface) {
+      $section_storage = NULL;
+    }
 
     if (!$this->layoutTempstoreRepository) {
       $this->messenger()->addWarning($this->t('To customize the navigation blocks, layout builder needs to be enabled.'));
@@ -228,7 +231,7 @@ final class LayoutForm extends FormBase {
       '#submit' => ['::redirectOnSubmit'],
       '#redirect' => 'discard_changes',
     ];
-    // $actions['preview_toggle'] = $this->buildContentPreviewToggle();
+    $actions['preview_toggle'] = $this->buildContentPreviewToggle();
     return $actions;
   }
 

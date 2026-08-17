@@ -14,7 +14,7 @@ navigation.layout:
     _title: 'Navigation layout'
     _form: 'Drupal\navigation\Form\LayoutForm'
     section_storage_type: navigation
-    section_storage: ~
+    section_storage: ''
   requirements:
     _permission: 'configure navigation layout'
   options:
