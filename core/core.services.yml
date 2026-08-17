@@ -455,8 +455,6 @@ services:
     arguments: ['@request_stack']
   csrf_state_change.request_subscriber:
     class: Drupal\Core\Access\CsrfStateChangeRequestSubscriber
-    tags:
-      - { name: event_subscriber }
   config.storage.active:
     class: Drupal\Core\Config\DatabaseStorage
     arguments: ['@database', 'config']
