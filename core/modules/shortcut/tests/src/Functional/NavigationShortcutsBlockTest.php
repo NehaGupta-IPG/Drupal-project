@@ -24,7 +24,7 @@ class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['navigation', 'shortcut', 'test_page_test'];
+  protected static $modules = ['navigation', 'navigation_ui', 'shortcut', 'test_page_test'];
 
   /**
    * {@inheritdoc}
