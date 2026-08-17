@@ -348,10 +348,7 @@
           '@action': !isOpen ? this.strings.open : this.strings.close,
           '@title': this.title,
         });
-        trigger.innerHTML = Drupal.theme(
-          'contextualTriggerText',
-          triggerText,
-        );
+        trigger.innerHTML = Drupal.theme('contextualTriggerText', triggerText);
         trigger.setAttribute('aria-pressed', isOpen);
       }
 
