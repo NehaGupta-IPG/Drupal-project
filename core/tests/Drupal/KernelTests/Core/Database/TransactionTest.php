@@ -1013,7 +1013,7 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertSame('savepoint_1', $savepoint1->name());
 
     $this->expectException(TransactionNameNonUniqueException::class);
-    $this->expectExceptionMessage("savepoint_1 is already in use.");
+    $this->expectExceptionMessageIsOrContains("A transaction named savepoint_1 is already in use.");
     $this->connection->startTransaction('savepoint_1');
   }
 
@@ -1030,7 +1030,7 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertSame('Dipsy', $savepoint1->name());
 
     $this->expectException(TransactionNameNonUniqueException::class);
-    $this->expectExceptionMessage("Dipsy is already in use.");
+    $this->expectExceptionMessageIsOrContains("A transaction named Dipsy is already in use.");
     $this->connection->startTransaction('Dipsy');
   }
 
@@ -1250,6 +1250,40 @@ class TransactionTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests post-transaction callback executes on "garbage collection".
+   *
+   * Simulate the end of a request by closing the connection and destroying
+   * the transaction manually. The order matters for this test as the garbage
+   * collection is unpredictable and could operate this way.
+   *
+   * @todo do not remove the test once the deprecation is removed; this test
+   *   should stay as long as post transaction callbacks are executed on
+   *   destruction of the Transaction object.
+   */
+  #[IgnoreDeprecations]
+  public function testPostTransactionsAlwaysExecutedBeforeConnectionIsDestroyed(): void {
+    $transaction = $this->createRootTransaction('', FALSE);
+    $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallback']);
+    $this->insertRow('row');
+    $this->assertNull($this->postTransactionCallbackAction);
+    $this->assertRowAbsent('rtcCommit');
+
+    Database::closeConnection();
+    // @phpstan-ignore unset.possiblyHookedProperty
+    unset($this->connection);
+    unset($transaction);
+
+    // Reopen the database connection so we can continue running assertions.
+    $this->connection = Database::getConnection();
+
+    // The post-transaction callback should now have inserted a 'rtcCommit'
+    // row.
+    $this->assertSame('rtcCommit', $this->postTransactionCallbackAction);
+    $this->assertRowPresent('row');
+    $this->assertRowPresent('rtcCommit');
+  }
+
+  /**
    * A post-transaction callback for testing purposes.
    */
   public function rootTransactionCallback(bool $success): void {
@@ -1295,6 +1329,31 @@ class TransactionTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests deprecation of implicit commit.
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecationOfImplicitCommit(): void {
+    $this->expectUserDeprecationMessage('Database commit by letting a Transaction object go out of scope is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Commit explicitly via Transaction::commitOrRelease() instead. See https://www.drupal.org/node/3524461');
+    $transaction = $this->createRootTransaction();
+    unset($transaction);
+    $this->assertRowPresent('David');
+  }
+
+  /**
+   * Tests deprecation of ::commitAll().
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecationOfCommitAll(): void {
+    $this->expectUserDeprecationMessage('Committing transactions via Drupal\\Core\\Database\\Transaction\\TransactionManagerBase::commitAll() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3524461');
+    $transaction = $this->createRootTransaction();
+    $savepoint = $this->createFirstSavepointTransaction();
+    $this->connection->commitAll();
+    $this->assertRowPresent('David');
+    $this->assertRowPresent('Roger');
+    unset($transaction, $savepoint);
+  }
+
+  /**
    * Tests that mocking transactions works fine.
    */
   public function testMockTransaction(): void {
@@ -1320,7 +1379,7 @@ class TransactionTest extends DatabaseTestBase {
     // that prevents the payload from executing is thrown, so we ignore
     // deprecations for this test.
     $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessage('Cannot unserialize Drupal\Core\Database\Transaction');
+    $this->expectExceptionMessageIs('Cannot unserialize Drupal\Core\Database\Transaction');
     unserialize($payload);
   }
 

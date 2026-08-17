@@ -3,10 +3,6 @@ description: 'Provides a standard site with commonly used features pre-configure
 type: 'Site'
 recipes:
   - basic_block_type
-  - article_comment
-  - article_tags
-  - article_content_type
-  - page_content_type
   - basic_html_format_editor
   - full_html_format_editor
   - core_recommended_performance
@@ -47,11 +43,8 @@ config:
       - system.menu.content
       - system.menu.navigation-user-links
     node:
-      - views.view.archive
       - views.view.content
       - views.view.content_recent
-      - views.view.frontpage
-      - views.view.glossary
     olivero:
       - block.block.olivero_help
     user:
@@ -65,7 +58,7 @@ config:
         use_admin_theme: true
     system.site:
       simpleConfigUpdate:
-        page.front: /node
+        page.front: /user/login
     user.role.anonymous:
       grantPermission: 'access content'
     user.role.authenticated:
@@ -79,10 +72,7 @@ config:
         - 'access files overview'
         - 'access navigation'
         - 'administer url aliases'
-        - 'create terms in tags'
         - 'create url aliases'
-        - 'edit own comments'
-        - 'edit terms in tags'
         - 'delete own files'
         - 'revert all revisions'
         - 'view all revisions'

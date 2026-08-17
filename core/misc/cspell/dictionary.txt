@@ -95,7 +95,6 @@ classmaps
 classtype
 cldr
 closethick
-codesniffer
 colgroups
 colinodell
 colspans
@@ -227,16 +226,15 @@ imagecache
 inglés
 inited
 inno
-instantiator
 interruptible
 introspectable
 invalidators
 invokable
 isam
+iterability
 javascripts
 jessebeach
 jqueryui
-jsonlint
 justinrainbow
 keypresses
 kinberg
@@ -264,7 +262,6 @@ longtext
 lrdd
 lstitle
 ltitle
-lzma
 mainpage
 maryjane
 maximumred
@@ -278,8 +275,6 @@ metapackage
 metapackages
 metatag
 metatags
-mglaman
-micheh
 mikey
 mimetypes
 minusthick
@@ -297,14 +292,12 @@ multisite
 multistep
 multivalue
 multivalued
-myclabs
 mysqladmin
 mysqldump
 mystarterkit
 namespacing
 navs
 ndocs
-necolas
 newcol
 newwin
 nids
@@ -346,7 +339,6 @@ persistable
 phpass
 phpcbf
 phpcodesniffer
-phpdocumentor
 phpserialize
 phpspec
 pickable
@@ -380,7 +372,6 @@ quicklinks
 quinlan
 qvalue
 qvalues
-ralouphie
 rasterizable
 rasterizes
 realpaths
@@ -417,7 +408,6 @@ schemaapi
 schemeless
 scorewords
 scriptable
-seld
 selectbox
 sess
 settingstray
@@ -428,8 +418,8 @@ sitewide
 slatkin
 smacss
 smalldatetime
+smartdate
 smtps
-spaze
 squaresmall
 squiz
 squizlabs
@@ -490,12 +480,12 @@ tabledrag
 tableheader
 tableinfo
 tableresponsive
+tablesaw
 tableselect
 tablesort
 tablesorts
 tabset
 tabwidth
-tbachert
 tenderwolf
 testbot
 testlogger
@@ -505,7 +495,6 @@ themename
 themer
 themers
 themey
-theseer
 threecol
 tids
 timegate
@@ -527,6 +516,8 @@ translatables
 trayblock
 trgm
 truecolor
+twigcs
+twigcsfixercache
 twistie
 twocol
 ufffd
@@ -560,6 +551,7 @@ userinfo
 versionable
 vfsstream
 viewports
+vincentlanglet
 warmable
 wcag
 webcal
@@ -574,6 +566,7 @@ writeln
 xbitmap
 xmlhttp
 xpsdocument
+xsmall
 xtmpl
 yamls
 yearless

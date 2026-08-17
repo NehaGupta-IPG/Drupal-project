@@ -7,7 +7,7 @@ namespace Drupal\Tests\system\Kernel\Extension;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleUninstallValidatorException;
-use Drupal\Core\Extension\ProfileExtensionList;
+use Drupal\Core\Extension\ModuleWeight;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -44,7 +44,7 @@ class ModuleHandlerTest extends KernelTestBase {
     $this->assertModuleList($module_list, 'After adding a module');
 
     // Try to mess with the module weights.
-    module_set_weight('dependency_foo_test', 20);
+    \Drupal::service(ModuleWeight::class)->set('dependency_foo_test', 20);
 
     // Move dependency_foo_test to the end of the array.
     unset($module_list[array_search('dependency_foo_test', $module_list)]);
@@ -174,14 +174,6 @@ class ModuleHandlerTest extends KernelTestBase {
     $dependency = 'dblog';
     $non_dependency = 'dependency_foo_test';
     $this->setInstallProfile($profile);
-    // Prime the \Drupal\Core\Extension\ExtensionList::getPathname() static
-    // cache with the location of the testing_install_profile_dependencies
-    // profile as it is not the currently active profile and we don't yet have
-    // any cached way to retrieve its location.
-    // @todo Remove as part of https://www.drupal.org/node/2186491
-    $profile_list = \Drupal::service('extension.list.profile');
-    assert($profile_list instanceof ProfileExtensionList);
-    $profile_list->setPathname($profile, 'core/profiles/tests/' . $profile . '/' . $profile . '.info.yml');
     $this->enableModules(['module_test', $profile]);
 
     $data = \Drupal::service('extension.list.module')->reset()->getList();
@@ -233,14 +225,6 @@ class ModuleHandlerTest extends KernelTestBase {
     $profile = 'testing_install_profile_all_dependencies';
     $dependencies = ['dblog', 'dependency_foo_test'];
     $this->setInstallProfile($profile);
-    // Prime the \Drupal\Core\Extension\ExtensionList::getPathname() static
-    // cache with the location of the testing_install_profile_dependencies
-    // profile as it is not the currently active profile and we don't yet have
-    // any cached way to retrieve its location.
-    // @todo Remove as part of https://www.drupal.org/node/2186491
-    $profile_list = \Drupal::service('extension.list.profile');
-    assert($profile_list instanceof ProfileExtensionList);
-    $profile_list->setPathname($profile, 'core/profiles/tests/' . $profile . '/' . $profile . '.info.yml');
     $this->enableModules(['module_test', $profile]);
 
     $data = \Drupal::service('extension.list.module')->reset()->getList();
@@ -255,7 +239,7 @@ class ModuleHandlerTest extends KernelTestBase {
 
     // Try uninstalling the dependencies.
     $this->expectException(ModuleUninstallValidatorException::class);
-    $this->expectExceptionMessage("The following reasons prevent the modules from being uninstalled: The 'Testing install profile all dependencies' install profile requires 'Database Logging'; The 'Testing install profile all dependencies' install profile requires 'Dependency foo test module'");
+    $this->expectExceptionMessageIs("The following reasons prevent the modules from being uninstalled: The 'Testing install profile all dependencies' install profile requires 'Database Logging'; The 'Testing install profile all dependencies' install profile requires 'Dependency foo test module'");
     $this->moduleInstaller()->uninstall($dependencies);
   }
 
