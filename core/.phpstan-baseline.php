@@ -20740,126 +20740,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/serialization/tests/src/Kernel/MapDataNormalizerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Block\\\\BlockEntitySettingTrayForm\\:\\:form\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Block/BlockEntitySettingTrayForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Block\\\\BlockEntitySettingTrayForm\\:\\:submitVisibility\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Block/BlockEntitySettingTrayForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Block\\\\BlockEntitySettingTrayForm\\:\\:validateVisibility\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Block/BlockEntitySettingTrayForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:validateConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:setPlugin\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:validateConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray_test\\\\Form\\\\SettingsTrayFormAnnotationIsClassBlockForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/modules/settings_tray_test/src/Form/SettingsTrayFormAnnotationIsClassBlockForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:assertEditModeDisabled\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:assertEditModeEnabled\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:assertOffCanvasBlockFormIsValid\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:disableEditMode\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:enableEditMode\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:openBlockForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:pressToolbarEditButton\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:toggleContextualTriggerVisibility\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\shortcut\\\\Entity\\\\Shortcut\\:\\:postSave\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -23886,6 +23766,42 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/toolbar/src/Controller/ToolbarController.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\contextual\\\\ContextualLinksTest\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/contextual/ContextualLinksTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\contextual\\\\ContextualLinksTest\\:\\:toggleContextualTriggerVisibility\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/contextual/ContextualLinksTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:isLabelInContentOverview\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:setupWorkspaceSwitcherBlock\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:switchToLive\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:switchToWorkspace\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\update\\\\Controller\\\\UpdateController\\:\\:updateStatusManually\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -25268,6 +25184,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/ExposedFormCache.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$untranslatable_configs in empty\\(\\) always exists and is not falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/src/FieldViewsDataProvider.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Form\\\\ViewsExposedForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -32062,12 +31984,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views_ui/src/ViewEditForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$group_info might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/views_ui/src/ViewEditForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_ui\\\\ViewFormBase\\:\\:getDisplayLabel\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34014,6 +33930,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Utility/ReflectionTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Calling sha1\\(\\) is forbidden, use sha256\\(\\) or hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Result of static method Drupal\\\\Composer\\\\Composer\\:\\:ensureComposerVersion\\(\\) \\(void\\) is used\\.$#',
 	'identifier' => 'staticMethod.void',
 	'count' => 1,
@@ -34078,18 +34006,6 @@ $ignoreErrors[] = [
 	'identifier' => 'disallowed.function',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/Plugin/Unpack/Fixtures.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
-	'identifier' => 'disallowed.function',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling sha1\\(\\) is forbidden, use sha256\\(\\) or hash\\(\\) with an xxHash algorithm instead\\.$#',
-	'identifier' => 'disallowed.function',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Access\\\\TestAccessCheckInterface\\:\\:access\\(\\) has no return type specified\\.$#',
