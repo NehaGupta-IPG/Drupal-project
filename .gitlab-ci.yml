@@ -976,7 +976,7 @@ default:
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
-    - if: $PERFORMANCE_TEST != "1" || $_TARGET_PHP == $PRIMARY_PHP
+    - if: $PERFORMANCE_TEST != "1" && $_TARGET_PHP == $PRIMARY_PHP
   stage: ⚡️ Tests
   needs: []
   parallel:
