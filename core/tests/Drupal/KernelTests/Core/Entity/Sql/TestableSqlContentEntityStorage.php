@@ -46,8 +46,8 @@ class TestableSqlContentEntityStorage extends SqlContentEntityStorage {
   /**
    * {@inheritdoc}
    */
-  protected function initialize(): void {
-    // Do nothing to bypass parent's constructor.
+  protected function initialize(): static {
+    return $this;
   }
 
   /**

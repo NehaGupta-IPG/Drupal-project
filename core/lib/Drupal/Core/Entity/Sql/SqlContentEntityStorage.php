@@ -67,10 +67,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @var \Drupal\Core\Entity\ContentEntityTypeInterface
    */
   protected $entityType {
-    get {
-      $this->initialize();
-      return $this->entityType;
-    }
+    get => $this->initialize()->entityType;
     set => $value;
   }
 
@@ -80,10 +77,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @var \Drupal\Core\Field\FieldStorageDefinitionInterface[]
    */
   protected $fieldStorageDefinitions {
-    get {
-      $this->initialize();
-      return $this->fieldStorageDefinitions;
-    }
+    get => $this->initialize()->fieldStorageDefinitions;
     set => $value;
   }
 
@@ -102,10 +96,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @var string
    */
   protected $revisionKey {
-    get {
-      $this->initialize();
-      return $this->revisionKey;
-    }
+    get => $this->initialize()->revisionKey;
     set => $value;
   }
 
@@ -129,10 +120,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @var string
    */
   protected $baseTable {
-    get {
-      $this->initialize();
-      return $this->baseTable;
-    }
+    get => $this->initialize()->baseTable;
     set => $value;
   }
 
@@ -142,10 +130,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @var string
    */
   protected $revisionTable {
-    get {
-      $this->initialize();
-      return $this->revisionTable;
-    }
+    get => $this->initialize()->revisionTable;
     set => $value;
   }
 
@@ -155,10 +140,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @var string
    */
   protected $dataTable {
-    get {
-      $this->initialize();
-      return $this->dataTable;
-    }
+    get => $this->initialize()->dataTable;
     set => $value;
   }
 
@@ -168,10 +150,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @var string
    */
   protected $revisionDataTable {
-    get {
-      $this->initialize();
-      return $this->revisionDataTable;
-    }
+    get => $this->initialize()->revisionDataTable;
     set => $value;
   }
 
@@ -263,9 +242,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Ensures that various properties are initialized.
    */
-  protected function initialize(): void {
+  protected function initialize(): static {
     if ($this->initialized) {
-      return;
+      return $this;
     }
     $this->initialized = TRUE;
 
@@ -273,6 +252,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $this->fieldStorageDefinitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($this->entityTypeId);
 
     $this->initTableLayout();
+    return $this;
   }
 
   /**
