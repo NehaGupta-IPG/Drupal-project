@@ -22,6 +22,7 @@ use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionListTrait;
 use Drupal\layout_builder\SectionStorageInterface;
 use Drupal\layout_builder\SupportAwareSectionStorageInterface;
+use Drupal\navigation_ui\Form\LayoutForm;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -133,7 +134,14 @@ final class NavigationSectionStorage extends PluginBase implements SectionStorag
    * {@inheritdoc}
    */
   public function buildRoutes(RouteCollection $collection): void {
-    // The route is hardcoded.
+    $this->buildLayoutRoutes($collection, $this->getPluginDefinition(), '/admin/config/user-interface/navigation-block');
+    $default_route = 'layout_builder.' . $this->getPluginDefinition()->id() . '.view';
+    $route = $collection->get($default_route);
+    // Use a form for editing the layout instead of a controller.
+    $defaults = $route->getDefaults();
+    $defaults['_form'] = LayoutForm::class;
+    unset($defaults['_controller']);
+    $route->setDefaults($defaults);
   }
 
   /**
@@ -161,7 +169,7 @@ final class NavigationSectionStorage extends PluginBase implements SectionStorag
    * {@inheritdoc}
    */
   public function getRedirectUrl(): Url {
-    return Url::fromRoute("navigation.layout");
+    return $this->getLayoutBuilderUrl();
   }
 
   /**

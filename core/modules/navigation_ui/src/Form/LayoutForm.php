@@ -63,7 +63,7 @@ final class LayoutForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, SectionStorageInterface $section_storage = NULL): array {
+  public function buildForm(array $form, FormStateInterface $form_state, ?SectionStorageInterface $section_storage = NULL): array {
     $form['#prefix'] = '<div id="js-config-form-wrapper">';
     $form['#suffix'] = '</div>';
     $form['#attributes']['class'][] = 'layout-builder-form';
