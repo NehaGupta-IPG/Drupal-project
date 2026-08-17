@@ -79,7 +79,7 @@ class OptionsHooks {
    *   The values to check.
    */
   protected function hasValuesInUse(string $entity_type_id, string $field_name, array $values): bool {
-    if (!$values) {
+    if (empty($values)) {
       return FALSE;
     }
 
