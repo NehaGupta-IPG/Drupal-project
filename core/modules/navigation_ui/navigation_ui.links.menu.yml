@@ -1,0 +1,5 @@
+navigation_block.admin_display:
+  title: Navigation blocks
+  parent: system.admin_config_ui
+  description: 'Manage navigation blocks.'
+  route_name: navigation.layout

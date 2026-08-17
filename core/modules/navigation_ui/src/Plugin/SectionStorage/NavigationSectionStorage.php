@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\navigation\Plugin\SectionStorage;
+namespace Drupal\navigation_ui\Plugin\SectionStorage;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;

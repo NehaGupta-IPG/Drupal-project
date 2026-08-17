@@ -1,0 +1,8 @@
+name: Navigation UI
+description: 'Provides the Layout Builder editing interface for navigation blocks.'
+package: Core
+version: VERSION
+type: module
+dependencies:
+  - drupal:navigation
+  - drupal:layout_builder

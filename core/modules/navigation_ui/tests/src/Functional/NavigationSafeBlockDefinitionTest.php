@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\navigation\Functional;
+namespace Drupal\Tests\navigation_ui\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -11,14 +11,14 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests the definition of navigation safe blocks.
  */
-#[Group('navigation')]
+#[Group('navigation_ui')]
 #[RunTestsInSeparateProcesses]
 class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['navigation', 'navigation_test', 'block', 'layout_builder'];
+  protected static $modules = ['navigation', 'navigation_ui', 'navigation_test', 'block', 'layout_builder'];
 
   /**
    * {@inheritdoc}

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\navigation\FunctionalJavascript;
+namespace Drupal\Tests\navigation_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests that the navigation block UI exists and stores data correctly.
  */
-#[Group('navigation')]
+#[Group('navigation_ui')]
 #[RunTestsInSeparateProcesses]
 class NavigationBlockUiTest extends WebDriverTestBase {
 
@@ -30,6 +30,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'navigation',
+    'navigation_ui',
     'block_content',
     'layout_builder',
     'layout_test',

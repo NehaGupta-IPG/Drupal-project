@@ -1,0 +1,4 @@
+navigation_ui.layoutBuilder:
+  css:
+    base:
+      css/base/layout-builder.css: {}

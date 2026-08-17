@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\navigation\Form;
+namespace Drupal\navigation_ui\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -43,7 +43,7 @@ final class LayoutForm extends FormBase {
   /**
    * Constructs a new LayoutForm.
    */
-  public function __construct(protected AccountInterface $currentUser, protected ?LayoutTempstoreRepositoryInterface $layoutTempstoreRepository = NULL) {
+  public function __construct(protected AccountInterface $currentUser, protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository) {
   }
 
   /**
@@ -52,7 +52,7 @@ final class LayoutForm extends FormBase {
   public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('current_user'),
-      $container->get('layout_builder.tempstore_repository', ContainerInterface::NULL_ON_INVALID_REFERENCE)
+      $container->get('layout_builder.tempstore_repository')
     );
   }
 
@@ -79,11 +79,6 @@ final class LayoutForm extends FormBase {
       $section_storage = NULL;
     }
 
-    if (!$this->layoutTempstoreRepository) {
-      $this->messenger()->addWarning($this->t('To customize the navigation blocks, layout builder needs to be enabled.'));
-      return $form;
-    }
-
     $form['#prefix'] = '<div id="js-config-form-wrapper">';
     $form['#suffix'] = '</div>';
     $form['#attributes']['class'][] = 'layout-builder-form';
@@ -93,7 +88,7 @@ final class LayoutForm extends FormBase {
       '#type' => 'layout_builder',
       '#section_storage' => $section_storage,
     ];
-    $form['#attached']['library'][] = 'navigation/navigation.layoutBuilder';
+    $form['#attached']['library'][] = 'navigation_ui/navigation_ui.layoutBuilder';
 
     $form['actions'] = [
       'enable_edit_mode' => [

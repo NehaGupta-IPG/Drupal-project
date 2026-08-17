@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests the shortcuts block in the navigation block UI.
  *
- * @see \Drupal\Tests\navigation\FunctionalJavascript\NavigationBlockUiTest
+ * @see \Drupal\Tests\navigation_ui\FunctionalJavascript\NavigationBlockUiTest
  */
 #[Group('shortcut')]
 #[RunTestsInSeparateProcesses]
@@ -31,6 +31,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
    */
   protected static $modules = [
     'navigation',
+    'navigation_ui',
     'block_content',
     'layout_builder',
     'layout_test',

@@ -91,11 +91,6 @@ internal.dropdown:
     - core/once
     - core/internal.floating-ui
 
-navigation.layoutBuilder:
-  css:
-    base:
-      css/base/layout-builder.css: {}
-
 internal.safe-triangle:
   # Internal library. Do not depend on it outside core nor add core usage
   # beyond the Navigation module.

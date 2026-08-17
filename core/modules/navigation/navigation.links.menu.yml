@@ -4,12 +4,6 @@ navigation.settings:
   route_name: navigation.settings
   parent: system.admin_config_ui
 
-navigation_block.admin_display:
-  title: Navigation blocks
-  parent: system.admin_config_ui
-  description: 'Manage navigation blocks.'
-  route_name: navigation.layout
-
 # Navigation User default links.
 navigation.user_links.user.page:
   title: 'View profile'
