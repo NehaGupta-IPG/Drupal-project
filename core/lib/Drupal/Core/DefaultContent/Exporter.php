@@ -252,7 +252,9 @@ final class Exporter implements LoggerAwareInterface {
   private function exportFieldItem(FieldItemInterface $item): array {
     $custom_serialized = Importer::getCustomSerializedPropertyNames($item);
 
-    $values = [];
+    // Start with the raw value so data outside any static property definition
+    // (e.g. a `map` field item's) is still exported.
+    $values = $item->getValue();
     foreach ($item->getProperties() as $name => $property) {
       $value = $property instanceof PrimitiveInterface ? $property->getCastedValue() : $property->getValue();
 
