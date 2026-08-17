@@ -34,4 +34,12 @@ class TruncateTest extends DriverSpecificDatabaseTestBase {
     $transaction->rollBack();
   }
 
+  /**
+   * Tests that the restart_identity option reaches the SQL statement.
+   */
+  public function testTruncateRestartIdentitySqlStatement(): void {
+    $this->assertStringNotContainsString('RESTART IDENTITY', (string) $this->connection->truncate('test'));
+    $this->assertStringContainsString('TRUNCATE {test} RESTART IDENTITY', (string) $this->connection->truncate('test', ['restart_identity' => TRUE]));
+  }
+
 }

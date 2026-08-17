@@ -40,6 +40,10 @@ class Truncate extends Query implements QueryExecutionVoidInterface {
    * PostgreSQL also locks the entire table for a TRUNCATE strongly reducing
    * the concurrency with other transactions.
    *
+   * The force_truncate option skips that fallback, so that a caller needing
+   * what TRUNCATE does beyond emptying the table gets a TRUNCATE inside a
+   * transaction too. The implicit COMMIT comes with it.
+   *
    * @see https://learnsql.com/blog/difference-between-truncate-delete-and-drop-table-in-sql
    */
   public function execute(): void {
@@ -62,9 +66,10 @@ class Truncate extends Query implements QueryExecutionVoidInterface {
     // Create a sanitized comment string to prepend to the query.
     $comments = $this->connection->makeComment($this->comments);
 
-    // The statement actually built depends on whether a transaction is active.
+    // The statement actually built depends on whether a transaction is active,
+    // unless the caller asked for a TRUNCATE either way.
     // @see ::execute()
-    if ($this->connection->inTransaction()) {
+    if ($this->connection->inTransaction() && empty($this->queryOptions['force_truncate'])) {
       return $comments . 'DELETE FROM {' . $this->connection->escapeTable($this->table) . '}';
     }
     else {

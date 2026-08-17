@@ -358,6 +358,17 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
+  public function truncateWithSerialId(string $table): void {
+    // TRUNCATE resets AUTO_INCREMENT, so emptying the table is all it takes.
+    // The "force_truncate" option keeps the statement a TRUNCATE inside a
+    // transaction too, where Truncate falls back to DELETE, which would leave
+    // AUTO_INCREMENT behind. Note that TRUNCATE causes an implicit commit.
+    $this->truncate($table, ['force_truncate' => TRUE])->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function schema() {
     if (empty($this->schema)) {
       $this->schema = new Schema($this);
