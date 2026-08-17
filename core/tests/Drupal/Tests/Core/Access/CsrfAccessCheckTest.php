@@ -9,6 +9,7 @@ use Drupal\Core\Access\CsrfAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -82,6 +83,18 @@ class CsrfAccessCheckTest extends UnitTestCase {
     $request = Request::create('/test-path/42?token=test_query');
 
     $this->assertEquals(AccessResult::allowed()->setCacheMaxAge(0), $this->accessCheck->access($route, $request, $this->routeMatch));
+  }
+
+  /**
+   * Tests that a false CSRF token requirement allows access.
+   */
+  #[AllowMockObjectsWithoutExpectations]
+  public function testFalseCsrfTokenRequirement(): void {
+    $access_check = new CsrfAccessCheck($this->createStub(CsrfTokenGenerator::class));
+    $route = new Route('/test-path', [], ['_csrf_token' => 'FALSE']);
+    $request = Request::create('/test-path');
+
+    $this->assertEquals(AccessResult::allowed(), $access_check->access($route, $request, $this->createStub(RouteMatchInterface::class)));
   }
 
   /**

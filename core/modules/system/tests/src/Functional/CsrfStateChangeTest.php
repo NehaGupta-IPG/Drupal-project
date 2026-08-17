@@ -35,6 +35,15 @@ class CsrfStateChangeTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that a GET route that considers CSRF protection can write config.
+   */
+  public function testConsideredGetCanWriteConfig(): void {
+    $this->drupalGet('csrf/considered-config-write');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Configuration updated.');
+  }
+
+  /**
    * Tests that a GET route cannot write an entity without CSRF protection.
    */
   public function testUnprotectedGetCannotWriteEntity(): void {

@@ -257,6 +257,7 @@ system.batch_page.html:
     _title_callback: '\Drupal\system\Controller\BatchController::batchPageTitle'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
     _format: 'html'
   options:
     _admin_route: TRUE
@@ -267,6 +268,7 @@ system.batch_page.json:
     _controller: '\Drupal\system\Controller\BatchController::batchPage'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
     _format: 'json'
   options:
     _admin_route: TRUE

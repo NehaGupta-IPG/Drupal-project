@@ -37,6 +37,20 @@ class TestController {
   }
 
   /**
+   * Writes configuration from a route that considers CSRF protection.
+   */
+  #[Route(
+    path: '/csrf/considered-config-write',
+    name: 'csrf_test.considered_config_write',
+    methods: ['GET'],
+    requirements: ['_access' => 'TRUE', '_csrf_token' => 'FALSE'],
+  )]
+  public function writeConsideredConfig(): Response {
+    \Drupal::configFactory()->getEditable('system.site')->set('name', 'Updated by considered GET request')->save();
+    return new Response('Configuration updated.');
+  }
+
+  /**
    * Writes an entity.
    */
   #[Route(

@@ -26,7 +26,7 @@ class CsrfStateChangeRequestSubscriber implements EventSubscriberInterface {
     }
 
     $route = $event->getRequest()->attributes->get(RouteObjectInterface::ROUTE_OBJECT);
-    if ($route instanceof Route && $route->getRequirement('_csrf_token') !== 'TRUE') {
+    if ($route instanceof Route && !$route->hasRequirement('_csrf_token')) {
       $event->getRequest()->attributes->set('_csrf_state_change_guard', TRUE);
     }
   }
