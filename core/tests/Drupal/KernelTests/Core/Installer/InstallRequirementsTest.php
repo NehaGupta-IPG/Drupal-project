@@ -45,20 +45,26 @@ class InstallRequirementsTest extends KernelTestBase {
     mkdir($sync_directory, 0777, TRUE);
     file_put_contents($sync_directory . '/core.extension.yml', <<<YAML
 module:
+  system: 0
   module_install_unmet_requirements: 0
 theme: {  }
 profile: testing
 YAML);
 
+    $public_directory = $this->siteDirectory . '/public';
+    $this->setSetting('file_public_path', $public_directory);
+    $this->assertDirectoryDoesNotExist($public_directory);
+
     $requirements = $this->installCheckRequirements([
       'config_install_path' => $sync_directory,
       'parameters' => [
-        'profile' => 'minimal',
+        'profile' => FALSE,
       ],
       'settings_verified' => TRUE,
     ]);
 
     $this->assertUnmetRequirements($requirements);
+    $this->assertDirectoryExists($public_directory);
   }
 
   /**
@@ -94,6 +100,10 @@ YAML);
     require_once 'core/includes/install.inc';
     require_once 'core/includes/install.core.inc';
 
+    $public_directory = $this->siteDirectory . '/public';
+    $this->setSetting('file_public_path', $public_directory);
+    $this->assertDirectoryDoesNotExist($public_directory);
+
     $requirements = $this->installCheckRequirements([
       'parameters' => [
         'profile' => FALSE,
@@ -103,6 +113,16 @@ YAML);
     ]);
 
     $this->assertUnmetRequirements($requirements);
+    $this->assertDirectoryExists($public_directory);
+  }
+
+  /**
+   * Tests invalid recipes are ignored during requirement checks.
+   */
+  public function testInvalidRecipeRequirementsAreIgnored(): void {
+    require_once 'core/includes/install.inc';
+
+    $this->assertSame([], drupal_check_recipe($this->siteDirectory . '/invalid'));
   }
 
   /**

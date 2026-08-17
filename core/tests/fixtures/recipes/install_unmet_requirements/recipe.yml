@@ -1,4 +1,6 @@
 name: 'Install unmet requirements'
 type: 'Testing'
+recipes:
+  - install_unmet_requirements_dependency
 install:
-  - module_install_unmet_requirements
+  - system
