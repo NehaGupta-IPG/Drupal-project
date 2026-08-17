@@ -10,7 +10,6 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
 use Drupal\layout_builder\SectionStorageInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a form for configuring navigation blocks.
@@ -47,16 +46,6 @@ final class LayoutForm extends FormBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container): static {
-    return new static(
-      $container->get('current_user'),
-      $container->get('layout_builder.tempstore_repository')
-    );
-  }
-
-  /**
    * Handles switching the configuration type selector.
    *
    * @return array
@@ -74,11 +63,7 @@ final class LayoutForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, SectionStorageInterface|string|null $section_storage = NULL) {
-    if (!$section_storage instanceof SectionStorageInterface) {
-      $section_storage = NULL;
-    }
-
+  public function buildForm(array $form, FormStateInterface $form_state, SectionStorageInterface $section_storage = NULL): array {
     $form['#prefix'] = '<div id="js-config-form-wrapper">';
     $form['#suffix'] = '</div>';
     $form['#attributes']['class'][] = 'layout-builder-form';
