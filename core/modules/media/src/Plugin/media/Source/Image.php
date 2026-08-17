@@ -170,7 +170,7 @@ class Image extends File {
    * {@inheritdoc}
    */
   public function shouldUpdateThumbnail(MediaInterface $media, bool $is_new = FALSE): bool {
-    return parent::shouldUpdateThumbnail($media) || $this->hasAltTextChanged($media, $media->getOriginal());
+    return parent::shouldUpdateThumbnail($media) || ($media->getOriginal() && $this->hasAltTextChanged($media, $media->getOriginal()));
   }
 
   /**
