@@ -57,14 +57,18 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
    * {@inheritdoc}
    */
   public function getLastInstalledDefinition($entity_type_id) {
+    $cid = $entity_type_id . '.entity_type_definitions.installed';
     if (isset($this->entityTypeDefinitions[$entity_type_id])) {
       return $this->entityTypeDefinitions[$entity_type_id];
     }
-    elseif ($cache = $this->cacheBackend->get($entity_type_id . '.entity_type_definitions.installed')) {
+    elseif ($cache = $this->cacheBackend->get($cid)) {
       $this->entityTypeDefinitions[$entity_type_id] = $cache->data;
       return $this->entityTypeDefinitions[$entity_type_id];
     }
-    return $this->getLastInstalledDefinitions()[$entity_type_id] ?? NULL;
+
+    $this->entityTypeDefinitions[$entity_type_id] = $this->keyValueFactory->get('entity.definitions.installed')->get($entity_type_id . '.entity_type');
+    $this->cacheBackend->set($cid, $this->entityTypeDefinitions[$entity_type_id]);
+    return $this->entityTypeDefinitions[$entity_type_id];
   }
 
   /**
@@ -87,29 +91,6 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
     }, $keys);
 
     $this->entityTypeDefinitions = array_combine($keys, $entity_type_definitions);
-
-    // Also populate the static and persistent cache for the field storage
-    // definitions to avoid a separate key/value lookup when all definitions are
-    // looked up first.
-    $items = [
-      'entity_type_definitions.installed' => [
-        'data' => $this->entityTypeDefinitions,
-        'expires' => Cache::PERMANENT,
-      ],
-    ];
-    foreach ($keys as $key) {
-      $this->entityFieldStorageDefinitions[$key] = $all_definitions[$key . '.field_storage_definitions'] ?? [];
-      $items[$key . '.entity_type_definitions.installed'] = [
-        'data' => $this->entityTypeDefinitions[$key],
-        'expires' => Cache::PERMANENT,
-      ];
-      $items[$key . '.field_storage_definitions.installed'] = [
-        'data' => $this->entityFieldStorageDefinitions[$key],
-        'expires' => Cache::PERMANENT,
-      ];
-    }
-
-    $this->cacheBackend->setMultiple($items);
     return $this->entityTypeDefinitions;
   }
 
@@ -119,7 +100,7 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
   public function setLastInstalledDefinition(EntityTypeInterface $entity_type) {
     $entity_type_id = $entity_type->id();
     $this->keyValueFactory->get('entity.definitions.installed')->set($entity_type_id . '.entity_type', $entity_type);
-    $this->cacheBackend->delete($entity_type_id . '.entity_type_definitions.installed');
+    $this->cacheBackend->set($entity_type_id . '.entity_type_definitions.installed', $entity_type);
     $this->entityTypeDefinitions = NULL;
     return $this;
   }
