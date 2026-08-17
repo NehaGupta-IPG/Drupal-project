@@ -29,6 +29,7 @@ class InlineBlockTest extends InlineBlockTestBase {
   protected static $modules = [
     'field_ui',
     'navigation',
+    'navigation_ui',
   ];
 
   /**
