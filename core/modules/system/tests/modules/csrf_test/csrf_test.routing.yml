@@ -21,3 +21,17 @@ csrf_test.route_with_csrf_token:
   requirements:
     _permission: 'administer site configuration'
     _csrf_token: 'TRUE'
+csrf_test.unprotected_config_write:
+  path: csrf/unprotected-config-write
+  methods: ['GET']
+  defaults:
+    _controller: '\Drupal\csrf_test\Controller\TestController::writeConfig'
+  requirements:
+    _access: 'TRUE'
+csrf_test.unprotected_entity_write:
+  path: csrf/unprotected-entity-write
+  methods: ['GET']
+  defaults:
+    _controller: '\Drupal\csrf_test\Controller\TestController::writeEntity'
+  requirements:
+    _access: 'TRUE'

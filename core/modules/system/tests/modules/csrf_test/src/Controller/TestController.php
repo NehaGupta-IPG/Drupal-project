@@ -21,4 +21,20 @@ class TestController {
     return new Response('Sometimes it is hard to think of test content!');
   }
 
+  /**
+   * Writes configuration.
+   */
+  public function writeConfig(): Response {
+    \Drupal::configFactory()->getEditable('system.site')->set('name', 'Updated by GET request')->save();
+    return new Response('Configuration updated.');
+  }
+
+  /**
+   * Writes an entity.
+   */
+  public function writeEntity(): Response {
+    \Drupal::entityTypeManager()->getStorage('entity_test')->create(['name' => 'Created by GET request'])->save();
+    return new Response('Entity created.');
+  }
+
 }

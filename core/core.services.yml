@@ -446,6 +446,17 @@ services:
     class: Drupal\Core\Config\CachedStorage
     arguments: ['@config.storage.active', '@cache.config']
   Drupal\Core\Config\StorageCacheInterface: '@config.storage'
+  csrf_state_change.config_storage:
+    class: Drupal\Core\Config\CsrfGuardedStorage
+    decorates: config.storage
+    arguments: ['@csrf_state_change.config_storage.inner', '@csrf_state_change.guard']
+  csrf_state_change.guard:
+    class: Drupal\Core\Access\CsrfStateChangeGuard
+    arguments: ['@request_stack']
+  csrf_state_change.request_subscriber:
+    class: Drupal\Core\Access\CsrfStateChangeRequestSubscriber
+    tags:
+      - { name: event_subscriber }
   config.storage.active:
     class: Drupal\Core\Config\DatabaseStorage
     arguments: ['@database', 'config']
