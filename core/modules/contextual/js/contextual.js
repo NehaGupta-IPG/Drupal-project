@@ -344,10 +344,14 @@
 
         this.$contextual.find('.contextual-links').prop('hidden', !isOpen);
         const trigger = this.$contextual.find('.trigger').get(0);
-        trigger.textContent = Drupal.t('@action @title configuration options', {
+        const triggerText = Drupal.t('@action @title configuration options', {
           '@action': !isOpen ? this.strings.open : this.strings.close,
           '@title': this.title,
         });
+        trigger.innerHTML = Drupal.theme(
+          'contextualTriggerText',
+          triggerText,
+        );
         trigger.setAttribute('aria-pressed', isOpen);
       }
 
@@ -511,6 +515,17 @@
   Drupal.theme.contextualTrigger = function () {
     return '<button class="trigger visually-hidden focusable" type="button"></button>';
   };
+
+  /**
+   * Contextual link trigger text.
+   *
+   * @param {string} text
+   *   The contextual link trigger text.
+   *
+   * @return {string}
+   *   A string representing a DOM fragment.
+   */
+  Drupal.theme.contextualTriggerText = (text) => text;
 
   /**
    * Bind Ajax contextual links when added.
