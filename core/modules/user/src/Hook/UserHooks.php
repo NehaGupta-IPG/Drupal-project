@@ -8,7 +8,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\filter\FilterFormatInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\system\Entity\Action;
-use Drupal\Component\Assertion\Inspector;
 use Drupal\user\RoleInterface;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Session\AccountInterface;
@@ -244,51 +243,6 @@ class UserHooks {
   }
 
   /**
-   * Implements hook_ENTITY_TYPE_insert() for user_role entities.
-   */
-  #[Hook('user_role_insert')]
-  public function userRoleInsert(RoleInterface $role): void {
-    // Ignore the authenticated and anonymous roles or the role is being synced.
-    if (in_array($role->id(), [
-      RoleInterface::AUTHENTICATED_ID,
-      RoleInterface::ANONYMOUS_ID,
-    ]) || $role->isSyncing()) {
-      return;
-    }
-    assert(Inspector::assertStringable($role->label()), 'Role label is expected to be a string.');
-    $add_id = 'user_add_role_action.' . $role->id();
-    if (!Action::load($add_id)) {
-      $action = Action::create([
-        'id' => $add_id,
-        'type' => 'user',
-        'label' => $this->t('Add the @label role to the selected user(s)', [
-          '@label' => $role->label(),
-        ]),
-        'configuration' => [
-          'rid' => $role->id(),
-        ],
-        'plugin' => 'user_add_role_action',
-      ]);
-      $action->save();
-    }
-    $remove_id = 'user_remove_role_action.' . $role->id();
-    if (!Action::load($remove_id)) {
-      $action = Action::create([
-        'id' => $remove_id,
-        'type' => 'user',
-        'label' => $this->t('Remove the @label role from the selected user(s)', [
-          '@label' => $role->label(),
-        ]),
-        'configuration' => [
-          'rid' => $role->id(),
-        ],
-        'plugin' => 'user_remove_role_action',
-      ]);
-      $action->save();
-    }
-  }
-
-  /**
    * Implements hook_ENTITY_TYPE_delete() for user_role entities.
    */
   #[Hook('user_role_delete')]
@@ -316,87 +270,6 @@ class UserHooks {
   public function modulesUninstalled($modules): void {
     // Remove any potentially orphan module data stored for users.
     \Drupal::service('user.data')->delete($modules);
-  }
-
-  /**
-   * Implements hook_toolbar().
-   */
-  #[Hook('toolbar')]
-  public function toolbar(): array {
-    $user = \Drupal::currentUser();
-    $items['user'] = [
-      '#type' => 'toolbar_item',
-      'tab' => [
-        '#type' => 'link',
-        '#title' => $user->getDisplayName(),
-        '#url' => Url::fromRoute('user.page'),
-        '#attributes' => [
-          'title' => $this->t('My account'),
-          'class' => [
-            'toolbar-icon',
-            'toolbar-icon-user',
-          ],
-        ],
-        '#cache' => [
-                  // Vary cache for anonymous and authenticated users.
-          'contexts' => [
-            'user.roles:anonymous',
-          ],
-        ],
-      ],
-      'tray' => [
-        '#heading' => $this->t('User account actions'),
-      ],
-      '#weight' => 100,
-      '#attached' => [
-        'library' => [
-          'user/drupal.user.icons',
-        ],
-      ],
-    ];
-    if ($user->isAnonymous()) {
-      $links = [
-        'login' => [
-          'title' => $this->t('Log in'),
-          'url' => Url::fromRoute('user.page'),
-        ],
-      ];
-      $items['user']['tray']['user_links'] = [
-        '#theme' => 'links__toolbar_user',
-        '#links' => $links,
-        '#attributes' => [
-          'class' => [
-            'toolbar-menu',
-          ],
-        ],
-      ];
-    }
-    else {
-      $items['user']['tab']['#title'] = [
-        '#lazy_builder' => [
-          'user.toolbar_link_builder:renderDisplayName',
-                [],
-        ],
-        '#create_placeholder' => TRUE,
-        '#lazy_builder_preview' => [
-        // Add a line of whitespace to the placeholder to ensure the icon is
-        // positioned in the same place it will be when the lazy loaded content
-        // appears.
-          '#markup' => '&nbsp;',
-        ],
-      ];
-      $items['user']['tray']['user_links'] = [
-        '#lazy_builder' => [
-          'user.toolbar_link_builder:renderToolbarLinks',
-                [],
-        ],
-        '#create_placeholder' => TRUE,
-        '#lazy_builder_preview' => [
-          '#markup' => '<a href="#" class="toolbar-tray-lazy-placeholder-link">&nbsp;</a>',
-        ],
-      ];
-    }
-    return $items;
   }
 
   /**
