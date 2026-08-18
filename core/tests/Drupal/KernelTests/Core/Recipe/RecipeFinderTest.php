@@ -76,6 +76,8 @@ class RecipeFinderTest extends KernelTestBase {
     file_put_contents($temp_dir . '/recipes/test/recipe.yml', 'name: Test!');
     $names = array_column(iterator_to_array(new Finder()), 'name');
     $this->assertContains('Test!', $names);
+    // Core recipes should be discovered too, by default.
+    $this->assertContains('Administrator role', $names);
 
     (new SymfonyFilesystem())->remove($temp_dir);
   }
