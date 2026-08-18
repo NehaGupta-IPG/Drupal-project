@@ -69,6 +69,8 @@
   <!-- Drupal best practice sniffs -->
   <rule ref="DrupalPractice">
     <exclude name="DrupalPractice.CodeAnalysis.VariableAnalysis.UndefinedUnsetVariable"/>
+    <exclude name="DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable"/>
+    <exclude name="DrupalPractice.CodeAnalysis.VariableAnalysis.VariableRedeclaration"/>
     <exclude name="DrupalPractice.Commenting.CommentEmptyLine.SpacingAfter"/>
     <exclude name="DrupalPractice.Constants.GlobalConstant.GlobalConstant"/>
     <exclude name="DrupalPractice.Constants.GlobalDefine.GlobalConstant"/>
@@ -119,7 +121,14 @@
   </rule>
 
   <!-- Additional sniffs not in the Drupal ruleset. -->
+  <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses"/>
+  <rule ref="SlevomatCodingStandard.ControlStructures.RequireShortTernaryOperator"/>
   <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch" />
+  <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses"/>
+  <rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash"/>
+  <rule ref="SlevomatCodingStandard.Namespaces.UseFromSameNamespace"/>
+  <rule ref="SlevomatCodingStandard.PHP.TypeCast" />
+  <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
 
   <!-- The Drupal ruleset disables this rule, but core enables it for tests. -->
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
