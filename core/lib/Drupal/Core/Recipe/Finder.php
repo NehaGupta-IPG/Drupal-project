@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Core\Recipe;
 
 use Composer\InstalledVersions;
-use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\Finder as SymfonyFinder;
 
 /**
  * Discovers recipes at specific locations in the file system.
@@ -21,7 +20,7 @@ use Symfony\Component\Finder\Finder;
  * \Drupal\Core\Recipe\Recipe objects. For example:
  *
  * @code
- * $discovery = new RecipeDiscovery('/path/to/recipes');
+ * $discovery = new Finder('/path/to/recipes');
  * foreach ($discovery as $recipe) {
  *   echo $recipe->name;
  * }
@@ -32,7 +31,7 @@ use Symfony\Component\Finder\Finder;
  * @internal
  *   This API is experimental.
  */
-final class RecipeDiscovery implements \IteratorAggregate {
+final class Finder implements \IteratorAggregate {
 
   /**
    * The location where Composer is configured to install recipes.
@@ -42,14 +41,14 @@ final class RecipeDiscovery implements \IteratorAggregate {
   /**
    * A finder that scans for `recipe.yml` files.
    */
-  private readonly Finder $finder;
+  private readonly SymfonyFinder $finder;
 
   public function __construct(
     string|array|null $directory = NULL,
-    private readonly bool $skipInvalid,
+    private readonly bool $skipInvalid = FALSE,
     public ?LoggerInterface $logger = NULL,
   ) {
-    $this->finder = Finder::create()
+    $this->finder = SymfonyFinder::create()
       ->files()
       ->name('recipe.yml')
       ->depth(1)
@@ -68,15 +67,13 @@ final class RecipeDiscovery implements \IteratorAggregate {
   /**
    * {@inheritdoc}
    */
-  public function getIterator(): iterable {
+  public function getIterator(): \Traversable {
     foreach ($this->finder as $file) {
       try {
         yield Recipe::createFromDirectory($file->getPath());
       }
       catch (\Throwable $e) {
-        if ($this->logger) {
-          Error::logException($this->logger, $e);
-        }
+        $this->logger?->error($e->getMessage());
         if ($this->skipInvalid) {
           continue;
         }
@@ -90,18 +87,26 @@ final class RecipeDiscovery implements \IteratorAggregate {
    *
    * Placeholder tokens, like {$name} and {$vendor}, are left as-is.
    *
-   * @return string|null
-   *   The path where Composer has installed recipes, or NULL if no recipes
-   *   are installed.
+   * @param string|null $project_root
+   *   (optional) The root of the project, where the top-level `composer.json`
+   *   is. Auto-detected by default.
+   *
+   * @return string
+   *   The path where Composer has installed recipes.
+   *
+   * @throws \RuntimeException
+   *   Thrown if the install directory for recipes cannot be determined.
    */
-  public static function getComposerRecipesDirectory(): ?string {
+  public static function getComposerRecipesDirectory(?string $project_root = NULL): string {
     // This is expensive to compute, and very unlikely to change in a request.
     if (isset(self::$recipesDirectory)) {
       return self::$recipesDirectory;
     }
 
-    ['install_path' => $project_root] = InstalledVersions::getRootPackage();
-    $project_root = realpath($project_root);
+    if (empty($project_root)) {
+      ['install_path' => $project_root] = InstalledVersions::getRootPackage();
+      $project_root = realpath($project_root);
+    }
     assert(is_string($project_root));
 
     $file = $project_root . DIRECTORY_SEPARATOR . 'composer.json';
