@@ -35,24 +35,20 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 final class RecipeDiscovery {
 
+  /**
+   * The location where Composer is configured to install recipes.
+   *
+   * @var string|null
+   */
   private static ?string $recipesDirectory = NULL;
 
-  public static function create(?string $directory = NULL, bool $include_core = TRUE, bool $skip_invalid = FALSE, ?LoggerInterface $logger = NULL): Finder {
-    $directories = [
-      $directory ?? self::getComposerRecipesDirectory(),
-    ];
-    if ($include_core) {
-      // Drupal boots in the web root, so this is guaranteed to be the location
-      // of core recipes.
-      $directories[] = 'core/recipes';
-    }
-
+  public static function create(?string $directory = NULL, bool $skip_invalid = FALSE, ?LoggerInterface $logger = NULL): Finder {
     return Finder::create()
       ->files()
       ->name('recipe.yml')
       ->depth(1)
       ->followLinks()
-      ->in($directories)
+      ->in($directory ?? self::getComposerRecipesDirectory())
       ->filter(function (SplFileInfo $file) use ($skip_invalid, $logger): bool {
         try {
           Recipe::createFromDirectory($file->getPath());
