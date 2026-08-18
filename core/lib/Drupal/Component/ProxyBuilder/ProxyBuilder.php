@@ -233,17 +233,7 @@ EOS;
     if ($reflection_method->hasReturnType()) {
       $signature_line .= ': ';
       $return_type = $reflection_method->getReturnType();
-      if ($return_type->allowsNull()) {
-        $signature_line .= '?';
-      }
-      if (!$return_type->isBuiltin()) {
-        // The parameter is a class or interface.
-        $signature_line .= '\\';
-      }
-      $return_type_name = $return_type->getName();
-      if ($return_type_name === 'self') {
-        $return_type_name = $reflection_method->getDeclaringClass()->getName();
-      }
+      $return_type_name = $this->buildType($return_type, $reflection_method->getDeclaringClass());
       $signature_line .= $return_type_name;
     }
 
@@ -269,17 +259,7 @@ EOS;
 
     if ($parameter->hasType()) {
       $type = $parameter->getType();
-      if ($type->allowsNull()) {
-        $parameter_string .= '?';
-      }
-      if (!$type->isBuiltin()) {
-        // The parameter is a class or interface.
-        $parameter_string .= '\\';
-      }
-      $type_name = $type->getName();
-      if ($type_name === 'self') {
-        $type_name = $parameter->getDeclaringClass()->getName();
-      }
+      $type_name = $this->buildType($type, $parameter->getDeclaringClass());
       $parameter_string .= $type_name . ' ';
     }
 
@@ -298,6 +278,67 @@ EOS;
   }
 
   /**
+   * Generates the string representation of a type.
+   *
+   * @param \ReflectionType $type
+   *   A reflection object of the type.
+   * @param \ReflectionClass $declaring_class
+   *   A reflection object of the declaring class.
+   *
+   * @return string
+   *   The string representation of the type.
+   */
+  protected function buildType(\ReflectionType $type, \ReflectionClass $declaring_class): string {
+    $separator = $type instanceof \ReflectionIntersectionType ? '&' : '|';
+    $type_names = [];
+    $check_nullables = TRUE;
+    if ($type instanceof \ReflectionUnionType || $type instanceof \ReflectionIntersectionType) {
+      $types = $type->getTypes();
+      // These types do not need to check if the internal types are nullable.
+      $check_nullables = FALSE;
+    }
+    else {
+      $types = [$type];
+    }
+
+    $types_count = count($types);
+    foreach ($types as $type_instance) {
+      if ($type_instance instanceof \ReflectionUnionType) {
+        $type_instance_string = $this->buildType($type_instance, $declaring_class);
+      }
+      elseif ($type_instance instanceof \ReflectionIntersectionType) {
+        $type_instance_string = $this->buildType($type_instance, $declaring_class);
+        if ($types_count > 1) {
+          // Wrap the intersection so that combinations of union and
+          // intersections are supported on PHP 8.2.
+          $type_instance_string = "($type_instance_string)";
+        }
+      }
+      else {
+        /** @var \ReflectionNamedType $type_instance */
+        $type_instance_string = '';
+        if ($check_nullables && $type_instance->allowsNull()) {
+          $type_instance_string .= '?';
+        }
+        if (!$type_instance->isBuiltin()) {
+          // The parameter is a class or interface.
+          $type_instance_string .= '\\';
+        }
+        $type_instance_name = $type_instance->getName();
+        if ($type_instance_name === 'self' || $type_instance_name === 'static') {
+          $type_instance_name = $declaring_class->getName();
+        }
+        $type_instance_string .= $type_instance_name;
+      }
+      $type_names[] = $type_instance_string;
+    }
+
+    // Avoid including the same type multiple times otherwise it can result in a
+    // "Duplicate type is redundant" fatal error.
+    return implode($separator, array_unique($type_names));
+  }
+
+  /**
    * Builds the body of a wrapped method.
    *
    * @param \ReflectionMethod $reflection_method
@@ -312,7 +353,7 @@ EOS;
     $function_name = $reflection_method->getName();
 
     if (!$reflection_method->isStatic()) {
-      if ($reflection_method->getReturnType() && $reflection_method->getReturnType()->getName() === 'void') {
+      if ($reflection_method->getReturnType() instanceof \ReflectionNamedType && $reflection_method->getReturnType()->getName() === 'void') {
         $output .= '    $this->lazyLoadItself()->' . $function_name . '(';
       }
       else {

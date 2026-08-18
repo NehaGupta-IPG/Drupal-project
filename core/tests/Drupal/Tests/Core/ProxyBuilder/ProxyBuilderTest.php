@@ -45,6 +45,7 @@ class ProxyBuilderTest extends UnitTestCase {
     $result = $this->proxyBuilder->build($class);
 
     // @todo Solve the silly linebreak for an empty array.
+    // @see \Drupal\Component\Utility\Variable::export()
     $method_body = <<<'EOS'
 
 /**
@@ -54,6 +55,70 @@ public function complexMethod($parameter, callable $function, ?\Drupal\Tests\Cor
 ))
 {
     return $this->lazyLoadItself()->complexMethod($parameter, $function, $test_service, $elements);
+}
+
+/**
+ * {@inheritdoc}
+ */
+public function voidMethod(): void
+{
+    $this->lazyLoadItself()->voidMethod();
+}
+
+/**
+ * {@inheritdoc}
+ */
+public function unionMethod(string|int|float $parameter): ?string
+{
+    return $this->lazyLoadItself()->unionMethod($parameter);
+}
+
+/**
+ * {@inheritdoc}
+ */
+public function unionMethod2(\Iterator|\Countable $parameter): string|int|null
+{
+    return $this->lazyLoadItself()->unionMethod2($parameter);
+}
+
+/**
+ * {@inheritdoc}
+ */
+public function intersectionMethod(\Iterator&\Countable $value): \Iterator&\Countable
+{
+    return $this->lazyLoadItself()->intersectionMethod($value);
+}
+
+/**
+ * {@inheritdoc}
+ */
+public function intersectionAndUnionMethod((\Iterator&\Countable)|\Traversable $value): (\Iterator&\Countable)|\Traversable
+{
+    return $this->lazyLoadItself()->intersectionAndUnionMethod($value);
+}
+
+/**
+ * {@inheritdoc}
+ */
+public function selfReferencing(): \Drupal\Tests\Core\ProxyBuilder\TestServiceComplexMethod
+{
+    return $this->lazyLoadItself()->selfReferencing();
+}
+
+/**
+ * {@inheritdoc}
+ */
+public function staticReferencing(): \Drupal\Tests\Core\ProxyBuilder\TestServiceComplexMethod
+{
+    return $this->lazyLoadItself()->staticReferencing();
+}
+
+/**
+ * {@inheritdoc}
+ */
+public function staticOrSelfReferencing(): \Drupal\Tests\Core\ProxyBuilder\TestServiceComplexMethod
+{
+    return $this->lazyLoadItself()->staticOrSelfReferencing();
 }
 
 EOS;
@@ -174,12 +239,71 @@ class TestServiceNoMethod {
 }
 
 /**
- * Call used to test a service with a complex method.
+ * Call used to test a service with complex methods.
  */
 class TestServiceComplexMethod {
 
+  /**
+   * A complex method.
+   */
   public function complexMethod($parameter, callable $function, ?TestServiceNoMethod $test_service = NULL, array &$elements = []) {
 
+  }
+
+  /**
+   * Void methods will not have a call to return.
+   */
+  public function voidMethod(): void {
+
+  }
+
+  /**
+   * Making use of union parameters where the return type is simplified.
+   */
+  public function unionMethod(string|int|float $parameter): string|null {
+    return is_string($parameter) ? $parameter : NULL;
+  }
+
+  /**
+   * Making use of union parameters.
+   */
+  public function unionMethod2(\Iterator|\Countable $parameter): string|int|null {
+    return count($parameter) === 1 ? 'foo' : 'bar';
+  }
+
+  /**
+   * Making use of intersection parameters.
+   */
+  public function intersectionMethod(\Iterator&\Countable $value): \Iterator&\Countable {
+    return $value;
+  }
+
+  /**
+   * Making use of intersection and union parameters and return types.
+   */
+  public function intersectionAndUnionMethod((\Iterator&\Countable)|\Traversable $value): (\Iterator&\Countable)|\Traversable {
+    return $value;
+  }
+
+  /**
+   * Referencing itself.
+   */
+  public function selfReferencing(): self {
+    return $this;
+  }
+
+  /**
+   * Referencing itself statically.
+   */
+  public function staticReferencing(): static {
+    return $this;
+  }
+
+  /**
+   * Only a single type should be returned here by the proxy.
+   */
+  public function staticOrSelfReferencing(): static|self {
+    return $this;
   }
 
 }
