@@ -320,7 +320,7 @@ class UpdateRegistry implements EventSubscriberInterface {
       $uninstalled_extensions = array_diff($old_extension_list, $new_extension_list);
       $installed_extensions = array_diff($new_extension_list, $old_extension_list);
 
-      // Set the list of enabled extensions correctly so update function
+      // Set the list of installed extensions correctly so update function
       // discovery works as expected.
       $this->enabledExtensions = $new_extension_list;
 

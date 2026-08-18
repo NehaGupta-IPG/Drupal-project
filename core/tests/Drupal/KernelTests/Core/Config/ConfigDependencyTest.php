@@ -24,7 +24,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
   /**
    * Modules to install.
    *
-   * The entity_test module is enabled to provide content entity types.
+   * The entity_test module is installed to provide content entity types.
    *
    * @var array
    */

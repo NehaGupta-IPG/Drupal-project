@@ -34,7 +34,7 @@ use Drupal\node\NodeInterface;
  * grants are required to access a node. There is a special case for the view
  * operation -- a record with node ID 0 corresponds to a "view all" grant for
  * the realm and grant ID of that record. If there are no node access modules
- * enabled, the core node module adds a node ID 0 record for realm 'all'. Node
+ * installed, the core node module adds a node ID 0 record for realm 'all'. Node
  * access modules can also grant "view all" permission on their custom realms;
  * for example, a module could create a record in {node_access} with:
  * @code

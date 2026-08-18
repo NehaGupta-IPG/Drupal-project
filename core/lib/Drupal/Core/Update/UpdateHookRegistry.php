@@ -21,7 +21,7 @@ class UpdateHookRegistry {
   private const FUNC_NAME_REGEXP = '/^(?<module>.+)_update_(?<version>\d+)$/';
 
   /**
-   * A list of enabled modules.
+   * A list of installed modules.
    *
    * @var string[]
    */

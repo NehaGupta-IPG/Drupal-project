@@ -44,7 +44,7 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
   }
 
   /**
-   * Add links to the Content menu, based on enabled modules.
+   * Add links to the Content menu, based on installed modules.
    *
    * @param array $links
    *   The array of links being altered.

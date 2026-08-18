@@ -42,7 +42,7 @@ class LanguageConfigOverrideImportTest extends BrowserTestBase {
     $this->copyConfig(\Drupal::service('config.storage'), $sync);
 
     // Uninstall the language module and its dependencies so we can test
-    // enabling the language module and creating overrides at the same time
+    // installing the language module and creating overrides at the same time
     // during a configuration synchronization.
     \Drupal::service('module_installer')->uninstall(['language']);
     // Ensure that the current site has no overrides registered to the
@@ -73,7 +73,7 @@ class LanguageConfigOverrideImportTest extends BrowserTestBase {
    * Tests that configuration events are not fired during a sync of overrides.
    */
   public function testConfigOverrideImportEvents(): void {
-    // Enable the config_events_test module so we can record events occurring.
+    // Install the config_events_test module so we can record events occurring.
     \Drupal::service('module_installer')->install(['config_events_test']);
     $this->rebuildContainer();
 

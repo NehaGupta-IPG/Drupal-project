@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the behavior of a field module after being disabled and re-enabled.
+ * Tests the behavior of a field module after being uninstalled and reinstalled.
  */
 #[Group('field')]
 #[RunTestsInSeparateProcesses]
@@ -50,7 +50,7 @@ class ReEnableModuleFieldTest extends BrowserTestBase {
   }
 
   /**
-   * Tests the behavior of a field module after being disabled and re-enabled.
+   * Tests the behavior of a field module after being uninstalled and reinstalled.
    *
    * @see field_system_info_alter()
    */

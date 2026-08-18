@@ -328,14 +328,14 @@ class KernelTestBaseTest extends KernelTestBase {
   }
 
   /**
-   * Tests database driver module enabled.
+   * Tests database driver module installed.
    *
    * @legacy-covers ::bootEnvironment
    */
   public function testDatabaseDriverModuleEnabled(): void {
     $module = Database::getConnection()->getProvider();
 
-    // Test that the module that is providing the database driver is enabled.
+    // Test that the module that is providing the database driver is installed.
     $this->assertSame(1, \Drupal::service('extension.list.module')->get($module)->status);
   }
 

@@ -31,7 +31,7 @@ class NoPreExistingSchemaUpdateTest extends BrowserTestBase {
     parent::setUp();
     $connection = Database::getConnection();
 
-    // Enable the update_test_no_preexisting module by altering the
+    // Install the update_test_no_preexisting module by altering the
     // core.extension configuration directly, so that the schema version
     // information is missing.
     $extensions = $connection->select('config')

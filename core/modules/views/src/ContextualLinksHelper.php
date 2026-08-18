@@ -82,7 +82,7 @@ class ContextualLinksHelper {
       $viewElement = $renderElement;
     }
 
-    // Exit if the Contextual Links module is not enabled or if the view is
+    // Exit if the Contextual Links module is not installed or if the view is
     // configured to hide its administrative links.
     if (!$this->moduleHandler->moduleExists('contextual') || !$viewElement['#view_display_show_admin_links']) {
       return;

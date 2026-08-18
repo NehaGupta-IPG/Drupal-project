@@ -246,7 +246,7 @@ function locale_system_update(array $components): void {
 
       // Update the list of translatable projects and start the import batch.
       // Only when new projects are added the update batch will be triggered.
-      // Not each enabled module will introduce a new project. E.g. sub modules.
+      // Not every installed module introduces a new project, e.g. submodules.
       $projects = array_keys(\Drupal::service(LocaleProjectRepository::class)->buildProjects());
       if ($list = array_intersect($list, $projects)) {
         $module_handler->loadInclude('locale', 'inc', 'locale.fetch');
@@ -295,7 +295,7 @@ function locale_system_remove($components): void {
     $module_handler->loadInclude('locale', 'inc', 'locale.bulk');
 
     // Only when projects are removed, the translation files and records will be
-    // deleted. Not each disabled module will remove a project, e.g., sub
+    // deleted. Not each uninstalled module will remove a project, e.g., sub
     // modules.
     $projects = array_keys(\Drupal::service(LocaleProjectRepository::class)->getAll());
     if ($list = array_intersect($list, $projects)) {

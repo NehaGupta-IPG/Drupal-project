@@ -40,7 +40,7 @@ class TermDisplayConfigurableTest extends TaxonomyTestBase {
     $assert->pageTextNotContains('Name');
     $assert->pageTextNotContains('Description');
 
-    // Enable helper module to make base fields' displays configurable.
+    // Install helper module to make base fields' displays configurable.
     \Drupal::service('module_installer')->install(['taxonomy_term_display_configurable_test']);
 
     // Need to reload these after installing the module.

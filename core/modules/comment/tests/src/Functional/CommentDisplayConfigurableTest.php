@@ -61,7 +61,7 @@ class CommentDisplayConfigurableTest extends CommentTestBase {
     $this->drupalGet('node/' . $nid);
     $assert->elementExists('css', 'p.comment__author span');
 
-    // Enable module to make base fields' displays configurable.
+    // Install module to make base fields' displays configurable.
     \Drupal::service('module_installer')->install(['comment_display_configurable_test']);
 
     // Configure display.

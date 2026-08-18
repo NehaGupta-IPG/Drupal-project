@@ -47,16 +47,16 @@ class ThemeUiTest extends BrowserTestBase {
   }
 
   /**
-   * Tests permissions for enabling themes depending on disabled modules.
+   * Tests permissions for installing themes depending on uninstalled modules.
    */
   public function testModulePermissions(): void {
-    // Log in as a user without permission to enable modules.
+    // Log in as a user without permission to install modules.
     $this->drupalLogin($this->drupalCreateUser([
       'administer themes',
     ]));
     $this->drupalGet('admin/appearance');
 
-    // The links to install a theme that would enable modules should be replaced
+    // The links to install a theme that would install modules should be replaced
     // by this message.
     $this->assertSession()->pageTextContains('This theme requires the listed modules to operate correctly. They must first be installed by a user with permissions to do so.');
 
@@ -99,13 +99,13 @@ class ThemeUiTest extends BrowserTestBase {
       $module_enabled_text = $count === 1 ? "{$this->testModules[$enabled_modules[0]]} has been installed." : $count . " modules have been installed:";
       $this->assertSession()->pageTextContains($module_enabled_text);
     };
-    // All the modules should be listed as disabled.
+    // All the modules should be listed as uninstalled.
     foreach ($all_dependent_modules as $module) {
       $expected_required_list_items[$module] = $this->testModules[$module] . " (disabled)";
     }
     $this->assertUninstallableTheme($expected_required_list_items, $theme_name);
 
-    // Enable the first group of dependee modules.
+    // Install the first group of dependee modules.
     $first_module_form_post = [];
     foreach ($first_modules as $module) {
       $first_module_form_post["modules[$module][enable]"] = 1;
@@ -118,14 +118,14 @@ class ThemeUiTest extends BrowserTestBase {
 
     // Confirm the theme is still uninstallable due to a remaining module
     // dependency.
-    // The modules that have already been enabled will no longer be listed as
+    // The modules that have already been installed will no longer be listed as
     // disabled.
     foreach ($first_modules as $module) {
       $expected_required_list_items[$module] = $this->testModules[$module];
     }
     $this->assertUninstallableTheme($expected_required_list_items, $theme_name);
 
-    // Enable the second group of dependee modules.
+    // Install the second group of dependee modules.
     $second_module_form_post = [];
     foreach ($second_modules as $module) {
       $second_module_form_post["modules[$module][enable]"] = 1;
@@ -140,7 +140,7 @@ class ThemeUiTest extends BrowserTestBase {
     $assert_session->addressEquals('admin/appearance');
     $assert_session->pageTextContains("The $theme_name theme has been installed");
 
-    // Confirm that the dependee modules can't be uninstalled because an enabled
+    // Confirm that the dependee modules can't be uninstalled because an installed
     // theme depends on them.
     $this->drupalGet('admin/modules/uninstall');
     foreach ($all_dependent_modules as $attribute) {
@@ -218,8 +218,8 @@ class ThemeUiTest extends BrowserTestBase {
   public static function providerTestThemeInstallWithModuleDependencies(): array {
     // Data provider values with the following keys:
     // -'theme_name': The name of the theme being tested.
-    // -'first_modules': Array of module machine names to enable first.
-    // -'second_modules': Array of module machine names to enable second.
+    // -'first_modules': Array of module machine names to install first.
+    // -'second_modules': Array of module machine names to install second.
     // -'required_by_messages': Array for checking the messages explaining why a
     // module can't be uninstalled. The array key is the selector where the
     // message should appear, the array value is the expected message.

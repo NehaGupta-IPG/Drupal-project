@@ -164,7 +164,7 @@ function hook_modules_installed($modules, $is_syncing): void {
  * @endlink for details on hook_schema and how database tables are defined.
  *
  * Note that since this function is called from a full bootstrap, all functions
- * (including those in modules enabled by the current page request) are
+ * (including those in modules loaded by the current page request) are
  * available when this hook is called. Use cases could be displaying a user
  * message, or calling a module function necessary for initial setup, etc.
  *
@@ -988,7 +988,7 @@ function hook_update_last_removed(): int {
  * @param string $phase
  *   The phase in which requirements are checked:
  *   - install: The module is being installed.
- *   - update: The module is enabled and update.php is run.
+ *   - update: The module is installed and update.php is run.
  *   - runtime: The runtime requirements are being checked and shown on the
  *     status report page.
  *

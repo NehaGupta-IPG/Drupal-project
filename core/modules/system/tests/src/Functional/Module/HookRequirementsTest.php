@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Attempts enabling a module that fails hook_requirements('install').
+ * Attempts to install a module that fails hook_requirements('install').
  */
 #[Group('Module')]
 #[RunTestsInSeparateProcesses]

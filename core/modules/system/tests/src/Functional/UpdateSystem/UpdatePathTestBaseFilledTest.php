@@ -307,7 +307,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('taxonomy/term/2/translations');
     $this->assertSession()->linkExists('Test root term - Spanish');
 
-    // Make sure our modules are still enabled.
+    // Make sure our modules are still installed.
     $expected_enabled_modules = [
       'basic_auth',
       'block',
@@ -357,7 +357,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       $this->assertTrue($this->container->get('module_handler')->moduleExists($module), 'The "' . $module . '" module is still enabled.');
     }
 
-    // Make sure our themes are still enabled.
+    // Make sure our themes are still installed.
     $expected_enabled_themes = [
       'olivero',
       'claro',

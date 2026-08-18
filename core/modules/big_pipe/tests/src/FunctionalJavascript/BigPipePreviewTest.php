@@ -40,7 +40,7 @@ class BigPipePreviewTest extends WebDriverTestBase {
 
     $this->drupalGet('big_pipe_test_preview');
 
-    // This test begins with the big_pipe_bypass_js module enabled, which blocks
+    // This test begins with the big_pipe_bypass_js module installed, which blocks
     // Big Pipe's JavaScript from loading. Without that JavaScript, the
     // placeholder and previews are not replaced and we can reliably test their
     // presence.

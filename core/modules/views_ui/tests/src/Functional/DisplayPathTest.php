@@ -281,7 +281,7 @@ class DisplayPathTest extends UITestBase {
     $this->assertSession()->optionExists('menu[parent]', 'admin:system.admin');
 
     // Check that parent menu item can now be
-    // added without the menu_ui module being enabled.
+    // added without the menu_ui module being installed.
     $this->submitForm([
       'menu[type]' => 'normal',
       'menu[parent]' => 'admin:system.admin',
@@ -333,7 +333,7 @@ class DisplayPathTest extends UITestBase {
     $display_options = $this->config('views.view.test_view')->get('display.page_1.display_options');
     $this->assertArrayNotHasKey('use_admin_theme', $display_options);
 
-    // Enable administration theme.
+    // Use the administration theme for this display.
     $this->drupalGet('admin/structure/views/nojs/display/test_view/page_1/use_admin_theme');
     $this->submitForm(['use_admin_theme' => TRUE], 'Apply');
     $this->assertSession()->pageTextContains('Administration theme: Yes');

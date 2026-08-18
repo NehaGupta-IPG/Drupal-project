@@ -10,7 +10,7 @@ namespace Drupal\Core\Extension;
  * 1. Starts "experimental".
  * 2. Stabilizes and goes "stable".
  * 3. Eventually (maybe), becomes "deprecated" when being phased out.
- * 4. Finally (maybe), becomes "obsolete" and can't be enabled anymore.
+ * 4. Finally (maybe), becomes "obsolete" and can't be installed anymore.
  */
 final class ExtensionLifecycle {
 

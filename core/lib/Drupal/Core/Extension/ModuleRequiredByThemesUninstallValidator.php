@@ -7,7 +7,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
- * Ensures modules cannot be uninstalled if enabled themes depend on them.
+ * Ensures modules cannot be uninstalled if installed themes depend on them.
  */
 class ModuleRequiredByThemesUninstallValidator implements ConfigImportModuleUninstallValidatorInterface {
 

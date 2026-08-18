@@ -21,7 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
 
   /**
-   * Enable language and a language-aware node access module.
+   * Install language and a language-aware node access module.
    *
    * @var array
    */
@@ -76,7 +76,7 @@ class NodeAccessLanguageAwareTest extends NodeAccessTestBase {
       ],
     ])->save();
 
-    // After enabling a node access module, the access table has to be rebuild.
+    // After installing a node access module, the access table has to be rebuild.
     \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
     // Create a normal authenticated user.

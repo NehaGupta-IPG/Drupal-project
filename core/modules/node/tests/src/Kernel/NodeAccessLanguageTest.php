@@ -35,10 +35,10 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
 
     $this->addPrivateField(NodeType::load('page'));
 
-    // After enabling a node access module, the access table has to be rebuild.
+    // After installing a node access module, the access table has to be rebuild.
     \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
-    // Enable the private node feature of the node_access_test module.
+    // Install the private node feature of the node_access_test module.
     \Drupal::state()->set('node_access_test.private', TRUE);
 
     // Add Hungarian, Catalan and Croatian.
@@ -68,7 +68,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
     $this->assertNodeAccess($expected_node_access, $node_public_hu->getTranslation('hu'), $web_user);
 
     // Creating a public node with no special langcode, like when no language
-    // module enabled.
+    // module installed.
     $node_public_no_language = $this->drupalCreateNode([
       'private' => FALSE,
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
@@ -137,7 +137,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
     $this->assertNodeAccess($expected_node_access_no_access, $node_private_hu->getTranslation('hu'), $web_user);
 
     // Creating a private node with no special langcode, like when no language
-    // module enabled.
+    // module installed.
     $node_private_no_language = $this->drupalCreateNode([
       'private' => TRUE,
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
@@ -207,7 +207,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
     $this->assertSame('hu', $node_public->language()->getId(), 'Node created as Hungarian.');
 
     // Creating a public node with no special langcode, like when no language
-    // module enabled.
+    // module installed.
     $node_no_language = $this->drupalCreateNode([
       'private' => FALSE,
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,

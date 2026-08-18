@@ -174,7 +174,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         throw new ExtensionNameLengthException("Module name '$module' is over the maximum allowed length of " . DRUPAL_EXTENSION_NAME_MAX_LENGTH . ' characters');
       }
 
-      // Throw an exception if a theme with the same name is enabled.
+      // Throw an exception if a theme with the same name is installed.
       $installed_themes = $extension_config->get('theme') ?: [];
       if (isset($installed_themes[$module])) {
         throw new ExtensionNameReservedException("Module name $module is already in use by an installed theme.");
@@ -264,8 +264,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // uses the new module list of the kernel. However, DrupalKernel does
     // not cause any modules to be loaded.
     // Furthermore, the currently active (fixed) module list can be
-    // different from the configured list of enabled modules. For all active
-    // modules not contained in the configured enabled modules, we assume a
+    // different from the configured list of installed modules. For all active
+    // modules not contained in the configured installed modules, we assume a
     // weight of 0.
     $current_module_filenames = $this->moduleHandler->getModuleList();
     $current_modules = array_fill_keys(array_keys($current_module_filenames), 0);
@@ -522,8 +522,10 @@ class ModuleInstaller implements ModuleInstallerInterface {
     asort($module_list);
     $module_list = array_keys($module_list);
 
-    // Only process modules that are enabled. A module is only enabled if it is
-    // configured as enabled. Custom or overridden module handlers might contain
+    // Only process modules that are installed. A module is only installed if it
+    // is
+    // configured as installed. Custom or overridden module handlers might
+    // contain
     // the module already, which means that it might be loaded, but not
     // necessarily installed.
     foreach ($module_list as $module) {

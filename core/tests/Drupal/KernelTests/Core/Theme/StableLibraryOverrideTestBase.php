@@ -48,7 +48,7 @@ abstract class StableLibraryOverrideTestBase extends KernelTestBase {
   protected $librariesToSkip = [];
 
   /**
-   * Enable all core modules that are not hidden or experimental.
+   * Install all core modules that are not hidden or experimental.
    */
   protected function enableVisibleAndStableCoreModules(): void {
     $all_modules = $this->container->get('extension.list.module')->getList();

@@ -464,7 +464,7 @@ class DisplayTest extends ViewTestBase {
     $this->checkTranslationSetting();
     \Drupal::service('module_installer')->install(['language']);
 
-    // Enabling the language module should not make a difference.
+    // Installing the Language module should not make a difference.
     $this->checkTranslationSetting();
 
     // Making the site multilingual should let translatable entity types support

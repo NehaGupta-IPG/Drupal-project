@@ -13,7 +13,7 @@ use Drupal\filter\Plugin\FilterInterface;
 /**
  * Provides a filter to limit allowed HTML tags.
  *
- * This filter does not do anything, but enabling of its module is done in a
+ * This filter does not do anything, but installation of its module is done in a
  * test.
  *
  * @see \Drupal\Tests\filter\Functional\FilterFormTest::testFilterForm()

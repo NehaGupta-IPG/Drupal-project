@@ -180,7 +180,7 @@ class LocaleHooks {
    */
   #[Hook('library_info_alter')]
   public function libraryInfoAlter(array &$libraries, $module): void {
-    // When the locale module is enabled, we update the core/drupal library to
+    // When the locale module is installed, we update the core/drupal library to
     // have a dependency on the locale/translations library, which provides
     // window.drupalTranslations, containing the translations for all strings in
     // JavaScript assets in the current language.

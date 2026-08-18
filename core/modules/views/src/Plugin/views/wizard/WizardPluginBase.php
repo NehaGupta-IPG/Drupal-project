@@ -366,7 +366,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
       ];
     }
 
-    // Only offer the block settings if the module is enabled.
+    // Only offer the block settings if the module is installed.
     if (\Drupal::moduleHandler()->moduleExists('block')) {
       $form['displays']['block'] = [
         '#type' => 'fieldset',
@@ -438,7 +438,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
       ];
     }
 
-    // Only offer the REST export settings if the module is enabled.
+    // Only offer the REST export settings if the module is installed.
     if (\Drupal::moduleHandler()->moduleExists('rest')) {
       $form['displays']['rest_export'] = [
         '#type' => 'fieldset',

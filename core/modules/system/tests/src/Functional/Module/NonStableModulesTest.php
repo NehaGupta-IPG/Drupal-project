@@ -68,13 +68,13 @@ class NonStableModulesTest extends BrowserTestBase {
     $this->drupalGet('admin/modules');
     $this->submitForm($edit, 'Install');
 
-    // The module should not be enabled and there should be a warning and a
+    // The module should not be installed and there should be a warning and a
     // list of the experimental modules with only this one.
     $this->assertSession()->pageTextNotContains('Experimental Test has been installed.');
     $this->assertSession()->pageTextContains('Experimental modules are provided for testing purposes only.');
     $this->assertSession()->pageTextContains('The following module is experimental: Experimental Test');
 
-    // There should be a warning about enabling experimental modules, but no
+    // There should be a warning about installing experimental modules, but no
     // warnings about deprecated modules.
     $this->assertSession()->pageTextContains('Are you sure you wish to install an experimental module?');
     $this->assertSession()->pageTextNotContains('Are you sure you wish to install a deprecated module?');
@@ -83,27 +83,27 @@ class NonStableModulesTest extends BrowserTestBase {
     // There should be no message about enabling dependencies.
     $this->assertSession()->pageTextNotContains('You must install');
 
-    // Enable the module and confirm that it worked.
+    // Install the module and confirm that it worked.
     $this->submitForm([], 'Continue');
     $this->assertSession()->pageTextContains('Experimental Test has been installed.');
 
     // Uninstall the module.
     \Drupal::service('module_installer')->uninstall(['experimental_module_test']);
 
-    // Test enabling a module that is not itself experimental, but that depends
+    // Test installing a module that is not itself experimental, but that depends
     // on an experimental module.
     $edit = [];
     $edit["modules[experimental_module_dependency_test][enable]"] = TRUE;
     $this->drupalGet('admin/modules');
     $this->submitForm($edit, 'Install');
 
-    // The module should not be enabled and there should be a warning and a
+    // The module should not be installed and there should be a warning and a
     // list of the experimental modules with only this one.
     $this->assertSession()->pageTextNotContains('2 modules have been installed: Experimental Dependency Test, Experimental Test');
     $this->assertSession()->pageTextContains('Experimental modules are provided for testing purposes only.');
     $this->assertSession()->pageTextContains('The following module is experimental: Experimental Test');
 
-    // There should be a warning about enabling experimental modules, but no
+    // There should be a warning about installing experimental modules, but no
     // warnings about deprecated modules.
     $this->assertSession()->pageTextContains('Are you sure you wish to install an experimental module?');
     $this->assertSession()->pageTextNotContains('Are you sure you wish to install a deprecated module?');
@@ -116,7 +116,7 @@ class NonStableModulesTest extends BrowserTestBase {
     // There should be a message about enabling dependencies.
     $this->assertSession()->pageTextContains('You must install the following module to install Experimental Dependency Test:Experimental Test');
 
-    // Enable the module and confirm that it worked.
+    // Install the module and confirm that it worked.
     $this->submitForm([], 'Continue');
     $this->assertSession()->pageTextContains('2 modules have been installed: Experimental Dependency Test, Experimental Test');
 
@@ -135,13 +135,13 @@ class NonStableModulesTest extends BrowserTestBase {
     $this->drupalGet('admin/modules');
     $this->submitForm($edit, 'Install');
 
-    // The module should not be enabled and there should be a warning and a
+    // The module should not be installed and there should be a warning and a
     // list of the experimental modules with only this one.
     $this->assertSession()->pageTextNotContains('2 modules have been installed: Experimental Dependency Test, Experimental Test');
     $this->assertSession()->pageTextContains('Experimental modules are provided for testing purposes only.');
     $this->assertSession()->pageTextContains('The following module is experimental: Experimental Test');
 
-    // There should be a warning about enabling experimental modules, but no
+    // There should be a warning about installing experimental modules, but no
     // warnings about deprecated modules.
     $this->assertSession()->pageTextContains('Are you sure you wish to install an experimental module?');
     $this->assertSession()->pageTextNotContains('Are you sure you wish to install a deprecated module?');
@@ -154,11 +154,11 @@ class NonStableModulesTest extends BrowserTestBase {
     // There should be no message about enabling dependencies.
     $this->assertSession()->pageTextNotContains('You must install');
 
-    // Enable the module and confirm that it worked.
+    // Install the module and confirm that it worked.
     $this->submitForm([], 'Continue');
     $this->assertSession()->pageTextContains('2 modules have been installed: Experimental Dependency Test, Experimental Test');
 
-    // Try to enable an experimental module that can not be due to
+    // Try to install an experimental module that can not be due to
     // hook_requirements().
     \Drupal::state()->set('experimental_module_requirements_test_requirements', TRUE);
     $edit = [];
@@ -183,7 +183,7 @@ class NonStableModulesTest extends BrowserTestBase {
     $this->drupalGet('admin/modules');
     $this->submitForm($edit, 'Install');
 
-    // The module should not be enabled and there should be a warning and a
+    // The module should not be installed and there should be a warning and a
     // list of the deprecated modules with only this one.
     $assert = $this->assertSession();
     $assert->pageTextNotContains('Deprecated module has been installed.');
@@ -195,7 +195,7 @@ class NonStableModulesTest extends BrowserTestBase {
     ]);
     $this->assertEquals('http://example.com/deprecated', $more_information_link->getAttribute('href'));
 
-    // The module should not be enabled and there should be a warning and a
+    // The module should not be installed and there should be a warning and a
     // list of the experimental modules with only this one.
     $assert->pageTextNotContains('Experimental Test has been installed.');
     $assert->pageTextContains('Experimental modules are provided for testing purposes only.');
@@ -211,7 +211,7 @@ class NonStableModulesTest extends BrowserTestBase {
     // There should be no message about enabling dependencies.
     $assert->pageTextNotContains('You must install');
 
-    // Enable the module and confirm that it worked.
+    // Install the module and confirm that it worked.
     $this->submitForm([], 'Continue');
     $assert->pageTextContains('2 modules have been installed: Deprecated module, Experimental Test.');
   }

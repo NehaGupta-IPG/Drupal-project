@@ -136,7 +136,7 @@ class AccessTest extends ViewTestBase {
     $tables = array_keys($main_query->getTables());
     $this->assertNotContains('node_access', $tables);
 
-    // Enable node access test module to ensure that table is present again.
+    // Install node access test module to ensure that table is present again.
     \Drupal::service('module_installer')->install(['node_access_test']);
     \Drupal::service(NodeAccessRebuild::class)->rebuild();
 

@@ -28,10 +28,10 @@ trait WorkspaceTestTrait {
   protected $workspaces = [];
 
   /**
-   * Enables the Workspaces module and creates two workspaces.
+   * Installs the Workspaces module and creates two workspaces.
    */
   protected function initializeWorkspacesModule(): void {
-    // Enable the Workspaces module here instead of the static::$modules array
+    // Install the Workspaces module here instead of the static::$modules array
     // so we can test it with default content.
     $this->enableModules(['workspaces']);
     $this->container = \Drupal::getContainer();

@@ -315,7 +315,7 @@ class SystemController extends ControllerBase {
         $theme->incompatible_engine = isset($theme->info['engine']) && !$this->themeManager->getThemeEngine($theme->info['engine']);
         // Confirm that module dependencies are available.
         $theme->incompatible_module = FALSE;
-        // Confirm that the user has permission to enable modules.
+        // Confirm that the user has permission to install modules.
         $theme->insufficient_module_permissions = FALSE;
       }
 
@@ -332,9 +332,9 @@ class SystemController extends ControllerBase {
           $module_name = $modules[$dependency]->info['name'];
           $theme->module_dependencies_list[$dependency] = $modules[$dependency]->status ? $this->t('@module_name', ['@module_name' => $module_name]) : $this->t('@module_name (<span class="admin-disabled">disabled</span>)', ['@module_name' => $module_name]);
 
-          // Create an additional property that contains only disabled module
+          // Create an additional property that contains only uninstalled module
           // dependencies. This will determine if it is possible to install the
-          // theme, or if modules must first be enabled.
+          // theme, or if modules must first be installed.
           if (!$modules[$dependency]->status) {
             $theme->module_dependencies_disabled[$dependency] = $module_name;
             if (!$this->currentUser()->hasPermission('administer modules')) {

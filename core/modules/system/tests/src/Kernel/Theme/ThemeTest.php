@@ -110,10 +110,10 @@ class ThemeTest extends KernelTestBase {
     $theme_handler = $this->container->get('theme_handler');
     $themes = $theme_handler->listInfo();
 
-    // Check if ThemeHandlerInterface::listInfo() retrieves enabled themes.
+    // Check if ThemeHandlerInterface::listInfo() retrieves installed themes.
     $this->assertSame(1, $themes['test_theme']->status, 'Installed theme detected');
 
-    // Check if ThemeHandlerInterface::listInfo() returns disabled themes.
+    // Check if ThemeHandlerInterface::listInfo() returns uninstalled themes.
     // Check for base theme and subtheme lists.
     $base_theme_list = ['test_base_theme' => 'Theme test base theme'];
     $sub_theme_list = ['test_subsubtheme' => 'Theme test subsubtheme', 'test_subtheme' => 'Theme test subtheme'];

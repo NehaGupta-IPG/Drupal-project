@@ -30,7 +30,7 @@ class LanguageConfigOverrideInstallTest extends KernelTestBase {
   public function testLanguageConfigOverrideInstall(): void {
     $this->installConfig(['language']);
     ConfigurableLanguage::createFromLangcode('de')->save();
-    // Need to enable test module after creating the language otherwise saving
+    // Need to install test module after creating the language otherwise saving
     // the language will install the configuration.
     $this->enableModules(['language_config_override_test']);
     \Drupal::state()->set('config_events_test.event', FALSE);

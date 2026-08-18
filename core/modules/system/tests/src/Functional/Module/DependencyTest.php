@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Enable module without dependency enabled.
+ * Install module without dependency installed.
  */
 #[Group('Module')]
 #[Group('#slow')]
@@ -51,7 +51,7 @@ INFO;
     ];
     $this->drupalGet('admin/modules');
     $this->submitForm($edit, 'Install');
-    // Enable module with project namespace to ensure nothing breaks.
+    // Install module with project namespace to ensure nothing breaks.
     $edit = [
       'modules[system_project_namespace_test][enable]' => TRUE,
     ];
@@ -121,7 +121,7 @@ INFO;
   }
 
   /**
-   * Tests enabling modules with different core version specifications.
+   * Tests installing modules with different core version specifications.
    */
   public function testCoreCompatibility(): void {
     $assert_session = $this->assertSession();
@@ -142,7 +142,7 @@ INFO;
   }
 
   /**
-   * Tests that module dependencies are enabled in the correct order in the UI.
+   * Tests that module dependencies are installed in the correct order in the UI.
    *
    * Dependencies should be enabled before their dependents.
    */
@@ -155,7 +155,7 @@ INFO;
     // depends on help.
     $expected_order = ['help', 'config', 'dblog'];
 
-    // Enable the modules through the UI, verifying that the dependency chain
+    // Install the modules through the UI, verifying that the dependency chain
     // is correct.
     $edit = [];
     $edit['modules[dblog][enable]'] = 'dblog';

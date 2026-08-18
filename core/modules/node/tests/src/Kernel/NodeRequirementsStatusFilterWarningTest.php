@@ -275,7 +275,7 @@ class NodeRequirementsStatusFilterWarningTest extends KernelTestBase {
   }
 
   /**
-   * Enables Node Access Test module.
+   * Installs Node Access Test module.
    */
   private function enableNodeAccessTestModule(): void {
     $this->enableModules(['node_access_test']);

@@ -70,7 +70,7 @@ class RebuildScriptTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('module_test: ' . $this->siteDirectory . '/modules/module_test');
     $this->assertSession()->pageTextContains('system_info_alter: true');
 
-    // Disable a module by writing to the core.extension list.
+    // Uninstall a module by writing to the core.extension list.
     $this->config('core.extension')->clear('module.module_test')->save();
     \Drupal::state()->set('container_rebuild_test.count', 0);
     $this->drupalGet(Url::fromUri('base:core/rebuild.php'));
@@ -81,7 +81,7 @@ class RebuildScriptTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('module_test: not installed');
     $this->assertSession()->pageTextContains('system_info_alter: false');
 
-    // Enable a module by writing to the core.extension list.
+    // Install a module by writing to the core.extension list.
     $modules = $this->config('core.extension')->get('module');
     $modules['module_test'] = 0;
     $this->config('core.extension')->set('module', \Drupal::service(ModuleWeight::class)->sort($modules))->save();

@@ -201,10 +201,10 @@ class HelpTest extends KernelTestBase {
   }
 
   /**
-   * Gets the list of enabled modules that implement hook_help().
+   * Gets the list of installed modules that implement hook_help().
    *
    * @return array
-   *   A list of enabled modules.
+   *   A list of installed modules.
    */
   protected function getModuleList(): array {
     $modules = [];

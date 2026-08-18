@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Ensures that data added to nodes by other modules appears in RSS feeds.
  *
- * Create a node, enable the node_test module to ensure that extra data is
+ * Create a node, install the node_test module to ensure that extra data is
  * added to the node's renderable array, then verify that the data appears on
  * the site-wide RSS feed at rss.xml.
  */
@@ -23,7 +23,7 @@ class NodeRSSContentTest extends NodeTestBase {
   use PromotedContentViewTestTrait;
 
   /**
-   * Enable a module that implements hook_node_view().
+   * Install a module that implements hook_node_view().
    *
    * @var array
    */

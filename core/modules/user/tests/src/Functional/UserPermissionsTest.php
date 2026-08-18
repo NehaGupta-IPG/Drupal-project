@@ -156,7 +156,7 @@ class UserPermissionsTest extends BrowserTestBase {
     \Drupal::entityTypeManager()->getStorage('user_role')->resetCache();
     $this->assertTrue(Role::load($this->rid)->isAdmin());
 
-    // Enable block module and ensure the 'administer news feeds'
+    // Install block module and ensure the 'administer news feeds'
     // permission is assigned by default.
     \Drupal::service('module_installer')->install(['block']);
 

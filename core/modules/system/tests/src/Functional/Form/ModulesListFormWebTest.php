@@ -68,24 +68,24 @@ class ModulesListFormWebTest extends BrowserTestBase {
   }
 
   /**
-   * Tests the status message when enabling one or more modules.
+   * Tests the status message when installing one or more modules.
    */
   public function testModulesListFormStatusMessage(): void {
     $this->drupalGet('admin/modules');
 
-    // Enable a module that does not define permissions.
+    // Install a module that does not define permissions.
     $edit = ['modules[layout_discovery][enable]' => 'layout_discovery'];
     $this->submitForm($edit, 'Install');
     $this->assertSession()->elementTextContains('xpath', "//div[@role='status' and h2[text()='Status message']]", 'Module Layout Discovery has been installed.');
     $this->assertSession()->elementNotExists('xpath', "//div[@role='status' and h2[text()='Status message']]//a");
 
-    // Enable a module that defines permissions.
+    // Install a module that defines permissions.
     $edit = ['modules[filter][enable]' => 'filter'];
     $this->submitForm($edit, 'Install');
     $this->assertSession()->elementTextContains('xpath', "//div[@role='status' and h2[text()='Status message']]", 'Module Filter has been installed.');
     $this->assertSession()->elementExists('xpath', "//div[@role='status' and h2[text()='Status message']]//a[contains(@href, '/admin/people/permissions/module/filter')]");
 
-    // Enable a module that has dependencies and both define permissions.
+    // Install a module that has dependencies and both define permissions.
     $edit = ['modules[content_moderation][enable]' => 'content_moderation'];
     $this->submitForm($edit, 'Install');
     $this->submitForm([], 'Continue');

@@ -50,7 +50,7 @@ class ImageTest extends ImageTestTestBase {
   }
 
   /**
-   * Tests that it's possible to upload SVG image, with the test module enabled.
+   * Tests that it's possible to upload SVG image, with the test module installed.
    */
   public function testCanUploadSvg(): void {
     $this->container->get('module_installer')

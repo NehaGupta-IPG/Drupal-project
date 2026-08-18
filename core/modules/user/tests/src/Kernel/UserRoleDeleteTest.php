@@ -143,7 +143,7 @@ class UserRoleDeleteTest extends KernelTestBase {
     // We have to manually trigger the removal of configuration belonging to the
     // module because KernelTestBase::disableModules() is not aware of this.
     $this->container->get('config.manager')->uninstall('module', 'node');
-    // Disable the node module.
+    // Uninstall the node module.
     $this->disableModules(['node']);
 
     // The $role config entity exists after removing the module dependency.

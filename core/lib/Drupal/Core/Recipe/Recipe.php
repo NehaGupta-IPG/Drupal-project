@@ -459,7 +459,7 @@ final class Recipe {
   }
 
   /**
-   * Validates that the corresponding extension is enabled for a config action.
+   * Validates that the extension for a config action is installed.
    *
    * @param mixed $value
    *   The config action; not used.

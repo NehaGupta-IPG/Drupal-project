@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Enable module without dependency enabled.
+ * Install module without dependency installed.
  */
 #[Group('Module')]
 #[Group('#slow')]
@@ -22,7 +22,7 @@ class DependencyFormTest extends ModuleTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Attempts to enable the Content Translation module without Language enabled.
+   * Attempts to install the Content Translation module without Language installed.
    */
   protected function doTestEnableWithoutDependency(): void {
     // Attempt to enable Content Translation without Language enabled.
@@ -57,7 +57,7 @@ class DependencyFormTest extends ModuleTestBase {
   }
 
   /**
-   * Tests that modules that don't pass requirement checks cannot be enabled.
+   * Tests that modules that don't pass requirement checks cannot be installed.
    */
   protected function doTestMissingRequirements(): void {
     // Test that the system_dependencies_test module is marked
@@ -88,7 +88,7 @@ class DependencyFormTest extends ModuleTestBase {
    * Tests the dependency checks when core version contains '8.x' within it.
    */
   protected function doTestCoreVersionContains8X(): void {
-    // Enable the helper module that alters the version and dependencies.
+    // Install the helper module that alters the version and dependencies.
     \Drupal::service('module_installer')->install(['dependency_version_test']);
 
     // Check that the above module installed OK.
@@ -100,7 +100,7 @@ class DependencyFormTest extends ModuleTestBase {
   }
 
   /**
-   * Tests enabling a module that depends on a module which fails hook_requirements().
+   * Tests installing a module with a dependency that fails hook_requirements().
    */
   protected function doTestEnableRequirementsFailureDependency(): void {
     \Drupal::service('module_installer')->install(['comment']);
@@ -120,8 +120,8 @@ class DependencyFormTest extends ModuleTestBase {
     $this->assertModules(['requirements1_test'], FALSE);
     $this->assertModules(['requirements2_test'], FALSE);
 
-    // Makes sure that already enabled modules the failing modules depend on
-    // were not disabled.
+    // Makes sure that already installed modules the failing modules depend on
+    // were not uninstalled.
     $this->assertModules(['comment'], TRUE);
   }
 

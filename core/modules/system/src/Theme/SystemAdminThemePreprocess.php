@@ -141,7 +141,7 @@ class SystemAdminThemePreprocess {
    *     projects. Each project (or module) is an associative array containing
    *     the following elements:
    *     - name: The name of the module.
-   *     - enable: A checkbox for enabling the module.
+   *     - install: A checkbox for installing the module.
    *     - description: A description of the module.
    *     - version: The version of the module.
    *     - links: Administration links provided by the module.

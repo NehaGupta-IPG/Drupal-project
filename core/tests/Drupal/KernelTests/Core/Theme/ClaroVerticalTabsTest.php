@@ -25,7 +25,7 @@ class ClaroVerticalTabsTest extends KernelTestBase {
    * Confirms that Claro can render vertical tabs correctly.
    */
   public function testVerticalTabs(): void {
-    // Enable the Claro theme.
+    // Install the Claro theme.
     \Drupal::service('theme_installer')->install(['claro']);
     $this->config('system.theme')->set('default', 'claro')->save();
 

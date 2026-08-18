@@ -2302,7 +2302,7 @@ function hook_entity_extra_field_info(): array {
 
   foreach (NodeType::loadMultiple() as $bundle) {
 
-    // Add also the 'language' select if Language module is enabled and the
+    // Add also the 'language' select if Language module is installed and the
     // bundle has multilingual support.
     // Visibility of the ordering of the language selector is the same as on the
     // node/add form.

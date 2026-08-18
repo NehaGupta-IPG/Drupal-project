@@ -30,7 +30,7 @@ class FieldDefinitionIntegrityTest extends KernelTestBase {
    * Tests the integrity of field plugin definitions.
    */
   public function testFieldPluginDefinitionIntegrity(): void {
-    // Enable all core modules that provide field plugins, and their
+    // Install all core modules that provide field plugins, and their
     // dependencies.
     $this->enableModules(
       $this->modulesWithSubdirectory(
@@ -176,7 +176,7 @@ class FieldDefinitionIntegrityTest extends KernelTestBase {
   protected function modulesWithSubdirectory($subdirectory): array {
     $modules = \Drupal::service('extension.list.module')->getList();
     $modules = array_filter($modules, function (Extension $module) use ($subdirectory): bool {
-      // Filter contrib, hidden, already enabled modules and modules in the
+      // Filter contrib, hidden, already installed modules and modules in the
       // Testing package.
       return ($module->origin === 'core'
         && empty($module->info['hidden'])

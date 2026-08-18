@@ -138,7 +138,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
         throw new ExtensionNameLengthException("Theme name $key is over the maximum allowed length of " . DRUPAL_EXTENSION_NAME_MAX_LENGTH . ' characters.');
       }
 
-      // Throw an exception if a module with the same name is enabled.
+      // Throw an exception if a module with the same name is installed.
       $installed_modules = $extension_config->get('module') ?: [];
       if (isset($installed_modules[$key])) {
         throw new ExtensionNameReservedException("Theme name $key is already in use by an installed module.");

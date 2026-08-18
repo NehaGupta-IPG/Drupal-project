@@ -2,11 +2,11 @@
  * Install the given module.
  *
  * @param {string} module
- *   The module machine name to enable.
+ *   The module machine name to install.
  * @param {boolean} force
  *   Force to install dependencies if applicable.
  * @param {function} callback
- *   A callback which will be called, when the module has been enabled.
+ *   A callback which will be called, when the module has been installed.
  * @return {object}
  *   The drupalInstallModule command.
  */
@@ -35,7 +35,7 @@ exports.command = function drupalInstallModule(module, force, callback) {
       );
     }
     // Wait for the checkbox for the module to be disabled as a sign that the
-    // module has been enabled.
+    // module has been installed.
     this.waitForElementPresent(
       `form.system-modules [name="modules[${module}][enable]"]:disabled`,
       10000,

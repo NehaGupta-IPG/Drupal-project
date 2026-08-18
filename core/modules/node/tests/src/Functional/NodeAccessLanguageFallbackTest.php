@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class NodeAccessLanguageFallbackTest extends NodeTestBase {
 
   /**
-   * Enable language and a non-language-aware node access module.
+   * Install language and a non-language-aware node access module.
    *
    * @var array
    */
@@ -38,7 +38,7 @@ class NodeAccessLanguageFallbackTest extends NodeTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // After enabling a node access module, the {node_access} table has to be
+    // After installing a node access module, the {node_access} table has to be
     // rebuilt.
     \Drupal::service(NodeAccessRebuild::class)->rebuild();
 

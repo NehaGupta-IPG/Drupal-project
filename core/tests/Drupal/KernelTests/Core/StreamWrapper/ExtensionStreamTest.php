@@ -34,7 +34,7 @@ class ExtensionStreamTest extends KernelTestBase {
   protected array $streamWrappers = [];
 
   /**
-   * The list of modules to enable.
+   * The list of modules to install.
    *
    * @var string[]
    */

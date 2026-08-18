@@ -3,7 +3,7 @@
 namespace Drupal\Core\Extension;
 
 /**
- * Interface for classes that manage a set of enabled modules.
+ * Interface for classes that manage a set of installed modules.
  *
  * Classes implementing this interface work with a fixed list of modules and are
  * responsible for loading module files and maintaining information about module
@@ -25,7 +25,7 @@ interface ModuleHandlerInterface {
   public function load($name);
 
   /**
-   * Loads all enabled modules.
+   * Loads all installed modules.
    */
   public function loadAll();
 
@@ -39,7 +39,7 @@ interface ModuleHandlerInterface {
   public function isLoaded();
 
   /**
-   * Reloads all enabled modules.
+   * Reloads all installed modules.
    */
   public function reload();
 
@@ -95,18 +95,18 @@ interface ModuleHandlerInterface {
   public function buildModuleDependencies(array $modules);
 
   /**
-   * Determines whether a given module is enabled.
+   * Determines whether a given module is installed.
    *
    * @param string $module
    *   The name of the module (without the .module extension).
    *
    * @return bool
-   *   TRUE if the module is both installed and enabled.
+   *   TRUE if the module is installed.
    */
   public function moduleExists($module);
 
   /**
-   * Loads an include file for each enabled module.
+   * Loads an include file for each installed module.
    *
    * @param string $type
    *   The include file's type (file extension).
@@ -155,7 +155,7 @@ interface ModuleHandlerInterface {
    *   The name of the hook (e.g. "help" or "menu").
    * @param string|string[]|null $modules
    *   (optional) A single module or multiple modules to check if they have any
-   *   implementations of a hook. Use NULL to check if any enabled module has
+   *   implementations of a hook. Use NULL to check if any installed module has
    *   implementations.
    *
    * @return bool
@@ -198,7 +198,7 @@ interface ModuleHandlerInterface {
   public function invoke($module, $hook, array $args = []);
 
   /**
-   * Invokes a hook in all enabled modules that implement it.
+   * Invokes a hook in all installed modules that implement it.
    *
    * @param string $hook
    *   The name of the hook to invoke.
@@ -240,7 +240,7 @@ interface ModuleHandlerInterface {
   public function invokeDeprecated($description, $module, $hook, array $args = []);
 
   /**
-   * Invokes a deprecated hook in all enabled modules that implement it.
+   * Invokes a deprecated hook in all installed modules that implement it.
    *
    * Invoking a deprecated hook adds the behavior of triggering an
    * E_USER_DEPRECATED error if any implementations are found.
@@ -354,13 +354,14 @@ interface ModuleHandlerInterface {
   public function alterDeprecated($description, $type, &$data, &$context1 = NULL, &$context2 = NULL);
 
   /**
-   * Returns an array of directories for all enabled modules.
+   * Returns an array of directories for all installed modules.
    *
    * This is useful for tasks such as finding a file that exists in all module
    * directories.
    *
    * @return array<string, string>
-   *   An associative array of the directories for all enabled modules, keyed by
+   *   An associative array of the directories for all installed modules, keyed
+   *   by
    *   the extension machine name.
    */
   public function getModuleDirectories();

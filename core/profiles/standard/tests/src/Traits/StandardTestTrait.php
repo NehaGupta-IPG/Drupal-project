@@ -73,7 +73,7 @@ trait StandardTestTrait {
 
     // Now we have all configuration imported, test all of them for schema
     // conformance. Ensures all imported default configuration is valid when
-    // standard profile modules are enabled.
+    // standard profile modules are installed.
     $names = $this->container->get('config.storage')->listAll();
     /** @var \Drupal\Core\Config\TypedConfigManagerInterface $typed_config */
     $typed_config = $this->container->get('config.typed');
@@ -102,7 +102,7 @@ trait StandardTestTrait {
     }
 
     // Ensure that configuration from the Standard profile is not reused when
-    // enabling a module again since it contains configuration that can not be
+    // reinstalling a module since it contains configuration that can not be
     // installed. For example, editor.editor.basic_html is editor configuration
     // that depends on the CKEditor 5 module. The CKEditor 5 module can not be
     // installed before the editor module since it depends on the editor module.

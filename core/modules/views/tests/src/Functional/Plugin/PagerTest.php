@@ -519,7 +519,7 @@ class PagerTest extends ViewTestBase {
     $display['display_options']['pager']['options']['items_per_page'] = 5;
     $view->save();
 
-    // Enable locale, config_translation and language module.
+    // Install locale, config_translation and language module.
     $this->container->get('module_installer')->install(['locale', 'language', 'config_translation']);
     $this->resetAll();
 
@@ -573,7 +573,7 @@ class PagerTest extends ViewTestBase {
    * Tests translating the pager using locale.
    */
   public function testPagerLocale(): void {
-    // Enable locale and language module.
+    // Install locale and language module.
     $this->container->get('module_installer')->install(['locale', 'language']);
     $this->resetAll();
     $langcode = 'nl';

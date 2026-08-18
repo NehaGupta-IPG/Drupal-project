@@ -18,7 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class NodePreviewAnonymousTest extends BrowserTestBase {
 
   /**
-   * Enable node module to test on the preview.
+   * Install node module to test on the preview.
    *
    * @var array
    */

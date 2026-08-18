@@ -83,7 +83,7 @@ class MainContentFallbackTest extends BrowserTestBase {
     $this->drupalGet('user/' . $this->webUser->id() . '/edit');
     $this->assertSession()->fieldExists('mail');
 
-    // Enable the block module again.
+    // Install the block module again.
     $this->drupalLogin($this->adminUser);
     $edit = [];
     $edit['modules[block][enable]'] = 'block';

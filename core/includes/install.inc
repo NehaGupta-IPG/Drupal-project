@@ -688,7 +688,7 @@ function drupal_check_module($module) {
  * Example of .info.yml file:
  * @code
  *    name: Minimal
- *    description: Start fresh, with only a few modules enabled.
+ *    description: Start fresh, with only a few modules installed.
  *    install:
  *      - block
  *      - dblog

@@ -51,9 +51,9 @@ class ModuleWeight {
   }
 
   /**
-   * Sorts the configured list of enabled modules.
+   * Sorts the configured list of installed modules.
    *
-   * The list of enabled modules is expected to be ordered by weight and name.
+   * The list of installed modules is expected to be ordered by weight and name.
    * The list is always sorted on write to avoid the overhead on read.
    *
    * @param array $data

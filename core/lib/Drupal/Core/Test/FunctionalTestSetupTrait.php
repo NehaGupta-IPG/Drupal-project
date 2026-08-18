@@ -234,17 +234,17 @@ trait FunctionalTestSetupTrait {
    * Rebuilds \Drupal::getContainer().
    *
    * Use this to update the test process's kernel with a new service container.
-   * For example, when the list of enabled modules is changed via the internal
+   * For example, when the list of installed modules is changed via the internal
    * browser the test process's kernel has a service container with an out of
    * date module list.
    *
    * @see TestBase::prepareEnvironment()
    * @see TestBase::restoreEnvironment()
    *
-   * @todo Fix https://www.drupal.org/node/2941757 so that module enable/disable
+   * @todo Fix https://www.drupal.org/node/2941757 so that module install/uninstall
    *   changes are immediately reflected in \Drupal::getContainer(). Until then,
    *   tests can invoke this workaround when requiring services from newly
-   *   enabled modules to be immediately available in the same request.
+   *   installed modules to be immediately available in the same request.
    */
   protected function rebuildContainer() {
     // Rebuild the kernel and bring it back to a fully bootstrapped state.
@@ -252,11 +252,11 @@ trait FunctionalTestSetupTrait {
   }
 
   /**
-   * Resets all data structures after having enabled new modules.
+   * Resets all data structures after having installed new modules.
    *
    * This method is called by FunctionalTestSetupTrait::rebuildAll() after
-   * enabling the requested modules. It must be called again when additional
-   * modules are enabled later.
+   * installing the requested modules. It must be called again when additional
+   * modules are installed later.
    *
    * @see \Drupal\Core\Test\FunctionalTestSetupTrait::rebuildAll()
    * @see \Drupal\Tests\BrowserTestBase::installDrupal()
@@ -529,7 +529,7 @@ trait FunctionalTestSetupTrait {
    * Resets and rebuilds the environment after setup.
    */
   protected function rebuildAll() {
-    // Reset/rebuild all data structures after enabling the modules, primarily
+    // Reset/rebuild all data structures after installing the modules, primarily
     // to synchronize all data structures and caches between the test runner and
     // the child site.
     // @todo Test-specific setUp() methods may set up further fixtures; find a

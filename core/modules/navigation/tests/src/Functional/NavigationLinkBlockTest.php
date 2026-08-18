@@ -136,7 +136,7 @@ class NavigationLinkBlockTest extends PageCacheTagsTestBase {
     $this->appendNavigationLinkBlock($help_label, $help_link_title, 'internal:/admin/help', 'internal');
 
     // Admin user should be capable to access to all the links but the internal
-    // one, since Help module is not enabled.
+    // one, since Help module is not installed.
     $test_page_url = Url::fromRoute('test_page_test.test_page');
     $this->drupalLogin($this->adminUser);
     $this->drupalGet($test_page_url);
@@ -163,7 +163,7 @@ class NavigationLinkBlockTest extends PageCacheTagsTestBase {
     $this->assertSession()->pageTextNotContains($help_label);
     $this->assertSession()->pageTextNotContains($help_link_title);
 
-    // Enable Help module and grant permissions to admin user.
+    // Install Help module and grant permissions to admin user.
     // Admin user should be capable to access to all the links.
     \Drupal::service('module_installer')->install(['help']);
     $this->adminUser->addRole($this->drupalCreateRole(['access help pages']))->save();

@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class InfoAlterTest extends KernelTestBase {
 
   /**
-   * Tests that theme .info.yml data is rebuild after enabling a module.
+   * Tests that theme .info.yml data is rebuilt after installing a module.
    *
    * Tests that info data is rebuilt after a module that implements
    * hook_system_info_alter() is enabled. Also tests if core *_list() functions
@@ -27,7 +27,7 @@ class InfoAlterTest extends KernelTestBase {
     $info = \Drupal::service('extension.list.module')->getList();
     $this->assertFalse(isset($info['node']->info['required']), 'Before the module_required_test is installed the node module is not required.');
 
-    // Enable the test module.
+    // Install the test module.
     \Drupal::service('module_installer')->install(['module_required_test'], FALSE);
     $this->assertTrue(\Drupal::moduleHandler()->moduleExists('module_required_test'), 'Test required module is enabled.');
 

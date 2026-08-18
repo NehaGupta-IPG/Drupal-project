@@ -61,7 +61,7 @@ class TestSubscriber implements EventSubscriberInterface {
    * Sets validation results for a specific event.
    *
    * This method is static to enable setting the expected results before this
-   * module is enabled.
+   * module is installed.
    *
    * @param \Drupal\package_manager\ValidationResult[]|null $results
    *   The validation results, or NULL to delete stored results.
@@ -84,7 +84,7 @@ class TestSubscriber implements EventSubscriberInterface {
    * Sets an exception to throw for a specific event.
    *
    * This method is static to enable setting the expected results before this
-   * module is enabled.
+   * module is installed.
    *
    * @param \Throwable|null $error
    *   The exception to throw, or NULL to delete a stored exception.

@@ -26,7 +26,7 @@ class ModuleHandlerTest extends KernelTestBase {
   protected static $modules = ['system'];
 
   /**
-   * The basic functionality of retrieving enabled modules.
+   * The basic functionality of retrieving installed modules.
    */
   public function testModuleList(): void {
     $module_list = ['system'];
@@ -93,7 +93,7 @@ class ModuleHandlerTest extends KernelTestBase {
     $this->enableModules(['module_test']);
     $this->assertTrue($this->moduleHandler()->moduleExists('module_test'), 'Test module is enabled.');
 
-    // Ensure that modules are not enabled.
+    // Ensure that modules are not installed.
     $this->assertFalse($this->moduleHandler()->moduleExists('dblog'), 'dblog module is disabled.');
     $this->assertFalse($this->moduleHandler()->moduleExists('config'), 'Config module is disabled.');
     $this->assertFalse($this->moduleHandler()->moduleExists('help'), 'Help module is disabled.');
@@ -127,7 +127,7 @@ class ModuleHandlerTest extends KernelTestBase {
     // Verify that the original module was installed.
     $this->assertTrue($this->moduleHandler()->moduleExists('dblog'), 'Module installation with dependencies succeeded.');
 
-    // Verify that the modules were enabled in the correct order.
+    // Verify that the modules were installed in the correct order.
     $module_order = \Drupal::state()->get('module_test.install_order', []);
     $this->assertEquals(['help', 'config', 'dblog'], $module_order);
 
@@ -145,7 +145,7 @@ class ModuleHandlerTest extends KernelTestBase {
     $uninstalled_modules = \Drupal::state()->get('module_test.uninstall_order', []);
     $this->assertEquals(['dblog', 'config', 'help'], $uninstalled_modules, 'Modules were uninstalled in the correct order.');
 
-    // Enable dblog module again, which should enable both the Config module and
+    // Install dblog module again, which should install both the Config module and
     // Help module. But, this time do it with Config module declaring a
     // dependency on a specific version of Help module in its info file. Make
     // sure that Drupal\Core\Extension\ModuleInstaller::install() still works.
@@ -161,7 +161,7 @@ class ModuleHandlerTest extends KernelTestBase {
     // Verify that the original module was installed.
     $this->assertTrue($this->moduleHandler()->moduleExists('dblog'), 'Module installation with version dependencies succeeded.');
 
-    // Finally, verify that the modules were enabled in the correct order.
+    // Finally, verify that the modules were installed in the correct order.
     $enable_order = \Drupal::state()->get('module_test.install_order', []);
     $this->assertSame(['help', 'config', 'dblog'], $enable_order);
   }
@@ -264,7 +264,7 @@ class ModuleHandlerTest extends KernelTestBase {
     // when there is test content preventing entity_test from being uninstalled.
     \Drupal::state()->set('module_test.dependency', 'dependency');
 
-    // Create an entity so that the modules can not be disabled.
+    // Create an entity so that the modules can not be uninstalled.
     $entity = EntityTest::create(['name' => $this->randomString()]);
     $entity->save();
 

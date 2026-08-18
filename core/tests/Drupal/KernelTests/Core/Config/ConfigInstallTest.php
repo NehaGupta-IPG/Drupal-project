@@ -148,7 +148,7 @@ class ConfigInstallTest extends KernelTestBase {
     // The 'entity' collection will not exist because the 'config_test' module
     // is not enabled.
     $this->assertEquals($collections, $active_storage->getAllCollectionNames());
-    // Enable the 'config_test' module and try again.
+    // Install the 'config_test' module and try again.
     $this->enableModules(['config_test']);
     \Drupal::service('config.installer')->installCollectionDefaultConfig('entity');
     $collections[] = 'entity';

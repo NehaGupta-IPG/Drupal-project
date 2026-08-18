@@ -1,8 +1,8 @@
 /**
- * Enable a given theme.
+ * Install a given theme.
  *
  * @param themeMachineName
- *   The theme machine name to enable
+ *   The theme machine name to install
  * @param adminTheme
  *   If true, install the theme as the admin theme instead of default.
  * @return {object}

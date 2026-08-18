@@ -13,7 +13,7 @@ use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Builds a confirmation form for enabling experimental and deprecated modules.
+ * Builds a confirmation form for installing non-stable modules.
  *
  * @internal
  */
@@ -27,21 +27,21 @@ class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
   protected ModuleExtensionList $moduleExtensionList;
 
   /**
-   * An array of module names to be enabled, keyed by lifecycle.
+   * An array of module names to be installed, keyed by lifecycle.
    *
    * @var array
    */
   protected array $groupedModuleInfo;
 
   /**
-   * Boolean indicating a core deprecated module is being enabled.
+   * Boolean indicating a core deprecated module is being installed.
    *
    * @var bool
    */
   protected bool $coreDeprecatedModules;
 
   /**
-   * Boolean indicating a contrib deprecated module is being enabled.
+   * Boolean indicating a contrib deprecated module is being installed.
    *
    * @var bool
    */
@@ -137,12 +137,12 @@ class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
   }
 
   /**
-   * Builds a message to be displayed to the user enabling deprecated modules.
+   * Builds a message to be displayed to the user installing deprecated modules.
    *
    * @param bool $core_deprecated_modules
-   *   TRUE if a core deprecated module is being enabled.
+   *   TRUE if a core deprecated module is being installed.
    * @param bool $contrib_deprecated_modules
-   *   TRUE if a contrib deprecated module is being enabled.
+   *   TRUE if a contrib deprecated module is being installed.
    *
    * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   The relevant message.
@@ -159,7 +159,7 @@ class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
   }
 
   /**
-   * Sets properties with information about non-stable modules being enabled.
+   * Sets properties with information about non-stable modules being installed.
    */
   protected function buildNonStableInfo(): void {
     $non_stable = $this->modules['non_stable'];

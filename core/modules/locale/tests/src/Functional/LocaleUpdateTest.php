@@ -343,7 +343,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
   }
 
   /**
-   * Tests automatic translation import when a module is enabled.
+   * Tests automatic translation import when a module is installed.
    */
   public function testEnableUninstallModule(): void {
     // Make the hidden test modules look like a normal custom module.
@@ -352,7 +352,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     // Check if there is no translation yet.
     $this->assertTranslation('Tuesday', '', 'de');
 
-    // Enable a module.
+    // Install a module.
     $edit = [
       'modules[locale_test_translate][enable]' => 'locale_test_translate',
     ];
@@ -384,14 +384,14 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    * Tests automatic translation import when a language is added.
    *
    * When a language is added, the system will check for translations files of
-   * enabled modules and will import them. When a language is removed the system
+   * installed modules and will import them. When a language is removed the system
    * will remove all translations of that language from the database.
    */
   public function testEnableLanguage(): void {
     // Make the hidden test modules look like a normal custom module.
     \Drupal::state()->set('locale.test_system_info_alter', TRUE);
 
-    // Enable a module.
+    // Install a module.
     $edit = [
       'modules[locale_test_translate][enable]' => 'locale_test_translate',
     ];
@@ -449,7 +449,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     // Make the hidden test modules look like a normal custom module.
     \Drupal::state()->set('locale.test_system_info_alter', TRUE);
 
-    // Enable a module.
+    // Install a module.
     $edit = [
       'modules[locale_test_translate][enable]' => 'locale_test_translate',
     ];

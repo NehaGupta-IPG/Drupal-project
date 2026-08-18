@@ -30,7 +30,7 @@ class ToolbarClaroOverridesTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * The theme installer used in this test for enabling themes.
+   * The theme installer used in this test for installing themes.
    *
    * @var \Drupal\Core\Extension\ThemeInstallerInterface
    */

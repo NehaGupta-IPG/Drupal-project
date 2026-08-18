@@ -13,7 +13,7 @@ use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Builds a confirmation form for enabling modules with dependencies.
+ * Builds a confirmation form for installing modules with dependencies.
  *
  * @internal
  */

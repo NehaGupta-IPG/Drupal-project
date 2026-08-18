@@ -842,7 +842,7 @@ class ConfigImporterTest extends KernelTestBase {
     // First, install system_test so that its hook_module_preinstall() will run
     // when module_test is installed.
     $this->container->get('module_installer')->install(['system_test']);
-    // Add module_test and system_test to the enabled modules to be imported,
+    // Add module_test and system_test to the installed modules to be imported,
     // so that module_test gets installed on import and system_test does not get
     // uninstalled.
     $extensions['module']['module_test'] = 0;

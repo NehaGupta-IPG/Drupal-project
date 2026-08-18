@@ -8,7 +8,7 @@
 declare(strict_types=1);
 
 /**
- * Enable the new_dependency_test_with_service module.
+ * Install the new_dependency_test_with_service module.
  */
 function new_dependency_test_update_8001(): void {
   $services = [

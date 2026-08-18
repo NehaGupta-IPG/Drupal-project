@@ -124,7 +124,7 @@ class MenuAccessTest extends BrowserTestBase {
     $this->assertMenuItemRoutesAccess(403, 'admin/structure', 'admin/people', 'admin/config');
 
     // The test cases below depend on routes, menu items and permissions added
-    // by the menu_test module. It is not enabled before this to ensure that any
+    // by the menu_test module. It is not installed before this to ensure that any
     // other configuration it provides that we don't need for these test cases
     // does not affect the assertions above.
     $this->container->get('module_installer')->install(['menu_test']);

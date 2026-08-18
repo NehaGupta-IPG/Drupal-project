@@ -29,8 +29,8 @@ class NodeContextualLinksTest extends NodeTestBase {
    * Tests if the node page works if Contextual Links is disabled.
    *
    * All views have Contextual links enabled by default, even with the
-   * Contextual links module disabled. This tests if no calls are done to the
-   * Contextual links module by views when it is disabled.
+   * Contextual links module uninstalled. This tests if no calls are done to the
+   * Contextual links module by views when it is uninstalled.
    *
    * @see https://www.drupal.org/node/2379811
    */

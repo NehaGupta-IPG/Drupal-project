@@ -120,7 +120,7 @@ class EntityFormDisplayTest extends KernelTestBase {
     $this->assertEquals('test_field_widget', $renderer->getPluginId());
     $this->assertNotSame($widget, $renderer);
 
-    // Check that specifying an unknown widget (e.g. case of a disabled module)
+    // Check that specifying an unknown widget (e.g. an uninstalled module)
     // gets stored as is in the display, but results in the default widget being
     // used.
     $form_display->setComponent($field_name, [

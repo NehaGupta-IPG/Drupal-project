@@ -27,7 +27,7 @@ class NavigationDefaultBlockDefinitionTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Tests the default block flow enabling Navigation module first.
+   * Tests the default block flow installing Navigation module first.
    */
   public function testNavigationDefaultAfterNavigation(): void {
     $test_page_url = Url::fromRoute('test_page_test.test_page');
@@ -48,7 +48,7 @@ class NavigationDefaultBlockDefinitionTest extends BrowserTestBase {
   }
 
   /**
-   * Tests the default block flow enabling the block provider module first.
+   * Tests the default block flow installing the block provider module first.
    */
   public function testNavigationDefaultBeforeNavigation(): void {
     $test_page_url = Url::fromRoute('test_page_test.test_page');

@@ -34,12 +34,12 @@ class ClassLoaderTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Tests that module-provided classes can be loaded when a module is enabled.
+   * Tests that module-provided classes can be loaded when a module is installed.
    *
    * @see \Drupal\module_autoload_test\SomeClass
    */
   public function testClassLoading(): void {
-    // Enable the module_test and module_autoload_test modules.
+    // Install the module_test and module_autoload_test modules.
     \Drupal::service('module_installer')->install(['module_test', 'module_autoload_test'], FALSE);
     $this->resetAll();
     // Check twice to test an unprimed and primed system_list() cache.
@@ -56,7 +56,7 @@ class ClassLoaderTest extends BrowserTestBase {
    * @see \Drupal\module_autoload_test\SomeClass
    */
   public function testClassLoadingNotInstalledModules(): void {
-    // Enable the module_test module.
+    // Install the module_test module.
     \Drupal::service('module_installer')->install(['module_test'], FALSE);
     $this->resetAll();
     // Check twice to test an unprimed and primed system_list() cache.
@@ -68,15 +68,15 @@ class ClassLoaderTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that module-provided classes can't be loaded from disabled modules.
+   * Tests that module-provided classes can't be loaded from uninstalled modules.
    *
    * @see \Drupal\module_autoload_test\SomeClass
    */
   public function testClassLoadingDisabledModules(): void {
-    // Enable the module_test and module_autoload_test modules.
+    // Install the module_test and module_autoload_test modules.
     \Drupal::service('module_installer')->install(['module_test', 'module_autoload_test'], FALSE);
     $this->resetAll();
-    // Ensure that module_autoload_test is disabled.
+    // Ensure that module_autoload_test is uninstalled.
     $this->container->get('module_installer')->uninstall(['module_autoload_test'], FALSE);
     $this->resetAll();
     // Check twice to test an unprimed and primed system_list() cache.

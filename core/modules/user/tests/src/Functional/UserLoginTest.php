@@ -160,7 +160,7 @@ class UserLoginTest extends BrowserTestBase {
     $this->assertFalse($password_hasher->needsRehash($account->getPassword()));
 
     // The current hashing cost is set to 10 in the container. Increase cost by
-    // one, by enabling a module containing the necessary container changes.
+    // one, by installing a module containing the necessary container changes.
     \Drupal::service('module_installer')->install(['user_custom_pass_hash_params_test']);
     $this->resetAll();
     // Reload the hashing service after container changes.

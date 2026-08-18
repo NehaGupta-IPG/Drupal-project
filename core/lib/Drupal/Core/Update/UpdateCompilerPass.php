@@ -22,7 +22,7 @@ class UpdateCompilerPass implements CompilerPassInterface {
     $process_aliases = FALSE;
     // Loop over the defined services and remove any with unmet dependencies.
     // The kernel cannot be booted if the container has such services. This
-    // allows modules to run their update hooks to enable newly added
+    // allows modules to run their update hooks to add newly required
     // dependencies.
     do {
       $has_changed = FALSE;

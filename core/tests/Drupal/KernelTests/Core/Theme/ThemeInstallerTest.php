@@ -162,7 +162,7 @@ class ThemeInstallerTest extends KernelTestBase {
   }
 
   /**
-   * Tests installing a theme with the same name as an enabled module.
+   * Tests installing a theme with the same name as an installed module.
    */
   public function testInstallThemeSameNameAsModule(): void {
     $name = 'name_collision_test';

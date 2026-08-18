@@ -40,7 +40,7 @@ class FieldImportCreateTest extends FieldKernelTestBase {
     // Create a second bundle for the 'Entity test' entity type.
     EntityTestHelper::createBundle('test_bundle');
 
-    // Enable field_test_config module and check that the field and storage
+    // Install field_test_config module and check that the field and storage
     // shipped in the module's default config were created.
     \Drupal::service('module_installer')->install(['field_test_config']);
 

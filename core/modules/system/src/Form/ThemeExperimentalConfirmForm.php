@@ -12,7 +12,7 @@ use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Builds a confirmation form for enabling experimental themes.
+ * Builds a confirmation form for installing experimental themes.
  *
  * @internal
  */

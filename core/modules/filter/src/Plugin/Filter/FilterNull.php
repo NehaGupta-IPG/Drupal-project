@@ -12,7 +12,7 @@ use Drupal\filter\Plugin\FilterInterface;
  * Provides a fallback placeholder filter to use for missing filters.
  *
  * The filter system uses this filter to replace missing filters (for example,
- * if a filter module has been disabled) that are still part of defined text
+ * if a filter module has been uninstalled) that are still part of defined text
  * formats. It returns an empty string.
  */
 #[Filter(

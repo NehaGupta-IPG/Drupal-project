@@ -73,26 +73,26 @@ class EntityDefaultLanguageTest extends KernelTestBase {
     $node = $this->createNode('content_es', 'en');
     $this->assertEquals('en', $node->langcode->value);
 
-    // Disable language module.
+    // Uninstall language module.
     $this->disableModules(['language']);
 
-    // With language module disabled, and a content type that is configured to
+    // With language module uninstalled, and a content type that is configured to
     // have no language specified by default, a new node of this content type
     // will have site's default language code when language is not specified.
     $node = $this->createNode('content_und');
     $this->assertEquals('en', $node->langcode->value);
-    // With language module disabled, and a content type that is configured to
+    // With language module uninstalled, and a content type that is configured to
     // have no language specified by default, a new node of this type will have
     // "es" language code when language "es" is specified.
     $node = $this->createNode('content_und', 'es');
     $this->assertEquals('es', $node->langcode->value);
 
-    // With language module disabled, and a content type that is configured to
+    // With language module uninstalled, and a content type that is configured to
     // have language "es" by default, a new node of this type will have site's
     // default language code when language is not specified.
     $node = $this->createNode('content_es');
     $this->assertEquals('en', $node->langcode->value);
-    // With language module disabled, and a content type that is configured to
+    // With language module uninstalled, and a content type that is configured to
     // have language "es" by default, a new node of this type will have "en"
     // language code when language "en" is specified.
     $node = $this->createNode('content_es', 'en');

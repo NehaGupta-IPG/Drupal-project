@@ -55,7 +55,7 @@ class FieldHelpTest extends BrowserTestBase {
     // Visit the Help page and make sure no warnings or notices are thrown.
     $this->drupalGet('admin/help/field');
 
-    // Enable the Options, Email and Field API Test modules.
+    // Install the Options, Email and Field API Test modules.
     \Drupal::service('module_installer')->install(['options', 'field_test']);
 
     $this->drupalGet('admin/help/field');

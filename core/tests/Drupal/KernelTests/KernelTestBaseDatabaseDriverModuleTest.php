@@ -57,7 +57,7 @@ class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
   }
 
   /**
-   * Tests database driver module enabled.
+   * Tests database driver module installed.
    *
    * @legacy-covers ::bootEnvironment
    */
@@ -67,7 +67,7 @@ class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
       $this->markTestSkipped("This test does not support the {$driver} database driver.");
     }
 
-    // Test that the module that is providing the database driver is enabled.
+    // Test that the module that is providing the database driver is installed.
     $this->assertSame(1, \Drupal::service('extension.list.module')->get('driver_test')->status);
   }
 

@@ -5,7 +5,7 @@ namespace Drupal\Core\Config;
 use Drupal\Core\Extension\ExtensionDiscovery;
 
 /**
- * Storage to access configuration and schema in enabled extensions.
+ * Storage to access configuration and schema in installed extensions.
  *
  * @see \Drupal\Core\Config\ConfigInstaller
  * @see \Drupal\Core\Config\TypedConfigManager
@@ -20,7 +20,7 @@ class ExtensionInstallStorage extends InstallStorage {
   protected $configStorage;
 
   /**
-   * Flag to include the profile in the list of enabled modules.
+   * Flag to include the profile in the list of installed modules.
    *
    * @var bool
    */
@@ -39,7 +39,7 @@ class ExtensionInstallStorage extends InstallStorage {
    * Overrides \Drupal\Core\Config\InstallStorage::__construct().
    *
    * @param \Drupal\Core\Config\StorageInterface $config_storage
-   *   The active configuration store where the list of enabled modules and
+   *   The active configuration store where the list of installed modules and
    *   themes is stored.
    * @param string $directory
    *   The directory to scan in each extension to scan for files.
@@ -74,7 +74,7 @@ class ExtensionInstallStorage extends InstallStorage {
   /**
    * Returns a map of all config object names and their folders.
    *
-   * The list is based on enabled modules and themes. The active configuration
+   * The list is based on installed modules and themes. The active configuration
    * storage is used rather than \Drupal\Core\Extension\ModuleHandler and
    *  \Drupal\Core\Extension\ThemeHandler in order to resolve circular
    * dependencies between these services and \Drupal\Core\Config\ConfigInstaller

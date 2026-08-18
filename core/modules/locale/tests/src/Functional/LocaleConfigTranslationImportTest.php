@@ -43,7 +43,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     // (test.af.po) has been prepared with a configuration translation.
     ConfigurableLanguage::createFromLangcode('af')->save();
 
-    // Enable locale module.
+    // Install locale module.
     $this->container->get('module_installer')->install(['locale']);
     $this->resetAll();
 
@@ -54,7 +54,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
       ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
       ->save();
 
-    // Add translation permissions now that the locale module has been enabled.
+    // Add translation permissions now that the locale module has been installed.
     $edit = [
       'authenticated[translate interface]' => 'translate interface',
     ];
@@ -109,7 +109,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
    */
   public function testConfigTranslationModuleInstall(): void {
 
-    // Enable locale, block and config_translation modules.
+    // Install locale, block and config_translation modules.
     $this->container->get('module_installer')->install(['block', 'config_translation']);
     $this->resetAll();
 
@@ -185,7 +185,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
    * Tests removing a string from Locale deletes configuration translations.
    */
   public function testLocaleRemovalAndConfigOverrideDelete(): void {
-    // Enable the locale module.
+    // Install the locale module.
     $this->container->get('module_installer')->install(['locale']);
     $this->resetAll();
 
@@ -231,7 +231,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
    * Tests removing a string from Locale changes configuration translations.
    */
   public function testLocaleRemovalAndConfigOverridePreserve(): void {
-    // Enable the locale module.
+    // Install the locale module.
     $this->container->get('module_installer')->install(['locale']);
     $this->resetAll();
 
@@ -345,7 +345,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     $module_installer->install(['locale_test_translate']);
     $this->resetAll();
 
-    // Verify that enabling the "locale_test_translate" module didn't cause
+    // Verify that installing the "locale_test_translate" module didn't cause
     // the string translation to be overwritten.
     $translation = $local_storage->findTranslation([
       'source' => $source_string,

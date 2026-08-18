@@ -97,7 +97,7 @@ class ToolbarCacheContextsTest extends BrowserTestBase {
     $this->assertToolbarCacheContexts(['user.permissions'], 'Expected cache contexts found with contextual module enabled.');
     \Drupal::service('module_installer')->uninstall(['contextual']);
 
-    // Test with the comment module enabled.
+    // Test with the comment module installed.
     $this->installExtraModules(['comment']);
     $this->adminUser2 = $this->drupalCreateUser(array_merge($this->perms, ['access comments']));
     $this->assertToolbarCacheContexts(['user.permissions'], 'Expected cache contexts found with comment module enabled.');

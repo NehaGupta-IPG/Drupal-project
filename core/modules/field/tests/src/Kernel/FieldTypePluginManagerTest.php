@@ -92,7 +92,7 @@ class FieldTypePluginManagerTest extends FieldKernelTestBase {
    * Tests all field items provide an existing main property.
    */
   public function testMainProperty(): void {
-    // Let's enable all Drupal modules in Drupal core, so we test any field
+    // Let's install all Drupal modules in Drupal core, so we test any field
     // type plugin.
     $this->enableAllCoreModules();
 
@@ -127,7 +127,7 @@ class FieldTypePluginManagerTest extends FieldKernelTestBase {
   }
 
   /**
-   * Enable all core modules.
+   * Install all core modules.
    */
   protected function enableAllCoreModules(): void {
     $listing = new ExtensionDiscovery($this->root);

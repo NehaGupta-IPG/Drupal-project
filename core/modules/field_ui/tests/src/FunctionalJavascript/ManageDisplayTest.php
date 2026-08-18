@@ -265,7 +265,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     // display component.
     \Drupal::service('module_installer')->uninstall(['field_third_party_test']);
 
-    // Ensure the button is still there after the module has been disabled.
+    // Ensure the button is still there after the module has been uninstalled.
     $this->drupalGet($manage_display);
     $this->assertTrue($field_test_settings->isVisible());
 

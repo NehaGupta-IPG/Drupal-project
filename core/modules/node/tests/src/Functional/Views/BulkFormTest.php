@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class BulkFormTest extends NodeTestBase {
 
   /**
-   * Modules to be enabled.
+   * Modules to be installed.
    *
    * @var array
    */

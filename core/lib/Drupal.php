@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * The container is built by the kernel and passed in to this class which stores
  * it statically. The container always contains the services from
- * \Drupal\Core\CoreServiceProvider, the service providers of enabled modules
+ * \Drupal\Core\CoreServiceProvider, the service providers of installed modules
  * and any other service providers defined in
  * $GLOBALS['conf']['container_service_providers'].
  *
@@ -104,7 +104,7 @@ class Drupal {
    * Below this version:
    * - The installer cannot be run.
    * - Updates cannot be run.
-   * - Modules and themes cannot be enabled.
+   * - Modules and themes cannot be installed.
    * - If a site managed to bypass all of the above, then an error is shown in
    *   the status report and various fatal errors occur on various pages.
    *

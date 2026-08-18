@@ -347,9 +347,9 @@ class ConfigInstaller implements ConfigInstallerInterface {
       }
       else {
         // Allow install profiles to provide overridden configuration for new
-        // extensions that are being enabled after Drupal has already been
-        // installed. This allows profiles to ship new extensions in version
-        // updates without requiring additional code to apply the overrides.
+        // extensions that are installed after the initial site installation.
+        // This allows profiles to ship new extensions in version updates
+        // without requiring additional code to apply the overrides.
         $data = $profile_overrides + $data;
       }
     }
@@ -404,7 +404,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
         // configuration entities can have dependencies on modules that are
         // not yet enabled. This approach means that any code that expects
         // default configuration entities to exist will be unstable after the
-        // module has been enabled and before the config entity has been
+        // module has been installed and before the config entity has been
         // imported.
         if ($this->isSyncing()) {
           continue;
@@ -443,7 +443,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
    */
   public function installCollectionDefaultConfig($collection) {
     $storage = new ExtensionInstallStorage($this->getActiveStorages(StorageInterface::DEFAULT_COLLECTION), InstallStorage::CONFIG_INSTALL_DIRECTORY, $collection, InstallerKernel::installationAttempted(), $this->installProfile);
-    // Only install configuration for enabled extensions.
+    // Only install configuration for installed extensions.
     $enabled_extensions = $this->getEnabledExtensions();
     $config_to_install = array_filter($storage->listAll(), function ($config_name) use ($enabled_extensions) {
       $provider = mb_substr($config_name, 0, strpos($config_name, '.'));
@@ -560,7 +560,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
 
     foreach ($names as $name) {
       $autoloader_paths[$name] = \Drupal::root() . '/' . $this->extensionPathResolver->getPath($type, $name);
-      // Add the extension that will be enabled to the list of enabled
+      // Add the extension that will be installed to the list of installed
       // extensions.
       $enabled_extensions[] = $name;
 
@@ -620,7 +620,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
    * @param \Drupal\Core\Config\StorageInterface $storage
    *   The storage containing the default configuration.
    * @param array $enabled_extensions
-   *   A list of all the currently enabled modules and themes.
+   *   A list of all the currently installed modules and themes.
    * @param \Drupal\Core\Config\StorageInterface[] $profile_storages
    *   An array of storage interfaces containing profile configuration to check
    *   for overrides.
@@ -656,7 +656,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
    * @param array $data
    *   Configuration data.
    * @param array $enabled_extensions
-   *   A list of all the currently enabled modules and themes.
+   *   A list of all the currently installed modules and themes.
    * @param array $all_config
    *   A list of all the active configuration names.
    *
@@ -682,7 +682,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
    * @param array $data
    *   Configuration data.
    * @param array $enabled_extensions
-   *   A list of all the currently enabled modules and themes.
+   *   A list of all the currently installed modules and themes.
    * @param array $all_config
    *   A list of all the active configuration names.
    *
@@ -728,13 +728,13 @@ class ConfigInstaller implements ConfigInstallerInterface {
   }
 
   /**
-   * Gets the list of enabled extensions including both modules and themes.
+   * Gets the list of installed extensions including both modules and themes.
    *
    * @return array
-   *   A list of enabled extensions which includes both modules and themes.
+   *   A list of installed extensions which includes both modules and themes.
    */
   protected function getEnabledExtensions() {
-    // Read enabled extensions directly from configuration to avoid circular
+    // Read installed extensions directly from configuration to avoid circular
     // dependencies on ModuleHandler and ThemeHandler.
     $extension_config = $this->configFactory->get('core.extension');
     $enabled_extensions = (array) $extension_config->get('module');

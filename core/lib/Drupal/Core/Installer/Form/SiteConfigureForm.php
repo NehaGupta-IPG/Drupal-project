@@ -254,7 +254,7 @@ class SiteConfigureForm extends ConfigFormBase {
 
     $account_values = $form_state->getValue('account');
 
-    // Enable update.module if this option was selected.
+    // Install update.module if this option was selected.
     $update_status_module = $form_state->getValue('enable_update_status_module');
     if (empty($install_state['config_install_path']) && $update_status_module) {
       $this->moduleInstaller->install(['update']);

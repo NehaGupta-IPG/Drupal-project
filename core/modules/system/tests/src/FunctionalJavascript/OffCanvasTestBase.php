@@ -56,13 +56,13 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
   }
 
   /**
-   * Enables a theme.
+   * Installs a theme.
    *
    * @param string $theme
    *   The theme.
    */
   protected function enableTheme($theme) {
-    // Enable the theme.
+    // Install the theme.
     \Drupal::service('theme_installer')->install([$theme]);
     $theme_config = \Drupal::configFactory()->getEditable('system.theme');
     $theme_config->set('default', $theme);

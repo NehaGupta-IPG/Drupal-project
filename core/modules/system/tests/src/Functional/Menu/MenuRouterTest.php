@@ -38,7 +38,7 @@ class MenuRouterTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    // Enable dummy module that implements hook_menu.
+    // Install dummy module that implements hook_menu.
     parent::setUp();
 
     $this->drupalPlaceBlock('system_menu_block:tools');

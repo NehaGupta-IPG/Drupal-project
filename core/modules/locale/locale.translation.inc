@@ -54,11 +54,10 @@ const LOCALE_TRANSLATION_SOURCE_COMPARE_GT = 1;
  * interface translations.
  *
  * For full functionality this function depends on the Update Status module.
- * When the Update Status module is enabled the project data will contain the
- * most recent module status; both in enabled status as in version. When the
- * Update Status module is disabled this function will return the last known
- * module state. The status will only be updated once the Update Status module
- * is enabled.
+ * When the Update Status module is installed, the project data will contain the
+ * most recent module installation status and version. When the Update Status
+ * module is uninstalled, this function will return the last known module state.
+ * The status will only be updated once the Update Status module is installed.
  *
  * @param array $project_names
  *   Array of names of the projects to get.

@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Test enabling content translation module.
+ * Test installing the Content Translation module.
  */
 #[Group('content_translation')]
 #[Group('#slow')]
@@ -42,7 +42,7 @@ class ContentTranslationEnableTest extends BrowserTestBase {
       'administer content types',
     ]);
     $this->drupalLogin($this->rootUser);
-    // Enable modules and make sure the related config entity type definitions
+    // Install modules and make sure the related config entity type definitions
     // are installed.
     $edit = [
       'modules[content_translation][enable]' => TRUE,

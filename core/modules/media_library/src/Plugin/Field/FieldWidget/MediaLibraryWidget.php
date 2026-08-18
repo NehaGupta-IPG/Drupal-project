@@ -636,7 +636,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     }
 
     // Show a message for privileged users to configure the field if the Field
-    // UI module is not enabled.
+    // UI module is not installed.
     if (!$this->moduleHandler->moduleExists('field_ui')) {
       return $this->t('There are no allowed media types configured for this field. Edit the field settings to select the allowed media types.');
     }
