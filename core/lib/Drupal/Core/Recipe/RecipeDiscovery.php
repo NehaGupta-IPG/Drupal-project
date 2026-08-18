@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Core\Recipe;
 
 use Composer\InstalledVersions;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Drupal\Core\Utility\Error;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Discovers recipes at specific locations in the file system.
@@ -32,62 +33,42 @@ use Symfony\Component\Finder\Finder;
  * @internal
  *   This API is experimental.
  */
-final class RecipeDiscovery extends Finder implements LoggerAwareInterface {
+final class RecipeDiscovery {
 
-  use LoggerAwareTrait;
+  private static ?string $recipesDirectory = NULL;
 
-  /**
-   * The directory for core recipes.
-   */
-  protected const string CORE_RECIPES_DIRECTORY = 'core/recipes';
-
-  /**
-   * Constructs a recipe discovery object.
-   *
-   * @param string|null $recipesDirectory
-   *   (optional) A path containing directories that contain a recipe.yml file.
-   *   There will be no further traversal into the directory tree.
-   * @param bool $includeCoreRecipes
-   *   (optional) Whether to include recipes provided by core.
-   * @param bool $skipInvalid
-   *   (optional) Whether recipes that have validation errors should be
-   *   ignored.
-   *
-   * @throws \LogicException
-   *   Thrown when no recipes directory is provided, core recipes are excluded,
-   *   and no recipe install path is configured in the root composer.json file.
-   */
-  public function __construct(
-    private readonly ?string $recipesDirectory = NULL,
-    private readonly bool $includeCoreRecipes = TRUE,
-    private readonly bool $skipInvalid = FALSE,
-  ) {
-    parent::__construct();
-    $directoriesToSearch = [];
-
-    if ($includeCoreRecipes) {
-      $directoriesToSearch[] = \Drupal::root() . DIRECTORY_SEPARATOR . self::CORE_RECIPES_DIRECTORY;
+  public static function create(?string $directory = NULL, bool $include_core = TRUE, bool $skip_invalid = TRUE, ?LoggerInterface $logger = NULL): Finder {
+    $directories = [
+      $directory ?? self::getComposerRecipesDirectory(),
+    ];
+    if ($include_core) {
+      // Drupal boots in the web root, so this is guaranteed to be the location
+      // of core recipes.
+      $directories[] = 'core/recipes';
     }
 
-    // If no custom recipes directory was specified, default to the composer
-    // recipe installer path, if any.
-    $recipesDirectory ??= self::getComposerRecipesDirectory();
-    if ($recipesDirectory) {
-      assert(is_dir($recipesDirectory));
-      $directoriesToSearch[] = $recipesDirectory;
-    }
-
-    if (empty($directoriesToSearch)) {
-      throw new \LogicException('If no recipe install path is configured in your root composer.json file, you must either provide a custom recipes directory or include core recipes.');
-    }
-
-    $this
+    return Finder::create()
       ->files()
       ->name('recipe.yml')
       ->depth(1)
       ->followLinks()
-      ->in($directoriesToSearch);
-
+      ->in($directories)
+      ->filter(function (SplFileInfo $file) use ($skip_invalid, $logger): bool {
+        try {
+          Recipe::createFromDirectory($file->getPath());
+        }
+        catch (\Throwable $e) {
+          // If we're ignoring invalid recipes, log the exception.
+          if ($skip_invalid) {
+            if ($logger) {
+              Error::logException($logger, $e);
+            }
+            return FALSE;
+          }
+          throw $e;
+        }
+        return TRUE;
+      });
   }
 
   /**
@@ -101,9 +82,8 @@ final class RecipeDiscovery extends Finder implements LoggerAwareInterface {
    */
   public static function getComposerRecipesDirectory(): ?string {
     // This is expensive to compute, and very unlikely to change in a request.
-    static $recipesDirectory;
-    if (isset($recipesDirectory)) {
-      return $recipesDirectory;
+    if (isset(self::$recipesDirectory)) {
+      return self::$recipesDirectory;
     }
 
     ['install_path' => $project_root] = InstalledVersions::getRootPackage();
@@ -119,19 +99,9 @@ final class RecipeDiscovery extends Finder implements LoggerAwareInterface {
       fn (array $criteria): bool => in_array('type:' . Recipe::COMPOSER_PROJECT_TYPE, $criteria, TRUE),
     );
     if ($directory) {
-      $recipesDirectory = $project_root . DIRECTORY_SEPARATOR . $directory;
+      return self::$recipesDirectory = $project_root . DIRECTORY_SEPARATOR . $directory;
     }
-    return $recipesDirectory;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getIterator(): \Iterator {
-    $iterator = parent::getIterator();
-    $iterator = new RecipeDiscoveryFilterIterator($iterator, $this->skipInvalid, $this->logger);
-
-    return $iterator;
+    throw new \RuntimeException("No recipe install location is configured in $file.");
   }
 
 }
