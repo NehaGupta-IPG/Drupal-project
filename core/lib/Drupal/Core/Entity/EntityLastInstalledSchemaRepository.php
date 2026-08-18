@@ -66,15 +66,22 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
       return $this->entityTypeDefinitions[$entity_type_id];
     }
 
-    $this->entityTypeDefinitions[$entity_type_id] = $this->keyValueFactory->get('entity.definitions.installed')->get($entity_type_id . '.entity_type');
-    $this->cacheBackend->set($cid, $this->entityTypeDefinitions[$entity_type_id]);
-    return $this->entityTypeDefinitions[$entity_type_id];
+    // Load all entity schema definitions to avoid having to load individual
+    // ones later.
+    $this->getLastInstalledDefinitions();
+    // An entity type ID might be requested which is not yet installed.
+    $definition = $this->entityTypeDefinitions[$entity_type_id] ?? [];
+    $this->cacheBackend->set($cid, $definition);
+    return $definition;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getLastInstalledDefinitions() {
+    if (isset($this->entityTypeDefinitions)) {
+      return $this->entityTypeDefinitions;
+    }
     $all_definitions = $this->keyValueFactory->get('entity.definitions.installed')->getAll();
 
     // Filter out field storage definitions.
@@ -89,6 +96,12 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
       $parts = explode('.', $key);
       return $parts[0];
     }, $keys);
+
+    // Prime the last installed field storage definitions too in case they are
+    // requested later.
+    foreach ($keys as $key) {
+      $this->entityFieldStorageDefinitions[$key] = $all_definitions[$key . '.field_storage_definitions'] ?? [];
+    }
 
     $this->entityTypeDefinitions = array_combine($keys, $entity_type_definitions);
     return $this->entityTypeDefinitions;
@@ -133,10 +146,12 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
       $this->entityFieldStorageDefinitions[$entity_type_id] = $cache->data;
       return $cache->data;
     }
-    $definitions = $this->keyValueFactory->get('entity.definitions.installed')->get($entity_type_id . '.field_storage_definitions', []);
-    $this->entityFieldStorageDefinitions[$entity_type_id] = $definitions;
-    $this->cacheBackend->set($entity_type_id . '.field_storage_definitions.installed', $definitions, Cache::PERMANENT);
-    return $definitions;
+    $this->getLastInstalledDefinitions();
+    if (isset($this->entityFieldStorageDefinitions[$entity_type_id])) {
+      $this->cacheBackend->set($entity_type_id . '.field_storage_definitions.installed', $this->entityFieldStorageDefinitions[$entity_type_id], Cache::PERMANENT);
+      return $this->entityFieldStorageDefinitions[$entity_type_id];
+    }
+    return [];
   }
 
   /**
@@ -144,6 +159,7 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
    */
   public function setLastInstalledFieldStorageDefinitions($entity_type_id, array $storage_definitions) {
     $this->keyValueFactory->get('entity.definitions.installed')->set($entity_type_id . '.field_storage_definitions', $storage_definitions);
+    $this->entityTypeDefinitions = NULL;
     unset($this->entityFieldStorageDefinitions[$entity_type_id]);
     $this->cacheBackend->delete($entity_type_id . '.field_storage_definitions.installed');
   }
@@ -153,6 +169,7 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
    */
   public function setLastInstalledFieldStorageDefinition(FieldStorageDefinitionInterface $storage_definition) {
     $entity_type_id = $storage_definition->getTargetEntityTypeId();
+    $this->entityTypeDefinitions = NULL;
     unset($this->entityFieldStorageDefinitions[$entity_type_id]);
     $definitions = $this->getLastInstalledFieldStorageDefinitions($entity_type_id);
     $definitions[$storage_definition->getName()] = $storage_definition;
@@ -165,6 +182,7 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
   public function deleteLastInstalledFieldStorageDefinition(FieldStorageDefinitionInterface $storage_definition) {
     $entity_type_id = $storage_definition->getTargetEntityTypeId();
     $definitions = $this->getLastInstalledFieldStorageDefinitions($entity_type_id);
+    $this->entityTypeDefinitions = NULL;
     unset($definitions[$storage_definition->getName()]);
     unset($this->entityFieldStorageDefinitions[$entity_type_id]);
     $this->setLastInstalledFieldStorageDefinitions($entity_type_id, $definitions);
