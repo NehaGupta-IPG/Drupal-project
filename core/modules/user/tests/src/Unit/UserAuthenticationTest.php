@@ -79,6 +79,15 @@ class UserAuthenticationTest extends UnitTestCase {
   }
 
   /**
+   * Reinitializes the password service as a mock object.
+   */
+  protected function setUpMockPasswordService(): void {
+    $this->passwordService = $this->createMock(PasswordInterface::class);
+    $reflection = new \ReflectionProperty($this->userAuth, 'passwordChecker');
+    $reflection->setValue($this->userAuth, $this->passwordService);
+  }
+
+  /**
    * Tests lookupAccount() with a valid username.
    */
   public function testLookupAccountWithValidUsername(): void {
@@ -104,6 +113,8 @@ class UserAuthenticationTest extends UnitTestCase {
    * Tests the authenticate method with an incorrect password.
    */
   public function testAuthenticateWithIncorrectPassword(): void {
+    $this->setUpMockPasswordService();
+
     $account = $this->createStub(User::class);
     $account
       ->method('getPassword')
@@ -127,6 +138,8 @@ class UserAuthenticationTest extends UnitTestCase {
    * Tests the authenticate method with a correct password.
    */
   public function testAuthenticateWithCorrectPassword(): void {
+    $this->setUpMockPasswordService();
+
     $account = $this->createStub(User::class);
     $account
       ->method('getPassword')
@@ -153,6 +166,8 @@ class UserAuthenticationTest extends UnitTestCase {
    * this regression can't happen again.
    */
   public function testAuthenticateWithZeroPassword(): void {
+    $this->setUpMockPasswordService();
+
     $account = $this->createStub(User::class);
     $account
       ->method('getPassword')
@@ -176,6 +191,8 @@ class UserAuthenticationTest extends UnitTestCase {
    * Tests the authenticate method with a correct password & new password hash.
    */
   public function testAuthenticateWithCorrectPasswordAndNewPasswordHash(): void {
+    $this->setUpMockPasswordService();
+
     $testUser = $this->createPartialMock(User::class, ['id', 'setPassword', 'save', 'getPassword']);
 
     $testUser
