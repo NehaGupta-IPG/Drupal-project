@@ -42,7 +42,11 @@ class StateTransitionValidation implements StateTransitionValidationInterface {
    */
   public function getValidTransitions(ContentEntityInterface $entity, AccountInterface $user) {
     $workflow = $this->moderationInfo->getWorkflowForEntity($entity);
-    $current_state = $entity->moderation_state->value ? $workflow->getTypePlugin()->getState($entity->moderation_state->value) : $workflow->getTypePlugin()->getInitialState($entity);
+    $workflow_type = $workflow->getTypePlugin();
+    $moderation_state = $entity->moderation_state->value;
+    $current_state = $moderation_state && $workflow_type->hasState($moderation_state)
+      ? $workflow_type->getState($moderation_state)
+      : $workflow_type->getInitialState($entity);
 
     return array_filter($current_state->getTransitions(), function (Transition $transition) use ($workflow, $user) {
       return $user->hasPermission('use ' . $workflow->id() . ' transition ' . $transition->id());

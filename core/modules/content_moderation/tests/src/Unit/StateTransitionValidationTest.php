@@ -99,6 +99,26 @@ class StateTransitionValidationTest extends UnitTestCase {
   }
 
   /**
+   * Falls back to the initial state when the entity's state no longer exists.
+   */
+  public function testValidTransitionsWithDeletedState(): void {
+    $user = $this->prophesize(AccountInterface::class);
+    $user->hasPermission(Argument::type('string'))->willReturn(TRUE);
+
+    $entity = $this->prophesize(ContentEntityInterface::class);
+    $entity = $entity->reveal();
+    $entity->moderation_state = new \stdClass();
+    $entity->moderation_state->value = 'archived';
+
+    $moderation_info = $this->prophesize(ModerationInformationInterface::class);
+    $moderation_info->getWorkflowForEntity($entity)->willReturn($this->workflow);
+
+    $validator = new StateTransitionValidation($moderation_info->reveal());
+    $transitions = $validator->getValidTransitions($entity, $user->reveal());
+    $this->assertNotEmpty($transitions);
+  }
+
+  /**
    * Data provider for the user transition test.
    */
   public static function userTransitionsProvider(): array {
