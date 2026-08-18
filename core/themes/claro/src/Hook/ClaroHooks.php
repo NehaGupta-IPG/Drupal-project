@@ -1290,27 +1290,6 @@ class ClaroHooks {
   }
 
   /**
-   * Implements hook_preprocess_HOOK() for fieldset__media_library_widget.
-   *
-   * @todo Remove this when https://www.drupal.org/project/drupal/issues/2999549
-   *   lands.
-   *
-   * @see \Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::formElement()
-   */
-  #[Hook('preprocess_fieldset__media_library_widget')]
-  public function preprocessFieldsetMediaLibraryWidget(array &$variables): void {
-    if (isset($variables['prefix']['weight_toggle'])) {
-      $variables['prefix']['weight_toggle']['#attributes']['class'][] = 'action-link';
-      $variables['prefix']['weight_toggle']['#attributes']['class'][] = 'action-link--extrasmall';
-      $variables['prefix']['weight_toggle']['#attributes']['class'][] = 'action-link--icon-show';
-      $variables['prefix']['weight_toggle']['#attributes']['class'][] = 'media-library-widget__toggle-weight';
-    }
-    if (isset($variables['suffix']['open_button'])) {
-      $variables['suffix']['open_button']['#attributes']['class'][] = 'media-library-open-button';
-    }
-  }
-
-  /**
    * Implements hook_views_pre_render().
    */
   #[Hook('views_pre_render')]
