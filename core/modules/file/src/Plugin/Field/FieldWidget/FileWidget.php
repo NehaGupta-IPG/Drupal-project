@@ -402,7 +402,7 @@ class FileWidget extends WidgetBase {
         '#title' => new TranslatableMarkup('Include file in display'),
         '#attributes' => [
           'class' => ['file-display'],
-          'aria-label' => (string) new TranslatableMarkup('Include file in display'),
+          'aria-label' => new TranslatableMarkup('Include file in display'),
         ],
       ];
       if (isset($item['display'])) {
