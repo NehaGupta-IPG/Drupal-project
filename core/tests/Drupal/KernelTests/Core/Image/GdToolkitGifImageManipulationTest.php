@@ -31,7 +31,9 @@ class GdToolkitGifImageManipulationTest extends GdToolkitImageManipulationTestBa
     $ret = parent::providerOperationTestCases();
 
     if (array_key_exists('rotate_transparent_5', $ret)) {
-      $ret['rotate_transparent_5'][3]['corners'][0] = [255, 93, 0, 46];
+      // On PHP 8.6+ the enlarged rotation canvas puts the corner sample on
+      // the transparent background, black in the GIF palette.
+      $ret['rotate_transparent_5'][3]['corners'][0] = PHP_VERSION_ID >= 80600 ? [0, 0, 0, 127] : [255, 93, 0, 46];
     }
 
     return $ret;

@@ -47,6 +47,12 @@ class GdToolkitNoTransparencyGifImageManipulationTest extends GdToolkitImageMani
       }
     }
 
+    if (PHP_VERSION_ID >= 80600 && array_key_exists('rotate_transparent_5', $ret)) {
+      // On PHP 8.6+ the enlarged rotation canvas puts the corner sample on
+      // the transparent background, black in the GIF palette.
+      $ret['rotate_transparent_5'][3]['corners'][0] = [0, 0, 0, 127];
+    }
+
     return $ret;
   }
 
