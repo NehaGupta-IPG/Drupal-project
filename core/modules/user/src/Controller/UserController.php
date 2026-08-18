@@ -454,6 +454,7 @@ class UserController extends ControllerBase {
     name: 'user.cancel_confirm',
     requirements: [
       '_entity_access' => 'user.delete',
+      '_csrf_token' => 'FALSE',
       'user' => '\d+',
     ],
     defaults: [
