@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
@@ -24,6 +25,15 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
     'language',
     'config_test',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function register(ContainerBuilder $container): void {
+    parent::register($container);
+    // Override the translate_english parameter to TRUE for this test.
+    $container->setParameter('language.translate_english', TRUE);
+  }
 
   /**
    * {@inheritdoc}
