@@ -36,9 +36,11 @@ class RecipeFinderTest extends KernelTestBase {
    * Tests that invalid recipes can be safely skipped, with a log message.
    */
   public function testSkipInvalidRecipe(): void {
-    $finder = new Finder($this->root . '/core/tests/fixtures/recipes', TRUE);
-    $finder->logger = new TestLogger();
-
+    $finder = new Finder(
+      $this->root . '/core/tests/fixtures/recipes',
+      TRUE,
+      new TestLogger(),
+    );
     // Convert to an array so that the generator gets run.
     iterator_to_array($finder);
     $this->assertTrue($finder->logger->hasErrorThatContains('foo: !php/enum Drupal\config_enum_test\DoesNotExistEnumValue::No'));
