@@ -2,6 +2,9 @@
 
 namespace Drupal\Component\Utility;
 
+use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Validation;
+
 /**
  * Helper class URL based methods.
  *
@@ -443,22 +446,17 @@ class UrlHelper {
    */
   public static function isValid($url, $absolute = FALSE) {
     if ($absolute) {
-      return (bool) preg_match("
-        /^                                                      # Start at the beginning of the text
-        (?:ftp|https?|feed):\/\/                                # Look for ftp, http, https or feed schemes
-        (?:                                                     # Userinfo (optional) which is typically
-          (?:(?:[\w\.\-\+!$&'\(\)*\+,;=]|%[0-9a-f]{2})+:)*      # a username or a username and password
-          (?:[\w\.\-\+%!$&'\(\)*\+,;=]|%[0-9a-f]{2})+@          # combination
-        )?
-        (?:
-          (?:[a-z0-9\-\.]|%[0-9a-f]{2})+                        # A domain name or a IPv4 address
-          |(?:\[(?:[0-9a-f]{0,4}:)*(?:[0-9a-f]{0,4})\])         # or a well formed IPv6 address
-        )
-        (?::[0-9]+)?                                            # Server port number (optional)
-        (?:[\/|\?]
-          (?:[\w#!:\.\?\+=&@$'~*,;\/\(\)\[\]\-]|%[0-9a-f]{2})   # The path and query (optional)
-        *)?
-      $/xi", $url);
+      $url_constraint = new Url(
+        protocols: ['ftp', 'http', 'https', 'feed'],
+        relativeProtocol: FALSE,
+      );
+      // Ignore fragments as they are not relevant to the validation.
+      // @todo remove once https://github.com/symfony/symfony/pull/65376 is
+      //   released in a stable version.
+      $url = explode('#', $url)[0];
+      /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
+      $violations = Validation::createValidator()->validate($url, [$url_constraint]);
+      return $violations->count() === 0;
     }
     else {
       return (bool) preg_match("/^(?:[\w#!:\.\?\+=&@$'~*,;\/\(\)\[\]\-]|%[0-9a-f]{2})+$/i", $url);
