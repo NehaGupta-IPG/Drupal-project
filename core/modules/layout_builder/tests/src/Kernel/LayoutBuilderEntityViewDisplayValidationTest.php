@@ -66,10 +66,8 @@ class LayoutBuilderEntityViewDisplayValidationTest extends ConfigEntityValidatio
   /**
    * {@inheritdoc}
    */
-  #[Skip]
+  #[Skip('Temporary: see https://www.drupal.org/node/2939931')]
   public function testLabelValidation(): void {
-    // @todo Remove this override in https://www.drupal.org/i/2939931. The label of Layout Builder's EntityViewDisplay override is computed dynamically, that issue will change this.
-    // @see \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay::label()
   }
 
   /**

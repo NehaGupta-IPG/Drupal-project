@@ -66,7 +66,7 @@ class ManagedStorageTest extends ConfigStorageTestBase implements StorageManager
   /**
    * {@inheritdoc}
    */
-  #[Skip('ManagedStorage cannot be invalid.')]
+  #[Skip('Permanent: see https://www.drupal.org/node/3047812')]
   public function testInvalidStorage(): void {
   }
 

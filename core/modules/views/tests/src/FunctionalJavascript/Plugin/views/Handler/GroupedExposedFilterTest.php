@@ -79,9 +79,8 @@ class GroupedExposedFilterTest extends WebDriverTestBase {
   /**
    * Tests if the right fields are shown and the right values set.
    */
-  #[Skip]
+  #[Skip('Temporary: see https://www.drupal.org/node/3028968')]
   public function testGroupedFilterValuesUI(): void {
-    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/project/drupal/issues/3028968.
     $web_assert = $this->assertSession();
 
     $this->drupalGet('/admin/structure/views/view/test_exposed_admin_ui');

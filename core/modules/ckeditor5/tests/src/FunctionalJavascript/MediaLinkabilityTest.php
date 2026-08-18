@@ -29,9 +29,8 @@ class MediaLinkabilityTest extends MediaTestBase {
    * Ensures arbitrary attributes can be added on links wrapping media via GHS.
    */
   #[DataProvider('providerLinkability')]
-  #[Skip('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3397387')]
+  #[Skip('Temporary: see https://www.drupal.org/node/3397387')]
   public function testLinkedMediaArbitraryHtml(bool $unrestricted): void {
-    // @todo Fix random test failure.
     $assert_session = $this->assertSession();
 
     $editor = Editor::load('test_format');

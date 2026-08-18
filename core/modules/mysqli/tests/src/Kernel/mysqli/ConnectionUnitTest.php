@@ -19,7 +19,7 @@ class ConnectionUnitTest extends BaseMySqlTest {
   /**
    * Tests pdo options override.
    */
-  #[Skip('mysqli is not a pdo driver.')]
+  #[Skip('Permanent: see https://www.drupal.org/node/3259709')]
   public function testConnectionOpen(): void {
   }
 

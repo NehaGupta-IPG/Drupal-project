@@ -25,7 +25,7 @@ class DatabaseExceptionWrapperTest extends BaseMySqlTest {
    * connection not to emulate statement preparation. Still, this is only valid
    * for the MySql driver.
    */
-  #[Skip('mysqli is not a pdo driver.')]
+  #[Skip('Permanent: see https://www.drupal.org/node/3259709')]
   public function testPrepareStatementFailOnPreparation(): void {
   }
 

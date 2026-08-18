@@ -612,9 +612,8 @@ JS;
   /**
    * Tests the preview displayed by the field widget.
    */
-  #[Skip('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3569225')]
+  #[Skip('Temporary: see https://www.drupal.org/node/3569225')]
   public function testWidgetPreview(): void {
-    // @todo Fix random test failure.
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

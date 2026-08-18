@@ -40,7 +40,7 @@ class DatabaseStorageTest extends StorageTestBase {
   /**
    * Tests asynchronous table creation.
    */
-  #[Skip('Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3398063')]
+  #[Skip('Temporary: see https://www.drupal.org/node/3398063')]
   public function testConcurrent(): void {
     if (!function_exists('pcntl_fork')) {
       $this->markTestSkipped('Requires the pcntl_fork() function');

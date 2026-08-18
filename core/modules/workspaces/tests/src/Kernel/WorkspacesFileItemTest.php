@@ -66,7 +66,7 @@ class WorkspacesFileItemTest extends FileItemTest {
   /**
    * {@inheritdoc}
    */
-  #[Skip("This is already implemented and tested in base class. We don't require in child class.")]
+  #[Skip('Permanent: see https://www.drupal.org/node/2550977')]
   public function testGenerateSampleValue(): void {
   }
 

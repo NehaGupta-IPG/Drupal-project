@@ -10,6 +10,7 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -41,10 +42,6 @@ class TimestampFormatterWithTimeDiffTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    if ($this->name() === 'testNoRefreshInterval') {
-      $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3400150");
-    }
-
     parent::setUp();
 
     FieldStorageConfig::create([
@@ -144,6 +141,7 @@ class TimestampFormatterWithTimeDiffTest extends WebDriverTestBase {
   /**
    * Tests the 'timestamp' formatter without refresh interval.
    */
+  #[Skip('Temporary: see https://www.drupal.org/node/3400150')]
   public function testNoRefreshInterval(): void {
     // Set the refresh interval to zero, meaning "no refresh".
     $display = EntityViewDisplay::load('entity_test.entity_test.default');

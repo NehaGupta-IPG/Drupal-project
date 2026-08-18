@@ -37,7 +37,7 @@ class LruCacheGenericTest extends GenericCacheBackendUnitTestBase {
   /**
    * The LRU memory cache removes items when invalidateTags is called.
    */
-  #[Skip]
+  #[Skip('Permanent: see https://www.drupal.org/node/3308877')]
   public function testInvalidateTags(): void {
   }
 

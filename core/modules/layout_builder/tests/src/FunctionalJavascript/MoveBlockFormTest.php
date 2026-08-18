@@ -100,7 +100,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
   /**
    * Tests moving a block.
    */
-  #[Skip('Skipped temporarily for random fails.')]
+  #[Skip('Temporary: see https://www.drupal.org/node/2918718')]
   public function testMoveBlock(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();

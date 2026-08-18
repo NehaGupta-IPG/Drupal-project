@@ -120,9 +120,8 @@ JS;
    *
    * @see https://www.drupal.org/node/3390178
    */
-  #[Skip]
+  #[Skip('Temporary: see https://www.drupal.org/node/3590200')]
   public function testMultipleReplacements(): void {
-    // @todo re-enable this test in https://www.drupal.org/project/drupal/issues/3590200
     $assert_session = $this->assertSession();
 
     $this->drupalGet(Url::fromRoute('big_pipe_test_multiple_replacements'));

@@ -131,9 +131,8 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    *  - Source: remote and local files
    *  - Import overwrite: all existing translations.
    */
-  #[Skip('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3393477')]
+  #[Skip('Temporary: see https://www.drupal.org/node/3393477')]
   public function testUpdateImportSourceRemote(): void {
-    // @todo Fix random test failure.
     $config = $this->config('locale.settings');
 
     // Build the test environment.

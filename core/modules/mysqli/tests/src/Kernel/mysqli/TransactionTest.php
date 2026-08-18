@@ -27,7 +27,7 @@ class TransactionTest extends DriverSpecificTransactionTestBase {
    * code outside the TransactionManager, that keeps track of the stack of
    * transaction-related operations in its stack.
    */
-  #[Skip('Skipping this while MySQLi cannot detect if a client transaction is active.')]
+  #[Skip('Permanent: see https://www.drupal.org/node/3259709')]
   public function testStartTransactionWhenActive(): void {
     $this->connection->getClientConnection()->begin_transaction();
     $this->connection->startTransaction();
@@ -45,7 +45,7 @@ class TransactionTest extends DriverSpecificTransactionTestBase {
    * code outside the TransactionManager, that keeps track of the stack of
    * transaction-related operations in its stack.
    */
-  #[Skip('Skipping this while MySQLi cannot detect if a client transaction is active.')]
+  #[Skip('Permanent: see https://www.drupal.org/node/3259709')]
   public function testCommitTransactionWhenInactive(): void {
     $transaction = $this->connection->startTransaction();
     $this->assertTrue($this->connection->inTransaction());

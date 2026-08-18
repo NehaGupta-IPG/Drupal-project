@@ -30,7 +30,7 @@ class DeprecatedAssetsTest extends KernelTestBase {
    *   The expected xxHash of the library.
    */
   #[DataProvider('deprecatedLibrariesProvider')]
-  #[Skip('There are currently no deprecated libraries.')]
+  #[Skip('Permanent: see https://www.drupal.org/node/3575462')]
   public function testDeprecatedLibraries(string $extension, string $name, string $deprecation_suffix, string $expected_hashed_library_definition): void {
     /** @var \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery */
     $library_discovery = $this->container->get('library.discovery');

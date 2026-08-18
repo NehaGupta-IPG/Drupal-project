@@ -309,9 +309,8 @@ JS;
   /**
    * Tests ajax focus handling.
    */
-  #[Skip('Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3396536')]
+  #[Skip('Temporary: see https://www.drupal.org/node/3396536')]
   public function testAjaxFocus(): void {
-    // @todo Fix random test failure.
     $this->drupalGet('/ajax_forms_test_get_form');
 
     $this->assertNotNull($select = $this->assertSession()->elementExists('css', '#edit-select'));

@@ -55,7 +55,7 @@ class MemoryStorageTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
-  #[Skip('MemoryStorage cannot be invalid.')]
+  #[Skip('Permanent: see https://www.drupal.org/node/3015886')]
   public function testInvalidStorage(): void {
   }
 

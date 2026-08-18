@@ -57,7 +57,7 @@ class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
-  #[Skip('No-op as this test does not make sense')]
+  #[Skip('Permanent: see https://www.drupal.org/node/3059332')]
   public function testInvalidStorage(): void {
   }
 
