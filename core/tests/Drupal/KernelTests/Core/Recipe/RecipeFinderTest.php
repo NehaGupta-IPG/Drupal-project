@@ -66,7 +66,7 @@ class RecipeFinderTest extends KernelTestBase {
         'installer-paths' => [
           'recipes/{$name}' => ['type:' . Recipe::COMPOSER_PROJECT_TYPE],
         ],
-      ]
+      ],
     ]);
     file_put_contents($temp_dir . '/composer.json', $contents);
 
@@ -78,6 +78,16 @@ class RecipeFinderTest extends KernelTestBase {
     $this->assertContains('Test!', $names);
 
     (new SymfonyFilesystem())->remove($temp_dir);
+  }
+
+  /**
+   * Tests that invalid recipes throw an exception by default.
+   */
+  public function testInvalidRecipesThrow(): void {
+    $finder = new Finder($this->root . '/core/tests/fixtures/recipes');
+    // This is a parse error, so we don't care about the exception type.
+    $this->expectExceptionMessage('foo: !php/enum Drupal\config_enum_test\DoesNotExistEnumValue::No');
+    iterator_to_array($finder);
   }
 
   /**
