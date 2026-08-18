@@ -2883,46 +2883,14 @@ function hook_validation_constraint_alter(array &$definitions) {
  *
  * There are two types of commands:
  *
- * @subsection sec_command_class Extending Symfony's Command class
- * One style extends `\Symfony\Component\Console\Command\Command` and implements
- * `execute()`:
- * @code
- * use Drupal\Component\Datetime\TimeInterface;
- * use Symfony\Component\Console\Attribute\AsCommand;
- * use Symfony\Component\Console\Command\Command;
- * use Symfony\Component\Console\Input\InputInterface;
- * use Symfony\Component\Console\Output\OutputInterface;
- * use Symfony\Component\Console\Style\SymfonyStyle;
- *
- * #[AsCommand(
- *   name: 'my_module:hello',
- *   description: 'Say hello.',
- * )]
- * class HelloCommand extends Command {
- *
- *   public function __construct(
- *     private readonly TimeInterface $time,
- *   ) {
- *     parent::__construct();
- *   }
- *
- *   protected function execute(InputInterface $input, OutputInterface $output): int {
- *     $io = new SymfonyStyle($input, $output);
- *     $now = new \DateTimeImmutable('@' . $this->time->getRequestTime());
- *     $io->success('Hello! The time is ' . $now->format('r'));
- *     return Command::SUCCESS;
- *   }
- *
- * }
- * @endcode
- *
  * @subsection sec_invokable_command Invokable command classes
- * As an alternative, a plain class can define a single `__invoke()` method
- * instead of extending `\Symfony\Component\Console\Command\Command`. Symfony
- * Console attributes such as `#[Argument]`, `#[Option]`, and `#[Ask]` can be
- * applied to individual parameters to declare arguments, options, and
- * interactive prompts, removing the need for a `configure()` method. Drupal
- * services can be injected via the constructor as normal.
+ * The recommended approach is a plain class that defines a single
+ * `__invoke()` method, instead of extending
+ * `\Symfony\Component\Console\Command\Command`. Symfony Console attributes
+ * such as `#[Argument]`, `#[Option]`, and `#[Ask]` can be applied to
+ * individual parameters to declare arguments, options, and interactive
+ * prompts, removing the need for a `configure()` method. Drupal services can
+ * be injected via the constructor as normal.
  * @code
  * use Drupal\Component\Datetime\TimeInterface;
  * use Symfony\Component\Console\Attribute\Argument;
@@ -2952,6 +2920,39 @@ function hook_validation_constraint_alter(array &$definitions) {
  *     $now = new \DateTimeImmutable('@' . $this->time->getRequestTime());
  *     $greeting = "[$now] Hello, $name!";
  *     $output->writeln($shout ? strtoupper($greeting) : $greeting);
+ *     return Command::SUCCESS;
+ *   }
+ *
+ * }
+ * @endcode
+ *
+ * @subsection sec_command_class Extending Symfony's Command class
+ * One style extends `\Symfony\Component\Console\Command\Command` and implements
+ * `execute()`:
+ * @code
+ * use Drupal\Component\Datetime\TimeInterface;
+ * use Symfony\Component\Console\Attribute\AsCommand;
+ * use Symfony\Component\Console\Command\Command;
+ * use Symfony\Component\Console\Input\InputInterface;
+ * use Symfony\Component\Console\Output\OutputInterface;
+ * use Symfony\Component\Console\Style\SymfonyStyle;
+ *
+ * #[AsCommand(
+ *   name: 'my_module:hello',
+ *   description: 'Say hello.',
+ * )]
+ * class HelloCommand extends Command {
+ *
+ *   public function __construct(
+ *     private readonly TimeInterface $time,
+ *   ) {
+ *     parent::__construct();
+ *   }
+ *
+ *   protected function execute(InputInterface $input, OutputInterface $output): int {
+ *     $io = new SymfonyStyle($input, $output);
+ *     $now = new \DateTimeImmutable('@' . $this->time->getRequestTime());
+ *     $io->success('Hello! The time is ' . $now->format('r'));
  *     return Command::SUCCESS;
  *   }
  *
