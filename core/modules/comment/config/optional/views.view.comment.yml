@@ -636,6 +636,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+          accept_null: false
         subject:
           id: subject
           table: comment_field_data
@@ -1450,6 +1451,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+          accept_null: false
         subject:
           id: subject
           table: comment_field_data

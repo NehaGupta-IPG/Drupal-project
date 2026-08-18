@@ -202,6 +202,7 @@ display:
             operator: ''
             operator_limit_selection: false
             operator_list: {  }
+          accept_null: false
         status_node:
           id: status_node
           table: node_field_data
@@ -216,6 +217,7 @@ display:
             operator: ''
             operator_limit_selection: false
             operator_list: {  }
+          accept_null: false
       style:
         type: html_list
         options:

@@ -69,6 +69,7 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
         'relationship' => 'none',
         'operator' => '=',
         'value' => 1,
+        'plugin_id' => 'boolean',
       ],
     ]);
     $default->setOption('sorts', [

@@ -8,6 +8,8 @@ use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Drupal\views\Plugin\views\filter\BooleanOperator;
+use Drupal\views\Plugin\ViewsHandlerManager;
 
 /**
  * Provides a BC layer for modules providing old configurations.
@@ -37,6 +39,8 @@ class ViewsConfigUpdater {
     #[Autowire(service: 'plugin.manager.field.formatter')]
     private readonly PluginManagerInterface $formatterPluginManager,
     protected EntityDisplayRepositoryInterface $entityDisplayRepository,
+    #[Autowire(service: 'plugin.manager.views.filter')]
+    protected ViewsHandlerManager $filterPluginManager,
   ) {
   }
 
@@ -68,8 +72,11 @@ class ViewsConfigUpdater {
    */
   public function updateAll(ViewEntityInterface $view) {
     return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
-      // @todo leaving this here now but new update hooks will need to update.
-      return FALSE;
+      $changed = FALSE;
+      if ($this->processBooleanFilterAcceptNull($handler, $handler_type)) {
+        $changed = TRUE;
+      }
+      return $changed;
     });
   }
 
@@ -131,6 +138,48 @@ class ViewsConfigUpdater {
     }
 
     return $changed;
+  }
+
+  /**
+   * Update boolean filter settings.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View to update.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function needsBooleanFilterAcceptNullUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, TRUE, function (array &$handler, string $handler_type) {
+      return $this->processBooleanFilterAcceptNull($handler, $handler_type);
+    });
+  }
+
+  /**
+   * Processes the boolean filter settings to accept null.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   *   If the filter plugin instance cannot be created.
+   */
+  protected function processBooleanFilterAcceptNull(array &$handler, string $handler_type): bool {
+    if ($handler_type === 'filter' && !isset($handler['accept_null'])) {
+      // Any of the children of the modified classes will also be inheriting
+      // the new settings.
+      $filter_instance = $this->filterPluginManager->getHandler($handler);
+      if ($filter_instance instanceof BooleanOperator) {
+        $handler['accept_null'] = FALSE;
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

@@ -134,11 +134,13 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
       $this->value_value = $this->definition['title'];
     }
 
-    if (isset($this->definition['accept null'])) {
-      $this->accept_null = (bool) $this->definition['accept null'];
-    }
-    elseif (isset($this->definition['accept_null'])) {
-      $this->accept_null = (bool) $this->definition['accept_null'];
+    foreach (['accept_null', 'accept null'] as $key) {
+      foreach ([$this->options, $this->definition] as $array) {
+        if (isset($array[$key])) {
+          $this->accept_null = (bool) $array[$key];
+          break;
+        }
+      }
     }
     $this->valueOptions = NULL;
 
@@ -185,8 +187,23 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
     $options = parent::defineOptions();
 
     $options['value']['default'] = FALSE;
+    $options['accept_null']['default'] = FALSE;
 
     return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function operatorForm(&$form, FormStateInterface $form_state): void {
+    parent::operatorForm($form, $form_state);
+
+    $form['accept_null'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Accept "NULL"'),
+      '#description' => $this->t('Treat a NULL value as false.'),
+      '#default_value' => $this->accept_null,
+    ];
   }
 
   /**
@@ -207,8 +224,12 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
       // Configuring a filter: use radios for clarity.
       $filter_form_type = 'radios';
     }
+
     $display_options = 'all';
-    $source = ':input[name="options[operator]"]';
+    $source = '';
+    if (!empty($form['operator'])) {
+      $source = ':input[name="options[operator]"]';
+    }
     if ($exposed) {
       $identifier = $this->options['expose']['identifier'];
       if (empty($this->options['expose']['use_operator']) || empty($this->options['expose']['operator_id'])) {
@@ -227,6 +248,23 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
         '#default_value' => $this->value,
       ];
       $identifier = $this->options['expose']['identifier'];
+
+      if (empty($this->options['expose']['use_operator']) || empty($this->options['expose']['operator_id'])) {
+        // If the operator is locked and not exposed.
+        $display_options = in_array($this->operator, $this->operatorValues(1)) ? 'value' : 'none';
+      }
+      else {
+        $source = ':input[name="' . $this->options['expose']['operator_id'] . '"]';
+      }
+    }
+
+    if ($display_options === 'all' || $display_options === 'value') {
+      $form['value'] = [
+        '#type' => $filter_form_type,
+        '#title' => $this->value_value,
+        '#options' => $this->valueOptions,
+        '#default_value' => $this->value,
+      ];
       $user_input = $form_state->getUserInput();
       if ($exposed && isset($identifier) && !isset($user_input[$identifier])) {
         $user_input[$identifier] = $this->value;
@@ -243,6 +281,11 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
           $form['value']['#states']['visible'][] = [
             $source => ['value' => $operator],
           ];
+          if (isset($form['accept_null'])) {
+            $form['accept_null']['#states']['visible'][] = [
+              $source => ['value' => $operator],
+            ];
+          }
         }
       }
     }
@@ -269,7 +312,16 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
       return $this->t('exposed');
     }
     if (empty($this->valueOptions)) {
-      $this->getValueOptions();
+      if (in_array($this->operator, $this->operatorValues(1))) {
+        $this->getValueOptions();
+        // Now that we have the valid options for this filter, just return the
+        // human-readable label based on the current value.  The valueOptions
+        // array is keyed with either 0 or 1, so if the current value is not
+        // empty, use the label for 1, and if it's empty, use the label for 0.
+        return $this->operator . ' ' . $this->valueOptions[!empty($this->value)];
+      }
+
+      return $this->operator;
     }
     if (in_array($this->operator, $this->operatorValues(1), TRUE)) {
       $this->getValueOptions();

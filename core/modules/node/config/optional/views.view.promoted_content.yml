@@ -171,6 +171,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+          accept_null: false
         status:
           id: status
           table: node_field_data
@@ -184,6 +185,7 @@ display:
             operator: ''
             operator_limit_selection: false
             operator_list: {  }
+          accept_null: false
         langcode:
           id: langcode
           table: node_field_data
