@@ -6,6 +6,8 @@ namespace Drupal\test_htmx\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Htmx\Htmx;
+use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -19,6 +21,12 @@ final class HtmxTestAttachmentsController extends ControllerBase {
    * @return mixed[]
    *   A render array.
    */
+  #[Route(
+    path: '/htmx-test-attachments/page',
+    name: 'test_htmx.attachments.page',
+    title: new TranslatableMarkup('Page'),
+    requirements: ['_permission' => 'access content'],
+  )]
   public function page(): array {
     return self::generateHtmxButton();
   }
@@ -29,6 +37,12 @@ final class HtmxTestAttachmentsController extends ControllerBase {
    * @return mixed[]
    *   A render array.
    */
+  #[Route(
+    path: '/htmx-test-attachments/before',
+    name: 'test_htmx.attachments.before',
+    title: new TranslatableMarkup('Page'),
+    requirements: ['_permission' => 'access content'],
+  )]
   public function before(): array {
     return self::generateHtmxButton(swap: 'beforebegin');
   }
@@ -39,6 +53,12 @@ final class HtmxTestAttachmentsController extends ControllerBase {
    * @return mixed[]
    *   A render array.
    */
+  #[Route(
+    path: '/htmx-test-attachments/after',
+    name: 'test_htmx.attachments.after',
+    title: new TranslatableMarkup('Page'),
+    requirements: ['_permission' => 'access content'],
+  )]
   public function after(): array {
     return self::generateHtmxButton(swap: 'afterend');
   }
@@ -49,6 +69,12 @@ final class HtmxTestAttachmentsController extends ControllerBase {
    * @return mixed[]
    *   A render array.
    */
+  #[Route(
+    path: '/htmx-test-attachments/wrapper',
+    name: 'test_htmx.attachments.wrapper',
+    title: new TranslatableMarkup('Minimal Response'),
+    requirements: ['_permission' => 'access content'],
+  )]
   public function withWrapperFormat(): array {
     return self::generateHtmxButton(swap: '', useWrapperFormat: TRUE);
   }
@@ -59,6 +85,12 @@ final class HtmxTestAttachmentsController extends ControllerBase {
    * @return mixed[]
    *   A render array.
    */
+  #[Route(
+    path: '/htmx-test-attachments/body',
+    name: 'test_htmx.attachments.body',
+    title: new TranslatableMarkup('Body testing'),
+    requirements: ['_permission' => 'access content'],
+  )]
   public function selectBody(): array {
     return [
       '#title' => $this->t('Boosted body'),
@@ -76,6 +108,19 @@ final class HtmxTestAttachmentsController extends ControllerBase {
    * @return mixed[]
    *   A render array.
    */
+  #[Route(
+    path: '/htmx-test-attachments/replace',
+    name: 'test_htmx.attachments.replace',
+    title: new TranslatableMarkup('Ajax Content'),
+    requirements: ['_permission' => 'access content'],
+  )]
+  #[Route(
+    path: '/htmx-test-attachments/route-option',
+    name: 'test_htmx.attachments.route_option',
+    title: new TranslatableMarkup('Using _htmx_route option'),
+    requirements: ['_permission' => 'access content'],
+    options: ['_htmx_route' => TRUE],
+  )]
   public function replace(): array {
     $build['content'] = [
       '#type' => 'container',

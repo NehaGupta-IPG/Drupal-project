@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\js_message_test\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
 /**
  * Test Controller to show message links.
  */
@@ -37,6 +40,12 @@ class JSMessageTestController {
    * @return array
    *   Render array for links.
    */
+  #[Route(
+    path: '/js_message_test_link_with_system_messages',
+    name: 'js_message_test.links_with_system_messages',
+    title: new TranslatableMarkup('JsMessageLinks'),
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function messageLinksWithSystemMessages() {
     // Add PHP rendered messages to the page.
     $messenger = \Drupal::messenger();
@@ -53,6 +62,12 @@ class JSMessageTestController {
    * @return array
    *   Render array for links.
    */
+  #[Route(
+    path: '/js_message_test_link',
+    name: 'js_message_test.links',
+    title: new TranslatableMarkup('JsMessageLinks'),
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function messageLinks() {
     $buttons = [];
     foreach (static::getMessagesSelectors() as $messagesSelector) {

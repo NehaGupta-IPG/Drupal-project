@@ -6,6 +6,7 @@ namespace Drupal\error_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Routing\Attribute\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -42,6 +43,17 @@ class ErrorTestController extends ControllerBase {
   /**
    * Generate warnings to test the error handler.
    */
+  #[Route(
+    path: '/error-test/generate-warnings',
+    name: 'error_test.generate_warnings',
+    requirements: ['_access' => 'TRUE'],
+  )]
+  #[Route(
+    path: '/error-test/generate-warnings-with-report',
+    name: 'error_test.generate_warnings_with_report',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['collect_errors' => TRUE],
+  )]
   public function generateWarnings($collect_errors = FALSE) {
     // Tell Drupal error reporter to collect test errors or not.
     define('SIMPLETEST_COLLECT_ERRORS', $collect_errors);
@@ -60,6 +72,11 @@ class ErrorTestController extends ControllerBase {
   /**
    * Generate fatal errors to test the error handler.
    */
+  #[Route(
+    path: '/error-test/generate-fatal-errors',
+    name: 'error_test.generate_fatal_errors',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function generateFatalErrors() {
     $function = function (array $test) {
     };
@@ -76,6 +93,11 @@ class ErrorTestController extends ControllerBase {
    *
    * @throws \Exception
    */
+  #[Route(
+    path: '/error-test/trigger-exception',
+    name: 'error_test.trigger_exception',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function triggerException(string $argument = "<script>alert('xss')</script>"): void {
     define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     // Add function arguments to the exception backtrace.
@@ -87,6 +109,11 @@ class ErrorTestController extends ControllerBase {
   /**
    * Trigger an exception to test the PDO exception handler.
    */
+  #[Route(
+    path: '/error-test/trigger-pdo-exception',
+    name: 'error_test.trigger_pdo_exception',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function triggerPDOException(): void {
     define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     $this->database->select('bananas_are_awesome', 'b')
@@ -97,6 +124,11 @@ class ErrorTestController extends ControllerBase {
   /**
    * Trigger an exception during rendering.
    */
+  #[Route(
+    path: '/error-test/trigger-renderer-exception',
+    name: 'error_test.trigger_renderer_exception',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function triggerRendererException() {
     return [
       '#type' => 'page',

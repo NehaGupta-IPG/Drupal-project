@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\test_page_test\Controller;
 
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -21,6 +23,11 @@ class Test {
    *   A render array as expected by
    *   \Drupal\Core\Render\RendererInterface::render().
    */
+  #[Route(
+    path: '/test-render-title',
+    name: 'test_page_test.render_title',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function renderTitle() {
     $build = [];
     $build['#markup'] = 'Hello Drupal';
@@ -36,6 +43,18 @@ class Test {
    *   A render array as expected by
    *   \Drupal\Core\Render\RendererInterface::render().
    */
+  #[Route(
+    path: '/test-page-static-title',
+    name: 'test_page_test.static_title',
+    title: new TranslatableMarkup('Static title'),
+    requirements: ['_access' => 'TRUE'],
+  )]
+  #[Route(
+    path: '/test-page-dynamic-title',
+    name: 'test_page_test.dynamic_title',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['_title_callback' => '\\Drupal\\test_page_test\\Controller\\Test::dynamicTitle'],
+  )]
   public function staticTitle() {
     $build = [];
     $build['#markup'] = 'Hello Drupal';
@@ -59,6 +78,11 @@ class Test {
    * @return array
    *   A render array
    */
+  #[Route(
+    path: '/test-page-cached-controller',
+    name: 'test_page_test.cached_controller',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function controllerWithCache() {
     $build = [];
     $build['#title'] = '<span>Cached title</span>';
@@ -86,9 +110,22 @@ class Test {
    * @param int $code
    *   The status code.
    */
+  #[Route(
+    path: '/test-http-response-exception/{code}',
+    name: 'test_page_test.http_response_exception',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['code' => 200],
+  )]
   public function httpResponseException(int $code) {
     throw new HttpException($code);
   }
+
+  #[Route(
+    path: '/test-error',
+    name: 'test_page_test.error',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['code' => 200],
+  )]
 
   public function error() {
     trigger_error('foo', E_USER_NOTICE);
@@ -97,6 +134,13 @@ class Test {
     ];
   }
 
+  #[Route(
+    path: '/test-escaped-characters',
+    name: 'test_page_test.escaped_characters',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['code' => 200],
+  )]
+
   public function escapedCharacters() {
     return [
       '#prefix' => '<div class="escaped">',
@@ -104,6 +148,13 @@ class Test {
       '#suffix' => '</div>',
     ];
   }
+
+  #[Route(
+    path: '/test-escaped-script',
+    name: 'test_page_test.escaped_script',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['code' => 200],
+  )]
 
   public function escapedScript() {
     return [
@@ -131,6 +182,12 @@ class Test {
    *
    * @see \Symfony\Component\HttpFoundation\RedirectResponse
    */
+  #[Route(
+    path: '/test-meta-refresh',
+    name: 'test_page_test.meta_refresh',
+    title: new TranslatableMarkup('Page with a redirect'),
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function metaRefresh() {
     return new RedirectResponse(Url::fromRoute('test_page_test.test_page', [], ['absolute' => TRUE])->toString(), 302);
   }
@@ -138,6 +195,12 @@ class Test {
   /**
    * Returns a page while triggering deprecation notices.
    */
+  #[Route(
+    path: '/test-deprecations',
+    name: 'test_page_test.deprecations',
+    title: new TranslatableMarkup('Page with deprecation notices'),
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function deprecations() {
     // Create 2 identical deprecation messages. This should only trigger a
     // single response header.

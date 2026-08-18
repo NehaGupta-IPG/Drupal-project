@@ -1,19 +1,3 @@
-menu_test.menu_name_test:
-  path: '/menu_name_test'
-  defaults:
-    _title: 'Test menu_name router item'
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.menu_callback_title:
-  path: '/menu_callback_title'
-  defaults:
-    _title: 'Menu Callback Title'
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-  requirements:
-    _access: 'TRUE'
-
 menu_test.login_callback:
   path: '/menu_login_callback'
   defaults:
@@ -27,14 +11,6 @@ menu_test.callback_description:
   path: '/menu_callback_description'
   defaults:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.callback_description_plain:
-  path: '/menu_callback_description/description-plain'
-  defaults:
-    _title: 'Menu item with a regular description'
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
   requirements:
     _access: 'TRUE'
 
@@ -157,14 +133,6 @@ menu_test.parent_url_test:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
   requirements:
     _permission: 'access child1 test page'
-
-menu_test.menu_no_title_callback:
-  path: '/menu_no_title_callback'
-  defaults:
-    _title: 'A title with @placeholder'
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-  requirements:
-    _access: 'TRUE'
 
 menu_test.router_test1:
   path: '/foo/{bar}'
@@ -477,118 +445,5 @@ menu_test.hidden_block_delete:
   defaults:
     _title: 'Configure block'
     _controller: '\Drupal\test_page_test\Controller\TestPageTestController::testPage'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.theme_callback:
-  path: '/menu-test/theme-callback/{inherited}'
-  defaults:
-    _title: 'Page that displays different themes'
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::themePage'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.no_theme_callback:
-  path: '/menu-test/no-theme-callback'
-  defaults:
-    _title: 'Page that displays different themes without using a theme negotiation.'
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::themePage'
-    inherited: false
-  requirements:
-    _access: 'TRUE'
-
-menu_test.exotic_path:
-  # "Special" ASCII characters, characters that look like a percent-escaped
-  # string, and characters from various non-ASCII alphabets.
-  # @todo Find a way to use the correct path.
-  # cSpell:disable-next-line
-  #path: "/menu-test/ -._~!$'\"()*@[]?&+%#,;=:%23%25%26%2B%2F%3Féøïвβ中國書۞"
-  path: '/menu-test/{exotic}'
-  defaults:
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-  requirements:
-    exotic: '.+'
-    _access: 'TRUE'
-
-menu_test.theme_callback_inheritance:
-  path: '/menu-test/theme-callback/{inherited}/inheritance'
-  defaults:
-    _title: 'Page that tests theme negotiation inheritance.'
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::themePage'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.title_test_case1:
-  path: '/menu-title-test/case1'
-  defaults:
-    _title: 'Example title - Case 1'
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.title_test_case2:
-  path: '/menu-title-test/case2'
-  defaults:
-    _title: 'Example title'
-    _title_callback: '\Drupal\menu_test\Controller\MenuTestController::titleCallback'
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.title_test_case3:
-  path: '/menu-title-test/case3'
-  defaults:
-    _title: 'Bike sheds full of blue smurfs' # this should be ignored
-    _title_callback: '\Drupal\menu_test\Controller\MenuTestController::titleCallback'
-    _title_arguments:
-      title: 'Example title'
-      case_number: '3'
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.context:
-  path: '/menu-test/context'
-  defaults:
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.custom:
-  path: '/menu-test/custom'
-  defaults:
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.breadcrumb1:
-  path: '/menu-test/breadcrumb1'
-  defaults:
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-    _title: '<script>alert(12);</script>'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.breadcrumb2:
-  path: '/menu-test/breadcrumb1/breadcrumb2'
-  defaults:
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-    _title_callback: '\Drupal\menu_test\Controller\MenuTestController::breadcrumbTitleCallback'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.breadcrumb3:
-  path: '/menu-test/breadcrumb1/breadcrumb2/breadcrumb3'
-  defaults:
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-    _title: 'Normal title'
-  requirements:
-    _access: 'TRUE'
-
-menu_test.skippable-breadcrumb:
-  path: '/menu-test/skippable-breadcrumb'
-  defaults:
-    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-    _title: 'Normal title'
   requirements:
     _access: 'TRUE'

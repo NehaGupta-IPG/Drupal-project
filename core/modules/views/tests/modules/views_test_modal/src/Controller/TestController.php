@@ -6,6 +6,7 @@ namespace Drupal\views_test_modal\Controller;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Url;
 
 /**
@@ -16,6 +17,11 @@ class TestController extends ControllerBase {
   /**
    * Renders a link to open the /admin/content view in a modal dialog.
    */
+  #[Route(
+    path: '/views-test-modal/modal',
+    name: 'views_test_modal.modal',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function modal() {
     $build = [];
 

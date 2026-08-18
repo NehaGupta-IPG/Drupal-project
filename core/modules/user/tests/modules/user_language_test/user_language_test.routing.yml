@@ -1,13 +1,3 @@
-user_language_test.post_response:
-  path: '/user-language-test/post'
-  defaults:
-    _controller: Drupal\user_language_test\Controller\UserLanguageTestController::buildPostResponse
-  methods: [post]
-  options:
-    _admin_route: TRUE
-  requirements:
-    _access: 'TRUE'
-
 user_language_test.form:
   path: '/user-language-test/form'
   defaults:

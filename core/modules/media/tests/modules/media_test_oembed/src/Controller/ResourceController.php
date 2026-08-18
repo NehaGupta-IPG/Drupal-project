@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\media_test_oembed\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +23,11 @@ class ResourceController {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The oEmbed resource response.
    */
+  #[Route(
+    path: '/media_test_oembed/resource',
+    name: 'media_test_oembed.resource.get',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function get(Request $request) {
     $asset_url = $request->query->get('url');
 
@@ -45,6 +51,11 @@ class ResourceController {
    * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
    *   The response.
    */
+  #[Route(
+    path: '/media_test_oembed/thumbnail',
+    name: 'media_test_oembed.resource.thumbnail',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function getThumbnailWithNoExtension() {
     $response = new BinaryFileResponse('core/misc/druplicon.png');
     $response->headers->set('Content-Type', 'image/png');

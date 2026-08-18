@@ -6,6 +6,7 @@ namespace Drupal\csrf_race_test\Controller;
 
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -33,6 +34,11 @@ class TestController extends ControllerBase {
    * @return array
    *   Empty page with jQuery.
    */
+  #[Route(
+    path: '/csrf_race/test',
+    name: 'csrf_race_test.test',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testMethod() {
     return [
       '#markup' => '',
@@ -51,6 +57,11 @@ class TestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\Response
    *   CSRF token.
    */
+  #[Route(
+    path: '/csrf_race/get_csrf_token/{num}',
+    name: 'csrf_race_test.csrftoken',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function getCsrfToken(int $num) {
     sleep($num);
     return new JsonResponse($this->tokenGenerator->get());

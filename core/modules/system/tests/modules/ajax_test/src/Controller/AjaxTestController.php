@@ -9,6 +9,8 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\AlertCommand;
 use Drupal\Core\Ajax\CloseDialogCommand;
 use Drupal\Core\Ajax\HtmlCommand;
+use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +27,12 @@ class AjaxTestController {
    * @return array
    *   Renderable array of AJAX dialog contents.
    */
+  #[Route(
+    path: '/ajax-test/dialog-contents',
+    name: 'ajax_test.dialog_contents',
+    title: new TranslatableMarkup('AJAX Dialog contents routing'),
+    requirements: ['_access' => 'TRUE'],
+  )]
   public static function dialogContents() {
     // This is a regular render array; the keys do not have special meaning.
     $content = [
@@ -56,6 +64,12 @@ class AjaxTestController {
    * @return array
    *   Renderable array of AJAX response contents.
    */
+  #[Route(
+    path: '/ajax-test/dialog-contents-types/{type}',
+    name: 'ajax_test.ajax_render_types',
+    title: new TranslatableMarkup('AJAX Dialog contents routing'),
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function renderTypes($type) {
     return [
       '#title' => '<em>AJAX Dialog & contents</em>',
@@ -72,6 +86,11 @@ class AjaxTestController {
    * @return array
    *   Renderable array of AJAX response contents.
    */
+  #[Route(
+    path: '/ajax-test/insert-block-wrapper',
+    name: 'ajax_test.insert_links_block_wrapper',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function insertLinksBlockWrapper() {
     $methods = [
       'html',
@@ -110,6 +129,11 @@ class AjaxTestController {
    * @return array
    *   Renderable array of AJAX response contents.
    */
+  #[Route(
+    path: '/ajax-test/insert-inline-wrapper',
+    name: 'ajax_test.insert_links_inline_wrapper',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function insertLinksInlineWrapper() {
     $methods = [
       'html',
@@ -148,6 +172,11 @@ class AjaxTestController {
    * @return array
    *   Renderable array of AJAX response contents.
    */
+  #[Route(
+    path: '/ajax-test/insert-table-wrapper',
+    name: 'ajax_test.insert_links_table_wrapper',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function insertLinksTableWrapper(): array {
     $build['links'] = [
       'ajax_target' => [
@@ -178,6 +207,11 @@ class AjaxTestController {
    * Verifies that the response incorporates JavaScript settings generated
    * during the page request by adding a dummy setting.
    */
+  #[Route(
+    path: '/ajax-test/render',
+    name: 'ajax_test.render',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function render() {
     return [
       '#attached' => [
@@ -194,6 +228,11 @@ class AjaxTestController {
   /**
    * Returns the used theme.
    */
+  #[Route(
+    path: '/admin/ajax-test/theme',
+    name: 'ajax_test.admin.theme',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function theme() {
     return [
       '#markup' => 'Current theme: ' . \Drupal::theme()->getActiveTheme()->getName(),
@@ -205,6 +244,11 @@ class AjaxTestController {
    *
    * Helps verifying AjaxResponse reorders commands to ensure correct execution.
    */
+  #[Route(
+    path: '/ajax-test/order',
+    name: 'ajax_test.order',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function order() {
     $response = new AjaxResponse();
     // HTML insertion command.
@@ -224,6 +268,11 @@ class AjaxTestController {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The JSON response object.
    */
+  #[Route(
+    path: '/ajax-test/render-error',
+    name: 'ajax_test.render_error',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function renderError(Request $request) {
     $message = '';
     $query = $request->query;
@@ -238,6 +287,11 @@ class AjaxTestController {
   /**
    * Returns a render array of form elements and links for dialog.
    */
+  #[Route(
+    path: '/ajax-test/dialog',
+    name: 'ajax_test.dialog',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function dialog() {
     // Add two wrapper elements for testing non-modal dialogs. Modal dialogs use
     // the global drupal-modal wrapper by default.
@@ -346,6 +400,11 @@ class AjaxTestController {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The JSON response object.
    */
+  #[Route(
+    path: '/ajax-test/dialog-close',
+    name: 'ajax_test.dialog_close',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function dialogClose() {
     $response = new AjaxResponse();
     $response->addCommand(new CloseDialogCommand('#ajax-test-dialog-wrapper-1'));
@@ -396,6 +455,11 @@ class AjaxTestController {
    * @return array
    *   The render array.
    */
+  #[Route(
+    path: '/ajax-test/global-events',
+    name: 'ajax_test.global_events',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function globalEvents() {
     return [
       '#attached' => [
@@ -417,6 +481,11 @@ class AjaxTestController {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The JSON response object.
    */
+  #[Route(
+    path: '/ajax-test/global-events/clear-log',
+    name: 'ajax_test.global_events_clear_log',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function globalEventsClearLog() {
     $response = new AjaxResponse();
     $response->addCommand(new HtmlCommand('#test_global_events_log', ''));
@@ -429,6 +498,11 @@ class AjaxTestController {
    * @throws \Exception
    *   The expected exception.
    */
+  #[Route(
+    path: '/ajax-test/throw-exception',
+    name: 'ajax_test.throw_exception',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function throwException() {
     throw new \Exception('This is an exception.');
   }
@@ -439,6 +513,11 @@ class AjaxTestController {
    * @return array
    *   The Ajax link.
    */
+  #[Route(
+    path: '/ajax-test/exception-link',
+    name: 'ajax_test.exception_link',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function exceptionLink() {
     return [
       '#type' => 'link',
@@ -461,6 +540,12 @@ class AjaxTestController {
    * @return array
    *   The AJAX link.
    */
+  #[Route(
+    path: '/ajax-test/http-methods',
+    name: 'ajax_test.http_methods',
+    requirements: ['_access' => 'TRUE'],
+    options: ['no_cache' => TRUE],
+  )]
   public function httpMethods(): array {
     return [
       '#type' => 'link',
@@ -488,6 +573,17 @@ class AjaxTestController {
    * @return array
    *   The render array.
    */
+  #[Route(
+    path: '/ajax-test/http-methods-dialog',
+    name: 'ajax_test.http_methods.dialog',
+    requirements: ['_access' => 'TRUE'],
+  )]
+  #[Route(
+    path: '/ajax-test/link-page-dialog-contents',
+    name: 'ajax_test.link_page.dialog_contents',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['_title_callback' => '\\Drupal\\ajax_test\\Controller\\AjaxTestController::linkPageDialogTitle'],
+  )]
   public function httpMethodsDialog(): array {
     return ['#markup' => 'Modal dialog contents'];
   }
@@ -498,6 +594,12 @@ class AjaxTestController {
    * @return array
    *   The AJAX link.
    */
+  #[Route(
+    path: '/ajax-test/link-page-dialog',
+    name: 'ajax_test.link_page.dialog',
+    title: new TranslatableMarkup('AJAX link page'),
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function linkPageDialog(): array {
     return [
       '#type' => 'link',
@@ -534,6 +636,11 @@ class AjaxTestController {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The Ajax link.
    */
+  #[Route(
+    path: '/ajax-test/constructor',
+    name: 'ajax_test.constructor',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function constructor(): Response {
     return new JsonResponse();
   }
@@ -544,6 +651,11 @@ class AjaxTestController {
    * @return array
    *   The Ajax link.
    */
+  #[Route(
+    path: '/ajax-test/property-link',
+    name: 'ajax_test.property_link',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function propertyLink(): array {
     return [
       '#markup' => '<a class="use-ajax" href="constructor" data-ajax-http-method="GET">Ajax constructor</a>',

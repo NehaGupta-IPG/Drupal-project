@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\http_response_debug_cacheability_headers_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides responses for testing debug cacheability headers in HTTP responses.
@@ -28,6 +30,12 @@ class TestResponseController extends ControllerBase {
    * @return array
    *   Render array.
    */
+  #[Route(
+    path: '/test-cache-contexts-headers',
+    name: 'http_response_debug_cacheability_headers_test.test_cache_contexts_headers',
+    title: new TranslatableMarkup('Test debug cache contexts headers'),
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testCacheContextsHeaders(): array {
     // Create multiple cache contexts that add up to more than 8k bytes.
     for ($i = 0; $i < 700; $i++) {
@@ -49,6 +57,12 @@ class TestResponseController extends ControllerBase {
    * @return array
    *   Render array.
    */
+  #[Route(
+    path: '/test-cache-tags-headers',
+    name: 'http_response_debug_cacheability_headers_test.test_cache_tags_headers',
+    title: new TranslatableMarkup('Test debug cache tags headers'),
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testCacheTagsHeaders(): array {
     // Create multiple cache tags that add up to more than 8k bytes.
     for ($i = 0; $i < 800; $i++) {

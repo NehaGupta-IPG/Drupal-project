@@ -7,6 +7,7 @@ namespace Drupal\nightwatch_theme_install_utility\Controller;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Extension\ThemeInstallerInterface;
+use Drupal\Core\Routing\Attribute\Route;
 
 /**
  * Provides an easier way for Nightwatch tests to install themes.
@@ -42,6 +43,11 @@ class ThemeInstallController extends ControllerBase {
    * @return array
    *   A render array confirming installation.
    */
+  #[Route(
+    path: '/admin/theme/install_default/{theme}',
+    name: 'nightwatch_utility.theme_install_default',
+    requirements: ['_permission' => 'administer themes'],
+  )]
   public function installDefault(string $theme) {
     return $this->installTheme($theme, 'default');
   }
@@ -55,6 +61,11 @@ class ThemeInstallController extends ControllerBase {
    * @return array
    *   A render array confirming installation.
    */
+  #[Route(
+    path: '/admin/theme/install_admin/{theme}',
+    name: 'nightwatch_utility.theme_install_admin',
+    requirements: ['_permission' => 'administer themes'],
+  )]
   public function installAdmin($theme) {
     return $this->installTheme($theme, 'admin');
   }

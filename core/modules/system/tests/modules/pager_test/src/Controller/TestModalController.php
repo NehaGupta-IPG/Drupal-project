@@ -6,6 +6,8 @@ namespace Drupal\pager_test\Controller;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -16,6 +18,12 @@ class TestModalController extends ControllerBase {
   /**
    * Renders a link to open pager_test.multiple_pagers in a modal dialog.
    */
+  #[Route(
+    path: '/pager-test/modal-pager',
+    name: 'pager_test.modal_pager',
+    title: new TranslatableMarkup('Page with a modal link with pagers'),
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function modal(): array {
     $build = [];
 

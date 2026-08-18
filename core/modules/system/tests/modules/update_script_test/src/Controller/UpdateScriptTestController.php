@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\update_script_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,6 +17,11 @@ class UpdateScriptTestController extends ControllerBase {
   /**
    * Outputs a link to the database updates URL.
    */
+  #[Route(
+    path: '/update-script-test/database-updates-menu-item',
+    name: 'update_script_test.database_updates_menu_item',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function databaseUpdatesMenuItem(Request $request) {
     // @todo Simplify with https://www.drupal.org/node/2548095
     $base_url = str_replace('/update.php', '', $request->getBaseUrl());
