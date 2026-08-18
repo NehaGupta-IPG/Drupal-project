@@ -33,16 +33,20 @@
     <exclude name="Drupal.Commenting.DocComment.LongFullStop"/>
     <exclude name="Drupal.Commenting.InlineComment.InvalidEndChar"/>
     <exclude name="Drupal.Commenting.InlineComment.SpacingAfter"/>
-    <exclude name="Drupal.Files.LineLength.TooLong"/>
     <exclude name="Drupal.Methods.MethodDeclaration.Underscore"/>
     <exclude name="Drupal.NamingConventions.ValidFunctionName.InvalidPrefix"/>
     <exclude name="Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
     <exclude name="Drupal.Semantics.ConstantName.ConstConstantStart"/>
     <exclude name="Drupal.Semantics.UnsilencedDeprecation.UnsilencedDeprecation"/>
     <exclude name="Generic.CodeAnalysis.UselessOverridingMethod.Found"/>
+    <exclude name="Generic.NamingConventions.TraitNameSuffix.Missing"/>
+    <exclude name="PSR2.Classes.PropertyDeclaration.Underscore"/>
+    <exclude name="PSR2.ControlStructures.SwitchDeclaration.TerminatingComment"/>
+    <exclude name="PSR2.Methods.MethodDeclaration.Underscore"/>
     <exclude name="SlevomatCodingStandard.PHP.ShortList.LongListUsed"/>
     <exclude name="Squiz.Arrays.ArrayDeclaration.KeySpecified"/>
     <exclude name="Squiz.Arrays.ArrayDeclaration.NoKeySpecified"/>
+    <exclude name="Squiz.Classes.ClassFileName.NoMatch"/>
   </rule>
 
   <!-- Drupal sniffs that core partially meets. -->
@@ -62,22 +66,22 @@
     <include-pattern>core/lib/*</include-pattern>
     <include-pattern>core/modules/system/tests/modules/HookOrder/*</include-pattern>
   </rule>
+  <rule ref="Drupal.Files.LineLength">
+    <exclude-pattern>*/tests/*</exclude-pattern>
+  </rule>
   <rule ref="Drupal.NamingConventions.ValidGlobal.GlobalUnderScore">
     <exclude-pattern>scripts/run-tests.sh</exclude-pattern>
   </rule>
 
   <!-- Drupal best practice sniffs -->
   <rule ref="DrupalPractice">
-    <exclude name="DrupalPractice.CodeAnalysis.VariableAnalysis.UndefinedUnsetVariable"/>
-    <exclude name="DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable"/>
-    <exclude name="DrupalPractice.CodeAnalysis.VariableAnalysis.VariableRedeclaration"/>
     <exclude name="DrupalPractice.Commenting.CommentEmptyLine.SpacingAfter"/>
     <exclude name="DrupalPractice.Constants.GlobalConstant.GlobalConstant"/>
     <exclude name="DrupalPractice.Constants.GlobalDefine.GlobalConstant"/>
     <exclude name="DrupalPractice.FunctionCalls.InsecureUnserialize.InsecureUnserialize"/>
     <exclude name="DrupalPractice.FunctionCalls.Theme.ThemeFunctionDirect"/>
     <exclude name="DrupalPractice.General.DescriptionT.DescriptionT"/>
-    <exclude name="DrupalPractice.General.OptionsT.TforValue"/>
+    <exclude name="DrupalPractice.General.OptionsT.OptionsValue"/>
     <exclude name="DrupalPractice.InfoFiles.CoreVersionRequirement.CoreVersionRequirement"/>
     <exclude name="DrupalPractice.InfoFiles.Description.Missing"/>
     <exclude name="DrupalPractice.Objects.GlobalClass.GlobalClass"/>
@@ -89,26 +93,15 @@
     <exclude name="DrupalPractice.Yaml.RoutingAccess.OpenCallback"/>
     <exclude name="DrupalPractice.Yaml.RoutingAccess.PermissionFound"/>
   </rule>
-  <rule ref="DrupalPractice.CodeAnalysis.VariableAnalysis">
-    <!-- Do not run this sniff on API files or transliteration data. -->
-    <exclude-pattern>*.api.php</exclude-pattern>
-    <exclude-pattern>core/lib/Drupal/Component/Transliteration/data/*.php</exclude-pattern>
-    <properties>
-      <property name="allowUnusedFunctionParameters" value="true"/>
-    </properties>
-  </rule>
 
-  <!-- Disable the legacy property-underscore warning that core intentionally permits. -->
-  <rule ref="PSR2.Classes.PropertyDeclaration.Underscore">
-    <severity>0</severity>
-  </rule>
-
-  <!-- Prevent misuse of the @inheritdoc PHPDoc tag. -->
+  <!-- Prevent misuse of PHPDoc tags. -->
   <rule ref="SlevomatCodingStandard.Commenting.ForbiddenAnnotations">
     <properties>
       <property name="forbiddenAnnotations" type="array">
+        <element value="@encode"/>
         <element value="@inheritDoc"/>
         <element value="@inheritdoc"/>
+        <element value="@returns"/>
       </property>
     </properties>
   </rule>
@@ -116,12 +109,14 @@
     <properties>
        <property name="forbiddenCommentPatterns" type="array">
          <element value="/@inheritDoc/"/>
+         <element value="/(?&lt;!\.)\.\.(?!\.)$/"/>
        </property>
     </properties>
   </rule>
 
   <!-- Additional sniffs not in the Drupal ruleset. -->
   <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses"/>
+  <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceOperator"/>
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireShortTernaryOperator"/>
   <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch" />
   <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses"/>
@@ -129,6 +124,15 @@
   <rule ref="SlevomatCodingStandard.Namespaces.UseFromSameNamespace"/>
   <rule ref="SlevomatCodingStandard.PHP.TypeCast" />
   <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
+  <rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
+    <exclude name="VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedUnsetVariable"/>
+    <!-- Do not run this sniff on API files or transliteration data. -->
+    <exclude-pattern>*.api.php</exclude-pattern>
+    <exclude-pattern>core/lib/Drupal/Component/Transliteration/data/*.php</exclude-pattern>
+    <properties>
+      <property name="allowUnusedFunctionParameters" value="true"/>
+    </properties>
+  </rule>
 
   <!-- The Drupal ruleset disables this rule, but core enables it for tests. -->
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
