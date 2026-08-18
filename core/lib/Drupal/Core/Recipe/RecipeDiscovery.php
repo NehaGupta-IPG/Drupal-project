@@ -36,35 +36,35 @@ final class RecipeDiscovery implements \IteratorAggregate {
 
   /**
    * The location where Composer is configured to install recipes.
-   *
-   * @var string|null
    */
   private static ?string $recipesDirectory = NULL;
 
+  /**
+   * A finder that scans for `recipe.yml` files.
+   */
+  private readonly Finder $finder;
+
   public function __construct(
-    private readonly Finder $finder,
+    string|array|null $directory = NULL,
     private readonly bool $skipInvalid,
     public ?LoggerInterface $logger = NULL,
-  ) {}
-
-  public static function create(string|array|null $directory = NULL, bool $skip_invalid = FALSE, ?LoggerInterface $logger = NULL): self {
-    $directory ??= [
-      self::getComposerRecipesDirectory(),
-      // Drupal runs in the web root, so this directory is guaranteed to exist
-      // (and Finder will throw if it doesn't).
-      'core/recipes',
-    ];
-
-    $finder = Finder::create()
+  ) {
+    $this->finder = Finder::create()
       ->files()
       ->name('recipe.yml')
       ->depth(1)
       ->followLinks()
-      ->in($directory);
-
-    return new self($finder, $skip_invalid, $logger);
+      ->in($directory ?? [
+        self::getComposerRecipesDirectory(),
+        // Drupal runs in the web root, so this directory is guaranteed to exist
+        // (and Finder will throw if it doesn't).
+        'core/recipes',
+      ]);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getIterator(): iterable {
     foreach ($this->finder as $file) {
       try {
