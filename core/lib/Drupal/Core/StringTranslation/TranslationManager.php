@@ -43,12 +43,6 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    */
   protected $defaultLangcode;
 
-  /**
-   * Constructs a TranslationManager object.
-   *
-   * @param \Drupal\Core\Language\LanguageDefault $default_language
-   *   The default language.
-   */
   public function __construct(LanguageDefault $default_language) {
     $this->defaultLangcode = $default_language->get()->getId();
   }
@@ -169,6 +163,13 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
     foreach ($this->sortedTranslators as $translator) {
       $translator->reset();
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluralIndex(int $count, ?string $langcode = NULL): int {
+    return -1;
   }
 
 }
