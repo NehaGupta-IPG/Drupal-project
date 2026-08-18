@@ -8,7 +8,6 @@ use Composer\InstalledVersions;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Discovers recipes at specific locations in the file system.
@@ -33,7 +32,7 @@ use Symfony\Component\Finder\SplFileInfo;
  * @internal
  *   This API is experimental.
  */
-final class RecipeDiscovery {
+final class RecipeDiscovery implements \IteratorAggregate {
 
   /**
    * The location where Composer is configured to install recipes.
@@ -42,28 +41,40 @@ final class RecipeDiscovery {
    */
   private static ?string $recipesDirectory = NULL;
 
-  public static function create(?string $directory = NULL, bool $skip_invalid = FALSE, ?LoggerInterface $logger = NULL): Finder {
-    return Finder::create()
+  public function __construct(
+    private readonly Finder $finder,
+    private readonly bool $skipInvalid,
+    public ?LoggerInterface $logger = NULL,
+  ) {}
+
+  public static function create(?string $directory = NULL, bool $skip_invalid = FALSE, ?LoggerInterface $logger = NULL): self {
+    $directory ??= self::getComposerRecipesDirectory();
+
+    $finder = Finder::create()
       ->files()
       ->name('recipe.yml')
       ->depth(1)
       ->followLinks()
-      ->in($directory ?? self::getComposerRecipesDirectory())
-      ->filter(function (SplFileInfo $file) use ($skip_invalid, $logger): bool {
-        try {
-          Recipe::createFromDirectory($file->getPath());
+      ->in($directory);
+
+    return new self($finder, $skip_invalid, $logger);
+  }
+
+  public function getIterator(): iterable {
+    foreach ($this->finder as $file) {
+      try {
+        yield Recipe::createFromDirectory($file->getPath());
+      }
+      catch (\Throwable $e) {
+        if ($this->logger) {
+          Error::logException($this->logger, $e);
         }
-        catch (\Throwable $e) {
-          if ($logger) {
-            Error::logException($logger, $e);
-          }
-          if ($skip_invalid) {
-            return FALSE;
-          }
-          throw $e;
+        if ($this->skipInvalid) {
+          continue;
         }
-        return TRUE;
-      });
+        throw $e;
+      }
+    }
   }
 
   /**
