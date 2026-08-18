@@ -37,14 +37,14 @@ class LocaleHooks {
         $output .= '<h2>' . $this->t('Uses') . '</h2>';
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Importing translation files') . '</dt>';
-        $output .= '<dd>' . $this->t('Translation files with translated interface text are imported automatically when languages are added on the <a href=":languages">Languages</a> page, or when modules or themes are installed. On the <a href=":locale-settings">Interface translation settings</a> page, the <em>Translation source</em> can be restricted to local files only, or to include the <a href=":server">Drupal translation server</a>. Although modules and themes may not be fully translated in all languages, new translations become available frequently. You can specify whether and how often to check for translation file updates and whether to overwrite existing translations on the <a href=":locale-settings">Interface translation settings</a> page. You can also manually import a translation file on the <a href=":import">Interface translation import</a> page.', [
+        $output .= '<dd>' . $this->t('Translation files with translated interface text are imported automatically when languages are added on the <a href=":languages">Languages</a> page, or when modules or themes are installed. On the <a href=":locale-settings">Interface translation settings</a> page, the <em>Translation source</em> can be restricted to local files only, or to include the <a href=":server">Drupal translations website</a>. Although modules and themes may not be fully translated in all languages, new translations become available frequently. You can specify whether and how often to check for translation file updates and whether to overwrite existing translations on the <a href=":locale-settings">Interface translation settings</a> page. You can also manually import a translation file on the <a href=":import">Interface translation import</a> page.', [
           ':import' => Url::fromRoute('locale.translate_import')->toString(),
           ':locale-settings' => Url::fromRoute('locale.settings')->toString(),
           ':languages' => Url::fromRoute('entity.configurable_language.collection')->toString(),
           ':server' => 'https://localize.drupal.org',
         ]) . '</dd>';
         $output .= '<dt>' . $this->t('Checking the translation status') . '</dt>';
-        $output .= '<dd>' . $this->t('You can check how much of the interface on your site is translated into which language on the <a href=":languages">Languages</a> page. On the <a href=":translation-updates">Available translation updates</a> page, you can check whether interface translation updates are available on the <a href=":server">Drupal translation server</a>.', [
+        $output .= '<dd>' . $this->t('You can check how much of the interface on your site is translated into which language on the <a href=":languages">Languages</a> page. On the <a href=":translation-updates">Available translation updates</a> page, you can check whether interface translation updates are available on the <a href=":server">Drupal translations website</a>.', [
           ':languages' => Url::fromRoute('entity.configurable_language.collection')->toString(),
           ':translation-updates' => Url::fromRoute('locale.translate_status')->toString(),
           ':server' => 'https://localize.drupal.org',
@@ -77,7 +77,7 @@ class LocaleHooks {
         $output = '<p>' . $this->t('Translation files are automatically downloaded and imported when <a title="Languages" href=":language">languages</a> are added, or when modules or themes are installed.', [
           ':language' => Url::fromRoute('entity.configurable_language.collection')->toString(),
         ]) . '</p>';
-        $output .= '<p>' . $this->t('This page allows translators to manually import translated strings contained in a Gettext Portable Object (.po) file. Manual import may be used for customized translations or for the translation of custom modules and themes. To customize translations you can download a translation file from the <a href=":url">Drupal translation server</a> or <a title="User interface translation export" href=":export">export</a> translations from the site, customize the translations using a Gettext translation editor, and import the result using this page.', [
+        $output .= '<p>' . $this->t('This page allows translators to manually import translated strings contained in a Gettext Portable Object (.po) file. Manual import may be used for customized translations or for the translation of custom modules and themes. To customize translations you can download a translation file from the <a href=":url">Drupal translations website</a> or <a title="User interface translation export" href=":export">export</a> translations from the site, customize the translations using a Gettext translation editor, and import the result using this page.', [
           ':url' => 'https://localize.drupal.org',
           ':export' => Url::fromRoute('locale.translate_export')->toString(),
         ]) . '</p>';

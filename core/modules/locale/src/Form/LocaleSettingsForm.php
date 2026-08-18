@@ -66,7 +66,7 @@ class LocaleSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Translation source'),
       '#config_target' => 'locale.settings:translation.use_source',
       '#options' => [
-        LOCALE_TRANSLATION_USE_SOURCE_REMOTE_AND_LOCAL => $this->t('Drupal translation server and local files'),
+        LOCALE_TRANSLATION_USE_SOURCE_REMOTE_AND_LOCAL => $this->t('Drupal translations website and local files'),
         LOCALE_TRANSLATION_USE_SOURCE_LOCAL => $this->t('Local files only'),
       ],
       '#description' => $this->t('The source of translation files for automatic interface translation.') . ' ' . $description,

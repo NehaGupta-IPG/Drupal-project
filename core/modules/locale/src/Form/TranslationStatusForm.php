@@ -204,7 +204,7 @@ class TranslationStatusForm extends FormBase {
   /**
    * Provides debug info for projects in case translation files are not found.
    *
-   * Translations files are being fetched either from Drupal translation server
+   * Translations files are being fetched either from Drupal translations website
    * and local files or only from the local filesystem depending on the
    * "Translation source" setting at admin/config/regional/translate/settings.
    * This method will produce debug information including the respective path(s)
