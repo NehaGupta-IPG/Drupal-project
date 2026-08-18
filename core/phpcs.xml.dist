@@ -31,13 +31,11 @@
   <!-- Drupal sniffs, excluding rules that core does not meet yet. -->
   <rule ref="Drupal">
     <exclude name="Drupal.Commenting.DocComment.LongFullStop"/>
-    <exclude name="Drupal.Commenting.FunctionComment.ParamCommentFullStop"/>
     <exclude name="Drupal.Commenting.InlineComment.InvalidEndChar"/>
     <exclude name="Drupal.Commenting.InlineComment.SpacingAfter"/>
     <exclude name="Drupal.Files.LineLength.TooLong"/>
     <exclude name="Drupal.Methods.MethodDeclaration.Underscore"/>
     <exclude name="Drupal.NamingConventions.ValidFunctionName.InvalidPrefix"/>
-    <exclude name="Drupal.NamingConventions.ValidFunctionName.NotCamelCaps"/>
     <exclude name="Drupal.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
     <exclude name="Drupal.Semantics.ConstantName.ConstConstantStart"/>
     <exclude name="Drupal.Semantics.UnsilencedDeprecation.UnsilencedDeprecation"/>
