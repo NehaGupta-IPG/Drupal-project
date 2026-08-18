@@ -1,0 +1,19 @@
+Patch-Source: https://github.com/bovigo/vfsStream/issues/299
+Subject: [PATCH] Avoid deprecated spl_object_hash() on PHP 8.6
+
+Use spl_object_id() where it is available while retaining the existing fallback
+for PHP 7.1, which is still supported by vfsStream. Cast the object ID to a
+string to preserve getResourceId()'s documented return value.
+
+diff --git a/src/main/php/org/bovigo/vfs/vfsStreamFile.php b/src/main/php/org/bovigo/vfs/vfsStreamFile.php
+--- a/src/main/php/org/bovigo/vfs/vfsStreamFile.php
++++ b/src/main/php/org/bovigo/vfs/vfsStreamFile.php
+@@ -371,7 +371,7 @@ class vfsStreamFile extends vfsStreamAbstractContent
+             $resource = $data['wrapper_data'];
+         }
+ 
+-        return spl_object_hash($resource);
++        return function_exists('spl_object_id') ? (string) spl_object_id($resource) : spl_object_hash($resource);
+     }
+ 
+     /**

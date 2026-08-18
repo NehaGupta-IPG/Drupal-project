@@ -129,6 +129,12 @@ default:
       patch -p1 -d vendor/phpspec/prophecy < fix-prophecy-php86-destructor.patch
     fi
 
+.patch-vfsstream-php86: &patch-vfsstream-php86
+  - |
+    if patch -p1 --dry-run --forward -d vendor/mikey179/vfsstream < fix-vfsstream-php86-spl-object-hash.patch >/dev/null 2>&1; then
+      patch -p1 --forward -d vendor/mikey179/vfsstream < fix-vfsstream-php86-spl-object-hash.patch
+    fi
+
 .with-composer: &with-composer
   needs:
     - job: '🧹 PHP Coding standards (PHPCS)'
@@ -165,6 +171,7 @@ default:
   - composer validate
   - composer install --optimize-autoloader
   - *patch-prophecy-php86
+  - *patch-vfsstream-php86
   - composer run-script drupal-phpunit-upgrade-check
   - echo -e "\e[0Ksection_end:`date +%s`:composer_setup\r\e[0K"
 
@@ -282,6 +289,7 @@ default:
         composer outdated;
       fi
     - *patch-prophecy-php86
+    - *patch-vfsstream-php86
   artifacts:
     expire_in: 1 week
     paths:
@@ -437,6 +445,7 @@ default:
       [[ $_TARGET_DB == pgsql* ]] && export SIMPLETEST_DB=pgsql://$POSTGRES_USER:$POSTGRES_PASSWORD@database/$POSTGRES_DB?module=pgsql
     - composer install --optimize-autoloader
     - *patch-prophecy-php86
+    - *patch-vfsstream-php86
     - export OTEL_COLLECTOR="$OPENTELEMETRY_COLLECTOR"
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
