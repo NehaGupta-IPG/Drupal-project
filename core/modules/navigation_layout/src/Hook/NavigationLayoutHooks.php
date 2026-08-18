@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\navigation_ui\Hook;
+namespace Drupal\navigation_layout\Hook;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -8,18 +8,18 @@ use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\layout_builder\Hook\LayoutBuilderHooks;
-use Drupal\navigation_ui\Plugin\SectionStorage\NavigationSectionStorage;
-use Drupal\navigation_ui\RenderCallbacks;
+use Drupal\navigation_layout\Plugin\SectionStorage\NavigationSectionStorage;
+use Drupal\navigation_layout\RenderCallbacks;
 
 /**
- * Hook implementations for navigation_ui.
+ * Hook implementations for navigation_layout.
  */
-class NavigationUiHooks {
+class NavigationLayoutHooks {
 
   use StringTranslationTrait;
 
   /**
-   * NavigationUiHooks constructor.
+   * NavigationLayoutHooks constructor.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
@@ -34,11 +34,11 @@ class NavigationUiHooks {
   #[RemoveHook('help', class: LayoutBuilderHooks::class, method: 'help')]
   public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
-      case 'help.page.navigation_ui':
+      case 'help.page.navigation_layout':
         $output = '';
         $output .= '<h3>' . $this->t('About') . '</h3>';
-        $output .= '<p>' . $this->t('The Navigation UI module provides a Layout Builder interface for configuring navigation blocks.') . '</p>';
-        $output .= '<p>' . $this->t('For more information, see the <a href=":docs">online documentation for the Navigation UI module</a>.', [':docs' => 'https://www.drupal.org/docs/develop/core-modules-and-themes/core-modules/navigation-module']) . '</p>';
+        $output .= '<p>' . $this->t('The Navigation Layout module provides a Layout Builder interface for configuring navigation blocks.') . '</p>';
+        $output .= '<p>' . $this->t('For more information, see the <a href=":docs">online documentation for the Navigation Layout module</a>.', [':docs' => 'https://www.drupal.org/docs/develop/core-modules-and-themes/core-modules/navigation-module']) . '</p>';
         return $output;
     }
     $configuration_route = 'layout_builder.navigation.';

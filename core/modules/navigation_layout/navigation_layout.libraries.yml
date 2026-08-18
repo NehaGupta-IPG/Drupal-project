@@ -1,4 +1,4 @@
-navigation_ui.layoutBuilder:
+navigation_layout.layoutBuilder:
   css:
     base:
       css/base/layout-builder.css: {}

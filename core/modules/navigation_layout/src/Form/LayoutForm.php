@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\navigation_ui\Form;
+namespace Drupal\navigation_layout\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -73,7 +73,7 @@ final class LayoutForm extends FormBase {
       '#type' => 'layout_builder',
       '#section_storage' => $section_storage,
     ];
-    $form['#attached']['library'][] = 'navigation_ui/navigation_ui.layoutBuilder';
+    $form['#attached']['library'][] = 'navigation_layout/navigation_layout.layoutBuilder';
 
     $form['actions'] = [
       'enable_edit_mode' => [

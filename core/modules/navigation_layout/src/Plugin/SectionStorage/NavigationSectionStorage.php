@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\navigation_ui\Plugin\SectionStorage;
+namespace Drupal\navigation_layout\Plugin\SectionStorage;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
@@ -23,7 +23,7 @@ use Drupal\layout_builder\SectionListTrait;
 use Drupal\layout_builder\SectionStorage\SectionStorageDefinition;
 use Drupal\layout_builder\SectionStorageInterface;
 use Drupal\layout_builder\SupportAwareSectionStorageInterface;
-use Drupal\navigation_ui\Form\LayoutForm;
+use Drupal\navigation_layout\Form\LayoutForm;
 use Symfony\Component\Routing\RouteCollection;
 
 /**

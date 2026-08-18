@@ -20,7 +20,7 @@ class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
    */
   protected static $modules = [
     'navigation',
-    'navigation_ui',
+    'navigation_layout',
     'navigation_test',
     'block',
     'layout_builder',

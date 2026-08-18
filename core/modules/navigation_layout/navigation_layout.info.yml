@@ -1,4 +1,4 @@
-name: Navigation UI
+name: Navigation Layout
 description: 'Provides the Layout Builder editing interface for navigation blocks.'
 package: Core
 version: VERSION
