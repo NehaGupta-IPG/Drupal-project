@@ -37,7 +37,7 @@ final class RecipeDiscovery {
 
   private static ?string $recipesDirectory = NULL;
 
-  public static function create(?string $directory = NULL, bool $include_core = TRUE, bool $skip_invalid = TRUE, ?LoggerInterface $logger = NULL): Finder {
+  public static function create(?string $directory = NULL, bool $include_core = TRUE, bool $skip_invalid = FALSE, ?LoggerInterface $logger = NULL): Finder {
     $directories = [
       $directory ?? self::getComposerRecipesDirectory(),
     ];
@@ -58,11 +58,10 @@ final class RecipeDiscovery {
           Recipe::createFromDirectory($file->getPath());
         }
         catch (\Throwable $e) {
-          // If we're ignoring invalid recipes, log the exception.
+          if ($logger) {
+            Error::logException($logger, $e);
+          }
           if ($skip_invalid) {
-            if ($logger) {
-              Error::logException($logger, $e);
-            }
             return FALSE;
           }
           throw $e;
