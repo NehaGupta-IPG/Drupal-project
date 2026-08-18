@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- cspell:ignore Openercase tfor superglobal -->
+<!-- cspell:ignore tfor superglobal -->
 <ruleset name="drupal_core">
   <arg name="extensions" value="engine,inc,install,module,php,profile,test,theme,yml"/>
   <!-- Scan files that are explicitly listed via <file> elements as PHP. -->
@@ -9,14 +9,16 @@
   <!-- Exclude folders used by common frontend tools. These folders match the file_scan_ignore_directories setting in default.settings.php. -->
   <exclude-pattern>*/bower_components/*</exclude-pattern>
   <exclude-pattern>*/node_modules/*</exclude-pattern>
-
   <!-- Exclude third party code. -->
-  <exclude-pattern>core/assets/vendor/*</exclude-pattern>
-  <exclude-pattern>core/tests/Drupal/Tests/Component/Annotation/Doctrine/</exclude-pattern>
-
+  <exclude-pattern>./core/assets/vendor/*</exclude-pattern>
+  <exclude-pattern>./core/tests/PHPStan/vendor/*</exclude-pattern>
   <!-- Exclude the PHPStan baseline and temp dir. -->
-  <exclude-pattern>core/.phpstan-baseline.php</exclude-pattern>
-  <exclude-pattern>core/phpstan-tmp/*</exclude-pattern>
+  <exclude-pattern>./core/.phpstan-baseline.php</exclude-pattern>
+  <exclude-pattern>./core/phpstan-tmp/*</exclude-pattern>
+  <!-- Exclude third-party code maintained within core that does not follow our standards. -->
+  <exclude-pattern>./core/tests/Drupal/Tests/Component/Annotation/Doctrine/</exclude-pattern>
+  <!-- Exclude test files that are intentionally empty, or intentionally violate coding standards. -->
+  <exclude-pattern>./modules/system/tests/fixtures/HtaccessTest</exclude-pattern>
 
   <file>.</file>
   <file>../composer</file>
@@ -28,13 +30,8 @@
 
   <!-- Drupal sniffs, excluding rules that core does not meet yet. -->
   <rule ref="Drupal">
-    <exclude name="Drupal.Arrays.Array.LongLineDeclaration"/>
-    <exclude name="Drupal.Commenting.ClassComment.Missing"/>
     <exclude name="Drupal.Commenting.DocComment.LongFullStop"/>
-    <exclude name="Drupal.Commenting.DocComment.MissingShort"/>
-    <exclude name="Drupal.Commenting.DocComment.ShortNotCapital"/>
     <exclude name="Drupal.Commenting.FunctionComment.ParamCommentFullStop"/>
-    <exclude name="Drupal.Commenting.InlineComment.DocBlock"/>
     <exclude name="Drupal.Commenting.InlineComment.InvalidEndChar"/>
     <exclude name="Drupal.Commenting.InlineComment.SpacingAfter"/>
     <exclude name="Drupal.Files.LineLength.TooLong"/>
@@ -51,32 +48,22 @@
   </rule>
 
   <!-- Drupal sniffs that core partially meets. -->
+  <rule ref="Drupal.Commenting.DocComment.MissingShort">
+    <include-pattern>core/*/KernelTests/*</include-pattern>
+    <include-pattern>core/*/Unit/*</include-pattern>
+    <include-pattern>core/*/FunctionalJavascript/*</include-pattern>
+  </rule>
   <rule ref="Drupal.Commenting.FunctionComment.Missing">
+    <include-pattern>core/*/src/Plugin/*</include-pattern>
     <include-pattern>*/Database/*</include-pattern>
     <include-pattern>*/FunctionalJavascript/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/access/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/argument/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/cache/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/display/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/exposed_form/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/field/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/filter/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/pager/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/query/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/sort/*</include-pattern>
-    <include-pattern>core/modules/*/Plugin/views/style/*</include-pattern>
+    <include-pattern>*/Kernel/*</include-pattern>
+    <include-pattern>*/KernelTests/*</include-pattern>
+    <include-pattern>*/Functional/*</include-pattern>
+    <include-pattern>*/Unit/*</include-pattern>
+    <include-pattern>core/lib/*</include-pattern>
+    <include-pattern>core/modules/system/tests/modules/HookOrder/*</include-pattern>
   </rule>
-  <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment">
-    <exclude-pattern>core/*/tests/*</exclude-pattern>
-    <exclude-pattern>core/lib/Drupal/Component/*</exclude-pattern>
-    <exclude-pattern>core/lib/Drupal/Core/*</exclude-pattern>
-    <exclude-pattern>core/tests/*</exclude-pattern>
-  </rule>
-  <rule ref="Drupal.Commenting.VariableComment.MissingVar">
-    <include-pattern>core/modules/*/tests/*</include-pattern>
-    <include-pattern>core/profiles/*/tests/*</include-pattern>
-  </rule>
-
   <rule ref="Drupal.NamingConventions.ValidGlobal.GlobalUnderScore">
     <exclude-pattern>scripts/run-tests.sh</exclude-pattern>
   </rule>
@@ -106,17 +93,9 @@
     <!-- Do not run this sniff on API files or transliteration data. -->
     <exclude-pattern>*.api.php</exclude-pattern>
     <exclude-pattern>core/lib/Drupal/Component/Transliteration/data/*.php</exclude-pattern>
-    <exclude-pattern>core/profiles/*/tests/*</exclude-pattern>
-    <exclude-pattern>core/tests/*</exclude-pattern>
-  </rule>
-  <rule ref="DrupalPractice.Objects.GlobalFunction">
-    <include-pattern>*/Kernel*/*</include-pattern>
-    <include-pattern>*/ListBuilder/*</include-pattern>
-    <include-pattern>*/Plugin/*</include-pattern>
-    <include-pattern>*/modules/system/tests/modules/*</include-pattern>
-    <include-pattern>*/tests/*/Form/*</include-pattern>
-    <include-pattern>*/tests/*/Functional*/*</include-pattern>
-    <include-pattern>core/lib/*</include-pattern>
+    <properties>
+      <property name="allowUnusedFunctionParameters" value="true"/>
+    </properties>
   </rule>
 
   <!-- Disable the legacy property-underscore warning that core intentionally permits. -->
@@ -146,6 +125,9 @@
 
   <!-- The Drupal ruleset disables this rule, but core enables it for tests. -->
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+    <properties>
+      <property name="spacesCountAroundEqualsSign" value="0" />
+    </properties>
     <include-pattern>*/tests/*</include-pattern>
     <exclude-pattern>*/fixtures/*</exclude-pattern>
   </rule>
