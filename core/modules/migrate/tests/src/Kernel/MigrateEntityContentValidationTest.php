@@ -55,7 +55,6 @@ class MigrateEntityContentValidationTest extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('user');
-    $this->installEntitySchema('user_role');
     $this->installEntitySchema('entity_test');
     $this->installConfig(['field', 'filter_test', 'system', 'user']);
 

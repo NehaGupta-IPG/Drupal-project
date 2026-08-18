@@ -32,7 +32,6 @@ class ContentModerationPermissionsTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->installEntitySchema('workflow');
   }
 
   /**

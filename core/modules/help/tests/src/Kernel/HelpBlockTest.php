@@ -44,7 +44,6 @@ class HelpBlockTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->installEntitySchema('block');
     $this->container->get('theme_installer')->install(['stark']);
     $this->config('system.theme')->set('default', 'stark')->save();
     $this->helpBlock = $this->placeBlock('help_block');

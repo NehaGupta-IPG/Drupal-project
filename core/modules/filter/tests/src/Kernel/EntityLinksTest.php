@@ -85,9 +85,6 @@ class EntityLinksTest extends KernelTestBase {
 
     // @see ::testMediaEntity
     $this->installEntitySchema('media');
-    $this->installEntitySchema('media_type');
-    $this->installEntitySchema('field_storage_config');
-    $this->installEntitySchema('field_config');
     $this->installEntitySchema('user');
     $this->installSchema('file', ['file_usage']);
     $this->installConfig(['media']);

@@ -38,7 +38,6 @@ class NodeRequirementsStatusFilterWarningTest extends KernelTestBase {
     parent::setUp();
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
-    $this->installEntitySchema('view');
     $this->installConfig(['field', 'node', 'views']);
     $this->installSchema('node', ['node_access']);
     // Remove default views to avoid interference.

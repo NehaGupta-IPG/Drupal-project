@@ -51,11 +51,8 @@ class CreateSampleEntityTest extends KernelTestBase {
     $this->installEntitySchema('file');
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
-    $this->installEntitySchema('node_type');
     $this->installEntitySchema('comment');
-    $this->installEntitySchema('comment_type');
     $this->installEntitySchema('path_alias');
-    $this->installEntitySchema('taxonomy_vocabulary');
     $this->installEntitySchema('taxonomy_term');
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     NodeType::create(['type' => 'article', 'name' => 'Article'])->save();

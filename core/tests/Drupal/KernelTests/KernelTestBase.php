@@ -11,6 +11,7 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Core\Database\SchemaDefinition\Schema;
@@ -90,7 +91,6 @@ use Symfony\Component\Routing\Route;
  * @see \Drupal\KernelTests\KernelTestBase::$modules
  * @see \Drupal\KernelTests\KernelTestBase::enableModules()
  * @see \Drupal\KernelTests\KernelTestBase::installConfig()
- * @see \Drupal\KernelTests\KernelTestBase::installEntitySchema()
  * @see \Drupal\KernelTests\KernelTestBase::installSchema()
  * @see \Drupal\Tests\BrowserTestBase
  *
@@ -774,6 +774,11 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
   protected function installEntitySchema($entity_type_id): void {
     $entity_type_manager = \Drupal::entityTypeManager();
     $entity_type = $entity_type_manager->getDefinition($entity_type_id);
+
+    if ($entity_type instanceof ConfigEntityTypeInterface) {
+      @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/project/drupal/issues/3343518', E_USER_DEPRECATED);
+    }
+
     \Drupal::service('entity_type.listener')->onEntityTypeCreate($entity_type);
 
     // For test runs, the most common storage backend is a SQL database. For

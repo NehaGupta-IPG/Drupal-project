@@ -40,7 +40,6 @@ class AccountTakeoverGadgetChainTest extends KernelTestBase {
     // in order for the payload to work.
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
-    $this->installEntitySchema('view');
     $this->installConfig(['node']);
   }
 

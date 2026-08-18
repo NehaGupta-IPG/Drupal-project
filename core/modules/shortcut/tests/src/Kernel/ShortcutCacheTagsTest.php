@@ -46,7 +46,6 @@ class ShortcutCacheTagsTest extends KernelTestBase {
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('shortcut');
-    $this->installEntitySchema('shortcut_set');
 
     $this->shortcutSet = ShortcutSet::create([
       'id' => 'default',

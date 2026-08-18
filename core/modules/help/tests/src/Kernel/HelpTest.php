@@ -64,7 +64,6 @@ class HelpTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->installEntitySchema('block');
     $this->installEntitySchema('block_content');
     $this->installEntitySchema('user');
 

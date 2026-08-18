@@ -38,7 +38,6 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
   public function setUp(): void {
     parent::setUp();
 
-    $this->installEntitySchema('date_format');
     $this->installConfig(['system']);
     $this->formBuilder = $this->container->get('form_builder');
   }

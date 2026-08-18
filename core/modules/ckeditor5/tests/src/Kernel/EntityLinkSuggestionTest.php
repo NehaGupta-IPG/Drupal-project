@@ -109,12 +109,10 @@ class EntityLinkSuggestionTest extends KernelTestBase {
     $node_article_type->save();
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
-    $this->installEntitySchema('date_format');
     $this->installSchema('node', ['node_access']);
     $this->container->get('content_translation.manager')->setEnabled('node', $node_page_type->id(), TRUE);
     $this->container->get('content_translation.manager')->setEnabled('node', $node_article_type->id(), TRUE);
 
-    $this->installEntitySchema('taxonomy_vocabulary');
     $this->installEntitySchema('taxonomy_term');
     $vocabulary = Vocabulary::create(['name' => 'Tags', 'vid' => 'tags']);
     $vocabulary->save();
