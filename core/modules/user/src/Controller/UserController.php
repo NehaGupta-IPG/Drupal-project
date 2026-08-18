@@ -439,6 +439,9 @@ class UserController extends ControllerBase {
   /**
    * Confirms cancelling a user account via an email link.
    *
+   * The email link includes a one-time HMAC, so this route does not need CSRF
+   * protection.
+   *
    * @param \Drupal\user\UserInterface $user
    *   The user account.
    * @param int $timestamp
