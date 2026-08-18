@@ -47,8 +47,13 @@ final class RecipeDiscovery implements \IteratorAggregate {
     public ?LoggerInterface $logger = NULL,
   ) {}
 
-  public static function create(?string $directory = NULL, bool $skip_invalid = FALSE, ?LoggerInterface $logger = NULL): self {
-    $directory ??= self::getComposerRecipesDirectory();
+  public static function create(string|array|null $directory = NULL, bool $skip_invalid = FALSE, ?LoggerInterface $logger = NULL): self {
+    $directory ??= [
+      self::getComposerRecipesDirectory(),
+      // Drupal runs in the web root, so this directory is guaranteed to exist
+      // (and Finder will throw if it doesn't).
+      'core/recipes',
+    ];
 
     $finder = Finder::create()
       ->files()
