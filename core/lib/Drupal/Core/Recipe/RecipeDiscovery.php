@@ -55,7 +55,10 @@ final class RecipeDiscovery implements \IteratorAggregate {
       ->depth(1)
       ->followLinks()
       ->in($directory ?? [
-        self::getComposerRecipesDirectory(),
+        // Placeholders used by the Composer installer don't make sense here.
+        // For example, if Composer is configured to install recipes in
+        // `./recipes/{$name}`, we really just want to scan `./recipes`.
+        str_replace(['{$vendor}', '{$name}'], '', self::getComposerRecipesDirectory()),
         // Drupal runs in the web root, so this directory is guaranteed to exist
         // (and Finder will throw if it doesn't).
         'core/recipes',
