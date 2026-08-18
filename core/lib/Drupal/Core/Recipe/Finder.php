@@ -46,7 +46,7 @@ final class Finder implements \IteratorAggregate {
   public function __construct(
     string|array|null $directory = NULL,
     private readonly bool $skipInvalid = FALSE,
-    public ?LoggerInterface $logger = NULL,
+    public readonly ?LoggerInterface $logger = NULL,
   ) {
     $this->finder = SymfonyFinder::create()
       ->files()
