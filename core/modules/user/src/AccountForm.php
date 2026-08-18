@@ -238,10 +238,6 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#disabled' => TRUE,
     ];
 
-    $user_preferred_langcode = $register ? $language_interface->getId() : $account->getPreferredLangcode();
-
-    $user_preferred_admin_langcode = $register ? $language_interface->getId() : $account->getPreferredAdminLangcode(FALSE);
-
     // Is the user preferred language added?
     $user_language_added = FALSE;
     if ($this->languageManager instanceof ConfigurableLanguageManagerInterface) {
