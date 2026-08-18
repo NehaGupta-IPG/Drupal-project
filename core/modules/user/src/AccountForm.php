@@ -123,6 +123,13 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#access' => $account->name->access('edit'),
     ];
 
+    $form['account']['notify'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Email user with password setup instructions'),
+      '#access' => $admin_create,
+      '#default_value' => $admin_create,
+    ];
+
     // Display password field only for existing users or when user is allowed to
     // assign a password during registration.
     if (!$register) {
@@ -175,7 +182,11 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
         '#type' => 'password_confirm',
         '#size' => 25,
         '#description' => $this->t('Provide a password for the new account in both fields.'),
-        '#required' => TRUE,
+        '#states' => [
+          'invisible' => [
+            ':input[name="notify"]' => ['checked' => TRUE],
+          ],
+        ],
       ];
     }
 
@@ -202,6 +213,11 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#default_value' => $status,
       '#options' => [$this->t('Blocked'), $this->t('Active')],
       '#access' => $account->status->access('edit') && $user->id() !== $account->id(),
+      '#states' => [
+        'invisible' => [
+          ':input[name="notify"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     $roles = Role::loadMultiple();
@@ -222,11 +238,9 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#disabled' => TRUE,
     ];
 
-    $form['account']['notify'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Notify user of new account'),
-      '#access' => $admin_create,
-    ];
+    $user_preferred_langcode = $register ? $language_interface->getId() : $account->getPreferredLangcode();
+
+    $user_preferred_admin_langcode = $register ? $language_interface->getId() : $account->getPreferredAdminLangcode(FALSE);
 
     // Is the user preferred language added?
     $user_language_added = FALSE;
