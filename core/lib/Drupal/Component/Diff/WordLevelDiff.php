@@ -27,7 +27,7 @@ class WordLevelDiff extends MappedDiff {
     foreach ($lines as $line) {
       // If the line is too long, just pretend the entire line is one big word
       // This prevents resource exhaustion problems
-      if ( $first ) {
+      if ($first) {
         $first = FALSE;
       }
       else {

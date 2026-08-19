@@ -11,4 +11,5 @@ class DiffOp {
   public $type;
   public $orig;
   public $closing;
+
 }

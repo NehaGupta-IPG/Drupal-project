@@ -176,7 +176,7 @@ class ConfigController implements ContainerInjectionInterface {
     }
     $syncStorage = $this->importTransformer->transform($this->syncStorage);
     $diff = $this->configManager->diff($this->targetStorage, $syncStorage, $source_name, $target_name, $collection);
-    $this->diffFormatter->show_header = FALSE;
+    $this->diffFormatter->showHeader = FALSE;
 
     $build = [];
 

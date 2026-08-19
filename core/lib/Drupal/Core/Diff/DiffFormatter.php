@@ -29,8 +29,8 @@ class DiffFormatter extends DiffFormatterBase {
    */
   public function __construct(ConfigFactoryInterface $config_factory) {
     $config = $config_factory->get('system.diff');
-    $this->leading_context_lines = $config->get('context.lines_leading');
-    $this->trailing_context_lines = $config->get('context.lines_trailing');
+    $this->leadingContextLines = $config->get('context.lines_leading');
+    $this->trailingContextLines = $config->get('context.lines_trailing');
   }
 
   /**
@@ -53,11 +53,11 @@ class DiffFormatter extends DiffFormatterBase {
   protected function _block_header($xbeg, $xlen, $ybeg, $ylen) {
     return [
       [
-        'data' => $xbeg + $this->line_stats['offset']['x'],
+        'data' => $xbeg + $this->lineStats['offset']['x'],
         'colspan' => 2,
       ],
       [
-        'data' => $ybeg + $this->line_stats['offset']['y'],
+        'data' => $ybeg + $this->lineStats['offset']['y'],
         'colspan' => 2,
       ],
     ];
@@ -67,7 +67,7 @@ class DiffFormatter extends DiffFormatterBase {
    * {@inheritdoc}
    */
   protected function _start_block($header) {
-    if ($this->show_header) {
+    if ($this->showHeader) {
       $this->rows[] = $header;
     }
   }

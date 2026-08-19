@@ -23,6 +23,7 @@ class Diff {
 
   /**
    * Constructor.
+   *
    * Computes diff between sequences of strings.
    *
    * @param array $from_lines
