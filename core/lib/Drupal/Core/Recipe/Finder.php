@@ -41,7 +41,7 @@ final class Finder implements \IteratorAggregate {
   /**
    * A finder that scans for `recipe.yml` files.
    */
-  private readonly SymfonyFinder $finder;
+  public readonly SymfonyFinder $finder;
 
   public function __construct(
     string|array|null $directory = NULL,

@@ -47,6 +47,25 @@ class RecipeFinderTest extends KernelTestBase {
   }
 
   /**
+   * Tests that recipes can be filtered in custom ways.
+   */
+  public function testCustomFiltering(): void {
+    $finder = new Finder($this->root . '/core/recipes');
+
+    // By default, we'll find the example recipe.
+    $this->assertContains(
+      'Example',
+      array_column(iterator_to_array($finder), 'name'),
+    );
+    // But not if we explicitly filter it out.
+    $finder->finder->notPath('example');
+    $this->assertNotContains(
+      'Example',
+      array_column(iterator_to_array($finder), 'name'),
+    );
+  }
+
+  /**
    * Tests that there is an error if Composer is misconfigured for recipes.
    */
   public function testUnknownComposerRecipeDirectory(): void {
