@@ -24,14 +24,18 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'views', 'block', 'views_test_config'];
+  protected static $modules = ['node', 'views', 'block', 'views_test_config', 'views_test_exposed_form'];
 
   /**
    * The views to use for testing.
    *
    * @var string[]
    */
-  public static $testViews = ['test_block_exposed_ajax', 'test_block_exposed_ajax_with_page'];
+  public static $testViews = [
+    'test_block_exposed_ajax',
+    'test_block_exposed_ajax_with_page',
+    'test_page_with_ajax_exposed_form_in_block',
+  ];
 
   /**
    * {@inheritdoc}
@@ -100,6 +104,29 @@ class BlockExposedFilterAJAXTest extends WebDriverTestBase {
     $this->assertSession()->waitForElementRemoved('xpath', '//*[text()="Article A"]');
     $this->submitForm([], 'Reset');
     $this->assertSession()->addressEquals('some-path');
+  }
+
+  /**
+   * Tests AJAX refreshes the exposed form when it is exposed in a block.
+   */
+  public function testExposedFormInBlockAjaxRefresh(): void {
+    $this->drupalPlaceBlock('views_exposed_filter_block:test_page_with_ajax_exposed_form_in_block-page_1');
+    $this->drupalGet('test_page_with_ajax_exposed_form_in_block');
+    $page = $this->getSession()->getPage();
+
+    $html = $page->getHtml();
+    $first_form_build_time = trim($page->find('xpath', '//div[contains(@class, "form-item-form-build-time")]')->getText());
+    self::assertNotEmpty($first_form_build_time, 'The form build time found on the page.');
+    $this->assertStringContainsString('Page A', $html);
+    $this->assertStringContainsString('Page B', $html);
+    $this->assertStringContainsString('Article A', $html);
+
+    $this->submitForm(['type' => 'page'], 'Apply');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+
+    $second_form_build_time = trim($page->find('xpath', '//div[contains(@class, "form-item-form-build-time")]')->getText());
+    self::assertNotEmpty($second_form_build_time, 'The form build time found on the page.');
+    self::assertNotEquals($first_form_build_time, $second_form_build_time, 'The form was successfully rebuilt.');
   }
 
 }

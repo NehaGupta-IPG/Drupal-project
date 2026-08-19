@@ -1,0 +1,7 @@
+name: 'Views Test Exposed form'
+type: module
+description: 'Provides hook to alter views exposed form for testing purposes.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:views
