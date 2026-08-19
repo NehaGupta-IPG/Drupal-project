@@ -146,6 +146,7 @@ user.role.*:
     description:
       type: text
       label: 'Description'
+      requiredKey: false
     weight:
       type: weight
       label: 'User role weight'
