@@ -11,10 +11,11 @@ use Symfony\Component\Finder\Finder as SymfonyFinder;
 /**
  * Discovers recipes at specific locations in the file system.
  *
- * This scans a single directory of your choosing, as well as core's recipes.
- * By design, it won't search anywhere else in the file system, which is an
- * intentional difference from ExtensionDiscovery, because all recipes (except
- * core's) must be installed in a single location.
+ * By default, this will scan core's recipes, along with the directory where
+ * Composer is configured to install recipes. Alternatively, it can scan
+ * directories of your choosing. It won't recurse into the file system, which is
+ * an intentional difference from ExtensionDiscovery, because all recipes
+ * (except core's) must be installed in a single location.
  *
  * Once instantiated, this object should be used as a simple iterator over
  * \Drupal\Core\Recipe\Recipe objects. For example:
