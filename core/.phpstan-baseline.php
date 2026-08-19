@@ -1610,12 +1610,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Batch/BatchStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Batch\\\\BatchStorage\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Batch/BatchStorage.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Batch\\\\BatchStorage\\:\\:update\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -5746,7 +5740,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
 	'identifier' => 'isset.variable',
-	'count' => 2,
+	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
 ];
 $ignoreErrors[] = [
@@ -13768,37 +13762,13 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/src/Plugin/views/field/File.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\file_test\\\\Form\\\\FileTestSaveUploadFromForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/file_test/src/Form/FileTestSaveUploadFromForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\file_test\\\\StreamWrapper\\\\DummyExternalReadOnlyWrapper\\:\\:stream_close\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/tests/file_test/src/StreamWrapper/DummyExternalReadOnlyWrapper.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\file_test\\\\StreamWrapper\\\\DummyReadOnlyStreamWrapper\\:\\:getInternalUri\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/file_test/src/StreamWrapper/DummyReadOnlyStreamWrapper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\file_test\\\\StreamWrapper\\\\DummyStreamWrapper\\:\\:getInternalUri\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/file_test/src/StreamWrapper/DummyStreamWrapper.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileFieldTestBase\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileFieldTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileFieldTestBase\\:\\:getLastFileId\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileFieldTestBase.php',
@@ -13826,12 +13796,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/tests/src/Functional/Formatter/FileVideoPosterFormatterTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileResourceTestBase\\:\\:makeCurrentUserFileOwner\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileResourceTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\FunctionalJavascript\\\\FileFieldValidateTest\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
@@ -14538,12 +14502,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\ImageStyleFlushTest\\:\\:createSampleImage\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageStyleFlushTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$edit in empty\\(\\) always exists and is not falsy\\.$#',
-	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageStyleFlushTest.php',
 ];
@@ -20782,126 +20740,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/serialization/tests/src/Kernel/MapDataNormalizerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Block\\\\BlockEntitySettingTrayForm\\:\\:form\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Block/BlockEntitySettingTrayForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Block\\\\BlockEntitySettingTrayForm\\:\\:submitVisibility\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Block/BlockEntitySettingTrayForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Block\\\\BlockEntitySettingTrayForm\\:\\:validateVisibility\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Block/BlockEntitySettingTrayForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:validateConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:setPlugin\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:validateConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray_test\\\\Form\\\\SettingsTrayFormAnnotationIsClassBlockForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/modules/settings_tray_test/src/Form/SettingsTrayFormAnnotationIsClassBlockForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:assertEditModeDisabled\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:assertEditModeEnabled\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:assertOffCanvasBlockFormIsValid\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:disableEditMode\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:enableEditMode\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:openBlockForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:pressToolbarEditButton\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:toggleContextualTriggerVisibility\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\shortcut\\\\Entity\\\\Shortcut\\:\\:postSave\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -23928,6 +23766,42 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/toolbar/src/Controller/ToolbarController.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\contextual\\\\ContextualLinksTest\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/contextual/ContextualLinksTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\contextual\\\\ContextualLinksTest\\:\\:toggleContextualTriggerVisibility\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/contextual/ContextualLinksTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:isLabelInContentOverview\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:setupWorkspaceSwitcherBlock\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:switchToLive\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:switchToWorkspace\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\update\\\\Controller\\\\UpdateController\\:\\:updateStatusManually\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -25310,6 +25184,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/ExposedFormCache.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$untranslatable_configs in empty\\(\\) always exists and is not falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/src/FieldViewsDataProvider.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Form\\\\ViewsExposedForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -32104,12 +31984,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views_ui/src/ViewEditForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$group_info might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/views_ui/src/ViewEditForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_ui\\\\ViewFormBase\\:\\:getDisplayLabel\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -33220,10 +33094,42 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/scripts/run-tests.sh',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Composer/Component/ComponentsIsolatedBuildTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Composer/Template/ComposerProjectTemplatesTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/BuildTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
 	'identifier' => 'disallowed.function',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/BuildTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/Tests/BuildTestTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\FunctionalJavascriptTests\\\\Ajax\\\\AjaxMaintenanceModeTest\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
@@ -33736,12 +33642,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/DependencyInjection/ContainerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Constructor of class Symfony\\\\Component\\\\ExpressionLanguage\\\\Expression has an unused parameter \\$expression\\.$#',
-	'identifier' => 'constructor.unusedParameter',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Component/DependencyInjection/Dumper/OptimizedPhpArrayDumperTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Component\\\\DependencyInjection\\\\Dumper\\\\OptimizedPhpArrayDumperTest\\:\\:getCollection\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34030,6 +33930,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Utility/ReflectionTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Calling sha1\\(\\) is forbidden, use sha256\\(\\) or hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Result of static method Drupal\\\\Composer\\\\Composer\\:\\:ensureComposerVersion\\(\\) \\(void\\) is used\\.$#',
 	'identifier' => 'staticMethod.void',
 	'count' => 1,
@@ -34094,18 +34006,6 @@ $ignoreErrors[] = [
 	'identifier' => 'disallowed.function',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/Plugin/Unpack/Fixtures.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
-	'identifier' => 'disallowed.function',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling sha1\\(\\) is forbidden, use sha256\\(\\) or hash\\(\\) with an xxHash algorithm instead\\.$#',
-	'identifier' => 'disallowed.function',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Access\\\\TestAccessCheckInterface\\:\\:access\\(\\) has no return type specified\\.$#',
@@ -34378,12 +34278,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityViewBuilderTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\EventSubscriber\\\\ActiveLinkResponseFilterTest\\:\\:providerTestSetLinkActiveClass\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/EventSubscriber/ActiveLinkResponseFilterTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function module_handler_test_hook\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34550,12 +34444,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/DefaultPluginManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Constructor of class Drupal\\\\Tests\\\\Core\\\\Plugin\\\\Discovery\\\\TestContainerDerivativeDiscovery has an unused parameter \\$example_service\\.$#',
-	'identifier' => 'constructor.unusedParameter',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/Discovery/TestContainerDerivativeDiscovery.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Plugin\\\\TestFilteredPluginManager\\:\\:getDefinitionsForContexts\\(\\) has no return type specified\\.$#',

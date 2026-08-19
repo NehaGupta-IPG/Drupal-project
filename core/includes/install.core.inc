@@ -171,6 +171,7 @@ function install_drupal($class_loader, $settings = [], ?callable $callback = NUL
         $finish_url = $install_state['profile_info']['distribution']['install']['finish_url'];
       }
       install_goto($finish_url);
+      \Drupal::service('cache_prewarmer')->preWarmAllCaches();
     }
   }
 }
@@ -347,7 +348,6 @@ function install_begin_request($class_loader, &$install_state): void {
 
   // Ensure that procedural dependencies are loaded as early as possible,
   // since the error/exception handlers depend on them.
-  require_once __DIR__ . '/../modules/system/system.install';
   require_once __DIR__ . '/common.inc';
   require_once __DIR__ . '/install.inc';
   require_once __DIR__ . '/form.inc';
@@ -462,19 +462,6 @@ function install_begin_request($class_loader, &$install_state): void {
   $container->set('string_translator.file_translation', new FileTranslation($directory, $file_system, $install_state['parameters']['profile'] ?? NULL));
   $container->get('string_translation')
     ->addTranslator($container->get('string_translator.file_translation'));
-
-  /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
-  $module_list = \Drupal::service('extension.list.module');
-  /** @var \Drupal\Core\Extension\ProfileExtensionList $profile_list */
-  $profile_list = \Drupal::service('extension.list.profile');
-
-  // Prime \Drupal\Core\Extension\ExtensionList::getPathname()'s static cache.
-  foreach ($install_state['profiles'] as $name => $profile) {
-    // Profile path is set in both module and profile lists. See
-    // \Drupal\Core\Config\ConfigInstaller::getProfileStorages for example.
-    $profile_list->setPathname($name, $profile->getPathname());
-    $module_list->setPathname($name, $profile->getPathname());
-  }
 
   $profile = _install_select_profile($install_state);
   if ($profile !== NULL) {
@@ -1119,7 +1106,6 @@ function install_verify_requirements(&$install_state) {
  *   An array of information about the current installation state.
  */
 function install_base_system(&$install_state): void {
-  // Install system.module.
   drupal_install_system($install_state);
 
   // Call HtaccessWriter::ensure() to ensure that all of Drupal's standard
@@ -1609,8 +1595,7 @@ function install_profile_modules(&$install_state) {
       $modules = array_merge($modules, array_keys($files[$module]->requires));
     }
   }
-  // The System module has already been installed by install_base_system().
-  $modules = array_diff(array_unique($modules), ['system']);
+
   foreach ($modules as $module) {
     if (!empty($files[$module]->info['required'])) {
       $required[$module] = $files[$module]->sort;
@@ -1651,7 +1636,7 @@ function install_profile_modules(&$install_state) {
     }
     $batch_builder->addOperation(
       '_install_module_batch',
-      [$module_group, $names],
+      [$module_group, $names, $install_state],
     );
   }
   $batch_builder
@@ -1867,10 +1852,21 @@ function install_finished(&$install_state): void {
  *
  * Performs batch installation of modules.
  */
-function _install_module_batch(array $modules, array $module_names, array &$context): void {
+function _install_module_batch(array $modules, array $module_names, array $install_state, array &$context): void {
   \Drupal::service('module_installer')->install($modules, FALSE);
   $context['results'] = array_merge($context['results'], $modules);
   $context['message'] = \Drupal::translation()->formatPlural(count($module_names), 'Installed %module module.', 'Installed %module modules.', ['%module' => implode(', ', $module_names)]);
+
+  // If installing system module, set the langcode to the one chosen in the
+  // installer.
+  if (in_array('system', $modules)) {
+    if (isset($install_state['parameters']['langcode'])) {
+      \Drupal::configFactory()->getEditable('system.site')
+        ->set('langcode', (string) $install_state['parameters']['langcode'])
+        ->set('default_langcode', (string) $install_state['parameters']['langcode'])
+        ->save();
+    }
+  }
 }
 
 /**
@@ -2328,17 +2324,6 @@ function install_config_import_batch() {
 
   // Get the sync storage.
   $sync = \Drupal::service('config.storage.sync');
-  // Match up the site UUIDs, the install_base_system install task will have
-  // installed the system module and created a new UUID.
-  $system_site = $sync->read('system.site');
-  // When installing from configuration it is possible that system.site
-  // configuration is not present. If this occurs a ConfigImporterException will
-  // by thrown when $config_importer->initialize() is called below and the error
-  // will be reported to the user.
-  if ($system_site !== FALSE) {
-    \Drupal::configFactory()->getEditable('system.site')->set('uuid', $system_site['uuid'])->save();
-  }
-
   // Create the storage comparer and the config importer.
   $storage_comparer = new StorageComparer($sync, \Drupal::service('config.storage'));
   $storage_comparer->createChangelist();
@@ -2524,7 +2509,7 @@ function _install_config_locale_overrides_process_batch(array $names, array $lan
  * @internal
  *   All installer code is internal.
  */
-function install_recipe_required_modules() {
+function install_recipe_required_modules(array $install_state) {
   // We need to manually trigger the installation of core-provided entity types,
   // as those will not be handled by the module installer.
   // @see install_profile_modules()
@@ -2549,9 +2534,6 @@ function install_recipe_required_modules() {
   }
   arsort($required);
 
-  // The system module is already installed. See install_base_system().
-  unset($required['system']);
-
   $modules = [];
   $names = [];
   foreach ($required as $module => $weight) {
@@ -2559,7 +2541,7 @@ function install_recipe_required_modules() {
     $names[] = $files[$module]->info['name'];
   }
   $batch_builder->addOperation('_install_module_batch',
-    [$modules, $names]
+    [$modules, $names, $install_state]
   );
   return $batch_builder->toArray();
 }

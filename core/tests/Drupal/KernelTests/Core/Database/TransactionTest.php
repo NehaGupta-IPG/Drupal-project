@@ -222,7 +222,7 @@ class TransactionTest extends DatabaseTestBase {
    */
   public function testRollbackRootWithActiveSavepoint(): void {
     $transaction = $this->createRootTransaction();
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint = $this->createFirstSavepointTransaction();
 
     // Try to rollback root. Since a savepoint is active, this should fail.
@@ -345,7 +345,7 @@ class TransactionTest extends DatabaseTestBase {
    * Tests savepoint transaction duplicated rollback.
    */
   public function testRollbackTwiceSameSavepoint(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $transaction = $this->createRootTransaction();
     $savepoint = $this->createFirstSavepointTransaction();
 
@@ -380,13 +380,13 @@ class TransactionTest extends DatabaseTestBase {
    * Tests savepoint transaction rollback failure when later savepoints exist.
    */
   public function testRollbackSavepointWithLaterSavepoint(): void {
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $transaction = $this->createRootTransaction();
     $savepoint1 = $this->createFirstSavepointTransaction();
 
     // Starts another savepoint transaction. Corresponds to 'SAVEPOINT
     // savepoint_2' on the database.
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint2 = $this->connection->startTransaction();
     $this->assertTrue($this->connection->inTransaction());
     $this->assertSame(3, $this->connection->transactionManager()->stackDepth());
@@ -946,12 +946,12 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertSame(3, $this->connection->transactionManager()->stackDepth());
     // Starts a savepoint transaction. Corresponds to 'SAVEPOINT savepoint_3'
     // on the database.
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint3 = $this->connection->startTransaction();
     $this->assertSame(4, $this->connection->transactionManager()->stackDepth());
     // Starts a savepoint transaction. Corresponds to 'SAVEPOINT savepoint_4'
     // on the database.
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint4 = $this->connection->startTransaction();
     $this->assertSame(5, $this->connection->transactionManager()->stackDepth());
 
@@ -978,7 +978,7 @@ class TransactionTest extends DatabaseTestBase {
    */
   public function testCommitWithActiveSavepoint(): void {
     $transaction = $this->createRootTransaction();
-    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
+    // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
     $savepoint1 = $this->createFirstSavepointTransaction('', FALSE);
 
     // Starts a savepoint transaction. Corresponds to 'SAVEPOINT savepoint_2'
@@ -1255,7 +1255,12 @@ class TransactionTest extends DatabaseTestBase {
    * Simulate the end of a request by closing the connection and destroying
    * the transaction manually. The order matters for this test as the garbage
    * collection is unpredictable and could operate this way.
+   *
+   * @todo do not remove the test once the deprecation is removed; this test
+   *   should stay as long as post transaction callbacks are executed on
+   *   destruction of the Transaction object.
    */
+  #[IgnoreDeprecations]
   public function testPostTransactionsAlwaysExecutedBeforeConnectionIsDestroyed(): void {
     $transaction = $this->createRootTransaction('', FALSE);
     $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallback']);
@@ -1321,6 +1326,31 @@ class TransactionTest extends DatabaseTestBase {
     $reflectionProperty->setValue($manager, []);
     unset($testConnection);
     Database::closeConnection('test_fail');
+  }
+
+  /**
+   * Tests deprecation of implicit commit.
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecationOfImplicitCommit(): void {
+    $this->expectUserDeprecationMessage('Database commit by letting a Transaction object go out of scope is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Commit explicitly via Transaction::commitOrRelease() instead. See https://www.drupal.org/node/3524461');
+    $transaction = $this->createRootTransaction();
+    unset($transaction);
+    $this->assertRowPresent('David');
+  }
+
+  /**
+   * Tests deprecation of ::commitAll().
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecationOfCommitAll(): void {
+    $this->expectUserDeprecationMessage('Committing transactions via Drupal\\Core\\Database\\Transaction\\TransactionManagerBase::commitAll() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3524461');
+    $transaction = $this->createRootTransaction();
+    $savepoint = $this->createFirstSavepointTransaction();
+    $this->connection->commitAll();
+    $this->assertRowPresent('David');
+    $this->assertRowPresent('Roger');
+    unset($transaction, $savepoint);
   }
 
   /**
