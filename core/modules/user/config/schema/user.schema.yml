@@ -143,6 +143,9 @@ user.role.*:
     label:
       type: required_label
       label: 'Label'
+    description:
+      type: text
+      label: 'Description'
     weight:
       type: weight
       label: 'User role weight'
@@ -195,10 +198,6 @@ action.configuration.user_remove_role_action:
 action.configuration.user_unblock_user_action:
   type: action_configuration_default
   label: 'Unblock the selected users configuration'
-
-search.plugin.user_search:
-  type: sequence
-  label: 'User search'
 
 condition.plugin.user_role:
   type: condition.plugin

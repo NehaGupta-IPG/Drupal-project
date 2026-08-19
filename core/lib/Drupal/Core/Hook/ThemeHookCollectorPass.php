@@ -14,6 +14,8 @@ use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\Attribute\ReorderHook;
+use Drupal\Core\Site\Settings;
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -61,6 +63,15 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
   protected array $preprocessForSuggestions;
 
   /**
+   * Deprecated .theme files.
+   *
+   * These are stored to allow emitting deprecation messages.
+   *
+   * @var array<string, true>
+   */
+  protected array $deprecatedThemeFiles = [];
+
+  /**
    * Constructor.
    *
    * @param list<string> $themes
@@ -97,6 +108,10 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
       'theme_hook_list' => $this->sortByTheme($implementationsByHook),
       'theme_preprocess_for_suggestions' => $this->preprocessForSuggestions ?? [],
     ]);
+
+    foreach ($this->deprecatedThemeFiles as $deprecatedThemeFile => $v) {
+      @trigger_error('Using ' . $deprecatedThemeFile . '.theme is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
+    }
   }
 
   /**
@@ -224,6 +239,10 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
 
       $isThemeSettings = str_ends_with($filename, 'theme-settings.php');
 
+      if ($fileExtension === 'theme') {
+        $this->deprecatedThemeFiles[pathinfo($filename, PATHINFO_FILENAME)] = TRUE;
+      }
+
       if ($fileExtension === 'php' && !$isThemeSettings) {
         $cached = $hookFileCache->get($filename);
         if ($cached) {
@@ -267,19 +286,27 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
         if ($implementations === NULL) {
           $finder = MockFileFinder::create($filename);
           $parser = new StaticReflectionParser('', $finder);
-          $implementations = [];
+          $implementations = [
+            'hooks' => [],
+          ];
           foreach ($parser->getMethodAttributes() as $function => $attributes) {
+            if (StaticReflectionParser::hasAttribute($attributes, ExtensionFileIsConverted::class)) {
+              $implementations['@skip_theme_file_deprecation'] = TRUE;
+            }
             if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
               break;
             }
             if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && (preg_match($currentThemePreg, $function, $matches) || preg_match($allThemesPreg, $function, $matches))) {
               assert($function === $matches['theme'] . '_' . $matches['hook']);
-              $implementations[] = ['theme' => $matches['theme'], 'hook' => $matches['hook']];
+              $implementations['hooks'][] = ['theme' => $matches['theme'], 'hook' => $matches['hook']];
             }
           }
           $proceduralHookFileCache->set($filename, $implementations);
         }
-        foreach ($implementations as $implementation) {
+        if (isset($implementations['@skip_theme_file_deprecation'])) {
+          unset($this->deprecatedThemeFiles[pathinfo($filename, PATHINFO_FILENAME)]);
+        }
+        foreach ($implementations['hooks'] as $implementation) {
           $this->proceduralImplementations[$implementation['hook']][] = $implementation['theme'];
         }
       }
@@ -357,8 +384,9 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
       if ($subPathName === 'src' || $subPathName === 'src/Hook') {
         return TRUE;
       }
+      $ignore_directories = Settings::get('file_scan_ignore_directories', []);
       // glob() doesn't support streams but scandir() does.
-      return !in_array($fileInfo->getFilename(), ['tests', 'js', 'css', 'templates']) && !array_filter(scandir($key), static fn($filename) => str_ends_with($filename, '.info.yml'));
+      return !in_array($fileInfo->getFilename(), array_merge(['tests', 'js', 'css', 'templates'], $ignore_directories)) && !array_filter(scandir($key), static fn($filename) => str_ends_with($filename, '.info.yml'));
     }
     if ($fileInfo->getFilename() === 'theme-settings.php') {
       return TRUE;

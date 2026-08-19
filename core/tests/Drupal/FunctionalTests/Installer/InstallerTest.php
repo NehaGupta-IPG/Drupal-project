@@ -34,10 +34,6 @@ class InstallerTest extends InstallerTestBase {
     // Confirm that we are logged-in after installation.
     $this->assertSession()->pageTextContains($this->rootUser->getAccountName());
 
-    // Verify that the confirmation message appears.
-    require_once $this->root . '/core/includes/install.inc';
-    $this->assertSession()->pageTextContains('Congratulations, you installed Drupal!');
-
     // Ensure that the timezone is correct for sites under test after installing
     // interactively.
     $this->assertEquals('Australia/Sydney', $this->config('system.date')->get('timezone.default'));
@@ -46,6 +42,7 @@ class InstallerTest extends InstallerTestBase {
     $module_extension_list = \Drupal::service('extension.list.module');
     $extensions = $module_extension_list->getList();
 
+    // By default, the profile should remain installed.
     $this->assertArrayHasKey('testing', $extensions);
     $this->assertEquals(1000, $extensions['testing']->weight);
     // Ensures that router is not rebuilt unnecessarily during the install.

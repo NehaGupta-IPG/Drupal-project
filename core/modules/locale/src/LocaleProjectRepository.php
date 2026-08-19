@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\locale;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -21,7 +21,7 @@ readonly class LocaleProjectRepository {
 
   public function __construct(
     #[Autowire(service: 'cache.memory')]
-    protected CacheBackendInterface $memoryCache,
+    protected MemoryCacheInterface $memoryCache,
     protected KeyValueFactoryInterface $keyValueFactory,
     protected ModuleHandlerInterface $moduleHandler,
     protected ModuleExtensionList $moduleExtensionList,
@@ -144,15 +144,13 @@ readonly class LocaleProjectRepository {
       unset($existing_projects[$name]);
       $data['info']['version'] ??= '';
 
-      // For dev releases, remove the '-dev' part and trust the translation
-      // server to fall back to the latest stable release for that branch.
+      // For legacy dev releases, remove the '-dev' part and trust the
+      // translation server to fall back to the latest stable release for that
+      // branch. For semantic releases for core and contrib, the translation
+      // server supports redirects for all possible version strings.
       if (str_ends_with($data['info']['version'], '-dev')) {
         if (preg_match("/^(\d+\.x-\d+\.).*$/", $data['info']['version'], $matches)) {
           // Example matches: "8.x-1.x-dev", "8.x-1.0-alpha1+5-dev => 8.x-1.x".
-          $data['info']['version'] = $matches[1] . 'x';
-        }
-        elseif (preg_match("/^(\d+\.\d+\.).*$/", $data['info']['version'], $matches)) {
-          // Example match: 8.0.0-dev => 8.0.x (Drupal core)
           $data['info']['version'] = $matches[1] . 'x';
         }
       }
@@ -166,6 +164,7 @@ readonly class LocaleProjectRepository {
         // gettext file. Use the default if not.
         server_pattern: !empty($data['info']['interface translation server pattern']) ? $data['info']['interface translation server pattern'] : $pattern,
         info: $data['info'] ?? [],
+        weight: $data['weight'] ?? 0,
         status: TRUE,
       );
 
