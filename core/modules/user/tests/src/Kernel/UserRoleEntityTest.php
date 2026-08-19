@@ -38,7 +38,7 @@ class UserRoleEntityTest extends KernelTestBase {
   }
 
   /**
-   * Tests that existing user roles have a description.
+   * Tests that role descriptions are optional in configuration.
    */
   public function testExistingRoleDescription(): void {
     $this->installConfig('user');
@@ -46,7 +46,18 @@ class UserRoleEntityTest extends KernelTestBase {
       $role = Role::load($role_id);
       $this->assertNotNull($role);
       $this->assertSame('', $role->getDescription());
+      $this->assertArrayNotHasKey('description', $this->config('user.role.' . $role_id)->getRawData());
     }
+
+    $role = Role::create(['id' => 'test_role', 'label' => 'Test role']);
+    $role->save();
+    $this->assertArrayNotHasKey('description', $this->config('user.role.test_role')->getRawData());
+
+    $role->setDescription('Lorem ipsum.')->save();
+    $this->assertSame('Lorem ipsum.', $this->config('user.role.test_role')->get('description'));
+
+    $role->setDescription('')->save();
+    $this->assertArrayNotHasKey('description', $this->config('user.role.test_role')->getRawData());
   }
 
   /**

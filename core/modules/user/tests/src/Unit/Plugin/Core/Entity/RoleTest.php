@@ -47,6 +47,9 @@ class RoleTest extends UnitTestCase {
 
     $this->assertSame($role, $role->setDescription('Lorem ipsum.'));
     $this->assertSame('Lorem ipsum.', $role->getDescription());
+
+    $role->setDescription('');
+    $this->assertSame('', $role->getDescription());
   }
 
 }
