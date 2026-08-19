@@ -10,6 +10,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines the 'map' entity field type.
+ *
+ * @property string $createdItem
  */
 #[FieldType(
   id: "map",

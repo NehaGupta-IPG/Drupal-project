@@ -7,6 +7,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines the 'created' entity field type.
+ *
+ * @property string $createdItem
  */
 #[FieldType(
   id: "created",

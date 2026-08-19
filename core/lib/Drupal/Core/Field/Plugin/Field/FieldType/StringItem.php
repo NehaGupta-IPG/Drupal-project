@@ -11,6 +11,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines the 'string' entity field type.
+ *
+ * @property string $item
  */
 #[FieldType(
   id: "string",

@@ -10,6 +10,8 @@ use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Defines the 'password' entity field type.
+ *
+ * @property string $password
  */
 #[FieldType(
   id: "password",

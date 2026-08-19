@@ -11,6 +11,8 @@ use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Defines the 'decimal' field type.
+ *
+ * @property double $item
  */
 #[FieldType(
   id: "decimal",

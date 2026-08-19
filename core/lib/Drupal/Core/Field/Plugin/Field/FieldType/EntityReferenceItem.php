@@ -31,6 +31,9 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\AllowedValuesConstraint;
  *
  * Supported settings (below the definition's 'settings' key) are:
  * - target_type: The entity type to reference. Required.
+ *
+ * @property string|int $target_id
+ * @property \Drupal\Core\Entity\EntityInterface $entity
  */
 #[FieldType(
   id: "entity_reference",

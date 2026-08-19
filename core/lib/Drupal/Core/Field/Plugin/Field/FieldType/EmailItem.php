@@ -13,6 +13,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines the 'email' field type.
+ *
+ * @property string $email
  */
 #[FieldType(
   id: "email",

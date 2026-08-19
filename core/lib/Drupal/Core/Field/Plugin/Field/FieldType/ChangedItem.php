@@ -13,6 +13,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Based on a field of this type, entity types can easily implement the
  * EntityChangedInterface.
  *
+ * @property string $changedItem
+ *
  * @see \Drupal\Core\Entity\EntityChangedInterface
  */
 #[FieldType(

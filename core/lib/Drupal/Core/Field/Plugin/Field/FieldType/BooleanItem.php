@@ -14,6 +14,8 @@ use Drupal\Core\TypedData\OptionsProviderInterface;
 
 /**
  * Defines the 'boolean' entity field type.
+ *
+ * @property bool true|false
  */
 #[FieldType(
   id: "boolean",

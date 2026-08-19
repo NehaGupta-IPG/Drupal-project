@@ -21,6 +21,8 @@ use Drupal\file\Validation\FileValidatorSettingsTrait;
 
 /**
  * Plugin implementation of the 'file' field type.
+ *
+ * @property int $fid
  */
 #[FieldType(
   id: "file",

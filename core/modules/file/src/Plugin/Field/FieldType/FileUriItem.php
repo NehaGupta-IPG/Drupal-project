@@ -11,6 +11,8 @@ use Drupal\file\ComputedFileUrl;
 
 /**
  * File-specific plugin implementation of a URI item to provide a full URL.
+ *
+ * @property string $fileUrl
  */
 #[FieldType(
   id: "file_uri",

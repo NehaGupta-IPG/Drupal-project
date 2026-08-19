@@ -18,6 +18,8 @@ use Drupal\link\LinkTitleVisibility;
 
 /**
  * Plugin implementation of the 'link' field type.
+ *
+ * @property string $link
  */
 #[FieldType(
   id: "link",

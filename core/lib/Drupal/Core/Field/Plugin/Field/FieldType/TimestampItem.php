@@ -11,6 +11,8 @@ use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Defines the 'timestamp' entity field type.
+ *
+ * @property string $timestamp
  */
 #[FieldType(
   id: "timestamp",

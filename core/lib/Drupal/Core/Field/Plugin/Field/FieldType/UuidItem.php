@@ -11,6 +11,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Defines the 'uuid' entity field type.
  *
  * The field uses a newly generated UUID as default value.
+ *
+ * @property string $uuid
  */
 #[FieldType(
   id: "uuid",

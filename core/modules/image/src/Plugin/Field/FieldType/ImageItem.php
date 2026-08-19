@@ -20,6 +20,8 @@ use Drupal\file\Plugin\Field\FieldType\FileItem;
 
 /**
  * Plugin implementation of the 'image' field type.
+ *
+ * @property int $id
  */
 #[FieldType(
   id: "image",

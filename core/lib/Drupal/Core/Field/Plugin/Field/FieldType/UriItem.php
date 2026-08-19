@@ -12,6 +12,8 @@ use Drupal\Core\TypedData\DataDefinition;
 /**
  * Defines the 'uri' entity field type.
  *
+ * @property \Drupal\Core\Url $url
+ *
  * URIs are not length limited by RFC 2616, but we need to provide a sensible
  * default. There is a de-facto limit of 2000 characters in browsers and other
  * implementors, so we go with 2048.

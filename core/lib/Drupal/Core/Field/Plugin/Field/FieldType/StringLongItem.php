@@ -10,6 +10,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines the 'string_long' field type.
+ *
+ * @property string $StringLongItem
  */
 #[FieldType(
   id: "string_long",

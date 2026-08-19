@@ -15,6 +15,8 @@ use Drupal\Core\TypedData\OptionsProviderInterface;
 
 /**
  * Defines the 'language' entity field item.
+ *
+ * @property string $languageItem
  */
 #[FieldType(
   id: "language",

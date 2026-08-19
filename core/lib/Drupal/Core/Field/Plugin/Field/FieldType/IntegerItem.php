@@ -10,6 +10,8 @@ use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Defines the 'integer' field type.
+ *
+ * @property int $item
  */
 #[FieldType(
   id: "integer",

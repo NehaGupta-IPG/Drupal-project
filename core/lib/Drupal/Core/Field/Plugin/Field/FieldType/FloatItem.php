@@ -11,6 +11,8 @@ use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Defines the 'float' field type.
+ *
+ * @property float $item
  */
 #[FieldType(
   id: "float",

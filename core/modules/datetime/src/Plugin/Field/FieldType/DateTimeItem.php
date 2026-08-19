@@ -12,6 +12,8 @@ use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Plugin implementation of the 'datetime' field type.
+ *
+ * @property string $datetime
  */
 #[FieldType(
   id: "datetime",
