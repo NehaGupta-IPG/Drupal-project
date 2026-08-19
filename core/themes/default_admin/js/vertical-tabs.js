@@ -36,6 +36,10 @@
           ),
       )),
     );
+    if (settings.childErrorIndicator.length) {
+      tab.item.addClass('error');
+      tab.title.append(settings.childErrorIndicator);
+    }
     return tab;
   };
 })(jQuery, Drupal);
