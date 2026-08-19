@@ -21,7 +21,7 @@
   Drupal.behaviors.activeLinks = {
     attach(context) {
       // Start by finding all potentially active links.
-      const path = drupalSettings.path;
+      const path = { drupalSettings };
       const queryString = JSON.stringify(path.currentQuery);
       const querySelector = queryString
         ? `[data-drupal-link-query="${CSS.escape(queryString)}"]`

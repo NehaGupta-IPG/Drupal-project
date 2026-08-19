@@ -311,7 +311,7 @@
    * 'Drupal.tableDrag.showWeight' localStorage value.
    */
   Drupal.tableDrag.prototype.initColumns = function () {
-    const $table = this.$table;
+    const { $table } = this;
     let hidden;
     let cell;
     let columnIndex;
@@ -1245,9 +1245,9 @@
         ? de.clientHeight
         : b.offsetHeight);
     this.windowHeight = windowHeight;
-    const scrollY = window.scrollY;
+    const { scrollY } = window;
     this.scrollY = scrollY;
-    const trigger = this.scrollSettings.trigger;
+    const { trigger } = this.scrollSettings;
     let delta = 0;
 
     // Return a scroll speed relative to the edge of the screen.

@@ -67,8 +67,8 @@ function viewToModelCaption(editor) {
  */
 function mapModelPositionToView(editingView) {
   return (evt, data) => {
-    const modelPosition = data.modelPosition;
-    const parent = modelPosition.parent;
+    const { modelPosition } = data;
+    const { parent } = modelPosition;
 
     if (!isDrupalMedia(parent)) {
       return;
@@ -207,8 +207,8 @@ export default class DrupalMediaCaptionEditing extends Plugin {
    * @inheritdoc
    */
   init() {
-    const editor = this.editor;
-    const schema = editor.model.schema;
+    const { editor } = this;
+    const { schema } = editor.model;
 
     // Schema configuration.
     if (!schema.isRegistered('caption')) {
@@ -235,8 +235,8 @@ export default class DrupalMediaCaptionEditing extends Plugin {
    * Initializes upcasting and downcasting Drupal Media captions.
    */
   _setupConversion() {
-    const editor = this.editor;
-    const view = editor.editing.view;
+    const { editor } = this;
+    const { view } = editor.editing;
 
     // View -> model converter for the data pipeline.
     editor.conversion.for('upcast').add(viewToModelCaption(editor));

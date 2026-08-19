@@ -89,14 +89,13 @@ export default class DrupalImageUploadAdapter {
    *  Native File object.
    */
   _initListeners(resolve, reject, file) {
-    const xhr = this.xhr;
-    const loader = this.loader;
+    const { xhr, loader } = this;
     const genericErrorText = `Couldn't upload file: ${file.name}.`;
 
     xhr.addEventListener('error', () => reject(genericErrorText));
     xhr.addEventListener('abort', () => reject());
     xhr.addEventListener('load', () => {
-      const response = xhr.response;
+      const { response } = xhr;
 
       if (!response || response.error) {
         return reject(response?.error?.message || genericErrorText);

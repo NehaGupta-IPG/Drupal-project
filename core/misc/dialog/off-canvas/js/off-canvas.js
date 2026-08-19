@@ -173,7 +173,7 @@
      *   Data attached to the event.
      */
     handleDialogResize(event) {
-      const $element = event.data.$element;
+      const { $element } = event.data;
       const $container = Drupal.offCanvas.getContainer($element);
 
       const $offsets = $container.find(
@@ -203,7 +203,7 @@
      *   Data attached to the event.
      */
     resetSize(event) {
-      const $element = event.data.$element;
+      const { $element } = event.data;
       const container = Drupal.offCanvas.getContainer($element);
       const position = event.data.settings.drupalOffCanvasPosition;
 
@@ -219,7 +219,7 @@
 
       displace();
 
-      const offsets = displace.offsets;
+      const { offsets } = displace;
 
       const topPosition =
         position === 'side' && offsets.top !== 0 ? `+${offsets.top}` : '';
@@ -272,7 +272,7 @@
         return;
       }
       Drupal.offCanvas.resetPadding();
-      const $element = event.data.$element;
+      const { $element } = event.data;
       const $container = Drupal.offCanvas.getContainer($element);
       const mainCanvasWrapper = Drupal.offCanvas.$mainCanvasWrapper[0];
 

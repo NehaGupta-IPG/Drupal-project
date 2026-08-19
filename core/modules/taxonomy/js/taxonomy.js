@@ -17,8 +17,7 @@
    */
   Drupal.behaviors.termDrag = {
     attach(context, settings) {
-      const backStep = settings.taxonomy.backStep;
-      const forwardStep = settings.taxonomy.forwardStep;
+      const { backStep, forwardStep } = settings.taxonomy;
       // Get the taxonomy tableDrag object.
       const tableDrag = Drupal.tableDrag.taxonomy;
       const $table = $('#taxonomy');

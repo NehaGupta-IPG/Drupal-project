@@ -92,7 +92,7 @@
       const $context = $(context);
 
       function clickEditHandler(e) {
-        const data = e.data;
+        const { data } = e;
         data.$wrapper.removeClass('hidden');
         if (data.$target.attr('data-machine-name-require-when-visible')) {
           data.$target
@@ -105,8 +105,8 @@
       }
 
       function machineNameHandler(e) {
-        const data = e.data;
-        const options = data.options;
+        const { data } = e;
+        const { options } = data;
         const baseValue = e.target.value;
 
         const needsTransliteration = !/^[A-Za-z0-9_\s]*$/.test(baseValue);

@@ -60,6 +60,7 @@
     "jsdoc/check-tag-names": ["warn"],
     "no-unused-vars": ["warn"],
     "operator-linebreak": ["error", "after", { "overrides": { "?": "ignore", ":": "ignore" } }],
+    "prefer-destructuring": ["error", { "object": true, "array": false }],
     "yml/indent": ["error", 2]
   },
   "settings": {

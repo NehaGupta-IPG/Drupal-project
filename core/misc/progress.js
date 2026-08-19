@@ -125,7 +125,7 @@
           const pb = this;
           // When doing a post request, you need non-null data. Otherwise a
           // HTTP 411 or HTTP 406 (with Apache mod_security) error may result.
-          let uri = this.uri;
+          let { uri } = this;
           if (!uri.includes('?')) {
             uri += '?';
           } else {

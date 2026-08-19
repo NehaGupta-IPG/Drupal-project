@@ -157,7 +157,7 @@ window.Drupal = { behaviors: {}, locale: {} };
   Drupal.attachBehaviors = function (context, settings) {
     context = context || document;
     settings = settings || drupalSettings;
-    const behaviors = Drupal.behaviors;
+    const { behaviors } = Drupal;
     // Execute all of them.
     Object.keys(behaviors || {}).forEach((i) => {
       if (typeof behaviors[i].attach === 'function') {
@@ -216,7 +216,7 @@ window.Drupal = { behaviors: {}, locale: {} };
     context = context || document;
     settings = settings || drupalSettings;
     trigger = trigger || 'unload';
-    const behaviors = Drupal.behaviors;
+    const { behaviors } = Drupal;
     // Execute all of them.
     Object.keys(behaviors || {}).forEach((i) => {
       if (typeof behaviors[i].detach === 'function') {
@@ -492,7 +492,7 @@ window.Drupal = { behaviors: {}, locale: {} };
     args = args || {};
     args['@count'] = count;
 
-    const pluralDelimiter = drupalSettings.pluralDelimiter;
+    const { pluralDelimiter } = drupalSettings;
     const translations = Drupal.t(
       singular + pluralDelimiter + plural,
       args,

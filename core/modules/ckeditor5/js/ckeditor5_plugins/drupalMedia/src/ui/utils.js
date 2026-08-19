@@ -16,19 +16,26 @@ import { getClosestSelectedDrupalMediaWidget } from '../utils';
  */
 export function getBalloonPositionData(editor) {
   const editingView = editor.editing.view;
-  const defaultPositions = BalloonPanelView.defaultPositions;
+  const {
+    northArrowSouth,
+    northArrowSouthWest,
+    northArrowSouthEast,
+    southArrowNorth,
+    southArrowNorthWest,
+    southArrowNorthEast,
+  } = BalloonPanelView.defaultPositions;
 
   return {
     target: editingView.domConverter.viewToDom(
       editingView.document.selection.getSelectedElement(),
     ),
     positions: [
-      defaultPositions.northArrowSouth,
-      defaultPositions.northArrowSouthWest,
-      defaultPositions.northArrowSouthEast,
-      defaultPositions.southArrowNorth,
-      defaultPositions.southArrowNorthWest,
-      defaultPositions.southArrowNorthEast,
+      northArrowSouth,
+      northArrowSouthWest,
+      northArrowSouthEast,
+      southArrowNorth,
+      southArrowNorthWest,
+      southArrowNorthEast,
     ],
   };
 }

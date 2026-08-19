@@ -4,7 +4,7 @@
  */
 
 (function ($, Drupal, drupalSettings) {
-  const dateFormats = drupalSettings.dateFormats;
+  const dateFormats = { drupalSettings };
 
   /**
    * Display the preview for date format entered.

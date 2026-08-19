@@ -93,7 +93,7 @@
    */
   function getRawOffset(el, edge) {
     const $el = $(el);
-    const documentElement = document.documentElement;
+    const { documentElement } = document;
     let displacement = 0;
     const horizontal = edge === 'left' || edge === 'right';
     // Get the offset of the element itself.

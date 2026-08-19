@@ -21,24 +21,21 @@
   Drupal.behaviors.fileValidateAutoAttach = {
     attach(context, settings) {
       const $context = $(context);
-      let elements;
 
       function initFileValidation(selector) {
         $(once('fileValidate', $context.find(selector))).on(
           'change.fileValidate',
-          { extensions: elements[selector] },
+          { extensions: settings.file.elements[selector] },
           Drupal.file.validateExtension,
         );
       }
 
       if (settings.file?.elements) {
-        elements = settings.file.elements;
-        Object.keys(elements).forEach(initFileValidation);
+        Object.keys(settings.file.elements).forEach(initFileValidation);
       }
     },
     detach(context, settings, trigger) {
       const $context = $(context);
-      let elements;
 
       function removeFileValidation(selector) {
         $(once.remove('fileValidate', $context.find(selector))).off(
@@ -48,8 +45,7 @@
       }
 
       if (trigger === 'unload' && settings.file?.elements) {
-        elements = settings.file.elements;
-        Object.keys(elements).forEach(removeFileValidation);
+        Object.keys(settings.file.elements).forEach(removeFileValidation);
       }
     },
   };

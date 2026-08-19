@@ -110,7 +110,7 @@
    */
   function onTextFormatChange(event) {
     const select = event.target;
-    const field = event.data.field;
+    const { field } = event.data;
     const activeFormatID = field.getAttribute('data-editor-active-text-format');
     const newFormatID = select.value;
 

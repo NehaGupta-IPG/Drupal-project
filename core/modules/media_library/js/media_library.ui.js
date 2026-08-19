@@ -200,7 +200,7 @@
         // Override the AJAX success callback to announce the updated content
         // to screen readers.
         if (displayAnnouncement || focusSelector) {
-          const success = ajaxObject.success;
+          const { success } = ajaxObject;
           ajaxObject.success = function (response, status) {
             success.bind(this)(response, status);
             // The AJAX link replaces the whole view, including the clicked
@@ -242,7 +242,7 @@
         '.js-media-library-views-form, .js-media-library-add-form',
         context,
       );
-      const currentSelection = Drupal.MediaLibrary.currentSelection;
+      const { currentSelection } = Drupal.MediaLibrary;
 
       if (!$form.length) {
         return;

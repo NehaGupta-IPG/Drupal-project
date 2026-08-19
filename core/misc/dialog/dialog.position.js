@@ -28,7 +28,7 @@
    *   Altered options object.
    */
   function resetPosition(options) {
-    const offsets = displace.offsets;
+    const { offsets } = displace;
     const left = offsets.left - offsets.right;
     const top = offsets.top - offsets.bottom;
 
