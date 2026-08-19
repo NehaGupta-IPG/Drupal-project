@@ -13,7 +13,9 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 
 /**
  * Tests the recipe finder.
@@ -63,6 +65,22 @@ class RecipeFinderTest extends KernelTestBase {
       'Example',
       array_column(iterator_to_array($finder), 'name'),
     );
+  }
+
+  /**
+   * Tests that there is an error if the finder is given invalid directories.
+   *
+   * @param string|array $directories
+   *   The directory, or directories, to instantiate the finder with.
+   */
+  #[TestWith([''])]
+  #[TestWith(['nonsense'])]
+  #[TestWith([['core', 'nonsense']])]
+  public function testInvalidDirectoriesRejected(string|array $directories): void {
+    $error_directory = array_last((array) $directories);
+    $this->expectException(DirectoryNotFoundException::class);
+    $this->expectExceptionMessage("The \"$error_directory\" directory does not exist.");
+    new Finder($directories);
   }
 
   /**
