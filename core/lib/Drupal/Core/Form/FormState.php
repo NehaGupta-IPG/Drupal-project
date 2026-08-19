@@ -5,6 +5,7 @@ namespace Drupal\Core\Form;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Response;
+use Drupal\Core\Utility\Error;
 
 /**
  * Stores information about the state of a form.
@@ -1056,6 +1057,9 @@ class FormState implements FormStateInterface {
    * {@inheritdoc}
    */
   public function setRedirectUrl(Url $url) {
+    if (!$url->access()) {
+      throw new \Exception(sprintf('Access denied for %s. Backtrace: %s', $url->getRouteName(), Error::formatBacktrace(debug_backtrace())));
+    }
     $this->redirect = $url;
     return $this;
   }

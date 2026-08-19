@@ -165,6 +165,8 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
     }
     $account = $this->userStorage->load($uid);
 
+    user_login_finalize($account);
+
     // A destination was set, probably on an exception controller.
     if (!$this->getRequest()->request->has('destination')) {
       $form_state->setRedirect(
@@ -175,8 +177,6 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
     else {
       $this->getRequest()->query->set('destination', $this->getRequest()->request->get('destination'));
     }
-
-    user_login_finalize($account);
   }
 
   /**

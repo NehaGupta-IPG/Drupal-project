@@ -93,7 +93,7 @@ class UserCancelTest extends BrowserTestBase {
     // Create a regular user.
     $account = $this->drupalCreateUser([]);
 
-    $admin_user = $this->drupalCreateUser(['cancel other accounts']);
+    $admin_user = $this->drupalCreateUser(['administer users', 'cancel other accounts']);
     $this->drupalLogin($admin_user);
 
     // Delete regular user.
