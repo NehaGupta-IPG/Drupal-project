@@ -13,7 +13,7 @@ class RoleStorage extends ConfigEntityStorage implements RoleStorageInterface {
   /**
    * {@inheritdoc}
    */
-  protected function mapToStorageRecord(EntityInterface $entity) {
+  protected function mapToStorageRecord(EntityInterface $entity): array {
     $data = parent::mapToStorageRecord($entity);
     if ($entity instanceof RoleInterface && $entity->getDescription() === '') {
       unset($data['description']);
