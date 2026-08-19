@@ -29,13 +29,13 @@ class Number {
    */
   private static function normalize(int|float|string $number): string {
     if (is_float($number)) {
-      // If the float has less significant decimals than the number we can
-      // guarantee, convert it to a string directly.
+      // If the float has fewer significant decimals than the PHP runtime
+      // configuration guarantees, convert it to a string directly.
       if (preg_match('/^\d+\.\d+$/', (string) $number)) {
         return (string) $number;
       }
-      // For floats with more significant decimals than 100, discard.
-      return rtrim(number_format($number, 15, '.', ''), '0');
+      // Discard digits beyond what can be rounded to float and back.
+      return rtrim(number_format($number, PHP_FLOAT_DIG, '.', ''), '0');
     }
     return (string) $number;
   }
@@ -54,15 +54,15 @@ class Number {
    *   suffer from system-specific limitations to float precision, so they
    *   can contain more significant decimals.
    *
-   *   @code Number::countSignificantDecimals(100.12345678901234567890) @endcode
+   *   Number::countSignificantDecimals(100.12345678901234567890)
    *   returns 11 but
-   *   @code Number::countSignificantDecimals('100.12345678901234567890') @endcode
+   *   Number::countSignificantDecimals('100.12345678901234567890')
    *   returns 20.
    */
   private static function countSignificantDecimals(int|float|string $number): int {
     $number_str = (string) $number;
 
-    // Handle scientific notation (e.g., 1.0E-5).
+    // Handle scientific notation (for example, 1.0E-5).
     if (stripos($number_str, 'e') !== FALSE) {
       [$mantissa, $exponent] = preg_split('/e/i', $number_str);
       $mantissa_decimals = 0;
