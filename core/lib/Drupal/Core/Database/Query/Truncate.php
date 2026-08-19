@@ -40,9 +40,12 @@ class Truncate extends Query implements QueryExecutionVoidInterface {
    * PostgreSQL also locks the entire table for a TRUNCATE strongly reducing
    * the concurrency with other transactions.
    *
-   * The force_truncate option skips that fallback, so that a caller needing
-   * what TRUNCATE does beyond emptying the table gets a TRUNCATE inside a
-   * transaction too. The implicit COMMIT comes with it.
+   * The reset_serial_id option asks for the serial ID of the table to be reset
+   * along with emptying it. TRUNCATE is the statement that does that, so the
+   * option skips the fallback and keeps a TRUNCATE inside a transaction too.
+   * The implicit COMMIT comes with it. Drivers whose TRUNCATE leaves the serial
+   * ID alone, or which have no TRUNCATE, override this class to honor the
+   * option their own way.
    *
    * @see https://learnsql.com/blog/difference-between-truncate-delete-and-drop-table-in-sql
    */
@@ -67,9 +70,10 @@ class Truncate extends Query implements QueryExecutionVoidInterface {
     $comments = $this->connection->makeComment($this->comments);
 
     // The statement actually built depends on whether a transaction is active,
-    // unless the caller asked for a TRUNCATE either way.
+    // unless the caller asked for the serial ID to be reset, which only
+    // TRUNCATE does.
     // @see ::execute()
-    if ($this->connection->inTransaction() && empty($this->queryOptions['force_truncate'])) {
+    if ($this->connection->inTransaction() && empty($this->queryOptions['reset_serial_id'])) {
       return $comments . 'DELETE FROM {' . $this->connection->escapeTable($this->table) . '}';
     }
     else {

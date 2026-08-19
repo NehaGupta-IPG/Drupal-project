@@ -5,7 +5,6 @@ namespace Drupal\sqlite\Driver\Database\sqlite;
 use Drupal\Component\Utility\FilterArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Connection as DatabaseConnection;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\StatementInterface;
@@ -527,33 +526,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function truncateWithSerialId(string $table): void {
     // SQLite has no TRUNCATE, so emptying the table leaves the AUTOINCREMENT
-    // high-water mark behind in "sqlite_sequence". Drop that row first, so the
-    // order does not change the outcome, and a failure between the two leaves
-    // the table as it was instead of leaving it empty with the next ID still
-    // ahead.
-    //
-    // In this driver a prefix is an attached database, so the schema has to be
-    // named explicitly instead of going through the query builder, which would
-    // prefix the name of the internal table as if it were a Drupal one.
-    $schema_name = rtrim($this->getPrefix(), '.') ?: 'main';
-    try {
-      $this->query("DELETE FROM [" . $schema_name . "].sqlite_sequence WHERE name = :name", [':name' => $table]);
-    }
-    catch (DatabaseExceptionWrapper $e) {
-      // sqlite_sequence only exists once a table of this schema uses
-      // AUTOINCREMENT, so it is missing while no table has a serial column. The
-      // statement is attempted before checking that, so the common case spends
-      // one query here instead of two. Anything else is a real failure.
-      $sequence_exists = (bool) $this->query("SELECT 1 FROM [" . $schema_name . "].sqlite_master WHERE type = :type AND name = :name", [
-        ':type' => 'table',
-        ':name' => 'sqlite_sequence',
-      ])->fetchField();
-      if ($sequence_exists) {
-        throw $e;
-      }
-    }
-
-    $this->truncate($table)->execute();
+    // high-water mark behind in "sqlite_sequence". The "reset_serial_id" option
+    // makes Truncate drop it.
+    $this->truncate($table, ['reset_serial_id' => TRUE])->execute();
   }
 
   /**

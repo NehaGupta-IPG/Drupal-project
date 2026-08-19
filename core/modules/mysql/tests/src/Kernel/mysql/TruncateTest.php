@@ -16,18 +16,18 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class TruncateTest extends DriverSpecificDatabaseTestBase {
 
   /**
-   * Tests that the force_truncate option keeps TRUNCATE inside a transaction.
+   * Tests that the reset_serial_id option keeps TRUNCATE in a transaction.
    *
    * Without the option the statement falls back to DELETE, which empties the
    * table without resetting AUTO_INCREMENT.
    */
-  public function testTruncateForceTruncateSqlStatement(): void {
+  public function testTruncateResetSerialIdSqlStatement(): void {
     $this->assertStringContainsString('TRUNCATE {test}', (string) $this->connection->truncate('test'));
 
     $transaction = $this->connection->startTransaction();
     $this->assertStringContainsString('DELETE FROM {test}', (string) $this->connection->truncate('test'));
 
-    $sql = (string) $this->connection->truncate('test', ['force_truncate' => TRUE]);
+    $sql = (string) $this->connection->truncate('test', ['reset_serial_id' => TRUE]);
     $this->assertStringContainsString('TRUNCATE {test}', $sql);
     $this->assertStringNotContainsString('DELETE', $sql);
     $transaction->rollBack();

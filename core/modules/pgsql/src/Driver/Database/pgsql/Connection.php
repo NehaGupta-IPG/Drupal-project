@@ -509,7 +509,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // the sequence back up, because the driver issues setval() for explicit
     // serial values.
     // @see \Drupal\pgsql\Driver\Database\pgsql\Insert::execute()
-    $this->truncate($table, ['restart_identity' => TRUE])->execute();
+    $this->truncate($table, ['reset_serial_id' => TRUE])->execute();
   }
 
   /**

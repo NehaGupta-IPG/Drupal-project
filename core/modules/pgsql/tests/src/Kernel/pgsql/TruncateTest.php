@@ -35,11 +35,11 @@ class TruncateTest extends DriverSpecificDatabaseTestBase {
   }
 
   /**
-   * Tests that the restart_identity option reaches the SQL statement.
+   * Tests that the reset_serial_id option reaches the SQL statement.
    */
-  public function testTruncateRestartIdentitySqlStatement(): void {
+  public function testTruncateResetSerialIdSqlStatement(): void {
     $this->assertStringNotContainsString('RESTART IDENTITY', (string) $this->connection->truncate('test'));
-    $this->assertStringContainsString('TRUNCATE {test} RESTART IDENTITY', (string) $this->connection->truncate('test', ['restart_identity' => TRUE]));
+    $this->assertStringContainsString('TRUNCATE {test} RESTART IDENTITY', (string) $this->connection->truncate('test', ['reset_serial_id' => TRUE]));
   }
 
 }

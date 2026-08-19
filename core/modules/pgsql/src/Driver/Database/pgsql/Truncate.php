@@ -9,7 +9,7 @@ use Drupal\Core\Database\Query\Truncate as QueryTruncate;
 /**
  * PostgreSQL implementation of \Drupal\Core\Database\Query\Truncate.
  *
- * Accepts a "restart_identity" option, which adds RESTART IDENTITY to the
+ * Honors the "reset_serial_id" option by adding RESTART IDENTITY to the
  * statement. TRUNCATE leaves the sequences owned by the columns of the table
  * alone without it.
  */
@@ -57,7 +57,7 @@ class Truncate extends QueryTruncate {
 
     // RESTART IDENTITY rewinds the sequences owned by the columns of the table
     // to their start value, in the same statement that empties the table.
-    $restart_identity = empty($this->queryOptions['restart_identity']) ? '' : 'RESTART IDENTITY ';
+    $restart_identity = empty($this->queryOptions['reset_serial_id']) ? '' : 'RESTART IDENTITY ';
 
     return $comments . 'TRUNCATE {' . $this->connection->escapeTable($this->table) . '} ' . $restart_identity;
   }
