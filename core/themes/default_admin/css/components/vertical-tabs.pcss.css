@@ -191,7 +191,7 @@
     }
 
     .dark-mode & {
-      border-color: var(--admin-color-border);
+      border-color: var(--vertical-tabs-border-color);
       background: var(--admin-color-bg);
     }
   }
@@ -236,7 +236,7 @@
   box-shadow: var(--vertical-tabs-shadow);
 
   .dark-mode & {
-    border-color: var(--admin-color-border);
+    border-color: var(--vertical-tabs-border-color);
     background: var(--admin-color-bg);
   }
 
