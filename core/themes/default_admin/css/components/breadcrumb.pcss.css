@@ -89,15 +89,22 @@
 
     & + .gin-breadcrumb__item::before {
       display: inline-block;
-      padding: 0 0.5em;
-      content: "/";
+      width: 0.5rem;
+      height: 0.5rem;
+      margin-inline: 0.75rem 1rem;
+      content: "";
+      transform: rotate(45deg);
       vertical-align: middle;
-      opacity: 0.3;
       background: none;
-      font-size: var(--admin-font-size-xs);
+      border-block-start: 2px solid var(--admin-color-text-soft);
+      border-inline-end: 2px solid var(--admin-color-text-soft);
+
+      [dir="rtl"] & {
+        transform: rotate(-45deg);
+      }
 
       @media (forced-colors: active) {
-        opacity: 1;
+        border-color: CanvasText;
       }
     }
 
@@ -137,11 +144,14 @@
     &:first-of-type + .gin-breadcrumb__item::before {
       width: 1px;
       height: 20px;
+      margin-inline-start: 0;
       margin-inline-end: 0.75em;
       padding-inline-start: 0.75em;
       padding-inline-end: 0;
       content: "";
+      transform: none;
       opacity: 0.3;
+      border-block-start: 0;
       border-inline-end: 1px solid var(--admin-color-text);
 
       @media (forced-colors: active) {
