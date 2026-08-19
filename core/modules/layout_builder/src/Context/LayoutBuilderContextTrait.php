@@ -39,13 +39,13 @@ trait LayoutBuilderContextTrait {
    *
    * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
    *   The section storage.
-   * @param int $delta
-   *   The section delta.
+   * @param int|null $delta
+   *   (optional) The section delta.
    *
    * @return \Drupal\Core\Plugin\Context\ContextInterface[]
    *   The array of context objects.
    */
-  protected function getPopulatedContexts(SectionStorageInterface $section_storage, int $delta): array {
+  protected function getPopulatedContexts(SectionStorageInterface $section_storage, ?int $delta = NULL): array {
     // Get all known globally available contexts IDs.
     $available_context_ids = array_keys($this->contextRepository()->getAvailableContexts());
     // Filter to those that are populated.

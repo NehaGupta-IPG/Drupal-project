@@ -39,8 +39,8 @@ class SectionThirdPartyIntegrationTest extends KernelTestBase {
       new Section(
         'layout_builder_test_plugin', [], [
           'first-uuid' => new SectionComponent(
-          'first-uuid',
-          'main',
+            'first-uuid',
+            'main',
             [
               'id' => 'system_powered_by_block',
             ]
@@ -50,8 +50,10 @@ class SectionThirdPartyIntegrationTest extends KernelTestBase {
     ];
     $section_storage = new TestSectionList($section_data);
 
-    // Check the 'main' region render array before altering.
-    $region = $section_storage->getSection(0)->toRenderArray()['main'];
+    // Check the section render array before altering.
+    $build = $section_storage->getSection(0)->toRenderArray();
+    $this->assertArrayNotHasKey('third_party', $build);
+    $region = $build['main'];
     $this->assertSame([
       'first-uuid',
       '#attributes',
@@ -60,7 +62,8 @@ class SectionThirdPartyIntegrationTest extends KernelTestBase {
 
     // Activate regions altering by third-party and recreate the render array.
     $this->container->get(LayoutBuilderTestSectionHooks::class)->setActive(TRUE);
-    $region = $section_storage->getSection(0)->toRenderArray()['main'];
+    $build = $section_storage->getSection(0)->toRenderArray();
+    $region = $build['main'];
 
     // Check that that 'main' region render array has been altered.
     $this->assertSame([
@@ -72,6 +75,9 @@ class SectionThirdPartyIntegrationTest extends KernelTestBase {
     $this->assertSame('3rd party: before', $region['before']['#markup']);
     $this->assertSame('3rd party: replaced', $region['first-uuid']['content']['#markup']);
     $this->assertSame('3rd party: after', $region['after']['#markup']);
+
+    // Check that the overall section render array has also been altered.
+    $this->assertSame('3rd party: section', $build['third_party']['#markup']);
   }
 
 }

@@ -29,7 +29,7 @@ class LayoutBuilderTestSectionHooks {
   }
 
   /**
-   * Reacts before layout_builder builds the regions.
+   * Executes before layout_builder builds the regions.
    *
    * Implements hook_layout_builder_section_regions_render_array_alter().
    */
@@ -44,7 +44,7 @@ class LayoutBuilderTestSectionHooks {
   }
 
   /**
-   * Reacts after layout_builder has built the regions.
+   * Executes after layout_builder has built the regions.
    *
    * Implements hook_layout_builder_section_regions_render_array_alter().
    */
@@ -58,6 +58,21 @@ class LayoutBuilderTestSectionHooks {
     ];
     // Alter also content provided by the core hook.
     $regions['main']['first-uuid']['content']['#markup'] = '3rd party: replaced';
+  }
+
+  /**
+   * Executes after layout_builder has built the section render array.
+   *
+   * Implements hook_layout_builder_section_render_array_alter().
+   */
+  #[Hook('layout_builder_section_render_array_alter')]
+  public function afterBuildSectionRenderArray(array &$build, Section $section, array $context): void {
+    if (!$this->active) {
+      return;
+    }
+    $build['third_party'] = [
+      '#markup' => '3rd party: section',
+    ];
   }
 
 }

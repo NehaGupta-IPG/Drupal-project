@@ -28,6 +28,7 @@ class TestSectionList implements SectionListInterface {
    * TestSectionList constructor.
    */
   public function __construct(array $sections) {
+    $this->setSections([]);
     // Loop through each section and reconstruct it to ensure that all default
     // values are present.
     foreach ($sections as $section) {
