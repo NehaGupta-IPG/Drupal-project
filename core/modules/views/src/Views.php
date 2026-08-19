@@ -2,6 +2,8 @@
 
 namespace Drupal\views;
 
+use Drupal\Core\Routing\RouteMatchInterface;
+
 /**
  * Static service container wrapper for views.
  */
@@ -601,6 +603,42 @@ class Views {
     }
 
     return [];
+  }
+
+  /**
+   * Builds args.
+   *
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The route match.
+   *
+   * @return array
+   *   Array of args.
+   */
+  public static function buildArgs(RouteMatchInterface $route_match) {
+    $args = [];
+    $route = $route_match->getRouteObject();
+    $map = $route->hasOption('_view_argument_map') ? $route->getOption('_view_argument_map') : [];
+
+    foreach ($map as $attribute => $parameter_name) {
+      // Allow parameters be pulled from the request.
+      // The map stores the actual name of the parameter in the request. Views
+      // which override existing controller, use for example 'node' instead of
+      // arg_nid as name.
+      if (isset($map[$attribute])) {
+        $attribute = $map[$attribute];
+      }
+
+      $arg = $route_match->getRawParameter($attribute);
+      if (!$arg) {
+        $arg = $route_match->getParameter($attribute);
+      }
+
+      if (isset($arg)) {
+        $args[] = $arg;
+      }
+    }
+
+    return $args;
   }
 
 }

@@ -8,8 +8,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Render\Element\Checkboxes;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\views\ExposedFormCache;
+use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -35,16 +37,26 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
   protected $currentPathStack;
 
   /**
+   * The current route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
    * Constructs a new ViewsExposedForm.
    *
    * @param \Drupal\views\ExposedFormCache $exposed_form_cache
    *   The exposed form cache.
    * @param \Drupal\Core\Path\CurrentPathStack $current_path_stack
    *   The current path stack.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The current route match.
    */
-  public function __construct(ExposedFormCache $exposed_form_cache, CurrentPathStack $current_path_stack) {
+  public function __construct(ExposedFormCache $exposed_form_cache, CurrentPathStack $current_path_stack, RouteMatchInterface $route_match) {
     $this->exposedFormCache = $exposed_form_cache;
     $this->currentPathStack = $current_path_stack;
+    $this->routeMatch = $route_match;
   }
 
   /**
@@ -53,7 +65,8 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('views.exposed_form_cache'),
-      $container->get('path.current')
+      $container->get('path.current'),
+      $container->get('current_route_match')
     );
   }
 
@@ -74,6 +87,13 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
     /** @var \Drupal\views\ViewExecutable $view */
     $view = $form_state->get('view');
     $display = &$form_state->get('display');
+    // Existing arguments need to be passed as this exposed form might
+    // be used in a block. Without this contextual views arguments
+    // will be lost.
+    if ($this->routeMatch->getRouteObject() && $this->routeMatch->getRouteName() !== 'views.ajax' && empty($view->args)) {
+      $args = Views::buildArgs($this->routeMatch);
+      $view->setArguments($args);
+    }
 
     $form_state->setUserInput($view->getExposedInput());
 
@@ -121,6 +141,17 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       '#id' => Html::getUniqueId('edit-submit-' . $view->storage->id()),
     ];
 
+    if ($view->hasUrl()) {
+      foreach ($view->getUrl()->getRouteParameters() as $k => $parameter) {
+        if ($parameter != 'all') {
+          $newParameters[$k] = $parameter;
+        }
+      }
+      if (isset($newParameters)) {
+        $view_url = $view->getUrl()->setRouteParameters($newParameters);
+      }
+    }
+
     if (!$view->hasUrl()) {
       // On any non views.ajax route, use the current route for the form action.
       if ($this->getRouteMatch()->getRouteName() !== 'views.ajax') {
@@ -130,6 +161,9 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
         // On the views.ajax route, set the action to the page we were on.
         $form_action = Url::fromUserInput($this->currentPathStack->getPath())->toString();
       }
+    }
+    elseif (isset($view_url)) {
+      $form_action = $view_url->toString();
     }
     else {
       $form_action = $view->getUrl()->toString();
