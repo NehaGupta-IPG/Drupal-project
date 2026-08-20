@@ -185,7 +185,6 @@ class Test {
   #[Route(
     path: '/test-meta-refresh',
     name: 'test_page_test.meta_refresh',
-    title: new TranslatableMarkup('Page with a redirect'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function metaRefresh() {
@@ -198,7 +197,6 @@ class Test {
   #[Route(
     path: '/test-deprecations',
     name: 'test_page_test.deprecations',
-    title: new TranslatableMarkup('Page with deprecation notices'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function deprecations() {

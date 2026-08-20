@@ -6,7 +6,6 @@ namespace Drupal\destructable_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\destructable_test\Destructable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +35,6 @@ final class CallsDestructableServiceController extends ControllerBase {
   #[Route(
     path: '/destructable',
     name: 'destructable',
-    title: new TranslatableMarkup('Calls destructable service'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function render(Request $request): Response {

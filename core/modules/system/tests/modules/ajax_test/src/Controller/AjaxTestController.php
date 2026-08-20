@@ -10,7 +10,6 @@ use Drupal\Core\Ajax\AlertCommand;
 use Drupal\Core\Ajax\CloseDialogCommand;
 use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,7 +29,6 @@ class AjaxTestController {
   #[Route(
     path: '/ajax-test/dialog-contents',
     name: 'ajax_test.dialog_contents',
-    title: new TranslatableMarkup('AJAX Dialog contents routing'),
     requirements: ['_access' => 'TRUE'],
   )]
   public static function dialogContents() {
@@ -67,7 +65,6 @@ class AjaxTestController {
   #[Route(
     path: '/ajax-test/dialog-contents-types/{type}',
     name: 'ajax_test.ajax_render_types',
-    title: new TranslatableMarkup('AJAX Dialog contents routing'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function renderTypes($type) {
@@ -597,7 +594,6 @@ class AjaxTestController {
   #[Route(
     path: '/ajax-test/link-page-dialog',
     name: 'ajax_test.link_page.dialog',
-    title: new TranslatableMarkup('AJAX link page'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function linkPageDialog(): array {

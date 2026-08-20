@@ -6,7 +6,6 @@ namespace Drupal\tabbingmanager_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * For testing the Tabbing Manager.
@@ -22,7 +21,6 @@ class TabbingManagerTestController extends ControllerBase {
   #[Route(
     path: '/tabbingmanager-test',
     name: 'tabbingmanager_test_page',
-    title: new TranslatableMarkup('Tabbing Manager testing'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function build() {

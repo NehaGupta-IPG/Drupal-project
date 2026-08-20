@@ -7,7 +7,6 @@ namespace Drupal\block_test\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Controller for block_test module.
@@ -17,7 +16,6 @@ class TestMultipleFormController extends ControllerBase {
   #[Route(
     path: '/test-multiple-forms',
     name: 'block_test.test_multiple_forms',
-    title: new TranslatableMarkup('Multiple forms'),
     requirements: ['_access' => 'TRUE'],
   )]
 

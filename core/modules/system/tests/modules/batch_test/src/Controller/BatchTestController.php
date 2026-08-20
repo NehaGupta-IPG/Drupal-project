@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\batch_test\Controller;
 
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\batch_test\BatchInjectionCallbacks;
 use Drupal\batch_test\BatchTestCallbacks;
 use Drupal\batch_test\BatchTestDefinitions;
@@ -27,7 +26,6 @@ class BatchTestController {
   #[Route(
     path: '/batch-test/redirect',
     name: 'batch_test.redirect',
-    title: new TranslatableMarkup('Redirect'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function testRedirect() {
@@ -48,7 +46,6 @@ class BatchTestController {
   #[Route(
     path: '/batch-test/large-percentage',
     name: 'batch_test.large_percentage',
-    title: new TranslatableMarkup('Simple page with batch over 100% complete'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function testLargePercentage() {
@@ -73,7 +70,6 @@ class BatchTestController {
   #[Route(
     path: '/batch-test/nested-programmatic/{value}',
     name: 'batch_test.nested_programmatic',
-    title: new TranslatableMarkup('Nested programmatic'),
     requirements: ['_access' => 'TRUE'],
     defaults: ['value' => '1'],
   )]
@@ -96,7 +92,6 @@ class BatchTestController {
   #[Route(
     path: '/batch-test/no-form',
     name: 'batch_test.no_form',
-    title: new TranslatableMarkup('Simple page'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function testNoForm() {
@@ -118,7 +113,6 @@ class BatchTestController {
   #[Route(
     path: '/batch-test/finish-redirect',
     name: 'batch_test.finish_redirect',
-    title: new TranslatableMarkup('Simple page with finish redirect call'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function testFinishRedirect() {
@@ -146,7 +140,6 @@ class BatchTestController {
   #[Route(
     path: '/batch-test/programmatic/{value}',
     name: 'batch_test.programmatic',
-    title: new TranslatableMarkup('Programmatic'),
     requirements: ['_access' => 'TRUE'],
     defaults: ['value' => '1'],
   )]

@@ -6,7 +6,6 @@ namespace Drupal\position_shim_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * The position shim test controller.
@@ -22,7 +21,6 @@ class PositionShimTestController extends ControllerBase {
   #[Route(
     path: '/position-shim-test',
     name: 'position_test_page',
-    title: new TranslatableMarkup('position testing'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function build() {

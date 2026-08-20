@@ -62,7 +62,6 @@ class MenuTestController extends ControllerBase {
   #[Route(
     path: '/menu_name_test',
     name: 'menu_test.menu_name_test',
-    title: new TranslatableMarkup('Test menu_name router item'),
     requirements: ['_access' => 'TRUE'],
   )]
   #[Route(
@@ -74,7 +73,6 @@ class MenuTestController extends ControllerBase {
   #[Route(
     path: '/menu_callback_description/description-plain',
     name: 'menu_test.callback_description_plain',
-    title: new TranslatableMarkup('Menu item with a regular description'),
     requirements: ['_access' => 'TRUE'],
   )]
   #[Route(
@@ -91,20 +89,17 @@ class MenuTestController extends ControllerBase {
   #[Route(
     path: '/menu-title-test/case1',
     name: 'menu_test.title_test_case1',
-    title: new TranslatableMarkup('Example title - Case 1'),
     requirements: ['_access' => 'TRUE'],
   )]
   #[Route(
     path: '/menu-title-test/case2',
     name: 'menu_test.title_test_case2',
-    title: new TranslatableMarkup('Example title'),
     requirements: ['_access' => 'TRUE'],
     defaults: ['_title_callback' => '\\Drupal\\menu_test\\Controller\\MenuTestController::titleCallback'],
   )]
   #[Route(
     path: '/menu-title-test/case3',
     name: 'menu_test.title_test_case3',
-    title: new TranslatableMarkup('Bike sheds full of blue smurfs'),
     requirements: ['_access' => 'TRUE'],
     defaults: [
       '_title_callback' => '\\Drupal\\menu_test\\Controller\\MenuTestController::titleCallback',
@@ -136,13 +131,11 @@ class MenuTestController extends ControllerBase {
   #[Route(
     path: '/menu-test/breadcrumb1/breadcrumb2/breadcrumb3',
     name: 'menu_test.breadcrumb3',
-    title: new TranslatableMarkup('Normal title'),
     requirements: ['_access' => 'TRUE'],
   )]
   #[Route(
     path: '/menu-test/skippable-breadcrumb',
     name: 'menu_test.skippable-breadcrumb',
-    title: new TranslatableMarkup('Normal title'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function menuTestCallback() {
@@ -181,20 +174,17 @@ class MenuTestController extends ControllerBase {
   #[Route(
     path: '/menu-test/theme-callback/{inherited}',
     name: 'menu_test.theme_callback',
-    title: new TranslatableMarkup('Page that displays different themes'),
     requirements: ['_access' => 'TRUE'],
   )]
   #[Route(
     path: '/menu-test/no-theme-callback',
     name: 'menu_test.no_theme_callback',
-    title: new TranslatableMarkup('Page that displays different themes without using a theme negotiation.'),
     requirements: ['_access' => 'TRUE'],
     defaults: ['inherited' => FALSE],
   )]
   #[Route(
     path: '/menu-test/theme-callback/{inherited}/inheritance',
     name: 'menu_test.theme_callback_inheritance',
-    title: new TranslatableMarkup('Page that tests theme negotiation inheritance.'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function themePage($inherited) {

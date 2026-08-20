@@ -6,7 +6,6 @@ namespace Drupal\update_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -59,7 +58,6 @@ class UpdateTestController extends ControllerBase {
   #[Route(
     path: '/update-test/{project_name}/{version}',
     name: 'update_test.update_test',
-    title: new TranslatableMarkup('Update test'),
     requirements: ['_access' => 'TRUE'],
     defaults: ['version' => NULL, 'project_name' => NULL],
   )]

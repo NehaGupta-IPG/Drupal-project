@@ -6,7 +6,6 @@ namespace Drupal\position_shim_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Controller for the testing jQuery UI position shim.
@@ -22,7 +21,6 @@ class PositionShimTestPortedJqueryTestsController extends ControllerBase {
   #[Route(
     path: '/position-shim-test-ported-from-jqueryui',
     name: 'position_test_ported_jqueryui',
-    title: new TranslatableMarkup('ported position testing'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function build() {

@@ -10,7 +10,6 @@ use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Pager\PagerParametersInterface;
 use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Security\TrustedCallbackInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Controller routine for testing the pager.
@@ -78,7 +77,6 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
   #[Route(
     path: '/pager-test/query-parameters',
     name: 'pager_test.query_parameters',
-    title: new TranslatableMarkup('Pager using query parameters for testing'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function queryParameters() {
@@ -112,7 +110,6 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
   #[Route(
     path: '/pager-test/multiple-pagers',
     name: 'pager_test.multiple_pagers',
-    title: new TranslatableMarkup('Page using multiple pagers for testing'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function multiplePagers() {

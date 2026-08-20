@@ -6,7 +6,6 @@ namespace Drupal\js_once_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Controller for testing the @drupal/once library integration.
@@ -22,7 +21,6 @@ class JsOnceTestController extends ControllerBase {
   #[Route(
     path: '/js_once_test',
     name: 'js_once_test',
-    title: new TranslatableMarkup('OnceTest'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function onceTest() {

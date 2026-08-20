@@ -6,7 +6,6 @@ namespace Drupal\views_test_data\Controller;
 
 use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Security\TrustedCallbackInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Controller class for views_test_data callbacks.
@@ -22,7 +21,6 @@ class ViewsTestDataController implements TrustedCallbackInterface {
   #[Route(
     path: '/views_test_data_error_form_page',
     name: 'views_test_data.error_form_page',
-    title: new TranslatableMarkup('Test Views Form Exposed Errors'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function errorFormPage() {

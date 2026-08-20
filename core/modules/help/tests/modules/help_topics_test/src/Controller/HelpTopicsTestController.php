@@ -6,7 +6,6 @@ namespace Drupal\help_topics_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Returns the response for help_topics_test routes.
@@ -25,7 +24,6 @@ class HelpTopicsTestController extends ControllerBase {
   #[Route(
     path: '/help_topics_test/{int_param<\\d+>}',
     name: 'help_topics_test.test_route',
-    title: new TranslatableMarkup('Page for testing URLs in topics'),
     requirements: ['_permission' => 'access test help'],
     options: ['parameters' => ['required_param' => ['type' => 'int']]],
   )]

@@ -77,7 +77,6 @@ class CommonTestController {
   #[Route(
     path: '/common-test/query-string',
     name: 'common_test.js_and_css_querystring',
-    title: new TranslatableMarkup('Test querystring'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function jsAndCssQuerystring() {
@@ -125,7 +124,6 @@ class CommonTestController {
   #[Route(
     path: '/common/attachments-test',
     name: 'common_test.page_attachments',
-    title: new TranslatableMarkup('Attachments test'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function attachments() {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\ajax_forms_test\Controller;
 
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -22,7 +21,6 @@ class DialogFormLink {
   #[Route(
     path: '/ajax_forms_test_dialog_form_link',
     name: 'ajax_forms_test.dialog_form_link',
-    title: new TranslatableMarkup('Dialog form link test'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function makeDialogFormLink() {

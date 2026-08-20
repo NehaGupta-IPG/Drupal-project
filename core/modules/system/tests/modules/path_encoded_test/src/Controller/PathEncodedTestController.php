@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\path_encoded_test\Controller;
 
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -22,19 +21,16 @@ class PathEncodedTestController {
   #[Route(
     path: '/hi/llama:party',
     name: 'path_encoded_test.colon',
-    title: new TranslatableMarkup('Colon'),
     requirements: ['_access' => 'TRUE'],
   )]
   #[Route(
     path: '/blog/@Dries',
     name: 'path_encoded_test.at_sign',
-    title: new TranslatableMarkup('At sign'),
     requirements: ['_access' => 'TRUE'],
   )]
   #[Route(
     path: '/cat(box)',
     name: 'path_encoded_test.parentheses',
-    title: new TranslatableMarkup('At sign'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function simple() {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\binary_file_response_test\Controller;
 
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -24,7 +23,6 @@ class BinaryFileResponseTestController {
   #[Route(
     path: '/binary_file_response_test/download',
     name: 'binary_file_response_test.download',
-    title: new TranslatableMarkup('Redirect'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function download(Request $request) {

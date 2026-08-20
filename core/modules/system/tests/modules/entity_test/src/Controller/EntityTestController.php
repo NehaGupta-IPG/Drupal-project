@@ -7,7 +7,6 @@ namespace Drupal\entity_test\Controller;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Controller routines for entity_test routes.
@@ -39,7 +38,6 @@ class EntityTestController extends ControllerBase {
   #[Route(
     path: '/entity_test/list/{entity_reference_field_name}/{referenced_entity_type}/{referenced_entity_id}',
     name: 'entity.entity_test.collection_referencing_entities',
-    title: new TranslatableMarkup('List entity_test entities referencing the given entity'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function listReferencingEntities($entity_reference_field_name, $referenced_entity_type, $referenced_entity_id) {
@@ -74,7 +72,6 @@ class EntityTestController extends ControllerBase {
   #[Route(
     path: '/entity_test/list_labels_alphabetically/{entity_type_id}',
     name: 'entity.entity_test.collection_labels_alphabetically',
-    title: new TranslatableMarkup('List labels of entities of the given entity type alphabetically'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function listEntitiesAlphabetically($entity_type_id) {
@@ -128,7 +125,6 @@ class EntityTestController extends ControllerBase {
   #[Route(
     path: '/entity_test/list_empty/{entity_type_id}',
     name: 'entity.entity_test.collection_empty',
-    title: new TranslatableMarkup('Empty list of entities of the given entity type, empty because no entities match the query'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function listEntitiesEmpty($entity_type_id) {

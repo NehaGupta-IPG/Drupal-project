@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\advisory_feed_test\Controller;
 
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -31,7 +30,6 @@ class AdvisoryTestController {
   #[Route(
     path: '/advisory-feed-json/{json_name}',
     name: 'advisory_feed_test.json_test',
-    title: new TranslatableMarkup('Update test'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function getPsaJson(string $json_name): Response {

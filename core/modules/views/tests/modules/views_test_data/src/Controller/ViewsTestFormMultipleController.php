@@ -6,7 +6,6 @@ namespace Drupal\views_test_data\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Controller routines for views form multiple test routes.
@@ -19,7 +18,6 @@ class ViewsTestFormMultipleController extends ControllerBase {
   #[Route(
     path: '/views_test_form_multiple',
     name: 'views_test_data.form_multiple',
-    title: new TranslatableMarkup('Test Views Form Multiple'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function testPage() {

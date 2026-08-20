@@ -6,7 +6,6 @@ namespace Drupal\session_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\session_test\Session\TestSessionBag;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +25,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/get',
     name: 'session_test.get',
-    title: new TranslatableMarkup('Session value'),
     requirements: ['_access' => 'TRUE'],
     options: ['no_cache' => TRUE],
   )]
@@ -46,7 +44,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/get-from-session-object',
     name: 'session_test.get_from_session_object',
-    title: new TranslatableMarkup('Session value'),
     requirements: ['_access' => 'TRUE'],
     options: ['no_cache' => TRUE],
   )]
@@ -66,7 +63,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/id',
     name: 'session_test.id',
-    title: new TranslatableMarkup('Session ID'),
     requirements: ['_access' => 'TRUE'],
     options: ['no_cache' => TRUE],
   )]
@@ -89,7 +85,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/id-from-cookie',
     name: 'session_test.id_from_cookie',
-    title: new TranslatableMarkup('Session ID from cookie'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function getIdFromCookie(Request $request): array {
@@ -110,7 +105,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/set/{test_value}',
     name: 'session_test.set',
-    title: new TranslatableMarkup('Set session value'),
     requirements: ['_access' => 'TRUE'],
     options: ['no_cache' => TRUE, 'converters' => ['test_value' => '\\s+']],
   )]
@@ -131,7 +125,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/no-set/{test_value}',
     name: 'session_test.no_set',
-    title: new TranslatableMarkup('Set session value but do not save session'),
     requirements: ['_access' => 'TRUE'],
     options: ['no_cache' => TRUE, 'converters' => ['test_value' => '\\s+']],
   )]
@@ -147,7 +140,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/set-message',
     name: 'session_test.set_message',
-    title: new TranslatableMarkup('Set message'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function setMessage(): Response {
@@ -164,7 +156,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/set-message-but-do-not-save',
     name: 'session_test.set_message_but_do_not_save',
-    title: new TranslatableMarkup('Set message but do not save session'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function setMessageButDoNotSave(): array {
@@ -179,7 +170,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/is-logged-in',
     name: 'session_test.is_logged_in',
-    title: new TranslatableMarkup('Check if user is logged in'),
     requirements: ['_user_is_logged_in' => 'TRUE'],
   )]
   public function isLoggedIn(): array {
@@ -195,7 +185,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/trace-handler',
     name: 'session_test.trace_handler',
-    title: new TranslatableMarkup('Returns the trace recorded by test proxy session handlers as JSON'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function traceHandler(Request $request): Response {
@@ -228,7 +217,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/trace-handler-rewrite-unmodified',
     name: 'session_test.trace_handler_rewrite_unmodified',
-    title: new TranslatableMarkup('Returns a trace of rewritten but unmodified session data recorded by test proxy session handlers as JSON'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function traceHandlerRewriteUnmodified(Request $request): Response {
@@ -261,14 +249,12 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/get-session',
     name: 'session_test.get_session_basic_auth',
-    title: new TranslatableMarkup('Get session information using basic authentication'),
     requirements: ['_permission' => 'administer site configuration'],
     options: ['no_cache' => TRUE, '_auth' => ['basic_auth']],
   )]
   #[Route(
     path: '/session-test/get-session-no-auth',
     name: 'session_test.get_session_no_auth',
-    title: new TranslatableMarkup('Get session information'),
     requirements: ['_access' => 'TRUE'],
     options: ['no_cache' => TRUE],
   )]
@@ -287,7 +273,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/set-session/{test_value}',
     name: 'session_test.set_session',
-    title: new TranslatableMarkup('Set a session value using basic authentication'),
     requirements: ['_permission' => 'administer site configuration'],
     options: ['no_cache' => TRUE, '_auth' => ['basic_auth'], 'converters' => ['test_value' => '\\s+']],
   )]
@@ -306,7 +291,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/set-bag-flag',
     name: 'session_test.set_bag_flag',
-    title: new TranslatableMarkup('Sets the test flag in the session test bag'),
     requirements: ['_access' => 'TRUE'],
     options: ['no_cache' => TRUE],
   )]
@@ -326,7 +310,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/clear-bag-flag',
     name: 'session_test.clear_bag_flag',
-    title: new TranslatableMarkup('Clears the test flag in the session test bag'),
     requirements: ['_access' => 'TRUE'],
     options: ['no_cache' => TRUE],
   )]
@@ -346,7 +329,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/has-bag-flag',
     name: 'session_test.has_bag_flag',
-    title: new TranslatableMarkup('Prints a message if the flag in the session bag is set'),
     requirements: ['_access' => 'TRUE'],
     options: ['no_cache' => TRUE],
   )]
@@ -368,7 +350,6 @@ class SessionTestController extends ControllerBase {
   #[Route(
     path: '/session-test/trigger-write-exception',
     name: 'session_test.trigger_write_exception',
-    title: new TranslatableMarkup('Trigger an exception when the session is written'),
     requirements: ['_access' => 'TRUE'],
     options: ['no_cache' => TRUE],
   )]

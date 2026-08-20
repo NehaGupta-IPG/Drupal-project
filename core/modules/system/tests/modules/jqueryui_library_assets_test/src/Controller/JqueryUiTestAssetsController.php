@@ -6,7 +6,6 @@ namespace Drupal\jqueryui_library_assets_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Controller for testing jQuery UI asset loading order.
@@ -25,7 +24,6 @@ class JqueryUiTestAssetsController extends ControllerBase {
   #[Route(
     path: '/jqueryui_library_assets_test/{library}',
     name: 'jqueryui_library_asset_test_page',
-    title: new TranslatableMarkup('Test jQuery UI asset loading order'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function build($library) {

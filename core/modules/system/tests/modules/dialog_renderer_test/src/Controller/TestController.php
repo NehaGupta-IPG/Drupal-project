@@ -6,7 +6,6 @@ namespace Drupal\dialog_renderer_test\Controller;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -23,7 +22,6 @@ class TestController {
   #[Route(
     path: '/dialog_renderer-content',
     name: 'dialog_renderer_test.modal_content',
-    title: new TranslatableMarkup('Thing 1'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function modalContent() {
@@ -42,7 +40,6 @@ class TestController {
   #[Route(
     path: '/dialog_renderer-content-link',
     name: 'dialog_renderer_test.modal_content_link',
-    title: new TranslatableMarkup('Thing 2'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function modalContentLink() {
@@ -68,7 +65,6 @@ class TestController {
   #[Route(
     path: '/dialog_renderer-content-input',
     name: 'dialog_renderer_test.modal_content_input',
-    title: new TranslatableMarkup('Thing 3'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function modalContentInput() {
@@ -97,7 +93,6 @@ class TestController {
   #[Route(
     path: '/dialog_renderer-test-links',
     name: 'dialog_renderer_test.links',
-    title: new TranslatableMarkup('Links'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function linksDisplay() {
@@ -276,7 +271,6 @@ class TestController {
   #[Route(
     path: '/dialog_renderer-collapsed-opener',
     name: 'dialog_renderer_test.collapsed_opener',
-    title: new TranslatableMarkup('Collapsed Openers'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function collapsedOpener() {

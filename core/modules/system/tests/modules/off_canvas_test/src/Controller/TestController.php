@@ -6,7 +6,6 @@ namespace Drupal\off_canvas_test\Controller;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -23,7 +22,6 @@ class TestController {
   #[Route(
     path: '/off-canvas-thing1',
     name: 'off_canvas_test.thing1',
-    title: new TranslatableMarkup('Thing 1'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function thing1() {
@@ -60,7 +58,6 @@ class TestController {
   #[Route(
     path: '/off-canvas-test-links',
     name: 'off_canvas_test.links',
-    title: new TranslatableMarkup('Links'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function linksDisplay() {

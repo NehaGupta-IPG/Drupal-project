@@ -6,7 +6,6 @@ namespace Drupal\views_test_render_cache\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Views;
 
 /**
@@ -32,7 +31,6 @@ class ViewsTestRenderCacheController extends ControllerBase {
   #[Route(
     path: '/views_test_render_cache/{view_id}/{display_id}/{args_1}/{args_2}',
     name: 'views_test_render_cache.blocks',
-    title: new TranslatableMarkup('Test!'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function double(string $view_id, string $display_id, string $args_1, string $args_2) {

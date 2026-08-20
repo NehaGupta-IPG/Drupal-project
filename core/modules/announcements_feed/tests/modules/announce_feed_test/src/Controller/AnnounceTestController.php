@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\announce_feed_test\Controller;
 
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -31,7 +30,6 @@ class AnnounceTestController {
   #[Route(
     path: '/announce-feed-json/{json_name}',
     name: 'announce_feed_test.json_test',
-    title: new TranslatableMarkup('Announce Feed test'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function setFeedConfig(string $json_name): JsonResponse|Response {

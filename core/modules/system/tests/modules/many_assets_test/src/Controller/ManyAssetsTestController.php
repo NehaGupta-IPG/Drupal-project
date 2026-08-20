@@ -6,7 +6,6 @@ namespace Drupal\many_assets_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\Attribute\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides a controller for testing asset loading order.
@@ -22,7 +21,6 @@ class ManyAssetsTestController extends ControllerBase {
   #[Route(
     path: '/many_assets_test',
     name: 'many_assets_test_page',
-    title: new TranslatableMarkup('Test jQuery UI asset loading order'),
     requirements: ['_access' => 'TRUE'],
   )]
   public function build() {
