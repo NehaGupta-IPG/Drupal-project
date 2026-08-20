@@ -177,15 +177,18 @@ class FieldAttachOtherTest extends FieldKernelTestBase {
     $entity_type = 'entity_test';
     $cid = "values:$entity_type:" . $entity_init->id();
 
-    // Check that no initial cache entry is present.
-    $this->assertFalse(\Drupal::cache('entity')->get($cid), 'Non-cached: no initial cache entry');
+    // Check that no initial cache entry is present. Saving an entity writes a
+    // tombstone item holding FALSE as data, so a usable cache entry is absent
+    // when there is no item or when the item holds FALSE.
+    // @see \Drupal\Core\Entity\ContentEntityStorageBase::resetCache()
+    $this->assertFalse(\Drupal::cache('entity')->get($cid)->data ?? FALSE, 'Non-cached: no initial cache entry');
 
     // Save, and check that no cache entry is present.
     $entity = clone($entity_init);
     $entity->{$this->fieldTestData->field_name}->setValue($values);
     $entity = $this->entitySaveReload($entity);
     $cid = "values:$entity_type:" . $entity->id();
-    $this->assertFalse(\Drupal::cache('entity')->get($cid), 'Non-cached: no cache entry on insert and load');
+    $this->assertFalse(\Drupal::cache('entity')->get($cid)->data ?? FALSE, 'Non-cached: no cache entry on insert and load');
 
     // Cacheable entity type.
     $entity_type = 'entity_test_rev';
@@ -199,7 +202,7 @@ class FieldAttachOtherTest extends FieldKernelTestBase {
 
     // Check that no initial cache entry is present.
     $cid = "values:$entity_type:" . $entity->id();
-    $this->assertFalse(\Drupal::cache('entity')->get($cid), 'Cached: no initial cache entry');
+    $this->assertFalse(\Drupal::cache('entity')->get($cid)->data ?? FALSE, 'Cached: no initial cache entry');
 
     // Save, and check that no cache entry is present.
     $entity = clone($entity_init);
@@ -207,7 +210,7 @@ class FieldAttachOtherTest extends FieldKernelTestBase {
     $entity->save();
     $cid = "values:$entity_type:" . $entity->id();
 
-    $this->assertFalse(\Drupal::cache('entity')->get($cid), 'Cached: no cache entry on insert');
+    $this->assertFalse(\Drupal::cache('entity')->get($cid)->data ?? FALSE, 'Cached: no cache entry on insert');
     // Load, and check that a cache entry is present with the expected values.
     $controller = $this->container->get('entity_type.manager')->getStorage($entity->getEntityTypeId());
     $controller->resetCache();
@@ -219,7 +222,7 @@ class FieldAttachOtherTest extends FieldKernelTestBase {
     $values = $this->_generateTestFieldValues($this->fieldTestData->field_storage_2->getCardinality());
     $entity->{$this->fieldTestData->field_name_2} = $values;
     $entity->save();
-    $this->assertFalse(\Drupal::cache('entity')->get($cid), 'Cached: no cache entry on update');
+    $this->assertFalse(\Drupal::cache('entity')->get($cid)->data ?? FALSE, 'Cached: no cache entry on update');
 
     // Load, and check that a cache entry is present with the expected values.
     $controller->resetCache();
@@ -232,7 +235,7 @@ class FieldAttachOtherTest extends FieldKernelTestBase {
     $entity->{$this->fieldTestData->field_name_2} = $values;
     $entity->setNewRevision();
     $entity->save();
-    $this->assertFalse(\Drupal::cache('entity')->get($cid), 'Cached: no cache entry on new revision creation');
+    $this->assertFalse(\Drupal::cache('entity')->get($cid)->data ?? FALSE, 'Cached: no cache entry on new revision creation');
 
     // Load, and check that a cache entry is present with the expected values.
     $controller->resetCache();
@@ -242,7 +245,7 @@ class FieldAttachOtherTest extends FieldKernelTestBase {
 
     // Delete, and check that the cache entry is wiped.
     $entity->delete();
-    $this->assertFalse(\Drupal::cache('entity')->get($cid), 'Cached: no cache entry after delete');
+    $this->assertFalse(\Drupal::cache('entity')->get($cid)->data ?? FALSE, 'Cached: no cache entry after delete');
   }
 
   /**

@@ -331,7 +331,11 @@ class ContentEntityCacheTest extends KernelTestBase {
       }
     };
     $assert_cache_not_exists = function ($cid) use ($persistent_cache, $memory_cache): void {
-      $this->assertFalse($persistent_cache->get($cid));
+      // Saving an entity writes a tombstone item holding FALSE as data, so a
+      // usable cache entry is absent when there is no item or when the item
+      // holds FALSE.
+      // @see \Drupal\Core\Entity\ContentEntityStorageBase::resetCache()
+      $this->assertFalse($persistent_cache->get($cid)->data ?? FALSE);
       $this->assertFalse($memory_cache->get($cid));
     };
 

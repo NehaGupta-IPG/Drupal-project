@@ -182,7 +182,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 25,
-      'CacheGetCount' => 73,
+      'CacheGetCount' => 75,
       'CacheSetCount' => 42,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -238,7 +238,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 10,
-      'CacheGetCount' => 56,
+      'CacheGetCount' => 57,
       'CacheSetCount' => 17,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -293,9 +293,9 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
       'QueryCount' => 15,
-      'CacheGetCount' => 71,
-      'CacheSetCount' => 1,
-      'CacheDeleteCount' => 1,
+      'CacheGetCount' => 72,
+      'CacheSetCount' => 2,
+      'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 7,
       'CacheTagGroupedLookups' => [
@@ -382,9 +382,9 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 15,
-      'CacheGetCount' => 98,
-      'CacheSetCount' => 1,
-      'CacheDeleteCount' => 1,
+      'CacheGetCount' => 99,
+      'CacheSetCount' => 2,
+      'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 9,
     ];
