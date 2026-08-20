@@ -35,6 +35,32 @@ class RecipeFinderTest extends KernelTestBase {
   }
 
   /**
+   * Tests that certain configuration options are disallowed.
+   */
+  #[TestWith([
+    'name',
+    ['alternate.yml'],
+    'Recipe discovery can only scan for files named `recipe.yml`.',
+  ])]
+  #[TestWith([
+    'depth',
+    [2],
+    'Recipe discovery cannot recurse into the file system.',
+  ])]
+  #[TestWith([
+    'directories',
+    [],
+    'Recipe discovery can only scan for files.',
+  ])]
+  public function testForbiddenMethods(string $method, array $arguments, string $expected_exception): void {
+    $this->expectException(\LogicException::class);
+    $this->expectExceptionMessage($expected_exception);
+
+    $finder = new Finder($this->root . '/core/recipes');
+    $finder->$method(...$arguments);
+  }
+
+  /**
    * Tests that invalid recipes can be safely skipped, with a log message.
    */
   public function testSkipInvalidRecipe(): void {

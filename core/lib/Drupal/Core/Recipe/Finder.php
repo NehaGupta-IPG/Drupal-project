@@ -40,31 +40,32 @@ final class Finder extends SymfonyFinder {
   private static ?string $recipesDirectory = NULL;
 
   public function __construct(
-    string|array|null $directory = NULL,
+    string|array|null $directories = NULL,
     private readonly bool $skipInvalid = FALSE,
     public readonly ?LoggerInterface $logger = NULL,
   ) {
     parent::__construct();
 
-    $this->files()
-      ->name('recipe.yml')
-      ->depth(1)
-      ->followLinks()
-      ->in($directory ?? [
-        // Placeholders used by the Composer installer don't make sense here.
-        // For example, if Composer is configured to install recipes in
-        // `./recipes/{$name}`, we really just want to scan `./recipes`.
-        str_replace(['{$vendor}', '{$name}'], '', self::getComposerRecipesDirectory()),
-        // Drupal runs in the web root, so this directory is guaranteed to exist
-        // (and Finder will throw if it doesn't).
-        'core/recipes',
-      ]);
+    $directories ??= [
+      // Placeholders used by the Composer installer don't make sense here.
+      // For example, if Composer is configured to install recipes in
+      // `./recipes/{$name}`, we really just want to scan `./recipes`.
+      str_replace(['{$vendor}', '{$name}'], '', self::getComposerRecipesDirectory()),
+      // Drupal runs in the web root, so this directory is guaranteed to exist
+      // (and Finder will throw if it doesn't).
+      'core/recipes',
+    ];
+    $this->in($directories)->followLinks();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getIterator(): \Generator {
+    $this->files();
+    parent::name('recipe.yml');
+    parent::depth(1);
+
     foreach (parent::getIterator() as $file) {
       try {
         yield Recipe::createFromDirectory($file->getPath());
@@ -77,6 +78,27 @@ final class Finder extends SymfonyFinder {
         throw $e;
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function directories(): never {
+    throw new \LogicException('Recipe discovery can only scan for files.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function depth(mixed $levels): never {
+    throw new \LogicException('Recipe discovery cannot recurse into the file system.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function name(mixed $patterns): never {
+    throw new \LogicException('Recipe discovery can only scan for files named `recipe.yml`.');
   }
 
   /**
