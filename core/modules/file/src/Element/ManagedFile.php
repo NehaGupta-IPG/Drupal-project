@@ -206,8 +206,11 @@ class ManagedFile extends FormElementBase {
 
     // Placeholder for where the messages shall appear. Being part of the
     // replaced markup, the next upload attempt replaces the messages away
-    // with the widget.
-    $form['#prefix'] .= '<div class="file-upload-messages"></div>';
+    // with the widget. The unique ID also works when the replaced element is
+    // a whole multi-value field widget, which has no upload button of its
+    // own to derive a selector from.
+    $message_wrapper_id = Html::getUniqueId('file-upload-messages-' . implode('-', $form_parents));
+    $form['#prefix'] .= '<div id="' . $message_wrapper_id . '" class="file-upload-messages"></div>';
     $output = $renderer->renderRoot($form);
 
     $response = new AjaxResponse();
@@ -216,7 +219,7 @@ class ManagedFile extends FormElementBase {
 
     // Deliver messages with the dedicated AJAX command instead of baking them
     // into the replaced markup.
-    $message_selector = '#' . $form['upload_button']['#ajax']['wrapper'] . ' .file-upload-messages';
+    $message_selector = '#' . $message_wrapper_id;
     foreach (\Drupal::messenger()->deleteAll() as $type => $messages) {
       foreach ($messages as $message) {
         $response->addCommand(new MessageCommand($message, $message_selector, ['type' => $type], FALSE));

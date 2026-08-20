@@ -82,7 +82,7 @@ class ManagedFileTest extends FileManagedUnitTestBase implements FormInterface {
     $this->assertSame('message', $commands[1]['command']);
     $this->assertSame('The file is too big.', (string) $commands[1]['message']);
     $this->assertSame('error', $commands[1]['messageOptions']['type']);
-    $this->assertStringEndsWith(' .file-upload-messages', $commands[1]['messageWrapperQuerySelector']);
+    $this->assertStringStartsWith('#file-upload-messages-managed-file', $commands[1]['messageWrapperQuerySelector']);
     $this->assertFalse($commands[1]['clearPrevious']);
     $this->assertCount(2, $commands);
 
