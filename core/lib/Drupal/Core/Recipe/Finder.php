@@ -32,25 +32,21 @@ use Symfony\Component\Finder\Finder as SymfonyFinder;
  * @internal
  *   This API is experimental.
  */
-final class Finder implements \IteratorAggregate {
+final class Finder extends SymfonyFinder {
 
   /**
    * The location where Composer is configured to install recipes.
    */
   private static ?string $recipesDirectory = NULL;
 
-  /**
-   * A finder that scans for `recipe.yml` files.
-   */
-  public readonly SymfonyFinder $finder;
-
   public function __construct(
     string|array|null $directory = NULL,
     private readonly bool $skipInvalid = FALSE,
     public readonly ?LoggerInterface $logger = NULL,
   ) {
-    $this->finder = SymfonyFinder::create()
-      ->files()
+    parent::__construct();
+
+    $this->files()
       ->name('recipe.yml')
       ->depth(1)
       ->followLinks()
@@ -68,8 +64,8 @@ final class Finder implements \IteratorAggregate {
   /**
    * {@inheritdoc}
    */
-  public function getIterator(): \Traversable {
-    foreach ($this->finder as $file) {
+  public function getIterator(): \Generator {
+    foreach (parent::getIterator() as $file) {
       try {
         yield Recipe::createFromDirectory($file->getPath());
       }

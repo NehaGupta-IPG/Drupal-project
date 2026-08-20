@@ -60,7 +60,7 @@ class RecipeFinderTest extends KernelTestBase {
       array_column(iterator_to_array($finder), 'name'),
     );
     // But not if we explicitly filter it out.
-    $finder->finder->notPath('example');
+    $finder->notPath('example');
     $this->assertNotContains(
       'Example',
       array_column(iterator_to_array($finder), 'name'),
