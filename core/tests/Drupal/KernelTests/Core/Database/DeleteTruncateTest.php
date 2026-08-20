@@ -246,6 +246,25 @@ class DeleteTruncateTest extends DatabaseTestBase {
   }
 
   /**
+   * Confirms that the reset_serial_id option set to FALSE keeps the serial ID.
+   *
+   * Every driver empties the table by the fastest statement that leaves the
+   * serial ID where the removed rows put it.
+   */
+  public function testTruncateWithoutResettingSerialId(): void {
+    $last_id = $this->insertPerson('Freddie');
+    $this->assertGreaterThan(1, $last_id);
+
+    $this->connection->truncate('test', ['reset_serial_id' => FALSE])->execute();
+
+    $num_records_after = $this->connection->select('test')->countQuery()->execute()->fetchField();
+    $this->assertEquals(0, $num_records_after);
+
+    // The serial ID carries on from the rows that are gone.
+    $this->assertSame($last_id + 1, $this->insertPerson('Brian'));
+  }
+
+  /**
    * Inserts a row into the test table without an explicit identifier.
    *
    * @param string $name

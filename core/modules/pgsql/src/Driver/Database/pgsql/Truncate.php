@@ -10,8 +10,9 @@ use Drupal\Core\Database\Query\Truncate as QueryTruncate;
  * PostgreSQL implementation of \Drupal\Core\Database\Query\Truncate.
  *
  * Honors the "reset_serial_id" option by adding RESTART IDENTITY to the
- * statement. TRUNCATE leaves the sequences owned by the columns of the table
- * alone without it.
+ * statement, which rewinds the sequences owned by the columns of the table.
+ * TRUNCATE leaves them alone without it, so the option set to FALSE still gets
+ * a TRUNCATE here instead of the slower DELETE.
  */
 class Truncate extends QueryTruncate {
 

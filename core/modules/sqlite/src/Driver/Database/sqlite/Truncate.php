@@ -13,8 +13,9 @@ use Drupal\Core\Database\Query\Truncate as QueryTruncate;
  * SQLite doesn't support TRUNCATE, but a DELETE query with no condition has
  * exactly the effect (it is implemented by DROPing the table).
  *
- * Honours the "reset_serial_id" option by dropping the row sqlite_sequence
- * holds for the table. Emptying the table leaves that row behind.
+ * Honors the "reset_serial_id" option by dropping the row "sqlite_sequence"
+ * holds for the table. Emptying the table leaves that row behind. SQLite has
+ * only DELETE, so the option set to FALSE costs nothing beyond it.
  */
 class Truncate extends QueryTruncate {
 
