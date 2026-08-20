@@ -63,6 +63,8 @@
    * @fires event:dialogContentResize
    */
   function resetSize(event) {
+    if (typeof event.data === 'undefined') return;
+
     const positionOptions = [
       'width',
       'height',
