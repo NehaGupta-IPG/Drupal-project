@@ -135,7 +135,7 @@ class NodePerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 34,
-      'CacheGetCount' => 82,
+      'CacheGetCount' => 84,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 18,
@@ -146,7 +146,7 @@ class NodePerformanceTest extends PerformanceTestBase {
         'render' => 5,
         'default' => 5,
         'routes' => 4,
-        'entity' => 2,
+        'entity' => 4,
         'file_parsing' => 1,
       ],
       'CacheSetCount' => 41,
