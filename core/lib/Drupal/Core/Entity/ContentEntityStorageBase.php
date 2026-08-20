@@ -48,6 +48,13 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   protected $cacheBackend;
 
   /**
+   * When the persistent cache was last checked, keyed by cache ID.
+   *
+   * @var array<string, float>
+   */
+  protected array $persistentCacheGetTimes = [];
+
+  /**
    * Whether the static revision cache should be ignored.
    *
    * This property will be set internally when loading an unchanged revision
@@ -1227,11 +1234,20 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       $cid_map[$id] = $this->buildCacheId($id);
     }
     $cids = array_values($cid_map);
+    // Record when the cache was checked. A cache item created after this
+    // point marks the values loaded now as potentially stale.
+    // @see self::setPersistentCache()
+    $now = microtime(TRUE);
+    foreach ($cids as $cid) {
+      $this->persistentCacheGetTimes[$cid] = $now;
+    }
     if ($cache = $this->cacheBackend->getMultiple($cids)) {
       // Get the entities that were found in the cache.
       foreach ($ids as $index => $id) {
         $cid = $cid_map[$id];
-        if (isset($cache[$cid])) {
+        // Tombstone items written by `::resetCache()` hold FALSE as data and
+        // count as a miss.
+        if (isset($cache[$cid]) && $cache[$cid]->data !== FALSE) {
           $entities[$id] = $cache[$cid]->data;
           unset($ids[$index]);
         }
@@ -1285,14 +1301,35 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       return;
     }
 
+    $cid_map = [];
+    foreach ($entities as $id => $entity) {
+      $cid_map[$id] = $this->buildCacheId($id);
+    }
+    // Look up the current cache items, including invalid ones, to detect
+    // writes that happened since this process last checked the cache.
+    $lookup_cids = array_values($cid_map);
+    $existing = $this->cacheBackend->getMultiple($lookup_cids, TRUE);
+
     $items = [];
     foreach ($entities as $id => $entity) {
-      $items[$this->buildCacheId($id)] = [
+      $cid = $cid_map[$id];
+      $get_time = $this->persistentCacheGetTimes[$cid] ?? $_SERVER['REQUEST_TIME_FLOAT'];
+      // A cache item created after the cache was last checked means another
+      // process saved the entity in the meantime: the values held here may be
+      // stale, so the writing is discarded. The tombstone written by
+      // `::resetCache()` is such an item. The comparison allows 1 millisecond
+      // of slack because the created timestamp is rounded to milliseconds.
+      if (isset($existing[$cid]) && $existing[$cid]->created >= $get_time - 0.001) {
+        continue;
+      }
+      $items[$cid] = [
         'data' => $entity,
         'tags' => ['entity_field_info'],
       ];
     }
-    $this->cacheBackend->setMultiple($items);
+    if ($items) {
+      $this->cacheBackend->setMultiple($items);
+    }
   }
 
   /**
@@ -1470,7 +1507,12 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
 
       $this->memoryCache->deleteMultiple($latest_revision_cids);
       if ($this->entityType->isPersistentlyCacheable()) {
-        $this->cacheBackend->deleteMultiple($cids);
+        // Write tombstone items instead of deleting. A parallel process that
+        // reads the entity before this reset may hold stale values and write
+        // them to the cache afterward. The tombstone is reported as a miss
+        // by `::getFromPersistentCache()`, and its creation time lets
+        // `::setPersistentCache()` detect and discard such stale writes.
+        $this->cacheBackend->setMultiple(array_fill_keys($cids, ['data' => FALSE]));
         if ($revision_cache_tags) {
           // Invalidate related entity revisions in the persistent entity cache.
           Cache::invalidateTags($revision_cache_tags);
