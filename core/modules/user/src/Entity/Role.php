@@ -83,6 +83,17 @@ class Role extends ConfigEntityBase implements RoleInterface {
   protected string $description = '';
 
   /**
+   * {@inheritdoc}
+   */
+  public function toArray() {
+    $properties = parent::toArray();
+    if ($this->description === '') {
+      unset($properties['description']);
+    }
+    return $properties;
+  }
+
+  /**
    * The weight of this role in administrative listings.
    *
    * @var int
