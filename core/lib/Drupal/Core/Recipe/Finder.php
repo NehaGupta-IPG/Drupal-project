@@ -29,6 +29,8 @@ use Symfony\Component\Finder\Finder as SymfonyFinder;
  *
  * @see \Drupal\Core\Recipe\RecipeConfigurator
  *
+ * @implements \IteratorAggregate<\Drupal\Core\Recipe\Recipe>
+ *
  * @internal
  *   This API is experimental.
  */
@@ -39,6 +41,19 @@ final class Finder extends SymfonyFinder {
    */
   private static ?string $recipesDirectory = NULL;
 
+  /**
+   * Constructs a recipe finder.
+   *
+   * @param string|array|null $directories
+   *   (optional) The directories that should be searched for recipes, or NULL
+   *   to use the default locations.
+   * @param bool $skipInvalid
+   *   (optional) Whether to silently skip invalid recipes, or allow them to
+   *   throw exceptions.
+   * @param \Psr\Log\LoggerInterface|null $logger
+   *   (optional) A logger where exceptions raised by invalid recipes should be
+   *   logged.
+   */
   public function __construct(
     string|array|null $directories = NULL,
     private readonly bool $skipInvalid = FALSE,
@@ -62,6 +77,10 @@ final class Finder extends SymfonyFinder {
    * {@inheritdoc}
    */
   public function getIterator(): \Generator {
+    // Set options that should never be configurable by calling code, so that
+    // we can guarantee they are what we expect them to be before iterating.
+    // Calling name() and depth() on $this is forbidden, so we need to set those
+    // options on the parent class.
     $this->files();
     parent::name('recipe.yml');
     parent::depth(1);
