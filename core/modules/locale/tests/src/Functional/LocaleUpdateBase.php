@@ -6,6 +6,7 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\file\Entity\File;
 use Drupal\Tests\BrowserTestBase;
@@ -79,7 +80,14 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
    */
   protected function setTranslationsDirectory($path) {
     \Drupal::service('file_system')->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY);
-    $this->config('locale.settings')->set('translation.path', $path)->save();
+    $settings['settings']['locale_translation_path'] = (object) [
+      'value' => $path,
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+    $settings = Settings::getAll();
+    $settings['locale_translation_path'] = $path;
+    new Settings($settings);
   }
 
   /**
@@ -110,7 +118,7 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
    *   singular strings are supported, no plurals. No double quotes are allowed
    *   in source and translations strings.
    */
-  protected function makePoFile($path, $filename, $timestamp = NULL, array $translations = []) {
+  protected function makePoFile($path, string $filename, $timestamp = NULL, array $translations = []) {
     $timestamp = $timestamp ?: \Drupal::time()->getRequestTime();
     $path = 'public://' . $path;
     $text = '';
@@ -126,11 +134,9 @@ msgstr ""
 EOF;
 
     // Convert array of translations to Gettext source and translation strings.
-    if ($translations) {
-      foreach ($translations as $source => $target) {
-        $text .= 'msgid "' . $source . '"' . "\n";
-        $text .= 'msgstr "' . $target . '"' . "\n";
-      }
+    foreach ($translations as $source => $target) {
+      $text .= 'msgid "' . $source . '"' . "\n";
+      $text .= 'msgstr "' . $target . '"' . "\n";
     }
 
     \Drupal::service('file_system')->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY);

@@ -11,6 +11,7 @@ use Drupal\ckeditor5\SmartDefaultSettings;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Logger\LogMessageParserInterface;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
@@ -41,11 +42,9 @@ class SmartDefaultSettingsTest extends KernelTestBase {
    *
    * The updated Text Format & Text Editors are explicitly checked.
    *
-   * @var bool
-   *
    * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
    */
-  protected $strictConfigSchema = FALSE;
+  protected bool $strictConfigSchema = FALSE;
 
   /**
    * The manager for "CKEditor 5 plugin" plugins.
@@ -69,23 +68,12 @@ class SmartDefaultSettingsTest extends KernelTestBase {
   protected $smartDefaultSettings;
 
   /**
-   * The database connection used.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
    * The service name for a logger implementation that collects anything logged.
-   *
-   * @var string
    */
   protected string $testLogServiceName = 'smart_default_settings_test.logger';
 
   /**
    * The message's placeholders parser.
-   *
-   * @var \Drupal\Core\Logger\LogMessageParserInterface
    */
   protected LogMessageParserInterface $parser;
 
@@ -101,7 +89,6 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     'media',
     'help',
     'editor_test',
-    'ckeditor_test',
   ];
 
   /**
@@ -389,6 +376,18 @@ class SmartDefaultSettingsTest extends KernelTestBase {
   }
 
   /**
+   * Implements hook_editor_info_alter().
+   *
+   * @see ::test()
+   */
+  #[Hook('editor_info_alter')]
+  public function editorInfoAlter(array &$editors): void {
+    // Drupal 9 used to have an editor called ckeditor. Copy the Unicorn editor
+    // to it to be able to test upgrading to CKEditor 5.
+    $editors['ckeditor'] = $editors['unicorn'];
+  }
+
+  /**
    * Tests the CKEditor 5 default settings conversion.
    *
    * @param string $format_id
@@ -415,6 +414,8 @@ class SmartDefaultSettingsTest extends KernelTestBase {
    * @param array|null $expected_post_update_text_editor_violations
    *   All expected media and filter settings violations for the given text
    *   format.
+   *
+   * @see ::editorInfoAlter()
    */
   #[DataProvider('provider')]
   public function test(string $format_id, array $filters_to_drop, array $expected_ckeditor5_settings, string $expected_superset, array $expected_fundamental_compatibility_violations, array $expected_db_logs, array $expected_messages, ?array $expected_post_filter_drop_fundamental_compatibility_violations = NULL, ?array $expected_post_update_text_editor_violations = NULL): void {
@@ -573,7 +574,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
    * @return \Generator
    *   Test scenarios.
    */
-  public static function provider() {
+  public static function provider(): \Iterator {
     $basic_html_test_case = [
       'format_id' => 'basic_html',
       'filters_to_drop' => [],

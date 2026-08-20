@@ -322,11 +322,11 @@ class Ckeditor5Hooks {
         // will be filtered in ckeditor5_js_alter() hook.
         $files = scandir("{$dir}/translations");
         foreach ($files as $file) {
-          if (str_ends_with($file, '.js')) {
-            $langcode = basename($file, '.js');
-            // Only add languages that Drupal can understands.
+          if (str_ends_with($file, '.umd.js')) {
+            $langcode = basename($file, '.umd.js');
+            // Only add languages that Drupal can understand.
             if (in_array($langcode, $ckeditor_langcodes)) {
-              $library['js']["{$dirname}/translations/{$langcode}.js"] = [
+              $library['js']["{$dirname}/translations/{$file}"] = [
                 'ckeditor5_langcode' => $langcode,
                 'minified' => TRUE,
                 'preprocess' => TRUE,
@@ -352,41 +352,14 @@ class Ckeditor5Hooks {
     $translations_library = 'core/ckeditor5.translations';
     if (in_array($translations_library, $this->libraryDependencyResolver->getLibrariesWithDependencies($assets->getLibraries()), TRUE)
       || in_array($translations_library, $this->libraryDependencyResolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries()), TRUE)) {
-
-      // This file is used to get a weight that will make it possible to
-      // aggregate all translation files in a single aggregate.
-      $ckeditor_dll_file = 'core/assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js';
-      // Use the placeholder file weight to set all the translations files
-      // weights so they can be aggregated together as expected. Account for
-      // requests where the library is not loaded such as when during an AJAX
-      // request when it was already loaded via the main request. In these cases
-      // it is unlikely that multiple JavaScript aggregates will be created
-      // anyway since AJAX requests generally result in very few libraries being
-      // loaded.
-      $default_weight = $javascript[$placeholder_file]['weight'] ?? 0;
-      if (isset($javascript[$ckeditor_dll_file])) {
-        $default_weight = $javascript[$ckeditor_dll_file]['weight'];
-      }
-
-      $ckeditor5_language = $this->languageMapper->getMapping($language->getId());
       // Remove all CKEditor 5 translations files that are not in the current
       // language.
-      foreach ($javascript as $index => &$item) {
-        // This is not a CKEditor 5 translation file, skip it.
-        if (empty($item['ckeditor5_langcode'])) {
-          continue;
-        }
-        // This file is the correct translation for this page.
-        if ($item['ckeditor5_langcode'] === $ckeditor5_language) {
-          // Set the weight for the translation file to be able to have the
-          // translation files aggregated.
-          $item['weight'] = $default_weight;
-        }
-        else {
-          // Remove files that don't match the language requested.
-          unset($javascript[$index]);
-        }
-      }
+      $ckeditor5_language = $this->languageMapper->getMapping($language->getId());
+      $javascript = array_filter($javascript, function ($item) use ($ckeditor5_language) {
+        // Skip files that are not CKEditor5 translation files. Remove files
+        // that don't match the language requested.
+        return empty($item['ckeditor5_langcode']) || $item['ckeditor5_langcode'] === $ckeditor5_language;
+      });
     }
     // The placeholder file is not a real file, remove it from the list.
     unset($javascript[$placeholder_file]);
@@ -522,7 +495,7 @@ class Ckeditor5Hooks {
   /**
    * AJAX callback handler for filter_format_form().
    *
-   * Used instead of editor_form_filter_admin_form_ajax from the editor module.
+   * Used instead of EditorHooks::editorFormFilterAdminFormAjax().
    *
    * @param array $form
    *   The form render array.
@@ -531,6 +504,8 @@ class Ckeditor5Hooks {
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The Ajax response.
+   *
+   * @see \Drupal\editor\Hook\EditorHooks::editorFormFilterAdminFormAjax()
    */
   public function updateCkeditor5HtmlFilter(array $form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
@@ -595,11 +570,16 @@ class Ckeditor5Hooks {
     // that switch, add an error class and attribute to the editor select,
     // otherwise remove.
     $ckeditor5_selected_but_errors = !$form_state->get('ckeditor5_is_active') && $form_state->get('ckeditor5_is_selected') && !empty($form_state->getErrors());
-    $response->addCommand(new InvokeCommand('[data-drupal-selector="edit-editor-editor"]', $ckeditor5_selected_but_errors ? 'addClass' : 'removeClass', ['error']));
-    $response->addCommand(new InvokeCommand('[data-drupal-selector="edit-editor-editor"]', $ckeditor5_selected_but_errors ? 'attr' : 'removeAttr', [
-      'data-error-switching-to-ckeditor5',
-      TRUE,
-    ]));
+    $response->addCommand(new InvokeCommand(
+      '[data-drupal-selector="edit-editor-editor"]',
+      $ckeditor5_selected_but_errors ? 'addClass' : 'removeClass',
+      ['error'],
+    ));
+    $response->addCommand(new InvokeCommand(
+      '[data-drupal-selector="edit-editor-editor"]',
+      $ckeditor5_selected_but_errors ? 'attr' : 'removeAttr',
+      ['data-error-switching-to-ckeditor5', TRUE],
+    ));
 
     /*
      * Recursively find #attach items in the form and add as attachments to the

@@ -19,39 +19,21 @@ use PHPUnit\Framework\Attributes\Group;
 class InstallTasksTest extends UnitTestCase {
 
   /**
-   * A connection object prophecy.
-   *
-   * @var \Drupal\mysql\Driver\Database\mysql\Connection|\Prophecy\Prophecy\ObjectProphecy
-   */
-  private $connection;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->connection = $this->prophesize(Connection::class);
-  }
-
-  /**
    * Creates a Tasks object for testing.
+   *
+   * @param \Drupal\mysql\Driver\Database\mysql\Connection $connection
+   *   The database connection.
    *
    * @return \Drupal\mysql\Driver\Database\mysql\Install\Tasks
    *   A Tasks object.
    */
-  private function createTasks(): Tasks {
-    /** @var \Drupal\mysql\Driver\Database\mysql\Connection $connection */
-    $connection = $this->connection->reveal();
-
+  private function createTasks(Connection $connection): Tasks {
     return new class($connection) extends Tasks {
 
       /**
        * The database connection.
-       *
-       * @var \Drupal\Core\Database\Connection
        */
-      private $connection;
+      private Connection $connection;
 
       public function __construct(Connection $connection) {
         $this->connection = $connection;
@@ -60,14 +42,14 @@ class InstallTasksTest extends UnitTestCase {
       /**
        * {@inheritdoc}
        */
-      protected function isConnectionActive() {
+      protected function isConnectionActive(): bool {
         return TRUE;
       }
 
       /**
        * {@inheritdoc}
        */
-      protected function getConnection() {
+      protected function getConnection(): Connection {
         return $this->connection;
       }
 
@@ -93,14 +75,14 @@ class InstallTasksTest extends UnitTestCase {
       /**
        * {@inheritdoc}
        */
-      protected function isConnectionActive() {
+      protected function isConnectionActive(): bool {
         return FALSE;
       }
 
       /**
        * {@inheritdoc}
        */
-      protected function getConnection() {
+      protected function getConnection(): null {
         return NULL;
       }
 
@@ -122,11 +104,12 @@ class InstallTasksTest extends UnitTestCase {
    */
   #[DataProvider('providerNameAndMinimumVersion')]
   public function testNameAndMinimumVersion(bool $is_mariadb, string $expected_name, string $expected_minimum_version): void {
-    $this->connection
-      ->isMariaDb()
-      ->shouldBeCalledTimes(2)
+    $connection = $this->createMock(Connection::class);
+    $connection
+      ->expects($this->exactly(2))
+      ->method('isMariaDb')
       ->willReturn($is_mariadb);
-    $tasks = $this->createTasks();
+    $tasks = $this->createTasks($connection);
 
     $minimum_version = $tasks->minimumVersion();
     $name = $tasks->name();

@@ -86,7 +86,9 @@ class Insert extends QueryInsert {
     // mimic MySQL and SQLite transactions which don't fail if a single query
     // fails. This is important for tables that are created on demand. For
     // example, \Drupal\Core\Cache\DatabaseBackend.
-    $this->connection->addSavepoint();
+    if ($this->connection->inTransaction()) {
+      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
+    }
     try {
       $stmt->execute(NULL, $this->queryOptions);
       if (isset($table_information->serial_fields[0])) {
@@ -104,17 +106,20 @@ class Insert extends QueryInsert {
         }
       }
 
-      $this->connection->releaseSavepoint();
+      if (isset($savepoint)) {
+        $savepoint->commitOrRelease();
+      }
+
+      // Re-initialize the values array so that we can re-use this query.
+      $this->insertValues = [];
+      return $last_insert_id ?? NULL;
     }
     catch (\Exception $e) {
-      $this->connection->rollbackSavepoint();
+      if (isset($savepoint)) {
+        $savepoint->rollback();
+      }
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, [], $this->queryOptions);
     }
-
-    // Re-initialize the values array so that we can re-use this query.
-    $this->insertValues = [];
-
-    return $last_insert_id ?? NULL;
   }
 
   /**

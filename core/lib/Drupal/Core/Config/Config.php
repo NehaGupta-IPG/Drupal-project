@@ -199,23 +199,24 @@ class Config extends StorableConfigBase {
    * {@inheritdoc}
    */
   public function save($has_trusted_data = FALSE) {
+    if (func_num_args() > 0) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $has_trusted_data argument is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3348180', E_USER_DEPRECATED);
+    }
     // Validate the configuration object name before saving.
     static::validateName($this->name);
 
     // If there is a schema for this configuration object, cast all values to
     // conform to the schema.
-    if (!$has_trusted_data) {
-      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
-        // Ensure that the schema wrapper has the latest data.
-        $this->schemaWrapper = NULL;
-        $this->data = $this->castValue(NULL, $this->data);
-        // Reclaim the memory used by the schema wrapper.
-        $this->schemaWrapper = NULL;
-      }
-      else {
-        foreach ($this->data as $key => $value) {
-          $this->validateValue($key, $value);
-        }
+    if (!$has_trusted_data && $this->typedConfigManager->hasConfigSchema($this->name)) {
+      // Ensure that the schema wrapper has the latest data.
+      $this->schemaWrapper = NULL;
+      $this->data = $this->castValue(NULL, $this->data);
+      // Reclaim the memory used by the schema wrapper.
+      $this->schemaWrapper = NULL;
+    }
+    else {
+      foreach ($this->data as $key => $value) {
+        $this->validateValue($key, $value);
       }
     }
 

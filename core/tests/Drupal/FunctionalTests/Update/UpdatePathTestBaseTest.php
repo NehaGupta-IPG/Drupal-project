@@ -7,6 +7,7 @@ namespace Drupal\FunctionalTests\Update;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Site\Settings;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Update')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class UpdatePathTestBaseTest extends UpdatePathTestBase {
 
   /**
@@ -25,8 +27,7 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
    * {@inheritdoc}
    */
   protected function setDatabaseDumpFiles(): void {
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz';
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/uninstall-history.php';
+    $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-11.3.0.bare.standard.php.gz';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-8.update-test-schema-enabled.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-8.update-test-semver-update-n-enabled.php';
   }
@@ -59,7 +60,7 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
     $select->range(0, 5);
     $select->fields('watchdog', ['message']);
 
-    $container_cannot_be_saved_messages = array_filter(iterator_to_array($select->execute()), function ($row) {
+    $container_cannot_be_saved_messages = array_filter(iterator_to_array($select->execute()), function ($row): bool {
       return str_contains($row->message, 'Container cannot be saved to cache.');
     });
     $this->assertEquals([], $container_cannot_be_saved_messages);
@@ -183,7 +184,7 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
    * Tests that setup is done correctly.
    */
   public function testSetup(): void {
-    $this->assertCount(4, $this->databaseDumpFiles);
+    $this->assertCount(3, $this->databaseDumpFiles);
     $this->assertSame(1, Settings::get('entity_update_batch_size'));
   }
 

@@ -27,6 +27,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(SandboxManagerBase::class)]
 #[Group('package_manager')]
+#[Group('#slow')]
 #[CoversClass(PackageManagerUninstallValidator::class)]
 #[RunTestsInSeparateProcesses]
 class StageCommitExceptionTest extends PackageManagerKernelTestBase {
@@ -100,7 +101,7 @@ class StageCommitExceptionTest extends PackageManagerKernelTestBase {
     }
     // PreconditionException requires a preconditions object.
     if ($thrown_class === PreconditionException::class) {
-      array_unshift($throwable_arguments, $this->createMock(PreconditionInterface::class));
+      array_unshift($throwable_arguments, $this->createStub(PreconditionInterface::class));
     }
     LoggingCommitter::setException($thrown_class, ...$throwable_arguments);
 

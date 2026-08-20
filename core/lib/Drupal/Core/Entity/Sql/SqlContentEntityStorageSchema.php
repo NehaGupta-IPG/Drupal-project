@@ -678,12 +678,12 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   public static function getTemporaryTableMappingPrefix(EntityTypeInterface $entity_type, array $field_storage_definitions, $first_prefix_part = 'tmp_') {
     // Construct a unique prefix based on the contents of the entity type and
     // field storage definitions.
-    $prefix_parts[] = spl_object_hash($entity_type);
+    $prefix_parts[] = spl_object_id($entity_type);
     foreach ($field_storage_definitions as $storage_definition) {
-      $prefix_parts[] = spl_object_hash($storage_definition);
+      $prefix_parts[] = spl_object_id($storage_definition);
     }
     $prefix_parts[] = \Drupal::time()->getRequestTime();
-    $hash = hash('sha256', implode('', $prefix_parts));
+    $hash = hash('sha256', implode(':', $prefix_parts));
 
     return $first_prefix_part . substr($hash, 0, 6);
   }
@@ -788,6 +788,10 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
           $this->database->insert($dedicated_revision_table_name)
             ->from($this->getSelectQueryForFieldStorageDeletion($revision_table, $shared_table_field_columns, $dedicated_table_field_columns, $field_table_name))
             ->execute();
+        }
+
+        if (isset($transaction)) {
+          $transaction->commitOrRelease();
         }
       }
       catch (\Exception $e) {
@@ -1742,6 +1746,10 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         // to a dedicated table schema, hence we should use the proper API.
         $this->performFieldSchemaOperation('delete', $original);
         $this->performFieldSchemaOperation('create', $storage_definition);
+
+        if (isset($transaction)) {
+          $transaction->commitOrRelease();
+        }
       }
       catch (\Exception $e) {
         if ($this->database->supportsTransactionalDDL()) {
@@ -1836,6 +1844,10 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         // to a schema table schema, hence we should use the proper API.
         $this->performFieldSchemaOperation('delete', $original);
         $this->performFieldSchemaOperation('create', $storage_definition);
+
+        if (isset($transaction)) {
+          $transaction->commitOrRelease();
+        }
       }
       catch (\Exception $e) {
         if ($this->database->supportsTransactionalDDL()) {
@@ -2067,7 +2079,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
 
     // Check that the schema does not include forbidden column names.
     if (array_intersect(array_keys($field_schema['columns']), $table_mapping->getReservedColumns())) {
-      throw new FieldException("Illegal field column names on {$storage_definition->getName()}");
+      throw new FieldException("Reserved field column names on {$storage_definition->getName()}");
     }
 
     $field_name = $storage_definition->getName();
@@ -2089,15 +2101,15 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       if ($initial_value_field_name = $storage_definition->getInitialValueFromField()) {
         // Check that the field used for populating initial values is valid.
         if (!isset($this->fieldStorageDefinitions[$initial_value_field_name])) {
-          throw new FieldException("Illegal initial value definition on {$storage_definition->getName()}: The field $initial_value_field_name does not exist.");
+          throw new FieldException("Invalid initial value definition on {$storage_definition->getName()}: The field $initial_value_field_name does not exist.");
         }
 
         if ($storage_definition->getType() !== $this->fieldStorageDefinitions[$initial_value_field_name]->getType()) {
-          throw new FieldException("Illegal initial value definition on {$storage_definition->getName()}: The field types do not match.");
+          throw new FieldException("Invalid initial value definition on {$storage_definition->getName()}: The field types do not match.");
         }
 
         if (!$table_mapping->allowsSharedTableStorage($this->fieldStorageDefinitions[$initial_value_field_name])) {
-          throw new FieldException("Illegal initial value definition on {$storage_definition->getName()}: Both fields have to be stored in the shared entity tables.");
+          throw new FieldException("Invalid initial value definition on {$storage_definition->getName()}: Both fields have to be stored in the shared entity tables.");
         }
 
         $initial_value_from_field = $table_mapping->getColumnNames($initial_value_field_name);
@@ -2334,7 +2346,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     $properties = $storage_definition->getPropertyDefinitions();
     $table_mapping = $this->getTableMapping($entity_type, [$storage_definition]);
     if (array_intersect(array_keys($schema['columns']), $table_mapping->getReservedColumns())) {
-      throw new FieldException("Illegal field column names on {$storage_definition->getName()}");
+      throw new FieldException("Reserved field column names on {$storage_definition->getName()}");
     }
 
     // Add field columns.

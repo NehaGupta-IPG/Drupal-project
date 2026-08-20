@@ -4,11 +4,11 @@ namespace Drupal\update;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Site\Settings;
 use Drupal\Core\Utility\Error;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Fetches project information from remote locations.
@@ -36,37 +36,14 @@ class UpdateFetcher implements UpdateFetcherInterface {
    */
   protected $updateSettings;
 
-  /**
-   * The HTTP client to fetch the feed data with.
-   *
-   * @var \GuzzleHttp\ClientInterface
-   */
-  protected $httpClient;
-
-  /**
-   * Whether to use HTTP fallback if HTTPS fails.
-   *
-   * @var bool
-   */
-  protected $withHttpFallback;
-
-  /**
-   * Constructs an UpdateFetcher.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   A Guzzle client object.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The settings instance.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, ClientInterface $http_client, Settings $settings, protected LoggerInterface $logger) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected ClientInterface $httpClient,
+    #[Autowire(service: 'logger.channel.update')]
+    protected LoggerInterface $logger,
+  ) {
     $this->fetchUrl = $config_factory->get('update.settings')->get('fetch.url');
-    $this->httpClient = $http_client;
     $this->updateSettings = $config_factory->get('update.settings');
-    $this->withHttpFallback = $settings->get('update_fetch_with_http_fallback', FALSE);
   }
 
   /**
@@ -74,26 +51,21 @@ class UpdateFetcher implements UpdateFetcherInterface {
    */
   public function fetchProjectData(array $project, $site_key = '') {
     $url = $this->buildFetchUrl($project, $site_key);
-    return $this->doRequest($url, ['headers' => ['Accept' => 'text/xml']], $this->withHttpFallback);
+    return $this->doRequest($url, ['headers' => ['Accept' => 'text/xml']]);
   }
 
   /**
-   * Applies a GET request with a possible HTTP fallback.
-   *
-   * This method falls back to HTTP in case there was some certificate
-   * problem.
+   * Applies a GET request.
    *
    * @param string $url
    *   The URL.
    * @param array $options
    *   The guzzle client options.
-   * @param bool $with_http_fallback
-   *   Should the function fall back to HTTP.
    *
    * @return string
-   *   The body of the HTTP(S) request, or an empty string on failure.
+   *   The body of the request, or an empty string on failure.
    */
-  protected function doRequest(string $url, array $options, bool $with_http_fallback): string {
+  protected function doRequest(string $url, array $options): string {
     $data = '';
     try {
       $data = (string) $this->httpClient
@@ -102,10 +74,6 @@ class UpdateFetcher implements UpdateFetcherInterface {
     }
     catch (ClientExceptionInterface $exception) {
       Error::logException($this->logger, $exception);
-      if ($with_http_fallback && !str_contains($url, "http://")) {
-        $url = str_replace('https://', 'http://', $url);
-        return $this->doRequest($url, $options, FALSE);
-      }
     }
     return $data;
   }

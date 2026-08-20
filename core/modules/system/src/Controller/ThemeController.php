@@ -6,10 +6,13 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Extension\ThemeInstallerInterface;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\system\Form\ThemeExperimentalConfirmForm;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
@@ -59,39 +62,6 @@ class ThemeController extends ControllerBase {
   }
 
   /**
-   * Uninstalls a theme.
-   *
-   * @param string $theme
-   *   The theme name.
-   *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
-   *   Redirects back to the appearance admin page.
-   */
-  public function uninstall(#[MapQueryParameter] string $theme) {
-    $config = $this->config('system.theme');
-
-    // Get current list of themes.
-    $themes = $this->themeHandler->listInfo();
-
-    // Check if the specified theme is one recognized by the system.
-    if (!empty($themes[$theme])) {
-      // Do not uninstall the default or admin theme.
-      if ($theme === $config->get('default') || $theme === $config->get('admin')) {
-        $this->messenger()->addError($this->t('%theme is the default theme and cannot be uninstalled.', ['%theme' => $themes[$theme]->info['name']]));
-      }
-      else {
-        $this->themeInstaller->uninstall([$theme]);
-        $this->messenger()->addStatus($this->t('The %theme theme has been uninstalled.', ['%theme' => $themes[$theme]->info['name']]));
-      }
-    }
-    else {
-      $this->messenger()->addError($this->t('The %theme theme was not found.', ['%theme' => $theme]));
-    }
-
-    return $this->redirect('system.themes_page');
-  }
-
-  /**
    * Installs a theme.
    *
    * @param string $theme
@@ -101,6 +71,14 @@ class ThemeController extends ControllerBase {
    *   Redirects back to the appearance admin page or the confirmation form
    *   if an experimental theme will be installed.
    */
+  #[Route(
+    path: '/admin/appearance/install',
+    name: 'system.theme_install',
+    requirements: [
+      '_permission' => 'administer themes',
+      '_csrf_token' => 'TRUE',
+    ],
+  )]
   public function install(#[MapQueryParameter] string $theme) {
     // Display confirmation form in case of experimental theme.
     if ($this->willInstallExperimentalTheme($theme)) {
@@ -136,6 +114,14 @@ class ThemeController extends ControllerBase {
       $this->messenger()->addError($this->t('Unable to install @theme due to missing module dependencies.', ['@theme' => $theme]));
     }
 
+    // Process any batch queued by hook_themes_installed (e.g. locale's
+    // langcode rewrite). batch_process() redirects to the batch page and
+    // then to $redirect after completion, so it is returned directly.
+    $batch = &batch_get();
+    if (!empty($batch)) {
+      return batch_process(Url::fromRoute('system.themes_page'));
+    }
+
     return $this->redirect('system.themes_page');
   }
 
@@ -150,6 +136,9 @@ class ThemeController extends ControllerBase {
    */
   protected function willInstallExperimentalTheme($theme) {
     $all_themes = $this->themeList->getList();
+    if (!isset($all_themes[$theme])) {
+      return FALSE;
+    }
     $dependencies = array_keys($all_themes[$theme]->requires);
     $themes_to_enable = array_merge([$theme], $dependencies);
 
@@ -172,6 +161,15 @@ class ThemeController extends ControllerBase {
    *   Redirects back to the appearance admin page or the confirmation form
    *   if an experimental theme will be installed.
    */
+  #[Route(
+    path: '/admin/appearance/default',
+    name: 'system.theme_set_default',
+    title: new TranslatableMarkup('Set as default theme'),
+    requirements: [
+      '_permission' => 'administer themes',
+      '_csrf_token' => 'TRUE',
+    ],
+  )]
   public function setDefaultTheme(#[MapQueryParameter] string $theme) {
     $config = $this->configFactory->getEditable('system.theme');
 
@@ -207,6 +205,14 @@ class ThemeController extends ControllerBase {
     }
     else {
       $this->messenger()->addError($this->t('The %theme theme was not found.', ['%theme' => $theme]));
+    }
+
+    // Process any batch queued by hook_themes_installed (e.g. locale's
+    // langcode rewrite). batch_process() redirects to the batch page and
+    // then to $redirect after completion, so it is returned directly.
+    $batch = &batch_get();
+    if (!empty($batch)) {
+      return batch_process(Url::fromRoute('system.themes_page'));
     }
 
     return $this->redirect('system.themes_page');

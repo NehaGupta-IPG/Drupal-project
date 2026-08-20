@@ -19,7 +19,15 @@ class SearchBlockTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'search', 'dblog', 'user'];
+  protected static $modules = [
+    'block',
+    'node',
+    'search',
+    'search_node',
+    'search_user',
+    'dblog',
+    'user',
+  ];
 
   /**
    * {@inheritdoc}
