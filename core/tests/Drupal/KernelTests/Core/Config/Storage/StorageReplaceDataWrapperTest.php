@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Config\Storage;
 
 use Drupal\config\StorageReplaceDataWrapper;
 use Drupal\Core\Config\StorageInterface;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -56,8 +57,8 @@ class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
+  #[Skip('Permanent: see https://www.drupal.org/node/3059332')]
   public function testInvalidStorage(): void {
-    $this->markTestSkipped('No-op as this test does not make sense');
   }
 
   /**

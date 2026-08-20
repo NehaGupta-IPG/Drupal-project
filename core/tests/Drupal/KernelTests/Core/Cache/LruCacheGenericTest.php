@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\MemoryCache\LruMemoryCache;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -36,8 +37,8 @@ class LruCacheGenericTest extends GenericCacheBackendUnitTestBase {
   /**
    * The LRU memory cache removes items when invalidateTags is called.
    */
+  #[Skip('Permanent: see https://www.drupal.org/node/3308877')]
   public function testInvalidateTags(): void {
-    $this->markTestSkipped();
   }
 
 }

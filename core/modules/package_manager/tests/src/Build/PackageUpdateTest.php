@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\package_manager\Build;
 
 use Drupal\package_manager_test_api\ControllerSandboxManager;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -18,10 +19,8 @@ class PackageUpdateTest extends TemplateProjectTestBase {
   /**
    * Tests updating packages in a stage directory.
    */
+  #[Skip('Temporary: see https://www.drupal.org/node/3508109')]
   public function testPackageUpdate(): void {
-    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/i/3508109
-    $this->markTestSkipped();
-
     $this->createTestProject('RecommendedProject');
 
     $fixtures = __DIR__ . '/../../fixtures/build_test_projects';

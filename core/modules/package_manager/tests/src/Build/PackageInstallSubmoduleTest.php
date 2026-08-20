@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Build;
 
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -21,10 +22,8 @@ class PackageInstallSubmoduleTest extends TemplateProjectTestBase {
    * packages.drupal.org handles submodules. Submodules are Composer
    * metapackages which depend on the Composer package of the main module.
    */
+  #[Skip('Temporary: see https://www.drupal.org/node/3508109')]
   public function testSubModules(): void {
-    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/i/3508109
-    $this->markTestSkipped();
-
     $this->createTestProject('RecommendedProject');
     // Set up the release metadata for the main module. The submodule does not
     // have its own release metadata.

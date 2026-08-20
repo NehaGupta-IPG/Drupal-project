@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Config\Storage;
 use Drupal\Core\Config\ManagedStorage;
 use Drupal\Core\Config\MemoryStorage;
 use Drupal\Core\Config\StorageManagerInterface;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -65,8 +66,8 @@ class ManagedStorageTest extends ConfigStorageTestBase implements StorageManager
   /**
    * {@inheritdoc}
    */
+  #[Skip('Permanent: see https://www.drupal.org/node/3047812')]
   public function testInvalidStorage(): void {
-    $this->markTestSkipped('ManagedStorage cannot be invalid.');
   }
 
 }

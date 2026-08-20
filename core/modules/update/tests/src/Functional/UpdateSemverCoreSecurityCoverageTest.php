@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\update\Functional;
 
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -17,9 +18,8 @@ class UpdateSemverCoreSecurityCoverageTest extends UpdateSemverCoreTestBase {
   /**
    * Tests the security coverage messages for Drupal core versions.
    */
+  #[Skip('Temporary: see https://www.drupal.org/node/3559550')]
   public function testSecurityCoverageMessage(): void {
-    // @todo Fix random test failure.
-    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3559550');
     foreach (static::securityCoverageMessageProvider() as $case) {
       $this->doTestSecurityCoverageMessage($case['installed_version'], $case['fixture'], $case['requirements_section_heading'], $case['message'], $case['mock_date']);
     }

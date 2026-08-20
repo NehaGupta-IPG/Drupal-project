@@ -10,6 +10,7 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\TestTools\Attribute\Skip;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -65,10 +66,8 @@ class LayoutBuilderEntityViewDisplayValidationTest extends ConfigEntityValidatio
   /**
    * {@inheritdoc}
    */
+  #[Skip('Temporary: see https://www.drupal.org/node/2939931')]
   public function testLabelValidation(): void {
-    // @todo Remove this override in https://www.drupal.org/i/2939931. The label of Layout Builder's EntityViewDisplay override is computed dynamically, that issue will change this.
-    // @see \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay::label()
-    $this->markTestSkipped();
   }
 
   /**
