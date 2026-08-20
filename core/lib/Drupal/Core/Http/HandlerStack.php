@@ -27,6 +27,7 @@ class HandlerStack {
    *   the best handler for your system will be utilized.
    *
    * @return \GuzzleHttp\HandlerStack<callable(\Psr\Http\Message\RequestInterface, array<array-key, mixed>): \GuzzleHttp\Promise\PromiseInterface<\Psr\Http\Message\ResponseInterface, mixed>>
+   *   The handler stack.
    */
   public static function create(?callable $handler = NULL): GuzzleHandlerStack {
     // Opportunistically enable persistent sharing of connections, DNS and TLS
