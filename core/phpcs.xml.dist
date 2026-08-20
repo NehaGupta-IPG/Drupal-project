@@ -51,18 +51,18 @@
 
   <!-- Drupal sniffs that core partially meets. -->
   <rule ref="Drupal.Commenting.DocComment.MissingShort">
+    <include-pattern>core/*/FunctionalJavascript/*</include-pattern>
     <include-pattern>core/*/KernelTests/*</include-pattern>
     <include-pattern>core/*/Unit/*</include-pattern>
-    <include-pattern>core/*/FunctionalJavascript/*</include-pattern>
   </rule>
   <rule ref="Drupal.Commenting.FunctionComment.Missing">
-    <include-pattern>core/*/src/Plugin/*</include-pattern>
     <include-pattern>*/Database/*</include-pattern>
+    <include-pattern>*/Functional/*</include-pattern>
     <include-pattern>*/FunctionalJavascript/*</include-pattern>
     <include-pattern>*/Kernel/*</include-pattern>
     <include-pattern>*/KernelTests/*</include-pattern>
-    <include-pattern>*/Functional/*</include-pattern>
     <include-pattern>*/Unit/*</include-pattern>
+    <include-pattern>core/*/src/Plugin/*</include-pattern>
     <include-pattern>core/lib/*</include-pattern>
     <include-pattern>core/modules/system/tests/modules/HookOrder/*</include-pattern>
   </rule>
@@ -123,16 +123,6 @@
   <rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash"/>
   <rule ref="SlevomatCodingStandard.Namespaces.UseFromSameNamespace"/>
   <rule ref="SlevomatCodingStandard.PHP.TypeCast" />
-  <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
-  <rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
-    <exclude name="VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedUnsetVariable"/>
-    <!-- Do not run this sniff on API files or transliteration data. -->
-    <exclude-pattern>*.api.php</exclude-pattern>
-    <exclude-pattern>core/lib/Drupal/Component/Transliteration/data/*.php</exclude-pattern>
-    <properties>
-      <property name="allowUnusedFunctionParameters" value="true"/>
-    </properties>
-  </rule>
 
   <!-- The Drupal ruleset disables this rule, but core enables it for tests. -->
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
@@ -145,6 +135,17 @@
   <!-- This rule explicitly re-enables the disabled rule. -->
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.DeclareStrictTypesMissing">
     <severity>5</severity>
+  </rule>
+
+  <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
+  <rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
+    <exclude name="VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedUnsetVariable"/>
+    <!-- Do not run this sniff on API files or transliteration data. -->
+    <exclude-pattern>*.api.php</exclude-pattern>
+    <exclude-pattern>core/lib/Drupal/Component/Transliteration/data/*.php</exclude-pattern>
+    <properties>
+      <property name="allowUnusedFunctionParameters" value="true"/>
+    </properties>
   </rule>
 
 </ruleset>
