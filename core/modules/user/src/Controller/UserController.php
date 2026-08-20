@@ -32,6 +32,8 @@ class UserController extends ControllerBase {
 
   /**
    * One time authentication service.
+   *
+   * @var \Drupal\user\OneTimeAuthentication
    */
   protected OneTimeAuthentication $oneTimeAuthentication;
 
@@ -47,6 +49,8 @@ class UserController extends ControllerBase {
 
   /**
    * The accountCancellation service.
+   *
+   * @var \Drupal\user\AccountCancellation
    */
   protected AccountCancellation $accountCancellation;
 

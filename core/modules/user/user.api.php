@@ -89,7 +89,7 @@ function hook_user_cancel($edit, UserInterface $account, $method): void {
  * @param array $methods
  *   An array containing user account cancellation methods, keyed by method id.
  *
- * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To define a
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. To define a
  *   new account cancellation method, create a plugin implementing
  *   \Drupal\user\AccountCancelMethodInterface. To alter existing cancellation
  *   method plugins, implement hook_user_cancel_method_info_alter().

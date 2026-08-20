@@ -52,7 +52,7 @@ class AccountSettingsForm extends ConfigFormBase {
       @trigger_error('Calling ' . __METHOD__ . '() with the $module_handler argument is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3566911', E_USER_DEPRECATED);
     }
     if (!$account_cancellation) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $account_cancellation argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $account_cancellation argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
       $account_cancellation = \Drupal::service(AccountCancellation::class);
     }
     $this->accountCancellation = $account_cancellation;

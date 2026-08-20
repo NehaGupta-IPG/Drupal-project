@@ -79,6 +79,13 @@ class EntityResource {
 
   use EntityValidationTrait;
 
+  /**
+   * Account cancellation service.
+   *
+   * @var \Drupal\user\AccountCancellation
+   */
+  protected AccountCancellation $accountCancellation;
+
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected EntityFieldManagerInterface $fieldManager,
@@ -93,12 +100,12 @@ class EntityResource {
     protected TimeInterface $time,
     protected AccountInterface $user,
     protected EventDispatcherInterface $eventDispatcher,
-    protected ?AccountCancellation $accountCancellation = NULL,
+    ?AccountCancellation $account_cancellation = NULL,
   ) {
-    if (!$this->accountCancellation) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $accountCancellation argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
-      $this->accountCancellation = \Drupal::service(AccountCancellation::class);
+    if ($account_cancellation === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $account_cancellation argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
     }
+    $this->accountCancellation = $account_cancellation ?? \Drupal::service(AccountCancellation::class);
   }
 
   /**

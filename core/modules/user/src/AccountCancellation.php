@@ -90,7 +90,7 @@ class AccountCancellation {
       $manager->createInstance($method)->cancel($account, $context);
     }
     else {
-      @trigger_error("Defining account cancellation methods by implementing hook_user_cancel_methods_alter() is deprecated in drupal:11.4.0 and is removed from drupal:11.4.0. To define a new account cancellation method, create a plugin implementing \Drupal\user\AccountCancelMethodInterface. See https://www.drupal.org/node/3580745", E_USER_DEPRECATED);
+      @trigger_error("Defining account cancellation methods by implementing hook_user_cancel_methods_alter() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. To define a new account cancellation method, create a plugin implementing \Drupal\user\AccountCancelMethodInterface. See https://www.drupal.org/node/3580745", E_USER_DEPRECATED);
       // In the legacy system, any custom method did execute the same code as
       // the 'block' core method. This was a bug. For backwards compatibility
       // reasons, we replicate the legacy behavior here. This will be removed
@@ -136,7 +136,7 @@ class AccountCancellation {
     }
 
     $this->moduleHandler->alterDeprecated(
-      'Implementing hook_user_cancel_methods_alter() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To define a new account cancellation method, create a plugin implementing \Drupal\user\AccountCancelMethodInterface. To alter existing cancellation method plugins, implement hook_user_cancel_method_info_alter(). See https://www.drupal.org/node/3580745',
+      'Implementing hook_user_cancel_methods_alter() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. To define a new account cancellation method, create a plugin implementing \Drupal\user\AccountCancelMethodInterface. To alter existing cancellation method plugins, implement hook_user_cancel_method_info_alter(). See https://www.drupal.org/node/3580745',
       'user_cancel_methods',
       $methods,
     );

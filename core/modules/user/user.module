@@ -139,12 +139,12 @@ function user_pass_reset_url($account, $options = []) {
  * @see \Drupal\user\OneTimeAuthentication::tokens()
  * @see \Drupal\user\Controller\UserController::confirmCancel()
  *
- * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\user\OneTimeAuthentication::generateCancelConfirmUrl() instead.
  * @see https://www.drupal.org/node/3581062
  */
 function user_cancel_url(UserInterface $account, $options = []) {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\OneTimeAuthentication::generateCancelConfirmUrl() instead. See https://www.drupal.org/node/3581062', E_USER_DEPRECATED);
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\user\OneTimeAuthentication::generateCancelConfirmUrl() instead. See https://www.drupal.org/node/3581062', E_USER_DEPRECATED);
   return \Drupal::service(OneTimeAuthentication::class)->generateCancelConfirmUrl($account, $options)->toString();
 }
 
@@ -192,14 +192,14 @@ function user_pass_rehash(UserInterface $account, $timestamp) {
  * @param string $method
  *   The account cancellation method to use.
  *
- * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\user\AccountCancellation::cancel() instead.
  *
  * @see https://www.drupal.org/node/3580745
  * @see _user_cancel()
  */
 function user_cancel($edit, $uid, $method): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::cancel() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::cancel() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
   $account = User::load($uid);
 
   if (!$account) {
@@ -242,14 +242,14 @@ function _user_cancel($edit, $account, $method): void {
  *
  * Finished batch processing callback for cancelling a user account.
  *
- * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\user\AccountCancellation::regenerateSession() instead.
  *
  * @see https://www.drupal.org/node/3580745
  * @see user_cancel()
  */
 function _user_cancel_session_regenerate(): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::regenerateSession() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::regenerateSession() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
   AccountCancellation::regenerateSession();
 }
 
@@ -261,7 +261,7 @@ function _user_cancel_session_regenerate(): void {
  * @return array
  *   An array containing all account cancellation methods as form elements.
  *
- * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\user\AccountCancellation::getMethodsFormElement() instead.
  *
  * @see https://www.drupal.org/node/3580745
@@ -269,7 +269,7 @@ function _user_cancel_session_regenerate(): void {
  * @see user_admin_settings()
  */
 function user_cancel_methods(): array {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::getMethodsFormElement() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::getMethodsFormElement() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
   return \Drupal::service(AccountCancellation::class)->getMethodsFormElement();
 }
 
