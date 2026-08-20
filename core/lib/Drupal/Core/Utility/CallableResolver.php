@@ -8,31 +8,40 @@ use Drupal\Core\DependencyInjection\ClassResolverInterface;
  * Resolves PHP callables.
  *
  * The callable resolver service aims to provide a standardized approach to how
- * callables are resolved and invoked from various subsystems. The callable
- * resolver will return or invoke a callable defined in any of the following
- * definition formats:
+ * callables are resolved and invoked from various subsystems.
  *
- * - Service notation:
+ * Anything that is already a native PHP callable is returned immediately, such
+ * as static methods, object calls with an instantiated object or closures.
+ *
  * @code
- * 'some.service:method'
- * @endcode
- * - Static methods:
+ * '\FooClass::staticMethod';
+ * ['\FooClass', 'staticMethod'];
+ * [$object, 'method'];
+ * @end code
+ *
+ * If it is not already a callable, then the callable definition must be defined
+ * as a string, the first part is either a service ID or a a class name. Note
+ * that services IDs can also be class or interface names. This is resolved
+ * using \Drupal\Core\DependencyInjection\ClassResolverInterface.
+ *
+ * The second, optional part is the method name. If none is provided, the
+ * returned object must implement the __invoke() method.
+ *
+ * For better readability, it is recommended to use a single : to differentiate
+ * the callable definition as the separator from a regular static method,
+ * although a double :: may be used as well.
+ *
  * @code
- * '\FooClass::staticMethod'
+ * 'service_name:method';
+ * ClassName::class . ':method';
+ * static::class . ':method';
+ * 'ClassWithInvokeMethod'
  * @endcode
- * - Non-static methods, instantiated with the class resolver:
- * @code
- * '\DependencyInjectedClass::method'
- * @endcode
- * - Object calls:
- * @code
- * [$object, 'method']
- * @endcode
- * - Classes with an __invoke method:
- * @code
- * '\ClassWithInvoke'
- * @endcode
- * - Closures.
+ *
+ * Note: Form classes may define their callables as '::methodName', this is
+ * resolved by \Drupal\Core\Form\FormStateInterface::prepareCallback() and
+ * reaches this as a native PHP callable as [$form_object, 'methodName']. This
+ * is only supported by form classes.
  */
 class CallableResolver {
 
@@ -51,7 +60,8 @@ class CallableResolver {
    * Gets a callable from a definition.
    *
    * @param callable|array|string $definition
-   *   A callable definition.
+   *   A callable definition. See the class documentation for more information
+   *   on supported formats.
    *
    * @return callable
    *   A callable.

@@ -10,10 +10,12 @@ interface ClassResolverInterface {
   /**
    * Returns a class instance with a given class definition.
    *
-   * In contrast to controllers you don't specify a method.
-   *
    * @param class-string<T>|string $definition
-   *   A class name or service name.
+   *   A class name or service name. Note that services are often registered
+   *   as a class or interface name as well. If it is not a service,
+   *   \Drupal\Core\DependencyInjection\ContainerInjectionInterface can be used
+   *   for dependency injection, if it is neither, it must not have a
+   *   constructor.
    *
    * @template T of object
    *
