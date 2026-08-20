@@ -71,7 +71,7 @@
    *   Whether to perform a search or not.
    */
   function searchHandler(event) {
-    const options = autocomplete.options;
+    const { options } = autocomplete;
 
     if (options.isComposing) {
       return false;

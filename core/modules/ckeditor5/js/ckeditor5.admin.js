@@ -377,7 +377,7 @@
             'ArrowUp',
             'ArrowDown',
           ];
-          const dir = document.documentElement.dir;
+          const { dir } = document.documentElement;
           if (supportedKeys.includes(event.key)) {
             if (event.currentTarget.dataset.divider.toLowerCase() === 'true') {
               switch (event.key) {
@@ -711,7 +711,7 @@
        *   The vertical tabs element.
        */
       const maintainActiveVerticalTab = (verticalTabs) => {
-        const id = verticalTabs.id;
+        const id = { verticalTabs };
 
         // If the UI state storage has an active tab, click that tab.
         const activeTab = getUiStateStorage(`${id}-active-tab`);

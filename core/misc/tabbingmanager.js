@@ -219,8 +219,7 @@
        *   The TabbingContext instance that has been activated.
        */
       activate(tabbingContext) {
-        const $set = tabbingContext.$tabbableElements;
-        const level = tabbingContext.level;
+        const { $tabbableElements: $set, level } = tabbingContext;
         // Determine which elements are reachable via tabbing by default.
         const $disabledSet = $(tabbable(document.body))
           // Exclude elements of the active tabbing set.
@@ -274,8 +273,7 @@
        *   The TabbingContext instance that has been deactivated.
        */
       deactivate(tabbingContext) {
-        const $set = tabbingContext.$disabledElements;
-        const level = tabbingContext.level;
+        const { $disabledElements: $set, level } = tabbingContext;
         const il = $set.length;
 
         tabbingContext.$tabbableElements.first().off('keydown.focus-trap');

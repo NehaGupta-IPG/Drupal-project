@@ -43,7 +43,7 @@ export default class ToggleDrupalMediaCaptionCommand extends Command {
    * @inheritdoc
    */
   refresh() {
-    const selection = this.editor.model.document.selection;
+    const { selection } = this.editor.model.document;
     const selectedElement = selection.getSelectedElement();
 
     // When selectedElement is falsy, it is potentially due to multiple elements
@@ -110,8 +110,8 @@ export default class ToggleDrupalMediaCaptionCommand extends Command {
    *   Flag indicating whether the caption should be focused.
    */
   _showDrupalMediaCaption(writer, focusCaptionOnShow) {
-    const model = this.editor.model;
-    const selection = model.document.selection;
+    const { model } = this.editor;
+    const { selection } = model.document;
     const mediaCaptionEditing = this.editor.plugins.get(
       'DrupalMediaCaptionEditing',
     );
@@ -138,8 +138,8 @@ export default class ToggleDrupalMediaCaptionCommand extends Command {
    *   The model writer.
    */
   _hideDrupalMediaCaption(writer) {
-    const editor = this.editor;
-    const selection = editor.model.document.selection;
+    const { editor } = this;
+    const { selection } = editor.model.document;
     const mediaCaptionEditing = editor.plugins.get('DrupalMediaCaptionEditing');
     let selectedElement = selection.getSelectedElement();
     let captionElement;

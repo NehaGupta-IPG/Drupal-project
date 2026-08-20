@@ -51,7 +51,7 @@
           if (nextFocusableElement) {
             nextFocusableElement.focus();
             // Move cursor to the end of the input.
-            const value = nextFocusableElement.value;
+            const { value } = nextFocusableElement;
             nextFocusableElement.value = '';
             nextFocusableElement.value = value;
             return;

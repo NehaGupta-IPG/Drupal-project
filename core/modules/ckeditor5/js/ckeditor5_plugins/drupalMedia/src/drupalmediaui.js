@@ -12,7 +12,7 @@ import mediaIcon from '../theme/icons/medialibrary.svg';
  */
 export default class DrupalMediaUI extends Plugin {
   init() {
-    const editor = this.editor;
+    const { editor } = this;
     const options = this.editor.config.get('drupalMedia');
     if (!options) {
       return;

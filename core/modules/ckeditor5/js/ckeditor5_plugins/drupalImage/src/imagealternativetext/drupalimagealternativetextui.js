@@ -140,7 +140,7 @@ export default class DrupalImageAlternativeTextUi extends Plugin {
    * @private
    */
   _createButton() {
-    const editor = this.editor;
+    const { editor } = this;
     editor.ui.componentFactory.add('drupalImageAlternativeText', (locale) => {
       const command = editor.commands.get('imageTextAlternative');
       const view = new ButtonView(locale);
@@ -167,8 +167,8 @@ export default class DrupalImageAlternativeTextUi extends Plugin {
    * @private
    */
   _createForm() {
-    const editor = this.editor;
-    const view = editor.editing.view;
+    const { editor } = this;
+    const { view } = editor.editing;
     const viewDocument = view.document;
     const imageUtils = editor.plugins.get('ImageUtils');
 
@@ -247,10 +247,9 @@ export default class DrupalImageAlternativeTextUi extends Plugin {
       return;
     }
 
-    const editor = this.editor;
+    const { editor } = this;
     const command = editor.commands.get('imageTextAlternative');
-    const decorativeToggle = this._form.decorativeToggle;
-    const labeledInput = this._form.labeledInput;
+    const { decorativeToggle, labeledInput } = this._form;
 
     this._form.disableCssTransitions();
 

@@ -614,7 +614,7 @@ function dataDowncastBlockImageLink() {
     }
     // The image will be already converted - so it will be present in the view.
     const image = conversionApi.mapper.toViewElement(data.item);
-    const writer = conversionApi.writer;
+    const { writer } = conversionApi;
 
     const additionalAttributes = {};
     const modelEntityLinkAttrs = {

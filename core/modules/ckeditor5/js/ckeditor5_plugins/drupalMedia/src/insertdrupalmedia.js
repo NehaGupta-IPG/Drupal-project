@@ -92,8 +92,8 @@ export default class InsertDrupalMediaCommand extends Command {
   }
 
   refresh() {
-    const model = this.editor.model;
-    const selection = model.document.selection;
+    const { model } = this.editor;
+    const { selection } = model.document;
     const allowedIn = model.schema.findAllowedParent(
       selection.getFirstPosition(),
       'drupalMedia',

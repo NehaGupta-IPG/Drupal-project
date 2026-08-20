@@ -11,7 +11,7 @@
    */
   Drupal.behaviors.batch = {
     attach(context, settings) {
-      const batch = settings.batch;
+      const { batch } = settings;
       const $progress = $(once('batch', '[data-drupal-progress]'));
       let progressBar;
 

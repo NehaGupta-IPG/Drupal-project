@@ -73,14 +73,14 @@ export function getClosestSelectedDrupalMediaWidget(selection) {
     return null;
   }
 
-  let parent = selection.getFirstPosition().parent;
+  let { parent } = selection.getFirstPosition();
 
   while (parent) {
     if (parent.is('element') && isDrupalMediaWidget(parent)) {
       return parent;
     }
 
-    parent = parent.parent;
+    ({ parent } = parent);
   }
 
   return null;

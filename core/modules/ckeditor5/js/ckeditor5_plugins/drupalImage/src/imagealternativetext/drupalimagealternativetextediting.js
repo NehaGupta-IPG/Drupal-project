@@ -49,7 +49,7 @@ export default class DrupalImageTextAlternativeEditing extends Plugin {
    * @inheritdoc
    */
   init() {
-    const editor = this.editor;
+    const { editor } = this;
 
     editor.conversion
       .for('editingDowncast')
@@ -92,7 +92,7 @@ export default class DrupalImageTextAlternativeEditing extends Plugin {
    */
   _imageEditingDowncastConverter(eventName) {
     const converter = (evt, data, conversionApi) => {
-      const editor = this.editor;
+      const { editor } = this;
       const imageUtils = editor.plugins.get('ImageUtils');
       if (!imageUtils.isImage(data.item)) {
         return;

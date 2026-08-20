@@ -225,7 +225,7 @@
             .attr('aria-pressed', true);
           const name = $tab.attr('data-toolbar-tray');
           // Store the active tab name or remove the setting.
-          const id = $tab.get(0).id;
+          const { id } = $tab.get(0);
           if (id) {
             localStorage.setItem(
               'Drupal.toolbar.activeTabID',
@@ -306,7 +306,7 @@
         $orientationToggleButton[0].textContent = this.strings[antiOrientation];
 
         // Update data offset attributes for the trays.
-        const dir = document.documentElement.dir;
+        const { dir } = document.documentElement;
         const edge = dir === 'rtl' ? 'right' : 'left';
         // Remove data-offset attributes from the trays so they can be refreshed.
         $trays.removeAttr('data-offset-left data-offset-right data-offset-top');
@@ -355,8 +355,8 @@
           typeof $activeTab.data('drupal-subtrees') !== 'undefined' &&
           orientation === 'vertical'
         ) {
-          const subtreesHash = drupalSettings.toolbar.subtreesHash;
-          const theme = drupalSettings.ajaxPageState.theme;
+          const { subtreesHash } = drupalSettings.toolbar;
+          const { theme } = drupalSettings.ajaxPageState;
           const endpoint = Drupal.url(`toolbar/subtrees/${subtreesHash}`);
           const cachedSubtreesHash = localStorage.getItem(
             `Drupal.toolbar.subtreesHash.${theme}`,

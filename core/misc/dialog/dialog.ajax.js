@@ -301,7 +301,7 @@
    *   Dialog settings.
    */
   window.addEventListener('dialog:aftercreate', (event) => {
-    const dialog = event.dialog;
+    const { dialog } = event;
     const cancelButton = event.target.querySelector('.dialog-cancel');
     const cancelClick = (e) => {
       dialog.close('cancel');

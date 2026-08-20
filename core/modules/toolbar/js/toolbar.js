@@ -147,7 +147,7 @@
         // asynchronously.
         Drupal.toolbar.setSubtrees.done((subtrees) => {
           menuModel.set('subtrees', subtrees);
-          const theme = drupalSettings.ajaxPageState.theme;
+          const { theme } = drupalSettings.ajaxPageState;
           localStorage.setItem(
             `Drupal.toolbar.subtrees.${theme}`,
             JSON.stringify(subtrees),

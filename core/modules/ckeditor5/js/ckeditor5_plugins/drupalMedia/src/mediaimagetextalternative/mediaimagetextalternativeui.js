@@ -60,7 +60,7 @@ export default class MediaImageTextAlternativeUi extends Plugin {
    * alternative and registers it in the editor ComponentFactory.
    */
   _createButton() {
-    const editor = this.editor;
+    const { editor } = this;
 
     editor.ui.componentFactory.add('mediaImageTextAlternative', (locale) => {
       const command = editor.commands.get('mediaImageTextAlternative');
@@ -89,8 +89,8 @@ export default class MediaImageTextAlternativeUi extends Plugin {
    * @private
    */
   _createForm() {
-    const editor = this.editor;
-    const view = editor.editing.view;
+    const { editor } = this;
+    const { view } = editor.editing;
     const viewDocument = view.document;
 
     /**
@@ -158,13 +158,12 @@ export default class MediaImageTextAlternativeUi extends Plugin {
     if (this._isVisible) {
       return;
     }
-    const editor = this.editor;
+    const { editor } = this;
     const command = editor.commands.get('mediaImageTextAlternative');
-    const decorativeToggle = this._form.decorativeToggle;
+    const { decorativeToggle, labeledInput } = this._form;
     const metadataRepository = editor.plugins.get(
       'DrupalMediaMetadataRepository',
     );
-    const labeledInput = this._form.labeledInput;
 
     this._form.disableCssTransitions();
 

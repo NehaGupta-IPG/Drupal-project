@@ -399,7 +399,7 @@ export default class DrupalLinkMediaEditing extends Plugin {
    * @private
    */
   _enableManualDecorators() {
-    const editor = this.editor;
+    const { editor } = this;
     const command = editor.commands.get('link');
 
     // eslint-disable-next-line no-restricted-syntax

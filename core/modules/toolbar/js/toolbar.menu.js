@@ -18,7 +18,7 @@
    * Maintains active tab in horizontal orientation.
    */
   $.fn.drupalToolbarMenuHorizontal = function () {
-    let currentPath = drupalSettings.path.currentPath;
+    let { currentPath } = drupalSettings.path;
     const menu = once('toolbar-menu-horizontal', this);
     if (menu.length) {
       const $menu = $(menu);
@@ -180,7 +180,7 @@
      *   The root of the menu.
      */
     function openActiveItem($menu) {
-      let currentPath = drupalSettings.path.currentPath;
+      let { currentPath } = drupalSettings.path;
       const pathItem = $menu.find(`a[href="${window.location.pathname}"]`);
       if (pathItem.length && !activeItem) {
         activeItem = window.location.pathname;

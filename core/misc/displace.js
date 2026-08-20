@@ -93,7 +93,7 @@
    */
   function getRawOffset(el, edge) {
     const $el = $(el);
-    const documentElement = document.documentElement;
+    const { documentElement } = document;
     let displacement = 0;
     const horizontal = edge === 'left' || edge === 'right';
     // Get the offset of the element itself.
@@ -102,7 +102,7 @@
     // to the edge of the viewport.
     placement -=
       window[`scroll${horizontal ? 'X' : 'Y'}`] ||
-      document.documentElement[`scroll${horizontal ? 'Left' : 'Top'}`] ||
+      documentElement[`scroll${horizontal ? 'Left' : 'Top'}`] ||
       0;
     // Find the displacement value according to the edge.
     switch (edge) {

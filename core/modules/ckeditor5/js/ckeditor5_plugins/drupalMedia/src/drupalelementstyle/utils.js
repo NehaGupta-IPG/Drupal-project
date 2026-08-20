@@ -64,7 +64,7 @@ export function getClosestElementWithElementStyleAttribute(
         return parent;
       }
     }
-    parent = parent.parent;
+    ({ parent } = parent);
   }
   return null;
 }

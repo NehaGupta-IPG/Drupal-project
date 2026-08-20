@@ -209,7 +209,7 @@ export default class DrupalMediaEditing extends Plugin {
    * @private
    */
   _defineSchema() {
-    const schema = this.editor.model.schema;
+    const { schema } = this.editor.model;
     schema.register('drupalMedia', {
       inheritAllFrom: '$blockObject',
       allowAttributes: Object.keys(this.attrs),
@@ -226,7 +226,7 @@ export default class DrupalMediaEditing extends Plugin {
    * @private
    */
   _defineConverters() {
-    const conversion = this.editor.conversion;
+    const { conversion } = this.editor;
     const metadataRepository = this.editor.plugins.get(
       'DrupalMediaMetadataRepository',
     );
