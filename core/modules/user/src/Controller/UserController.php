@@ -55,9 +55,9 @@ class UserController extends ControllerBase {
   protected AccountCancellation $accountCancellation;
 
   public function __construct(
-    protected DateFormatterInterface $date_formatter,
-    protected UserStorageInterface $user_storage,
-    protected UserDataInterface $user_data,
+    protected DateFormatterInterface $dateFormatter,
+    protected UserStorageInterface $userStorage,
+    protected UserDataInterface $userData,
     protected LoggerInterface $logger,
     protected FloodInterface $flood,
     protected TimeInterface $time,
