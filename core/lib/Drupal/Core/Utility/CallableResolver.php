@@ -91,6 +91,7 @@ class CallableResolver {
     }
     // Callable in the class::method notation.
     if (str_contains($definition, '::')) {
+      @trigger_error('Using :: for non-static callbacks is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use a single : instead. See https://www.drupal.org/node/xxxx', E_USER_DEPRECATED);
       [$class_or_service, $method] = explode('::', $definition, 2);
     }
     if (empty($class_or_service) || empty($method)) {
