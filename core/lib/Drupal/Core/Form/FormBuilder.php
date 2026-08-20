@@ -1405,12 +1405,15 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
    */
   protected function elementTriggeredScriptedSubmission($element, FormStateInterface &$form_state) {
     $input = $form_state->getUserInput();
-    if (!empty($input['_triggering_element_name']) && $element['#name'] == $input['_triggering_element_name']) {
-      if (empty($input['_triggering_element_value']) || $input['_triggering_element_value'] == $element['#value']) {
-        return TRUE;
-      }
+    if (empty($input['_triggering_element_name']) || $element['#name'] != $input['_triggering_element_name']) {
+      return FALSE;
     }
-    return FALSE;
+    // Unique #name is enough. Compare value only to disambiguate shared names (op).
+    if ($element['#name'] === 'op' || $element['#name'] === '') {
+      $posted = (string) ($input['_triggering_element_value'] ?? '');
+      return $posted === '' || $posted === (string) $element['#value'];
+    }
+    return TRUE;
   }
 
   /**
