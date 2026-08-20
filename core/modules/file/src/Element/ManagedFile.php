@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\MessageCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
@@ -203,14 +204,25 @@ class ManagedFile extends FormElementBase {
       $form[$current_file_count]['#attributes']['class'][] = 'ajax-new-content';
     }
 
-    $status_messages = ['#type' => 'status_messages'];
-    $form['#prefix'] .= $renderer->renderRoot($status_messages);
+    // Placeholder for where the messages shall appear. Being part of the
+    // replaced markup, the next upload attempt replaces the messages away
+    // with the widget.
+    $form['#prefix'] .= '<div class="file-upload-messages"></div>';
     $output = $renderer->renderRoot($form);
 
     $response = new AjaxResponse();
     $response->setAttachments($form['#attached']);
+    $response->addCommand(new ReplaceCommand(NULL, $output));
 
-    return $response->addCommand(new ReplaceCommand(NULL, $output));
+    // Deliver messages with the dedicated AJAX command instead of baking them
+    // into the replaced markup.
+    $message_selector = '#' . $form['upload_button']['#ajax']['wrapper'] . ' .file-upload-messages';
+    foreach (\Drupal::messenger()->deleteAll() as $type => $messages) {
+      foreach ($messages as $message) {
+        $response->addCommand(new MessageCommand($message, $message_selector, ['type' => $type], FALSE));
+      }
+    }
+    return $response;
   }
 
   /**
