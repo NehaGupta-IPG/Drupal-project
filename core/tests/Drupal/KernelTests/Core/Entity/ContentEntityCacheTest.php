@@ -480,4 +480,51 @@ class ContentEntityCacheTest extends KernelTestBase {
     $this->assertEquals('New name', $unchanged->getName());
   }
 
+  /**
+   * Tests that a stale cache item is not served after a concurrent save.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3474843
+   */
+  public function testStaleCacheItemNotServedAfterConcurrentSave(): void {
+    // The stale writing detection compares cache item creation timestamps. The
+    // memory cache backend used in kernel tests stamps items with the request
+    // time, so use the database cache backend for the entity bin, as a
+    // production site does. The entity storage handler is rebuilt to pick up
+    // the replaced bin service.
+    $backend = $this->container->get('cache.backend.database')->get('entity');
+    $this->container->set('cache.entity', $backend);
+    $this->container->get('entity_type.manager')->clearCachedDefinitions();
+
+    $storage = $this->container->get('entity_type.manager')->getStorage($this->revEntityTypeId);
+
+    $entity = $storage->create(['name' => 'Original']);
+    $entity->save();
+    $id = $entity->id();
+    $cid = "values:$this->revEntityTypeId:$id";
+
+    // Process A: read the entity from the database. Keep a copy of the loaded
+    // entity, standing in for the cache item process A will write later.
+    $stale_entity = clone $storage->load($id);
+    $this->assertSame('Original', $stale_entity->label());
+
+    // Process B: save the entity with a new name. This writes a tombstone
+    // cache item for the entity.
+    $storage->load($id)->set('name', 'Updated')->save();
+    $tombstone = \Drupal::cache('entity')->get($cid);
+    $this->assertNotFalse($tombstone);
+    $this->assertFalse($tombstone->data);
+
+    // Simulate the process A delayed writing to the persistent cache by using
+    // the cloned entity, which still holds the initial values. The writing must
+    // be discarded, since the tombstone is newer than process A's cache check.
+    $set_persistent_cache = new \ReflectionMethod($storage, 'setPersistentCache');
+    $set_persistent_cache->invoke($storage, [$id => $stale_entity]);
+    $this->assertFalse(\Drupal::cache('entity')->get($cid)->data);
+
+    // A load must not return stale values. Process B's saving cleared the
+    // static cache entry, so the load reads the persistent cache and finds the
+    // tombstone.
+    $this->assertSame('Updated', $storage->load($id)->label());
+  }
+
 }
