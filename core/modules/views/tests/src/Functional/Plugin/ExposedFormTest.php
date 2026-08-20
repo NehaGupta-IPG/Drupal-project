@@ -35,6 +35,7 @@ class ExposedFormTest extends ViewTestBase {
   public static $testViews = [
     'test_exposed_form_buttons',
     'test_exposed_block',
+    'test_argument_exposed_block',
     'test_exposed_form_sort_items_per_page',
     'test_exposed_form_pager',
     'test_remember_selected',
@@ -339,6 +340,37 @@ class ExposedFormTest extends ViewTestBase {
       'page_display' => ['page_1'],
       'block_display' => ['block_1'],
     ];
+  }
+
+  /**
+   * Test that an exposed form block keeps the page's argument.
+   */
+  public function testExposedBlockArgument(): void {
+    $view = Views::getView('test_argument_exposed_block');
+    $view->setDisplay('page_1');
+    $this->drupalPlaceBlock('views_exposed_filter_block:test_argument_exposed_block-page_1');
+
+    $node = reset($this->nodes);
+    $this->drupalGet('test_argument_exposed_block/' . $node->id());
+    $this->assertSession()->statusCodeEquals(200);
+
+    $xpath = $this->assertSession()->buildXPathQuery('//form[@id=:id]', [
+      ':id' => $this->getExpectedExposedFormId($view),
+    ]);
+    $form = $this->assertSession()->elementExists('xpath', $xpath);
+    $this->assertStringContainsString('/test_argument_exposed_block/' . $node->id(), $form->getAttribute('action'));
+
+    // The URL should keep the argument and show the node.
+    $this->submitForm(['type' => $node->bundle()], 'Apply');
+    $this->assertSession()->addressEquals('test_argument_exposed_block/' . $node->id());
+    $this->assertSession()->pageTextContains($node->label());
+
+    // A mismatched bundle should still keep the argument and not
+    // default to an unfiltered set of results.
+    $other_bundle = $node->bundle() === 'article' ? 'page' : 'article';
+    $this->submitForm(['type' => $other_bundle], 'Apply');
+    $this->assertSession()->addressEquals('test_argument_exposed_block/' . $node->id());
+    $this->assertSession()->elementNotExists('css', '.views-row');
   }
 
   /**
