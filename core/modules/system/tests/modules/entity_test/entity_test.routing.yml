@@ -98,4 +98,4 @@ entity.entity_test_computed_field.canonical:
     _entity_access: 'entity_test_computed_field.view'
 
 route_callbacks:
-  - '\Drupal\entity_test\Routing\EntityTestRoutes::routes'
+  - '\Drupal\entity_test\Routing\EntityTestRoutes:routes'

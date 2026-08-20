@@ -1,5 +1,5 @@
 route_callbacks:
-  - '\Drupal\jsonapi\Routing\Routes::routes'
+  - '\Drupal\jsonapi\Routing\Routes:routes'
 
 jsonapi.settings:
   path: '/admin/config/services/jsonapi'

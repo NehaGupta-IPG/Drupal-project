@@ -6,4 +6,4 @@ create and edit custom blocks:
   description: 'Manage the single-use blocks within the Layout Builder'
 
 permission_callbacks:
-  - \Drupal\layout_builder\LayoutBuilderOverridesPermissions::permissions
+  - \Drupal\layout_builder\LayoutBuilderOverridesPermissions:permissions

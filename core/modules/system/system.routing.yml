@@ -307,5 +307,5 @@ system.linkset_settings:
     _permission: 'administer site configuration'
 
 route_callbacks:
-  - '\Drupal\system\Routing\AssetRoutes::routes'
-  - '\Drupal\system\Routing\MenuLinksetRoutes::routes'
+  - '\Drupal\system\Routing\AssetRoutes:routes'
+  - '\Drupal\system\Routing\MenuLinksetRoutes:routes'

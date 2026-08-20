@@ -4,4 +4,4 @@ administer filters:
   restrict access: true
 
 permission_callbacks:
-  - Drupal\filter\FilterPermissions::permissions
+  - Drupal\filter\FilterPermissions:permissions
