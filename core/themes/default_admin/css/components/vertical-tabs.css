@@ -209,6 +209,43 @@
   }
 }
 
+/* Styles for vertical tabs that contain child validation errors. */
+
+.vertical-tabs__menu-item.error {
+  & .vertical-tabs__menu-link {
+    color: var(--input--error-color);
+
+    &::before {
+      /* Width must be enough to create a good non-color contrast with the blue active border */
+      border-inline-start: calc(var(--vertical-tabs-menu-link--active-border-size) + 2px) solid var(--input--error-color);
+    }
+  }
+
+  & .vertical-tabs__menu-item-title {
+    position: relative;
+    display: inline-block;
+    /* Make room for validation error icon. */
+    padding-inline-end: calc(var(--admin-space-m) + var(--admin-space-xs));
+
+    &::before {
+      position: absolute;
+      display: block;
+      padding-block-end: calc(var(--admin-line-height) * 1rem); /* Match line-height */
+      padding-inline-end: var(--admin-space-m);
+      content: "";
+      mask-image: var(--admin-icon-error);
+      mask-repeat: no-repeat;
+      mask-position: center;
+      background: var(--input--error-color);
+      inset-inline-end: 0;
+
+      @media (forced-colors: active) {
+        background: canvasText;
+      }
+    }
+  }
+}
+
 .vertical-tabs__menu-link-content {
   position: relative;
   z-index: 1; /* Keep text above the pseudo element that paints the hover background. */
