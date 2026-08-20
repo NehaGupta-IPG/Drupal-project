@@ -54,6 +54,7 @@ class AliasPathProcessor implements InboundPathProcessorInterface, OutboundPathP
       if (str_starts_with($path, '//')) {
         $path = '/' . ltrim($path, '/');
       }
+      $bubbleable_metadata?->addCacheTags(['route_match']);
     }
     return $path;
   }

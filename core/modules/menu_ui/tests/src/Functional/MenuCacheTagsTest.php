@@ -72,6 +72,7 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
       // The cache contexts associated with the (in)accessible menu links are
       // bubbled.
       'config:user.role.anonymous',
+      'route_match',
     ];
     $this->verifyPageCache($url, 'HIT', $expected_tags);
 

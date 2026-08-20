@@ -396,6 +396,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $expected_cache_tags[] = 'config:user.role.anonymous';
     }
     $expected_cache_tags[] = 'http_response';
+    $expected_cache_tags[] = 'route_match';
     return Cache::mergeTags($expected_cache_tags, $this->entity->getCacheTags());
   }
 

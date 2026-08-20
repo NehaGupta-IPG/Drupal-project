@@ -39,7 +39,7 @@ class TokenReplaceWebTest extends BrowserTestBase {
 
     $this->drupalGet('token-test/' . $node->id());
     $this->assertSession()->pageTextContains("Tokens: {$node->id()} {$account->id()}");
-    $this->assertCacheTags(['node:1', 'rendered', 'user:2']);
+    $this->assertCacheTags(['node:1', 'rendered', 'route_match', 'user:2']);
     $this->assertCacheContexts([
       'languages:language_interface',
       'theme',
@@ -49,7 +49,7 @@ class TokenReplaceWebTest extends BrowserTestBase {
 
     $this->drupalGet('token-test-without-bubbleable-metadata/' . $node->id());
     $this->assertSession()->pageTextContains("Tokens: {$node->id()} {$account->id()}");
-    $this->assertCacheTags(['node:1', 'rendered', 'user:2']);
+    $this->assertCacheTags(['node:1', 'rendered', 'route_match', 'user:2']);
     $this->assertCacheContexts([
       'languages:language_interface',
       'theme',

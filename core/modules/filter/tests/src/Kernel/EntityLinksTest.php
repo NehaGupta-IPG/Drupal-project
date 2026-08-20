@@ -161,7 +161,7 @@ class EntityLinksTest extends KernelTestBase {
     foreach ($expected_hrefs as $langcode => $expected_alias) {
       $expected_result = (new FilterProcessResult())
         ->setProcessedText(sprintf('<a href="%s">Link text</a>', $expected_alias))
-        ->setCacheTags(['entity_test_mul:1'])
+        ->setCacheTags(['route_match', 'entity_test_mul:1'])
         ->setCacheContexts([])
         ->setCacheMaxAge(Cache::PERMANENT);
 
@@ -185,7 +185,7 @@ class EntityLinksTest extends KernelTestBase {
         $langcode,
         (new FilterProcessResult())
           ->setProcessedText(sprintf('<a href="%s?query=string#fragment">Link text</a>', $expected_alias))
-          ->setCacheTags(['entity_test_mul:1'])
+          ->setCacheTags(['route_match', 'entity_test_mul:1'])
           ->setCacheContexts([])
           ->setCacheMaxAge(Cache::PERMANENT)
       );
@@ -286,9 +286,15 @@ class EntityLinksTest extends KernelTestBase {
    */
   public static function providerTestMediaEntity(): array {
     return [
-      [TRUE, 'file', ['target_id' => 1], '/media/1', ['media:1']],
+      [TRUE, 'file', ['target_id' => 1], '/media/1', ['route_match', 'media:1']],
       [FALSE, 'file', ['target_id' => 1], '/<SITE_DIRECTORY>/files/druplicon.txt', ['file:1', 'media:1']],
-      [TRUE, 'oembed:video', ['value' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'], '/media/1', ['media:1']],
+      [
+        TRUE,
+        'oembed:video',
+        ['value' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
+        '/media/1',
+        ['route_match', 'media:1'],
+      ],
       [
         FALSE,
         'oembed:video',
@@ -296,7 +302,7 @@ class EntityLinksTest extends KernelTestBase {
         'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         ['media:1'],
       ],
-      [TRUE, 'test', ['value' => 'foobar'], '/media/1', ['media:1']],
+      [TRUE, 'test', ['value' => 'foobar'], '/media/1', ['route_match', 'media:1']],
       [FALSE, 'test', ['value' => 'foobar'], '', ['media:1']],
     ];
   }

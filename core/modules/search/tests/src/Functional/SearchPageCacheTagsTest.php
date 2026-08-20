@@ -189,6 +189,7 @@ class SearchPageCacheTagsTest extends BrowserTestBase {
       'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
       'rendered',
       'node_list',
+      'route_match',
     ];
 
     // Node search results for shop, should return node:1 (bike shed shop) and

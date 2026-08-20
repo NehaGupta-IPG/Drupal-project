@@ -88,6 +88,7 @@ class CacheWebTest extends ViewTestBase {
       'config:views.view.test_display',
       'node_list',
       'rendered',
+      'route_match',
     ];
     $this->assertCacheTags($cache_tags);
 

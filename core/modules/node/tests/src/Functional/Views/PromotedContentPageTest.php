@@ -255,7 +255,7 @@ class PromotedContentPageTest extends ViewTestBase {
       'node_list',
     ];
 
-    $render_cache_tags = Cache::mergeTags($empty_node_listing_cache_tags, $cache_context_tags);
+    $render_cache_tags = Cache::mergeTags($empty_node_listing_cache_tags, $cache_context_tags, ['route_match']);
     $this->assertViewsCacheTags(
       $view,
       $empty_node_listing_cache_tags,
@@ -263,7 +263,12 @@ class PromotedContentPageTest extends ViewTestBase {
       $render_cache_tags
     );
     $expected_tags = Cache::mergeTags($empty_node_listing_cache_tags, $cache_context_tags);
-    $expected_tags = Cache::mergeTags($expected_tags, ['http_response', 'rendered', 'config:user.role.anonymous']);
+    $expected_tags = Cache::mergeTags($expected_tags, [
+      'http_response',
+      'rendered',
+      'config:user.role.anonymous',
+      'route_match',
+    ]);
     $this->assertPageCacheContextsAndTags(
       Url::fromRoute('view.promoted_content.page_1'),
       $cache_contexts,
@@ -310,7 +315,7 @@ class PromotedContentPageTest extends ViewTestBase {
       'node:15',
     ];
     $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($cache_contexts)->getCacheTags();
-    $first_page_output_cache_tags = Cache::mergeTags($first_page_result_cache_tags, $cache_context_tags);
+    $first_page_output_cache_tags = Cache::mergeTags($first_page_result_cache_tags, $cache_context_tags, ['route_match']);
     $first_page_output_cache_tags = Cache::mergeTags($first_page_output_cache_tags, [
       'config:filter.format.plain_text',
       'node_view',
@@ -348,6 +353,7 @@ class PromotedContentPageTest extends ViewTestBase {
       'user:0',
       'http_response',
       'rendered',
+      'route_match',
       // FinishResponseSubscriber adds this cache tag to responses that have the
       // 'user.permissions' cache context for anonymous users.
       'config:user.role.anonymous',

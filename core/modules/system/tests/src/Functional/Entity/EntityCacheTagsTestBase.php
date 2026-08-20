@@ -357,25 +357,29 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
     $referencing_entity_cache_tags = Cache::mergeTags($referencing_entity_cache_tags, $this->getAdditionalCacheTagsForEntity($this->entity));
     $referencing_entity_cache_tags = Cache::mergeTags($referencing_entity_cache_tags, $view_cache_tag);
     $referencing_entity_cache_tags = Cache::mergeTags($referencing_entity_cache_tags, $cache_context_tags);
-    $referencing_entity_cache_tags = Cache::mergeTags($referencing_entity_cache_tags, ['rendered']);
+    $referencing_entity_cache_tags = Cache::mergeTags($referencing_entity_cache_tags, ['rendered', 'route_match']);
 
     $non_referencing_entity_cache_tags = Cache::mergeTags($this->nonReferencingEntity->getCacheTags(), \Drupal::entityTypeManager()->getViewBuilder('entity_test')->getCacheTags());
-    $non_referencing_entity_cache_tags = Cache::mergeTags($non_referencing_entity_cache_tags, ['rendered']);
+    $non_referencing_entity_cache_tags = Cache::mergeTags($non_referencing_entity_cache_tags, [
+      'rendered',
+      'route_match',
+    ]);
 
     // Generate the cache tags for all two possible entity listing paths.
     // 1. list cache tag only (listing query has no match)
     // 2. list cache tag plus entity cache tag (listing query has a match)
-    $empty_entity_listing_cache_tags = Cache::mergeTags($this->entity->getEntityType()->getListCacheTags(), $page_cache_tags);
+    $empty_entity_listing_cache_tags = Cache::mergeTags($this->entity->getEntityType()->getListCacheTags(), $page_cache_tags, ['route_match']);
 
     $nonempty_entity_listing_cache_tags = Cache::mergeTags($this->entity->getEntityType()->getListCacheTags(), $this->entity->getCacheTags());
     $nonempty_entity_listing_cache_tags = Cache::mergeTags($nonempty_entity_listing_cache_tags, $this->getAdditionalCacheTagsForEntityListing());
-    $nonempty_entity_listing_cache_tags = Cache::mergeTags($nonempty_entity_listing_cache_tags, $page_cache_tags);
+    $nonempty_entity_listing_cache_tags = Cache::mergeTags($nonempty_entity_listing_cache_tags, $page_cache_tags, ['route_match']);
 
     $this->verifyPageCache($referencing_entity_url, 'MISS');
 
     // Verify a cache hit, but also the presence of the correct cache tags.
     $expected_tags = Cache::mergeTags($referencing_entity_cache_tags, $page_cache_tags);
     $expected_tags = Cache::mergeTags($expected_tags, $page_cache_tags_referencing_entity);
+    $expected_tags = Cache::mergeTags($expected_tags, ['route_match']);
     $this->verifyPageCache($referencing_entity_url, 'HIT', $expected_tags);
 
     // Also verify the existence of an entity render cache entry.
@@ -392,7 +396,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
 
     $this->verifyPageCache($non_referencing_entity_url, 'MISS');
     // Verify a cache hit, but also the presence of the correct cache tags.
-    $this->verifyPageCache($non_referencing_entity_url, 'HIT', Cache::mergeTags($non_referencing_entity_cache_tags, $page_cache_tags));
+    $this->verifyPageCache($non_referencing_entity_url, 'HIT', Cache::mergeTags($non_referencing_entity_cache_tags, $page_cache_tags, ['route_match']));
     // Also verify the existence of an entity render cache entry.
     $cache_keys = ['entity_view', 'entity_test', $this->nonReferencingEntity->id(), 'full'];
     $this->verifyRenderCache($cache_keys, $non_referencing_entity_cache_tags, (new CacheableMetadata())->setCacheContexts($entity_cache_contexts));
@@ -403,6 +407,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
     // Verify a cache hit, but also the presence of the correct cache tags.
     $expected_tags = Cache::mergeTags($referencing_entity_cache_tags, $page_cache_tags);
     $expected_tags = Cache::mergeTags($expected_tags, $page_cache_tags_referencing_entity);
+    $expected_tags = Cache::mergeTags($expected_tags, ['route_match']);
     $this->verifyPageCache($listing_url, 'HIT', $expected_tags);
 
     // Prime the page cache for the empty listing.
@@ -603,13 +608,17 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
 
     // Verify cache hits.
     $referencing_entity_cache_tags = Cache::mergeTags($this->referencingEntity->getCacheTags(), \Drupal::entityTypeManager()->getViewBuilder('entity_test')->getCacheTags());
-    $referencing_entity_cache_tags = Cache::mergeTags($referencing_entity_cache_tags, ['http_response', 'rendered']);
+    $referencing_entity_cache_tags = Cache::mergeTags($referencing_entity_cache_tags, [
+      'http_response',
+      'rendered',
+      'route_match',
+    ]);
 
     $nonempty_entity_listing_cache_tags = Cache::mergeTags($this->entity->getEntityType()->getListCacheTags(), $this->getAdditionalCacheTagsForEntityListing());
-    $nonempty_entity_listing_cache_tags = Cache::mergeTags($nonempty_entity_listing_cache_tags, $page_cache_tags);
+    $nonempty_entity_listing_cache_tags = Cache::mergeTags($nonempty_entity_listing_cache_tags, $page_cache_tags, ['route_match']);
 
     $this->verifyPageCache($referencing_entity_url, 'HIT', Cache::mergeTags($referencing_entity_cache_tags, $page_cache_tags));
-    $this->verifyPageCache($listing_url, 'HIT', $page_cache_tags);
+    $this->verifyPageCache($listing_url, 'HIT', Cache::mergeTags($page_cache_tags, ['route_match']));
     $this->verifyPageCache($empty_entity_listing_url, 'HIT', $empty_entity_listing_cache_tags);
     $this->verifyPageCache($nonempty_entity_listing_url, 'HIT', $nonempty_entity_listing_cache_tags);
   }

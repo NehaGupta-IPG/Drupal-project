@@ -187,6 +187,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
       'node:1',
       'node:2',
       'node:3',
+      'route_match',
     ]);
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/main/linkset'));
     $this->assertDrupalResponseCacheability('MISS', $expected_cacheability, $response);
@@ -229,6 +230,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
       'node:1',
       'node:2',
       'node:3',
+      'route_match',
     ]);
     // Warm the cache, then get a response and ensure it was warmed.
     $this->doRequest('GET', Url::fromUri('base:/system/menu/main/linkset'));
@@ -260,6 +262,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
       'node:1',
       'node:2',
       'node:3',
+      'route_match',
     ]);
     $this->assertDrupalResponseCacheability(FALSE, $expected_cacheability, $response);
     // Ensure the "Our name" menu link is visible.
@@ -284,6 +287,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
     $expected_cacheability->addCacheTags([
       'config:system.menu.account',
       'http_response',
+      'route_match',
     ]);
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/account/linkset'));
     $this->assertDrupalResponseCacheability('MISS', $expected_cacheability, $response);
@@ -298,6 +302,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
     $expected_cacheability->setCacheTags([
       'config:system.menu.account',
       'http_response',
+      'route_match',
     ]);
     // The account menu surfaces the CSRF-protected /user/logout URL for
     // authenticated users; URL generation bubbles the 'session' cache context

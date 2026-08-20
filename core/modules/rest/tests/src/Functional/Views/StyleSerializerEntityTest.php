@@ -114,7 +114,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
 
     $actual_json = $this->drupalGet('test/serialize/field', ['query' => ['_format' => 'json']]);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertCacheTags($view->getCacheTags());
+    $this->assertCacheTags(Cache::mergeTags($view->getCacheTags(), ['route_match']));
     $this->assertCacheContexts(['languages:language_interface', 'theme', 'request_format']);
     // @todo Due to https://www.drupal.org/node/2352009 we can't yet test the
     // propagation of cache max-age.
@@ -170,7 +170,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     foreach ($entities as $entity) {
       $expected_cache_tags = Cache::mergeTags($expected_cache_tags, $entity->getCacheTags());
     }
-    $this->assertCacheTags($expected_cache_tags);
+    $this->assertCacheTags(Cache::mergeTags($expected_cache_tags, ['route_match']));
     $this->assertCacheContexts(['languages:language_interface', 'theme', 'entity_test_view_grants', 'request_format']);
 
     // Change the format to xml.
@@ -266,6 +266,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
       'entity_test:8',
       'entity_test:9',
       'entity_test_list',
+      'route_match',
     ];
     $cache_contexts = [
       'entity_test_view_grants',
