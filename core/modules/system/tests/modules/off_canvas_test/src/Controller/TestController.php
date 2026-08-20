@@ -6,6 +6,7 @@ namespace Drupal\off_canvas_test\Controller;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -23,6 +24,7 @@ class TestController {
     path: '/off-canvas-thing1',
     name: 'off_canvas_test.thing1',
     requirements: ['_access' => 'TRUE'],
+    title: new TranslatableMarkup('Thing 1'),
   )]
   public function thing1() {
     return [
