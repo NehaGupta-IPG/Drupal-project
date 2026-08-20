@@ -223,6 +223,7 @@ class PagePreviewTest extends NodeTestBase {
     $this->assertSession()->pageTextContains($edit[$body_key]);
     $this->assertSession()->pageTextContains($edit[$term_key]);
     $this->assertSession()->linkExists('Back to content editing');
+    $this->assertSession()->buttonExists('Save');
 
     // Check that we see the class of the node type on the body element.
     $this->assertSession()->elementExists('xpath', "//body[contains(@class, 'page-node-type-page')]");
@@ -431,7 +432,11 @@ class PagePreviewTest extends NodeTestBase {
       'menu[title]' => 'Changed title',
     ];
     $this->submitForm($edit, 'Preview');
-    $this->clickLink('Back to content editing');
+    $this->submitForm([], 'Save');
+    $this->assertSession()->addressEquals($node->toUrl());
+
+    // The save operation must execute form-level submit handlers.
+    $this->drupalGet('node/' . $node->id() . '/edit');
     $this->assertSession()->checkboxChecked('edit-menu-enabled');
     $this->assertSession()->fieldValueEquals('menu[title]', 'Changed title');
 

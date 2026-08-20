@@ -460,7 +460,6 @@ class OliveroHooks {
     $form['backlink']['#options']['attributes']['class'][] = 'button';
     $form['backlink']['#options']['attributes']['class'][] = 'button--small';
     $form['backlink']['#options']['attributes']['class'][] = 'button--icon-back';
-    $form['backlink']['#options']['attributes']['class'][] = 'button--primary';
     $form['view_mode']['#attributes']['class'][] = 'form-element--small';
   }
 
