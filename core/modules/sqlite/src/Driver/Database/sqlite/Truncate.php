@@ -23,6 +23,10 @@ class Truncate extends QueryTruncate {
    * {@inheritdoc}
    */
   public function execute(): void {
+    // The table's "sqlite_sequence" entry goes before the table is emptied.
+    // Emptying the table does not touch "sqlite_sequence", so the order does
+    // not change the outcome, and a failure between the two leaves the table
+    // as it was instead of leaving it empty with the next ID still ahead.
     if (!empty($this->queryOptions['reset_serial_id'])) {
       $this->resetSerialId();
     }
@@ -31,11 +35,6 @@ class Truncate extends QueryTruncate {
 
   /**
    * Drops the AUTOINCREMENT high-water mark that sqlite_sequence holds.
-   *
-   * The row goes before the table is emptied. Emptying the table does not touch
-   * sqlite_sequence, so the order does not change the outcome, and a failure
-   * between the two leaves the table as it was instead of leaving it empty with
-   * the next ID still ahead.
    */
   protected function resetSerialId(): void {
     // In this driver a prefix is an attached database, so the schema has to be
