@@ -88,29 +88,29 @@ class ExtensionDiscovery {
    *
    * Reads .info.yml files efficiently.
    *
-   * @var \Drupal\Core\Extension\InfoParser|null
+   * @var \Drupal\Core\Extension\InfoParser
    */
-  protected ?InfoParser $infoParser;
+  protected InfoParser $infoParser;
 
   /**
    * Constructs a new ExtensionDiscovery object.
    *
    * @param string $root
    *   The app root.
-   * @param bool $use_info_parser
-   *   Whether the info_parser should be used. Note this argument also
-   *   determines if the deprecated file cache property is set to maintain BC in
-   *   Drupal 11.
    * @param string[] $profile_directories
    *   The available profile directories.
    * @param string $site_path
    *   The path to the site.
    */
-  public function __construct(string $root, $use_info_parser = TRUE, ?array $profile_directories = NULL, ?string $site_path = NULL) {
+  public function __construct(
+    string $root,
+    ?array $profile_directories = NULL,
+    ?string $site_path = NULL
+  ) {
     $this->root = $root;
     $this->profileDirectories = $profile_directories;
     $this->sitePath = $site_path;
-    $this->infoParser = $use_info_parser ? new InfoParser($root) : NULL;
+    $this->infoParser = new InfoParser($root);
   }
 
   /**
@@ -456,19 +456,7 @@ class ExtensionDiscovery {
       }
 
       // Determine the extension type from the info file.
-      $type = FALSE;
-      if ($this->infoParser === NULL) {
-        $file = $fileinfo->openFile('r');
-        while (!$type && !$file->eof()) {
-          preg_match('@^type:\s*(\'|")?(\w+)\1?\s*(?:\#.*)?$@', $file->fgets(), $matches);
-          if (isset($matches[2])) {
-            $type = $matches[2];
-          }
-        }
-      }
-      else {
-        $type = $this->infoParser->parse($fileinfo->getPathname())['type'] ?? FALSE;
-      }
+      $type = $this->infoParser->parse($fileinfo->getPathname())['type'] ?? FALSE;
       if (empty($type)) {
         continue;
       }

@@ -81,7 +81,7 @@ class InstallProfileUninstallValidator implements ModuleUninstallValidatorInterf
   protected function getExtensionDiscovery(): ExtensionDiscovery {
     if (!isset($this->noProfileExtensionDiscovery)) {
       // cspell:ignore CNKDSIUSYFUISEFCB
-      $this->noProfileExtensionDiscovery = new ExtensionDiscovery($this->root, TRUE, ['_does_not_exist_profile_CNKDSIUSYFUISEFCB'], $this->sitePath);
+      $this->noProfileExtensionDiscovery = new ExtensionDiscovery($this->root, ['_does_not_exist_profile_CNKDSIUSYFUISEFCB'], $this->sitePath);
     }
     return $this->noProfileExtensionDiscovery;
   }

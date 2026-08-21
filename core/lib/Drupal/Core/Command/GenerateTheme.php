@@ -260,7 +260,7 @@ class GenerateTheme extends Command {
    *   The extension info array. NULL if the theme_name is not discovered.
    */
   private function getThemeInfo(string $theme_name): ? Extension {
-    $extension_discovery = new ExtensionDiscovery($this->root, TRUE, []);
+    $extension_discovery = new ExtensionDiscovery($this->root, []);
     $themes = $extension_discovery->scan('theme');
 
     $theme = $themes[$theme_name] ?? NULL;

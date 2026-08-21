@@ -37,7 +37,7 @@ class ExtensionDiscoveryTest extends UnitTestCase {
     $this->assertFileExists($root . '/core/modules/system/system.info.yml');
 
     // Create an ExtensionDiscovery with $root.
-    $extension_discovery = new ExtensionDiscovery($root, TRUE, NULL, 'sites/default');
+    $extension_discovery = new ExtensionDiscovery($root, NULL, 'sites/default');
 
     /** @var \Drupal\Core\Extension\Extension[][] $extensions_by_type */
     $extensions_by_type = [];
@@ -67,7 +67,7 @@ class ExtensionDiscoveryTest extends UnitTestCase {
    * @legacy-covers ::scan
    */
   public function testExtensionDiscoveryTypeComment(): void {
-    $extension_discovery = new ExtensionDiscovery($this->root, TRUE, [], 'sites/default');
+    $extension_discovery = new ExtensionDiscovery($this->root, [], 'sites/default');
     $modules = $extension_discovery->scan('module', TRUE);
     $this->assertArrayHasKey('module_info_type_comment', $modules);
   }

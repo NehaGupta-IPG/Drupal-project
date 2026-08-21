@@ -186,7 +186,7 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
       // When inside a testing environment, we allow all extensions to be
       // available to simplify testing distributions.
       $profileDirectories = static::insideTest() ? [] : [$this->profileExtensionList->getPath($profile)];
-      $this->extensionDiscovery[$profile] = new ExtensionDiscovery($this->appRoot, TRUE, $profileDirectories);
+      $this->extensionDiscovery[$profile] = new ExtensionDiscovery($this->appRoot, $profileDirectories);
     }
     return $this->extensionDiscovery[$profile];
   }
