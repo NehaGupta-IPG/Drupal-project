@@ -360,7 +360,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
 
       // Move the 'moderation_state' field widget to the footer region, if
       // available.
-      if (isset($form['footer']) && in_array($form_object->getOperation(), ['edit', 'default'], TRUE)) {
+      if (isset($form['footer']) && in_array($form_object->getOperation(), ['edit', 'add', 'default'], TRUE)) {
         $form['moderation_state']['#group'] = 'footer';
       }
 
@@ -383,7 +383,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    */
   protected function isModeratedEntityEditForm(FormInterface $form_object) {
     return $form_object instanceof ContentEntityFormInterface &&
-      in_array($form_object->getOperation(), ['edit', 'default', 'layout_builder'], TRUE) &&
+      in_array($form_object->getOperation(), ['edit', 'add', 'default', 'layout_builder'], TRUE) &&
       $this->moderationInfo->isModeratedEntity($form_object->getEntity());
   }
 
