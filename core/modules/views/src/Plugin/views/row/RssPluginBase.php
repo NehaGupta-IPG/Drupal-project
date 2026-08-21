@@ -84,14 +84,14 @@ abstract class RssPluginBase extends RowPluginBase {
     $this->entityDisplayRepository = $entity_display_repository;
 
     if ($language_manager === NULL) {
-      @trigger_error('Passing null as the language_manager service to RssPluginBase::__construct() is deprecated in drupal:10.4.0 and is required from drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/2816447', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $language_manager argument is deprecated in drupal:12.0.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3618490', E_USER_DEPRECATED);
       $language_manager = \Drupal::service('language_manager');
     }
 
     $this->languageManager = $language_manager;
 
     if ($entity_repository === NULL) {
-      @trigger_error('Passing null as the entity.repository service to RssPluginBase::__construct() is deprecated in drupal:10.4.0 and is required from drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/2816447', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $entity_repository argument is deprecated in drupal:12.0.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3618490', E_USER_DEPRECATED);
       $entity_repository = \Drupal::service('entity.repository');
     }
 
