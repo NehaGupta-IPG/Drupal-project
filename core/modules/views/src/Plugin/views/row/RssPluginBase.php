@@ -2,8 +2,6 @@
 
 namespace Drupal\views\Plugin\views\row;
 
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -149,19 +147,9 @@ abstract class RssPluginBase extends RowPluginBase {
   public function calculateDependencies(): array {
     $dependencies = parent::calculateDependencies();
 
-    try {
-      $view_mode = $this->entityTypeManager
-        ->getStorage('entity_view_mode')
-        ->load($this->entityTypeId . '.' . $this->options['view_mode']);
-    }
-    catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
-      \Drupal::logger('views')->error('Could not load entity view mode %view_mode', [
-        '%view_mode' => $this->entityTypeId . '.' . $this->options['view_mode'],
-        'exception' => $e,
-      ]);
-
-      $view_mode = NULL;
-    }
+    $view_mode = $this->entityTypeManager
+      ->getStorage('entity_view_mode')
+      ->load($this->entityTypeId . '.' . $this->options['view_mode']);
 
     if ($view_mode) {
       $dependencies[$view_mode->getConfigDependencyKey()][] = $view_mode->getConfigDependencyName();
