@@ -5,5 +5,4 @@ version: VERSION
 hidden: true
 install:
   - locale
-  - locale_test_fetch_langcodes
 keep_english: true

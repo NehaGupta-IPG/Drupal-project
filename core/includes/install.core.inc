@@ -1793,14 +1793,11 @@ function install_finish_translations(&$install_state): array {
   // using a batch.
   $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
   $languages = \Drupal::languageManager()->getLanguages();
-  // Use locale_translatable_language_list() for fetching to exclude English
-  // unless translate_english is enabled, avoiding unnecessary translation
-  // fetches when a profile uses keep_english.
-  $translatable_langcodes = array_keys(locale_translatable_language_list());
   $batches = [];
   if (count($projects) > 1) {
     $options = LocaleDefaultOptions::updateOptions();
-    if ($batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch([], $translatable_langcodes, $options)) {
+    // Only check .po files for translatable languages: pass empty list.
+    if ($batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch([], [], $options)) {
       $batches[] = $batch;
     }
   }
@@ -1811,9 +1808,8 @@ function install_finish_translations(&$install_state): array {
     $batches[] = _install_config_locale_overrides();
   }
 
-  // Creates configuration translations. Uses all configured languages
-  // including English since config overrides are needed when the active
-  // configuration language differs from English.
+  // Create configuration translation for all languages. May need to be done
+  // for English too, so include all languages.
   $batches[] = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], array_keys($languages), [], TRUE);
   return $batches;
 }
