@@ -79,7 +79,7 @@ class MenuActiveTrailTest extends UnitTestCase {
     $this->lock = $this->createStub(LockBackendInterface::class);
     $this->pathMatcher = $this->createStub(PathMatcherInterface::class);
 
-    $this->menuActiveTrail = new MenuActiveTrail($this->menuLinkManager, $this->currentRouteMatch, $this->cache, $this->lock, $this->pathMatcher);
+    $this->menuActiveTrail = new MenuActiveTrail($this->menuLinkManager, $this->currentRouteMatch, $this->cache, $this->lock, $this->pathMatcher, $this->requestStack);
   }
 
   /**
@@ -351,6 +351,84 @@ class MenuActiveTrailTest extends UnitTestCase {
       // Ensure we normalize the serialized data by sorting them.
       ->with('active-trail:route:baby_llama:route_parameters:' . serialize(['a' => 0, 'b' => 1]));
     $this->menuActiveTrail->destruct();
+  }
+
+  /**
+   * Provides test data for testGetActiveLinkWithQueryString().
+   *
+   * @return array
+   *   Returns a list of test data of which each is an array containing the
+   *   following elements:
+   *     - query: The query parameters of the current request.
+   *     - expected_id: The ID of the menu link expected to be active.
+   */
+  public static function providerQueryString(): array {
+    return [
+      'no query string matches the link without query options' => [
+        [],
+        'baby_llama_link_1',
+      ],
+      'a query string matches the link declaring it' => [
+        ['sort_order' => 'ASC'],
+        'baby_llama_link_2',
+      ],
+      'a different value matches the other link' => [
+        ['sort_order' => 'DESC'],
+        'baby_llama_link_3',
+      ],
+      'additional parameters in the request still match' => [
+        ['sort_order' => 'DESC', 'page' => '2'],
+        'baby_llama_link_3',
+      ],
+      'an unknown value falls back to the first matching link' => [
+        ['sort_order' => 'SIDEWAYS'],
+        'baby_llama_link_1',
+      ],
+    ];
+  }
+
+  /**
+   * Tests getActiveLink() with menu links that differ only by query string.
+   */
+  #[DataProvider('providerQueryString')]
+  public function testGetActiveLinkWithQueryString(array $query, string $expected_id): void {
+    $request = new Request($query);
+    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'baby_llama');
+    $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route(''));
+    $request->attributes->set('_raw_variables', new InputBag([]));
+    $this->requestStack->push($request);
+
+    // Three links on the same route, below different parents, that differ only
+    // in the query options they carry.
+    $links = [
+      'baby_llama_link_1' => MenuLinkMock::createMock([
+        'id' => 'baby_llama_link_1',
+        'route_name' => 'baby_llama',
+        'title' => 'Baby llama',
+        'parent' => 'mama_llama_link',
+      ]),
+      'baby_llama_link_2' => MenuLinkMock::createMock([
+        'id' => 'baby_llama_link_2',
+        'route_name' => 'baby_llama',
+        'title' => 'Baby llama ascending',
+        'parent' => 'papa_llama_link',
+        'options' => ['query' => ['sort_order' => 'ASC']],
+      ]),
+      'baby_llama_link_3' => MenuLinkMock::createMock([
+        'id' => 'baby_llama_link_3',
+        'route_name' => 'baby_llama',
+        'title' => 'Baby llama descending',
+        'parent' => 'grandma_llama_link',
+        'options' => ['query' => ['sort_order' => 'DESC']],
+      ]),
+    ];
+
+    $this->menuLinkManager
+      ->method('loadLinksByRoute')
+      ->with('baby_llama')
+      ->willReturn($links);
+
+    $this->assertSame($expected_id, $this->menuActiveTrail->getActiveLink('llama_menu')->getPluginId());
   }
 
 }
