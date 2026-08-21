@@ -66,7 +66,7 @@ class UpdateController extends ControllerBase {
       ->addOperation([$this->updateManager, 'fetchDataBatch'], [])
       ->setProgressMessage($this->t('Trying to check available update data ...'))
       ->setErrorMessage($this->t('Error checking available update data.'))
-      ->setFinishCallback([self::class, 'updateFetchDataFinished']);
+      ->setFinishCallback(self::class . ':updateFetchDataFinished');
     batch_set($batch_builder->toArray());
     return batch_process('admin/reports/updates');
   }
@@ -79,19 +79,19 @@ class UpdateController extends ControllerBase {
    * @param array $results
    *   Batch results.
    */
-  public static function updateFetchDataFinished(bool $success, array $results): void {
+  public function updateFetchDataFinished(bool $success, array $results): void {
     if ($success) {
       if (!empty($results)) {
         if (!empty($results['updated'])) {
-          \Drupal::messenger()->addStatus(\Drupal::translation()->formatPlural($results['updated'], 'Checked available update data for one project.', 'Checked available update data for @count projects.'));
+          $this->messenger()->addStatus($this->formatPlural($results['updated'], 'Checked available update data for one project.', 'Checked available update data for @count projects.'));
         }
         if (!empty($results['failures'])) {
-          \Drupal::messenger()->addError(\Drupal::translation()->formatPlural($results['failures'], 'Failed to get available update data for one project.', 'Failed to get available update data for @count projects.'));
+          $this->messenger()->addError($this->formatPlural($results['failures'], 'Failed to get available update data for one project.', 'Failed to get available update data for @count projects.'));
         }
       }
     }
     else {
-      \Drupal::messenger()->addError(t('An error occurred trying to get available update data.'), 'error');
+      $this->messenger()->addError($this->t('An error occurred trying to get available update data.'), 'error');
     }
   }
 
