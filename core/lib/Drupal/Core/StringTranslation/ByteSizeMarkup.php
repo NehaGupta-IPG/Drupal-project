@@ -19,6 +19,17 @@ final class ByteSizeMarkup {
   /**
    * Gets the TranslatableMarkup object for the provided size.
    *
+   * @param float|int $size
+   *   The size to format (in bytes).
+   * @param string|null $langcode
+   *   (optional) The language code of the language to translate to, if
+   *   different from the default language.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface|null $stringTranslation
+   *   (optional) The string translation service.
+   * @param int $precision
+   *   (optional) The number of digits after the decimal point to round to.
+   *   Defaults to 2.
+   *
    * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   The translatable markup.
    *
