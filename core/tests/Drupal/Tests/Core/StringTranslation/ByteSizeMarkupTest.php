@@ -67,19 +67,19 @@ class ByteSizeMarkupTest extends UnitTestCase {
       ['59.72 PB', 67234178751368124],
       // Decimal Yottabytes.
       ['194.67 YB', 235346823821125814962843827],
-      // Decimal Megabytes - lower precision
+      // Decimal Megabytes - lower precision.
       ['3 MB', 3623651, 0],
       ['4 GB', 4053371676, 0],
-      // Decimal Petabytes
+      // Decimal Petabytes.
       ['60 PB', 67234178751368124, 0],
-      // Decimal Yottabytes
+      // Decimal Yottabytes.
       ['195 YB', 235346823821125814962843827, 0],
-      // Decimal Megabytes - more precision
+      // Decimal Megabytes - more precision.
       ['3.456 MB', 3623651, 3],
       ['3.775 GB', 4053371676, 3],
-      // Decimal Petabytes - more precision
+      // Decimal Petabytes - more precision.
       ['59.716 PB', 67234178751368124, 3],
-      // Decimal Yottabytes - more precision
+      // Decimal Yottabytes - more precision.
       ['194.674 YB', 235346823821125814962843827, 3],
     ];
   }
