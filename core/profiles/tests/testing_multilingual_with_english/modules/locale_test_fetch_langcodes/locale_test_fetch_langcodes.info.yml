@@ -1,0 +1,8 @@
+name: 'Locale test fetch langcodes'
+type: module
+description: 'Records langcodes passed to LocaleFetch::buildUpdateBatch for test assertions.'
+package: Testing
+version: '1.0.0'
+hidden: true
+'interface translation project': locale_test_fetch_langcodes
+'interface translation server pattern': profiles/tests/testing_multilingual_with_english/modules/locale_test_fetch_langcodes/translations/%language.po

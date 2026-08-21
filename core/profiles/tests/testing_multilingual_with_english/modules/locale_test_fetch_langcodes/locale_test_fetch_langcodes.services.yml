@@ -1,0 +1,5 @@
+services:
+  locale_test_fetch_langcodes.locale_fetch_recorder:
+    class: Drupal\locale_test_fetch_langcodes\LocaleFetchRecorder
+    decorates: Drupal\locale\LocaleFetch
+    arguments: ['@.inner']

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
-use Drupal\Core\Database\Database;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -34,22 +33,23 @@ class InstallerTranslationMultipleLanguageKeepEnglishTest extends InstallerTrans
   public function testTranslationsLoaded(): void {
     parent::testTranslationsLoaded();
 
-    // Verify that English is a configured language but not translatable.
+    // With keep_english, English is a configured language on the site.
     $languages = \Drupal::languageManager()->getLanguages();
     $this->assertArrayHasKey('en', $languages);
+
+    // But English should not be in the translatable language list since
+    // translate_english is not enabled.
     $translatable_languages = locale_translatable_language_list();
     $this->assertArrayNotHasKey('en', $translatable_languages);
 
-    // The locale_test_translate module provides a local translation file
-    // pattern (test.%language.po). A test.en.po file exists with a distinctive
-    // "Monday EN" translation. Verify it was NOT imported during installation,
-    // proving that English was excluded from the translation fetch phase.
-    $count = Database::getConnection()->select('locales_target')
-      ->condition('language', 'en')
-      ->countQuery()
-      ->execute()
-      ->fetchField();
-    $this->assertEquals(0, $count, 'No English translations should be imported when translate_english is not enabled.');
+    // The locale_test_fetch_langcodes module decorates LocaleFetch and records
+    // the langcodes passed to buildUpdateBatch() during installation. Verify
+    // that English was not included.
+    $langcodes = \Drupal::state()->get('locale_test_fetch_langcodes.langcodes');
+    $this->assertIsArray($langcodes, 'The fetch langcodes should have been recorded during installation.');
+    $this->assertNotContains('en', $langcodes, 'English should not be passed to buildUpdateBatch when translate_english is not enabled.');
+    $this->assertContains('de', $langcodes);
+    $this->assertContains('es', $langcodes);
   }
 
 }
