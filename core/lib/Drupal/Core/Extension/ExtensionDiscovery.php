@@ -105,7 +105,7 @@ class ExtensionDiscovery {
   public function __construct(
     string $root,
     ?array $profile_directories = NULL,
-    ?string $site_path = NULL
+    ?string $site_path = NULL,
   ) {
     $this->root = $root;
     $this->profileDirectories = $profile_directories;
