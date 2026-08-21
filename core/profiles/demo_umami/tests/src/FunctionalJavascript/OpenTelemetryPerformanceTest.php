@@ -64,7 +64,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('quiche');
 
     $expected = [
-      'QueryCount' => 194,
+      'QueryCount' => 193,
       'CacheGetCount' => 217,
       'CacheSetCount' => 226,
       'CacheDeleteCount' => 0,
@@ -346,7 +346,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('Umami');
 
     $expected = [
-      'QueryCount' => 177,
+      'QueryCount' => 176,
       'CacheGetCount' => 225,
       'CacheSetCount' => 240,
       'CacheDeleteCount' => 0,
@@ -524,7 +524,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 263,
+      'QueryCount' => 262,
       'CacheGetCount' => 257,
       'CacheGetCountByBin' => [
         'config' => 52,
