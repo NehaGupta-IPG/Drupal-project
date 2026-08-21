@@ -4,7 +4,6 @@ namespace Drupal\Core\Extension;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\State\StateInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -77,14 +76,13 @@ class ThemeExtensionList extends ExtensionList {
     CacheBackendInterface $cache,
     InfoParserInterface $info_parser,
     ModuleHandlerInterface $module_handler,
-    StateInterface $state,
     ConfigFactoryInterface $config_factory,
     #[Autowire(param: 'install_profile')]
     $install_profile,
     #[Autowire(param: 'container.themes')]
     array $container_themes_info = [],
   ) {
-    parent::__construct($root, 'theme', $cache, $info_parser, $module_handler, $state, $install_profile);
+    parent::__construct($root, 'theme', $cache, $info_parser, $module_handler, $install_profile);
 
     $this->configFactory = $config_factory;
 
@@ -92,13 +90,6 @@ class ThemeExtensionList extends ExtensionList {
     foreach ($container_themes_info as $theme_name => $info) {
       $this->addedPathNames[$theme_name] = $info['pathname'];
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getPathNamesCacheId() {
-    return NULL;
   }
 
   /**

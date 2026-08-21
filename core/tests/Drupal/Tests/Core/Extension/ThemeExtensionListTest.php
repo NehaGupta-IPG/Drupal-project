@@ -11,10 +11,6 @@ use Drupal\Core\Extension\InfoParser;
 use Drupal\Core\Extension\InfoParserInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
-use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
-use Drupal\Core\Lock\NullLockBackend;
-use Drupal\Core\State\State;
-use Drupal\Core\State\StateInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -64,8 +60,6 @@ class ThemeExtensionListTest extends UnitTestCase {
       ->alter('system_info', Argument::type('array'), Argument::type(Extension::class), Argument::any())
       ->shouldBeCalled();
 
-    $state = new State(new KeyValueMemoryFactory(), new NullBackend('bin'), new NullLockBackend());
-
     $config_factory = $this->getConfigFactoryStub([
       'core.extension' => [
         'module' => [],
@@ -76,7 +70,7 @@ class ThemeExtensionListTest extends UnitTestCase {
       ],
     ]);
 
-    $theme_list = new TestThemeExtensionList($this->root, new NullBackend('test'), $info_parser->reveal(), $module_handler->reveal(), $state, $config_factory, 'testing');
+    $theme_list = new TestThemeExtensionList($this->root, new NullBackend('test'), $info_parser->reveal(), $module_handler->reveal(), $config_factory, 'testing');
     $theme_list->setExtensionDiscovery($extension_discovery->reveal());
 
     $theme_data = $theme_list->reset()->getList();
@@ -96,12 +90,9 @@ class ThemeExtensionListTest extends UnitTestCase {
    * Tests that installed theme path names are taken from the container.
    *
    * The constructor seeds the path names of installed themes from the
-   * container so that the state cache is not consulted.
+   * container so that discovery is not required.
    */
   public function testGetPathnameFromContainer(): void {
-    $state = $this->prophesize(StateInterface::class);
-    $state->get(Argument::cetera())->shouldNotBeCalled();
-    $state->set(Argument::cetera())->shouldNotBeCalled();
 
     $extension_discovery = $this->prophesize(ExtensionDiscovery::class);
     $extension_discovery->scan(Argument::cetera())->shouldNotBeCalled();
@@ -114,7 +105,6 @@ class ThemeExtensionListTest extends UnitTestCase {
       new NullBackend('test'),
       new InfoParser($this->root),
       $module_handler->reveal(),
-      $state->reveal(),
       $config_factory,
       'test',
       ['test_theme' => ['pathname' => 'core/themes/test_theme/test_theme.info.yml']],
@@ -139,9 +129,8 @@ class ThemeExtensionListTest extends UnitTestCase {
   public function testDoGetBaseThemes(array $themes, $theme, array $expected): void {
     // Mocks and stubs.
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
-    $state = new State(new KeyValueMemoryFactory(), new NullBackend('bin'), new NullLockBackend());
     $config_factory = $this->getConfigFactoryStub([]);
-    $theme_listing = new ThemeExtensionList($this->root, new NullBackend('test'), new InfoParser($this->root), $module_handler->reveal(), $state, $config_factory, 'test');
+    $theme_listing = new ThemeExtensionList($this->root, new NullBackend('test'), new InfoParser($this->root), $module_handler->reveal(), $config_factory, 'test');
 
     $method_to_test = (new \ReflectionObject($theme_listing))->getMethod('doGetBaseThemes');
     $base_themes = $method_to_test->invoke($theme_listing, $themes, $theme);

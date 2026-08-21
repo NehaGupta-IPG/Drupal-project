@@ -3,9 +3,7 @@
 namespace Drupal\Core\Extension;
 
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
-use Drupal\Core\State\StateInterface;
 
 /**
  * Provides available extensions.
@@ -103,13 +101,6 @@ abstract class ExtensionList {
   protected $addedPathNames = [];
 
   /**
-   * The state store.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
    * The install profile used by the site.
    *
    * @var string|false|null
@@ -129,18 +120,15 @@ abstract class ExtensionList {
    *   The info parser.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state.
    * @param string $install_profile
    *   The install profile used by the site.
    */
-  public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, $install_profile) {
+  public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, $install_profile) {
     $this->root = $root;
     $this->type = $type;
     $this->cache = $cache;
     $this->infoParser = $info_parser;
     $this->moduleHandler = $module_handler;
-    $this->state = $state;
     $this->installProfile = $install_profile;
   }
 
@@ -170,16 +158,6 @@ abstract class ExtensionList {
     $this->cache->delete($this->getInfoCacheId());
     $this->pathNames = NULL;
 
-    if ($cache_id = $this->getPathNamesCacheId()) {
-      try {
-        $this->state->delete($cache_id);
-      }
-      catch (DatabaseExceptionWrapper) {
-        // Ignore exceptions caused by a non existing {key_value} table in the
-        // early installer.
-      }
-    }
-
     return $this;
   }
 
@@ -201,16 +179,6 @@ abstract class ExtensionList {
    */
   protected function getInfoCacheId() {
     return "system.{$this->type}.info";
-  }
-
-  /**
-   * Returns the extension filenames cache ID.
-   *
-   * @return string|null
-   *   The filename cache ID, or NULL when path names are not cached in state.
-   */
-  protected function getPathNamesCacheId() {
-    return "system.{$this->type}.files";
   }
 
   /**
@@ -439,19 +407,7 @@ abstract class ExtensionList {
    */
   public function getPathNames() {
     if ($this->pathNames === NULL) {
-      $cache_id = $this->getPathNamesCacheId();
-      if ($cache_id) {
-        $this->pathNames = $this->state->get($cache_id);
-      }
-
-      if ($this->pathNames === NULL) {
-        $this->pathNames = $this->recalculatePathNames();
-        if ($cache_id) {
-          // Store filenames to allow static::getPathname() to retrieve them
-          // without having to rebuild or scan the filesystem.
-          $this->state->set($cache_id, $this->pathNames);
-        }
-      }
+      $this->pathNames = $this->recalculatePathNames();
     }
     return $this->pathNames;
   }

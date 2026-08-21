@@ -12,7 +12,6 @@ use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\ExtensionList;
 use Drupal\Core\Extension\InfoParserInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\State\StateInterface;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -32,8 +31,8 @@ class ExtensionListTest extends UnitTestCase {
    * Tests get name with non existing extension.
    */
   public function testGetNameWithNonExistingExtension(): void {
-    [$cache, $info_parser, $module_handler, $state] = $this->getMocks();
-    $test_extension_list = new TestExtension($this->randomMachineName(), 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), $state->reveal(), 'testing');
+    [$cache, $info_parser, $module_handler] = $this->getMocks();
+    $test_extension_list = new TestExtension($this->randomMachineName(), 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), 'testing');
 
     $extension_discovery = $this->prophesize(ExtensionDiscovery::class);
     $extension_discovery->scan('test_extension')->willReturn([]);
@@ -56,8 +55,8 @@ class ExtensionListTest extends UnitTestCase {
    * Tests get with non existing extension.
    */
   public function testGetWithNonExistingExtension(): void {
-    [$cache, $info_parser, $module_handler, $state] = $this->getMocks();
-    $test_extension_list = new TestExtension($this->randomMachineName(), 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), $state->reveal(), 'testing');
+    [$cache, $info_parser, $module_handler] = $this->getMocks();
+    $test_extension_list = new TestExtension($this->randomMachineName(), 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), 'testing');
 
     $extension_discovery = $this->prophesize(ExtensionDiscovery::class);
     $extension_discovery->scan('test_extension')->willReturn([]);
@@ -156,9 +155,9 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * Tests get path names without a state cache.
+   * Tests get path names without state.
    */
-  public function testGetPathNamesWithoutStateCache(): void {
+  public function testGetPathNamesWithoutState(): void {
     vfsStream::setup('drupal_root');
     vfsStream::create([
       'example' => [
@@ -172,13 +171,10 @@ class ExtensionListTest extends UnitTestCase {
       ],
     ]);
 
-    [$cache, $info_parser, $module_handler, $state] = $this->getMocks();
-    $state->get(Argument::cetera())->shouldNotBeCalled();
-    $state->set(Argument::cetera())->shouldNotBeCalled();
-    $state->delete(Argument::cetera())->shouldNotBeCalled();
+    [$cache, $info_parser, $module_handler] = $this->getMocks();
     $info_parser->parse(Argument::any())->willReturn([]);
 
-    $test_extension_list = new TestExtensionWithoutPathNamesStateCache('vfs://drupal_root', 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), $state->reveal(), 'testing');
+    $test_extension_list = new TestExtension('vfs://drupal_root', 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), 'testing');
     $extension_discovery = $this->prophesize(ExtensionDiscovery::class);
     $extension_discovery->scan('test_extension')->willReturn([
       'test_name' => new Extension('vfs://drupal_root', 'test_extension', 'example/test_name/test_name.info.yml'),
@@ -360,12 +356,12 @@ class ExtensionListTest extends UnitTestCase {
       touch("vfs://drupal_root/example/$extension_name/$extension_name.info.yml", 123456789);
     }
 
-    [$cache, $info_parser, $module_handler, $state] = $this->getMocks();
+    [$cache, $info_parser, $module_handler] = $this->getMocks();
     $info_parser->parse(Argument::any())->will(function ($args) {
       return Yaml::decode(file_get_contents('vfs://drupal_root/' . $args[0]));
     });
 
-    $test_extension_list = new TestExtension('vfs://drupal_root', 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), $state->reveal(), 'testing');
+    $test_extension_list = new TestExtension('vfs://drupal_root', 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), 'testing');
 
     $extension_discovery = $this->prophesize(ExtensionDiscovery::class);
     $extension_scan_result = [];
@@ -381,8 +377,7 @@ class ExtensionListTest extends UnitTestCase {
     $cache = $this->prophesize(CacheBackendInterface::class);
     $info_parser = $this->prophesize(InfoParserInterface::class);
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
-    $state = $this->prophesize(StateInterface::class);
-    return [$cache, $info_parser, $module_handler, $state];
+    return [$cache, $info_parser, $module_handler];
   }
 
 }
@@ -426,20 +421,6 @@ class TestExtension extends ExtensionList {
    */
   protected function getExtensionDiscovery() {
     return $this->extensionDiscovery ?: parent::getExtensionDiscovery();
-  }
-
-}
-
-/**
- * Stub class for testing ExtensionList without a state path names cache.
- */
-class TestExtensionWithoutPathNamesStateCache extends TestExtension {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getPathNamesCacheId() {
-    return NULL;
   }
 
 }

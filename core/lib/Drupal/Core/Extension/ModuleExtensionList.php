@@ -4,7 +4,6 @@ namespace Drupal\Core\Extension;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Update\UpdateHookRegistry;
 
@@ -59,8 +58,6 @@ class ModuleExtensionList extends ExtensionList {
    *   The info parser.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    * @param \Drupal\Core\Extension\ExtensionList $profile_list
@@ -70,8 +67,8 @@ class ModuleExtensionList extends ExtensionList {
    * @param array[] $container_modules_info
    *   (optional) The module locations coming from the compiled container.
    */
-  public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, ConfigFactoryInterface $config_factory, ExtensionList $profile_list, $install_profile, array $container_modules_info = []) {
-    parent::__construct($root, $type, $cache, $info_parser, $module_handler, $state, $install_profile);
+  public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, ExtensionList $profile_list, $install_profile, array $container_modules_info = []) {
+    parent::__construct($root, $type, $cache, $info_parser, $module_handler, $install_profile);
 
     $this->configFactory = $config_factory;
     $this->profileList = $profile_list;
@@ -80,13 +77,6 @@ class ModuleExtensionList extends ExtensionList {
     foreach ($container_modules_info as $module_name => $info) {
       $this->addedPathNames[$module_name] = $info['pathname'];
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getPathNamesCacheId() {
-    return NULL;
   }
 
   /**

@@ -91,3 +91,13 @@ function system_post_update_clear_admin_compact_mode_config(): void {
   $config->clear('admin_compact_mode');
   $config->save();
 }
+
+/**
+ * Remove unused extension pathname state keys.
+ */
+function system_post_update_remove_extension_pathname_state(): void {
+  \Drupal::state()->deleteMultiple([
+    'system.module.files',
+    'system.theme.files',
+  ]);
+}
