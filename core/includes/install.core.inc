@@ -438,7 +438,7 @@ function install_begin_request($class_loader, &$install_state): void {
   $kernel::bootEnvironment();
 
   // Add list of all available profiles to the installation state.
-  $listing = new ExtensionDiscovery($kernel->getAppRoot(), FALSE);
+  $listing = new ExtensionDiscovery($kernel->getAppRoot());
   $listing->setProfileDirectories([]);
   $install_state['profiles'] += $listing->scan('profile');
 

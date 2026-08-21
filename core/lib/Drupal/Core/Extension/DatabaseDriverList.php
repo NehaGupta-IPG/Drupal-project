@@ -63,7 +63,7 @@ class DatabaseDriverList extends ExtensionList {
    * {@inheritdoc}
    */
   protected function getExtensionDiscovery() {
-    return new ExtensionDiscovery($this->root, FALSE);
+    return new ExtensionDiscovery($this->root);
   }
 
   /**

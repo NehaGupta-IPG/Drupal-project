@@ -361,7 +361,7 @@ class InstallCommand extends Command {
    */
   protected function getProfiles($include_hidden = FALSE, $auto_select_distributions = TRUE) {
     // Build a list of all available profiles.
-    $listing = new ExtensionDiscovery(getcwd(), FALSE);
+    $listing = new ExtensionDiscovery(getcwd());
     $listing->setProfileDirectories([]);
     $profiles = [];
     $info_parser = new InfoParserDynamic(getcwd());

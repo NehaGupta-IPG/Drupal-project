@@ -37,13 +37,13 @@ class ExtensionDiscoveryTest extends UnitTestCase {
     $this->assertFileExists($root . '/core/modules/system/system.info.yml');
 
     // Create an ExtensionDiscovery with $root.
-    $extension_discovery = new ExtensionDiscovery($root, FALSE, NULL, 'sites/default');
+    $extension_discovery = new ExtensionDiscovery($root, TRUE, NULL, 'sites/default');
 
     /** @var \Drupal\Core\Extension\Extension[][] $extensions_by_type */
     $extensions_by_type = [];
     $files_by_type_and_name = [];
     foreach (['profile', 'module', 'theme'] as $type) {
-      $extensions_by_type[$type] = $extension_discovery->scan($type, FALSE);
+      $extensions_by_type[$type] = $extension_discovery->scan($type);
       foreach ($extensions_by_type[$type] as $name => $extension) {
         $files_by_type_and_name[$type][$name] = $extension->getPathname();
       }
