@@ -79,7 +79,7 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, $route);
     $request->attributes->set('_raw_variables', new ParameterBag($requestParams));
 
-    $routeMatch = RouteMatch::createfromRequest($request);
+    $routeMatch = RouteMatch::createFromRequest($request);
 
     // Check for allowed access.
     $this->assertInstanceOf(AccessResultAllowed::class, $this->accessCheck->access($route, $request, $routeMatch));
