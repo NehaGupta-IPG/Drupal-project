@@ -19,7 +19,13 @@ class LocaleFetchRecorder extends LocaleFetch {
    * {@inheritdoc}
    */
   public function buildUpdateBatch(array $projects = [], array $langcodes = [], array $options = []): array {
-    \Drupal::state()->set('locale_test_fetch_langcodes.langcodes', $langcodes);
+    // Only record the first call, which occurs during
+    // install_finish_translations(). Later calls from module installation
+    // hooks (e.g. locale_modules_installed()) would overwrite with different
+    // arguments.
+    if (\Drupal::state()->get('locale_test_fetch_langcodes.langcodes') === NULL) {
+      \Drupal::state()->set('locale_test_fetch_langcodes.langcodes', $langcodes);
+    }
     return $this->inner->buildUpdateBatch($projects, $langcodes, $options);
   }
 
