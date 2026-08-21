@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use Drupal\Core\Database\Database;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -28,24 +29,30 @@ class InstallerTranslationMultipleLanguageKeepEnglishTest extends InstallerTrans
   protected $profile = 'testing_multilingual_with_english';
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUpLanguage(): void {
+    parent::setUpLanguage();
+    // Place an English .po file in the translations directory. If the
+    // installer incorrectly attempts to import English translations, these
+    // strings will appear in the locales_target table.
+    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-' . \Drupal::VERSION . '.en.po', $this->getPo('en'));
+  }
+
+  /**
    * Tests that English translations are not fetched with keep_english.
    */
   public function testTranslationsLoaded(): void {
     parent::testTranslationsLoaded();
 
-    // Verify that English is not included in the translatable language list
-    // even though keep_english added it as a configured language.
-    $translatable_languages = locale_translatable_language_list();
-    $this->assertArrayNotHasKey('en', $translatable_languages);
-
-    // Verify that no English translation was fetched during installation by
-    // checking the translation status does not include English entries.
-    $status = \Drupal::keyValue('locale.translation_status')->getAll();
-    foreach ($status as $project => $project_status) {
-      if (is_array($project_status)) {
-        $this->assertArrayNotHasKey('en', $project_status, "Project '$project' should not have English translation status.");
-      }
-    }
+    // Verify that no English interface translation strings were imported
+    // during installation despite an English .po file being available.
+    $count = Database::getConnection()->select('locales_target')
+      ->condition('language', 'en')
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $this->assertEquals(0, $count, 'No English translations should be imported when translate_english is not enabled.');
   }
 
 }
