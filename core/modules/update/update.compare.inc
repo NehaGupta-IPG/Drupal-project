@@ -86,7 +86,7 @@ function update_process_project_info(&$projects): void {
  * @return array
  *   An array of installed projects with current update status information.
  *
- * @see update_get_available()
+ * @see \Drupal\update\UpdateManager::getAvailable()
  * @see \Drupal\update\UpdateManager::getProjects()
  * @see \Drupal\update\UpdateManager::processProjectInfo()
  * @see \Drupal\update\UpdateManagerInterface::projectStorage()

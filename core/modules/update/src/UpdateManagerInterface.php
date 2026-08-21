@@ -131,4 +131,32 @@ interface UpdateManagerInterface {
    */
   public function projectStorage($key);
 
+  /**
+   * Tries to get update information and refreshes it when necessary.
+   *
+   * In addition to checking the lifetime, this function also ensures that there
+   * are no .info.yml files for installed modules or themes that have a newer
+   * modification timestamp than the last time we checked for available update
+   * data. If any .info.yml file was modified, it almost certainly means a new
+   * version of something was installed. Without fresh available update data,
+   * the logic in update_calculate_project_data() will be wrong and produce
+   * confusing, bogus results.
+   *
+   * @param bool $refresh
+   *   (optional) Boolean to indicate if this method should refresh
+   *   automatically if there's no data. Defaults to FALSE.
+   *
+   * @return array
+   *   Array of data about available releases, keyed by project shortname.
+   *
+   * @see \Drupal\update\UpdateManager::refreshUpdateData()
+   * @see \Drupal\update\UpdateManager::getProjects()
+   */
+  public function getAvailable(bool $refresh): array;
+
+  /**
+   * Invalidates stored data relating to update status.
+   */
+  public function reset(): void;
+
 }

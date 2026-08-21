@@ -119,9 +119,8 @@ class UpdateCalculateProjectDataTest extends KernelTestBase {
    */
   #[DataProvider('providerProjectStatus')]
   public function testProjectStatus(string $fixture, int $status, string $label, string $expected_error_message): void {
-    update_storage_clear();
     $this->setReleaseMetadata(__DIR__ . $fixture);
-    $available = update_get_available(TRUE);
+    $available = \Drupal::service('update.manager')->getAvailable(TRUE);
     $project_data = \Drupal::service(UpdateCalculator::class)->getProjectData($available);
     $this->assertArrayHasKey('status', $project_data['drupal']);
     $this->assertEquals($status, $project_data['drupal']['status']);

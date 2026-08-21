@@ -35,7 +35,7 @@ class UpdateController extends ControllerBase {
     $build = [
       '#theme' => 'update_report',
     ];
-    if ($available = update_get_available(TRUE)) {
+    if ($available = $this->updateManager->getAvailable(TRUE)) {
       $this->moduleHandler()->loadInclude('update', 'compare.inc');
       $build['#data'] = $this->updateCalculator->getProjectData($available);
 
@@ -66,9 +66,33 @@ class UpdateController extends ControllerBase {
       ->addOperation([$this->updateManager, 'fetchDataBatch'], [])
       ->setProgressMessage($this->t('Trying to check available update data ...'))
       ->setErrorMessage($this->t('Error checking available update data.'))
-      ->setFinishCallback('update_fetch_data_finished');
+      ->setFinishCallback([self::class, 'updateFetchDataFinished']);
     batch_set($batch_builder->toArray());
     return batch_process('admin/reports/updates');
+  }
+
+  /**
+   * Finished batch callback.
+   *
+   * @param bool $success
+   *   TRUE if batch successfully completed.
+   * @param array $results
+   *   Batch results.
+   */
+  public static function updateFetchDataFinished(bool $success, array $results): void {
+    if ($success) {
+      if (!empty($results)) {
+        if (!empty($results['updated'])) {
+          \Drupal::messenger()->addStatus(\Drupal::translation()->formatPlural($results['updated'], 'Checked available update data for one project.', 'Checked available update data for @count projects.'));
+        }
+        if (!empty($results['failures'])) {
+          \Drupal::messenger()->addError(\Drupal::translation()->formatPlural($results['failures'], 'Failed to get available update data for one project.', 'Failed to get available update data for @count projects.'));
+        }
+      }
+    }
+    else {
+      \Drupal::messenger()->addError(t('An error occurred trying to get available update data.'), 'error');
+    }
   }
 
 }
