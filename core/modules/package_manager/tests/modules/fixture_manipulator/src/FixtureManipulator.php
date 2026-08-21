@@ -280,7 +280,11 @@ class FixtureManipulator {
     if ($file_name === NULL) {
       $file_name = "$project_name.info.yml";
     }
-    assert(file_put_contents("$path/$file_name", Yaml::encode(['project' => $project_name])) !== FALSE);
+    assert(file_put_contents("$path/$file_name", Yaml::encode([
+      'project' => $project_name,
+      'type' => 'module',
+      'core_version_requirement' => '*',
+    ])) !== FALSE);
     return $this;
   }
 

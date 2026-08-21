@@ -1,4 +1,5 @@
 name: 'Package Manager Test Update'
 description: 'A module to test updates'
 type: module
+core_version_requirement: '*'
 package: Testing
