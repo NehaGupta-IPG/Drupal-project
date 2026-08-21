@@ -7,9 +7,9 @@
 use Drupal\Core\Extension\ExtensionVersion;
 use Drupal\Core\Utility\Error;
 use Drupal\update\ProjectRelease;
+use Drupal\update\UpdateCalculator;
 use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
-use Drupal\update\ProjectCoreCompatibility;
 
 /**
  * Determines version and type information for currently installed projects.
@@ -21,8 +21,14 @@ use Drupal\update\ProjectCoreCompatibility;
  * @param array $projects
  *   Array of project information from
  *   \Drupal\update\UpdateManager::getProjects().
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3566774
  */
 function update_process_project_info(&$projects): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
   foreach ($projects as $key => $project) {
     // Assume an official release until we see otherwise.
     $install_type = 'official';
@@ -82,61 +88,19 @@ function update_process_project_info(&$projects): void {
  *
  * @see update_get_available()
  * @see \Drupal\update\UpdateManager::getProjects()
- * @see update_process_project_info()
+ * @see \Drupal\update\UpdateManager::processProjectInfo()
  * @see \Drupal\update\UpdateManagerInterface::projectStorage()
  * @see \Drupal\update\ProjectCoreCompatibility::setReleaseMessage()
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal::service(UpdateCalculator::class)
+ *   ->getProjectData($available) instead.
+ *
+ * @see https://www.drupal.org/node/3566774
  */
 function update_calculate_project_data($available) {
-  // Retrieve the projects from storage, if present.
-  $projects = \Drupal::service('update.manager')->projectStorage('update_project_data');
-  // If $projects is empty, then the data must be rebuilt.
-  // Otherwise, return the data and skip the rest of the function.
-  if (!empty($projects)) {
-    return $projects;
-  }
-  $projects = \Drupal::service('update.manager')->getProjects();
-  update_process_project_info($projects);
-  if (isset($projects['drupal']) && !empty($available['drupal'])) {
-    // Calculate core status first so that it is complete before
-    // \Drupal\update\ProjectCoreCompatibility::setReleaseMessage() is called
-    // for each module below.
-    update_calculate_project_update_status($projects['drupal'], $available['drupal']);
-    if (isset($available['drupal']['releases']) && !empty($available['drupal']['supported_branches'])) {
-      $supported_branches = explode(',', $available['drupal']['supported_branches']);
-      $project_core_compatibility = new ProjectCoreCompatibility($projects['drupal'], $available['drupal']['releases'], $supported_branches);
-    }
-  }
-
-  foreach ($projects as $project => $project_info) {
-    if (isset($available[$project])) {
-      if ($project === 'drupal') {
-        continue;
-      }
-      update_calculate_project_update_status($projects[$project], $available[$project]);
-      // Inject the list of compatible core versions to show administrator(s)
-      // which versions of core a given available update can be installed with.
-      // Since individual releases of a project can be compatible with different
-      // versions of core, and even multiple major versions of core (for
-      // example, 8.9.x and 9.0.x), this list will hopefully help
-      // administrator(s) know which available updates they can upgrade a given
-      // project to.
-      if (isset($project_core_compatibility)) {
-        $project_core_compatibility->setReleaseMessage($projects[$project]);
-      }
-    }
-    else {
-      $projects[$project]['status'] = UpdateFetcherInterface::UNKNOWN;
-      $projects[$project]['reason'] = t('No available releases found');
-    }
-  }
-  // Give other modules a chance to alter the status (for example, to allow a
-  // contrib module to provide fine-grained settings to ignore specific
-  // projects or releases).
-  \Drupal::moduleHandler()->alter('update_status', $projects);
-
-  // Store the site's update status for at most 1 hour.
-  \Drupal::keyValueExpirable('update')->setWithExpire('update_project_data', $projects, 3600);
-  return $projects;
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(UpdateCalculator::class)->getProjectData($available) instead. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+  return \Drupal::service(UpdateCalculator::class)->getProjectData($available);
 }
 
 /**
@@ -204,8 +168,14 @@ function update_calculate_project_data($available) {
  *   An array containing information about a specific project.
  * @param array $available
  *   Data about available project releases of a specific project.
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There
+ *   is no replacement.
+ *
+ * @see https://www.drupal.org/node/3566774
  */
 function update_calculate_project_update_status(&$project_data, $available): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
   foreach (['title', 'link'] as $attribute) {
     if (!isset($project_data[$attribute]) && isset($available[$attribute])) {
       $project_data[$attribute] = $available[$attribute];
@@ -414,8 +384,8 @@ function update_calculate_project_update_status(&$project_data, $available): voi
     // Other than the currently installed release, ignore unpublished, insecure,
     // or unsupported updates.
     elseif (!$release->isPublished() ||
-            !$release_is_supported ||
-            $release->isInsecure()
+      !$release_is_supported ||
+      $release->isInsecure()
     ) {
       continue;
     }
@@ -449,15 +419,17 @@ function update_calculate_project_update_status(&$project_data, $available): voi
     // Look for the 'latest version' if we haven't found it yet. Latest is
     // defined as the most recent version for the target major version.
     if (!isset($project_data['latest_version'])
-        && $release_major_version == $target_major) {
+      && $release_major_version == $target_major
+    ) {
       $project_data['latest_version'] = $version;
       $project_data['releases'][$version] = $release_info;
     }
 
     // Look for the development snapshot release for this branch.
     if (!isset($project_data['dev_version'])
-        && $release_major_version == $target_major
-        && $release_module_version->getVersionExtra() === 'dev') {
+      && $release_major_version == $target_major
+      && $release_module_version->getVersionExtra() === 'dev'
+    ) {
       $project_data['dev_version'] = $version;
       $project_data['releases'][$version] = $release_info;
     }
@@ -472,7 +444,8 @@ function update_calculate_project_update_status(&$project_data, $available): voi
     // Look for the 'recommended' version if we haven't found it yet (see
     // PHPDoc at the top of this function for the definition).
     if (!isset($project_data['recommended'])
-        && $release_major_version == $target_major && $release_is_supported) {
+      && $release_major_version == $target_major && $release_is_supported
+    ) {
       if ($recommended_version_without_extra !== $release_version_without_extra) {
         $recommended_version_without_extra = $release_version_without_extra;
         $recommended_release = $release_info;

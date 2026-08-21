@@ -9,6 +9,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\update\ProjectRelease;
 use Drupal\Core\Extension\ExtensionVersion;
 use Drupal\Core\Utility\Error;
+use Drupal\update\UpdateCalculator;
 use Drupal\update\UpdateManagerInterface;
 
 /**
@@ -65,7 +66,7 @@ final class ProjectInfo {
    */
   public function getProjectInfo(): ?array {
     $available_updates = $this->getAvailableProjects();
-    $project_data = update_calculate_project_data($available_updates);
+    $project_data = \Drupal::service(UpdateCalculator::class)->getProjectData($available_updates);
     if (!isset($project_data[$this->name])) {
       return $available_updates[$this->name] ?? NULL;
     }
@@ -148,7 +149,7 @@ final class ProjectInfo {
       $existing_version = $project_data['existing_version'];
       // Treat an unknown version the same as a project whose project
       // information is not available, so return NULL.
-      // @see \update_process_project_info()
+      // @see \Drupal\update\UpdateManager::processProjectInfo()
       if ($existing_version instanceof TranslatableMarkup && $existing_version->getUntranslatedString() === 'Unknown') {
         return NULL;
       }

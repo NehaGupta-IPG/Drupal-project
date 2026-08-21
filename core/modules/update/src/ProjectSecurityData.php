@@ -85,7 +85,7 @@ final class ProjectSecurityData {
    *
    * @param array $project_data
    *   Project data from Drupal\update\UpdateManagerInterface::getProjects() and
-   *   processed by update_process_project_info().
+   *   processed by \Drupal\update\UpdateManager::processProjectInfo().
    * @param array $releases
    *   Project releases as returned by update_get_available().
    *

@@ -12,6 +12,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\update\ProjectSecurityData;
 use Drupal\update\ProjectSecurityRequirement;
+use Drupal\update\UpdateCalculator;
 use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
 
@@ -24,6 +25,7 @@ class UpdateRequirements {
 
   public function __construct(
     protected readonly ModuleHandlerInterface $moduleHandler,
+    protected readonly UpdateCalculator $updateCalculator,
   ) {}
 
   /**
@@ -51,7 +53,7 @@ class UpdateRequirements {
     $requirements = [];
     if ($available = update_get_available(FALSE)) {
       $this->moduleHandler->loadInclude('update', 'inc', 'update.compare');
-      $data = update_calculate_project_data($available);
+      $data = $this->updateCalculator->getProjectData($available);
       // First, populate the requirements for core:
       $requirements['update_core'] = $this->requirementCheck($data['drupal'], 'core');
       if (!empty($available['drupal']['releases'])) {
@@ -91,7 +93,7 @@ class UpdateRequirements {
    *
    * @param array $project
    *   Array of information about the project we're testing as returned by
-   *   update_calculate_project_data().
+   *   \Drupal\update\UpdateCalculator::projectData().
    * @param string $type
    *   What kind of project this is ('core' or 'contrib').
    *
@@ -100,7 +102,7 @@ class UpdateRequirements {
    *
    * @see hook_requirements()
    * @see Drupal\update\Hook\UpdateRequirements::runtime()
-   * @see update_calculate_project_data()
+   * @see \Drupal\update\UpdateCalculator::projectData()
    */
   protected function requirementCheck($project, $type): array {
     $requirement = [];

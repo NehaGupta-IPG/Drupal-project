@@ -319,7 +319,7 @@ class UpdateThemeHooks {
       }
     }
 
-    if (isset($project['also'])) {
+    if (!empty($project['also'])) {
       foreach ($project['also'] as $also) {
         $versions_inner[] = [
           '#theme' => 'update_version',

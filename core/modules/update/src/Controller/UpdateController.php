@@ -5,6 +5,7 @@ namespace Drupal\update\Controller;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\update\UpdateCalculator;
 use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
 
@@ -13,31 +14,15 @@ use Drupal\update\UpdateManagerInterface;
  */
 class UpdateController extends ControllerBase {
 
-  /**
-   * Update manager service.
-   *
-   * @var \Drupal\update\UpdateManagerInterface
-   */
-  protected $updateManager;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * Constructs update status data.
-   *
-   * @param \Drupal\update\UpdateManagerInterface $update_manager
-   *   Update Manager Service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
-  public function __construct(UpdateManagerInterface $update_manager, RendererInterface $renderer) {
-    $this->updateManager = $update_manager;
-    $this->renderer = $renderer;
+  public function __construct(
+    protected UpdateManagerInterface $updateManager,
+    protected RendererInterface $renderer,
+    protected ?UpdateCalculator $updateCalculator = NULL,
+  ) {
+    if (!$updateCalculator) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $updateCalculator argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3587768', E_USER_DEPRECATED);
+      $this->updateCalculator = \Drupal::service(UpdateCalculator::class);
+    }
   }
 
   /**
@@ -52,7 +37,7 @@ class UpdateController extends ControllerBase {
     ];
     if ($available = update_get_available(TRUE)) {
       $this->moduleHandler()->loadInclude('update', 'compare.inc');
-      $build['#data'] = update_calculate_project_data($available);
+      $build['#data'] = $this->updateCalculator->getProjectData($available);
 
       // @todo Consider using 'fetch_failures' from the 'update' collection
       // in the key_value_expire service for this?

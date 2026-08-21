@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\update\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\update\UpdateCalculator;
 use Drupal\update\UpdateManagerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
@@ -16,7 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Test the values set in update_calculate_project_data().
+ * Test the values set in \Drupal\update\UpdateCalculator::projectData().
  */
 #[Group('update')]
 #[RunTestsInSeparateProcesses]
@@ -115,15 +116,13 @@ class UpdateCalculateProjectDataTest extends KernelTestBase {
 
   /**
    * Tests the project_status of the project.
-   *
-   * @legacy-covers update_calculate_project_update_status
    */
   #[DataProvider('providerProjectStatus')]
   public function testProjectStatus(string $fixture, int $status, string $label, string $expected_error_message): void {
     update_storage_clear();
     $this->setReleaseMetadata(__DIR__ . $fixture);
     $available = update_get_available(TRUE);
-    $project_data = update_calculate_project_data($available);
+    $project_data = \Drupal::service(UpdateCalculator::class)->getProjectData($available);
     $this->assertArrayHasKey('status', $project_data['drupal']);
     $this->assertEquals($status, $project_data['drupal']['status']);
     $this->assertArrayHasKey('extra', $project_data['drupal']);
