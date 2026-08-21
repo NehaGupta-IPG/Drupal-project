@@ -29,24 +29,21 @@ class InstallerTranslationMultipleLanguageKeepEnglishTest extends InstallerTrans
   protected $profile = 'testing_multilingual_with_english';
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUpLanguage(): void {
-    parent::setUpLanguage();
-    // Place an English .po file in the translations directory. If the
-    // installer incorrectly attempts to import English translations, these
-    // strings will appear in the locales_target table.
-    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-' . \Drupal::VERSION . '.en.po', $this->getPo('en'));
-  }
-
-  /**
    * Tests that English translations are not fetched with keep_english.
    */
   public function testTranslationsLoaded(): void {
     parent::testTranslationsLoaded();
 
-    // Verify that no English interface translation strings were imported
-    // during installation despite an English .po file being available.
+    // Verify that English is a configured language but not translatable.
+    $languages = \Drupal::languageManager()->getLanguages();
+    $this->assertArrayHasKey('en', $languages);
+    $translatable_languages = locale_translatable_language_list();
+    $this->assertArrayNotHasKey('en', $translatable_languages);
+
+    // The locale_test_translate module provides a local translation file
+    // pattern (test.%language.po). A test.en.po file exists with a distinctive
+    // "Monday EN" translation. Verify it was NOT imported during installation,
+    // proving that English was excluded from the translation fetch phase.
     $count = Database::getConnection()->select('locales_target')
       ->condition('language', 'en')
       ->countQuery()
