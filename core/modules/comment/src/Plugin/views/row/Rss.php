@@ -90,6 +90,8 @@ class Rss extends RssPluginBase {
       return;
     }
 
+    $comment = $this->getEntityTranslationByRelationship($comment, $row);
+
     $comment->rss_namespaces = [];
     $comment->rss_elements = [
       [
