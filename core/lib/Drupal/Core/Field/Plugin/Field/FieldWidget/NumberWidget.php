@@ -79,7 +79,8 @@ class NumberWidget extends WidgetBase {
     // Set the step for floating point and decimal numbers.
     switch ($this->fieldDefinition->getType()) {
       case 'decimal':
-        $element['#step'] = pow(0.1, $field_settings['scale']);
+        // Guard against problems with small numbers beyond 15 positions.
+        $element['#step'] = '0.' . str_repeat('0', $field_settings['scale'] - 1) . '1';
         break;
 
       case 'float':
