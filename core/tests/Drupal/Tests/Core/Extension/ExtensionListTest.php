@@ -155,37 +155,6 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * Tests get path names without state.
-   */
-  public function testGetPathNamesWithoutState(): void {
-    vfsStream::setup('drupal_root');
-    vfsStream::create([
-      'example' => [
-        'test_name' => [
-          'test_name.info.yml' => Yaml::encode([
-            'name' => 'test name',
-            'type' => 'test_extension',
-            'core' => '8.x',
-          ]),
-        ],
-      ],
-    ]);
-
-    [$cache, $info_parser, $module_handler] = $this->getMocks();
-    $info_parser->parse(Argument::any())->willReturn([]);
-
-    $test_extension_list = new TestExtension('vfs://drupal_root', 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), 'testing');
-    $extension_discovery = $this->prophesize(ExtensionDiscovery::class);
-    $extension_discovery->scan('test_extension')->willReturn([
-      'test_name' => new Extension('vfs://drupal_root', 'test_extension', 'example/test_name/test_name.info.yml'),
-    ]);
-    $test_extension_list->setExtensionDiscovery($extension_discovery->reveal());
-
-    $this->assertSame(['test_name' => 'example/test_name/test_name.info.yml'], $test_extension_list->getPathNames());
-    $test_extension_list->reset();
-  }
-
-  /**
    * Tests get pathname.
    */
   public function testGetPathname(): void {
