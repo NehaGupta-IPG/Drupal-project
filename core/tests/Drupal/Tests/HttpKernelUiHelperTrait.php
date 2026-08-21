@@ -9,6 +9,9 @@ use Behat\Mink\Driver\DriverInterface;
 use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Test\Session\KernelTestSessionManager;
+use Drupal\Core\Test\Session\KernelTestSessionMiddleware;
 use Drupal\Core\Url;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 
@@ -20,8 +23,8 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
  *   to set a current user.
  * - There is no active theme. To place blocks, a test must first install a
  *   theme and then set it as active.
- * - Session semantics differ from normal page requests. Do not rely on session
- *   state beyond its existence (no persistence or regeneration).
+ * - Session semantics differ from normal page requests. To enable session
+ *   persistence, see self::alterSessionServices().
  * - Page caching modules will not work. See \Drupal\Tests\Traits\Core\Cache\PageCachePolicyTrait
  *   for how to set them up.
  */
@@ -35,6 +38,24 @@ trait HttpKernelUiHelperTrait {
    * This is lazily initialized by the first call to self::drupalGet().
    */
   protected ?Mink $mink;
+
+  /**
+   * Sets up services to enable sessions with Kernel test HTTP requests.
+   *
+   * This should be called from an implementation of
+   * \Drupal\Core\DependencyInjection\ServiceModifierInterface::alter().
+   *
+   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
+   *   The container to alter.
+   */
+  public function alterSessionServices(ContainerBuilder $container) {
+    // Alter session services that normally skip session creation on the CLI.
+    $service_definition = $container->getDefinition('http_middleware.session');
+    $service_definition->setClass(KernelTestSessionMiddleware::class);
+
+    $service_definition = $container->getDefinition('session_manager');
+    $service_definition->setClass(KernelTestSessionManager::class);
+  }
 
   /**
    * Retrieves a Drupal path.
