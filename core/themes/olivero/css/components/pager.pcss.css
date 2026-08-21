@@ -7,7 +7,6 @@
 
 .pager__items {
   display: flex;
-  flex-wrap: wrap;
   align-items: flex-end;
   margin-block: 0;
   margin-inline-start: 0;
@@ -20,9 +19,11 @@
 
 .pager__item {
   display: flex;
+  flex: 1 1 0;
   align-items: center;
   justify-content: center;
   width: var(--sp2-5);
+  max-width: var(--sp2-5);
   height: var(--sp2-5);
   cursor: default;
   color: var(--color-text-neutral-soft);
@@ -30,6 +31,7 @@
 
   @media (--sm) {
     width: var(--sp3);
+    max-width: var(--sp3);
     height: var(--sp3);
   }
 }
