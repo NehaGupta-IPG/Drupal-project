@@ -453,6 +453,7 @@ services:
   csrf_state_change.guard:
     class: Drupal\Core\Access\CsrfStateChangeGuard
     arguments: ['@request_stack']
+  Drupal\Core\Access\CsrfStateChangeGuard: '@csrf_state_change.guard'
   csrf_state_change.request_subscriber:
     class: Drupal\Core\Access\CsrfStateChangeRequestSubscriber
   config.storage.active:
