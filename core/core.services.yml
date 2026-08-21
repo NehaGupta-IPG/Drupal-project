@@ -716,7 +716,7 @@ services:
   Drupal\Core\Extension\ModuleExtensionList: '@extension.list.module'
   extension.list.profile:
     class: Drupal\Core\Extension\ProfileExtensionList
-    arguments: ['%app.root%', 'profile', '@cache.default', '@info_parser', '@module_handler', '@state', '%install_profile%']
+    arguments: ['%app.root%', 'profile', '@cache.default', '@info_parser', '@module_handler', '%install_profile%']
   Drupal\Core\Extension\ProfileExtensionList: '@extension.list.profile'
   extension.list.theme:
     class: Drupal\Core\Extension\ThemeExtensionList
