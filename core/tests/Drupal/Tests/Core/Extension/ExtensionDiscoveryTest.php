@@ -96,24 +96,35 @@ class ExtensionDiscoveryTest extends UnitTestCase {
       // Override the core instance of the 'test_theme' theme.
       'sites/default/themes/test_theme/test_theme.info.yml' => [
         'type' => 'theme',
+        'core_version_requirement' => '*',
       ],
       // Override the core instance of the 'minimal' profile.
       'sites/default/profiles/minimal/minimal.info.yml' => [
         'type' => 'profile',
+        'core_version_requirement' => '*',
       ],
       'profiles/my_profile/my_profile.info.yml' => [
         'type' => 'profile',
+        'core_version_requirement' => '*',
       ],
-      'profiles/my_profile/modules/my_profile_nested_module/my_profile_nested_module.info.yml' => [],
+      'profiles/my_profile/modules/my_profile_nested_module/my_profile_nested_module.info.yml' => [
+        'core_version_requirement' => '*',
+      ],
       'profiles/other_profile/other_profile.info.yml' => [
         'type' => 'profile',
+        'core_version_requirement' => '*',
       ],
       'core/modules/user/user.info.yml' => [],
-      'profiles/other_profile/modules/other_profile_nested_module/other_profile_nested_module.info.yml' => [],
+      'profiles/other_profile/modules/other_profile_nested_module/other_profile_nested_module.info.yml' => [
+        'core_version_requirement' => '*',
+      ],
       'core/modules/system/system.info.yml' => [],
-      'modules/devel/devel.info.yml' => [],
+      'modules/devel/devel.info.yml' => [
+        'core_version_requirement' => '*',
+      ],
       'modules/poorly_placed_theme/poorly_placed_theme.info.yml' => [
         'type' => 'theme',
+        'core_version_requirement' => '*',
       ],
     ];
 
