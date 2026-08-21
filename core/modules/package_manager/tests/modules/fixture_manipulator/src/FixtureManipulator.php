@@ -129,6 +129,8 @@ class FixtureManipulator {
       $project_info_data = [
         'name' => $package['name'],
         'project' => $project_name,
+        'type' => 'module',
+        'core_version_requirement' => '*',
       ];
       $extra_files["$project_name.info.yml"] = Yaml::encode($project_info_data);
     }
@@ -284,6 +286,7 @@ class FixtureManipulator {
       'project' => $project_name,
       'type' => 'module',
       'core_version_requirement' => '*',
+      'name' => 'Name',
     ])) !== FALSE);
     return $this;
   }
