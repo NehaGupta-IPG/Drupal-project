@@ -156,6 +156,40 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
+   * Tests get path names without a state cache.
+   */
+  public function testGetPathNamesWithoutStateCache(): void {
+    vfsStream::setup('drupal_root');
+    vfsStream::create([
+      'example' => [
+        'test_name' => [
+          'test_name.info.yml' => Yaml::encode([
+            'name' => 'test name',
+            'type' => 'test_extension',
+            'core' => '8.x',
+          ]),
+        ],
+      ],
+    ]);
+
+    [$cache, $info_parser, $module_handler, $state] = $this->getMocks();
+    $state->get(Argument::cetera())->shouldNotBeCalled();
+    $state->set(Argument::cetera())->shouldNotBeCalled();
+    $state->delete(Argument::cetera())->shouldNotBeCalled();
+    $info_parser->parse(Argument::any())->willReturn([]);
+
+    $test_extension_list = new TestExtensionWithoutPathNamesStateCache('vfs://drupal_root', 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), $state->reveal(), 'testing');
+    $extension_discovery = $this->prophesize(ExtensionDiscovery::class);
+    $extension_discovery->scan('test_extension')->willReturn([
+      'test_name' => new Extension('vfs://drupal_root', 'test_extension', 'example/test_name/test_name.info.yml'),
+    ]);
+    $test_extension_list->setExtensionDiscovery($extension_discovery->reveal());
+
+    $this->assertSame(['test_name' => 'example/test_name/test_name.info.yml'], $test_extension_list->getPathNames());
+    $test_extension_list->reset();
+  }
+
+  /**
    * Tests get pathname.
    */
   public function testGetPathname(): void {
@@ -392,6 +426,20 @@ class TestExtension extends ExtensionList {
    */
   protected function getExtensionDiscovery() {
     return $this->extensionDiscovery ?: parent::getExtensionDiscovery();
+  }
+
+}
+
+/**
+ * Stub class for testing ExtensionList without a state path names cache.
+ */
+class TestExtensionWithoutPathNamesStateCache extends TestExtension {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getPathNamesCacheId() {
+    return NULL;
   }
 
 }

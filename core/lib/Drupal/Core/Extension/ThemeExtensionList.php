@@ -97,6 +97,13 @@ class ThemeExtensionList extends ExtensionList {
   /**
    * {@inheritdoc}
    */
+  protected function getPathNamesCacheId() {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function doList() {
     // Find themes.
     $themes = parent::doList();

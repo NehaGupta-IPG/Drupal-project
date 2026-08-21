@@ -170,12 +170,14 @@ abstract class ExtensionList {
     $this->cache->delete($this->getInfoCacheId());
     $this->pathNames = NULL;
 
-    try {
-      $this->state->delete($this->getPathNamesCacheId());
-    }
-    catch (DatabaseExceptionWrapper) {
-      // Ignore exceptions caused by a non existing {key_value} table in the
-      // early installer.
+    if ($cache_id = $this->getPathNamesCacheId()) {
+      try {
+        $this->state->delete($cache_id);
+      }
+      catch (DatabaseExceptionWrapper) {
+        // Ignore exceptions caused by a non existing {key_value} table in the
+        // early installer.
+      }
     }
 
     return $this;
@@ -204,8 +206,8 @@ abstract class ExtensionList {
   /**
    * Returns the extension filenames cache ID.
    *
-   * @return string
-   *   The filename cache ID.
+   * @return string|null
+   *   The filename cache ID, or NULL when path names are not cached in state.
    */
   protected function getPathNamesCacheId() {
     return "system.{$this->type}.files";
@@ -438,13 +440,17 @@ abstract class ExtensionList {
   public function getPathNames() {
     if ($this->pathNames === NULL) {
       $cache_id = $this->getPathNamesCacheId();
-      $this->pathNames = $this->state->get($cache_id);
+      if ($cache_id) {
+        $this->pathNames = $this->state->get($cache_id);
+      }
 
       if ($this->pathNames === NULL) {
         $this->pathNames = $this->recalculatePathNames();
-        // Store filenames to allow static::getPathname() to retrieve them
-        // without having to rebuild or scan the filesystem.
-        $this->state->set($cache_id, $this->pathNames);
+        if ($cache_id) {
+          // Store filenames to allow static::getPathname() to retrieve them
+          // without having to rebuild or scan the filesystem.
+          $this->state->set($cache_id, $this->pathNames);
+        }
       }
     }
     return $this->pathNames;

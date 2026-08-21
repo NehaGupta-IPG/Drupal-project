@@ -85,6 +85,13 @@ class ModuleExtensionList extends ExtensionList {
   /**
    * {@inheritdoc}
    */
+  protected function getPathNamesCacheId() {
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getExtensionDiscovery() {
     $discovery = parent::getExtensionDiscovery();
 
