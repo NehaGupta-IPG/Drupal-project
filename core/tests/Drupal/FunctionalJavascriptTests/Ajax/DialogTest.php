@@ -263,4 +263,106 @@ class DialogTest extends WebDriverTestBase {
     $this->assertSame(808, $width);
   }
 
+  /**
+   * Tests checkbox controls textfield visibility in dialog forms.
+   */
+  public function testDialogCheckbox(): void {
+    $this->drupalGet('ajax-test/dialog');
+    $page = $this->getSession()->getPage();
+
+    // Open the form in a modal dialog.
+    $page->clickLink('Link 5 (form)');
+
+    // Wait for dialog to open.
+    $this->assertSession()->waitForElementVisible('css', '.ui-dialog');
+
+    // Find the trigger checkbox and conditional textfield.
+    $trigger = $page->findField('trigger_checkbox');
+    $this->assertNotNull($trigger, 'Trigger checkbox found in dialog');
+    $this->assertFalse($trigger->isChecked(), 'Checkbox is initially unchecked');
+
+    $conditional_field = $page->findField('conditional_textfield');
+    $this->assertNotNull($conditional_field, 'Conditional textfield found in dialog');
+
+    // Check the checkbox to show the conditional textfield.
+    $trigger->check();
+    $this->getSession()->wait(500);
+    $this->assertTrue($conditional_field->isVisible(), 'Conditional textfield is visible when checkbox is checked');
+
+    // Uncheck to hide the textfield.
+    $trigger->uncheck();
+    $this->getSession()->wait(500);
+    $this->assertFalse($conditional_field->isVisible(), 'Conditional textfield is hidden when checkbox is unchecked');
+  }
+
+  /**
+   * Tests #states initial sync when dialog opens.
+   */
+  public function testDialogButtonInitialState(): void {
+    $this->drupalGet('ajax-test/dialog');
+    $page = $this->getSession()->getPage();
+    $page->clickLink('Link 5 (form)');
+
+    $dialog = $this->assertSession()->waitForElementVisible('css', '.ui-dialog');
+    $conditional_field = $page->findField('conditional_textfield');
+    $trigger = $page->findField('trigger_checkbox');
+
+    // Verify initial state sync.
+    $this->assertFalse($conditional_field->isVisible());
+
+    // Verify state changes work.
+    $trigger->check();
+    $this->getSession()->wait(500);
+    $this->assertTrue($conditional_field->isVisible());
+
+    // Verify buttons are properly rendered.
+    $buttons = $dialog->find('css', '.ui-dialog-buttonpane')->findAll('css', 'button');
+    $this->assertGreaterThanOrEqual(3, count($buttons));
+  }
+
+  /**
+   * Tests #states conditions on dialog buttons matching issue #3008172.
+   *
+   * Verifies that #states on form-actions containers and form elements
+   * are properly synchronized to dialog buttons.
+   */
+  public function testDialogButtonStatesInvisible(): void {
+    $this->drupalGet('ajax-test/dialog');
+    $page = $this->getSession()->getPage();
+    $page->clickLink('Link 9 (button states form)');
+
+    $dialog = $this->assertSession()->waitForElementVisible('css', '.ui-dialog');
+    $send_button = $dialog->find('css', '.ui-dialog-buttonpane button');
+    $subject_field = $page->findField('subject');
+    $name_field = $page->findField('name');
+
+    // Verify initial state.
+    $this->assertTrue($send_button->isVisible());
+    $this->assertFalse($subject_field->isVisible());
+
+    // Subject field visible when name = "Admin".
+    $name_field->setValue('Admin');
+    $this->getSession()->wait(700);
+    $this->assertTrue($subject_field->isVisible());
+    $this->assertTrue($send_button->isVisible());
+
+    // Button hidden when name = "Hide Button".
+    $name_field->setValue('Hide Button');
+    $this->getSession()->wait(700);
+    $this->assertFalse($send_button->isVisible());
+    $this->assertFalse($subject_field->isVisible());
+
+    // Reset to initial state.
+    $name_field->setValue('');
+    $this->getSession()->wait(700);
+    $this->assertTrue($send_button->isVisible());
+    $this->assertFalse($subject_field->isVisible());
+
+    // Default behavior with other values.
+    $name_field->setValue('John Doe');
+    $this->getSession()->wait(700);
+    $this->assertTrue($send_button->isVisible());
+    $this->assertFalse($subject_field->isVisible());
+  }
+
 }

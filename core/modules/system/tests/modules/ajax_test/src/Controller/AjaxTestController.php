@@ -334,6 +334,14 @@ class AjaxTestController {
             ]),
           ],
         ],
+        'link9' => [
+          'title' => 'Link 9 (button states form)',
+          'url' => Url::fromRoute('ajax_test.dialog_button_states_form'),
+          'attributes' => [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+          ],
+        ],
       ],
     ];
 

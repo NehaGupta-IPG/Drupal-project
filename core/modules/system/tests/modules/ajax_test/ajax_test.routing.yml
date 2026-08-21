@@ -22,6 +22,14 @@ ajax_test.dialog_form:
   requirements:
     _access: 'TRUE'
 
+ajax_test.dialog_button_states_form:
+  path: '/ajax-test/dialog-button-states-form'
+  defaults:
+    _title: 'Button States Form'
+    _form: '\Drupal\ajax_test\Form\AjaxTestButtonStatesForm'
+  requirements:
+    _access: 'TRUE'
+
 ajax_test.dialog:
   path: '/ajax-test/dialog'
   defaults:

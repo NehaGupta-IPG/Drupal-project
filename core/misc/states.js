@@ -701,6 +701,7 @@
         .find(tagsSupportDisable)
         .addBack(tagsSupportDisable)
         .prop('disabled', e.value);
+      // Dialog button state sync is now handled by MutationObserver in dialog.ajax.js
     }
   });
 
@@ -746,6 +747,7 @@
         $element = $(e.target);
       }
       $element.toggle(e.value);
+      // Dialog button state sync is now handled by MutationObserver in dialog.ajax.js
     }
   });
 

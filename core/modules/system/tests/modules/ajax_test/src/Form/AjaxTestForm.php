@@ -61,6 +61,29 @@ class AjaxTestForm extends FormBase {
         'event' => 'click',
       ],
     ];
+
+    $form['fieldset'] = [
+      '#type' => 'container',
+      '#weight' => 1000,
+    ];
+
+    $form['fieldset']['trigger_checkbox'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show additional field'),
+      '#attributes' => ['tabindex' => '-1'],
+    ];
+
+    $form['fieldset']['conditional_textfield'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Conditional field'),
+      '#states' => [
+        'visible' => [
+          ':input[name="trigger_checkbox"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#attributes' => ['tabindex' => '-1'],
+    ];
+
     return $form;
   }
 
