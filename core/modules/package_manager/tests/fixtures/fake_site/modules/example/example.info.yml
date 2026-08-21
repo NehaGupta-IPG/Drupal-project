@@ -1,3 +1,4 @@
 # This file should be staged.
 name: Example
 type: module
+core_version_requirement: '*'
