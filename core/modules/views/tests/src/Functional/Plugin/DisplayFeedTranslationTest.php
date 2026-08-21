@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Functional\Plugin;
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\Tests\WaitTerminateTestTrait;
@@ -25,6 +26,7 @@ class DisplayFeedTranslationTest extends ViewTestBase {
 
   use ContentTranslationTestTrait;
   use PathAliasTestTrait;
+  use PromotedContentViewTestTrait;
   use WaitTerminateTestTrait;
 
   /**
@@ -138,20 +140,26 @@ class DisplayFeedTranslationTest extends ViewTestBase {
    * Tests that rendered node content is in current language.
    */
   public function testFeedTranslation(): void {
+    $this->enablePromotedContentView();
+
     $node = $this->drupalCreateNode([
       'type' => 'page',
       'title' => 'Something in English',
       'langcode' => 'en',
+      'promote' => 1,
     ]);
 
     $es_translation = $node->addTranslation('es');
     $es_translation->set('title', 'Algo en Español');
     $es_translation->set('body', [['value' => 'Algo en Español']]);
+    $es_translation->set('promote', 1);
     $es_translation->save();
 
     // Visit the page in english and assert title in English language.
     $this->drupalGet('rss.xml');
+    $this->assertSession()->statusCodeEquals(200);
     $items = $this->getSession()->getDriver()->find('//channel/item');
+    $this->assertCount(1, $items, 'One rss item for the english request.');
     foreach ($items as $item) {
       $title_element = $item->findAll('xpath', 'title');
       $this->assertEquals('Something in English', $title_element[0]->getText());
@@ -159,6 +167,9 @@ class DisplayFeedTranslationTest extends ViewTestBase {
 
     // Visit the page in spanish and assert title in Spanish language.
     $this->drupalGet('es/rss.xml');
+    $this->assertSession()->statusCodeEquals(200);
+    $items = $this->getSession()->getDriver()->find('//channel/item');
+    $this->assertCount(1, $items, 'One rss item for the spanish request.');
     foreach ($items as $item) {
       $title_element = $item->findAll('xpath', 'title');
       $this->assertEquals('Algo en Español', $title_element[0]->getText());
