@@ -66,7 +66,7 @@ class RoutePathGenerationTraitTest extends UnitTestCase {
    */
   #[DataProvider('providerTestCsrfTokenCompleteLifeCycle')]
   public function testCsrfTokenCompleteLifeCycle(array $params): void {
-    $route = new Route('test/example/{param}', [], ['_csrf_token' => TRUE]);
+    $route = new Route('test/example/{param}', [], ['_csrf_token' => 'TRUE']);
 
     // Process the route so the "token" param is generated.
     $routeParams = $params;
