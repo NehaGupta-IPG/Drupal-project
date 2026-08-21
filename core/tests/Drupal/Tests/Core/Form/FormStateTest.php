@@ -24,11 +24,9 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests the getRedirect() method.
-   *
-   * @legacy-covers ::getRedirect
    */
   #[DataProvider('providerTestGetRedirect')]
-  public function testGetRedirect($form_state_additions, $expected): void {
+  public function testGetRedirect(array $form_state_additions, $expected): void {
     $form_state = (new FormState())->setFormState($form_state_additions);
     $redirect = $form_state->getRedirect();
     $this->assertEquals($expected, $redirect);
@@ -58,8 +56,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests the setError() method.
-   *
-   * @legacy-covers ::setError
    */
   public function testSetError(): void {
     $form_state = new FormState();
@@ -70,11 +66,9 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests the getError() method.
-   *
-   * @legacy-covers ::getError
    */
   #[DataProvider('providerTestGetError')]
-  public function testGetError($errors, $parents, $error = NULL): void {
+  public function testGetError(array $errors, array $parents, ?string $error = NULL): void {
     $element['#parents'] = $parents;
     $form_state = (new FormState())->setFormState([
       'errors' => $errors,
@@ -99,11 +93,9 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests set error by name.
-   *
-   * @legacy-covers ::setErrorByName
    */
   #[DataProvider('providerTestSetErrorByName')]
-  public function testSetErrorByName($limit_validation_errors, $expected_errors): void {
+  public function testSetErrorByName(?array $limit_validation_errors, array $expected_errors): void {
     $form_state = new FormState();
     $form_state->setLimitValidationErrors($limit_validation_errors);
     $form_state->clearErrors();
@@ -137,14 +129,12 @@ class FormStateTest extends UnitTestCase {
     $form_state = new FormState();
     $form_state->setValidationComplete();
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Form errors cannot be set after form validation has finished.');
+    $this->expectExceptionMessageIs('Form errors cannot be set after form validation has finished.');
     $form_state->setErrorByName('test', 'message');
   }
 
   /**
    * Tests prepare callback valid method.
-   *
-   * @legacy-covers ::prepareCallback
    */
   public function testPrepareCallbackValidMethod(): void {
     $form_state = new FormState();
@@ -155,8 +145,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests prepare callback in valid method.
-   *
-   * @legacy-covers ::prepareCallback
    */
   public function testPrepareCallbackInValidMethod(): void {
     $form_state = new FormState();
@@ -168,8 +156,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests prepare callback array.
-   *
-   * @legacy-covers ::prepareCallback
    */
   public function testPrepareCallbackArray(): void {
     $form_state = new FormState();
@@ -181,8 +167,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests load include.
-   *
-   * @legacy-covers ::loadInclude
    */
   public function testLoadInclude(): void {
     $type = 'some_type';
@@ -200,8 +184,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests load include no name.
-   *
-   * @legacy-covers ::loadInclude
    */
   public function testLoadIncludeNoName(): void {
     $type = 'some_type';
@@ -218,8 +200,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests load include not found.
-   *
-   * @legacy-covers ::loadInclude
    */
   public function testLoadIncludeNotFound(): void {
     $type = 'some_type';
@@ -236,8 +216,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests load include already loaded.
-   *
-   * @legacy-covers ::loadInclude
    */
   public function testLoadIncludeAlreadyLoaded(): void {
     $type = 'some_type';
@@ -262,8 +240,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests is cached.
-   *
-   * @legacy-covers ::isCached
    */
   #[DataProvider('providerTestIsCached')]
   public function testIsCached($cache_key, $no_cache_key, $expected): void {
@@ -319,8 +295,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests set cached post.
-   *
-   * @legacy-covers ::setCached
    */
   public function testSetCachedPost(): void {
     $form_state = new FormState();
@@ -331,14 +305,12 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests set cached get.
-   *
-   * @legacy-covers ::setCached
    */
   public function testSetCachedGet(): void {
     $form_state = new FormState();
     $form_state->setRequestMethod('GET');
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Form state caching on GET requests is not allowed.');
+    $this->expectExceptionMessageIs('Form state caching on GET requests is not allowed.');
     $form_state->setCached();
   }
 
@@ -403,8 +375,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests get clean value keys.
-   *
-   * @legacy-covers ::getCleanValueKeys
    */
   public function testGetCleanValueKeys(): void {
     $form_state = new FormState();
@@ -413,8 +383,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests set clean value keys.
-   *
-   * @legacy-covers ::setCleanValueKeys
    */
   public function testSetCleanValueKeys(): void {
     $form_state = new FormState();
@@ -424,8 +392,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests add clean value key.
-   *
-   * @legacy-covers ::addCleanValueKey
    */
   public function testAddCleanValueKey(): FormState {
     $form_state = new FormState();
@@ -440,8 +406,6 @@ class FormStateTest extends UnitTestCase {
 
   /**
    * Tests clean values.
-   *
-   * @legacy-covers ::cleanValues
    */
   #[Depends('testAddCleanValueKey')]
   public function testCleanValues($form_state): void {

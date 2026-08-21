@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel;
 
+use Drupal\Core\Entity\EntityInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -15,19 +16,19 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class FieldValidationTest extends FieldKernelTestBase {
 
   /**
-   * @var string
+   * The entity type.
    */
-  private $entityType;
+  private string $entityType;
 
   /**
-   * @var string
+   * The bundle.
    */
-  private $bundle;
+  private string $bundle;
 
   /**
-   * @var \Drupal\Core\Entity\EntityInterface
+   * The test entity.
    */
-  private $entity;
+  private EntityInterface $entity;
 
   /**
    * {@inheritdoc}

@@ -87,10 +87,10 @@ class ReflectionFactoryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::createInstance
+   * Tests create instance.
    */
   #[DataProvider('providerGetInstanceArguments')]
-  public function testCreateInstance($expected, $reflector_name, $plugin_id, $plugin_definition, $configuration): void {
+  public function testCreateInstance(array $expected, string $reflector_name, string $plugin_id, array $plugin_definition, array $configuration): void {
     // Create a mock DiscoveryInterface which can return our plugin definition.
     $mock_discovery = $this->getMockBuilder('Drupal\Component\Plugin\Discovery\DiscoveryInterface')
       ->onlyMethods(['getDefinition', 'getDefinitions', 'hasDefinition'])
@@ -112,13 +112,11 @@ class ReflectionFactoryTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getInstanceArguments
+   * Tests get instance arguments.
    */
   #[DataProvider('providerGetInstanceArguments')]
-  public function testGetInstanceArguments($expected, $reflector_name, $plugin_id, $plugin_definition, $configuration): void {
-    $reflection_factory = $this->getMockBuilder('Drupal\Component\Plugin\Factory\ReflectionFactory')
-      ->disableOriginalConstructor()
-      ->getMock();
+  public function testGetInstanceArguments(array $expected, string $reflector_name, string $plugin_id, array $plugin_definition, array $configuration): void {
+    $reflection_factory = $this->createStub(ReflectionFactory::class);
     $get_instance_arguments_ref = new \ReflectionMethod($reflection_factory, 'getInstanceArguments');
 
     // Special case for plugin class without a constructor.

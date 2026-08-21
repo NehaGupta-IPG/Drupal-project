@@ -30,29 +30,21 @@ class UploadedFileConstraintValidatorTest extends KernelTestBase {
 
   /**
    * The file name.
-   *
-   * @var string
    */
   protected string $filename;
 
   /**
    * The temporary file path.
-   *
-   * @var string
    */
   protected string $path;
 
   /**
    * The max 4 MB filesize to use for testing.
-   *
-   * @var int
    */
   protected int $maxSize = 4194304;
 
   /**
    * A validator.
-   *
-   * @var \Symfony\Component\Validator\Validator\ValidatorInterface
    */
   private ValidatorInterface $validator;
 
@@ -71,8 +63,6 @@ class UploadedFileConstraintValidatorTest extends KernelTestBase {
 
   /**
    * Tests validate success.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidateSuccess(): void {
     $uploadedFile = new FormUploadedFile(new UploadedFile(
@@ -86,8 +76,6 @@ class UploadedFileConstraintValidatorTest extends KernelTestBase {
 
   /**
    * Tests validate fail.
-   *
-   * @legacy-covers ::validate
    */
   #[DataProvider('validateProvider')]
   public function testValidateFail(int $errorCode, string $message): void {

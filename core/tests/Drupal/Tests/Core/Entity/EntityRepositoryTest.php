@@ -66,8 +66,6 @@ class EntityRepositoryTest extends UnitTestCase {
 
   /**
    * Tests the getTranslationFromContext() method.
-   *
-   * @legacy-covers ::getTranslationFromContext
    */
   public function testGetTranslationFromContext(): void {
     $language = new Language(['id' => 'en']);
@@ -75,7 +73,7 @@ class EntityRepositoryTest extends UnitTestCase {
       ->willReturn($language)
       ->shouldBeCalledTimes(1);
     $this->languageManager->getFallbackCandidates(Argument::type('array'))
-      ->will(function ($args) {
+      ->will(function ($args): array {
         $context = $args[0];
         $candidates = [];
         if (!empty($context['langcode'])) {

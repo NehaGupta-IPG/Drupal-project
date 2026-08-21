@@ -25,7 +25,7 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
    * @legacy-covers ::processPlaceholders
    */
   #[DataProvider('providerProcessPlaceholders')]
-  public function testProcessPlaceholders($strategies, $placeholders, $result): void {
+  public function testProcessPlaceholders($strategies, array $placeholders, $result): void {
     $chained_placeholder_strategy = new ChainedPlaceholderStrategy();
 
     foreach ($strategies as $strategy) {
@@ -130,8 +130,6 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
 
   /**
    * Tests process placeholders no strategies.
-   *
-   * @legacy-covers ::processPlaceholders
    */
   public function testProcessPlaceholdersNoStrategies(): void {
     // Placeholders but no strategies defined.
@@ -141,14 +139,12 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
 
     $chained_placeholder_strategy = new ChainedPlaceholderStrategy();
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('At least one placeholder strategy must be present; by default the fallback strategy \Drupal\Core\Render\Placeholder\SingleFlushStrategy is always present.');
+    $this->expectExceptionMessageIs('At least one placeholder strategy must be present; by default the fallback strategy \Drupal\Core\Render\Placeholder\SingleFlushStrategy is always present.');
     $chained_placeholder_strategy->processPlaceholders($placeholders);
   }
 
   /**
    * Tests process placeholders with rogue placeholder strategy.
-   *
-   * @legacy-covers ::processPlaceholders
    */
   public function testProcessPlaceholdersWithRoguePlaceholderStrategy(): void {
     // Placeholders but no strategies defined.
@@ -168,7 +164,7 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
     $chained_placeholder_strategy = new ChainedPlaceholderStrategy();
     $chained_placeholder_strategy->addPlaceholderStrategy($rogue_strategy);
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('Processed placeholders must be a subset of all placeholders.');
+    $this->expectExceptionMessageIs('Processed placeholders must be a subset of all placeholders.');
     $chained_placeholder_strategy->processPlaceholders($placeholders);
   }
 

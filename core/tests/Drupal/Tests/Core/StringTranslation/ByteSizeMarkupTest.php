@@ -26,7 +26,8 @@ class ByteSizeMarkupTest extends UnitTestCase {
    * @legacy-covers ::create
    */
   #[DataProvider('providerTestCommonFormatSize')]
-  public function testCommonFormatSize($expected, $input, $precision = 2): void {
+<<<<<<< core/tests/Drupal/Tests/Core/StringTranslation/ByteSizeMarkupTest.php
+  public function testCommonFormatSize($string $expected, int|float $input, int $precision = 2): void {
     $size = ByteSizeMarkup::create($input, NULL, $this->getStringTranslationStub(), $precision);
     $this->assertInstanceOf(TranslatableMarkup::class, $size);
     $this->assertEquals($expected, $size);

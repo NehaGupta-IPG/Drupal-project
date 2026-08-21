@@ -30,8 +30,6 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
    *   The installed version core version to set.
    * @param string[] $expected_versions
    *   The expected versions.
-   *
-   * @legacy-covers ::getInstallableReleases
    */
   #[DataProvider('providerGetInstallableReleases')]
   public function testGetInstallableReleases(string $fixture, string $installed_version, array $expected_versions): void {
@@ -195,7 +193,7 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
     $this->setReleaseMetadata(['drupal' => __DIR__ . '/../../fixtures/release-history/drupal.9.8.2_unknown_status.xml']);
     $project_info = new ProjectInfo('drupal');
     $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage("The project 'drupal' can not be updated because its status is any status besides published");
+    $this->expectExceptionMessageIs("The project 'drupal' can not be updated because its status is any status besides published");
     $project_info->getInstallableReleases();
   }
 
@@ -298,8 +296,6 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
    *   The path of the release metadata.
    * @param string[] $expected_supported_branches
    *   The expected supported branches.
-   *
-   * @legacy-covers ::getSupportedBranches
    */
   #[DataProvider('providerGetSupportedBranches')]
   public function testGetSupportedBranches(string $release_xml, array $expected_supported_branches): void {

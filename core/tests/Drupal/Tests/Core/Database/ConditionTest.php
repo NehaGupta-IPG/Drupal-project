@@ -10,12 +10,10 @@ use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Tests\Core\Database\Stub\StubCondition;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
-use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use Prophecy\Argument;
 
 /**
  * Tests Drupal\Core\Database\Query\Condition.
@@ -44,19 +42,18 @@ class ConditionTest extends UnitTestCase {
    * @legacy-covers ::compile
    */
   #[DataProvider('providerSimpleCondition')]
-  public function testSimpleCondition($expected, $field_name): void {
-    $connection = $this->prophesize(Connection::class);
-    $connection->escapeField($field_name)->will(function ($args) {
-      return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
+  public function testSimpleCondition(string $expected, string $field_name): void {
+    $connection = $this->createStub(Connection::class);
+    $connection->method('escapeField')->willReturnCallback(function (string $field): string|array|null {
+      return preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
     });
-    $connection->mapConditionOperator('=')->willReturn(['operator' => '=']);
-    $connection->condition('AND')->willReturn(new Condition('AND'));
-    $connection = $connection->reveal();
+    $connection->method('mapConditionOperator')->willReturn(['operator' => '=']);
+    $connection->method('condition')->willReturn(new Condition('AND'));
 
     $query_placeholder = $this->prophesize(PlaceholderInterface::class);
 
     $counter = 0;
-    $query_placeholder->nextPlaceholder()->will(function () use (&$counter) {
+    $query_placeholder->nextPlaceholder()->will(function () use (&$counter): int {
       return $counter++;
     });
     $query_placeholder->uniqueIdentifier()->willReturn(4);
@@ -83,23 +80,20 @@ class ConditionTest extends UnitTestCase {
    *   The operator to pass into the condition() method.
    * @param mixed $expected_arguments
    *   (optional) The expected set arguments.
-   *
-   * @legacy-covers ::compile
    */
   #[DataProvider('dataProviderTestCompileWithKnownOperators')]
   public function testCompileWithKnownOperators($expected, $field, $value, $operator, $expected_arguments = NULL): void {
-    $connection = $this->prophesize(Connection::class);
-    $connection->escapeField(Argument::any())->will(function ($args) {
-      return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
+    $connection = $this->createStub(Connection::class);
+    $connection->method('escapeField')->willReturnCallback(function (string $field): string|array|null {
+      return preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
     });
-    $connection->mapConditionOperator(Argument::any())->willReturn(NULL);
-    $connection->condition('AND')->willReturn(new Condition('AND'));
-    $connection = $connection->reveal();
+    $connection->method('mapConditionOperator')->willReturn(NULL);
+    $connection->method('condition')->willReturn(new Condition('AND'));
 
     $query_placeholder = $this->prophesize(PlaceholderInterface::class);
 
     $counter = 0;
-    $query_placeholder->nextPlaceholder()->will(function () use (&$counter) {
+    $query_placeholder->nextPlaceholder()->will(function () use (&$counter): int {
       return $counter++;
     });
     $query_placeholder->uniqueIdentifier()->willReturn(4);
@@ -188,23 +182,20 @@ class ConditionTest extends UnitTestCase {
 
   /**
    * Tests compile with sql injection for operator.
-   *
-   * @legacy-covers ::compile
    */
   #[DataProvider('providerTestCompileWithSqlInjectionForOperator')]
   public function testCompileWithSqlInjectionForOperator($operator): void {
-    $connection = $this->prophesize(Connection::class);
-    $connection->escapeField(Argument::any())->will(function ($args) {
-      return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
+    $connection = $this->createStub(Connection::class);
+    $connection->method('escapeField')->willReturnCallback(function (string $field): string|array|null {
+      return preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
     });
-    $connection->mapConditionOperator(Argument::any())->willReturn(NULL);
-    $connection->condition('AND')->willReturn(new Condition('AND'));
-    $connection = $connection->reveal();
+    $connection->method('mapConditionOperator')->willReturn(NULL);
+    $connection->method('condition')->willReturn(new Condition('AND'));
 
     $query_placeholder = $this->prophesize(PlaceholderInterface::class);
 
     $counter = 0;
-    $query_placeholder->nextPlaceholder()->will(function () use (&$counter) {
+    $query_placeholder->nextPlaceholder()->will(function () use (&$counter): int {
       return $counter++;
     });
     $query_placeholder->uniqueIdentifier()->willReturn(4);
@@ -213,7 +204,7 @@ class ConditionTest extends UnitTestCase {
     $condition = $connection->condition('AND');
     $condition->condition('name', 'value', $operator);
     $this->expectException(InvalidQueryException::class);
-    $this->expectExceptionMessage('Invalid characters in query operator:');
+    $this->expectExceptionMessageIsOrContains('Invalid characters in query operator:');
     $condition->compile($connection, $query_placeholder);
   }
 
@@ -234,7 +225,7 @@ class ConditionTest extends UnitTestCase {
    * Tests that the core Condition can be overridden.
    */
   public function testContribCondition(): void {
-    $connection = new StubConnection($this->createMock(StubPDO::class), [
+    $connection = new StubConnection($this->createStub(\PDO::class), [
       'namespace' => 'Drupal\mock\Driver\Database\mock',
       'prefix' => '',
     ]);

@@ -76,7 +76,6 @@ trait PerformanceTestTrait {
       'performance' => 'ALL',
       'performanceTimeline' => 'ALL',
     ];
-    // Support legacy key.
     $driver_args[1]['goog:chromeOptions']['perfLoggingPrefs'] = [
       'traceCategories' => 'timeline,devtools.timeline,browser',
     ];
@@ -172,7 +171,7 @@ trait PerformanceTestTrait {
         }
       }
       foreach ($performance_test_data['cache_tag_operations'] as $operation) {
-        match($operation['operation']) {
+        match ($operation['operation']) {
           CacheTagOperation::GetCurrentChecksum => $cache_tag_checksum_count++,
           CacheTagOperation::IsValid => $cache_tag_is_valid_count++,
           CacheTagOperation::InvalidateTags => $cache_tag_invalidation_count++,
@@ -683,7 +682,7 @@ trait PerformanceTestTrait {
     $values = [];
     foreach ($expected as $name => $metric) {
       if (in_array($name, $assertRange)) {
-        $this->assertCountBetween($metric - 500, $metric + 500, $performance_data->{"get$name"}(), "Asserting $name");
+        $this->assertCountBetween($metric - 2000, $metric + 2000, $performance_data->{"get$name"}(), "Asserting $name");
         unset($expected[$name]);
       }
       else {

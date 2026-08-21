@@ -63,8 +63,13 @@ class RegisterForm extends AccountForm {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $admin = $form_state->getValue('administer_users');
+    $notify = !$form_state->isValueEmpty('notify');
 
-    if (!\Drupal::config('user.settings')->get('verify_mail') || $admin) {
+    // Use the submitted password only when the password field is accessible:
+    // either self-registration with email verification disabled, or admin
+    // creation without the notification checkbox. In all other cases, generate
+    // a random password so the user must set their own via email.
+    if (($admin && !$notify) || !\Drupal::config('user.settings')->get('verify_mail')) {
       $pass = $form_state->getValue('pass');
     }
     else {
@@ -85,7 +90,6 @@ class RegisterForm extends AccountForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $account = $this->entity;
-    $pass = $account->getPassword();
     $admin = $form_state->getValue('administer_users');
     $notify = !$form_state->isValueEmpty('notify');
 
@@ -96,14 +100,21 @@ class RegisterForm extends AccountForm {
     $form_state->set('user', $account);
     $form_state->setValue('uid', $account->id());
 
-    $this->logger('user')->info('New user: %name %email.', ['%name' => $form_state->getValue('name'), '%email' => '<' . $form_state->getValue('mail') . '>', 'type' => $account->toLink($this->t('Edit'), 'edit-form')->toString()]);
-
-    // Add plain text password into user account to generate mail tokens.
-    $account->password = $pass;
+    $this->logger('user')
+      ->info('New user: %name %email.', [
+        '%name' => $form_state->getValue('name'),
+        '%email' => '<' . $form_state->getValue('mail') . '>',
+        'type' => $account->toLink($this->t('Edit'), 'edit-form')->toString(),
+      ]);
 
     // New administrative account without notification.
     if ($admin && !$notify) {
-      $this->messenger()->addStatus($this->t('Created a new user account for <a href=":url">%name</a>. No email has been sent.', [':url' => $account->toUrl()->toString(), '%name' => $account->getAccountName()]));
+      $this->messenger()
+        ->addStatus($this->t('Created a new user account for <a href=":url">%name</a>. No email has been sent.', [
+          ':url' => $account->toUrl()
+            ->toString(),
+          '%name' => $account->getAccountName(),
+        ]));
     }
     // No email verification required; log in user immediately.
     elseif (!$admin && !\Drupal::config('user.settings')->get('verify_mail') && $account->isActive()) {
@@ -115,13 +126,23 @@ class RegisterForm extends AccountForm {
     // No administrator approval required.
     elseif ($account->isActive() || $notify) {
       if (!$account->getEmail() && $notify) {
-        $this->messenger()->addStatus($this->t('The new user <a href=":url">%name</a> was created without an email address, so no welcome message was sent.', [':url' => $account->toUrl()->toString(), '%name' => $account->getAccountName()]));
+        $this->messenger()
+          ->addStatus($this->t('The new user <a href=":url">%name</a> was created without an email address, so no welcome message was sent.', [
+            ':url' => $account->toUrl()
+              ->toString(),
+            '%name' => $account->getAccountName(),
+          ]));
       }
       else {
         $op = $notify ? 'register_admin_created' : 'register_no_approval_required';
         if (_user_mail_notify($op, $account)) {
           if ($notify) {
-            $this->messenger()->addStatus($this->t('A welcome message with further instructions has been emailed to the new user <a href=":url">%name</a>.', [':url' => $account->toUrl()->toString(), '%name' => $account->getAccountName()]));
+            $this->messenger()
+              ->addStatus($this->t('A welcome message with further instructions has been emailed to the new user <a href=":url">%name</a>.', [
+                ':url' => $account->toUrl()
+                  ->toString(),
+                '%name' => $account->getAccountName(),
+              ]));
           }
           else {
             $this->messenger()->addStatus($this->t('A welcome message with further instructions has been sent to your email address.'));

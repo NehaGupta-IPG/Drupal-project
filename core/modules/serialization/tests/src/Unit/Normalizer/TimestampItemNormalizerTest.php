@@ -36,13 +36,6 @@ class TimestampItemNormalizerTest extends UnitTestCase {
   protected $normalizer;
 
   /**
-   * The test TimestampItem.
-   *
-   * @var \Drupal\Core\Field\Plugin\Field\FieldType\TimestampItem
-   */
-  protected $item;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -53,8 +46,6 @@ class TimestampItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests supports normalization.
-   *
-   * @legacy-covers ::supportsNormalization
    */
   public function testSupportsNormalization(): void {
     $timestamp_item = $this->createTimestampItemProphecy();
@@ -66,8 +57,6 @@ class TimestampItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests supports denormalization.
-   *
-   * @legacy-covers ::supportsDenormalization
    */
   public function testSupportsDenormalization(): void {
     $timestamp_item = $this->createTimestampItemProphecy();
@@ -85,7 +74,6 @@ class TimestampItemNormalizerTest extends UnitTestCase {
    * Tests normalize.
    *
    * @see \Drupal\Tests\serialization\Unit\Normalizer\TimestampNormalizerTest
-   * @legacy-covers ::normalize
    */
   public function testNormalize(): void {
     // Mock TimestampItem @FieldType, which contains a Timestamp @DataType,
@@ -122,8 +110,6 @@ class TimestampItemNormalizerTest extends UnitTestCase {
 
   /**
    * Tests denormalize.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalize(): void {
     $timestamp_item_normalization = [

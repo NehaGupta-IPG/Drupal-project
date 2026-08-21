@@ -74,8 +74,6 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
 
   /**
    * Tests the convert() method.
-   *
-   * @legacy-covers ::convert
    */
   #[DataProvider('providerTestConvert')]
   public function testConvert($value, array $definition, array $defaults, $expected_result): void {
@@ -124,8 +122,6 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
 
   /**
    * Tests the convert() method with an invalid entity type ID.
-   *
-   * @legacy-covers ::convert
    */
   public function testConvertWithInvalidEntityType(): void {
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
@@ -139,23 +135,19 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
 
   /**
    * Tests the convert() method with an invalid dynamic entity type ID.
-   *
-   * @legacy-covers ::convert
    */
   public function testConvertWithInvalidType(): void {
     $this->expectException(ParamNotConvertedException::class);
-    $this->expectExceptionMessage('The type definition "entity_revision_{entity_type_id}" is invalid. The expected format is "entity_revision:<entity_type_id>".');
+    $this->expectExceptionMessageIs('The type definition "entity_revision_{entity_type_id}" is invalid. The expected format is "entity_revision:<entity_type_id>".');
     $this->converter->convert('valid_id', ['type' => 'entity_revision_{entity_type_id}'], 'foo', ['foo' => 'valid_id']);
   }
 
   /**
    * Tests the convert() method with an invalid dynamic entity type ID.
-   *
-   * @legacy-covers ::convert
    */
   public function testConvertWithInvalidDynamicEntityType(): void {
     $this->expectException(ParamNotConvertedException::class);
-    $this->expectExceptionMessage('The "foo" parameter was not converted because the "invalid_entity_type_id" parameter is missing.');
+    $this->expectExceptionMessageIs('The "foo" parameter was not converted because the "invalid_entity_type_id" parameter is missing.');
     $this->converter->convert('valid_id', ['type' => 'entity_revision:{invalid_entity_type_id}'], 'foo', ['foo' => 'valid_id']);
   }
 

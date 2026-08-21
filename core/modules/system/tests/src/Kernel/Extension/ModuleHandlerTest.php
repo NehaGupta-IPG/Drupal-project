@@ -7,11 +7,10 @@ namespace Drupal\Tests\system\Kernel\Extension;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleUninstallValidatorException;
-use Drupal\Core\Extension\ProfileExtensionList;
+use Drupal\Core\Extension\ModuleWeight;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -45,7 +44,7 @@ class ModuleHandlerTest extends KernelTestBase {
     $this->assertModuleList($module_list, 'After adding a module');
 
     // Try to mess with the module weights.
-    module_set_weight('dependency_foo_test', 20);
+    \Drupal::service(ModuleWeight::class)->set('dependency_foo_test', 20);
 
     // Move dependency_foo_test to the end of the array.
     unset($module_list[array_search('dependency_foo_test', $module_list)]);
@@ -175,14 +174,6 @@ class ModuleHandlerTest extends KernelTestBase {
     $dependency = 'dblog';
     $non_dependency = 'dependency_foo_test';
     $this->setInstallProfile($profile);
-    // Prime the \Drupal\Core\Extension\ExtensionList::getPathname() static
-    // cache with the location of the testing_install_profile_dependencies
-    // profile as it is not the currently active profile and we don't yet have
-    // any cached way to retrieve its location.
-    // @todo Remove as part of https://www.drupal.org/node/2186491
-    $profile_list = \Drupal::service('extension.list.profile');
-    assert($profile_list instanceof ProfileExtensionList);
-    $profile_list->setPathname($profile, 'core/profiles/tests/' . $profile . '/' . $profile . '.info.yml');
     $this->enableModules(['module_test', $profile]);
 
     $data = \Drupal::service('extension.list.module')->reset()->getList();
@@ -234,14 +225,6 @@ class ModuleHandlerTest extends KernelTestBase {
     $profile = 'testing_install_profile_all_dependencies';
     $dependencies = ['dblog', 'dependency_foo_test'];
     $this->setInstallProfile($profile);
-    // Prime the \Drupal\Core\Extension\ExtensionList::getPathname() static
-    // cache with the location of the testing_install_profile_dependencies
-    // profile as it is not the currently active profile and we don't yet have
-    // any cached way to retrieve its location.
-    // @todo Remove as part of https://www.drupal.org/node/2186491
-    $profile_list = \Drupal::service('extension.list.profile');
-    assert($profile_list instanceof ProfileExtensionList);
-    $profile_list->setPathname($profile, 'core/profiles/tests/' . $profile . '/' . $profile . '.info.yml');
     $this->enableModules(['module_test', $profile]);
 
     $data = \Drupal::service('extension.list.module')->reset()->getList();
@@ -256,7 +239,7 @@ class ModuleHandlerTest extends KernelTestBase {
 
     // Try uninstalling the dependencies.
     $this->expectException(ModuleUninstallValidatorException::class);
-    $this->expectExceptionMessage("The following reasons prevent the modules from being uninstalled: The 'Testing install profile all dependencies' install profile requires 'Database Logging'; The 'Testing install profile all dependencies' install profile requires 'Dependency foo test module'");
+    $this->expectExceptionMessageIs("The following reasons prevent the modules from being uninstalled: The 'Testing install profile all dependencies' install profile requires 'Database Logging'; The 'Testing install profile all dependencies' install profile requires 'Dependency foo test module'");
     $this->moduleInstaller()->uninstall($dependencies);
   }
 
@@ -420,7 +403,7 @@ class ModuleHandlerTest extends KernelTestBase {
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
    *   The module handler service.
    */
-  protected function moduleHandler() {
+  protected function moduleHandler(): ?object {
     return $this->container->get('module_handler');
   }
 
@@ -430,28 +413,8 @@ class ModuleHandlerTest extends KernelTestBase {
    * @return \Drupal\Core\Extension\ModuleInstallerInterface
    *   The module installer service.
    */
-  protected function moduleInstaller() {
+  protected function moduleInstaller(): ?object {
     return $this->container->get('module_installer');
-  }
-
-  /**
-   * Tests autoloading .token and .view files.
-   */
-  #[IgnoreDeprecations]
-  public function testAutoloadHookInfoFiles(): void {
-    $this->expectDeprecation('Autoloading hooks in the file (core/modules/system/tests/modules/module_test/module_test.tokens.inc) is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Move the functions in this file to either the .module file or other appropriate location. See https://www.drupal.org/node/3489765');
-    $this->moduleInstaller()->install(['module_test']);
-    $testToken = [];
-    $testToken['types']['token_info_invoked'] = [
-      'name' => 'tokens.inc test',
-      'description' => 'tokens.inc test',
-    ];
-    $testToken['tokens']['token_info_invoked']['token_test_1'] = [
-      'type' => 'text',
-      'name' => 'tokens.inc test 1',
-    ];
-    $this->assertTrue($this->moduleHandler()->hasImplementations('token_info', ['module_test']));
-    $this->assertEquals($testToken, $this->moduleHandler()->invoke('module_test', 'token_info', []));
   }
 
 }

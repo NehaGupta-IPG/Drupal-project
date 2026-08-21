@@ -21,30 +21,22 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class LinkFormatterTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['link'];
 
   /**
    * The entity type used in this test.
-   *
-   * @var string
    */
   protected string $entityType = 'entity_test';
 
   /**
    * The bundle used in this test.
-   *
-   * @var string
    */
   protected string $bundle = 'entity_test';
 
   /**
    * The name of the field used in this test.
-   *
-   * @var string
    */
   protected string $fieldName = 'field_test';
 
@@ -94,6 +86,7 @@ class LinkFormatterTest extends EntityKernelTestBase {
    */
   #[DataProvider('providerLinkFormatter')]
   public function testLinkFormatter(string $formatter): void {
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->container->get('entity_type.manager')
       ->getStorage($this->entityType)
       ->create([

@@ -12,6 +12,7 @@ use Drupal\system\Install\Requirements\SystemRequirements;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
 use Drupal\TestTools\Extension\InfoWriterTrait;
+use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,7 +21,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the update script access and functionality.
  */
 #[Group('Update')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class UpdateScriptTest extends BrowserTestBase {
   use InfoWriterTrait;
@@ -53,25 +53,18 @@ class UpdateScriptTest extends BrowserTestBase {
 
   /**
    * URL to the update.php script.
-   *
-   * @var string
    */
-  private $updateUrl;
+  private Url $updateUrl;
 
   /**
    * A user with the necessary permissions to administer software updates.
-   *
-   * @var \Drupal\user\UserInterface
    */
-  private $updateUser;
+  private UserInterface $updateUser;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    if ($this->name() === 'testMissingExtension') {
-      $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
-    }
     parent::setUp();
     $this->updateUrl = Url::fromRoute('system.db_update');
     $this->statusReportUrl = Url::fromRoute('system.status');
@@ -289,7 +282,7 @@ class UpdateScriptTest extends BrowserTestBase {
   /**
    * Data provider for testExtensionCompatibilityChange().
    */
-  public static function providerExtensionCompatibilityChange() {
+  public static function providerExtensionCompatibilityChange(): array {
     $incompatible_module_message = "The following module is installed, but it is incompatible with Drupal " . \Drupal::VERSION . ":";
     $incompatible_theme_message = "The following theme is installed, but it is incompatible with Drupal " . \Drupal::VERSION . ":";
     return [
@@ -373,7 +366,7 @@ class UpdateScriptTest extends BrowserTestBase {
     $test_error_urls = [];
     $extension_base_info = [
       'version' => 'VERSION',
-      'core_version_requirement' => '^8 || ^9 || ^10',
+      'core_version_requirement' => \Drupal::VERSION,
     ];
 
     // For each core extension create and error of info.yml information and
@@ -584,8 +577,7 @@ class UpdateScriptTest extends BrowserTestBase {
           'theme' => ['theme'],
         ],
       ],
-      'core and contrib' =>
-      [
+      'core and contrib' => [
         'core' => [
           'module' => ['aggregator', 'rdf'],
           'theme' => ['seven'],
@@ -900,7 +892,7 @@ class UpdateScriptTest extends BrowserTestBase {
   /**
    * Returns the Drupal 7 system table schema.
    */
-  public function getSystemSchema() {
+  public function getSystemSchema(): array {
     return [
       'description' => "A list of all modules, themes, and theme engines that are or have been installed in Drupal's file system.",
       'fields' => [

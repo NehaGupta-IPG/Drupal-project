@@ -42,13 +42,13 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
 
     $this->setUpVfs();
 
-    $module_handler = $this->createMock(ModuleHandlerInterface::class);
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
     $module_handler
       ->method('getModuleDirectories')
       ->willReturn($this->directories['module']);
 
     /** @var \Drupal\Core\Extension\ThemeHandlerInterface|\Prophecy\Prophecy\ObjectProphecy $module_handler */
-    $theme_handler = $this->createMock(ThemeHandlerInterface::class);
+    $theme_handler = $this->createStub(ThemeHandlerInterface::class);
     $theme_handler
       ->method('getThemeDirectories')
       ->willReturn($this->directories['theme']);
@@ -72,8 +72,6 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
 
   /**
    * Tests get source context.
-   *
-   * @legacy-covers ::getSourceContext
    */
   public function testGetSourceContext(): void {
     $source = $this->helpLoader->getSourceContext('@' . HelpTopicTwigLoader::MAIN_NAMESPACE . '/test.topic.html.twig');
@@ -82,12 +80,10 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
 
   /**
    * Tests get source context exception.
-   *
-   * @legacy-covers ::getSourceContext
    */
   public function testGetSourceContextException(): void {
     $this->expectException(LoaderError::class);
-    $this->expectExceptionMessage("Malformed YAML in help topic \"vfs://root/modules/test/help_topics/test.invalid_yaml.html.twig\":");
+    $this->expectExceptionMessageIs("Malformed YAML in help topic \"vfs://root/modules/test/help_topics/test.invalid_yaml.html.twig\": An error occurred when attempting to parse front matter data on line 2.");
 
     $this->helpLoader->getSourceContext('@' . HelpTopicTwigLoader::MAIN_NAMESPACE . '/test.invalid_yaml.html.twig');
   }
