@@ -244,7 +244,7 @@ class DuplicateInfoFileValidatorTest extends PackageManagerKernelTestBase {
     if (!file_exists($file_dir)) {
       $fs->mkdir($root_directory . $file_dir);
     }
-    file_put_contents($root_directory . $file_path, "name: SOME MODULE\ntype: module\n");
+    file_put_contents($root_directory . $file_path, "name: SOME MODULE\ntype: module\ncore_version_requirement: '*'");
   }
 
 }
