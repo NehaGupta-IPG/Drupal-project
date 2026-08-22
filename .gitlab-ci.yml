@@ -209,6 +209,8 @@ default:
     - echo "SIMPLETEST_DB = $SIMPLETEST_DB"
     - export PHPUNIT_CONFIGURATION_FILE_PATH=$CI_PROJECT_DIR/core
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/server-setup.sh
+    # Test execution must not fetch Composer packages or metadata.
+    - export COMPOSER_DISABLE_NETWORK=1
   script:
     - sudo -u www-data -E -H composer run-script drupal-phpunit-upgrade-check
     # Need to pass this along directly.
@@ -421,7 +423,8 @@ default:
       [[ $_TARGET_DB == mysql* ]] && export SIMPLETEST_DB=$_TARGET_DB_DRIVER://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=$_TARGET_DB_DRIVER_MODULE
       [[ $_TARGET_DB == mariadb* ]] && export SIMPLETEST_DB=$_TARGET_DB_DRIVER://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE?module=$_TARGET_DB_DRIVER_MODULE
       [[ $_TARGET_DB == pgsql* ]] && export SIMPLETEST_DB=pgsql://$POSTGRES_USER:$POSTGRES_PASSWORD@database/$POSTGRES_DB?module=pgsql
-    - composer install --optimize-autoloader
+    # Dependency setup may use the network; the test process remains offline.
+    - COMPOSER_DISABLE_NETWORK=0 composer install --optimize-autoloader
     - export OTEL_COLLECTOR="$OPENTELEMETRY_COLLECTOR"
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
