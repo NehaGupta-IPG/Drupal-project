@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Lock;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
+use Drupal\Core\Database\Event\StatementExecutionStartEvent;
 use Drupal\Core\Lock\DatabaseLockBackend;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\database_test\EventSubscriber\DatabaseEventSubscriber;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +19,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Lock')]
 #[RunTestsInSeparateProcesses]
 class LockTest extends KernelTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = ['database_test'];
 
   /**
    * Database lock backend to test.
@@ -70,6 +78,57 @@ class LockTest extends KernelTestBase {
     $this->lock->release($long_key);
     $is_free = $this->lock->lockMayBeAvailable($long_key);
     $this->assertTrue($is_free, 'Long key lock has been released.');
+  }
+
+  /**
+   * Tests that acquiring an unavailable lock does not fail a query.
+   *
+   * Relying on the primary key constraint to detect that a lock is taken makes
+   * databases such as PostgreSQL log an error for every failed acquisition,
+   * even though the error is expected and handled.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3318915
+   */
+  public function testBackendLockUnavailable(): void {
+    $connection = $this->container->get('database');
+
+    // Another request holds the lock.
+    $other_request = new DatabaseLockBackend($connection);
+    $this->assertTrue($other_request->acquire('lock_a', 3600), 'Could acquire lock in another request.');
+
+    $subscriber = $this->container->get(DatabaseEventSubscriber::class);
+    $connection->enableEvents([StatementExecutionStartEvent::class, StatementExecutionFailureEvent::class]);
+    $this->assertFalse($this->lock->acquire('lock_a'), 'Could not acquire a lock held by another request.');
+    $connection->disableEvents([StatementExecutionStartEvent::class, StatementExecutionFailureEvent::class]);
+
+    $this->assertSame(0, $subscriber->countStatementFailures, 'Acquiring an unavailable lock does not trigger a database error.');
+  }
+
+  /**
+   * Tests that a lock held by another request can be broken once it expires.
+   */
+  public function testBackendLockExpiration(): void {
+    $other_request = new DatabaseLockBackend($this->container->get('database'));
+    $this->assertTrue($other_request->acquire('lock_a', 3600), 'Could acquire lock in another request.');
+    $this->assertFalse($this->lock->acquire('lock_a'), 'Could not acquire an unexpired lock.');
+
+    // Expire the lock the other request never released.
+    $this->container->get('database')->update('semaphore')
+      ->fields(['expire' => microtime(TRUE) - 1])
+      ->condition('name', 'lock_a')
+      ->execute();
+
+    $this->assertTrue($this->lock->acquire('lock_a'), 'Could acquire an expired lock held by another request.');
+  }
+
+  /**
+   * Tests that acquiring a lock creates the semaphore table if it is missing.
+   */
+  public function testBackendLockMissingTable(): void {
+    Database::getConnection()->schema()->dropTable('semaphore');
+
+    $this->assertTrue($this->lock->acquire('lock_a'), 'Could acquire lock after the semaphore table was created.');
+    $this->assertFalse($this->lock->lockMayBeAvailable('lock_a'), 'Acquired lock is unavailable.');
   }
 
   /**

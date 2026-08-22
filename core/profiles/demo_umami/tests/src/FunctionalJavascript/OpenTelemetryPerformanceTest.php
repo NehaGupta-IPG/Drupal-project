@@ -64,7 +64,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('quiche');
 
     $expected = [
-      'QueryCount' => 195,
+      'QueryCount' => 200,
       'CacheGetCount' => 217,
       'CacheSetCount' => 226,
       'CacheDeleteCount' => 0,
@@ -127,7 +127,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('quiche');
 
     $expected = [
-      'QueryCount' => 66,
+      'QueryCount' => 68,
       'CacheGetCount' => 168,
       'CacheSetCount' => 59,
       'CacheDeleteCount' => 0,
@@ -212,6 +212,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
       'SELECT "base_table"."revision_id" AS "revision_id", "base_table"."id" AS "id" FROM "content_moderation_state_revision" "base_table" INNER JOIN "content_moderation_state_field_revision" "content_moderation_state_field_revision" ON "content_moderation_state_field_revision"."revision_id" = "base_table"."revision_id" WHERE ("content_moderation_state_field_revision"."content_entity_type_id" LIKE "node" ESCAPE \'\\\\\') AND ("content_moderation_state_field_revision"."content_entity_id" = "1") AND ("content_moderation_state_field_revision"."content_entity_revision_id" = "76") AND ("content_moderation_state_field_revision"."workflow" = "editorial") AND ("content_moderation_state_field_revision"."langcode" = "en") ORDER BY "base_table"."revision_id" DESC',
       'SELECT "revision"."revision_id" AS "revision_id", "revision"."langcode" AS "langcode", "revision"."revision_default" AS "revision_default", "base"."id" AS "id", "base"."uuid" AS "uuid", CASE "base"."revision_id" WHEN "revision"."revision_id" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "content_moderation_state" "base" INNER JOIN "content_moderation_state_revision" "revision" ON "revision"."id" = "base"."id" AND "revision"."revision_id" IN (76)',
       'SELECT "content_moderation_state_field_revision".*, "content_moderation_state_field_revision"."langcode" AS "content_moderation_state_field_revision__langcode" FROM "content_moderation_state_field_revision" "content_moderation_state_field_revision" WHERE "content_moderation_state_field_revision"."revision_id" IN ("76")',
+      'SELECT "expire", "value" FROM "semaphore" WHERE "name" = "theme_registry:runtime:umami:Drupal\Core\Cache\CacheCollector"',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("theme_registry:runtime:umami:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "theme_registry:runtime:umami:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
     ];
@@ -219,7 +220,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
 
     $expected = [
-      'QueryCount' => 51,
+      'QueryCount' => 52,
       'CacheGetCount' => 163,
       'CacheGetCountByBin' => [
         'page' => 1,
@@ -346,7 +347,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('Umami');
 
     $expected = [
-      'QueryCount' => 178,
+      'QueryCount' => 183,
       'CacheGetCount' => 225,
       'CacheSetCount' => 240,
       'CacheDeleteCount' => 0,
@@ -416,7 +417,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
     }, 'umamiFrontPageCoolCache');
 
     $expected = [
-      'QueryCount' => 54,
+      'QueryCount' => 56,
       'CacheGetCount' => 170,
       'CacheSetCount' => 75,
       'CacheDeleteCount' => 0,
@@ -524,7 +525,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 264,
+      'QueryCount' => 270,
       'CacheGetCount' => 257,
       'CacheGetCountByBin' => [
         'config' => 52,

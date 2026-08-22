@@ -79,6 +79,7 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
       'SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.revision_uid.related" )',
       'SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.uid.relationship.get" )',
       'SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.uid.related" )',
+      'SELECT "expire", "value" FROM "semaphore" WHERE "name" = "path_alias_prefix_list:Drupal\Core\Cache\CacheCollector"',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("path_alias_prefix_list:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "path_alias_prefix_list:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
 
@@ -87,7 +88,7 @@ class JsonApiPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
 
     $expected = [
-      'QueryCount' => 17,
+      'QueryCount' => 18,
       'CacheGetCount' => 41,
       'CacheGetCountByBin' => [
         'config' => 7,
