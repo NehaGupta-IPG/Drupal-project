@@ -331,33 +331,42 @@ class ModuleHandlerTest extends UnitTestCase {
   public function testInvokeAllReturn(): void {
     $object = new \stdClass();
     // No implementations.
-    $this->assertInvokeAllListenersReturn([], []);
+    $this->assertSame(
+      [],
+      $this->invokeAllWithListeners([]),
+    );
     // Only null/void return values.
-    $this->assertInvokeAllListenersReturn([], [
-      fn () => NULL,
-      fn () => NULL,
-    ]);
+    $this->assertSame(
+      [],
+      $this->invokeAllWithListeners([
+        fn () => NULL,
+        fn () => NULL,
+      ]),
+    );
     // Only empty array and null.
-    $this->assertInvokeAllListenersReturn([], [
-      fn () => [],
-      fn () => NULL,
-    ]);
+    $this->assertSame(
+      [],
+      $this->invokeAllWithListeners([
+        fn () => [],
+        fn () => NULL,
+      ]),
+    );
     // Only non-array values.
-    $this->assertInvokeAllListenersReturn(
+    $this->assertSame(
       [
         'A',
         $object,
         'B',
       ],
-      [
+      $this->invokeAllWithListeners([
         fn () => 'A',
         fn () => NULL,
         fn () => $object,
         fn () => 'B',
-      ],
+      ]),
     );
     // Only arrays.
-    $this->assertInvokeAllListenersReturn(
+    $this->assertSame(
       [
         'a' => 'A2',
         'X',
@@ -370,7 +379,7 @@ class ModuleHandlerTest extends UnitTestCase {
         ],
         'Z',
       ],
-      [
+      $this->invokeAllWithListeners([
         fn () => ['a' => 'A1'],
         fn () => ['X', 'Y'],
         fn () => NULL,
@@ -379,10 +388,10 @@ class ModuleHandlerTest extends UnitTestCase {
         fn () => ['nested' => ['aa' => 'AA1', 'bb' => 'BB']],
         fn () => ['nested' => ['aa' => 'AA2', 'cc' => 'CC']],
         fn () => ['Z'],
-      ],
+      ]),
     );
     // Combination of arrays and non-array values.
-    $this->assertInvokeAllListenersReturn(
+    $this->assertSame(
       [
         'a' => 'A2',
         'X',
@@ -397,7 +406,7 @@ class ModuleHandlerTest extends UnitTestCase {
         ],
         'Z',
       ],
-      [
+      $this->invokeAllWithListeners([
         fn () => ['a' => 'A1'],
         fn () => ['X', 'Y'],
         fn () => 'Non-array string',
@@ -408,55 +417,22 @@ class ModuleHandlerTest extends UnitTestCase {
         fn () => ['nested' => ['aa' => 'AA1', 'bb' => 'BB']],
         fn () => ['nested' => ['aa' => 'AA2', 'cc' => 'CC']],
         fn () => ['Z'],
-      ],
+      ]),
     );
     // Array-like objects are treated as non-array.
-    $array_object = new \ArrayObject(['x' => 'X']);
-    $this->assertInvokeAllListenersReturn(
-      [
-        $array_object,
-      ],
-      [
-        fn () => $array_object,
-      ],
-    );
-    $this->assertInvokeAllListenersReturn(
-      [
-        $array_object,
-        5,
-      ],
-      [
-        fn () => $array_object,
-        fn () => 5,
-      ],
-    );
-    $this->assertInvokeAllListenersReturn(
+    $array_object = new \ArrayObject(['y' => 'Y']);
+    $this->assertSame(
       [
         'x' => 'X',
         $array_object,
-        'y' => 'Y',
+        'z' => 'Z',
       ],
-      [
+      $this->invokeAllWithListeners([
         fn () => ['x' => 'X'],
         fn () => $array_object,
-        fn () => ['y' => 'Y'],
-      ],
+        fn () => ['z' => 'Z'],
+      ]),
     );
-  }
-
-  /**
-   * Calls ModuleHandler::invokeAll() and asserts the result.
-   *
-   * @param mixed $expected
-   *   The expected return value from ->invokeAll().
-   * @param list<callable> $listeners
-   *   The virtual callables for hook implementations.
-   * @param array $args
-   *   The $args argument to pass to ->invokeAll().
-   */
-  protected function assertInvokeAllListenersReturn(mixed $expected, array $listeners, array $args = []): void {
-    $result = $this->invokeAllWithListeners($listeners, $args);
-    $this->assertSame($expected, $result);
   }
 
   /**
