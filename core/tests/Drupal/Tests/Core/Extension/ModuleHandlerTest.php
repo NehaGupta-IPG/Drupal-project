@@ -391,6 +391,8 @@ class ModuleHandlerTest extends UnitTestCase {
       ]),
     );
     // Combination of arrays and non-array values.
+    // This is a separate execution path in ModuleHandler::invokeAll(), so it
+    // needs a separate test case.
     $this->assertSame(
       [
         'a' => 'A2',
