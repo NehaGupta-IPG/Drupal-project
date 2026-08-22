@@ -1784,13 +1784,16 @@ function install_import_translations(&$install_state) {
  *   An array of batch definitions.
  */
 function install_finish_translations(&$install_state): array {
-  $batches = [];
+  \Drupal::moduleHandler()->loadInclude('locale', 'fetch.inc');
+  \Drupal::moduleHandler()->loadInclude('locale', 'compare.inc');
+  \Drupal::moduleHandler()->loadInclude('locale', 'bulk.inc');
 
   // Download contributed project translations. When more projects than core
   // are installed, their translations should be downloaded (if required) and
   // imported in all translatable languages (does not include English by
   // default, only when explicitly configured as such by the profile).
   $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
+  $batches = [];
   if (count($projects) > 1) {
     $options = LocaleDefaultOptions::updateOptions();
     if ($batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch([], [], $options)) {
