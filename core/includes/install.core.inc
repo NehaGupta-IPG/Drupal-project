@@ -1808,9 +1808,8 @@ function install_finish_translations(&$install_state): array {
   }
 
   // Update configuration default language codes and create configuration
-  // translation for all languages (including English if needed, when
-  // a foreign language is used to install a site but the keep_english
-  // profile option is also used).
+  // translation for all languages (including English if that is still
+  // a configured language and not the site default).
   $batches[] = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], [], [], TRUE);
   return $batches;
 }
