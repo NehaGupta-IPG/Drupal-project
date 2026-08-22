@@ -1784,33 +1784,29 @@ function install_import_translations(&$install_state) {
  *   An array of batch definitions.
  */
 function install_finish_translations(&$install_state): array {
-  \Drupal::moduleHandler()->loadInclude('locale', 'fetch.inc');
-  \Drupal::moduleHandler()->loadInclude('locale', 'compare.inc');
-  \Drupal::moduleHandler()->loadInclude('locale', 'bulk.inc');
-
-  // Build a fresh list of installed projects. When more projects than core are
-  // installed, their translations will be downloaded (if required) and imported
-  // using a batch.
-  $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
-  $languages = \Drupal::languageManager()->getLanguages();
   $batches = [];
+
+  // Download contributed project translations. When more projects than core
+  // are installed, their translations should be downloaded (if required) and
+  // imported in all translatable languages (does not include English).
+  $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
   if (count($projects) > 1) {
-    $options = LocaleDefaultOptions::updateOptions();
-    // Only check .po files for translatable languages: pass empty list.
-    if ($batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch([], [], $options)) {
+    if ($batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch()) {
       $batches[] = $batch;
     }
   }
 
-  // If installing from configuration, detect custom translations in the
-  // configuration files.
-  if (!empty($install_state['config_install_path']) && \Drupal::service('module_handler')->moduleExists('locale')) {
+  // When installing from configuration, sync custom translations to locale
+  // storage, so they are protected later.
+  if (!empty($install_state['config_install_path'])) {
     $batches[] = _install_config_locale_overrides();
   }
 
-  // Create configuration translation for all languages. May need to be done
-  // for English too, so include all languages.
-  $batches[] = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], array_keys($languages), [], TRUE);
+  // Update configuration default language codes and create configuration
+  // translation for all languages (including English if needed, when
+  // a foreign language is used to install a site but the keep_english
+  // profile option is also used).
+  $batches[] = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], [], [], TRUE);
   return $batches;
 }
 
