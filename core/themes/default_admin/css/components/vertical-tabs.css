@@ -218,6 +218,8 @@
     &::before {
       /* Width must be enough to create a good non-color contrast with the blue active border */
       border-inline-start: calc(var(--vertical-tabs-menu-link--active-border-size) + 2px) solid var(--input--error-color);
+      border-start-start-radius: var(--vertical-tabs-border-radius);
+      border-end-start-radius: var(--vertical-tabs-border-radius);
     }
   }
 
