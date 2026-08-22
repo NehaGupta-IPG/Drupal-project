@@ -38,6 +38,7 @@ use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleFetch;
 use Drupal\locale\LocaleConfigBatch;
 use Drupal\locale\LocaleProjectRepository;
@@ -1787,10 +1788,12 @@ function install_finish_translations(&$install_state): array {
 
   // Download contributed project translations. When more projects than core
   // are installed, their translations should be downloaded (if required) and
-  // imported in all translatable languages (does not include English).
+  // imported in all translatable languages (does not include English by
+  // default, only when explicitly configured as such by the profile).
   $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
   if (count($projects) > 1) {
-    if ($batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch()) {
+    $options = LocaleDefaultOptions::updateOptions();
+    if ($batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch([], [], $options)) {
       $batches[] = $batch;
     }
   }
