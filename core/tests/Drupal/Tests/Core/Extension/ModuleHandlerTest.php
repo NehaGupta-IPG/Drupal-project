@@ -289,40 +289,35 @@ class ModuleHandlerTest extends UnitTestCase {
    * Tests different arguments passed to invokeAll().
    */
   public function testInvokeAllArguments(): void {
-    $report = [];
     $b_local = 'B';
     $d_local = 'D';
+    $call_count = 0;
     $this->invokeAllWithListeners(
       [
-        function ($a, &$b, $c = NULL, &$d = NULL, ...$more_args) use (&$report) {
-          $report[] = [$a, $b, $c, $d, $more_args];
+        function ($a, &$b, $c = NULL, &$d = NULL, ...$more_args) use (&$call_count) {
+          ++$call_count;
+          $this->assertSame(
+            ['A', 'B', NULL, 'D', ['e' => 'E']],
+            [$a, $b, $c, $d, $more_args],
+          );
           $b = 'B modified';
           $d = 'D modified';
         },
       ],
       [
         'A',
+        // Test by-reference arguments.
         &$b_local,
+        // Test named arguments.
         'd' => &$d_local,
         'e' => 'E',
       ],
     );
-    $report[] = [$b_local, $d_local];
-    $this->assertSame([
-      // Argument values passed to the implementation.
-      [
-        'A',
-        'B',
-        NULL,
-        'D',
-        ['e' => 'E'],
-      ],
-      // Modified by-reference variables.
-      [
-        'B modified',
-        'D modified',
-      ],
-    ], $report);
+    // The artificially registered listener was called exactly once.
+    $this->assertSame(1, $call_count);
+    // The two local variables were modified.
+    $this->assertSame('B modified', $b_local);
+    $this->assertSame('D modified', $d_local);
   }
 
   /**
