@@ -66,12 +66,12 @@ abstract class ExtensionList {
   protected $addedPathNames = [];
 
   public function __construct(
-    protected $root,
-    protected $type,
+    protected string $root,
+    protected string $type,
     protected CacheBackendInterface $cache,
     protected InfoParserInterface $infoParser,
     protected ModuleHandlerInterface $moduleHandler,
-    protected $installProfile,
+    protected string|false|null $installProfile,
   ) {}
 
   /**
