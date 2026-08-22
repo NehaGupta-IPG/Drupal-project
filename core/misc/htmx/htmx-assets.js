@@ -89,6 +89,11 @@
       return;
     }
 
+    if (!detail.xhr.getResponseHeader('Content-Type').includes('text/html')) {
+      // Only process HTML responses.
+      return;
+    }
+
     // We need to parse the response to find all the assets to load.
     // htmx cleans up too many things to be able to rely on their dom fragment.
     let responseHTML = Document.parseHTMLUnsafe(detail.serverResponse);
