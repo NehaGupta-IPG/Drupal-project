@@ -443,10 +443,10 @@ class ModuleHandlerTest extends UnitTestCase {
    * @param array $args
    *   The $args argument to pass to ->invokeAll().
    *
-   * @return mixed
+   * @return array
    *   The return value from ->invokeAll().
    */
-  protected function invokeAllWithListeners(array $listeners, array $args = []): mixed {
+  protected function invokeAllWithListeners(array $listeners, array $args = []): array {
     $this->assertIsList($listeners);
     // Get an empty default module handler, then populate the internal
     // implementation lists property with reflection.
