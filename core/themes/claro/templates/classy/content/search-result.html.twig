@@ -62,11 +62,11 @@
   <a href="{{ url }}">{{ title }}</a>
 </h3>
 {{ title_suffix }}
-<div class="search-result__snippet-info">
+<div class="search-result__content">
   {% if snippet %}
     <p{{ content_attributes.addClass('search-result__snippet') }}>{{ snippet }}</p>
   {% endif %}
   {% if info %}
-    <p class="search-result__info">{{ info }}</p>
+    <p class="search-result__meta">{{ info }}</p>
   {% endif %}
 </div>
