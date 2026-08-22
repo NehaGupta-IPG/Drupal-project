@@ -292,7 +292,7 @@ class ModuleHandlerTest extends UnitTestCase {
     $report = [];
     $b_local = 'B';
     $d_local = 'D';
-    $this->invokeAllListeners(
+    $this->invokeAllWithListeners(
       [
         function ($a, &$b, $c = NULL, &$d = NULL, ...$more_args) use (&$report) {
           $report[] = [$a, $b, $c, $d, $more_args];
@@ -455,7 +455,7 @@ class ModuleHandlerTest extends UnitTestCase {
    *   The $args argument to pass to ->invokeAll().
    */
   protected function assertInvokeAllListenersReturn(mixed $expected, array $listeners, array $args = []): void {
-    $result = $this->invokeAllListeners($listeners, $args);
+    $result = $this->invokeAllWithListeners($listeners, $args);
     $this->assertSame($expected, $result);
   }
 
@@ -470,7 +470,7 @@ class ModuleHandlerTest extends UnitTestCase {
    * @return mixed
    *   The return value from ->invokeAll().
    */
-  protected function invokeAllListeners(array $listeners, array $args = []): mixed {
+  protected function invokeAllWithListeners(array $listeners, array $args = []): mixed {
     $this->assertIsList($listeners);
     // Get an empty default module handler, then populate the internal
     // implementation lists property with reflection.
