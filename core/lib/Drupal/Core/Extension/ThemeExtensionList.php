@@ -55,12 +55,6 @@ class ThemeExtensionList extends ExtensionList {
     'dependencies' => [],
   ];
 
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
 
   /**
    * The list of installed themes.
@@ -76,7 +70,7 @@ class ThemeExtensionList extends ExtensionList {
     CacheBackendInterface $cache,
     InfoParserInterface $info_parser,
     ModuleHandlerInterface $module_handler,
-    ConfigFactoryInterface $config_factory,
+    protected ConfigFactoryInterface $configFactory,
     #[Autowire(param: 'install_profile')]
     $install_profile,
     #[Autowire(param: 'container.themes')]
@@ -84,9 +78,6 @@ class ThemeExtensionList extends ExtensionList {
   ) {
     parent::__construct($root, 'theme', $cache, $info_parser, $module_handler, $install_profile);
 
-    $this->configFactory = $config_factory;
-
-    // Use the information from the container. This is an optimization.
     foreach ($container_themes_info as $theme_name => $info) {
       $this->addedPathNames[$theme_name] = $info['pathname'];
     }
