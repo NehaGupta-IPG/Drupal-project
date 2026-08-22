@@ -48,7 +48,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
    */
   public function onMaintenanceModeRequest(RequestEvent $event) {
     // If the site is offline, log out unprivileged users.
-    if ($this->account->isAuthenticated()) {
+    if ($this->account->isAuthenticated() && !$this->maintenanceMode->exempt($this->account)) {
       user_logout();
     }
   }
