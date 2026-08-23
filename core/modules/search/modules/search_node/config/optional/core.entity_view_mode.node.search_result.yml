@@ -5,6 +5,6 @@ dependencies:
     - node
 id: node.search_result
 label: 'Search result highlighting input'
-description: ''
+description: 'Used to provide highlighted text in search results.'
 targetEntityType: node
 cache: true

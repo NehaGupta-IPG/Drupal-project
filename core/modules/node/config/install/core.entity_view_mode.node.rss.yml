@@ -5,6 +5,6 @@ dependencies:
     - node
 id: node.rss
 label: RSS
-description: ''
+description: 'Used for content shown in RSS feeds.'
 targetEntityType: node
 cache: true

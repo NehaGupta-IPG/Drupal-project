@@ -8,6 +8,6 @@ dependencies:
       - media_library
 id: media.media_library
 label: 'Media library'
-description: null
+description: 'Used when editing media in the Media Library.'
 targetEntityType: media
 cache: true

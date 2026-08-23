@@ -5,6 +5,6 @@ dependencies:
     - node
 id: node.teaser
 label: Teaser
-description: ''
+description: 'Used when showing content previews in lists.'
 targetEntityType: node
 cache: true

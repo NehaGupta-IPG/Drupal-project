@@ -5,6 +5,6 @@ dependencies:
     - user
 id: user.full
 label: 'User account'
-description: ''
+description: 'Used when showing a full user profile.'
 targetEntityType: user
 cache: true

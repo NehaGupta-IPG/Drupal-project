@@ -5,6 +5,6 @@ dependencies:
     - block_content
 id: block_content.full
 label: Full
-description: ''
+description: 'Used when showing a custom block in full.'
 targetEntityType: block_content
 cache: true
