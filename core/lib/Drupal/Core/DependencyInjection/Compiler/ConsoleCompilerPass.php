@@ -24,7 +24,9 @@ class ConsoleCompilerPass implements CompilerPassInterface {
    */
   public function process(ContainerBuilder $container): void {
     // Get all classes with the #[AsCommand] attribute.
-    foreach ($this->getClasses(new \ArrayIterator($container->getParameter('container.namespaces'))) as $className) {
+    $scanner = new AttributeScanner(new \ArrayIterator($container->getParameter('container.namespaces')));
+    foreach ($scanner->scan(AsCommand::class, 'Command') as $reflection) {
+      $className = $reflection->getName();
       // Don't create a service definition if this class is already a service.
       if ($container->hasDefinition($className) || $container->hasAlias($className)) {
         continue;
@@ -47,22 +49,6 @@ class ConsoleCompilerPass implements CompilerPassInterface {
         ->addTag('console.command');
 
       $container->setDefinition($className, $definition);
-    }
-  }
-
-  /**
-   * Gets command classes for the provided namespaces.
-   *
-   * @param \Traversable<class-string, string|array<int, string>> $namespaces
-   *   The namespaces and their source directories.
-   *
-   * @return \Generator<class-string>
-   *   Generates class strings.
-   */
-  protected function getClasses(\Traversable $namespaces): \Generator {
-    $scanner = new AttributeScanner($namespaces);
-    foreach ($scanner->scan(AsCommand::class, 'Command') as $reflection) {
-      yield $reflection->getName();
     }
   }
 
