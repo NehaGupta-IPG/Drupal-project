@@ -23,6 +23,7 @@
         "dealerdirect/phpcodesniffer-composer-installer": "v1.2.0",
         "doctrine/deprecations": "1.1.5",
         "doctrine/instantiator": "2.0.0",
+        "doctrine/sql-formatter": "1.5.4",
         "drupal/coder": "9.0.1",
         "google/protobuf": "v4.33.6",
         "lullabot/mink-selenium2-driver": "v1.7.4",
