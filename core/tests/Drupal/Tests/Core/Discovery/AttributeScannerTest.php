@@ -47,6 +47,25 @@ class AttributeScannerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that a namespace can have multiple source directories.
+   */
+  public function testScanSupportsMultipleDirectories(): void {
+    $namespaces = new \ArrayObject([
+      'Drupal\\router_test' => [
+        $this->root . '/core/modules/system/tests/modules/router_test_directory/src',
+        $this->root . '/core/modules/system/tests/modules/router_test_directory/nonexistent',
+      ],
+    ]);
+    $scanner = new AttributeScanner($namespaces);
+    $classes = [];
+    foreach ($scanner->scan(Route::class, 'Controller') as $reflection) {
+      $classes[] = $reflection->getName();
+    }
+
+    $this->assertContains(TestAttributes::class, $classes);
+  }
+
+  /**
    * Tests that non-instantiable and non-loadable classes are skipped.
    */
   public function testScanSkipsNonLoadableClasses(): void {
