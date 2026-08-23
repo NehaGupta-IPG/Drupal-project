@@ -110,7 +110,9 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
 
     $this->enablePromotedContentView(FALSE);
 
-    ViewTestData::createTestViews(static::class, ['views_test_config']);
+    if ($import_test_views) {
+      ViewTestData::createTestViews(static::class, ['views_test_config']);
+    }
 
     Workspace::create(['id' => 'stage', 'label' => 'Stage'])->save();
   }
@@ -337,6 +339,108 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
     $view = Views::getView('workspace_title_contains');
     $view->execute();
     $this->assertIdenticalResultset($view, [], ['nid' => 'nid']);
+  }
+
+  /**
+   * Tests a relationship that joins on a revisionable base field.
+   */
+  public function testViewsRelationshipOnRevisionableField(): void {
+    $live_author = $this->createUser([], 'live author');
+    $workspace_author = $this->createUser([], 'workspace author');
+
+    $node = $this->createNode(['title' => 'A', 'uid' => $live_author->id(), 'promote' => TRUE]);
+
+    $this->switchToWorkspace('stage');
+    $node->setOwner($workspace_author)->save();
+
+    // The author relationship joins 'users_field_data' on the revisionable
+    // 'node_field_data.uid' column, so the join has to use the author recorded
+    // on the workspace revision.
+    $view = $this->buildNodeView('workspace_author_relationship', [
+      'relationships' => [
+        'uid' => [
+          'id' => 'uid',
+          'table' => 'node_field_data',
+          'field' => 'uid',
+          'entity_type' => 'node',
+          'entity_field' => 'uid',
+          'plugin_id' => 'standard',
+          'required' => TRUE,
+        ],
+      ],
+      'fields' => [
+        'name' => [
+          'id' => 'name',
+          'table' => 'users_field_data',
+          'field' => 'name',
+          'relationship' => 'uid',
+          'entity_type' => 'user',
+          'entity_field' => 'name',
+          'plugin_id' => 'field',
+        ],
+      ],
+    ]);
+    $view->execute();
+
+    $this->assertCount(1, $view->result);
+    $this->assertSame('workspace author', (string) $view->field['name']->getValue(reset($view->result)));
+
+    // Outside the workspace the relationship resolves to the live author.
+    $this->switchToLive();
+    $view = Views::getView('workspace_author_relationship');
+    $view->execute();
+
+    $this->assertCount(1, $view->result);
+    $this->assertSame('live author', (string) $view->field['name']->getValue(reset($view->result)));
+  }
+
+  /**
+   * Tests the node published status filter in a workspace.
+   */
+  public function testViewsNodeStatusFilter(): void {
+    $node_1 = $this->createNode(['title' => 'Published in Live', 'status' => TRUE, 'promote' => TRUE]);
+    $node_2 = $this->createNode(['title' => 'Unpublished in Live', 'status' => FALSE, 'promote' => TRUE]);
+
+    $this->switchToWorkspace('stage');
+
+    // Flip the published status of both nodes in the workspace.
+    $node_1->setUnpublished()->save();
+    $node_2->setPublished()->save();
+
+    // The 'node_status' filter adds a raw SQL snippet instead of a condition,
+    // so its 'status' and 'uid' references are rewritten inside the snippet and
+    // the filter checks the workspace revision.
+    $view = $this->promotedContentViewWithNodeStatusFilter();
+    $view->execute();
+    $this->assertIdenticalResultset($view, [['nid' => $node_2->id()]], ['nid' => 'nid']);
+
+    // Outside the workspace the live status decides what is visible.
+    $this->switchToLive();
+    $view = $this->promotedContentViewWithNodeStatusFilter();
+    $view->execute();
+    $this->assertIdenticalResultset($view, [['nid' => $node_1->id()]], ['nid' => 'nid']);
+  }
+
+  /**
+   * Loads the promoted content view, filtered by the node status filter.
+   *
+   * @return \Drupal\views\ViewExecutable
+   *   The executable view.
+   */
+  protected function promotedContentViewWithNodeStatusFilter(): ViewExecutable {
+    $view = Views::getView('promoted_content');
+    $view->setDisplay('page_1');
+    $view->displayHandlers->get('page_1')->overrideOption('filters', [
+      'status_extra' => [
+        'id' => 'status_extra',
+        'table' => 'node_field_data',
+        'field' => 'status_extra',
+        'entity_type' => 'node',
+        'plugin_id' => 'node_status',
+      ],
+    ]);
+
+    return $view;
   }
 
   /**

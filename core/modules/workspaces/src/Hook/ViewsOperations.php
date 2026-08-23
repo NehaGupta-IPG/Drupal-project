@@ -145,6 +145,7 @@ class ViewsOperations {
         }
       }
     }
+    unset($table_info);
 
     // JOINs must be in order. i.e, any tables you mention in the ON clause of a
     // JOIN must appear prior to that JOIN. Since we're modifying a JOIN in
@@ -167,6 +168,41 @@ class ViewsOperations {
       if ($info['base'] == $base_entity_table) {
         $relationships[] = $relationship;
       }
+    }
+
+    // A relationship can join on a revisionable base field, e.g. the 'Content:
+    // Author' relationship joins 'users_field_data' on 'node_field_data.uid'.
+    // Collect those joins first, because rewriting them adds tables to the
+    // table queue and moves them around.
+    $joins_to_rewrite = [];
+    foreach ($table_queue as $alias => $join_table_info) {
+      $join = $join_table_info['join'] ?? NULL;
+      // Skip the joins added by this class, they already point to the revision
+      // table, as well as joins that use a formula for the left side.
+      if (!$join instanceof JoinPluginInterface || $this->adjustedTables->offsetExists($join) || $join->leftFormula) {
+        continue;
+      }
+
+      if (in_array($join->leftTable, $relationships, TRUE) && in_array($join->leftField, $revisionable_fields, TRUE)) {
+        $joins_to_rewrite[$alias] = $join;
+      }
+    }
+
+    foreach ($joins_to_rewrite as $alias => $join) {
+      $revision_table = $this->ensureRevisionTable($entity_type, $query, $join->leftTable);
+      if (!$revision_table) {
+        continue;
+      }
+
+      $join->leftFormula = "$revision_table.$join->leftField";
+
+      // The revision table has to come before the join that references it, and
+      // the 'workspace_association' table before the revision table. Move the
+      // revision table first, otherwise moving it would leave the
+      // 'workspace_association' table behind.
+      $this->moveEntityTable($query, $revision_table, $alias);
+      $workspace_association_table = $this->ensureWorkspaceAssociationTable($entity_type->id(), $query, $join->leftTable);
+      $this->moveEntityTable($query, $workspace_association_table, $revision_table);
     }
 
     // Go through and look to see if we have to modify fields.
@@ -232,9 +268,11 @@ class ViewsOperations {
   /**
    * Rewrites references to revisionable base fields in a query expression.
    *
-   * Replaces any '<relationship>.<field>' reference to a revisionable field
+   * Replaces every '<relationship>.<field>' reference to a revisionable field
    * with a reference to the entity type's revision table, adding that table to
-   * the query if it's not there yet.
+   * the query if it's not there yet. This is a plain string replacement, not
+   * SQL parsing, so a reference inside a quoted string or a comment in a raw
+   * snippet is rewritten too.
    *
    * @param string $expression
    *   The query expression, e.g. a field, a formula or a condition snippet.
@@ -253,14 +291,20 @@ class ViewsOperations {
   protected function rewriteRevisionableFieldReferences(string $expression, Sql $query, EntityTypeInterface $entity_type, array $relationships, array $revisionable_fields): string {
     foreach ($relationships as $relationship) {
       foreach ($revisionable_fields as $field) {
-        $pattern = '/\b' . preg_quote("$relationship.$field", '/') . '\b/';
-        if (preg_match($pattern, $expression)) {
-          $alias = $this->ensureRevisionTable($entity_type, $query, $relationship);
-          if ($alias) {
-            // Reference the revision table instead of the base table.
-            $expression = preg_replace($pattern, "$alias.$field", $expression);
-          }
+        $reference = "$relationship.$field";
+        // Skip the regex entirely for the common case of no match at all.
+        if (!str_contains($expression, $reference)) {
+          continue;
         }
+
+        // Add the revision table only when the pattern really matches, and use
+        // a callback so that the replacement is not scanned for backreferences.
+        $pattern = '/\b' . preg_quote($reference, '/') . '\b/';
+        $expression = preg_replace_callback($pattern, function () use ($query, $entity_type, $relationship, $field) {
+          // Reference the revision table instead of the base table.
+          $alias = $this->ensureRevisionTable($entity_type, $query, $relationship);
+          return $alias ? "$alias.$field" : "$relationship.$field";
+        }, $expression);
       }
     }
 
@@ -283,6 +327,8 @@ class ViewsOperations {
    */
   protected function rewriteConditionField(mixed &$field, Sql $query, EntityTypeInterface $entity_type, array $relationships, array $revisionable_fields): void {
     if ($field instanceof ConditionInterface) {
+      // Changing the array in place doesn't mark the condition as changed, so
+      // this relies on Views compiling conditions after the alter runs.
       $conditions = &$field->conditions();
       foreach ($conditions as &$condition_info) {
         // Skip the '#conjunction' element and anything without a field.
@@ -433,24 +479,24 @@ class ViewsOperations {
   }
 
   /**
-   * Moves a 'workspace_association' table to appear before the given alias.
+   * Moves a table to appear before the given alias.
    *
-   * Because Workspace chains possibly pre-existing tables onto the
-   * 'workspace_association' table, we have to ensure that the
-   * 'workspace_association' table appears in the query before the alias it's
-   * chained on or the SQL is invalid.
+   * Because Workspaces chains possibly pre-existing tables onto the
+   * 'workspace_association' table and the revision table, we have to ensure
+   * that those tables appear in the query before the alias they're chained on
+   * or the SQL is invalid.
    *
    * @param \Drupal\views\Plugin\views\query\Sql $query
    *   The SQL query object.
-   * @param string $workspace_association_table
-   *   The alias of the 'workspace_association' table.
+   * @param string $table_alias
+   *   The alias of the table to move.
    * @param string $alias
    *   The alias of the table it needs to appear before.
    */
-  protected function moveEntityTable(Sql $query, string $workspace_association_table, string $alias): void {
+  protected function moveEntityTable(Sql $query, string $table_alias, string $alias): void {
     $table_queue =& $query->getTableQueue();
     $keys = array_keys($table_queue);
-    $current_index = array_search($workspace_association_table, $keys);
+    $current_index = array_search($table_alias, $keys);
     $index = array_search($alias, $keys);
 
     // If it's already before our table, we don't need to move it, as we could
@@ -458,8 +504,8 @@ class ViewsOperations {
     if ($current_index < $index) {
       return;
     }
-    $splice = [$workspace_association_table => $table_queue[$workspace_association_table]];
-    unset($table_queue[$workspace_association_table]);
+    $splice = [$table_alias => $table_queue[$table_alias]];
+    unset($table_queue[$table_alias]);
 
     // Now move the item to the proper location in the array. Don't use
     // array_splice() because that breaks indices.
