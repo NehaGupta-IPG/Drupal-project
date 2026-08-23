@@ -3,11 +3,10 @@
 namespace Drupal\Core\Theme;
 
 use Drupal\Component\Render\MarkupInterface;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\Hook\HookData;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\Core\Utility\CallableResolver;
@@ -64,9 +63,7 @@ class ThemeManager implements ThemeManagerInterface {
     protected CallableResolver $callableResolver,
     #[AutowireLocator('theme_engine', 'engine_name')]
     protected ServiceCollectionInterface $themeEngines,
-    protected KeyValueFactoryInterface $keyValueFactory,
-    #[Autowire(service: 'cache.bootstrap')]
-    protected CacheBackendInterface $cache,
+    protected HookData $hookData,
   ) {
   }
 
@@ -537,13 +534,7 @@ class ThemeManager implements ThemeManagerInterface {
    */
   protected function getImplementationsForTheme(string $theme_key, string $hook): array {
     if (!isset($this->allHookImplementations)) {
-      if ($cache = $this->cache->get('theme_hook_data')) {
-        $this->allHookImplementations = $cache->data;
-      }
-      else {
-        $this->allHookImplementations = $this->keyValueFactory->get('hook_data')->get('theme_hook_list') ?? [];
-        $this->cache->set('theme_hook_data', $this->allHookImplementations);
-      }
+      $this->allHookImplementations = $this->hookData->getThemeHookData()['theme_hook_list'] ?? [];
     }
 
     if (!isset($this->themeHookImplementations[$theme_key][$hook])) {

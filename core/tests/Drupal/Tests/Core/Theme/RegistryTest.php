@@ -8,6 +8,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Hook\HookData;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Lock\LockBackendInterface;
@@ -100,7 +101,7 @@ class RegistryTest extends UnitTestCase {
     $this->kernel = $this->createStub(HttpKernelInterface::class);
     $this->keyValueFactory = new KeyValueMemoryFactory();
 
-    $this->registry = new Registry($this->cache, $this->lock, $this->moduleHandler, $this->themeHandler, $this->runtimeCache, $this->moduleList, $this->kernel, $this->keyValueFactory);
+    $this->registry = new Registry($this->cache, $this->lock, $this->moduleHandler, $this->themeHandler, $this->runtimeCache, $this->moduleList, $this->kernel, new HookData($this->keyValueFactory, $this->runtimeCache));
     $this->registry->setThemeManager($this->themeManager);
   }
 
