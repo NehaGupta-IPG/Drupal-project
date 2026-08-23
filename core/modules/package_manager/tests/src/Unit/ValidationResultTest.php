@@ -11,6 +11,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
@@ -30,13 +31,13 @@ class ValidationResultTest extends UnitTestCase {
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString, DrupalPractice.Objects.GlobalFunction
     $summary = $summary ? t($summary) : NULL;
     $result = ValidationResult::createWarning($messages, $summary);
-    $this->assertResultValid($result, $messages, $summary, RequirementSeverity::Warning->value);
+    $this->assertResultValid($result, $messages, $summary, RequirementSeverity::Warning);
   }
 
   /**
    * Tests overall severity.
    *
-   * @legacy-covers ::getOverallSeverity
+   * @legacy-covers ::getOverallSeverityEnum
    */
   public function testOverallSeverity(): void {
     // An error and a warning should be counted as an error.
@@ -46,17 +47,29 @@ class ValidationResultTest extends UnitTestCase {
       ValidationResult::createWarning([t('Moo!')]),
       // phpcs:enable DrupalPractice.Objects.GlobalFunction
     ];
-    $this->assertSame(RequirementSeverity::Error->value, ValidationResult::getOverallSeverity($results));
+    $this->assertSame(RequirementSeverity::Error, ValidationResult::getOverallSeverityEnum($results));
 
     // If there are no results, but no errors, the results should be counted as
     // a warning.
     array_shift($results);
-    $this->assertSame(RequirementSeverity::Warning->value, ValidationResult::getOverallSeverity($results));
+    $this->assertSame(RequirementSeverity::Warning, ValidationResult::getOverallSeverityEnum($results));
 
     // If there are just plain no results, we should get
     // RequirementSeverity::OK.
     array_shift($results);
-    $this->assertSame(RequirementSeverity::OK->value, ValidationResult::getOverallSeverity($results));
+    $this->assertSame(RequirementSeverity::OK, ValidationResult::getOverallSeverityEnum($results));
+  }
+
+  /**
+   * Tests the deprecated getOverallSeverity() method.
+   *
+   * @legacy-covers ::getOverallSeverity
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecatedGetOverallSeverity(): void {
+    // phpcs:ignore DrupalPractice.Objects.GlobalFunction
+    $results = [ValidationResult::createError([t('Boo!')])];
+    $this->assertSame(RequirementSeverity::Error->value, ValidationResult::getOverallSeverity($results));
   }
 
   /**
@@ -67,7 +80,7 @@ class ValidationResultTest extends UnitTestCase {
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString, DrupalPractice.Objects.GlobalFunction
     $summary = $summary ? t($summary) : NULL;
     $result = ValidationResult::createError($messages, $summary);
-    $this->assertResultValid($result, $messages, $summary, RequirementSeverity::Error->value);
+    $this->assertResultValid($result, $messages, $summary, RequirementSeverity::Error);
   }
 
   /**
@@ -165,10 +178,10 @@ class ValidationResultTest extends UnitTestCase {
    *   The expected messages.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $summary
    *   The expected summary or NULL if not summary is expected.
-   * @param int $severity
+   * @param \Drupal\Core\Extension\Requirement\RequirementSeverity $severity
    *   The severity.
    */
-  protected function assertResultValid(ValidationResult $result, array $expected_messages, ?TranslatableMarkup $summary, int $severity): void {
+  protected function assertResultValid(ValidationResult $result, array $expected_messages, ?TranslatableMarkup $summary, RequirementSeverity $severity): void {
     $this->assertSame($expected_messages, $result->messages);
     if ($summary === NULL) {
       $this->assertNull($result->summary);
@@ -177,7 +190,34 @@ class ValidationResultTest extends UnitTestCase {
       $this->assertSame($summary->getUntranslatedString(), $result->summary
         ->getUntranslatedString());
     }
-    $this->assertSame($severity, $result->severity);
+    $this->assertSame($severity, $result->severityEnum);
+  }
+
+  /**
+   * Tests the deprecated severity property.
+   *
+   * @legacy-covers ::__get
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecatedSeverityProperty(): void {
+    // phpcs:ignore DrupalPractice.Objects.GlobalFunction
+    $result = ValidationResult::createError([t('Boo!')]);
+    $this->assertSame(RequirementSeverity::Error->value, $result->severity);
+  }
+
+  /**
+   * Tests constructing a result with an int severity.
+   *
+   * @legacy-covers ::__construct
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecatedIntSeverityConstructorArgument(): void {
+    $reflected_constructor = new \ReflectionMethod(ValidationResult::class, '__construct');
+    $reflected_class = new \ReflectionClass(ValidationResult::class);
+    $result = $reflected_class->newInstanceWithoutConstructor();
+    // phpcs:ignore DrupalPractice.Objects.GlobalFunction
+    $reflected_constructor->invoke($result, RequirementSeverity::Error->value, [t('Boo!')], NULL, TRUE);
+    $this->assertSame(RequirementSeverity::Error, $result->severityEnum);
   }
 
 }

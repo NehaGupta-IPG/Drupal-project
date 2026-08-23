@@ -13,16 +13,24 @@ use PhpTuf\ComposerStager\API\Exception\ExceptionInterface;
  * A value object to contain the results of a validation.
  *
  * @property \Drupal\Core\StringTranslation\TranslatableMarkup[] $messages
+ * @property int $severity
+ *   The severity of the result as an int. Deprecated in drupal:11.5.0 and is
+ *   removed from drupal:12.0.0. Use
+ *   \Drupal\package_manager\ValidationResult::$severityEnum instead. See
+ *   https://www.drupal.org/node/3618729.
  */
 final class ValidationResult {
 
   /**
+   * The severity of the result.
+   */
+  public readonly RequirementSeverity $severityEnum;
+
+  /**
    * Creates a ValidationResult object.
    *
-   * @param int $severity
-   *   The severity of the result. Should be one of the
-   *   SystemManager::REQUIREMENT_* constants.
-   *   @todo Refactor this to use RequirementSeverity in https://www.drupal.org/i/3525121.
+   * @param \Drupal\Core\Extension\Requirement\RequirementSeverity|int $severity
+   *   The severity of the result.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup[]|string[] $messages
    *   The result messages.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $summary
@@ -35,11 +43,16 @@ final class ValidationResult {
    *   is NULL.
    */
   private function __construct(
-    public readonly int $severity,
+    RequirementSeverity|int $severity,
     private readonly array $messages,
     public readonly ?TranslatableMarkup $summary,
     bool $assert_translatable,
   ) {
+    if (is_int($severity)) {
+      @trigger_error('Calling ' . __METHOD__ . '() with $severity as an int is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Pass a \Drupal\Core\Extension\Requirement\RequirementSeverity instead. See https://www.drupal.org/node/3618729', E_USER_DEPRECATED);
+      $severity = RequirementSeverity::from($severity);
+    }
+    $this->severityEnum = $severity;
     if ($assert_translatable) {
       assert(Inspector::assertAll(fn ($message) => $message instanceof TranslatableMarkup, $messages));
     }
@@ -58,9 +71,21 @@ final class ValidationResult {
     return match ($name) {
       // The messages must be private so that they cannot be mutated by external
       // code, but we want to allow callers to access them in the same way as
-      // $this->summary and $this->severity.
+      // $this->summary and $this->severityEnum.
       'messages' => $this->messages,
+      'severity' => $this->getDeprecatedSeverity(),
     };
+  }
+
+  /**
+   * Returns the integer severity of the result.
+   *
+   * @return int
+   *   The severity of the result.
+   */
+  private function getDeprecatedSeverity(): int {
+    @trigger_error('\Drupal\package_manager\ValidationResult::$severity is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Use \Drupal\package_manager\ValidationResult::$severityEnum instead. See https://www.drupal.org/node/3618729', E_USER_DEPRECATED);
+    return $this->severityEnum->value;
   }
 
   /**
@@ -77,7 +102,7 @@ final class ValidationResult {
     // All Composer Stager exceptions are translatable.
     $is_translatable = $throwable instanceof ExceptionInterface;
     $message = $is_translatable ? $throwable->getTranslatableMessage() : $throwable->getMessage();
-    return new static(RequirementSeverity::Error->value, [$message], $summary, $is_translatable);
+    return new static(RequirementSeverity::Error, [$message], $summary, $is_translatable);
   }
 
   /**
@@ -91,7 +116,7 @@ final class ValidationResult {
    * @return static
    */
   public static function createError(array $messages, ?TranslatableMarkup $summary = NULL): static {
-    return new static(RequirementSeverity::Error->value, $messages, $summary, TRUE);
+    return new static(RequirementSeverity::Error, $messages, $summary, TRUE);
   }
 
   /**
@@ -105,7 +130,7 @@ final class ValidationResult {
    * @return static
    */
   public static function createWarning(array $messages, ?TranslatableMarkup $summary = NULL): static {
-    return new static(RequirementSeverity::Warning->value, $messages, $summary, TRUE);
+    return new static(RequirementSeverity::Warning, $messages, $summary, TRUE);
   }
 
   /**
@@ -117,15 +142,35 @@ final class ValidationResult {
    * @return int
    *   The overall severity of the results. Will be one of the
    *   SystemManager::REQUIREMENT_* constants.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Use
+   *   \Drupal\package_manager\ValidationResult::getOverallSeverityEnum()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3618729
    */
   public static function getOverallSeverity(array $results): int {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Use \Drupal\package_manager\ValidationResult::getOverallSeverityEnum() instead. See https://www.drupal.org/node/3618729', E_USER_DEPRECATED);
+    return static::getOverallSeverityEnum($results)->value;
+  }
+
+  /**
+   * Returns the overall severity for a set of validation results.
+   *
+   * @param \Drupal\package_manager\ValidationResult[] $results
+   *   The validation results.
+   *
+   * @return \Drupal\Core\Extension\Requirement\RequirementSeverity
+   *   The overall severity of the results.
+   */
+  public static function getOverallSeverityEnum(array $results): RequirementSeverity {
     foreach ($results as $result) {
-      if ($result->severity === RequirementSeverity::Error->value) {
-        return RequirementSeverity::Error->value;
+      if ($result->severityEnum === RequirementSeverity::Error) {
+        return RequirementSeverity::Error;
       }
     }
     // If there were no errors, then any remaining results must be warnings.
-    return $results ? RequirementSeverity::Warning->value : RequirementSeverity::OK->value;
+    return $results ? RequirementSeverity::Warning : RequirementSeverity::OK;
   }
 
   /**
@@ -142,7 +187,7 @@ final class ValidationResult {
    */
   public static function isEqual(self $a, self $b): bool {
     return (
-      $a->severity === $b->severity &&
+      $a->severityEnum === $b->severityEnum &&
       strval($a->summary) === strval($b->summary) &&
       array_map('strval', $a->messages) === array_map('strval', $b->messages)
     );
