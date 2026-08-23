@@ -6,6 +6,8 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\DefaultConfigMode;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -86,7 +88,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $this->updateRegistry = $update_registry;
 
     if (!$this->moduleWeight instanceof ModuleWeight) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleWeight argument is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3595653', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleWeight argument is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3595653', E_USER_DEPRECATED);
       $this->moduleWeight = \Drupal::service(ModuleWeight::class);
     }
   }
@@ -736,10 +738,17 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * @internal
    */
   protected function installSchema(string $module): void {
-    $tables = $this->invoke($module, 'schema') ?? [];
+    $schemaDefinition = $this->invoke($module, 'schema') ?? [];
     $schema = $this->connection->schema();
-    foreach ($tables as $name => $table) {
-      $schema->createTable($name, $table);
+    if ($schemaDefinition instanceof Schema) {
+      assert($schemaDefinition->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
+      assert($schemaDefinition->name === $module, 'Invalid schema definition name, must be equal to the module name');
+      $schema->createSchemaFromDefinition($schemaDefinition);
+    }
+    else {
+      foreach ($schemaDefinition as $name => $table) {
+        $schema->createTable($name, $table);
+      }
     }
   }
 
@@ -752,9 +761,10 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * @internal
    */
   protected function uninstallSchema(string $module): void {
-    $tables = $this->invoke($module, 'schema') ?? [];
+    $schemaDefinition = $this->invoke($module, 'schema') ?? [];
     $schema = $this->connection->schema();
-    foreach (array_keys($tables) as $table) {
+    $table_names = ($schemaDefinition instanceof Schema) ? $schemaDefinition->tableNames() : array_keys($schemaDefinition);
+    foreach ($table_names as $table) {
       if ($schema->tableExists($table)) {
         $schema->dropTable($table);
       }
