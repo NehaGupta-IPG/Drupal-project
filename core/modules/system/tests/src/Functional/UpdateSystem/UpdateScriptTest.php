@@ -58,8 +58,6 @@ class UpdateScriptTest extends BrowserTestBase {
 
   /**
    * A user with the necessary permissions to administer software updates.
-   *
-   * @var \Drupal\user\UserInterface
    */
   private UserInterface $updateUser;
 
@@ -579,8 +577,7 @@ class UpdateScriptTest extends BrowserTestBase {
           'theme' => ['theme'],
         ],
       ],
-      'core and contrib' =>
-      [
+      'core and contrib' => [
         'core' => [
           'module' => ['aggregator', 'rdf'],
           'theme' => ['seven'],
