@@ -118,7 +118,7 @@ function user_update_last_removed(): int {
 /**
  * Adds the 'color_scheme' base field to the user entity.
  */
-function user_update_11101(): void {
+function user_update_11401(): void {
   $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
   $field = BaseFieldDefinition::create('string')
     ->setLabel(t('Color scheme'))
