@@ -4,16 +4,15 @@
 {# Setup base attributes #}
 {# Additional classes will be set by variant. #}
 {% set attributes = create_attribute({
-  'class': ['ui-dialog', 'ui-widget', 'ui-front'],
-  'aria-labelledby': id ~ '-title',
+  class: ['ui-dialog', 'ui-widget', 'ui-front'],
+  'aria-labelledby': (id ~ '-title'),
  })
 %}
-
 
 {# Setup content wrapper attributes #}
 {# Additional classes will be set by variant. #}
 {% set content_wrapper_attributes = create_attribute({
-    'class': ['dialog-content', 'ui-dialog-content'],
+    class: ['dialog-content', 'ui-dialog-content'],
   })
 %}
 
@@ -24,7 +23,7 @@
   'dialog-off-canvas',
   'dialog-position-' ~ position ?? 'side',
   'ui-dialog-off-canvas',
-  'ui-dialog-position-' ~ position ?? 'side'
+  'ui-dialog-position-' ~ position ?? 'side',
   ]) }}>
   {% else %}
     {# Setup default and modal dialog attributes #}

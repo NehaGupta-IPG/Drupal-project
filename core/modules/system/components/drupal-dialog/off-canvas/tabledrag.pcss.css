@@ -54,13 +54,13 @@
       content: "";
       cursor: move;
       background-color: transparent;
-      background-image: url(../../../icons/bebebe/move.svg);
+      background-image: url(../../../../../misc/icons/bebebe/move.svg);
       background-repeat: no-repeat;
       background-position: center;
 
       @media (forced-colors: active) {
         background: linktext;
-        mask-image: url(../../../icons/bebebe/move.svg);
+        mask-image: url(../../../../../misc/icons/bebebe/move.svg);
         mask-repeat: no-repeat;
         mask-position: center;
       }

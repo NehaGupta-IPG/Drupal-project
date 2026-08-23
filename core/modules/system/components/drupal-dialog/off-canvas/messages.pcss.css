@@ -11,9 +11,9 @@
   --off-canvas-messages-text-color-status: #325e1c;
   --off-canvas-messages-text-color-warning: #734c00;
   --off-canvas-messages-text-color-error: #a51b00;
-  --off-canvas-messages-icon-status: url(../../../icons/73b355/check.svg);
-  --off-canvas-messages-icon-warning: url(../../../icons/e29700/warning.svg);
-  --off-canvas-messages-icon-error: url(../../../icons/e32700/error.svg);
+  --off-canvas-messages-icon-status: url(../../../../../misc/icons/73b355/check.svg);
+  --off-canvas-messages-icon-warning: url(../../../../../misc/icons/e29700/warning.svg);
+  --off-canvas-messages-icon-error: url(../../../../../misc/icons/e32700/error.svg);
 
   & .messages {
     position: relative; /* Anchor ::before pseudo-element. */

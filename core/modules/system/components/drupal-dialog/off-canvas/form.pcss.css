@@ -110,7 +110,7 @@
     padding-inline-end: 20px;
     border: var(--drupal-off-canvas-input-border);
     border-radius: var(--drupal-off-canvas-input-border-radius);
-    background-image: url(../../../icons/545560/chevron-down.svg);
+    background-image: url(../../../../../misc/icons/545560/chevron-down.svg);
     background-repeat: no-repeat;
     background-position: center right 5px; /* LTR */
     background-size: 12px;
@@ -131,12 +131,12 @@
    */
   & .form-autocomplete {
     padding-inline-end: 40px; /* Room for icon. */
-    background-image: url(../../../icons/868686/magnifier.svg);
+    background-image: url(../../../../../misc/icons/868686/magnifier.svg);
     background-repeat: no-repeat;
     background-position: center right 1px; /* LTR */
 
     &.ui-autocomplete-loading {
-      background-image: url(../../../icons/spinner.gif);
+      background-image: url(../../../../../misc/icons/spinner.gif);
     }
 
     &:dir(rtl) {

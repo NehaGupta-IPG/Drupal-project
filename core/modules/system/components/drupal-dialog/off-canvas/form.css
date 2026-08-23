@@ -143,7 +143,7 @@
     background-position: center right 1px; /* LTR */
 
     &.ui-autocomplete-loading {
-      background-image: url(../../../icons/spinner.gif);
+      background-image: url(../../../../../misc/icons/spinner.gif);
     }
 
     &:dir(rtl) {

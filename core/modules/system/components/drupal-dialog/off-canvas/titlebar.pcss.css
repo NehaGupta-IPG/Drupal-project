@@ -31,7 +31,7 @@
       height: 100%;
       content: "";
       background-color: currentColor;
-      mask-image: url(../../../icons/ffffff/pencil.svg);
+      mask-image: url(../../../../../misc/icons/ffffff/pencil.svg);
       mask-repeat: no-repeat;
       mask-size: contain;
       mask-position: center;
