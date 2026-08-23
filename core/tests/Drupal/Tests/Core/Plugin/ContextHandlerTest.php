@@ -123,6 +123,53 @@ class ContextHandlerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that a definition is asked about a context object only once.
+   */
+  public function testGetMatchingContextsMemoizesTheAnswer(): void {
+    $context = $this->createStub('Drupal\\Core\\Plugin\\Context\\ContextInterface');
+    $definition = $this->createMock('Drupal\\Core\\Plugin\\Context\\ContextDefinitionInterface');
+    // Without the memo this runs once per call below. isSatisfiedBy() is pure
+    // with respect to its two operands, so the repeats can only ever produce
+    // the answer that is already known.
+    $definition->expects($this->once())
+      ->method('isSatisfiedBy')
+      ->with($context)
+      ->willReturn(TRUE);
+
+    $contexts = ['node' => $context];
+    for ($i = 0; $i < 3; $i++) {
+      $this->assertSame($contexts, $this->contextHandler->getMatchingContexts($contexts, $definition));
+    }
+  }
+
+  /**
+   * Tests that the memo is kept per operand pair.
+   */
+  public function testGetMatchingContextsKeepsAnswersApart(): void {
+    $satisfied = $this->createStub('Drupal\\Core\\Plugin\\Context\\ContextInterface');
+    $unsatisfied = $this->createStub('Drupal\\Core\\Plugin\\Context\\ContextInterface');
+    $contexts = ['yes' => $satisfied, 'no' => $unsatisfied];
+
+    // The second definition answers the other way round for both contexts, so
+    // an answer shared between definitions or between contexts surfaces as a
+    // wrong return value and not only as a call count.
+    $first = $this->createMock('Drupal\\Core\\Plugin\\Context\\ContextDefinitionInterface');
+    $first->expects($this->exactly(2))
+      ->method('isSatisfiedBy')
+      ->willReturnCallback(fn ($context) => $context === $satisfied);
+
+    $second = $this->createMock('Drupal\\Core\\Plugin\\Context\\ContextDefinitionInterface');
+    $second->expects($this->exactly(2))
+      ->method('isSatisfiedBy')
+      ->willReturnCallback(fn ($context) => $context === $unsatisfied);
+
+    for ($i = 0; $i < 2; $i++) {
+      $this->assertSame(['yes' => $satisfied], $this->contextHandler->getMatchingContexts($contexts, $first));
+      $this->assertSame(['no' => $unsatisfied], $this->contextHandler->getMatchingContexts($contexts, $second));
+    }
+  }
+
+  /**
    * Tests get matching contexts.
    */
   #[DataProvider('providerTestGetMatchingContexts')]

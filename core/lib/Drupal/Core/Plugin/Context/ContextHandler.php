@@ -14,6 +14,18 @@ use Drupal\Core\Plugin\ContextAwarePluginInterface;
 class ContextHandler implements ContextHandlerInterface {
 
   /**
+   * Memo of isSatisfiedBy() answers, per definition and then per context.
+   *
+   * Both operands are held as weak references, so an answer disappears once
+   * either side is collected. Keeping them as keys is also what makes the memo
+   * safe: an object id alone could be reused by a later object while the
+   * answer for the collected one is still readable.
+   *
+   * @var \WeakMap<\Drupal\Core\Plugin\Context\ContextDefinitionInterface, \WeakMap<\Drupal\Core\Plugin\Context\ContextInterface, bool>>|null
+   */
+  protected ?\WeakMap $satisfiedBy = NULL;
+
+  /**
    * {@inheritdoc}
    */
   public function filterPluginDefinitionsByContexts(array $contexts, array $definitions) {
@@ -72,8 +84,26 @@ class ContextHandler implements ContextHandlerInterface {
    * {@inheritdoc}
    */
   public function getMatchingContexts(array $contexts, ContextDefinitionInterface $definition) {
-    return array_filter($contexts, function (ContextInterface $context) use ($definition) {
-      return $definition->isSatisfiedBy($context);
+    // isSatisfiedBy() is pure with respect to its two operands: the same
+    // definition asked about the same context cannot answer differently within
+    // a request. It is also expensive - it builds constraint objects, may
+    // generate sample entities through
+    // EntityContextDefinition::getSampleValues() and runs the validator - and
+    // callers ask it the same questions
+    // repeatedly. Layout Builder is the extreme case: every entity it renders
+    // filters the section storage definitions against every available context,
+    // and LazyContextRepository hands out the same runtime context objects each
+    // time, so the answers are already known.
+    $this->satisfiedBy ??= new \WeakMap();
+    $answers = $this->satisfiedBy[$definition] ??= new \WeakMap();
+
+    // The closure is typed so that its signature stays what it was before the
+    // memo: reading back from a WeakMap widens to mixed otherwise.
+    return array_filter($contexts, function (ContextInterface $context) use ($definition, $answers): bool {
+      if (!isset($answers[$context])) {
+        $answers[$context] = $definition->isSatisfiedBy($context);
+      }
+      return (bool) $answers[$context];
     });
   }
 
