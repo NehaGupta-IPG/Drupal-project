@@ -33,4 +33,4 @@ administer node published status:
   restrict access: true
 
 permission_callbacks:
-  - \Drupal\node\NodePermissions::nodeTypePermissions
+  - \Drupal\node\NodePermissions:nodeTypePermissions

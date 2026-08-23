@@ -270,7 +270,7 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
           foreach ($methodAttributes as $attribute) {
             if ($attribute instanceof Hook) {
               self::checkInvalidHookParametersInThemes($attribute, $class);
-              $this->oopImplementations[$attribute->hook][$class . '::' . ($attribute->method ?: $method)] = $theme;
+              $this->oopImplementations[$attribute->hook][$class . ':' . ($attribute->method ?: $method)] = $theme;
             }
             elseif ($attribute instanceof RemoveHook) {
               throw new \LogicException("The #[RemoveHook] attribute is not allowed in themes. Found in $class.");
@@ -355,7 +355,7 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
     $classesMap = [];
     foreach ($implementationsByHook as $hookImplementations) {
       foreach (array_keys($hookImplementations) as $identifier) {
-        $parts = explode('::', $identifier, 2);
+        $parts = explode(':', $identifier, 2);
         if (isset($parts[1])) {
           $classesMap[$parts[0]] = TRUE;
         }

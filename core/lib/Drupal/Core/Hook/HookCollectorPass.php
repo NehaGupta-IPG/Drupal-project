@@ -272,7 +272,7 @@ class HookCollectorPass implements CompilerPassInterface {
     $classesMap = [];
     foreach ($implementationsByHook as $hookImplementations) {
       foreach (array_keys($hookImplementations) as $identifier) {
-        $parts = explode('::', $identifier, 2);
+        $parts = explode(':', $identifier, 2);
         if (isset($parts[1])) {
           $classesMap[$parts[0]] = TRUE;
         }
@@ -426,7 +426,7 @@ class HookCollectorPass implements CompilerPassInterface {
           foreach ($methodAttributes as $attribute) {
             if ($attribute instanceof Hook) {
               self::checkForProceduralOnlyHooks($attribute, $class);
-              $this->oopImplementations[$attribute->hook][$class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
+              $this->oopImplementations[$attribute->hook][$class . ':' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
               if ($attribute->order !== NULL) {
                 // Use a lower weight for order operations that are declared
                 // together with the hook listener they apply to.
@@ -436,7 +436,7 @@ class HookCollectorPass implements CompilerPassInterface {
             elseif ($attribute instanceof ReorderHook) {
               $identifier = $attribute->class === ProceduralCall::class
                 ? $attribute->method
-                : $attribute->class . '::' . $attribute->method;
+                : $attribute->class . ':' . $attribute->method;
               // Use a higher weight for order operations that target other hook
               // listeners.
               $this->orderOperations[$attribute->hook][1][] = $attribute->order->getOperation($identifier);
@@ -444,7 +444,7 @@ class HookCollectorPass implements CompilerPassInterface {
             elseif ($attribute instanceof RemoveHook) {
               $identifier = $attribute->class === ProceduralCall::class
                 ? $attribute->method
-                : $attribute->class . '::' . $attribute->method;
+                : $attribute->class . ':' . $attribute->method;
               $this->removeHookIdentifiers[$attribute->hook][] = $identifier;
             }
           }

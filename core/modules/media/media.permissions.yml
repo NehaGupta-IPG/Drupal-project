@@ -34,7 +34,7 @@ access media overview:
   description: 'Users with this permission can access the media overview page.'
 
 permission_callbacks:
-  - \Drupal\media\MediaPermissions::mediaTypePermissions
+  - \Drupal\media\MediaPermissions:mediaTypePermissions
 
 view own unpublished media:
   title: 'View own unpublished media'

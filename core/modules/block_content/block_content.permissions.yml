@@ -1,5 +1,5 @@
 permission_callbacks:
-  - \Drupal\block_content\BlockContentPermissions::blockTypePermissions
+  - \Drupal\block_content\BlockContentPermissions:blockTypePermissions
 
 access block library:
   title: 'Access the Content blocks overview page'

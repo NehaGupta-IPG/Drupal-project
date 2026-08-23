@@ -73,4 +73,4 @@ image.effect_edit_form:
     _permission: 'administer image styles'
 
 route_callbacks:
-  - '\Drupal\image\Routing\ImageStyleRoutes::routes'
+  - '\Drupal\image\Routing\ImageStyleRoutes:routes'

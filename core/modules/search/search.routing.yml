@@ -65,4 +65,4 @@ entity.search_page.delete_form:
     _entity_access: 'search_page.delete'
 
 route_callbacks:
-  - '\Drupal\search\Routing\SearchPageRoutes::routes'
+  - '\Drupal\search\Routing\SearchPageRoutes:routes'

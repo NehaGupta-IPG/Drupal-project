@@ -18,4 +18,4 @@ view vocabulary labels:
   title: 'View vocabulary labels'
 
 permission_callbacks:
-  - Drupal\taxonomy\TaxonomyPermissions::permissions
+  - Drupal\taxonomy\TaxonomyPermissions:permissions
