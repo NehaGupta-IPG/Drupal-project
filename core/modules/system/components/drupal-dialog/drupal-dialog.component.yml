@@ -1,7 +1,7 @@
 $schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
 
 name: Drupal Dialog
-description: A web component wrapping a dialog intended to be rendered for display using HTMX.
+description: A web component wrapping a dialog element. Used by HtmxDialogRenderer but functionally independent.
 status: experimental
 group: Dialog
 
@@ -31,7 +31,7 @@ props:
     position:
       type: string
       title: Dialog position
-      description: Only used by core of off-canvas which is currently always set to 'side'.
+      description: Only used by core for off-canvas which is currently always set to 'side'.
       enum:
         - default
         - top
@@ -45,8 +45,6 @@ slots:
     description: The content provided for the dialog
 
 libraryOverrides:
-  dependencies:
-    - core/drupal.htmx
   css:
     component:
       drupal-dialog.css: {}

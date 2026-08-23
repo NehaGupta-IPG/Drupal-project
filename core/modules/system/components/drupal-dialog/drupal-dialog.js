@@ -15,7 +15,7 @@
    *   attribute
    *   2. closedby="any" backdrop-click polyfill for Safari
    *   3. Self-removal from DOM on dialog close (unless data-persist)
-   *   4. Cleanup when removed by server (htmx delete swap) via disconnectedCallback
+   *   4. Cleanup when removed by other code via disconnectedCallback
    */
   class DrupalDialog extends HTMLElement {
     connectedCallback() {
@@ -74,7 +74,7 @@
     }
 
     disconnectedCallback() {
-      // Server-driven removal path: htmx deleted this element without calling
+      // This element was deleted without calling
       // dialog.close(). Clean up and close silently if still open.
       const dialog = this.querySelector('dialog');
       if (!dialog) return;

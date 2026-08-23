@@ -114,47 +114,9 @@ dialog.titlebar:empty {
 }
 
 /* Content */
-[data-dialog-content] {
+.dialog-content {
   overflow: auto;
   flex: 1 1 auto;
   padding: 1.25rem 1.5rem;
   background: #fff;
-}
-
-/* Footer */
-[data-dialog-footer] {
-  display: flex;
-  flex-wrap: wrap;
-  flex-shrink: 0;
-  justify-content: flex-end;
-  padding: 0.75rem 1.5rem;
-  border-top: 1px solid #ddd;
-  border-radius: 0 0 4px 4px;
-  background: #f3f4f9;
-  gap: 0.5rem;
-}
-[data-dialog-footer]:empty {
-  display: none;
-}
-
-/* Danger variant — alertdialog with destructive action */
-[data-dialog-titlebar][data-dialog-danger] {
-  background: #b91c1c;
-}
-
-.button--danger {
-  padding: 0.4rem 0.9rem;
-  cursor: pointer;
-  color: #fff;
-  border: none;
-  border-radius: 3px;
-  background: #b91c1c;
-  font-size: 1rem;
-}
-.button--danger:hover {
-  background: #991b1b;
-}
-.button--danger:focus-visible {
-  outline: 2px solid #fca5a5;
-  outline-offset: 2px;
 }
