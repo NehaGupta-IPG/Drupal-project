@@ -66,6 +66,21 @@ class AttributeScannerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that an array of namespaces can be scanned.
+   */
+  public function testScanSupportsNamespaceArrays(): void {
+    $scanner = new AttributeScanner([
+      'Drupal\\router_test' => $this->root . '/core/modules/system/tests/modules/router_test_directory/src',
+    ]);
+    $classes = [];
+    foreach ($scanner->scan(Route::class, 'Controller') as $reflection) {
+      $classes[] = $reflection->getName();
+    }
+
+    $this->assertContains(TestAttributes::class, $classes);
+  }
+
+  /**
    * Tests that non-instantiable and non-loadable classes are skipped.
    */
   public function testScanSkipsNonLoadableClasses(): void {

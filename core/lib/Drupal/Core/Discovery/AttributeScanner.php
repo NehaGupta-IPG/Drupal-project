@@ -19,12 +19,11 @@ class AttributeScanner {
   /**
    * Constructs an AttributeScanner object.
    *
-   * @param \Traversable<string, string|array<int, string>> $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look in.
+   * @param array<string, string|array<int, string>>|\Traversable<string, string|array<int, string>> $namespaces
+   *   The root paths keyed by the corresponding namespace to look in.
    */
   public function __construct(
-    protected readonly \Traversable $namespaces,
+    protected readonly array|\Traversable $namespaces,
   ) {}
 
   /**

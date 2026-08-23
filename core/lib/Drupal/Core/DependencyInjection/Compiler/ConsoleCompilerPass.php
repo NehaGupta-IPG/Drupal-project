@@ -24,7 +24,7 @@ class ConsoleCompilerPass implements CompilerPassInterface {
    */
   public function process(ContainerBuilder $container): void {
     // Get all classes with the #[AsCommand] attribute.
-    $scanner = new AttributeScanner(new \ArrayIterator($container->getParameter('container.namespaces')));
+    $scanner = new AttributeScanner($container->getParameter('container.namespaces'));
     foreach ($scanner->scan(AsCommand::class, 'Command') as $reflection) {
       $className = $reflection->getName();
       // Don't create a service definition if this class is already a service.
