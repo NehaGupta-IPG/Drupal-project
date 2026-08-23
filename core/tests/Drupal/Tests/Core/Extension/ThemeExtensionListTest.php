@@ -14,6 +14,7 @@ use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Lock\NullLockBackend;
 use Drupal\Core\State\State;
+use Drupal\Core\State\StateInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -89,6 +90,39 @@ class ThemeExtensionListTest extends UnitTestCase {
     $this->assertEquals('test_base_theme', $info_base_theme->getName());
     $this->assertInstanceOf('Drupal\Core\Extension\Extension', $info_subtheme);
     $this->assertEquals('test_subtheme', $info_subtheme->getName());
+  }
+
+  /**
+   * Tests that installed theme path names are taken from the container.
+   *
+   * The constructor seeds the path names of installed themes from the
+   * container so that the state cache is not consulted.
+   */
+  public function testGetPathnameFromContainer(): void {
+    $state = $this->prophesize(StateInterface::class);
+    $state->get(Argument::cetera())->shouldNotBeCalled();
+    $state->set(Argument::cetera())->shouldNotBeCalled();
+
+    $extension_discovery = $this->prophesize(ExtensionDiscovery::class);
+    $extension_discovery->scan(Argument::cetera())->shouldNotBeCalled();
+
+    $module_handler = $this->prophesize(ModuleHandlerInterface::class);
+    $config_factory = $this->getConfigFactoryStub([]);
+
+    $theme_list = new TestThemeExtensionList(
+      $this->root,
+      new NullBackend('test'),
+      new InfoParser($this->root),
+      $module_handler->reveal(),
+      $state->reveal(),
+      $config_factory,
+      'test',
+      ['test_theme' => ['pathname' => 'core/themes/test_theme/test_theme.info.yml']],
+    );
+    $theme_list->setExtensionDiscovery($extension_discovery->reveal());
+
+    $this->assertSame('core/themes/test_theme/test_theme.info.yml', $theme_list->getPathname('test_theme'));
+    $this->assertSame('core/themes/test_theme', $theme_list->getPath('test_theme'));
   }
 
   /**

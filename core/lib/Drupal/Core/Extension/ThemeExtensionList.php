@@ -81,10 +81,17 @@ class ThemeExtensionList extends ExtensionList {
     ConfigFactoryInterface $config_factory,
     #[Autowire(param: 'install_profile')]
     $install_profile,
+    #[Autowire(param: 'container.themes')]
+    array $container_themes_info = [],
   ) {
     parent::__construct($root, 'theme', $cache, $info_parser, $module_handler, $state, $install_profile);
 
     $this->configFactory = $config_factory;
+
+    // Use the information from the container. This is an optimization.
+    foreach ($container_themes_info as $theme_name => $info) {
+      $this->addedPathNames[$theme_name] = $info['pathname'];
+    }
   }
 
   /**
