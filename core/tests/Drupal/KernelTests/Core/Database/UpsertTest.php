@@ -46,7 +46,10 @@ class UpsertTest extends DatabaseTestBase {
       'name' => 'Meredith',
     ]);
 
-    $upsert->execute();
+    $result = $upsert->execute();
+    // @todo Remove the assertion in drupal:13.0.0.
+    // @see https://www.drupal.org/project/drupal/issues/3615136
+    $this->assertNull($result);
 
     $num_records_after = $connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField();
     $this->assertEquals($num_records_before + 1, $num_records_after, 'Rows were inserted and updated properly.');
@@ -150,7 +153,6 @@ class UpsertTest extends DatabaseTestBase {
 
     // Add a new row.
     $upsert->values([
-      // Test a non sequence ID for better testing of the default return value.
       'id' => 3,
       'update' => 'Update value 2',
     ]);
