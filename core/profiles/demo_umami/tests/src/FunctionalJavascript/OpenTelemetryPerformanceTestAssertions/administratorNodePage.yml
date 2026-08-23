@@ -1,9 +1,9 @@
 QueryCount: 261
-CacheGetCount: 258
+CacheGetCount: 275
 CacheGetCountByBin:
   config: 55
   bootstrap: 15
-  discovery: 86
+  discovery: 103
   data: 13
   entity: 24
   dynamic_page_cache: 1
@@ -12,7 +12,7 @@ CacheGetCountByBin:
   render: 17
   file_parsing: 2
   menu: 21
-CacheSetCount: 266
+CacheSetCount: 283
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
 CacheTagLookupQueryCount: 30
@@ -129,6 +129,6 @@ CacheTagGroupedLookups:
   -
     - block_content_view
 ScriptCount: 12
-ScriptBytes: 187160
+ScriptBytes: 187089
 StylesheetCount: 11
-StylesheetBytes: 73614
+StylesheetBytes: 73545

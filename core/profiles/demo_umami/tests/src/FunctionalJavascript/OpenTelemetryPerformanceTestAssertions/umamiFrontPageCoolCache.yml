@@ -1,17 +1,17 @@
-QueryCount: 55
-CacheGetCount: 165
+QueryCount: 54
+CacheGetCount: 174
 CacheGetCountByBin:
   page: 1
   config: 40
   bootstrap: 13
-  discovery: 58
+  discovery: 67
   data: 8
   dynamic_page_cache: 1
   render: 23
   default: 2
   entity: 16
   routes: 3
-CacheSetCount: 76
+CacheSetCount: 75
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
 CacheTagLookupQueryCount: 19
@@ -115,6 +115,6 @@ CacheTagGroupedLookups:
   -
     - 'config:user.role.anonymous'
 ScriptCount: 3
-ScriptBytes: 12091
+ScriptBytes: 12006
 StylesheetCount: 7
 StylesheetBytes: 34766
