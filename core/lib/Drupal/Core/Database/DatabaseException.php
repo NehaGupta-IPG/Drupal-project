@@ -9,7 +9,7 @@ namespace Drupal\Core\Database;
  * throw exceptions that implement this interface to allow database
  * abstraction in Drupal.
  */
-// phpcs:ignore Drupal.Classes.InterfaceName.InterfaceSuffix
+// phpcs:ignore Generic.NamingConventions.InterfaceNameSuffix.Missing
 interface DatabaseException extends \Throwable {
 
 }
