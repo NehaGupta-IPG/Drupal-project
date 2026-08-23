@@ -133,8 +133,6 @@ class LocaleUpdateTest extends LocaleUpdateBase {
    */
   #[Repeat(3, 2)]
   public function testUpdateImportSourceRemote(): void {
-    // @todo Fix random test failure.
-    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3393477');
     $config = $this->config('locale.settings');
 
     // Build the test environment.
