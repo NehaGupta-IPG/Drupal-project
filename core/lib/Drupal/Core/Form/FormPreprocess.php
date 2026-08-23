@@ -145,6 +145,11 @@ class FormPreprocess {
     $variables['label_display'] = $element['#title_display'];
     $variables['label'] = ['#theme' => 'form_element_label'];
     $variables['label'] += array_intersect_key($element, array_flip(['#id', '#required', '#title', '#title_display']));
+    // Pass errors to the label template so it can adjust visually-hidden
+    // behavior when validation fails.
+    if (!empty($element['#errors'])) {
+      $variables['label']['#errors'] = $element['#errors'];
+    }
     $variables['label']['#attributes'] = $element['#label_attributes'];
     if (!empty($element['#label_for'])) {
       $variables['label']['#for'] = $element['#label_for'];
@@ -207,6 +212,10 @@ class FormPreprocess {
 
     // Pass elements required to template.
     $variables['required'] = !empty($element['#required']) ? $element['#required'] : NULL;
+
+    // Pass errors to template so labels can adjust visually-hidden behavior
+    // when validation fails.
+    $variables['errors'] = !empty($element['#errors']) ? $element['#errors'] : NULL;
   }
 
   /**
