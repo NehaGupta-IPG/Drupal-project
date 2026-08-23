@@ -46,16 +46,6 @@ third_party_settings:
                 entity: layout_builder.entity
             weight: 1
             additional: {  }
-          01b94e28-e38c-4849-98d6-ed77bca30afc:
-            uuid: 01b94e28-e38c-4849-98d6-ed77bca30afc
-            region: content
-            configuration:
-              id: 'extra_field_block:node:page:content_moderation_control'
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-            weight: 2
-            additional: {  }
         third_party_settings: {  }
 id: node.page.full
 targetEntityType: node
@@ -80,5 +70,6 @@ content:
     weight: 1
     region: content
 hidden:
+  content_moderation_control: true
   langcode: true
   layout_builder__layout: true
