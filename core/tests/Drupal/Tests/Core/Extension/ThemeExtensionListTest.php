@@ -96,6 +96,8 @@ class ThemeExtensionListTest extends UnitTestCase {
 
     $extension_discovery = $this->prophesize(ExtensionDiscovery::class);
     $extension_discovery->scan(Argument::cetera())->shouldNotBeCalled();
+    $info_parser = $this->prophesize(InfoParserInterface::class);
+    $info_parser->parse(Argument::cetera())->shouldNotBeCalled();
 
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $config_factory = $this->getConfigFactoryStub([]);
@@ -103,7 +105,7 @@ class ThemeExtensionListTest extends UnitTestCase {
     $theme_list = new TestThemeExtensionList(
       $this->root,
       new NullBackend('test'),
-      new InfoParser($this->root),
+      $info_parser->reveal(),
       $module_handler->reveal(),
       $config_factory,
       'test',
