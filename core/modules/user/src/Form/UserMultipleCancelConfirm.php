@@ -212,30 +212,28 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
 
     // Clear out the accounts from the temp store.
     $this->tempStoreFactory->get('user_user_operations_cancel')->delete($current_user_id);
-    if ($form_state->getValue('confirm')) {
-      foreach ($form_state->getValue('accounts') as $uid => $value) {
-        // Prevent programmatic form submissions from cancelling user 1.
-        if ($uid <= 1) {
-          continue;
-        }
-        // Prevent user administrators from deleting themselves without
-        // confirmation.
-        if ($uid == $current_user_id) {
-          $admin_form_mock = [];
-          $admin_form_state = $form_state;
-          $admin_form_state->unsetValue('user_cancel_confirm');
-          // The $user global is not a complete user entity, so load the full
-          // entity.
-          $account = $this->userStorage->load($uid);
-          $admin_form = $this->entityTypeManager->getFormObject('user', 'cancel');
-          $admin_form->setEntity($account);
-          // Calling this directly required to init form object with $account.
-          $admin_form->buildForm($admin_form_mock, $admin_form_state);
-          $admin_form->submitForm($admin_form_mock, $admin_form_state);
-        }
-        else {
-          user_cancel($form_state->getValues(), $uid, $form_state->getValue('user_cancel_method'));
-        }
+    foreach ($form_state->getValue('accounts') as $uid => $value) {
+      // Prevent programmatic form submissions from cancelling user 1.
+      if ($uid <= 1) {
+        continue;
+      }
+      // Prevent user administrators from deleting themselves without
+      // confirmation.
+      if ($uid == $current_user_id) {
+        $admin_form_mock = [];
+        $admin_form_state = $form_state;
+        $admin_form_state->unsetValue('user_cancel_confirm');
+        // The $user global is not a complete user entity, so load the full
+        // entity.
+        $account = $this->userStorage->load($uid);
+        $admin_form = $this->entityTypeManager->getFormObject('user', 'cancel');
+        $admin_form->setEntity($account);
+        // Calling this directly required to init form object with $account.
+        $admin_form->buildForm($admin_form_mock, $admin_form_state);
+        $admin_form->submitForm($admin_form_mock, $admin_form_state);
+      }
+      else {
+        user_cancel($form_state->getValues(), $uid, $form_state->getValue('user_cancel_method'));
       }
     }
     $form_state->setRedirect('entity.user.collection');

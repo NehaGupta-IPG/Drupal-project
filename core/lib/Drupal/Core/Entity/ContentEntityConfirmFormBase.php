@@ -40,9 +40,17 @@ abstract class ContentEntityConfirmFormBase extends ContentEntityForm implements
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the internal name used to refer to the confirmation item.
+   *
+   * @return string
+   *   The internal form name.
    */
-  public function getFormName() {
+  public function getFormName(): string {
+    @trigger_error(
+      'ContentEntityConfirmFormBase::getFormName() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. 
+      Implementations should remove this method. See https://www.drupal.org/node/3505037',
+      E_USER_DEPRECATED
+    );
     return 'confirm';
   }
 
@@ -56,7 +64,6 @@ abstract class ContentEntityConfirmFormBase extends ContentEntityForm implements
 
     $form['#attributes']['class'][] = 'confirmation';
     $form['description'] = ['#markup' => $this->getDescription()];
-    $form[$this->getFormName()] = ['#type' => 'hidden', '#value' => 1];
 
     // By default, render the form using theme_confirm_form().
     if (!isset($form['#theme'])) {

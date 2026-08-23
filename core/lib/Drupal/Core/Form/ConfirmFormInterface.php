@@ -47,12 +47,4 @@ interface ConfirmFormInterface extends FormInterface {
    */
   public function getCancelText();
 
-  /**
-   * Returns the internal name used to refer to the confirmation item.
-   *
-   * @return string
-   *   The internal form name.
-   */
-  public function getFormName();
-
 }
