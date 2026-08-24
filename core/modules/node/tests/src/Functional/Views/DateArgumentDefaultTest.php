@@ -29,7 +29,7 @@ class DateArgumentDefaultTest extends NodeTestBase {
   public static $testViews = ['test_argument_node_date'];
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * @var array
    */

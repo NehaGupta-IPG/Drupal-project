@@ -98,7 +98,7 @@ class ConfigInstallWebTest extends BrowserTestBase {
     //   shouldn't.
     $this->container->get('config.factory')->reset();
 
-    // Disable and uninstall the integration module.
+    // Uninstall the integration module.
     $this->container->get('module_installer')->uninstall(['config_integration_test']);
 
     // Verify the integration module's config was uninstalled.
@@ -284,7 +284,7 @@ class ConfigInstallWebTest extends BrowserTestBase {
 
     $this->drupalGet('admin/modules');
 
-    // Enable a module which has a constant in configuration.
+    // Install a module which has a constant in configuration.
     $this->assertSession()->fieldExists('edit-modules-config-constant-test-enable')->check();
     $this->submitForm([], 'Install');
     $this->assertSession()->statusCodeEquals(200);

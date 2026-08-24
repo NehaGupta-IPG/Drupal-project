@@ -90,7 +90,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * Tests the plugin manager with a disabled module.
+   * Tests the plugin manager with an uninstalled module.
    */
   public function testDefaultPluginManagerWithDisabledModule(): void {
     $definitions = $this->expectedDefinitions;

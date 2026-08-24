@@ -35,7 +35,7 @@ function hook_config_translation_info(&$info): void {
   $entity_type_manager = \Drupal::entityTypeManager();
   $route_provider = \Drupal::service('router.route_provider');
 
-  // If field UI is not enabled, the base routes of the type
+  // If field UI is not installed, the base routes of the type
   // "entity.field_config.{$entity_type}_field_edit_form" are not defined.
   if (\Drupal::moduleHandler()->moduleExists('field_ui')) {
     // Add fields entity mappers to all fieldable entity types defined.

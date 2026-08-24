@@ -8,7 +8,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 
 /**
- * Provides helpers for enabling modules.
+ * Provides helpers for installing modules.
  *
  * @internal
  */
@@ -25,13 +25,13 @@ trait ModulesEnabledTrait {
   abstract protected function currentUser();
 
   /**
-   * Provides a confirmation message after modules have been enabled.
+   * Provides a confirmation message after modules have been installed.
    *
    * @param string[] $modules
-   *   Enabled module names, keyed by machine names.
+   *   Installed module names, keyed by machine names.
    *
    * @return \Drupal\Core\StringTranslation\PluralTranslatableMarkup
-   *   A confirmation message. If any of the enabled modules have permissions
+   *   A confirmation message. If any of the installed modules have permissions
    *   that the current user can manage, then include a link to the permissions
    *   page for those modules.
    */
@@ -62,12 +62,12 @@ trait ModulesEnabledTrait {
    * Provides a fail message after attempt to install a module.
    *
    * @param string[] $modules
-   *   Enabled module names, keyed by machine names.
+   *   Installed module names, keyed by machine names.
    * @param \Drupal\Core\Config\PreExistingConfigException $exception
    *   Exception thrown if configuration with the same name already exists.
    *
    * @return \Drupal\Core\StringTranslation\PluralTranslatableMarkup
-   *   A confirmation message. If any of the enabled modules have permissions
+   *   A confirmation message. If any of the installed modules have permissions
    *   that the current user can manage, then include a link to the permissions
    *   page for those modules.
    */

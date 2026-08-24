@@ -36,7 +36,7 @@ function locale_translation_flush_projects(): void {
  * module. Only the properties required by Locale module is included and
  * additional (custom) modules and translation server data is added.
  *
- * In case the Update Status module is disabled this function will return an
+ * In case the Update Status module is uninstalled this function will return an
  * empty array.
  *
  * @return array

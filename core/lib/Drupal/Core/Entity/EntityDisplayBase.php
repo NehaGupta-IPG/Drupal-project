@@ -283,7 +283,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
     $bundle_config_dependency = $target_entity_type->getBundleConfigDependency($this->bundle);
     $this->addDependency($bundle_config_dependency['type'], $bundle_config_dependency['name']);
 
-    // If field.module is enabled, add dependencies on 'field_config' entities
+    // If field.module is installed, add dependencies on 'field_config' entities
     // for both displayed and hidden fields. We intentionally leave out base
     // field overrides, since the field still exists without them.
     if (\Drupal::moduleHandler()->moduleExists('field')) {

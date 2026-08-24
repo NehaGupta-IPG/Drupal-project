@@ -258,7 +258,7 @@ class Ckeditor5Hooks {
       // drupal.dialog.jquery-ui.js.
       $libraries['drupal.dialog']['js']['modules/ckeditor5/js/ckeditor5.dialog.fix.js'] = [];
     }
-    // Only add translation processing if the locale module is enabled.
+    // Only add translation processing if the locale module is installed.
     if (!$this->moduleHandler->moduleExists('locale')) {
       return;
     }

@@ -208,7 +208,7 @@ class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
     $this->assertSession()->linkExists('Cron');
     $this->assertSession()->linkNotExists('New Llama');
 
-    // Verify that block disappears gracefully when shortcut module is disabled.
+    // Verify that block disappears gracefully when shortcut module is uninstalled.
     // Shortcut entities has to be removed first.
     $link_storage = \Drupal::entityTypeManager()->getStorage('shortcut');
     $link_storage->delete($link_storage->loadMultiple());

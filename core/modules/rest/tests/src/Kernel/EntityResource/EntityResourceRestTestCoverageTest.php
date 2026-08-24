@@ -48,7 +48,7 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
     $all_modules = $this->container->get('extension.list.module')->getList();
     $stable_core_modules = array_filter($all_modules, function ($module): bool {
       // Filter out contrib, hidden, testing, deprecated and experimental
-      // modules. We also don't need to enable modules that are already enabled.
+      // modules. We also don't need to install modules that are already installed.
       return $module->origin === 'core' &&
         empty($module->info['hidden']) &&
         $module->status == FALSE &&

@@ -63,7 +63,7 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
    *
    * The file system/tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz
    * can also be used in case we want to test with a database filled with
-   * content, and with all core modules enabled.
+   * content, and with all core modules installed.
    *
    * @var array
    */

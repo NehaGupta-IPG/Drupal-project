@@ -21,7 +21,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
   /**
    * Modules to install.
    *
-   * Enable dummy module that implements hook_block_insert() for exceptions and
+   * Install dummy module that implements hook_block_insert() for exceptions and
    * field_ui to edit display settings.
    *
    * @var array

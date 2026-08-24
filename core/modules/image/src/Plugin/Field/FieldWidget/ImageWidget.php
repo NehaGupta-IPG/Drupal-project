@@ -94,7 +94,7 @@ class ImageWidget extends FileWidget {
     $image_styles = \Drupal::service(ImageDerivativeUtilities::class)->styleOptions(FALSE);
     // Unset possible 'No defined styles' option.
     unset($image_styles['']);
-    // Styles could be lost because of enabled/disabled modules that defines
+    // Styles could be lost because installed/uninstalled modules define
     // their styles in code.
     $image_style_setting = $this->getSetting('preview_image_style');
     if (isset($image_styles[$image_style_setting])) {

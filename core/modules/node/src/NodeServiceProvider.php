@@ -18,7 +18,7 @@ class NodeServiceProvider implements ServiceProviderInterface {
    */
   public function register(ContainerBuilder $container) {
     // Register the node.node_translation_migrate service in the container if
-    // the migrate and language modules are enabled.
+    // the migrate and language modules are installed.
     $modules = $container->getParameter('container.modules');
     if (isset($modules['migrate']) && isset($modules['language'])) {
       $container->register('node.node_translation_migrate', NodeTranslationMigrateSubscriber::class)
@@ -28,7 +28,7 @@ class NodeServiceProvider implements ServiceProviderInterface {
     }
 
     // Register the node.node_translation_exception service in the container if
-    // the language module is enabled.
+    // the language module is installed.
     if (isset($modules['language'])) {
       $container->register('node.node_translation_exception', NodeTranslationExceptionSubscriber::class)
         ->addTag('event_subscriber')

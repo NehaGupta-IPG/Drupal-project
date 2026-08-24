@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class MediaBulkFormTest extends MediaFunctionalTestBase {
 
   /**
-   * Modules to be enabled.
+   * Modules to be installed.
    *
    * @var array
    */

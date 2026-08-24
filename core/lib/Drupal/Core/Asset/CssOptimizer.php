@@ -108,7 +108,7 @@ class CssOptimizer implements AssetOptimizerInterface {
    *
    * The returned contents are compressed removing white space and comments only
    * when CSS aggregation is enabled. This optimization will not apply for
-   * color.module enabled themes with CSS aggregation turned off.
+   * themes with color.module installed and CSS aggregation turned off.
    *
    * @param string $file
    *   Name of the stylesheet to be processed.

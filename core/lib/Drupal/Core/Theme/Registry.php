@@ -312,7 +312,7 @@ class Registry implements DestructableInterface {
    */
   protected function build() {
     // First, preprocess the theme hooks advertised by modules. This will
-    // serve as the basic registry. Since the list of enabled modules is the
+    // serve as the basic registry. Since the list of installed modules is the
     // same regardless of the theme used, this is cached in its own entry to
     // save building it for every theme.
     if ($cached = $this->cache->get('theme_registry:build:modules')) {
@@ -737,7 +737,7 @@ class Registry implements DestructableInterface {
   /**
    * Invalidates theme registry caches.
    *
-   * To be called when the list of enabled extensions is changed.
+   * To be called when the list of installed extensions is changed.
    */
   public function reset() {
     // Reset the runtime registry.

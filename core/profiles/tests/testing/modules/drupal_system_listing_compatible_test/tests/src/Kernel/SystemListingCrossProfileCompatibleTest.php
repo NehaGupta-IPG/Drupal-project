@@ -16,9 +16,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class SystemListingCrossProfileCompatibleTest extends KernelTestBase {
 
   /**
-   * Attempt to enable a module from the Testing profile.
+   * Attempt to install a module from the Testing profile.
    *
-   * This test uses the Minimal profile, but enables a module from the Testing
+   * This test uses the Minimal profile, but installs a module from the Testing
    * profile to confirm that a different profile can be used for running tests.
    *
    * @var array

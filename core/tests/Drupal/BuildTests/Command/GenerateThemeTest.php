@@ -71,7 +71,7 @@ class GenerateThemeTest extends QuickStartTestBase {
   }
 
   /**
-   * Tests generating theme from a simple named Starterkit enabled theme.
+   * Tests generating theme from a simple named Starterkit-enabled theme.
    */
   public function testSimpleStarterkitTheme(): void {
     $starterkit_theme_path_relative = 'themes/simple';
@@ -283,7 +283,7 @@ FIXTURE;
   }
 
   /**
-   * Tests generating a theme from another Starterkit enabled theme.
+   * Tests generating a theme from another Starterkit-enabled theme.
    */
   protected function doTestGeneratingFromAnotherTheme(): void {
     $this->setVersion('9.4.0');

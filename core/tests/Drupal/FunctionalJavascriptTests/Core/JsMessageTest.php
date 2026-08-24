@@ -32,7 +32,7 @@ class JsMessageTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Enable the theme.
+    // Install the theme.
     \Drupal::service('theme_installer')->install(['test_messages']);
     $theme_config = \Drupal::configFactory()->getEditable('system.theme');
     $theme_config->set('default', 'test_messages');

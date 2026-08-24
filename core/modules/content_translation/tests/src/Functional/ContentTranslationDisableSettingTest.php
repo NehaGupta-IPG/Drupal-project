@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Test disabling content translation module.
+ * Test uninstalling the Content Translation module.
  */
 #[Group('content_translation')]
 #[CoversClass(ContentLanguageSettingsForm::class)]

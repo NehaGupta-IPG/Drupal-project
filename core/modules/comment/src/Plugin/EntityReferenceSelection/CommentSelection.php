@@ -100,7 +100,7 @@ class CommentSelection extends DefaultSelection {
     }
 
     // Historically, comments were always linked to 'node' entities, but that is
-    // no longer the case, as the 'node' module might not even be enabled.
+    // no longer the case, as the 'node' module might not even be installed.
     // Comments can now be linked to any entity and they can also be referenced
     // by other entities, so we won't have a single table to join to. That
     // actually means that we can no longer optimize the query on those cases.

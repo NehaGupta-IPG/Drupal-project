@@ -58,7 +58,7 @@ class BlockContentHooks {
   #[Hook('entity_type_alter')]
   public function entityTypeAlter(array &$entity_types) : void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
-    // Add a translation handler for fields if the language module is enabled.
+    // Add a translation handler for fields if the language module is installed.
     if (\Drupal::moduleHandler()->moduleExists('language')) {
       $translation = $entity_types['block_content']->get('translation');
       $translation['block_content'] = TRUE;

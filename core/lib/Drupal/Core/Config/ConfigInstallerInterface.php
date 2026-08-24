@@ -16,13 +16,12 @@ interface ConfigInstallerInterface {
    * view as a default configuration file:
    * core/modules/node/config/optional/views.view.promoted_content.yml
    * When the Views module is installed after the Node module is already
-   * enabled, the promoted_content view will be installed.
+   * installed, the promoted_content view will be installed.
    *
    * Additionally, the default configuration directory for the extension being
    * installed is searched to discover if it contains default configuration
-   * that is owned by other enabled extensions. So, the promoted_content view
-   * will also
-   * be installed when the Node module is installed after Views.
+   * that is owned by other installed extensions. So, the promoted_content view
+   * will also be installed when the Node module is installed after Views.
    *
    * @param string $type
    *   The extension type; e.g., 'module' or 'theme'.
@@ -47,7 +46,7 @@ interface ConfigInstallerInterface {
    *
    * @param \Drupal\Core\Config\StorageInterface|null $storage
    *   (optional) The configuration storage to search for optional
-   *   configuration. If not provided, all enabled extension's optional
+   *   configuration. If not provided, all installed extension's optional
    *   configuration directories including the install profile's will be
    *   searched.
    * @param array $dependency

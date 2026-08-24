@@ -7,7 +7,7 @@ use Drupal\Core\Routing\RouteSubscriberBase;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * A route subscriber to remove routes that depend on modules being enabled.
+ * A route subscriber to remove routes that depend on modules being installed.
  */
 class ModuleRouteSubscriber extends RouteSubscriberBase {
 

@@ -230,7 +230,7 @@ EOS;
   }
 
   /**
-   * Tests get pending update functions with loaded modules but not enabled.
+   * Tests get pending update functions with loaded modules but not installed.
    */
   public function testGetPendingUpdateFunctionsWithLoadedModulesButNotEnabled(): void {
     $this->setupBasicExtensions();
@@ -244,7 +244,7 @@ EOS;
     $theme_handler = $theme_handler->reveal();
 
     // Preload modules to ensure that ::getAvailableUpdateFunctions filters out
-    // not enabled modules.
+    // not installed modules.
     include_once 'vfs://drupal/sites/default/modules/module_a/module_a.post_update.php';
     include_once 'vfs://drupal/sites/default/modules/module_b/module_b.post_update.php';
 

@@ -25,7 +25,7 @@ class NodeModuleHooks {
    */
   #[Hook('modules_installed')]
   public function modulesInstalled(array $modules): void {
-    // Check if any of the newly enabled modules require the node_access table
+    // Check if any of the newly installed modules require the node_access table
     // to be rebuilt.
     if (!$this->nodeAccessRebuild->needsRebuild() && $this->moduleHandler->hasImplementations('node_grants', $modules)) {
       $this->nodeAccessRebuild->setNeedsRebuild();
@@ -37,13 +37,15 @@ class NodeModuleHooks {
    */
   #[Hook('modules_uninstalled')]
   public function modulesUninstalled($modules): void {
-    // Check whether any of the disabled modules implemented hook_node_grants(),
+    // Check whether any of the uninstalled modules implemented
+    // hook_node_grants(),
     // in which case the node access table needs to be rebuilt.
     foreach ($modules as $module) {
-      // At this point, the module is already disabled, but its code is still
+      // At this point, the module is already uninstalled, but its code is still
       // loaded in memory. Module functions must no longer be called. We only
       // check whether a hook implementation function exists and do not invoke
-      // it. Node access also needs to be rebuilt if language module is disabled
+      // it. Node access also needs to be rebuilt if the Language module is
+      // uninstalled
       // to remove any language-specific grants.
       if (!$this->nodeAccessRebuild->needsRebuild() && ($this->moduleHandler->hasImplementations('node_grants', $module) || $module == 'language')) {
         $this->nodeAccessRebuild->setNeedsRebuild();

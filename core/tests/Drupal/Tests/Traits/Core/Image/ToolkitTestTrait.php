@@ -10,7 +10,7 @@ use Drupal\Tests\TestFileCreationTrait;
 /**
  * Provides common methods for image toolkit kernel tests.
  *
- * The testing class must ensure that image_test.module is enabled.
+ * The testing class must ensure that image_test.module is installed.
  */
 trait ToolkitTestTrait {
 

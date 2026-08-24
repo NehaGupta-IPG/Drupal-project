@@ -144,7 +144,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     // The priority for authentication must be higher than the highest event
     // subscriber accessing the current user. Especially it must be higher than
     // LanguageRequestSubscriber as LanguageManager accesses the current user if
-    // the language module is enabled.
+    // the language module is installed.
     $events[KernelEvents::REQUEST][] = ['onKernelRequestAuthenticate', 300];
 
     // Access check must be performed after routing.

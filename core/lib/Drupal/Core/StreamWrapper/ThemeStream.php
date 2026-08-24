@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines the read-only theme:// stream wrapper for theme files.
  *
- * Only enabled themes are supported.
+ * Only installed themes are supported.
  *
  * Example Usage:
  * @code

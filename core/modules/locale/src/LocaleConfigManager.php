@@ -615,7 +615,7 @@ class LocaleConfigManager {
       foreach ($names as $name) {
         $config = $this->configFactory->reset($name)->getEditable($name);
         // Should only update if still exists in active configuration. If locale
-        // module is enabled later, then some configuration may not exist
+        // module is installed later, then some configuration may not exist
         // anymore.
         if (!$config->isNew()) {
           $langcode = $config->get('langcode');

@@ -71,7 +71,7 @@ class ConfigImportAllTest extends ModuleTestBase {
     unset($all_modules['shortcut']);
     $all_modules = array_filter($all_modules, function ($module): bool {
       // Filter out contrib, hidden, testing, experimental, and deprecated
-      // modules. We also don't need to enable modules that are already enabled.
+      // modules. We also don't need to install modules that are already installed.
       if ($module->origin !== 'core'
         || !empty($module->info['hidden'])
         || $module->status == TRUE
@@ -129,7 +129,7 @@ class ConfigImportAllTest extends ModuleTestBase {
     $this->assertEqualsCanonicalizing($expected_modules, $validation_modules);
 
     $modules_to_uninstall = array_filter($all_modules, function ($module): bool {
-      // Filter profiles, and required and not enabled modules.
+      // Filter profiles, and required and not installed modules.
       if (!empty($module->info['required']) || $module->status == FALSE || $module->getType() === 'profile') {
         return FALSE;
       }
@@ -183,7 +183,7 @@ class ConfigImportAllTest extends ModuleTestBase {
 
     // Now we have all configuration imported, test all of them for schema
     // conformance. Ensures all imported default configuration is valid when
-    // all modules are enabled.
+    // all modules are installed.
     $names = $this->container->get('config.storage')->listAll();
     /** @var \Drupal\Core\Config\TypedConfigManagerInterface $typed_config */
     $typed_config = $this->container->get('config.typed');

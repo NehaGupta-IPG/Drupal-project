@@ -410,8 +410,8 @@ class PathAliasTest extends PathTestBase {
     $this->assertSession()->fieldValueEquals('path[0][alias]', $edit['path[0][alias]']);
     $this->assertTrue($path_alias->hasClass('error'));
 
-    // Behavior here differs with the inline_form_errors module enabled.
-    // Enable the inline_form_errors module and try this again. This module
+    // Behavior here differs with the inline_form_errors module installed.
+    // Install the inline_form_errors module and try this again. This module
     // improves validation with a link in the error message(s) to the fields
     // which have invalid input.
     $this->assertTrue($this->container->get('module_installer')->install(['inline_form_errors'], TRUE), 'Installed inline_form_errors.');

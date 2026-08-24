@@ -42,7 +42,7 @@ class LocaleExtensionHooks {
 
         // Update the list of translatable projects and start the import batch.
         // Only when new projects are added the update batch will be triggered.
-        // Not each enabled module will introduce a new project. E.g. sub
+        // Not each installed module will introduce a new project. E.g. sub
         // modules.
         $projects = array_keys($this->localeProjectRepository->buildProjects());
         if ($extensions = array_intersect($extensions, $projects)) {

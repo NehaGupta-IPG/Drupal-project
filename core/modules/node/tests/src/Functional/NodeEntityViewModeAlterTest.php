@@ -19,7 +19,7 @@ class NodeEntityViewModeAlterTest extends NodeTestBase {
   use EntityViewTrait;
 
   /**
-   * Enable dummy module that implements hook_ENTITY_TYPE_view() for nodes.
+   * Install dummy module that implements hook_ENTITY_TYPE_view() for nodes.
    *
    * @var string[]
    */

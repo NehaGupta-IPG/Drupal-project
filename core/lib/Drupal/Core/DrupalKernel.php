@@ -149,7 +149,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $prepared = FALSE;
 
   /**
-   * Holds the list of enabled modules.
+   * Holds the list of installed modules.
    *
    * @var array
    *   An associative array whose keys are module names and whose values are
@@ -165,7 +165,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $moduleData = [];
 
   /**
-   * Holds the list of enabled themes from core.extension config.
+   * Holds the list of installed themes from core.extension config.
    *
    * @var array|null
    *   An associative array whose keys are theme names and whose values are
@@ -189,7 +189,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $classLoader;
 
   /**
-   * Config storage object used for reading enabled modules configuration.
+   * Config storage object used for reading installed modules configuration.
    *
    * @var \Drupal\Core\Config\StorageInterface
    */
@@ -609,7 +609,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $this->loadLegacyIncludes();
 
-    // Load all enabled modules.
+    // Load all installed modules.
     $this->container->get('module_handler')->loadAll();
 
     // Register stream wrappers.
@@ -647,7 +647,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->serviceYamls['app']['core'] = 'core/core.services.yml';
     $this->serviceProviderClasses['app']['core'] = 'Drupal\Core\CoreServiceProvider';
 
-    // Retrieve enabled modules and register their namespaces.
+    // Retrieve installed modules and register their namespaces.
     if (!isset($this->moduleList) || !isset($this->themeList)) {
       $extensions = $this->getExtensions();
       // The module list is manipulated in the TestRunnerKernel, so we should
@@ -1680,7 +1680,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Returns an array of Extension class parameters for all enabled extensions.
+   * Returns Extension class parameters for all installed extensions.
    *
    * @param array $extension_list
    *   The list of extensions to return filenames for.
@@ -1689,7 +1689,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @return array
    *   An associated array of extension class parameters, keyed by extension
-   *   name, for all enabled themes.
+   *   name, for all installed themes.
    */
   protected function getExtensionsParameter(array $extension_list, callable $get_data): array {
     $extensions = [];
@@ -1706,7 +1706,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Gets the filenames for each enabled extension.
+   * Gets the filenames for each installed extension.
    *
    * @param array $extension_list
    *   The list of extensions to return filenames for.

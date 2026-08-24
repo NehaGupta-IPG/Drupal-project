@@ -120,8 +120,8 @@ class FieldConfigDeleteForm extends EntityDeleteForm {
 
     $form_state->setRedirectUrl($this->getCancelUrl());
 
-    // Fields are purged on cron. However, the field module prevents disabling
-    // modules when field types they provided are used in a field until it is
+    // Fields are purged on cron. However, the Field module prevents module
+    // uninstallation when provided field types are used in a field until it is
     // fully purged. In the case that a field has minimal or no content, a
     // single call to \Drupal\Core\Field\FieldPurger::purgeBatch() will remove
     // it from the system. Call this with a low batch limit to  avoid

@@ -55,7 +55,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
     $this->drupalGet('admin/modules');
     $this->submitForm($edit, 'Install');
 
-    // The module should not be enabled and there should be a warning and a
+    // The module should not be installed and there should be a warning and a
     // list of the deprecated modules with only this one.
     $assert = $this->assertSession();
     $assert->pageTextNotContains('Deprecated module has been installed.');
@@ -67,7 +67,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
     ]);
     $this->assertEquals('http://example.com/deprecated', $more_information_link->getAttribute('href'));
 
-    // There should be a warning about enabling deprecated modules, but no
+    // There should be a warning about installing deprecated modules, but no
     // warnings about experimental modules.
     $this->assertSession()->pageTextContains('Are you sure you wish to install a deprecated module?');
     $this->assertSession()->pageTextNotContains('Are you sure you wish to install an experimental module?');
@@ -76,27 +76,27 @@ class DeprecatedModulesTest extends BrowserTestBase {
     // There should be no message about enabling dependencies.
     $assert->pageTextNotContains('You must install');
 
-    // Enable the module and confirm that it worked.
+    // Install the module and confirm that it worked.
     $this->submitForm([], 'Continue');
     $assert->pageTextContains('Deprecated module has been installed.');
 
     // Uninstall the module.
     \Drupal::service('module_installer')->uninstall(['deprecated_module']);
 
-    // Test enabling a module that is not itself deprecated, but that depends on
+    // Test installing a module that is not itself deprecated, but that depends on
     // a deprecated module.
     $edit = [];
     $edit["modules[deprecated_module_dependency][enable]"] = TRUE;
     $this->drupalGet('admin/modules');
     $this->submitForm($edit, 'Install');
 
-    // The module should not be enabled and there should be a warning and a
+    // The module should not be installed and there should be a warning and a
     // list of the deprecated modules with only this one.
     $assert->pageTextNotContains('2 modules have been installed: Deprecated module dependency, Deprecated module');
     $assert->pageTextContains('Deprecated modules are modules that may be removed from the next major release of Drupal core. Use at your own risk.');
     $assert->pageTextContains('The Deprecated module module is deprecated');
 
-    // There should be a warning about enabling deprecated modules, but no
+    // There should be a warning about installing deprecated modules, but no
     // warnings about experimental modules.
     $this->assertSession()->pageTextContains('Are you sure you wish to install a deprecated module?');
     $this->assertSession()->pageTextNotContains('Are you sure you wish to install an experimental module?');
@@ -108,7 +108,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
     // There should be a message about enabling dependencies.
     $assert->pageTextContains('You must install the following module to install Deprecated module dependency:Deprecated module');
 
-    // Enable the module and confirm that it worked.
+    // Install the module and confirm that it worked.
     $this->submitForm([], 'Continue');
     $assert->pageTextContains('2 modules have been installed: Deprecated module dependency, Deprecated module');
 
@@ -124,7 +124,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
     $this->drupalGet('admin/modules');
     $this->submitForm($edit, 'Install');
 
-    // The module should not be enabled and there should be a warning and a
+    // The module should not be installed and there should be a warning and a
     // list of the deprecated modules with only this one.
     $assert->pageTextNotContains('2 modules have been installed: Deprecated module with non deprecated dependency, Drupal system listing compatible test');
     $assert->pageTextContains('Deprecated modules are modules that may be removed from the next major release of Drupal core. Use at your own risk.');
@@ -135,7 +135,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
     ]);
     $this->assertEquals('http://example.com/deprecated', $more_information_link->getAttribute('href'));
 
-    // There should be a warning about enabling deprecated modules, but no
+    // There should be a warning about installing deprecated modules, but no
     // warnings about experimental modules.
     $this->assertSession()->pageTextContains('Are you sure you wish to install a deprecated module?');
     $this->assertSession()->pageTextNotContains('Are you sure you wish to install an experimental module?');
@@ -147,7 +147,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
     // There should be a message about enabling dependencies.
     $assert->pageTextContains('You must install the following module to install Deprecated module with non deprecated dependency:Drupal system listing compatible test');
 
-    // Enable the module and confirm that it worked.
+    // Install the module and confirm that it worked.
     $this->submitForm([], 'Continue');
     $assert->pageTextContains('2 modules have been installed: Deprecated module with non deprecated dependency, Drupal system listing compatible test.');
 
@@ -166,13 +166,13 @@ class DeprecatedModulesTest extends BrowserTestBase {
     $this->drupalGet('admin/modules');
     $this->submitForm($edit, 'Install');
 
-    // The module should not be enabled and there should be a warning and a
+    // The module should not be installed and there should be a warning and a
     // list of the deprecated modules with only this one.
     $assert->pageTextNotContains('2 modules have been installed: Deprecated module dependency, Deprecated module');
     $assert->pageTextContains('Deprecated modules are modules that may be removed from the next major release of Drupal core. Use at your own risk.');
     $assert->pageTextContains('The Deprecated module module is deprecated');
 
-    // There should be a warning about enabling deprecated modules, but no
+    // There should be a warning about installing deprecated modules, but no
     // warnings about experimental modules.
     $this->assertSession()->pageTextContains('Are you sure you wish to install a deprecated module?');
     $this->assertSession()->pageTextNotContains('Are you sure you wish to install an experimental module?');
@@ -184,7 +184,7 @@ class DeprecatedModulesTest extends BrowserTestBase {
     // There should be no message about enabling dependencies.
     $assert->pageTextNotContains('You must install');
 
-    // Enable the modules and confirm that it worked.
+    // Install the modules and confirm that it worked.
     $this->submitForm([], 'Continue');
     $assert->pageTextContains('2 modules have been installed: Deprecated module, Deprecated module dependency');
 

@@ -68,7 +68,7 @@ class EditorManagerTest extends KernelTestBase {
     $this->assertSame([], $this->editorManager->getAttachments([]), 'No attachments when no text editor is enabled and retrieving attachments for zero text formats.');
     $this->assertSame([], $this->editorManager->getAttachments(['filtered_html', 'full_html']), 'No attachments when no text editor is enabled and retrieving attachments for multiple text formats.');
 
-    // Enable the Text Editor Test module, which has the Unicorn Editor and
+    // Install the Text Editor Test module, which has the Unicorn Editor and
     // clear the editor manager's cache so it is picked up.
     $this->enableModules(['editor_test']);
     $this->editorManager = $this->container->get('plugin.manager.editor');

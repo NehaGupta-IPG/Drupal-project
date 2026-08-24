@@ -88,7 +88,7 @@ class ConfigImportUITest extends BrowserTestBase {
     $sync->write($dynamic_name, $original_dynamic_data);
     $this->assertTrue($sync->exists($dynamic_name), $dynamic_name . ' found.');
 
-    // Enable the Automated Cron and config_install_schema_test modules during
+    // Install the Automated Cron and config_install_schema_test modules during
     // import. The config_install_schema_test module is used because it creates
     // a table during the install. The Automated Cron module is used because it
     // creates a single simple configuration file during the install.

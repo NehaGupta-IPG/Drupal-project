@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines the read-only module:// stream wrapper for module files.
  *
- * Only enabled modules are supported.
+ * Only installed modules are supported.
  *
  * Example usage:
  * @code

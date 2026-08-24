@@ -25,7 +25,7 @@ class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
   use NodeAccessTrait;
 
   /**
-   * Enable language and two node access modules.
+   * Install language and two node access modules.
    *
    * @var array
    */
@@ -86,7 +86,7 @@ class NodeAccessLanguageAwareCombinationTest extends NodeAccessTestBase {
       ],
     ])->save();
 
-    // After enabling a node access module, the access table has to be rebuild.
+    // After installing a node access module, the access table has to be rebuild.
     \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
     // Add Hungarian and Catalan.

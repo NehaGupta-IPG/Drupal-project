@@ -1155,7 +1155,7 @@ PHP,
     ];
     $this->assertSame($default_libraries, $this->manager->getEnabledLibraries($editor));
 
-    // Enable the CKEditor 5 Test module, which has the layercake plugin and
+    // Install the CKEditor 5 Test module, which has the layercake plugin and
     // clear the editor manager's static cache so that it is picked up.
     $this->enableModules(['ckeditor5_test']);
     $this->manager = $this->container->get('plugin.manager.ckeditor5.plugin');
@@ -1203,7 +1203,7 @@ PHP,
     sort($expected_libraries);
     $this->assertSame($expected_libraries, $this->manager->getEnabledLibraries($editor));
 
-    // Enable the CKEditor 5 Plugin Conditions Test module, which has the
+    // Install the CKEditor 5 Plugin Conditions Test module, which has the
     // ckeditor5_plugin_conditions_test_plugins_condition plugin which is
     // conditionally enabled. Clear the editor manager's static cache so that it
     // is picked up.

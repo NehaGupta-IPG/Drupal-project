@@ -36,14 +36,14 @@ class EntityTypeConstraintsTest extends EntityKernelTestBase {
     ];
     $this->assertEquals($default_constraints, $entity_type->getConstraints());
 
-    // Enable our test module and test extending constraints.
+    // Install our test module and test extending constraints.
     $this->enableModules(['entity_test_constraints']);
     $this->container->get('module_handler')->resetImplementations();
 
     $extra_constraints = ['Test' => []];
     $this->state->set('entity_test_constraints.build', $extra_constraints);
     // Re-fetch the entity type manager from the new container built after the
-    // new modules were enabled.
+    // new modules were installed.
     $this->entityTypeManager = $this->container->get('entity_type.manager');
     $this->entityTypeManager->clearCachedDefinitions();
     $entity_type = $this->entityTypeManager->getDefinition('entity_test_constraints');

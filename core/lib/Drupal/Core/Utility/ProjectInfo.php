@@ -14,11 +14,11 @@ class ProjectInfo {
    *
    * This iterates over a list of the installed modules or themes and groups
    * them by project and status. A few parts of this function assume that
-   * enabled modules and themes are always processed first, and if uninstalled
+   * installed modules and themes are always processed first, and if uninstalled
    * modules or themes are being processed (there is a setting to control if
    * uninstalled code should be included in the Available updates report or
    * not),those are only processed after $projects has been populated with
-   * information about the enabled code. 'Hidden' modules and themes are
+   * information about the installed code. 'Hidden' modules and themes are
    * ignored if they are not installed. 'Hidden' Modules and themes in the
    * "Testing" package are ignored regardless of installation status.
    *
@@ -122,8 +122,8 @@ class ProjectInfo {
         // Only add the file we're processing to the 'includes' array for this
         // project if it is of the same type and status (which is encoded in the
         // $project_display_type). This prevents listing all the uninstalled
-        // modules included with an enabled project if we happen to be checking
-        // for uninstalled modules, too.
+        // modules included with an installed project if we happen to be
+        // checking for uninstalled modules, too.
         $projects[$project_name]['includes'][$file->getName()] = $file->info['name'];
         $projects[$project_name]['info']['_info_file_ctime'] = max($projects[$project_name]['info']['_info_file_ctime'], $file->info['_info_file_ctime']);
         $projects[$project_name]['datestamp'] = max($projects[$project_name]['datestamp'], $file->info['datestamp']);

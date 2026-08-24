@@ -61,7 +61,7 @@ class ExperimentalThemeTest extends BrowserTestBase {
     $this->cssSelect('a[title="Install Experimental test theme"]')[0]->click();
     $this->assertSession()->pageTextContains('Experimental themes are provided for testing purposes only. Use at your own risk.');
 
-    // The module should not be enabled and there should be a warning and a
+    // The module should not be installed and there should be a warning and a
     // list of the experimental modules with only this one.
     $this->assertSession()->pageTextNotContains('The Experimental test theme has been installed.');
     $this->assertSession()->pageTextContains('Experimental themes are provided for testing purposes only.');
@@ -69,7 +69,7 @@ class ExperimentalThemeTest extends BrowserTestBase {
     // There should be no message about enabling dependencies.
     $this->assertSession()->pageTextNotContains('You must enable');
 
-    // Enable the theme and confirm that it worked.
+    // Install the theme and confirm that it worked.
     $this->submitForm([], 'Continue');
     $this->assertSession()->pageTextContains('The Experimental test theme has been installed.');
 
@@ -92,12 +92,12 @@ class ExperimentalThemeTest extends BrowserTestBase {
     $this->cssSelect('a[title="Install Experimental test as default theme"]')[0]->click();
     $this->assertSession()->pageTextContains('Experimental themes are provided for testing purposes only. Use at your own risk.');
 
-    // Test enabling a theme that is not itself experimental, but that depends
+    // Test installing a theme that is not itself experimental, but that depends
     // on an experimental module.
     $this->drupalGet('admin/appearance');
     $this->cssSelect('a[title="Install Experimental dependency test theme"]')[0]->click();
 
-    // The theme should not be enabled and there should be a warning and a
+    // The theme should not be installed and there should be a warning and a
     // list of the experimental modules with only this one.
     $this->assertSession()->pageTextNotContains('The Experimental dependency test theme has been installed.');
     $this->assertSession()->pageTextContains('Experimental themes are provided for testing purposes only. Use at your own risk.');
@@ -110,7 +110,7 @@ class ExperimentalThemeTest extends BrowserTestBase {
     // There should be a message about enabling dependencies.
     $this->assertSession()->pageTextContains('You must install the following theme to install Experimental dependency test:Experimental test');
 
-    // Enable the theme and confirm that it worked.
+    // Install the theme and confirm that it worked.
     $this->submitForm([], 'Continue');
     $this->assertSession()->pageTextContains('The Experimental dependency test theme has been installed.');
     $this->assertSession()->responseContains(sprintf('Experimental test %s                (experimental theme)', \Drupal::VERSION));

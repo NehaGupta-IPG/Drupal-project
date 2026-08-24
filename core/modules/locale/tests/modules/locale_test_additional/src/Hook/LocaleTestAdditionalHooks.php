@@ -15,7 +15,7 @@ class LocaleTestAdditionalHooks {
   /**
    * Implements hook_system_info_alter().
    *
-   * By default this modules is hidden but once enabled it behaves like a normal
+   * By default this modules is hidden but once installed it behaves like a normal
    * (not hidden) module. This hook implementation changes the .info.yml data by
    * setting the hidden status to FALSE.
    */

@@ -62,10 +62,10 @@ class BulkFormAccessTest extends NodeTestBase {
 
     $this->addPrivateField(NodeType::load('article'));
 
-    // After enabling a node access module, the access table has to be rebuild.
+    // After installing a node access module, the access table has to be rebuild.
     \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
-    // Enable the private node feature of the node_access_test module.
+    // Install the private node feature of the node_access_test module.
     \Drupal::state()->set('node_access_test.private', TRUE);
   }
 

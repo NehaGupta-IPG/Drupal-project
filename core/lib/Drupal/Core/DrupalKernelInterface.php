@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
  * The interface for DrupalKernel, the core of Drupal.
  *
  * This interface extends Symfony's KernelInterface and adds methods for
- * responding to modules being enabled or disabled during its lifetime.
+ * responding to modules being installed or uninstalled during its lifetime.
  */
 interface DrupalKernelInterface extends HttpKernelInterface {
 

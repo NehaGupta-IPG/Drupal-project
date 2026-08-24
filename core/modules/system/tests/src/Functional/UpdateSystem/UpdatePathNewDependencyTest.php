@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
- * Modules can introduce new dependencies and enable them in update hooks.
+ * Modules can introduce new dependencies and install them in update hooks.
  */
 #[Group('system')]
 #[RunTestsInSeparateProcesses]

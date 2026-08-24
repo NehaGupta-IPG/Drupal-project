@@ -110,13 +110,13 @@
  * @section sec_rest Enabling REST for entities and the log
  * Here are the steps to take to use the REST operations provided by Drupal
  * Core:
- * - Enable the REST module, plus Basic Auth or another authentication method.
+ * - Install the REST module, plus Basic Auth or another authentication method.
  * - Node entity support is configured by default. If you would like to support
  *   other types of entities, you can copy
  *   core/modules/rest/config/optional/rest.resource.entity.node.yml to your
  *   sync configuration directory, appropriately modified for other entity
  *   types, and import it. Support for GET on the log from the Database Logging
- *   module can also be enabled in this way; in this case, the 'entity:node'
+ *   module can also be installed in this way; in this case, the 'entity:node'
  *   line in the configuration would be replaced by the appropriate plugin ID,
  *   'dblog'.
  * - Set up permissions to allow the desired REST operations for a role, and set
@@ -234,8 +234,9 @@
  *   profile), which is imported to the active storage when the extension is
  *   enabled. These configuration items are located in the config/install
  *   sub-directory of the extension. Note that changes to this configuration
- *   after a module or theme is already enabled have no effect; to make a
- *   configuration change after a module or theme is enabled, you would need to
+ *   after a module or theme is already installed have no effect; to make a
+ *   configuration change after a module or theme is installed, you would need
+ *   to
  *   uninstall/reinstall or use a hook_update_N() function.
  * - Defining optional configuration for a module or theme. Optional
  *   configuration items are located in the config/optional sub-directory of the

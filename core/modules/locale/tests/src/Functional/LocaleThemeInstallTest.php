@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests that locale rewrites config langcodes after theme install.
  *
- * When a theme ships config with langcode 'en' and locale is enabled with a
+ * When a theme ships config with langcode 'en' and locale is installed with a
  * non-English site default, locale's updateDefaultConfigLangcodes() batch
  * must rewrite those langcodes to the site default after install.
  */

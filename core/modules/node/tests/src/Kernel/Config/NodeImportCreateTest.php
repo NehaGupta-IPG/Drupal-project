@@ -43,7 +43,7 @@ class NodeImportCreateTest extends KernelTestBase {
     // Check that the content type does not exist yet.
     $this->assertNull(NodeType::load($node_type_id));
 
-    // Enable node_test_config module and check that the content type
+    // Install node_test_config module and check that the content type
     // shipped in the module's default config is created.
     $this->container->get('module_installer')->install(['node_test_config']);
     $node_type = NodeType::load($node_type_id);

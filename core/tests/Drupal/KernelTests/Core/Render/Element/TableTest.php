@@ -79,7 +79,7 @@ class TableTest extends KernelTestBase {
       '#empty' => 'Empty row.',
     ];
 
-    // Enable the Starterkit theme.
+    // Install the Starterkit theme.
     \Drupal::service('theme_installer')->install(['starterkit_theme']);
     $this->config('system.theme')->set('default', 'starterkit_theme')->save();
 

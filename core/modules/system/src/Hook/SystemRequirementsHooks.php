@@ -95,7 +95,7 @@ class SystemRequirementsHooks {
         ];
       }
 
-      // Gather all obsolete and experimental modules being enabled.
+      // Gather all obsolete and experimental modules being installed.
       $obsolete_extensions = [];
       $deprecated_modules = [];
       $experimental_modules = [];

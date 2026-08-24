@@ -74,7 +74,7 @@ class FilterFormTest extends BrowserTestBase {
   public function testFilterForm(): void {
     $this->doFilterFormTestAsAdmin();
     $this->doFilterFormTestAsNonAdmin();
-    // Ensure that enabling modules which provide filter plugins behaves
+    // Ensure that installing modules which provide filter plugins behaves
     // correctly.
     // @see https://www.drupal.org/node/2387983
     \Drupal::service('module_installer')->install(['filter_test_plugin']);

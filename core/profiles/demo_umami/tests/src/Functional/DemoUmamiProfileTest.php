@@ -84,7 +84,7 @@ class DemoUmamiProfileTest extends BrowserTestBase {
 
     // Now we have all configuration imported, test all of them for schema
     // conformance. Ensures all imported default configuration is valid when
-    // Demo Umami profile modules are enabled.
+    // Demo Umami profile modules are installed.
     $names = $this->container->get('config.storage')->listAll();
     /** @var \Drupal\Core\Config\TypedConfigManagerInterface $typed_config */
     $typed_config = $this->container->get('config.typed');

@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class NodeAccessRecordsTest extends NodeAccessTestBase {
 
   /**
-   * Enable a module that implements node access API hooks and alter hook.
+   * Install a module that implements node access API hooks and alter hook.
    *
    * @var array
    */

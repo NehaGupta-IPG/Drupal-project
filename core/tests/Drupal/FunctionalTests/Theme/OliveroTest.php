@@ -84,7 +84,7 @@ class OliveroTest extends BrowserTestBase {
     $this->assertSession()->responseNotContains('olivero/css/components/header-search-wide.css');
     $this->assertSession()->responseNotContains('olivero/css/components/header-search-narrow.css');
 
-    // Enable modules that will exercise preprocess block logic.
+    // Install modules that will exercise preprocess block logic.
     \Drupal::service('module_installer')->install(
       ['search', 'menu_link_content', 'search_node']
     );

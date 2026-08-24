@@ -147,7 +147,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
     $string = $this->storage->findString(['source' => 'Medium (220×220)', 'context' => '', 'type' => 'configuration']);
     $this->assertNull($string, 'Configuration strings have been created upon installation.');
 
-    // Enable the image module.
+    // Install the image module.
     $this->drupalGet('admin/modules');
     $this->submitForm(['modules[image][enable]' => "1"], 'Install');
     $this->rebuildContainer();
@@ -250,13 +250,13 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
    */
   public function testOptionalConfiguration(): void {
     $this->assertNodeConfig(FALSE, FALSE);
-    // Enable the node module.
+    // Install the node module.
     $this->drupalGet('admin/modules');
     $this->submitForm(['modules[node][enable]' => "1"], 'Install');
     $this->submitForm([], 'Continue');
     $this->rebuildContainer();
     $this->assertNodeConfig(TRUE, FALSE);
-    // Enable the views module (which node provides some optional config for).
+    // Install the views module (which node provides some optional config for).
     $this->drupalGet('admin/modules');
     $this->submitForm(['modules[views][enable]' => "1"], 'Install');
     $this->rebuildContainer();

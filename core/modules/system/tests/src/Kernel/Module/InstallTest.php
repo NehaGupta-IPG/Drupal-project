@@ -51,9 +51,9 @@ class InstallTest extends KernelTestBase {
   }
 
   /**
-   * Tests enabling User module once more.
+   * Tests reinstalling the User module.
    *
-   * Regression: The installer might enable a module twice due to automatic
+   * Regression: The installer might install a module twice due to automatic
    * dependency resolution. A bug caused the stored weight for user.module to
    * be an array.
    */
@@ -125,7 +125,7 @@ class InstallTest extends KernelTestBase {
   }
 
   /**
-   * Tests installing a module with the same name as an enabled theme.
+   * Tests installing a module with the same name as an installed theme.
    */
   public function testInstallModuleSameNameAsTheme(): void {
     $name = 'name_collision_test';

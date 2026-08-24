@@ -23,7 +23,7 @@ More about configuration:
 INSTALLATION PROFILES
 ---------------------
 
-Installation profiles define additional steps (such as enabling modules,
+Installation profiles define additional steps (such as installing modules,
 defining content types, etc.) that run after the base installation provided
 by core when Drupal is first installed. There are two basic installation
 profiles provided with Drupal core.

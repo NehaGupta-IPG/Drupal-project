@@ -689,10 +689,10 @@ function update_already_performed($module, $number) {
 /**
  * Invokes hook_update_dependencies() in all installed modules.
  *
- * This function is similar to \Drupal::moduleHandler()->invokeAll(), with the
- * main difference that it does not require that a module be enabled to invoke
- * its hook, only that it be installed. This allows the update system to
- * properly perform updates even on modules that are currently disabled.
+ * This function is similar to \Drupal::moduleHandler()->invokeAll(), but it
+ * iterates over all modules with a recorded schema version and loads each
+ * module's .install file directly, rather than relying on the currently
+ * loaded module list.
  *
  * @return array
  *   An array of return values obtained by merging the results of the

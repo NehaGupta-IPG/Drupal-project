@@ -147,7 +147,7 @@ class ToolbarAdminMenuTest extends BrowserTestBase {
     // structure changed.
     $this->assertDifferentHash();
 
-    // Enable a module.
+    // Install a module.
     $edit = [];
     $edit['modules[taxonomy][enable]'] = TRUE;
     $this->drupalGet('admin/modules');

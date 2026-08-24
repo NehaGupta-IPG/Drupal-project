@@ -153,7 +153,7 @@ class InstallStorage extends FileStorage {
       $this->folders += $this->getCoreNames();
       // Perform an ExtensionDiscovery scan as we cannot use
       // \Drupal\Core\Extension\ExtensionList::getPath() yet because the system
-      // module may not yet be enabled during install.
+      // module may not yet be installed during install.
       // @todo Remove as part of https://www.drupal.org/node/2186491
       $listing = new ExtensionDiscovery(\Drupal::root());
       if ($profile = \Drupal::installProfile()) {

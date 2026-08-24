@@ -130,7 +130,7 @@ abstract class ModuleTestBase extends BrowserTestBase {
   }
 
   /**
-   * Assert the list of modules are enabled or disabled.
+   * Assert the list of modules are installed or uninstalled.
    *
    * @param array $modules
    *   Module list to check.

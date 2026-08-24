@@ -46,7 +46,7 @@ class ModuleRouteSubscriberTest extends UnitTestCase {
   }
 
   /**
-   * Tests that removeRoute() removes routes when the module is not enabled.
+   * Tests that removeRoute() removes routes when the module is not installed.
    *
    * @param string $route_name
    *   The machine name for the route.

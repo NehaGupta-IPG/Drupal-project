@@ -99,7 +99,7 @@ class UserTokenReplaceTest extends BrowserTestBase {
     $metadata_tests['[user:url]'] = $base_bubbleable_metadata;
     $metadata_tests['[user:edit-url]'] = $base_bubbleable_metadata;
     $bubbleable_metadata = clone $base_bubbleable_metadata;
-    // This test runs with the Language module enabled, which means config is
+    // This test runs with the Language module installed, which means config is
     // overridden by LanguageConfigFactoryOverride (to provide translations of
     // config). This causes the interface language cache context to be added for
     // config entities. The four next tokens use DateFormat Config entities, and

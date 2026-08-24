@@ -68,7 +68,7 @@ class ModuleTestThemeHooks {
   #[Hook('modules_installed')]
   public function modulesInstalled($modules): void {
     // Record the ordered list of modules that were passed in to this hook so we
-    // can check that the modules were enabled in the correct sequence.
+    // can check that the modules were installed in the correct sequence.
     \Drupal::state()->set('module_test.install_order', $modules);
   }
 

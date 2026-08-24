@@ -298,7 +298,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
 
     $modules = self::getModulesToEnable(static::class);
 
-    // When a module is providing the database driver, then enable that module.
+    // When a module is providing the database driver, then install that module.
     $connection_info = Database::getConnectionInfo();
     $namespace = $connection_info['default']['namespace'] ?? '';
     $autoload = $connection_info['default']['autoload'] ?? '';
@@ -306,7 +306,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
       [$first, $second] = explode('\\', $namespace, 3);
       if ($first === 'Drupal' && strtolower($second) === $second) {
         // Add the module that provides the database driver to the list of
-        // modules as the first to be enabled.
+        // modules as the first to be installed.
         array_unshift($modules, $second);
       }
     }
@@ -704,7 +704,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    *   A module or list of modules for which to install default configuration.
    *
    * @throws \LogicException
-   *   If any module in $modules is not enabled.
+   *   If any module in $modules is not installed.
    */
   protected function installConfig($modules): void {
     foreach ((array) $modules as $module) {
@@ -729,16 +729,16 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    *   The name or an array of the names of the tables to install.
    *
    * @throws \LogicException
-   *   If $module is not enabled or the table schema cannot be found.
+   *   If $module is not installed or the table schema cannot be found.
    */
   protected function installSchema($module, $tables): void {
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
     // Database connection schema is technically able to create database tables
-    // using any valid specification, for example of a non-enabled module. But
+    // using any valid specification, for example of a non-installed module. But
     // ability to load the module's .install file depends on many other factors.
     // To prevent differences in test behavior and non-reproducible test
-    // failures, we only allow the schema of explicitly loaded/enabled modules
+    // failures, we only allow the schema of explicitly loaded/installed modules
     // to be installed.
     if (!$module_handler->moduleExists($module)) {
       throw new \LogicException("$module module is not installed.");
@@ -789,7 +789,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
   }
 
   /**
-   * Enables modules for this test.
+   * Installs modules for this test.
    *
    * This method does not install modules fully. Services and hooks for the
    * module are available, but the install process is not performed.
@@ -808,9 +808,9 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    *   is not applied.
    *
    * @throws \LogicException
-   *   If any module in $modules is already enabled.
+   *   If any module in $modules is already installed.
    * @throws \RuntimeException
-   *   If a module is not enabled after enabling it.
+   *   If a module is not installed after installing it.
    */
   protected function enableModules(array $modules): void {
     // Perform an ExtensionDiscovery scan as this function may receive a
@@ -836,7 +836,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
         continue;
       }
       $extensions[$module] = $module_list[$module];
-      // Maintain the list of enabled modules in configuration.
+      // Maintain the list of installed modules in configuration.
       $extension_config['module'][$module] = 0;
     }
     $active_storage->write('core.extension', $extension_config);
@@ -859,18 +859,18 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
   }
 
   /**
-   * Disables modules for this test.
+   * Uninstalls modules for this test.
    *
    * @param string[] $modules
-   *   A list of modules to disable. Dependencies are not resolved; i.e.,
+   *   A list of modules to uninstall. Dependencies are not resolved; i.e.,
    *   multiple modules have to be specified with dependent modules first.
-   *   Code of previously enabled modules is still loaded. The modules are only
+   *   Code of previously installed modules is still loaded. The modules are only
    *   removed from the active module list.
    *
    * @throws \LogicException
-   *   If any module in $modules is already disabled.
+   *   If any module in $modules is already uninstalled.
    * @throws \RuntimeException
-   *   If a module is not disabled after disabling it.
+   *   If a module is not uninstalled after uninstalling it.
    */
   protected function disableModules(array $modules): void {
     // Unset the list of modules in the extension handler.

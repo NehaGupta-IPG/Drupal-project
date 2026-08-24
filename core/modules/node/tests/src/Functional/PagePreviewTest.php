@@ -34,7 +34,7 @@ class PagePreviewTest extends NodeTestBase {
   }
 
   /**
-   * Enable the comment, node and taxonomy modules to test on the preview.
+   * Install the comment, node and taxonomy modules to test on the preview.
    *
    * @var array
    */

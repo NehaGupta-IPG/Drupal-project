@@ -93,7 +93,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by the test_theme theme via hook_theme_suggestions_alter().');
     $this->assertSession()->pageTextContains('Hooks: theme_test_theme test_theme_theme_suggestions_alter');
 
-    // Enable the theme_suggestions_test module to test modules implementing
+    // Install the theme_suggestions_test module to test modules implementing
     // suggestions alter hooks.
     \Drupal::service('module_installer')->install(['theme_suggestions_test']);
     $this->resetAll();
@@ -116,7 +116,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
     $this->drupalGet('theme-test/suggestion-alter');
     $this->assertSession()->pageTextContains('Template overridden based on new theme suggestion provided by the test_theme theme via hook_theme_suggestions_HOOK_alter().');
 
-    // Enable the theme_suggestions_test module to test modules implementing
+    // Install the theme_suggestions_test module to test modules implementing
     // suggestions alter hooks.
     \Drupal::service('module_installer')->install(['theme_suggestions_test']);
     $this->resetAll();

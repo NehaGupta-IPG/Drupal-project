@@ -27,7 +27,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
   /**
    * Modules to install.
    *
-   * Enable path module to ensure that the selection handler does not fail for
+   * Install path module to ensure that the selection handler does not fail for
    * entities with a path field.
    *
    * @var array
@@ -328,7 +328,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     // If no eligible view is available we should see a message.
     $this->assertTrue($assert_session->waitForText('The views entity selection mode requires a view.'));
 
-    // Enable the entity_reference_test module which creates an eligible view.
+    // Install the entity_reference_test module which creates an eligible view.
     $this->container->get('module_installer')
       ->install(['entity_reference_test']);
     $this->resetAll();

@@ -49,7 +49,7 @@ class ServiceProviderTest extends KernelTestBase {
   }
 
   /**
-   * Tests that the DIC keeps up with module enable/disable in the same request.
+   * Tests that the DIC keeps up with module install/uninstall in the same request.
    */
   public function testServiceProviderRegistrationDynamic(): void {
     // Uninstall the module and ensure the service provider's service is not

@@ -76,10 +76,10 @@ class LanguageSelectElementTest extends BrowserTestBase {
   /**
    * Tests the case when the language select elements should not be printed.
    *
-   * This happens when the language module is disabled.
+   * This happens when the language module is uninstalled.
    */
   public function testHiddenLanguageSelectElement(): void {
-    // Disable the language module, so that the language select field will not
+    // Uninstall the language module, so that the language select field will not
     // be rendered.
     $this->container->get('module_installer')->uninstall(['language']);
     $this->drupalGet('form-test/language_select');

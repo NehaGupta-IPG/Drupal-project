@@ -33,7 +33,7 @@ class FunctionsTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Enable the Starterkit theme.
+    // Install the Starterkit theme.
     $this->container->get('theme_installer')->install(['starterkit_theme']);
     $this->config('system.theme')->set('default', 'starterkit_theme')->save();
   }

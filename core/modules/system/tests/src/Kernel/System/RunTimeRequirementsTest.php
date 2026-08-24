@@ -28,7 +28,7 @@ class RunTimeRequirementsTest extends KernelTestBase {
    * Tests hook_runtime_requirements() and hook_runtime_requirements_alter().
    */
   public function testRuntimeRequirements(): void {
-    // Enable the test module.
+    // Install the test module.
     \Drupal::service('module_installer')->install(['module_runtime_requirements']);
     $testRequirements = [
       'title' => 'RuntimeError',

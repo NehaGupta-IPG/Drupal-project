@@ -34,7 +34,7 @@ class RouteCachingQueryAlteredTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    // page_cache module is enabled in the testing profile, however by default
+    // page_cache module is installed in the testing profile, however by default
     // exceptions which create 4xx responses are cached for 1 hour. This is
     // undesirable for certain response types (e.g., 401) which vary on other
     // elements of the request than the URL. For this reason, do not cache 4xx

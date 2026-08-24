@@ -19,7 +19,7 @@ class WorkspacesServiceProvider extends ServiceProviderBase {
   public function register(ContainerBuilder $container): void {
     $modules = $container->getParameter('container.modules');
 
-    // Add the entity query override only when the pgsql module is enabled.
+    // Add the entity query override only when the pgsql module is installed.
     if (isset($modules['pgsql'])) {
       $container->register('pgsql.workspaces.entity.query.sql', 'Drupal\workspaces\EntityQuery\PgsqlQueryFactory')
         ->addArgument(new Reference(('database')))

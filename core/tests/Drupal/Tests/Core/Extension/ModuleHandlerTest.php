@@ -256,7 +256,7 @@ class ModuleHandlerTest extends UnitTestCase {
   }
 
   /**
-   * Tests invoke methods when module is enabled.
+   * Tests invoke methods when module is installed.
    */
   public function testInvokeModuleEnabled(): void {
     $module_handler = $this->getModuleHandler();

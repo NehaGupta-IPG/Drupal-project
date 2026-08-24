@@ -105,7 +105,8 @@ class AttributeClassDiscovery implements DiscoveryInterface {
               // situation with optional dependencies and plugins. Therefore,
               // silently skip over this class and avoid writing to the cache,
               // so that it is scanned each time. This ensures that the plugin
-              // definition will be found if the module it requires is enabled.
+              // definition will be found if the module it requires is
+              // installed.
               try {
                 if (!class_exists($class)) {
                   continue;

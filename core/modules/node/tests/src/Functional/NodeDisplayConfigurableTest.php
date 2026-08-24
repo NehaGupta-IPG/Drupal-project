@@ -71,7 +71,7 @@ class NodeDisplayConfigurableTest extends NodeTestBase {
     $this->drupalGet($node->toUrl());
     $this->assertNodeHtml($node, $user, TRUE, $metadata_region, $field_classes, $field_classes, TRUE);
 
-    // Enable module to make base fields' displays configurable.
+    // Install module to make base fields' displays configurable.
     \Drupal::service('module_installer')->install(['node_display_configurable_test']);
 
     // Configure display.

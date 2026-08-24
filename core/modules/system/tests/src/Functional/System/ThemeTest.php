@@ -90,7 +90,7 @@ INFO;
    * Tests the theme settings form.
    */
   public function testThemeSettings(): void {
-    // Ensure a disabled theme settings form URL returns 404.
+    // Ensure an uninstalled theme settings form URL returns 404.
     $this->drupalGet('admin/appearance/settings/olivero');
     $this->assertSession()->statusCodeEquals(404);
     // Ensure a non existent theme settings form URL returns 404.
@@ -288,7 +288,7 @@ INFO;
     $this->assertSession()->fieldValueEquals('logo_path', 'core/misc/druplicon.png');
 
     // Make sure the logo and favicon settings are not available when the file
-    // module is not enabled.
+    // module is not installed.
     \Drupal::service('module_installer')->uninstall(['file']);
     $this->drupalGet('admin/appearance/settings');
     $this->assertSession()->pageTextNotContains('Logo image settings');
@@ -400,7 +400,7 @@ INFO;
     $this->drupalGet('node/' . $this->node->id() . '/edit');
     $this->assertSession()->responseContains('core/themes/claro');
 
-    // Disable the admin theme on the node admin pages.
+    // Stop using the admin theme on the node admin pages.
     $edit = [
       'use_admin_theme' => FALSE,
     ];

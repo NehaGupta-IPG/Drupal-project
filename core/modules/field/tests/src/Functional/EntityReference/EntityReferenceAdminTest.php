@@ -27,9 +27,9 @@ class EntityReferenceAdminTest extends BrowserTestBase {
   /**
    * Modules to install.
    *
-   * Enable path module to ensure that the selection handler does not fail for
+   * Install path module to ensure that the selection handler does not fail for
    * entities with a path field.
-   * Enable views_ui module to see the no_view_help text.
+   * Install views_ui module to see the no_view_help text.
    *
    * @var array
    */

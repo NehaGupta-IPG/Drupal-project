@@ -102,7 +102,7 @@
  *   @link theme_render Theme and render topic @endlink for more information).
  *   This render array is then rendered in the requested format (HTML, dialog,
  *   modal, AJAX are supported by default). In the case of HTML, it will be
- *   surrounded by blocks by default: the Block module is enabled by default,
+ *   surrounded by blocks by default: the Block module is installed by default,
  *   and hence its Page Display Variant that surrounds the main content with
  *   blocks is also used by default.
  * - A \Symfony\Component\HttpFoundation\Response object.

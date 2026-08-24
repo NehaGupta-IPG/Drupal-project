@@ -69,7 +69,7 @@ class TwigRegistryLoaderTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('This line is from twig_theme_test/templates/twig-registry-loader-test-extend.html.twig');
     $this->assertSession()->pageTextContains('This line is from twig_theme_test/templates/twig-registry-loader-test-include.html.twig');
 
-    // Enable a theme that overrides the extend and insert templates to ensure
+    // Install a theme that overrides the extend and insert templates to ensure
     // they are picked up by the registry loader.
     $this->config('system.theme')
       ->set('default', 'test_theme_twig_registry_loader')
@@ -78,7 +78,7 @@ class TwigRegistryLoaderTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('This line is from test_theme_twig_registry_loader/templates/twig-registry-loader-test-extend.html.twig');
     $this->assertSession()->pageTextContains('This line is from test_theme_twig_registry_loader/templates/twig-registry-loader-test-include.html.twig');
 
-    // Enable overriding theme that overrides the extend and insert templates
+    // Install overriding theme that overrides the extend and insert templates
     // from the base theme.
     $this->config('system.theme')
       ->set('default', 'test_theme_twig_registry_loader_theme')
@@ -87,7 +87,7 @@ class TwigRegistryLoaderTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('This line is from test_theme_twig_registry_loader_theme/templates/twig-registry-loader-test-extend.html.twig');
     $this->assertSession()->pageTextContains('This line is from test_theme_twig_registry_loader_theme/templates/twig-registry-loader-test-include.html.twig');
 
-    // Enable a subtheme for the theme that doesn't have any overrides to make
+    // Install a subtheme for the theme that doesn't have any overrides to make
     // sure that templates are being loaded from the first parent which has the
     // templates.
     $this->config('system.theme')

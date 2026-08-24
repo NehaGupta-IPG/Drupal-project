@@ -20,7 +20,7 @@ class ServiceDestructionTest extends KernelTestBase {
    * Verifies that services are destructed when used.
    */
   public function testDestructionUsed(): void {
-    // Enable the test module to add it to the container.
+    // Install the test module to add it to the container.
     $this->enableModules(['service_provider_test']);
 
     $request = $this->container->get('request_stack')->getCurrentRequest();
@@ -42,7 +42,7 @@ class ServiceDestructionTest extends KernelTestBase {
    * Verifies that services are not unnecessarily destructed when not used.
    */
   public function testDestructionUnused(): void {
-    // Enable the test module to add it to the container.
+    // Install the test module to add it to the container.
     $this->enableModules(['service_provider_test']);
 
     $request = $this->container->get('request_stack')->getCurrentRequest();
@@ -65,7 +65,7 @@ class ServiceDestructionTest extends KernelTestBase {
    * @legacy-covers \Drupal\Core\DependencyInjection\Compiler\RegisterServicesForDestructionPass::process
    */
   public function testDestructableServicesOrder(): void {
-    // Destructable services before the module is enabled.
+    // Destructable services before the module is installed.
     $core_services = $this->container->getParameter('kernel.destructable_services');
 
     $this->enableModules(['service_provider_test']);

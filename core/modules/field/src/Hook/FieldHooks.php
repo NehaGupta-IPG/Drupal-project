@@ -109,7 +109,7 @@ class FieldHooks {
         ]) . '</dd>';
         $output .= '<h2>' . $this->t('Field, widget, and formatter information') . '</h2>';
         // Make a list of all widget, formatter, and field modules currently
-        // enabled, ordered by displayed module name (module names are not
+        // installed, ordered by displayed module name (module names are not
         // translated).
         $items = [];
         $modules = \Drupal::moduleHandler()->getModuleList();
