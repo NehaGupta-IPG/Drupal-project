@@ -9,6 +9,7 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Extension\Discovery\RecursiveExtensionFilterCallback;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\TextUI\Configuration\Registry as PhpunitConfigurationRegistry;
 
@@ -24,52 +25,52 @@ use PHPUnit\TextUI\Configuration\Registry as PhpunitConfigurationRegistry;
  */
 function drupal_phpunit_find_extension_directories($scan_directory): array {
   $extensions = [];
-  $dirs = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($scan_directory, \RecursiveDirectoryIterator::FOLLOW_SYMLINKS));
-  foreach ($dirs as $dir) {
-    if (str_contains($dir->getPathname(), '.info.yml')) {
-      // Cut off ".info.yml" from the filename for use as the extension name. We
-      // use getRealPath() so that we can scan extensions represented by
-      // directory aliases.
-      $extensions[substr($dir->getFilename(), 0, -9)] = $dir->getPathInfo()
-        ->getRealPath();
-    }
+  // Use Unix paths regardless of platform, skip dot directories, follow
+  // symlinks (to allow extensions to be linked from elsewhere), and return
+  // the RecursiveDirectoryIterator instance to have access to getSubPath(),
+  // since SplFileInfo does not support relative paths.
+  $flags = \FilesystemIterator::UNIX_PATHS;
+  $flags |= \FilesystemIterator::SKIP_DOTS;
+  $flags |= \FilesystemIterator::FOLLOW_SYMLINKS;
+  $flags |= \FilesystemIterator::CURRENT_AS_SELF;
+  $directory_iterator = new \RecursiveDirectoryIterator($scan_directory, $flags);
+  $callback = new RecursiveExtensionFilterCallback(['node_modules', 'bower_components'], TRUE);
+  $filter = new \RecursiveCallbackFilterIterator($directory_iterator, [$callback, 'accept']);
+  $iterator = new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::LEAVES_ONLY, \RecursiveIteratorIterator::CATCH_GET_CHILD);
+  foreach ($iterator as $file) {
+    // Cut off ".info.yml" from the filename for use as the extension name. We
+    // use getRealPath() so that we can scan extensions represented by
+    // directory aliases.
+    $extensions[substr($file->getFilename(), 0, -9)] = dirname($file->getRealPath() ?: $file->getPathname());
   }
   return $extensions;
 }
 
 /**
- * Returns directories under which contributed extensions may exist.
+ * Returns directories from which test extensions may be discovered.
  *
  * @param string $root
  *   (optional) Path to the root of the Drupal installation.
  *
  * @return array
- *   An array of directories under which contributed extensions may exist.
+ *   A list of directories from which test extensions may be discovered.
  */
 function drupal_phpunit_contrib_extension_directory_roots($root = NULL): array {
   if ($root === NULL) {
     $root = dirname(__DIR__, 2);
   }
   $paths = [
-    $root . '/core/modules',
-    $root . '/core/profiles',
-    $root . '/core/themes',
-    $root . '/modules',
-    $root . '/profiles',
-    $root . '/themes',
+    $root . '/core',
+    $root,
   ];
   $sites_path = $root . '/sites';
-  // Note this also checks sites/../modules and sites/../profiles.
   foreach (scandir($sites_path) as $site) {
-    if ($site[0] === '.' || $site === 'simpletest') {
+    if ($site[0] === '.' || $site === 'simpletest' || !is_dir("$sites_path/$site")) {
       continue;
     }
-    $path = "$sites_path/$site";
-    $paths[] = is_dir("$path/modules") ? realpath("$path/modules") : NULL;
-    $paths[] = is_dir("$path/profiles") ? realpath("$path/profiles") : NULL;
-    $paths[] = is_dir("$path/themes") ? realpath("$path/themes") : NULL;
+    $paths[] = "$sites_path/$site";
   }
-  return array_filter($paths);
+  return $paths;
 }
 
 /**
