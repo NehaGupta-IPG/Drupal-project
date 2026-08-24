@@ -31,7 +31,7 @@ class TaxonomyPermissions implements PermissionProviderInterface {
    *   Permissions array.
    */
   public function permissions() {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Call the getPermissions() method instead. See https://www.drupal.org/node/3421580', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Call the getPermissions() method instead. See https://www.drupal.org/node/3421580', E_USER_DEPRECATED);
     return $this->getPermissions();
   }
 

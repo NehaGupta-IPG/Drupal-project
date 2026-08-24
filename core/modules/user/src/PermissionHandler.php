@@ -197,7 +197,7 @@ class PermissionHandler implements PermissionHandlerInterface {
       // syntax, see \Drupal\Core\Utility\CallableResolver. These methods
       // should return an array of permissions in the same structure.
       if (isset($permissions['permission_callbacks'])) {
-        @trigger_error("The 'permission_callbacks' key in {$provider}.permissions.yml is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Declare a service implementing \\Drupal\\user\\PermissionProviderInterface instead. See https://www.drupal.org/node/3421580", E_USER_DEPRECATED);
+        @trigger_error("The 'permission_callbacks' key in {$provider}.permissions.yml is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Declare a service implementing \\Drupal\\user\\PermissionProviderInterface instead. See https://www.drupal.org/node/3421580", E_USER_DEPRECATED);
         foreach ($permissions['permission_callbacks'] as $permission_callback) {
           $callback = $this->callableResolver->getCallableFromDefinition($permission_callback);
           if ($callback_permissions = call_user_func($callback)) {
