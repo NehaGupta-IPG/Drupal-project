@@ -33,6 +33,15 @@ class ExceptionDetectNeedsInstallSubscriber implements EventSubscriberInterface 
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected static function getPriority(): int {
+    // Run after DefaultExceptionSubscriber so that it handles regular HTTP
+    // exceptions first.
+    return -129;
+  }
+
+  /**
    * Handles errors for this subscriber.
    *
    * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
@@ -40,6 +49,7 @@ class ExceptionDetectNeedsInstallSubscriber implements EventSubscriberInterface 
    */
   public function onException(ExceptionEvent $event) {
     $exception = $event->getThrowable();
+
     if ($this->shouldRedirectToInstaller($exception, $this->connection)) {
       // Only redirect if this is an HTML response (i.e., a user trying to view
       // the site in a web browser before installing it).
