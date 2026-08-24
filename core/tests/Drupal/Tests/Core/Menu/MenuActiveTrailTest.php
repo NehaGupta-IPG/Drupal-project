@@ -147,6 +147,30 @@ class MenuActiveTrailTest extends UnitTestCase {
       $link_1_parent_ids,
     ];
 
+    // A link whose query options are all present in the request is returned,
+    // even when an earlier link without query options also matches the route.
+    $link_3 = MenuLinkMock::createMock([
+      'id' => 'baby_llama_link_3',
+      'route_name' => 'baby_llama',
+      'title' => 'Baby llama',
+      'parent' => 'papa_llama_link',
+      'options' => ['query' => ['foo' => 2, 'sort' => 'DESC']],
+    ]);
+    $link_3_parent_ids = ['baby_llama_link_3', 'papa_llama_link', ''];
+    $query_links = ['baby_llama_link_1' => $link_1, 'baby_llama_link_3' => $link_3];
+
+    // The request carries an extra pager parameter, lists the keys in another
+    // order and passes the integer option as a string, none of which may break
+    // the match.
+    $matching_request = clone $request;
+    $matching_request->query->replace(['sort' => 'DESC', 'foo' => '2', 'page' => '2']);
+    $data[] = [$matching_request, $query_links, Random::machineName(), $link_3, $link_3_parent_ids];
+
+    // The first enabled link is returned when no link's query options match.
+    $unmatched_request = clone $request;
+    $unmatched_request->query->replace(['foo' => '1']);
+    $data[] = [$unmatched_request, $query_links, Random::machineName(), $link_1, $link_1_parent_ids];
+
     // Test disabled parent link.
     MenuLinkMock::createMock([
       'id' => 'baby_llama_link_1',
@@ -327,6 +351,7 @@ class MenuActiveTrailTest extends UnitTestCase {
     $route = $request->attributes->get(RouteObjectInterface::ROUTE_OBJECT);
     $route->setPath('/test/{b}/{a}');
     $request->attributes->get('_raw_variables')->add(['b' => 1, 'a' => 0]);
+    $request->query->replace(['d' => '1', 'c' => '0']);
     $this->requestStack->push($request);
 
     $this->menuLinkManager->expects($this->once())
@@ -346,89 +371,13 @@ class MenuActiveTrailTest extends UnitTestCase {
 
     $this->assertSame($expected_trail_ids, $this->menuActiveTrail->getActiveTrailIds($data[2]));
 
+    // Ensure we normalize the serialized data by sorting them.
+    $expected_parameters = serialize(['a' => 0, 'b' => 1]);
+    $expected_query = serialize(['c' => '0', 'd' => '1']);
     $this->cache->expects($this->once())
       ->method('set')
-      // Ensure we normalize the serialized data by sorting them.
-      ->with('active-trail:route:baby_llama:route_parameters:' . serialize(['a' => 0, 'b' => 1]));
+      ->with('active-trail:route:baby_llama:route_parameters:' . $expected_parameters . ':query:' . $expected_query);
     $this->menuActiveTrail->destruct();
-  }
-
-  /**
-   * Provides test data for testGetActiveLinkWithQueryString().
-   *
-   * @return array
-   *   Returns a list of test data of which each is an array containing the
-   *   following elements:
-   *     - query: The query parameters of the current request.
-   *     - expected_id: The ID of the menu link expected to be active.
-   */
-  public static function providerQueryString(): array {
-    return [
-      'no query string matches the link without query options' => [
-        [],
-        'baby_llama_link_1',
-      ],
-      'a query string matches the link declaring it' => [
-        ['sort_order' => 'ASC'],
-        'baby_llama_link_2',
-      ],
-      'a different value matches the other link' => [
-        ['sort_order' => 'DESC'],
-        'baby_llama_link_3',
-      ],
-      'additional parameters in the request still match' => [
-        ['sort_order' => 'DESC', 'page' => '2'],
-        'baby_llama_link_3',
-      ],
-      'an unknown value falls back to the first matching link' => [
-        ['sort_order' => 'SIDEWAYS'],
-        'baby_llama_link_1',
-      ],
-    ];
-  }
-
-  /**
-   * Tests getActiveLink() with menu links that differ only by query string.
-   */
-  #[DataProvider('providerQueryString')]
-  public function testGetActiveLinkWithQueryString(array $query, string $expected_id): void {
-    $request = new Request($query);
-    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'baby_llama');
-    $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route(''));
-    $request->attributes->set('_raw_variables', new InputBag([]));
-    $this->requestStack->push($request);
-
-    // Three links on the same route, below different parents, that differ only
-    // in the query options they carry.
-    $links = [
-      'baby_llama_link_1' => MenuLinkMock::createMock([
-        'id' => 'baby_llama_link_1',
-        'route_name' => 'baby_llama',
-        'title' => 'Baby llama',
-        'parent' => 'mama_llama_link',
-      ]),
-      'baby_llama_link_2' => MenuLinkMock::createMock([
-        'id' => 'baby_llama_link_2',
-        'route_name' => 'baby_llama',
-        'title' => 'Baby llama ascending',
-        'parent' => 'papa_llama_link',
-        'options' => ['query' => ['sort_order' => 'ASC']],
-      ]),
-      'baby_llama_link_3' => MenuLinkMock::createMock([
-        'id' => 'baby_llama_link_3',
-        'route_name' => 'baby_llama',
-        'title' => 'Baby llama descending',
-        'parent' => 'grandma_llama_link',
-        'options' => ['query' => ['sort_order' => 'DESC']],
-      ]),
-    ];
-
-    $this->menuLinkManager
-      ->method('loadLinksByRoute')
-      ->with('baby_llama')
-      ->willReturn($links);
-
-    $this->assertSame($expected_id, $this->menuActiveTrail->getActiveLink('llama_menu')->getPluginId());
   }
 
 }

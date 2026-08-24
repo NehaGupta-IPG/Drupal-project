@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheCollector;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides the default implementation of the active menu trail service.
@@ -43,6 +44,8 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
    *   The lock backend.
    * @param \Drupal\Core\Path\PathMatcherInterface $pathMatcher
    *   The path.matcher service.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request_stack service.
    */
   public function __construct(
     MenuLinkManagerInterface $menu_link_manager,
@@ -50,6 +53,7 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
     CacheBackendInterface $cache,
     LockBackendInterface $lock,
     protected PathMatcherInterface $pathMatcher,
+    protected RequestStack $requestStack,
   ) {
     parent::__construct(NULL, $cache, $lock);
     $this->menuLinkManager = $menu_link_manager;
@@ -66,6 +70,11 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
       $route_parameters = $this->routeMatch->getRawParameters()->all();
       ksort($route_parameters);
       $this->cid = 'active-trail:route:' . $this->routeMatch->getRouteName() . ':route_parameters:' . serialize($route_parameters);
+      // The active trail can differ per query string.
+      if ($query = $this->requestStack->getCurrentRequest()?->query->all()) {
+        ksort($query);
+        $this->cid .= ':query:' . serialize($query);
+      }
     }
 
     return $this->cid;
@@ -169,6 +178,18 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
     // https://www.drupal.org/project/drupal/issues/3523497
     if ($this->pathMatcher->isFrontPage()) {
       $links = array_merge($links, $this->menuLinkManager->loadLinksByRoute('<front>', [], $menu_name));
+    }
+
+    // Several menu links can share a route and differ only in their query
+    // options. Prefer an enabled link whose query options are all present in
+    // the current request, so that unrelated parameters such as a pager do not
+    // break the match.
+    $query = $this->requestStack->getCurrentRequest()?->query->all() ?? [];
+    foreach ($links as $link) {
+      $link_query = $link->getOptions()['query'] ?? [];
+      if ($link_query && $link->isEnabled() && array_intersect_key($query, $link_query) == $link_query) {
+        return $link;
+      }
     }
 
     // Select the first enabled matching link.
