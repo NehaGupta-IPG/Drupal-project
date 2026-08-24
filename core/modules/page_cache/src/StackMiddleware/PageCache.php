@@ -2,9 +2,11 @@
 
 namespace Drupal\page_cache\StackMiddleware;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\PageCache\ResponsePolicyInterface;
 use Drupal\Core\Site\Settings;
@@ -23,6 +25,21 @@ class PageCache implements HttpKernelInterface {
    * Name of Page Cache's response header.
    */
   const HEADER = 'X-Drupal-Cache';
+
+  /**
+   * The cache context that marks a response as varying by query string.
+   */
+  protected const QUERY_ARGS_CONTEXT = 'url.query_args';
+
+  /**
+   * Contexts that select a rendering mode rather than a content dependency.
+   *
+   * @see \Drupal\Core\EventSubscriber\MainContentViewSubscriber::WRAPPER_FORMAT
+   */
+  protected const RENDER_MODE_CONTEXTS = [
+    'url.query_args:' . MainContentViewSubscriber::WRAPPER_FORMAT,
+    'url.query_args:_format',
+  ];
 
   /**
    * The wrapped HTTP kernel.
@@ -56,6 +73,13 @@ class PageCache implements HttpKernelInterface {
    * @var string
    */
   protected $cid;
+
+  /**
+   * The cache ID for the query-independent canonical variant of the path.
+   *
+   * @var string|null
+   */
+  protected $canonicalCid;
 
   /**
    * Constructs a PageCache object.
@@ -317,6 +341,18 @@ class PageCache implements HttpKernelInterface {
     if ($cache = $this->cache->get($cid, $allow_invalid)) {
       return $cache->data;
     }
+    if ($this->isQueryStringUnificationEnabled()) {
+      // Compute the canonical cache ID now, before routing resolves further
+      // request data, for consistency with getCacheId().
+      $canonical_cid = $this->getCanonicalCacheId($request);
+
+      // Skip the lookup when it would just be a repeat of the one above:
+      // for a request with no query string, or with only render-mode query
+      // parameters, $cid already equals the canonical ID.
+      if ($canonical_cid !== $cid && $cache = $this->cache->get($canonical_cid, $allow_invalid)) {
+        return $cache->data;
+      }
+    }
     return FALSE;
   }
 
@@ -343,8 +379,94 @@ class PageCache implements HttpKernelInterface {
    *   tags. For example, ['node' => [123], 'user' => [92]].
    */
   protected function set(Request $request, Response $response, $expire, array $tags) {
+    if (
+      $this->isQueryStringUnificationEnabled()
+      && !$response->isRedirect()
+      && $this->isQueryIndependent($response)
+    ) {
+
+      // If the content does not vary by query string, store the cache using
+      // the canonical cache ID so changes to query string load from the same
+      // cache entry.
+      $this->cache->set($this->getCanonicalCacheId($request), $response, $expire, $tags);
+      return;
+    }
     $cid = $this->getCacheId($request);
     $this->cache->set($cid, $response, $expire, $tags);
+  }
+
+  /**
+   * Determines whether query-independent cache unification is enabled.
+   *
+   * @return bool
+   *   TRUE if responses that declare no dependency on the query string
+   *   should be stored and served under a canonical, query-independent
+   *   cache ID.
+   */
+  protected function isQueryStringUnificationEnabled(): bool {
+    return (bool) Settings::get('page_cache_ignore_query_args', FALSE);
+  }
+
+  /**
+   * Determines whether a response is independent of the request's query string.
+   *
+   * @param \Symfony\Component\HttpFoundation\Response $response
+   *   The response to check.
+   *
+   * @return bool
+   *   TRUE if the response does not declare a dependency on the query
+   *   string (ignoring cache contexts that select a rendering mode rather
+   *   than a content dependency), FALSE otherwise.
+   */
+  protected function isQueryIndependent(Response $response): bool {
+    if (!$response instanceof CacheableResponseInterface) {
+      return FALSE;
+    }
+    foreach ($response->getCacheableMetadata()->getCacheContexts() as $context) {
+      if (in_array($context, static::RENDER_MODE_CONTEXTS, TRUE)) {
+        continue;
+      }
+      if ($context === static::QUERY_ARGS_CONTEXT || str_starts_with($context, static::QUERY_ARGS_CONTEXT . ':')) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * Gets the canonical, query-independent page cache ID for this request.
+   *
+   * Mirrors getCacheId(), except that query parameters other than those in
+   * RENDER_MODE_CONTEXTS are dropped. For a request with no query string at
+   * all, this produces the exact same value as getCacheId() — there is
+   * nothing to drop, so the "canonical" entry and the plain entry are one
+   * and the same.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   A request object.
+   *
+   * @return string
+   *   The canonical cache ID for this request, preserving only the query
+   *   parameters that select a rendering mode (see RENDER_MODE_CONTEXTS).
+   */
+  protected function getCanonicalCacheId(Request $request): string {
+    if (!isset($this->canonicalCid)) {
+      $preserved_params = [];
+      foreach (static::RENDER_MODE_CONTEXTS as $context) {
+        $param_name = substr($context, strlen(static::QUERY_ARGS_CONTEXT) + 1);
+        if ($request->query->has($param_name)) {
+          $preserved_params[$param_name] = $request->query->get($param_name);
+        }
+      }
+      ksort($preserved_params);
+      $query = $preserved_params ? '?' . UrlHelper::buildQuery($preserved_params) : '';
+      $cid_parts = [
+        $request->getSchemeAndHttpHost() . $request->getPathInfo() . $query,
+        $request->getRequestFormat(NULL),
+      ];
+      $this->canonicalCid = implode(':', $cid_parts);
+    }
+    return $this->canonicalCid;
   }
 
   /**
