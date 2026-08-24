@@ -20,13 +20,12 @@ class ThemeExtensionListTest extends KernelTestBase {
 
   /**
    * Tests get list.
-   *
-   * @legacy-covers ::getList
    */
   public function testGetList(): void {
     \Drupal::configFactory()->getEditable('core.extension')
       ->set('module.testing', 1000)
       ->set('theme.test_theme', 0)
+      ->set('profile', 'testing')
       ->save();
 
     // The installation profile is provided by a container parameter.

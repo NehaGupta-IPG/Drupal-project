@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
  * the current patch-under-test).
  */
 #[Group('Scaffold')]
+#[Group('#slow')]
 class ScaffoldUpgradeTest extends TestCase {
 
   use AssertUtilsTrait;
@@ -111,7 +112,7 @@ class ScaffoldUpgradeTest extends TestCase {
    * @return string
    *   Path to temporary git repository.
    */
-  protected function createTmpRepo($source, $destParent, $version): string {
+  protected function createTmpRepo(string $source, string $destParent, $version): string {
     $target = $destParent . '/' . basename($source);
     $filesystem = new Filesystem();
     $filesystem->copy($source, $target);

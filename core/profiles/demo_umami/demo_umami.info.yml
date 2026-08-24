@@ -2,16 +2,15 @@ name: 'Demo: Umami Food Magazine (Experimental)'
 type: profile
 description: 'Install an example site that shows off some of Drupal’s capabilities.'
 version: VERSION
+hidden: true
 install:
   - node
-  - history
   - big_pipe
   - block
   - breakpoint
   - ckeditor5
   - config
   - contextual
-  - contact
   - layout_builder
   - layout_discovery
   - menu_link_content
@@ -29,9 +28,7 @@ install:
   - dynamic_page_cache
   - taxonomy
   - dblog
-  - search
-  - shortcut
-  - toolbar
+  - navigation
   - field_ui
   - file
   - views

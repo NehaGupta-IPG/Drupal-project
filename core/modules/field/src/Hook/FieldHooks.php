@@ -29,7 +29,7 @@ class FieldHooks {
   use StringTranslationTrait;
 
   public function __construct(
-    #[Autowire(service: 'cache.field_config_memory')]
+    #[Autowire(service: 'cache.memory')]
     protected readonly CacheBackendInterface $memoryCache,
   ) {
 
@@ -105,7 +105,7 @@ class FieldHooks {
         $output .= '<dt>' . $this->t('Enabling field types, widgets, and formatters') . '</dt>';
         $output .= '<dd>' . $this->t('The Field module provides the infrastructure for fields; the field types, formatters, and widgets are provided by Drupal core or additional modules. Some of the modules are required; the optional modules can be installed from the <a href=":modules">Extend administration page</a>. Additional fields, formatters, and widgets may be provided by contributed modules, which you can find in the <a href=":contrib">contributed module section of Drupal.org</a>.', [
           ':modules' => Url::fromRoute('system.modules_list')->toString(),
-          ':contrib' => 'https://www.drupal.org/project/modules',
+          ':contrib' => 'https://www.drupal.org/project/project_module',
         ]) . '</dd>';
         $output .= '<h2>' . $this->t('Field, widget, and formatter information') . '</h2>';
         // Make a list of all widget, formatter, and field modules currently
@@ -171,16 +171,6 @@ class FieldHooks {
         return $output;
     }
     return NULL;
-  }
-
-  /**
-   * Implements hook_cron().
-   */
-  #[Hook('cron')]
-  public function cron(): void {
-    // Do a pass of purging on deleted Field API data, if any exists.
-    $limit = \Drupal::config('field.settings')->get('purge_batch_size');
-    field_purge_batch($limit);
   }
 
   /**
@@ -369,8 +359,9 @@ class FieldHooks {
       foreach ($field_storage->getBundles() as $bundle) {
         $field = FieldConfig::loadByName($field_storage->getTargetEntityTypeId(), $bundle, $field_storage->getName());
         // Reset the handler settings. This triggers
-        // field_field_config_presave(), which will take care of reassigning the
-        // handler to the correct derivative for the new target_type.
+        // \Drupal\field\Hook\FieldHooks::fieldConfigPresave(), which will take
+        // care of reassigning the handler to the correct derivative for the new
+        // target_type.
         $field->setSetting('handler_settings', []);
         $field->save();
       }
@@ -429,8 +420,8 @@ class FieldHooks {
     }
     // In case we removed all the target bundles allowed by the field in
     // EntityReferenceItem::onDependencyRemoval() or
-    // field_entity_bundle_delete() we have to log a critical message because
-    // the field will not function correctly anymore.
+    // \Drupal\field\Hook\FieldHooks::entityBundleDelete() we have to log a
+    // critical message because the field will not function correctly anymore.
     $handler_settings = $field->getSetting('handler_settings');
     if (isset($handler_settings['target_bundles']) && $handler_settings['target_bundles'] === []) {
       \Drupal::logger('entity_reference')->critical('The %field_name entity reference field (entity_type: %entity_type, bundle: %bundle) no longer has any valid bundle it can reference. The field is not working correctly anymore and has to be adjusted.', [

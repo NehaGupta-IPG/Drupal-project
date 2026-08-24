@@ -6,12 +6,14 @@ use Drupal\Core\Block\MainContentBlockPluginInterface;
 use Drupal\Core\Block\TitleBlockPluginInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\CacheOptionalInterface;
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Render\Element;
 use Drupal\block\Entity\Block;
+use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\Core\Security\TrustedCallbackInterface;
 
 /**
@@ -47,10 +49,9 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
       $cache_tags = Cache::mergeTags($cache_tags, $plugin->getCacheTags());
 
       // Create the render array for the block as a whole.
-      // @see template_preprocess_block().
+      // @see \Drupal\block\Hook\BlockHooks::preprocessBlock().
       $build[$entity_id] = [
         '#cache' => [
-          'keys' => ['entity_view', 'block', $entity->id()],
           'contexts' => Cache::mergeContexts(
             $entity->getCacheContexts(),
             $plugin->getCacheContexts()
@@ -60,6 +61,31 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
         ],
         '#weight' => $entity->getWeight(),
       ];
+
+      // For block plugins implementing CacheOptionalInterface, the expectation
+      // is that the cost of rendering them is less than retrieving them from
+      // cache. Only add cache keys to the block render array if the block
+      // plugin does not implement CacheOptionalInterface.
+      // If any CacheOptionalInterface block is set to render as a placeholder
+      // (createPlaceholder() returns TRUE), the cached response in the internal
+      // page cache or external caches and proxies will include the block
+      // markup, but the block is not cached anywhere else. If a
+      // CacheOptionalInterface block is not set to render as a placeholder,
+      // then its rendered markup is cached within the rendered page in the
+      // dynamic page cache.
+      if (!$plugin instanceof CacheOptionalInterface) {
+        $build[$entity_id]['#cache']['keys'] = ['entity_view', 'block', $entity->id()];
+      }
+      else {
+        // When a block implements CacheOptionalInterface, it will be excluded
+        // from the dynamic render cache. Since it is also cheap to render,
+        // prevent it being placeholdered by BigPipe. This avoids loading
+        // BigPipe's JavaScript if this block is the only placeholder on the
+        // page, which is likely to be the case on dynamic page cache hits.
+        $build[$entity_id]['#placeholder_strategy_denylist'] = [
+          BigPipeStrategy::class => TRUE,
+        ];
+      }
 
       // Allow altering of cacheability metadata or setting #create_placeholder.
       $this->moduleHandler->alter(['block_build', "block_build_" . $plugin->getBaseId()], $build[$entity_id], $plugin);
@@ -117,7 +143,7 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
     }
 
     // Create the render array for the block as a whole.
-    // @see template_preprocess_block().
+    // @see \Drupal\block\Hook\BlockHooks::preprocessBlock().
     $build = [
       '#theme' => 'block',
       '#attributes' => [],
@@ -145,6 +171,15 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
     $module_handler->alter(['block_view', "block_view_$base_id"], $build, $plugin);
 
     return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    // Blocks do not use a view cache tag, they have no mechanisms that would
+    // require an invalidation of view related caches.
+    return [];
   }
 
   /**
@@ -199,11 +234,13 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
       // #contextual_links is information about the *entire* block. Therefore,
       // we must move these properties from $content and merge them into the
       // top-level element.
-      foreach (['#attributes', '#contextual_links'] as $property) {
-        if (isset($content[$property])) {
-          $build[$property] += $content[$property];
-          unset($content[$property]);
-        }
+      if (isset($content['#contextual_links'])) {
+        $build['#contextual_links'] += $content['#contextual_links'];
+        unset($content['#contextual_links']);
+      }
+      if (isset($content['#wrapper_attributes'])) {
+        $build['#attributes'] += $content['#wrapper_attributes'];
+        unset($content['#wrapper_attributes']);
       }
       $build['content'] = $content;
     }

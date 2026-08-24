@@ -41,9 +41,9 @@ abstract class EntityBase implements EntityInterface {
   protected $enforceIsNew;
 
   /**
-   * A typed data object wrapping this entity.
+   * A weak reference to the typed data object wrapping this entity.
    *
-   * @var \Drupal\Core\TypedData\ComplexDataInterface
+   * @var \WeakReference
    */
   protected $typedData;
 
@@ -201,7 +201,7 @@ abstract class EntityBase implements EntityInterface {
       }
     }
 
-    if (isset($link_templates[$rel])) {
+    if ($rel !== NULL && isset($link_templates[$rel])) {
       $route_parameters = $this->urlRouteParameters($rel);
       $route_name = "entity.{$this->entityTypeId}." . str_replace(['-', 'drupal:'], ['_', ''], $rel);
       $uri = new Url($route_name, $route_parameters);
@@ -214,6 +214,7 @@ abstract class EntityBase implements EntityInterface {
       if (isset($bundles[$bundle]['uri_callback'])) {
         $uri_callback = $bundles[$bundle]['uri_callback'];
       }
+      // @phpstan-ignore method.deprecated
       elseif ($entity_uri_callback = $this->getEntityType()->getUriCallback()) {
         $uri_callback = $entity_uri_callback;
       }
@@ -625,12 +626,19 @@ abstract class EntityBase implements EntityInterface {
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function getTypedData() {
-    if (!isset($this->typedData)) {
-      $class = $this->getTypedDataClass();
-      $this->typedData = $class::createFromEntity($this);
+    if ($this->typedData instanceof \WeakReference) {
+      $return = $this->typedData->get();
+      if ($return !== NULL) {
+        return $return;
+      }
     }
-    return $this->typedData;
+
+    $class = $this->getTypedDataClass();
+    $return = $class::createFromEntity($this);
+    $this->typedData = \WeakReference::create($return);
+    return $return;
   }
 
   /**
@@ -703,52 +711,6 @@ abstract class EntityBase implements EntityInterface {
   public function setOriginal(?EntityInterface $original): static {
     $this->originalEntity = $original;
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __get($name) {
-    if ($name == 'original') {
-      @trigger_error("Getting the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::getOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
-      return $this->getOriginal();
-    }
-    return $this->$name ?? NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __set($name, $value) {
-    if ($name == 'original') {
-      @trigger_error("Setting the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::setOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
-      $this->setOriginal($value);
-      return;
-    }
-    $this->$name = $value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __isset($name) {
-    if ($name == 'original') {
-      @trigger_error("Checking for the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::getOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
-      return $this->getOriginal();
-    }
-    return isset($this->$name);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __unset($name) {
-    if ($name == 'original') {
-      @trigger_error("Unsetting the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::setOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
-      $this->setOriginal(NULL);
-      return;
-    }
-    unset($this->$name);
   }
 
 }

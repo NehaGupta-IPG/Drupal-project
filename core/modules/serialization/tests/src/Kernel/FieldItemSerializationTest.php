@@ -23,12 +23,7 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'serialization',
-    'field',
     'entity_test',
-    'text',
-    'filter',
-    'user',
     'field_normalization_test',
   ];
 
@@ -171,7 +166,7 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    *   The format to test. (NULL results in the format-agnostic normalization.)
    */
   #[DataProvider('providerTestCustomBooleanNormalization')]
-  public function testCustomBooleanNormalization(array $test_modules, $format): void {
+  public function testCustomBooleanNormalization(array $test_modules, ?string $format): void {
     // Asserts the entity contains the value we set.
     $this->assertFalse($this->entity->field_test_boolean->value);
 
@@ -180,7 +175,7 @@ class FieldItemSerializationTest extends NormalizerTestBase {
     $core_normalization = $this->container->get('serializer')->normalize($this->entity, $format);
     $this->assertFalse($core_normalization['field_test_boolean'][0]['value']);
 
-    $assert_denormalization = function (array $normalization) use ($format) {
+    $assert_denormalization = function (array $normalization) use ($format): void {
       $denormalized_entity = $this->container->get('serializer')->denormalize($normalization, EntityTestMulRev::class, $format, []);
       $this->assertInstanceOf(EntityTestMulRev::class, $denormalized_entity);
       $this->assertTrue($denormalized_entity->field_test_boolean->value);
@@ -218,7 +213,7 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    * @return array
    *   Test cases.
    */
-  public static function providerTestCustomBooleanNormalization() {
+  public static function providerTestCustomBooleanNormalization(): array {
     return [
       'Format-agnostic @FieldType-level normalizers SHOULD be able to affect the format-agnostic normalization' => [
         ['test_fieldtype_boolean_emoji_normalizer'],

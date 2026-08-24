@@ -19,10 +19,8 @@ class FileValidatorTest extends FileValidatorTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'file',
     'file_test',
     'file_validator_test',
-    'user',
   ];
 
   /**

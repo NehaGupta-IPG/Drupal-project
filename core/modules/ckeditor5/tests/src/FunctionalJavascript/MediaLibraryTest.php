@@ -103,7 +103,7 @@ class MediaLibraryTest extends WebDriverTestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -169,6 +169,7 @@ class MediaLibraryTest extends WebDriverTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-content'));
+    $this->assertSession()->elementAttributeContains('css', '.ui-dialog', 'class', 'media-library-widget-modal');
 
     // Ensure that the tab order is correct.
     $tabs = $page->findAll('css', '.media-library-menu__link');

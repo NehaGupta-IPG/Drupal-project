@@ -62,8 +62,6 @@ class DateTimeNormalizerTest extends UnitTestCase {
 
   /**
    * Tests supports normalization.
-   *
-   * @legacy-covers ::supportsNormalization
    */
   public function testSupportsNormalization(): void {
     $this->assertTrue($this->normalizer->supportsNormalization($this->data->reveal()));
@@ -77,8 +75,6 @@ class DateTimeNormalizerTest extends UnitTestCase {
 
   /**
    * Tests supports denormalization.
-   *
-   * @legacy-covers ::supportsDenormalization
    */
   public function testSupportsDenormalization(): void {
     $this->assertTrue($this->normalizer->supportsDenormalization($this->data->reveal(), DateTimeInterface::class));
@@ -86,8 +82,6 @@ class DateTimeNormalizerTest extends UnitTestCase {
 
   /**
    * Tests normalize.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalize(): void {
     $random_rfc_3339_string = $this->randomMachineName();
@@ -107,8 +101,6 @@ class DateTimeNormalizerTest extends UnitTestCase {
 
   /**
    * Tests normalize when null.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalizeWhenNull(): void {
     $this->data->getDateTime()
@@ -120,8 +112,6 @@ class DateTimeNormalizerTest extends UnitTestCase {
 
   /**
    * Tests the denormalize function with good data.
-   *
-   * @legacy-covers ::denormalize
    */
   #[DataProvider('providerTestDenormalizeValidFormats')]
   public function testDenormalizeValidFormats($normalized, $expected): void {
@@ -136,7 +126,7 @@ class DateTimeNormalizerTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestDenormalizeValidFormats() {
+  public static function providerTestDenormalizeValidFormats(): array {
     $data = [];
 
     $data['RFC3339'] = ['2016-11-06T09:02:00+00:00', new \DateTimeImmutable('2016-11-06T09:02:00+00:00')];
@@ -152,8 +142,6 @@ class DateTimeNormalizerTest extends UnitTestCase {
 
   /**
    * Tests the denormalize function with a user supplied format.
-   *
-   * @legacy-covers ::denormalize
    */
   #[DataProvider('providerTestDenormalizeUserFormats')]
   public function testDenormalizeUserFormats($normalized, $format, $expected): void {
@@ -168,7 +156,7 @@ class DateTimeNormalizerTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestDenormalizeUserFormats() {
+  public static function providerTestDenormalizeUserFormats(): array {
     $data = [];
 
     $data['Y/m/d H:i:s P'] = [
@@ -192,8 +180,6 @@ class DateTimeNormalizerTest extends UnitTestCase {
 
   /**
    * Tests the denormalize function with bad data.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalizeException(): void {
     $this->expectException(UnexpectedValueException::class);
@@ -224,7 +210,7 @@ class DateTimeNormalizerTest extends UnitTestCase {
       return $data->reveal();
     };
     return [
-      'RFC 3339' => [fn (UnitTestCase $test) => $case($test)],
+      'RFC 3339' => [fn (UnitTestCase $test): DateTimeInterface => $case($test)],
     ];
   }
 

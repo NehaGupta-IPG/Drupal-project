@@ -25,7 +25,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * @see \Drupal\views\Plugin\views\field\EntityField
  */
 #[Group('views')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class FieldFieldTest extends ViewsKernelTestBase {
 
@@ -37,7 +36,6 @@ class FieldFieldTest extends ViewsKernelTestBase {
   protected static $modules = [
     'field',
     'entity_test',
-    'user',
     'views_test_formatter',
     'views_entity_test',
   ];
@@ -60,13 +58,6 @@ class FieldFieldTest extends ViewsKernelTestBase {
    * @var \Drupal\entity_test\Entity\EntityTest[]
    */
   protected $entities;
-
-  /**
-   * The stored revisionable test entities.
-   *
-   * @var \Drupal\entity_test\Entity\EntityTestRev[]
-   */
-  protected $entityRevision;
 
   /**
    * Stores a couple of test users.
@@ -184,8 +175,7 @@ class FieldFieldTest extends ViewsKernelTestBase {
     ]);
     $field_multiple->save();
 
-    $this->entityRevision = [];
-    $this->entityRevision[0] = $entity = EntityTestRev::create([
+    $entity = EntityTestRev::create([
       'name' => 'base value',
       'field_test' => 1,
       'field_test_multiple' => [1, 3, 7],
@@ -203,7 +193,6 @@ class FieldFieldTest extends ViewsKernelTestBase {
     $entity->field_test_multiple[2]->value = 5;
     $entity->user_id->target_id = $this->testUsers[1]->id();
     $entity->save();
-    $this->entityRevision[1] = $entity;
 
     $entity = clone $original_entity;
     $entity->setNewRevision(TRUE);
@@ -214,9 +203,8 @@ class FieldFieldTest extends ViewsKernelTestBase {
     $entity->field_test_multiple[2]->value = 9;
     $entity->user_id->target_id = $this->testUsers[2]->id();
     $entity->save();
-    $this->entityRevision[2] = $entity;
 
-    $this->entityRevision[3] = $entity = EntityTestRev::create([
+    $entity = EntityTestRev::create([
       'name' => 'next entity value',
       'field_test' => 4,
       'field_test_multiple' => [2, 9, 9],

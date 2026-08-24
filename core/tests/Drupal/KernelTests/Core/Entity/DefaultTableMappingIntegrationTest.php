@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -35,18 +36,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
   protected $tableMapping;
 
   /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['entity_test_extra'];
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected EntityFieldManagerInterface $entityFieldManager;
-
-  /**
    * The entity definition update manager.
    *
    * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
@@ -59,18 +48,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // Setup some fields for entity_test_extra to create.
-    $definitions['multivalued_base_field'] = BaseFieldDefinition::create('string')
-      ->setName('multivalued_base_field')
-      ->setTargetEntityTypeId('entity_test_mulrev')
-      ->setTargetBundle('entity_test_mulrev')
-      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
-      // Base fields are non-translatable and non-revisionable by default, but
-      // we explicitly set these values here for extra clarity.
-      ->setTranslatable(FALSE)
-      ->setRevisionable(FALSE);
-    $this->state->set('entity_test_mulrev.additional_base_field_definitions', $definitions);
-
     $this->tableMapping = $this->entityTypeManager->getStorage('entity_test_mulrev')->getTableMapping();
 
     // Ensure that the tables for the new field are created.
@@ -79,8 +56,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
   /**
    * Tests DefaultTableMapping::getFieldTableName().
-   *
-   * @legacy-covers ::getFieldTableName
    */
   public function testGetFieldTableName(): void {
     // Test the field table name for a single-valued base field, which is stored
@@ -101,8 +76,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
   /**
    * Tests get all field table names.
-   *
-   * @legacy-covers ::getAllFieldTableNames
    */
   public function testGetAllFieldTableNames(): void {
     // Check a field that is stored in all the shared tables.
@@ -140,8 +113,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
   /**
    * Tests DefaultTableMapping::getTableNames().
-   *
-   * @legacy-covers ::getTableNames
    */
   public function testGetTableNames(): void {
     $storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('entity_test_mulrev');
@@ -165,6 +136,26 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
       $dedicated_revision_table,
     ];
     $this->assertEquals($expected, $this->tableMapping->getTableNames());
+  }
+
+  /**
+   * Implements hook_entity_base_field_info().
+   */
+  #[Hook('entity_base_field_info')]
+  public function entityBaseFieldInfo(EntityTypeInterface $entity_type): array {
+    $definitions = [];
+    if ($entity_type->id() === 'entity_test_mulrev') {
+      $definitions['multivalued_base_field'] = BaseFieldDefinition::create('string')
+        ->setName('multivalued_base_field')
+        ->setTargetEntityTypeId('entity_test_mulrev')
+        ->setTargetBundle('entity_test_mulrev')
+        ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+        // Base fields are non-translatable and non-revisionable by default, but
+        // we explicitly set these values here for extra clarity.
+        ->setTranslatable(FALSE)
+        ->setRevisionable(FALSE);
+    }
+    return $definitions;
   }
 
 }

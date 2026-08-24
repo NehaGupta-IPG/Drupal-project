@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
@@ -34,13 +33,6 @@ class EntitySchemaTest extends EntityKernelTestBase {
    * @var \Drupal\Core\Database\Connection
    */
   protected $database;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
    * The entity definition update manager.
@@ -109,7 +101,12 @@ class EntitySchemaTest extends EntityKernelTestBase {
     \Drupal::service('field_storage_definition.listener')->onFieldStorageDefinitionCreate($storage_definitions['custom_base_field']);
     \Drupal::service('field_storage_definition.listener')->onFieldStorageDefinitionCreate($storage_definitions['custom_bundle_field']);
     $schema_handler = $this->database->schema();
-    $tables = ['entity_test_update', 'entity_test_update_revision', 'entity_test_update_data', 'entity_test_update_revision_data'];
+    $tables = [
+      'entity_test_update',
+      'entity_test_update_revision',
+      'entity_test_update_data',
+      'entity_test_update_revision_data',
+    ];
     $dedicated_tables = ['entity_test_update__custom_bundle_field', 'entity_test_update_revision__custom_bundle_field'];
 
     // Initially only the base table and the dedicated field data table should
@@ -272,7 +269,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
    * @return array
    *   An array of test cases consisting of an entity type ID and a field name.
    */
-  public static function providerTestPrimaryKeyUpdate() {
+  public static function providerTestPrimaryKeyUpdate(): array {
     // Build up test cases for all possible entity type configurations.
     // For each entity type we test reinstalling each field that is part of
     // any table's primary key.
@@ -335,13 +332,13 @@ class EntitySchemaTest extends EntityKernelTestBase {
 
     // Get a list of all the entities in the schema.
     $key_value_store = \Drupal::keyValue('entity.storage_schema.sql');
-    $schema = $key_value_store->getAll();
+    $schema = $key_value_store->getAllKeys();
 
     // Count the storage definitions provided by the entity_test module, so that
     // after uninstall we can be sure there were some to be deleted.
     $entity_type_id_count = 0;
 
-    foreach (array_keys($schema) as $storage_definition_name) {
+    foreach ($schema as $storage_definition_name) {
       [$entity_type_id] = explode('.', $storage_definition_name);
       if (in_array($entity_type_id, $entity_type_ids)) {
         $entity_type_id_count++;
@@ -356,13 +353,13 @@ class EntitySchemaTest extends EntityKernelTestBase {
 
     // Get a list of all the entities in the schema.
     $key_value_store = \Drupal::keyValue('entity.storage_schema.sql');
-    $schema = $key_value_store->getAll();
+    $schema = $key_value_store->getAllKeys();
 
     // Count the storage definitions that come from entity types provided by
     // the entity_test module.
     $entity_type_id_count = 0;
 
-    foreach (array_keys($schema) as $storage_definition_name) {
+    foreach ($schema as $storage_definition_name) {
       [$entity_type_id] = explode('.', $storage_definition_name);
       if (in_array($entity_type_id, $entity_type_ids)) {
         $entity_type_id_count++;

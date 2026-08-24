@@ -27,14 +27,11 @@ class RestPermissionsTest extends KernelTestBase {
     'rest',
     'dblog',
     'serialization',
-    'basic_auth',
     'user',
   ];
 
   /**
    * Tests permissions.
-   *
-   * @legacy-covers ::permissions
    */
   public function testPermissions(): void {
     RestResourceConfig::create([

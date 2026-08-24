@@ -30,30 +30,17 @@ class HandlerAllTest extends ViewsKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
     'comment',
-    'contact',
     'dblog',
     'field',
-    'filter',
     'file',
-    'history',
     'image',
     'language',
-    'locale',
     'media',
     'node',
-    'search',
-    'options',
     'taxonomy',
     'text',
-    'user',
   ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
 
   /**
    * Tests most of the handlers.

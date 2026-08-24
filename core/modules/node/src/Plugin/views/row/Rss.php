@@ -25,13 +25,13 @@ class Rss extends RssPluginBase {
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $base_table = 'node_field_data';
 
   /**
    * The base field for this row plugin.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $base_field = 'nid';
 
   /**
@@ -136,7 +136,8 @@ class Rss extends RssPluginBase {
     $item->title = $node->label();
     $item->link = $node->toUrl('canonical', ['absolute' => TRUE])->toString();
     // Provide a reference so that the render call in
-    // template_preprocess_views_view_row_rss() can still access it.
+    // \Drupal\views\Hook\ViewsThemeHooks::preprocessViewsViewRowRss()
+    // can still access it.
     $item->elements = &$node->rss_elements;
     $item->nid = $node->id();
     $build = [

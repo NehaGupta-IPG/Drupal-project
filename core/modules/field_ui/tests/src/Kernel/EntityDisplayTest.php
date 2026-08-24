@@ -31,7 +31,6 @@ class EntityDisplayTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'field_ui',
     'field',
     'entity_test',
     'user',
@@ -103,6 +102,7 @@ class EntityDisplayTest extends KernelTestBase {
       'weight' => -5,
       'settings' => [
         'link_to_entity' => FALSE,
+        'link_rel' => 'canonical',
       ],
       'third_party_settings' => [],
       'region' => 'content',

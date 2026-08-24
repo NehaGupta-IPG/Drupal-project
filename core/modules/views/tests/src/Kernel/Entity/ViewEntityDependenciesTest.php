@@ -41,10 +41,8 @@ class ViewEntityDependenciesTest extends ViewsKernelTestBase {
   protected static $modules = [
     'node',
     'comment',
-    'user',
     'field',
     'text',
-    'search',
   ];
 
   /**
@@ -131,8 +129,6 @@ class ViewEntityDependenciesTest extends ViewsKernelTestBase {
       ],
       'module' => [
         'node',
-        // The argument handler is provided by the search module.
-        'search',
         'text',
         'user',
       ],
@@ -159,7 +155,6 @@ class ViewEntityDependenciesTest extends ViewsKernelTestBase {
       'module' => [
         'core',
         'node',
-        'search',
         'user',
         'views',
       ],

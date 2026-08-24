@@ -64,7 +64,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
 
     $class_resolver = $this->prophesize(ClassResolverInterface::class);
-    $class_resolver->getInstanceFromDefinition(Argument::type('string'))->will(function ($arguments) {
+    $class_resolver->getInstanceFromDefinition(Argument::type('string'))->will(function ($arguments): object {
       $class_name = $arguments[0];
       return new $class_name();
     });
@@ -113,7 +113,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
    * @legacy-covers ::getConstraintObjects
    */
   #[DataProvider('providerTestIsSatisfiedBy')]
-  public function testIsSatisfiedBy($expected, ContextDefinition $requirement, ContextDefinition $definition, $value = NULL): void {
+  public function testIsSatisfiedBy(bool $expected, ContextDefinition $requirement, ContextDefinition $definition, $value = NULL): void {
     $entity_storage = $this->prophesize(EntityStorageInterface::class);
     $content_entity_storage = $this->prophesize(ContentEntityStorageInterface::class);
     $this->entityTypeManager->getStorage('test_config')->willReturn($entity_storage->reveal());
@@ -141,7 +141,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
   /**
    * Provides test data for ::testIsSatisfiedBy().
    */
-  public static function providerTestIsSatisfiedBy() {
+  public static function providerTestIsSatisfiedBy(): array {
     $data = [];
 
     $content = new EntityType(['id' => 'test_content']);
@@ -168,7 +168,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
     $data['content entity, incorrect manual constraint'] = [
       TRUE,
       EntityContextDefinition::fromEntityType($content),
-      EntityContextDefinition::fromEntityType($content)->addConstraint('EntityType', 'test_config'),
+      EntityContextDefinition::fromEntityType($content)->addConstraint('EntityType', ['type' => 'test_config']),
     ];
     $data['config entity, matching type, no value'] = [
       TRUE,
@@ -198,7 +198,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
    * @legacy-covers ::getConstraintObjects
    */
   #[DataProvider('providerTestIsSatisfiedByGenerateBundledEntity')]
-  public function testIsSatisfiedByGenerateBundledEntity($expected, array $requirement_bundles, array $candidate_bundles, ?array $bundles_to_instantiate = NULL): void {
+  public function testIsSatisfiedByGenerateBundledEntity(bool $expected, array $requirement_bundles, array $candidate_bundles, ?array $bundles_to_instantiate = NULL): void {
     // If no bundles are explicitly specified, instantiate all bundles.
     if (!$bundles_to_instantiate) {
       $bundles_to_instantiate = $candidate_bundles;
@@ -241,16 +241,16 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
 
     $requirement = EntityContextDefinition::fromEntityType($entity_type);
     if ($requirement_bundles) {
-      $requirement->addConstraint('Bundle', $requirement_bundles);
+      $requirement->addConstraint('Bundle', ['bundle' => $requirement_bundles]);
     }
-    $definition = EntityContextDefinition::fromEntityType($entity_type)->addConstraint('Bundle', $candidate_bundles);
+    $definition = EntityContextDefinition::fromEntityType($entity_type)->addConstraint('Bundle', ['bundle' => $candidate_bundles]);
     $this->assertRequirementIsSatisfied($expected, $requirement, $definition);
   }
 
   /**
    * Provides test data for ::testIsSatisfiedByGenerateBundledEntity().
    */
-  public static function providerTestIsSatisfiedByGenerateBundledEntity() {
+  public static function providerTestIsSatisfiedByGenerateBundledEntity(): array {
     $data = [];
     $data['no requirement'] = [
       TRUE,
@@ -296,7 +296,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
    * @legacy-covers ::getConstraintObjects
    */
   #[DataProvider('providerTestIsSatisfiedByPassBundledEntity')]
-  public function testIsSatisfiedByPassBundledEntity($expected, $requirement_constraint): void {
+  public function testIsSatisfiedByPassBundledEntity(bool $expected, $requirement_constraint): void {
     $entity_type = new EntityType(['id' => 'test_content']);
     $this->entityTypeManager->getDefinitions()->willReturn([
       'test_content' => $entity_type,
@@ -320,7 +320,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
 
     $requirement = EntityContextDefinition::fromEntityTypeId('test_content');
     if ($requirement_constraint) {
-      $requirement->addConstraint('Bundle', $requirement_constraint);
+      $requirement->addConstraint('Bundle', ['bundle' => $requirement_constraint]);
     }
     $definition = EntityContextDefinition::fromEntityTypeId('test_content');
     $this->assertRequirementIsSatisfied($expected, $requirement, $definition, $entity->reveal());
@@ -329,7 +329,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
   /**
    * Provides test data for ::testIsSatisfiedByPassBundledEntity().
    */
-  public static function providerTestIsSatisfiedByPassBundledEntity() {
+  public static function providerTestIsSatisfiedByPassBundledEntity(): array {
     $data = [];
     $data[] = [TRUE, []];
     $data[] = [FALSE, ['first_bundle']];

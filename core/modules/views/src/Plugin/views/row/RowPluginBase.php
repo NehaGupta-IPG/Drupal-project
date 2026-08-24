@@ -52,13 +52,13 @@ abstract class RowPluginBase extends PluginBase {
   /**
    * The actual field used.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $base_field;
 
   /**
    * The field alias.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $field_alias;
 
   /**
@@ -97,7 +97,7 @@ abstract class RowPluginBase extends PluginBase {
       $relationship_options = [];
 
       foreach ($relationships as $relationship) {
-        $relationship_handler = Views::handlerManager('relationship')->getHandler($relationship);
+        $relationship_handler = \Drupal::service('plugin.manager.views.relationship')->getHandler($relationship);
 
         // If this relationship is valid for this type, add it to the list.
         $data = Views::viewsData()->get($relationship['table']);

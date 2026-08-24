@@ -6,6 +6,8 @@ namespace Drupal\Tests\Core\Block;
 
 use Drupal\block_test\Plugin\Block\TestBlockInstantiation;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Transliteration\PhpTransliteration;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -30,12 +32,8 @@ class BlockBaseTest extends UnitTestCase {
    * @see \Drupal\Core\Block\BlockBase::getMachineNameSuggestion()
    */
   #[DataProvider('providerTestGetMachineNameSuggestion')]
-  public function testGetMachineNameSuggestion($label, $expected): void {
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $transliteration = $this->getMockBuilder('Drupal\Core\Transliteration\PhpTransliteration')
-      ->setConstructorArgs([NULL, $module_handler])
-      ->onlyMethods(['readLanguageOverrides'])
-      ->getMock();
+  public function testGetMachineNameSuggestion(string $label, string $expected): void {
+    $transliteration = new PhpTransliteration(NULL, $this->createStub(ModuleHandlerInterface::class));
 
     $config = [];
     $definition = [
@@ -50,7 +48,7 @@ class BlockBaseTest extends UnitTestCase {
   /**
    * Provides data for testGetMachineNameSuggestion().
    */
-  public static function providerTestGetMachineNameSuggestion() {
+  public static function providerTestGetMachineNameSuggestion(): array {
     return [
       ['Admin label', 'adminlabel'],
       // cspell:disable-next-line

@@ -184,7 +184,7 @@ class BlockViewBuilderTest extends KernelTestBase {
     $output = $builder->view($entity, 'block');
 
     $this->assertSame(
-      ['block_view', 'config:block.block.test_block_title', 'custom_cache_tag'],
+      ['config:block_list', 'custom_cache_tag'],
       $output['#cache']['tags']
     );
   }
@@ -226,6 +226,43 @@ class BlockViewBuilderTest extends KernelTestBase {
     $this->block->delete();
     $this->assertFalse($cache_bin->get($cache_keys, CacheableMetadata::createFromRenderArray($build)), 'The block render cache entry has been cleared when the block was deleted.');
 
+    // Restore the previous request method.
+    $request->setMethod($request_method);
+  }
+
+  /**
+   * Tests block render cache handling of cache-optional blocks.
+   */
+  public function testBlockViewBuilderCacheOptional(): void {
+    // Verify cache handling for a non-empty block.
+    $this->verifyRenderCacheHandling();
+
+    // Create a block with a plugin implementing CacheOptionalInterface.
+    $this->block = $this->controller->create([
+      'id' => 'test_block',
+      'theme' => 'stark',
+      'plugin' => 'test_cache_optional',
+    ]);
+    $this->block->save();
+    \Drupal::keyValue('block_test')->set('content', 'This is content for a block that is not render cached.');
+
+    /** @var \Drupal\Core\Cache\VariationCacheFactoryInterface $variation_cache_factory */
+    $variation_cache_factory = \Drupal::service('variation_cache_factory');
+    $cache_bin = $variation_cache_factory->get('render');
+
+    // Force a request via GET so we can test the render cache.
+    $request = \Drupal::request();
+    $request_method = $request->server->get('REQUEST_METHOD');
+    $request->setMethod('GET');
+
+    // Test that an entry for the block is not created in the render cache.
+    $build = $this->getBlockRenderArray();
+    $cache_keys = ['entity_view', 'block', 'test_block'];
+    $markup = $this->renderer->renderRoot($build);
+    $this->assertTrue(str_contains((string) $markup, 'This is content for a block that is not render cached.'));
+    $this->assertFalse($cache_bin->get($cache_keys, CacheableMetadata::createFromRenderArray($build)));
+    // Confirm that build render array has no cache keys.
+    $this->assertArrayNotHasKey('keys', $build['#cache']);
     // Restore the previous request method.
     $request->setMethod($request_method);
   }
@@ -278,7 +315,7 @@ class BlockViewBuilderTest extends KernelTestBase {
 
     $default_keys = ['entity_view', 'block', 'test_block'];
     $default_contexts = [];
-    $default_tags = ['block_view', 'config:block.block.test_block'];
+    $default_tags = ['config:block_list'];
     $default_max_age = Cache::PERMANENT;
 
     // hook_block_build_alter() adds an additional cache key.

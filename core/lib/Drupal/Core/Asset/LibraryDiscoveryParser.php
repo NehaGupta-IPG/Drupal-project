@@ -157,7 +157,7 @@ class LibraryDiscoveryParser {
       if (!isset($library['js']) && !isset($library['css']) && !isset($library['drupalSettings']) && !isset($library['dependencies'])) {
         throw new IncompleteLibraryDefinitionException(sprintf("Incomplete library definition for definition '%s' in extension '%s'", $id, $extension));
       }
-      $library += ['dependencies' => [], 'js' => [], 'css' => []];
+      $library += ['dependencies' => [], 'js' => [], 'css' => [], 'fonts' => []];
 
       if (isset($library['header']) && !is_bool($library['header'])) {
         throw new \LogicException(sprintf("The 'header' key in the library definition '%s' in extension '%s' is invalid: it must be a boolean.", $id, $extension));
@@ -188,7 +188,7 @@ class LibraryDiscoveryParser {
         ];
       }
 
-      foreach (['js', 'css'] as $type) {
+      foreach (['js', 'css', 'fonts'] as $type) {
         // Prepare (flatten) the SMACSS-categorized definitions.
         // @todo After Asset(ic) changes, retain the definitions as-is and
         //   properly resolve dependencies for all (css) libraries per category,
@@ -433,7 +433,7 @@ class LibraryDiscoveryParser {
    *   The extension name.
    * @param array $overrides
    *   The library overrides.
-   * @param Drupal\Core\Theme\ActiveTheme $active_theme
+   * @param \Drupal\Core\Theme\ActiveTheme $active_theme
    *   The active theme.
    *
    * @return array
@@ -530,7 +530,7 @@ class LibraryDiscoveryParser {
         // Process libraries overrides.
         if (isset($libraries_overrides["$extension/$library_name"])) {
           if (isset($library['deprecated'])) {
-            $override_message = sprintf('Theme "%s" is overriding a deprecated library.', $extension);
+            $override_message = sprintf('Theme "%s" is overriding a deprecated library.', $active_theme->getName());
             $library_deprecation = str_replace('%library_id%', "$extension/$library_name", $library['deprecated']);
             // phpcs:ignore Drupal.Semantics.FunctionTriggerError
             @trigger_error("$override_message $library_deprecation", E_USER_DEPRECATED);
@@ -541,7 +541,7 @@ class LibraryDiscoveryParser {
             // A string or boolean definition implies an override (or removal)
             // for the whole library. Use the override key to specify that this
             // library will be overridden when it is called.
-            // @see \Drupal\Core\Asset\LibraryDiscovery::getLibraryByName()
+            // @see \Drupal\Core\Asset\LibraryDiscoveryCollector::getLibraryByName()
             if ($override_definition) {
               $libraries[$library_name]['override'] = $override_definition;
             }

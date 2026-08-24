@@ -77,8 +77,6 @@ class YamlDiscoveryTest extends UnitTestCase {
 
   /**
    * Tests get definitions with translatable definitions.
-   *
-   * @legacy-covers ::getDefinitions
    */
   public function testGetDefinitionsWithTranslatableDefinitions(): void {
     vfsStream::setup('root');
@@ -101,7 +99,10 @@ EOS;
       ],
     ]);
 
-    $discovery = new YamlDiscovery('test', ['test_1' => vfsStream::url('root/test_1'), 'test_2' => vfsStream::url('root/test_2')]);
+    $discovery = new YamlDiscovery('test', [
+      'test_1' => vfsStream::url('root/test_1'),
+      'test_2' => vfsStream::url('root/test_2'),
+    ]);
     $discovery->addTranslatableProperty('title', 'title_context');
     $definitions = $discovery->getDefinitions();
 

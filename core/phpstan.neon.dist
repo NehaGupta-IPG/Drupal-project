@@ -1,5 +1,6 @@
 # Configuration file for PHPStan static code checking, see https://phpstan.org .
 # The PHPStan check is executed as a job in the CI pipeline.
+
 includes:
   - .phpstan-baseline.php
 
@@ -9,7 +10,11 @@ parameters:
 
   level: 1
 
+  checkFunctionArgumentTypes: true
   checkInternalClassCaseSensitivity: true
+
+  parallel:
+    minimumNumberOfJobsPerProcess: 1
 
   fileExtensions:
     - sh
@@ -33,6 +38,8 @@ parameters:
     - phpstan-tmp/*
     # Skip Drupal's own PHPStan rules test fixtures.
     - tests/PHPStan/fixtures/*
+    # Skip Drupal's own PHPStan vendor directory
+    - tests/PHPStan/vendor/*
     # Skip Drupal 6 & 7 code.
     - scripts/dump-database-d?.sh
     - scripts/generate-d?-content.sh
@@ -55,9 +62,23 @@ parameters:
     - identifier: missingType.iterableValue
 
 rules:
+  # The rules below are Drupal custom ones.
   - Drupal\PHPStan\Rules\ComponentTestDoesNotExtendCoreTest
-  - Drupal\PHPStan\Rules\NoClassMetadataOnAbstractTestClasses
-  - PHPStan\Rules\Functions\MissingFunctionReturnTypehintRule
-  - PHPStan\Rules\Methods\MissingMethodReturnTypehintRule
+  - Drupal\PHPStan\Rules\TestClassClassMetadata
+  - Drupal\PHPStan\Rules\TestClassMethodMetadata
+  # ----------------------------------------------------------
   # The rule below can be removed when we increase level to 2.
   - PHPStan\Rules\Classes\AccessPrivateConstantThroughStaticRule
+  # The rules below can be removed when we increase level to 6.
+  - PHPStan\Rules\Functions\MissingFunctionReturnTypehintRule
+  - PHPStan\Rules\Methods\MissingMethodReturnTypehintRule
+
+services:
+  errorFormatter.multiplex:
+    class: Drupal\PHPStan\ErrorFormatter\MultiplexErrorFormatter
+    arguments:
+      basePath: ::getenv(_ARTIFACTS_DIR)
+      outputs:
+        gitlab: phpstan-gitlab.json
+        junit: phpstan-junit.xml
+        table: null

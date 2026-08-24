@@ -210,7 +210,7 @@ class RouteProviderTest extends KernelTestBase {
   /**
    * Data provider for testMixedCasePaths()
    */
-  public static function providerMixedCaseRoutePaths() {
+  public static function providerMixedCaseRoutePaths(): array {
     // cSpell:disable
     return [
       ['/path/one', 'route_a'],
@@ -233,7 +233,7 @@ class RouteProviderTest extends KernelTestBase {
    * Confirms that we find routes using a case-insensitive path match.
    */
   #[DataProvider('providerMixedCaseRoutePaths')]
-  public function testMixedCasePaths($path, $expected_route_name, $method = 'GET'): void {
+  public function testMixedCasePaths(string $path, ?string $expected_route_name, string $method = 'GET'): void {
     $connection = Database::getConnection();
     $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, 'test_routes');
 
@@ -259,7 +259,7 @@ class RouteProviderTest extends KernelTestBase {
   /**
    * Data provider for testMixedCasePaths()
    */
-  public static function providerDuplicateRoutePaths() {
+  public static function providerDuplicateRoutePaths(): array {
     // When matching routes with the same fit the route with the lowest-sorting
     // name should end up first in the resulting route collection.
     return [
@@ -276,7 +276,7 @@ class RouteProviderTest extends KernelTestBase {
    * Confirms that we find all routes with the same path.
    */
   #[DataProvider('providerDuplicateRoutePaths')]
-  public function testDuplicateRoutePaths($path, $number, $expected_route_name = NULL): void {
+  public function testDuplicateRoutePaths(string $path, int $number, ?string $expected_route_name = NULL): void {
     $connection = Database::getConnection();
     $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, 'test_routes');
 

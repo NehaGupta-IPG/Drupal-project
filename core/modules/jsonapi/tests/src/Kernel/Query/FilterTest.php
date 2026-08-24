@@ -37,9 +37,7 @@ class FilterTest extends JsonapiKernelTestBase {
    */
   protected static $modules = [
     'field',
-    'file',
     'image',
-    'jsonapi',
     'node',
     'serialization',
     'text',
@@ -164,14 +162,12 @@ class FilterTest extends JsonapiKernelTestBase {
 
   /**
    * Tests query condition.
-   *
-   * @legacy-covers ::queryCondition
    */
   public function testQueryCondition(): void {
     // Can't use a data provider because we need access to the container.
     $data = $this->queryConditionData();
 
-    $get_sql_query_for_entity_query = function ($entity_query) {
+    $get_sql_query_for_entity_query = function ($entity_query): string {
       // Expose parts of \Drupal\Core\Entity\Query\Sql\Query::execute().
       $o = new \ReflectionObject($entity_query);
       $m1 = $o->getMethod('prepare');
@@ -331,12 +327,10 @@ class FilterTest extends JsonapiKernelTestBase {
 
   /**
    * Tests create from query parameter.
-   *
-   * @legacy-covers ::createFromQueryParameter
    */
   #[DataProvider('parameterProvider')]
-  public function testCreateFromQueryParameter($case, $expected): void {
-    $resource_type = new ResourceType('foo', 'bar', NULL);
+  public function testCreateFromQueryParameter(array $case, array $expected): void {
+    $resource_type = new ResourceType('foo', 'bar', \stdClass::class);
     $actual = Filter::createFromQueryParameter($case, $resource_type, $this->getFieldResolverMock($resource_type));
     $conditions = $actual->root()->members();
     for ($i = 0; $i < count($case); $i++) {
@@ -349,7 +343,7 @@ class FilterTest extends JsonapiKernelTestBase {
   /**
    * Data provider for testCreateFromQueryParameter.
    */
-  public static function parameterProvider() {
+  public static function parameterProvider(): array {
     return [
       'shorthand' => [
         ['uid' => ['value' => 1]],
@@ -364,8 +358,6 @@ class FilterTest extends JsonapiKernelTestBase {
 
   /**
    * Tests create from query parameter nested.
-   *
-   * @legacy-covers ::createFromQueryParameter
    */
   public function testCreateFromQueryParameterNested(): void {
     $parameter = [
@@ -405,7 +397,7 @@ class FilterTest extends JsonapiKernelTestBase {
         ],
       ],
     ];
-    $resource_type = new ResourceType('foo', 'bar', NULL);
+    $resource_type = new ResourceType('foo', 'bar', \stdClass::class);
     $filter = Filter::createFromQueryParameter($parameter, $resource_type, $this->getFieldResolverMock($resource_type));
     $root = $filter->root();
 

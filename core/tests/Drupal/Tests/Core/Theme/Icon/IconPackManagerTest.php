@@ -34,6 +34,7 @@ class IconPackManagerTest extends UnitTestCase {
   public static function providerIconPackLibraryName(): array {
     return [
       'valid name with underscore' => ['my_theme/my_library', TRUE],
+      'valid name with dot' => ['my_theme/my.library', TRUE],
       'valid name with hyphen' => ['my_theme/my-library', TRUE],
       'valid name with hyphen and numbers' => ['my_theme/my-long-library_with_mixed-hyphens123', TRUE],
       'invalid theme name case 1' => ['my-theme/my-library', FALSE],
@@ -62,23 +63,13 @@ class IconPackManagerTest extends UnitTestCase {
       'library' => $name,
     ];
 
-    // Mock all dependencies for IconPackManager.
-    $module_handler = $this->createMock(ModuleHandlerInterface::class);
-    $theme_handler = $this->createMock(ThemeHandlerInterface::class);
-    $cache_backend = $this->createMock(CacheBackendInterface::class);
-
-    // Add the IconExtractorPluginManager mock here.
-    $icon_extractor_manager = $this->createMock(IconExtractorPluginManager::class);
-
-    $icon_collector = $this->createMock(IconCollector::class);
-
     // Create the IconPackManager instance and pass the manager with definition.
     $iconPackManager = new IconPackManager(
-      $module_handler,
-      $theme_handler,
-      $cache_backend,
-      $icon_extractor_manager,
-      $icon_collector,
+      $this->createStub(ModuleHandlerInterface::class),
+      $this->createStub(ThemeHandlerInterface::class),
+      $this->createStub(CacheBackendInterface::class),
+      $this->createStub(IconExtractorPluginManager::class),
+      $this->createStub(IconCollector::class),
       $this->root,
     );
 
@@ -95,7 +86,7 @@ class IconPackManagerTest extends UnitTestCase {
     }
     catch (\Exception $e) {
       if (!$is_valid) {
-        $this->assertSame('icon_test:foo Error in definition `foo`:[library] Does not match the regex pattern ^\w+/[A-Za-z]+[\w-]*$', $e->getMessage());
+        $this->assertSame('icon_test:foo Error in definition `foo`:[library] Does not match the regex pattern ^\w+/[A-Za-z]+[\w\.-]*$', $e->getMessage());
         $this->assertInstanceOf(IconPackConfigErrorException::class, $e);
       }
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel\Views;
 
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -42,7 +43,6 @@ class RowPluginTest extends ViewsKernelTestBase {
     'node',
     'node_test_views',
     'text',
-    'user',
   ];
 
   /**
@@ -86,7 +86,7 @@ class RowPluginTest extends ViewsKernelTestBase {
           'body' => [
             [
               'value' => $this->randomMachineName(42),
-              'format' => filter_default_format(),
+              'format' => $this->container->get(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
             ],
           ],
         ]

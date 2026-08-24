@@ -5,8 +5,8 @@ namespace Drupal\Core\Datetime\Element;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Variable;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Security\StaticTrustedCallbackHelper;
@@ -57,6 +57,8 @@ class Datetime extends DateElementBase {
       '#pre_render' => [
         [static::class, 'preRenderGroup'],
       ],
+      '#theme' => 'datetime_form',
+      '#theme_wrappers' => ['datetime_wrapper'],
       '#date_date_format' => $date_format,
       '#date_date_element' => 'date',
       '#date_date_callbacks' => [],
@@ -234,37 +236,10 @@ class Datetime extends DateElementBase {
    */
   public static function processDatetime(&$element, FormStateInterface $form_state, &$complete_form) {
     $format_settings = [];
-    $property_keys = [];
     // The value callback has populated the #value array.
     $date = !empty($element['#value']['object']) ? $element['#value']['object'] : NULL;
 
     $element['#tree'] = TRUE;
-
-    // If we have two value elements, we need a fieldset.
-    if ($element['#date_date_element'] !== 'none' && $element['#date_time_element'] !== 'none') {
-      // We need a fieldset to hold both and to use the #title for the legend.
-      $element['#theme_wrappers']['fieldset'] = [
-        '#id' => $element['#id'] . '--wrapper',
-      ];
-      $element['#theme'] = 'datetime_form';
-      $in_fieldset = TRUE;
-    }
-    // Otherwise, this can be wrapped in a simple container, and requires no
-    // special #theme at all.
-    else {
-      $element['#theme_wrappers'][] = 'container';
-      $in_fieldset = FALSE;
-      // But we're going to need to move a bunch of properties from the parent
-      // element into the value element, so initialize their keys here.
-      $property_keys = [
-        '#title',
-        '#title_display',
-        '#title_attributes',
-        '#description',
-        '#description_display',
-        '#description_attributes',
-      ];
-    }
 
     if ($element['#date_date_element'] != 'none') {
 
@@ -303,6 +278,8 @@ class Datetime extends DateElementBase {
 
       $element['date'] = [
         '#type' => 'date',
+        '#title' => t('Date'),
+        '#title_display' => 'invisible',
         '#value' => $date_value,
         '#attributes' => $element['#attributes'] + $extra_attributes,
         '#required' => $element['#required'],
@@ -310,22 +287,6 @@ class Datetime extends DateElementBase {
         '#error_no_message' => TRUE,
         '#date_date_format' => $element['#date_date_format'],
       ];
-
-      // If we're inside a fieldset, the date element needs an invisible label.
-      if ($in_fieldset) {
-        $element['date']['#title'] = t('Date');
-        $element['date']['#title_display'] = 'invisible';
-      }
-      // Otherwise, the date element is all we have, so move the properties
-      // we need from the root element into the date element.
-      else {
-        foreach ($property_keys as $key) {
-          if (isset($element[$key])) {
-            $element['date'][$key] = $element[$key];
-            unset($element[$key]);
-          }
-        }
-      }
 
       // Allows custom callbacks to alter the element.
       if (!empty($element['#date_date_callbacks'])) {
@@ -348,28 +309,14 @@ class Datetime extends DateElementBase {
       ];
       $element['time'] = [
         '#type' => 'date',
+        '#title' => t('Time'),
+        '#title_display' => 'invisible',
         '#value' => $time_value,
         '#attributes' => $element['#attributes'] + $extra_attributes,
         '#required' => $element['#required'],
         '#size' => 12,
         '#error_no_message' => TRUE,
       ];
-
-      // If we're inside a fieldset, the time element needs an invisible label.
-      if ($in_fieldset) {
-        $element['time']['#title'] = t('Time');
-        $element['time']['#title_display'] = 'invisible';
-      }
-      // Otherwise, the time element is all we have, so move the properties
-      // we need from the root element into the date element.
-      else {
-        foreach ($property_keys as $key) {
-          if (isset($element[$key])) {
-            $element['time'][$key] = $element[$key];
-            unset($element[$key]);
-          }
-        }
-      }
 
       // Allows custom callbacks to alter the element.
       if (!empty($element['#date_time_callbacks'])) {

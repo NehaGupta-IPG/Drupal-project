@@ -83,7 +83,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
       'provider' => 'plugin_test',
     ];
 
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
     $plugin_manager = new TestPluginManager($this->namespaces, $definitions, $module_handler, 'test_alter_hook', FruitInterface::class);
     $plugin_manager->getDefinition('plugin_test', FALSE);
     $this->assertTrue(TRUE, 'No PHP fatal error occurred when retrieving the definitions of a module with plugins that depend on a non-installed module class should not cause a PHP fatal.');
@@ -276,8 +276,6 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
   /**
    * Tests plugins with the proper interface.
-   *
-   * @legacy-covers ::createInstance
    */
   public function testCreateInstanceWithJustValidInterfaces(): void {
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, FruitInterface::class);
@@ -289,13 +287,11 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
   /**
    * Tests plugins without the proper interface.
-   *
-   * @legacy-covers ::createInstance
    */
   public function testCreateInstanceWithInvalidInterfaces(): void {
     $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
 
-    $module_handler->expects($this->any())
+    $module_handler->expects($this->never())
       ->method('moduleExists')
       ->with('plugin_test')
       ->willReturn(TRUE);
@@ -318,13 +314,11 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
   /**
    * Tests plugins without a required interface.
-   *
-   * @legacy-covers ::getDefinitions
    */
   public function testGetDefinitionsWithoutRequiredInterface(): void {
     $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
 
-    $module_handler->expects($this->any())
+    $module_handler->expects($this->exactly(3))
       ->method('moduleExists')
       ->with('plugin_test')
       ->willReturn(FALSE);
@@ -345,38 +339,32 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
   /**
    * Tests get cache contexts.
-   *
-   * @legacy-covers ::getCacheContexts
    */
   public function testGetCacheContexts(): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler->reveal(), NULL);
     $cache_contexts = $plugin_manager->getCacheContexts();
     $this->assertIsArray($cache_contexts);
-    array_map(function ($cache_context) {
+    array_map(function (string $cache_context): void {
       $this->assertIsString($cache_context);
     }, $cache_contexts);
   }
 
   /**
    * Tests get cache tags.
-   *
-   * @legacy-covers ::getCacheTags
    */
   public function testGetCacheTags(): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, $module_handler->reveal(), NULL);
     $cache_tags = $plugin_manager->getCacheTags();
     $this->assertIsArray($cache_tags);
-    array_map(function ($cache_tag) {
+    array_map(function (string $cache_tag): void {
       $this->assertIsString($cache_tag);
     }, $cache_tags);
   }
 
   /**
    * Tests get cache max age.
-   *
-   * @legacy-covers ::getCacheMaxAge
    */
   public function testGetCacheMaxAge(): void {
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
@@ -415,8 +403,6 @@ class DefaultPluginManagerTest extends UnitTestCase {
 
   /**
    * Tests process definition.
-   *
-   * @legacy-covers ::processDefinition
    */
   #[DataProvider('providerTestProcessDefinition')]
   public function testProcessDefinition($definition, $expected): void {
@@ -427,7 +413,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
     $this->assertEquals($expected, $definition);
   }
 
-  public static function providerTestProcessDefinition() {
+  public static function providerTestProcessDefinition(): array {
     $data = [];
 
     $data['merge'][] = [
@@ -509,7 +495,7 @@ class TestPluginForm implements PluginFormInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     return [];
   }
 

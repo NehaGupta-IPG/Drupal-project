@@ -493,6 +493,15 @@ $settings['update_free_access'] = FALSE;
 # $settings['file_assets_path'] = 'sites/default/files';
 
 /**
+ * Asset aggregate garbage collection threshold.
+ *
+ * During cache clears, JavaScript and CSS aggregates older than this threshold
+ * will be deleted. Set this to 0 to immediately delete all files, e.g. during
+ * development.
+ */
+# $settings['aggregate_gc_threshold'] = 86400 * 45;
+
+/**
  * Public file base URL:
  *
  * An alternative base URL to be used for serving public files. This must
@@ -635,7 +644,7 @@ $settings['update_free_access'] = FALSE;
  */
 # $settings['locale_custom_strings_en'][''] = [
 #   'Home' => 'Front page',
-#   '@count min' => '@count minutes',
+#   'Last run @time ago' => 'Last run was done @time ago',
 # ];
 
 /**
@@ -697,6 +706,22 @@ $settings['update_free_access'] = FALSE;
  */
 # $config['system.site']['name'] = 'My Drupal site';
 # $config['user.settings']['anonymous'] = 'Visitor';
+
+/**
+ * Enable HTML5 form validation.
+ *
+ * Drupal disables HTML5 form validation by default due to issues with
+ * usability and accessibility.  Setting this to TRUE will allow user agents to
+ * perform client-side HTML5 validation. This prevents Drupal's Form API (FAPI)
+ * validation from executing, so FAPI validation error messages may not be
+ * displayed including those for required elements.
+ *
+ * This setting will be removed in Drupal 13. HTML form validation will always
+ * be disabled.
+ *
+ * @see https://www.drupal.org/node/3537128
+ */
+# $settings['enable_html5_validation'] = TRUE;
 
 /**
  * Load services definition file.

@@ -14,10 +14,10 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
-use Drupal\workspaces\Form\WorkspacePublishForm;
 use Drupal\workspaces\WorkspaceOperationFactory;
 use Drupal\workspaces\WorkspacePublisher;
 use Drupal\workspaces\WorkspacePublisherInterface;
+use Drupal\workspaces_ui\Form\WorkspacePublishForm;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -47,6 +47,7 @@ class WorkspacePublisherTest extends KernelTestBase {
     'node',
     'user',
     'workspaces',
+    'workspaces_ui',
   ];
 
   /**
@@ -117,7 +118,7 @@ class WorkspacePublisherTest extends KernelTestBase {
     $messenger = \Drupal::service('messenger');
 
     $workspaceOperationFactory = $this->createMock(WorkspaceOperationFactory::class);
-    $entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+    $entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
     $logger = $this->createMock(LoggerInterface::class);
     /** @var \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerFactory */
     $loggerFactory = \Drupal::service('logger.factory');
@@ -127,7 +128,6 @@ class WorkspacePublisherTest extends KernelTestBase {
     $workspacePublisher = $this->createMock(WorkspacePublisherInterface::class);
 
     $workspace
-      ->expects($this->any())
       ->method('label');
 
     $workspace
@@ -181,7 +181,7 @@ class TestTime extends Time {
   /**
    * {@inheritdoc}
    */
-  public function getRequestTime() {
+  public function getRequestTime(): float|int {
     return parent::getRequestTime() + static::$offset;
   }
 

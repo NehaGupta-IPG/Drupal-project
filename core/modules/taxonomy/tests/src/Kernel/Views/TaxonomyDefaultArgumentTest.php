@@ -9,7 +9,6 @@ use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Tests the representative node relationship for terms.
@@ -26,6 +25,16 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
   public static $testViews = ['taxonomy_default_argument_test'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE): void {
+    parent::setUp($import_test_views);
+
+    // The view requires the current user to be logged in.
+    $this->setUpCurrentUser(permissions: ['access content']);
+  }
+
+  /**
    * Init view with a request by provided URL.
    *
    * @param string $request_url
@@ -38,15 +47,14 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
    *
    * @throws \Exception
    */
-  protected function initViewWithRequest($request_url, $view_name = 'taxonomy_default_argument_test') {
+  protected function initViewWithRequest(string $request_url, $view_name = 'taxonomy_default_argument_test') {
     $view = Views::getView($view_name);
 
     $request = Request::create($request_url);
     $request->server->set('SCRIPT_NAME', $GLOBALS['base_path'] . 'index.php');
     $request->server->set('SCRIPT_FILENAME', 'index.php');
 
-    $response = $this->container->get('http_kernel')
-      ->handle($request, HttpKernelInterface::SUB_REQUEST);
+    $response = $this->container->get('http_kernel')->handle($request);
 
     $view->setRequest($request);
     $view->setResponse($response);
@@ -63,7 +71,6 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
 
     $expected = implode(',', [$this->term1->id(), $this->term2->id()]);
     $this->assertEquals($expected, $view->argument['tid']->getDefaultArgument());
-    $this->assertEquals($this->nodes[0]->getCacheTags(), $view->argument['tid']->getPlugin('argument_default')->getCacheTags());
     $view->destroy();
   }
 
@@ -89,7 +96,6 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
 
     $expected = implode(',', [$this->term1->id(), $this->term2->id()]);
     $this->assertEquals($expected, $view->argument['tid']->getDefaultArgument());
-    $this->assertEquals($this->nodes[0]->getCacheTags(), $view->argument['tid']->getPlugin('argument_default')->getCacheTags());
   }
 
   /**
@@ -100,7 +106,6 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
 
     $expected = $this->term1->id();
     $this->assertEquals($expected, $view->argument['tid']->getDefaultArgument());
-    $this->assertEmpty($view->argument['tid']->getPlugin('argument_default')->getCacheTags());
   }
 
 }

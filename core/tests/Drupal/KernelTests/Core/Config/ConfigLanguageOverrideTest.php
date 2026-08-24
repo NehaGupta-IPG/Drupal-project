@@ -23,7 +23,6 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
     'user',
     'language',
     'config_test',
-    'field',
   ];
 
   /**

@@ -5,6 +5,8 @@
  * Hooks and documentation related to the theme and render system.
  */
 
+use Drupal\Core\Extension\ThemeSettingsProvider;
+
 /**
  * @defgroup themeable Theme system overview
  * @{
@@ -25,17 +27,17 @@
  * arrays and rendering.
  *
  * @section sec_twig_theme Twig Templating Engine
- * Drupal 8 uses the templating engine Twig. Twig offers developers a fast,
- * secure, and flexible method for building templates for Drupal 8 sites. Twig
+ * Drupal uses the templating engine Twig. Twig offers developers a fast,
+ * secure, and flexible method for building templates for Drupal sites. Twig
  * also offers substantial usability improvements over PHPTemplate, and does
  * not require front-end developers to know PHP to build and manipulate Drupal
- * 8 themes.
+ * themes.
  *
- * For further information on theming in Drupal 8 see
- * https://www.drupal.org/docs/8/theming
+ * For further information on theming in Drupal see
+ * https://www.drupal.org/docs/develop/theming-drupal
  *
  * For further Twig documentation see
- * https://twig.symfony.com/doc/1.x/templates.html
+ * https://twig.symfony.com/doc/3.x/templates.html
  *
  * @section sec_theme_hooks Theme Hooks
  * The theme system is invoked in \Drupal\Core\Render\Renderer::doRender() by
@@ -228,7 +230,7 @@
  * same, which gives users fewer user interface patterns to learn.
  *
  * For further information on the Theme and Render APIs, see:
- * - https://www.drupal.org/docs/8/theming
+ * - https://www.drupal.org/docs/develop/theming-drupal
  * - https://www.drupal.org/developing/api/8/render
  * - @link themeable Theme system overview @endlink.
  *
@@ -538,7 +540,7 @@ function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
   $form['toggle_breadcrumb'] = [
     '#type' => 'checkbox',
     '#title' => t('Display the breadcrumb'),
-    '#default_value' => theme_get_setting('features.breadcrumb'),
+    '#default_value' => \Drupal::service(ThemeSettingsProvider::class)->getSetting('features.breadcrumb'),
     '#description'   => t('Show a trail of links from the homepage to the current page.'),
   ];
 }
@@ -787,7 +789,7 @@ function hook_theme_suggestions_HOOK_alter(array &$suggestions, array &$variable
  */
 function hook_themes_installed($theme_list): void {
   foreach ($theme_list as $theme) {
-    block_theme_initialize($theme);
+    // ...perform some action based on the $theme.
   }
 }
 
@@ -1211,9 +1213,6 @@ function hook_page_bottom(array &$page_bottom): void {
  *     renderable element or element tree to pass to the template. This name is
  *     used as the name of the variable that holds the renderable element or
  *     tree in preprocess and process functions.
- *   - file: The file that any preprocess implementations reside in. This file
- *     will be included prior to the template being rendered, to make sure that
- *     the preprocess function (as needed) is actually loaded.
  *   - path: If specified, overrides the path to the directory that contains the
  *     file to be used. This path should be relative to the Drupal root
  *     directory. If not provided, the path will be set to the module or theme's
@@ -1241,8 +1240,7 @@ function hook_page_bottom(array &$page_bottom): void {
  *     can specify a different pattern if required.
  *   - initial preprocess: A string or array callback supported by
  *     \Drupal\Core\Utility\CallableResolver to set up the initial and default
- *     variables for the template. Replaces automatically discovered
- *     template_preprocess_HOOK functions. Can be set as
+ *     variables for the template. Can be set as
  *     static::class . ':preprocessSomething' on hook classes.
  *   - preprocess functions: A list of functions used to preprocess this data.
  *     Ordinarily this won't be used; it's automatically filled in. For
@@ -1318,17 +1316,17 @@ function hook_theme($existing, $type, $theme, $path): array {
  * For example:
  * @code
  * $theme_registry['entity_add_list'] = [
+ *   'variables' => [
+ *     'bundles' => [],
+ *     'add_bundle_message' => NULL,
+ *   ],
  *   'template' => 'entity-add-list',
- *   'path' => 'core/themes/claro/templates',
+ *   'initial preprocess' => 'Drupal\\system\\Hook\\SystemThemeHooks:preprocessEntityAddList',
  *   'type' => 'theme_engine',
  *   'theme path' => 'core/themes/claro',
- *   'variables' => [
- *     'bundles' => NULL,
- *   ],
+ *   'path' => 'core/themes/claro/templates',
  *   'preprocess functions' => [
- *     1 => 'template_preprocess_entity_add_list',
- *     2 => 'contextual_preprocess',
- *     3 => 'claro_preprocess_entity_add_list',
+ *     0 => 'claro_preprocess_entity_add_list',
  *   ],
  * ];
  * @endcode
@@ -1372,6 +1370,21 @@ function hook_theme_registry_alter(&$theme_registry) {
  */
 function hook_template_preprocess_default_variables_alter(&$variables) {
   $variables['is_admin'] = \Drupal::currentUser()->hasPermission('access administration pages');
+}
+
+/**
+ * Alter icon pack definitions.
+ *
+ * Allows modules to modify icon pack definitions.
+ *
+ * @param array $icon_packs
+ *   The array of icon pack definitions, keyed by icon pack ID.
+ */
+function hook_icon_pack_alter(array &$icon_packs): void {
+  // Example: Change the label of an icon pack.
+  if (isset($icon_packs['navigation'])) {
+    $icon_packs['navigation']['label'] = 'Custom navigation icons';
+  }
 }
 
 /**

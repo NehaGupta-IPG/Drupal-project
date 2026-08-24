@@ -467,6 +467,9 @@
  *   - data: Contains data that can vary by path or similar context.
  *   - discovery: Contains cached discovery data for things such as plugins,
  *     views_data, or YAML discovered data such as library info.
+ *   - memory: An in-memory cache bin, also called static cache. Useful
+ *     alternative to properties when cache invalidation is needed, for example
+ *     through cache tags.
  *
  * A module can define a cache bin by defining a service in its
  * modulename.services.yml file as follows (substituting the desired name for
@@ -479,6 +482,15 @@
  *   factory: ['@cache_factory', 'get']
  *   arguments: [name_of_bin]
  * @endcode
+ *
+ * The tag can also include a default backend, which is useful for example
+ * when defining in-memory (which uses a separate tag) or fast chained bin.
+ *
+ * @code
+ * - { name: cache.bin, default_backend: cache.backend.chainedfast }
+ * - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+ * @endcode
+ *
  * See the @link container Services topic @endlink for more on defining
  * services.
  *
@@ -487,7 +499,7 @@
  * There are two ways to remove an item from the cache:
  * - Deletion (using delete(), deleteMultiple() or deleteAll()) permanently
  *   removes the item from the cache.
- * - Invalidation (using invalidate(), invalidateMultiple() or invalidateAll())
+ * - Invalidation (using invalidate() or invalidateMultiple())
  *   is a "soft" delete that only marks items as "invalid", meaning "not fresh"
  *   or "not fresh enough". Invalid items are not usually returned from the
  *   cache, so in most ways they behave as if they have been deleted. However,
@@ -551,7 +563,7 @@
  *
  * Drupal is a content management system, so naturally you want changes to your
  * content to be reflected everywhere, immediately. That's why we made sure that
- * every entity type in Drupal 8 automatically has support for cache tags: when
+ * every entity type in Drupal automatically has support for cache tags: when
  * you save an entity, you can be sure that the cache items that have the
  * corresponding cache tags will be invalidated.
  * This also is the case when you define your own entity types: you'll get the
@@ -1138,15 +1150,13 @@
  *     subdirectory)
  *
  * Some notes about writing PHP test classes:
- * - The class needs a phpDoc comment block with a description and
- *   @group annotation, which gives information about the test.
- * - For unit tests, this comment block should also have @coversDefaultClass
- *   annotation.
+ * - The class needs a phpDoc comment block with a description of the test, and
+ *   a #[Group(...)] attribute, which gives information about the test.
+ * - For unit tests, this comment block should also have a #[CoversClass(...)]
+ *   attribute.
  * - When writing tests, put the test code into public methods, each covering a
  *   logical subset of the functionality that is being tested.
- * - The test methods must have names starting with 'test'. For unit tests, the
- *   test methods need to have a phpDoc block with @covers annotation telling
- *   which class method they are testing.
+ * - The test methods must have names starting with 'test'.
  * - In some cases, you may need to write a test module to support your test;
  *   put such modules under the your_module/tests/modules directory.
  *
@@ -1611,8 +1621,7 @@
  * - Module weight.
  * - Alphabetical by module name.
  * - This order can be modified by using the order parameter on the #[Hook]
- *   attribute, using the #[ReorderHook] attribute, or implementing the legacy
- *   hook_module_implements_alter.
+ *   attribute, using the #[ReorderHook] attribute.
  *
  * @section implementing Implementing a hook
  *
@@ -1661,11 +1670,6 @@
  *
  * The following hooks can not be implemented as a class method, and must be
  * implemented as procedural:
- *
- * Legacy meta hooks:
- * - hook_hook_info()
- * - hook_module_implements_alter()
- * @see \Drupal\Core\Hook\Attribute\LegacyModuleImplementsAlter
  *
  * Install hooks:
  * - hook_install()
@@ -2680,8 +2684,8 @@ function hook_validation_constraint_alter(array &$definitions) {
  * Creating a tag for a service does not do anything on its own, but tags
  * can be discovered or queried in a compiler pass when the container is built,
  * and a corresponding action can be taken. See
- * \Drupal\Core\Render\MainContent\MainContentRenderersPass for an example of
- * finding tagged services.
+ * \Drupal\Core\DependencyInjection\Compiler\TaggedHandlersPass for an example
+ * of finding tagged services.
  *
  * See @link container Services and Dependency Injection Container @endlink for
  * information on services and the dependency injection container.

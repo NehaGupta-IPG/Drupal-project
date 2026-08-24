@@ -35,8 +35,6 @@ class MysqlDateSqlTest extends UnitTestCase {
 
   /**
    * Tests the getDateField method.
-   *
-   * @legacy-covers ::getDateField
    */
   public function testGetDateField(): void {
     $date_sql = new MysqlDateSql($this->database);
@@ -50,11 +48,9 @@ class MysqlDateSqlTest extends UnitTestCase {
 
   /**
    * Tests date formatting replacement.
-   *
-   * @legacy-covers ::getDateFormat
    */
   #[DataProvider('providerTestGetDateFormat')]
-  public function testGetDateFormat($field, $format, $expected_format): void {
+  public function testGetDateFormat(string $field, string $format, string $expected_format): void {
     $date_sql = new MysqlDateSql($this->database);
 
     $this->assertEquals("DATE_FORMAT($field, '$expected_format')", $date_sql->getDateFormat($field, $format));
@@ -63,7 +59,7 @@ class MysqlDateSqlTest extends UnitTestCase {
   /**
    * Provider for date formatting test.
    */
-  public static function providerTestGetDateFormat() {
+  public static function providerTestGetDateFormat(): array {
     return [
       ['foo.field', 'Y-y-M-m', '%Y-%y-%b-%m'],
       ['bar.field', 'n-F D d l', '%c-%M %a %d %W'],
@@ -73,8 +69,6 @@ class MysqlDateSqlTest extends UnitTestCase {
 
   /**
    * Tests timezone offset formatting.
-   *
-   * @legacy-covers ::setFieldTimezoneOffset
    */
   public function testSetFieldTimezoneOffset(): void {
     $date_sql = new MysqlDateSql($this->database);
@@ -86,8 +80,6 @@ class MysqlDateSqlTest extends UnitTestCase {
 
   /**
    * Tests setting the database offset.
-   *
-   * @legacy-covers ::setTimezoneOffset
    */
   public function testSetTimezoneOffset(): void {
     $database = $this->prophesize(Connection::class);

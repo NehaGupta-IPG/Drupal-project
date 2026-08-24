@@ -30,8 +30,6 @@ class RevisionUidTest extends ViewsKernelTestBase {
   protected static $modules = [
     'node',
     'node_test_views',
-    'user',
-    'views',
   ];
 
   /**
