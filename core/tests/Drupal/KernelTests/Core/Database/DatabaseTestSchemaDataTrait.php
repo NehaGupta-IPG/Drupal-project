@@ -499,6 +499,14 @@ trait DatabaseTestSchemaDataTrait {
       'Element wildcard nested CONTAINS no match' => ['$.revs[*].name', 'reviewer', 'CONTAINS', []],
       'Element wildcard nested STARTS_WITH' => ['$.revs[*].name', 'auth', 'STARTS_WITH', [10]],
       'Element wildcard nested ENDS_WITH' => ['$.revs[*].name', 'thor', 'ENDS_WITH', [10]],
+
+      // [*] matches only array elements and .* only object members; these
+      // paths use the wrong accessor for the stored shape, so nothing
+      // matches.
+      'Element wildcard against object' => ['$.deps[*].status', 'enabled', '=', []],
+      'Element wildcard against object of numbers' => ['$.counts[*]', 7, '=', []],
+      'Wildcard against array' => ['$.revs.*.uid', 3, '=', []],
+      'Wildcard against array of numbers' => ['$.items.*', 20, '=', []],
     ];
   }
 

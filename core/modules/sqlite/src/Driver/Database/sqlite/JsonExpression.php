@@ -133,21 +133,23 @@ class JsonExpression extends BaseJsonExpression {
   protected function wildcardRowSet(): array {
     // SQLite doesn't support wildcards in json_extract. Use json_each to
     // iterate the wildcard level and read each element's value at the
-    // remaining suffix path. json_each walks the members of an object and the
-    // elements of an array alike, so the prefix alone covers both the .* and
-    // the [*] accessor.
+    // remaining suffix path.
     [$prefix, $suffix] = $this->splitAtWildcard();
+    // json_each walks object members and array elements alike. Filter on the
+    // container type so [*] matches only arrays and .* only objects, like
+    // MySQL and PostgreSQL.
+    $shape = $this->wildcardAccessor() === self::WILDCARD_ELEMENT ? 'array' : 'object';
+    $row_filter = "json_type({$this->field}, {$this->connection->quote($prefix)}) = '{$shape}' AND ";
     if ($suffix === '$') {
       $extract = 'je.value';
       $element_type = 'je.type';
-      $row_filter = '';
     }
     else {
       $extract = "json_extract(je.value, {$this->connection->quote($suffix)})";
       $element_type = "json_type(je.value, {$this->connection->quote($suffix)})";
       // json_extract on a scalar je.value (e.g. a string) causes a
       // "malformed JSON" error. Filter to object/array values only.
-      $row_filter = "je.type IN ('object', 'array') AND ";
+      $row_filter .= "je.type IN ('object', 'array') AND ";
     }
     return [
       'from' => "json_each({$this->field}, {$this->connection->quote($prefix)}) je",
