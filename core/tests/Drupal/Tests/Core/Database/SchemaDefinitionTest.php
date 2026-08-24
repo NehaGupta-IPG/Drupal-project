@@ -634,21 +634,6 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * Tests AlternativeIndexes::toArray().
-   */
-  public function testAlternativeIndexesToArray(): void {
-    $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessageIs('The \'ages\' AlternativeIndexes cannot be converted to legacy array-based specifications');
-    $ginIndex = new GinIndex(name: 'ages', columns: ['age']);
-    $index = new Index(name: 'ages', columns: ['age']);
-    $alternativeIndexes = new AlternativeIndexes(
-      name: 'ages',
-      indexes: [$ginIndex, $index],
-    );
-    $alternativeIndexes->toArray();
-  }
-
-  /**
    * Tests passing limited length columns to primary key.
    */
   public function testInvalidPrimaryKeyForPartialLengthColumn(): void {

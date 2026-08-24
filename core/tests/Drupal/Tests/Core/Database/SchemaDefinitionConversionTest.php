@@ -304,28 +304,14 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
   /**
    * Tests AlternativeIndexes::toArray().
    */
-  public function testConvertAlternativeIndexes(): void {
-    $alternativeIndexes = new AlternativeIndexes(
-      name: 'ages',
-      indexes: [
-        new GinIndex(name: 'ages', columns: ['age']),
-        new Index(name: 'ages', columns: ['age']),
-      ],
-    );
-    $this->assertEquals(['age'], $alternativeIndexes->toArray());
-  }
-
-  /**
-   * Tests AlternativeIndexes::toArray() without a regular Index alternative.
-   */
-  public function testConvertAlternativeIndexesWithoutRegularIndex(): void {
+  public function testAlternativeIndexesToArray(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage("The 'ages' AlternativeIndexes cannot be converted to legacy array-based specifications");
+    $this->expectExceptionMessageIs('The \'ages\' AlternativeIndexes cannot be converted to legacy array-based specifications');
+    $ginIndex = new GinIndex(name: 'ages', columns: ['age']);
+    $index = new Index(name: 'ages', columns: ['age']);
     $alternativeIndexes = new AlternativeIndexes(
       name: 'ages',
-      indexes: [
-        new GinIndex(name: 'ages', columns: ['age']),
-      ],
+      indexes: [$ginIndex, $index],
     );
     $alternativeIndexes->toArray();
   }

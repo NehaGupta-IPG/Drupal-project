@@ -11,13 +11,13 @@ use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\GinIndex;
+use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
-use Drupal\pgsql\Driver\Database\pgsql\GinIndex;
-use Drupal\pgsql\Driver\Database\pgsql\GistIndex;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -1527,7 +1527,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ),
       ],
     );
-    $this->schema->createTableFromDefinition(SchemaDefinitionType::Test, 'database_test', $tableDefinition);
+    $this->schema->createTableFromDefinition(SchemaDefinitionType::Test, 'test_specialized_indexes', $tableDefinition);
 
     $this->assertTrue($this->schema->tableExists('test_specialized_indexes'));
     $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'ages'));
@@ -1550,42 +1550,61 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * override this method.
    */
   public function testAddFieldWithSpecializedIndexes(): void {
-    $table_specification = [
-      'fields' => [
-        'id' => [
-          'type' => 'serial',
-          'not null' => TRUE,
-        ],
+    $initialTableDefinition = new Table(
+      name: 'test_add_field_index',
+      description: 'Table with specialized indexes.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
       ],
-      'primary key' => ['id'],
-    ];
-    $this->schema->createTable('test_add_field_index', $table_specification);
+      primaryKey: new PrimaryKey(['id']),
+    );
+    $this->schema->createTableFromDefinition(SchemaDefinitionType::Test, 'test_add_field_index', $initialTableDefinition);
 
-    $this->schema->addField('test_add_field_index', 'age', [
-      'type' => 'int',
-      'not null' => TRUE,
-      'default' => 0,
-    ], [
-      'indexes' => [
-        'age_legacy' => ['age'],
-        'ages' => new Index(name: 'ages', columns: ['age']),
-        'gin_age' => new GinIndex(name: 'gin_age', columns: ['age']),
-        'gist_age' => new GistIndex(name: 'gist_age', columns: ['age']),
-        'alternative_ages' => new AlternativeIndexes(
+    $modifiedTableDefinition = new Table(
+      name: 'test_add_field_index',
+      description: 'Table with specialized indexes.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      indexes: [
+        new Index(name: 'ages', columns: ['age']),
+        new GinIndex(name: 'gin_age', columns: ['age']),
+        new GistIndex(name: 'gist_age', columns: ['age']),
+        new AlternativeIndexes(
           name: 'alternative_ages',
           indexes: [
             new GinIndex(name: 'alternative_ages', columns: ['age']),
             new Index(name: 'alternative_ages', columns: ['age']),
           ],
         ),
-        'alternative_skipped' => new AlternativeIndexes(
+        new AlternativeIndexes(
           name: 'alternative_skipped',
           indexes: [
             new GistIndex(name: 'alternative_skipped', columns: ['age']),
           ],
         ),
       ],
-    ]);
+    );
+
+    $this->schema->addField('test_add_field_index', 'age', [
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+    ],
+    array_merge($modifiedTableDefinition->toArray(), [
+      'new_definition' => $modifiedTableDefinition,
+    ]),
+    );
 
     $this->assertTrue($this->schema->fieldExists('test_add_field_index', 'age'));
     // The legacy array-based index specification and the regular index
@@ -1611,47 +1630,66 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * override this method.
    */
   public function testChangeFieldWithSpecializedIndexes(): void {
-    $table_specification = [
-      'fields' => [
-        'id' => [
-          'type' => 'serial',
-          'not null' => TRUE,
-        ],
-        'age' => [
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-        ],
+    $initialTableDefinition = new Table(
+      name: 'test_change_field_index',
+      description: 'Table with specialized indexes.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
       ],
-      'primary key' => ['id'],
-    ];
-    $this->schema->createTable('test_change_field_index', $table_specification);
+      primaryKey: new PrimaryKey(['id']),
+    );
+    $this->schema->createTableFromDefinition(SchemaDefinitionType::Test, 'test_change_field_index', $initialTableDefinition);
 
-    $this->schema->changeField('test_change_field_index', 'age', 'age_new', [
-      'type' => 'int',
-      'not null' => TRUE,
-      'default' => 0,
-    ], [
-      'indexes' => [
-        'age_legacy' => ['age_new'],
-        'ages' => new Index(name: 'ages', columns: ['age_new']),
-        'gin_age' => new GinIndex(name: 'gin_age', columns: ['age_new']),
-        'gist_age' => new GistIndex(name: 'gist_age', columns: ['age_new']),
-        'alternative_ages' => new AlternativeIndexes(
+    $modifiedTableDefinition = new Table(
+      name: 'test_change_field_index',
+      description: 'Table with specialized indexes.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age_new',
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      indexes: [
+        new Index(name: 'ages', columns: ['age_new']),
+        new GinIndex(name: 'gin_age', columns: ['age_new']),
+        new GistIndex(name: 'gist_age', columns: ['age_new']),
+        new AlternativeIndexes(
           name: 'alternative_ages',
           indexes: [
             new GinIndex(name: 'alternative_ages', columns: ['age_new']),
             new Index(name: 'alternative_ages', columns: ['age_new']),
           ],
         ),
-        'alternative_skipped' => new AlternativeIndexes(
+        new AlternativeIndexes(
           name: 'alternative_skipped',
           indexes: [
             new GistIndex(name: 'alternative_skipped', columns: ['age_new']),
           ],
         ),
       ],
-    ]);
+    );
+
+    $this->schema->changeField('test_change_field_index', 'age', 'age_new', [
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+    ],
+    array_merge($modifiedTableDefinition->toArray(), [
+      'new_definition' => $modifiedTableDefinition,
+    ]),
+    );
 
     $this->assertTrue($this->schema->fieldExists('test_change_field_index', 'age_new'));
     // The legacy array-based index specification and the regular index

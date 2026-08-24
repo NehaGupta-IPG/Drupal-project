@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\SchemaDefinition;
 
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
+
 /**
  * Describes a database GiST (Generalized Search Tree) index.
  *

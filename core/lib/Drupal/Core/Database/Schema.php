@@ -2,7 +2,11 @@
 
 namespace Drupal\Core\Database;
 
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Core\Database\Query\PlaceholderInterface;
+use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
+use Drupal\Core\Database\SchemaDefinition\GinIndex;
+use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
@@ -671,23 +675,59 @@ abstract class Schema implements PlaceholderInterface {
    *   When concrete driver class is missing implementations.
    */
   final public function createTableFromDefinition(SchemaDefinitionType $schemaDefinitionType, string $schemaName, TableDefinition $table): void {
-    $indexes = [];
-    $specializedIndexes = [];
+    $this->createTable($table->name, $table->toArray());
+
+    // Handles creation of indexes of types that are not the standard B-Tree.
     foreach ($table->indexes ?? [] as $index) {
       if ($index instanceof Index) {
-        $indexes[] = $index;
+        continue;
       }
-      else {
-        $specializedIndexes[] = $index;
-      }
+      $this->createIndexFromDefinition($table, $index->name);
     }
+  }
 
-    $spec = $table->toArray();
-    unset($spec['indexes']);
-    foreach ($indexes as $index) {
-      $spec['indexes'][$index->name] = $index->toArray();
+  /**
+   * Creates a new index from a table schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Table $table
+   *   The table definition.
+   * @param string $indexName
+   *   The index name.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified index already exists.
+   * @throws \BadMethodCallException
+   *   When concrete driver class is missing implementations.
+   */
+  final public function createIndexFromDefinition(TableDefinition $table, string $indexName): void {
+    foreach ($table->indexes as $tmp) {
+      if ($tmp->name === $indexName) {
+        $index = $tmp;
+        break;
+      }
     }
-    $this->createTable($table->name, $spec);
+    if (!isset($index)) {
+      throw new SchemaDefinitionException("Index '{$indexName}' is not present in the schema definition");
+    }
+    if ($index instanceof AlternativeIndexes) {
+      foreach ($index->indexes as $tmp) {
+        if (in_array(get_class($tmp), $this->getSupportedIndexTypes(), TRUE)) {
+          $index = $tmp;
+          break;
+        }
+      }
+    }
+    if ($index instanceof AlternativeIndexes) {
+      return;
+    }
+    $indexClass = get_class($index);
+    if (in_array($indexClass, $this->getSupportedIndexTypes(), TRUE)) {
+      match ($indexClass) {
+        GinIndex::class => $this->addGinIndex($table->name, $index->name, $index->toArray()),
+        GistIndex::class => $this->addGistIndex($table->name, $index->name, $index->toArray()),
+        Index::class => $this->addIndex($table->name, $index->name, $index->toArray(), $table->toArray()),
+      };
+    }
   }
 
   /**
