@@ -65,7 +65,7 @@ class JsonCondition extends Condition {
    *   The JSONPath expression (must start with '$').
    * @param string|int|float|array|bool|null $value
    *   The value to compare against. Ignored for unary operators (IS NULL,
-   *   IS NOT NULL, HAS KEY).
+   *   IS NOT NULL, HAS KEY) and required for every other operator.
    * @param string $operator
    *   The comparison operator.
    */
@@ -154,6 +154,13 @@ class JsonCondition extends Condition {
           implode(' and ', array_keys($domains)),
         ));
       }
+    }
+    // Only unary operators accept NULL, and they ignore it.
+    if ($this->value === NULL && !in_array($this->operator, ['IS NULL', 'IS NOT NULL', 'HAS KEY'], TRUE)) {
+      throw new InvalidQueryException(sprintf(
+        'JSON operator %s requires a value. Use IS NULL or IS NOT NULL to match a missing value or a stored JSON null.',
+        $this->operator,
+      ));
     }
   }
 

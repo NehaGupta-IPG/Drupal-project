@@ -90,7 +90,7 @@ interface ConditionInterface {
    *   The JSONPath expression (must start with '$').
    * @param string|int|float|array|bool|null $value
    *   The value to compare against. Ignored for unary operators (IS NULL,
-   *   IS NOT NULL, HAS KEY).
+   *   IS NOT NULL, HAS KEY) and required for every other operator.
    * @param string $operator
    *   The comparison operator. A jsonpath with a wildcard segment matches any
    *   number of values, and asks whether any of them satisfies the operator.

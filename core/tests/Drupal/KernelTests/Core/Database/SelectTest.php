@@ -677,6 +677,8 @@ class SelectTest extends DatabaseTestBase {
       'CONTAINS rejects array' => ['field', '$.path', ['a', 'b'], 'CONTAINS'],
       'IN rejects nested array' => ['field', '$.path', ['a', ['b']], 'IN'],
       'BETWEEN rejects nested array' => ['field', '$.path', [[1], 2], 'BETWEEN'],
+      '= rejects NULL' => ['field', '$.path', NULL, '='],
+      'CONTAINS rejects NULL' => ['field', '$.path', NULL, 'CONTAINS'],
       'IN rejects number then string' => ['field', '$.path', [1, 'a'], 'IN'],
       'IN rejects string then number' => ['field', '$.path', ['a', 1], 'IN'],
       'IN rejects boolean and string' => ['field', '$.path', [TRUE, 'a'], 'IN'],
