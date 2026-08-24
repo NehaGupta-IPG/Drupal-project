@@ -20,7 +20,8 @@ field.storage_settings.list_integer:
             type: label
             label: 'Label'
     allowed_values_function:
-      type: string
+      # A string function name or an array callable.
+      type: ignore
       label: 'Allowed values function'
 
 field.value.list_integer:
@@ -51,7 +52,8 @@ field.storage_settings.list_float:
             type: label
             label: 'Label'
     allowed_values_function:
-      type: string
+      # A string function name or an array callable.
+      type: ignore
       label: 'Allowed values function'
 
 field.value.list_float:
@@ -82,7 +84,8 @@ field.storage_settings.list_string:
             type: label
             label: 'Label'
     allowed_values_function:
-      type: string
+      # A string function name or an array callable.
+      type: ignore
       label: 'Allowed values function'
 
 field.value.list_string:
