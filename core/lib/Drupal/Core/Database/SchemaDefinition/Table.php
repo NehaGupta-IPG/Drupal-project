@@ -107,7 +107,9 @@ final class Table implements SchemaDefinitionInterface {
       // indexes like GIN or GiST. They are skipped, and alternative indexes
       // are resolved to their regular Index definition, if any.
       foreach ($this->indexes as $index) {
-        $spec['indexes'][$index->name] = $index->toArray();
+        if ($index instanceof Index || $index instanceof AlternativeIndexes) {
+          $spec['indexes'][$index->name] = $index->toArray();
+        }
       }
     }
     if ($this->foreignKeys !== NULL) {

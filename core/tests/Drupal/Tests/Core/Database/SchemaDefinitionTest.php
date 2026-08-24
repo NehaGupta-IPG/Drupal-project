@@ -606,10 +606,10 @@ class SchemaDefinitionTest extends UnitTestCase {
     $this->expectExceptionMessage('All members of the \'indexes\' argument of the \'invalid\' AlternativeIndexes must be IndexInterface objects');
     new AlternativeIndexes(
       name: 'invalid',
-      // @phpstan-ignore argument.type
       indexes: [
         new AlternativeIndexes(
           name: 'invalid',
+          // @phpstan-ignore argument.type
           indexes: [
             new Index(name: 'invalid', columns: ['age']),
             'foo',

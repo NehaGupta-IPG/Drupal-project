@@ -270,8 +270,6 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
       'primary key' => ['id'],
       'indexes' => [
         'ages' => ['age'],
-        'gin_ages' => ['age'],
-        'gist_ages' => ['age'],
         'alternative_ages' => ['age'],
       ],
     ];

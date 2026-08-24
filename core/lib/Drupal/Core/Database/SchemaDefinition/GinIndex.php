@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\SchemaDefinition;
 
-use Drupal\Core\Database\SchemaDefinition\IndexBase;
-
 /**
  * Describes a database GIN (Generalized Inverted Index) index.
  *

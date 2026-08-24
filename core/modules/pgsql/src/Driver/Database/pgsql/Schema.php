@@ -5,8 +5,9 @@ namespace Drupal\pgsql\Driver\Database\pgsql;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\Core\Database\SchemaDefinition\GinIndex;
+use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
-use Drupal\Core\Database\SchemaDefinition\IndexBase;
 use Drupal\Core\Language\LanguageManager;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
@@ -888,7 +889,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  protected function getSupportedIndexDefinitionClasses(): array {
+  protected function getSupportedIndexTypes(): array {
     return [Index::class, GinIndex::class, GistIndex::class];
   }
 

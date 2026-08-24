@@ -4,8 +4,8 @@ namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
-use Drupal\Core\Database\SchemaDefinition\Index as IndexDefinition;
-use Drupal\Core\Database\SchemaDefinition\IndexBase;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IndexInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
@@ -352,10 +352,9 @@ abstract class Schema implements PlaceholderInterface {
    *   adding a type 'serial' field, you MUST specify at least one key
    *   or index including it in this array. See ::changeField() for more
    *   explanation why. The values of the 'indexes' element may also be
-   *   index definition objects, being IndexBase or AlternativeIndexes
-   *   objects. Index definitions of a technology not supported by the
-   *   driver are skipped, and alternative indexes fall back to their
-   *   most preferred supported definition.
+   *   IndexInterface definition objects. Index definitions of a technology
+   *   not supported by the driver are skipped, and alternative indexes
+   *   fall back to their most preferred supported definition.
    *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
@@ -629,11 +628,10 @@ abstract class Schema implements PlaceholderInterface {
    *   (optional) Keys and indexes specification to be created on the
    *   table along with changing the field. The format is the same as a
    *   table specification but without the 'fields' element. The values
-   *   of the 'indexes' element may also be index definition objects,
-   *   being IndexBase or AlternativeIndexes objects. Index definitions
-   *   of a technology not supported by the driver are skipped, and
-   *   alternative indexes fall back to their most preferred supported
-   *   definition.
+   *   of the 'indexes' element may also be IndexInterface definition objects.
+   *   Index definitions of a technology not supported by the driver are
+   *   skipped, and alternative indexes fall back to their most preferred
+   *   supported definition.
    *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table or source field doesn't exist.
@@ -678,11 +676,7 @@ abstract class Schema implements PlaceholderInterface {
     $indexes = [];
     $specializedIndexes = [];
     foreach ($table->indexes ?? [] as $index) {
-      $index = $this->resolveIndexDefinition($index);
-      if ($index === NULL) {
-        continue;
-      }
-      if ($index instanceof IndexDefinition) {
+      if ($index instanceof Index) {
         $indexes[] = $index;
       }
       else {
@@ -696,9 +690,6 @@ abstract class Schema implements PlaceholderInterface {
       $spec['indexes'][$index->name] = $index->toArray();
     }
     $this->createTable($table->name, $spec);
-    foreach ($specializedIndexes as $index) {
-      $this->createSpecializedIndex($table->name, $index);
-    }
   }
 
   /**
@@ -709,94 +700,11 @@ abstract class Schema implements PlaceholderInterface {
    * this method to declare them. Index definitions of an unsupported class
    * are skipped when a table is created from a table schema definition.
    *
-   * @return list<class-string<\Drupal\Core\Database\SchemaDefinition\IndexBase>>
+   * @return list<class-string<\Drupal\Core\Database\SchemaDefinition\IndexInterface>>
    *   The supported index definition classes.
    */
-  protected function getSupportedIndexDefinitionClasses(): array {
-    return [IndexDefinition::class];
-  }
-
-  /**
-   * Creates a specialized index from an index definition.
-   *
-   * Drivers declaring support for specialized index definition classes in
-   * ::getSupportedIndexDefinitionClasses() must override this method to
-   * create the corresponding indexes.
-   *
-   * @param string $tableName
-   *   The name of the table the index belongs to.
-   * @param \Drupal\Core\Database\SchemaDefinition\IndexBase $index
-   *   The index definition.
-   *
-   * @throws \BadMethodCallException
-   *   When the method is not implemented in the concrete driver class.
-   */
-  protected function createSpecializedIndex(string $tableName, IndexBase $index): void {
-    throw new \BadMethodCallException(get_class($this) . '::createSpecializedIndex() not implemented.');
-  }
-
-  /**
-   * Resolves an index definition against the classes this driver supports.
-   *
-   * @param \Drupal\Core\Database\SchemaDefinition\IndexBase|\Drupal\Core\Database\SchemaDefinition\AlternativeIndexes $index
-   *   The index definition to resolve.
-   *
-   * @return \Drupal\Core\Database\SchemaDefinition\IndexBase|null
-   *   The index definition of a supported class, or NULL if the index uses a
-   *   technology not supported by this driver. Alternative indexes resolve
-   *   to their most preferred supported definition.
-   */
-  protected function resolveIndexDefinition(IndexBase|AlternativeIndexes $index): ?IndexBase {
-    $supportedIndexClasses = $this->getSupportedIndexDefinitionClasses();
-    if ($index instanceof AlternativeIndexes) {
-      return $index->firstOfClasses($supportedIndexClasses);
-    }
-    return in_array($index::class, $supportedIndexClasses, TRUE) ? $index : NULL;
-  }
-
-  /**
-   * Prepares a keys specification containing index definition objects.
-   *
-   * The 'indexes' element of a keys specification, as passed to ::addField()
-   * or ::changeField(), may contain index definition objects next to legacy
-   * array-based index specifications. Regular Index definitions are
-   * converted to legacy arrays, keyed by the index name. Specialized index
-   * definitions supported by this driver are removed from the specification
-   * and returned separately, to be created with ::createSpecializedIndex().
-   * Definitions of an index technology not supported by this driver are
-   * skipped, and alternative indexes fall back to their most preferred
-   * supported definition.
-   *
-   * @param array|null $keys_new
-   *   A keys and indexes specification, as passed to ::addField() or
-   *   ::changeField().
-   *
-   * @return array{array|null, list<\Drupal\Core\Database\SchemaDefinition\IndexBase>}
-   *   The keys specification with all index definition objects converted or
-   *   removed, and the list of specialized index definitions to create.
-   */
-  protected function prepareKeysSpecification(?array $keys_new): array {
-    $specializedIndexes = [];
-    foreach ($keys_new['indexes'] ?? [] as $name => $index) {
-      if (!($index instanceof IndexBase || $index instanceof AlternativeIndexes)) {
-        continue;
-      }
-      unset($keys_new['indexes'][$name]);
-      $index = $this->resolveIndexDefinition($index);
-      if ($index === NULL) {
-        continue;
-      }
-      if ($index instanceof IndexDefinition) {
-        $keys_new['indexes'][$index->name] = $index->toArray();
-      }
-      else {
-        $specializedIndexes[] = $index;
-      }
-    }
-    if (isset($keys_new['indexes']) && $keys_new['indexes'] === []) {
-      unset($keys_new['indexes']);
-    }
-    return [$keys_new, $specializedIndexes];
+  protected function getSupportedIndexTypes(): array {
+    return [Index::class];
   }
 
   /**
