@@ -483,7 +483,8 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
           $translation->setName($translation->getName());
         }
 
-        // Set thumbnail, thumbnail must be update in case of alt or target_id has changed.
+        // Set thumbnail.
+        // Thumbnail must be update in case of alt or target_id has changed.
         $translation->updateThumbnail();
       }
     }
