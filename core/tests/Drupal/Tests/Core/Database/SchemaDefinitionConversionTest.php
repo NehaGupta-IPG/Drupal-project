@@ -7,8 +7,9 @@ namespace Drupal\Tests\Core\Database;
 use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
-
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\GinIndex;
+use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\KeyColumn;
@@ -19,8 +20,7 @@ use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
-use Drupal\pgsql\Driver\Database\pgsql\GinIndex;
-use Drupal\pgsql\Driver\Database\pgsql\GistIndex;
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -270,6 +270,8 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
       'primary key' => ['id'],
       'indexes' => [
         'ages' => ['age'],
+        'gin_ages' => ['age'],
+        'gist_ages' => ['age'],
         'alternative_ages' => ['age'],
       ],
     ];
@@ -296,12 +298,6 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
             new Index(name: 'alternative_ages', columns: ['age']),
           ],
         ),
-        new AlternativeIndexes(
-          name: 'alternative_no_fallback',
-          indexes: [
-            new GistIndex(name: 'alternative_no_fallback', columns: ['age']),
-          ],
-        ),
       ],
     );
 
@@ -326,7 +322,7 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
    * Tests AlternativeIndexes::toArray() without a regular Index alternative.
    */
   public function testConvertAlternativeIndexesWithoutRegularIndex(): void {
-    $this->expectException(\LogicException::class);
+    $this->expectException(SchemaDefinitionException::class);
     $this->expectExceptionMessage("The 'ages' AlternativeIndexes cannot be converted to legacy array-based specifications");
     $alternativeIndexes = new AlternativeIndexes(
       name: 'ages',

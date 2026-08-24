@@ -9,6 +9,8 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\FloatValue;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\GinIndex;
+use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
@@ -19,8 +21,6 @@ use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Drupal\Core\Database\Exception\SchemaDefinitionException;
-use Drupal\pgsql\Driver\Database\pgsql\GinIndex;
-use Drupal\pgsql\Driver\Database\pgsql\GistIndex;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -544,7 +544,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidIndexInTable(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('All members of the \'indexes\' argument of the \'test\' Table must be IndexBase or AlternativeIndexes objects');
+    $this->expectExceptionMessage('All members of the \'indexes\' argument of the \'test\' Table must be IndexInterface objects');
     new Table(
       name: 'test',
       columns: [
@@ -603,7 +603,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testInvalidIndexInAlternativeIndexes(): void {
     $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessage('All members of the \'indexes\' argument of the \'invalid\' AlternativeIndexes must be IndexBase objects');
+    $this->expectExceptionMessage('All members of the \'indexes\' argument of the \'invalid\' AlternativeIndexes must be IndexInterface objects');
     new AlternativeIndexes(
       name: 'invalid',
       // @phpstan-ignore argument.type
@@ -612,6 +612,7 @@ class SchemaDefinitionTest extends UnitTestCase {
           name: 'invalid',
           indexes: [
             new Index(name: 'invalid', columns: ['age']),
+            'foo',
           ],
         ),
       ],
@@ -633,18 +634,31 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
-   * Tests AlternativeIndexes::firstOfClasses().
+   * Tests AlternativeIndexes::toArray().
    */
-  public function testAlternativeIndexesFirstOfClasses(): void {
+  public function testAlternativeIndexesToArray(): void {
     $ginIndex = new GinIndex(name: 'ages', columns: ['age']);
     $index = new Index(name: 'ages', columns: ['age']);
     $alternativeIndexes = new AlternativeIndexes(
       name: 'ages',
       indexes: [$ginIndex, $index],
     );
-    $this->assertSame($ginIndex, $alternativeIndexes->firstOfClasses([Index::class, GinIndex::class, GistIndex::class]));
-    $this->assertSame($index, $alternativeIndexes->firstOfClasses([Index::class]));
-    $this->assertNull($alternativeIndexes->firstOfClasses([GistIndex::class]));
+    $this->assertSame(['age'], $alternativeIndexes->toArray());
+  }
+
+  /**
+   * Tests AlternativeIndexes::toArray() with no Index specified.
+   */
+  public function testAlternativeIndexesToArrayWithNoRegularIndex(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('The \'ages\' AlternativeIndexes cannot be converted to legacy array-based specifications, no regular Index specified');
+    $ginIndex = new GinIndex(name: 'ages', columns: ['age']);
+    $gistIndex = new GistIndex(name: 'ages', columns: ['age']);
+    $alternativeIndexes = new AlternativeIndexes(
+      name: 'ages',
+      indexes: [$ginIndex, $gistIndex],
+    );
+    $alternativeIndexes->toArray();
   }
 
   /**

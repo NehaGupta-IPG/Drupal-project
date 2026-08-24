@@ -19,20 +19,20 @@ use Drupal\Core\Database\Exception\SchemaDefinitionException;
  * new AlternativeIndexes(
  *   name: 'ages',
  *   indexes: [
- *     new \Drupal\pgsql\Driver\Database\pgsql\GinIndex(name: 'ages', columns: ['age']),
+ *     new GinIndex(name: 'ages', columns: ['age']),
  *     new Index(name: 'ages', columns: ['age']),
  *   ],
  * ),
  * @endcode
  */
-final class AlternativeIndexes implements SchemaDefinitionInterface {
+final class AlternativeIndexes implements SchemaDefinitionInterface, IndexInterface {
 
   /**
    * Constructor.
    *
    * @param string $name
    *   The index name.
-   * @param list<IndexBase> $indexes
+   * @param list<IndexInterface> $indexes
    *   The alternative index definitions, in order of preference. Each index
    *   must have the same name as this object.
    */
@@ -53,8 +53,8 @@ final class AlternativeIndexes implements SchemaDefinitionInterface {
     if ($this->indexes === []) {
       throw new SchemaDefinitionException("The 'indexes' argument of the '{$this->name}' AlternativeIndexes must not be empty");
     }
-    if (!Inspector::assertAllObjects($this->indexes, IndexBase::class)) {
-      throw new SchemaDefinitionException("All members of the 'indexes' argument of the '{$this->name}' AlternativeIndexes must be IndexBase objects");
+    if (!Inspector::assertAllObjects($this->indexes, IndexInterface::class)) {
+      throw new SchemaDefinitionException("All members of the 'indexes' argument of the '{$this->name}' AlternativeIndexes must be IndexInterface objects");
     }
     foreach ($this->indexes as $index) {
       if ($index->name !== $this->name) {
@@ -65,40 +65,27 @@ final class AlternativeIndexes implements SchemaDefinitionInterface {
   }
 
   /**
-   * Returns the first index that is an instance of the given classes.
-   *
-   * @param list<class-string<IndexBase>> $classes
-   *   The index definition classes to match, normally the classes supported
-   *   by a database driver.
-   *
-   * @return \Drupal\Core\Database\SchemaDefinition\IndexBase|null
-   *   The most preferred index matching one of the given classes, or NULL if
-   *   none matches.
-   */
-  public function firstOfClasses(array $classes): ?IndexBase {
-    foreach ($this->indexes as $index) {
-      if (in_array($index::class, $classes, TRUE)) {
-        return $index;
-      }
-    }
-    return NULL;
-  }
-
-  /**
    * {@inheritdoc}
    *
    * The legacy array-based specifications cannot describe alternative
    * indexes; the first regular Index is used, if defined.
    *
-   * @throws \LogicException
+   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
    *   When no regular Index alternative is defined.
    */
   public function toArray(): array {
-    $index = $this->firstOfClasses([Index::class]);
-    if ($index === NULL) {
-      throw new \LogicException("The '{$this->name}' AlternativeIndexes cannot be converted to legacy array-based specifications");
+    foreach ($this->indexes as $index) {
+      if ($index instanceof Index) {
+        $tmp = $index;
+        break;
+      }
     }
-    return $index->toArray();
+
+    if (!isset($tmp)) {
+      throw new SchemaDefinitionException("The '{$this->name}' AlternativeIndexes cannot be converted to legacy array-based specifications, no regular Index specified");
+    }
+
+    return $tmp->toArray();
   }
 
 }

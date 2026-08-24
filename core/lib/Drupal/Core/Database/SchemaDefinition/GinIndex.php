@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Drupal\pgsql\Driver\Database\pgsql;
+namespace Drupal\Core\Database\SchemaDefinition;
 
 use Drupal\Core\Database\SchemaDefinition\IndexBase;
 
 /**
  * Describes a database GIN (Generalized Inverted Index) index.
  *
- * GIN indexes are specific to PostgreSQL. Drivers for databases that do not
- * support them skip the index. Use AlternativeIndexes to specify a fallback
- * index to be created in that case.
+ * GIN indexes are currently implemented by PostgreSQL only. Drivers for
+ * databases that do not support them skip the index. Use AlternativeIndexes
+ * to specify a fallback index to be created in that case.
  */
-final class GinIndex extends IndexBase {
+final class GinIndex extends KeyBase implements IndexInterface {
 
   /**
    * Constructor.
@@ -25,10 +25,10 @@ final class GinIndex extends IndexBase {
    *   naming columns. Limited length columns are not allowed.
    */
   public function __construct(
-    string $name,
+    public readonly string $name,
     array $columns,
   ) {
-    parent::__construct($name, $columns, FALSE);
+    parent::__construct($columns, FALSE);
   }
 
 }
