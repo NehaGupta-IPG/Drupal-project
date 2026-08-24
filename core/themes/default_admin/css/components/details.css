@@ -63,7 +63,7 @@
   }
 
   &.error {
-    border: 2px solid var(--admin-color-error);
+    border: 1px solid var(--admin-color-error);
   }
 
   .dark-mode & {
@@ -198,6 +198,11 @@
 
   .dark-mode & {
     background-color: transparent;
+  }
+
+  /* Make room for validation error icon. */
+  .form-wrapper > & {
+    padding-inline-end: calc(var(--admin-space-m) + var(--admin-space-l) + var(--admin-space-s));
   }
 }
 
@@ -363,4 +368,66 @@
 .system-status-report .details {
   border: 1px solid var(--admin-color-border);
   border-radius: var(--admin-radius-m);
+}
+
+/* Styles for details that contain child validation errors. */
+
+.gin-details.error {
+  position: relative;
+  border-color: var(--input--error-color);
+  border-left: none;
+
+  /* Remove left border for open details summary. */
+  &[open] > .gin-details__summary::after {
+    border-left: none;
+  }
+
+  &::before {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 0;
+    height: 100%;
+    content: "";
+    /* Match vertical tabs error border for consistency */
+    border-inline-start: calc(var(--vertical-tabs-menu-link--active-border-size) + 2px) solid var(--input--error-color);
+    border-start-start-radius: var(--admin-radius-m);
+    border-end-start-radius: var(--admin-radius-m);
+  }
+
+  & > .gin-details__summary {
+    &:not(:hover) {
+      color: var(--input--error-color);
+    }
+
+    & > span:first-child {
+      position: relative;
+      display: inline-block;
+      /* Make room for validation error icon. */
+      padding-inline-end: calc(var(--admin-space-m) + var(--admin-space-xs));
+
+      &::before {
+        position: absolute;
+        display: block;
+        padding-block-end: var(--admin-space-m); /* Match line-height */
+        padding-inline-end: var(--admin-space-m);
+        content: "";
+        mask-image: var(--admin-icon-error);
+        mask-repeat: no-repeat;
+        mask-position: center;
+        background: var(--input--error-color);
+        inset-inline-end: 0;
+
+        @media (forced-colors: active) {
+          background: canvasText;
+        }
+      }
+    }
+
+    &.gin-details__summary--vertical-tabs-item > span:first-child::before {
+      padding-block-end: var(--summary-accordion-line-height);
+    }
+  }
 }

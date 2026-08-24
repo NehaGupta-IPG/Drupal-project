@@ -204,6 +204,14 @@
   border-block-end: 1px solid var(--admin-color-border-soft);
   border-radius: 0;
 
+  &.error {
+    border-block: 1px solid var(--input--error-color);
+
+    &::before {
+      border-radius: 0;
+    }
+  }
+
   .dark-mode & {
     border-color: var(--admin-color-border);
   }

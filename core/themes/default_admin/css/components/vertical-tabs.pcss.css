@@ -328,6 +328,12 @@
     border-end-end-radius: var(--details-accordion-border-size-radius);
   }
 
+  &.error {
+    &::before {
+      border-radius: 0;
+    }
+  }
+
   .js .vertical-tabs & {
     float: inline-start;
     overflow: visible;
@@ -341,6 +347,11 @@
     }
 
     > summary {
+      display: none;
+    }
+
+    /* Hide details border for vertical tabs pane */
+    &.error::before {
       display: none;
     }
   }
