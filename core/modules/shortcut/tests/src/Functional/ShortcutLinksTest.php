@@ -12,11 +12,13 @@ use Drupal\Tests\block\Functional\AssertBlockAppearsTrait;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Create, view, edit, delete, and change shortcut links.
  */
+#[IgnoreDeprecations]
 #[Group('shortcut')]
 #[RunTestsInSeparateProcesses]
 class ShortcutLinksTest extends ShortcutTestBase {
@@ -479,9 +481,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
    * @param int $index
    *   Link position counting from zero.
    * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use new FormattableMarkup() to embed variables in the message
-   *   text, not t(). If left blank, a default message will be displayed.
+   *   (optional) A message to display with the assertion.
    *
    * @internal
    */

@@ -14,6 +14,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -51,6 +52,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly AccountInterface $currentUser,
     protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly EntityTypeBundleInfoInterface $entityTypeBundleInfo,
     protected readonly BlockManagerInterface $blockManager,
     protected readonly RendererInterface $renderer,
     protected readonly ModuleHandlerInterface $moduleHandler,
@@ -185,11 +187,13 @@ final class PreprocessHooks implements TrustedCallbackInterface {
 
       $entity_type = $entity->getEntityType();
       $type_label = $entity_type->getSingularLabel();
-      $bundle_key = $entity_type->getKey('bundle');
 
-      if ($bundle_key) {
-        $bundle_entity = $entity->get($bundle_key)->entity;
-        $type_label = $bundle_entity->label();
+      if ($entity_type->hasKey('bundle')) {
+        $bundle_info = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
+        $bundle_label = $bundle_info[$entity->bundle()]['label'] ?? NULL;
+        if ($bundle_label !== NULL) {
+          $type_label = $bundle_label;
+        }
       }
 
       if ($entity_type->id() === 'user') {
@@ -440,6 +444,16 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     if (isset($variables['suffix']['open_button'])) {
       $variables['suffix']['open_button']['#attributes']['class'][] = 'media-library-open-button';
     }
+  }
+
+  /**
+   * Implements hook_preprocess_HOOK() for container__media_library_widget_selection.
+   *
+   * @see \Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::formElement()
+   */
+  #[Hook('preprocess_container__media_library_widget_selection')]
+  public function preprocessContainerMediaLibraryWidgetSelection(array &$variables): void {
+    $variables['attributes']['class'][] = 'media-library-selection';
   }
 
   /**
@@ -830,6 +844,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    */
   #[Hook('preprocess_links__media_library_menu')]
   public function preprocessLinksMediaLibraryMenu(array &$variables): void {
+    $variables['attributes']['class'][] = 'media-library-menu';
     foreach ($variables['links'] as &$link) {
       // Add a class to the Media Library menu items.
       $link['attributes']->addClass('media-library-menu__item');
@@ -854,6 +869,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    */
   #[Hook('preprocess_media_library_item__small')]
   public function preprocessMediaLibraryItemSmall(array &$variables): void {
+    $variables['attributes']['class'][] = 'media-library-item';
     $variables['content']['select']['#attributes']['class'][] = 'media-library-item__click-to-select-checkbox';
   }
 
@@ -864,6 +880,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    */
   #[Hook('preprocess_media_library_item__widget')]
   public function preprocessMediaLibraryItemWidget(array &$variables): void {
+    $variables['attributes']['class'][] = 'media-library-item';
     $variables['content']['remove_button']['#attributes']['class'][] = 'media-library-item__remove';
     $variables['content']['remove_button']['#attributes']['class'][] = 'icon-link';
   }
@@ -1198,37 +1215,6 @@ final class PreprocessHooks implements TrustedCallbackInterface {
       $variables['description_display'] = 'invisible';
       $variables['description_toggle'] = TRUE;
     }
-  }
-
-  /**
-   * Implements toolbar preprocess.
-   *
-   * This is also called by system_preprocess_toolbar() in instances where Admin
-   * is the administration theme but not the active theme.
-   *
-   * @see system_preprocess_toolbar()
-   */
-  #[Hook('preprocess_toolbar')]
-  public function preprocessToolbar(array &$variables): void {
-    $variables['attributes']['data-drupal-gin-processed-toolbar'] = TRUE;
-
-    // The controller resolver does not support Closures at this time. For now,
-    // we use a wrapper function to load the service with dependencies.
-    // @see https://www.drupal.org/project/drupal/issues/3060638
-    $variables['user_picture'] = [
-      '#lazy_builder' => [static::class . '::lazyToolbarUserPicture', []],
-      '#create_placeholder' => TRUE,
-    ];
-
-    // Check if Navigation module is active.
-    if ($this->moduleHandler->moduleExists('navigation')) {
-      // Attach the new drupal navigation styles.
-      $variables['#attached']['library'][] = 'default_admin/navigation';
-      return;
-    }
-
-    // Toolbar library.
-    $variables['#attached']['library'][] = 'default_admin/toolbar';
   }
 
   /**
