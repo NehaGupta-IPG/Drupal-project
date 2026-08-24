@@ -9,6 +9,14 @@
  * Generic elements.
  */
 
+/* stylelint-disable at-rule-no-unknown */
+
+@view-transition {
+  navigation: auto;
+}
+
+/* stylelint-enable at-rule-no-unknown */
+
 html {
   font-family: var(--font-family);
   font-size: 100%;
