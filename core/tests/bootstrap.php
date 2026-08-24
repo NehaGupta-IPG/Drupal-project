@@ -100,7 +100,7 @@ function drupal_phpunit_populate_class_loader() {
 
     $dirs = [];
     foreach ($extension_roots as $extension_root) {
-      foreach (ExtensionDiscovery::getExtensionDirectoryIterator($extension_root, ['node_modules', 'bower_components'], TRUE) ?? [] as $file) {
+      foreach (ExtensionDiscovery::getExtensionDirectoryIterator($extension_root, ['node_modules'], TRUE) ?? [] as $file) {
         $dirs[substr($file->getFilename(), 0, -9)] = dirname($file->getRealPath() ?: $file->getPathname());
       }
     }
