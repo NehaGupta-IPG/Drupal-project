@@ -293,8 +293,28 @@ class ExtensionDiscovery {
    */
   public static function findExtensionDirectories(string $scan_directory, array $ignore_directories = [], bool $include_tests = FALSE): array {
     $extensions = [];
+    foreach (static::getExtensionDirectoryIterator($scan_directory, $ignore_directories, $include_tests) ?? [] as $file) {
+      $extensions[substr($file->getFilename(), 0, -9)] = dirname($file->getRealPath() ?: $file->getPathname());
+    }
+    return $extensions;
+  }
+
+  /**
+   * Creates an iterator that finds extension info files beneath a directory.
+   *
+   * @param string $scan_directory
+   *   The absolute directory to scan.
+   * @param string[] $ignore_directories
+   *   Directory names to exclude from the scan.
+   * @param bool $include_tests
+   *   Whether to include extensions below test directories.
+   *
+   * @return \RecursiveIteratorIterator|null
+   *   The iterator, or NULL if the directory does not exist.
+   */
+  private static function getExtensionDirectoryIterator(string $scan_directory, array $ignore_directories, bool $include_tests): ?\RecursiveIteratorIterator {
     if (!is_dir($scan_directory)) {
-      return $extensions;
+      return NULL;
     }
 
     // Use Unix paths regardless of platform, skip dot directories, follow
@@ -308,12 +328,14 @@ class ExtensionDiscovery {
     $directory_iterator = new \RecursiveDirectoryIterator($scan_directory, $flags);
     $callback = new RecursiveExtensionFilterCallback($ignore_directories, $include_tests);
     $filter = new \RecursiveCallbackFilterIterator($directory_iterator, [$callback, 'accept']);
-    $iterator = new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::LEAVES_ONLY, \RecursiveIteratorIterator::CATCH_GET_CHILD);
 
-    foreach ($iterator as $file) {
-      $extensions[substr($file->getFilename(), 0, -9)] = dirname($file->getRealPath() ?: $file->getPathname());
-    }
-    return $extensions;
+    // The actual recursive filesystem scan is only invoked by instantiating the
+    // RecursiveIteratorIterator.
+    return new \RecursiveIteratorIterator($filter,
+      \RecursiveIteratorIterator::LEAVES_ONLY,
+      // Suppress filesystem errors in case a directory cannot be accessed.
+      \RecursiveIteratorIterator::CATCH_GET_CHILD
+    );
   }
 
   /**
@@ -452,41 +474,13 @@ class ExtensionDiscovery {
     $dir_prefix = ($dir == '' ? '' : "$dir/");
     $absolute_dir = ($dir == '' ? $this->root : $this->root . "/$dir");
 
-    if (!is_dir($absolute_dir)) {
-      return $files;
-    }
-    // Use Unix paths regardless of platform, skip dot directories, follow
-    // symlinks (to allow extensions to be linked from elsewhere), and return
-    // the RecursiveDirectoryIterator instance to have access to getSubPath(),
-    // since SplFileInfo does not support relative paths.
-    $flags = \FilesystemIterator::UNIX_PATHS;
-    $flags |= \FilesystemIterator::SKIP_DOTS;
-    $flags |= \FilesystemIterator::FOLLOW_SYMLINKS;
-    $flags |= \FilesystemIterator::CURRENT_AS_SELF;
-    $directory_iterator = new \RecursiveDirectoryIterator($absolute_dir, $flags);
-
     // Allow directories specified in settings.php to be ignored. You can use
     // this to not check for files in common special-purpose directories. For
     // example, node_modules and bower_components. Ignoring irrelevant
     // directories is a performance boost.
     $ignore_directories = Settings::get('file_scan_ignore_directories', []);
 
-    // Filter the recursive scan to discover extensions only.
-    // Important: Without a RecursiveFilterIterator, RecursiveDirectoryIterator
-    // would recurse into the entire filesystem directory tree without any kind
-    // of limitations.
-    $callback = new RecursiveExtensionFilterCallback($ignore_directories, $include_tests);
-    $filter = new \RecursiveCallbackFilterIterator($directory_iterator, [$callback, 'accept']);
-
-    // The actual recursive filesystem scan is only invoked by instantiating the
-    // RecursiveIteratorIterator.
-    $iterator = new \RecursiveIteratorIterator($filter,
-      \RecursiveIteratorIterator::LEAVES_ONLY,
-      // Suppress filesystem errors in case a directory cannot be accessed.
-      \RecursiveIteratorIterator::CATCH_GET_CHILD
-    );
-
-    foreach ($iterator as $key => $fileinfo) {
+    foreach (static::getExtensionDirectoryIterator($absolute_dir, $ignore_directories, $include_tests) ?? [] as $key => $fileinfo) {
       // All extension names in Drupal have to be valid PHP function names due
       // to the module hook architecture.
       if (!preg_match(static::PHP_FUNCTION_PATTERN, $fileinfo->getBasename('.info.yml'))) {
