@@ -29,7 +29,7 @@ class LocaleCoreHooks {
    * Implements hook_rebuild().
    */
   #[Hook('rebuild')]
-  public function rebuild() {
+  public function rebuild(): void {
     $extensions = array_merge(
       ['core'],
       array_keys($this->moduleHandler->getModuleList()),
