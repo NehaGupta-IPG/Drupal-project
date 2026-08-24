@@ -50,8 +50,9 @@ class NodeRequirements {
     $requirements['node_access'] = [
       'title' => $this->t('Node Access Permissions'),
       'value' => $value,
-      'description' => $this->t('If the site is experiencing problems with permissions to content, you may have to rebuild the permissions cache. Rebuilding will remove all privileges to content and replace them with permissions based on the current modules and settings. Rebuilding may take some time if there is a lot of content or complex permission settings. After rebuilding has completed, content will automatically use the new permissions. <a href=":rebuild">Rebuild permissions</a>', [
+      'description' => $this->t('If you see "Disabled", everything should be perfectly fine. It just means that no module is declaring node permissions, so all nodes are visible for users with the "View published content" <a href=":permissions">permission</a>. If the site is experiencing problems with permissions to content, you may have to rebuild the permissions cache. Rebuilding will remove all privileges to content and replace them with permissions based on the current modules and settings. Rebuilding may take some time if there is a lot of content or complex permission settings. After rebuilding has completed, content will automatically use the new permissions. <a href=":rebuild">Rebuild permissions</a>', [
         ':rebuild' => Url::fromRoute('node.configure_rebuild_confirm')->toString(),
+        ':permissions' => Url::fromRoute('user.admin_permissions')->toString(),
       ]),
     ];
 
