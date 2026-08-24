@@ -61,6 +61,8 @@ class ThumbnailDownloader extends QueueWorkerBase implements ContainerFactoryPlu
   public function processItem($data) {
     /** @var \Drupal\media\Entity\Media $media */
     if ($media = $this->entityTypeManager->getStorage('media')->load($data['id'])) {
+      // Check if the media has a translation for the given language.
+      $media = $data['langcode'] && $media->hasTranslation($data['langcode']) ? $media->getTranslation($data['langcode']) : $media;
       $media->updateQueuedThumbnail();
       $media->save();
     }

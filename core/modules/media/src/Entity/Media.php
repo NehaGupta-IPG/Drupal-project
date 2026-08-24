@@ -392,7 +392,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
       if ($this->hasTranslation($langcode)) {
         $translation = $this->getTranslation($langcode);
         if ($translation->bundle->entity->thumbnailDownloadsAreQueued() && $translation->shouldUpdateThumbnail($is_new)) {
-          \Drupal::queue('media_entity_thumbnail')->createItem(['id' => $translation->id()]);
+          \Drupal::queue('media_entity_thumbnail')->createItem(['id' => $translation->id(), 'langcode' => $langcode]);
         }
       }
     }
@@ -483,10 +483,8 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
           $translation->setName($translation->getName());
         }
 
-        // Set thumbnail.
-        if ($translation->shouldUpdateThumbnail($this->isNew())) {
-          $translation->updateThumbnail();
-        }
+        // Set thumbnail, thumbnail must be update in case of alt or target_id has changed.
+        $translation->updateThumbnail();
       }
     }
   }
