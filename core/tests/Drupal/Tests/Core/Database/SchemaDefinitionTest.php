@@ -637,26 +637,13 @@ class SchemaDefinitionTest extends UnitTestCase {
    * Tests AlternativeIndexes::toArray().
    */
   public function testAlternativeIndexesToArray(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('The \'ages\' AlternativeIndexes cannot be converted to legacy array-based specifications');
     $ginIndex = new GinIndex(name: 'ages', columns: ['age']);
     $index = new Index(name: 'ages', columns: ['age']);
     $alternativeIndexes = new AlternativeIndexes(
       name: 'ages',
       indexes: [$ginIndex, $index],
-    );
-    $this->assertSame(['age'], $alternativeIndexes->toArray());
-  }
-
-  /**
-   * Tests AlternativeIndexes::toArray() with no Index specified.
-   */
-  public function testAlternativeIndexesToArrayWithNoRegularIndex(): void {
-    $this->expectException(SchemaDefinitionException::class);
-    $this->expectExceptionMessageIs('The \'ages\' AlternativeIndexes cannot be converted to legacy array-based specifications, no regular Index specified');
-    $ginIndex = new GinIndex(name: 'ages', columns: ['age']);
-    $gistIndex = new GistIndex(name: 'ages', columns: ['age']);
-    $alternativeIndexes = new AlternativeIndexes(
-      name: 'ages',
-      indexes: [$ginIndex, $gistIndex],
     );
     $alternativeIndexes->toArray();
   }

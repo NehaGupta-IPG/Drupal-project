@@ -412,14 +412,6 @@ class Schema extends DatabaseSchema {
       throw new SchemaObjectExistsException("Cannot add field '$table.$field': field already exists.");
     }
 
-    [$keys_new, $specialized_indexes] = $this->prepareKeysSpecification($keys_new);
-
-    if (!empty($keys_new['indexes'])) {
-      // Normalizing the indexes requires the specification of each indexed
-      // field; provide the specification of the field being added.
-      $keys_new['fields'][$field] ??= $spec;
-    }
-
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
     $is_primary_key = isset($keys_new['primary key']) && in_array($field, $keys_new['primary key'], TRUE);
     if ($is_primary_key) {
@@ -479,9 +471,6 @@ class Schema extends DatabaseSchema {
     if ($fix_null) {
       $spec['not null'] = TRUE;
       $this->changeField($table, $field, $field, $spec);
-    }
-    foreach ($specialized_indexes as $index) {
-      $this->createSpecializedIndex($table, $index);
     }
   }
 
@@ -651,15 +640,6 @@ class Schema extends DatabaseSchema {
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
-
-    [$keys_new, $specialized_indexes] = $this->prepareKeysSpecification($keys_new);
-
-    if (!empty($keys_new['indexes'])) {
-      // Normalizing the indexes requires the specification of each indexed
-      // field; provide the specification of the field being changed.
-      $keys_new['fields'][$field_new] ??= $spec;
-    }
-
     if (isset($keys_new['primary key']) && in_array($field_new, $keys_new['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field_new => $spec]);
     }
@@ -673,9 +653,6 @@ class Schema extends DatabaseSchema {
     if ($spec['type'] === 'serial') {
       $max = $this->connection->query('SELECT MAX(`' . $field_new . '`) FROM {' . $table . '}')->fetchField();
       $this->executeDdlStatement("ALTER TABLE {" . $table . "} AUTO_INCREMENT = " . ($max + 1));
-    }
-    foreach ($specialized_indexes as $index) {
-      $this->createSpecializedIndex($table, $index);
     }
   }
 

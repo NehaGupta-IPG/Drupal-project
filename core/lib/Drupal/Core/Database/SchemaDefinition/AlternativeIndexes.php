@@ -67,25 +67,12 @@ final class AlternativeIndexes implements SchemaDefinitionInterface, IndexInterf
   /**
    * {@inheritdoc}
    *
-   * The legacy array-based specifications cannot describe alternative
-   * indexes; the first regular Index is used, if defined.
+   * The legacy array-based specifications can only describe regular indexes.
    *
    * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
-   *   When no regular Index alternative is defined.
    */
   public function toArray(): array {
-    foreach ($this->indexes as $index) {
-      if ($index instanceof Index) {
-        $tmp = $index;
-        break;
-      }
-    }
-
-    if (!isset($tmp)) {
-      throw new SchemaDefinitionException("The '{$this->name}' AlternativeIndexes cannot be converted to legacy array-based specifications, no regular Index specified");
-    }
-
-    return $tmp->toArray();
+    throw new SchemaDefinitionException("The '{$this->name}' AlternativeIndexes cannot be converted to legacy array-based specifications");
   }
 
 }

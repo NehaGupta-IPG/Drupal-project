@@ -582,13 +582,11 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  * Drupal.
  *
  * Besides regular Index objects, the 'indexes' property of a Table accepts
- * specialized index definitions provided by database drivers, like
- * \Drupal\pgsql\Driver\Database\pgsql\GinIndex and
- * \Drupal\pgsql\Driver\Database\pgsql\GistIndex. Drivers that cannot create an
- * index with the specified technology skip its creation. Use an
- * AlternativeIndexes object to list definitions for the same logical index in
- * order of preference; the driver creates the first index it supports and
- * ignores the others:
+ * specialized index definitions provided by database drivers, like GinIndex
+ * and GistIndex. Drivers that cannot create an index with the specified
+ * technology skip its creation. Use an AlternativeIndexes object to list
+ * definitions for the same logical index in order of preference; the driver
+ * creates the first index it supports and ignores the others:
  * @code
  * indexes: [
  *   new AlternativeIndexes(

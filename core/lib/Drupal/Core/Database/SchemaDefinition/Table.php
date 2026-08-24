@@ -103,11 +103,10 @@ final class Table implements SchemaDefinitionInterface {
       }
     }
     if ($this->indexes !== NULL) {
-      // The legacy array-based specifications cannot describe specialized
-      // indexes like GIN or GiST. They are skipped, and alternative indexes
-      // are resolved to their regular Index definition, if any.
+      // The legacy array-based specifications can only describe regular B-Tree
+      // indexes. Other definitions are skipped.
       foreach ($this->indexes as $index) {
-        if ($index instanceof Index || $index instanceof AlternativeIndexes) {
+        if ($index instanceof Index) {
           $spec['indexes'][$index->name] = $index->toArray();
         }
       }

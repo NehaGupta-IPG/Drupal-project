@@ -3,9 +3,7 @@
 namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Query\PlaceholderInterface;
-use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\Index;
-use Drupal\Core\Database\SchemaDefinition\IndexInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;

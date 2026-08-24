@@ -29,4 +29,15 @@ final class GistIndex extends KeyBase implements IndexInterface {
     parent::__construct($columns, FALSE);
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * The legacy array-based specifications can only describe regular indexes.
+   *
+   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
+   */
+  public function toArray(): array {
+    throw new SchemaDefinitionException("The '{$this->name}' GistIndex cannot be converted to legacy array-based specifications");
+  }
+
 }
