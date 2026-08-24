@@ -34,11 +34,11 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
   /**
    * Installer step: Select installation profile.
    */
-  protected function setUpProfile() {
+  protected function setUpProfile(): void {
     // Ensure the site name 'Multilingual' appears as expected in the 'Use
     // existing configuration' radio description.
     $this->assertSession()->pageTextContains('Install Multilingual using existing configuration.');
-    return parent::setUpProfile();
+    parent::setUpProfile();
   }
 
   /**
@@ -59,7 +59,6 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
     file_put_contents($this->publicFilesDirectory . '/translations/drupal-8.0.0.es.po', $this->getPo('es'));
     $locale_settings = Yaml::decode(file_get_contents($this->siteDirectory . '/config/sync/locale.settings.yml'));
     $locale_settings['translation']['use_source'] = 'local';
-    $locale_settings['translation']['path'] = $this->publicFilesDirectory . '/translations';
     file_put_contents($this->siteDirectory . '/config/sync/locale.settings.yml', Yaml::encode($locale_settings));
   }
 

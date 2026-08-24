@@ -7,9 +7,11 @@ namespace Drupal\Tests\node\Functional\Views;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use Drupal\views\ResultRow;
 use Drupal\views\Tests\AssertViewsCacheTagsTrait;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
@@ -169,7 +171,7 @@ class FrontPageTest extends ViewTestBase {
    * @internal
    */
   protected function assertNotInResultSet(ViewExecutable $view, array $not_expected_nids, string $message = ''): void {
-    $found_nids = array_filter($view->result, function ($row) use ($not_expected_nids) {
+    $found_nids = array_filter($view->result, function (ResultRow $row) use ($not_expected_nids): bool {
       return in_array($row->nid, $not_expected_nids);
     });
     $this->assertEmpty($found_nids, $message);
@@ -273,7 +275,7 @@ class FrontPageTest extends ViewTestBase {
         'body' => [
           [
             'value' => $this->randomMachineName(32),
-            'format' => filter_default_format(),
+            'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
           ],
         ],
         'type' => 'article',

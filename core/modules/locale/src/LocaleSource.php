@@ -5,16 +5,23 @@ namespace Drupal\locale;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
+use Drupal\locale\File\LocaleFile;
 
 /**
  * Provides the locale source services.
  */
 class LocaleSource {
 
+  /**
+   * The hash algorithm used to calculate the hash of the local file.
+   */
+  public const string LOCAL_FILE_HASH_ALGO = 'xxh128';
+
   public function __construct(
-    protected readonly LocaleProjectStorageInterface $projectStorage,
+    protected readonly LocaleProjectRepository $localeProjectRepository,
     protected readonly FileSystemInterface $fileSystem,
     protected readonly ConfigFactoryInterface $configFactory,
+    protected readonly CurrentImportStorage $currentImportStorage,
   ) {}
 
   /**
@@ -32,7 +39,7 @@ class LocaleSource {
    */
   public function loadSources(?array $projects = NULL, ?array $langcodes = NULL): array {
     $sources = [];
-    $projects = $projects ?: array_keys($this->projectStorage->getProjects());
+    $projects = $projects ?: array_keys($this->localeProjectRepository->getAll());
     $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
     // Load source data from locale_translation_status cache.
@@ -60,9 +67,9 @@ class LocaleSource {
    *
    * @see sourceBuild()
    */
-  public function buildSources(array $projects = [], array $langcodes = []): array {
+  public function buildSources(array $projects, array $langcodes = []): array {
     $sources = [];
-    $projects = $this->projectStorage->getProjects($projects);
+    $projects = $this->localeProjectRepository->getMultiple($projects);
     $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
     foreach ($projects as $project) {
@@ -101,16 +108,10 @@ class LocaleSource {
   public function sourceCheckFile($source) {
     if (isset($source->files[LOCALE_TRANSLATION_LOCAL])) {
       $source_file = $source->files[LOCALE_TRANSLATION_LOCAL];
-      $directory = $source_file->directory;
-      $filename = '/' . preg_quote($source_file->filename) . '$/';
-
-      if (is_dir($directory)) {
-        if ($files = $this->fileSystem->scanDirectory($directory, $filename, ['key' => 'name', 'recurse' => FALSE])) {
-          $file = current($files);
-          $source_file->uri = $file->uri;
-          $source_file->timestamp = filemtime($file->uri);
-          return $source_file;
-        }
+      if (isset($source_file->uri) && file_exists($source_file->uri)) {
+        $source_file->timestamp = filemtime($source_file->uri);
+        $source_file->hash = hash_file(self::LOCAL_FILE_HASH_ALGO, $source_file->uri);
+        return $source_file;
       }
     }
     return FALSE;
@@ -119,7 +120,7 @@ class LocaleSource {
   /**
    * Builds abstract translation source.
    *
-   * @param object $project
+   * @param \Drupal\locale\LocaleTranslatableProject $project
    *   Project object.
    * @param string $langcode
    *   Language code.
@@ -158,17 +159,17 @@ class LocaleSource {
    *   - "timestamp": Timestamp of the file.
    *   - "keep": TRUE to keep the downloaded file.
    */
-  public function sourceBuild($project, $langcode, $filename = NULL) {
+  public function sourceBuild(LocaleTranslatableProject $project, string $langcode, ?string $filename = NULL) {
     // Follow-up issue: https://www.drupal.org/node/1842380.
-    // Convert $source object to a TranslatableProject class and use a typed
-    // class for $source-file.
+    // Convert $source object to a LocaleTranslationSource class.
 
     // Create a source object with data of the project object.
-    $source = clone $project;
+    $source = (object) $project->toArray();
     $source->project = $project->name;
     $source->langcode = $langcode;
     $source->type = '';
     $source->timestamp = 0;
+    $source->hash = '';
     $source->last_checked = 0;
 
     $filename = $filename ?: $this->configFactory->get('locale.settings')->get('translation.default_filename');
@@ -179,49 +180,42 @@ class LocaleSource {
     // file path we will only check for a file in the local file system.
     $files = [];
     if ($this->fileIsRemote($source->server_pattern)) {
-      $files[LOCALE_TRANSLATION_REMOTE] = (object) [
-        'project' => $project->name,
-        'langcode' => $langcode,
-        'version' => $project->version,
-        'type' => LOCALE_TRANSLATION_REMOTE,
-        'filename' => $this->buildServerPattern($source, basename($source->server_pattern)),
-        'uri' => $this->buildServerPattern($source, $source->server_pattern),
-      ];
-      $files[LOCALE_TRANSLATION_LOCAL] = (object) [
-        'project' => $project->name,
-        'langcode' => $langcode,
-        'version' => $project->version,
-        'type' => LOCALE_TRANSLATION_LOCAL,
-        'filename' => $this->buildServerPattern($source, $filename),
-        'directory' => 'translations://',
-      ];
-      $files[LOCALE_TRANSLATION_LOCAL]->uri = $files[LOCALE_TRANSLATION_LOCAL]->directory . $files[LOCALE_TRANSLATION_LOCAL]->filename;
+      $remote_filename = $this->buildServerPattern($source, basename($source->server_pattern));
+      $remote_uri = $this->buildServerPattern($source, $source->server_pattern);
+      $remote_file = new LocaleFile($remote_filename, $remote_uri, '', NULL, $langcode, $project->name, $project->version);
+      $remote_file->type = LOCALE_TRANSLATION_REMOTE;
+      $files[LOCALE_TRANSLATION_REMOTE] = $remote_file;
+
+      $local_filename = $this->buildServerPattern($source, $filename);
+      $local_uri = 'translations://' . $local_filename;
+      $local_file = new LocaleFile($local_filename, $local_uri, '', NULL, $langcode, $project->name, $project->version);
+      $local_file->type = LOCALE_TRANSLATION_LOCAL;
+      $local_file->directory = 'translations://';
+      $files[LOCALE_TRANSLATION_LOCAL] = $local_file;
     }
     else {
-      $files[LOCALE_TRANSLATION_LOCAL] = (object) [
-        'project' => $project->name,
-        'langcode' => $langcode,
-        'version' => $project->version,
-        'type' => LOCALE_TRANSLATION_LOCAL,
-        'filename' => $this->buildServerPattern($source, basename($source->server_pattern)),
-        'directory' => $this->buildServerPattern($source, $this->fileSystem->dirname($source->server_pattern)),
-      ];
-      $files[LOCALE_TRANSLATION_LOCAL]->uri = $files[LOCALE_TRANSLATION_LOCAL]->directory . '/' . $files[LOCALE_TRANSLATION_LOCAL]->filename;
+      $local_directory = $this->buildServerPattern($source, $this->fileSystem->dirname($source->server_pattern));
+      $local_filename = $this->buildServerPattern($source, basename($source->server_pattern));
+      $local_uri = $local_directory . '/' . $local_filename;
+      $local_file = new LocaleFile($local_filename, $local_uri, '', NULL, $langcode, $project->name, $project->version);
+      $local_file->type = LOCALE_TRANSLATION_LOCAL;
+      $local_file->directory = $local_directory;
+      $files[LOCALE_TRANSLATION_LOCAL] = $local_file;
     }
     $source->files = $files;
 
     // If this project+language is already translated, we add its status and
     // update the current translation timestamp and last_updated time. If the
     // project+language is not translated before, create a new record.
-    $history = locale_translation_get_file_history();
-    if (isset($history[$project->name][$langcode]) && $history[$project->name][$langcode]->timestamp) {
-      $source->files[LOCALE_TRANSLATION_CURRENT] = $history[$project->name][$langcode];
+    $current_import_state = $this->currentImportStorage->get($project->name, $langcode);
+    if ($current_import_state instanceof CurrentImport && $current_import_state->timestamp) {
       $source->type = LOCALE_TRANSLATION_CURRENT;
-      $source->timestamp = $history[$project->name][$langcode]->timestamp;
-      $source->last_checked = $history[$project->name][$langcode]->last_checked;
+      $source->timestamp = $current_import_state->timestamp;
+      $source->hash = $current_import_state->hash;
+      $source->last_checked = $current_import_state->last_checked ?? NULL;
     }
-    else {
-      locale_translation_update_file_history($source);
+    elseif (!$current_import_state) {
+      $this->currentImportStorage->save(CurrentImport::createFromSource($source));
     }
 
     return $source;
@@ -247,7 +241,7 @@ class LocaleSource {
       '%project' => $project->name,
       '%version' => $project->version,
       '%core' => $project->core,
-      '%language' => $project->langcode ?? '%language',
+      '%language' => $project->langcode,
     ];
     return strtr($template, $variables);
   }

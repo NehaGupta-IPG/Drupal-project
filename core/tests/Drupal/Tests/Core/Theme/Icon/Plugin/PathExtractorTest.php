@@ -12,6 +12,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\Theme\Plugin\IconExtractor\PathExtractor.
@@ -36,17 +37,15 @@ class PathExtractorTest extends UnitTestCase {
 
   /**
    * The IconFinder instance.
-   *
-   * @var \Drupal\Core\Theme\Icon\IconFinder|\PHPUnit\Framework\MockObject\MockObject
    */
-  private IconFinder $iconFinder;
+  private IconFinder&Stub $iconFinder;
 
   /**
    * {@inheritdoc}
    */
   public function setUp():void {
     parent::setUp();
-    $this->iconFinder = $this->createMock(IconFinder::class);
+    $this->iconFinder = $this->createStub(IconFinder::class);
     $this->pathExtractorPlugin = new PathExtractor(
       [
         'id' => $this->pluginId,

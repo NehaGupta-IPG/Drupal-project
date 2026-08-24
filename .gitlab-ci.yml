@@ -123,6 +123,8 @@ default:
   needs:
     - job: '🧹 PHP Coding standards (PHPCS)'
       optional: true
+    - job: '🧹 PHP Static Analysis (phpstan)'
+      optional: true
     - job: '📦 Composer'
       optional: true
 
@@ -303,7 +305,8 @@ default:
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
   script:
-    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "PHPUnit-Unit" --concurrency "$CONCURRENCY" --repeat "1" --sqlite ":memory:" --verbose --non-html --all || EXIT_CODE=$?
+    - export EXIT_CODE=0
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "unit" --concurrency "$CONCURRENCY" --repeat "1" --sqlite ":memory:" --verbose --non-html --all || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == $NEXT_PHP_MAJOR ]] && exit 100
@@ -355,6 +358,7 @@ default:
     # Component tests are run via the PHPUnit CLI using a PHPUnit configuration
     # file of its own located in the core/tests/Drupal/Tests/Component
     # directory.
+    - export EXIT_CODE=0
     - vendor/bin/phpunit -c core/tests/Drupal/Tests/Component --testsuite unit-component --colors=always --testdox --log-junit $_ARTIFACTS_DIR/junit.xml --fail-on-deprecation $_FAIL_ON_PHPUNIT_DEPRECATION $_PHPUNIT_COVERAGE || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
@@ -412,43 +416,13 @@ default:
   <<: [ *with-composer, *test-setup ]
   retry: 1
   variables:
-    TESTSUITE: PHPUnit-Build
-    KUBERNETES_CPU_REQUEST: "12"
-    CONCURRENCY: "6"
-  services:
-    - <<: *with-database
-
-'🖱️️️ PHPUnit Functional Javascript':
-  <<: [ *with-composer, *test-setup ]
-  parallel: 3
-  variables:
-    TESTSUITE: PHPUnit-FunctionalJavascript
-    CONCURRENCY: "12"
+    TESTSUITE: build
     KUBERNETES_CPU_REQUEST: "16"
-  services:
-    - <<: *with-database
-    - <<: *with-selenium-chrome
-  after_script:
-    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
-    - cp /builds/chromedriver.log ./
-
-'🌐️️ PHPUnit Functional':
-  <<: [ *with-composer, *test-setup ]
-  parallel: 8
-  variables:
-    TESTSUITE: PHPUnit-Functional
-    CONCURRENCY: "24"
-    KUBERNETES_CPU_REQUEST: "16"
-  services:
-    - <<: *with-database
-
-'⚙️️ PHPUnit Kernel':
-  <<: [ *with-composer, *test-setup ]
-  parallel: 4
-  variables:
-    TESTSUITE: PHPUnit-Kernel
-    KUBERNETES_CPU_REQUEST: "12"
-    CONCURRENCY: "20"
+    CONCURRENCY: "8"
+    # No parallel for this job, setup manually the env variables that need to
+    # be passed to run-tests.sh command line options.
+    CI_NODE_INDEX: 1
+    CI_NODE_TOTAL: 1
   services:
     - <<: *with-database
 
@@ -499,6 +473,40 @@ default:
     paths:
       - ./core/.yarn/cache
     policy: pull
+
+'🖱️️️ PHPUnit Functional Javascript':
+  <<: [ *with-composer, *test-setup ]
+  parallel: 3
+  variables:
+    TESTSUITE: functional-javascript
+    CONCURRENCY: "12"
+    KUBERNETES_CPU_REQUEST: "14"
+  services:
+    - <<: *with-database
+    - <<: *with-selenium-chrome
+  after_script:
+    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+    - cp /builds/chromedriver.log ./
+
+'🌐️️ PHPUnit Functional':
+  <<: [ *with-composer, *test-setup ]
+  parallel: 8
+  variables:
+    TESTSUITE: functional
+    CONCURRENCY: "24"
+    KUBERNETES_CPU_REQUEST: "16"
+  services:
+    - <<: *with-database
+
+'⚙️️ PHPUnit Kernel':
+  <<: [ *with-composer, *test-setup ]
+  parallel: 4
+  variables:
+    TESTSUITE: kernel
+    KUBERNETES_CPU_REQUEST: "12"
+    CONCURRENCY: "24"
+  services:
+    - <<: *with-database
 
 '🔁 Repeat Class Test':
   <<: [ *with-composer, *test-setup ]
@@ -595,7 +603,7 @@ default:
   parallel:
     matrix:
       - _TARGET_PHP: !reference [.php_versions]
-        _TARGET_DB: [mariadb-10.6]
+        _TARGET_DB: [mariadb-10.11]
   variables:
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
@@ -625,7 +633,7 @@ default:
   parallel:
     matrix:
       - _TARGET_PHP: !reference [.php_versions]
-        _TARGET_DB: [pgsql-16, pgsql-17, pgsql-18]
+        _TARGET_DB: [pgsql-18]
 
 'SQLite':
   <<: [ *recursive-trigger, *run-on-mr ]
@@ -636,15 +644,15 @@ default:
 
 # Jobs running on commits.
 # The value set in the "needs" property will determine the order in the sequence.
-'[Commit] PHP 8.5 PostgreSQL 16':
+'[Commit] PHP 8.5 PostgreSQL 18':
   <<: [ *recursive-trigger, *run-on-commit ]
   variables:
     _TARGET_PHP: $MINIMUM_PHP
-    _TARGET_DB: "pgsql-16"
+    _TARGET_DB: "pgsql-18"
 
 '[Commit] PHP 8.5 MySQL 9 via mysqli':
   <<: [ *recursive-trigger, *run-on-commit ]
-  needs: [ '[Commit] PHP 8.5 PostgreSQL 16' ]
+  needs: [ '[Commit] PHP 8.5 PostgreSQL 18' ]
   variables:
     _TARGET_PHP: $MINIMUM_PHP
     _TARGET_DB: "mysql-9"
@@ -660,15 +668,15 @@ default:
 
 # Jobs running daily.
 # The value set in the "needs" property will determine the order in the sequence.
-'[Daily] PHP minimum PostgreSQL 16':
+'[Daily] PHP minimum PostgreSQL 18':
   <<: [ *recursive-trigger, *run-daily ]
   variables:
     _TARGET_PHP: $MINIMUM_PHP
-    _TARGET_DB: "pgsql-16"
+    _TARGET_DB: "pgsql-18"
 
 '[Daily] PHP 8.5 MySQL 9 via mysqli':
   <<: [ *recursive-trigger, *run-daily ]
-  needs: [ '[Daily] PHP minimum PostgreSQL 16' ]
+  needs: [ '[Daily] PHP minimum PostgreSQL 18' ]
   variables:
     _TARGET_PHP: "8.5-ubuntu"
     _TARGET_DB: "mysql-9"
@@ -682,27 +690,21 @@ default:
     _TARGET_PHP: $MINIMUM_PHP
     _TARGET_DB: "sqlite-3"
 
-'[Daily] MariaDB 10.6':
+'[Daily] MariaDB 10.11':
   <<: [ *recursive-trigger, *run-daily ]
   needs: [ '[Daily] PHP minimum SQLite 3.45' ]
   variables:
-    _TARGET_DB: "mariadb-10.6"
+    _TARGET_DB: "mariadb-10.11"
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
 
 '[Daily] MySQL 9.3':
   <<: [ *recursive-trigger, *run-daily ]
-  needs: [ '[Daily] MariaDB 10.6' ]
+  needs: [ '[Daily] MariaDB 10.11' ]
   variables:
     _TARGET_DB: "mysql-9"
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
-
-'[Daily] PostgreSQL 18':
-  <<: [ *recursive-trigger, *run-daily ]
-  needs: [ '[Daily] MySQL 9.3' ]
-  variables:
-    _TARGET_DB: "pgsql-18"
 
 ################
 # Lint Jobs

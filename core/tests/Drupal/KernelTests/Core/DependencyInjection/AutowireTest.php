@@ -62,6 +62,12 @@ class AutowireTest extends KernelTestBase {
           $aliases[$id] = substr($service, 1);
         }
         elseif (isset($service['class']) && class_exists($service['class'])) {
+          // Check that the number of arguments matches the constructor.
+          if (isset($service['arguments'])) {
+            $constructor = new \ReflectionMethod($service['class'], '__construct');
+            $this->assertLessThanOrEqual($constructor->getNumberOfParameters(), count($service['arguments']), sprintf('%s (%s): %d arguments defined, but constructor only accepts %d', $id, $service['class'], count($service['arguments']), $constructor->getNumberOfParameters()));
+          }
+
           // Ignore services named by their own class.
           if ($id === $service['class']) {
             continue;
@@ -131,6 +137,45 @@ class AutowireTest extends KernelTestBase {
     $missing = array_diff($expected, $aliases);
     $formatted = Yaml::encode(array_map(fn (int|string $alias): string => sprintf('@%s', $alias), $missing));
     $this->assertSame($expected, array_intersect($expected, $aliases), sprintf('The following core services do not have map the class name to an alias. Add the following to core.services.yml in the appropriate place: %s%s%s', \PHP_EOL, \PHP_EOL, $formatted));
+  }
+
+  /**
+   * Tests that core service aliases match the interfaces they map to.
+   */
+  public function testCoreServiceAliasInterfaces(): void {
+    $services = [];
+    $aliases = [];
+
+    foreach ($this->getCoreServiceFiles() as $filename) {
+      foreach ((Yaml::decode(file_get_contents($filename))['services'] ?? []) as $id => $service) {
+        if (is_string($service)) {
+          $aliases[$id] = substr($service, 1);
+        }
+        else {
+          $services[$id] = $service['class'] ?? $id;
+        }
+      }
+    }
+
+    $mismatched = [];
+    foreach ($aliases as $alias => $service) {
+      $this->assertArrayHasKey($service, $services);
+
+      if (interface_exists($alias)) {
+        // The service class must implement the aliased interface.
+        if (!is_subclass_of($services[$service], $alias)) {
+          $mismatched[] = sprintf('%s aliases to @%s (class %s) which does not implement %s', $alias, $service, $services[$service], $alias);
+        }
+      }
+      else {
+        // The service class must be the aliased class or a subclass of it.
+        if ($services[$service] !== $alias) {
+          $mismatched[] = sprintf('%s aliases to @%s (class %s) which is not an instance of %s', $alias, $service, $services[$service], $alias);
+        }
+      }
+    }
+
+    $this->assertEmpty($mismatched, 'The following core service aliases do not match their interfaces:' . PHP_EOL . implode(PHP_EOL, $mismatched));
   }
 
   /**
@@ -232,8 +277,8 @@ class AutowireTest extends KernelTestBase {
    * @return string[]
    *   An array of filenames.
    */
-  private function getCoreServiceFiles() {
-    $filenames = array_map(fn($module) => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
+  private function getCoreServiceFiles(): array {
+    $filenames = array_map(fn(array $module): string => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
     $filenames[] = 'core/core.services.yml';
     return array_filter($filenames, 'file_exists');
   }

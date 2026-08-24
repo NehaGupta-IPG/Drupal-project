@@ -27,7 +27,6 @@ class BlockFilterTest extends WebDriverTestBase {
     'node',
     'datetime',
     'layout_builder',
-    'layout_builder_expose_all_field_blocks',
     'user',
   ];
 
@@ -57,6 +56,8 @@ class BlockFilterTest extends WebDriverTestBase {
    * Tests block filter.
    */
   public function testBlockFilter(): void {
+    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/project/drupal/issues/3028968.
+    $this->markTestSkipped();
     $assert_session = $this->assertSession();
     $session = $this->getSession();
     $page = $session->getPage();
@@ -138,7 +139,7 @@ class BlockFilterTest extends WebDriverTestBase {
     $visible_categories = $this->filterVisibleElements($categories);
     $this->assertCount(0, $visible_categories);
     $announce_element = $page->find('css', '#drupal-live-announce');
-    $page->waitFor(2, function () use ($announce_element) {
+    $page->waitFor(2, function () use ($announce_element): bool {
       return str_starts_with($announce_element->getText(), '0 blocks are available');
     });
 

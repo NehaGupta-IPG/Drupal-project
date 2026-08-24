@@ -9,6 +9,7 @@ use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -20,9 +21,9 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class ReverseProxyMiddlewareTest extends UnitTestCase {
 
   /**
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The HTTP kernel.
    */
-  protected $mockHttpKernel;
+  protected HttpKernelInterface&Stub $mockHttpKernel;
 
   /**
    * {@inheritdoc}
@@ -30,10 +31,9 @@ class ReverseProxyMiddlewareTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $responseMock = $this->createMock(Response::class);
-    $this->mockHttpKernel = $this->createMock(HttpKernelInterface::class);
+    $this->mockHttpKernel = $this->createStub(HttpKernelInterface::class);
     $this->mockHttpKernel->method('handle')
-      ->willReturn($responseMock);
+      ->willReturn($this->createStub(Response::class));
   }
 
   /**

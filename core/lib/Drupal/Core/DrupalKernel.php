@@ -995,11 +995,17 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $all_messages = [];
     $config_is_syncing = FALSE;
     $source_storage = NULL;
+    $stream_wrappers_registered = FALSE;
     if (isset($this->container)) {
       // Save the id of the currently logged in user.
       if ($this->container->initialized('current_user')) {
         $current_user_id = $this->container->get('current_user')->id();
       }
+
+      if ($this->container->initialized('stream_wrapper_manager') && !empty($this->container->get('stream_wrapper_manager')->getWrappers())) {
+        $stream_wrappers_registered = TRUE;
+      }
+
       // After rebuilding the container some objects will have stale services.
       // Record a map of objects to service IDs prior to rebuilding the
       // container in order to ensure
@@ -1060,6 +1066,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->container = $container;
     if ($session_started) {
       $this->container->get('session')->start();
+    }
+
+    if ($stream_wrappers_registered) {
+      // Re-register the stream wrappers with the manager service.
+      $this->container->get('stream_wrapper_manager')->register();
     }
 
     // The request stack is preserved across container rebuilds. Re-inject the
@@ -1299,6 +1310,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $session_started = FALSE;
     $subrequest = FALSE;
     $reload_module_handler = FALSE;
+    $stream_wrappers_registered = FALSE;
 
     // Save the id of the currently logged in user.
     if ($this->container->initialized('current_user')) {
@@ -1307,6 +1319,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     if ($this->container->initialized('module_handler') && $this->container->get('module_handler')->isLoaded()) {
       $reload_module_handler = TRUE;
+    }
+
+    if ($this->container->initialized('stream_wrapper_manager') && !empty($this->container->get('stream_wrapper_manager')->getWrappers())) {
+      $stream_wrappers_registered = TRUE;
     }
 
     // After rebuilding the container some objects will have stale services.
@@ -1328,14 +1344,30 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $all_messages = $this->container->get('messenger')->all();
 
+    // Track the config installer syncing flag for when multiple modules are
+    // installed and container is reset.
+    $config_is_syncing = $this->container->get('config.installer')->isSyncing();
+    $source_storage = $this->container->get('config.installer')->getSourceStorage();
     $persist = $this->getServicesToPersist($this->container);
     $this->container->reset();
     $this->persistServices($this->container, $persist);
+    // Restore syncing flag to new container.
+    if ($config_is_syncing) {
+      $this->container->get('config.installer')->setSyncing(TRUE);
+      if ($source_storage) {
+        $this->container->get('config.installer')->setSourceStorage($source_storage);
+      }
+    }
 
     $this->container->set('kernel', $this);
 
     // Set the class loader which was registered as a synthetic service.
     $this->container->set('class_loader', $this->classLoader);
+
+    if ($stream_wrappers_registered) {
+      // Re-register the stream wrappers with the manager service.
+      $this->container->get('stream_wrapper_manager')->register();
+    }
 
     if ($reload_module_handler) {
       $this->container->get('module_handler')->reload();

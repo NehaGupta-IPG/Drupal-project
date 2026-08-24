@@ -1232,6 +1232,16 @@ class SystemRequirementsHooks {
           'description' => $this->t('The rebuild_access setting is enabled in settings.php. It is recommended to have this setting disabled unless you are performing a rebuild.'),
         ];
       }
+
+      // Warn about HTML5 validation setting removal in Drupal 13.
+      if (Settings::get('enable_html5_validation') === TRUE) {
+        $requirements['enable_html5_validation'] = [
+          'title' => $this->t('HTML5 validation'),
+          'value' => $this->t('Enabled'),
+          'severity' => RequirementSeverity::Warning,
+          'description' => $this->t('The enable_html5_validation setting will be removed in Drupal 13, and HTML5 validation will be disabled on all forms.  Make sure your forms will still work the way you expect before upgrading by setting the value to FALSE in a test environment. See <a href=":url">the change record</a> for more information.', [':url' => 'https://www.drupal.org/node/3537128']),
+        ];
+      }
     }
 
     // Check if the SameSite cookie attribute is set to a valid value. Since
@@ -1362,6 +1372,10 @@ class SystemRequirementsHooks {
           'severity' => RequirementSeverity::Warning,
         ];
       }
+    }
+
+    if ($phase === 'runtime') {
+      $requirements['password_hashing'] = $this->checkPasswordHashing();
     }
 
     // Ensure that no module has a current schema version that is lower than the
@@ -1520,6 +1534,54 @@ class SystemRequirementsHooks {
     }
 
     return $requirements;
+  }
+
+  /**
+   * Builds password hashing requirements check result.
+   *
+   * @return array
+   *   Hashing requirements result.
+   */
+  protected function checkPasswordHashing(): array {
+    $availableAlgorithms = password_algos();
+    $hashingAlgorithm = \Drupal::getContainer()->getParameter('password.algorithm') ?? PASSWORD_DEFAULT;
+
+    if (!in_array($hashingAlgorithm, $availableAlgorithms, TRUE)) {
+      return [
+        'title' => $this->t('Password hashing'),
+        'value' => $this->t('The configured password hashing algorithm %algorithm is not available in your PHP installation. Ensure that the <a href=":url">necessary PHP extensions</a> are installed and that the Drupal password hashing configuration is correct.', [
+          '%algorithm' => $hashingAlgorithm,
+          ':url' => 'https://www.php.net/manual/password.requirements.php',
+        ]),
+        'severity' => RequirementSeverity::Error,
+      ];
+    }
+    if ($hashingAlgorithm !== PASSWORD_BCRYPT) {
+      return [
+        'title' => $this->t('Password hashing'),
+        'value' => $this->t('Passwords are hashed with the %algorithm algorithm.', [
+          '%algorithm' => $hashingAlgorithm,
+        ]),
+        'severity' => RequirementSeverity::Info,
+      ];
+    }
+
+    if (count(array_intersect(['argon2id', 'argon2i'], $availableAlgorithms)) > 0) {
+      return [
+        'title' => $this->t('Password hashing'),
+        'value' => $this->t('Passwords are hashed with the bcrypt algorithm. It is recommended to <a href=":url">switch</a> to argon2id.', [
+          ':url' => 'https://www.drupal.org/node/3530196',
+        ]),
+        'severity' => RequirementSeverity::Warning,
+      ];
+    }
+    return [
+      'title' => $this->t('Password hashing'),
+      'value' => $this->t('Passwords are hashed with the bcrypt algorithm. It is recommended to enable <a href=":url">argon2 password hashing</a> in your PHP installation and to switch to argon2id.', [
+        ':url' => 'https://www.php.net/manual/password.requirements.php',
+      ]),
+      'severity' => RequirementSeverity::Warning,
+    ];
   }
 
 }

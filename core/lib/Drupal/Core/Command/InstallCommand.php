@@ -168,7 +168,7 @@ class InstallCommand extends Command {
    * @return int
    *   The command exit status.
    */
-  protected function install($class_loader, SymfonyStyle $io, $profile, $langcode, $site_path, $site_name, string $recipe, ?string $password = NULL) {
+  protected function install($class_loader, SymfonyStyle $io, $profile, $langcode, $site_path, $site_name, string $recipe, #[\SensitiveParameter] ?string $password = NULL) {
     $sqliteDriverNamespace = 'Drupal\\sqlite\\Driver\\Database\\sqlite';
     $password ??= Crypt::randomBytesBase64(12);
     $parameters = [
@@ -187,10 +187,10 @@ class InstallCommand extends Command {
         ],
         'install_configure_form' => [
           'site_name' => $site_name,
-          'site_mail' => 'drupal@localhost',
+          'site_mail' => 'drupal@example.com',
           'account' => [
             'name' => 'admin',
-            'mail' => 'admin@localhost',
+            'mail' => 'admin@example.com',
             'pass' => [
               'pass1' => $password,
               'pass2' => $password,

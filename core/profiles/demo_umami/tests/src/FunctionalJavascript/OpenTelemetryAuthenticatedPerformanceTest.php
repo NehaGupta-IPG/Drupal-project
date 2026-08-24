@@ -61,12 +61,12 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 3,
-      'CacheGetCount' => 33,
+      'CacheGetCount' => 34,
       'CacheGetCountByBin' => [
         'config' => 12,
         'bootstrap' => 7,
         'discovery' => 5,
-        'data' => 5,
+        'data' => 6,
         'dynamic_page_cache' => 2,
         'render' => 2,
       ],
@@ -126,26 +126,26 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 284,
-      'CacheGetCount' => 269,
+      'QueryCount' => 259,
+      'CacheGetCount' => 250,
       'CacheGetCountByBin' => [
-        'config' => 64,
-        'bootstrap' => 16,
-        'discovery' => 82,
-        'data' => 18,
+        'config' => 60,
+        'bootstrap' => 15,
+        'discovery' => 75,
+        'data' => 20,
         'entity' => 24,
         'dynamic_page_cache' => 1,
         'default' => 20,
-        'render' => 22,
+        'render' => 13,
         'menu' => 22,
       ],
-      'CacheSetCount' => 266,
+      'CacheSetCount' => 254,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 29,
+      'CacheTagLookupQueryCount' => 28,
       'ScriptCount' => 4,
       'ScriptBytes' => 200400,
-      'StylesheetCount' => 6,
+      'StylesheetCount' => 7,
       'StylesheetBytes' => 79412,
     ];
     $this->assertMetrics($expected, $performance_data);

@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Mail;
 
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Mail\MailManager;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -24,17 +29,13 @@ class MailManagerTest extends UnitTestCase {
 
   /**
    * The cache backend to use.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $cache;
+  protected CacheBackendInterface&Stub $cache;
 
   /**
    * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * The configuration factory.
@@ -45,17 +46,13 @@ class MailManagerTest extends UnitTestCase {
 
   /**
    * The plugin discovery.
-   *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $discovery;
+  protected DiscoveryInterface&Stub $discovery;
 
   /**
    * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $renderer;
+  protected RendererInterface&MockObject $renderer;
 
   /**
    * The mail manager under test.
@@ -100,13 +97,13 @@ class MailManagerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     // Prepare the default constructor arguments required by MailManager.
-    $this->cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
+    $this->cache = $this->createStub(CacheBackendInterface::class);
 
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
 
     // Mock a Discovery object to replace AnnotationClassDiscovery.
-    $this->discovery = $this->createMock('Drupal\Component\Plugin\Discovery\DiscoveryInterface');
-    $this->discovery->expects($this->any())
+    $this->discovery = $this->createStub(DiscoveryInterface::class);
+    $this->discovery
       ->method('getDefinitions')
       ->willReturn($this->definitions);
   }
@@ -132,7 +129,7 @@ class MailManagerTest extends UnitTestCase {
         'mail' => 'test@example.com',
       ],
     ]);
-    $logger_factory = $this->createMock('\Drupal\Core\Logger\LoggerChannelFactoryInterface');
+    $logger_factory = $this->createStub(LoggerChannelFactoryInterface::class);
     $string_translation = $this->getStringTranslationStub();
     $this->renderer = $this->createMock(RendererInterface::class);
     // Construct the manager object and override its discovery.
@@ -161,6 +158,9 @@ class MailManagerTest extends UnitTestCase {
       'example_test_key' => 'test_mail_collector',
     ];
     $this->setUpMailManager($interface);
+
+    $this->renderer->expects($this->never())
+      ->method('executeInRenderContext');
 
     // Test that an unmatched message_id returns the default plugin instance.
     $options = ['module' => 'foo', 'key' => 'bar'];
