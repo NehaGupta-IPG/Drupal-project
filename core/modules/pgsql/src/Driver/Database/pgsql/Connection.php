@@ -206,13 +206,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   public function query($query, array $args = [], $options = []) {
     $options += $this->defaultOptions();
 
-    // Boolean arguments used to be cast to integers here, to work around the
-    // PDO PostgreSQL driver not type casting them correctly when parameters are
-    // bound using associative arrays. Connection::query() now does this for all
-    // drivers.
-    // @see \Drupal\Core\Database\Connection::query()
-    // @see http://bugs.php.net/bug.php?id=48383
-
     // We need to wrap queries with a savepoint if:
     // - Currently in a transaction.
     // - A 'mimic_implicit_commit' does not exist already.

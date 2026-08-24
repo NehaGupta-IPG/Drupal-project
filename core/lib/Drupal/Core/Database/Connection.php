@@ -1017,7 +1017,7 @@ abstract class Connection {
   public function jsonExpression(string $field, string $path): JsonExpression {
     $class = $this->getDriverClass('JsonExpression');
     if ($class === 'JsonExpression') {
-      @trigger_error('Not implementing JsonExpression in database drivers is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Implement JsonExpression to provide JSON support. See https://www.drupal.org/node/3389682', E_USER_DEPRECATED);
+      @trigger_error('Not implementing JsonExpression in database drivers is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Implement JsonExpression to provide JSON support. See https://www.drupal.org/node/3389682', E_USER_DEPRECATED);
       throw new \LogicException('Driver does not provide JSON support.');
     }
     return new $class($this, $field, $path);

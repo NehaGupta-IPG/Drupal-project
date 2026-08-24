@@ -15,7 +15,7 @@ use Drupal\Core\Database\InvalidQueryException;
  * Select::addJsonExpression(). To add a JSON extraction to a SELECT field list,
  * use the query builder instead of this class:
  * @code
- * $alias = $query->addJsonExpression('field_data', '$.status', TRUE);
+ * $alias = $query->addJsonExpression('field_data', '$.status', 'status');
  * // With a type cast:
  * $alias = $query->addJsonExpression('field_data', '$.score', 'score', JsonCastType::Int);
  * @endcode

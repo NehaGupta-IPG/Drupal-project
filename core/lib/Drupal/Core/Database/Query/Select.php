@@ -4,8 +4,6 @@ namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
 
-// cspell:ignore uncast
-
 /**
  * Query builder for SELECT statements.
  *

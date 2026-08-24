@@ -137,9 +137,6 @@ class JsonCondition extends Condition {
       ));
     }
 
-    // All operators are handled generically via the driver-specific
-    // JsonExpression methods: toSql(), toCastSql(), toHasKeySql(),
-    // toContainsSql(), and toComparisonSql().
     switch ($this->operator) {
       case 'IS NULL':
       case 'IS NOT NULL':
