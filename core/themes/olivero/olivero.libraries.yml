@@ -13,12 +13,12 @@ global-styling:
       preload: true
   css:
     base:
-      css/base/fonts.css: {}
-      css/base/variables.css: {}
-      css/base/base.css: {}
+      css/base/fonts.css: { attributes: { critical: true }, preprocess: false }
+      css/base/variables.css: { attributes: { critical: true }, preprocess: false }
+      css/base/base.css: { attributes: { critical: true }, preprocess: false }
     layout:
-      css/layout/layout.css: {}
-      css/layout/grid.css: {}
+      css/layout/layout.css: { attributes: { critical: true }, preprocess: false }
+      css/layout/grid.css: { attributes: { critical: true }, preprocess: false }
       css/layout/layout-content-narrow.css: {}
       css/layout/layout-content-medium.css: {}
       css/layout/layout-footer.css: {}

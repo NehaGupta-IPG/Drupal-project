@@ -1765,7 +1765,7 @@ services:
   Drupal\Core\Session\MetadataBag: '@session_manager.metadata_bag'
   asset.css.collection_renderer:
     class: Drupal\Core\Asset\CssCollectionRenderer
-    arguments: [ '@asset.query_string', '@file_url_generator' ]
+    arguments: [ '@asset.query_string', '@file_url_generator' , '@current_route_match', '@request_stack']
   asset.css.collection_optimizer:
     class: Drupal\Core\Asset\CssCollectionOptimizerLazy
     arguments: [ '@asset.css.collection_grouper', '@asset.css.optimizer', '@theme.manager', '@library.dependency_resolver', '@request_stack', '@file_system', '@config.factory', '@file_url_generator', '@datetime.time', '@language_manager']
