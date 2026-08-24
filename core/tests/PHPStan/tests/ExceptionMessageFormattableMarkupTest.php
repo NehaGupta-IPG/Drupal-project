@@ -31,6 +31,7 @@ class ExceptionMessageFormattableMarkupTest extends RuleTestCase {
    * {@inheritdoc}
    */
   public function testRule(): void {
+    // cspell:ignore analyse
     $this->analyse(
       [__DIR__ . '/../fixtures/exception-message-formattable-markup.php'],
       [

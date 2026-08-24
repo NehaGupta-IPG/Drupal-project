@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\Plugin\DataType\EntityReference;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Language\Language;
@@ -852,7 +851,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
           // Update the default internal language cache.
           $this->setDefaultLangcode();
           if (isset($this->translations[$this->defaultLangcode])) {
-            $message = new FormattableMarkup('A translation already exists for the specified language (@langcode).', ['@langcode' => $this->defaultLangcode]);
+            $message = sprintf('A translation already exists for the specified language (%s).', $this->defaultLangcode);
             throw new \InvalidArgumentException($message);
           }
           $this->updateFieldLangcodes($this->defaultLangcode);
@@ -863,7 +862,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
           $items = $this->get($this->langcodeKey);
           if ($items->value != $this->activeLangcode) {
             $items->setValue($this->activeLangcode, FALSE);
-            $message = new FormattableMarkup('The translation language cannot be changed (@langcode).', ['@langcode' => $this->activeLangcode]);
+            $message = sprintf('The translation language cannot be changed (%s).', $this->activeLangcode);
             throw new \LogicException($message);
           }
         }
@@ -874,7 +873,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         //   read-only. See https://www.drupal.org/node/2443991.
         if (isset($this->values[$this->defaultLangcodeKey]) && $this->get($this->defaultLangcodeKey)->value != $this->isDefaultTranslation()) {
           $this->get($this->defaultLangcodeKey)->setValue($this->isDefaultTranslation(), FALSE);
-          $message = new FormattableMarkup('The default translation flag cannot be changed (@langcode).', ['@langcode' => $this->activeLangcode]);
+          $message = sprintf('The default translation flag cannot be changed (%s).', $this->activeLangcode);
           throw new \LogicException($message);
         }
         break;
