@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests visibility of managed files.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileManagedStateTest extends WebDriverTestBase {
 
   /**
