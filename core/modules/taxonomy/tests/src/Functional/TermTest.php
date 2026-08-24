@@ -7,6 +7,7 @@ namespace Drupal\Tests\taxonomy\Functional;
 use Behat\Mink\Element\NodeElement;
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\taxonomy\Entity\Term;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class TermTest extends TaxonomyTestBase {
 
   use AssertBreadcrumbTrait;
+  use StringTranslationTrait;
 
   /**
    * Vocabulary for testing.
@@ -714,7 +716,7 @@ class TermTest extends TaxonomyTestBase {
       'description[0][value]' => $this->randomMachineName(100),
       'parent[]' => [0],
     ];
-    $this->submitForm($edit, t('Save'));
+    $this->submitForm($edit, 'Save');
     $trail = [
       '' => 'Home',
       'taxonomy/term/' . $term->id() => $edit['name[0][value]'],

@@ -11,7 +11,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Controller\CacheableTitle;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
-use Drupal\Core\Controller\TitleResolverInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Path\PathMatcherInterface;
@@ -88,6 +87,20 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
    * @var \Drupal\Core\Path\PathMatcherInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $pathMatcher;
+
+  /**
+   * The mocked current path service.
+   *
+   * @var \Drupal\Core\Path\CurrentPathStack|\PHPUnit\Framework\MockObject\Stub
+   */
+  protected $currentPath;
+
+  /**
+   * The mocked current user service.
+   *
+   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\Stub
+   */
+  protected $currentUser;
 
   /**
    * {@inheritdoc}

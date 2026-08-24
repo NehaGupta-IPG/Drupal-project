@@ -7,13 +7,15 @@ namespace Drupal\Tests\system\Functional\Cache;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Breadcrumb Render Cache.
- *
- * @group Cache
- * @group Breadcrumb
  */
+#[Group('Cache')]
+#[Group('Breadcrumb')]
+#[RunTestsInSeparateProcesses]
 class BreadcrumbRenderCacheTest extends BrowserTestBase {
 
   use AssertBreadcrumbTrait;
@@ -47,7 +49,7 @@ class BreadcrumbRenderCacheTest extends BrowserTestBase {
   /**
    * Tests Homepage.
    */
-  public function testHomepage() {
+  public function testHomepage(): void {
     // Test homepage.
     $this->drupalGet('<front>');
     $this->assertSession()->statusCodeEquals(200);
@@ -59,8 +61,7 @@ class BreadcrumbRenderCacheTest extends BrowserTestBase {
   /**
    * Tests BreadCrumb Render Cache.
    */
-  public function testBreadCrumbRenderCache() {
-    $url = Url::fromRoute('breadcrumb_render_cache_test.title_test', [])->toString();
+  public function testBreadCrumbRenderCache(): void {
     $url1 = Url::fromRoute('breadcrumb_render_cache_test.title_test', ['api_id' => '564564564'])->toString();
     $this->drupalGet($url1);
     $this->assertSession()->statusCodeEquals(200);

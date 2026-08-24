@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Menu;
 
 use Drupal\block\Entity\Block;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\NodeType;
@@ -24,6 +25,7 @@ class BreadcrumbTest extends BrowserTestBase {
 
   use AssertBreadcrumbTrait;
   use PromotedContentViewTestTrait;
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -379,7 +381,7 @@ class BreadcrumbTest extends BrowserTestBase {
     $newUsername = $this->randomMachineName();
     $edit = [];
     $edit['name'] = $newUsername;
-    $this->submitForm($edit, t('Save'));
+    $this->submitForm($edit, 'Save');
 
     // Verify correct breadcrumb and page title when viewing own user account.
     $trail = $home;
@@ -480,7 +482,7 @@ class BreadcrumbTest extends BrowserTestBase {
   /**
    * Tests breadcrumb cacheability.
    */
-  public function testBreadcrumbCacheability() {
+  public function testBreadcrumbCacheability(): void {
     // Create an article.
     $node = $this->drupalCreateNode([
       'type' => 'article',
