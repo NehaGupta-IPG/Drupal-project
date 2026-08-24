@@ -288,7 +288,7 @@ class ExtensionDiscovery {
    * @param bool $include_tests
    *   Whether to include extensions below test directories.
    *
-   * @return \RecursiveIteratorIterator|null
+   * @return \RecursiveIteratorIterator<\RecursiveDirectoryIterator>|null
    *   The iterator, or NULL if the directory does not exist.
    */
   public static function getExtensionDirectoryIterator(string $scan_directory, array $ignore_directories, bool $include_tests): ?\RecursiveIteratorIterator {
