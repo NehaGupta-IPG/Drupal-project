@@ -79,7 +79,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    *
    * @var string
    */
-  protected static $entityTypeId = NULL;
+  protected static $entityTypeId;
 
   /**
    * The fields that are protected against modification during PATCH requests.
@@ -108,7 +108,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    *
    * @see ::getInvalidNormalizedEntityToCreate
    */
-  protected static $labelFieldName = NULL;
+  protected static $labelFieldName;
 
   /**
    * The entity ID for the first created entity in doTestPost().
@@ -764,6 +764,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     $this->resourceConfigStorage->load(static::$resourceConfigId)->delete();
     $this->refreshTestStateAfterRestConfigChange();
+    $this->entityStorage = $this->container->get('entity_type.manager')->getStorage(static::$entityTypeId);
     $this->entity = $this->entityStorage->loadUnchanged($this->entity->id());
     $this->revokeAllPermissions();
   }

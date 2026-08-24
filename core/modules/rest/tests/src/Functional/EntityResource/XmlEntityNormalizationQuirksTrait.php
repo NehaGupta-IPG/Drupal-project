@@ -42,7 +42,7 @@ trait XmlEntityNormalizationQuirksTrait {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedNormalizedEntity() {
+  protected function getExpectedNormalizedEntity(): array {
     $default_normalization = parent::getExpectedNormalizedEntity();
 
     if ($this->entity instanceof FieldableEntityInterface) {
@@ -51,9 +51,8 @@ trait XmlEntityNormalizationQuirksTrait {
     else {
       $normalization = $this->applyXmlConfigEntityDecodingQuirks($default_normalization);
     }
-    $normalization = $this->applyXmlDecodingQuirks($normalization);
 
-    return $normalization;
+    return $this->applyXmlDecodingQuirks($normalization);
   }
 
   /**
@@ -147,7 +146,7 @@ trait XmlEntityNormalizationQuirksTrait {
    *
    * @see \Symfony\Component\Serializer\Encoder\XmlEncoder
    */
-  protected function applyXmlConfigEntityDecodingQuirks(array $normalization) {
+  protected function applyXmlConfigEntityDecodingQuirks(array $normalization): array {
     $normalization = static::castToString($normalization);
 
     // When a single dependency is listed, it's not decoded into an array.
