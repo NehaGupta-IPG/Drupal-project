@@ -65,7 +65,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 195,
-      'CacheGetCount' => 217,
+      'CacheGetCount' => 238,
       'CacheSetCount' => 226,
       'CacheDeleteCount' => 0,
       'CacheTagLookupQueryCount' => 24,
@@ -128,7 +128,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 66,
-      'CacheGetCount' => 168,
+      'CacheGetCount' => 184,
       'CacheSetCount' => 59,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -220,14 +220,14 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 51,
-      'CacheGetCount' => 163,
+      'CacheGetCount' => 177,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 34,
         'bootstrap' => 12,
         'discovery' => 67,
         'data' => 6,
-        'entity' => 21,
+        'entity' => 35,
         'dynamic_page_cache' => 1,
         'routes' => 5,
         'render' => 13,
@@ -347,7 +347,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 178,
-      'CacheGetCount' => 225,
+      'CacheGetCount' => 241,
       'CacheSetCount' => 240,
       'CacheDeleteCount' => 0,
       'CacheTagLookupQueryCount' => 25,
@@ -417,7 +417,7 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 54,
-      'CacheGetCount' => 170,
+      'CacheGetCount' => 183,
       'CacheSetCount' => 75,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -525,13 +525,13 @@ class OpenTelemetryPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 264,
-      'CacheGetCount' => 257,
+      'CacheGetCount' => 278,
       'CacheGetCountByBin' => [
         'config' => 52,
         'bootstrap' => 15,
         'discovery' => 75,
         'data' => 14,
-        'entity' => 24,
+        'entity' => 45,
         'dynamic_page_cache' => 1,
         'default' => 20,
         'routes' => 18,

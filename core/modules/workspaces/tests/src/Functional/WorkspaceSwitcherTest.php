@@ -68,11 +68,15 @@ class WorkspaceSwitcherTest extends BrowserTestBase {
 
     $node_type = $this->drupalCreateContentType();
     $node = $this->drupalCreateNode(['type' => $node_type->id()]);
-    $this->assertFalse($entity_cache->get("values:node:{$node->id()}"));
+    // Saving an entity writes a tombstone item holding FALSE as data, so a
+    // usable cache entry is absent when there is no item or when the item
+    // holds FALSE.
+    // @see \Drupal\Core\Entity\ContentEntityStorageBase::resetCache()
+    $this->assertFalse($entity_cache->get("values:node:{$node->id()}")->data ?? FALSE);
 
     // Access the node page to prime its persistent cache.
     $this->drupalGet($node->toUrl());
-    $this->assertNotFalse($entity_cache->get("values:node:{$node->id()}"));
+    $this->assertNotFalse($entity_cache->get("values:node:{$node->id()}")->data ?? FALSE);
 
     $vultures = Workspace::load('vultures');
     $gravity = Workspace::load('gravity');
@@ -80,7 +84,7 @@ class WorkspaceSwitcherTest extends BrowserTestBase {
 
     // Check that switching into a workspace doesn't invalidate the persistent
     // cache.
-    $this->assertNotFalse($entity_cache->get("values:node:{$node->id()}"));
+    $this->assertNotFalse($entity_cache->get("values:node:{$node->id()}")->data ?? FALSE);
 
     // Confirm the block shows on the front page.
     $this->drupalGet('<front>');

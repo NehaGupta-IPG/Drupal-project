@@ -1374,12 +1374,19 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     // Override the cache backend so we can set expectations.
     $this->cache = $this->createMock(CacheBackendInterface::class);
     // In case of a cache miss, the entity is loaded from the storage and then
-    // set in the cache.
+    // set in the cache. Before the write, the cache is checked a second time,
+    // with invalid items included, for items created since the miss.
+    // @see \Drupal\Core\Entity\ContentEntityStorageBase::setPersistentCache()
     $key = 'values:' . $this->entityTypeId . ':1';
-    $this->cache->expects($this->once())
+    $invocation = 0;
+    $this->cache->expects($this->exactly(2))
       ->method('getMultiple')
-      ->with([$key])
-      ->willReturn([]);
+      ->willReturnCallback(function (array $cids, bool $allow_invalid = FALSE) use ($key, &$invocation): array {
+        $invocation++;
+        $this->assertSame([$key], $cids);
+        $this->assertSame($invocation === 2, $allow_invalid);
+        return [];
+      });
     $this->cache->expects($this->once())
       ->method('setMultiple')
       ->with([
