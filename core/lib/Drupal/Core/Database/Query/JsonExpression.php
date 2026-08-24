@@ -31,8 +31,9 @@ abstract class JsonExpression {
    * The normalized JSONPath expression.
    *
    * All key names are in a format supported by all database drivers:
-   * - Simple alphanumeric keys use dot notation: $.key
-   * - Keys with special characters use double-quoted dot notation: $."key"
+   * - Keys of word characters from dot notation stay unquoted: $.key
+   * - All other keys use double-quoted dot notation, with " and \ escaped:
+   *   $."key-x"
    * - Array indices are unchanged: $[0]
    * - Both wildcard accessors are unchanged: $.* and $[*]
    */
@@ -41,12 +42,22 @@ abstract class JsonExpression {
   /**
    * The parsed path segments (key names and array indices as strings).
    *
-   * A wildcard segment keeps its accessor apart: self::WILDCARD_MEMBER for
-   * $.*, self::WILDCARD_ELEMENT for $[*].
+   * Key names are decoded. A wildcard segment keeps its accessor apart:
+   * self::WILDCARD_MEMBER for $.*, self::WILDCARD_ELEMENT for $[*].
    *
    * @var string[]
    */
   protected readonly array $pathSegments;
+
+  /**
+   * The parsed JSONPath segments.
+   *
+   * Key segments include the decoded key and a quoting flag. Index segments
+   * include the index, while wildcard segments contain only their marker.
+   *
+   * @var list<array{0: string, 1?: string, 2?: bool}>
+   */
+  private readonly array $segments;
 
   /**
    * The path segment of the object member wildcard, written as $.* in a path.
@@ -57,6 +68,26 @@ abstract class JsonExpression {
    * The path segment of the array element wildcard, written as $[*].
    */
   protected const WILDCARD_ELEMENT = '[*]';
+
+  /**
+   * Identifies an object key segment.
+   */
+  private const SEGMENT_KEY = 'key';
+
+  /**
+   * Identifies an array index segment.
+   */
+  private const SEGMENT_INDEX = 'index';
+
+  /**
+   * Identifies an object wildcard segment.
+   */
+  private const SEGMENT_WILDCARD_MEMBER = 'wildcard_member';
+
+  /**
+   * Identifies an array wildcard segment.
+   */
+  private const SEGMENT_WILDCARD_ELEMENT = 'wildcard_element';
 
   /**
    * Constructs a JsonExpression object.
@@ -80,9 +111,16 @@ abstract class JsonExpression {
   ) {
     $this->field = $connection->escapeField($field);
 
-    $this->validatePath($path);
-    $this->pathSegments = $this->parseSegments($path);
-    $this->path = $this->normalizePath($path);
+    $this->segments = $this->parsePath($path);
+    $this->pathSegments = array_map(
+      fn(array $segment) => match ($segment[0]) {
+        self::SEGMENT_KEY, self::SEGMENT_INDEX => $segment[1],
+        self::SEGMENT_WILDCARD_MEMBER => self::WILDCARD_MEMBER,
+        self::SEGMENT_WILDCARD_ELEMENT => self::WILDCARD_ELEMENT,
+      },
+      $this->segments,
+    );
+    $this->path = $this->renderSegments($this->segments);
   }
 
   /**
@@ -405,8 +443,7 @@ abstract class JsonExpression {
    *   drivers.
    */
   public function hasWildcard(): bool {
-    return in_array(self::WILDCARD_MEMBER, $this->pathSegments, TRUE)
-      || in_array(self::WILDCARD_ELEMENT, $this->pathSegments, TRUE);
+    return (bool) array_filter($this->segments, $this->isWildcardSegment(...));
   }
 
   /**
@@ -422,9 +459,12 @@ abstract class JsonExpression {
    *   The return value is meaningless when hasWildcard() returns FALSE.
    */
   protected function wildcardAccessor(): string {
-    return in_array(self::WILDCARD_ELEMENT, $this->pathSegments, TRUE)
-      ? self::WILDCARD_ELEMENT
-      : '.' . self::WILDCARD_MEMBER;
+    foreach ($this->segments as $segment) {
+      if ($segment[0] === self::SEGMENT_WILDCARD_ELEMENT) {
+        return self::WILDCARD_ELEMENT;
+      }
+    }
+    return '.' . self::WILDCARD_MEMBER;
   }
 
   /**
@@ -465,120 +505,142 @@ abstract class JsonExpression {
    * gets it from wildcardAccessor().
    *
    * @return array{string, string}
-   *   A tuple of [prefix, suffix] raw paths.
+   *   A tuple of [prefix, suffix] rendered paths.
    */
   protected function splitAtWildcard(): array {
-    $parts = explode($this->wildcardAccessor(), $this->path, 2);
-    return [$parts[0], '$' . $parts[1]];
+    foreach ($this->segments as $position => $segment) {
+      if ($this->isWildcardSegment($segment)) {
+        return [
+          $this->renderSegments(array_slice($this->segments, 0, $position)),
+          $this->renderSegments(array_slice($this->segments, $position + 1)),
+        ];
+      }
+    }
+    throw new \LogicException('The path holds no wildcard.');
   }
 
   /**
-   * Validates a JSONPath expression.
+   * Parses a JSONPath expression into segments.
    *
    * Accepts:
-   * - Dot notation with simple keys: $.key, $.key-name, $.key_name
+   * - Dot notation with keys of word characters and dashes: $.key, $.key-name
    * - Bracket notation with integer indices: $[0], $[42]
-   * - Bracket notation with quoted strings: $["any key"], $["esc\"aped"]
-   * - Wildcard: $.*, $[*], $.level1.*.level2
+   * - Bracket notation with quoted keys, the empty key included: $["any key"],
+   *   $["esc\"aped"], $[""]. The only escape sequences are \" and \\. Other
+   *   escapes like \n are not decoded, so they are rejected instead of
+   *   reading a different key on each backend.
+   * - One wildcard: $.*, $[*], $.level1.*.level2
    *
    * @param string $path
-   *   The JSONPath expression to validate.
+   *   The JSONPath expression.
+   *
+   * @return array[]
+   *   The parsed segments, in path order.
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
-   *   If the path does not match the allowed pattern.
+   *   If the path cannot be parsed, or holds more than one wildcard.
    */
-  protected function validatePath(string $path): void {
-    if (!preg_match('/^\$(\.[\w-]+|\.\*|\[\*]|\[\d+]|\["([^"\\\\]|\\\\.)*"])*$/', $path)) {
-      throw new InvalidQueryException(sprintf(
-        'The provided jsonpath "%s" is invalid. Use dot notation ($.key), bracket notation ($["key"]), or array indices ($[0]).',
-        $path,
-      ));
+  protected function parsePath(string $path): array {
+    if (!str_starts_with($path, '$')) {
+      throw $this->invalidPathException($path);
+    }
+    $segments = [];
+    $wildcards = 0;
+    $length = strlen($path);
+    $offset = 1;
+    // Every token is matched at $offset with the anchored flag, so the whole
+    // path has to tokenize. Trailing characters such as a newline fail here.
+    $token = '/\.(?<key>[\w-]+)|\["(?<quoted>(?:[^"\\\\]|\\\\["\\\\])*)"]|\[(?<index>\d+)]|\.\*|\[\*]/A';
+    while ($offset < $length) {
+      if (!preg_match($token, $path, $match, PREG_UNMATCHED_AS_NULL, $offset)) {
+        throw $this->invalidPathException($path);
+      }
+      if (isset($match['key'])) {
+        // A key of word characters only is safe to render unquoted. Every
+        // other key, such as one with a dash, is double-quoted.
+        $segments[] = [self::SEGMENT_KEY, $match['key'], !preg_match('/^\w+$/', $match['key'])];
+      }
+      elseif (isset($match['quoted'])) {
+        // Decode \" and \\. Rendering escapes them again.
+        $segments[] = [self::SEGMENT_KEY, preg_replace('/\\\\(["\\\\])/', '$1', $match['quoted']), TRUE];
+      }
+      elseif (isset($match['index'])) {
+        $segments[] = [self::SEGMENT_INDEX, $match['index']];
+      }
+      else {
+        $segments[] = [$match[0] === '[*]' ? self::SEGMENT_WILDCARD_ELEMENT : self::SEGMENT_WILDCARD_MEMBER];
+        $wildcards++;
+      }
+      $offset += strlen($match[0]);
     }
     // Only one wildcard segment is supported. Multiple wildcards would require
     // nested subqueries on SQLite and nested array handling on MySQL.
-    if (preg_match_all('/\.\*|\[\*]/', $path) > 1) {
+    if ($wildcards > 1) {
       throw new InvalidQueryException(sprintf(
         'The provided jsonpath "%s" contains multiple wildcards. Only one wildcard segment is supported.',
         $path,
       ));
     }
+    return $segments;
   }
 
   /**
-   * Normalizes a JSONPath for use in SQL across all database drivers.
+   * Builds the exception for a path the parser rejects.
    *
-   * Converts bracket-quoted strings and dot-notation segments with special
-   * characters to double-quoted dot notation. Simple alphanumeric keys, array
-   * indices and both wildcard accessors are left unchanged.
+   * @param string $path
+   *   The rejected JSONPath expression.
    *
-   * Example: $.foo.bar-baz[0]["already quoted"] becomes
-   *          $.foo."bar-baz"[0]."already quoted"
+   * @return \Drupal\Core\Database\InvalidQueryException
+   *   The exception to throw.
+   */
+  protected function invalidPathException(string $path): InvalidQueryException {
+    return new InvalidQueryException(sprintf(
+      'The provided jsonpath "%s" is invalid. Use dot notation ($.key), bracket notation ($["key"]), or array indices ($[0]).',
+      $path,
+    ));
+  }
+
+  /**
+   * Renders parsed segments as a portable JSONPath.
+   *
+   * Keys of word characters from dot notation stay unquoted ($.key), all
+   * other keys use double-quoted dot notation with " and \ escaped
+   * ($."key-x"). Array indices keep their bracket form ($[0]).
    *
    * The two wildcard accessors are kept apart. Every backend reads $.* as the
    * object member wildcard and $[*] as the array element wildcard, so folding
    * one into the other selects different values.
    *
-   * @param string $path
-   *   The validated JSONPath expression.
+   * @param array[] $segments
+   *   The parsed segments to render.
    *
    * @return string
-   *   The normalized JSONPath.
+   *   The rendered JSONPath.
    */
-  protected function normalizePath(string $path): string {
-    // Convert bracket-quoted strings to double-quoted dot notation.
-    // Only unescape \" → " and \\ → \. Other escape sequences like \0, \n,
-    // \xNN must not be decoded as they can produce unsafe characters in SQL.
-    $path = preg_replace_callback(
-      '/\["((?:[^"\\\\]|\\\\.)*)"]/',
-      fn($m) => '."' . preg_replace('/\\\\(["\\\\])/', '$1', $m[1]) . '"',
-      $path,
-    );
-    // Quote dot-notation segments that contain non-word characters.
-    $path = preg_replace_callback(
-      '/\.(\w[\w-]*)/',
-      fn($m) => preg_match('/^\w+$/', $m[1]) ? '.' . $m[1] : '."' . $m[1] . '"',
-      $path,
-    );
+  protected function renderSegments(array $segments): string {
+    $path = '$';
+    foreach ($segments as $segment) {
+      $path .= match ($segment[0]) {
+        self::SEGMENT_KEY => $segment[2] ? '."' . addcslashes($segment[1], '"\\') . '"' : '.' . $segment[1],
+        self::SEGMENT_INDEX => "[{$segment[1]}]",
+        self::SEGMENT_WILDCARD_MEMBER => '.' . self::WILDCARD_MEMBER,
+        self::SEGMENT_WILDCARD_ELEMENT => self::WILDCARD_ELEMENT,
+      };
+    }
     return $path;
   }
 
   /**
-   * Parses a JSONPath into individual path segments.
+   * Whether a parsed segment is a wildcard.
    *
-   * @param string $path
-   *   The validated JSONPath expression.
+   * @param array $segment
+   *   A parsed segment.
    *
-   * @return string[]
-   *   The path segments (key names and array indices as strings).
+   * @return bool
+   *   TRUE for a wildcard segment.
    */
-  protected function parseSegments(string $path): array {
-    // Strip leading "$" or "$.".
-    $path = preg_replace('/^\$\.?/', '', $path);
-    $segments = [];
-    // Match dot-notation keys, wildcards, bracket-quoted strings, or numeric
-    // indices.
-    preg_match_all('/\.?([\w-]+)|\.?\*|\[\*]|\["((?:[^"\\\\]|\\\\.)*)"]|\[(\d+)]/', $path, $matches, PREG_SET_ORDER);
-    foreach ($matches as $match) {
-      if ($match[0] === '[*]') {
-        $segments[] = self::WILDCARD_ELEMENT;
-      }
-      elseif ($match[0] === '.*' || $match[0] === '*') {
-        $segments[] = self::WILDCARD_MEMBER;
-      }
-      elseif ($match[1] !== '') {
-        // Dot notation key.
-        $segments[] = $match[1];
-      }
-      elseif (isset($match[2]) && $match[2] !== '') {
-        // Bracket-quoted string — unescape only \" and \\.
-        $segments[] = preg_replace('/\\\\(["\\\\])/', '$1', $match[2]);
-      }
-      else {
-        // Numeric index.
-        $segments[] = $match[3];
-      }
-    }
-    return $segments;
+  private function isWildcardSegment(array $segment): bool {
+    return $segment[0] === self::SEGMENT_WILDCARD_MEMBER || $segment[0] === self::SEGMENT_WILDCARD_ELEMENT;
   }
 
 }

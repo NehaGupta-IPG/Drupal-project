@@ -9,6 +9,7 @@ use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Query\JsonCondition;
+use Drupal\Core\Database\Query\JsonExpression;
 use Drupal\Core\Database\Query\SelectExtender;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -717,6 +718,8 @@ class SelectTest extends DatabaseTestBase {
       'semicolon in path' => ['$.key; DROP TABLE'],
       'space in path' => ['$.key OR true'],
       'parenthesis in path' => ['$.key)'],
+      'trailing newline' => ["$.key\n"],
+      'unsupported escape in quoted key' => ['$["a\nb"]'],
       'multiple wildcards' => ['$.level1.*.level2.*.level3'],
       'multiple element wildcards' => ['$.level1[*].level2[*].level3'],
       'mixed wildcards' => ['$.level1[*].level2.*.level3'],
@@ -733,6 +736,17 @@ class SelectTest extends DatabaseTestBase {
   public function testJsonExpressionPathValidation(string $path): void {
     $this->expectException(InvalidQueryException::class);
     $this->connection->jsonExpression('test_field', $path);
+  }
+
+  /**
+   * Tests that a quoted key holding an escaped quote or backslash is accepted.
+   *
+   * The sample rows hold no keys with quotes or backslashes, so these paths
+   * are checked at construction only.
+   */
+  public function testJsonExpressionQuotedKeyEscapes(): void {
+    $this->assertInstanceOf(JsonExpression::class, $this->connection->jsonExpression('test_field', '$["a\"b"]'));
+    $this->assertInstanceOf(JsonExpression::class, $this->connection->jsonExpression('test_field', '$["a\\\\b"]'));
   }
 
   /**
