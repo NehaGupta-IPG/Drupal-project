@@ -18,6 +18,8 @@ use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
+use Drupal\Core\Database\SchemaDefinition\View;
+use Drupal\Core\Database\SchemaDefinition\ViewQuery;
 use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -30,6 +32,8 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(Schema::class)]
 #[CoversClass(Table::class)]
 #[CoversClass(Column::class)]
+#[CoversClass(View::class)]
+#[CoversClass(ViewQuery::class)]
 class SchemaDefinitionTest extends UnitTestCase {
 
   /**
@@ -61,6 +65,13 @@ class SchemaDefinitionTest extends UnitTestCase {
           primaryKey: new PrimaryKey(['id']),
         ),
       ],
+      views: [
+        new View(
+          name: 'foo_view',
+          query: new ViewQuery('SELECT [id] FROM {foo}'),
+          description: 'Foo view for the database unit tests.',
+        ),
+      ],
     );
 
     // Check ::tableNames().
@@ -71,6 +82,59 @@ class SchemaDefinitionTest extends UnitTestCase {
     $this->assertInstanceOf(Table::class, $tableDefinition);
     $this->assertSame('foo', $tableDefinition->name);
     $this->assertSame('Foo table for the database unit tests.', $tableDefinition->description);
+
+    // Check ::viewNames().
+    $this->assertSame(['foo_view'], $schemaDefinition->viewNames());
+
+    // Check ::getViewDefinition().
+    $viewDefinition = $schemaDefinition->getViewDefinition('foo_view');
+    $this->assertInstanceOf(View::class, $viewDefinition);
+    $this->assertSame('foo_view', $viewDefinition->name);
+    $this->assertSame('SELECT [id] FROM {foo}', $viewDefinition->query->expression);
+    $this->assertSame([], $viewDefinition->query->arguments);
+    $this->assertSame('Foo view for the database unit tests.', $viewDefinition->description);
+
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Schema test_foo_bar does not define a view named baz_view');
+    $schemaDefinition->getViewDefinition('baz_view');
+  }
+
+  /**
+   * Tests rejecting a non-View member of Schema::$views.
+   */
+  public function testInvalidViewInSchema(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('All members of the \'views\' argument of a Schema must be View objects');
+    new Schema(
+      type: SchemaDefinitionType::Test,
+      name: 'test',
+      tables: [],
+      // @phpstan-ignore argument.type
+      views: [
+        'foo_view' => 'SELECT [id] FROM {foo}',
+      ],
+    );
+  }
+
+  /**
+   * Tests rejecting an empty View::$name.
+   */
+  public function testEmptyViewName(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('The \'name\' argument of a View cannot be empty');
+    new View(
+      name: '',
+      query: new ViewQuery('SELECT [id] FROM {foo}'),
+    );
+  }
+
+  /**
+   * Tests rejecting an empty ViewQuery expression.
+   */
+  public function testEmptyViewQuery(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('The \'expression\' argument of a ViewQuery cannot be empty');
+    new ViewQuery('');
   }
 
   /**

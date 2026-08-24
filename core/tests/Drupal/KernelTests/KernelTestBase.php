@@ -641,15 +641,18 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
       $this->kernel->shutdown();
     }
 
-    // Remove all prefixed tables.
+    // Remove all prefixed views and tables.
     $original_connection_info = Database::getConnectionInfo('simpletest_original_default');
     $original_prefix = $original_connection_info['default']['prefix'] ?? NULL;
     $test_connection_info = Database::getConnectionInfo('default');
     $test_prefix = $test_connection_info['default']['prefix'] ?? NULL;
     if ($original_prefix != $test_prefix) {
-      $tables = Database::getConnection()->schema()->findTables('%');
+      $schema = Database::getConnection()->schema();
+      // Drop views, including views built on other views, before their tables.
+      $schema->dropViews($schema->findViews('%'));
+      $tables = $schema->findTables('%');
       foreach ($tables as $table) {
-        if (Database::getConnection()->schema()->dropTable($table)) {
+        if ($schema->dropTable($table)) {
           unset($tables[$table]);
         }
       }
@@ -727,7 +730,8 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
    * @param string $module
    *   The name of the module that defines the table's schema.
    * @param string|array $tables
-   *   The name or an array of the names of the tables to install.
+   *   The names of tables to install. Object-based definitions also accept SQL
+   *   view names in any order relative to their tables.
    *
    * @throws \LogicException
    *   If $module is not enabled or the table schema cannot be found.
@@ -748,6 +752,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     /** @var \Drupal\Core\Database\Schema $schema */
     $schema = $this->container->get('database')->schema();
     $tables = (array) $tables;
+    $view_definitions = [];
     foreach ($tables as $table) {
       if ($specification instanceof Schema) {
         try {
@@ -756,13 +761,24 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
           continue;
         }
         catch (SchemaDefinitionException) {
-          throw new \LogicException("$module module does not define a schema for table '$table'.");
+          // The name might be a SQL view instead of a table.
+        }
+        try {
+          $view_definitions[] = $specification->getViewDefinition($table);
+          continue;
+        }
+        catch (SchemaDefinitionException) {
+          throw new \LogicException("$module module does not define a schema for table or view '$table'.");
         }
       }
       if (empty($specification[$table])) {
         throw new \LogicException("$module module does not define a schema for table '$table'.");
       }
       $schema->createTable($table, $specification[$table]);
+    }
+    // Views are created after tables because they select from them.
+    foreach ($view_definitions as $view_definition) {
+      $schema->createViewFromDefinition($view_definition);
     }
   }
 

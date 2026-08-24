@@ -51,6 +51,34 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
   }
 
   /**
+   * Tests that SQL views declared by a module are installed and uninstalled.
+   *
+   * @legacy-covers ::installSchema
+   * @legacy-covers ::uninstallSchema
+   */
+  public function testSchemaWithView(): void {
+    $schema = Database::getConnection()->schema();
+
+    $this->container->get('module_installer')->install(['sql_view_test']);
+    $this->assertTrue($schema->tableExists('sql_view_test'));
+    $this->assertTrue($schema->viewExists('sql_view_test_view'));
+    $this->assertTrue($schema->viewExists('sql_view_test_view2'));
+
+    Database::getConnection()->insert('sql_view_test')
+      ->fields(['name' => 'John'])
+      ->execute();
+    $shout = Database::getConnection()->query('SELECT [shout] FROM {sql_view_test_view}')->fetchField();
+    $this->assertSame('JOHN', $shout);
+    $shout = Database::getConnection()->query('SELECT [shout] FROM {sql_view_test_view2}')->fetchField();
+    $this->assertSame('JOHN', $shout);
+
+    $this->container->get('module_installer')->uninstall(['sql_view_test']);
+    $this->assertFalse($schema->viewExists('sql_view_test_view2'));
+    $this->assertFalse($schema->viewExists('sql_view_test_view'));
+    $this->assertFalse($schema->tableExists('sql_view_test'));
+  }
+
+  /**
    * Tests config changes by hook_install() are saved for dependent modules.
    *
    * @legacy-covers ::install

@@ -43,6 +43,19 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
+  public function viewExists(string $name, bool $add_prefix = TRUE): bool {
+    $info = $this->getPrefixInfo($name, $add_prefix);
+
+    // Don't use {} around sqlite_master table.
+    return (bool) $this->connection->query('SELECT 1 FROM [' . $info['schema'] . '].sqlite_master WHERE type = :type AND name = :name', [
+      ':type' => 'view',
+      ':name' => $info['table'],
+    ])->fetchField();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function fieldExists($table, $column) {
     $schema = $this->introspectSchema($table);
     return !empty($schema['fields'][$column]);
@@ -295,6 +308,9 @@ class Schema extends DatabaseSchema {
     if ($this->tableExists($new_name)) {
       throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': table '$new_name' already exists.");
     }
+    if ($this->viewExists($new_name)) {
+      throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': view '$new_name' already exists.");
+    }
 
     $schema = $this->introspectSchema($table);
 
@@ -335,6 +351,17 @@ class Schema extends DatabaseSchema {
     $this->connection->tableDropped = TRUE;
     $this->executeDdlStatement('DROP TABLE {' . $table . '}');
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function dropView(string $name): bool {
+    $dropped = parent::dropView($name);
+    if ($dropped) {
+      $this->connection->tableDropped = TRUE;
+    }
+    return $dropped;
   }
 
   /**
@@ -452,7 +479,7 @@ class Schema extends DatabaseSchema {
     $i = 0;
     do {
       $new_table = $table . '_' . $i++;
-    } while ($this->tableExists($new_table));
+    } while ($this->tableExists($new_table) || $this->viewExists($new_table));
 
     $this->createTable($new_table, $new_schema);
 
@@ -492,8 +519,39 @@ class Schema extends DatabaseSchema {
     $old_count = $this->connection->query('SELECT COUNT(*) FROM {' . $table . '}')->fetchField();
     $new_count = $this->connection->query('SELECT COUNT(*) FROM {' . $new_table . '}')->fetchField();
     if ($old_count == $new_count) {
+      // SQLite cannot rename the replacement table while a view references
+      // the dropped table. Because SQLite has no dependency catalog, preserve
+      // and recreate every view in the schema.
+      $info = $this->getPrefixInfo($table);
+      // Don't use {} around sqlite_master table.
+      $views = $this->connection->query('SELECT name, sql FROM [' . $info['schema'] . '].sqlite_master WHERE type = :type ORDER BY rowid', [
+        ':type' => 'view',
+      ])->fetchAllKeyed();
+
+      // Prepare every statement before dropping anything. Restore the schema
+      // omitted by sqlite_master while preserving the optional output-column
+      // list. The pattern ignores parentheses inside quoted identifiers.
+      $recreate_statements = [];
+      foreach ($views as $view_name => $view_sql) {
+        $view_sql = preg_replace('/^CREATE\s+VIEW\s+(?:"[^"]+"|\[[^\]]+\]|`[^`]+`|[^\s(]+)\s*(\((?:"[^"]*"|`[^`]*`|\[[^\]]*\]|[^()])*\))?\s+AS\s/is', 'CREATE VIEW [' . $info['schema'] . '].[' . $view_name . ']$1 AS ', $view_sql, 1, $count);
+        if (!$count) {
+          throw new SchemaException("Unable to recreate the SQL view $view_name.");
+        }
+        $recreate_statements[] = $view_sql;
+      }
+
+      foreach (array_keys($views) as $view_name) {
+        $this->dropView($view_name);
+      }
+
       $this->dropTable($table);
       $this->renameTable($new_table, $table);
+
+      foreach ($recreate_statements as $view_sql) {
+        // A view selecting from a column that no longer exists is still
+        // recreated: SQLite validates a view only when it is queried.
+        $this->executeDdlStatement($view_sql);
+      }
     }
   }
 
@@ -1065,6 +1123,28 @@ class Schema extends DatabaseSchema {
     }
 
     return $tables;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function findViews(string $view_expression): array {
+    $views = [];
+
+    // SQLite stores each prefix in a separate attached database. Search each
+    // one and use sqlite_master row IDs as creation order.
+    $attached_dbs = $this->connection->getAttachedDatabases();
+    foreach ($attached_dbs as $schema) {
+      // Can't use query placeholders for the schema because the query would
+      // have to be :prefixsqlite_master, which does not work.
+      $result = $this->connection->query("SELECT name FROM [" . $schema . "].sqlite_master WHERE type = :type AND name LIKE :view_name ORDER BY rowid", [
+        ':type' => 'view',
+        ':view_name' => $view_expression,
+      ]);
+      $views += $result->fetchAllKeyed(0, 0);
+    }
+
+    return $views;
   }
 
 }

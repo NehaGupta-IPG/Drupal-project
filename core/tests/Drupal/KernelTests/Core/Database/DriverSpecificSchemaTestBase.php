@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaDefinition\Column;
@@ -20,7 +21,10 @@ use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\View;
+use Drupal\Core\Database\SchemaDefinition\ViewQuery;
 use Drupal\Core\Database\SchemaException;
+use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -77,6 +81,30 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    *   The generated column to test.
    */
   abstract public function checkGeneratedColumnStorage(GeneratedColumnStorage $storage, string $table, string $column): void;
+
+  /**
+   * Checks whether a SQL view exists in the database catalog.
+   *
+   * Drivers can override this method to query their database catalog directly.
+   *
+   * @param bool $exists
+   *   Whether the view is expected to exist.
+   * @param string $view
+   *   The view to test.
+   */
+  public function checkSqlViewExists(bool $exists, string $view): void {
+    $this->assertSame($exists, $this->schema->viewExists($view));
+  }
+
+  /**
+   * Indicates whether Schema::findViews() preserves creation order.
+   *
+   * Override when the database catalog cannot distinguish views created close
+   * together.
+   */
+  protected function findViewsOrderIsGuaranteed(): bool {
+    return TRUE;
+  }
 
   /**
    * Tests inserting data into an existing table.
@@ -1222,13 +1250,9 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   }
 
   /**
-   * Tests table schema methods when a view exists.
+   * Tests the SQL view schema methods, and table methods when a view exists.
    */
   public function testSchemaMethodsWithView(): void {
-    // We will be testing with three tables.
-    $test_schema = Database::getConnection()->schema();
-
-    // Create the tables.
     $table_specification = [
       'description' => 'Test table.',
       'fields' => [
@@ -1237,22 +1261,34 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
           'default' => NULL,
           'description' => 'Test field.',
         ],
+        'name' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'Test name field.',
+        ],
       ],
     ];
-    $test_schema->createTable('test_table', $table_specification);
+    $this->schema->createTable('test_table', $table_specification);
 
-    // Create a view to ensure it is not found.
-    Database::getConnection()->query('create view {test_view} as select * from {test_table}');
+    $this->assertFalse($this->schema->viewExists('test_view'));
+    $this->assertFalse($this->schema->viewExists('test_table'), 'Table is not checked by viewExists() method');
+    $this->checkSqlViewExists(FALSE, 'test_view');
 
-    // Test \Drupal\Core\Database\Schema::tableExists().
+    $this->schema->createView('test_view', 'SELECT [id], [name] FROM {test_table}');
+    $this->assertTrue($this->schema->viewExists('test_view'));
+    $this->checkSqlViewExists(TRUE, 'test_view');
+
     $this->assertTrue($this->schema->tableExists('test_table'), 'Table exists');
     $this->assertFalse($this->schema->tableExists('test_view'), 'View is not checked by tableExists() method');
 
-    // Test \Drupal\Core\Database\Schema::findTables().
-    $tables = array_values($test_schema->findTables('t%'));
+    $tables = array_values($this->schema->findTables('t%'));
     $this->assertEquals(['test_table'], $tables, 'All tables were found.');
 
-    // Test \Drupal\Core\Database\Schema::getComment().
+    $views = array_values($this->schema->findViews('t%'));
+    $this->assertEquals(['test_view'], $views, 'Only views are found by findViews().');
+
     $this->checkSchemaComment('Test table.', 'test_table');
     $this->checkSchemaComment('Test field.', 'test_table', 'id');
     $this->checkSchemaComment(FALSE, 'test_view');
@@ -1260,8 +1296,147 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->checkSchemaComment(FALSE, 'does_not_exist');
     $this->checkSchemaComment(FALSE, 'does_not_exist', 'id');
 
-    // Clean up the view.
-    Database::getConnection()->query('drop view {test_view}');
+    $this->connection->insert('test_table')
+      ->fields(['id' => 1, 'name' => 'John'])
+      ->execute();
+    $record = $this->connection->query('SELECT [id], [name] FROM {test_view}')->fetchAssoc();
+    $this->assertSame(['id', 'name'], array_keys($record));
+    $this->assertEquals(1, $record['id']);
+    $this->assertSame('John', $record['name']);
+
+    // Views cannot replace existing schema objects by default.
+    try {
+      $this->schema->createView('test_view', 'SELECT [id] FROM {test_table}');
+      $this->fail('Creating an existing view did not fail.');
+    }
+    catch (SchemaObjectExistsException $e) {
+      $this->assertSame("View 'test_view' already exists.", $e->getMessage());
+    }
+    try {
+      $this->schema->createView('test_table', 'SELECT [id] FROM {test_table}');
+      $this->fail('Creating a view with the name of an existing table did not fail.');
+    }
+    catch (SchemaObjectExistsException $e) {
+      $this->assertSame("Table 'test_table' already exists.", $e->getMessage());
+    }
+
+    // Tables cannot take the name of an existing view.
+    try {
+      $this->schema->createTable('test_view', $table_specification);
+      $this->fail('Creating a table with the name of an existing view did not fail.');
+    }
+    catch (SchemaObjectExistsException $e) {
+      $this->assertSame("View 'test_view' already exists.", $e->getMessage());
+    }
+    try {
+      $this->schema->renameTable('test_table', 'test_view');
+      $this->fail('Renaming a table to the name of an existing view did not fail.');
+    }
+    catch (SchemaObjectExistsException $e) {
+      $this->assertSame("Cannot rename 'test_table' to 'test_view': view 'test_view' already exists.", $e->getMessage());
+    }
+
+    // Replacing a view discards its previous columns.
+    $this->schema->createView('test_view', 'SELECT [id] FROM {test_table}', TRUE);
+    $this->assertTrue($this->schema->viewExists('test_view'));
+    $record = $this->connection->query('SELECT * FROM {test_view}')->fetchAssoc();
+    $this->assertSame(['id'], array_keys($record));
+
+    $this->assertTrue($this->schema->dropView('test_view'));
+    $this->assertFalse($this->schema->viewExists('test_view'));
+    $this->checkSqlViewExists(FALSE, 'test_view');
+    $this->assertEquals([], $this->schema->findViews('t%'));
+    $this->assertFalse($this->schema->dropView('test_view'));
+
+    $this->schema->createView('test_view', 'SELECT [id] FROM {test_table}');
+    $this->schema->createView('test_view2', 'SELECT [id] FROM {test_view}');
+    if ($this->findViewsOrderIsGuaranteed()) {
+      $this->assertSame(['test_view', 'test_view2'], array_values($this->schema->findViews('test_view%')));
+    }
+    // Pass the base view first to verify that dropViews() resolves
+    // dependencies.
+    $this->schema->dropViews(['test_view', 'test_view2']);
+    $this->assertFalse($this->schema->viewExists('test_view'));
+    $this->assertFalse($this->schema->viewExists('test_view2'));
+  }
+
+  /**
+   * Tests creating a SQL view from a schema definition.
+   */
+  public function testCreateSchemaWithView(): void {
+    $tableName = 'test_people';
+    $viewName = 'test_people_view';
+    $schemaDefinition = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_schema',
+      tables: [
+        new Table(
+          name: $tableName,
+          description: 'Basic test table for the SQL view.',
+          columns: [
+            Column::serial(
+              name: 'id',
+            ),
+            Column::varcharAscii(
+              name: 'name',
+              description: "A person's name",
+              length: 255,
+              notNull: TRUE,
+              default: new StringValue(''),
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+      ],
+      views: [
+        new View(
+          name: $viewName,
+          query: new ViewQuery('SELECT [id], UPPER([name]) AS [shout] FROM {' . $tableName . '}'),
+          description: 'Test view over the test table.',
+        ),
+      ],
+    );
+
+    $this->schema->createSchemaFromDefinition($schemaDefinition);
+    $this->assertTrue($this->schema->tableExists($tableName));
+    $this->assertTrue($this->schema->viewExists($viewName));
+    $this->checkSqlViewExists(TRUE, $viewName);
+
+    $this->connection->insert($tableName)->fields(['name' => 'John'])->execute();
+    $shout = $this->connection
+      ->select($viewName)
+      ->fields($viewName, ['shout'])
+      ->execute()
+      ->fetchField();
+    $this->assertSame('JOHN', $shout);
+
+    // A view query can also be built from a select query without bound
+    // parameters.
+    $select = $this->connection->select($tableName, 't')->fields('t', ['id', 'name']);
+    $select->where('[t].[id] > 0');
+    $this->schema->createViewFromDefinition(new View(
+      name: 'test_people_filtered',
+      query: ViewQuery::fromSelect($select),
+    ));
+    $this->assertSame('John', $this->connection->query('SELECT [name] FROM {test_people_filtered}')->fetchField());
+    $this->assertTrue($this->schema->dropView('test_people_filtered'));
+
+    // A select query with bound parameters is rejected.
+    $select = $this->connection->select($tableName, 't')
+      ->fields('t', ['id'])
+      ->condition('name', 'John');
+    try {
+      ViewQuery::fromSelect($select);
+      $this->fail('Building a view query from a select query with bound parameters did not fail.');
+    }
+    catch (SchemaDefinitionException $e) {
+      $this->assertSame('The query of a SQL view cannot contain bound parameters', $e->getMessage());
+    }
+
+    // Drop the view first: PostgreSQL refuses to drop a table that has a
+    // dependent view.
+    $this->assertTrue($this->schema->dropView($viewName));
+    $this->assertTrue($this->schema->dropTable($tableName));
   }
 
   /**

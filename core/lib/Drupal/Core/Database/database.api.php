@@ -16,6 +16,8 @@ use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\View;
+use Drupal\Core\Database\SchemaDefinition\ViewQuery;
 
 /**
  * @defgroup database Database abstraction layer
@@ -492,6 +494,20 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  * }
  * @endcode
  *
+ * A schema can also declare SQL views. Create one directly with
+ * \Drupal\Core\Database\Schema::createView(), or add
+ * \Drupal\Core\Database\SchemaDefinition\View objects to the 'views' argument
+ * of the \Drupal\Core\Database\SchemaDefinition\Schema returned by hook_schema().
+ * Tables and views share one namespace per database, so a view cannot take the
+ * name of an existing table.
+ *
+ * Write view queries with curly braces around table names and square brackets
+ * around identifiers. View definitions cannot contain bound parameters, so
+ * never include user input. Convert a select query without parameters with
+ * \Drupal\Core\Database\SchemaDefinition\ViewQuery::fromSelect().
+ * Identifier and table-prefix replacement also affects literal square or curly
+ * brackets inside strings.
+ *
  * @see \Drupal\Core\Extension\ModuleInstaller::installSchema()
  * @see \Drupal\Core\Extension\ModuleInstaller::uninstallSchema()
  * @see \Drupal\TestTools\Extension\SchemaInspector::getTablesSpecification()
@@ -593,10 +609,10 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  * or more tables and their related keys and indexes. A schema is defined by
  * hook_schema() which must live in your module's .install file.
  *
- * The tables declared by this hook will be automatically created when the
- * module is installed, and removed when the module is uninstalled. This happens
- * before hook_install() is invoked, and after hook_uninstall() is invoked,
- * respectively.
+ * The tables and SQL views declared by this hook will be automatically created
+ * when the module is installed, and removed when the module is uninstalled.
+ * This happens before hook_install() is invoked, and after hook_uninstall() is
+ * invoked, respectively.
  *
  * By declaring the tables used by your module via an implementation of
  * hook_schema(), these tables will be available on all supported database
@@ -670,10 +686,17 @@ function hook_schema(): Schema {
     ],
   );
 
+  $views[] = new View(
+    name: 'users_data_serialized',
+    query: new ViewQuery('SELECT [uid], [module], [name] FROM {users_data} WHERE [serialized] = 1'),
+    description: 'The serialized records of the {users_data} table.',
+  );
+
   return new Schema(
     type: SchemaDefinitionType::Module,
     name: 'hook',
     tables: $tables,
+    views: $views,
   );
 }
 

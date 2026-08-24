@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore attgenerated attname attnum attrelid objid refobjid refobjsubid
 // cSpell:ignore regclass
-// cspell:ignore relkind relname
+// cspell:ignore relkind relname schemaname viewname
 
 /**
  * Tests schema API for the PostgreSQL driver.
@@ -42,6 +42,19 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       GeneratedColumnStorage::Stored => 's',
     };
     $this->assertSame($expected, $generated);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkSqlViewExists(bool $exists, string $view): void {
+    $get_prefix_info = new \ReflectionMethod($this->schema, 'getPrefixInfo');
+    $info = $get_prefix_info->invoke($this->schema, $view);
+    $found = (bool) $this->connection->query('SELECT 1 FROM pg_views WHERE schemaname = :schema AND viewname = :view', [
+      ':schema' => $info['schema'],
+      ':view' => $info['table'],
+    ])->fetchField();
+    $this->assertSame($exists, $found);
   }
 
   /**

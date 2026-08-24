@@ -73,13 +73,23 @@ class EnvironmentCleaner implements EnvironmentCleanerInterface {
    * Performs the fixture database cleanup.
    *
    * @return int
-   *   The number of tables that were removed.
+   *   The number of tables and SQL views that were removed.
    */
   protected function doCleanDatabase(): int {
     /** @var \Drupal\Core\Database\Schema $schema */
     $schema = $this->testDatabase->schema();
-    $tables = $schema->findTables('test%');
     $count = 0;
+    // Drop views, including views built on other views, before their tables.
+    $views = [];
+    foreach ($schema->findViews('test%') as $view) {
+      // Only drop views which begin with 'test' followed by digits.
+      if (preg_match('/^test\d+.*/', $view, $matches)) {
+        $views[] = $matches[0];
+      }
+    }
+    $schema->dropViews($views);
+    $count += count($views);
+    $tables = $schema->findTables('test%');
     foreach ($tables as $table) {
       // Only drop tables which begin wih 'test' followed by digits, for
       // example, {test12345678node__body}.

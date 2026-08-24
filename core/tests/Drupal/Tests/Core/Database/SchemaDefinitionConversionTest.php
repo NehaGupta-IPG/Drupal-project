@@ -20,6 +20,8 @@ use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
+use Drupal\Core\Database\SchemaDefinition\View;
+use Drupal\Core\Database\SchemaDefinition\ViewQuery;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -266,6 +268,38 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
     );
 
     $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
+  }
+
+  /**
+   * Tests Schema::toArray() for a schema defining SQL views.
+   */
+  public function testConvertSchemaDefinitionWithView(): void {
+    $schemaDefinition = new Schema(
+      type: SchemaDefinitionType::Test,
+      name: 'test_foo',
+      tables: [
+        new Table(
+          name: 'foo',
+          description: 'Foo table for the database unit tests.',
+          columns: [
+            Column::serial(
+              name: 'id',
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+      ],
+      views: [
+        new View(
+          name: 'foo_view',
+          query: new ViewQuery('SELECT [id] FROM {foo}'),
+        ),
+      ],
+    );
+
+    $this->expectException(\LogicException::class);
+    $this->expectExceptionMessage('SQL views have no legacy array-based specification.');
+    $schemaDefinition->toArray();
   }
 
 }

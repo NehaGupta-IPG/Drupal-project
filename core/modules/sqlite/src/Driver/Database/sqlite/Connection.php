@@ -169,12 +169,12 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
         // Check if the database is now empty, ignore the internal SQLite
         // tables.
         try {
-          $count = $this->query('SELECT COUNT(*) FROM ' . $prefix . '.sqlite_master WHERE type = :type AND name NOT LIKE :pattern', [
-            ':type' => 'table',
+          $count = $this->query("SELECT COUNT(*) FROM " . $prefix . ".sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE :pattern", [
             ':pattern' => 'sqlite_%',
           ])->fetchField();
 
-          // We can prune the database file if it doesn't have any tables.
+          // We can prune the database file if it doesn't have any tables or
+          // views.
           if ($count == 0 && $this->connectionOptions['database'] != ':memory:' && file_exists($this->connectionOptions['database'] . '-' . $prefix)) {
             // Detach the database.
             $this->query('DETACH DATABASE :schema', [':schema' => $prefix]);

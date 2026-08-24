@@ -780,10 +780,10 @@ class ModuleInstaller implements ModuleInstallerInterface {
   }
 
   /**
-   * Creates all tables defined in a module's hook_schema().
+   * Creates all tables and SQL views defined in a module's hook_schema().
    *
    * @param string $module
-   *   The module for which the tables will be created.
+   *   The module for which the tables and views will be created.
    *
    * @internal
    */
@@ -806,16 +806,25 @@ class ModuleInstaller implements ModuleInstallerInterface {
   }
 
   /**
-   * Removes all tables defined in a module's hook_schema().
+   * Removes all tables and SQL views defined in a module's hook_schema().
    *
    * @param string $module
-   *   The module for which the tables will be removed.
+   *   The module for which the tables and views will be removed.
    *
    * @internal
    */
   protected function uninstallSchema(string $module): void {
     $schemaDefinition = $this->invoke($module, 'schema') ?? [];
+    $schema = $this->connection->schema();
     if ($schemaDefinition instanceof Schema) {
+      // Drop views in reverse declaration order before dropping their tables.
+      // PostgreSQL prevents either object from being dropped while a declared
+      // view depends on it.
+      foreach (array_reverse($schemaDefinition->viewNames()) as $view) {
+        if ($schema->viewExists($view)) {
+          $schema->dropView($view);
+        }
+      }
       $table_names = $schemaDefinition->tableNames();
     }
     else {
@@ -824,7 +833,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
       $table_names = array_keys($schemaDefinition);
     }
-    $schema = $this->connection->schema();
     foreach ($table_names as $table) {
       if ($schema->tableExists($table)) {
         $schema->dropTable($table);

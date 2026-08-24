@@ -11,7 +11,7 @@ use Drupal\Core\Database\SchemaObjectExistsException;
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
 // cSpell:ignore contype fillfactor indexname indexrelid indisprimary indkey
 // cSpell:ignore indrelid nextval nspname regclass relkind relname relnamespace
-// cSpell:ignore schemaname setval
+// cSpell:ignore schemaname setval viewname
 
 /**
  * @addtogroup schemaapi
@@ -545,6 +545,18 @@ EOD;
   /**
    * {@inheritdoc}
    */
+  public function viewExists(string $name, bool $add_prefix = TRUE): bool {
+    $prefixInfo = $this->getPrefixInfo($name, $add_prefix);
+
+    return (bool) $this->connection->query("SELECT 1 FROM pg_views WHERE schemaname = :schema AND viewname = :view", [
+      ':schema' => $prefixInfo['schema'],
+      ':view' => $prefixInfo['table'],
+    ])->fetchField();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function findTables($table_expression) {
     $prefix = $this->connection->getPrefix();
     $prefix_length = strlen($prefix);
@@ -583,12 +595,49 @@ EOD;
   /**
    * {@inheritdoc}
    */
+  public function findViews(string $view_expression): array {
+    $prefix = $this->connection->getPrefix();
+    $prefix_length = strlen($prefix);
+    $views = [];
+
+    // pg_views has no creation metadata. Order by the object IDs in pg_class,
+    // which PostgreSQL assigns when it creates catalog entries.
+    $results = $this->connection->query("SELECT cl.relname AS viewname FROM pg_class cl INNER JOIN pg_namespace ns ON cl.relnamespace = ns.oid WHERE ns.nspname = :schema AND cl.relkind = 'v' ORDER BY cl.oid", [':schema' => $this->defaultSchema]);
+    foreach ($results as $view) {
+      if ($prefix && substr($view->viewname, 0, $prefix_length) !== $prefix) {
+        // This view name does not start with the default prefix, which means
+        // that it is not managed by Drupal so it should be excluded from the
+        // result.
+        continue;
+      }
+
+      // Remove the prefix from the returned views.
+      $unprefixed_view_name = substr($view->viewname, $prefix_length);
+
+      // Exclude a view whose full name is the prefix itself.
+      if (!empty($unprefixed_view_name)) {
+        $views[$unprefixed_view_name] = $unprefixed_view_name;
+      }
+    }
+
+    // Convert the view expression from its SQL LIKE syntax to a regular
+    // expression and escape the delimiter that will be used for matching.
+    $view_expression = str_replace(['%', '_'], ['.*?', '.'], preg_quote($view_expression, '/'));
+    return preg_grep('/^' . $view_expression . '$/i', $views);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function renameTable($table, $new_name) {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot rename '$table' to '$new_name': table '$table' doesn't exist.");
     }
     if ($this->tableExists($new_name)) {
       throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': table '$new_name' already exists.");
+    }
+    if ($this->viewExists($new_name)) {
+      throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': view '$new_name' already exists.");
     }
 
     // Get the schema and tablename for the old table.
