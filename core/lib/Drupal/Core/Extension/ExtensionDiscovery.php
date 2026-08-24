@@ -279,27 +279,6 @@ class ExtensionDiscovery {
   }
 
   /**
-   * Finds extension directories beneath a filesystem path.
-   *
-   * @param string $scan_directory
-   *   The absolute directory to scan.
-   * @param string[] $ignore_directories
-   *   Directory names to exclude from the scan.
-   * @param bool $include_tests
-   *   Whether to include extensions below test directories.
-   *
-   * @return string[]
-   *   An associative array of extension names keyed to their absolute paths.
-   */
-  public static function findExtensionDirectories(string $scan_directory, array $ignore_directories = [], bool $include_tests = FALSE): array {
-    $extensions = [];
-    foreach (static::getExtensionDirectoryIterator($scan_directory, $ignore_directories, $include_tests) ?? [] as $file) {
-      $extensions[substr($file->getFilename(), 0, -9)] = dirname($file->getRealPath() ?: $file->getPathname());
-    }
-    return $extensions;
-  }
-
-  /**
    * Creates an iterator that finds extension info files beneath a directory.
    *
    * @param string $scan_directory
@@ -312,7 +291,7 @@ class ExtensionDiscovery {
    * @return \RecursiveIteratorIterator|null
    *   The iterator, or NULL if the directory does not exist.
    */
-  private static function getExtensionDirectoryIterator(string $scan_directory, array $ignore_directories, bool $include_tests): ?\RecursiveIteratorIterator {
+  public static function getExtensionDirectoryIterator(string $scan_directory, array $ignore_directories, bool $include_tests): ?\RecursiveIteratorIterator {
     if (!is_dir($scan_directory)) {
       return NULL;
     }

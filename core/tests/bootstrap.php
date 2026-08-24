@@ -14,24 +14,6 @@ use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\TextUI\Configuration\Registry as PhpunitConfigurationRegistry;
 
 /**
- * Finds all valid extension directories recursively within a given directory.
- *
- * @param string $scan_directory
- *   The directory that should be recursively scanned.
- *
- * @return array
- *   An associative array of extension directories found within the scanned
- *   directory, keyed by extension name.
- */
-function drupal_phpunit_find_extension_directories($scan_directory): array {
-  return ExtensionDiscovery::findExtensionDirectories(
-    $scan_directory,
-    ['node_modules', 'bower_components'],
-    TRUE,
-  );
-}
-
-/**
  * Returns directories from which test extensions may be discovered.
  *
  * @param string $root
@@ -116,8 +98,12 @@ function drupal_phpunit_populate_class_loader() {
     // Scan for arbitrary extension namespaces from core and contrib.
     $extension_roots = drupal_phpunit_contrib_extension_directory_roots();
 
-    $dirs = array_map('drupal_phpunit_find_extension_directories', $extension_roots);
-    $dirs = array_reduce($dirs, 'array_merge', []);
+    $dirs = [];
+    foreach ($extension_roots as $extension_root) {
+      foreach (ExtensionDiscovery::getExtensionDirectoryIterator($extension_root, ['node_modules', 'bower_components'], TRUE) ?? [] as $file) {
+        $dirs[substr($file->getFilename(), 0, -9)] = dirname($file->getRealPath() ?: $file->getPathname());
+      }
+    }
     $GLOBALS['namespaces'] = drupal_phpunit_get_extension_namespaces($dirs);
   }
   foreach ($GLOBALS['namespaces'] as $prefix => $paths) {

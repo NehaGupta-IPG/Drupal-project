@@ -73,9 +73,9 @@ class ExtensionDiscoveryTest extends UnitTestCase {
   }
 
   /**
-   * Tests finding extension directories without initializing Drupal.
+   * Tests finding extension info files without initializing Drupal.
    */
-  public function testFindExtensionDirectories(): void {
+  public function testGetExtensionDirectoryIterator(): void {
     $root = vfsStream::setup('root', NULL, [
       'modules' => [
         'example' => [
@@ -87,11 +87,19 @@ class ExtensionDiscoveryTest extends UnitTestCase {
           ],
         ],
       ],
+      '.git' => [
+        'not_an_extension' => [
+          'not_an_extension.info.yml' => '',
+        ],
+      ],
     ]);
 
-    $extensions = ExtensionDiscovery::findExtensionDirectories($root->url(), ['node_modules'], TRUE);
+    $extensions = [];
+    foreach (ExtensionDiscovery::getExtensionDirectoryIterator($root->url(), ['node_modules'], TRUE) ?? [] as $file) {
+      $extensions[] = $file->getFilename();
+    }
 
-    $this->assertSame(['example'], array_keys($extensions));
+    $this->assertSame(['example.info.yml'], $extensions);
   }
 
   /**
