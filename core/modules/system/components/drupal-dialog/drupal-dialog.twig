@@ -38,8 +38,8 @@
     {# Dialogs are in the top layer so use a native <dialog> #}
     <dialog open aria-labelledby="{{ id -}}-title" closedby="{{ close }}" {% if variant === 'modal' %} data-modal{% endif %} {{ attributes.addClass('ui-widget-content') }}>
   {% endif %}
-    <div class="titlebar ui-dialog-titlebar ui-widget-header">
-      <h2 id="{{ id -}}-title" class="ui-dialog-title">{{ title }}</h2>
+    <div class="titlebar ui-dialog-titlebar">
+      <h2 id="{{ id -}}-title" class="dialog-title ui-dialog-title">{{ title }}</h2>
       <form method="dialog">
         <button class="titlebar-close ui-dialog-titlebar-close" aria-label="Close">
           <span class="ui-button-icon ui-icon ui-icon-closethick"></span>

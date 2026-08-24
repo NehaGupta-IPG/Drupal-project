@@ -11,7 +11,7 @@
   --off-canvas-title-text-color: #fff;
   --off-canvas-title-font-size: 16px;
 
-  & .ui-dialog-titlebar {
+  & .dialog-titlebar {
     position: relative;
     margin: 0 calc(-1 * var(--off-canvas-padding));
     padding: var(--off-canvas-title-padding) 50px;
@@ -43,7 +43,7 @@
   }
 
   /* Close button. */
-  & .ui-dialog-titlebar-close {
+  & .dialog-titlebar-close {
     position: absolute;
     top: 50%;
     inset-inline: auto 10px;
