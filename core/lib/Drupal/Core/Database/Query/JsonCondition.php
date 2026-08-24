@@ -106,6 +106,55 @@ class JsonCondition extends Condition {
         $this->operator,
       ));
     }
+    // Reject arrays before they reach a driver that expects one value.
+    $array_operators = [
+      'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'JSON_CONTAINS',
+      'IS NULL', 'IS NOT NULL', 'HAS KEY',
+    ];
+    if (is_array($this->value) && !in_array($this->operator, $array_operators, TRUE)) {
+      throw new InvalidQueryException(sprintf(
+        'JSON operator %s does not support an array value.',
+        $this->operator,
+      ));
+    }
+    // A comparison list holds scalars of one comparison domain, where
+    // integers and floats compare as one numeric domain. JSON_CONTAINS is
+    // exempt: nested heterogeneous JSON is meaningful there.
+    if (in_array($this->operator, ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], TRUE)) {
+      $domains = [];
+      foreach ($this->value as $element) {
+        if (is_array($element)) {
+          throw new InvalidQueryException(sprintf(
+            'JSON operator %s does not support an array element in its value.',
+            $this->operator,
+          ));
+        }
+        if ($element === NULL) {
+          throw new InvalidQueryException(sprintf(
+            'JSON operator %s does not support a NULL element in its value. Use IS NULL or IS NOT NULL to match a missing value or a stored JSON null.',
+            $this->operator,
+          ));
+        }
+        if (!is_scalar($element)) {
+          throw new InvalidQueryException(sprintf(
+            'JSON operator %s does not support a non-scalar element in its value.',
+            $this->operator,
+          ));
+        }
+        $domains[match (TRUE) {
+          is_int($element), is_float($element) => 'number',
+          is_bool($element) => 'boolean',
+          default => 'string',
+        }] = TRUE;
+      }
+      if (count($domains) > 1) {
+        throw new InvalidQueryException(sprintf(
+          'JSON operator %s requires all values to share one comparison domain (number, boolean or string), got %s.',
+          $this->operator,
+          implode(' and ', array_keys($domains)),
+        ));
+      }
+    }
   }
 
   /**

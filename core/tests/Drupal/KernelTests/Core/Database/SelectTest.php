@@ -672,6 +672,17 @@ class SelectTest extends DatabaseTestBase {
       'unsupported operator' => ['field', '$.path', 'value', 'INVALID'],
       'IN requires array' => ['field', '$.path', 'string', 'IN'],
       'BETWEEN requires two' => ['field', '$.path', [1], 'BETWEEN'],
+      '= rejects array' => ['field', '$.path', ['a', 'b'], '='],
+      'CONTAINS rejects array' => ['field', '$.path', ['a', 'b'], 'CONTAINS'],
+      'IN rejects nested array' => ['field', '$.path', ['a', ['b']], 'IN'],
+      'BETWEEN rejects nested array' => ['field', '$.path', [[1], 2], 'BETWEEN'],
+      'IN rejects number then string' => ['field', '$.path', [1, 'a'], 'IN'],
+      'IN rejects string then number' => ['field', '$.path', ['a', 1], 'IN'],
+      'IN rejects boolean and string' => ['field', '$.path', [TRUE, 'a'], 'IN'],
+      'BETWEEN rejects mixed endpoints' => ['field', '$.path', [1, 'a'], 'BETWEEN'],
+      'IN rejects NULL first element' => ['field', '$.path', [NULL, 1], 'IN'],
+      'IN rejects NULL later element' => ['field', '$.path', [1, NULL], 'IN'],
+      'IN rejects object element' => ['field', '$.path', [new \stdClass()], 'IN'],
     ];
   }
 
