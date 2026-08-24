@@ -66,6 +66,7 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
     'views',
     'views_ui',
     'menu_ui',
+    'locale',
   ];
 
   /**

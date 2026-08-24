@@ -36,6 +36,7 @@ class ConfigTranslationCacheTest extends BrowserTestBase {
     'node',
     'views',
     'views_ui',
+    'locale',
   ];
 
   /**

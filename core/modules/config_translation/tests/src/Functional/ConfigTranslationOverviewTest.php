@@ -49,13 +49,6 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
   protected $langcodes = ['fr', 'ta'];
 
   /**
-   * String translation storage object.
-   *
-   * @var \Drupal\locale\StringStorageInterface
-   */
-  protected $localeStorage;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -74,7 +67,6 @@ class ConfigTranslationOverviewTest extends BrowserTestBase {
     foreach ($this->langcodes as $langcode) {
       ConfigurableLanguage::createFromLangcode($langcode)->save();
     }
-    $this->localeStorage = $this->container->get('locale.storage');
     $this->drupalPlaceBlock('local_tasks_block');
     $this->drupalPlaceBlock('page_title_block');
   }

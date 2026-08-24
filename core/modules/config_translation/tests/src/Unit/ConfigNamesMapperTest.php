@@ -10,12 +10,11 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Language\Language;
-use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
-use Drupal\locale\LocaleConfigManager;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -46,11 +45,11 @@ class ConfigNamesMapperTest extends UnitTestCase {
   protected $configNamesMapper;
 
   /**
-   * The locale configuration manager.
+   * The language manager used for testing.
    *
-   * @var \Drupal\locale\LocaleConfigManager|\PHPUnit\Framework\MockObject\Stub
+   * @var \Drupal\language\ConfigurableLanguageManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $localeConfigManager;
+  protected $languageManager;
 
   /**
    * The typed configuration manager.
@@ -103,22 +102,21 @@ class ConfigNamesMapperTest extends UnitTestCase {
 
     $this->typedConfigManager = $this->createStub(TypedConfigManagerInterface::class);
 
-    $this->localeConfigManager = $this->createStub(LocaleConfigManager::class);
-
     $this->configMapperManager = $this->createStub(ConfigMapperManagerInterface::class);
 
     $this->baseRoute = new Route('/admin/config/system/site-information');
+
+    $this->languageManager = $this->createStub(ConfigurableLanguageManagerInterface::class);
 
     $this->configNamesMapper = new TestConfigNamesMapper(
       'system.site_information_settings',
       $this->pluginDefinition,
       $this->getConfigFactoryStub(),
       $this->typedConfigManager,
-      $this->localeConfigManager,
       $this->configMapperManager,
       $this->routeProvider,
       $this->getStringTranslationStub(),
-      $this->createStub(LanguageManagerInterface::class),
+      $this->languageManager,
       $this->createStub(EventDispatcherInterface::class)
     );
   }
@@ -594,19 +592,28 @@ class ConfigNamesMapperTest extends UnitTestCase {
    */
   #[DataProvider('providerTestHasTranslation')]
   public function testHasTranslation(array $mock_return_values, bool $expected): void {
-    $language = new Language();
+    $language = new Language(['id' => 'xx']);
 
     // As the configuration names are arbitrary, simply use integers.
     $config_names = range(1, count($mock_return_values));
     $this->configNamesMapper->setConfigNames($config_names);
 
-    $map = [];
-    foreach ($config_names as $i => $config_name) {
-      $map[] = [$config_name, $language->getId(), $mock_return_values[$i]];
-    }
-    $this->localeConfigManager
-      ->method('hasTranslation')
-      ->willReturnMap($map);
+    // Mock the language manager to return a config override object for each config name.
+    $this->languageManager
+      ->method('getLanguageConfigOverride')
+      ->willReturnCallback(function ($langcode, $name) use ($config_names, $mock_return_values) {
+        // Find which config name is being checked to determine its mock value.
+        $index = array_search($name, $config_names);
+        $has_translation = $mock_return_values[$index];
+
+        $config_override = $this->createStub('\Drupal\language\Config\LanguageConfigOverride');
+
+        // If a translation is expected to exist, isNew() should return FALSE.
+        // If no translation exists, isNew() returns TRUE.
+        $config_override->method('isNew')->willReturn(!$has_translation);
+
+        return $config_override;
+      });
 
     $result = $this->configNamesMapper->hasTranslation($language);
     $this->assertSame($expected, $result);

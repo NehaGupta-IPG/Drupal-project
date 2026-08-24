@@ -47,10 +47,6 @@ class ConfigTranslationListUiTest extends BrowserTestBase {
 
     $this->drupalLogin($this->drupalCreateUser($permissions));
 
-    $this->config('locale.settings')
-      ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
-      ->save();
     $this->drupalPlaceBlock('local_tasks_block');
   }
 
