@@ -277,6 +277,16 @@ class InsertJsonTest extends DatabaseTestBase {
    * Tests that a second expression for the same column is rejected.
    */
   public function testJsonExpressionDuplicateField(): void {
+    try {
+      $this->connection->insert('json')
+        ->from($this->sampleSelect())
+        ->jsonExpression('status', 'test_field', '$.key');
+      $this->fail('Should not be able to add an expression for a column the select query already selects.');
+    }
+    catch (InvalidQueryException $e) {
+      $this->assertSame('The select query already has a field named "status".', $e->getMessage());
+    }
+
     $insert = $this->connection->insert('json')
       ->from($this->sampleSelect())
       ->jsonExpression('name', 'test_field', '$.key');

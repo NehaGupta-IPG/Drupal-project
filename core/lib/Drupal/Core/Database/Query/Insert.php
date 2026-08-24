@@ -115,9 +115,10 @@ abstract class Insert extends Query implements \Countable {
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
    *   If the query has no select query to insert the result of, if the select
-   *   query already has an expression named after the target column, or if the
-   *   jsonpath is invalid or contains a wildcard. A wildcard matches any
-   *   number of values, and an inserted column takes one.
+   *   query already has a field or an expression named after the target
+   *   column, or if the jsonpath is invalid or contains a wildcard. A
+   *   wildcard matches any number of values, and an inserted column takes
+   *   one.
    *
    * @see \Drupal\Core\Database\Query\Insert::from()
    * @see \Drupal\Core\Database\Query\SelectInterface::addJsonExpression()
@@ -125,6 +126,10 @@ abstract class Insert extends Query implements \Countable {
    */
   public function jsonExpression(string $field, string $json_field, string $jsonpath, JsonCastType $cast = JsonCastType::Text): static {
     $this->validateFromQuery('expression');
+    $fields = $this->fromQuery->getFields();
+    if (isset($fields[$field])) {
+      throw new InvalidQueryException(sprintf('The select query already has a field named "%s".', $field));
+    }
     $expressions = $this->fromQuery->getExpressions();
     if (isset($expressions[$field])) {
       throw new InvalidQueryException(sprintf('The select query already has an expression named "%s".', $field));
