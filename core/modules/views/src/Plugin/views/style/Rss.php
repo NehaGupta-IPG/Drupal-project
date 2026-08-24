@@ -145,6 +145,8 @@ class Rss extends StylePluginBase {
     foreach ($this->channel_elements as &$element) {
       if (isset($element['namespace'])) {
         $this->namespaces = array_merge($this->namespaces, $element['namespace']);
+        // Remove namespace from the channel element render array as it has been
+        // merged into the RSS namespaces.
         unset($element['namespace']);
       }
     }
