@@ -12,6 +12,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -51,9 +52,11 @@ class ShortcutSetStorage extends ConfigEntityStorage implements ShortcutSetStora
    *   The memory cache.
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
    */
-  public function __construct(EntityTypeInterface $entity_info, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache, Connection $connection) {
-    parent::__construct($entity_info, $config_factory, $uuid_service, $language_manager, $memory_cache);
+  public function __construct(EntityTypeInterface $entity_info, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache, Connection $connection, protected MessengerInterface $messenger) {
+    parent::__construct($entity_info, $config_factory, $uuid_service, $language_manager, $memory_cache, $messenger);
 
     $this->moduleHandler = $module_handler;
     $this->connection = $connection;
@@ -70,7 +73,8 @@ class ShortcutSetStorage extends ConfigEntityStorage implements ShortcutSetStora
       $container->get('module_handler'),
       $container->get('language_manager'),
       $container->get('entity.memory_cache'),
-      $container->get('database')
+      $container->get('database'),
+      $container->get('messenger')
     );
   }
 

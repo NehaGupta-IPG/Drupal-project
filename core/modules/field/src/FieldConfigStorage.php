@@ -10,6 +10,7 @@ use Drupal\Core\Field\DeletedFieldsRepositoryInterface;
 use Drupal\Core\Field\FieldConfigStorageBase;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Component\Uuid\UuidInterface;
@@ -59,9 +60,11 @@ class FieldConfigStorage extends FieldConfigStorageBase {
    *   The deleted fields repository.
    * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
    *   The memory cache.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
    */
-  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, DeletedFieldsRepositoryInterface $deleted_fields_repository, MemoryCacheInterface $memory_cache) {
-    parent::__construct($entity_type, $config_factory, $uuid_service, $language_manager, $memory_cache);
+  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, DeletedFieldsRepositoryInterface $deleted_fields_repository, MemoryCacheInterface $memory_cache, protected MessengerInterface $messenger) {
+    parent::__construct($entity_type, $config_factory, $uuid_service, $language_manager, $memory_cache, $messenger);
     $this->entityTypeManager = $entity_type_manager;
     $this->fieldTypeManager = $field_type_manager;
     $this->deletedFieldsRepository = $deleted_fields_repository;
@@ -79,7 +82,8 @@ class FieldConfigStorage extends FieldConfigStorageBase {
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.field.field_type'),
       $container->get('entity_field.deleted_fields_repository'),
-      $container->get('entity.memory_cache')
+      $container->get('entity.memory_cache'),
+      $container->get('messenger')
     );
   }
 

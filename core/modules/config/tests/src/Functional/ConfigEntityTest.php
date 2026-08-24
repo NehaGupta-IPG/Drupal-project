@@ -304,21 +304,21 @@ class ConfigEntityTest extends BrowserTestBase {
     $id = $edit['id'];
     $this->assertSession()->linkByHrefExists("admin/structure/config_test/manage/$id");
 
-    // Create a configuration entity with '0' machine name.
+    // Create a configuration entity with '1' machine name.
     $edit = [
-      'id' => '0',
-      'label' => '0',
+      'id' => '1',
+      'label' => '1',
     ];
     $this->drupalGet('admin/structure/config_test/add');
     $this->submitForm($edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains('0 configuration has been created.');
-    $this->assertSession()->linkByHrefExists('admin/structure/config_test/manage/0');
-    $this->assertSession()->linkByHrefExists('admin/structure/config_test/manage/0/delete');
-    $this->drupalGet('admin/structure/config_test/manage/0/delete');
+    $this->assertSession()->pageTextContains('1 configuration has been created.');
+    $this->assertSession()->linkByHrefExists('admin/structure/config_test/manage/1');
+    $this->assertSession()->linkByHrefExists('admin/structure/config_test/manage/1/delete');
+    $this->drupalGet('admin/structure/config_test/manage/1/delete');
     $this->submitForm([], 'Delete');
     $storage = \Drupal::entityTypeManager()->getStorage('config_test');
-    $this->assertNull($storage->load(0), 'Test entity deleted');
+    $this->assertNull($storage->load(1), 'Test entity deleted');
 
     // Create a configuration entity with a property that uses AJAX to show
     // extra form elements. Test this scenario in a non-JS case by using a

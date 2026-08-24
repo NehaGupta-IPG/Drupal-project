@@ -27,6 +27,7 @@ use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -102,6 +103,13 @@ class ConfigEntityStorageTest extends UnitTestCase {
   protected $configManager;
 
   /**
+   * The configuration manager.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface|\Prophecy\Prophecy\ProphecyInterface
+   */
+  protected $messenger;
+
+  /**
    * {@inheritdoc}
    *
    * @legacy-covers ::__construct
@@ -136,11 +144,13 @@ class ConfigEntityStorageTest extends UnitTestCase {
 
     $this->configFactory = $this->prophesize(ConfigFactoryInterface::class);
 
+    $this->messenger = $this->prophesize(MessengerInterface::class);
+
     $this->entityQuery = $this->prophesize(QueryInterface::class);
     $entity_query_factory = $this->prophesize(QueryFactoryInterface::class);
     $entity_query_factory->get($entity_type, 'AND')->willReturn($this->entityQuery->reveal());
 
-    $this->entityStorage = new ConfigEntityStorage($entity_type, $this->configFactory->reveal(), $this->uuidService->reveal(), $this->languageManager->reveal(), new MemoryCache(new Time()));
+    $this->entityStorage = new ConfigEntityStorage($entity_type, $this->configFactory->reveal(), $this->uuidService->reveal(), $this->languageManager->reveal(), new MemoryCache(new Time()), $this->messenger->reveal());
     $this->entityStorage->setModuleHandler($this->moduleHandler->reveal());
 
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);

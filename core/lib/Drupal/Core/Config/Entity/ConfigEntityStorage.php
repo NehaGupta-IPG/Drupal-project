@@ -14,6 +14,7 @@ use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -96,13 +97,16 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    *   The language manager.
    * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
    *   The memory cache backend.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
    */
-  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache) {
+  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache, protected MessengerInterface $messenger) {
     parent::__construct($entity_type, $memory_cache);
 
     $this->configFactory = $config_factory;
     $this->uuidService = $uuid_service;
     $this->languageManager = $language_manager;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -114,7 +118,8 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       $container->get('config.factory'),
       $container->get('uuid'),
       $container->get('language_manager'),
-      $container->get('entity.memory_cache')
+      $container->get('entity.memory_cache'),
+      $container->get('messenger')
     );
   }
 
@@ -160,8 +165,17 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     /** @var \Drupal\Core\Config\Config[] $configs */
     $configs = [];
     $records = [];
-    foreach ($this->configFactory->loadMultiple($names) as $config) {
+    foreach ($this->configFactory->loadMultiple($names) as $name => $config) {
       $id = $config->get($this->idKey);
+
+      // Check if $id is null or empty.
+      if (empty($id)) {
+        // Add an error message using Messenger service and return from the loop.
+        $this->messenger->addMessage($this->t("The following config has no ID specified: @name", [
+          '@name' => $name,
+        ]), 'error');
+        return [];
+      }
       $records[$id] = $this->overrideFree ? $config->getOriginal(NULL, FALSE) : $config->get();
       $configs[$id] = $config;
     }
