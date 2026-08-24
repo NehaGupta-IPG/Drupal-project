@@ -14,7 +14,7 @@
   background: var(--input-bg-color);
   font-size: var(--input-font-size);
   line-height: var(--input-line-height);
-  appearance: none; /* Being able to control inner box shadow on iOS. */
+  appearance: none; /* Control inner box shadow on iOS. */
 }
 
 .no-touchevents .form-element--extrasmall,
@@ -25,76 +25,69 @@
   line-height: var(--input--extrasmall-line-height);
 }
 
-/**
- * Override normalize.css's search appearance.
- */
+/* Override normalize.css's search appearance. */
 .form-element--type-search[type="search"] {
   appearance: none;
   box-sizing: border-box;
 }
 
-/**
- * Fix minor things for specific types.
- */
+/* Fix minor issues for specific input types. */
 .form-element--type-date,
 .form-element--type-time {
   /* stylelint-disable-next-line declaration-property-value-no-unknown */
   vertical-align: -webkit-baseline-middle; /* Prevent iOS input jump while filling. */
 }
+
 .form-element--type-date {
   min-width: 9.5rem; /* Prevent input width change while filling. */
 }
+
 .form-element--type-time {
   min-width: 7.5rem; /* Prevent input width change while filling. */
 }
 
 .form-element--type-color {
-  min-width: 3rem; /* Bigger input for webkit */
+  min-width: 3rem; /* Bigger input for WebKit */
   padding: 0; /* Bigger pickable area */
-  text-indent: calc(0.75rem - var(--input-border-size)); /* Text-input fallback for non-supporting browsers like Safari */
+  text-indent: calc(0.75rem - var(--input-border-size)); /* Fallback for non-supporting browsers */
 }
 
-/**
- * Better upload button alignment for Chrome.
- */
+/* Better upload button alignment for Chrome. */
 .form-element--type-file::-webkit-file-upload-button {
   vertical-align: top;
 }
 
-/**
- * States.
- */
+/* States. */
 .form-element:active {
   border-color: var(--input--focus-border-color);
 }
+
 .form-element:hover {
   border-color: var(--input--hover-border-color);
   box-shadow: inset 0 0 0 var(--input-border-size) var(--input--hover-border-color);
 }
+
 .form-element:focus {
-  box-shadow:
-    0 0 0 2px var(--color-white),
-    0 0 0 5px var(--color-focus);
+  box-shadow: 0 0 0 2px var(--color-white), 0 0 0 5px var(--color-focus);
 }
+
 .form-element:hover:focus {
-  box-shadow:
-    0 0 0 2px var(--color-white),
-    0 0 0 5px var(--color-focus),
-    inset 0 0 0 var(--input-border-size) var(--input--hover-border-color);
+  box-shadow: 0 0 0 2px var(--color-white), 0 0 0 5px var(--color-focus), inset 0 0 0 var(--input-border-size) var(--input--hover-border-color);
 }
 
 .form-element.error {
   border-width: var(--input--error-border-size);
   border-color: var(--input--error-border-color);
 }
+
 .form-element.error:hover {
   box-shadow: none;
 }
+
 .form-element.error:hover:focus {
-  box-shadow:
-    0 0 0 2px var(--color-white),
-    0 0 0 5px var(--color-focus);
+  box-shadow: 0 0 0 2px var(--color-white), 0 0 0 5px var(--color-focus);
 }
+
 .form-element--type-textarea.error + .cke {
   border-color: var(--input--error-border-color);
 }
@@ -104,15 +97,12 @@
   border-color: var(--input--disabled-border-color);
   background-color: var(--input--disabled-bg-color);
   box-shadow: none;
-  /* https://stackoverflow.com/q/262158#answer-23511280 */
-  -webkit-text-fill-color: var(--input--disabled-fg-color);
+  -webkit-text-fill-color: var(--input--disabled-fg-color); /* Prevent text fill color issue */
 }
 
-/**
- * Improve form element usability on narrow devices.
- */
+/* Improve usability on narrow devices. */
 @media screen and (max-width: 600px) {
-  /* Number, date and time are skipped here */
+  /* Number, date, and time are skipped here */
   .form-element {
     float: none;
     width: 100%;
@@ -127,4 +117,9 @@
 
 .form-element--type-textarea.error + .ck-editor > .ck-editor__main {
   border: var(--input--error-border-size) solid var(--input--error-border-color);
+}
+
+/* Prevent overlapping of collapsible fields on smaller screens. */
+.text-full.form-element {
+  width: 100%;
 }

@@ -21,7 +21,7 @@
   background: var(--input-bg-color);
   font-size: var(--input-font-size);
   line-height: var(--input-line-height);
-  appearance: none; /* Being able to control inner box shadow on iOS. */
+  appearance: none; /* Control inner box shadow on iOS. */
 }
 
 .no-touchevents .form-element--extrasmall,
@@ -32,19 +32,13 @@
   line-height: var(--input--extrasmall-line-height);
 }
 
-/**
- * Override normalize.css's search appearance.
- */
-
+/* Override normalize.css's search appearance. */
 .form-element--type-search[type="search"] {
   appearance: none;
   box-sizing: border-box;
 }
 
-/**
- * Fix minor things for specific types.
- */
-
+/* Fix minor things for specific types. */
 .form-element--type-date,
 .form-element--type-time {
   /* stylelint-disable-next-line declaration-property-value-no-unknown */
@@ -65,18 +59,12 @@
   text-indent: calc(0.75rem - var(--input-border-size)); /* Text-input fallback for non-supporting browsers like Safari */
 }
 
-/**
- * Better upload button alignment for Chrome.
- */
-
+/* Better upload button alignment for Chrome. */
 .form-element--type-file::-webkit-file-upload-button {
   vertical-align: top;
 }
 
-/**
- * States.
- */
-
+/* States. */
 .form-element:active {
   border-color: var(--input--focus-border-color);
 }
@@ -123,16 +111,12 @@
   border-color: var(--input--disabled-border-color);
   background-color: var(--input--disabled-bg-color);
   box-shadow: none;
-  /* https://stackoverflow.com/q/262158#answer-23511280 */
-  -webkit-text-fill-color: var(--input--disabled-fg-color);
+  -webkit-text-fill-color: var(--input--disabled-fg-color); /* Prevent text fill color issue */
 }
 
-/**
- * Improve form element usability on narrow devices.
- */
-
+/* Improve form element usability on narrow devices. */
 @media screen and (max-width: 37.5rem) {
-  /* Number, date and time are skipped here */
+  /* Number, date, and time are skipped here */
   .form-element {
     float: none;
     width: 100%;
@@ -147,4 +131,9 @@
 
 .form-element--type-textarea.error + .ck-editor > .ck-editor__main {
   border: var(--input--error-border-size) solid var(--input--error-border-color);
+}
+
+/* Fix overlapping of collapsible fields on smaller screens. */
+.text-full.form-element {
+  width: 100%;
 }
