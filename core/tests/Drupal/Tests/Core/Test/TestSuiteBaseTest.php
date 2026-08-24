@@ -23,9 +23,9 @@ class TestSuiteBaseTest extends TestCase {
   }
 
   /**
-   * Tests that extension discovery does not recurse into dependency directories.
+   * Tests that extension discovery does not recurse into irrelevant directories.
    */
-  public function testExtensionDirectoryDiscoverySkipsDependencyDirectories(): void {
+  public function testExtensionDirectoryDiscoverySkipsIrrelevantDirectories(): void {
     $root = vfsStream::setup('root', NULL, [
       'modules' => [
         'example' => [
@@ -35,6 +35,11 @@ class TestSuiteBaseTest extends TestCase {
               'not_an_extension.info.yml' => '',
             ],
           ],
+        ],
+      ],
+      '.git' => [
+        'not_an_extension' => [
+          'not_an_extension.info.yml' => '',
         ],
       ],
     ]);

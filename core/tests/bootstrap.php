@@ -34,7 +34,7 @@ function drupal_phpunit_find_extension_directories($scan_directory): array {
   $flags |= \FilesystemIterator::FOLLOW_SYMLINKS;
   $flags |= \FilesystemIterator::CURRENT_AS_SELF;
   $directory_iterator = new \RecursiveDirectoryIterator($scan_directory, $flags);
-  $callback = new RecursiveExtensionFilterCallback(['node_modules', 'bower_components'], TRUE);
+  $callback = new RecursiveExtensionFilterCallback(['node_modules'], TRUE);
   $filter = new \RecursiveCallbackFilterIterator($directory_iterator, [$callback, 'accept']);
   $iterator = new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::LEAVES_ONLY, \RecursiveIteratorIterator::CATCH_GET_CHILD);
   foreach ($iterator as $file) {
