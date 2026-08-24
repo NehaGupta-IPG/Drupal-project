@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\options_test\Hook;
 
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\options_test\OptionsAllowedValues;
 
 /**
  * Hook implementations for options_test.
