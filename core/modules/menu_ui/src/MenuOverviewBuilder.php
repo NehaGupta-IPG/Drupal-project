@@ -29,9 +29,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * The classic tabledrag overview used to live inside the combined menu edit
  * form. It is extracted here so that a menu's own settings and its link list
  * can live on separate pages (see
- * https://www.drupal.org/project/drupal/issues/2520232), and so the same table
- * can be reused both by the standalone "Links" page and by the settings_tray
- * off-canvas editor.
+ * https://www.drupal.org/project/drupal/issues/2520232).
  *
  * Callers build the table into a form section, record that section's parents in
  * the 'menu_overview_form_parents' form-state key, and call submit() from their
