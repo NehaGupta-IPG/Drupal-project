@@ -114,6 +114,11 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
       // $field->setSetting('allowed_values_function', $callable);
       $allowed_values_function = implode('::', $allowed_values_function);
     }
+    elseif ($allowed_values_function instanceof \Closure) {
+      // The function is set as a closure and has no meaningful string
+      // representation.
+      $allowed_values_function = 'Closure';
+    }
 
     if (!$form_state->get('items_count')) {
       $form_state->set('items_count', max(count($allowed_values), 0));
