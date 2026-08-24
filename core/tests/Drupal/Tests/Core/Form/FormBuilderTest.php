@@ -24,10 +24,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
@@ -101,7 +99,7 @@ class FormBuilderTest extends FormTestBase {
     $form_arg = 'foo';
     $form_state = new FormState();
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs('The form class foo could not be found or loaded.');
+    $this->expectExceptionMessage('The form class foo could not be found or loaded.');
     $this->formBuilder->getFormId($form_arg, $form_state);
   }
 
@@ -112,7 +110,7 @@ class FormBuilderTest extends FormTestBase {
     $form_arg = \stdClass::class;
     $form_state = new FormState();
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs("The form argument $form_arg must be an instance of \Drupal\Core\Form\FormInterface.");
+    $this->expectExceptionMessage("The form argument $form_arg must be an instance of \Drupal\Core\Form\FormInterface.");
     $this->formBuilder->getFormId($form_arg, $form_state);
   }
 
@@ -133,7 +131,8 @@ class FormBuilderTest extends FormTestBase {
    * Tests the getFormId() method with an injected class name form ID.
    */
   public function testGetFormIdWithInjectedClassName(): void {
-    \Drupal::setContainer(new ContainerBuilder());
+    $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+    \Drupal::setContainer($container);
 
     $form_arg = 'Drupal\Tests\Core\Form\TestFormInjected';
 
@@ -186,14 +185,16 @@ class FormBuilderTest extends FormTestBase {
    * Tests the handling of FormStateInterface::$response.
    */
   #[DataProvider('formStateResponseProvider')]
-  public function testHandleFormStateResponse(string $class, string $form_state_key): void {
+  public function testHandleFormStateResponse($class, $form_state_key): void {
     $form_id = 'test_form_id';
     $expected_form = self::buildTestFormStructure();
 
-    $response = $this->createStub($class);
+    $response = $this->getMockBuilder($class)
+      ->disableOriginalConstructor()
+      ->getMock();
 
     $form_arg = $this->getMockForm($form_id, $expected_form);
-    $form_arg
+    $form_arg->expects($this->any())
       ->method('submitForm')
       ->willReturnCallback(function ($form, FormStateInterface $form_state) use ($response, $form_state_key): void {
         $form_state->setFormState([$form_state_key => $response]);
@@ -233,13 +234,17 @@ class FormBuilderTest extends FormTestBase {
     $expected_form = self::buildTestFormStructure();
 
     // Set up a response that will be used.
-    $response = $this->createStub(Response::class);
+    $response = $this->getMockBuilder('Symfony\Component\HttpFoundation\Response')
+      ->disableOriginalConstructor()
+      ->getMock();
 
     // Set up a redirect that will not be called.
-    $redirect = $this->createStub(RedirectResponse::class);
+    $redirect = $this->getMockBuilder('Symfony\Component\HttpFoundation\RedirectResponse')
+      ->disableOriginalConstructor()
+      ->getMock();
 
     $form_arg = $this->getMockForm($form_id, $expected_form);
-    $form_arg
+    $form_arg->expects($this->any())
       ->method('submitForm')
       ->willReturnCallback(function ($form, FormStateInterface $form_state) use ($response, $redirect): void {
         // Set both the response and the redirect.
@@ -269,7 +274,7 @@ class FormBuilderTest extends FormTestBase {
   public function testGetFormWithString(): void {
     $form_id = 'test_form_id';
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs('The form class test_form_id could not be found or loaded.');
+    $this->expectExceptionMessage('The form class test_form_id could not be found or loaded.');
     $this->formBuilder->getForm($form_id);
   }
 
@@ -308,7 +313,7 @@ class FormBuilderTest extends FormTestBase {
   public function testBuildFormWithString(): void {
     $form_id = 'test_form_id';
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessageIs('The form class test_form_id could not be found or loaded.');
+    $this->expectExceptionMessage('The form class test_form_id could not be found or loaded.');
     $this->formBuilder->getForm($form_id);
   }
 
@@ -352,7 +357,7 @@ class FormBuilderTest extends FormTestBase {
    *   The corresponding submitted input value.
    */
   #[DataProvider('providerTestBuildFormWithTriggeringElement')]
-  public function testBuildFormWithTriggeringElement(string $element_value, string $input_value): void {
+  public function testBuildFormWithTriggeringElement($element_value, $input_value): void {
     $form_id = 'test_form_id';
     $expected_form = self::buildTestFormStructure();
 
@@ -469,8 +474,6 @@ class FormBuilderTest extends FormTestBase {
    * Tests the getCache() method.
    */
   public function testGetCache(): void {
-    $this->setUpMockFormCacheInterface();
-
     $form_id = 'test_form_id';
     $expected_form = self::buildTestFormStructure();
     $expected_form['#token'] = FALSE;
@@ -570,8 +573,6 @@ class FormBuilderTest extends FormTestBase {
    * Tests that a cached form is deleted after submit.
    */
   public function testFormCacheDeletionCached(): void {
-    $this->setUpMockFormCacheInterface();
-
     $form_id = 'test_form_id';
     $form_build_id = $this->randomMachineName();
 
@@ -602,8 +603,6 @@ class FormBuilderTest extends FormTestBase {
    * Tests that an uncached form does not trigger cache set or delete.
    */
   public function testFormCacheDeletionUncached(): void {
-    $this->setUpMockFormCacheInterface();
-
     $form_id = 'test_form_id';
     $form_build_id = $this->randomMachineName();
 
@@ -714,7 +713,7 @@ class FormBuilderTest extends FormTestBase {
    * @legacy-covers ::buildForm
    */
   #[DataProvider('providerTestChildAccessInheritance')]
-  public function testChildAccessInheritance(array $element, $access_checks): void {
+  public function testChildAccessInheritance($element, $access_checks): void {
     $form_arg = new TestFormWithPredefinedForm();
     $form_arg->setForm($element);
 
@@ -920,9 +919,7 @@ class FormBuilderTest extends FormTestBase {
     $form_id = 'test_form_id';
 
     if (is_bool($valid_token)) {
-      $this->setUpMockCsrfTokenGenerator();
-
-      $this->csrfToken
+      $this->csrfToken->expects($this->any())
         ->method('get')
         ->willReturnArgument(0);
       $this->csrfToken->expects($this->atLeastOnce())
@@ -979,7 +976,7 @@ class FormBuilderTest extends FormTestBase {
    * @legacy-covers ::prepareForm
    */
   #[DataProvider('providerTestFormTokenCacheability')]
-  public function testFormTokenCacheability(bool|string|null $token, bool $is_authenticated, string $method, bool $opted_in_for_cache): void {
+  public function testFormTokenCacheability($token, $is_authenticated, $method, $opted_in_for_cache): void {
     $user = $this->prophesize(AccountProxyInterface::class);
     $user->isAuthenticated()
       ->willReturn($is_authenticated);
@@ -1120,6 +1117,52 @@ class FormBuilderTest extends FormTestBase {
     $this->assertSame('op', $triggeringElement['#name']);
   }
 
+  /**
+   * Tests Ajax fallback uses a unique triggering element name.
+   *
+   * Ajax submissions send _triggering_element_name and
+   * _triggering_element_value. If the value no longer matches the button, the
+   * triggering element is not identified and Form API falls back to the first
+   * button. That first button is often an unrelated control such as Media
+   * Library "Add media".
+   *
+   * When the submitted name uniquely matches a button, that button must be
+   * used instead of the first-button fallback.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3174361
+   */
+  public function testTriggeringElementFallbackWithUniqueName(): void {
+    $form_arg = 'Drupal\Tests\Core\Form\TestForm';
+
+    // Ajax extra data identifies the second button, but the value no longer
+    // matches so early detection fails.
+    $form_state = new FormState();
+    $form_state->setMethod('GET');
+    $form_state->setUserInput([
+      'form_id' => 'test_form',
+      '_triggering_element_name' => 'other_action',
+      '_triggering_element_value' => 'Changed label',
+    ]);
+    $this->formBuilder->buildForm($form_arg, $form_state);
+    $triggeringElement = $form_state->getTriggeringElement();
+    $this->assertIsArray($triggeringElement);
+    $this->assertSame('other_action', $triggeringElement['#name']);
+    $this->assertSame('Other action', $triggeringElement['#value']);
+
+    // An unknown name still falls back to the first button.
+    $form_state = new FormState();
+    $form_state->setMethod('GET');
+    $form_state->setUserInput([
+      'form_id' => 'test_form',
+      '_triggering_element_name' => 'does_not_exist',
+      '_triggering_element_value' => 'Changed label',
+    ]);
+    $this->formBuilder->buildForm($form_arg, $form_state);
+    $triggeringElement = $form_state->getTriggeringElement();
+    $this->assertIsArray($triggeringElement);
+    $this->assertSame('op', $triggeringElement['#name']);
+  }
+
 }
 
 /**
@@ -1158,7 +1201,7 @@ class TestFormInjected extends TestForm implements ContainerInjectionInterface {
 class TestFormWithPredefinedForm extends TestForm {
 
   /**
-   * The form data.
+   * @var array
    */
   protected array $form;
 
