@@ -16,3 +16,14 @@
 .site-footer .block__title {
   color: var(--color--gray-65);
 }
+
+#block-olivero-primary-admin-actions {
+  margin-bottom: var(--sp);
+}
+
+#block-olivero-primary-admin-actions .button-action {
+  height: auto;
+  padding: var(--sp0-75) var(--sp);
+  border-width: 0.1em;
+  font-size: var(--font-size-base);
+}
