@@ -70,7 +70,7 @@ class LanguageFilter extends InOperator implements ContainerFactoryPluginInterfa
     $form['limit_to_content_languages'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Limit to the languages used by the content'),
-      '#description' => $this->t('When this filter is exposed, only list the languages that the content actually uses. Languages with no content, and the special options such as the site default or interface language, are not shown to visitors. A default value can still be set to a special option; it is shown to visitors as the language it resolves to.'),
+      '#description' => $this->t('When this filter is exposed, only list the languages that the content uses. Languages with no content, and options such as the site default or interface language, are not shown. The site default or interface language can be used as the default value and will display as the language it resolves to.'),
       '#default_value' => $this->options['limit_to_content_languages'],
     ];
   }
@@ -118,8 +118,7 @@ class LanguageFilter extends InOperator implements ContainerFactoryPluginInterfa
       return FALSE;
     }
     // When the options are limited to the languages the content uses, hide the
-    // exposed filter entirely unless the content uses more than one language;
-    // with one (or no) language there is nothing meaningful to choose from.
+    // exposed filter entirely unless the content uses more than one language.
     if (!empty($this->options['limit_to_content_languages']) && !empty($this->options['exposed']) && $this->table && count($this->getContentLanguageOptions()) < 2) {
       return FALSE;
     }
@@ -131,17 +130,14 @@ class LanguageFilter extends InOperator implements ContainerFactoryPluginInterfa
    */
   protected function valueForm(&$form, FormStateInterface $form_state): void {
     // The content-aware behavior only applies to the exposed form when the
-    // option is enabled. Everywhere else (including the settings form, where
-    // the default value is configured) the full list of options is used.
+    // option is enabled.
     if (empty($this->options['limit_to_content_languages']) || !$form_state->get('exposed')) {
       parent::valueForm($form, $form_state);
       return;
     }
 
     // Resolve a dynamic default value (such as the interface language) to the
-    // actual language so visitors see, and can change, a concrete language
-    // instead of an abstract option. Drop any value the content does not use,
-    // so the default is never set to a language that is not offered.
+    // actual language. Drop any value the content does not use.
     $content_options = $this->getContentLanguageOptions();
     $configured_value = $this->value;
     $this->value = array_intersect_key($this->resolveLanguageValues($this->value), $content_options);
