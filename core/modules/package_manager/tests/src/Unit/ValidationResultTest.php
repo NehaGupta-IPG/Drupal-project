@@ -67,8 +67,7 @@ class ValidationResultTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testDeprecatedGetOverallSeverity(): void {
-    // phpcs:ignore DrupalPractice.Objects.GlobalFunction
-    $results = [ValidationResult::createError([t('Boo!')])];
+    $results = [ValidationResult::createError([new TranslatableMarkup('Boo!')])];
     $this->assertSame(RequirementSeverity::Error->value, ValidationResult::getOverallSeverity($results));
   }
 
@@ -200,8 +199,7 @@ class ValidationResultTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testDeprecatedSeverityProperty(): void {
-    // phpcs:ignore DrupalPractice.Objects.GlobalFunction
-    $result = ValidationResult::createError([t('Boo!')]);
+    $result = ValidationResult::createError([new TranslatableMarkup('Boo!')]);
     $this->assertSame(RequirementSeverity::Error->value, $result->severity);
   }
 
@@ -215,8 +213,7 @@ class ValidationResultTest extends UnitTestCase {
     $reflected_constructor = new \ReflectionMethod(ValidationResult::class, '__construct');
     $reflected_class = new \ReflectionClass(ValidationResult::class);
     $result = $reflected_class->newInstanceWithoutConstructor();
-    // phpcs:ignore DrupalPractice.Objects.GlobalFunction
-    $reflected_constructor->invoke($result, RequirementSeverity::Error->value, [t('Boo!')], NULL, TRUE);
+    $reflected_constructor->invoke($result, RequirementSeverity::Error->value, [new TranslatableMarkup('Boo!')], NULL, TRUE);
     $this->assertSame(RequirementSeverity::Error, $result->severityEnum);
   }
 
