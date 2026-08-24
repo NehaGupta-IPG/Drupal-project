@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\PermissionHandlerInterface;
+use Drupal\user\RoleInterface;
 use Drupal\user\RoleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -239,8 +240,15 @@ class UserPermissionsForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    foreach ($form_state->getValue('role_names') as $role_name => $name) {
-      user_role_change_permissions($role_name, (array) $form_state->getValue($role_name));
+    $authenticated_to_revoke = array_fill_keys(array_keys(array_filter((array) $form_state->getValue(RoleInterface::AUTHENTICATED_ID))), 0);
+
+    $roles = $this->getRoles();
+    foreach ($form_state->getValue('role_names') as $rid => $name) {
+      $permissions = (array) $form_state->getValue($rid);
+      if (!in_array($rid, [RoleInterface::AUTHENTICATED_ID, RoleInterface::ANONYMOUS_ID]) && !$roles[$rid]->isAdmin()) {
+        $permissions = array_merge($permissions, $authenticated_to_revoke);
+      }
+      user_role_change_permissions($rid, $permissions);
     }
 
     $this->messenger()->addStatus($this->t('The changes have been saved.'));
