@@ -97,8 +97,6 @@ class LocaleFileManager {
    */
   public function deleteTranslationFiles(array $projects = [], array $langcodes = []): bool {
     $fail = FALSE;
-    $this->currentImportStorage->delete($projects, $langcodes);
-
     // Delete all translation files from the translations directory.
     if ($files = $this->getInterfaceTranslationFiles($projects, $langcodes)) {
       foreach ($files as $file) {

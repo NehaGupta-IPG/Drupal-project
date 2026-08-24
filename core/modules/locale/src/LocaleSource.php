@@ -332,7 +332,11 @@ class LocaleSource {
     // update the current translation timestamp and last_updated time. If the
     // project+language is not translated before, create a new record.
     $current_import_state = $this->currentImportStorage->get($project->name, $langcode);
-    if ($current_import_state instanceof CurrentImport && $current_import_state->timestamp) {
+    if (
+      $current_import_state instanceof CurrentImport
+      && $current_import_state->timestamp
+      && $current_import_state->version === $source->version
+    ) {
       $source->type = LOCALE_TRANSLATION_CURRENT;
       $source->timestamp = $current_import_state->timestamp;
       $source->hash = $current_import_state->hash;
