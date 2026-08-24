@@ -245,20 +245,13 @@ class Tables implements TablesInterface {
             $revision_table = $entity_type->getRevisionTable();
           }
         }
+        $entity_tables[$entity_base_table] = $this->getTableMapping($entity_base_table, $entity_type_id);
         if ($data_table) {
-          if (!$langcode) {
-            // Without a langcode, the data table join can return one row per
-            // translation, so the query is no longer simple. A
-            // langcode-restricted join already limits the result to a single
-            // row per entity.
-            $this->sqlQuery->addMetaData('simple_query', FALSE);
-          }
           $entity_tables[$data_table] = $this->getTableMapping($data_table, $entity_type_id);
         }
         if ($revision_table) {
           $entity_tables[$revision_table] = $this->getTableMapping($revision_table, $entity_type_id);
         }
-        $entity_tables[$entity_base_table] = $this->getTableMapping($entity_base_table, $entity_type_id);
         $sql_column = $specifier;
 
         // If there are more specifiers, get the right sql column name if the
@@ -305,6 +298,16 @@ class Tables implements TablesInterface {
         }
 
         $table = $this->ensureEntityTable($index_prefix, $sql_column, $type, $langcode, $base_table, $entity_id_field, $entity_tables);
+
+        if ($table != 'base_table') {
+          if (!$langcode) {
+            // Without a langcode, the data table join can return one row per
+            // translation, so the query is no longer simple. A
+            // langcode-restricted join already limits the result to a single
+            // row per entity.
+            $this->sqlQuery->addMetaData('simple_query', FALSE);
+          }
+        }
       }
 
       // If there is both a field storage and a field column then check for case
