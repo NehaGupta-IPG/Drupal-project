@@ -39,15 +39,4 @@ class OptionsTestHooks {
     }
   }
 
-  /**
-   * Implements hook_entity_field_storage_info_alter().
-   */
-  #[Hook('entity_field_storage_info_alter')]
-  public function entityFieldStorageInfoAlter(&$fields, EntityTypeInterface $entity_type): void {
-    if (($entity_type->id() === 'entity_test') && isset($fields['string_allowed_values_function'])) {
-      $fields['string_allowed_values_function']
-        ->setSetting('allowed_values_function', [OptionsAllowedValues::class, 'simpleValues']);
-    }
-  }
-
 }

@@ -823,6 +823,9 @@ class OptionsWidgetsTest extends FieldTestBase {
       'entity_type' => 'entity_test',
       'type' => 'list_string',
       'cardinality' => 1,
+      'settings' => [
+        'allowed_values_function' => [OptionsAllowedValues::class, 'simpleValues'],
+      ],
     ]);
     $field_storage_config->save();
 
