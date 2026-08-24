@@ -13,26 +13,16 @@
       'messages--' ~ type,
     ]
   %}
-  <div role="contentinfo" aria-label="{{ status_headings[type] }}"{{ attributes.addClass(classes)|without('role', 'aria-label') }} data-drupal-message-set>
-    {% if type == 'error' %}
-      <div role="alert">
+  <div role="{{ type in ['error', 'warning'] ? 'alert' : 'status' }}" aria-label="{{ status_headings[type] }}"{{ attributes.addClass(classes)|without('role', 'aria-label') }} data-drupal-message-set>
+    {% if status_headings[type] %}
+      <h2 class="visually-hidden">{{ status_headings[type] }}</h2>
     {% endif %}
-      {% if status_headings[type] %}
-        <h2 class="visually-hidden">{{ status_headings[type] }}</h2>
-      {% endif %}
-      {% if messages|length > 1 %}
-        <ul class="messages__list" data-drupal-message-list-type="{{ type }}">
-          {%- for message in messages %}
-            {% message.attributes.addClass('messages__item') %}
-            {{ message }}
-          {%- endfor -%}
-        </ul>
-      {% else %}
-        {{ messages|first }}
-      {% endif %}
-    {% if type == 'error' %}
-      </div>
-    {% endif %}
+      <ul class="messages__list" data-drupal-message-list-type="{{ type }}">
+        {%- for message in messages %}
+          {% message.attributes.addClass('messages__item') %}
+          {{ message }}
+        {%- endfor -%}
+      </ul>
   </div>
   {# Remove type specific classes. #}
   {% set attributes = attributes.removeClass(classes) %}
