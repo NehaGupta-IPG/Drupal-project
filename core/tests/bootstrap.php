@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-use Drupal\Core\Extension\Discovery\RecursiveExtensionFilterCallback;
+use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\TextUI\Configuration\Registry as PhpunitConfigurationRegistry;
 
@@ -24,26 +24,11 @@ use PHPUnit\TextUI\Configuration\Registry as PhpunitConfigurationRegistry;
  *   directory, keyed by extension name.
  */
 function drupal_phpunit_find_extension_directories($scan_directory): array {
-  $extensions = [];
-  // Use Unix paths regardless of platform, skip dot directories, follow
-  // symlinks (to allow extensions to be linked from elsewhere), and return
-  // the RecursiveDirectoryIterator instance to have access to getSubPath(),
-  // since SplFileInfo does not support relative paths.
-  $flags = \FilesystemIterator::UNIX_PATHS;
-  $flags |= \FilesystemIterator::SKIP_DOTS;
-  $flags |= \FilesystemIterator::FOLLOW_SYMLINKS;
-  $flags |= \FilesystemIterator::CURRENT_AS_SELF;
-  $directory_iterator = new \RecursiveDirectoryIterator($scan_directory, $flags);
-  $callback = new RecursiveExtensionFilterCallback(['node_modules'], TRUE);
-  $filter = new \RecursiveCallbackFilterIterator($directory_iterator, [$callback, 'accept']);
-  $iterator = new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::LEAVES_ONLY, \RecursiveIteratorIterator::CATCH_GET_CHILD);
-  foreach ($iterator as $file) {
-    // Cut off ".info.yml" from the filename for use as the extension name. We
-    // use getRealPath() so that we can scan extensions represented by
-    // directory aliases.
-    $extensions[substr($file->getFilename(), 0, -9)] = dirname($file->getRealPath() ?: $file->getPathname());
-  }
-  return $extensions;
+  return ExtensionDiscovery::findExtensionDirectories(
+    $scan_directory,
+    ['node_modules', 'bower_components'],
+    TRUE,
+  );
 }
 
 /**

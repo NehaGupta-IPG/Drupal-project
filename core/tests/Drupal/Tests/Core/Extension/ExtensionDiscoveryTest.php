@@ -73,6 +73,28 @@ class ExtensionDiscoveryTest extends UnitTestCase {
   }
 
   /**
+   * Tests finding extension directories without initializing Drupal.
+   */
+  public function testFindExtensionDirectories(): void {
+    $root = vfsStream::setup('root', NULL, [
+      'modules' => [
+        'example' => [
+          'example.info.yml' => '',
+          'node_modules' => [
+            'not_an_extension' => [
+              'not_an_extension.info.yml' => '',
+            ],
+          ],
+        ],
+      ],
+    ]);
+
+    $extensions = ExtensionDiscovery::findExtensionDirectories($root->url(), ['node_modules'], TRUE);
+
+    $this->assertSame(['example'], array_keys($extensions));
+  }
+
+  /**
    * Adds example files to the filesystem structure.
    *
    * @param array $filesystem_structure

@@ -279,6 +279,44 @@ class ExtensionDiscovery {
   }
 
   /**
+   * Finds extension directories beneath a filesystem path.
+   *
+   * @param string $scan_directory
+   *   The absolute directory to scan.
+   * @param string[] $ignore_directories
+   *   Directory names to exclude from the scan.
+   * @param bool $include_tests
+   *   Whether to include extensions below test directories.
+   *
+   * @return string[]
+   *   An associative array of extension names keyed to their absolute paths.
+   */
+  public static function findExtensionDirectories(string $scan_directory, array $ignore_directories = [], bool $include_tests = FALSE): array {
+    $extensions = [];
+    if (!is_dir($scan_directory)) {
+      return $extensions;
+    }
+
+    // Use Unix paths regardless of platform, skip dot directories, follow
+    // symlinks (to allow extensions to be linked from elsewhere), and return
+    // the RecursiveDirectoryIterator instance to have access to getSubPath(),
+    // since SplFileInfo does not support relative paths.
+    $flags = \FilesystemIterator::UNIX_PATHS;
+    $flags |= \FilesystemIterator::SKIP_DOTS;
+    $flags |= \FilesystemIterator::FOLLOW_SYMLINKS;
+    $flags |= \FilesystemIterator::CURRENT_AS_SELF;
+    $directory_iterator = new \RecursiveDirectoryIterator($scan_directory, $flags);
+    $callback = new RecursiveExtensionFilterCallback($ignore_directories, $include_tests);
+    $filter = new \RecursiveCallbackFilterIterator($directory_iterator, [$callback, 'accept']);
+    $iterator = new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::LEAVES_ONLY, \RecursiveIteratorIterator::CATCH_GET_CHILD);
+
+    foreach ($iterator as $file) {
+      $extensions[substr($file->getFilename(), 0, -9)] = dirname($file->getRealPath() ?: $file->getPathname());
+    }
+    return $extensions;
+  }
+
+  /**
    * Filters out extensions not belonging to the scanned installation profiles.
    *
    * @param \Drupal\Core\Extension\Extension[] $all_files
