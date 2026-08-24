@@ -68,9 +68,9 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   protected function doToContainsSql(string $encoded_value): string {
-    // Values are embedded inside single-quoted SQL string literals (jsonpath
-    // expressions). Use quote() for driver-correct escaping, then strip the
-    // surrounding quotes it adds since we're inside an existing literal.
+    // Escape the encoded value with quote(), then strip the surrounding
+    // quotes it adds: the value is embedded inside an existing single-quoted
+    // jsonpath literal. The other embedding sites in this class do the same.
     $sql_value = substr($this->connection->quote($encoded_value), 1, -1);
     $quoted_path = $this->connection->quote($this->path);
     return "JSONB_PATH_QUERY_ARRAY({$this->field}, {$quoted_path}) @> '[{$sql_value}]'";
@@ -92,13 +92,10 @@ class JsonExpression extends BaseJsonExpression {
     $encoded = is_string($value) || is_bool($value)
       ? json_encode($value, JSON_THROW_ON_ERROR)
       : $value;
-    // Values are embedded inside single-quoted SQL string literals (jsonpath
-    // expressions). Use quote() for driver-correct escaping, then strip the
-    // surrounding quotes it adds since we're inside an existing literal.
+    // Escape the encoded value before embedding it in the jsonpath predicate.
     $sql_value = substr($this->connection->quote((string) $encoded), 1, -1);
-    // The path and value are combined in one SQL string literal. Escape
-    // single quotes in the path; $sql_value is already escaped above.
-    $escaped_path = str_replace("'", "''", $this->path);
+    // Escape the path before embedding it in the same predicate.
+    $escaped_path = substr($this->connection->quote($this->path), 1, -1);
     // PDO requires the ? be doubled else they are considered placeholders.
     return [
       'sql' => "{$this->field} @?? '{$escaped_path} ? (@ {$op} {$sql_value})'",
@@ -113,7 +110,8 @@ class JsonExpression extends BaseJsonExpression {
     // jsonb_path_query returns one row per value the jsonpath matches, so the
     // wildcard needs no rewriting. The #>> operator reads the value of a row as
     // text, with an empty path array addressing the value itself.
-    $escaped_path = str_replace("'", "''", $this->path);
+    // Escape the path before embedding it in the function call.
+    $escaped_path = substr($this->connection->quote($this->path), 1, -1);
     return [
       'from' => "jsonb_path_query({$this->field}::jsonb, '{$escaped_path}') AS v",
       'value' => "v #>> '{}'",
