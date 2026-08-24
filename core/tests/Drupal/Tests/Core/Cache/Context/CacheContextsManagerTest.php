@@ -9,12 +9,15 @@ use Drupal\Core\Cache\Context\CacheContextInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
 use Drupal\Core\DependencyInjection\Container as DrupalContainer;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\Stub;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\Container;
 
 // cspell:ignore cnenzrgre
@@ -142,6 +145,31 @@ class CacheContextsManagerTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * Tests that convertTokensToKeys() memoizes results within a request.
+   */
+  public function testConvertTokensToKeysMemoization(): void {
+    // Memoization only applies to anonymous users.
+    $container = $this->getMockContainer(anonymous: TRUE);
+    $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
+
+    $tokens = ['foo', 'baz:parameterA'];
+
+    // First call computes the result.
+    $result1 = $cache_contexts_manager->convertTokensToKeys($tokens);
+    // Second call with the same tokens should return the memoized result.
+    $result2 = $cache_contexts_manager->convertTokensToKeys($tokens);
+    $this->assertSame($result1, $result2, 'Repeated calls with the same tokens return the same memoized object.');
+
+    // Call with different order should also hit the cache (tokens are sorted).
+    $result3 = $cache_contexts_manager->convertTokensToKeys(array_reverse($tokens));
+    $this->assertSame($result1, $result3, 'Token order does not affect memoization.');
+
+    // Different tokens should return a different result.
+    $result4 = $cache_contexts_manager->convertTokensToKeys(['foo']);
+    $this->assertNotSame($result1, $result4, 'Different tokens produce different results.');
+  }
+
   public function testAvailableContextStrings(): void {
     $cache_contexts_manager = new CacheContextsManager($this->getMockContainer(), $this->getContextsFixture());
     $contexts = $cache_contexts_manager->getAll();
@@ -160,7 +188,13 @@ class CacheContextsManagerTest extends UnitTestCase {
     return ['foo', 'baz'];
   }
 
-  protected function getMockContainer(): Stub {
+  protected function getMockContainer(bool $anonymous = FALSE): Stub {
+    $current_user = $this->createStub(AccountProxyInterface::class);
+    $current_user->method('isAnonymous')->willReturn($anonymous);
+
+    $request_stack = $this->createStub(RequestStack::class);
+    $request_stack->method('getCurrentRequest')->willReturn(new Request());
+
     $container = $this->createStub(DrupalContainer::class);
     $container
       ->method('get')
@@ -174,6 +208,16 @@ class CacheContextsManagerTest extends UnitTestCase {
           'cache_context.baz',
           Container::EXCEPTION_ON_INVALID_REFERENCE,
           new BazCacheContext(),
+        ],
+        [
+          'current_user',
+          Container::EXCEPTION_ON_INVALID_REFERENCE,
+          $current_user,
+        ],
+        [
+          'request_stack',
+          Container::EXCEPTION_ON_INVALID_REFERENCE,
+          $request_stack,
         ],
       ]);
     return $container;

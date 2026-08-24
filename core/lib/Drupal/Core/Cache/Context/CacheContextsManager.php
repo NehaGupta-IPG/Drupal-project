@@ -3,7 +3,9 @@
 namespace Drupal\Core\Cache\Context;
 
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Converts cache context tokens into cache keys.
@@ -40,6 +42,25 @@ class CacheContextsManager {
    * The set of valid context tokens.
    */
   protected array $validContextTokens;
+
+  /**
+   * Cached reference to the current_user service.
+   */
+  protected ?AccountProxyInterface $currentUser = NULL;
+
+  /**
+   * Cached reference to the request_stack service.
+   */
+  protected ?RequestStack $requestStack = NULL;
+
+  /**
+   * Per-request cache for convertTokensToKeys() results (anonymous only).
+   *
+   * Keyed by the request object ID and sorted, comma-separated context tokens.
+   *
+   * @var \Drupal\Core\Cache\Context\ContextCacheKeys[]
+   */
+  protected array $convertedKeysCache = [];
 
   /**
    * Constructs a CacheContextsManager object.
@@ -106,6 +127,28 @@ class CacheContextsManager {
    */
   public function convertTokensToKeys(array $context_tokens) {
     assert($this->assertValidTokens($context_tokens));
+
+    // Memoize results for anonymous users only. During rendering, the same
+    // set of cache context tokens is passed to this method many times per
+    // request. Sorting ensures order-independent cache hits.
+    //
+    // For authenticated users, memoization is skipped because cache context
+    // values can change mid-request (e.g., role grants, AccountSwitcher,
+    // subrequests). The request object ID is included in the key so that
+    // subrequests get their own cache partition.
+    $this->currentUser ??= $this->container->get('current_user');
+    if ($this->currentUser->isAnonymous()) {
+      $this->requestStack ??= $this->container->get('request_stack');
+      $request_id = spl_object_id($this->requestStack->getCurrentRequest());
+      $sorted = $context_tokens;
+      sort($sorted);
+      $cache_key = $request_id . ':' . implode(',', $sorted);
+
+      if (isset($this->convertedKeysCache[$cache_key])) {
+        return $this->convertedKeysCache[$cache_key];
+      }
+    }
+
     $cacheable_metadata = new CacheableMetadata();
     $optimized_tokens = $this->optimizeTokens($context_tokens);
     // Iterate over cache contexts that have been optimized away and get their
@@ -125,7 +168,12 @@ class CacheContextsManager {
 
     // Create the returned object and merge in the cacheability metadata.
     $context_cache_keys = new ContextCacheKeys($keys);
-    return $context_cache_keys->merge($cacheable_metadata);
+    $result = $context_cache_keys->merge($cacheable_metadata);
+
+    if (isset($cache_key)) {
+      $this->convertedKeysCache[$cache_key] = $result;
+    }
+    return $result;
   }
 
   /**

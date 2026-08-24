@@ -33926,7 +33926,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$container of class Drupal\\\\Core\\\\Cache\\\\Context\\\\CacheContextsManager constructor expects Symfony\\\\Component\\\\DependencyInjection\\\\ContainerInterface, PHPUnit\\\\Framework\\\\MockObject\\\\Stub given\\.$#',
 	'identifier' => 'argument.type',
-	'count' => 5,
+	'count' => 6,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Cache/Context/CacheContextsManagerTest.php',
 ];
 $ignoreErrors[] = [
