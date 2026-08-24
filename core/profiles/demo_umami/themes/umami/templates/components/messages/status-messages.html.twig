@@ -30,7 +30,7 @@
           'messages--' ~ type,
         ]
       %}
-      <drupal-umami-messages aria-label="{{ status_headings[type] }}" {{ attributes.addClass(classes)|without('aria-label') }} role={{ type == 'error' or type == 'warning' ? 'alert' : 'status' }} data-drupal-message-set>
+            <drupal-umami-messages aria-label="{{ status_headings[type] }}" {{ attributes.addClass(classes)|without('aria-label') }} role={{ type == 'error' or type == 'warning' ? 'alert' : 'status' }} data-drupal-message-set>
         {% if status_headings[type] %}
           <span slot="title">{{ status_headings[type] }}</span>
         {% endif %}
