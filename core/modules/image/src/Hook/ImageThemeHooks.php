@@ -57,6 +57,7 @@ class ImageThemeHooks {
           'alt' => '',
           'title' => NULL,
           'attributes' => [],
+          'preload' => FALSE,
         ],
         'initial preprocess' => static::class . ':preprocessImageStyle',
       ],
@@ -110,6 +111,7 @@ class ImageThemeHooks {
           'attributes' => NULL,
           'url' => NULL,
           'image_style' => NULL,
+          'preload' => FALSE,
         ],
         'initial preprocess' => static::class . ':preprocessImageFormatter',
       ],
@@ -148,6 +150,7 @@ class ImageThemeHooks {
    *   - attributes: An optional associative array of html attributes to be
    *     placed in the img tag.
    *   - image_style: An optional image style.
+   *   - preload: Determine whether we need to add preload link.
    *   - url: An optional \Drupal\Core\Url object.
    */
   public function preprocessImageFormatter(array &$variables): void {
@@ -163,6 +166,7 @@ class ImageThemeHooks {
       ];
     }
     $variables['image']['#attributes'] = $variables['attributes'];
+    $variables['image']['#preload'] = $variables['preload'];
 
     $item = $variables['item'];
 
@@ -344,6 +348,7 @@ class ImageThemeHooks {
    *     popular browsers.
    *   - attributes: Associative array of additional attributes to be placed in
    *     the img tag.
+   *   - preload: Determine whether we need to add preload link.
    */
   public function preprocessImageStyle(array &$variables): void {
     $style = ImageStyle::load($variables['style_name']);
@@ -362,6 +367,7 @@ class ImageThemeHooks {
       '#height' => $dimensions['height'],
       '#attributes' => $variables['attributes'],
       '#style_name' => $variables['style_name'],
+      '#preload' => $variables['preload'],
     ];
 
     // If the current image toolkit supports this file type, prepare the URI for
@@ -375,6 +381,7 @@ class ImageThemeHooks {
       // Don't render the image by default, but allow other preprocess functions
       // to override that if they need to.
       $variables['image']['#access'] = FALSE;
+      $variables['image']['#preload'] = FALSE;
 
       // Inform the site builders why their image didn't work.
       ($this->imageLogger)()->warning('Could not apply @style image style to @uri because the style does not support it.', [

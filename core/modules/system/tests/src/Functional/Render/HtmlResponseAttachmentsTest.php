@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class HtmlResponseAttachmentsTest extends BrowserTestBase {
 
+  use AssertPageHeadTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -118,25 +120,13 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
    * @internal
    */
   protected function assertFeed(): void {
-    // Discover the DOM element for the feed link.
-    $test_meta = $this->xpath('//head/link[@href="test://url"]');
-    $this->assertCount(1, $test_meta, 'Link has URL.');
-    // Reconcile the other attributes.
     $test_meta_attributes = [
       'href' => 'test://url',
       'rel' => 'alternate',
       'type' => 'application/rss+xml',
       'title' => 'Your RSS feed.',
     ];
-    $test_meta = reset($test_meta);
-    if (empty($test_meta)) {
-      $this->fail('Unable to find feed link.');
-    }
-    else {
-      foreach ($test_meta_attributes as $attribute => $value) {
-        $this->assertEquals($value, $test_meta->getAttribute($attribute));
-      }
-    }
+    $this->assertPageHead('link', $test_meta_attributes, 1);
   }
 
   /**
@@ -145,17 +135,10 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
    * @internal
    */
   protected function assertHead(): void {
-    // Discover the DOM element for the meta link.
-    $test_meta = $this->xpath('//head/meta[@test-attribute="test_value"]');
-    $this->assertCount(1, $test_meta, 'There\'s only one test attribute.');
-    // Grab the only DOM element.
-    $test_meta = reset($test_meta);
-    if (empty($test_meta)) {
-      $this->fail('Unable to find the head meta.');
-    }
-    else {
-      $this->assertEquals('test_value', $test_meta->getAttribute('test-attribute'));
-    }
+    $test_meta_attributes = [
+      'test-attribute' => 'test_value',
+    ];
+    $this->assertPageHead('meta', $test_meta_attributes, 1);
   }
 
 }

@@ -21,7 +21,7 @@ umami.wide:
     - 2x
 umami.hero_tiny:
   label: Hero tiny
-  mediaQuery: 'all'
+  mediaQuery: 'all and (max-width: 499px)'
   weight: 0
 umami.hero_medium:
   label: Hero medium

@@ -72,6 +72,7 @@ class ImageFormatter extends ImageFormatterBase {
       'image_style' => '',
       'image_link' => '',
       'image_loading' => [
+        'preload' => FALSE,
         'attribute' => 'lazy',
       ],
     ] + parent::defaultSettings();
@@ -115,7 +116,30 @@ class ImageFormatter extends ImageFormatterBase {
       '#type' => 'details',
       '#title' => $this->t('Image loading'),
       '#weight' => 10,
-      '#description' => $this->t('Lazy render images with native image loading attribute (<em>loading="lazy"</em>). This improves performance by allowing browsers to lazily load images.'),
+      '#description' => $this->t('Render images with page preload link or image loading attribute.'),
+    ];
+    $element['image_loading']['preload'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Preload'),
+      '#default_value' => $image_loading['preload'] ?? FALSE,
+      '#description' => $this->t('Preload to optimize the loading of late-discovered resources. Normally large or hero images below the fold. <a href=":link_preload">Learn more about preload</a> and see <a href=":link_examples">examples for images</a>', [
+        ':link_preload' => 'https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/preload',
+        ':link_examples' => 'https://html.spec.whatwg.org/multipage/semantics.html#attr-link-imagesrcset',
+      ]),
+    ];
+    $element['image_loading']['attribute_pre_description'] = [
+      '#type' => 'container',
+      'description' => [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#value' => $this->t('Lazy render images with native image loading attribute (<em>loading="lazy"</em>). This improves performance by allowing browsers to lazily load images.'),
+        '#attributes' => ['class' => ['form-item__description']],
+      ],
+      '#states' => [
+        'visible' => [
+          ':input[name*="preload"]' => ['checked' => FALSE],
+        ],
+      ],
     ];
     $loading_attribute_options = [
       'lazy' => $this->t('Lazy (<em>loading="lazy"</em>)'),
@@ -129,6 +153,11 @@ class ImageFormatter extends ImageFormatterBase {
       '#description' => $this->t('Select the loading attribute for images. <a href=":link">Learn more about the loading attribute for images.</a>', [
         ':link' => 'https://html.spec.whatwg.org/multipage/urls-and-fetching.html#lazy-loading-attributes',
       ]),
+      '#states' => [
+        'visible' => [
+          ':input[name*="preload"]' => ['checked' => FALSE],
+        ],
+      ],
     ];
     $element['image_loading']['attribute']['lazy']['#description'] = $this->t('Delays loading the image until that section of the page is visible in the browser. When in doubt, lazy loading is recommended.');
     $element['image_loading']['attribute']['eager']['#description'] = $this->t('Force browsers to download an image as soon as possible. This is the browser default for legacy reasons. Only use this option when the image is always expected to render.');
@@ -167,7 +196,9 @@ class ImageFormatter extends ImageFormatterBase {
 
     $image_loading = $this->getSetting('image_loading');
     $summary[] = $this->t('Image loading: @attribute', [
-      '@attribute' => $image_loading['attribute'],
+      '@attribute' => array_key_exists('preload', $image_loading) && $image_loading['preload']
+        ? $this->t('preload')
+        : $image_loading['attribute'],
     ]);
 
     return array_merge($summary, parent::settingsSummary());
@@ -221,7 +252,9 @@ class ImageFormatter extends ImageFormatterBase {
       unset($item->_attributes);
 
       $image_loading_settings = $this->getSetting('image_loading');
-      $attributes['loading'] = $image_loading_settings['attribute'];
+      if (empty($image_loading_settings['preload'])) {
+        $attributes['loading'] = $image_loading_settings['attribute'];
+      }
 
       $elements[$delta] = [
         '#theme' => 'image_formatter',
@@ -229,6 +262,7 @@ class ImageFormatter extends ImageFormatterBase {
         '#attributes' => $attributes,
         '#image_style' => $image_style_setting,
         '#url' => $url,
+        '#preload' => $image_loading_settings['preload'] ?? FALSE,
         '#cache' => [
           'tags' => $cache_tags,
         ],

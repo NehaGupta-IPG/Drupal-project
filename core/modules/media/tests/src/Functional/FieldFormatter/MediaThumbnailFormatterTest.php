@@ -10,6 +10,7 @@ use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
 use Drupal\media\Plugin\Field\FieldFormatter\MediaThumbnailFormatter;
 use Drupal\Tests\media\Functional\MediaFunctionalTestBase;
+use Drupal\Tests\system\Functional\Render\AssertPageHeadTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class MediaThumbnailFormatterTest extends MediaFunctionalTestBase {
 
+  use AssertPageHeadTrait;
   use TestFileCreationTrait;
 
   /**
@@ -72,7 +74,7 @@ class MediaThumbnailFormatterTest extends MediaFunctionalTestBase {
       ->save();
 
     // Change the image thumbnail to point into the media.
-    $this->changeMediaReferenceFieldLinkType('media');
+    $this->changeMediaReferenceFieldLinkType('media', TRUE);
 
     // Create and upload a file to the media.
     $file = File::create([
@@ -97,18 +99,31 @@ class MediaThumbnailFormatterTest extends MediaFunctionalTestBase {
 
     // Validate the image being loaded with the media reference.
     $this->assertSession()->responseContains('<a href="' . $mediaImage->toUrl('edit-form')->toString());
+    $this->assertSession()->responseNotContains('loading="eager"');
+    // Check preload head link tag.
+    $this->assertPageHead('link', [
+      'rel' => 'preload',
+      'as' => 'image',
+      'href' => $file->createFileUrl(),
+    ], 1);
 
     // Retrieve the created node.
     $node = $this->drupalGetNodeByTitle($title);
     $nid = $node->id();
 
     // Change the image thumbnail to point into the content node.
-    $this->changeMediaReferenceFieldLinkType('content');
+    $this->changeMediaReferenceFieldLinkType('content', FALSE);
     $this->drupalGet('node/' . $nid);
 
     // Validate image being loaded with the content on the link.
     $this->assertSession()->responseContains('<a href="' . $node->toUrl()->toString());
     $this->assertSession()->responseContains('loading="eager"');
+    // Check preload head link tag.
+    $this->assertPageHead('link', [
+      'rel' => 'preload',
+      'as' => 'image',
+      'href' => $file->createFileUrl(),
+    ], 0);
   }
 
   /**
@@ -116,8 +131,10 @@ class MediaThumbnailFormatterTest extends MediaFunctionalTestBase {
    *
    * @param string $type
    *   Image link type.
+   * @param bool $preload
+   *   Preload option.
    */
-  private function changeMediaReferenceFieldLinkType(string $type): void {
+  private function changeMediaReferenceFieldLinkType(string $type, bool $preload): void {
     // Change the display to use the media thumbnail formatter with image link.
     $this->container->get('entity_display.repository')
       ->getViewDisplay('node', 'article', 'default')
@@ -126,7 +143,10 @@ class MediaThumbnailFormatterTest extends MediaFunctionalTestBase {
         'settings' => [
           'image_link' => $type,
           'image_style' => '',
-          'image_loading' => ['attribute' => 'eager'],
+          'image_loading' => [
+            'preload' => $preload,
+            'attribute' => 'eager',
+          ],
         ],
       ])
       ->save();

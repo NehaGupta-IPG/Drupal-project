@@ -4,6 +4,7 @@ namespace Drupal\responsive_image\Hook;
 
 use Drupal\breakpoint\BreakpointManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Template\Attribute;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Drupal\responsive_image\ResponsiveImageBuilder;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
@@ -35,6 +36,7 @@ class ResponsiveImageThemeHooks {
           'responsive_image_style_id' => [],
           'height' => NULL,
           'width' => NULL,
+          'preload' => FALSE,
         ],
         'initial preprocess' => static::class . ':preprocessResponsiveImage',
       ],
@@ -44,6 +46,7 @@ class ResponsiveImageThemeHooks {
           'item' => NULL,
           'url' => NULL,
           'responsive_image_style_id' => NULL,
+          'preload' => FALSE,
         ],
         'initial preprocess' => static::class . ':preprocessResponsiveImageFormatter',
       ],
@@ -62,6 +65,7 @@ class ResponsiveImageThemeHooks {
    *     placed in the img tag.
    *   - responsive_image_style_id: A responsive image style.
    *   - url: An optional \Drupal\Core\Url object.
+   *   - preload: Determine whether we need to add preload link.
    */
   public function preprocessResponsiveImageFormatter(&$variables): void {
     // Provide fallback to standard image if valid responsive image style is not
@@ -99,6 +103,7 @@ class ResponsiveImageThemeHooks {
       $variables['responsive_image']["#$key"] = $item->$key;
     }
     $variables['responsive_image']['#attributes'] = $attributes;
+    $variables['responsive_image']['#preload'] = $variables['preload'];
   }
 
   /**
@@ -114,6 +119,7 @@ class ResponsiveImageThemeHooks {
    *   - attributes: Associative array of attributes to be placed in the img
    *     tag.
    *   - responsive_image_style_id: The ID of the responsive image style.
+   *   - preload: Determine whether we need to add preload link.
    */
   public function preprocessResponsiveImage(array &$variables): void {
     // Make sure that width and height are proper values, if they exist we'll
@@ -205,6 +211,62 @@ class ResponsiveImageThemeHooks {
       }
       $variables['img_element']['#attributes'] = $variables['attributes'];
     }
+
+    // Prepare preload links.
+    if ($variables['preload']) {
+      $html_head = [];
+      foreach ($variables['sources'] as $source) {
+        $html_head[] = $this->responsiveImagePrepareHeaderLink($variables['uri'], $source);
+      }
+      $variables['img_element']['#preload'] = $html_head;
+    }
+  }
+
+  /**
+   * Prepare preload links for the page HTML head.
+   *
+   * @param string $uri
+   *   URI of the file.
+   * @param \Drupal\Core\Template\Attribute $item
+   *   Source item.
+   *
+   * @return array
+   *   Preload link data.
+   */
+  protected function responsiveImagePrepareHeaderLink(string $uri, Attribute $item): array {
+    // Each field may have different mime types for each image just like URIs.
+    $mime = @mime_content_type($uri);
+    $item_type = $item['type'] ?? NULL;
+    $mime = $item_type ? $item_type->value() : $mime;
+
+    [$type] = array_map('trim', explode('/', $mime, 2));
+
+    $attrs = [
+      'rel' => 'preload',
+      'as' => $type,
+      'type' => $mime,
+      'imagesrcset' => $item['srcset']->value(),
+    ];
+
+    if ($sizes = ($item['sizes'] ?? NULL)) {
+      $attrs['imagesizes'] = $sizes->value();
+    }
+    elseif ($media = ($item['media'] ?? NULL)) {
+      $attrs['media'] = $media->value();
+    }
+
+    // Prepare a unique key to prevent the case when we have several preloaded
+    // images on the page and the IDs of the html_head attachments
+    // will conflict.
+    $key = hash('crc32', serialize($attrs));
+
+    return [
+      [
+        '#tag' => 'link',
+        '#attributes' => $attrs,
+      ],
+      'responsive_preload_' . $type . '_' . $key,
+    ];
   }
 
 }

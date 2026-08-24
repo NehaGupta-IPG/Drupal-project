@@ -67,8 +67,10 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
-      // @todo leaving this here now but new update hooks will need to update.
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
+      if ($this->processImagePreloadFieldHandler($handler, $handler_type, $view)) {
+        return TRUE;
+      }
       return FALSE;
     });
   }
@@ -128,6 +130,60 @@ class ViewsConfigUpdater {
 
     if ($changed) {
       $view->set('display', $displays);
+    }
+
+    return $changed;
+  }
+
+  /**
+   * Add lazy load options to all image type field configurations.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View to update.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function needsImagePreloadFieldUpdate(ViewEntityInterface $view) {
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) use ($view) {
+      return $this->processImagePreloadFieldHandler($handler, $handler_type, $view);
+    });
+  }
+
+  /**
+   * Processes image type fields.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View being updated.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  protected function processImagePreloadFieldHandler(array &$handler, string $handler_type, ViewEntityInterface $view) {
+    $changed = FALSE;
+
+    $allowed_types = ['image', 'responsive_image', 'media_thumbnail'];
+
+    // Add any missing settings for lazy loading.
+    if (($handler_type === 'field')
+      && isset($handler['plugin_id'], $handler['type'])
+      && $handler['plugin_id'] === 'field'
+      && in_array($handler['type'], $allowed_types)
+      && !isset($handler['settings']['image_loading']['preload'])) {
+      $image_loading = $handler['settings']['image_loading'] ?? [];
+      // In the context of #3192234, we updated the image loading config for the
+      // "responsive_image" formatter, but forgot to do the same for "image" and
+      // "media_thumbnail" formatters.
+      // @see processResponsiveImageLazyLoadFieldHandler()
+      if (!$image_loading) {
+        $image_loading = ['attribute' => 'eager'];
+      }
+      $handler['settings']['image_loading'] = ['preload' => FALSE] + $image_loading;
+      $changed = TRUE;
     }
 
     return $changed;

@@ -25,6 +25,7 @@ content:
       responsive_image_style: hero
       image_link: ''
       image_loading:
+        preload: true
         attribute: eager
     third_party_settings: {  }
     weight: 1

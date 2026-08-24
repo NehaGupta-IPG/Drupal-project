@@ -120,16 +120,20 @@ class MediaThumbnailFormatter extends ImageFormatter {
       return $elements;
     }
 
+    $attributes = [];
     $image_style_setting = $this->getSetting('image_style');
+    $image_loading_settings = $this->getSetting('image_loading');
+    if (empty($image_loading_settings['preload'])) {
+      $attributes['loading'] = $image_loading_settings['attribute'];
+    }
 
     /** @var \Drupal\media\MediaInterface[] $media_items */
     foreach ($media_items as $delta => $media) {
       $elements[$delta] = [
         '#theme' => 'image_formatter',
         '#item' => $media->get('thumbnail')->first(),
-        '#attributes' => [
-          'loading' => $this->getSetting('image_loading')['attribute'],
-        ],
+        '#preload' => $image_loading_settings['preload'] ?? FALSE,
+        '#attributes' => $attributes,
         '#image_style' => $this->getSetting('image_style'),
         '#url' => $this->getMediaThumbnailUrl($media, $items->getEntity()),
       ];
