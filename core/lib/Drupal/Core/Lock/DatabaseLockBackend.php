@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
+use Drupal\Core\Shutdown\ShutdownHandler;
 
 /**
  * Defines the database lock backend. This is the default backend in Drupal.
@@ -35,7 +36,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
   public function __construct(Connection $database) {
     // __destruct() is causing problems with garbage collections, register a
     // shutdown function instead.
-    drupal_register_shutdown_function([$this, 'releaseAll']);
+    ShutdownHandler::getInstance()->add([$this, 'releaseAll']);
     $this->database = $database;
   }
 

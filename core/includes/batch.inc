@@ -18,6 +18,7 @@ use Drupal\Component\Utility\Timer;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Batch\Percentage;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Shutdown\ShutdownHandler;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -63,7 +64,7 @@ function _batch_page(Request $request) {
   // updated.
   // @see _batch_shutdown()
   // @see \Symfony\Component\HttpFoundation\Response::send()
-  drupal_register_shutdown_function('_batch_shutdown');
+  ShutdownHandler::getInstance()->add('_batch_shutdown');
   _batch_needs_update(TRUE);
 
   $build = [];
@@ -566,7 +567,7 @@ function _batch_finished() {
  * Shutdown function: Stores the current batch data for the next request.
  *
  * @see _batch_page()
- * @see drupal_register_shutdown_function()
+ * @see \Drupal\Core\Shutdown\ShutdownHandler::add()
  */
 function _batch_shutdown(): void {
   if (($batch = batch_get()) && _batch_needs_update()) {

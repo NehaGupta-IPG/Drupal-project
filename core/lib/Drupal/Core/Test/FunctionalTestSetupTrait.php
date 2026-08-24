@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Test;
 
+use Drupal\Core\Shutdown\ShutdownHandler;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\Environment;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
@@ -723,9 +724,7 @@ trait FunctionalTestSetupTrait {
     // and will be changed by the test run. Otherwise it will contain callbacks
     // from both environments and the testing environment will try to call the
     // handlers defined by the original one.
-    $callbacks = &drupal_register_shutdown_function();
-    $this->originalShutdownCallbacks = $callbacks;
-    $callbacks = [];
+    $this->originalShutdownCallbacks = ShutdownHandler::getInstance()->reset();
   }
 
 }

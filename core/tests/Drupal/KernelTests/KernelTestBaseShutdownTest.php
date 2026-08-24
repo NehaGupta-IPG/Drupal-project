@@ -7,6 +7,7 @@ namespace Drupal\KernelTests;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\Core\Shutdown\ShutdownHandler;
 
 /**
  * Tests Drupal\KernelTests\KernelTestBase.
@@ -48,7 +49,7 @@ class KernelTestBaseShutdownTest extends KernelTestBase {
    */
   public function testShutdownFunction(): void {
     $this->expectedShutdownCalled = ['shutdownFunction', 'shutdownFunction2'];
-    drupal_register_shutdown_function([$this, 'shutdownFunction']);
+    ShutdownHandler::getInstance()->add([$this, 'shutdownFunction']);
   }
 
   /**
@@ -65,7 +66,7 @@ class KernelTestBaseShutdownTest extends KernelTestBase {
    */
   public function shutdownFunction(): void {
     self::$shutdownCalled[] = 'shutdownFunction';
-    drupal_register_shutdown_function([$this, 'shutdownFunction2']);
+    ShutdownHandler::getInstance()->add([$this, 'shutdownFunction2']);
   }
 
   /**

@@ -6,6 +6,7 @@ use Composer\Autoload\ClassLoader;
 use Drupal\Core\Database\Event\StatementEvent;
 use Drupal\Core\Extension\DatabaseDriverList;
 use Drupal\Core\Cache\NullBackend;
+use Drupal\Core\Shutdown\ShutdownHandler;
 
 /**
  * Primary front-controller for the database system.
@@ -617,12 +618,12 @@ abstract class Database {
   /**
    * Calls commitAll() on all the open connections.
    *
-   * If drupal_register_shutdown_function() exists the commit will occur during
-   * shutdown so that it occurs at the latest possible moment.
+   * If ShutdownHandler exists the commit will occur during shutdown so that
+   * it occurs at the latest possible moment.
    *
    * @param bool $shutdown
    *   Internal param to denote that the method is being called by
-   *   _drupal_shutdown_function().
+   *   ShutdownHandler::shutdown().
    *
    * @internal
    *   This method exists only to work around a bug caused by Drupal incorrectly
@@ -650,13 +651,13 @@ abstract class Database {
       return;
     }
 
-    if (!function_exists('drupal_register_shutdown_function')) {
+    if (!class_exists('\Drupal\Core\Shutdown\ShutdownHandler')) {
       return;
     }
 
     if (!$registered) {
       $registered = TRUE;
-      drupal_register_shutdown_function('\Drupal\Core\Database\Database::commitAllOnShutdown', TRUE);
+      ShutdownHandler::getInstance()->add(__CLASS__ . '::commitAllOnShutdown', TRUE);
     }
   }
 

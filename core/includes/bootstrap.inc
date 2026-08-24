@@ -6,9 +6,10 @@
  */
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Shutdown\ShutdownHandler;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Utility\Error;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 // cspell:ignore htkey
 
@@ -473,51 +474,41 @@ function drupal_static_reset($name = NULL): void {
  * @param mixed ...$args
  *   Additional arguments to pass to the shutdown function.
  *
- * @return array
+ * @return iterable
  *   Array of shutdown functions to be executed.
  *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *    \Drupal\Core\Shutdown\ShutdownHandler::get() or
+ *    \Drupal\Core\Shutdown\ShutdownHandler::add() or
+ *    \Drupal\Core\Shutdown\ShutdownHandler::reset() instead.
+ *
+ * @see https://www.drupal.org/node/3053808
  * @see register_shutdown_function()
  * @ingroup php_wrappers
  */
 function &drupal_register_shutdown_function($callback = NULL, ...$args) {
-  // We cannot use drupal_static() here because the static cache is reset during
-  // batch processing, which breaks batch handling.
-  static $callbacks = [];
-
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Shutdown\ShutdownHandler::get() or \Drupal\Core\Shutdown\ShutdownHandler::add() or \Drupal\Core\Shutdown\ShutdownHandler::reset() instead. See https://www.drupal.org/node/3053808', E_USER_DEPRECATED);
+  $handler = ShutdownHandler::getInstance();
   if (isset($callback)) {
-    // Only register the internal shutdown function once.
-    if (empty($callbacks)) {
-      register_shutdown_function('_drupal_shutdown_function');
-    }
-    // Save callback and arguments.
-    $callbacks[] = ['callback' => $callback, 'arguments' => $args];
+    // Save callback and arguments
+    $handler->add($callback, ...$args);
   }
+  $callbacks = $handler->get();
   return $callbacks;
 }
 
 /**
  * Executes registered shutdown functions.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See
+ *   \Drupal\Core\Shutdown\ShutdownHandler. As internal API, function may also
+ *   be removed in a minor release.
+ *
+ * @see https://www.drupal.org/node/3053808
  */
 function _drupal_shutdown_function(): void {
-  $callbacks = &drupal_register_shutdown_function();
-
-  // Set the CWD to DRUPAL_ROOT as it is not guaranteed to be the same as it
-  // was in the normal context of execution.
-  chdir(DRUPAL_ROOT);
-
-  try {
-    reset($callbacks);
-    // Do not use foreach() here because it is possible that the callback will
-    // add to the $callbacks array via drupal_register_shutdown_function().
-    while ($callback = current($callbacks)) {
-      call_user_func_array($callback['callback'], $callback['arguments']);
-      next($callbacks);
-    }
-  }
-  // Catch \Throwable, which covers both Error and Exception throwables.
-  catch (\Throwable $error) {
-    _drupal_shutdown_function_handle_exception($error);
-  }
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See \Drupal\Core\Utility\ShutdownHandler. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3053808', E_USER_DEPRECATED);
+  ShutdownHandler::getInstance()->shutdown();
 }
 
 /**
@@ -526,19 +517,14 @@ function _drupal_shutdown_function(): void {
  * @param \Exception|\Throwable $exception
  *   The exception object that was thrown.
  *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Utility\Error::shutdownExceptionHandler() instead. As internal
+ *   API, function may also be removed in a minor release.
+ *
+ * @see https://www.drupal.org/node/3053808
  * @see _drupal_shutdown_function()
  */
 function _drupal_shutdown_function_handle_exception($exception): void {
-  // If using PHP-FPM then fastcgi_finish_request() will have been fired
-  // preventing further output to the browser.
-  if (!function_exists('fastcgi_finish_request')) {
-    // If we are displaying errors, then do so with no possibility of a
-    // further uncaught exception being thrown.
-    require_once __DIR__ . '/errors.inc';
-    if (error_displayable()) {
-      print '<h1>Uncaught exception thrown in shutdown function.</h1>';
-      print '<p>' . Error::renderExceptionSafe($exception) . '</p><hr />';
-    }
-  }
-  error_log($exception);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Utility\Error::shutdownExceptionHandler() instead. As internal API, ' . __FUNCTION__ . '() may also be removed in a minor release. See https://www.drupal.org/node/3053808', E_USER_DEPRECATED);
+  Error::shutdownExceptionHandler($exception);
 }

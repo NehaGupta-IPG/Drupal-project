@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Bootstrap;
 
+use Drupal\Core\Shutdown\ShutdownHandler;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -35,26 +36,27 @@ class ShutdownFunctionTest extends KernelTestBase {
   public function testShutdownFunctionInShutdownFunction(): void {
     // Ensure there are no shutdown functions registered before starting the
     // test.
-    $this->assertEmpty(drupal_register_shutdown_function());
+    $instance = ShutdownHandler::getInstance();
+    $this->assertEmpty($instance->get());
     // Register a shutdown function that, when called, will register another
     // shutdown function.
-    drupal_register_shutdown_function([$this, 'shutdownOne']);
-    $this->assertCount(1, drupal_register_shutdown_function());
+    $instance->add([$this, 'shutdownOne']);
+    $this->assertCount(1, $instance->get());
 
     // Simulate the Drupal shutdown.
-    _drupal_shutdown_function();
+    $instance->shutdown();
 
     // Test that the expected functions are called.
     $this->assertTrue($this->shutDownOneCalled);
     $this->assertTrue($this->shutDownTwoCalled);
-    $this->assertCount(2, drupal_register_shutdown_function());
+    $this->assertCount(2, $instance->get());
   }
 
   /**
    * Tests shutdown functions by registering another shutdown function.
    */
   public function shutdownOne(): void {
-    drupal_register_shutdown_function([$this, 'shutdownTwo']);
+    ShutdownHandler::getInstance()->add([$this, 'shutdownTwo']);
     $this->shutDownOneCalled = TRUE;
   }
 
