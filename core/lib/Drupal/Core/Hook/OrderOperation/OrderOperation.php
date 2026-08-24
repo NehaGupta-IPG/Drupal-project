@@ -64,7 +64,9 @@ abstract class OrderOperation {
    */
   final public static function unpack(array $packed_operation): self {
     [$is_before_or_after, $args] = $packed_operation;
-    return new ($is_before_or_after ? BeforeOrAfter::class : FirstOrLast::class)(...$args);
+    return $is_before_or_after
+      ? new BeforeOrAfter(...$args)
+      : new FirstOrLast(...$args);
   }
 
 }
