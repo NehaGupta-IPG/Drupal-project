@@ -1788,29 +1788,27 @@ function install_finish_translations(&$install_state): array {
   \Drupal::moduleHandler()->loadInclude('locale', 'compare.inc');
   \Drupal::moduleHandler()->loadInclude('locale', 'bulk.inc');
 
-  // Download contributed project translations. When more projects than core
-  // are installed, their translations should be downloaded (if required) and
-  // imported in all translatable languages (does not include English by
-  // default, only when explicitly configured as such by the profile).
+  // Build a fresh list of installed projects. When more projects than core are
+  // installed, their translations will be downloaded (if required) and imported
+  // using a batch.
   $projects = \Drupal::service(LocaleProjectRepository::class)->buildProjects();
+  $languages = \Drupal::languageManager()->getLanguages();
   $batches = [];
   if (count($projects) > 1) {
     $options = LocaleDefaultOptions::updateOptions();
-    if ($batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch([], [], $options)) {
+    if ($batch = \Drupal::service(LocaleFetch::class)->buildUpdateBatch([], array_keys($languages), $options)) {
       $batches[] = $batch;
     }
   }
 
-  // When installing from configuration, sync custom translations to locale
-  // storage, so they are protected later.
-  if (!empty($install_state['config_install_path'])) {
+  // If installing from configuration, detect custom translations in the
+  // configuration files.
+  if (!empty($install_state['config_install_path']) && \Drupal::service('module_handler')->moduleExists('locale')) {
     $batches[] = _install_config_locale_overrides();
   }
 
-  // Update configuration default language codes and create configuration
-  // translation for all languages (including English if that is still
-  // a configured language and not the site default).
-  $batches[] = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], [], [], TRUE);
+  // Creates configuration translations.
+  $batches[] = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], array_keys($languages), [], TRUE);
   return $batches;
 }
 
