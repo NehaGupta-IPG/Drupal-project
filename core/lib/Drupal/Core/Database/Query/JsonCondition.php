@@ -119,8 +119,6 @@ class JsonCondition extends Condition {
     if (!$this->changed && isset($this->queryPlaceholderIdentifier) && $this->queryPlaceholderIdentifier == $queryPlaceholder->uniqueIdentifier()) {
       return;
     }
-    $this->queryPlaceholderIdentifier = $queryPlaceholder->uniqueIdentifier();
-    $this->changed = FALSE;
 
     $expression = $connection->jsonExpression($this->field, $this->path);
 
@@ -136,6 +134,10 @@ class JsonCondition extends Condition {
         implode(', ', self::WILDCARD_OPERATORS),
       ));
     }
+
+    // Leave the condition recompilable if validation fails.
+    $this->queryPlaceholderIdentifier = $queryPlaceholder->uniqueIdentifier();
+    $this->changed = FALSE;
 
     switch ($this->operator) {
       case 'IS NULL':

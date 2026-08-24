@@ -760,6 +760,16 @@ class SelectTest extends DatabaseTestBase {
     $query->addField('j', 'id');
     $query->jsonCondition('test_field', '$.deps.*.status', $value, $operator);
 
+    try {
+      $query->execute();
+      $this->fail('Expected exception not thrown');
+    }
+    catch (InvalidQueryException $e) {
+      $this->assertStringContainsString("JSON operator {$operator} does not support the wildcard", $e->getMessage());
+    }
+
+    // A failed compile leaves the condition recompilable, so executing the
+    // same query object again throws the same exception.
     $this->expectException(InvalidQueryException::class);
     $this->expectExceptionMessage("JSON operator {$operator} does not support the wildcard");
     $query->execute();
