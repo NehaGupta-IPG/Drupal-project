@@ -110,13 +110,19 @@ class LocaleFetch {
    */
   protected function getFetchOperations(array $projects, array $langcodes, array $options): array {
     $operations = [];
+    $all_projects = $this->localeProjectRepository->getAll();
 
     foreach ($projects as $project) {
       foreach ($langcodes as $langcode) {
         if (locale_translation_use_remote_source()) {
-          $operations[] = [self::class . ':batchDownload', [$project, $langcode]];
+          if ($this->shouldAttemptRemoteProject($langcode, $all_projects[$project]->server_pattern)) {
+            $operations[] = [self::class . ':batchDownload', [$project, $langcode]];
+            $operations[] = [self::class . ':batchImport', [$project, $langcode, $options]];
+          }
         }
-        $operations[] = [self::class . ':batchImport', [$project, $langcode, $options]];
+        else {
+          $operations[] = [self::class . ':batchImport', [$project, $langcode, $options]];
+        }
       }
     }
 
@@ -326,12 +332,8 @@ class LocaleFetch {
     // Check the status of remote translation files.
     if ($options['use_remote'] && isset($source->files[LOCALE_TRANSLATION_REMOTE])) {
       $remote_file = $source->files[LOCALE_TRANSLATION_REMOTE];
-      if ($langcode === 'en') {
-        // drupal.org does not support english as translation.
-        $uri = $this->localeSource->buildServerPattern($source, strtr(\Drupal::TRANSLATION_DEFAULT_SERVER_PATTERN, ['%language' => $langcode]));
-        if ($uri === $remote_file->uri) {
-          $failure = TRUE;
-        }
+      if (!$this->shouldAttemptRemoteProject($langcode, $source->server_pattern)) {
+        $failure = TRUE;
       }
 
       $remoteFileInfo = $this->localeFileManager->checkRemoteFileStatus($remote_file->uri);
@@ -365,6 +367,27 @@ class LocaleFetch {
       '%langcode' => $langcode,
       '%project' => $source->project,
     ]);
+  }
+
+  /**
+   * Checks if a remote file should be attempted for a project and language.
+   *
+   * The default translation server does not provide English translations, so
+   * remote files are skipped for English when the project uses that server.
+   *
+   * @param string $langcode
+   *   The language code.
+   * @param string $server_pattern
+   *   The server pattern for the project.
+   *
+   * @return bool
+   *   TRUE if a remote file should be attempted.
+   */
+  protected function shouldAttemptRemoteProject(string $langcode, string $server_pattern): bool {
+    if ($langcode === 'en' && $server_pattern === \Drupal::TRANSLATION_DEFAULT_SERVER_PATTERN) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
 }

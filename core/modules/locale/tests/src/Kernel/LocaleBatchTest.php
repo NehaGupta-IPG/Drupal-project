@@ -64,6 +64,7 @@ class LocaleBatchTest extends KernelTestBase {
       langcode: 'en',
     );
     $source->version = '1.0.0';
+    $source->server_pattern = \Drupal::TRANSLATION_DEFAULT_SERVER_PATTERN;
     $source->files[LOCALE_TRANSLATION_REMOTE] = new LocaleFile('test_module-1.0.0.en.po', 'https://ftp.drupal.org/files/translations/all/test_module/test_module-1.0.0.en.po', '');
 
     \Drupal::keyValue('locale.translation_status')->setMultiple(['test_module' => ['en' => $source]]);
