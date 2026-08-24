@@ -64,10 +64,8 @@ class PhpMail implements MailInterface {
     // Join the body array into one string.
     $message['body'] = implode("\n\n", $message['body']);
 
-    // Convert any HTML to plain-text.
+    // Convert any HTML to plain text (which also wraps the mail body).
     $message['body'] = MailFormatHelper::htmlToText($message['body']);
-    // Wrap the mail body for sending.
-    $message['body'] = MailFormatHelper::wrapMail($message['body']);
 
     return $message;
   }
@@ -100,7 +98,7 @@ class PhpMail implements MailInterface {
       if (in_array(strtolower($name), self::MAILBOX_LIST_HEADERS, TRUE)) {
         // Split values by comma, but ignore commas encapsulated in double
         // quotes.
-        $value = str_getcsv($value, ',');
+        $value = str_getcsv($value, escape: '\\');
       }
       $headers->addHeader($name, $value);
     }
@@ -114,7 +112,7 @@ class PhpMail implements MailInterface {
     $mail_body = preg_replace('@\r?\n@', $line_endings, $message['body']);
     $mail_headers = $headers->toString();
 
-    if (!$this->request->server->has('WINDIR') && !str_contains($this->request->server->get('SERVER_SOFTWARE'), 'Win32')) {
+    if (!$this->request->server->has('WINDIR') && !str_contains($this->request->server->get('SERVER_SOFTWARE', ''), 'Win32')) {
       // On most non-Windows systems, the "-f" option to the sendmail command
       // is used to set the Return-Path. There is no space between -f and
       // the value of the return path.

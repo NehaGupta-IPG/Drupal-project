@@ -4,23 +4,35 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Asset;
 
-use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\Datetime\Time;
 use Drupal\Core\Asset\Exception\IncompleteLibraryDefinitionException;
 use Drupal\Core\Asset\Exception\InvalidLibraryFileException;
 use Drupal\Core\Asset\Exception\LibraryDefinitionMissingLicenseException;
 use Drupal\Core\Asset\LibrariesDirectoryFileFinder;
 use Drupal\Core\Asset\LibraryDiscoveryParser;
+use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\Extension\ExtensionPathResolver;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Lock\NullLockBackend;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\ComponentPluginManager;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Utility\YamlCacheCollector;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
- * @coversDefaultClass \Drupal\Core\Asset\LibraryDiscoveryParser
- * @group Asset
+ * Tests Drupal\Core\Asset\LibraryDiscoveryParser.
  */
+#[CoversClass(LibraryDiscoveryParser::class)]
+#[Group('Asset')]
 class LibraryDiscoveryParserTest extends UnitTestCase {
 
   /**
@@ -39,24 +51,18 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
   /**
    * The mocked module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&MockObject $moduleHandler;
 
   /**
-   * The mocked theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The theme manager.
    */
-  protected $themeManager;
+  protected ThemeManagerInterface&Stub $themeManager;
 
   /**
-   * The mocked active theme.
-   *
-   * @var \Drupal\Core\Theme\ActiveTheme|\PHPUnit\Framework\MockObject\MockObject
+   * The active theme.
    */
-  protected $activeTheme;
+  protected ActiveTheme&Stub $activeTheme;
 
   /**
    * The mocked lock backend.
@@ -66,32 +72,29 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   protected $lock;
 
   /**
-   * The mocked stream wrapper manager.
-   *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface||\PHPUnit\Framework\MockObject\MockObject
+   * The stream wrapper manager.
    */
-  protected $streamWrapperManager;
+  protected StreamWrapperManagerInterface&Stub $streamWrapperManager;
 
   /**
-   * The mocked libraries directory file finder.
-   *
-   * @var \Drupal\Core\Asset\LibrariesDirectoryFileFinder||\PHPUnit\Framework\MockObject\MockObject
+   * The libraries directory file finder.
    */
-  protected $librariesDirectoryFileFinder;
+  protected LibrariesDirectoryFileFinder&Stub $librariesDirectoryFileFinder;
 
   /**
-   * The mocked extension path resolver.
-   *
-   * @var \Drupal\Core\Extension\ExtensionPathResolver|\PHPUnit\Framework\MockObject\MockObject
+   * The extension path resolver.
    */
-  protected $extensionPathResolver;
+  protected ExtensionPathResolver&Stub $extensionPathResolver;
 
   /**
-   * The mocked extension path resolver.
-   *
-   * @var \Drupal\Core\Theme\ComponentPluginManager|\PHPUnit\Framework\MockObject\MockObject
+   * The extension path resolver.
    */
-  protected $componentPluginManager;
+  protected ComponentPluginManager&Stub $componentPluginManager;
+
+  /**
+   * The YAML cache collector.
+   */
+  protected YamlCacheCollector $yamlCacheCollector;
 
   /**
    * {@inheritdoc}
@@ -100,37 +103,47 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     parent::setUp();
 
     $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $this->themeManager = $this->createMock(ThemeManagerInterface::class);
-    $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->activeTheme->expects($this->any())
+    $this->themeManager = $this->createStub(ThemeManagerInterface::class);
+    $this->activeTheme = $this->createStub(ActiveTheme::class);
+    $this->activeTheme
       ->method('getLibrariesOverride')
       ->willReturn([]);
-    $this->themeManager->expects($this->any())
+    $this->themeManager
       ->method('getActiveTheme')
       ->willReturn($this->activeTheme);
-    $this->streamWrapperManager = $this->createMock(StreamWrapperManagerInterface::class);
-    $this->librariesDirectoryFileFinder = $this->createMock(LibrariesDirectoryFileFinder::class);
+    $this->streamWrapperManager = $this->createStub(StreamWrapperManagerInterface::class);
+    $this->librariesDirectoryFileFinder = $this->createStub(LibrariesDirectoryFileFinder::class);
     $this->extensionPathResolver = $this->createMock(ExtensionPathResolver::class);
-    $this->componentPluginManager = $this->createMock(ComponentPluginManager::class);
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
+    $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
+
+    $this->yamlCacheCollector = new YamlCacheCollector('library.yaml_parser', new MemoryCache(new Time()), new NullLockBackend(), new Time());
+    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+  }
+
+  /**
+   * Reinitializes the libraries directory file finder as a mock object.
+   */
+  protected function setUpMockLibrariesDirectoryFileFinder(): void {
+    $this->librariesDirectoryFileFinder = $this->createMock(LibrariesDirectoryFileFinder::class);
+    $reflection = new \ReflectionProperty($this->libraryDiscoveryParser, 'librariesDirectoryFileFinder');
+    $reflection->setValue($this->libraryDiscoveryParser, $this->librariesDirectoryFileFinder);
+  }
+
+  /**
+   * Reinitializes the stream wrapper manager as a mock object.
+   */
+  protected function setUpMockStreamWrapperManager(): void {
+    $this->streamWrapperManager = $this->createMock(StreamWrapperManagerInterface::class);
+    $reflection = new \ReflectionProperty($this->libraryDiscoveryParser, 'streamWrapperManager');
+    $reflection->setValue($this->libraryDiscoveryParser, $this->streamWrapperManager);
   }
 
   /**
    * Tests that basic functionality works for getLibraryByName.
-   *
-   * @covers ::buildByExtension
-   *
-   * @runInSeparateProcess
    */
+  #[RunInSeparateProcess]
   public function testBuildByExtensionSimple(): void {
-    FileCacheFactory::setPrefix('testing');
-    // Use the default file cache configuration.
-    FileCacheFactory::setConfiguration([
-      'library_parser' => [],
-    ]);
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
+    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
       ->with('example_module')
@@ -155,14 +168,12 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $this->assertEquals(\Drupal::VERSION, $library['version']);
 
     // Ensure that the expected FileCache entry exists.
-    $cache = FileCacheFactory::get('library_parser')->get($path . '/example_module.libraries.yml');
+    $cache = $this->yamlCacheCollector->get($path . '/example_module.libraries.yml');
     $this->assertArrayHasKey('example', $cache);
   }
 
   /**
    * Tests that a theme can be used instead of a module.
-   *
-   * @covers ::buildByExtension
    */
   public function testBuildByExtensionWithTheme(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -188,8 +199,6 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
   /**
    * Tests that a module with a missing library file results in FALSE.
-   *
-   * @covers ::buildByExtension
    */
   public function testBuildByExtensionWithMissingLibraryFile(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -210,7 +219,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Tests that an exception is thrown when a libraries file couldn't be parsed.
    *
-   * @covers ::buildByExtension
+   * @legacy-covers ::buildByExtension
    */
   public function testInvalidLibrariesFile(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -231,8 +240,6 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
   /**
    * Tests that no exception is thrown when only dependencies are specified.
-   *
-   * @covers ::buildByExtension
    */
   public function testBuildByExtensionWithOnlyDependencies(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -253,8 +260,6 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
   /**
    * Tests that an exception is thrown with only the version property specified.
-   *
-   * @covers ::buildByExtension
    */
   public function testBuildByExtensionWithMissingInformation(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -270,14 +275,14 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
 
     $this->expectException(IncompleteLibraryDefinitionException::class);
-    $this->expectExceptionMessage("Incomplete library definition for definition 'example' in extension 'example_module_missing_information'");
+    $this->expectExceptionMessageIs("Incomplete library definition for definition 'example' in extension 'example_module_missing_information'");
     $this->libraryDiscoveryParser->buildByExtension('example_module_missing_information');
   }
 
   /**
    * Tests the version property, and how it propagates to the contained assets.
    *
-   * @covers ::buildByExtension
+   * @legacy-covers ::buildByExtension
    */
   public function testVersion(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -294,9 +299,9 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
     $libraries = $this->libraryDiscoveryParser->buildByExtension('versions');
 
-    $this->assertArrayNotHasKey('version', $libraries['versionless']);
-    $this->assertEquals(-1, $libraries['versionless']['css'][0]['version']);
-    $this->assertEquals(-1, $libraries['versionless']['js'][0]['version']);
+    $this->assertArrayNotHasKey('version', $libraries['no_version']);
+    $this->assertEquals(-1, $libraries['no_version']['css'][0]['version']);
+    $this->assertEquals(-1, $libraries['no_version']['js'][0]['version']);
 
     $this->assertEquals('9.8.7.6', $libraries['versioned']['version']);
     $this->assertEquals('9.8.7.6', $libraries['versioned']['css'][0]['version']);
@@ -310,7 +315,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Tests that the version property of external libraries is handled.
    *
-   * @covers ::buildByExtension
+   * @legacy-covers ::buildByExtension
    */
   public function testExternalLibraries(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -336,7 +341,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Ensures that CSS weights are taken into account properly.
    *
-   * @covers ::buildByExtension
+   * @legacy-covers ::buildByExtension
    */
   public function testDefaultCssWeights(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -377,7 +382,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Ensures that you cannot provide positive weights for JavaScript libraries.
    *
-   * @covers ::buildByExtension
+   * @legacy-covers ::buildByExtension
    */
   public function testJsWithPositiveWeight(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -399,7 +404,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Tests a library with CSS/JavaScript and a setting.
    *
-   * @covers ::buildByExtension
+   * @legacy-covers ::buildByExtension
    */
   public function testLibraryWithCssJsSetting(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -432,7 +437,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Tests a library with dependencies.
    *
-   * @covers ::buildByExtension
+   * @legacy-covers ::buildByExtension
    */
   public function testLibraryWithDependencies(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -458,9 +463,11 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Tests a library with a couple of data formats like full URL.
    *
-   * @covers ::buildByExtension
+   * @legacy-covers ::buildByExtension
    */
   public function testLibraryWithDataTypes(): void {
+    $this->setUpMockStreamWrapperManager();
+
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
       ->with('data_types')
@@ -496,7 +503,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Tests a library with JavaScript-specific flags.
    *
-   * @covers ::buildByExtension
+   * @legacy-covers ::buildByExtension
    */
   public function testLibraryWithJavaScript(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -522,7 +529,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Tests that an exception is thrown when license is missing when 3rd party.
    *
-   * @covers ::buildByExtension
+   * @legacy-covers ::buildByExtension
    */
   public function testLibraryThirdPartyWithMissingLicense(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -538,14 +545,14 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
 
     $this->expectException(LibraryDefinitionMissingLicenseException::class);
-    $this->expectExceptionMessage("Missing license information in library definition for definition 'no-license-info-but-remote' extension 'licenses_missing_information': it has a remote, but no license.");
+    $this->expectExceptionMessageIs("Missing license information in library definition for definition 'no-license-info-but-remote' extension 'licenses_missing_information': it has a remote, but no license.");
     $this->libraryDiscoveryParser->buildByExtension('licenses_missing_information');
   }
 
   /**
    * Tests a library with various licenses, some GPL-compatible, some not.
    *
-   * @covers ::buildByExtension
+   * @legacy-covers ::buildByExtension
    */
   public function testLibraryWithLicenses(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -632,14 +639,12 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Tests libraries with overrides.
    *
-   * @covers ::applyLibrariesOverride
+   * @legacy-covers ::applyLibrariesOverride
    */
   public function testLibraryOverride(): void {
     $mock_theme_path = 'mocked_themes/kittens';
-    $this->themeManager = $this->createMock(ThemeManagerInterface::class);
-    $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->themeManager = $this->createStub(ThemeManagerInterface::class);
+    $this->activeTheme = $this->createMock(ActiveTheme::class);
     $this->activeTheme->expects($this->atLeastOnce())
       ->method('getLibrariesOverride')
       ->willReturn([
@@ -654,7 +659,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
           ],
         ],
       ]);
-    $this->themeManager->expects($this->any())
+    $this->themeManager
       ->method('getActiveTheme')
       ->willReturn($this->activeTheme);
 
@@ -664,9 +669,9 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->method('getPath')
       ->with('module', 'example_module')
       ->willReturn($path);
-    $this->componentPluginManager = $this->createMock(ComponentPluginManager::class);
+    $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
 
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
+    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
 
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
@@ -685,17 +690,19 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Tests deprecated library with an override.
    *
-   * @covers ::applyLibrariesOverride
-   *
-   * @group legacy
+   * @legacy-covers ::applyLibrariesOverride
    */
+  #[IgnoreDeprecations]
   public function testLibraryOverrideDeprecated(): void {
-    $this->expectDeprecation('Theme "deprecated" is overriding a deprecated library. The "deprecated/deprecated" asset library is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. Use another library instead. See https://www.example.com');
+    $this->expectUserDeprecationMessage('Theme "test_theme" is overriding a deprecated library. The "deprecated/deprecated" asset library is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. Use another library instead. See https://www.example.com');
     $mock_theme_path = 'mocked_themes/kittens';
-    $this->themeManager = $this->createMock(ThemeManagerInterface::class);
+    $this->themeManager = $this->createStub(ThemeManagerInterface::class);
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
       ->disableOriginalConstructor()
       ->getMock();
+    $this->activeTheme->expects($this->atLeastOnce())
+      ->method('getName')
+      ->willReturn('test_theme');
     $this->activeTheme->expects($this->atLeastOnce())
       ->method('getLibrariesOverride')
       ->willReturn([
@@ -709,7 +716,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
           ],
         ],
       ]);
-    $this->themeManager->expects($this->any())
+    $this->themeManager
       ->method('getActiveTheme')
       ->willReturn($this->activeTheme);
 
@@ -719,8 +726,8 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->method('getPath')
       ->with('module', 'deprecated')
       ->willReturn($path);
-    $this->componentPluginManager = $this->createMock(ComponentPluginManager::class);
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
+    $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
+    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
 
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
@@ -731,22 +738,15 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   }
 
   /**
-   * Verifies assertions catch invalid CSS declarations.
-   *
-   * @dataProvider providerTestCssAssert
-   */
-
-  /**
    * Verify an assertion fails if CSS declarations have non-existent categories.
    *
    * @param string $extension
    *   The css extension to build.
    * @param string $exception_message
    *   The expected exception message.
-   *
-   * @dataProvider providerTestCssAssert
    */
-  public function testCssAssert($extension, $exception_message): void {
+  #[DataProvider('providerTestCssAssert')]
+  public function testCssAssert(string $extension, string $exception_message): void {
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
       ->with($extension)
@@ -760,25 +760,38 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
 
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage($exception_message);
+    $this->expectExceptionMessageIs($exception_message);
     $this->libraryDiscoveryParser->buildByExtension($extension);
   }
 
   /**
    * Data provider for testing bad CSS declarations.
    */
-  public static function providerTestCssAssert() {
+  public static function providerTestCssAssert(): array {
     return [
-      'css_bad_category' => ['css_bad_category', 'See https://www.drupal.org/node/2274843.'],
-      'Improper CSS nesting' => ['css_bad_nesting', 'CSS must be nested under a category. See https://www.drupal.org/node/2274843.'],
-      'Improper CSS nesting array' => ['css_bad_nesting_array', 'CSS files should be specified as key/value pairs, where the values are configuration options. See https://www.drupal.org/node/2274843.'],
+      'css_bad_category' => [
+        'css_bad_category',
+        'Invalid CSS category: bad_category. See https://www.drupal.org/node/2274843.',
+      ],
+      'Improper CSS nesting' => [
+        'css_bad_nesting',
+        'CSS must be nested under a category. See https://www.drupal.org/node/2274843.',
+      ],
+      'Improper CSS nesting array' => [
+        'css_bad_nesting_array',
+        'CSS files should be specified as key/value pairs, where the values are configuration options. See https://www.drupal.org/node/2274843.',
+      ],
     ];
   }
 
   /**
-   * @covers ::buildByExtension
+   * Tests non core libraries found.
+   *
+   * @legacy-covers ::buildByExtension
    */
   public function testNonCoreLibrariesFound(): void {
+    $this->setUpMockLibrariesDirectoryFileFinder();
+
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
       ->with('example_contrib_module')
@@ -807,9 +820,13 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::buildByExtension
+   * Tests non core libraries not found.
+   *
+   * @legacy-covers ::buildByExtension
    */
   public function testNonCoreLibrariesNotFound(): void {
+    $this->setUpMockLibrariesDirectoryFileFinder();
+
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
       ->with('example_contrib_module')
@@ -842,7 +859,9 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::parseLibraryInfo
+   * Tests empty library file.
+   *
+   * @legacy-covers ::parseLibraryInfo
    */
   public function testEmptyLibraryFile(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -869,13 +888,18 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
  */
 class TestLibraryDiscoveryParser extends LibraryDiscoveryParser {
 
+  /**
+   * The valid URIs.
+   *
+   * @var array
+   */
   protected $validUris;
 
   protected function fileValidUri($source) {
     return $this->validUris[$source] ?? FALSE;
   }
 
-  public function setFileValidUri($source, $valid) {
+  public function setFileValidUri($source, $valid): void {
     $this->validUris[$source] = $valid;
   }
 

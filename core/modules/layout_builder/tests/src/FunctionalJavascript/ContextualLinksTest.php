@@ -7,14 +7,15 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore blocktest
-
 /**
  * Test contextual links compatibility with the Layout Builder.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class ContextualLinksTest extends WebDriverTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -30,6 +31,7 @@ class ContextualLinksTest extends WebDriverTestBase {
     'layout_test',
     'block',
     'node',
+    'node_block_test',
     'contextual',
   ];
 
@@ -131,7 +133,7 @@ class ContextualLinksTest extends WebDriverTestBase {
    * @param string $block_name
    *   The block name as it appears in the Add block form.
    */
-  protected function addBlock($block_name) {
+  protected function addBlock(string $block_name): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -189,7 +191,7 @@ class ContextualLinksTest extends WebDriverTestBase {
    *
    * @internal
    */
-  protected function assertCorrectContextualLinks() {
+  protected function assertCorrectContextualLinks(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.block-views-blocktest-block-view-block-2'));

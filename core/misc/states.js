@@ -724,7 +724,7 @@
       if (e.value) {
         const label = `label${e.target.id ? `[for=${e.target.id}]` : ''}`;
         const $label = $(e.target)
-          .attr({ required: 'required', 'aria-required': 'true' })
+          .attr({ required: 'required' })
           .closest('.js-form-item, .js-form-wrapper')
           .find(label);
         // Avoids duplicate required markers on initialization.
@@ -733,7 +733,7 @@
         }
       } else {
         $(e.target)
-          .removeAttr('required aria-required')
+          .removeAttr('required')
           .closest('.js-form-item, .js-form-wrapper')
           .find('label.js-form-required')
           .removeClass('js-form-required form-required');

@@ -6,13 +6,16 @@ namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI of row plugins.
  *
- * @group views_ui
  * @see \Drupal\views_test_data\Plugin\views\row\RowTest.
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class RowUITest extends UITestBase {
 
   /**
@@ -87,7 +90,7 @@ class RowUITest extends UITestBase {
     $teaser = EntityViewMode::load('node.teaser');
     $teaser->set('label', 'Teaser <em>markup</em>');
     $teaser->save();
-    $this->drupalGet('admin/structure/views/view/frontpage/edit/default');
+    $this->drupalGet('admin/structure/views/view/promoted_content/edit/default');
     $this->assertSession()->assertEscaped('Teaser <em>markup</em>');
   }
 

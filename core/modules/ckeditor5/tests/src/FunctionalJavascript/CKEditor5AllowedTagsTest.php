@@ -7,16 +7,18 @@ namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Yaml\Yaml;
 
 // cspell:ignore esque imageUpload sourceediting Editing's
-
 /**
  * Tests for CKEditor 5.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
 
   /**
@@ -41,9 +43,9 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
   /**
    * The default allowed elements for filter_html's "allowed_html" setting.
    *
-   * @see \Drupal\filter\Plugin\Filter\FilterHtml
-   *
    * @var string
+   *
+   * @see \Drupal\filter\Plugin\Filter\FilterHtml
    */
   protected $defaultElementsWhenUpdatingNotCkeditor5 = "<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type='1 A I'> <li> <dl> <dt> <dd> <h2 id='jump-*'> <h3 id> <h4 id> <h5 id> <h6 id>";
 
@@ -52,7 +54,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
    *
    * @var string
    */
-  protected $defaultElementsAfterUpdatingToCkeditor5 = '<br> <p> <h2 id="jump-*"> <h3 id> <h4 id> <h5 id> <h6 id> <cite> <dl> <dt> <dd> <a hreflang href> <blockquote cite> <ul type> <ol type="1 A I" reversed start> <strong> <em> <code> <li>';
+  protected $defaultElementsAfterUpdatingToCkeditor5 = '<br> <p> <h2 id="jump-*"> <h3 id> <h4 id> <h5 id> <h6 id> <cite> <dl> <dt> <dd> <a hreflang href> <blockquote cite> <strong> <em> <code> <ul type> <ol type reversed start> <li>';
 
   /**
    * Test enabling CKEditor 5 in a way that triggers validation.
@@ -433,6 +435,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $page->fillField('title[0][value]', 'My test content');
     $page->fillField('body[0][value]', '<foo bar="baz">⬅️✌️➡️</foo><p><a style="color:#ff0000;" foo="bar" hreflang="en" href="https://example.com"><abbr title="National Aeronautics and Space Administration">NASA</abbr> is an acronym.</a></p>');
     $page->pressButton('Save');
+    $this->assertTrue($assert_session->waitForText('My test content'));
 
     // Configure Full HTML text format to use CKEditor 5.
     $this->drupalGet('admin/config/content/formats/manage/full_html');
@@ -458,6 +461,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     // Ensure the editor is loaded and ensure that arbitrary markup is retained.
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-editor'));
     $page->pressButton('Save');
+    $this->assertTrue($assert_session->waitForText('NASA is an acronym.'));
 
     // But note that the `style` attribute was stripped by
     // \Drupal\editor\EditorXssFilter\Standard.
@@ -473,6 +477,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $this->drupalGet('node/1/edit');
     $page->pressButton('Save');
 
+    $this->assertTrue($assert_session->waitForText('NASA is an acronym.'));
     $assert_session->responseContains('<p><a foo="bar" hreflang="en" href="https://example.com"><abbr title="National Aeronautics and Space Administration">NASA</abbr> is an acronym.</a></p>');
 
     // Configure Basic HTML text format to use CKE5 and enable the link plugin.
@@ -493,6 +498,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $page->pressButton('Continue');
     $assert_session->assertWaitOnAjaxRequest();
     $page->pressButton('Save');
+    $this->assertTrue($assert_session->waitForText('NASA is an acronym.'));
 
     // The `style` and foo` attributes should have been removed, as should the
     // `<abbr>` and `<foo>` tags.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\cron_queue_test\Plugin\QueueWorker;
 
 use Drupal\Core\Queue\Attribute\QueueWorker;
@@ -26,7 +28,7 @@ class CronQueueTestDeriverQueue extends QueueWorkerBase {
   /**
    * {@inheritdoc}
    */
-  public function processItem($data) {
+  public function processItem($data): void {
     $state = \Drupal::state();
     $processed = $state->get(self::PLUGIN_ID, 0);
     $state->set(self::PLUGIN_ID, ++$processed);

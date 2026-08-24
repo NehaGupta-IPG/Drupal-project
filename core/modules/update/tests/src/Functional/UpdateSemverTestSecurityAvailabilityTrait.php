@@ -10,7 +10,16 @@ namespace Drupal\Tests\update\Functional;
 trait UpdateSemverTestSecurityAvailabilityTrait {
 
   /**
-   * Tests the Update Manager module when a security update is available.
+   * Tests Update Status when a security update is available.
+   */
+  public function testSecurityUpdateAvailability(): void {
+    foreach (static::securityUpdateAvailabilityProvider() as $case) {
+      $this->doTestSecurityUpdateAvailability($case['site_patch_version'], $case['expected_security_releases'], $case['expected_update_message_type'], $case['fixture']);
+    }
+  }
+
+  /**
+   * Tests the Update Status module when a security update is available.
    *
    * @param string $site_patch_version
    *   The patch version to set the site to for testing.
@@ -20,10 +29,8 @@ trait UpdateSemverTestSecurityAvailabilityTrait {
    *   The type of update message expected.
    * @param string $fixture
    *   The test fixture that contains the test XML.
-   *
-   * @dataProvider securityUpdateAvailabilityProvider
    */
-  public function testSecurityUpdateAvailability($site_patch_version, array $expected_security_releases, $expected_update_message_type, $fixture): void {
+  protected function doTestSecurityUpdateAvailability($site_patch_version, array $expected_security_releases, $expected_update_message_type, $fixture): void {
     $this->setProjectInstalledVersion("8.$site_patch_version");
     $this->refreshUpdateStatus([$this->updateProject => $fixture]);
     $this->assertSecurityUpdates("{$this->updateProject}-8", $expected_security_releases, $expected_update_message_type, $this->updateTableLocator);
@@ -87,9 +94,9 @@ trait UpdateSemverTestSecurityAvailabilityTrait {
    *   - 8.1.0 Insecure
    *   - 8.0.2 Security update
    *   - 8.0.1 Insecure
-   *   - 8.0.0 Insecure
+   *   - 8.0.0 Insecure.
    */
-  public static function securityUpdateAvailabilityProvider() {
+  public static function securityUpdateAvailabilityProvider(): array {
     $test_cases = [
       // Security release available for site minor release 0.
       // No releases for next minor.

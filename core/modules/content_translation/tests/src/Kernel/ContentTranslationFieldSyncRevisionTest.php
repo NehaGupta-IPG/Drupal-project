@@ -15,12 +15,14 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the field synchronization logic when revisions are involved.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
 
   use TestFileCreationTrait;
@@ -63,6 +65,8 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
+
     $entity_type_id = 'entity_test_mulrev';
     $this->installEntitySchema($entity_type_id);
     $this->installEntitySchema('file');
@@ -71,7 +75,6 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     ConfigurableLanguage::createFromLangcode('it')->save();
     ConfigurableLanguage::createFromLangcode('fr')->save();
 
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     $field_storage_config = FieldStorageConfig::create([
       'field_name' => $this->fieldName,
       'type' => 'image',
@@ -120,12 +123,12 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
   /**
    * Checks that field synchronization works as expected with revisions.
    *
-   * @covers \Drupal\content_translation\Plugin\Validation\Constraint\ContentTranslationSynchronizedFieldsConstraintValidator::create
-   * @covers \Drupal\content_translation\Plugin\Validation\Constraint\ContentTranslationSynchronizedFieldsConstraintValidator::validate
-   * @covers \Drupal\content_translation\Plugin\Validation\Constraint\ContentTranslationSynchronizedFieldsConstraintValidator::hasSynchronizedPropertyChanges
-   * @covers \Drupal\content_translation\FieldTranslationSynchronizer::getFieldSynchronizedProperties
-   * @covers \Drupal\content_translation\FieldTranslationSynchronizer::synchronizeFields
-   * @covers \Drupal\content_translation\FieldTranslationSynchronizer::synchronizeItems
+   * @legacy-covers \Drupal\content_translation\Plugin\Validation\Constraint\ContentTranslationSynchronizedFieldsConstraintValidator::create
+   * @legacy-covers \Drupal\content_translation\Plugin\Validation\Constraint\ContentTranslationSynchronizedFieldsConstraintValidator::validate
+   * @legacy-covers \Drupal\content_translation\Plugin\Validation\Constraint\ContentTranslationSynchronizedFieldsConstraintValidator::hasSynchronizedPropertyChanges
+   * @legacy-covers \Drupal\content_translation\FieldTranslationSynchronizer::getFieldSynchronizedProperties
+   * @legacy-covers \Drupal\content_translation\FieldTranslationSynchronizer::synchronizeFields
+   * @legacy-covers \Drupal\content_translation\FieldTranslationSynchronizer::synchronizeItems
    */
   public function testFieldSynchronizationAndValidation(): void {
     // Test that when untranslatable field widgets are displayed, synchronized
@@ -387,7 +390,6 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
       $entity->save();
     }
 
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     $field_storage_config = FieldStorageConfig::create([
       'field_name' => $file_field_name,
       'type' => 'file',
@@ -469,7 +471,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
    * @param bool $display
    *   Whether untranslatable field widgets should be displayed.
    */
-  protected function setUntranslatableFieldWidgetsDisplay($display) {
+  protected function setUntranslatableFieldWidgetsDisplay($display): void {
     $entity_type_id = $this->storage->getEntityTypeId();
     $settings = ['untranslatable_fields_hide' => !$display];
     $this->contentTranslationManager->setBundleTranslationSettings($entity_type_id, $entity_type_id, $settings);
@@ -480,6 +482,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
 
   /**
    * @return \Drupal\Core\Entity\ContentEntityInterface
+   *   The saved entity.
    */
   protected function saveNewEntity() {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
@@ -551,7 +554,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
   /**
    * Asserts that the latest revision has the expected field values.
    *
-   * @param $entity_id
+   * @param string $entity_id
    *   The entity ID.
    * @param array $expected_values
    *   An array of expected values in the following order:

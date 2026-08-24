@@ -6,16 +6,22 @@ namespace Drupal\Tests\Core\Security;
 
 use Drupal\Core\Security\RequestSanitizer;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Tests RequestSanitizer class.
- *
- * @coversDefaultClass \Drupal\Core\Security\RequestSanitizer
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- * @group Security
  */
+#[CoversClass(RequestSanitizer::class)]
+#[Group('Security')]
+#[PreserveGlobalState(FALSE)]
+#[RunTestsInSeparateProcesses]
 class RequestSanitizerTest extends UnitTestCase {
 
   /**
@@ -55,12 +61,11 @@ class RequestSanitizerTest extends UnitTestCase {
    * @param array|null $expected_errors
    *   An array of expected errors. If set to NULL then error logging is
    *   disabled.
-   * @param array $whitelist
-   *   An array of keys to whitelist and not sanitize.
-   *
-   * @dataProvider providerTestRequestSanitization
+   * @param array $allow_list
+   *   An array of keys to allow and not sanitize.
    */
-  public function testRequestSanitization(Request $request, array $expected = [], ?array $expected_errors = NULL, array $whitelist = []): void {
+  #[DataProvider('providerTestRequestSanitization')]
+  public function testRequestSanitization(Request $request, array $expected = [], ?array $expected_errors = NULL, array $allow_list = []): void {
     // Set up globals.
     $_GET = $request->query->all();
     $_POST = $request->request->all();
@@ -69,7 +74,7 @@ class RequestSanitizerTest extends UnitTestCase {
     $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
     $_SERVER['QUERY_STRING'] = $request->server->get('QUERY_STRING');
 
-    $request = RequestSanitizer::sanitize($request, $whitelist, is_null($expected_errors) ? FALSE : TRUE);
+    $request = RequestSanitizer::sanitize($request, $allow_list, is_null($expected_errors) ? FALSE : TRUE);
 
     // Normalize the expected data.
     $expected += ['cookies' => [], 'query' => [], 'request' => []];
@@ -106,8 +111,9 @@ class RequestSanitizerTest extends UnitTestCase {
    * Data provider for testRequestSanitization.
    *
    * @return array
+   *   An array of test data for testRequestSanitization.
    */
-  public static function providerTestRequestSanitization() {
+  public static function providerTestRequestSanitization(): array {
     $tests = [];
 
     $request = new Request(['q' => 'index.php']);
@@ -120,7 +126,13 @@ class RequestSanitizerTest extends UnitTestCase {
     $tests['no sanitization COOKIE'] = [$request, ['cookies' => ['key' => 'value']]];
 
     $request = new Request(['q' => 'index.php'], ['field' => 'value'], [], ['key' => 'value']);
-    $tests['no sanitization GET, POST, COOKIE'] = [$request, ['query' => ['q' => 'index.php'], 'request' => ['field' => 'value'], 'cookies' => ['key' => 'value']]];
+    $tests['no sanitization GET, POST, COOKIE'] = [$request,
+      [
+        'query' => ['q' => 'index.php'],
+        'request' => ['field' => 'value'],
+        'cookies' => ['key' => 'value'],
+      ],
+    ];
 
     $request = new Request(['q' => 'index.php']);
     $tests['no sanitization GET log'] = [$request, ['query' => ['q' => 'index.php']], []];
@@ -144,28 +156,57 @@ class RequestSanitizerTest extends UnitTestCase {
     $tests['sanitization GET, POST, COOKIE'] = [$request];
 
     $request = new Request(['#q' => 'index.php']);
-    $tests['sanitization GET log'] = [$request, [], ['Potentially unsafe keys removed from query string parameters (GET): #q']];
+    $tests['sanitization GET log'] = [
+      $request,
+      [],
+      ['Potentially unsafe keys removed from query string parameters (GET): #q'],
+    ];
 
     $request = new Request([], ['#field' => 'value']);
-    $tests['sanitization POST log'] = [$request, [], ['Potentially unsafe keys removed from request body parameters (POST): #field']];
+    $tests['sanitization POST log'] = [
+      $request,
+      [],
+      ['Potentially unsafe keys removed from request body parameters (POST): #field'],
+    ];
 
     $request = new Request([], [], [], ['#key' => 'value']);
     $tests['sanitization COOKIE log'] = [$request, [], ['Potentially unsafe keys removed from cookie parameters: #key']];
 
     $request = new Request(['#q' => 'index.php'], ['#field' => 'value'], [], ['#key' => 'value']);
-    $tests['sanitization GET, POST, COOKIE log'] = [$request, [], ['Potentially unsafe keys removed from query string parameters (GET): #q', 'Potentially unsafe keys removed from request body parameters (POST): #field', 'Potentially unsafe keys removed from cookie parameters: #key']];
+    $tests['sanitization GET, POST, COOKIE log'] = [
+      $request,
+      [],
+      [
+        'Potentially unsafe keys removed from query string parameters (GET): #q',
+        'Potentially unsafe keys removed from request body parameters (POST): #field',
+        'Potentially unsafe keys removed from cookie parameters: #key',
+      ],
+    ];
 
     $request = new Request(['q' => 'index.php', 'foo' => ['#bar' => 'foo']]);
-    $tests['recursive sanitization log'] = [$request, ['query' => ['q' => 'index.php', 'foo' => []]], ['Potentially unsafe keys removed from query string parameters (GET): #bar']];
+    $tests['recursive sanitization log'] = [
+      $request,
+      ['query' => ['q' => 'index.php', 'foo' => []]],
+      ['Potentially unsafe keys removed from query string parameters (GET): #bar'],
+    ];
 
     $request = new Request(['q' => 'index.php', 'foo' => ['#bar' => 'foo']]);
-    $tests['recursive no sanitization whitelist'] = [$request, ['query' => ['q' => 'index.php', 'foo' => ['#bar' => 'foo']]], [], ['#bar']];
+    $tests['recursive no sanitization allowed list'] = [
+      $request,
+      ['query' => ['q' => 'index.php', 'foo' => ['#bar' => 'foo']]],
+      [],
+      ['#bar'],
+    ];
 
     $request = new Request([], ['#field' => 'value']);
-    $tests['no sanitization POST whitelist'] = [$request, ['request' => ['#field' => 'value']], [], ['#field']];
+    $tests['no sanitization POST allowed list'] = [$request, ['request' => ['#field' => 'value']], [], ['#field']];
 
     $request = new Request(['q' => 'index.php', 'foo' => ['#bar' => 'foo', '#foo' => 'bar']]);
-    $tests['recursive multiple sanitization log'] = [$request, ['query' => ['q' => 'index.php', 'foo' => []]], ['Potentially unsafe keys removed from query string parameters (GET): #bar, #foo']];
+    $tests['recursive multiple sanitization log'] = [
+      $request,
+      ['query' => ['q' => 'index.php', 'foo' => []]],
+      ['Potentially unsafe keys removed from query string parameters (GET): #bar, #foo'],
+    ];
 
     $request = new Request(['#q' => 'index.php']);
     $request->attributes->set(RequestSanitizer::SANITIZED, TRUE);
@@ -181,19 +222,36 @@ class RequestSanitizerTest extends UnitTestCase {
     $tests['destination removal COOKIE'] = [$request];
 
     $request = new Request(['destination' => 'whatever?%23test=value']);
-    $tests['destination removal GET log'] = [$request, [], ['Potentially unsafe destination removed from query parameter bag because it contained the following keys: #test']];
+    $tests['destination removal GET log'] = [
+      $request,
+      [],
+      ['Potentially unsafe destination removed from query parameter bag because it contained the following keys: #test'],
+    ];
 
     $request = new Request([], ['destination' => 'whatever?%23test=value']);
-    $tests['destination removal POST log'] = [$request, [], ['Potentially unsafe destination removed from request parameter bag because it contained the following keys: #test']];
+    $tests['destination removal POST log'] = [
+      $request,
+      [],
+      ['Potentially unsafe destination removed from request parameter bag because it contained the following keys: #test'],
+    ];
 
     $request = new Request([], [], [], ['destination' => 'whatever?%23test=value']);
-    $tests['destination removal COOKIE log'] = [$request, [], ['Potentially unsafe destination removed from cookies parameter bag because it contained the following keys: #test']];
+    $tests['destination removal COOKIE log'] = [
+      $request,
+      [],
+      ['Potentially unsafe destination removed from cookies parameter bag because it contained the following keys: #test'],
+    ];
 
     $request = new Request(['destination' => 'whatever?q[%23test]=value']);
     $tests['destination removal subkey'] = [$request];
 
     $request = new Request(['destination' => 'whatever?q[%23test]=value']);
-    $tests['destination whitelist'] = [$request, ['query' => ['destination' => 'whatever?q[%23test]=value']], [], ['#test']];
+    $tests['destination allowed list'] = [
+      $request,
+      ['query' => ['destination' => 'whatever?q[%23test]=value']],
+      [],
+      ['#test'],
+    ];
 
     $request = new Request(['destination' => "whatever?\x00bar=base&%23test=value"]);
     $tests['destination removal zero byte'] = [$request];
@@ -212,17 +270,16 @@ class RequestSanitizerTest extends UnitTestCase {
    *
    * @param string $destination
    *   The destination string to test.
-   *
-   * @dataProvider providerTestAcceptableDestinations
    */
+  #[DataProvider('providerTestAcceptableDestinations')]
   public function testAcceptableDestinationGet($destination): void {
     // Set up a GET request.
     $request = $this->createRequestForTesting(['destination' => $destination]);
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertSame($destination, $request->query->get('destination', NULL));
-    $this->assertNull($request->request->get('destination', NULL));
+    $this->assertSame($destination, $request->query->get('destination'));
+    $this->assertNull($request->request->get('destination'));
     $this->assertSame($destination, $_GET['destination']);
     $this->assertSame($destination, $_REQUEST['destination']);
     $this->assertArrayNotHasKey('destination', $_POST);
@@ -234,17 +291,16 @@ class RequestSanitizerTest extends UnitTestCase {
    *
    * @param string $destination
    *   The destination string to test.
-   *
-   * @dataProvider providerTestSanitizedDestinations
    */
+  #[DataProvider('providerTestSanitizedDestinations')]
   public function testSanitizedDestinationGet($destination): void {
     // Set up a GET request.
     $request = $this->createRequestForTesting(['destination' => $destination]);
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertNull($request->request->get('destination', NULL));
-    $this->assertNull($request->query->get('destination', NULL));
+    $this->assertNull($request->request->get('destination'));
+    $this->assertNull($request->query->get('destination'));
     $this->assertArrayNotHasKey('destination', $_POST);
     $this->assertArrayNotHasKey('destination', $_REQUEST);
     $this->assertArrayNotHasKey('destination', $_GET);
@@ -252,21 +308,44 @@ class RequestSanitizerTest extends UnitTestCase {
   }
 
   /**
+   * Tests HTTP method override handling during request sanitization.
+   */
+  #[TestWith(["POST", "POST"])]
+  #[TestWith(["GET", "POST"])]
+  #[TestWith(["HEAD", "POST"])]
+  #[TestWith(["PUT", "PUT"])]
+  #[TestWith(["DELETE", "DELETE"])]
+  #[TestWith(["CONNECT", "POST"])]
+  #[TestWith(["OPTIONS", NULL])]
+  #[TestWith(["QUERY", NULL])]
+  #[TestWith(["TRACE", "POST"])]
+  #[TestWith(["PATCH", "PATCH"])]
+  public function testRequestMethodOverride(string $override, ?string $expected): void {
+    $request = $this->createRequestForTesting();
+    $request->server->set('REQUEST_METHOD', 'POST');
+    $request->headers->set('X-HTTP-Method-Override', $override);
+    if (!$expected) {
+      $this->expectException(BadRequestHttpException::class);
+    }
+    $request = RequestSanitizer::sanitize($request, []);
+    $this->assertSame($expected, $request->getMethod());
+  }
+
+  /**
    * Tests acceptable destinations are not removed from POST requests.
    *
    * @param string $destination
    *   The destination string to test.
-   *
-   * @dataProvider providerTestAcceptableDestinations
    */
+  #[DataProvider('providerTestAcceptableDestinations')]
   public function testAcceptableDestinationPost($destination): void {
     // Set up a POST request.
     $request = $this->createRequestForTesting([], ['destination' => $destination]);
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertSame($destination, $request->request->get('destination', NULL));
-    $this->assertNull($request->query->get('destination', NULL));
+    $this->assertSame($destination, $request->request->get('destination'));
+    $this->assertNull($request->query->get('destination'));
     $this->assertSame($destination, $_POST['destination']);
     $this->assertSame($destination, $_REQUEST['destination']);
     $this->assertArrayNotHasKey('destination', $_GET);
@@ -278,17 +357,16 @@ class RequestSanitizerTest extends UnitTestCase {
    *
    * @param string $destination
    *   The destination string to test.
-   *
-   * @dataProvider providerTestSanitizedDestinations
    */
+  #[DataProvider('providerTestSanitizedDestinations')]
   public function testSanitizedDestinationPost($destination): void {
     // Set up a POST request.
     $request = $this->createRequestForTesting([], ['destination' => $destination]);
 
     $request = RequestSanitizer::sanitize($request, [], TRUE);
 
-    $this->assertNull($request->request->get('destination', NULL));
-    $this->assertNull($request->query->get('destination', NULL));
+    $this->assertNull($request->request->get('destination'));
+    $this->assertNull($request->query->get('destination'));
     $this->assertArrayNotHasKey('destination', $_POST);
     $this->assertArrayNotHasKey('destination', $_REQUEST);
     $this->assertArrayNotHasKey('destination', $_GET);
@@ -306,7 +384,7 @@ class RequestSanitizerTest extends UnitTestCase {
    * @return \Symfony\Component\HttpFoundation\Request
    *   The request object.
    */
-  protected function createRequestForTesting(array $query = [], array $request = []) {
+  protected function createRequestForTesting(array $query = [], array $request = []): Request {
     $request = new Request($query, $request);
 
     // Set up globals.
@@ -322,7 +400,7 @@ class RequestSanitizerTest extends UnitTestCase {
   /**
    * Data provider for testing acceptable destinations.
    */
-  public static function providerTestAcceptableDestinations() {
+  public static function providerTestAcceptableDestinations(): array {
     $data = [];
     // Standard internal example node path is present in the 'destination'
     // parameter.
@@ -339,7 +417,7 @@ class RequestSanitizerTest extends UnitTestCase {
   /**
    * Data provider for testing sanitized destinations.
    */
-  public static function providerTestSanitizedDestinations() {
+  public static function providerTestSanitizedDestinations(): array {
     $data = [];
     // External URL without scheme is not allowed.
     $data[] = ['//example.com/test'];
@@ -356,7 +434,7 @@ class RequestSanitizerTest extends UnitTestCase {
    * @param string $errstr
    *   The error message.
    */
-  public function errorHandler($errno, $errstr) {
+  public function errorHandler($errno, $errstr): void {
     $this->errors[] = compact('errno', 'errstr');
   }
 

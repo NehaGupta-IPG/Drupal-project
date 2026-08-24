@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies that installing from existing configuration works.
- *
- * @group Installer
  */
-class InstallerExistingConfigMultilingualTest extends InstallerExistingConfigTestBase {
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
+class InstallerExistingConfigMultilingualTest extends InstallerConfigDirectoryTestBase {
 
   /**
    * {@inheritdoc}
@@ -21,8 +24,37 @@ class InstallerExistingConfigMultilingualTest extends InstallerExistingConfigTes
   /**
    * {@inheritdoc}
    */
-  protected function getConfigTarball() {
-    return __DIR__ . '/../../../fixtures/config_install/multilingual.tar.gz';
+  protected function getConfigLocation(): string {
+    return __DIR__ . '/../../../fixtures/config_install/multilingual';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function prepareEnvironment(): void {
+    parent::prepareEnvironment();
+    mkdir(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
+
+    // Test that contrib translations are not installed by
+    // install_import_translations(). If they are then the translation from
+    // locale_test_additional will not be overwritten by the translation from
+    // locale_test_extra.
+    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/locale_test_additional-1.0.es.po', <<<PO
+msgid ""
+msgstr ""
+
+msgid "Test string"
+msgstr "Test string wrong"
+PO
+    );
+    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/locale_test_extra-1.0.es.po', <<<PO
+msgid ""
+msgstr ""
+
+msgid "Test string"
+msgstr "Test string correct"
+PO
+    );
   }
 
   /**
@@ -36,9 +68,21 @@ class InstallerExistingConfigMultilingualTest extends InstallerExistingConfigTes
     $count = (int) \Drupal::database()->select('watchdog', 'w')->fields('w')->condition('severity', RfcLogLevel::WARNING, '<=')->countQuery()->execute()->fetchField();
     $this->assertSame(0, $count);
 
-    // Ensure the correct message is logged from locale_config_batch_finished().
+    // Ensure the correct message is logged from \Drupal\locale\LocaleConfigBatch::batchFinished().
     $count = (int) \Drupal::database()->select('watchdog', 'w')->fields('w')->condition('message', 'The configuration was successfully updated. %number configuration objects updated.')->countQuery()->execute()->fetchField();
     $this->assertSame(1, $count);
+
+    $this->assertEquals('Test string correct', (string) new TranslatableMarkup('Test string', [], ['langcode' => 'es']));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpLanguage(): void {
+    // This step is skipped because of an incredibly fiddly logic chain. In
+    // install_load_profile(), the language is automatically detected from the
+    // config sync directory included in the profile that was generated for this
+    // test (see ::prepareEnvironment() and its parents).
   }
 
 }

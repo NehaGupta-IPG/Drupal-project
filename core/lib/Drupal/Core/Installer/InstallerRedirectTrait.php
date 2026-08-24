@@ -18,6 +18,7 @@ trait InstallerRedirectTrait {
    * Returns whether the current PHP process runs on CLI.
    *
    * @return bool
+   *   TRUE if the current PHP process is running on CLI, otherwise FALSE.
    */
   protected function isCli() {
     return PHP_SAPI === 'cli';
@@ -70,12 +71,12 @@ trait InstallerRedirectTrait {
       return TRUE;
     }
 
-    // Redirect if the database is empty.
+    // Redirect if Drupal is not installed (key_value table missing).
     if ($connection) {
       try {
-        return !$connection->schema()->tableExists('sequences');
+        return !$connection->schema()->tableExists('key_value');
       }
-      catch (\Exception $e) {
+      catch (\Exception) {
         // If we still have an exception at this point, we need to be careful
         // since we should not redirect if the exception represents an error on
         // an already-installed site (for example, if the database server went

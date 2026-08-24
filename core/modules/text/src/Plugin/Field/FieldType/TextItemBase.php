@@ -8,6 +8,7 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\filter\FilterFormatRepositoryInterface;
 
 /**
  * Base class for 'text' configurable field types.
@@ -131,21 +132,27 @@ abstract class TextItemBase extends FieldItemBase {
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     $random = new Random();
     $settings = $field_definition->getSettings();
+    $allowed_formats = $settings['allowed_formats'];
+    $fallback = \Drupal::service(FilterFormatRepositoryInterface::class)->getFallbackFormatId();
+
+    if (!empty($allowed_formats) && !in_array($fallback, $allowed_formats)) {
+      $fallback = reset($allowed_formats);
+    }
 
     if (empty($settings['max_length'])) {
-      // Textarea handling
-      $value = $random->paragraphs();
+      // Textarea handling.
+      $value = $random->paragraphs(2);
     }
     else {
       // Textfield handling.
-      $max = ceil($settings['max_length'] / 3);
+      $max = (int) ceil($settings['max_length'] / 3);
       $value = substr($random->sentences(mt_rand(1, $max), FALSE), 0, $settings['max_length']);
     }
 
     $values = [
       'value' => $value,
       'summary' => $value,
-      'format' => filter_fallback_format(),
+      'format' => $fallback,
     ];
     return $values;
   }

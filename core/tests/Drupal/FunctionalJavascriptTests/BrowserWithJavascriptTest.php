@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests;
 
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests if we can execute JavaScript in the browser.
- *
- * @group javascript
  */
+#[Group('javascript')]
+#[RunTestsInSeparateProcesses]
 class BrowserWithJavascriptTest extends WebDriverTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['test_page_test'];
 
@@ -37,7 +37,7 @@ class BrowserWithJavascriptTest extends WebDriverTestBase {
         e = d.documentElement,
         g = d.getElementsByTagName('body')[0],
         x = w.innerWidth || e.clientWidth || g.clientWidth,
-        y = w.innerHeight || e.clientHeight|| g.clientHeight;
+        y = w.outerHeight || e.clientHeight|| g.clientHeight;
         return x == 400 && y == 300;
     }())
 JS;
@@ -141,8 +141,8 @@ JS;
     $session->visit($url);
 
     // There are 2 alerts to accept before we can get the content of the page.
-    $session->getDriver()->getWebdriverSession()->accept_alert();
-    $session->getDriver()->getWebdriverSession()->accept_alert();
+    $session->getDriver()->getWebdriverSession()->alert()->accept();
+    $session->getDriver()->getWebdriverSession()->alert()->accept();
 
     $out = $session->getPage()->getContent();
 

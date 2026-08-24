@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Functional\Views;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI of the field handler.
  *
- * @group field
  * @see \Drupal\field\Plugin\views\field\Field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldUITest extends FieldTestBase {
 
   /**
@@ -24,9 +28,7 @@ class FieldUITest extends FieldTestBase {
   public static $testViews = ['test_view_fieldapi'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['views_ui'];
 
@@ -64,7 +66,7 @@ class FieldUITest extends FieldTestBase {
 
     // Tests the available formatter options.
     $options = $this->assertSession()->selectExists('edit-options-type')->findAll('css', 'option');
-    $options = array_map(function ($item) {
+    $options = array_map(function (NodeElement $item) {
       return $item->getValue();
     }, $options);
     $this->assertEqualsCanonicalizing(['text_default', 'text_trimmed'], $options);
@@ -120,7 +122,7 @@ class FieldUITest extends FieldTestBase {
     // Test the click sort column options.
     // Tests the available formatter options.
     $options = $this->assertSession()->selectExists('edit-options-click-sort-column')->findAll('css', 'option');
-    $options = array_map(function ($item) {
+    $options = array_map(function (NodeElement $item) {
       return $item->getValue();
     }, $options);
     $this->assertEqualsCanonicalizing(['format', 'value'], $options);

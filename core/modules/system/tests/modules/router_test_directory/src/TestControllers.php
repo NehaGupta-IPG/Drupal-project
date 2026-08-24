@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\router_test;
 
 use Drupal\Core\Cache\CacheableResponse;
@@ -61,7 +63,7 @@ class TestControllers {
         $text = sprintf('User route "%s" was matched.', $match[RouteObjectInterface::ROUTE_NAME]);
       }
     }
-    catch (ParamNotConvertedException $e) {
+    catch (ParamNotConvertedException) {
     }
     return new Response($text);
   }
@@ -72,7 +74,7 @@ class TestControllers {
    * Passes unsafe HTML as an argument to a method which throws an exception.
    * This can be used to test if the generated backtrace is properly escaped.
    */
-  public function test10() {
+  public function test10(): void {
     $this->removeExceptionLogger();
     $this->throwException('<script>alert(\'xss\')</script>');
   }
@@ -98,7 +100,7 @@ class TestControllers {
     return new Psr7Response(200, [], 'test23');
   }
 
-  public function test24() {
+  public function test24(): void {
     $this->removeExceptionLogger();
     throw new \Exception('Escaped content: <p> <br> <h3>');
   }

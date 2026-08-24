@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\views_test_data\Plugin\views\display_extender;
 
 use Drupal\Component\Utility\Unicode;
@@ -30,7 +32,7 @@ class DisplayExtenderTest extends DisplayExtenderPluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
 
-    $options['test_extender_test_option'] = ['default' => $this->t('Empty')];
+    $options['test_extender_test_option'] = ['default' => 'Empty'];
 
     return $options;
   }
@@ -38,11 +40,11 @@ class DisplayExtenderTest extends DisplayExtenderPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function optionsSummary(&$categories, &$options) {
+  public function optionsSummary(&$categories, &$options): void {
     parent::optionsSummary($categories, $options);
 
     $categories['display_extender_test'] = [
-      'title' => $this->t('Display extender test settings'),
+      'title' => 'Display extender test settings',
       'column' => 'second',
       'build' => [
         '#weight' => -100,
@@ -51,7 +53,7 @@ class DisplayExtenderTest extends DisplayExtenderPluginBase {
 
     $options['test_extender_test_option'] = [
       'category' => 'display_extender_test',
-      'title' => $this->t('Test option'),
+      'title' => 'Test option',
       'value' => Unicode::truncate($this->options['test_extender_test_option'], 24, FALSE, TRUE),
     ];
   }
@@ -59,14 +61,14 @@ class DisplayExtenderTest extends DisplayExtenderPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     switch ($form_state->get('section')) {
       case 'test_extender_test_option':
-        $form['#title'] .= $this->t('Test option');
+        $form['#title'] .= 'Test option';
         $form['test_extender_test_option'] = [
-          '#title' => $this->t('Test option'),
+          '#title' => 'Test option',
           '#type' => 'textfield',
-          '#description' => $this->t('This is a textfield for test_option.'),
+          '#description' => 'This is a textfield for test_option.',
           '#default_value' => $this->options['test_extender_test_option'],
         ];
     }
@@ -75,7 +77,7 @@ class DisplayExtenderTest extends DisplayExtenderPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function submitOptionsForm(&$form, FormStateInterface $form_state) {
+  public function submitOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::submitOptionsForm($form, $form_state);
     switch ($form_state->get('section')) {
       case 'test_extender_test_option':
@@ -87,21 +89,21 @@ class DisplayExtenderTest extends DisplayExtenderPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function defaultableSections(&$sections, $section = NULL) {
+  public function defaultableSections(&$sections, $section = NULL): void {
     $sections['test_extender_test_option'] = ['test_extender_test_option'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function query() {
+  public function query(): void {
     $this->testState['query'] = TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function preExecute() {
+  public function preExecute(): void {
     $this->testState['preExecute'] = TRUE;
   }
 

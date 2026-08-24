@@ -15,7 +15,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\StringTranslation\TranslationManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides the help topics list section for the help page.
@@ -51,7 +51,7 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\help\HelpTopicPluginManagerInterface $pluginManager
@@ -66,24 +66,18 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
    *   The translation manager. We are using a method that doesn't exist on an
    *   interface, so require this class.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected HelpTopicPluginManagerInterface $pluginManager, protected RendererInterface $renderer, protected LanguageDefault $defaultLanguage, protected LanguageManagerInterface $languageManager, protected TranslationManager $translationManager) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected HelpTopicPluginManagerInterface $pluginManager,
+    protected RendererInterface $renderer,
+    protected LanguageDefault $defaultLanguage,
+    protected LanguageManagerInterface $languageManager,
+    #[Autowire(service: 'string_translation')]
+    protected TranslationManager $translationManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('plugin.manager.help_topic'),
-      $container->get('renderer'),
-      $container->get('language.default'),
-      $container->get('language_manager'),
-      $container->get('string_translation')
-    );
   }
 
   /**

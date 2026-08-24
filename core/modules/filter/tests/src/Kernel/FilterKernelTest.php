@@ -7,23 +7,28 @@ namespace Drupal\Tests\filter\Kernel;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Template\TwigThemeEngine;
 use Drupal\editor\EditorXssFilter\Standard;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\FilterPluginCollection;
+use Drupal\filter\Plugin\Filter\FilterAutoP;
+use Drupal\filter\Plugin\Filter\FilterUrl;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore outro
+// cspell:ignore toolongdomainexampledomainexampledomainexampledomainexampledomain
 /**
  * Tests Filter module filters individually.
- *
- * @group filter
  */
+#[Group('filter')]
+#[RunTestsInSeparateProcesses]
 class FilterKernelTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'filter'];
 
@@ -413,6 +418,7 @@ class FilterKernelTest extends KernelTestBase {
     // strings and expectations, we're using "\n" instead of regular newlines
     // here.
     // cSpell:disable
+    // phpcs:disable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     $tests = [
       // Single line breaks should be changed to <br /> tags, while paragraphs
       // separated with double line breaks should be enclosed with <p></p> tags.
@@ -486,14 +492,19 @@ class FilterKernelTest extends KernelTestBase {
         '<p><drupal-media data-caption=" " data-entity-type="media" data-entity-uuid="dbb16f97-cd11-4357-acde-cd09e19e312b"></drupal-media></p>' => FALSE,
       ],
     ];
+    // phpcs:enable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     // cSpell:enable
     $this->assertFilteredString($filter, $tests);
 
     // Very long string hitting PCRE limits.
     $limit = max((int) ini_get('pcre.backtrack_limit'), (int) ini_get('pcre.recursion_limit'));
     $source = $this->randomMachineName($limit);
-    $result = _filter_autop($source);
-    $this->assertEquals($result, '<p>' . $source . "</p>\n", 'Line break filter can process very long strings.');
+
+    $plugin = \Drupal::service('plugin.manager.filter')->createInstance('filter_autop');
+    assert($plugin instanceof FilterAutoP);
+
+    $result = $plugin->process($source, 'en');
+    $this->assertEquals($result->getProcessedText(), '<p>' . $source . "</p>\n", 'Line break filter can process very long strings.');
   }
 
   /**
@@ -514,8 +525,7 @@ class FilterKernelTest extends KernelTestBase {
       'directory' => '',
       'children' => 'Test two',
     ];
-    include_once $this->root . '/core/themes/engines/twig/twig.engine';
-    $render = (string) twig_render_template('container.html.twig', $variables);
+    $render = (string) \Drupal::service(TwigThemeEngine::class)->renderTemplate('container', $variables);
     $render = trim($render);
 
     // Render text before applying the auto paragraph filter.
@@ -525,22 +535,19 @@ class FilterKernelTest extends KernelTestBase {
 <div>Test two</div>
 
 <!-- END CUSTOM TEMPLATE OUTPUT from 'container.html.twig' -->", $render);
-    $result = _filter_autop($render);
+    $plugin = \Drupal::service('plugin.manager.filter')->createInstance('filter_autop');
+    assert($plugin instanceof FilterAutoP);
+    $result = $plugin->process($render, 'en');
 
     // After auto-p is applied, the theme debug should no longer have
     // line breaks but the true line breaks should still.
     $this->assertSame("<!-- THEME DEBUG --><!-- THEME HOOK: 'container' --><!-- 💡 BEGIN CUSTOM TEMPLATE OUTPUT from 'container.html.twig' --><div>Test two</div>
 
-<!-- END CUSTOM TEMPLATE OUTPUT from 'container.html.twig' -->", $result);
+<!-- END CUSTOM TEMPLATE OUTPUT from 'container.html.twig' -->", $result->getProcessedText());
   }
 
   /**
    * Tests filter settings, defaults, access restrictions and similar.
-   *
-   * @todo This is for functions like filter_filter and check_markup, whose
-   *   functionality is not completely focused on filtering. Some ideas:
-   *   restricting formats according to user permissions, proper cache
-   *   handling, defaults -- allowed tags/attributes/protocols.
    *
    * @todo It is possible to add script, iframe etc. to allowed tags, but this
    *   makes HTML filter completely ineffective.
@@ -717,6 +724,7 @@ class FilterKernelTest extends KernelTestBase {
     $email_with_plus_sign = 'one+two@example.com';
 
     // Filter selection/pattern matching.
+    // phpcs:disable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     $tests = [
       // HTTP URLs.
       'http://example.com or www.example.com' => [
@@ -732,15 +740,15 @@ class FilterKernelTest extends KernelTestBase {
         '<a href="mailto:' . $email_with_plus_sign . '">' . $email_with_plus_sign . '</a>' => TRUE,
       ],
       // URI parts and special characters.
-      'http://trailingslash.com/ or www.trailingslash.com/
+      'http://trailing-slash.com/ or www.trailing-slash.com/
       http://host.com/some/path?query=foo&bar[baz]=beer#fragment or www.host.com/some/path?query=foo&bar[baz]=beer#fragment
       http://twitter.com/#!/example/status/22376963142324226
       http://example.com/@user/
       ftp://user:pass@ftp.example.com/~home/dir1
       sftp://user@nonstandardport:222/dir
       ssh://192.168.0.100/srv/git/drupal.git' => [
-        '<a href="http://trailingslash.com/">http://trailingslash.com/</a>' => TRUE,
-        '<a href="http://www.trailingslash.com/">www.trailingslash.com/</a>' => TRUE,
+        '<a href="http://trailing-slash.com/">http://trailing-slash.com/</a>' => TRUE,
+        '<a href="http://www.trailing-slash.com/">www.trailing-slash.com/</a>' => TRUE,
         '<a href="http://host.com/some/path?query=foo&amp;bar[baz]=beer#fragment">http://host.com/some/path?query=foo&amp;bar[baz]=beer#fragment</a>' => TRUE,
         '<a href="http://www.host.com/some/path?query=foo&amp;bar[baz]=beer#fragment">www.host.com/some/path?query=foo&amp;bar[baz]=beer#fragment</a>' => TRUE,
         '<a href="http://twitter.com/#!/example/status/22376963142324226">http://twitter.com/#!/example/status/22376963142324226</a>' => TRUE,
@@ -779,9 +787,11 @@ class FilterKernelTest extends KernelTestBase {
         'http://www.toolong' => FALSE,
         '<a href="mailto:me@me.tv">me@me.tv</a>' => TRUE,
       ],
-      // Absolute URL protocols.
-      // The list to test is found in the beginning of _filter_url() at
-      // $protocols = \Drupal::getContainer()->getParameter('filter_protocols').
+      // Absolute URL protocols. The list to test is found at the beginning of
+      // \Drupal\filter\Plugin\Filter\FilterUrl::process() at
+      // @code
+      // $protocols = $this->container->getParameter('filter_protocols').
+      // @endcode
       'https://example.com,
       ftp://ftp.example.com,
       news://example.net,
@@ -806,9 +816,11 @@ class FilterKernelTest extends KernelTestBase {
         'not foo://disallowed.com.' => TRUE,
       ],
     ];
+    // phpcs:enable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     $this->assertFilteredString($filter, $tests);
 
     // Surrounding text/punctuation.
+    // phpcs:disable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     $tests = [
       'Partial URL with trailing period www.partial.com.
       Email with trailing comma person@example.com,
@@ -835,9 +847,11 @@ class FilterKernelTest extends KernelTestBase {
         '(<a href="http://www.parenthesis.com/dir?a=1&amp;b=2#a">www.parenthesis.com/dir?a=1&amp;b=2#a</a>)' => TRUE,
       ],
     ];
+    // phpcs:enable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     $this->assertFilteredString($filter, $tests);
 
     // Surrounding markup.
+    // phpcs:disable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     $tests = [
       '<p xmlns="www.namespace.com" />
       <p xmlns="http://namespace.com">
@@ -902,11 +916,11 @@ class FilterKernelTest extends KernelTestBase {
       '<script>
       <!--
         // @see www.example.com
-        var exampleurl = "http://example.net";
+        var example_url = "http://example.net";
       -->
       <!--//--><![CDATA[//><!--
         // @see www.example.com
-        var exampleurl = "http://example.net";
+        var example_url = "http://example.net";
       //--><!]]>
       </script>' => [
         'href="http://www.example.com"' => FALSE,
@@ -951,6 +965,7 @@ class FilterKernelTest extends KernelTestBase {
         '<li class="odd"><a href="http://www.class.listitem.com">www.class.listitem.com</a></li>' => TRUE,
       ],
     ];
+    // phpcs:enable Drupal.Arrays.Array.ArrayClosingIndentation, Drupal.Arrays.Array.ArrayIndentation
     $this->assertFilteredString($filter, $tests);
 
     // URL trimming.
@@ -1038,25 +1053,32 @@ class FilterKernelTest extends KernelTestBase {
     ]);
     $path = __DIR__ . '/../..';
 
+    $plugin = \Drupal::service('plugin.manager.filter')->createInstance('filter_url', [
+      'settings' => ['filter_url_length' => 72],
+    ]);
+    assert($plugin instanceof FilterUrl);
+
     $input = file_get_contents($path . '/filter.url-input.txt');
     $expected = file_get_contents($path . '/filter.url-output.txt');
-    $result = _filter_url($input, $filter);
-    $this->assertSame($expected, $result, 'Complex HTML document was correctly processed.');
+    $result = $plugin->process($input, 'en');
+    $this->assertSame($expected, $result->getProcessedText(), 'Complex HTML document was correctly processed.');
 
     $pcre_backtrack_limit = ini_get('pcre.backtrack_limit');
     // Setting this limit to the smallest possible value should cause PCRE
-    // errors and break the various preg_* functions used by _filter_url().
+    // errors and break the various preg_* functions used by
+    // \Drupal\filter\Plugin\Filter\FilterUrl::process().
     ini_set('pcre.backtrack_limit', 1);
 
-    // If PCRE errors occur, _filter_url() should return the exact same text.
+    // If PCRE errors occur, Drupal\filter\Plugin\Filter\FilterUrl::process()
+    // should return the exact same text.
     // Case of a small and simple HTML document.
     $input = $expected = '<p>www.test.com</p>';
-    $result = _filter_url($input, $filter);
-    $this->assertSame($expected, $result, 'Simple HTML document was left intact when PCRE errors occurred.');
+    $result = $plugin->process($input, 'en');
+    $this->assertSame($expected, $result->getProcessedText(), 'Simple HTML document was left intact when PCRE errors occurred.');
     // Case of a complex HTML document.
     $input = $expected = file_get_contents($path . '/filter.url-input.txt');
-    $result = _filter_url($input, $filter);
-    $this->assertSame($expected, $result, 'Complex HTML document was left intact when PCRE errors occurred.');
+    $result = $plugin->process($input, 'en');
+    $this->assertSame($expected, $result->getProcessedText(), 'Complex HTML document was left intact when PCRE errors occurred.');
 
     // Setting limit back to default.
     ini_set('pcre.backtrack_limit', $pcre_backtrack_limit);

@@ -7,20 +7,21 @@ namespace Drupal\Tests\system\Functional\UpdateSystem;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
+use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the minimum schema version when only 7.x update hooks are retained.
- *
- * @group Update
  */
+#[Group('Update')]
+#[RunTestsInSeparateProcesses]
 class UpdatesWith7xTest extends BrowserTestBase {
 
   use RequirementsPageTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['update_test_with_7x'];
 
@@ -31,15 +32,15 @@ class UpdatesWith7xTest extends BrowserTestBase {
 
   /**
    * The URL for the update page.
-   *
-   * @var string
    */
-  private $updateUrl;
+  private string $updateUrl;
 
   /**
    * An administrative user.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
-  private $updateUser;
+  private UserInterface $updateUser;
 
   /**
    * {@inheritdoc}
@@ -53,6 +54,9 @@ class UpdatesWith7xTest extends BrowserTestBase {
     ]);
   }
 
+  /**
+   * Tests updating from Drupal 7.
+   */
   public function testWith7x(): void {
     /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
     $update_registry = \Drupal::service('update.update_hook_registry');

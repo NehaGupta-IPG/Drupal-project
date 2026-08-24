@@ -1,8 +1,17 @@
-global-styling:
+variables:
+  aggregate_target:
+    css: 'claro'
   version: VERSION
   css:
     base:
-      css/base/variables.css: {}
+      css/base/variables.css: { }
+
+global-styling:
+  aggregate_target:
+    css: claro
+  version: VERSION
+  css:
+    base:
       css/base/elements.css: {}
       css/base/typography.css: {}
       css/base/print.css: {}
@@ -12,21 +21,19 @@ global-styling:
       css/classy/components/field.css: {}
       css/classy/components/icons.css: {}
       css/classy/components/inline-form.css: {}
-      css/classy/components/item-list.css: {}
       css/classy/components/link.css: {}
       css/classy/components/links.css: {}
       css/classy/components/menu.css: {}
       css/classy/components/more-link.css: {}
-      css/classy/components/tablesort.css: {}
       css/classy/components/textarea.css: {}
       css/classy/components/ui-dialog.css: {}
       css/components/accordion.css: {}
       css/components/action-link.css: {}
       css/components/content-header.css: {}
+      css/components/ckeditor5.css: {}
       css/components/container-inline.css: {}
       css/components/container-inline.module.css: {}
       css/components/breadcrumb.css: {}
-      css/components/button.css: {}
       css/components/details.css: {}
       css/components/divider.css: {}
       css/components/messages.css: {}
@@ -49,15 +56,11 @@ global-styling:
       css/components/tables.css: {}
       css/components/table--file-multiple-widget.css: {}
       css/components/search-admin-settings.css: {}
-      css/components/tablesort-indicator.css: {}
-      css/components/system-status-report-general-info.css: {}
-      css/components/system-status-report.css: {}
-      css/components/system-status-report-counters.css: {}
-      css/components/system-status-counter.css: {}
       css/components/tableselect.css: {}
       css/components/tabs.css: {}
     theme:
       css/theme/colors.css: {}
+      css/components/button.css: {}
     layout:
       css/layout/breadcrumb.css: {}
       css/layout/local-actions.css: {}
@@ -66,6 +69,7 @@ global-styling:
     - system/admin
     - core/jquery
     - core/drupal
+    - claro/variables
     # Claro has small and extra small variation for most of the control elements
     # such as inputs, action links, buttons, dropbuttons. For usability and
     # accessibility reasons, we keep target sizes big enough on touch screen
@@ -81,6 +85,8 @@ form-two-columns:
   css:
     layout:
       css/layout/form-two-columns.css: {}
+  dependencies:
+    - claro/variables
 
 maintenance-page:
   version: VERSION
@@ -117,7 +123,9 @@ claro.jquery.ui:
   version: VERSION
   css:
     component:
-      css/components/jquery.ui/theme.css: { weight: -1 }
+      css/components/jquery.ui/theme.css: {}
+  dependencies:
+    - claro/variables
 
 claro.drupal.dialog:
   version: VERSION
@@ -125,6 +133,7 @@ claro.drupal.dialog:
     theme:
       css/components/dialog.css: {}
   dependencies:
+    - claro/variables
     - claro/claro.jquery.ui
 
 claro.tabledrag:
@@ -137,6 +146,16 @@ drupal.node.preview:
   css:
     theme:
       css/components/node-preview.css: {}
+
+drupal.tablesort:
+  version: VERSION
+  css:
+    component:
+      css/classy/components/tablesort.css: {}
+      css/components/tablesort.css: {}
+      css/components/tablesort-indicator.css: {}
+  dependencies:
+    - claro/variables
 
 media-form:
   version: VERSION
@@ -151,6 +170,8 @@ image.admin:
   css:
     component:
       css/components/image.admin.css: {}
+  dependencies:
+    - claro/variables
 
 system.admin:
   version: VERSION
@@ -163,6 +184,7 @@ system.admin:
     layout:
       css/layout/system-admin--layout.css: { weight: -10 }
   dependencies:
+    - claro/variables
     - claro/card
 
 checkbox:
@@ -177,6 +199,8 @@ icon-link:
   css:
     component:
       css/components/icon-link.css: {}
+  dependencies:
+    - claro/variables
 
 dropbutton:
   version: VERSION
@@ -193,14 +217,6 @@ autocomplete:
     - core/once
     - claro/claro.jquery.ui
 
-drupal.shortcut:
-  version: VERSION
-  css:
-    # @todo move this to components after
-    #   https://www.drupal.org/project/drupal/issues/3045467 is in.
-    theme:
-      css/components/shortcut.css: {}
-
 details-focus:
   js:
     js/details.js: {}
@@ -208,6 +224,11 @@ details-focus:
 ajax:
   js:
     js/ajax.js: {}
+
+item-list:
+  css:
+    component:
+      css/classy/components/item-list.css: {}
 
 form.password-confirm:
   css:
@@ -219,15 +240,31 @@ form.password-confirm:
     - core/drupal
     - claro/global-styling
 
+
+status.report:
+  version: VERSION
+  css:
+    component:
+      css/components/system-status-report-general-info.css: {}
+      css/components/system-status-report.css: {}
+      css/components/system-status-report-counters.css: {}
+      css/components/system-status-counter.css: {}
+  dependencies:
+    - claro/variables
+
 views:
   css:
     component:
       css/components/views-exposed-form.css: {}
+  dependencies:
+    - claro/variables
 
 views_ui:
   css:
     component:
       css/components/views-ui.css: {}
+  dependencies:
+    - claro/variables
 
 messages:
   js:
@@ -238,6 +275,8 @@ card:
     component:
       css/layout/card-list.css: {}
       css/components/card.css: {}
+  dependencies:
+    - claro/variables
 
 vertical-tabs:
   css:
@@ -252,6 +291,8 @@ file:
   css:
     component:
       css/components/file.css: {}
+  dependencies:
+    - claro/variables
 
 media_library.theme:
   version: VERSION
@@ -259,6 +300,7 @@ media_library.theme:
     theme:
       css/theme/media-library.css: {}
   dependencies:
+    - claro/variables
     - claro/icon-link
 
 media_library.ui:
@@ -272,12 +314,15 @@ media_library.ui:
     - core/drupal
     - core/jquery
     - core/once
+    - claro/variables
 
 progress:
   version: VERSION
   css:
     component:
       css/components/progress.css: {}
+  dependencies:
+    - claro/variables
 
 tabbingmanager:
   version: VERSION
@@ -289,6 +334,8 @@ filter:
   css:
     component:
       css/theme/filter.theme.css: {}
+  dependencies:
+    - claro/variables
 
 tableselect:
   version: VERSION

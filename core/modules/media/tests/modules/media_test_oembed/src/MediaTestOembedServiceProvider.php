@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\media_test_oembed;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -13,7 +15,7 @@ class MediaTestOembedServiceProvider extends ServiceProviderBase {
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     parent::alter($container);
 
     $container->getDefinition('media.oembed.provider_repository')

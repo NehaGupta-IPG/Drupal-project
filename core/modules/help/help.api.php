@@ -5,6 +5,7 @@
  * Hooks for the Help system.
  */
 
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 
 /**
@@ -64,20 +65,21 @@ use Drupal\Core\Url;
  *   The current route match. This can be used to generate different help
  *   output for different pages that share the same route.
  *
- * @return string|array
+ * @return string|\Stringable|array|null
  *   A render array, localized string, or object that can be rendered into
  *   a string, containing the help text.
  */
-function hook_help($route_name, \Drupal\Core\Routing\RouteMatchInterface $route_match) {
+function hook_help($route_name, RouteMatchInterface $route_match): string|\Stringable|array|null {
   switch ($route_name) {
     // Main module help for the block module.
     case 'help.page.block':
-      return '<p>' . t('Blocks are boxes of content rendered into an area, or region, of a web page. The default theme Olivero, for example, implements the regions "Sidebar", "Highlighted", "Content", "Header", "Footer Top", "Footer Bottom", etc., and a block may appear in any one of these areas. The <a href=":blocks">blocks administration page</a> provides a drag-and-drop interface for assigning a block to a region, and for controlling the order of blocks within regions.', [':blocks' => Url::fromRoute('block.admin_display')->toString()]) . '</p>';
+      return '<p>' . t('Blocks are boxes of content rendered into an area, or region, of a web page. A theme will declare regions, for example, "Sidebar", "Highlighted", "Content", "Header", "Footer Top", "Footer Bottom", etc., and a block may appear in any one of these areas. The <a href=":blocks">blocks administration page</a> provides a drag-and-drop interface for assigning a block to a region, and for controlling the order of blocks within regions.', [':blocks' => Url::fromRoute('block.admin_display')->toString()]) . '</p>';
 
     // Help for another path in the block module.
     case 'block.admin_display':
       return '<p>' . t('This page provides a drag-and-drop interface for assigning a block to a region, and for controlling the order of blocks within regions. Since not all themes implement the same regions, or display regions in the same way, blocks are positioned on a per-theme basis. Remember that your changes will not be saved until you click the <em>Save blocks</em> button at the bottom of the page.') . '</p>';
   }
+  return NULL;
 }
 
 /**

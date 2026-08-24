@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\rest\Functional;
 
-use Behat\Mink\Driver\BrowserKitDriver;
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Url;
 use Drupal\rest\RestResourceConfigInterface;
+use Drupal\Tests\ApiRequestTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -26,17 +26,21 @@ use Psr\Http\Message\ResponseInterface;
  */
 abstract class ResourceTestBase extends BrowserTestBase {
 
+  use ApiRequestTrait {
+    makeApiRequest as request;
+  }
+
   /**
    * The format to use in this test.
    *
    * A format is the combination of a certain normalizer and a certain
    * serializer.
    *
-   * @see https://www.drupal.org/developing/api/8/serialization
-   *
    * (The default is 'json' because that doesn't depend on any module.)
    *
    * @var string
+   *
+   * @see https://www.drupal.org/developing/api/8/serialization
    */
   protected static $format = 'json';
 
@@ -67,14 +71,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @see \Drupal\rest\Entity\RestResourceConfig::__construct()
    */
-  protected static $resourceConfigId = NULL;
+  protected static $resourceConfigId;
 
   /**
    * The account to use for authentication, if any.
    *
    * @var null|\Drupal\Core\Session\AccountInterface
    */
-  protected $account = NULL;
+  protected $account;
 
   /**
    * The REST resource config entity storage.
@@ -91,11 +95,13 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected $serializer;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $modules = ['rest'];
+  protected static $modules = [
+    'rest',
+    'dynamic_page_cache',
+    'page_cache',
+  ];
 
   /**
    * {@inheritdoc}
@@ -148,7 +154,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param string[] $methods
    *   The allowed methods for this resource.
    */
-  protected function provisionResource($formats = [], $authentication = [], array $methods = ['GET', 'POST', 'PATCH', 'DELETE']) {
+  protected function provisionResource(
+    $formats = [],
+    $authentication = [],
+    array $methods = ['GET', 'POST', 'PATCH', 'DELETE'],
+  ) {
     $this->resourceConfigStorage->create([
       'id' => static::$resourceConfigId,
       'granularity' => RestResourceConfigInterface::RESOURCE_GRANULARITY,
@@ -166,7 +176,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Refreshes the state of the tester to be in sync with the testee.
    *
    * Should be called after every change made to:
-   * - RestResourceConfig entities
+   * - RestResourceConfig entities.
    */
   protected function refreshTestStateAfterRestConfigChange() {
     // Ensure that the cache tags invalidator has its internal values reset.
@@ -210,6 +220,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param string $method
    *   The HTTP method for which to set up authentication.
    *
+   * @return void
+   *   Returns nothing.
+   *
    * @see ::grantPermissionsToAnonymousRole()
    * @see ::grantPermissionsToAuthenticatedRole()
    */
@@ -222,6 +235,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   HTTP method.
    * @param \Psr\Http\Message\ResponseInterface $response
    *   The response to assert.
+   *
+   * @return void
+   *   Returns nothing.
    */
   abstract protected function assertResponseWhenMissingAuthentication($method, ResponseInterface $response);
 
@@ -230,14 +246,17 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * (Should be called before sending a well-formed request.)
    *
-   * @see \GuzzleHttp\ClientInterface::request()
-   *
    * @param string $method
    *   HTTP method.
    * @param \Drupal\Core\Url $url
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
+   *
+   * @return void
+   *   Returns nothing.
+   *
+   * @see \GuzzleHttp\ClientInterface::request()
    */
   abstract protected function assertNormalizationEdgeCases($method, Url $url, array $request_options);
 
@@ -246,14 +265,17 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * (Should be called before sending a well-formed request.)
    *
-   * @see \GuzzleHttp\ClientInterface::request()
-   *
    * @param string $method
    *   HTTP method.
    * @param \Drupal\Core\Url $url
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
+   *
+   * @return void
+   *   Returns nothing.
+   *
+   * @see \GuzzleHttp\ClientInterface::request()
    */
   abstract protected function assertAuthenticationEdgeCases($method, Url $url, array $request_options);
 
@@ -269,6 +291,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Initializes authentication.
    *
    * E.g. for cookie authentication, we first need to get a cookie.
+   *
+   * @return void
+   *   Returns nothing.
    */
   protected function initAuthentication() {}
 
@@ -326,36 +351,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
-   * Performs a HTTP request. Wraps the Guzzle HTTP client.
-   *
-   * Why wrap the Guzzle HTTP client? Because we want to keep the actual test
-   * code as simple as possible, and hence not require them to specify the
-   * 'http_errors = FALSE' request option, nor do we want them to have to
-   * convert Drupal Url objects to strings.
-   *
-   * We also don't want to follow redirects automatically, to ensure these tests
-   * are able to detect when redirects are added or removed.
-   *
-   * @see \GuzzleHttp\ClientInterface::request()
-   *
-   * @param string $method
-   *   HTTP method.
-   * @param \Drupal\Core\Url $url
-   *   URL to request.
-   * @param array $request_options
-   *   Request options to apply.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   */
-  protected function request($method, Url $url, array $request_options) {
-    $request_options[RequestOptions::HTTP_ERRORS] = FALSE;
-    $request_options[RequestOptions::ALLOW_REDIRECTS] = FALSE;
-    $request_options = $this->decorateWithXdebugCookie($request_options);
-    $client = $this->getHttpClient();
-    return $client->request($method, $url->setAbsolute(TRUE)->toString(), $request_options);
-  }
-
-  /**
    * Asserts that a resource response has the given status code and body.
    *
    * @param int $expected_status_code
@@ -387,7 +382,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       // sets it to 'text/html' by default. We also cannot detect the presence
       // of Apache either here in the CLI. For now having this documented here
       // is all we can do.
-      // $this->assertFalse($response->hasHeader('Content-Type'));
+      // "$this->assertFalse($response->hasHeader('Content-Type'));".
       $this->assertSame('', (string) $response->getBody());
     }
     else {
@@ -399,13 +394,19 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // Expected cache tags: X-Drupal-Cache-Tags header.
     $this->assertSame($expected_cache_tags !== FALSE, $response->hasHeader('X-Drupal-Cache-Tags'));
-    if (is_array($expected_cache_tags)) {
+    if ($expected_cache_tags === []) {
+      $this->assertSame('', $response->getHeader('X-Drupal-Cache-Tags')[0]);
+    }
+    elseif (is_array($expected_cache_tags)) {
       $this->assertEqualsCanonicalizing($expected_cache_tags, explode(' ', $response->getHeader('X-Drupal-Cache-Tags')[0]));
     }
 
     // Expected cache contexts: X-Drupal-Cache-Contexts header.
     $this->assertSame($expected_cache_contexts !== FALSE, $response->hasHeader('X-Drupal-Cache-Contexts'));
-    if (is_array($expected_cache_contexts)) {
+    if ($expected_cache_contexts === []) {
+      $this->assertSame('', $response->getHeader('X-Drupal-Cache-Contexts')[0]);
+    }
+    elseif (is_array($expected_cache_contexts)) {
       $optimized_expected_cache_contexts = \Drupal::service('cache_contexts_manager')->optimizeTokens($expected_cache_contexts);
       $this->assertEqualsCanonicalizing($optimized_expected_cache_contexts, explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));
     }
@@ -415,8 +416,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertTrue($response->hasHeader('X-Drupal-Cache'));
       $this->assertSame($expected_page_cache_header_value, $response->getHeader('X-Drupal-Cache')[0]);
     }
-    else {
-      $this->assertFalse($response->hasHeader('X-Drupal-Cache'));
+    elseif ($response->hasHeader('X-Drupal-Cache')) {
+      $this->assertMatchesRegularExpression('#^UNCACHEABLE \((no cacheability|(request|response) policy)\)$#', $response->getHeader('X-Drupal-Cache')[0]);
     }
 
     // Expected Dynamic Page Cache header value: X-Drupal-Dynamic-Cache header.
@@ -424,8 +425,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertTrue($response->hasHeader('X-Drupal-Dynamic-Cache'));
       $this->assertSame($expected_dynamic_page_cache_header_value, $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
     }
-    else {
-      $this->assertFalse($response->hasHeader('X-Drupal-Dynamic-Cache'));
+    elseif ($response->hasHeader('X-Drupal-Dynamic-Cache')) {
+      $this->assertMatchesRegularExpression('#^UNCACHEABLE \(((no|poor) cacheability|(request|response) policy|\d{3}(, sub-request: (HIT|MISS))?)\)$#', $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
     }
   }
 
@@ -434,7 +435,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @param int $expected_status_code
    *   The expected response status.
-   * @param string $expected_message
+   * @param string|false $expected_message
    *   The expected error message.
    * @param \Psr\Http\Message\ResponseInterface $response
    *   The error response to assert.
@@ -460,47 +461,13 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
-   * Adds the Xdebug cookie to the request options.
-   *
-   * @param array $request_options
-   *   The request options.
-   *
-   * @return array
-   *   Request options updated with the Xdebug cookie if present.
-   */
-  protected function decorateWithXdebugCookie(array $request_options) {
-    $session = $this->getSession();
-    $driver = $session->getDriver();
-    if ($driver instanceof BrowserKitDriver) {
-      $client = $driver->getClient();
-      foreach ($client->getCookieJar()->all() as $cookie) {
-        if (isset($request_options[RequestOptions::HEADERS]['Cookie'])) {
-          $request_options[RequestOptions::HEADERS]['Cookie'] .= '; ' . $cookie->getName() . '=' . $cookie->getValue();
-        }
-        else {
-          $request_options[RequestOptions::HEADERS]['Cookie'] = $cookie->getName() . '=' . $cookie->getValue();
-        }
-      }
-    }
-    return $request_options;
-  }
-
-  /**
    * Recursively sorts an array by key.
    *
    * @param array $array
    *   An array to sort.
    */
   protected static function recursiveKSort(array &$array) {
-    // First, sort the main array.
-    ksort($array);
-
-    // Then check for child arrays.
-    foreach ($array as $key => &$value) {
-      if (is_array($value)) {
-        static::recursiveKSort($value);
-      }
-    }
+    SortArray::sortByKeyRecursive($array);
   }
 
 }

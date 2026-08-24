@@ -10,7 +10,6 @@ use Drupal\views\Attribute\ViewsField;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Field handler to display entity label optionally linked to entity page.
@@ -38,7 +37,7 @@ class EntityLabel extends FieldPluginBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -48,18 +47,6 @@ class EntityLabel extends FieldPluginBase {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager')
-    );
   }
 
   /**
@@ -111,10 +98,10 @@ class EntityLabel extends FieldPluginBase {
         $this->options['alter']['url'] = $entity->toUrl();
         $this->options['alter']['make_link'] = TRUE;
       }
-      catch (UndefinedLinkTemplateException $e) {
+      catch (UndefinedLinkTemplateException) {
         $this->options['alter']['make_link'] = FALSE;
       }
-      catch (EntityMalformedException $e) {
+      catch (EntityMalformedException) {
         $this->options['alter']['make_link'] = FALSE;
       }
     }

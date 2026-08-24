@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
-use Drupal\views\Views;
 use Drupal\views\ViewExecutable;
+use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the grid style plugin.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\style\Grid
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class StyleGridTest extends PluginKernelTestBase {
 
   /**
@@ -67,29 +70,45 @@ class StyleGridTest extends PluginKernelTestBase {
     $output = \Drupal::service('renderer')->renderRoot($output);
     $this->setRawContent($output);
     if (!in_array($alignment, $this->alignmentsTested)) {
-      $result = $this->xpath('//div[contains(@class, "views-view-grid") and contains(@class, :alignment) and contains(@class, :columns)]', [':alignment' => $alignment, ':columns' => 'cols-' . $columns]);
+      $result = $this->xpath(
+        '//div[contains(@class, "views-view-grid") and contains(@class, :alignment) and contains(@class, :columns)]',
+        [
+          ':alignment' => $alignment,
+          ':columns' => 'cols-' . $columns,
+        ]
+      );
       $this->assertGreaterThan(0, count($result), ucfirst($alignment) . " grid markup detected.");
       $this->alignmentsTested[] = $alignment;
     }
     $width = '0';
     switch ($columns) {
-      case 5: $width = '20';
+      case 5:
+        $width = '20';
         break;
 
-      case 4: $width = '25';
+      case 4:
+        $width = '25';
         break;
 
-      case 3: $width = '33.3333';
+      case 3:
+        $width = '33.3333';
         break;
 
-      case 2: $width = '50';
+      case 2:
+        $width = '50';
         break;
 
-      case 1: $width = '100';
+      case 1:
+        $width = '100';
         break;
     }
     // Ensure last column exists.
-    $result = $this->xpath('//div[contains(@class, "views-col") and contains(@class, :columns) and starts-with(@style, :width)]', [':columns' => 'col-' . $columns, ':width' => 'width: ' . $width]);
+    $result = $this->xpath(
+      '//div[contains(@class, "views-col") and contains(@class, :columns) and starts-with(@style, :width)]',
+      [
+        ':columns' => 'col-' . $columns,
+        ':width' => 'width: ' . $width,
+      ]);
     $this->assertGreaterThan(0, count($result), ucfirst($alignment) . " $columns column grid: last column exists and automatic width calculated correctly.");
     // Ensure no extra columns were generated.
     $result = $this->xpath('//div[contains(@class, "views-col") and contains(@class, :columns)]', [':columns' => 'col-' . ($columns + 1)]);

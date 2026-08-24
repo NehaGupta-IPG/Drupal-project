@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional\Rest;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
 use Drupal\user\Entity\User;
 
+/**
+ * Resource test base for file entity.
+ */
 abstract class FileResourceTestBase extends EntityResourceTestBase {
 
   /**
@@ -44,7 +48,19 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function doTestPost(): void {
+    // Drupal does not allow creating file entities independently. It allows
+    // you to create file entities that are referenced from another entity
+    // (e.g. an image for a node's image field).
+    // For that purpose, there is the "file_upload" REST resource plugin.
+    // @see \Drupal\file\FileAccessControlHandler::checkCreateAccess()
+    // @see \Drupal\file\Plugin\rest\resource\FileUploadResource
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpAuthorization($method): void {
     switch ($method) {
       case 'GET':
         $this->grantPermissionsToTestedRole(['access content']);
@@ -67,7 +83,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * Makes the current user the file owner.
    */
-  protected function makeCurrentUserFileOwner() {
+  protected function makeCurrentUserFileOwner(): void {
     $account = static::$auth ? User::load(2) : User::load(0);
     $this->entity->setOwnerId($account->id());
     $this->entity->setOwner($account);
@@ -77,7 +93,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function createEntity() {
+  protected function createEntity(): EntityInterface {
     $this->author = User::load(1);
 
     $file = File::create();
@@ -96,7 +112,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedNormalizedEntity() {
+  protected function getExpectedNormalizedEntity(): array {
     return [
       'changed' => [
         [
@@ -165,7 +181,7 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getNormalizedPostEntity() {
+  protected function getNormalizedPostEntity(): array {
     return [
       'uid' => [
         [
@@ -183,14 +199,14 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getNormalizedPatchEntity() {
+  protected function getNormalizedPatchEntity(): array {
     return array_diff_key($this->getNormalizedPostEntity(), ['uid' => TRUE]);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedCacheContexts() {
+  protected function getExpectedCacheContexts(): array {
     return [
       'url.site',
       'user.permissions',
@@ -200,21 +216,8 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testPost(): void {
-    // Drupal does not allow creating file entities independently. It allows you
-    // to create file entities that are referenced from another entity (e.g. an
-    // image for a node's image field).
-    // For that purpose, there is the "file_upload" REST resource plugin.
-    // @see \Drupal\file\FileAccessControlHandler::checkCreateAccess()
-    // @see \Drupal\file\Plugin\rest\resource\FileUploadResource
-    $this->markTestSkipped();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getExpectedUnauthorizedAccessMessage($method) {
-    return match($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method): string {
+    return match ($method) {
       'GET' => "The 'access content' permission is required.",
       'PATCH' => "Only the file owner can update the file entity.",
       'DELETE' => "The 'delete any file' permission is required.",

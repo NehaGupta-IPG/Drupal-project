@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\media_library_test_widget\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\Attribute\FieldWidget;
@@ -39,7 +41,7 @@ class MediaLibraryInceptionWidget extends MediaLibraryWidget {
   /**
    * {@inheritdoc}
    */
-  public function elementValidate($element, FormStateInterface $form_state, $form) {
+  public function elementValidate($element, FormStateInterface $form_state, $form): void {
     $field_name = $element['#field_name'];
     $entity = $form_state->getFormObject()->getEntity();
     $input = $form_state->getUserInput();

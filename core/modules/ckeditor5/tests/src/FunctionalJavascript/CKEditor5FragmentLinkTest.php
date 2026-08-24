@@ -14,13 +14,16 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the fragment link points to CKEditor 5.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class CKEditor5FragmentLinkTest extends WebDriverTestBase {
 
   use TestFileCreationTrait;
@@ -37,8 +40,6 @@ class CKEditor5FragmentLinkTest extends WebDriverTestBase {
 
   /**
    * The admin user.
-   *
-   * @var \Drupal\user\Entity\User
    */
   protected User $account;
 
@@ -72,7 +73,7 @@ class CKEditor5FragmentLinkTest extends WebDriverTestBase {
       'field_storage' => $field_storage,
       'bundle' => 'page',
       'label' => 'Body',
-      'settings' => ['display_summary' => TRUE],
+      'settings' => [],
       'required' => TRUE,
     ])->save();
 
@@ -82,7 +83,7 @@ class CKEditor5FragmentLinkTest extends WebDriverTestBase {
       'bundle' => 'page',
       'mode' => 'default',
       'status' => TRUE,
-    ])->setComponent('body', ['type' => 'text_textarea_with_summary'])
+    ])->setComponent('body', ['type' => 'text_textarea'])
       ->save();
 
     $this->account = $this->drupalCreateUser([
