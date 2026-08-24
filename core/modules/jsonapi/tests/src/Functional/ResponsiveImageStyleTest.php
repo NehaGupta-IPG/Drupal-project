@@ -104,6 +104,9 @@ class ResponsiveImageStyleTest extends ConfigEntityResourceTestBase {
         'links' => [
           'self' => ['href' => $self_url],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
         'attributes' => [
           'breakpoint_group' => 'test_group',
           'dependencies' => [

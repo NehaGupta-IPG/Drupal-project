@@ -1314,6 +1314,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $merged_document['data'] = [];
     }
 
+    // Simulate what DataNormalizer::normalize() does.
+    foreach ($merged_document['data'] as $i => $item) {
+      $merged_document['data'][$i]['meta']['arity'] = $i;
+    }
+
     $cacheability = static::getExpectedCollectionCacheability($this->account, $collection, NULL, $filtered);
     $cacheability->setCacheMaxAge($merged_response->getCacheableMetadata()->getCacheMaxAge());
 
@@ -2748,6 +2753,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
           $owner_resource['attributes'][$field_name] = $this->serializer->normalize($owner->get($field_name)[0]->get('value'), 'api_json');
         }
         $owner_resource['links']['self']['href'] = static::getResourceLink($owner_resource);
+        $owner_resource['meta']['arity'] = 0;
         $expected_document['included'] = [$owner_resource];
         $expected_cacheability->addCacheableDependency($owner);
         $expected_cacheability->addCacheableDependency(static::entityAccess($owner, 'view', $this->account));
@@ -3373,6 +3379,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected static function decorateExpectedResponseForIncludedFields(CacheableResourceResponse $expected_response, array $related_responses) {
     $expected_document = $expected_response->getResponseData();
     $expected_cacheability = $expected_response->getCacheableMetadata();
+    $arity = 0;
     foreach ($related_responses as $related_response) {
       $related_document = $related_response->getResponseData();
       $expected_cacheability->addCacheableDependency($related_response->getCacheableMetadata());
@@ -3392,7 +3399,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
           : $related_data;
         foreach ($related_resources as $related_resource) {
           if (empty($expected_document['included']) || !static::collectionHasResourceIdentifier($related_resource, $expected_document['included'])) {
+            $related_resource['meta']['arity'] = $arity;
             $expected_document['included'][] = $related_resource;
+            $arity++;
           }
         }
       }

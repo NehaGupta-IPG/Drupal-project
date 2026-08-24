@@ -86,6 +86,9 @@ class ViewTest extends ConfigEntityResourceTestBase {
         'links' => [
           'self' => ['href' => $self_url],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
         'attributes' => [
           'base_field' => 'nid',
           'base_table' => 'node',

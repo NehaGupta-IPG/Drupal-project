@@ -87,6 +87,9 @@ class RoleTest extends ConfigEntityResourceTestBase {
         'links' => [
           'self' => ['href' => $self_url],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
         'attributes' => [
           'weight' => 2,
           'langcode' => 'en',

@@ -45,6 +45,7 @@ final class CollectResourceObjectMetaEvent extends Event implements RefinableCac
     if (empty($context['resource_object']) || !($context['resource_object'] instanceof ResourceObject) || $this->context['resource_object']->getId() !== $this->resourceObject->getId()) {
       throw new \RuntimeException('The context must contain a valid resource object.');
     }
+    $this->meta = $this->resourceObject->getMeta();
   }
 
   /**

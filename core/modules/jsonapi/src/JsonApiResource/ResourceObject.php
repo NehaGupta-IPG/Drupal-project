@@ -70,6 +70,13 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   protected $language;
 
   /**
+   * The resource object's metadata.
+   *
+   * @var array
+   */
+  protected array $meta;
+
+  /**
    * ResourceObject constructor.
    *
    * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
@@ -87,8 +94,10 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
    *   The links for the resource object.
    * @param \Drupal\Core\Language\LanguageInterface|null $language
    *   (optional) The resource language.
+   * @param array $meta
+   *   Any metadata for the ResourceObject.
    */
-  public function __construct(CacheableDependencyInterface $cacheability, ResourceType $resource_type, $id, $revision_id, array $fields, LinkCollection $links, ?LanguageInterface $language = NULL) {
+  public function __construct(CacheableDependencyInterface $cacheability, ResourceType $resource_type, $id, $revision_id, array $fields, LinkCollection $links, ?LanguageInterface $language = NULL, array $meta = []) {
     assert(is_null($revision_id) || $resource_type->isVersionable());
     $this->setCacheability($cacheability);
     $this->resourceType = $resource_type;
@@ -101,6 +110,47 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
     // entity system.
     // @see \Drupal\Core\Entity\EntityBase::language()
     $this->language = $language ?: new Language(['id' => LanguageInterface::LANGCODE_NOT_SPECIFIED]);
+    $this->meta = $meta;
+  }
+
+  /**
+   * Returns a copy of the given ResourceObject with the given arity.
+   *
+   * @param int $arity
+   *   The new arity, must be a non-negative integer.
+   *
+   * @return static
+   *   A newly created ResourceObject with the given arity, otherwise
+   *   the same.
+   */
+  public function withArity(int $arity): ResourceObject {
+    if ($this->resourceType->isVersionable()) {
+      $versionIdentifier = str_replace('id:', '', $this->getVersionIdentifier());
+    }
+    else {
+      $versionIdentifier = NULL;
+    }
+
+    return new static(
+      $this,
+      $this->getResourceType(),
+      $this->getId(),
+      $versionIdentifier,
+      $this->getFields(),
+      $this->getLinks(),
+      $this->getLanguage(),
+      [ResourceIdentifier::ARITY_KEY => $arity] + $this->getMeta()
+    );
+  }
+
+  /**
+   * Gets the resource identifier objects metadata.
+   *
+   * @return array
+   *   The metadata.
+   */
+  public function getMeta(): array {
+    return $this->meta;
   }
 
   /**

@@ -3,6 +3,8 @@
 namespace Drupal\jsonapi\Normalizer;
 
 use Drupal\jsonapi\JsonApiResource\Data;
+use Drupal\jsonapi\JsonApiResource\ResourceObject;
+use Drupal\jsonapi\JsonApiResource\ResourceObjectData;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 
 /**
@@ -28,6 +30,18 @@ class DataNormalizer extends NormalizerBase {
    */
   public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     assert($object instanceof Data);
+
+    if ($object instanceof ResourceObjectData) {
+      $data = $object->toArray();
+      foreach ($data as $i => $item) {
+        if ($item instanceof ResourceObject) {
+          $data[$i] = $item->withArity($i);
+        }
+      }
+
+      $object = new ResourceObjectData($data, $object->getCardinality());
+    }
+
     $cacheable_normalizations = array_map(function ($resource) use ($format, $context) {
       return $this->serializer->normalize($resource, $format, $context);
     }, $object->toArray());

@@ -101,6 +101,9 @@ class PathAliasTest extends ResourceTestBase {
         'links' => [
           'self' => ['href' => $self_url->toString()],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
         'attributes' => [
           'alias' => '/frontpage1',
           'path' => '/<front>',

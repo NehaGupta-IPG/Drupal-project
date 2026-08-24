@@ -98,6 +98,9 @@ class ContentLanguageSettingsTest extends ConfigEntityResourceTestBase {
         'links' => [
           'self' => ['href' => $self_url],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
         'attributes' => [
           'default_langcode' => 'site_default',
           'dependencies' => [

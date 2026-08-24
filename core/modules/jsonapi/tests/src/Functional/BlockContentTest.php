@@ -157,6 +157,9 @@ class BlockContentTest extends ResourceTestBase {
         'links' => [
           'self' => ['href' => $self_url->toString()],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
         'attributes' => [
           'body' => [
             'value' => 'The name "llama" was adopted by European settlers from native Peruvians.',

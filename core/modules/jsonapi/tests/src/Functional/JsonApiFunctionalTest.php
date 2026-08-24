@@ -89,6 +89,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertArrayHasKey('type', $single_output['data']);
     $this->assertEquals($this->nodes[0]->getTitle(), $single_output['data']['attributes']['title']);
+    $this->assertArrayHasKey('arity', $single_output['data']['meta']);
 
     // 5.1 Single article with access denied because unauthenticated.
     Json::decode($this->drupalGet('/jsonapi/node/article/' . $this->nodes[60]->uuid()));
@@ -127,6 +128,9 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     $single_output = Json::decode($this->drupalGet('/jsonapi/node/article/' . $uuid . '/field_tags', [
       'query' => ['include' => 'vid'],
     ]));
+    foreach ($single_output['data'] as $arity => $item) {
+      $this->assertEquals($arity, $item['meta']['arity']);
+    }
     $this->assertSession()->statusCodeEquals(200);
     $this->assertEquals('taxonomy_term--tags', $single_output['data'][0]['type']);
     $this->assertArrayNotHasKey('tid', $single_output['data'][0]['attributes']);
@@ -584,6 +588,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'resource_meta_user_has_admin_role' => 'no',
       'resource_meta_user_id' => $this->user->id(),
       'resource_meta_title' => $node->getTitle(),
+      'arity' => 0,
     ];
     $this->assertEquals($expectedMeta, $result['data']['meta']);
     // Test if the cache tags bubbled up.
@@ -593,13 +598,13 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     // Test if the relationship has the correct metadata when loading a
     // resource collection.
     $result = Json::decode($this->drupalGet('jsonapi/node/article'));
-    foreach ($result['data'] as $resource) {
+    foreach ($result['data'] as $i => $resource) {
       if ($resource['id'] === $node->uuid()) {
         $this->assertEquals($expectedMeta, $resource['meta']);
       }
 
       else {
-        $this->assertArrayNotHasKey('meta', $resource);
+        $this->assertEquals(['arity' => $i], $resource['meta']);
       }
 
     }
@@ -620,6 +625,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       'resource_meta_user_has_admin_role' => 'yes',
       'resource_meta_user_id' => $this->adminUser->id(),
       'resource_meta_title' => $node->getTitle(),
+      'arity' => 0,
     ];
     $this->assertEquals($expectedMeta, $result['data']['meta']);
     // Test if the cache tags bubbled up.
@@ -767,6 +773,9 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
             ],
           ],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
       ],
     ];
     $response = $this->request('POST', $collection_url, [
@@ -900,6 +909,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         'id' => $uuid,
         'type' => 'node--article',
         'attributes' => ['title' => 'My updated title'],
+        'meta' => ['arity' => 0],
       ],
     ];
     $individual_url = Url::fromRoute('jsonapi.node--article.individual', [

@@ -159,6 +159,9 @@ class UserTest extends ResourceTestBase {
         'links' => [
           'self' => ['href' => $self_url],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
         'attributes' => [
           'display_name' => 'Llama',
           'created' => '1973-11-29T21:33:09+00:00',

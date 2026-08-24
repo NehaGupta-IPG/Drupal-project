@@ -108,6 +108,9 @@ class ShortcutTest extends ResourceTestBase {
         'links' => [
           'self' => ['href' => $self_url],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
         'attributes' => [
           'title' => 'Comments',
           'link' => [

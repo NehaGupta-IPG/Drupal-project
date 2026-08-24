@@ -182,6 +182,9 @@ class MediaTest extends ResourceTestBase {
         'links' => [
           'self' => ['href' => $self_url->toString()],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
         'attributes' => [
           'langcode' => 'en',
           'name' => 'Llama',

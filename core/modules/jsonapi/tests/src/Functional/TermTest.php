@@ -267,6 +267,9 @@ class TermTest extends ResourceTestBase {
         'links' => [
           'self' => ['href' => $self_url->toString()],
         ],
+        'meta' => [
+          'arity' => 0,
+        ],
         'attributes' => [
           'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'default_langcode' => TRUE,
