@@ -39,7 +39,8 @@ final class ViewQuery extends Expression {
    *
    * @param \Drupal\Core\Database\Query\SelectInterface $select
    *   The select query. It must not use bound parameters. Conditions can use
-   *   literal values through \Drupal\Core\Database\Query\SelectInterface::where().
+   *   literal values through
+   *   \Drupal\Core\Database\Query\SelectInterface::where().
    *
    * @return self
    *   The view query wrapping the select query.

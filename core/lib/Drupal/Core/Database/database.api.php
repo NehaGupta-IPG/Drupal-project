@@ -496,8 +496,9 @@ use Drupal\Core\Database\SchemaDefinition\ViewQuery;
  *
  * A schema can also declare SQL views. Create one directly with
  * \Drupal\Core\Database\Schema::createView(), or add
- * \Drupal\Core\Database\SchemaDefinition\View objects to the 'views' argument
- * of the \Drupal\Core\Database\SchemaDefinition\Schema returned by hook_schema().
+ * \Drupal\Core\Database\SchemaDefinition\View objects to the 'views'
+ * argument of the \Drupal\Core\Database\SchemaDefinition\Schema returned
+ * by hook_schema().
  * Tables and views share one namespace per database, so a view cannot take the
  * name of an existing table.
  *
