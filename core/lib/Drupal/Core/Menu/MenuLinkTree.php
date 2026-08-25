@@ -16,6 +16,14 @@ use Drupal\Core\Utility\CallableResolver;
 class MenuLinkTree implements MenuLinkTreeInterface {
 
   /**
+   * The default menu link tree manipulators applied when none are specified.
+   */
+  protected const array DEFAULT_MANIPULATORS = [
+    ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+    ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+  ];
+
+  /**
    * Constructs a \Drupal\Core\Menu\MenuLinkTree object.
    *
    * @param \Drupal\Core\Menu\MenuTreeStorageInterface $treeStorage
@@ -101,7 +109,8 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   /**
    * {@inheritdoc}
    */
-  public function transform(array $tree, array $manipulators) {
+  public function transform(array $tree, ?array $manipulators = NULL) {
+    $manipulators ??= static::DEFAULT_MANIPULATORS;
     foreach ($manipulators as $manipulator) {
       $callable = $this->callableResolver->getCallableFromDefinition($manipulator['callable']);
       // Prepare the arguments for the menu tree manipulator callable; the first

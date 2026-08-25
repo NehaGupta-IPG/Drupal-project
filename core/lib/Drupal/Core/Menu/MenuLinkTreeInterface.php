@@ -80,11 +80,12 @@ interface MenuLinkTreeInterface {
    *     ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
    *   ];
    *   @endcode
+   *   If NULL, the default set of manipulators is applied.
    *
    * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
    *   The manipulated menu link tree.
    */
-  public function transform(array $tree, array $manipulators);
+  public function transform(array $tree, ?array $manipulators = NULL);
 
   /**
    * Builds a renderable array from a menu tree.

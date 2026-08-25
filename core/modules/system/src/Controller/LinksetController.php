@@ -264,11 +264,7 @@ final class LinksetController extends ControllerBase {
     $parameters->onlyEnabledLinks();
     $parameters->setMinDepth(0);
     $tree = $this->menuTree->load($menu->id(), $parameters);
-    $manipulators = [
-      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
-      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-    ];
-    return $this->menuTree->transform($tree, $manipulators);
+    return $this->menuTree->transform($tree);
   }
 
 }

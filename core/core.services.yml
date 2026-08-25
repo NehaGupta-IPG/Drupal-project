@@ -882,7 +882,7 @@ services:
   Drupal\Core\Menu\MenuActiveTrailInterface: '@menu.active_trail'
   menu.parent_form_selector:
     class: Drupal\Core\Menu\MenuParentFormSelector
-    arguments: ['@menu.link_tree', '@entity_type.manager', '@string_translation']
+    arguments: ['@menu.link_tree', '@entity_type.manager', '@string_translation', '@menu.default_tree_manipulators']
   Drupal\Core\Menu\MenuParentFormSelectorInterface: '@menu.parent_form_selector'
   local_action.yaml_cache_collector:
     class: Drupal\Core\Utility\YamlCacheCollector

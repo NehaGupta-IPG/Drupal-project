@@ -73,11 +73,7 @@ class SystemController extends ControllerBase {
     $parameters = new MenuTreeParameters();
     $parameters->setRoot($link_id)->excludeRoot()->setTopLevelOnly()->onlyEnabledLinks();
     $tree = $this->menuLinkTree->load(NULL, $parameters);
-    $manipulators = [
-      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
-      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-    ];
-    $tree = $this->menuLinkTree->transform($tree, $manipulators);
+    $tree = $this->menuLinkTree->transform($tree);
     $tree_access_cacheability = new CacheableMetadata();
     $blocks = [];
     foreach ($tree as $key => $element) {
