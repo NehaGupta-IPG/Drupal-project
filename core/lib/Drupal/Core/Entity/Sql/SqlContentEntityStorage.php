@@ -217,6 +217,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $this->revisionTable = NULL;
     $this->dataTable = NULL;
     $this->revisionDataTable = NULL;
+    $this->langcodeKey = FALSE;
+    $this->defaultLangcodeKey = FALSE;
 
     $table_mapping = $this->getTableMapping();
     $this->baseTable = $table_mapping->getBaseTable();

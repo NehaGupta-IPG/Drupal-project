@@ -84,13 +84,18 @@ class EntityTestUpdate extends ContentEntityBase {
         ->setSetting('unsigned', TRUE);
     }
 
-    $fields[$entity_type->getKey('langcode')] = BaseFieldDefinition::create('language')
-      ->setLabel(new TranslatableMarkup('Language'));
-    if ($entity_type->isRevisionable()) {
-      $fields[$entity_type->getKey('langcode')]->setRevisionable(TRUE);
-    }
-    if ($entity_type->isTranslatable()) {
-      $fields[$entity_type->getKey('langcode')]->setTranslatable(TRUE);
+    // Guarded like the revision key above, so that a test can put the entity
+    // type in the state an entity type that was never translatable is really
+    // in: without a langcode key, and therefore without a langcode column.
+    if ($entity_type->hasKey('langcode')) {
+      $fields[$entity_type->getKey('langcode')] = BaseFieldDefinition::create('language')
+        ->setLabel(new TranslatableMarkup('Language'));
+      if ($entity_type->isRevisionable()) {
+        $fields[$entity_type->getKey('langcode')]->setRevisionable(TRUE);
+      }
+      if ($entity_type->isTranslatable()) {
+        $fields[$entity_type->getKey('langcode')]->setTranslatable(TRUE);
+      }
     }
 
     $fields['name'] = BaseFieldDefinition::create('string')
