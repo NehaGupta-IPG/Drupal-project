@@ -32,7 +32,7 @@ class KernelTestHttpSessionTest extends KernelTestBase implements ServiceModifie
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     $this->alterSessionServices($container);
   }
 

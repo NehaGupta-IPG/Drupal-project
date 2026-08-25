@@ -37,7 +37,7 @@ class KernelTestHttpFormTest extends KernelTestBase implements ServiceModifierIn
   /**
    * {@inheritdoc}
    */
-  public function alter(ContainerBuilder $container) {
+  public function alter(ContainerBuilder $container): void {
     $this->alterFormBuilder($container);
 
     // This is only needed for authenticated user submission.
