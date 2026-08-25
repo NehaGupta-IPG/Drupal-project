@@ -12,7 +12,7 @@ CacheGetCountByBin:
   render: 14
   file_parsing: 2
   menu: 22
-CacheSetCount: 266
+CacheSetCount: 274
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
 CacheTagLookupQueryCount: 29
@@ -119,6 +119,7 @@ CacheTagGroupedLookups:
   -
     - 'config:system.menu.navigation-user-links'
   -
+    - 'config:language.types'
     - 'config:user.role.authenticated'
     - 'config:user.role.test_admin'
     - 'user:11'
