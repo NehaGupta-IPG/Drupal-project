@@ -4,12 +4,30 @@
 tests/Drupal/**/*Test.php   export-ignore
 **/tests/src/**/*Test.php   export-ignore
 
-# Test fixtures, modules, themes, engines. Exclude everything directly under
-# tests/ except the src/ tree, which contains base classes and traits that
-# contrib tests extend.
-modules/*/tests/*/    export-ignore
-modules/*/tests/src/ -export-ignore
+# Test fixtures, modules, themes, engines. Exclude test subdirectories.
 tests/fixtures/       export-ignore
+modules/*/tests/*/ export-ignore
+
+# Functional test traits that contrib and custom code use.
+modules/*/tests/src/                   -export-ignore
+modules/*/tests/src/*                  export-ignore
+modules/block/tests/src/Traits/         -export-ignore
+modules/block/tests/src/Traits/*        export-ignore
+modules/block/tests/src/Traits/BlockCreationTrait.php       -export-ignore
+modules/node/tests/src/Traits/          -export-ignore
+modules/node/tests/src/Traits/*         export-ignore
+modules/node/tests/src/Traits/ContentTypeCreationTrait.php  -export-ignore
+modules/node/tests/src/Traits/NodeCreationTrait.php         -export-ignore
+modules/user/tests/src/Traits/          -export-ignore
+modules/user/tests/src/Traits/*         export-ignore
+modules/user/tests/src/Traits/UserCreationTrait.php         -export-ignore
+
+# FunctionalJavascript test modules.
+modules/system/tests/modules/                                  -export-ignore
+modules/system/tests/modules/*/                                export-ignore
+modules/system/tests/modules/css_disable_transitions_test/     -export-ignore
+modules/system/tests/modules/js_testing_ajax_request_test/     -export-ignore
+modules/system/tests/modules/js_testing_log_test/              -export-ignore
 
 # Per-test fixture data under tests/Drupal/Tests/.
 tests/Drupal/Tests/**/fixtures/ export-ignore
