@@ -11,7 +11,8 @@ use Drupal\Core\Form\FormBuilder;
  *
  * This is only a workaround for https://www.drupal.org/node/2505339.
  *
- * @todo Remove this when https://www.drupal.org/node/2505339 is fixed.
+ * @todo Deprecate and remove this when https://www.drupal.org/node/2505339 is
+ * fixed.
  */
 class KernelTestFormBuilder extends FormBuilder {
 

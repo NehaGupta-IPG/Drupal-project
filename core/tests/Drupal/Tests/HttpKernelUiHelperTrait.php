@@ -74,7 +74,7 @@ trait HttpKernelUiHelperTrait {
    * This should be called from an implementation of
    * \Drupal\Core\DependencyInjection\ServiceModifierInterface::alter().
    *
-   * @todo This can be removed when
+   * @todo This can be deprecated and removed when
    * https://www.drupal.org/project/drupal/issues/2505339 is fixed.
    *
    * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
