@@ -8,6 +8,7 @@ use Drupal\Core\Database\Schema as DatabaseSchema;
 use Drupal\Core\Database\SchemaDefinition\GinIndex;
 use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Language\LanguageManager;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
@@ -664,7 +665,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function addField($table, $field, $spec, $new_keys = []) {
+  public function addField($table, $field, $specification, $keys_new = [], ?SchemaDefinition $schema = NULL) {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add field '$table.$field': table doesn't exist.");
     }
@@ -1112,7 +1113,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function changeField($table, $field, $field_new, $spec, $new_keys = []) {
+  public function changeField($table, $field, $field_new, $spec, $keys_new = [], ?SchemaDefinition $schema = NULL) {
     if (!$this->fieldExists($table, $field)) {
       throw new SchemaObjectDoesNotExistException("Cannot change the definition of field '$table.$field': field doesn't exist.");
     }

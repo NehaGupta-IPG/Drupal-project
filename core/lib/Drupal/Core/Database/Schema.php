@@ -358,6 +358,7 @@ abstract class Schema implements PlaceholderInterface {
    *   IndexInterface definition objects. Index definitions of a technology
    *   not supported by the driver are skipped, and alternative indexes
    *   fall back to their most preferred supported definition.
+   * phpcs:ignore Drupal.Commenting.FunctionComment.ParamNameNoMatch
    * @param \Drupal\Core\Database\SchemaDefinition\Schema|null $schema
    *   (optional) The destination Schema definition where the table is defined
    *   with the changed column and all defined indexes.
@@ -729,6 +730,7 @@ abstract class Schema implements PlaceholderInterface {
    *   Index definitions of a technology not supported by the driver are
    *   skipped, and alternative indexes fall back to their most preferred
    *   supported definition.
+   * phpcs:ignore Drupal.Commenting.FunctionComment.ParamNameNoMatch
    * @param \Drupal\Core\Database\SchemaDefinition\Schema|null $schema
    *   (optional) The destination Schema definition where the table is defined
    *   with the changed column and all defined indexes.
