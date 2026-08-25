@@ -11,3 +11,15 @@
 function language_update_last_removed(): int {
   return 8001;
 }
+
+/**
+ * Set new options for administration language method.
+ */
+function language_update_11001(): string {
+  $config = \Drupal::configFactory()->getEditable('language.negotiation');
+  $config->set('admin_language.default_langcode', 'site_default');
+  $config->set('admin_language.allow_user_change', TRUE);
+  $config->save();
+
+  return 'Set new options for administration language method.';
+}

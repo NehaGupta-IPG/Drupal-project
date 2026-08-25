@@ -238,10 +238,6 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#disabled' => TRUE,
     ];
 
-    $user_preferred_langcode = $register ? $language_interface->getId() : $account->getPreferredLangcode();
-
-    $user_preferred_admin_langcode = $register ? $language_interface->getId() : $account->getPreferredAdminLangcode(FALSE);
-
     // Is the user preferred language added?
     $user_language_added = FALSE;
     if ($this->languageManager instanceof ConfigurableLanguageManagerInterface) {
@@ -261,7 +257,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#type' => 'language_select',
       '#title' => $this->t('Site language'),
       '#languages' => LanguageInterface::STATE_CONFIGURABLE,
-      '#default_value' => $user_preferred_langcode,
+      '#default_value' => $register ? $language_interface->getId() : $account->getPreferredLangcode(),
       '#description' => $user_language_added ? $this->t("This account's preferred language for emails and site presentation.") : $this->t("This account's preferred language for emails."),
       // This is used to explain that user preferred language and entity
       // language are synchronized. It can be removed if a different behavior is
@@ -269,20 +265,36 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#pre_render' => ['user_langcode' => [$this, 'alterPreferredLangcodeDescription']],
     ];
 
-    // Only show the account setting for Administration pages language to users
-    // if one of the detection and selection methods uses it.
+    // Only show the account setting for Administration language to users
+    // if the detection method is enabled and if users are allowed to change
+    // it.
+    $admin_language_name = '';
     $show_admin_language = FALSE;
     if (($account->hasPermission('access administration pages') || $account->hasPermission('view the administration theme')) && $this->languageManager instanceof ConfigurableLanguageManagerInterface) {
       $negotiator = $this->languageManager->getNegotiator();
-      $show_admin_language = $negotiator && $negotiator->isNegotiationMethodEnabled(LanguageNegotiationUserAdmin::METHOD_ID);
+      if ($negotiator && $negotiator->isNegotiationMethodEnabled(LanguageNegotiationUserAdmin::METHOD_ID)) {
+        // Check if users are allowed to change the administration language.
+        $config = \Drupal::config('language.negotiation');
+        $show_admin_language = $config->get('admin_language.allow_user_change') ?? TRUE;
+
+        // Get the default admin language and resolve site_default to actual
+        // language ID.
+        $admin_langcode_default = $config->get('admin_language.default_langcode');
+        if ($admin_langcode_default === LanguageInterface::LANGCODE_SITE_DEFAULT) {
+          $admin_language_name = $this->languageManager->getDefaultLanguage()->getName();
+        }
+        else {
+          $admin_language_name = $this->languageManager->getLanguage($admin_langcode_default)->getName();
+        }
+      }
     }
     $form['language']['preferred_admin_langcode'] = [
       '#type' => 'language_select',
-      '#title' => $this->t('Administration pages language'),
+      '#title' => $this->t('Administration language'),
       '#languages' => LanguageInterface::STATE_CONFIGURABLE,
-      '#default_value' => $user_preferred_admin_langcode,
+      '#default_value' => $register ? '' : $account->getPreferredAdminLangcode(FALSE),
       '#access' => $show_admin_language,
-      '#empty_option' => $this->t('- No preference -'),
+      '#empty_option' => $admin_language_name ? $this->t("Site's administration language (@language)", ['@language' => $admin_language_name]) : $this->t("Site's administration language"),
       '#empty_value' => '',
     ];
 

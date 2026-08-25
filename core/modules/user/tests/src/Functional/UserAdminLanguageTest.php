@@ -129,15 +129,17 @@ class UserAdminLanguageTest extends BrowserTestBase {
     $this->addCustomLanguage();
     $this->setLanguageNegotiation();
 
-    // Even though we have admin language negotiation, so long as the user has
-    // no preference set, negotiation will fall back further.
+    // We have admin language negotiation as secondary to URL. So long as the
+    // user has no preference set, negotiation will use the configured default
+    // admin language for their user profile editing but path negotiation when
+    // using a path prefix for the language.
     $path = 'user/' . $this->adminUser->id() . '/edit';
     $this->drupalGet($path);
-    $this->assertSession()->pageTextContains('Language negotiation method: language-default');
+    $this->assertSession()->pageTextContains('Language negotiation method: language-user-admin');
     $this->drupalGet('xx/' . $path);
     $this->assertSession()->pageTextContains('Language negotiation method: language-url');
 
-    // Set a preferred language code for the user.
+    // Set a valid preferred language code for the user.
     $edit = [];
     $edit['preferred_admin_langcode'] = 'xx';
     $this->drupalGet($path);
@@ -165,15 +167,18 @@ class UserAdminLanguageTest extends BrowserTestBase {
     $this->submitForm([], 'Send');
     $this->assertSession()->statusCodeEquals(200);
 
-    // Unset the preferred language code for the user.
+    // Unset the preferred language code for the user. The global site admin
+    // language will still be used for user editing regardless of the URL,
+    // because that is considered an admin path for admin users and is now
+    // configured higher priority.
     $edit = [];
     $edit['preferred_admin_langcode'] = '';
     $this->drupalGet($path);
     $this->submitForm($edit, 'Save');
     $this->drupalGet($path);
-    $this->assertSession()->pageTextContains('Language negotiation method: language-default');
+    $this->assertSession()->pageTextContains('Language negotiation method: language-user-admin');
     $this->drupalGet('xx/' . $path);
-    $this->assertSession()->pageTextContains('Language negotiation method: language-url');
+    $this->assertSession()->pageTextContains('Language negotiation method: language-user-admin');
   }
 
   /**
@@ -194,6 +199,9 @@ class UserAdminLanguageTest extends BrowserTestBase {
     ];
     $this->drupalGet('admin/config/regional/language/detection');
     $this->submitForm($edit, 'Save settings');
+    // Enable per-user language customization for administration pages.
+    $this->drupalGet('admin/config/regional/language/detection/admin_language');
+    $this->submitForm(['allow_user_change' => TRUE], 'Save configuration');
   }
 
   /**

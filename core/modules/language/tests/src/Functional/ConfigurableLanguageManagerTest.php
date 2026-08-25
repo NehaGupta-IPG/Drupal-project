@@ -218,6 +218,10 @@ class ConfigurableLanguageManagerTest extends BrowserTestBase {
       'language-user-admin' => 1,
       'language-selected' => 2,
     ]);
+    // Enable per-user administration language customization.
+    \Drupal::configFactory()->getEditable('language.negotiation')
+      ->set('admin_language.allow_user_change', TRUE)
+      ->save();
 
     // Create a field on the user entity.
     $field_name = $this->randomMachineName();
