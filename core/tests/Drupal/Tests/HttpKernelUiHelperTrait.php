@@ -33,7 +33,8 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
  *   for how to set them up.
  * - To submit a form, see self::alterFormBuilder(). To submit a form as an
  *   authenticated user, session persistence with self::alterSessionServices()
- *   is also needed.
+ *   is also needed and the user must be logged in with
+ *   self::setCurrentUserWithSession.
  */
 trait HttpKernelUiHelperTrait {
 
@@ -106,6 +107,8 @@ trait HttpKernelUiHelperTrait {
     $this->container->get('current_user')->setAccount($account);
 
     if ($account->id()) {
+      // Set the account ID into the session. This is the same as
+      // user_login_finalize().
       $this->container->get('session')->set('uid', $account->id());
     }
   }
