@@ -114,22 +114,13 @@ class TwigPhpStorageCache implements CacheInterface {
    */
   public function write(string $key, string $content): void {
     $this->storage()->save($key, $content);
-    // Save the last mtime.
-    $cid = 'twig:' . $key;
-    $this->cache->set($cid, \Drupal::time()->getRequestTime());
   }
 
   /**
    * {@inheritdoc}
    */
   public function getTimestamp(string $key): int {
-    $cid = 'twig:' . $key;
-    if ($cache = $this->cache->get($cid)) {
-      return $cache->data;
-    }
-    else {
-      return 0;
-    }
+    return 0;
   }
 
 }
