@@ -41,6 +41,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * customize the generated schema; e.g., to add additional indexes.
  *
  * @ingroup entity_api
+ *
+ * phpcs:ignoreFile
  */
 class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEntityStorageInterface, DynamicallyFieldableEntityStorageSchemaInterface, EntityBundleListenerInterface {
 
@@ -62,9 +64,22 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * The entity type's field storage definitions.
    *
+   * @var \Drupal\Core\Entity\ContentEntityTypeInterface
+   */
+  protected $entityType {
+    get => $this->initialize()->entityType;
+    set => $value;
+  }
+
+  /**
+   * The entity type's field storage definitions.
+   *
    * @var \Drupal\Core\Field\FieldStorageDefinitionInterface[]
    */
-  protected $fieldStorageDefinitions;
+  protected $fieldStorageDefinitions {
+    get => $this->initialize()->fieldStorageDefinitions;
+    set => $value;
+  }
 
   /**
    * The mapping of field columns to SQL tables.
@@ -80,7 +95,10 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    *
    * @var string
    */
-  protected $revisionKey = FALSE;
+  protected $revisionKey {
+    get => $this->initialize()->revisionKey;
+    set => $value;
+  }
 
   /**
    * The entity langcode key.
@@ -101,28 +119,40 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    *
    * @var string
    */
-  protected $baseTable;
+  protected $baseTable {
+    get => $this->initialize()->baseTable;
+    set => $value;
+  }
 
   /**
    * The table that stores revisions, if the entity supports revisions.
    *
    * @var string
    */
-  protected $revisionTable;
+  protected $revisionTable {
+    get => $this->initialize()->revisionTable;
+    set => $value;
+  }
 
   /**
    * The table that stores properties, if the entity has multilingual support.
    *
    * @var string
    */
-  protected $dataTable;
+  protected $dataTable {
+    get => $this->initialize()->dataTable;
+    set => $value;
+  }
 
   /**
    * The table that stores revision field data if the entity supports revisions.
    *
    * @var string
    */
-  protected $revisionDataTable;
+  protected $revisionDataTable {
+    get => $this->initialize()->revisionDataTable;
+    set => $value;
+  }
 
   /**
    * Active database connection.
@@ -158,6 +188,13 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @var bool
    */
   protected $temporary = FALSE;
+
+  /**
+   * Whether the lazy-initialized properties are initialized.
+   *
+   * @var bool
+   */
+  protected bool $initialized = FALSE;
 
   /**
    * {@inheritdoc}
@@ -200,10 +237,22 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $this->database = $database;
     $this->languageManager = $language_manager;
     $this->entityTypeManager = $entity_type_manager;
-    $this->entityType = $this->entityTypeManager->getActiveDefinition($entity_type->id());
-    $this->fieldStorageDefinitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($entity_type->id());
+  }
+
+  /**
+   * Ensures that various properties are initialized.
+   */
+  protected function initialize(): static {
+    if ($this->initialized) {
+      return $this;
+    }
+    $this->initialized = TRUE;
+
+    $this->entityType = $this->entityTypeManager->getActiveDefinition($this->entityTypeId);
+    $this->fieldStorageDefinitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($this->entityTypeId);
 
     $this->initTableLayout();
+    return $this;
   }
 
   /**
@@ -1942,7 +1991,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   public function onFieldStorageDefinitionCreate(FieldStorageDefinitionInterface $storage_definition) {
     $this->wrapSchemaException(function () use ($storage_definition) {
       $this->getStorageSchema()->onFieldStorageDefinitionCreate($storage_definition);
-      $this->fieldStorageDefinitions[$storage_definition->getName()] = $storage_definition;
+      $field_storage_definitions = $this->fieldStorageDefinitions;
+      $field_storage_definitions[$storage_definition->getName()] = $storage_definition;
+      $this->fieldStorageDefinitions = $field_storage_definitions;
       $this->tableMapping = NULL;
     });
   }
@@ -1953,7 +2004,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   public function onFieldStorageDefinitionUpdate(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
     $this->wrapSchemaException(function () use ($storage_definition, $original) {
       $this->getStorageSchema()->onFieldStorageDefinitionUpdate($storage_definition, $original);
-      $this->fieldStorageDefinitions[$storage_definition->getName()] = $storage_definition;
+      $field_storage_definitions = $this->fieldStorageDefinitions;
+      $field_storage_definitions[$storage_definition->getName()] = $storage_definition;
+      $this->fieldStorageDefinitions = $field_storage_definitions;
       $this->tableMapping = NULL;
     });
   }
@@ -1980,7 +2033,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     // Update the field schema.
     $this->wrapSchemaException(function () use ($storage_definition) {
       $this->getStorageSchema()->onFieldStorageDefinitionDelete($storage_definition);
-      unset($this->fieldStorageDefinitions[$storage_definition->getName()]);
+      $field_storage_definitions = $this->fieldStorageDefinitions;
+      unset($field_storage_definitions[$storage_definition->getName()]);
+      $this->fieldStorageDefinitions = $field_storage_definitions;
       $this->tableMapping = NULL;
     });
   }

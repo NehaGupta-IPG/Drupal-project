@@ -44,6 +44,13 @@ class TestableSqlContentEntityStorage extends SqlContentEntityStorage {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function initialize(): static {
+    return $this;
+  }
+
+  /**
    * Sets the table mapping.
    *
    * @param \Drupal\Core\Entity\Sql\TableMappingInterface $table_mapping

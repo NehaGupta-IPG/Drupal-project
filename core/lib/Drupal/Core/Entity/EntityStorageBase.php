@@ -101,6 +101,16 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   protected array $entityIdsToLoad = [];
 
   /**
+   * Whether the entity type uses the static cache.
+   */
+  protected bool $isStaticallyCacheable;
+
+  /**
+   * Whether the entity type uses the persistent cache.
+   */
+  protected bool $isPersistentlyCacheable;
+
+  /**
    * Constructs an EntityStorageBase instance.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -112,9 +122,11 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     $this->entityTypeId = $entity_type->id();
     $this->entityType = $entity_type;
     $this->baseEntityClass = $entity_type->getClass();
-    $this->idKey = $this->entityType->getKey('id');
-    $this->uuidKey = $this->entityType->getKey('uuid');
-    $this->langcodeKey = $this->entityType->getKey('langcode');
+    $this->idKey = $entity_type->getKey('id');
+    $this->uuidKey = $entity_type->getKey('uuid');
+    $this->langcodeKey = $entity_type->getKey('langcode');
+    $this->isStaticallyCacheable = $entity_type->isStaticallyCacheable();
+    $this->isPersistentlyCacheable = $entity_type->isPersistentlyCacheable();
     $this->memoryCache = $memory_cache;
     $this->memoryCacheTag = 'entity.memory_cache:' . $this->entityTypeId;
     $this->uuidMemoryCacheTag = 'entity.memory_cache:uuid:' . $this->entityTypeId;
@@ -255,11 +267,10 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    *   Entities to store in the cache.
    */
   protected function setStaticCache(array $entities) {
-    $has_uuid = $this->entityType->hasKey('uuid');
-    if ($this->entityType->isStaticallyCacheable()) {
+    if ($this->isStaticallyCacheable) {
       foreach ($entities as $id => $entity) {
         $this->memoryCache->set($this->buildCacheId($id), $entity, MemoryCacheInterface::CACHE_PERMANENT, [$this->memoryCacheTag]);
-        if ($has_uuid) {
+        if ($this->uuidKey) {
           // Pre-cache the UUID of this entity to speed up ::loadEntityByUuid
           // @see ::loadByProperties
           $this->memoryCache->set(\sprintf('uuid_lookup:%s:%s', $this->entityTypeId, $entity->uuid()), [$id], MemoryCacheInterface::CACHE_PERMANENT, [$this->uuidMemoryCacheTag]);
@@ -346,7 +357,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     $flipped_ids = $ids ? array_flip($ids) : FALSE;
     // Try to load entities from the static cache, if the entity type supports
     // static caching.
-    if ($ids && $this->entityType->isStaticallyCacheable()) {
+    if ($ids && $this->isStaticallyCacheable) {
       $entities += $this->getFromStaticCache($ids);
       $not_found = $this->getNotFoundFromStaticCache($ids);
       // Remove any statically cached entity lookups from the remaining IDs to

@@ -77,7 +77,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    */
   public function __construct(EntityTypeInterface $entity_type, EntityFieldManagerInterface $entity_field_manager, CacheBackendInterface $cache, MemoryCacheInterface $memory_cache, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
     parent::__construct($entity_type, $memory_cache);
-    $this->bundleKey = $this->entityType->getKey('bundle');
+    $this->bundleKey = $entity_type->getKey('bundle');
     $this->entityFieldManager = $entity_field_manager;
     $this->cacheBackend = $cache;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
@@ -1217,7 +1217,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   Array of entities from the persistent cache.
    */
   protected function getFromPersistentCache(?array &$ids = NULL) {
-    if (!$this->entityType->isPersistentlyCacheable() || empty($ids)) {
+    if (!$this->isPersistentlyCacheable || empty($ids)) {
       return [];
     }
     $entities = [];
@@ -1374,11 +1374,13 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     // Also make entities available in the static cache with their default
     // revision as they are frequently accessed through their revision ID, for
     // example when upcasting to the latest revision.
-    if ($this->entityType->isStaticallyCacheable() && $this->entityType->isRevisionable()) {
+    if ($this->isStaticallyCacheable) {
       foreach ($entities as $entity) {
-        // @see \Drupal\Core\Entity\ContentEntityStorageBase::setPersistentRevisionCache()
-        $cache_tags_revision = [$this->memoryCacheTag, "{$this->entityTypeId}:{$entity->id()}:revisions"];
-        $this->memoryCache->set($this->buildRevisionCacheId($entity->getRevisionId()), $entity, MemoryCacheInterface::CACHE_PERMANENT, $cache_tags_revision);
+        if ($entity->getRevisionId() !== NULL) {
+          // @see \Drupal\Core\Entity\ContentEntityStorageBase::setPersistentRevisionCache()
+          $cache_tags_revision = [$this->memoryCacheTag, "{$this->entityTypeId}:{$entity->id()}:revisions"];
+          $this->memoryCache->set($this->buildRevisionCacheId($entity->getRevisionId()), $entity, MemoryCacheInterface::CACHE_PERMANENT, $cache_tags_revision);
+        }
       }
     }
   }

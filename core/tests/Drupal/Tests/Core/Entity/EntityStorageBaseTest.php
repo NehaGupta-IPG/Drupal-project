@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Entity;
 
+use Drupal\Component\Datetime\Time;
+use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageBase;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -110,9 +112,19 @@ class EntityStorageBaseTest extends UnitTestCase {
     $expected = array_map([$this, 'generateEntityInterface'], $expected);
     $load_multiple = array_map([$this, 'generateEntityInterface'], $load_multiple);
 
+    // Make our EntityTypeInterface mock so that we can turn off static caching.
+    $mock_entity_type = $this->createStub(EntityTypeInterface::class);
+    // Disallow caching.
+    $mock_entity_type
+      ->method('isStaticallyCacheable')
+      ->willReturn(FALSE);
+    $mock_entity_type
+      ->method('isPersistentlyCacheable')
+      ->willReturn(FALSE);
+
     // Make our EntityStorageBase mock.
     $mock_base = $this->getMockBuilder(StubEntityStorageBase::class)
-      ->disableOriginalConstructor()
+      ->setConstructorArgs([$mock_entity_type, new MemoryCache(new Time())])
       ->onlyMethods(['doLoadMultiple', 'postLoad'])
       ->getMock();
 
@@ -121,16 +133,6 @@ class EntityStorageBaseTest extends UnitTestCase {
       ->method('doLoadMultiple')
       ->with($query)
       ->willReturn($load_multiple);
-
-    // Make our EntityTypeInterface mock so that we can turn off static caching.
-    $mock_entity_type = $this->createStub(EntityTypeInterface::class);
-    // Disallow caching.
-    $mock_entity_type
-      ->method('isStaticallyCacheable')
-      ->willReturn(FALSE);
-    // Add the EntityTypeInterface to the storage object.
-    $ref_entity_type = new \ReflectionProperty($mock_base, 'entityType');
-    $ref_entity_type->setValue($mock_base, $mock_entity_type);
 
     // Set up expectations for postLoad(), which we only call if there are
     // results from loadMultiple().
