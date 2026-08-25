@@ -1,5 +1,5 @@
 QueryCount: 54
-CacheGetCount: 170
+CacheGetCount: 171
 CacheGetCountByBin:
   page: 1
   config: 40
@@ -7,11 +7,11 @@ CacheGetCountByBin:
   discovery: 60
   data: 8
   dynamic_page_cache: 1
-  render: 23
+  render: 24
   default: 5
   entity: 16
   routes: 3
-CacheSetCount: 75
+CacheSetCount: 84
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
 CacheTagLookupQueryCount: 19
@@ -67,11 +67,11 @@ CacheTagGroupedLookups:
     - 'block_content:3'
     - 'config:configurable_language_list'
   -
-    - 'config:filter.format.basic_html'
     - 'config:system.menu.footer'
   -
     - 'config:system.menu.account'
     - 'config:system.site'
+    - 'config:filter.format.basic_html'
     - block_content_view
     - 'config:image.style.medium_8_7'
     - 'file:37'
