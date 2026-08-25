@@ -284,11 +284,11 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   public function invokeAllWith(string $hook, callable $callback): void {
     if ($hook == 'requirements') {
-      // hook_requirements() is special, they typically reside in .install files
-      // and they are not collected in \Drupal\Core\Hook\HookCollectorPass to
-      // avoid edge cases when those files have not yet been loaded. Fall
-      // back to an implementation similar to legacyInvoke(). Callers are
-      // responsible to load the .install files first.
+      // hook_requirements() is special, it typically resides in .install files
+      // and is not collected in \Drupal\Core\Hook\HookCollectorPass to avoid
+      // edge cases when those files have not yet been loaded. Fall back to an
+      // implementation similar to legacyInvoke(). Callers are responsible to
+      // load the .install files first.
       foreach ($this->moduleList as $module => $filename) {
         $function = $module . '_' . $hook;
         if (function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyRequirementsHook::class)) {
