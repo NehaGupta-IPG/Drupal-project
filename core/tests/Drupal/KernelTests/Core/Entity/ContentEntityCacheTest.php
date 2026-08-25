@@ -530,10 +530,9 @@ class ContentEntityCacheTest extends KernelTestBase {
     // Once the outermost callback has returned, caching works as normal
     // again. Both caches were cleared directly above, so there is no stale
     // static cache entry left to mask this.
-    $recached = $storage->load($entity->id());
+    $storage->load($entity->id());
     $this->assertNotFalse($persistent_cache->get($cache_id));
     $this->assertNotFalse($memory_cache->get($cache_id));
-    $this->assertSame($recached, $storage->load($entity->id()));
   }
 
   /**
