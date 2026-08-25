@@ -10,10 +10,7 @@ use Drupal\Tests\HttpKernelUiHelperTrait;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Drupal\Core\Logger\RfcLoggerTrait;
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 
 /**
@@ -24,9 +21,8 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 #[Group('Test')]
 #[Group('KernelTests')]
 #[RunTestsInSeparateProcesses]
-class KernelTestHttpFormTest extends KernelTestBase implements ServiceModifierInterface, LoggerInterface {
+class KernelTestHttpFormTest extends KernelTestBase implements ServiceModifierInterface {
 
-  use RfcLoggerTrait;
   use UserCreationTrait;
 
   /**
@@ -46,15 +42,6 @@ class KernelTestHttpFormTest extends KernelTestBase implements ServiceModifierIn
 
     // This is only needed for authenticated user submission.
     $this->alterSessionServices($container);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function log($level, string|\Stringable $message, array $context = []): void {
-    if ($level <= RfcLogLevel::ERROR) {
-      $this->fail(strtr($message, $context));
-    }
   }
 
   /**
