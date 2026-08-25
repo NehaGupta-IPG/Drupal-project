@@ -89,7 +89,9 @@ class KernelTestHttpFormTest extends KernelTestBase implements ServiceModifierIn
     $user = $this->createUser([
       'access content',
     ]);
-    $this->setCurrentUser($user);
+    // The user must be set in the session to use the form submission, so their
+    // CSRF token can be retrieved.
+    $this->setCurrentUserWithSession($user);
 
     // Ensure the proper response code for a _form route.
     $this->drupalGet('form-test/object-builder');
@@ -101,12 +103,9 @@ class KernelTestHttpFormTest extends KernelTestBase implements ServiceModifierIn
 
     $edit = ['bananas' => 'green'];
     $this->submitForm($edit, 'Save', 'form-test-form-test-object');
+
     $this->assertSession()->statusCodeEquals(Response::HTTP_OK);
     $this->assertSession()->pageTextContains('The FormTestObject::submitForm() method was used for this form.');
-
-    // TODO: FAILS because the incoming form value has the token, but the
-    // validation's token checking is find the lazy builder value in the form
-    // array!!??
 
     $config_factory = $this->container->get('config.factory');
     $value = $config_factory->get('form_test.object')->get('bananas');
