@@ -213,6 +213,9 @@ trait HttpKernelUiHelperTrait {
   /**
    * Fills and submits a form.
    *
+   * This is not named 'submitForm' as that prevents Kernel test classes from
+   * behaving as form classes.
+   *
    * @param array $edit
    *   Field data in an associative array. Changes the current input fields
    *   (where possible) to the values indicated.
@@ -233,7 +236,7 @@ trait HttpKernelUiHelperTrait {
    *   form, which is typically the same thing but with hyphens replacing the
    *   underscores.
    */
-  protected function submitForm(array $edit, $submit, $form_html_id = NULL): void {
+  protected function drupalSubmitForm(array $edit, $submit, $form_html_id = NULL): void {
     $assert_session = $this->assertSession();
     $submit_button = $assert_session->buttonExists($submit);
     // Check if button has a form attribute set.

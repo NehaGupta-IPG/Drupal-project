@@ -68,7 +68,7 @@ class KernelTestHttpFormTest extends KernelTestBase implements ServiceModifierIn
     $this->assertSession()->fieldExists('bananas');
 
     $edit = ['bananas' => 'green'];
-    $this->submitForm($edit, 'Save', 'form-test-form-test-object');
+    $this->drupalSubmitForm($edit, 'Save', 'form-test-form-test-object');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('The FormTestObject::submitForm() method was used for this form.');
 
@@ -102,7 +102,7 @@ class KernelTestHttpFormTest extends KernelTestBase implements ServiceModifierIn
     $this->assertSession()->fieldExists('bananas');
 
     $edit = ['bananas' => 'green'];
-    $this->submitForm($edit, 'Save', 'form-test-form-test-object');
+    $this->drupalSubmitForm($edit, 'Save', 'form-test-form-test-object');
 
     $this->assertSession()->statusCodeEquals(Response::HTTP_OK);
     $this->assertSession()->pageTextContains('The FormTestObject::submitForm() method was used for this form.');
