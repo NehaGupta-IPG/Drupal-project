@@ -123,6 +123,7 @@ class SchemaDefinitionTest extends UnitTestCase {
     $this->expectException(SchemaDefinitionException::class);
     $this->expectExceptionMessage('The \'name\' argument of a View cannot be empty');
     new View(
+      // @phpstan-ignore argument.type
       name: '',
       query: new ViewQuery('SELECT [id] FROM {foo}'),
     );
