@@ -3,9 +3,7 @@
 namespace Drupal\Core\Extension;
 
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
-use Drupal\Core\State\StateInterface;
 
 /**
  * Provides available extensions.
@@ -20,28 +18,6 @@ use Drupal\Core\State\StateInterface;
  */
 abstract class ExtensionList {
 
-  /**
-   * The type of the extension.
-   *
-   * Possible values: "module", "theme", "profile" or "database_driver".
-   *
-   * @var string
-   */
-  protected $type;
-
-  /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
-   * The cache.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cache;
 
   /**
    * Default values to be merged into *.info.yml file arrays.
@@ -50,19 +26,6 @@ abstract class ExtensionList {
    */
   protected $defaults = [];
 
-  /**
-   * The info parser.
-   *
-   * @var \Drupal\Core\Extension\InfoParserInterface
-   */
-  protected $infoParser;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
 
   /**
    * The cached extensions.
@@ -102,47 +65,14 @@ abstract class ExtensionList {
    */
   protected $addedPathNames = [];
 
-  /**
-   * The state store.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * The install profile used by the site.
-   *
-   * @var string|false|null
-   */
-  protected $installProfile;
-
-  /**
-   * Constructs a new instance.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $type
-   *   The extension type.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache.
-   * @param \Drupal\Core\Extension\InfoParserInterface $info_parser
-   *   The info parser.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state.
-   * @param string $install_profile
-   *   The install profile used by the site.
-   */
-  public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, $install_profile) {
-    $this->root = $root;
-    $this->type = $type;
-    $this->cache = $cache;
-    $this->infoParser = $info_parser;
-    $this->moduleHandler = $module_handler;
-    $this->state = $state;
-    $this->installProfile = $install_profile;
-  }
+  public function __construct(
+    protected string $root,
+    protected string $type,
+    protected CacheBackendInterface $cache,
+    protected InfoParserInterface $infoParser,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected string|false|null $installProfile,
+  ) {}
 
   /**
    * Returns the extension discovery.
@@ -170,14 +100,6 @@ abstract class ExtensionList {
     $this->cache->delete($this->getInfoCacheId());
     $this->pathNames = NULL;
 
-    try {
-      $this->state->delete($this->getPathNamesCacheId());
-    }
-    catch (DatabaseExceptionWrapper) {
-      // Ignore exceptions caused by a non existing {key_value} table in the
-      // early installer.
-    }
-
     return $this;
   }
 
@@ -199,16 +121,6 @@ abstract class ExtensionList {
    */
   protected function getInfoCacheId() {
     return "system.{$this->type}.info";
-  }
-
-  /**
-   * Returns the extension filenames cache ID.
-   *
-   * @return string
-   *   The filename cache ID.
-   */
-  protected function getPathNamesCacheId() {
-    return "system.{$this->type}.files";
   }
 
   /**
@@ -437,15 +349,7 @@ abstract class ExtensionList {
    */
   public function getPathNames() {
     if ($this->pathNames === NULL) {
-      $cache_id = $this->getPathNamesCacheId();
-      $this->pathNames = $this->state->get($cache_id);
-
-      if ($this->pathNames === NULL) {
-        $this->pathNames = $this->recalculatePathNames();
-        // Store filenames to allow static::getPathname() to retrieve them
-        // without having to rebuild or scan the filesystem.
-        $this->state->set($cache_id, $this->pathNames);
-      }
+      $this->pathNames = $this->recalculatePathNames();
     }
     return $this->pathNames;
   }
