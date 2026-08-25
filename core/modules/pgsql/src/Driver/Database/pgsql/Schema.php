@@ -1014,7 +1014,7 @@ EOD;
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If the specified table already has an index by that name.
    */
-  public function addGinIndex(string $table, string $name, array $fields): void {
+  protected function addGinIndex(string $table, string $name, array $fields): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add GIN index '$name' to table '$table': table doesn't exist.");
     }
@@ -1051,7 +1051,7 @@ EOD;
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If the specified table already has an index by that name.
    */
-  public function addGistIndex(string $table, string $name, array $fields): void {
+  protected function addGistIndex(string $table, string $name, array $fields): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add GiST index '$name' to table '$table': table doesn't exist.");
     }

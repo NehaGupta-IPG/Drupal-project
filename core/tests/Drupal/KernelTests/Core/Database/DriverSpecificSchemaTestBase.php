@@ -16,6 +16,7 @@ use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
@@ -1490,7 +1491,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * override this method.
    */
   public function testCreateTableFromDefinitionWithSpecializedIndexes(): void {
-    $tableDefinition = new Table(
+    $tables[] = new Table(
       name: 'test_specialized_indexes',
       description: 'Table with specialized indexes.',
       columns: [
@@ -1527,7 +1528,14 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         ),
       ],
     );
-    $this->schema->createTableFromDefinition(SchemaDefinitionType::Test, 'test_specialized_indexes', $tableDefinition);
+
+    $schema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_specialized_indexes',
+      tables: $tables,
+    );
+
+    $this->schema->createSchemaFromDefinition($schema);
 
     $this->assertTrue($this->schema->tableExists('test_specialized_indexes'));
     $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'ages'));
@@ -1550,7 +1558,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * override this method.
    */
   public function testAddFieldWithSpecializedIndexes(): void {
-    $initialTableDefinition = new Table(
+    $initialTableDefinition[] = new Table(
       name: 'test_add_field_index',
       description: 'Table with specialized indexes.',
       columns: [
@@ -1560,9 +1568,16 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       ],
       primaryKey: new PrimaryKey(['id']),
     );
-    $this->schema->createTableFromDefinition(SchemaDefinitionType::Test, 'test_add_field_index', $initialTableDefinition);
 
-    $modifiedTableDefinition = new Table(
+    $initialSchema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_add_field_index',
+      tables: $initialTableDefinition,
+    );
+
+    $this->schema->createSchemaFromDefinition($initialSchema);
+
+    $modifiedTableDefinition[] = new Table(
       name: 'test_add_field_index',
       description: 'Table with specialized indexes.',
       columns: [
@@ -1596,14 +1611,29 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       ],
     );
 
-    $this->schema->addField('test_add_field_index', 'age', [
-      'type' => 'int',
-      'not null' => TRUE,
-      'default' => 0,
-    ],
-    array_merge($modifiedTableDefinition->toArray(), [
-      'new_definition' => $modifiedTableDefinition,
-    ]),
+    $modifiedSchema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_add_field_index',
+      tables: $modifiedTableDefinition,
+    );
+
+    $this->schema->addField('test_add_field_index', 'age',
+      [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      [
+        'indexes' => [
+          'age_legacy' => ['age'],
+          'ages' => TRUE,
+          'gin_age' => TRUE,
+          'gist_age' => TRUE,
+          'alternative_ages' => TRUE,
+          'alternative_skipped' => TRUE,
+        ],
+      ],
+      $modifiedSchema,
     );
 
     $this->assertTrue($this->schema->fieldExists('test_add_field_index', 'age'));
@@ -1630,7 +1660,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * override this method.
    */
   public function testChangeFieldWithSpecializedIndexes(): void {
-    $initialTableDefinition = new Table(
+    $initialTableDefinition[] = new Table(
       name: 'test_change_field_index',
       description: 'Table with specialized indexes.',
       columns: [
@@ -1645,9 +1675,16 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       ],
       primaryKey: new PrimaryKey(['id']),
     );
-    $this->schema->createTableFromDefinition(SchemaDefinitionType::Test, 'test_change_field_index', $initialTableDefinition);
 
-    $modifiedTableDefinition = new Table(
+    $initialSchema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_change_field_index',
+      tables: $initialTableDefinition,
+    );
+
+    $this->schema->createSchemaFromDefinition($initialSchema);
+
+    $modifiedTableDefinition[] = new Table(
       name: 'test_change_field_index',
       description: 'Table with specialized indexes.',
       columns: [
@@ -1681,14 +1718,29 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       ],
     );
 
-    $this->schema->changeField('test_change_field_index', 'age', 'age_new', [
-      'type' => 'int',
-      'not null' => TRUE,
-      'default' => 0,
-    ],
-    array_merge($modifiedTableDefinition->toArray(), [
-      'new_definition' => $modifiedTableDefinition,
-    ]),
+    $modifiedSchema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_change_field_index',
+      tables: $modifiedTableDefinition,
+    );
+
+    $this->schema->changeField('test_change_field_index', 'age', 'age_new',
+      [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      [
+        'indexes' => [
+          'age_legacy' => ['age'],
+          'ages' => TRUE,
+          'gin_age' => TRUE,
+          'gist_age' => TRUE,
+          'alternative_ages' => TRUE,
+          'alternative_skipped' => TRUE,
+        ],
+      ],
+      $modifiedSchema,
     );
 
     $this->assertTrue($this->schema->fieldExists('test_change_field_index', 'age_new'));

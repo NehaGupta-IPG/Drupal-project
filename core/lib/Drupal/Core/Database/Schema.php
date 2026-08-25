@@ -8,6 +8,7 @@ use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\GinIndex;
 use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IndexInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
@@ -357,13 +358,16 @@ abstract class Schema implements PlaceholderInterface {
    *   IndexInterface definition objects. Index definitions of a technology
    *   not supported by the driver are skipped, and alternative indexes
    *   fall back to their most preferred supported definition.
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema|null $schema
+   *   (optional) The destination Schema definition where the table is defined
+   *   with the changed column and all defined indexes.
    *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If the specified table already has a field by that name.
    */
-  abstract public function addField($table, $field, $spec, $keys_new = []);
+  abstract public function addField($table, $field, $spec, $keys_new = [] /*, ?SchemaDefinition $schema = NULL */);
 
   /**
    * Drop a field.
@@ -533,6 +537,50 @@ abstract class Schema implements PlaceholderInterface {
   abstract public function addIndex($table, $name, $fields, array $spec);
 
   /**
+   * Adds a GIN (Generalized Inverted Index) index.
+   *
+   * @param string $table
+   *   The table to be altered.
+   * @param string $name
+   *   The name of the index.
+   * @param list<\Drupal\Core\Database\SchemaDefinition\KeyColumn|string> $columns
+   *   A mix of key column specifiers, being KeyColumn objects or strings
+   *   naming columns. Limited length columns are not allowed.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   *   If the specified table doesn't exist.
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified table already has an index by that name.
+   * @throws \LogicException
+   *   If the driver does not implement this method.
+   */
+  protected function addGinIndex(string $table, string $name, array $columns): void {
+    throw new \LogicException("The '{$this->connection->driver()}' database driver does not implement " . __METHOD__);
+  }
+
+  /**
+   * Adds a GiST (Generalized Search Tree) index.
+   *
+   * @param string $table
+   *   The table to be altered.
+   * @param string $name
+   *   The name of the index.
+   * @param list<\Drupal\Core\Database\SchemaDefinition\KeyColumn|string> $columns
+   *   A mix of key column specifiers, being KeyColumn objects or strings
+   *   naming columns. Limited length columns are not allowed.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   *   If the specified table doesn't exist.
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified table already has an index by that name.
+   * @throws \LogicException
+   *   If the driver does not implement this method.
+   */
+  protected function addGistIndex(string $table, string $name, array $columns): void {
+    throw new \LogicException("The '{$this->connection->driver()}' database driver does not implement " . __METHOD__);
+  }
+
+  /**
    * Drop an index.
    *
    * @param string $table
@@ -567,6 +615,53 @@ abstract class Schema implements PlaceholderInterface {
       throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
     }
     throw new \RuntimeException("The '{$this->connection->driver()}' database driver does not implement " . __METHOD__);
+  }
+
+  /**
+   * Resolves the new keys to add to a table changing or adding a field.
+   *
+   * @param array $keys_new
+   *   Keys and indexes specification to be created on the table along with the
+   *   column addition/change.
+   * @param string $tableName
+   *   The name of the Table object.
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
+   *   The destination Schema definition where the table is defined with all
+   *   defined indexes.
+   *
+   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
+   *   When the requested table is missing.
+   */
+  protected function resolveNewKeysFromSchemaDefinition(array &$keys_new, string $tableName, SchemaDefinition $schema) {
+    $tableDefinition = $schema->getTableDefinition($tableName);
+    $indexes = [];
+    foreach ($keys_new['indexes'] as $name => $key) {
+      if ($key === TRUE) {
+        foreach ($tableDefinition->indexes as $tmp) {
+          if ($name === $tmp->name) {
+            $key = $tmp;
+            break;
+          }
+        }
+      }
+      if (!$key instanceof IndexInterface) {
+        $indexes[$name] = $key;
+        continue;
+      }
+      if ($key instanceof AlternativeIndexes) {
+        foreach ($key->indexes as $tmp) {
+          if (in_array(get_class($tmp), $this->getSupportedIndexTypes(), TRUE)) {
+            $indexes[$name] = $key;
+            continue;
+          }
+        }
+      }
+      if (in_array(get_class($key), $this->getSupportedIndexTypes(), TRUE)) {
+        $indexes[$name] = $key;
+        continue;
+      }
+    }
+    $keys_new['indexes'] = $indexes;
   }
 
   /**
@@ -634,13 +729,16 @@ abstract class Schema implements PlaceholderInterface {
    *   Index definitions of a technology not supported by the driver are
    *   skipped, and alternative indexes fall back to their most preferred
    *   supported definition.
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema|null $schema
+   *   (optional) The destination Schema definition where the table is defined
+   *   with the changed column and all defined indexes.
    *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table or source field doesn't exist.
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If the specified destination field already exists.
    */
-  abstract public function changeField($table, $field, $field_new, $spec, $keys_new = []);
+  abstract public function changeField($table, $field, $field_new, $spec, $keys_new = [] /*, ?SchemaDefinition $schema = NULL */);
 
   /**
    * Creates the tables in a schema definition.

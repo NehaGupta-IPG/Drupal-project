@@ -2,6 +2,9 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
+use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
@@ -316,12 +319,15 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function addField($table, $field, $specification, $keys_new = []) {
+  public function addField($table, $field, $specification, $keys_new = [], ?SchemaDefinition $schema = NULL) {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add field '$table.$field': table doesn't exist.");
     }
     if ($this->fieldExists($table, $field)) {
       throw new SchemaObjectExistsException("Cannot add field '$table.$field': field already exists.");
+    }
+    if ($schema && $keys_new) {
+      $this->resolveNewKeysFromSchemaDefinition($keys_new, $table, $schema);
     }
     if (isset($keys_new['primary key']) && in_array($field, $keys_new['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field => $specification]);
@@ -423,6 +429,27 @@ class Schema extends DatabaseSchema {
    *       that will be used as an expression field.
    */
   protected function alterTable($table, $old_schema, $new_schema, array $mapping = []) {
+    // SQLite cannot manage IndexInterface definitions.
+    $indexes = [];
+    foreach ($new_schema['indexes'] ?? [] as $name => $value) {
+      if (is_array($value)) {
+        $indexes[$name] = $value;
+        continue;
+      }
+      if ($value instanceof AlternativeIndexes) {
+        foreach ($value->indexes as $tmp) {
+          if ($tmp instanceof Index) {
+            $indexes[$name] = $tmp->toArray();
+            continue 2;
+          }
+        }
+      }
+      $indexes[$name] = $value->toArray();
+    }
+    if ($indexes) {
+      $new_schema['indexes'] = $indexes;
+    }
+
     $i = 0;
     do {
       $new_table = $table . '_' . $i++;
@@ -607,12 +634,15 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function changeField($table, $field, $field_new, $spec, $keys_new = []) {
+  public function changeField($table, $field, $field_new, $spec, $keys_new = [], ?SchemaDefinition $schema = NULL) {
     if (!$this->fieldExists($table, $field)) {
       throw new SchemaObjectDoesNotExistException("Cannot change the definition of field '$table.$field': field doesn't exist.");
     }
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
+    }
+    if ($schema && $keys_new) {
+      $this->resolveNewKeysFromSchemaDefinition($keys_new, $table, $schema);
     }
     if (isset($keys_new['primary key']) && in_array($field_new, $keys_new['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field_new => $spec]);
