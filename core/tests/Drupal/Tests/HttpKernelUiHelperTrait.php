@@ -94,6 +94,8 @@ trait HttpKernelUiHelperTrait {
    *
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user account object.
+   *
+   * @see self::alterSessionServices()
    */
   public function setCurrentUserWithSession(AccountInterface $account): void {
     // Reset the Mink browser session.
