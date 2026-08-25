@@ -78,6 +78,7 @@ trait HttpKernelUiHelperTrait {
    * https://www.drupal.org/project/drupal/issues/2505339 is fixed.
    *
    * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
+   *   The container to alter.
    */
   public function alterFormBuilder(ContainerBuilder $container) {
     // Alter the form builder.
