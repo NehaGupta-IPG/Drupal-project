@@ -183,6 +183,11 @@ trait DatabaseTestSchemaDataTrait {
         'status' => 1,
         'test_field' => '{"deps": {"a": {"status": "enabled"}, "b": {"status": "disabled"}, "c": {"status": "enabled"}}, "counts": {"a": 7, "b": 8}, "revs": [{"uid": 3, "name": "editor"}, {"uid": 5, "name": "author"}]}',
       ])
+      ->values([
+        'id' => 11,
+        'status' => 1,
+        'test_field' => '{"nulled": null, "flag_true": true, "flag_false": false, "long_text": "' . str_repeat('abcdefgh', 40) . '"}',
+      ])
       ->execute();
   }
 
@@ -248,7 +253,7 @@ trait DatabaseTestSchemaDataTrait {
       'IN with no matching' => ['$.number', [99, 100], 'IN', []],
       'NOT IN with matching' => ['$.number', [10], 'NOT IN', [1]],
       'IN with empty array' => ['$.number', [], 'IN', []],
-      'NOT IN with empty array' => ['$.number', [], 'NOT IN', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+      'NOT IN with empty array' => ['$.number', [], 'NOT IN', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]],
 
       // JSON_CONTAINS.
       'Array value with full containment' => ['$.array', [32, 41], 'JSON_CONTAINS', [5]],
@@ -355,10 +360,19 @@ trait DatabaseTestSchemaDataTrait {
       'NOT BETWEEN matching' => ['$.number', [6, 10], 'NOT BETWEEN', [1]],
 
       // IS NULL / IS NOT NULL (includes row 7 which has SQL NULL column).
-      'IS NULL' => ['$.number', NULL, 'IS NULL', [4, 5, 6, 7, 8, 9, 10]],
+      'IS NULL' => ['$.number', NULL, 'IS NULL', [4, 5, 6, 7, 8, 9, 10, 11]],
       'IS NOT NULL' => ['$.number', NULL, 'IS NOT NULL', [1, 2, 3]],
-      'IS NULL includes NULL column' => ['$.float', NULL, 'IS NULL', [1, 2, 3, 4, 6, 7, 9, 10]],
+      'IS NULL includes NULL column' => ['$.float', NULL, 'IS NULL', [1, 2, 3, 4, 6, 7, 9, 10, 11]],
       'IS NOT NULL on float path' => ['$.float', NULL, 'IS NOT NULL', [5, 8]],
+
+      // HAS KEY distinguishes a stored JSON null from a missing path. Text
+      // extraction returns SQL NULL for JSON null and text for booleans.
+      'IS NULL on stored JSON null' => ['$.nulled', NULL, 'IS NULL', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]],
+      'IS NOT NULL on stored JSON null' => ['$.nulled', NULL, 'IS NOT NULL', []],
+      'HAS KEY on stored JSON null' => ['$.nulled', NULL, 'HAS KEY', [11]],
+      'CONTAINS against JSON null' => ['$.nulled', 'ul', 'CONTAINS', []],
+      'CONTAINS against boolean' => ['$.flag_true', 'ru', 'CONTAINS', [11]],
+      'STARTS_WITH against boolean' => ['$.flag_false', 'fal', 'STARTS_WITH', [11]],
 
       // HAS KEY.
       'HAS KEY' => ['$.key', NULL, 'HAS KEY', [3, 4]],
@@ -395,7 +409,7 @@ trait DatabaseTestSchemaDataTrait {
       'Hyphenated key equals' => ['$.hyphen-key', 'hyphen value', '=', [9]],
       'Hyphenated key no match' => ['$.hyphen-key', 'wrong', '=', []],
       'Hyphenated key IS NOT NULL' => ['$.hyphen-key', NULL, 'IS NOT NULL', [9]],
-      'Hyphenated key IS NULL' => ['$.hyphen-key', NULL, 'IS NULL', [1, 2, 3, 4, 5, 6, 7, 8, 10]],
+      'Hyphenated key IS NULL' => ['$.hyphen-key', NULL, 'IS NULL', [1, 2, 3, 4, 5, 6, 7, 8, 10, 11]],
       'Nested hyphenated key' => ['$.nested-obj.inner-key', 42, '=', [9]],
 
       // Bracket notation with quoted keys.

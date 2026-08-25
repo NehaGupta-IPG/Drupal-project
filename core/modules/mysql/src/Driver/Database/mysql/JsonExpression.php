@@ -22,7 +22,7 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  protected function doToCastSql(JsonCastType $type, ?string $expression = NULL): string {
+  protected function doToCastSql(JsonCastType $type, ?string $expression = NULL, ?string $type_expression = NULL): string {
     $extract = $expression ?? $this->toSql();
     return match ($type) {
       // MariaDB's CAST(<JSON boolean> AS SIGNED) returns 0 for both true and
@@ -31,7 +31,12 @@ class JsonExpression extends BaseJsonExpression {
       JsonCastType::Bool => "({$extract} = JSON_EXTRACT('true', '$'))",
       JsonCastType::Int => "CAST({$extract} AS SIGNED)",
       JsonCastType::Float => "CAST({$extract} AS DOUBLE)",
-      JsonCastType::Text => "CAST(JSON_UNQUOTE({$extract}) AS CHAR(255))",
+      // JSON_UNQUOTE turns a JSON null into the string 'null', so map it to
+      // SQL NULL first, like the text extraction on PostgreSQL and SQLite. A
+      // plain NULLIF would also swallow a stored string "null". JSON_UNQUOTE
+      // keeps the value whole; a CAST to CHAR would need a length, and MySQL
+      // rejects writing a value longer than the cast length.
+      JsonCastType::Text => "CASE WHEN JSON_TYPE({$extract}) = 'NULL' THEN NULL ELSE JSON_UNQUOTE({$extract}) END",
     };
   }
 

@@ -95,7 +95,9 @@ interface ConditionInterface {
    *   The comparison operator. A jsonpath with a wildcard segment matches any
    *   number of values, and asks whether any of them satisfies the operator.
    *   Not every operator can expand a wildcard that way, see
-   *   JsonCondition::WILDCARD_OPERATORS.
+   *   JsonCondition::WILDCARD_OPERATORS. IS NULL matches a missing path and a
+   *   stored JSON null alike, and IS NOT NULL matches a value other than JSON
+   *   null; use HAS KEY to test presence regardless of the value.
    *
    * @return static
    *   The called object.

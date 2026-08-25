@@ -40,7 +40,7 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  protected function doToCastSql(JsonCastType $type, ?string $expression = NULL): string {
+  protected function doToCastSql(JsonCastType $type, ?string $expression = NULL, ?string $type_expression = NULL): string {
     $sql = $expression ?? $this->toSql();
     return match ($type) {
       JsonCastType::Bool => "({$sql})::boolean::integer",

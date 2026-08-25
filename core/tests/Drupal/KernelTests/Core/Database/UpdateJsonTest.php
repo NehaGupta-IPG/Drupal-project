@@ -217,7 +217,7 @@ class UpdateJsonTest extends DatabaseTestBase {
     // Rows 1 and 4 hold true, row 2 holds false, the rest are untouched.
     $this->assertEqualsCanonicalizing([1, 4], $this->idsWithStatus(1));
     $this->assertEquals([2], $this->idsWithStatus(0));
-    $this->assertEqualsCanonicalizing([3, 5, 6, 7, 8, 9, 10], $this->idsWithStatus(9));
+    $this->assertEqualsCanonicalizing([3, 5, 6, 7, 8, 9, 10, 11], $this->idsWithStatus(9));
   }
 
   /**
@@ -384,7 +384,7 @@ class UpdateJsonTest extends DatabaseTestBase {
     $num_updated = $this->connection->update('json')
       ->jsonExpression('name', 'test_field', '$.nonexistent')
       ->execute();
-    $this->assertSame(10, $num_updated);
+    $this->assertSame(11, $num_updated);
 
     $names = $this->connection->select('json', 'j')
       ->fields('j', ['name'])

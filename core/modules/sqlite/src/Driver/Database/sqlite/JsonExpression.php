@@ -22,12 +22,22 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  protected function doToCastSql(JsonCastType $type, ?string $expression = NULL): string {
+  protected function doToCastSql(JsonCastType $type, ?string $expression = NULL, ?string $type_expression = NULL): string {
     $sql = $expression ?? $this->toSql();
+    if ($expression === NULL) {
+      $type_expression = "json_type({$this->field}, {$this->connection->quote($this->path)})";
+    }
     return match ($type) {
       JsonCastType::Bool, JsonCastType::Int => "CAST({$sql} AS INTEGER)",
       JsonCastType::Float => "CAST({$sql} AS REAL)",
-      JsonCastType::Text => $sql,
+      // json_extract() reads a JSON boolean as the integer 1 or 0, while the
+      // text extraction on MySQL and PostgreSQL reads it as 'true' or
+      // 'false'. Only the JSON type still knows it was a boolean, so map it
+      // back to the JSON literal. json_extract() also leaves a JSON number as
+      // SQL INTEGER or REAL, so every other value is cast to TEXT like the
+      // text extraction on the other backends. CAST keeps NULL as NULL, so a
+      // missing path and a JSON null still read as SQL NULL.
+      JsonCastType::Text => $type_expression === NULL ? "CAST({$sql} AS TEXT)" : "CASE {$type_expression} WHEN 'true' THEN 'true' WHEN 'false' THEN 'false' ELSE CAST({$sql} AS TEXT) END",
     };
   }
 

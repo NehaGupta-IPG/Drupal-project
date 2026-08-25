@@ -26,7 +26,7 @@ class InsertJsonTest extends DatabaseTestBase {
   /**
    * The highest ID of the sample data.
    */
-  protected const LAST_SAMPLE_ID = 10;
+  protected const LAST_SAMPLE_ID = 11;
 
   /**
    * Returns a select query on the sample rows of the 'json' table.

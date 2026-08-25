@@ -191,7 +191,8 @@ class JsonCondition extends Condition {
     switch ($this->operator) {
       case 'IS NULL':
       case 'IS NOT NULL':
-        $this->stringVersion = "{$expression->toSql()} {$this->operator}";
+        // Text extraction maps both a missing path and JSON null to SQL NULL.
+        $this->stringVersion = "{$expression->toCastSql(JsonCastType::Text)} {$this->operator}";
         $this->arguments = [];
         return;
 

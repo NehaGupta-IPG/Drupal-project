@@ -272,8 +272,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    *   addExpression(), a numeric suffix is added if the alias is already taken.
    * @param \Drupal\Core\Database\Query\JsonCastType $cast
    *   The type to cast the extracted value to. Defaults to text, which returns
-   *   the value unquoted. On MySQL and MariaDB a text cast truncates the value
-   *   to 255 characters.
+   *   the value unquoted.
    *
    * @return string
    *   The alias of the expression, to use in addField() or orderBy().

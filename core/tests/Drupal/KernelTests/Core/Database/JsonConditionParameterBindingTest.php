@@ -98,7 +98,7 @@ class JsonConditionParameterBindingTest extends DatabaseTestBase {
   public function testBooleanConditionOnIntegerColumn(): void {
     $this->connection->insert('json')
       ->fields(['id', 'status', 'test_field'])
-      ->values(['id' => 11, 'status' => 0, 'test_field' => '{"number": 99}'])
+      ->values(['id' => 12, 'status' => 0, 'test_field' => '{"number": 99}'])
       ->execute();
 
     $query = $this->connection->select('json', 'j');
@@ -106,7 +106,7 @@ class JsonConditionParameterBindingTest extends DatabaseTestBase {
     $query->jsonCondition('j.test_field', '$.number', 99, '=');
     $query->condition('status', FALSE);
 
-    $this->assertEquals([11], $query->execute()->fetchCol());
+    $this->assertEquals([12], $query->execute()->fetchCol());
   }
 
 }

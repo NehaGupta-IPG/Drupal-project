@@ -134,8 +134,7 @@ class Update extends Query implements ConditionInterface {
    *   The JSONPath expression (must start with '$').
    * @param \Drupal\Core\Database\Query\JsonCastType $cast
    *   The type to cast the extracted value to. Defaults to text, which returns
-   *   the value unquoted. On MySQL and MariaDB a text cast truncates the value
-   *   to 255 characters.
+   *   the value unquoted.
    *
    * @return $this
    *   The called object.

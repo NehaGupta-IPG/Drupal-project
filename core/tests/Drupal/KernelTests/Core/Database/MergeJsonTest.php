@@ -28,17 +28,17 @@ class MergeJsonTest extends DatabaseTestBase {
   /**
    * The ID the insert part of a merge uses in these tests.
    *
-   * The sample data fills the IDs 1 to 10, so a merge that inserts uses the
-   * next one. The ID is explicit, so it is the same on every backend.
+   * Sample rows use IDs 1 through 11. Using the next ID keeps the insert
+   * consistent across database backends.
    */
-  protected const INSERT_ID = 11;
+  protected const INSERT_ID = 12;
 
   /**
    * Removes the rows a merge inserted and resets the marker column.
    */
   protected function resetJsonTable(): void {
     $this->connection->delete('json')
-      ->condition('id', 10, '>')
+      ->condition('id', 11, '>')
       ->execute();
     $this->connection->update('json')
       ->fields(['status' => 1])
@@ -128,7 +128,7 @@ class MergeJsonTest extends DatabaseTestBase {
     else {
       $this->assertSame(Merge::STATUS_UPDATE, $result);
       $this->assertEqualsCanonicalizing($expected_ids, $this->idsWithStatus(2));
-      $this->assertSame(10, $this->countRows());
+      $this->assertSame(11, $this->countRows());
     }
   }
 
@@ -144,7 +144,7 @@ class MergeJsonTest extends DatabaseTestBase {
       ->execute();
 
     $this->assertSame(Merge::STATUS_UPDATE, $result);
-    $this->assertSame(10, $this->countRows());
+    $this->assertSame(11, $this->countRows());
 
     $names = $this->connection->select('json', 'j')
       ->fields('j', ['id', 'name'])
@@ -173,7 +173,7 @@ class MergeJsonTest extends DatabaseTestBase {
       ->execute();
 
     $this->assertSame(Merge::STATUS_INSERT, $result);
-    $this->assertSame(11, $this->countRows());
+    $this->assertSame(12, $this->countRows());
     $this->assertSame([static::INSERT_ID], $this->idsWithStatus(3));
 
     $result = $this->connection->merge('json')
@@ -187,7 +187,7 @@ class MergeJsonTest extends DatabaseTestBase {
       ->execute();
 
     $this->assertSame(Merge::STATUS_UPDATE, $result);
-    $this->assertSame(11, $this->countRows());
+    $this->assertSame(12, $this->countRows());
     $this->assertSame([static::INSERT_ID], $this->idsWithStatus(2));
   }
 
@@ -201,9 +201,9 @@ class MergeJsonTest extends DatabaseTestBase {
       ->execute();
 
     $this->assertNull($result);
-    $this->assertSame(10, $this->countRows());
+    $this->assertSame(11, $this->countRows());
     $this->assertSame([], $this->idsWithStatus(3));
-    $this->assertCount(10, $this->idsWithStatus(1));
+    $this->assertCount(11, $this->idsWithStatus(1));
   }
 
   /**
@@ -219,7 +219,7 @@ class MergeJsonTest extends DatabaseTestBase {
       ->execute();
     $this->assertSame(Merge::STATUS_UPDATE, $result);
     $this->assertSame([3], $this->idsWithStatus(2));
-    $this->assertSame(10, $this->countRows());
+    $this->assertSame(11, $this->countRows());
 
     // A key that no row with a matching JSON value holds inserts instead.
     $result = $this->connection->merge('json')
@@ -272,7 +272,7 @@ class MergeJsonTest extends DatabaseTestBase {
       ->execute();
 
     $this->assertSame(Merge::STATUS_UPDATE, $result);
-    $this->assertSame(10, $this->countRows());
+    $this->assertSame(11, $this->countRows());
     $this->assertSame([3], $this->idsWithStatus(6));
 
     $row = $this->connection->select('json', 'j')
@@ -343,7 +343,7 @@ class MergeJsonTest extends DatabaseTestBase {
 
     $this->assertSame(Merge::STATUS_UPDATE, $result);
     $this->assertSame([10], $this->idsWithStatus(2));
-    $this->assertSame(10, $this->countRows());
+    $this->assertSame(11, $this->countRows());
   }
 
   /**
@@ -363,7 +363,7 @@ class MergeJsonTest extends DatabaseTestBase {
       ->execute();
 
     $this->assertSame(Merge::STATUS_UPDATE, $result);
-    $this->assertSame(10, $this->countRows());
+    $this->assertSame(11, $this->countRows());
     // The default cast returns text without the quotes of the JSON string.
     $this->assertSame('some text', $this->fieldValue(3, 'name'));
     // The field that the expression does not target is still written.
@@ -417,7 +417,7 @@ class MergeJsonTest extends DatabaseTestBase {
         $this->assertSame('inserted text', $this->fieldValue(static::INSERT_ID, 'name'));
       }
     }
-    $this->assertSame(11, $this->countRows());
+    $this->assertSame(12, $this->countRows());
   }
 
   /**
@@ -436,7 +436,7 @@ class MergeJsonTest extends DatabaseTestBase {
       ->insertFields(['id' => static::INSERT_ID])
       ->execute();
     $this->assertSame(Merge::STATUS_UPDATE, $result);
-    $this->assertSame(10, $this->countRows());
+    $this->assertSame(11, $this->countRows());
     $this->assertSame('some text', $this->fieldValue(3, 'name'));
     $this->assertSame('some other text', $this->fieldValue(4, 'name'));
 
@@ -480,7 +480,7 @@ class MergeJsonTest extends DatabaseTestBase {
     // Rows 1 and 4 hold true, row 2 holds false, the rest are untouched.
     $this->assertEqualsCanonicalizing([1, 4], $this->idsWithStatus(1));
     $this->assertSame([2], $this->idsWithStatus(0));
-    $this->assertEqualsCanonicalizing([3, 5, 6, 7, 8, 9, 10], $this->idsWithStatus(9));
+    $this->assertEqualsCanonicalizing([3, 5, 6, 7, 8, 9, 10, 11], $this->idsWithStatus(9));
   }
 
   /**
@@ -528,7 +528,7 @@ class MergeJsonTest extends DatabaseTestBase {
       ->execute();
 
     $this->assertSame(Merge::STATUS_UPDATE, $result);
-    $this->assertSame(10, $this->countRows());
+    $this->assertSame(11, $this->countRows());
     $this->assertSame('some other text', $this->fieldValue(4, 'name'));
     $this->assertNull($this->fieldValue(3, 'name'));
   }
@@ -554,7 +554,7 @@ class MergeJsonTest extends DatabaseTestBase {
       ->isNotNull('j.name')
       ->execute()
       ->fetchCol();
-    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10], array_map('intval', $named));
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10, 11], array_map('intval', $named));
   }
 
   /**

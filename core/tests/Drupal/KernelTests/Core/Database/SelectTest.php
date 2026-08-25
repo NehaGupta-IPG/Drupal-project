@@ -1138,7 +1138,7 @@ class SelectTest extends DatabaseTestBase {
     $ids = array_map('intval', $query->execute()->fetchCol());
     $this->assertEquals(1, $ids[0]);
     $this->assertEqualsCanonicalizing([2, 3], array_slice($ids, 1, 2));
-    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10], array_slice($ids, 3));
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 3));
 
     // One extender wrapping another passes both methods down to the query.
     // Rows 3 and 4 hold $.key, and "some other text" sorts before "some text".
@@ -1169,7 +1169,7 @@ class SelectTest extends DatabaseTestBase {
     $this->assertContains(2, array_slice($ids, 1, 2));
     $this->assertContains(3, array_slice($ids, 1, 2));
     // Rows without $.number sort as NULL; their order is undefined.
-    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10], array_slice($ids, 3));
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 3));
 
     // Integer DESC: 10 before 5, NULLs last.
     $query = $this->connection->select('json', 'j');
@@ -1179,7 +1179,7 @@ class SelectTest extends DatabaseTestBase {
     $this->assertContains(2, array_slice($ids, 0, 2));
     $this->assertContains(3, array_slice($ids, 0, 2));
     $this->assertEquals(1, $ids[2]);
-    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10], array_slice($ids, 3));
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 3));
 
     // String ASC: rows with $.key: 3 ("some text"), 4 ("some other text").
     // "some other text" < "some text", so 4 then 3. NULLs last.
@@ -1189,7 +1189,7 @@ class SelectTest extends DatabaseTestBase {
     $ids = $query->execute()->fetchCol();
     $this->assertEquals(4, $ids[0]);
     $this->assertEquals(3, $ids[1]);
-    $this->assertEqualsCanonicalizing([1, 2, 5, 6, 7, 8, 9, 10], array_slice($ids, 2));
+    $this->assertEqualsCanonicalizing([1, 2, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 2));
 
     // String DESC: "some text" > "some other text", so 3 then 4. NULLs last.
     $query = $this->connection->select('json', 'j');
@@ -1198,7 +1198,7 @@ class SelectTest extends DatabaseTestBase {
     $ids = $query->execute()->fetchCol();
     $this->assertEquals(3, $ids[0]);
     $this->assertEquals(4, $ids[1]);
-    $this->assertEqualsCanonicalizing([1, 2, 5, 6, 7, 8, 9, 10], array_slice($ids, 2));
+    $this->assertEqualsCanonicalizing([1, 2, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 2));
 
     // Float ASC: row 5 (1.5) before row 8 (3.14). NULLs last.
     $query = $this->connection->select('json', 'j');
@@ -1207,7 +1207,7 @@ class SelectTest extends DatabaseTestBase {
     $ids = array_map('intval', $query->execute()->fetchCol());
     $this->assertEquals(5, $ids[0]);
     $this->assertEquals(8, $ids[1]);
-    $this->assertEqualsCanonicalizing([1, 2, 3, 4, 6, 7, 9, 10], array_slice($ids, 2));
+    $this->assertEqualsCanonicalizing([1, 2, 3, 4, 6, 7, 9, 10, 11], array_slice($ids, 2));
 
     // Float DESC: row 8 (3.14) before row 5 (1.5). NULLs last.
     $query = $this->connection->select('json', 'j');
@@ -1216,7 +1216,17 @@ class SelectTest extends DatabaseTestBase {
     $ids = array_map('intval', $query->execute()->fetchCol());
     $this->assertEquals(8, $ids[0]);
     $this->assertEquals(5, $ids[1]);
-    $this->assertEqualsCanonicalizing([1, 2, 3, 4, 6, 7, 9, 10], array_slice($ids, 2));
+    $this->assertEqualsCanonicalizing([1, 2, 3, 4, 6, 7, 9, 10, 11], array_slice($ids, 2));
+
+    // Text ASC over numbers sorts lexicographically on every driver, so the
+    // "10" of rows 2 and 3 comes before the "5" of row 1. NULLs last.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.number', 'ASC', JsonCastType::Text);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEqualsCanonicalizing([2, 3], array_slice($ids, 0, 2));
+    $this->assertEquals(1, $ids[2]);
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10, 11], array_slice($ids, 3));
   }
 
   /**
@@ -1241,6 +1251,23 @@ class SelectTest extends DatabaseTestBase {
     $query->addJsonExpression('test_field', '$.number', 'number_value', JsonCastType::Int);
     $query->condition('j.id', 1);
     $this->assertEquals(5, $query->execute()->fetchObject()->number_value);
+
+    // The default text cast returns a JSON number as text on every driver.
+    $query = $this->connection->select('json', 'j');
+    $query->addJsonExpression('test_field', '$.number', 'number_text');
+    $query->condition('j.id', 1);
+    $this->assertSame('5', $query->execute()->fetchObject()->number_text);
+
+    // Text extraction preserves nulls, booleans, and long strings.
+    $query = $this->connection->select('json', 'j');
+    $query->addJsonExpression('test_field', '$.nulled', 'nulled');
+    $query->addJsonExpression('test_field', '$.flag_true', 'flag');
+    $query->addJsonExpression('test_field', '$.long_text', 'long_text');
+    $query->condition('j.id', 11);
+    $row = $query->execute()->fetchObject();
+    $this->assertNull($row->nulled);
+    $this->assertSame('true', $row->flag);
+    $this->assertSame(str_repeat('abcdefgh', 40), $row->long_text);
 
     // The alias can be ordered by, and duplicate aliases are suffixed the same
     // way as in addExpression().
@@ -1267,7 +1294,7 @@ class SelectTest extends DatabaseTestBase {
     $big = 4294967296;
     $this->connection->insert('json')
       ->fields([
-        'id' => 11,
+        'id' => 12,
         'status' => 1,
         'test_field' => '{"big": ' . $big . '}',
       ])
@@ -1276,15 +1303,15 @@ class SelectTest extends DatabaseTestBase {
     $query = $this->connection->select('json', 'j');
     $query->addField('j', 'id');
     $query->addJsonExpression('test_field', '$.big', 'big_value', JsonCastType::Int);
-    $query->condition('j.id', 11);
+    $query->condition('j.id', 12);
     $this->assertEquals($big, $query->execute()->fetchObject()->big_value);
 
-    // Ordering casts the same way, so it must not error either. Row 11 holds
-    // the only $.big value, the rows without the key sort as NULL.
+    // The same cast is used for ordering. Row 12 has the only $.big value;
+    // rows without the key sort as NULL.
     $query = $this->connection->select('json', 'j');
     $query->addField('j', 'id');
     $query->jsonOrderBy('test_field', '$.big', 'DESC', JsonCastType::Int);
-    $this->assertEquals(11, (int) $query->execute()->fetchCol()[0]);
+    $this->assertEquals(12, (int) $query->execute()->fetchCol()[0]);
   }
 
 }

@@ -161,6 +161,12 @@ abstract class JsonExpression {
    * @param string|null $expression
    *   A SQL expression to cast. If NULL, uses toSql() to extract from the
    *   JSON column.
+   * @param string|null $type_expression
+   *   A SQL expression returning the JSON type name of the value $expression
+   *   yields. SQLite values lose the boolean type outside the JSON domain, so
+   *   its text cast reads the type from this expression instead. Only needed
+   *   together with $expression; the type of the value at the JSON path is
+   *   used without it.
    *
    * @return string
    *   A SQL fragment that casts the value to the given type.
@@ -171,11 +177,11 @@ abstract class JsonExpression {
    * @internal
    *   This method should only be used by the database layer.
    */
-  public function toCastSql(JsonCastType $type, ?string $expression = NULL): string {
+  public function toCastSql(JsonCastType $type, ?string $expression = NULL, ?string $type_expression = NULL): string {
     if ($expression === NULL) {
       $this->assertNoWildcard('casting a value');
     }
-    return $this->doToCastSql($type, $expression);
+    return $this->doToCastSql($type, $expression, $type_expression);
   }
 
   /**
@@ -186,11 +192,14 @@ abstract class JsonExpression {
    * @param string|null $expression
    *   A SQL expression to cast. If NULL, uses toSql() to extract from the
    *   JSON column.
+   * @param string|null $type_expression
+   *   A SQL expression returning the JSON type name of the value $expression
+   *   yields, or NULL, as documented on toCastSql().
    *
    * @return string
    *   A SQL fragment that casts the value to the given type.
    */
-  abstract protected function doToCastSql(JsonCastType $type, ?string $expression = NULL): string;
+  abstract protected function doToCastSql(JsonCastType $type, ?string $expression = NULL, ?string $type_expression = NULL): string;
 
   /**
    * Generates SQL to check if the JSON path exists (has a key/element).
@@ -343,7 +352,7 @@ abstract class JsonExpression {
       'filter' => $row_filter,
     ] = $this->wildcardRowSet();
     $guard = $row_filter . $this->toTypeGuardSql($type, $type_expression);
-    return $this->wildcardMatchSql($from, $guard . $test($this->toCastSql($type, $value)));
+    return $this->wildcardMatchSql($from, $guard . $test($this->toCastSql($type, $value, $type_expression)));
   }
 
   /**

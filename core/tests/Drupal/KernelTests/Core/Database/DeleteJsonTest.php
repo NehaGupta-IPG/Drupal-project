@@ -19,7 +19,7 @@ class DeleteJsonTest extends DatabaseTestBase {
   /**
    * The IDs of all rows the sample data inserts into the 'json' table.
    */
-  protected const ALL_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  protected const ALL_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
   /**
    * Empties the 'json' table and inserts the sample data again.
@@ -86,7 +86,7 @@ class DeleteJsonTest extends DatabaseTestBase {
       ->jsonCondition('test_field', '$.boolean', TRUE, '=')
       ->execute();
     $this->assertSame(1, $num_deleted);
-    $this->assertEqualsCanonicalizing([2, 3, 4, 5, 6, 7, 8, 9, 10], $this->remainingIds());
+    $this->assertEqualsCanonicalizing([2, 3, 4, 5, 6, 7, 8, 9, 10, 11], $this->remainingIds());
 
     // OR: key = "some text" OR number = 5 → rows 1 and 3, of which row 1 is
     // already gone.
@@ -97,7 +97,7 @@ class DeleteJsonTest extends DatabaseTestBase {
     $or->jsonCondition('test_field', '$.number', 5);
     $num_deleted = $delete->condition($or)->execute();
     $this->assertSame(2, $num_deleted);
-    $this->assertEqualsCanonicalizing([2, 4, 5, 6, 7, 8, 9, 10], $this->remainingIds());
+    $this->assertEqualsCanonicalizing([2, 4, 5, 6, 7, 8, 9, 10, 11], $this->remainingIds());
 
     // Mixed: a JSON condition AND a condition on a regular column. Rows 2 and
     // 3 both hold 10 at $.number, so the id narrows the delete to row 3.
@@ -107,7 +107,7 @@ class DeleteJsonTest extends DatabaseTestBase {
       ->condition('id', 3)
       ->execute();
     $this->assertSame(1, $num_deleted);
-    $this->assertEqualsCanonicalizing([1, 2, 4, 5, 6, 7, 8, 9, 10], $this->remainingIds());
+    $this->assertEqualsCanonicalizing([1, 2, 4, 5, 6, 7, 8, 9, 10, 11], $this->remainingIds());
   }
 
   /**
@@ -125,7 +125,7 @@ class DeleteJsonTest extends DatabaseTestBase {
       ->condition('id', 1, '<>')
       ->execute();
     $this->assertSame(2, $num_deleted);
-    $this->assertEqualsCanonicalizing([1, 4, 5, 6, 7, 8, 9, 10], $this->remainingIds());
+    $this->assertEqualsCanonicalizing([1, 4, 5, 6, 7, 8, 9, 10, 11], $this->remainingIds());
 
     // CONTAINS binds a LIKE placeholder next to two IN placeholders.
     $this->resetJsonTable();
@@ -134,7 +134,7 @@ class DeleteJsonTest extends DatabaseTestBase {
       ->condition('id', [3, 9], 'IN')
       ->execute();
     $this->assertSame(1, $num_deleted);
-    $this->assertEqualsCanonicalizing([1, 2, 4, 5, 6, 7, 8, 9, 10], $this->remainingIds());
+    $this->assertEqualsCanonicalizing([1, 2, 4, 5, 6, 7, 8, 9, 10, 11], $this->remainingIds());
 
     // Two JSON conditions that both bind placeholders.
     $this->resetJsonTable();
@@ -143,7 +143,7 @@ class DeleteJsonTest extends DatabaseTestBase {
       ->jsonCondition('test_field', '$.key', 'some', 'STARTS_WITH')
       ->execute();
     $this->assertSame(1, $num_deleted);
-    $this->assertEqualsCanonicalizing([1, 2, 4, 5, 6, 7, 8, 9, 10], $this->remainingIds());
+    $this->assertEqualsCanonicalizing([1, 2, 4, 5, 6, 7, 8, 9, 10, 11], $this->remainingIds());
   }
 
   /**
@@ -154,7 +154,7 @@ class DeleteJsonTest extends DatabaseTestBase {
       ->jsonCondition('test_field', '$.deps.*.status', 'enabled', '=')
       ->execute();
     $this->assertSame(1, $num_deleted);
-    $this->assertEqualsCanonicalizing([1, 2, 3, 4, 5, 6, 7, 8, 9], $this->remainingIds());
+    $this->assertEqualsCanonicalizing([1, 2, 3, 4, 5, 6, 7, 8, 9, 11], $this->remainingIds());
   }
 
   /**
