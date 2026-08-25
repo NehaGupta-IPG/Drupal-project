@@ -120,6 +120,12 @@ class SqlContentEntityStorageTest extends UnitTestCase {
     $this->entityType
       ->method('id')
       ->willReturn($this->entityTypeId);
+    $this->entityType
+      ->method('isStaticallyCacheable')
+      ->willReturn(TRUE);
+    $this->entityType
+      ->method('isPersistentlyCacheable')
+      ->willReturn(TRUE);
 
     $this->container = new ContainerBuilder();
     \Drupal::setContainer($this->container);
@@ -141,12 +147,23 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
   /**
    * Reinitializes the entity type as a mock object.
+   *
+   * @param bool $isStaticallyCacheable
+   *   If the entity type is statically cacheable.
+   * @param bool $isPersistentlyCacheable
+   *   If the entity type is persistently cacheable.
    */
-  protected function setUpMockEntityType(): void {
+  protected function setUpMockEntityType(bool $isStaticallyCacheable = TRUE, bool $isPersistentlyCacheable = TRUE): void {
     $this->entityType = $this->createMock(ContentEntityTypeInterface::class);
     $this->entityType
       ->method('id')
       ->willReturn($this->entityTypeId);
+    $this->entityType
+      ->method('isStaticallyCacheable')
+      ->willReturn($isStaticallyCacheable);
+    $this->entityType
+      ->method('isPersistentlyCacheable')
+      ->willReturn($isPersistentlyCacheable);
   }
 
   /**
@@ -617,7 +634,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       'uuid' => $entity_keys['uuid'],
     ];
 
-    $this->entityType->expects($this->exactly(4))
+    $this->entityType
       ->method('isRevisionable')
       ->willReturn(TRUE);
     $this->entityType
@@ -703,7 +720,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       $field_names = array_merge($field_names, $revisionable_field_names);
       $this->fieldDefinitions += $this->mockFieldDefinitions(array_merge($revisionable_field_names, array_values($revision_metadata_field_names)), ['isRevisionable' => TRUE]);
 
-      $this->entityType->expects($this->exactly(4))
+      $this->entityType
         ->method('isRevisionable')
         ->willReturn(TRUE);
       $this->entityType
@@ -1278,7 +1295,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    */
   public function testLoadMultipleNoPersistentCache(): void {
     $this->setUpModuleHandlerNoImplementations();
-    $this->setUpMockEntityType();
+    $this->setUpMockEntityType(TRUE, FALSE);
 
     $id = 1;
     $entity = $this->getMockBuilder(StubRevisionableEntity::class)
