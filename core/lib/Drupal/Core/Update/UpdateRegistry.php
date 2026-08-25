@@ -255,7 +255,7 @@ class UpdateRegistry implements EventSubscriberInterface {
       $extensions = $cache->data;
     }
     else {
-      $extension_discovery = new ExtensionDiscovery($this->root, TRUE, [], $this->sitePath);
+      $extension_discovery = new ExtensionDiscovery($this->root, [], $this->sitePath);
       $module_extensions = $extension_discovery->scan('module');
       $theme_extensions = $this->includeThemes() ? $extension_discovery->scan('theme') : [];
       $profile_extensions = $extension_discovery->scan('profile');
