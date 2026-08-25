@@ -21,7 +21,6 @@ use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Extension\ExtensionDiscovery;
-use Drupal\Core\KeyValueStore\KeyValueDatabaseFactory;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Routing\RouteObjectInterface;
@@ -466,14 +465,14 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     }
 
     // Bootstrap the kernel. Do not use createFromRequest() to retain Settings.
-    $kernel = new DrupalKernel('testing', $this->classLoader, $this->sharesDatabaseState());
+    $kernel = new DrupalKernel('testing', $this->classLoader, $this instanceof SharedEnvironmentTestInterface);
     $kernel->setSitePath($this->siteDirectory);
     // Boot a new one-time container from scratch. Set the module list upfront
     // to avoid a subsequent rebuild or setting the kernel into the
     // pre-installer mode.
     $extensions = $modules ? $this->getExtensionsForModules($modules) : [];
     $kernel->updateModules($extensions, $extensions);
-    if ($this->sharesDatabaseState()) {
+    if ($this instanceof SharedEnvironmentTestInterface) {
       $kernel->setContainerNeedsRebuild(FALSE);
       $kernel->setOverrideUseCache(TRUE);
     }
