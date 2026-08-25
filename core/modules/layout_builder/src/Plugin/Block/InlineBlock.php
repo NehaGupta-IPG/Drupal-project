@@ -265,7 +265,9 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
       if (empty($block) && !empty($this->configuration['block_revision_id'])) {
         $block = $this->entityTypeManager->getStorage('block_content')->loadRevision($this->configuration['block_revision_id']);
       }
-      if ($block) {
+      // If block_revision_id is empty, the component already contains an
+      // independent serialized block and should not be duplicated again.
+      if ($block && !empty($this->configuration['block_revision_id'])) {
         $block = $block->createDuplicate();
       }
     }
