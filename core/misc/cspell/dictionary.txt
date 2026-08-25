@@ -148,6 +148,7 @@ dragtable
 drillable
 dropbutton
 dropbuttons
+drupalimagecaption
 editables
 egulias
 elbonia

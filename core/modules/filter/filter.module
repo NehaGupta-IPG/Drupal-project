@@ -235,7 +235,7 @@ function check_markup($text, $format_id = NULL, $langcode = '', $filter_types_to
  * @return array
  *   An associative array of filtering tips, keyed by filter name. Each
  *   filtering tip is an associative array with elements:
- *   - tip: Tip text.
+ *   - tip: Tip text as render array, translated markup object or string.
  *   - id: Filter ID.
  *
  * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no
@@ -259,8 +259,9 @@ function _filter_tips($format_id): array {
       if ($filter->status) {
         $tip = $filter->tips();
         if (isset($tip)) {
+          $tip_render_array = is_array($tip) ? $tip : ['#markup' => $tip];
           $tips[$format->label()][$name] = [
-            'tip' => ['#markup' => $tip],
+            'tip' => $tip_render_array,
             'id' => $name,
           ];
         }
