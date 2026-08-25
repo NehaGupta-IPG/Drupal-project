@@ -802,7 +802,7 @@ abstract class Schema implements PlaceholderInterface {
     }
     // Views are created after tables because they select from them.
     foreach ($schema->views as $view) {
-      $this->createViewFromDefinition($view);
+      $this->createViewFromDefinition($schema->type, $schema->name, $view);
     }
   }
 
@@ -828,13 +828,17 @@ abstract class Schema implements PlaceholderInterface {
   /**
    * Creates a new SQL view from a view schema definition.
    *
+   * @param \Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType $schemaDefinitionType
+   *   The type of Drupal feature providing the schema.
+   * @param string $schemaName
+   *   The schema name.
    * @param \Drupal\Core\Database\SchemaDefinition\View $view
    *   The view definition.
    *
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If a table or a view with the specified name already exists.
    */
-  final public function createViewFromDefinition(ViewDefinition $view): void {
+  final public function createViewFromDefinition(SchemaDefinitionType $schemaDefinitionType, string $schemaName, ViewDefinition $view): void {
     $this->createView($view->name, $view->query->expression);
   }
 

@@ -18,41 +18,30 @@ final class ViewQuery extends Expression {
   /**
    * Constructor.
    *
-   * @param string $expression
-   *   The SELECT query defining the view. Never include user input in the
-   *   query.
+   * @param string|\Drupal\Core\Database\Query\SelectInterface $expression
+   *   The SELECT query defining the view, either as a string or as a select
+   *   query to build it from. A select query must not use bound parameters;
+   *   conditions can use literal values through
+   *   \Drupal\Core\Database\Query\SelectInterface::where(). Never include
+   *   user input in the query.
    *
    * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
-   *   When the expression is empty.
+   *   When the expression is empty, or the select query uses bound
+   *   parameters.
    */
   public function __construct(
-    string $expression,
+    string|SelectInterface $expression,
   ) {
+    if ($expression instanceof SelectInterface) {
+      if ($expression->getArguments()) {
+        throw new SchemaDefinitionException('The query of a SQL view cannot contain bound parameters');
+      }
+      $expression = (string) $expression;
+    }
     if ($expression === '') {
       throw new SchemaDefinitionException("The 'expression' argument of a ViewQuery cannot be empty");
     }
     parent::__construct($expression);
-  }
-
-  /**
-   * Creates a view query from a select query.
-   *
-   * @param \Drupal\Core\Database\Query\SelectInterface $select
-   *   The select query. It must not use bound parameters. Conditions can use
-   *   literal values through
-   *   \Drupal\Core\Database\Query\SelectInterface::where().
-   *
-   * @return self
-   *   The view query wrapping the select query.
-   *
-   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
-   *   When the select query uses bound parameters.
-   */
-  public static function fromSelect(SelectInterface $select): self {
-    if ($select->getArguments()) {
-      throw new SchemaDefinitionException('The query of a SQL view cannot contain bound parameters');
-    }
-    return new self((string) $select);
   }
 
 }

@@ -256,8 +256,6 @@ class KernelTestBaseTest extends KernelTestBase {
 
   /**
    * Tests installing a table and a SQL view from a schema definition.
-   *
-   * @legacy-covers ::installSchema
    */
   public function testInstallSchemaWithView(): void {
     $this->enableModules(['sql_view_test']);

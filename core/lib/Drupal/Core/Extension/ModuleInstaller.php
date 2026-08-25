@@ -791,7 +791,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $schemaDefinition = $this->invoke($module, 'schema') ?? [];
     $schema = $this->connection->schema();
     if ($schemaDefinition instanceof Schema) {
-      assert($schemaDefinition->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
+      assert(in_array($schemaDefinition->type, [SchemaDefinitionType::Module, SchemaDefinitionType::Test], TRUE), 'Invalid schema definition type, must be SchemaDefinitionType::Module or SchemaDefinitionType::Test');
       assert($schemaDefinition->name === $module, 'Invalid schema definition name, must be equal to the module name');
       $schema->createSchemaFromDefinition($schemaDefinition);
     }
@@ -817,14 +817,12 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $schemaDefinition = $this->invoke($module, 'schema') ?? [];
     $schema = $this->connection->schema();
     if ($schemaDefinition instanceof Schema) {
-      // Drop views in reverse declaration order before dropping their tables.
-      // PostgreSQL prevents either object from being dropped while a declared
-      // view depends on it.
-      foreach (array_reverse($schemaDefinition->viewNames()) as $view) {
-        if ($schema->viewExists($view)) {
-          $schema->dropView($view);
-        }
-      }
+      // Drop the module's declared views before dropping their tables.
+      // PostgreSQL refuses to drop a table while a view still depends on it,
+      // and refuses to drop a view while another view still depends on it.
+      // dropViews() retries until it can, so the views do not need to be
+      // declared in dependency order.
+      $schema->dropViews($schemaDefinition->viewNames());
       $table_names = $schemaDefinition->tableNames();
     }
     else {

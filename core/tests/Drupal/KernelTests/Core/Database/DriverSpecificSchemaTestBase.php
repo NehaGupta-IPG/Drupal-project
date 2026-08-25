@@ -1414,9 +1414,9 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     // parameters.
     $select = $this->connection->select($tableName, 't')->fields('t', ['id', 'name']);
     $select->where('[t].[id] > 0');
-    $this->schema->createViewFromDefinition(new View(
+    $this->schema->createViewFromDefinition(SchemaDefinitionType::Test, 'test_schema', new View(
       name: 'test_people_filtered',
-      query: ViewQuery::fromSelect($select),
+      query: new ViewQuery($select),
     ));
     $this->assertSame('John', $this->connection->query('SELECT [name] FROM {test_people_filtered}')->fetchField());
     $this->assertTrue($this->schema->dropView('test_people_filtered'));
@@ -1426,7 +1426,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       ->fields('t', ['id'])
       ->condition('name', 'John');
     try {
-      ViewQuery::fromSelect($select);
+      new ViewQuery($select);
       $this->fail('Building a view query from a select query with bound parameters did not fail.');
     }
     catch (SchemaDefinitionException $e) {

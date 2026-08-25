@@ -52,9 +52,6 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
 
   /**
    * Tests that SQL views declared by a module are installed and uninstalled.
-   *
-   * @legacy-covers ::installSchema
-   * @legacy-covers ::uninstallSchema
    */
   public function testSchemaWithView(): void {
     $schema = Database::getConnection()->schema();

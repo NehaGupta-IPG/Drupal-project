@@ -274,6 +274,20 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
    * Tests Schema::toArray() for a schema defining SQL views.
    */
   public function testConvertSchemaDefinitionWithView(): void {
+    $arraySpecification = [
+      'foo' => [
+        'description' => 'Foo table for the database unit tests.',
+        'fields' => [
+          'id' => [
+            'type' => 'serial',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
+          ],
+        ],
+        'primary key' => ['id'],
+      ],
+    ];
+
     $schemaDefinition = new Schema(
       type: SchemaDefinitionType::Test,
       name: 'test_foo',
@@ -297,9 +311,9 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
       ],
     );
 
-    $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('SQL views have no legacy array-based specification.');
-    $schemaDefinition->toArray();
+    // The view has no legacy array-based specification, so it is not present
+    // in the returned array.
+    $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
   }
 
 }

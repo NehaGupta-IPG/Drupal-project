@@ -504,10 +504,10 @@ use Drupal\Core\Database\SchemaDefinition\ViewQuery;
  *
  * Write view queries with curly braces around table names and square brackets
  * around identifiers. View definitions cannot contain bound parameters, so
- * never include user input. Convert a select query without parameters with
- * \Drupal\Core\Database\SchemaDefinition\ViewQuery::fromSelect().
- * Identifier and table-prefix replacement also affects literal square or curly
- * brackets inside strings.
+ * never include user input. A
+ * \Drupal\Core\Database\SchemaDefinition\ViewQuery can also be built from a
+ * select query without parameters. Identifier and table-prefix replacement
+ * also affects literal square or curly brackets inside strings.
  *
  * @see \Drupal\Core\Extension\ModuleInstaller::installSchema()
  * @see \Drupal\Core\Extension\ModuleInstaller::uninstallSchema()

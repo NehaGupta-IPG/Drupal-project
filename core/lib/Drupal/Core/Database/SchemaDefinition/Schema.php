@@ -131,9 +131,8 @@ final class Schema implements SchemaDefinitionInterface {
    * {@inheritdoc}
    */
   public function toArray(): array {
-    if ($this->views) {
-      throw new \LogicException('SQL views have no legacy array-based specification.');
-    }
+    // SQL views have no legacy array-based specification, so a declared
+    // view is not present in the returned array.
     $spec = [];
     foreach ($this->tables as $table) {
       $spec[$table->name] = $table->toArray();

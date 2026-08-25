@@ -778,7 +778,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     }
     // Views are created after tables because they select from them.
     foreach ($view_definitions as $view_definition) {
-      $schema->createViewFromDefinition($view_definition);
+      $schema->createViewFromDefinition($specification->type, $specification->name, $view_definition);
     }
   }
 
