@@ -459,4 +459,20 @@ class ModerationStateFieldItemListTest extends KernelTestBase {
     $this->assertFalse($translation->isPublished());
   }
 
+  /**
+   * Tests the storage settings of the content entity type ID field.
+   *
+   * A case-sensitive field lets the moderation state lookup use an equality
+   * condition, which is what allows the database to use the
+   * content_moderation_state__lookup index.
+   *
+   * @see \Drupal\Core\Entity\Query\Sql\Condition::translateCondition()
+   */
+  public function testContentEntityTypeIdStorageSettings(): void {
+    $storage_definition = $this->container->get('entity_field.manager')
+      ->getFieldStorageDefinitions('content_moderation_state')['content_entity_type_id'];
+    $this->assertTrue($storage_definition->getSetting('case_sensitive'));
+    $this->assertTrue($storage_definition->getSetting('is_ascii'));
+  }
+
 }
