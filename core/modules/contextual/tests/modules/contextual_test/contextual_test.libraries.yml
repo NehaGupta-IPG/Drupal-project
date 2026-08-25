@@ -1,0 +1,10 @@
+relocate:
+  version: VERSION
+  js:
+    js/contextual_test_relocate.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    # Ensures this behavior runs after the contextual behavior has registered
+    # the placeholder it moves away.
+    - contextual/drupal.contextual-links
