@@ -62,7 +62,7 @@ class LocaleJs {
     if (!empty($parsed['refresh:' . $languageInterface->getId()])) {
       // Don't clear the refresh flag on failure, so that another try will
       // be performed later.
-      if (_locale_rebuild_js()) {
+      if (_locale_rebuild_js($languageInterface->getId())) {
         unset($parsed['refresh:' . $languageInterface->getId()]);
       }
       // Store any changes after refresh was attempted.

@@ -73,10 +73,15 @@ class LibraryDiscoveryParser {
       if ($this->moduleHandler->moduleExists($extension)) {
         $extension_type = 'module';
       }
-      else {
+      elseif (\Drupal::service('theme_handler')->themeExists($extension)) {
         $extension_type = 'theme';
       }
-      $path = $this->extensionPathResolver->getPath($extension_type, $extension);
+      if (!empty($extension_type)) {
+        $path = $this->extensionPathResolver->getPath($extension_type, $extension);
+      }
+      else {
+        return [];
+      }
     }
 
     $libraries = $this->parseLibraryInfo($extension, $path);
