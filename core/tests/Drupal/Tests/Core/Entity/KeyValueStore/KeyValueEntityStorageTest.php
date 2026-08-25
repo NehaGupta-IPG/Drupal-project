@@ -110,6 +110,12 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->entityType
       ->method('getListCacheTags')
       ->willReturn(['test_entity_type_list']);
+    $this->entityType
+      ->method('isStaticallyCacheable')
+      ->willReturn(FALSE);
+    $this->entityType
+      ->method('isPersistentlyCacheable')
+      ->willReturn(FALSE);
 
     $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
     $this->entityTypeManager
