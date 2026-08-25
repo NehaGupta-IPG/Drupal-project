@@ -46,11 +46,28 @@ trait PerformanceTestTrait {
    * and call this helper.
    *
    * @see \Drupal\Tests\BrowserTestBase::installModulesFromClassProperty()
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
+   * ::doGetModulesFromClassProperty() instead.
+   * @see https://www.drupal.org/project/drupal/issues/3614825
    */
   private function doInstallModulesFromClassProperty(ContainerInterface $container): void {
     // Bypass everything that WebDriverTestBase does here to get closer to
     // a production configuration.
     BrowserTestBase::installModulesFromClassProperty($container);
+  }
+
+  /**
+   * Helper for ::getModulesFromClassProperty().
+   *
+   * To use this, override BrowserTestBase::installModulesFromClassProperty()
+   * and call this helper.
+   *
+   * @see \Drupal\Tests\BrowserTestBase::installModulesFromClassProperty()
+   */
+  private function doGetModulesFromClassProperty(): array {
+    // Bypass everything that WebDriverTestBase does here to get closer to
+    // a production configuration.
+    return BrowserTestBase::getModulesFromClassProperty();
   }
 
   /**

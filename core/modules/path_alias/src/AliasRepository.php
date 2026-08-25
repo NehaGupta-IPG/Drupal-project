@@ -116,11 +116,18 @@ class AliasRepository implements AliasRepositoryInterface {
     $query = $this->getBaseQuery();
     $query->addExpression(1);
 
-    return (bool) $query
-      ->condition('base_table.path', $this->connection->escapeLike($initial_substring) . '%', 'LIKE')
-      ->range(0, 1)
-      ->execute()
-      ->fetchField();
+    // This query may run in the early installer when the table has not yet been
+    // created yet, in that case ignore any errors.
+    try {
+      return (bool) $query
+        ->condition('base_table.path', $this->connection->escapeLike($initial_substring) . '%', 'LIKE')
+        ->range(0, 1)
+        ->execute()
+        ->fetchField();
+    }
+    catch (\Exception) {
+      return FALSE;
+    }
   }
 
   /**
