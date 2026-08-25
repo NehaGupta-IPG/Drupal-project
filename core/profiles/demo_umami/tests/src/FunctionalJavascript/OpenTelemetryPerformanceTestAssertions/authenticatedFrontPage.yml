@@ -51,7 +51,6 @@ CacheTagGroupedLookups:
     - rendered
     - 'user:6'
   -
-    - 'config:filter.format.basic_html'
     - 'config:system.menu.footer'
   -
     - 'config:system.menu.account'
@@ -63,6 +62,7 @@ CacheTagGroupedLookups:
     - 'config:responsive_image.styles.hero'
     - 'media:18'
     - 'config:system.site'
+    - 'config:filter.format.basic_html'
     - 'config:image.style.medium_8_7'
     - 'file:37'
     - 'media:19'
