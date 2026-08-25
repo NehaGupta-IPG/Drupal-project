@@ -11,6 +11,7 @@ use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Test\Form\KernelTestFormBuilder;
 use Drupal\Core\Test\Session\KernelTestSessionManager;
 use Drupal\Core\Test\Session\KernelTestSessionMiddleware;
@@ -26,7 +27,8 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
  * - There is no active theme. To render forms or place blocks, a test must
  *   first install a theme and then set it as active.
  * - Session semantics differ from normal page requests. To enable session
- *   persistence, see self::alterSessionServices().
+ *   persistence, see self::alterSessionServices(), and to set the current user
+ *   use self::setCurrentUserWithSession().
  * - Page caching modules will not work. See \Drupal\Tests\Traits\Core\Cache\PageCachePolicyTrait
  *   for how to set them up.
  * - To submit a form, see self::alterFormBuilder(). To submit a form as an
@@ -49,6 +51,9 @@ trait HttpKernelUiHelperTrait {
    *
    * This should be called from an implementation of
    * \Drupal\Core\DependencyInjection\ServiceModifierInterface::alter().
+   *
+   * If using sessions, setting the current user must be done with
+   * self::setCurrentUserWithSession().
    *
    * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
    *   The container to alter.
@@ -77,6 +82,32 @@ trait HttpKernelUiHelperTrait {
     // Alter the form builder.
     $service_definition = $container->getDefinition('form_builder');
     $service_definition->setClass(KernelTestFormBuilder::class);
+  }
+
+  /**
+   * Switch the current logged in user in both the system and the session.
+   *
+   * This should be used instead of
+   * \Drupal\Tests\user\Traits\UserCreationTrait::setCurrentUser() if session
+   * support is required.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user account object.
+   */
+  public function setCurrentUserWithSession(AccountInterface $account): void {
+    // Reset the Mink browser session.
+    $this->getSession()->reset();
+
+    // Destroy the PHP session if there is one.
+    if (isset($_SESSION)) {
+      $this->container->get('session_manager')->destroy();
+    }
+
+    $this->container->get('current_user')->setAccount($account);
+
+    if ($account->id()) {
+      $this->container->get('session')->set('uid', $account->id());
+    }
   }
 
   /**
