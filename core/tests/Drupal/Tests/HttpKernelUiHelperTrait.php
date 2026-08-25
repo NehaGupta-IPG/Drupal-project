@@ -270,19 +270,9 @@ trait HttpKernelUiHelperTrait {
     }
 
     // Submit form.
-    // $this->prepareRequest();
     $submit_button->press();
 
     $this->resetStatics();
-
-    // Ensure that any changes to variables in the other thread are picked up.
-    // $this->refreshVariables();
-
-    // // Check if there are any meta refresh redirects (like Batch API pages).
-    // if ($this->checkForMetaRefresh()) {
-    //   // We are finished with all meta refresh redirects, so reset the counter.
-    //   $this->metaRefreshCount = 0;
-    // }
 
     // Log only for WebDriverTestBase tests because for tests using
     // DrupalTestBrowser we log with ::getResponseLogHandler.
