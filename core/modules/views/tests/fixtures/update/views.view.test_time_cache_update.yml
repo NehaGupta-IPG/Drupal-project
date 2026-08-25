@@ -1,0 +1,38 @@
+langcode: en
+status: true
+dependencies: {  }
+id: test_time_cache_update
+label: test_time_cache_update
+module: views
+description: ''
+tag: ''
+base_table: views_test_data
+base_field: nid
+display:
+  default:
+    display_plugin: default
+    id: default
+    display_title: Default
+    position: 0
+    display_options:
+      cache:
+        type: time
+        options:
+          results_lifespan: 0
+          results_lifespan_custom: 1000
+          output_lifespan: 3600
+          output_lifespan_custom: 500
+  page_1:
+    display_plugin: page
+    id: page_1
+    display_options:
+      defaults:
+        cache: false
+      cache:
+        type: time
+        options:
+          results_lifespan: custom
+          results_lifespan_custom: 100
+          output_lifespan: 0
+          output_lifespan_custom: 0
+      path: test-time-cache-update

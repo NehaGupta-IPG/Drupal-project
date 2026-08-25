@@ -67,10 +67,68 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
-      // @todo leaving this here now but new update hooks will need to update.
-      return FALSE;
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
+      $changed = FALSE;
+      if ($this->processTimeCacheUpdate($handler, $handler_type, $view)) {
+        $changed = TRUE;
+      }
+      return $changed;
     });
+  }
+
+  /**
+   * Removes the custom lifespan options of time-based cache plugins.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View to update.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function needsTimeCacheUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type) use ($view) {
+      return $this->processTimeCacheUpdate($handler, $handler_type, $view);
+    });
+  }
+
+  /**
+   * Processes the options of time-based cache plugins.
+   *
+   * @param array $compound_handler
+   *   A compound display handler.
+   * @param string $handler_type
+   *   The handler type.
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View being updated.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  protected function processTimeCacheUpdate(array &$compound_handler, string $handler_type, ViewEntityInterface $view): bool {
+    if ($handler_type !== 'cache' || ($compound_handler['type'] ?? NULL) !== 'time' || !isset($compound_handler['options'])) {
+      return FALSE;
+    }
+
+    $changed = FALSE;
+    $options = &$compound_handler['options'];
+    foreach (['results_lifespan', 'output_lifespan'] as $field) {
+      if (!array_key_exists($field . '_custom', $options)) {
+        continue;
+      }
+      if (($options[$field] ?? NULL) === 'custom') {
+        $options[$field] = (int) $options[$field . '_custom'];
+      }
+      unset($options[$field . '_custom']);
+      $changed = TRUE;
+    }
+
+    $deprecations_triggered = &$this->triggeredDeprecations['3233105'][$view->id()];
+    if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
+      $deprecations_triggered = TRUE;
+      @trigger_error(sprintf('Support for the results_lifespan_custom and output_lifespan_custom settings of time-based cache plugins, as used in the "%s" view, is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Store the custom lifespan directly in results_lifespan and output_lifespan instead. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/9999999', $view->id()), E_USER_DEPRECATED);
+    }
+
+    return $changed;
   }
 
   /**
@@ -96,10 +154,12 @@ class ViewsConfigUpdater {
       'relationship' => 'relationships',
       'filter' => 'filters',
       'pager' => 'pager',
+      'cache' => 'cache',
     ];
 
     $compound_display_handlers = [
       'pager',
+      'cache',
     ];
 
     foreach ($displays as $display_id => &$display) {

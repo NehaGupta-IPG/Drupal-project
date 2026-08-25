@@ -8,6 +8,7 @@ use Drupal\Core\Config\FileStorage;
 use Drupal\views\ViewsConfigUpdater;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -30,12 +31,39 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   ];
 
   /**
-   * Tests ViewsConfigUpdater.
+   * Tests the removal of the custom lifespan options of time-based caching.
    */
-  public function testViewsConfigUpdater(): void {
-    // ViewsConfigUpdater currently contains no actual configuration update
-    // logic. Replace this method with a real test when it does.
-    $this->markTestSkipped();
+  #[IgnoreDeprecations]
+  public function testNeedsTimeCacheUpdate(): void {
+    $config_updater = $this->container
+      ->get('class_resolver')
+      ->getInstanceFromDefinition(ViewsConfigUpdater::class);
+    assert($config_updater instanceof ViewsConfigUpdater);
+
+    $test_view = $this->loadTestView('views.view.test_time_cache_update');
+    $this->assertTrue($config_updater->needsTimeCacheUpdate($test_view));
+    $test_view->save();
+
+    // A custom lifespan was stored as 0 in the main option with the actual
+    // value in the "_custom" option, but unused.
+    $default_options = $test_view->getDisplay('default')['display_options']['cache']['options'];
+    $this->assertSame(0, $default_options['results_lifespan']);
+    $this->assertArrayNotHasKey('results_lifespan_custom', $default_options);
+    $this->assertSame(3600, $default_options['output_lifespan']);
+    $this->assertArrayNotHasKey('output_lifespan_custom', $default_options);
+
+    // Configuration that was never cast by the config schema stores the
+    // string "custom" in the main option, which cannot be kept: the
+    // configured custom lifespan is applied.
+    $page_options = $test_view->getDisplay('page_1')['display_options']['cache']['options'];
+    $this->assertSame(100, $page_options['results_lifespan']);
+    $this->assertArrayNotHasKey('results_lifespan_custom', $page_options);
+    // "Never cache" with no custom value must be kept.
+    $this->assertSame(0, $page_options['output_lifespan']);
+    $this->assertArrayNotHasKey('output_lifespan_custom', $page_options);
+
+    // The updated view does not need the update anymore.
+    $this->assertFalse($config_updater->needsTimeCacheUpdate($test_view));
   }
 
   /**

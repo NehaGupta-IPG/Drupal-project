@@ -22,6 +22,11 @@ use Drupal\views\Attribute\ViewsCache;
 class Time extends CachePluginBase {
 
   /**
+   * The lifespans in seconds offered as preset options in the UI.
+   */
+  protected const array LIFESPAN_PRESETS = [60, 300, 1800, 3600, 21600, 518400];
+
+  /**
    * {@inheritdoc}
    */
   protected $usesOptions = TRUE;
@@ -58,9 +63,7 @@ class Time extends CachePluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['results_lifespan'] = ['default' => 3600];
-    $options['results_lifespan_custom'] = ['default' => 0];
     $options['output_lifespan'] = ['default' => 3600];
-    $options['output_lifespan_custom'] = ['default' => 0];
 
     return $options;
   }
@@ -70,16 +73,16 @@ class Time extends CachePluginBase {
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
-    $options = [60, 300, 1800, 3600, 21600, 518400];
-    $options = array_map([$this->dateFormatter, 'formatInterval'], array_combine($options, $options));
+    $options = array_map([$this->dateFormatter, 'formatInterval'], array_combine(static::LIFESPAN_PRESETS, static::LIFESPAN_PRESETS));
     $options = [0 => $this->t('Never cache')] + $options + ['custom' => $this->t('Custom')];
 
+    $results_lifespan = (int) $this->options['results_lifespan'];
     $form['results_lifespan'] = [
       '#type' => 'select',
       '#title' => $this->t('Query results'),
       '#description' => $this->t('The length of time raw query results should be cached.'),
       '#options' => $options,
-      '#default_value' => $this->options['results_lifespan'],
+      '#default_value' => isset($options[$results_lifespan]) ? $results_lifespan : 'custom',
     ];
     $form['results_lifespan_custom'] = [
       '#type' => 'textfield',
@@ -87,19 +90,20 @@ class Time extends CachePluginBase {
       '#size' => '25',
       '#maxlength' => '30',
       '#description' => $this->t('Length of time in seconds raw query results should be cached.'),
-      '#default_value' => $this->options['results_lifespan_custom'],
+      '#default_value' => isset($options[$results_lifespan]) ? 0 : $results_lifespan,
       '#states' => [
         'visible' => [
           ':input[name="cache_options[results_lifespan]"]' => ['value' => 'custom'],
         ],
       ],
     ];
+    $output_lifespan = (int) $this->options['output_lifespan'];
     $form['output_lifespan'] = [
       '#type' => 'select',
       '#title' => $this->t('Rendered output'),
       '#description' => $this->t('The length of time rendered HTML output should be cached.'),
       '#options' => $options,
-      '#default_value' => $this->options['output_lifespan'],
+      '#default_value' => isset($options[$output_lifespan]) ? $output_lifespan : 'custom',
     ];
     $form['output_lifespan_custom'] = [
       '#type' => 'textfield',
@@ -107,7 +111,7 @@ class Time extends CachePluginBase {
       '#size' => '25',
       '#maxlength' => '30',
       '#description' => $this->t('Length of time in seconds rendered HTML output should be cached.'),
-      '#default_value' => $this->options['output_lifespan_custom'],
+      '#default_value' => isset($options[$output_lifespan]) ? 0 : $output_lifespan,
       '#states' => [
         'visible' => [
           ':input[name="cache_options[output_lifespan]"]' => ['value' => 'custom'],
@@ -123,10 +127,27 @@ class Time extends CachePluginBase {
     $custom_fields = ['output_lifespan', 'results_lifespan'];
     foreach ($custom_fields as $field) {
       $cache_options = $form_state->getValue('cache_options');
-      if ($cache_options[$field] == 'custom' && !is_numeric($cache_options[$field . '_custom'])) {
+      if ($cache_options[$field] === 'custom' && !is_numeric($cache_options[$field . '_custom'])) {
         $form_state->setError($form[$field . '_custom'], $this->t('Custom time values must be numeric.'));
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitOptionsForm(&$form, FormStateInterface $form_state): void {
+    $cache_options = $form_state->getValue('cache_options');
+    foreach (['results_lifespan', 'output_lifespan'] as $field) {
+      if ($cache_options[$field] === 'custom') {
+        $cache_options[$field] = (int) ($cache_options[$field . '_custom'] ?? 0);
+      }
+      else {
+        $cache_options[$field] = (int) $cache_options[$field];
+      }
+      unset($cache_options[$field . '_custom']);
+    }
+    $form_state->setValue('cache_options', $cache_options);
   }
 
   /**
@@ -140,10 +161,15 @@ class Time extends CachePluginBase {
 
   /**
    * Gets the value for the lifespan of the given type.
+   *
+   * @param string $type
+   *   The cache type, either 'results' or 'output'.
+   *
+   * @return int
+   *   The lifespan in seconds.
    */
   protected function getLifespan($type) {
-    $lifespan = $this->options[$type . '_lifespan'] == 'custom' ? $this->options[$type . '_lifespan_custom'] : $this->options[$type . '_lifespan'];
-    return $lifespan;
+    return (int) $this->options[$type . '_lifespan'];
   }
 
   /**
