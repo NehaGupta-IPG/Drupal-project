@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Component\Datetime\Time;
 use Drupal\Core\Cache\MemoryCache\MemoryCache;
-use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageBase;
 use Drupal\Core\Entity\EntityTypeInterface;
