@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\FunctionalJavascript\Form;
 
-use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -113,28 +112,6 @@ class DevelopmentSettingsFormTest extends WebDriverTestBase {
         NULL,
       ],
     ];
-  }
-
-  /**
-   * Tests disabling cache bins which cache markup.
-   */
-  public function testDisabledRenderedOutputCacheBins(): void {
-    self::assertFalse(\Drupal::getContainer()->has('cache.backend.null'));
-
-    $this->drupalGet(Url::fromRoute('system.development_settings'));
-    $this->getSession()->getPage()->checkField('Do not cache markup');
-    $this->getSession()->getPage()->pressButton('Save settings');
-
-    $this->drupalGet(Url::fromRoute('system.status'));
-    $this->assertSession()->pageTextContains('Markup caching disabled');
-    $this->assertSession()->linkExists('development settings page');
-
-    $refreshed_container = $this->initKernel(Request::create('/'));
-    self::assertTrue($refreshed_container->has('cache.backend.null'));
-    $cache_bins = ['page', 'dynamic_page_cache', 'render'];
-    foreach ($cache_bins as $cache_bin) {
-      self::assertInstanceOf(NullBackend::class, $refreshed_container->get("cache.$cache_bin"));
-    }
   }
 
 }

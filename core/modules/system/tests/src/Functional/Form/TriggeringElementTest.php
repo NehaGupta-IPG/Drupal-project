@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\system\FunctionalJavascript\Form;
+namespace Drupal\Tests\system\Functional\Form;
 
-use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Form')]
 #[RunTestsInSeparateProcesses]
-class TriggeringElementTest extends WebDriverTestBase {
+class TriggeringElementTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
@@ -97,18 +97,14 @@ class TriggeringElementTest extends WebDriverTestBase {
     // Retrieve a form where 'button1' has #access=FALSE and 'button2' doesn't.
     $this->drupalGet($path . '/rs/s');
 
-    // Submit the form with 'button1=button1' in the POST data, which someone
-    // trying to get around security safeguards could easily do. We have to do
-    // a little trickery here, to work around the safeguards in submitForm()
-    // by renaming the text field and value that is in the form to 'button1',
-    // we can get the data we want into \Drupal::request()->request.
-    $page = $this->getSession()->getPage();
-    $input = $page->find('css', 'input[name="text"]');
-    $this->assertNotNull($input, 'text input located.');
-
-    $input->setValue('name', 'button1');
-    $input->setValue('value', 'button1');
-    $this->xpath('//form[@id="' . $form_html_id . '"]//input[@type="submit"]')[0]->click();
+    // Submit a forged button1 value that could not come from the rendered form.
+    $client = $this->getSession()->getDriver()->getClient();
+    $form = $client->getCrawler()
+      ->filterXPath('//form[@id="' . $form_html_id . '"]')
+      ->form();
+    $values = $form->getPhpValues();
+    $values['button1'] = 'button1';
+    $client->request('POST', $form->getUri(), $values);
 
     // Ensure that the triggering element was not set to the restricted button.
     // Do this with both a negative and positive assertion, because negative

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Drupal\FunctionalJavascriptTests\Core\Session;
+namespace Drupal\FunctionalTests\Core\Session;
 
-use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('session')]
 #[RunTestsInSeparateProcesses]
-class SessionTest extends WebDriverTestBase {
+class SessionTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
@@ -58,9 +58,11 @@ class SessionTest extends WebDriverTestBase {
     $this->drupalGet('<front>');
 
     $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
 
     for ($i = 0; $i < 25; $i++) {
       $page->clickLink('Link to front page');
+      $assert_session->statusCodeEquals(200);
     }
   }
 

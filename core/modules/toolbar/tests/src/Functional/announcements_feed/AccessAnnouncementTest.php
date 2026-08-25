@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\toolbar\FunctionalJavascript\announcements_feed;
+namespace Drupal\Tests\toolbar\Functional\announcements_feed;
 
 use Drupal\announce_feed_test\AnnounceTestHttpClientMiddleware;
-use Drupal\Tests\system\FunctionalJavascript\OffCanvasTestBase;
+use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('toolbar')]
 #[RunTestsInSeparateProcesses]
-class AccessAnnouncementTest extends OffCanvasTestBase {
+class AccessAnnouncementTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
@@ -34,7 +34,7 @@ class AccessAnnouncementTest extends OffCanvasTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp():void {
+  protected function setUp(): void {
     parent::setUp();
     AnnounceTestHttpClientMiddleware::setAnnounceTestEndpoint('/announce-feed-json/community-feeds');
   }

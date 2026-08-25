@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\media_library\FunctionalJavascript;
+namespace Drupal\Tests\media_library\Functional;
 
 use Drupal\Core\Url;
 use Drupal\field_ui\FieldUI;
+use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -14,12 +15,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('media_library')]
 #[RunTestsInSeparateProcesses]
-class WidgetWithoutTypesTest extends MediaLibraryTestBase {
+class WidgetWithoutTypesTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['field_ui'];
+  protected static $modules = ['media_library_test', 'field_ui'];
 
   /**
    * {@inheritdoc}
