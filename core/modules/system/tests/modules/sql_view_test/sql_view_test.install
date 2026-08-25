@@ -51,7 +51,7 @@ function sql_view_test_schema(): Schema {
   );
 
   return new Schema(
-    type: SchemaDefinitionType::Module,
+    type: SchemaDefinitionType::Test,
     name: 'sql_view_test',
     tables: [$table],
     views: [$view, $dependent_view],

@@ -14,7 +14,7 @@ final class View {
   /**
    * Constructor.
    *
-   * @param string $name
+   * @param non-empty-string $name
    *   The view name.
    * @param ViewQuery $query
    *   The SELECT query defining the view.

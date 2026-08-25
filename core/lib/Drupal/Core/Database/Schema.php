@@ -402,7 +402,7 @@ abstract class Schema implements PlaceholderInterface {
    */
   public function createView(string $name, string $query, bool $replace = FALSE): void {
     if ($this->tableExists($name)) {
-      throw new SchemaObjectExistsException("Table '$name' already exists.");
+      throw new SchemaObjectExistsException("View '$name' cannot be created as a table with the same name already exists.");
     }
     if ($this->viewExists($name)) {
       if (!$replace) {
