@@ -7,11 +7,11 @@ namespace Drupal\KernelTests;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Tests\HttpKernelUiHelperTrait;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Response;
-use Drupal\Tests\user\Traits\UserCreationTrait;
 
 /**
  * Tests use of form submission with HTTP requests in a kernel test.
