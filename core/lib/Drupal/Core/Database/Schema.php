@@ -275,9 +275,10 @@ abstract class Schema implements PlaceholderInterface {
    *   number of characters (including zero characters).
    *
    * @return array
-   *   Both the keys and values are the matching views. Ordering is
-   *   driver-specific and does not necessarily reflect dependencies. Use
-   *   ::dropViews() when order matters.
+   *   Both the keys and values are the matching views, in no particular
+   *   order. A view can select from another view, and some database
+   *   engines refuse to drop one while the other still exists; pass the
+   *   result to ::dropViews() to drop them all safely regardless of order.
    */
   public function findViews(string $view_expression): array {
     $condition = $this->buildTableNameCondition('%', 'LIKE');

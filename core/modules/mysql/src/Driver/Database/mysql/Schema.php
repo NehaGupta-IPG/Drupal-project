@@ -418,44 +418,6 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function findViews(string $view_expression): array {
-    $condition = $this->buildTableNameCondition('%', 'LIKE');
-    $condition->condition('table_type', 'VIEW');
-    $condition->compile($this->connection, $this);
-
-    $prefix = $this->connection->getPrefix();
-    $prefix_length = strlen($prefix);
-    $views = [];
-    // information_schema.views has no creation time to order by, so
-    // information_schema.tables is queried instead and filtered to views.
-    // MySQL records creation times to the nearest second, so views created
-    // within the same second may be returned in either order.
-    $results = $this->connection->query("SELECT table_name AS table_name FROM information_schema.tables WHERE " . (string) $condition . " ORDER BY create_time", $condition->arguments());
-    foreach ($results as $view) {
-      if ($prefix && substr($view->table_name, 0, $prefix_length) !== $prefix) {
-        // This view name does not start with the prefix, which means that it
-        // is not managed by Drupal so it should be excluded from the result.
-        continue;
-      }
-
-      // Remove the prefix from the returned views.
-      $unprefixed_view_name = substr($view->table_name, $prefix_length);
-
-      // Exclude a view whose full name is the prefix itself.
-      if (!empty($unprefixed_view_name)) {
-        $views[$unprefixed_view_name] = $unprefixed_view_name;
-      }
-    }
-
-    // Convert the view expression from its SQL LIKE syntax to a regular
-    // expression and escape the delimiter that will be used for matching.
-    $view_expression = str_replace(['%', '_'], ['.*?', '.'], preg_quote($view_expression, '/'));
-    return preg_grep('/^' . $view_expression . '$/i', $views);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function addField($table, $field, $spec, $keys_new = []) {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add field '$table.$field': table doesn't exist.");

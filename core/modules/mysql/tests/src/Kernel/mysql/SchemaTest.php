@@ -71,14 +71,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function findViewsOrderIsGuaranteed(): bool {
-    // MySQL records creation times to the nearest second.
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function assertCollation(): void {
     // Make sure that varchar fields have the correct collations.
     $columns = $this->connection->query('SHOW FULL COLUMNS FROM {test_table}');

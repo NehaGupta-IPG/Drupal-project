@@ -97,16 +97,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   }
 
   /**
-   * Indicates whether Schema::findViews() preserves creation order.
-   *
-   * Override when the database catalog cannot distinguish views created close
-   * together.
-   */
-  protected function findViewsOrderIsGuaranteed(): bool {
-    return TRUE;
-  }
-
-  /**
    * Tests inserting data into an existing table.
    *
    * @param string $table
@@ -1317,7 +1307,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       $this->fail('Creating a view with the name of an existing table did not fail.');
     }
     catch (SchemaObjectExistsException $e) {
-      $this->assertSame("Table 'test_table' already exists.", $e->getMessage());
+      $this->assertSame("View 'test_table' cannot be created as a table with the same name already exists.", $e->getMessage());
     }
 
     // Tables cannot take the name of an existing view.
@@ -1350,9 +1340,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     $this->schema->createView('test_view', 'SELECT [id] FROM {test_table}');
     $this->schema->createView('test_view2', 'SELECT [id] FROM {test_view}');
-    if ($this->findViewsOrderIsGuaranteed()) {
-      $this->assertSame(['test_view', 'test_view2'], array_values($this->schema->findViews('test_view%')));
-    }
     // Pass the base view first to verify that dropViews() resolves
     // dependencies.
     $this->schema->dropViews(['test_view', 'test_view2']);

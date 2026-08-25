@@ -593,15 +593,26 @@ EOD;
   }
 
   /**
-   * {@inheritdoc}
+   * Finds all SQL views that are like the specified base view name.
+   *
+   * @param string $view_expression
+   *   A case-insensitive pattern against which view names are compared. Both
+   *   '_' and '%' are treated like wildcards in MySQL 'LIKE' expressions,
+   *   where '_' matches any single character and '%' matches an arbitrary
+   *   number of characters (including zero characters).
+   *
+   * @return array
+   *   Both the keys and values are the matching views, with a view listed
+   *   after any view it selects from.
    */
   public function findViews(string $view_expression): array {
     $prefix = $this->connection->getPrefix();
     $prefix_length = strlen($prefix);
     $views = [];
 
-    // pg_views has no creation metadata. Order by the object IDs in pg_class,
-    // which PostgreSQL assigns when it creates catalog entries.
+    // pg_views has no object id to order by, so pg_class is queried instead:
+    // its object id is assigned in creation order, which orders a view after
+    // the view it selects from.
     $results = $this->connection->query("SELECT cl.relname AS viewname FROM pg_class cl INNER JOIN pg_namespace ns ON cl.relnamespace = ns.oid WHERE ns.nspname = :schema AND cl.relkind = 'v' ORDER BY cl.oid", [':schema' => $this->defaultSchema]);
     foreach ($results as $view) {
       if ($prefix && substr($view->viewname, 0, $prefix_length) !== $prefix) {

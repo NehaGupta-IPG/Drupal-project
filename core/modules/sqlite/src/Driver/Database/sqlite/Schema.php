@@ -1132,12 +1132,12 @@ class Schema extends DatabaseSchema {
     $views = [];
 
     // SQLite stores each prefix in a separate attached database. Search each
-    // one and use sqlite_master row IDs as creation order.
+    // one for matching views.
     $attached_dbs = $this->connection->getAttachedDatabases();
     foreach ($attached_dbs as $schema) {
       // Can't use query placeholders for the schema because the query would
       // have to be :prefixsqlite_master, which does not work.
-      $result = $this->connection->query("SELECT name FROM [" . $schema . "].sqlite_master WHERE type = :type AND name LIKE :view_name ORDER BY rowid", [
+      $result = $this->connection->query("SELECT name FROM [" . $schema . "].sqlite_master WHERE type = :type AND name LIKE :view_name", [
         ':type' => 'view',
         ':view_name' => $view_expression,
       ]);
