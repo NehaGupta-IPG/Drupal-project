@@ -149,7 +149,7 @@ class JsonExpression extends BaseJsonExpression {
     // container type so [*] matches only arrays and .* only objects, like
     // MySQL and PostgreSQL.
     $shape = $this->wildcardAccessor() === self::WILDCARD_ELEMENT ? 'array' : 'object';
-    $row_filter = "json_type({$this->field}, {$this->connection->quote($prefix)}) = '{$shape}' AND ";
+    $row_filter = "json_type({$this->field}, {$this->connection->quote($prefix)}) = '{$shape}'";
     if ($suffix === '$') {
       $extract = 'je.value';
       $element_type = 'je.type';
@@ -159,7 +159,7 @@ class JsonExpression extends BaseJsonExpression {
       $element_type = "json_type(je.value, {$this->connection->quote($suffix)})";
       // json_extract on a scalar je.value (e.g. a string) causes a
       // "malformed JSON" error. Filter to object/array values only.
-      $row_filter .= "je.type IN ('object', 'array') AND ";
+      $row_filter .= " AND je.type IN ('object', 'array')";
     }
     return [
       'from' => "json_each({$this->field}, {$this->connection->quote($prefix)}) je",
@@ -179,13 +179,10 @@ class JsonExpression extends BaseJsonExpression {
     $json_types = match ($type) {
       JsonCastType::Int, JsonCastType::Float => "'integer', 'real'",
       JsonCastType::Bool => "'true', 'false'",
-      JsonCastType::Text => '',
+      JsonCastType::Text => "'text'",
     };
-    if ($json_types === '') {
-      return '';
-    }
     $type_expression ??= "json_type({$this->field}, {$this->connection->quote($this->path)})";
-    return "{$type_expression} IN ({$json_types}) AND ";
+    return "{$type_expression} IN ({$json_types})";
   }
 
 }

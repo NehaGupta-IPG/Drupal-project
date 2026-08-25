@@ -1035,8 +1035,9 @@ abstract class Connection {
    * @param string $path
    *   The JSONPath expression (e.g. "$.status").
    * @param string|int|float|array|bool|null $value
-   *   The value to compare against. Ignored for unary operators (IS NULL,
-   *   IS NOT NULL, HAS KEY).
+   *   The comparison value. Unary operators (IS NULL, IS NOT NULL, HAS KEY)
+   *   ignore it; every other operator requires it. Its PHP type determines
+   *   the comparison domain.
    * @param string $operator
    *   The comparison operator.
    *

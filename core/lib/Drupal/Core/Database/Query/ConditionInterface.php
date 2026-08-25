@@ -89,15 +89,19 @@ interface ConditionInterface {
    * @param string $jsonpath
    *   The JSONPath expression (must start with '$').
    * @param string|int|float|array|bool|null $value
-   *   The value to compare against. Ignored for unary operators (IS NULL,
-   *   IS NOT NULL, HAS KEY) and required for every other operator.
+   *   The comparison value. It is ignored by IS NULL, IS NOT NULL, and HAS
+   *   KEY, and required by every other operator. Its PHP type determines the
+   *   comparison domain: integers and floats are JSON numbers, booleans are
+   *   JSON booleans, and strings are JSON strings. Comparison operators do
+   *   not match values of another JSON type. CONTAINS, STARTS_WITH, and
+   *   ENDS_WITH search the text representation of any JSON value. Cast string
+   *   input to the intended PHP type before use.
    * @param string $operator
-   *   The comparison operator. A jsonpath with a wildcard segment matches any
-   *   number of values, and asks whether any of them satisfies the operator.
-   *   Not every operator can expand a wildcard that way, see
-   *   JsonCondition::WILDCARD_OPERATORS. IS NULL matches a missing path and a
-   *   stored JSON null alike, and IS NOT NULL matches a value other than JSON
-   *   null; use HAS KEY to test presence regardless of the value.
+   *   The comparison operator. A path with one wildcard matches when any
+   *   selected value satisfies the operator. See
+   *   JsonCondition::WILDCARD_OPERATORS for supported operators. IS NULL
+   *   matches both a missing path and JSON null; use HAS KEY to distinguish
+   *   between them.
    *
    * @return static
    *   The called object.

@@ -129,15 +129,12 @@ class JsonExpression extends BaseJsonExpression {
     $json_type = match ($type) {
       JsonCastType::Int, JsonCastType::Float => 'number',
       JsonCastType::Bool => 'boolean',
-      JsonCastType::Text => '',
+      JsonCastType::Text => 'string',
     };
-    if ($json_type === '') {
-      return '';
-    }
     // JSONB_TYPEOF() needs a jsonb value, so the #> operator is used here
     // instead of the #>> operator toSql() uses to extract text.
     $type_expression ??= "JSONB_TYPEOF({$this->field}::jsonb #> {$this->pathArraySql()})";
-    return "{$type_expression} = '{$json_type}' AND ";
+    return "{$type_expression} = '{$json_type}'";
   }
 
 }

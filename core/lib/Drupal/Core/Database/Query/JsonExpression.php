@@ -270,9 +270,10 @@ abstract class JsonExpression {
    * backend, because a value of another type equals no value of the compared
    * type.
    *
-   * The guard is combined with AND, so a value of another type matches no
-   * operator, including a negated one such as <> or NOT BETWEEN. This is what
-   * PostgreSQL's type aware jsonpath comparison does for scalar values.
+   * The test only runs when the guard passes, so a value of another type
+   * matches no operator, including a negated one such as <> or NOT BETWEEN.
+   * This is what PostgreSQL's type aware jsonpath comparison does for scalar
+   * values.
    *
    * @param \Drupal\Core\Database\Query\JsonCastType $type
    *   The cast type the comparison uses.
@@ -281,8 +282,7 @@ abstract class JsonExpression {
    *   NULL, the type of the value at this expression's JSON path is used.
    *
    * @return string
-   *   A SQL fragment ending in ' AND ', or an empty string when the cast
-   *   cannot fail, as is the case for a text cast.
+   *   A boolean SQL predicate.
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
    *   If the path contains a wildcard and $type_expression is NULL.
@@ -307,8 +307,7 @@ abstract class JsonExpression {
    *   NULL, the type of the value at this expression's JSON path is used.
    *
    * @return string
-   *   A SQL fragment ending in ' AND ', or an empty string when the cast
-   *   cannot fail, as is the case for a text cast.
+   *   A boolean SQL predicate.
    */
   abstract protected function doToTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string;
 
@@ -323,6 +322,11 @@ abstract class JsonExpression {
    * The test is combined with the type guard of $type, so a value of another
    * JSON type is skipped instead of cast.
    *
+   * Numeric comparisons use floating-point precision so that JSON integers
+   * and floats share one comparison domain. Values beyond 2^53 may therefore
+   * lose precision, including before the query is built if PHP receives them
+   * as floats. Result casts via toCastSql() keep the integer type.
+   *
    * @param \Drupal\Core\Database\Query\JsonCastType $type
    *   The cast type the test compares in.
    * @param callable $test
@@ -331,6 +335,10 @@ abstract class JsonExpression {
    *   @code
    *   fn(string $value) => "{$value} LIKE :db_condition_placeholder_0"
    *   @endcode
+   * @param bool $type_guarded
+   *   Whether the test runs only on values of the JSON type matching $type.
+   *   The LIKE family passes FALSE: it searches the text rendering of a value
+   *   of any type.
    *
    * @return string
    *   A SQL fragment that evaluates to TRUE if a value at the path satisfies
@@ -339,11 +347,20 @@ abstract class JsonExpression {
    * @internal
    *   This method should only be used by the database layer.
    */
-  public function toPredicateSql(JsonCastType $type, callable $test): string {
+  public function toPredicateSql(JsonCastType $type, callable $test, bool $type_guarded = TRUE): string {
+    // Comparisons work in one numeric domain: an integer operand compares the
+    // way a float operand does, so 8 matches a stored 8.0 and 7.5 never
+    // matches 7 by truncation. JSON has one number type, and jsonb cannot
+    // even report an integer and a float apart. The integer result cast of
+    // toCastSql() is a separate contract and keeps its type.
+    if ($type === JsonCastType::Int) {
+      $type = JsonCastType::Float;
+    }
     if (!$this->hasWildcard()) {
-      $sql = $test($this->toCastSql($type));
-      $type_guard = $this->toTypeGuardSql($type);
-      return $type_guard === '' ? $sql : "({$type_guard}{$sql})";
+      return $this->guardedTestSql(
+        $type_guarded ? $this->toTypeGuardSql($type) : '',
+        $test($this->toCastSql($type)),
+      );
     }
     [
       'from' => $from,
@@ -351,8 +368,35 @@ abstract class JsonExpression {
       'type' => $type_expression,
       'filter' => $row_filter,
     ] = $this->wildcardRowSet();
-    $guard = $row_filter . $this->toTypeGuardSql($type, $type_expression);
-    return $this->wildcardMatchSql($from, $guard . $test($this->toCastSql($type, $value, $type_expression)));
+    $where = $this->guardedTestSql(
+      $type_guarded ? $this->toTypeGuardSql($type, $type_expression) : '',
+      $test($this->toCastSql($type, $value, $type_expression)),
+    );
+    // The value and type expressions can error on a row the filter excludes,
+    // so the filter has to run first.
+    $where = $this->guardedTestSql($row_filter, $where);
+    return $this->wildcardMatchSql($from, $where);
+  }
+
+  /**
+   * Combines a guard and a test so the test runs behind the guard.
+   *
+   * SQL does not promise an evaluation order for AND, so the test could run
+   * on a value the guard rejects: PostgreSQL could cast a value the type
+   * guard skips, SQLite could extract from a scalar row the row filter
+   * excludes. CASE promises the order.
+   *
+   * @param string $guard
+   *   A boolean SQL predicate, such as a type guard or a wildcard row filter,
+   *   or an empty string for no guard.
+   * @param string $test
+   *   The boolean SQL to run behind the guard.
+   *
+   * @return string
+   *   The combined boolean SQL.
+   */
+  protected function guardedTestSql(string $guard, string $test): string {
+    return $guard === '' ? $test : "CASE WHEN {$guard} THEN {$test} ELSE FALSE END";
   }
 
   /**
@@ -369,8 +413,8 @@ abstract class JsonExpression {
    *     to toCastSql().
    *   - type: a SQL expression returning the JSON type name of that value, to
    *     be passed to toTypeGuardSql().
-   *   - filter: a SQL fragment ending in ' AND ' that restricts the rows
-   *     before the value is read, or an empty string.
+   *   - filter: a boolean SQL predicate that restricts the rows before the
+   *     value is read, or an empty string.
    */
   abstract protected function wildcardRowSet(): array;
 

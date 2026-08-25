@@ -64,8 +64,10 @@ class JsonCondition extends Condition {
    * @param string $path
    *   The JSONPath expression (must start with '$').
    * @param string|int|float|array|bool|null $value
-   *   The value to compare against. Ignored for unary operators (IS NULL,
-   *   IS NOT NULL, HAS KEY) and required for every other operator.
+   *   The comparison value. Unary operators (IS NULL, IS NOT NULL, HAS KEY)
+   *   ignore it; every other operator requires it. Its PHP type determines
+   *   the comparison domain. See
+   *   ConditionInterface::jsonCondition().
    * @param string $operator
    *   The comparison operator.
    */
@@ -259,9 +261,11 @@ class JsonCondition extends Condition {
           ?? $this->mapConditionOperator('LIKE');
         $keyword = $like_operator['operator'] ?? 'LIKE';
         $escape = $like_operator['postfix'] ?? '';
+        // LIKE searches the text representation of every JSON type.
         $this->stringVersion = $expression->toPredicateSql(
           JsonCastType::Text,
           fn(string $extract) => "{$extract} {$keyword} {$placeholder}{$escape}",
+          FALSE,
         );
         $this->arguments = [$placeholder => $like_value];
         return;

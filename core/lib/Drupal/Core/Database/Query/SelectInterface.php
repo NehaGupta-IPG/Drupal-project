@@ -707,13 +707,13 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    * @param string $jsonpath
    *   The JSONPath expression (must start with '$').
    * @param string|int|float|array|bool|null $value
-   *   The value to compare against. Ignored for unary operators (IS NULL,
-   *   IS NOT NULL, HAS KEY).
+   *   The comparison value. Unary operators (IS NULL, IS NOT NULL, HAS KEY)
+   *   ignore it; every other operator requires it. Its PHP type determines
+   *   the comparison domain.
    * @param string $operator
-   *   The comparison operator. A jsonpath with a wildcard segment matches any
-   *   number of values, and asks whether any of them satisfies the operator.
-   *   Not every operator can expand a wildcard that way, see
-   *   JsonCondition::WILDCARD_OPERATORS.
+   *   The comparison operator. A path with one wildcard matches when any
+   *   selected value satisfies the operator. See
+   *   JsonCondition::WILDCARD_OPERATORS for supported operators.
    *
    * @return static
    *   The called object.

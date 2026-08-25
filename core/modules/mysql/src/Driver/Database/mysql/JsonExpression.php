@@ -105,13 +105,10 @@ class JsonExpression extends BaseJsonExpression {
       JsonCastType::Int => "'INTEGER', 'UNSIGNED INTEGER'",
       JsonCastType::Float => "'DOUBLE', 'DECIMAL', 'INTEGER', 'UNSIGNED INTEGER'",
       JsonCastType::Bool => "'BOOLEAN'",
-      JsonCastType::Text => '',
+      JsonCastType::Text => "'STRING'",
     };
-    if ($json_types === '') {
-      return '';
-    }
     $type_expression ??= "JSON_TYPE({$this->toSql()})";
-    return "{$type_expression} IN ({$json_types}) AND ";
+    return "{$type_expression} IN ({$json_types})";
   }
 
 }

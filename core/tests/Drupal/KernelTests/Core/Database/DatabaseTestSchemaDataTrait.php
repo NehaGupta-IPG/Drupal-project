@@ -186,7 +186,7 @@ trait DatabaseTestSchemaDataTrait {
       ->values([
         'id' => 11,
         'status' => 1,
-        'test_field' => '{"nulled": null, "flag_true": true, "flag_false": false, "long_text": "' . str_repeat('abcdefgh', 40) . '"}',
+        'test_field' => '{"nulled": null, "flag_true": true, "flag_false": false, "whole_float": 8.0, "seven_string": "7", "numeric_string": "01234", "mixed": [1, "str", {"uid": 5}, [2]], "long_text": "' . str_repeat('abcdefgh', 40) . '"}',
       ])
       ->execute();
   }
@@ -225,6 +225,26 @@ trait DatabaseTestSchemaDataTrait {
       'Boolean IN FALSE' => ['$.boolean', [FALSE], 'IN', [2]],
       'Boolean IN both' => ['$.boolean', [TRUE, FALSE], 'IN', [1, 2, 4]],
       'Boolean NOT IN TRUE' => ['$.boolean', [TRUE], 'NOT IN', [2]],
+
+      // Integer and float operands share a numeric comparison domain without
+      // truncating fractional values.
+      'Int against stored float' => ['$.whole_float', 8, '=', [11]],
+      'Float against stored int' => ['$.number', 10.0, '=', [2, 3]],
+      'Int against fractional' => ['$.float', 1, '=', []],
+      'Int IN against fractional' => ['$.float', [3], 'IN', []],
+      'Fractional in int range' => ['$.float', [1, 2], 'BETWEEN', [5]],
+      'Float wildcard against stored int' => ['$.items[*]', 20.0, '=', [8]],
+      'Int negated against equal stored float' => ['$.whole_float', 8, '<>', []],
+
+      // Strings compare to stored JSON strings only: numbers and strings
+      // never cross-match, and a numeric-looking string keeps exact string
+      // matching. The LIKE family searches the text rendering of any type.
+      'String against stored number' => ['$.number', '10', '=', []],
+      'String IN against stored number' => ['$.number', ['10'], 'IN', []],
+      'Int against stored numeric string' => ['$.seven_string', 7, '=', []],
+      'String against stored numeric string' => ['$.seven_string', '7', '=', [11]],
+      'Leading zero string exact match' => ['$.numeric_string', '01234', '=', [11]],
+      'CONTAINS against stored number' => ['$.number', '0', 'CONTAINS', [2, 3]],
 
       // Type mismatch.
       'Non-matching text' => ['$.key', 'nothing to see here', '=', []],
@@ -519,6 +539,12 @@ trait DatabaseTestSchemaDataTrait {
       'Element wildcard nested CONTAINS no match' => ['$.revs[*].name', 'reviewer', 'CONTAINS', []],
       'Element wildcard nested STARTS_WITH' => ['$.revs[*].name', 'auth', 'STARTS_WITH', [10]],
       'Element wildcard nested ENDS_WITH' => ['$.revs[*].name', 'thor', 'ENDS_WITH', [10]],
+
+      // Row 11 holds scalars, an object and an array side by side at $.mixed.
+      // A suffix after the wildcard matches inside the container elements and
+      // must not error on the scalar ones.
+      'Element wildcard suffix on mixed elements' => ['$.mixed[*].uid', 5, '=', [11]],
+      'Element wildcard suffix on mixed elements no match' => ['$.mixed[*].uid', 9, '=', []],
 
       // [*] matches only array elements and .* only object members; these
       // paths use the wrong accessor for the stored shape, so nothing
