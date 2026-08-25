@@ -86,6 +86,11 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
       ->setDescription(t('The ID of the content entity type this moderation state is for.'))
       ->setRequired(TRUE)
       ->setSetting('max_length', EntityTypeInterface::ID_MAX_LENGTH)
+      // Entity type IDs are ASCII machine names. Storing them case-sensitively
+      // lets the entity query use an equality condition, which keeps
+      // content_moderation_state__lookup usable as an index.
+      ->setSetting('is_ascii', TRUE)
+      ->setSetting('case_sensitive', TRUE)
       ->setRevisionable(TRUE);
 
     $fields['content_entity_id'] = BaseFieldDefinition::create('integer')
