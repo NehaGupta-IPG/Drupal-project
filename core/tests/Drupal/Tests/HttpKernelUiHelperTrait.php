@@ -59,7 +59,7 @@ trait HttpKernelUiHelperTrait {
    * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
    *   The container to alter.
    */
-  public function alterSessionServices(ContainerBuilder $container) {
+  public function alterSessionServices(ContainerBuilder $container): void {
     // Alter session services that normally skip session creation on the CLI.
     $service_definition = $container->getDefinition('http_middleware.session');
     $service_definition->setClass(KernelTestSessionMiddleware::class);
@@ -80,7 +80,7 @@ trait HttpKernelUiHelperTrait {
    * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
    *   The container to alter.
    */
-  public function alterFormBuilder(ContainerBuilder $container) {
+  public function alterFormBuilder(ContainerBuilder $container): void {
     // Alter the form builder.
     $service_definition = $container->getDefinition('form_builder');
     $service_definition->setClass(KernelTestFormBuilder::class);
@@ -233,7 +233,7 @@ trait HttpKernelUiHelperTrait {
    *   form, which is typically the same thing but with hyphens replacing the
    *   underscores.
    */
-  protected function submitForm(array $edit, $submit, $form_html_id = NULL) {
+  protected function submitForm(array $edit, $submit, $form_html_id = NULL): void {
     $assert_session = $this->assertSession();
     $submit_button = $assert_session->buttonExists($submit);
     // Check if button has a form attribute set.
