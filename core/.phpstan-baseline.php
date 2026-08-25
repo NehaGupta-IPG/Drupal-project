@@ -23520,28 +23520,28 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/contextual/ContextualLinksTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:isLabelInContentOverview\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\Functional\\\\workspaces\\\\WorkspaceTest\\:\\:isLabelInContentOverview\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+	'path' => __DIR__ . '/modules/toolbar/tests/src/Functional/workspaces/WorkspaceTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:setupWorkspaceSwitcherBlock\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\Functional\\\\workspaces\\\\WorkspaceTest\\:\\:setupWorkspaceSwitcherBlock\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+	'path' => __DIR__ . '/modules/toolbar/tests/src/Functional/workspaces/WorkspaceTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:switchToLive\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\Functional\\\\workspaces\\\\WorkspaceTest\\:\\:switchToLive\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+	'path' => __DIR__ . '/modules/toolbar/tests/src/Functional/workspaces/WorkspaceTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:switchToWorkspace\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\Functional\\\\workspaces\\\\WorkspaceTest\\:\\:switchToWorkspace\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+	'path' => __DIR__ . '/modules/toolbar/tests/src/Functional/workspaces/WorkspaceTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\update\\\\Controller\\\\UpdateController\\:\\:updateStatusManually\\(\\) has no return type specified\\.$#',
