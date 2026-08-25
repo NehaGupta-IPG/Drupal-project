@@ -480,4 +480,103 @@ class ContentEntityCacheTest extends KernelTestBase {
     $this->assertEquals('New name', $unchanged->getName());
   }
 
+  /**
+   * Tests that ::executeWithoutCaching() disables both entity caches.
+   */
+  public function testExecuteWithoutCaching(): void {
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
+    $entity_type_manager = $this->container->get('entity_type.manager');
+    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+    $storage = $entity_type_manager->getStorage($this->revEntityTypeId);
+
+    $entity = $storage->create();
+    $entity->save();
+
+    $persistent_cache = \Drupal::cache('entity');
+    $cache_id = "values:{$this->revEntityTypeId}:{$entity->id()}";
+
+    // Populate the static and persistent caches, then clear the persistent
+    // cache entry so it is possible to tell whether a later load repopulates
+    // it.
+    $loaded = $storage->load($entity->id());
+    $this->assertNotFalse($persistent_cache->get($cache_id));
+    $persistent_cache->delete($cache_id);
+
+    $storage->executeWithoutCaching(function ($passed_storage) use ($storage, $entity, $loaded, $persistent_cache, $cache_id) {
+      $this->assertSame($storage, $passed_storage);
+
+      // The static cache is bypassed, so a new object is returned.
+      $uncached = $passed_storage->load($entity->id());
+      $this->assertNotSame($loaded, $uncached);
+
+      // The load performed above did not repopulate the persistent cache.
+      $this->assertFalse($persistent_cache->get($cache_id));
+
+      // Nested calls keep caching disabled until the outermost callback
+      // returns.
+      $passed_storage->executeWithoutCaching(function () use ($passed_storage, $entity, $uncached) {
+        $this->assertNotSame($uncached, $passed_storage->load($entity->id()));
+      });
+    });
+
+    // Once the outermost callback has returned, caching works as normal
+    // again. Reset the static cache first, since it still holds the object
+    // loaded before ::executeWithoutCaching() was called.
+    $storage->resetCache([$entity->id()]);
+    $recached = $storage->load($entity->id());
+    $this->assertNotFalse($persistent_cache->get($cache_id));
+    $this->assertSame($recached, $storage->load($entity->id()));
+  }
+
+  /**
+   * Tests EntityTypeManagerInterface::executeWithoutCaching().
+   */
+  public function testEntityTypeManagerExecuteWithoutCaching(): void {
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
+    $entity_type_manager = $this->container->get('entity_type.manager');
+    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $rev_storage */
+    $rev_storage = $entity_type_manager->getStorage($this->revEntityTypeId);
+    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $non_rev_storage */
+    $non_rev_storage = $entity_type_manager->getStorage($this->nonRevEntityTypeId);
+
+    $rev_entity = $rev_storage->create();
+    $rev_entity->save();
+    $non_rev_entity = $non_rev_storage->create();
+    $non_rev_entity->save();
+
+    $persistent_cache = \Drupal::cache('entity');
+    $rev_cache_id = "values:{$this->revEntityTypeId}:{$rev_entity->id()}";
+    $non_rev_cache_id = "values:{$this->nonRevEntityTypeId}:{$non_rev_entity->id()}";
+
+    // Populate both storages' static and persistent caches, then clear the
+    // persistent cache entries so it is possible to tell whether a later
+    // load repopulates them.
+    $rev_loaded = $rev_storage->load($rev_entity->id());
+    $non_rev_loaded = $non_rev_storage->load($non_rev_entity->id());
+    $this->assertNotFalse($persistent_cache->get($rev_cache_id));
+    $this->assertNotFalse($persistent_cache->get($non_rev_cache_id));
+    $persistent_cache->delete($rev_cache_id);
+    $persistent_cache->delete($non_rev_cache_id);
+
+    // Passing an explicit list of entity type IDs disables caching for the
+    // storage of each one, for the duration of the callback.
+    $entity_type_manager->executeWithoutCaching(function () use ($rev_storage, $non_rev_storage, $rev_entity, $non_rev_entity, $rev_loaded, $non_rev_loaded, $persistent_cache, $rev_cache_id, $non_rev_cache_id) {
+      $this->assertNotSame($rev_loaded, $rev_storage->load($rev_entity->id()));
+      $this->assertNotSame($non_rev_loaded, $non_rev_storage->load($non_rev_entity->id()));
+      $this->assertFalse($persistent_cache->get($rev_cache_id));
+      $this->assertFalse($persistent_cache->get($non_rev_cache_id));
+    }, [$this->revEntityTypeId, $this->nonRevEntityTypeId]);
+
+    // Omitting the entity type IDs disables caching for every entity type,
+    // including ones not explicitly listed.
+    $entity_type_manager->executeWithoutCaching(function () use ($rev_storage, $rev_entity, $rev_loaded) {
+      $this->assertNotSame($rev_loaded, $rev_storage->load($rev_entity->id()));
+    });
+
+    // Once the callback has returned, caching works as normal again.
+    $rev_storage->resetCache([$rev_entity->id()]);
+    $rev_storage->load($rev_entity->id());
+    $this->assertNotFalse($persistent_cache->get($rev_cache_id));
+  }
+
 }

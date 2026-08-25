@@ -227,6 +227,19 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
   /**
    * {@inheritdoc}
    */
+  public function executeWithoutCaching(callable $callback, ?array $entity_type_ids = NULL): mixed {
+    $entity_type_ids ??= array_keys($this->getDefinitions());
+    $run = $callback;
+    foreach ($entity_type_ids as $entity_type_id) {
+      $storage = $this->getStorage($entity_type_id);
+      $run = fn () => $storage->executeWithoutCaching(fn () => $run());
+    }
+    return $run();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getListBuilder($entity_type_id) {
     return $this->getHandler($entity_type_id, 'list_builder');
   }

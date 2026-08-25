@@ -38,6 +38,27 @@ interface EntityTypeManagerInterface extends PluginManagerInterface, CachedDisco
   public function getStorage($entity_type_id);
 
   /**
+   * Executes a callback with entity caching disabled for some entity types.
+   *
+   * This disables caching, via
+   * \Drupal\Core\Entity\EntityStorageInterface::executeWithoutCaching(), on
+   * the storage of each given entity type. Since storage instances are
+   * shared for the duration of the request, this also covers entities of
+   * those types that get loaded internally while the callback runs, for
+   * example when loading a paragraph while loading its parent entity.
+   *
+   * @param callable $callback
+   *   A callback, invoked with no arguments.
+   * @param string[]|null $entity_type_ids
+   *   (optional) The entity type IDs to disable caching for. Defaults to
+   *   all entity types.
+   *
+   * @return mixed
+   *   The return value of the callback.
+   */
+  public function executeWithoutCaching(callable $callback, ?array $entity_type_ids = NULL): mixed;
+
+  /**
    * Creates a new view builder instance.
    *
    * @param string $entity_type_id
