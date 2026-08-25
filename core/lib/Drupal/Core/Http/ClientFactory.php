@@ -11,7 +11,7 @@ use GuzzleHttp\Utils;
 /**
  * Helper class to construct a HTTP client with Drupal specific config.
  */
-class ClientFactory {
+class ClientFactory implements ClientFactoryInterface {
 
   /**
    * The handler stack.
@@ -21,23 +21,14 @@ class ClientFactory {
   protected $stack;
 
   /**
-   * Constructs a new ClientFactory instance.
-   *
-   * @param \GuzzleHttp\HandlerStack $stack
-   *   The handler stack.
+   * {@inheritdoc}
    */
   public function __construct(HandlerStack $stack) {
     $this->stack = $stack;
   }
 
   /**
-   * Constructs a new client object from some configuration.
-   *
-   * @param array $config
-   *   The config for the client.
-   *
-   * @return \GuzzleHttp\Client
-   *   The HTTP client.
+   * {@inheritdoc}
    */
   public function fromOptions(array $config = []) {
     $default_config = [

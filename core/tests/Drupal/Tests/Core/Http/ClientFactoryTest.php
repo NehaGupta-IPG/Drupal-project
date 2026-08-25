@@ -59,7 +59,8 @@ class ClientFactoryTest extends UnitTestCase {
     $client = $this->factory->fromOptions($parameter_config);
 
     foreach ($expected_config_keys as $key => $expected) {
-      $this->assertSame($expected, $client->getConfig($key));
+      $options = $client->getOptions();
+      $this->assertSame($expected, $options[$key]);
     }
   }
 
