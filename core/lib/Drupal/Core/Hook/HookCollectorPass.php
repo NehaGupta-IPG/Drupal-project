@@ -48,7 +48,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
    *
    * @var string[]
    */
-  protected array $proceduralFileExtensions = ['module', 'profile', 'install'];
+  protected array $proceduralFileExtensions = ['module', 'profile'];
 
   /**
    * OOP implementation module names keyed by hook name and "$class::$method".
@@ -434,27 +434,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
 
             $legacy_attributes = [LegacyHook::class, LegacyRequirementsHook::class];
             if (!static::hasAnyAttribute($attributes, $legacy_attributes) && (preg_match($current_module_preg, $function, $matches) || preg_match($all_modules_preg, $function, $matches))) {
-              // Skip hooks that are not supported by the new hook system, they
-              // do not need to be added to the BC layer. Note that is different
-              // from static::checkForProceduralOnlyHooks(). hook_requirements
-              // is allowed and only update hooks are considered as dynamic
-              // exclusion, since post updates are not expected to be parsed.
-              // Also, update hooks are checked as ends with, since the regular
-              // expression sometimes attributes them to the wrong module,
-              // resulting in a prefix.
-              $staticDenyHooks = [
-                'install',
-                'install_tasks',
-                'install_tasks_alter',
-                'schema',
-                'uninstall',
-                'update_last_removed',
-                'update_dependencies',
-              ];
-              if (in_array($matches['hook'], $staticDenyHooks) || preg_match('/update_\d+$/', $function)) {
-                continue;
-              }
-
               assert($function === $matches['module'] . '_' . $matches['hook']);
               $implementations[] = ['module' => $matches['module'], 'hook' => $matches['hook']];
             }
