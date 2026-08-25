@@ -493,24 +493,32 @@ class ContentEntityCacheTest extends KernelTestBase {
     $entity->save();
 
     $persistent_cache = \Drupal::cache('entity');
+    /** @var \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache */
+    $memory_cache = \Drupal::service('entity.memory_cache');
+    // The static (memory) cache and the persistent cache use the same cache
+    // ID format.
+    // @see \Drupal\Core\Entity\EntityStorageBase::buildCacheId()
     $cache_id = "values:{$this->revEntityTypeId}:{$entity->id()}";
 
-    // Populate the static and persistent caches, then clear the persistent
-    // cache entry so it is possible to tell whether a later load repopulates
-    // it.
+    // Populate the static and persistent caches, then clear both cache
+    // entries directly so it is possible to tell whether a later load
+    // repopulates them.
     $loaded = $storage->load($entity->id());
     $this->assertNotFalse($persistent_cache->get($cache_id));
+    $this->assertNotFalse($memory_cache->get($cache_id));
     $persistent_cache->delete($cache_id);
+    $memory_cache->delete($cache_id);
 
-    $storage->executeWithoutCaching(function ($passed_storage) use ($storage, $entity, $loaded, $persistent_cache, $cache_id) {
+    $storage->executeWithoutCaching(function ($passed_storage) use ($storage, $entity, $loaded, $persistent_cache, $memory_cache, $cache_id) {
       $this->assertSame($storage, $passed_storage);
 
       // The static cache is bypassed, so a new object is returned.
       $uncached = $passed_storage->load($entity->id());
       $this->assertNotSame($loaded, $uncached);
 
-      // The load performed above did not repopulate the persistent cache.
+      // The load performed above did not repopulate either cache.
       $this->assertFalse($persistent_cache->get($cache_id));
+      $this->assertFalse($memory_cache->get($cache_id));
 
       // Nested calls keep caching disabled until the outermost callback
       // returns.
@@ -520,11 +528,11 @@ class ContentEntityCacheTest extends KernelTestBase {
     });
 
     // Once the outermost callback has returned, caching works as normal
-    // again. Reset the static cache first, since it still holds the object
-    // loaded before ::executeWithoutCaching() was called.
-    $storage->resetCache([$entity->id()]);
+    // again. Both caches were cleared directly above, so there is no stale
+    // static cache entry left to mask this.
     $recached = $storage->load($entity->id());
     $this->assertNotFalse($persistent_cache->get($cache_id));
+    $this->assertNotFalse($memory_cache->get($cache_id));
     $this->assertSame($recached, $storage->load($entity->id()));
   }
 
