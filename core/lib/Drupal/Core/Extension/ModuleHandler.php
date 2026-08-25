@@ -292,6 +292,8 @@ class ModuleHandler implements ModuleHandlerInterface {
       foreach ($this->moduleList as $module => $filename) {
         $function = $module . '_' . $hook;
         if (function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyRequirementsHook::class)) {
+          $message = "$function without a #[LegacyRequirementsHook] attribute is deprecated in drupal:11.3.0 and removed in drupal:13.0.0. See https://www.drupal.org/node/3549685";
+          @trigger_error($message, E_USER_DEPRECATED);
           $callback($function, $module);
         }
       }
