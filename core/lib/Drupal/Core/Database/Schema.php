@@ -633,7 +633,7 @@ abstract class Schema implements PlaceholderInterface {
    * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
    *   When the requested table is missing.
    */
-  protected function resolveNewKeysFromSchemaDefinition(array &$keys_new, string $tableName, SchemaDefinition $schema) {
+  protected function resolveNewKeysFromSchemaDefinition(array &$keys_new, string $tableName, SchemaDefinition $schema): void {
     $tableDefinition = $schema->getTableDefinition($tableName);
     $indexes = [];
     foreach ($keys_new['indexes'] as $name => $key) {
