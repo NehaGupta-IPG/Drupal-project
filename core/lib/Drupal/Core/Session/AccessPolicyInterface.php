@@ -52,8 +52,8 @@ interface AccessPolicyInterface {
    *
    * This should only be used to revoke permissions. If you wish to add
    * permissions, you should write another access policy that uses the
-   * calculatePermissions method instead, unless your access policy depends on
-   * the account having a specific permission.
+   * calculatePermissions method instead, unless your access policy needs to
+   * check whether or not the account has a specific permission.
    *
    * Keep in mind that there are many ways to alter access policy results.
    * Because each access policy itself is a service, the best way to get rid of
