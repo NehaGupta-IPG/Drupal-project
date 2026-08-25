@@ -348,11 +348,7 @@ abstract class JsonExpression {
    *   This method should only be used by the database layer.
    */
   public function toPredicateSql(JsonCastType $type, callable $test, bool $type_guarded = TRUE): string {
-    // Comparisons work in one numeric domain: an integer operand compares the
-    // way a float operand does, so 8 matches a stored 8.0 and 7.5 never
-    // matches 7 by truncation. JSON has one number type, and jsonb cannot
-    // even report an integer and a float apart. The integer result cast of
-    // toCastSql() is a separate contract and keeps its type.
+    // Compare JSON integers and floats without truncating fractional values.
     if ($type === JsonCastType::Int) {
       $type = JsonCastType::Float;
     }

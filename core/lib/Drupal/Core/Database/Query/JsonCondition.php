@@ -219,7 +219,8 @@ class JsonCondition extends Condition {
         //   element of the value.
         // - Every member of a candidate object has to be present in the value
         //   under the same name, and its value contained.
-        // - A scalar is contained when it is equal and of the same JSON type.
+        // - A scalar is contained when it is equal and of the same JSON type,
+        //   except that numbers compare numerically across integer and float.
         // On an array of objects this matches one element as a whole, so it
         // tests a combination of values, where a jsonCondition() per value can
         // match values of different elements. Nesting an array inside a

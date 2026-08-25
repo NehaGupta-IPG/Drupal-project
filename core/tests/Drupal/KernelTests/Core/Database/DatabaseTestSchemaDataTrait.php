@@ -186,7 +186,7 @@ trait DatabaseTestSchemaDataTrait {
       ->values([
         'id' => 11,
         'status' => 1,
-        'test_field' => '{"nulled": null, "flag_true": true, "flag_false": false, "whole_float": 8.0, "seven_string": "7", "numeric_string": "01234", "mixed": [1, "str", {"uid": 5}, [2]], "long_text": "' . str_repeat('abcdefgh', 40) . '"}',
+        'test_field' => '{"": "empty-key", "nulled": null, "flag_true": true, "flag_false": false, "whole_float": 8.0, "seven_string": "7", "numeric_string": "01234", "empty_list": [], "empty_obj": {}, "mixed": [1, "str", {"uid": 5}, [2]], "long_text": "' . str_repeat('abcdefgh', 40) . '"}',
       ])
       ->execute();
   }
@@ -390,6 +390,8 @@ trait DatabaseTestSchemaDataTrait {
       'IS NULL on stored JSON null' => ['$.nulled', NULL, 'IS NULL', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]],
       'IS NOT NULL on stored JSON null' => ['$.nulled', NULL, 'IS NOT NULL', []],
       'HAS KEY on stored JSON null' => ['$.nulled', NULL, 'HAS KEY', [11]],
+      'Empty key equals' => ['$[""]', 'empty-key', '=', [11]],
+      'Empty key HAS KEY' => ['$[""]', NULL, 'HAS KEY', [11]],
       'CONTAINS against JSON null' => ['$.nulled', 'ul', 'CONTAINS', []],
       'CONTAINS against boolean' => ['$.flag_true', 'ru', 'CONTAINS', [11]],
       'STARTS_WITH against boolean' => ['$.flag_false', 'fal', 'STARTS_WITH', [11]],
@@ -545,6 +547,19 @@ trait DatabaseTestSchemaDataTrait {
       // must not error on the scalar ones.
       'Element wildcard suffix on mixed elements' => ['$.mixed[*].uid', 5, '=', [11]],
       'Element wildcard suffix on mixed elements no match' => ['$.mixed[*].uid', 9, '=', []],
+
+      // JSON_CONTAINS number handling and nesting.
+      'JSON_CONTAINS float candidate of stored int' => ['$.items', [10.0], 'JSON_CONTAINS', [8]],
+      'JSON_CONTAINS int candidate of stored int' => ['$.items', [20], 'JSON_CONTAINS', [8]],
+      'JSON_CONTAINS fractional candidate no match' => ['$.items', [10.5], 'JSON_CONTAINS', []],
+
+      // An empty container has no values a wildcard can match, so every
+      // operator returns no rows, including the negated ones.
+      'Wildcard on empty array' => ['$.empty_list[*]', 5, '=', []],
+      'Wildcard on empty array negated' => ['$.empty_list[*]', 5, '<>', []],
+      'Wildcard on empty array NOT IN' => ['$.empty_list[*]', [5], 'NOT IN', []],
+      'Wildcard on empty array CONTAINS' => ['$.empty_list[*]', 'x', 'CONTAINS', []],
+      'Wildcard on empty object' => ['$.empty_obj.*', 5, '=', []],
 
       // [*] matches only array elements and .* only object members; these
       // paths use the wrong accessor for the stored shape, so nothing
