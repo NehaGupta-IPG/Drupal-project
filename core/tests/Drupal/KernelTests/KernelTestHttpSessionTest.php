@@ -37,7 +37,7 @@ class KernelTestHttpSessionTest extends KernelTestBase implements ServiceModifie
   }
 
   /**
-   * Tests data can be stored in the sesssion.
+   * Tests data can be stored in the session.
    */
   public function testSession(): void {
     // Make PHP use serialize() to store session data, so that we can inspect
@@ -61,7 +61,7 @@ class KernelTestHttpSessionTest extends KernelTestBase implements ServiceModifie
     $session_cookie = $mink_session->getCookie($session_name);
     $this->assertNotEmpty($session_cookie);
 
-    // Check that the sessssss ID in the database is correct.
+    // Check that the session ID in the database is correct.
     $query = $this->container->get('database')->select('sessions')
       ->fields('sessions');
     $session_row = $query->execute()->fetchAssoc();
