@@ -50,11 +50,6 @@ class KernelTestHttpFormTest extends KernelTestBase implements ServiceModifierIn
   protected function setUp(): void {
     parent::setUp();
 
-    $this->installSchema('user', 'users_data');
-    $this->installEntitySchema('user');
-    // The config from user module creates the anonymous role.
-    $this->installConfig('user');
-
     // Set up a theme so form elements are rendered.
     $this->container->get('theme_installer')->install(['stark']);
     $this->config('system.theme')->set('default', 'stark')->save();
@@ -86,6 +81,11 @@ class KernelTestHttpFormTest extends KernelTestBase implements ServiceModifierIn
    * Tests basic form functionality for an authenticated user.
    */
   public function testAuthenticatedForm(): void {
+    $this->installSchema('user', 'users_data');
+    $this->installEntitySchema('user');
+    // The config from user module creates the anonymous role.
+    $this->installConfig('user');
+
     $user = $this->createUser([
       'access content',
     ]);
