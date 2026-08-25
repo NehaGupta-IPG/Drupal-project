@@ -347,9 +347,12 @@ class LocaleFetch {
           $remote_file->timestamp = $remoteFileInfo->lastModified;
           $this->localeSource->saveSource($source->name, $source->langcode, LOCALE_TRANSLATION_REMOTE, $remote_file);
         }
-        // @todo What to do with when the file is not found (404)? To prevent
-        //   re-checking within the TTL (1day, 1week) we can set a last_checked
-        //   timestamp or cache the result.
+        else {
+          // When the file is not found (404), prevent re-checking within the TTL
+          // (1day, 1week) by setting a last_checked timestamp.
+          $remote_file->timestamp = 0;
+          $this->localeSource->saveSource($source->name, $source->langcode, LOCALE_TRANSLATION_REMOTE, $remote_file);
+        }
         $checked = TRUE;
       }
       else {
