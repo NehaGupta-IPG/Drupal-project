@@ -1,0 +1,4 @@
+name: Distribution test
+type: module
+package: Testing
+version: VERSION

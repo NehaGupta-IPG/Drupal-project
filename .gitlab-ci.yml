@@ -376,6 +376,7 @@ default:
     CI_NODE_TOTAL: 1
   services:
     - <<: *with-database
+    - <<: *with-selenium-chrome
 
 '🔁 Repeat Class Test':
   <<: [ *with-composer, *test-setup ]
