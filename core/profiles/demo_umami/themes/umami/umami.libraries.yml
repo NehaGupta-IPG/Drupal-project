@@ -6,7 +6,6 @@ global:
     component:
       css/components/blocks/help/help.css: {}
       css/components/blocks/page-title/page-title.css: {}
-      css/components/blocks/language-switcher/language-switcher.css: {}
       css/components/blocks/search/search.css: {}
       css/components/blocks/search/search-results.css: {}
       css/components/blocks/articles-aside/articles-aside.css: {}
@@ -92,6 +91,17 @@ oneplusfourgrid_section:
   css:
     layout:
       layouts/oneplusfourgrid_section/oneplusfourgrid_section.css: {}
+
+language-switcher:
+  css:
+    component:
+      css/components/blocks/language-switcher/language-switcher.css: {}
+  js:
+    js/components/language-switcher/language-switcher.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.debounce
+    - core/once
 
 filter:
   version: VERSION

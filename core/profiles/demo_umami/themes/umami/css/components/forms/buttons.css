@@ -3,7 +3,7 @@
  * This file is used to style form buttons generically, with overrides per form
  */
 
-.button {
+.button:not([hidden]) {
   display: inline-block;
   min-width: inherit;
   max-width: inherit;
