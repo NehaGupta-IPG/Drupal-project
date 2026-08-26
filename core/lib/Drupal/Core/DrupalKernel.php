@@ -994,6 +994,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       Settings::get('deployment_identifier'),
       PHP_OS,
       serialize(Settings::get('container_yamls')),
+      // Add this so that the initial container is unique.
+      (int) $this->overrideUseCache,
     ];
     return implode(':', $parts);
   }
