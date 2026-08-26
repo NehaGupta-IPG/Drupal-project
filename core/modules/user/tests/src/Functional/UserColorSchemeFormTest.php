@@ -37,27 +37,27 @@ class UserColorSchemeFormTest extends BrowserTestBase {
   /**
    * Description used when both themes honor the preference.
    */
-  const DESCRIPTION_BOTH = 'System follows your operating system or browser setting. Applies where supported by site theme.';
+  const DESCRIPTION_BOTH = 'System follows your operating system or browser setting. Applies wherever your site’s theme supports it.';
 
   /**
    * Description used when only the site theme honors the preference.
    */
-  const DESCRIPTION_SITE_ONLY = 'System follows your operating system or browser setting. The site follows this setting, administration pages do not.';
+  const DESCRIPTION_SITE_ONLY = 'System follows your operating system or browser setting. The site follows this setting, administrative pages do not.';
 
   /**
    * Description used when only the administration theme honors the preference.
    */
-  const DESCRIPTION_ADMIN_ONLY = 'System follows your operating system or browser setting. Administration pages follow this setting, the rest of the site does not.';
+  const DESCRIPTION_ADMIN_ONLY = 'System follows your operating system or browser setting. Administrative pages follow this setting, the rest of the site does not.';
 
   /**
    * Description used when the account may not use the administration theme.
    */
-  const DESCRIPTION_NO_ADMIN_ACCESS = 'Only administration pages follow this setting, and this account does not use the administration theme. The setting has no effect.';
+  const DESCRIPTION_NO_ADMIN_ACCESS = 'This setting has no effect on your account. Only administration pages support it, and this account does not use the administration theme.';
 
   /**
    * Description used when neither theme honors the preference.
    */
-  const DESCRIPTION_NONE = 'Neither the site theme nor the administration theme follows this setting. The setting has no effect.';
+  const DESCRIPTION_NONE = 'This setting has no effect. Neither the site not the administration pages support it.';
 
   /**
    * {@inheritdoc}
