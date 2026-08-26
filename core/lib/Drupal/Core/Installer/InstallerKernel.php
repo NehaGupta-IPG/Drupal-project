@@ -27,6 +27,27 @@ class InstallerKernel extends DrupalKernel {
   protected array $compiledExtensions = [];
 
   /**
+   * Whether the next container initialization must recompile unconditionally.
+   *
+   * @see ::rebuildContainer()
+   * @see ::initializeContainer()
+   */
+  protected bool $forceContainerRebuild = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function rebuildContainer() {
+    // ::initializeContainer() skips recompiling when the module and theme
+    // lists are unchanged since the last compilation. An explicit rebuild
+    // request means something the memo cannot observe has changed - such as
+    // the installer switching from early-phase to database-backed services -
+    // so the memo must not swallow it.
+    $this->forceContainerRebuild = TRUE;
+    return parent::rebuildContainer();
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function initializeContainer() {
@@ -37,7 +58,8 @@ class InstallerKernel extends DrupalKernel {
     // without any module changes in between. Since allowDumping is FALSE, no
     // cached container exists, so the parent will always recompile.
     $extensions = $this->getExtensions();
-    if (isset($this->container)
+    if (!$this->forceContainerRebuild
+      && isset($this->container)
       && count($extensions['module'] ?? []) === count($this->compiledExtensions['module'] ?? [])
       && count($extensions['theme'] ?? []) === count($this->compiledExtensions['theme'] ?? [])
       && !array_diff_key($extensions['module'] ?? [], $this->compiledExtensions['module'] ?? [])
@@ -48,6 +70,7 @@ class InstallerKernel extends DrupalKernel {
     }
     else {
       $this->containerNeedsRebuild = TRUE;
+      $this->forceContainerRebuild = FALSE;
       $this->compiledExtensions = $extensions;
       return parent::initializeContainer();
     }
