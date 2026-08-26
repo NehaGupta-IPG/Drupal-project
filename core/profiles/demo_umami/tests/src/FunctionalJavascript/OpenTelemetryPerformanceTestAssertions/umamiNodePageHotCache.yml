@@ -28,7 +28,6 @@ CacheTagGroupedLookups:
     - 'config:user.role.anonymous'
     - 'config:views.view.recipe_collections'
     - 'config:views.view.related_recipes'
-    - 'config:workflows.workflow.editorial'
     - 'file:37'
     - http_response
     - local_task
