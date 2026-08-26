@@ -549,6 +549,7 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     // 0. This ensures that the initial container state is the same for each
     // method, while container rebuilds during tests will force a new cache key.
     $kernel->resetCacheSuffix();
+    $kernel->resetContainer();
 
     if ($record === NULL) {
       try {

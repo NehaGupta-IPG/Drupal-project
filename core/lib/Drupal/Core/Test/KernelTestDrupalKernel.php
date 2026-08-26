@@ -70,6 +70,9 @@ class KernelTestDrupalKernel extends DrupalKernel {
    */
   protected function getContainerCacheKey() {
     $key = parent::getContainerCacheKey();
+    if ($this->containerNeedsRebuild) {
+      $this->cacheSuffix++;
+    }
     // Vary by whether cache usage is being overridden, so that when the
     // container is rebuilt with the same key after an override, it does not
     // invalidate the original cached container.
