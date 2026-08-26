@@ -5,6 +5,9 @@
 
 (function ($, Drupal) {
   let autocomplete;
+  let inBrowser = typeof window !== 'undefined';
+  let UA = inBrowser && window.navigator.userAgent.toLowerCase();
+  let isAndroid = UA && UA.indexOf('android') > 0;
 
   /**
    * Helper splitting terms from the autocomplete value.
@@ -224,12 +227,18 @@
           });
 
           // Use CompositionEvent to handle IME inputs. It requests remote server on "compositionend" event only.
-          $autocomplete.on('compositionstart.autocomplete', () => {
-            autocomplete.options.isComposing = true;
-          });
-          $autocomplete.on('compositionend.autocomplete', () => {
+          $autocomplete.on('change.autocomplete', function () {
             autocomplete.options.isComposing = false;
           });
+
+          if (!isAndroid) {
+            $autocomplete.on('compositionstart.autocomplete', function () {
+              autocomplete.options.isComposing = true;
+            });
+            $autocomplete.on('compositionend.autocomplete', function () {
+              autocomplete.options.isComposing = false;
+            });
+          }
         },
       );
     },
