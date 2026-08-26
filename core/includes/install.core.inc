@@ -1582,8 +1582,8 @@ function install_profile_modules(&$install_state) {
   install_core_entity_type_definitions();
 
   $modules = $install_state['profile_info']['install'];
-  $database_module = _install_get_database_module_name();
-  if ($database_module !== NULL) {
+  $database_module = Database::getConnection()->getProvider();
+  if ($database_module !== 'core') {
     array_unshift($modules, $database_module);
   }
 
@@ -2552,7 +2552,7 @@ function install_recipe_required_modules(array $install_state) {
   // Always install required modules first.
   $required = [];
 
-  $database_module = _install_get_database_module_name();
+  $database_module = Database::getConnection()->getProvider();
 
   foreach ($files as $module => $extension) {
     if (!empty($extension->info['required']) || $module === $database_module) {
@@ -2594,30 +2594,4 @@ function install_recipe_batch(&$install_state) {
   }
 
   return $batch_builder->toArray();
-}
-
-/**
- * Gets the database driver module name.
- *
- * The database driver is provided by a module. That module must be
- * installed before any other module, as it must be able to override any call
- * to hook_schema() or any "backend_overridable" service. In edge cases, a
- * driver module may extend from another driver module. In order for the
- * extended classes to be autoloadable, the extending module should list the
- * extended module in its dependencies.
- *
- * @return ?string
- *   The database driver module or NULL if none is found.
- */
-function _install_get_database_module_name(): ?string {
-  $connection = Database::getConnection();
-  $provider = $connection->getProvider();
-  $database_module = NULL;
-  if ($provider !== 'core') {
-    $autoload = $connection->getConnectionOptions()['autoload'] ?? '';
-    if (str_contains($autoload, 'src/Driver/Database/')) {
-      $database_module = $provider;
-    }
-  }
-  return $database_module;
 }
