@@ -90,13 +90,6 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
       $column_key = key(reset($results));
       $other_entity_values = array_column($results, $column_key);
 
-      // These values from the database area always strings, so we can change
-      // the case of all of them.
-      $other_entity_values = array_map(fn(string $value) => iconv('UTF-8', 'ASCII//TRANSLIT', $value), $other_entity_values);
-      // Item values could be of any type, only change the case of string
-      // values.
-      $item_values = array_map(fn(mixed $value) => is_string($value) ? iconv('UTF-8', 'ASCII//TRANSLIT', $value) : $value, $item_values);
-
       // If our entity duplicates field values in any other entity, the query
       // will return all field values that belong to those entities. Narrow
       // down to only the specific duplicate values.
@@ -131,9 +124,9 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
   }
 
   /**
-   * Performs a case-insensitive array intersection.
+   * Performs a case- and accent-insensitive array intersection.
    *
-   * This retains the capitalization of the original string.
+   * This retains the capitalization and accents of the original string.
    *
    * @param array $orig_values
    *   The original values to be returned.
@@ -142,15 +135,36 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
    *
    * @return array
    *   Elements of $orig_values contained in $comp_values when ignoring
-   *   capitalization.
+   *   capitalization and accents.
    */
   private function caseInsensitiveArrayIntersect(array $orig_values, array $comp_values): array {
-    $lowercase_comp_values = array_map('strtolower', $comp_values);
-    $intersect_map = array_map(fn (string $x) => in_array(strtolower($x), $lowercase_comp_values, TRUE) ? $x : NULL, $orig_values);
+    $normalized_comp_values = array_map([$this, 'normalizeForComparison'], $comp_values);
+    $intersect_map = array_map(fn (string $x) => in_array($this->normalizeForComparison($x), $normalized_comp_values, TRUE) ? $x : NULL, $orig_values);
 
     return array_filter($intersect_map, function ($x) {
       return $x !== NULL;
     });
+  }
+
+  /**
+   * Normalizes a string for case- and accent-insensitive comparison.
+   *
+   * Decomposes accented characters into a base character plus a combining
+   * mark (Unicode Normalization Form D), then strips the combining marks.
+   * This mirrors the behavior of an accent-insensitive database collation,
+   * such as MySQL's utf8mb4_general_ci, without depending on the system's
+   * iconv transliteration tables, which vary by platform and can collapse
+   * unrelated non-Latin-script strings onto the same placeholder character.
+   *
+   * @param string $value
+   *   The value to normalize.
+   *
+   * @return string
+   *   The normalized value.
+   */
+  private function normalizeForComparison(string $value): string {
+    $decomposed = \Normalizer::normalize($value, \Normalizer::FORM_D) ?: $value;
+    return strtolower(preg_replace('/[\x{0300}-\x{036f}]/u', '', $decomposed));
   }
 
   /**

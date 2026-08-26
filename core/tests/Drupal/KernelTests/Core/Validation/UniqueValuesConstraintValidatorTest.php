@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Validation;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldValueValidator;
 use Drupal\entity_test\Entity\EntityTestUniqueConstraint;
 use Drupal\KernelTests\KernelTestBase;
@@ -340,7 +341,15 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
   /**
    * Username validation with Unique field validations.
    *
-   * Case sensitivity and ASCII value comparison.
+   * Case sensitivity and accent normalization.
+   *
+   * The expected outcome depends on the database driver: MySQL/MariaDB's
+   * default collation is accent-insensitive, so the database itself
+   * considers "brulee" and "brûlée" duplicates and a pre-save violation
+   * must be raised to avoid an uncaught database exception on save.
+   * PostgreSQL and SQLite default to accent-sensitive collations, so the
+   * two values are genuinely distinct there and saving both must succeed
+   * without a violation.
    */
   public function testUsernameUniqueValidation(): void {
     // Create entity with two values for the testing field.
@@ -365,7 +374,16 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
     ];
     $entity = EntityTestUniqueConstraint::create($definition);
     $violations = $entity->validate();
-    $this->assertCount(1, $violations);
+
+    if (in_array(Database::getConnection()->driver(), ['mysql', 'mysqli'])) {
+      $this->assertCount(1, $violations);
+    }
+    else {
+      $this->assertCount(0, $violations);
+      // Saving must never throw an uncaught database exception: on this
+      // driver the two values are genuinely distinct.
+      $entity->save();
+    }
   }
 
 }
