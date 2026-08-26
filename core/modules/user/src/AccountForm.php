@@ -4,6 +4,7 @@ namespace Drupal\user;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
@@ -13,6 +14,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Theme\MissingThemeDependencyException;
+use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\user\Entity\Role;
@@ -31,6 +34,16 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    * @var \Drupal\Core\Language\LanguageManagerInterface
    */
   protected $languageManager;
+
+  /**
+   * The theme initialization service.
+   *
+   * This is set by ::create() instead of by the constructor, because the
+   * constructor signature is inherited by subclasses outside core.
+   *
+   * @var \Drupal\Core\Theme\ThemeInitializationInterface|null
+   */
+  protected ?ThemeInitializationInterface $themeInitialization = NULL;
 
   /**
    * Constructs a new AccountForm object.
@@ -53,12 +66,27 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
+    $instance = new static(
       $container->get('entity.repository'),
       $container->get('language_manager'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time')
     );
+    $instance->themeInitialization = $container->get('theme.initialization');
+    return $instance;
+  }
+
+  /**
+   * Gets the theme initialization service for this form.
+   *
+   * @return \Drupal\Core\Theme\ThemeInitializationInterface
+   *   The theme initialization service.
+   */
+  protected function themeInitialization(): ThemeInitializationInterface {
+    if ($this->themeInitialization === NULL) {
+      $this->themeInitialization = \Drupal::service('theme.initialization');
+    }
+    return $this->themeInitialization;
   }
 
   /**
@@ -330,6 +358,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#open' => TRUE,
       '#weight' => 7,
     ];
+    $cacheability = CacheableMetadata::createFromRenderArray($form);
     $form['user_settings']['color_scheme'] = [
       '#type' => 'radios',
       '#title' => $this->t('Color scheme'),
@@ -339,10 +368,132 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
         'auto' => $this->t('System'),
       ],
       '#default_value' => $account->get('color_scheme')->value ?: 'auto',
-      '#description' => $this->t('System follows your operating system or browser setting. Applies where supported by site theme.'),
-    ];
+    ] + $this->colorSchemeElementProperties($account, $cacheability);
+    $cacheability->applyTo($form);
 
     return parent::form($form, $form_state);
+  }
+
+  /**
+   * Builds the description and disabled state of the color scheme element.
+   *
+   * Only a theme that declares 'supports color scheme' in its .info.yml file
+   * honors the preference, so what the element offers depends on the site
+   * theme and the administration theme:
+   * - Neither declares support: nothing honors the preference, so the element
+   *   is disabled.
+   * - Both declare support: the preference applies to the whole site.
+   * - Only the site theme declares support: the preference applies outside
+   *   administration pages.
+   * - Only the administration theme declares support: the preference applies
+   *   to administration pages, which only accounts that may use the
+   *   administration theme ever see. For other accounts nothing honors the
+   *   preference, so the element is disabled.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The account the form is built for.
+   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   *   Collects the cacheability of the decision.
+   *
+   * @return array
+   *   Form element properties to add to the color scheme element.
+   */
+  protected function colorSchemeElementProperties(UserInterface $account, CacheableMetadata $cacheability): array {
+    $theme_config = $this->config('system.theme');
+    $cacheability->addCacheableDependency($theme_config);
+
+    $default_theme = $theme_config->get('default');
+    // An empty 'admin' value means administration pages use the site theme.
+    $admin_theme = $theme_config->get('admin') ?: $default_theme;
+
+    $default_supports = $this->themeSupportsColorScheme($default_theme);
+    $admin_supports = $admin_theme === $default_theme
+      ? $default_supports
+      : $this->themeSupportsColorScheme($admin_theme);
+
+    if ($default_supports && $admin_supports) {
+      return [
+        '#description' => $this->t('System follows your operating system or browser setting. Applies where supported by site theme.'),
+      ];
+    }
+
+    if ($default_supports) {
+      return [
+        '#description' => $this->t('System follows your operating system or browser setting. The site follows this setting, administration pages do not.'),
+      ];
+    }
+
+    if ($admin_supports) {
+      if ($this->accountMayUseAdminTheme($account, $cacheability)) {
+        return [
+          '#description' => $this->t('System follows your operating system or browser setting. Administration pages follow this setting, the rest of the site does not.'),
+        ];
+      }
+      return [
+        '#disabled' => TRUE,
+        '#description' => $this->t('Only administration pages follow this setting, and this account does not use the administration theme. The setting has no effect.'),
+      ];
+    }
+
+    return [
+      '#disabled' => TRUE,
+      '#description' => $this->t('Neither the site theme nor the administration theme follows this setting. The setting has no effect.'),
+    ];
+  }
+
+  /**
+   * Determines whether a theme honors the color scheme preference.
+   *
+   * @param string|null $theme_name
+   *   The machine name of the theme, or NULL if none is configured.
+   *
+   * @return bool
+   *   TRUE if the theme, or one of its base themes, declares support.
+   */
+  protected function themeSupportsColorScheme(?string $theme_name): bool {
+    if ($theme_name === NULL || $theme_name === '') {
+      return FALSE;
+    }
+    try {
+      // For a theme that is not installed, getActiveThemeByName() returns the
+      // default output of core, which declares no support.
+      return $this->themeInitialization()->getActiveThemeByName($theme_name)->supportsColorScheme();
+    }
+    catch (MissingThemeDependencyException) {
+      // The theme is installed but a base theme of it is not. Broken theme
+      // configuration must not break the account form.
+      return FALSE;
+    }
+  }
+
+  /**
+   * Determines whether an account may use the administration theme.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The account the form is built for.
+   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   *   Collects the cacheability of the decision.
+   *
+   * @return bool
+   *   TRUE if the account may use the administration theme.
+   */
+  protected function accountMayUseAdminTheme(UserInterface $account, CacheableMetadata $cacheability): bool {
+    // A new account holds no roles yet: it is not authenticated, so a
+    // permission check evaluates the anonymous role, which says nothing about
+    // the account being created. Offer the setting instead of disabling it on
+    // evidence that does not apply, and let the account edit form decide once
+    // the roles are known.
+    if ($account->isNew()) {
+      return TRUE;
+    }
+    // The permission belongs to the account being edited, not to the account
+    // filling in the form, so the result varies with the roles of the edited
+    // account and with the permissions those roles carry.
+    $cacheability->addCacheableDependency($account);
+    foreach (Role::loadMultiple($account->getRoles()) as $role) {
+      $cacheability->addCacheableDependency($role);
+    }
+    return $account->hasPermission('view the administration theme');
   }
 
   /**
