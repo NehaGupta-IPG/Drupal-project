@@ -1038,7 +1038,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // If there is no cached container definition, build a new container from
     // scratch.
-    if (!isset($container_definition)) {
+    if ($container_definition === NULL) {
       $container = $this->compileContainer();
 
       // Only dump the container if dumping is allowed. This is useful for
