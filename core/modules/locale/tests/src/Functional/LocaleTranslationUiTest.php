@@ -32,6 +32,11 @@ class LocaleTranslationUiTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $profile = 'testing_locale';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $defaultTheme = 'stark';
 
   /**
@@ -314,7 +319,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     _locale_rebuild_js($langcode);
 
     $locale_javascripts = \Drupal::state()->get('locale.translation.javascript', []);
-    $js_file = 'public://' . $config->get('javascript.directory') . '/' . $langcode . '_' . $locale_javascripts[$langcode] . '.js';
+    $js_file = 'assets://' . $config->get('javascript.directory') . '/' . $langcode . '_' . $locale_javascripts[$langcode] . '.js';
     $this->assertFileExists($js_file);
 
     // Test JavaScript translation rebuilding.
@@ -331,7 +336,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     new Settings($settings);
     _locale_rebuild_js($langcode);
     $locale_javascripts = \Drupal::state()->get('locale.translation.javascript', []);
-    $js_file = 'public://' . $config->get('javascript.directory') . '/' . $langcode . '_' . $locale_javascripts[$langcode] . '.js';
+    $js_file = 'assets://' . $config->get('javascript.directory') . '/' . $langcode . '_' . $locale_javascripts[$langcode] . '.js';
     $content = file_get_contents($js_file);
     $this->assertStringContainsString('"' . $string_override . '":"' . $string_override . '"', $content);
   }

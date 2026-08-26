@@ -6,15 +6,30 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\user\RoleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides the user permissions administration form.
  *
+ * @phpstan-import-type PermissionInfoList from
+ *   \Drupal\user\PermissionHandlerInterface
+ *
  * @internal
  */
+#[Route(
+  path: '/admin/people/permissions',
+  name: 'user.admin_permissions',
+  requirements: [
+    '_permission' => 'administer permissions',
+  ],
+  defaults: [
+    '_title' => new TranslatableMarkup('Permissions'),
+  ],
+)]
 class UserPermissionsForm extends FormBase {
 
   /**
@@ -64,9 +79,12 @@ class UserPermissionsForm extends FormBase {
   /**
    * Group permissions by the modules that provide them.
    *
-   * @return string[][]
+   * @return array<string, PermissionInfoList>
    *   A nested array. The outer keys are modules that provide permissions. The
-   *   inner arrays are permission names keyed by their machine names.
+   *   inner arrays contain permissions info as defined in
+   *   PermissionHandlerInterface.
+   *
+   * @see \Drupal\user\PermissionHandlerInterface::getPermissions
    */
   protected function permissionsByProvider(): array {
     $permissions = $this->permissionHandler->getPermissions();
@@ -115,8 +133,6 @@ class UserPermissionsForm extends FormBase {
       '#value' => $role_names,
     ];
     // Render role/permission overview:
-    $hide_descriptions = system_admin_compact_mode();
-
     $form['system_compact_link'] = [
       '#id' => FALSE,
       '#type' => 'system_compact_link',
@@ -179,16 +195,13 @@ class UserPermissionsForm extends FormBase {
         ];
         $form['permissions'][$perm]['description'] = [
           '#type' => 'inline_template',
-          '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning %}<div class="description">{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
+          '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning %}<div class="description" data-admin-compact-collapsible>{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
           '#context' => [
             'title' => $perm_item['title'],
           ],
         ];
-        // Show the permission description.
-        if (!$hide_descriptions) {
-          $form['permissions'][$perm]['description']['#context']['description'] = $perm_item['description'];
-          $form['permissions'][$perm]['description']['#context']['warning'] = $perm_item['warning'];
-        }
+        $form['permissions'][$perm]['description']['#context']['description'] = $perm_item['description'];
+        $form['permissions'][$perm]['description']['#context']['warning'] = $perm_item['warning'];
         foreach ($role_names as $rid => $name) {
           $form['permissions'][$perm][$rid] = [
             '#title' => $name . ': ' . $perm_item['title'],

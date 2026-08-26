@@ -23,7 +23,6 @@ use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use GuzzleHttp\Cookie\CookieJar;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Provides a test case for functional Drupal tests.
@@ -47,9 +46,8 @@ use PHPUnit\Framework\TestCase;
  *
  * @ingroup testing
  */
-abstract class BrowserTestBase extends TestCase {
+abstract class BrowserTestBase extends DrupalTestCase {
 
-  use DrupalTestCaseTrait;
   use FunctionalTestSetupTrait;
   use UiHelperTrait {
     FunctionalTestSetupTrait::refreshVariables insteadof UiHelperTrait;
@@ -458,10 +456,14 @@ abstract class BrowserTestBase extends TestCase {
    */
   protected function getSessionCookies() {
     $domain = parse_url($this->getUrl(), PHP_URL_HOST);
-    $session_id = $this->getSession()->getCookie($this->getSessionName());
-    $cookies = CookieJar::fromArray([$this->getSessionName() => $session_id], $domain);
+    $session_name = $this->getSessionName();
+    $session_id = $this->getSession()->getCookie($session_name);
 
-    return $cookies;
+    $cookies = [];
+    if ($session_id !== NULL) {
+      $cookies[$session_name] = $session_id;
+    }
+    return CookieJar::fromArray($cookies, $domain);
   }
 
   /**
@@ -501,8 +503,6 @@ abstract class BrowserTestBase extends TestCase {
     $this->initSettings();
     $this->container = $container = $this->initKernel(\Drupal::request());
     $this->initConfig($container);
-    $this->installDefaultThemeFromClassProperty($container);
-    $this->installModulesFromClassProperty($container);
 
     // Clear the static cache so that subsequent cache invalidations will work
     // as expected.
@@ -587,12 +587,17 @@ abstract class BrowserTestBase extends TestCase {
     $backtrace = debug_backtrace();
     // Find the test class that has the test method.
     while ($caller = Error::getLastCaller($backtrace)) {
-      // If we match PHPUnit's TestCase::runTest, then the previously processed
-      // caller entry is where our test method sits.
-      if (isset($last_caller) && isset($caller['function']) && $caller['function'] === 'PHPUnit\Framework\TestCase->runTest()') {
-        // Return the last caller since that has to be the test class.
-        $caller = $last_caller;
-        break;
+      // If we match PHPUnit's TestCase::runTest or ::invokeTestMethod, then
+      // the previously processed caller entry is where our test method sits.
+      if (isset($last_caller) && isset($caller['function'])) {
+        if (in_array($caller['function'], [
+          'PHPUnit\Framework\TestCase->runTest()',
+          'PHPUnit\Framework\TestCase->invokeTestMethod()',
+        ], TRUE)) {
+          // Return the last caller since that has to be the test class.
+          $caller = $last_caller;
+          break;
+        }
       }
 
       // If the test method is implemented by a test class's parent then the

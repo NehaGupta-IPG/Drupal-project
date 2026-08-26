@@ -189,14 +189,20 @@ class LinkFieldTest extends BrowserTestBase {
     ];
 
     // Define some invalid URLs.
-    $validation_error_1 = "The path '@link_path' is invalid.";
+    $validation_error_1 = "The URL '@link_path' is invalid.";
     $validation_error_2 = "Enter a content title to select it, or enter an internal path starting with /, ? or #. External links must be a full URL including the protocol, such as";
-    $validation_error_3 = "The path '@link_path' is inaccessible.";
+    $validation_error_3 = "The URL '@link_path' is inaccessible.";
     $validation_error_4 = 'Enter a content title to select it, or enter an internal path starting with /, ? or #.';
     $validation_error_5 = "External links must be a full URL including the protocol, such as";
+    $validation_error_6 = "The URL '@link_path' doesn't exist.";
+    $validation_error_7 = "The URL '@link_path' has an invalid parameter.";
+    $validation_error_8 = "The URL '@uri' is internal, but the {$field_name} field only supports external URLs.";
+    $validation_error_9 = "The URL '@uri' is external, but the {$field_name} field only supports internal paths.";
+    $validation_error_10 = "The URL '@link_path' has an invalid protocol.";
+
     $invalid_external_entries = [
       // Invalid protocol.
-      'invalid://not-a-valid-protocol' => $validation_error_1,
+      'invalid://not-a-valid-protocol' => $validation_error_10,
       // Missing host name.
       'http://' => $validation_error_1,
       // Missing protocol schema.
@@ -204,9 +210,15 @@ class LinkFieldTest extends BrowserTestBase {
     ];
     $invalid_internal_entries = [
       'no-leading-slash' => $validation_error_2,
-      'entity:non_existing_entity_type/yar' => $validation_error_1,
+      'entity:non_existing_entity_type/yar' => $validation_error_6,
       // URI for an entity that doesn't exist, with an invalid ID.
-      'entity:user/invalid-parameter' => $validation_error_1,
+      'entity:user/invalid-parameter' => $validation_error_7,
+    ];
+    $only_external = [
+      '/entity_test/add' => $validation_error_8,
+    ];
+    $only_internal = [
+      'http://www.example.com/' => $validation_error_9,
     ];
 
     // Test external and internal URLs for
@@ -219,14 +231,14 @@ class LinkFieldTest extends BrowserTestBase {
     $this->field->setSetting('link_type', LinkItemInterface::LINK_EXTERNAL);
     $this->field->save();
     $this->assertValidEntries($field_name, $valid_external_entries);
-    $this->assertInvalidEntries($field_name, $valid_internal_entries + $invalid_external_entries);
+    $this->assertInvalidEntries($field_name, $valid_internal_entries + $invalid_external_entries + $only_external);
 
     // Test external URLs for 'link_type' = LinkItemInterface::LINK_INTERNAL.
     $invalid_internal_entries['no-leading-slash'] = $validation_error_4;
     $this->field->setSetting('link_type', LinkItemInterface::LINK_INTERNAL);
     $this->field->save();
     $this->assertValidEntries($field_name, $valid_internal_entries);
-    $this->assertInvalidEntries($field_name, $valid_external_entries + $invalid_internal_entries);
+    $this->assertInvalidEntries($field_name, $valid_external_entries + $invalid_internal_entries + $only_internal);
 
     // Ensure that users with 'link to any page', don't apply access checking.
     $this->drupalLogin($this->drupalCreateUser([
@@ -497,74 +509,6 @@ class LinkFieldTest extends BrowserTestBase {
     $content = $display->build($entity);
     $output = \Drupal::service('renderer')->renderRoot($content);
     return (string) $output;
-  }
-
-  /**
-   * Test link widget exception handled if link uri value is invalid.
-   */
-  public function testLinkWidgetCaughtExceptionEditingInvalidUrl(): void {
-    $field_name = $this->randomMachineName();
-    $this->fieldStorage = FieldStorageConfig::create([
-      'field_name' => $field_name,
-      'entity_type' => 'entity_test',
-      'type' => 'link',
-      'cardinality' => 1,
-    ]);
-    $this->fieldStorage->save();
-    FieldConfig::create([
-      'field_storage' => $this->fieldStorage,
-      'label' => 'Link',
-      'bundle' => 'entity_test',
-      'settings' => [
-        'title' => LinkTitleVisibility::Optional->value,
-        'link_type' => LinkItemInterface::LINK_GENERIC,
-      ],
-    ])->save();
-
-    $entityTypeManager = $this->container->get('entity_type.manager');
-    $entityTypeManager
-      ->getStorage('entity_form_display')
-      ->load('entity_test.entity_test.default')
-      ->setComponent($field_name, [
-        'type' => 'link_default',
-      ])
-      ->save();
-
-    $entityTypeManager
-      ->getStorage('entity_view_display')
-      ->create([
-        'targetEntityType' => 'entity_test',
-        'bundle' => 'entity_test',
-        'mode' => 'full',
-        'status' => TRUE,
-      ])
-      ->setComponent($field_name, [
-        'type' => 'link',
-      ])
-      ->save();
-
-    // Entities can be saved without validation, for example via migration.
-    // Link fields may contain invalid uris such as external URLs without
-    // scheme.
-    $invalidUri = 'www.example.com';
-    $invalidLinkUrlEntity = $entityTypeManager
-      ->getStorage('entity_test')
-      ->create([
-        'name' => 'Test entity with invalid link URL',
-        $field_name => ['uri' => $invalidUri],
-      ]);
-    $invalidLinkUrlEntity->save();
-
-    // If a user without 'link to any page' permission edits an entity, widget
-    // checks access by converting uri to Url object, which will throw an
-    // InvalidArgumentException if uri is invalid.
-    $this->drupalLogin($this->drupalCreateUser([
-      'view test entity',
-      'administer entity_test content',
-    ]));
-    $this->drupalGet("/entity_test/manage/{$invalidLinkUrlEntity->id()}/edit");
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->fieldValueEquals("{$field_name}[0][uri]", $invalidUri);
   }
 
 }

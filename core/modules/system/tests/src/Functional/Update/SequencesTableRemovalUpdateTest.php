@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Functional\Update;
 use Drupal\Core\Database\Database;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Update')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class SequencesTableRemovalUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -22,6 +24,7 @@ class SequencesTableRemovalUpdateTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-11.3.0.bare.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-shortcut.php',
     ];
   }
 

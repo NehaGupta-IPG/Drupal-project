@@ -27,6 +27,11 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'testing_locale';
+
+  /**
    * Tests update changes configuration translations if enabled after language.
    */
   public function testConfigTranslationImport(): void {
@@ -63,13 +68,8 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
 
     // Check and update the translation status. This will import the Afrikaans
     // translations of locale_test_translate module.
-    $this->drupalGet('admin/reports/translations/check');
-
-    // Override the Drupal core translation status to be up to date.
-    // Drupal core should not be a subject in this test.
-    $status = locale_translation_get_status();
-    $status['drupal']['af']->type = 'current';
-    \Drupal::state()->set('locale.translation_status', $status);
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
 
     $this->drupalGet('admin/reports/translations');
     $this->submitForm([], 'Update translations');
@@ -98,10 +98,9 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
 
     $this->configImporter()->import();
 
-    $this->drupalGet('admin/reports/translations/check');
-    $status = locale_translation_get_status();
-    $status['drupal']['af']->type = 'current';
-    \Drupal::state()->set('locale.translation_status', $status);
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
+    $this->checkForMetaRefresh();
     $this->drupalGet('admin/reports/translations');
     $this->submitForm([], 'Update translations');
 
