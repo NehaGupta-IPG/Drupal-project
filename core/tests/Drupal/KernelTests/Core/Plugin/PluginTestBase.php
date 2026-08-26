@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Plugin;
 
 use Drupal\Core\Extension\ModuleHandler;
+use Drupal\Core\Hook\HookData;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\plugin_test\Plugin\DefaultsTestPluginManager;
@@ -83,7 +84,7 @@ abstract class PluginTestBase extends KernelTestBase {
     //   as derivatives and ReflectionFactory.
     $this->testPluginManager = new TestPluginManager();
     $this->mockBlockManager = new MockBlockManager();
-    $module_handler = new ModuleHandler($this->root, [], $this->container->get('hook.data'), $this->container->get('callable_resolver'));
+    $module_handler = new ModuleHandler($this->root, [], $this->container->get(HookData::class), $this->container->get('callable_resolver'));
     $this->defaultsTestPluginManager = new DefaultsTestPluginManager($module_handler);
 
     // The expected plugin definitions within each manager. Several tests assert

@@ -716,13 +716,11 @@ services:
   default_plugin_manager:
     abstract: true
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
-  hook.data:
-    class: Drupal\Core\Hook\HookData
+  Drupal\Core\Hook\HookData:
     arguments: ['@keyvalue', '@cache.bootstrap']
-  Drupal\Core\Hook\HookData: '@hook.data'
   module_handler:
     class: Drupal\Core\Extension\ModuleHandler
-    arguments: ['%app.root%', '%container.modules%', '@hook.data', '@callable_resolver']
+    arguments: ['%app.root%', '%container.modules%', '@Drupal\Core\Hook\HookData', '@callable_resolver']
   Drupal\Core\Extension\ModuleHandlerInterface: '@module_handler'
   module_installer:
     class: Drupal\Core\Extension\ModuleInstaller
@@ -1674,7 +1672,7 @@ services:
   Drupal\Core\Theme\ThemeInitializationInterface: '@theme.initialization'
   theme.registry:
     class: Drupal\Core\Theme\Registry
-    arguments: ['@cache.default', '@lock', '@module_handler', '@theme_handler', '@cache.bootstrap', '@extension.list.module', '@kernel', '@hook.data']
+    arguments: ['@cache.default', '@lock', '@module_handler', '@theme_handler', '@cache.bootstrap', '@extension.list.module', '@kernel', '@Drupal\Core\Hook\HookData']
     tags:
       - { name: needs_destruction }
     calls:
