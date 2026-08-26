@@ -857,6 +857,11 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       $types = ViewExecutable::getHandlerTypes();
       $plural = $types[$type]['plural'];
 
+      $handler_type = $type;
+      if (!empty($types[$type]['type'])) {
+        $handler_type = $types[$type]['type'];
+      }
+
       // Cast to an array so that if the display does not have any handlers of
       // this type there is no PHP error.
       foreach ((array) $this->getOption($plural) as $id => $info) {
@@ -880,16 +885,18 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
             $this->view->initQuery();
           }
           $aggregate = $this->view->query->getAggregationInfo();
-          if (!empty($aggregate[$info['group_type']]['handler'][$type])) {
+
+          if (
+            !empty($aggregate[$info['group_type']]['handler'][$type])
+            && (
+              empty($aggregate[$info['group_type']]['handler']['exclude'])
+              || (
+                isset($info['type']) &&
+                !in_array($info['type'], $aggregate[$info['group_type']]['handler']['exclude']))
+            )
+          ) {
             $override = $aggregate[$info['group_type']]['handler'][$type];
           }
-        }
-
-        if (!empty($types[$type]['type'])) {
-          $handler_type = $types[$type]['type'];
-        }
-        else {
-          $handler_type = $type;
         }
 
         if ($handler = \Drupal::service('views.plugin_managers')->get($handler_type)->getHandler($info, $override)) {

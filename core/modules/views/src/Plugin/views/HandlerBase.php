@@ -909,7 +909,13 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
         $executable->initQuery();
       }
       $aggregate = $executable->query->getAggregationInfo();
-      if (!empty($aggregate[$item['group_type']]['handler'][$type])) {
+      if (
+        !empty($aggregate[$item['group_type']]['handler'][$type])
+        && (
+          empty($aggregate[$item['group_type']]['handler']['exclude'])
+          || !in_array($item['type'], $aggregate[$item['group_type']]['handler']['exclude'])
+        )
+      ) {
         $override = $aggregate[$item['group_type']]['handler'][$type];
       }
     }
