@@ -1582,6 +1582,17 @@ function install_profile_modules(&$install_state) {
   install_core_entity_type_definitions();
 
   $modules = $install_state['profile_info']['install'];
+  $database_module = _install_get_database_module_name();
+  if ($database_module !== NULL) {
+    array_unshift($modules, $database_module);
+  }
+
+  // Extra module support is only implemented by the testing framework, to
+  // reduce the number of container rebuilds during test runs.
+  $extra_modules = $install_state['extra_modules'] ?? [];
+  if ($extra_modules) {
+    $modules = array_merge($modules, $extra_modules);
+  }
   $files = \Drupal::service('extension.list.module')->getList();
 
   // Always install required modules first. Respect the dependencies between
@@ -1682,6 +1693,12 @@ function install_core_entity_type_definitions(): void {
 function install_profile_themes(&$install_state): void {
   // Install the themes specified by the installation profile.
   $themes = $install_state['profile_info']['themes'];
+
+  // Default theme support is only implemented by the testing framework, to
+  // reduce the number of container rebuilds during test runs.
+  if (isset($install_state['default_theme'])) {
+    $themes = array_unique(array_merge($themes, [$install_state['default_theme']]));
+  }
   \Drupal::service('theme_installer')->install($themes);
 
   // Ensure that the install profile's theme is used.
@@ -1705,7 +1722,15 @@ function install_install_profile(&$install_state): void {
   // any disparities that this creates.
   \Drupal::service('config.installer')->installOptionalConfig();
 
-  \Drupal::service('module_installer')->install([$install_state['parameters']['profile']], FALSE);
+  if (empty($install_state['profile_info']['opt_out_install'])) {
+    \Drupal::service('module_installer')->install([$install_state['parameters']['profile']], FALSE);
+  }
+
+  if (isset($install_state['default_theme'])) {
+    \Drupal::service('config.factory')->getEditable('system.theme')
+      ->set('default', $install_state['default_theme'])
+      ->save();
+  }
 
   // Ensure that the install profile's theme is used.
   // @see _drupal_maintenance_theme()
@@ -2527,8 +2552,10 @@ function install_recipe_required_modules(array $install_state) {
   // Always install required modules first.
   $required = [];
 
+  $database_module = _install_get_database_module_name();
+
   foreach ($files as $module => $extension) {
-    if (!empty($extension->info['required'])) {
+    if (!empty($extension->info['required']) || $module === $database_module) {
       $required[$module] = $extension->sort;
     }
   }
@@ -2567,4 +2594,30 @@ function install_recipe_batch(&$install_state) {
   }
 
   return $batch_builder->toArray();
+}
+
+/**
+ * Gets the database driver module name.
+ *
+ * The database driver is provided by a module. That module must be
+ * installed before any other module, as it must be able to override any call
+ * to hook_schema() or any "backend_overridable" service. In edge cases, a
+ * driver module may extend from another driver module. In order for the
+ * extended classes to be autoloadable, the extending module should list the
+ * extended module in its dependencies.
+ *
+ * @return ?string
+ *   The database driver module or NULL if none is found.
+ */
+function _install_get_database_module_name(): ?string {
+  $connection = Database::getConnection();
+  $provider = $connection->getProvider();
+  $database_module = NULL;
+  if ($provider !== 'core') {
+    $autoload = $connection->getConnectionOptions()['autoload'] ?? '';
+    if (str_contains($autoload, 'src/Driver/Database/')) {
+      $database_module = $provider;
+    }
+  }
+  return $database_module;
 }

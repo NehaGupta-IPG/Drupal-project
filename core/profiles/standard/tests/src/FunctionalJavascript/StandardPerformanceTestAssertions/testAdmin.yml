@@ -1,0 +1,51 @@
+QueryCount: 4
+CacheGetCount: 48
+CacheGetCountByBin:
+  config: 9
+  data: 4
+  discovery: 13
+  bootstrap: 8
+  entity: 1
+  dynamic_page_cache: 1
+  routes: 5
+  render: 7
+CacheSetCount: 2
+CacheDeleteCount: 0
+CacheTagInvalidationCount: 0
+CacheTagLookupQueryCount: 5
+CacheTagGroupedLookups:
+  -
+    - route_match
+    - access_policies
+    - routes
+    - router
+    - entity_types
+    - entity_field_info
+    - entity_bundles
+    - local_task
+    - library_info
+    - http_response
+  -
+    - 'config:filter.format.restricted_html'
+    - 'node:1'
+    - node_view
+    - rendered
+    - 'user:0'
+    - user_view
+  -
+    - 'config:block_list'
+  -
+    - 'config:navigation.block_layout'
+    - 'config:navigation.settings'
+    - 'config:node_type_list'
+    - 'config:system.menu.admin'
+    - 'config:system.menu.content'
+  -
+    - 'config:system.menu.navigation-user-links'
+    - 'config:user.role.administrator'
+    - 'config:user.role.authenticated'
+    - 'user:3'
+ScriptCount: 8
+ScriptBytes: 141667
+StylesheetCount: 3
+StylesheetBytes: 43668
