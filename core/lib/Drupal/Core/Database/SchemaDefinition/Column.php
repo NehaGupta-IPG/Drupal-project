@@ -458,4 +458,22 @@ final class Column implements SchemaDefinitionInterface {
     );
   }
 
+  /**
+   * Returns a Column object for a json column.
+   */
+  public static function json(
+    string $name,
+    ?string $description = NULL,
+    ?bool $notNull = NULL,
+    NullValue|null $default = NULL,
+  ): self {
+    return self::create(
+      type: ColumnType::Json,
+      name: $name,
+      description: $description,
+      notNull: $notNull,
+      default: $default,
+    );
+  }
+
 }

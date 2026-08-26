@@ -256,6 +256,24 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests passing a string default to a json column.
+   */
+  public function testStringDefaultForJsonColumn(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('Cannot set a string default for column \'data\'');
+    new Table(
+      name: 'test',
+      columns: [
+        Column::create(
+          name: 'data',
+          type: ColumnType::Json,
+          default: new StringValue('{}'),
+        ),
+      ],
+    );
+  }
+
+  /**
    * Tests passing a int default to an int column.
    */
   public function testIntDefaultForIntColumn(): void {

@@ -30,6 +30,7 @@ enum ColumnType: string {
 
   // Other types.
   case Blob = 'blob';
+  case Json = 'json';
 
   /**
    * Checks if a default value is compatible with a column type.
@@ -50,6 +51,11 @@ enum ColumnType: string {
       ColumnType::Serial => [],
       ColumnType::Float, ColumnType::Numeric => [
         FloatValue::class,
+        NullValue::class,
+      ],
+      // MySQL cannot apply a literal default to a JSON column, so only an
+      // explicit NULL default is portable.
+      ColumnType::Json => [
         NullValue::class,
       ],
     };
