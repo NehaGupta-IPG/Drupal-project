@@ -1029,13 +1029,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     $container_definition = $this->getContainerFromCacheIfCacheable();
-
-    // If the module list hasn't already been set in updateModules and we are
-    // not forcing a rebuild, then try and load the container from the cache.
-    if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-      $container_definition = $this->getCachedContainerDefinition();
-    }
-
     // If there is no cached container definition, build a new container from
     // scratch.
     if ($container_definition === NULL) {
@@ -1933,10 +1926,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Get the container from cache if it's cacheable.
    *
-   * @return ?\Symfony\Component\DependencyInjection\ContainerInterface
+   * @return ?array
    *   An initialized container object or NULL.
    */
-  protected function getContainerFromCacheIfCacheable(): ?ContainerInterface {
+  protected function getContainerFromCacheIfCacheable(): ?array {
     // If the module list hasn't already been set in updateModules and we are
     // not forcing a rebuild, then try and load the container from the cache.
     if (empty($this->moduleList) && !$this->containerNeedsRebuild) {

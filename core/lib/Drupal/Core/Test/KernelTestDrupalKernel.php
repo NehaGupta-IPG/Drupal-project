@@ -62,7 +62,7 @@ class KernelTestDrupalKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
-  protected function getContainerFromCacheIfCacheable(): ?ContainerInterface {
+  protected function getContainerFromCacheIfCacheable(): ?array {
     $container_definition = NULL;
     // If the module list hasn't already been set in updateModules and we are
     // not forcing a rebuild, then try and load the container from the cache.
