@@ -1,0 +1,5 @@
+name: 'Theme test color scheme subtheme'
+type: theme
+description: 'Test theme which inherits color scheme support from its base theme.'
+version: VERSION
+base theme: test_color_scheme_theme

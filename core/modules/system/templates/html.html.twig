@@ -20,9 +20,11 @@
  * - placeholder_token: The token for generating head, css, js and js-bottom
  *   placeholders.
  * - color_scheme: The user's preferred color scheme: 'light', 'dark' or 'auto'.
- *   'auto' means the operating system preference should be followed. Whether
- *   this has a visual effect depends on the active theme. The same value is
- *   rendered as the data-color-scheme attribute in html_attributes.
+ *   'auto' means the operating system preference should be followed. This
+ *   variable is only present when the theme declares 'supports color scheme:
+ *   true' in its .info.yml file, and so is the matching data-color-scheme
+ *   attribute in html_attributes. A theme inherits the declaration from its
+ *   base theme.
  *
  * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
  *

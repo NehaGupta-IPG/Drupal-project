@@ -1,0 +1,6 @@
+name: 'Theme test color scheme theme'
+type: theme
+description: 'Test theme which declares that it honors the user color scheme preference.'
+version: VERSION
+base theme: stark
+supports color scheme: true

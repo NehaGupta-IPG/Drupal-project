@@ -40,7 +40,6 @@ class RouterTest extends BrowserTestBase {
     $renderer_required_cache_contexts = [
       'languages:' . LanguageInterface::TYPE_INTERFACE,
       'theme',
-      'user.color_scheme',
       'user.permissions',
     ];
     $expected_cache_contexts = Cache::mergeContexts(

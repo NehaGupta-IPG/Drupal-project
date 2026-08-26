@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Theme;
 
+use Drupal\Core\Extension\Extension;
+
 /**
  * Defines a theme and its information needed at runtime.
  *
@@ -218,6 +220,31 @@ class ActiveTheme {
    */
   public function getLibrariesExtend() {
     return $this->librariesExtend;
+  }
+
+  /**
+   * Determines whether the theme honors the user color scheme preference.
+   *
+   * A theme declares this with 'supports color scheme: true' in its .info.yml
+   * file. The declaration is inherited, so a subtheme of a theme that declares
+   * support also supports the preference.
+   *
+   * @return bool
+   *   TRUE if this theme or any of its base themes declares support.
+   *
+   * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
+   * @see \Drupal\system\Hook\PageAttachmentsHook::pageAttachments()
+   */
+  public function supportsColorScheme(): bool {
+    $extensions = array_merge([$this->extension], array_values($this->baseThemeExtensions));
+    foreach ($extensions as $extension) {
+      // The constructor defaults 'extension' to a string, so only inspect real
+      // Extension objects.
+      if ($extension instanceof Extension && !empty($extension->info['supports color scheme'])) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

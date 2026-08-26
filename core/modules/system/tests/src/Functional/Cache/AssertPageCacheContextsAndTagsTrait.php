@@ -142,12 +142,11 @@ trait AssertPageCacheContextsAndTagsTrait {
         $is_html_response = $this->getSession()->getResponseHeader('Content-Type') === 'text/html; charset=utf-8';
         $default_contexts[] = 'user.permissions';
 
-        // The <html> element carries a data-color-scheme attribute that varies
-        // per user color scheme preference.
-        if ($is_html_response) {
-          $default_contexts[] = 'user.color_scheme';
-        }
-
+        // 'user.color_scheme' is deliberately not a default context. It is only
+        // added for themes that declare 'supports color scheme' in their
+        // .info.yml file, so tests running such a theme have to expect it
+        // explicitly.
+        // @see \Drupal\Tests\system\Functional\Cache\ColorSchemeCacheContextTest
         if (!in_array('user.roles', $expected_contexts) && $is_html_response) {
           $default_contexts[] = 'user.roles:authenticated';
         }

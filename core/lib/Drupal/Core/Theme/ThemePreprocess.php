@@ -266,9 +266,14 @@ class ThemePreprocess {
     $variables['html_attributes']['dir'] = $language_interface->getDirection();
     // The color scheme is exposed as a variable for theme developers. The
     // data-color-scheme attribute is the rendered counterpart of that value.
-    $color_scheme = $this->currentUser->getColorScheme();
-    $variables['color_scheme'] = $color_scheme;
-    $variables['html_attributes']['data-color-scheme'] = $color_scheme;
+    // Both are only set for themes that declare 'supports color scheme' in
+    // their .info.yml file, so themes that ignore the preference do not
+    // advertise a color scheme they never apply.
+    if ($this->themeManager->getActiveTheme()->supportsColorScheme()) {
+      $color_scheme = $this->currentUser->getColorScheme();
+      $variables['color_scheme'] = $color_scheme;
+      $variables['html_attributes']['data-color-scheme'] = $color_scheme;
+    }
 
     if (isset($variables['db_is_active']) && !$variables['db_is_active']) {
       $variables['db_offline'] = TRUE;
