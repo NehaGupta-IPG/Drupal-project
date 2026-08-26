@@ -341,7 +341,11 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
   /**
    * Username validation with Unique field validations.
    *
-   * Case sensitivity and accent normalization.
+   * Case sensitivity and accent normalization, checked in both directions:
+   * an accented value already saved when the unaccented value is
+   * validated, and an unaccented value already saved when the accented
+   * value is validated. The comparison must not depend on which value was
+   * saved first.
    *
    * The expected outcome depends on the database driver: MySQL/MariaDB's
    * default collation is accent-insensitive, so the database itself
@@ -352,7 +356,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
    * without a violation.
    */
   public function testUsernameUniqueValidation(): void {
-    // Create entity with two values for the testing field.
+    // Accented value saved first, unaccented value validated against it.
     $definition = [
       'id' => (int) rand(0, getrandmax()),
       'user_id' => 0,
@@ -382,6 +386,37 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
       $this->assertCount(0, $violations);
       // Saving must never throw an uncaught database exception: on this
       // driver the two values are genuinely distinct.
+      $entity->save();
+    }
+
+    // Unaccented value saved first, accented value validated against it.
+    $definition = [
+      'id' => (int) rand(0, getrandmax()),
+      'user_id' => 0,
+      'field_test_text' => [
+        'cafe',
+      ],
+    ];
+    $entity = EntityTestUniqueConstraint::create($definition);
+    $violations = $entity->validate();
+    $this->assertCount(0, $violations);
+    $entity->save();
+
+    $definition = [
+      'id' => (int) rand(0, getrandmax()),
+      'user_id' => 0,
+      'field_test_text' => [
+        'café',
+      ],
+    ];
+    $entity = EntityTestUniqueConstraint::create($definition);
+    $violations = $entity->validate();
+
+    if (in_array(Database::getConnection()->driver(), ['mysql', 'mysqli'])) {
+      $this->assertCount(1, $violations);
+    }
+    else {
+      $this->assertCount(0, $violations);
       $entity->save();
     }
   }
