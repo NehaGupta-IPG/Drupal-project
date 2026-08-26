@@ -484,6 +484,20 @@ drupal.item-list:
     component:
       misc/components/item-list.module.css: {}
 
+drupal.js-class:
+  # Add the 'js' class to the html element before the first paint so that CSS
+  # styling the state of markup that a behavior will transform later applies
+  # before any content can paint. This prevents a flash of untransformed
+  # content.
+  #
+  # This is a render blocking request, so depend on it only from libraries
+  # that need the class before the first paint. Pages that do not need it
+  # keep getting the class from misc/drupal.init.js in the footer.
+  version: VERSION
+  header: true
+  js:
+    misc/js-class.js: {}
+
 drupal.machine-name:
   version: VERSION
   js:
@@ -632,10 +646,14 @@ drupal.vertical-tabs:
   css:
     component:
       misc/vertical-tabs.css: {}
+      # Kept separate so that themes replacing vertical-tabs.css keep the
+      # flicker prevention.
+      misc/vertical-tabs-anti-flicker.css: {}
   dependencies:
     - core/jquery
     - core/once
     - core/drupal
+    - core/drupal.js-class
     - core/drupalSettings
     - core/drupal.form
   before:

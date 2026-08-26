@@ -81,7 +81,11 @@ class FieldUITest extends UITestBase {
     $edit_handler_url = '/admin/structure/views/ajax/handler-group/test_view/default/field/name';
     $this->drupalGet($edit_handler_url);
     $data = Json::decode($this->getSession()->getPage()->getContent());
-    $this->assertEquals('Configure aggregation settings for field Views test: Name', $data[3]['dialogOptions']['title']);
+    // Find the dialog command instead of relying on its position, which
+    // changes with the number of asset commands in the response.
+    $dialog_commands = array_filter($data, fn (array $command): bool => isset($command['dialogOptions']['title']));
+    $this->assertCount(1, $dialog_commands);
+    $this->assertEquals('Configure aggregation settings for field Views test: Name', reset($dialog_commands)['dialogOptions']['title']);
   }
 
   /**

@@ -57,12 +57,19 @@
    *
    * @function Drupal.dialog~resetSize
    *
-   * @param {jQuery.Event} event
-   *   The event triggered.
+   * @param {object} eventData
+   *   An object with settings and $element keys for the dialog being resized.
    *
    * @fires event:dialogContentResize
    */
-  function resetSize(event) {
+  function resetSize(eventData) {
+    // The resize handlers are unbound when a dialog closes, but a call that
+    // was already scheduled still runs after the debounce delay, by which
+    // time the dialog it was scheduled for may be gone. jQuery UI throws when
+    // a dialog method is called on an element that has no dialog.
+    if (!eventData.$element.data('ui-dialog')) {
+      return;
+    }
     const positionOptions = [
       'width',
       'height',
@@ -79,7 +86,7 @@
     let adjustedValue;
     for (let n = 0; n < positionOptions.length; n++) {
       option = positionOptions[n];
-      optionValue = event.data.settings[option];
+      optionValue = eventData.settings[option];
       if (optionValue) {
         // jQuery UI does not support percentages on heights, convert to pixels.
         if (
@@ -96,7 +103,7 @@
           // Don't force the dialog to be bigger vertically than needed.
           if (
             option === 'height' &&
-            Math.round(event.data.$element.parent().outerHeight()) <
+            Math.round(eventData.$element.parent().outerHeight()) <
               adjustedValue
           ) {
             adjustedValue = 'auto';
@@ -106,12 +113,12 @@
       }
     }
     // Offset the dialog center to be at the center of Drupal.displace.offsets.
-    if (!event.data.settings.modal) {
+    if (!eventData.settings.modal) {
       adjustedOptions = resetPosition(adjustedOptions);
     }
-    event.data.$element.dialog('option', adjustedOptions);
+    eventData.$element.dialog('option', adjustedOptions);
 
-    event.data.$element
+    eventData.$element
       ?.get(0)
       ?.dispatchEvent(
         new CustomEvent('dialogContentResize', { bubbles: true }),
@@ -119,10 +126,16 @@
   }
 
   window.addEventListener('dialog:aftercreate', (e) => {
-    const autoResize = debounce(resetSize, 20);
     const $element = $(e.target);
     const { settings } = e;
     const eventData = { settings, $element };
+    // resetSize() runs after the event that requested it was dispatched,
+    // because it is debounced, so it receives its context directly. Reading
+    // it from event.data at that point would be unreliable: jQuery
+    // re-assigns event.data on the shared event object for every handler it
+    // calls, so it holds the data of the last handler bound for the event by
+    // the time the debounce delay has passed.
+    const autoResize = debounce(() => resetSize(eventData), 20);
 
     if (settings.autoResize === true || settings.autoResize === 'true') {
       const uiDialog = $element
@@ -130,13 +143,9 @@
         .dialog('widget');
       uiDialog[0].style.position = 'fixed';
       $(window)
-        .on('resize.dialogResize scroll.dialogResize', eventData, autoResize)
+        .on('resize.dialogResize scroll.dialogResize', autoResize)
         .trigger('resize.dialogResize');
-      $(document).on(
-        'drupalViewportOffsetChange.dialogResize',
-        eventData,
-        autoResize,
-      );
+      $(document).on('drupalViewportOffsetChange.dialogResize', autoResize);
     }
   });
 

@@ -46,6 +46,17 @@
    */
   Drupal.behaviors.verticalTabs = {
     attach(context) {
+      // The vertical tabs anti-flicker CSS hides details groups this behavior
+      // has not processed yet, so the untransformed markup never paints. Mark
+      // the groups as processed in all code paths, including when the
+      // viewport is too narrow to transform them, so they are only hidden
+      // between the first paint and the first attach.
+      context
+        .querySelectorAll('[data-vertical-tabs-panes]')
+        .forEach((verticalTabGroup) => {
+          verticalTabGroup.classList.add('vertical-tabs-processed');
+        });
+
       const width = drupalSettings.widthBreakpoint || 640;
       const mq = `(max-width: ${width}px)`;
 
@@ -75,11 +86,34 @@
             return;
           }
 
-          // Create the tab column.
-          const tabList = $('<ul class="vertical-tabs__menu"></ul>');
-          $this
-            .wrap('<div class="vertical-tabs clearfix"></div>')
-            .before(tabList);
+          // The default template renders the widget markup, including the
+          // tab menu, server side so the widget is complete at first paint.
+          // Adopt that markup when it is present; otherwise build it, so that
+          // overridden templates rendering only the details group keep
+          // working.
+          const serverRendered = $this.parent().hasClass('vertical-tabs');
+          let tabList;
+          const menuItems = {};
+          if (serverRendered) {
+            tabList = $this.siblings('.vertical-tabs__menu').first();
+            // Map the server rendered menu items by the ID of the pane each
+            // one links to, so panes and menu items pair up reliably.
+            tabList.children('.vertical-tabs__menu-item').each(function () {
+              const link = this.querySelector('a[href^="#"]');
+              if (link) {
+                menuItems[link.getAttribute('href').substring(1)] = this;
+              }
+            });
+            $this.parent().addClass('vertical-tabs--enhanced');
+          } else {
+            // Create the tab column.
+            tabList = $('<ul class="vertical-tabs__menu"></ul>');
+            $this
+              .wrap(
+                '<div class="vertical-tabs clearfix vertical-tabs--enhanced"></div>',
+              )
+              .before(tabList);
+          }
 
           // Transform each details into a tab.
           $details.each(function () {
@@ -90,11 +124,15 @@
             // we only want to copy the summary title, which is the first child
             // node.
             const title = $summary[0]?.firstChild?.textContent || '';
+            const item = serverRendered ? menuItems[this.id] : undefined;
             const verticalTab = new Drupal.verticalTab({
               title,
               details: $that,
+              item: item ? $(item) : undefined,
             });
-            tabList.append(verticalTab.item);
+            if (!item) {
+              tabList.append(verticalTab.item);
+            }
             $that
               .removeClass('collapsed')
               .removeAttr('open')
@@ -152,6 +190,9 @@
    *   The name of the tab.
    * @param {jQuery} settings.details
    *   The jQuery object of the details element that is the tab pane.
+   * @param {jQuery} [settings.item]
+   *   The server rendered menu item to adopt. When omitted, the menu item is
+   *   built with the verticalTab theme function.
    *
    * @fires event:summaryUpdated
    *
@@ -159,7 +200,17 @@
    */
   Drupal.verticalTab = function (settings) {
     const self = this;
-    $.extend(this, settings, Drupal.theme('verticalTab', settings));
+    if (settings.item) {
+      // Adopt a server rendered menu item instead of building one.
+      $.extend(this, settings);
+      this.link = this.item.find('a').first();
+      this.title = this.item.find('.vertical-tabs__menu-item-title').first();
+      this.summary = this.item
+        .find('.vertical-tabs__menu-item-summary')
+        .first();
+    } else {
+      $.extend(this, settings, Drupal.theme('verticalTab', settings));
+    }
 
     this.link.attr('href', `#${settings.details.attr('id')}`);
 
