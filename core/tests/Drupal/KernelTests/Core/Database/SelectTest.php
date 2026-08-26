@@ -785,8 +785,8 @@ class SelectTest extends DatabaseTestBase {
         $this->assertStringContainsString("JSON operator {$operator} does not support the wildcard", $e->getMessage(), "Case: $label");
       }
 
-      // A failed compile leaves the condition recompilable, so executing the
-      // same query object again throws the same exception.
+      // A failed compile can be retried, so executing the same query object
+      // again throws the same exception.
       try {
         $query->execute();
         $this->fail("Case: $label. Expected exception not thrown on the second execution.");

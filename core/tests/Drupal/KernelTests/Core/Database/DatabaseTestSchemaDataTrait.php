@@ -439,7 +439,7 @@ trait DatabaseTestSchemaDataTrait {
       'Bracket nested' => ['$["nested-obj"]["inner-key"]', 42, '=', [9]],
       'Bracket mixed with dot' => ['$.nested-obj["inner-key"]', 42, '=', [9]],
       'Bracket with single quote no injection' => ['$["key\' OR \'1\'=\'1"]', 'value', '=', []],
-      // Path metacharacters inside a quoted key are literal key characters,
+      // Path syntax characters inside a quoted key are literal key characters,
       // and a leading dash key is double-quoted when the path is rendered. No
       // sample row holds these keys, so the paths run and match nothing.
       'Bracket key containing a dot' => ['$["some.key-x"]', 'value', '=', []],

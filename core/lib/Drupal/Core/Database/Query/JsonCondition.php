@@ -193,7 +193,8 @@ class JsonCondition extends Condition {
       ));
     }
 
-    // Leave the condition recompilable if validation fails.
+    // Mark the condition compiled only after validation, so a failed compile
+    // can be retried.
     $this->queryPlaceholderIdentifier = $queryPlaceholder->uniqueIdentifier();
     $this->changed = FALSE;
 
