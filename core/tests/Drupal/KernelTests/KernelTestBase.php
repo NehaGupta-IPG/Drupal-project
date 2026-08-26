@@ -545,6 +545,10 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     }
 
     $record = $this->loadSharedDatabaseState();
+    // For each method in the test, reset the kernel container cache suffix to
+    // 0. This ensures that the initial container state is the same for each
+    // method, while container rebuilds during tests will force a new cache key.
+    $kernel->resetCacheSuffix();
 
     if ($record === NULL) {
       try {

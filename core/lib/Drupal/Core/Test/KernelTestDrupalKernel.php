@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Test;
 
 use Drupal\Core\DrupalKernel;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The DrupalKernel class is the core of Drupal itself.
@@ -31,12 +32,28 @@ class KernelTestDrupalKernel extends DrupalKernel {
   protected bool $overrideUseCache = FALSE;
 
   /**
+   * A cache suffix to increment on rebuilds.
+   *
+   * @internal only use in tests.
+   */
+  protected int $cacheSuffix = 0;
+
+  /**
    * Sets whether the container should be rebuilt.
    *
    * @internal only use this in tests.
    */
   public function setContainerNeedsRebuild(bool $rebuild): void {
     $this->containerNeedsRebuild = $rebuild;
+  }
+
+  /**
+   * Resets the cache suffix to 0.
+   *
+   * @internal only use this in tests.
+   */
+  public function resetCacheSuffix(): void {
+    $this->cacheSuffix = 0;
   }
 
   /**
@@ -56,7 +73,7 @@ class KernelTestDrupalKernel extends DrupalKernel {
     // Vary by whether cache usage is being overridden, so that when the
     // container is rebuilt with the same key after an override, it does not
     // invalidate the original cached container.
-    $key .= ':' . (int) $this->overrideUseCache;
+    $key .= ':' . $this->cacheSuffix;
     return $key;
   }
 
@@ -75,6 +92,22 @@ class KernelTestDrupalKernel extends DrupalKernel {
       $this->overrideUseCache = FALSE;
     }
     return $container_definition;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function rebuildContainer() {
+    $this->cacheSuffix++;
+    return parent::rebuildContainer();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resetContainer(): ContainerInterface {
+    $this->cacheSuffix++;
+    return parent::resetContainer();
   }
 
 }
