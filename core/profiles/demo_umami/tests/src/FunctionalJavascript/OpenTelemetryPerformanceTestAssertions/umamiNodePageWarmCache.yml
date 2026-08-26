@@ -1,9 +1,9 @@
 QueryCount: 51
-CacheGetCount: 163
+CacheGetCount: 165
 CacheGetCountByBin:
   page: 1
   config: 34
-  bootstrap: 12
+  bootstrap: 14
   discovery: 67
   data: 6
   entity: 20
@@ -72,6 +72,7 @@ CacheTagGroupedLookups:
     - 'block_content:1'
     - 'block_content:2'
     - 'config:configurable_language_list'
+    - 'config:system.theme'
   -
     - 'config:system.menu.footer'
   -
