@@ -63,7 +63,12 @@ class LocaleSource {
     foreach ($projects as $project_name) {
       foreach ($langcodes as $langcode) {
         if (!isset($sources[$project_name][$langcode])) {
-          $project = $this->localeProjectRepository->getMultiple([$project_name])[$project_name];
+          $project = $this->localeProjectRepository->getMultiple([$project_name])[$project_name] ?? NULL;
+          if (!$project instanceof LocaleTranslatableProject) {
+            // Skip stale project names that are no longer tracked, for example
+            // after a module is uninstalled.
+            continue;
+          }
           $sources[$project_name][$langcode] = $this->sourceBuild($project, $langcode);
         }
       }
@@ -79,11 +84,11 @@ class LocaleSource {
    * @param string $langcode
    *   The language code.
    *
-   * @return \Drupal\locale\LocaleTranslationSource
-   *   The source object.
+   * @return \Drupal\locale\LocaleTranslationSource|null
+   *   The source object, or NULL if the project is no longer tracked.
    */
-  public function loadSource(string $project_name, string $langcode): LocaleTranslationSource {
-    return $this->loadSources([$project_name], [$langcode])[$project_name][$langcode];
+  public function loadSource(string $project_name, string $langcode): ?LocaleTranslationSource {
+    return $this->loadSources([$project_name], [$langcode])[$project_name][$langcode] ?? NULL;
   }
 
   /**
@@ -100,7 +105,10 @@ class LocaleSource {
    */
   public function saveSource(string $project, string $langcode, string $type, LocaleFile|CurrentImport $data): void {
     // Load the translation status.
-    $project_sources = $this->loadSources([$project])[$project];
+    $project_sources = $this->loadSources([$project])[$project] ?? NULL;
+    if ($project_sources === NULL) {
+      return;
+    }
 
     // Merge the new status data with the existing status.
     $request_time = $this->time->getRequestTime();

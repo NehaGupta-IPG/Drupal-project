@@ -85,6 +85,9 @@ class LocaleProjectChecker {
     foreach ($projects as $project) {
       foreach ($langcodes as $langcode) {
         $source = $this->localeSource->loadSource($project, $langcode);
+        if (!$source) {
+          continue;
+        }
         $file = $this->localeSource->sourceCheckFile($source);
         if ($file) {
           $this->localeSource->saveSource($project, $langcode, LOCALE_TRANSLATION_LOCAL, $file);

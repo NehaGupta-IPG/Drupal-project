@@ -27,6 +27,22 @@ class LocaleBatchTest extends KernelTestBase {
   ];
 
   /**
+   * Tests that an import batch finishes if its project is no longer tracked.
+   */
+  public function testMissingProjectFinishesImportBatch(): void {
+    $context = [
+      'sandbox' => [],
+      'results' => [],
+      'finished' => 0.5,
+      'message' => '',
+    ];
+
+    \Drupal::service(LocaleFetch::class)->batchImport('missing_project', 'fr', [], $context);
+
+    $this->assertSame(1, $context['finished']);
+  }
+
+  /**
    * Checks that the import batch finishes if the translation has already been imported.
    */
   public function testBuildProjects(): void {
