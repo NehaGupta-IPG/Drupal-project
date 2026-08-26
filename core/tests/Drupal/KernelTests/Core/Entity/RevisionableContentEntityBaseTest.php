@@ -156,18 +156,71 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
     $entity = $storage->loadUnchanged($entity->id());
     $this->assertTrue($entity->wasDefaultRevision());
 
-    // Check that the "revision_default" flag cannot be changed once set.
-    $this->expectException(EntityStorageException::class);
-    $this->expectExceptionMessageIs("An existing default revision of the 'entity_test_mul_revlog' entity type can not be changed to a non-default revision.");
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $entity2 */
-    $entity2 = EntityTestMulWithRevisionLog::create([
-      'type' => $entity_type_id,
-    ]);
-    $entity2->save();
-    $this->assertTrue($entity2->wasDefaultRevision());
-    $entity2->isDefaultRevision(FALSE);
-    $entity2->save();
-    $this->assertTrue($entity2->wasDefaultRevision());
+    // Check that the "revision_default" flag cannot be changed once set. The
+    // check consults getOriginal(), so make sure a caller cannot dodge it by
+    // setting one.
+    foreach (['unset', 'set before the demotion', 'set after the demotion'] as $original) {
+      /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $entity2 */
+      $entity2 = EntityTestMulWithRevisionLog::create([
+        'type' => $entity_type_id,
+      ]);
+      $entity2->save();
+      $this->assertTrue($entity2->wasDefaultRevision());
+
+      if ($original === 'set before the demotion') {
+        $entity2->setOriginal(clone $entity2);
+      }
+      $entity2->isDefaultRevision(FALSE);
+      if ($original === 'set after the demotion') {
+        $entity2->setOriginal(clone $entity2);
+      }
+
+      try {
+        $entity2->save();
+        $this->fail("Demoting the default revision was allowed with the original $original.");
+      }
+      catch (EntityStorageException $e) {
+        $this->assertSame("An existing default revision of the '$entity_type_id' entity type can not be changed to a non-default revision.", $e->getMessage());
+      }
+      $this->assertTrue($entity2->wasDefaultRevision());
+    }
+  }
+
+  /**
+   * Tests re-saving a previous default revision.
+   */
+  public function testResavePreviousDefaultRevision(): void {
+    $entity_type_id = 'entity_test_mul_revlog';
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage($entity_type_id);
+
+    $entity = EntityTestMulWithRevisionLog::create(['type' => $entity_type_id]);
+    $entity->save();
+    $previous_revision_id = $entity->getRevisionId();
+    $entity->setNewRevision();
+    $entity->save();
+    $default_revision_id = $entity->getRevisionId();
+
+    // Nothing creates pending revisions here, so the previous default
+    // revision keeps "revision_default" even though it is no longer the
+    // default one.
+    /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $previous_revision */
+    $previous_revision = $storage->loadRevision($previous_revision_id);
+    $this->assertTrue($previous_revision->wasDefaultRevision());
+    $this->assertFalse($previous_revision->isDefaultRevision());
+
+    // Callers can set the original to avoid loading it again.
+    $previous_revision->setOriginal(clone $previous_revision);
+    $previous_revision->set('name', 'Renamed');
+    // The revision is already non-default, so this call changes nothing.
+    $previous_revision->isDefaultRevision(FALSE);
+    $previous_revision->save();
+
+    $previous_revision = $storage->loadRevision($previous_revision_id);
+    $this->assertEquals('Renamed', $previous_revision->label());
+    $this->assertTrue($previous_revision->wasDefaultRevision());
+    $this->assertFalse($previous_revision->isDefaultRevision());
+    $this->assertEquals($default_revision_id, $storage->loadUnchanged($entity->id())->getRevisionId());
   }
 
   /**
