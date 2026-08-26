@@ -146,6 +146,9 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
       'user:' . $author_1->id(),
       'user_view',
       'config:filter.format.basic_html',
+      // Deciding whether the color scheme preference has an effect reads the
+      // theme configuration.
+      'config:system.theme',
       // FinishResponseSubscriber adds this cache tag to responses that have the
       // 'user.permissions' cache context for anonymous users.
       'config:user.role.anonymous',
@@ -167,6 +170,9 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
       'comment_list',
       'node_list',
       'config:views.view.comments_recent',
+      // Deciding whether the color scheme preference has an effect reads the
+      // theme configuration.
+      'config:system.theme',
       // FinishResponseSubscriber adds this cache tag to responses that have the
       // 'user.permissions' cache context for anonymous users.
       'config:user.role.anonymous',

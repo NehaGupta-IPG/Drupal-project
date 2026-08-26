@@ -105,6 +105,9 @@ class GlossaryTest extends ViewTestBase {
         'user_list',
         'http_response',
         'rendered',
+        // Deciding whether the color scheme preference has an effect reads the
+        // theme configuration.
+        'config:system.theme',
         // FinishResponseSubscriber adds this cache tag to responses that have
         // the 'user.permissions' cache context for anonymous users.
         'config:user.role.anonymous',

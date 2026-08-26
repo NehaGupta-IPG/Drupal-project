@@ -453,6 +453,11 @@ class BlockTest extends BlockTestBase {
     $cache_entry = \Drupal::cache('page')->get($cid);
     $expected_cache_tags = [
       'config:block_list',
+      // Deciding whether the color scheme preference has an effect reads the
+      // theme configuration. The block render cache does not carry that
+      // decision, so only the page cache entry has this tag.
+      // @see \Drupal\Core\Theme\ColorSchemeSupport::appliesToAccount()
+      'config:system.theme',
       'config:user.role.anonymous',
       'http_response',
       'rendered',
@@ -493,6 +498,7 @@ class BlockTest extends BlockTestBase {
     $cache_entry = \Drupal::cache('page')->get($cid);
     $expected_cache_tags = [
       'config:block_list',
+      'config:system.theme',
       'config:user.role.anonymous',
       'http_response',
       'rendered',

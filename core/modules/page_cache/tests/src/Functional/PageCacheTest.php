@@ -391,7 +391,7 @@ class PageCacheTest extends BrowserTestBase {
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
-      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', '4xx-response config:user.role.anonymous http_response rendered');
+      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', '4xx-response config:system.theme config:user.role.anonymous http_response rendered');
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', 'languages:language_interface theme url.query_args:_wrapper_format user.permissions user.roles:authenticated');
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
       $this->drupalGet($content_url);
@@ -450,7 +450,7 @@ class PageCacheTest extends BrowserTestBase {
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
-      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', '4xx-response config:user.role.anonymous http_response rendered');
+      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', '4xx-response config:system.theme config:user.role.anonymous http_response rendered');
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', 'languages:language_interface theme url.query_args:_wrapper_format user.permissions user.roles:authenticated');
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
     }
