@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Kernel\Migrate\d7;
 
 use Drupal\Core\Database\Database;
-use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use Drupal\search\Entity\SearchPage;
+use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests migration of search page status and settings.
- *
- * @group migrate_drupal_7
  */
+#[Group('migrate_drupal_7')]
+#[RunTestsInSeparateProcesses]
 class MigrateSearchPageTest extends MigrateDrupal7TestBase {
 
   /**
@@ -52,8 +54,8 @@ class MigrateSearchPageTest extends MigrateDrupal7TestBase {
    * Tests migration of search status and settings to search page entity.
    */
   public function testSearchPage(): void {
-    $this->enableModules(['node']);
-    $this->installConfig(['search']);
+    $this->enableModules(['node', 'search_node', 'search_user']);
+    $this->installConfig(['search', 'search_node', 'search_user']);
     $this->executeMigration('d7_search_page');
     $configuration = [
       'rankings' => [
@@ -100,6 +102,7 @@ class MigrateSearchPageTest extends MigrateDrupal7TestBase {
    * Tests that search page is only migrated for modules enabled on D8 site.
    */
   public function testModuleExists(): void {
+    $this->enableModules(['search_user']);
     $this->installConfig(['search']);
     $this->executeMigration('d7_search_page');
 
@@ -111,8 +114,8 @@ class MigrateSearchPageTest extends MigrateDrupal7TestBase {
    * Tests that a search page will be created if it does not exist.
    */
   public function testUserSearchCreate(): void {
-    $this->enableModules(['node']);
-    $this->installConfig(['search']);
+    $this->enableModules(['node', 'search_node', 'search_user']);
+    $this->installConfig(['search', 'search_node', 'search_user']);
     /** @var \Drupal\search\Entity\SearchPage $search_page */
     $search_page = SearchPage::load('user_search');
     $search_page->delete();

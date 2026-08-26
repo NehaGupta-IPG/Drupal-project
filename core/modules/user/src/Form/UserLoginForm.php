@@ -7,6 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\BareHtmlPageRendererInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserAuthInterface;
@@ -14,12 +15,26 @@ use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
 use Drupal\user\UserFloodControlInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides a user login form.
  *
  * @internal
  */
+#[Route(
+  path: '/user/login',
+  name: 'user.login',
+  requirements: [
+    '_user_is_logged_in' => 'FALSE',
+  ],
+  options: [
+    '_maintenance_access' => TRUE,
+  ],
+  defaults: [
+    '_title' => new TranslatableMarkup('Log in'),
+  ],
+)]
 class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
 
   /**
@@ -182,7 +197,8 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
       // reached. Default is 50 failed attempts allowed in one hour. This is
       // independent of the per-user limit to catch attempts from one IP to log
       // in to many different user accounts.  We have a reasonably high limit
-      // since there may be only one apparent IP for all users at an institution.
+      // since there may be only one apparent IP for all users at an
+      // institution.
       if (!$this->userFloodControl->isAllowed('user.failed_login_ip', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
         $form_state->set('flood_control_triggered', 'ip');
         return;

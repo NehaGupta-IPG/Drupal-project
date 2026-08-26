@@ -10,13 +10,17 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\TestTools\Random;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests query batching.
- *
- * @covers \Drupal\migrate_query_batch_test\Plugin\migrate\source\QueryBatchTest
- * @group migrate
  */
+#[Group('migrate')]
+#[CoversClass(\Drupal\migrate_query_batch_test\Plugin\migrate\source\QueryBatchTest::class)]
+#[RunTestsInSeparateProcesses]
 class QueryBatchTest extends KernelTestBase {
 
   /**
@@ -61,7 +65,7 @@ class QueryBatchTest extends KernelTestBase {
    */
   public function testBatchSizeNegative(): void {
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('batch_size must be greater than or equal to zero');
+    $this->expectExceptionMessageIs('batch_size must be greater than or equal to zero');
     $plugin = $this->getPlugin(['batch_size' => -1]);
     $plugin->next();
   }
@@ -71,7 +75,7 @@ class QueryBatchTest extends KernelTestBase {
    */
   public function testBatchSizeNonInteger(): void {
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('batch_size must be greater than or equal to zero');
+    $this->expectExceptionMessageIs('batch_size must be greater than or equal to zero');
     $plugin = $this->getPlugin(['batch_size' => '1']);
     $plugin->next();
   }
@@ -148,9 +152,8 @@ class QueryBatchTest extends KernelTestBase {
    *   The expected batch size, will be set to zero for invalid batch sizes.
    * @param int $expected_batch_count
    *   The total number of batches.
-   *
-   * @dataProvider queryDataProvider
    */
+  #[DataProvider('queryDataProvider')]
   public function testQueryBatch($source_data, $expected_data, $num_rows, $configuration, $expected_batch_size, $expected_batch_count): void {
     $plugin = $this->getPlugin($configuration);
 

@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests draggable list builder.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigDraggableListBuilderTest extends BrowserTestBase {
 
   /**
@@ -40,7 +41,7 @@ class ConfigDraggableListBuilderTest extends BrowserTestBase {
       $role->save();
     }
 
-    // Navigate to Roles page
+    // Navigate to Roles page.
     $this->drupalGet('admin/people/roles');
 
     // Test for the page title.
@@ -58,7 +59,8 @@ class ConfigDraggableListBuilderTest extends BrowserTestBase {
     $role->set('label', $role_name)->save();
 
     $this->drupalGet('admin/people/roles');
-    $this->assertSession()->responseContains('<td>' . Html::escape($role_name));
+    $roleElementLabel = $this->cssSelect('td[data-drupal-wrapper-selector="edit-entities-role-0-label"]');
+    $this->assertEquals($role_name, $roleElementLabel[0]->getText());
   }
 
 }

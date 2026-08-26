@@ -4,25 +4,40 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Menu;
 
+use Drupal\Component\Datetime\Time;
+use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+use Drupal\Component\Plugin\Factory\FactoryInterface;
+use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Lock\NullLockBackend;
 use Drupal\Core\Menu\LocalTaskInterface;
 use Drupal\Core\Menu\LocalTaskManager;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Utility\YamlCacheCollector;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\Menu\LocalTaskManager
- * @group Menu
+ * Tests Drupal\Core\Menu\LocalTaskManager.
  */
+#[CoversClass(LocalTaskManager::class)]
+#[Group('Menu')]
 class LocalTaskManagerTest extends UnitTestCase {
 
   /**
@@ -34,10 +49,8 @@ class LocalTaskManagerTest extends UnitTestCase {
 
   /**
    * The mocked argument resolver.
-   *
-   * @var \PHPUnit\Framework\MockObject\MockObject
    */
-  protected $argumentResolver;
+  protected ArgumentResolverInterface&MockObject $argumentResolver;
 
   /**
    * The test request.
@@ -48,24 +61,18 @@ class LocalTaskManagerTest extends UnitTestCase {
 
   /**
    * The mocked route provider.
-   *
-   * @var \PHPUnit\Framework\MockObject\MockObject
    */
-  protected $routeProvider;
+  protected RouteProviderInterface&MockObject $routeProvider;
 
   /**
    * The mocked plugin discovery.
-   *
-   * @var \PHPUnit\Framework\MockObject\MockObject
    */
-  protected $pluginDiscovery;
+  protected DiscoveryInterface&MockObject $pluginDiscovery;
 
   /**
    * The plugin factory used in the test.
-   *
-   * @var \PHPUnit\Framework\MockObject\MockObject
    */
-  protected $factory;
+  protected FactoryInterface&MockObject $factory;
 
   /**
    * The cache backend used in the test.
@@ -76,24 +83,18 @@ class LocalTaskManagerTest extends UnitTestCase {
 
   /**
    * The mocked access manager.
-   *
-   * @var \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $accessManager;
+  protected AccessManagerInterface&MockObject $accessManager;
 
   /**
    * The route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $routeMatch;
+  protected RouteMatchInterface&MockObject $routeMatch;
 
   /**
    * The mocked account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $account;
+  protected AccountInterface&MockObject $account;
 
   /**
    * {@inheritdoc}
@@ -251,8 +252,9 @@ class LocalTaskManagerTest extends UnitTestCase {
     $language_manager->expects($this->any())
       ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => 'en']));
+    $yaml_cache_collector = new YamlCacheCollector('test', new MemoryCache(new Time()), new NullLockBackend(), new Time());
 
-    $this->manager = new LocalTaskManager($this->argumentResolver, $request_stack, $this->routeMatch, $this->routeProvider, $module_handler, $this->cacheBackend->reveal(), $language_manager, $this->accessManager, $this->account);
+    $this->manager = new LocalTaskManager($this->argumentResolver, $request_stack, $this->routeMatch, $this->routeProvider, $module_handler, $this->cacheBackend->reveal(), $language_manager, $this->accessManager, $this->account, $yaml_cache_collector);
 
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'discovery');
     $property->setValue($this->manager, $this->pluginDiscovery);
@@ -362,6 +364,7 @@ class LocalTaskManagerTest extends UnitTestCase {
    * Returns the cache entry expected when running getLocalTaskForRoute().
    *
    * @return array
+   *   The expected cache entry.
    */
   protected function getLocalTasksCache(): array {
     $local_task_fixtures = $this->getLocalTaskFixtures();
@@ -394,7 +397,7 @@ class LocalTaskManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getTasksBuild
+   * Tests get tasks build with cacheability metadata.
    */
   public function testGetTasksBuildWithCacheabilityMetadata(): void {
     $definitions = $this->getLocalTaskFixtures();
@@ -431,6 +434,93 @@ class LocalTaskManagerTest extends UnitTestCase {
     // Ensure that all cacheability metadata is merged together.
     $this->assertEqualsCanonicalizing(['tag.example1', 'tag.example2'], $cacheability->getCacheTags());
     $this->assertEqualsCanonicalizing(['context.example1', 'context.example2', 'route', 'user.permissions'], $cacheability->getCacheContexts());
+  }
+
+  /**
+   * Test multiple parallel calls with fibers.
+   */
+  public function testGetTasksBuildWithFibers(): void {
+    $definitions = $this->getLocalTaskFixtures();
+
+    $this->pluginDiscovery->expects($this->once())
+      ->method('getDefinitions')
+      ->willReturn($definitions);
+
+    $active_plugin_id = 'menu_local_task_test_tasks_view';
+    $map = [];
+
+    foreach ($definitions as $plugin_id => $info) {
+      $mock = $this->prophesize(LocalTaskInterface::class);
+      $mock->willImplement(CacheableDependencyInterface::class);
+      $mock->getRouteName()->willReturn($info['route_name']);
+      $mock->getTitle()->willReturn($info['title']);
+      $mock->getRouteParameters(Argument::cetera())->willReturn([]);
+      $mock->getOptions(Argument::cetera())->willReturn([]);
+      $mock->getActive()->willReturn($plugin_id === $active_plugin_id);
+      $mock->getWeight()->willReturn($info['weight'] ?? 0);
+      $mock->getCacheContexts()->willReturn([]);
+      $mock->getCacheTags()->willReturn([]);
+      $mock->getCacheMaxAge()->willReturn(Cache::PERMANENT);
+      $map[] = [$info['id'], [], $mock->reveal()];
+    }
+
+    // Simulate an access callback that suspends a fiber.
+    $this->accessManager->expects($this->any())
+      ->method('checkNamedRoute')
+      ->willReturnCallback(function (string $route_name) {
+        if ($route_name === 'menu_local_task_test_tasks_edit') {
+          \Fiber::suspend();
+        }
+        return AccessResult::allowed();
+      });
+
+    $this->factory->expects($this->any())
+      ->method('createInstance')
+      ->willReturnMap($map);
+    $this->setupLocalTaskManager();
+
+    $this->argumentResolver->expects($this->any())
+      ->method('getArguments')
+      ->willReturn([]);
+
+    $this->routeMatch->expects($this->any())
+      ->method('getRouteName')
+      ->willReturn('menu_local_task_test_tasks_view');
+    $this->routeMatch->expects($this->any())
+      ->method('getRawParameters')
+      ->willReturn(new InputBag());
+
+    $first_fiber = new \Fiber(fn () => $this->manager->getLocalTasks('menu_local_task_test_tasks_view', 0));
+    $second_fiber = new \Fiber(fn () => $this->manager->getLocalTasks('menu_local_task_test_tasks_view', 1));
+
+    $fibers = [$first_fiber, $second_fiber];
+    $suspended = FALSE;
+    do {
+      foreach ($fibers as $key => $fiber) {
+        if (!$fiber->isStarted()) {
+          $fiber->start();
+        }
+        elseif ($fiber->isSuspended()) {
+          $suspended = TRUE;
+          $fiber->resume();
+        }
+        elseif ($fiber->isTerminated()) {
+          unset($fibers[$key]);
+        }
+      }
+    } while (!empty($fibers));
+
+    // Ensure that the fibers were suspended at least once to make sure that
+    // the expected scenario is tested here.
+    $this->assertTrue($suspended);
+
+    // Assert that both fibers return the correct result.
+    $this->assertEquals([
+      'menu_local_task_test_tasks_settings',
+      'menu_local_task_test_tasks_edit',
+      'menu_local_task_test_tasks_view.tab',
+    ], array_keys($first_fiber->getReturn()['tabs']));
+    $this->assertEquals(['menu_local_task_test_tasks_view_child1', 'menu_local_task_test_tasks_view_child2'], array_keys($second_fiber->getReturn()['tabs']));
   }
 
   protected function setupFactoryAndLocalTaskPlugins(array $definitions, $active_plugin_id): void {
@@ -471,7 +561,16 @@ class LocalTaskManagerTest extends UnitTestCase {
 
     $cache_context_manager = $this->prophesize(CacheContextsManager::class);
 
-    foreach ([NULL, ['user.permissions'], ['route'], ['route', 'context.example1'], ['context.example1', 'route'], ['route', 'context.example1', 'context.example2'], ['context.example1', 'context.example2', 'route'], ['route', 'context.example1', 'context.example2', 'user.permissions']] as $argument) {
+    foreach ([
+      NULL,
+      ['user.permissions'],
+      ['route'],
+      ['route', 'context.example1'],
+      ['context.example1', 'route'],
+      ['route', 'context.example1', 'context.example2'],
+      ['context.example1', 'context.example2', 'route'],
+      ['route', 'context.example1', 'context.example2', 'user.permissions'],
+    ] as $argument) {
       $cache_context_manager->assertValidTokens($argument)->willReturn(TRUE);
     }
 

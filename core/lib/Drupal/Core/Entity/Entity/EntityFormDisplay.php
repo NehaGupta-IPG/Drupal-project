@@ -33,10 +33,12 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'id',
-      'targetEntityType',
-      'bundle',
-      'mode',
+      'properties' => [
+        'id',
+        'targetEntityType',
+        'bundle',
+        'mode',
+      ],
     ],
   ],
   config_export: [
@@ -46,7 +48,8 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
     'mode',
     'content',
     'hidden',
-  ])]
+  ],
+  )]
 class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayInterface {
 
   /**

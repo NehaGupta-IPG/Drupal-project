@@ -6,10 +6,16 @@ namespace Drupal\Tests\shortcut\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\BasicAuthResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group rest
+ * Tests Shortcut Set Xml Basic Auth.
  */
+#[IgnoreDeprecations]
+#[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class ShortcutSetXmlBasicAuthTest extends ShortcutSetResourceTestBase {
 
   use BasicAuthResourceTestTrait;
@@ -33,7 +39,7 @@ class ShortcutSetXmlBasicAuthTest extends ShortcutSetResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $mimeType = 'text/xml; charset=UTF-8';
+  protected static $mimeType = 'text/xml; charset=utf-8';
 
   /**
    * {@inheritdoc}

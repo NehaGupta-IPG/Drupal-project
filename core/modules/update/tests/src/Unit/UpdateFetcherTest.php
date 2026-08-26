@@ -13,15 +13,17 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Psr\Log\LoggerInterface;
 
 /**
  * Tests update functionality unrelated to the database.
- *
- * @coversDefaultClass \Drupal\update\UpdateFetcher
- *
- * @group update
  */
+#[CoversClass(UpdateFetcher::class)]
+#[Group('update')]
 class UpdateFetcherTest extends UnitTestCase {
 
   /**
@@ -98,10 +100,9 @@ class UpdateFetcherTest extends UnitTestCase {
    * @param string $expected
    *   The expected URL returned from UpdateFetcher::buildFetchUrl()
    *
-   * @dataProvider providerTestUpdateBuildFetchUrl
-   *
    * @see \Drupal\update\UpdateFetcher::buildFetchUrl()
    */
+  #[DataProvider('providerTestUpdateBuildFetchUrl')]
   public function testUpdateBuildFetchUrl(array $project, $site_key, $expected): void {
     $url = $this->updateFetcher->buildFetchUrl($project, $site_key);
     $this->assertEquals($url, $expected);
@@ -173,8 +174,10 @@ class UpdateFetcherTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::doRequest
-   * @covers ::fetchProjectData
+   * Tests update fetcher no fallback.
+   *
+   * @legacy-covers ::doRequest
+   * @legacy-covers ::fetchProjectData
    */
   public function testUpdateFetcherNoFallback(): void {
     // First, try without the HTTP fallback setting, and HTTPS mocked to fail.
@@ -202,9 +205,12 @@ class UpdateFetcherTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::doRequest
-   * @covers ::fetchProjectData
+   * Tests update fetcher http fallback.
+   *
+   * @legacy-covers ::doRequest
+   * @legacy-covers ::fetchProjectData
    */
+  #[IgnoreDeprecations]
   public function testUpdateFetcherHttpFallback(): void {
     $settings = new Settings(['update_fetch_with_http_fallback' => TRUE]);
     $this->mockClient(

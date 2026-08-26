@@ -34,8 +34,10 @@ use Drupal\Core\Entity\EntityFormModeInterface;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'id',
-      'targetEntityType',
+      'properties' => [
+        'id',
+        'targetEntityType',
+      ],
     ],
   ],
   config_export: [
@@ -44,7 +46,8 @@ use Drupal\Core\Entity\EntityFormModeInterface;
     'description',
     'targetEntityType',
     'cache',
-  ])]
+  ],
+  )]
 class EntityFormMode extends EntityDisplayModeBase implements EntityFormModeInterface {
 
 }

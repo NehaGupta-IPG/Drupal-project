@@ -58,7 +58,10 @@ class TestFieldWidgetMultiple extends WidgetBase {
    */
   public function settingsSummary() {
     $summary = [];
-    $summary[] = $this->t('@setting: @value', ['@setting' => 'test_widget_setting_multiple', '@value' => $this->getSetting('test_widget_setting_multiple')]);
+    $summary[] = $this->t('@setting: @value', [
+      '@setting' => 'test_widget_setting_multiple',
+      '@value' => $this->getSetting('test_widget_setting_multiple'),
+    ]);
     return $summary;
   }
 
@@ -88,7 +91,7 @@ class TestFieldWidgetMultiple extends WidgetBase {
   /**
    * Element validation helper.
    */
-  public static function multipleValidate($element, FormStateInterface $form_state) {
+  public static function multipleValidate($element, FormStateInterface $form_state): void {
     $values = array_map('trim', explode(',', $element['#value']));
     $items = [];
     foreach ($values as $value) {

@@ -6,19 +6,27 @@ namespace Drupal\Tests\system\Functional\Menu;
 
 use Drupal\block\Entity\Block;
 use Drupal\Core\Url;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * Tests breadcrumbs functionality.
- *
- * @group Menu
  */
+#[Group('Menu')]
+#[RunTestsInSeparateProcesses]
 class BreadcrumbTest extends BrowserTestBase {
 
   use AssertBreadcrumbTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'minimal';
 
   /**
    * {@inheritdoc}
@@ -145,7 +153,7 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->assertBreadcrumb("admin/structure/types/manage/$type/fields/node.$type.body", $trail);
 
     // Verify Filter text format administration breadcrumbs.
-    $filter_formats = filter_formats();
+    $filter_formats = \Drupal::service(FilterFormatRepositoryInterface::class)->getAllFormats();
     $format = reset($filter_formats);
     $format_id = $format->id();
     $trail = $config + [
@@ -388,6 +396,15 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->drupalGet('menu-test/breadcrumb1/breadcrumb2/breadcrumb3');
     $this->assertSession()->responseContains('<script>alert(12);</script>');
     $this->assertSession()->assertEscaped('<script>alert(123);</script>');
+
+    // Assert that the breadcrumb cacheability is respected after not applying.
+    $this->assertBreadcrumb(Url::fromRoute('menu_test.skippable-breadcrumb', [], [
+      'query' => [
+        'menu_test_skip_breadcrumbs' => 'yes',
+      ],
+    ]), []);
+    $trail = $home + ['menu-test' => 'Menu test root'];
+    $this->assertBreadcrumb(Url::fromRoute('menu_test.skippable-breadcrumb'), $trail);
   }
 
   /**

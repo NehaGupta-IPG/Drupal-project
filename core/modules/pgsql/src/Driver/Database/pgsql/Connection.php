@@ -11,6 +11,7 @@ use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
+use Pdo\Pgsql;
 
 // cSpell:ignore ilike nextval
 
@@ -85,6 +86,12 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @see ::addSavepoint()
    * @see ::releaseSavepoint()
    * @see ::rollbackSavepoint()
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   TransactionManager to start a transaction then call ::commitOrRelease()
+   *   or ::rollback() on it.
+   *
+   * @see https://www.drupal.org/node/3524461
    */
   protected array $savepoints = [];
 
@@ -92,6 +99,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * Constructs a connection object.
    */
   public function __construct(\PDO $connection, array $connection_options) {
+    assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Pgsql : TRUE);
     // Sanitize the schema name here, so we do not have to do it in other
     // functions.
     if (isset($connection_options['schema']) && ($connection_options['schema'] !== 'public')) {
@@ -103,9 +111,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     $this->connectionOptions = $connection_options;
 
     parent::__construct($connection, $connection_options);
-
-    // Force PostgreSQL to use the UTF-8 character set by default.
-    $this->connection->exec("SET NAMES 'UTF8'");
 
     // Execute PostgreSQL init_commands.
     if (isset($connection_options['init_commands'])) {
@@ -136,7 +141,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
     // Default to TCP connection on port 5432.
     if (empty($connection_options['port'])) {
       $connection_options['port'] = 5432;
@@ -150,14 +155,16 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // http://bugs.php.net/bug.php?id=53217
     // so backslashes in the password need to be doubled up.
     // The bug was reported against pdo_pgsql 1.0.2, backslashes in passwords
-    // will break on this doubling up when the bug is fixed, so check the version
-    // elseif (phpversion('pdo_pgsql') < 'version_this_was_fixed_in') {
+    // will break on this doubling up when the bug is fixed, so check the
+    // version.
+    // "elseif (phpversion('pdo_pgsql') < 'version_this_was_fixed_in') {".
     else {
       $connection_options['password'] = str_replace('\\', '\\\\', $connection_options['password']);
     }
 
     $connection_options['database'] = (!empty($connection_options['database']) ? $connection_options['database'] : 'template1');
-    $dsn = 'pgsql:host=' . $connection_options['host'] . ' dbname=' . $connection_options['database'] . ' port=' . $connection_options['port'];
+    // Force PostgreSQL to use the UTF-8 character set by default.
+    $dsn = 'pgsql:host=' . $connection_options['host'] . ' dbname=' . $connection_options['database'] . ' port=' . $connection_options['port'] . ' client_encoding=UTF8';
 
     // Allow PDO options to be overridden.
     $connection_options += [
@@ -177,7 +184,12 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     ];
 
     try {
-      $pdo = new \PDO($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
+      if (\PHP_VERSION_ID >= 80400) {
+        $pgsql = new Pgsql($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
+      }
+      else {
+        $pgsql = new \PDO($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
+      }
     }
     catch (\PDOException $e) {
       if (static::getSQLState($e) == static::CONNECTION_FAILURE) {
@@ -191,7 +203,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       throw $e;
     }
 
-    return $pdo;
+    return $pgsql;
   }
 
   /**
@@ -213,26 +225,26 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // - Currently in a transaction.
     // - A 'mimic_implicit_commit' does not exist already.
     // - The query is not a savepoint query.
-    $wrap_with_savepoint = $this->inTransaction() &&
+    if (
+      $this->inTransaction() &&
       !$this->transactionManager()->has('mimic_implicit_commit') &&
       !(is_string($query) && (
         stripos($query, 'ROLLBACK TO SAVEPOINT ') === 0 ||
         stripos($query, 'RELEASE SAVEPOINT ') === 0 ||
         stripos($query, 'SAVEPOINT ') === 0
-      )
-    );
-    if ($wrap_with_savepoint) {
+      ))
+    ) {
       // Create a savepoint so we can rollback a failed query. This is so we can
       // mimic MySQL and SQLite transactions which don't fail if a single query
       // fails. This is important for tables that are created on demand. For
       // example, \Drupal\Core\Cache\DatabaseBackend.
-      $this->addSavepoint();
+      $savepoint = $this->startTransaction('mimic_implicit_commit');
       try {
         $return = parent::query($query, $args, $options);
-        $this->releaseSavepoint();
+        $savepoint->commitOrRelease();
       }
       catch (\Exception $e) {
-        $this->rollbackSavepoint();
+        $savepoint->rollback();
         throw $e;
       }
     }
@@ -255,6 +267,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return parent::prepareStatement($query, $options, $allow_row_count);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function queryRange($query, $from, $count, array $args = [], array $options = []) {
     return $this->query($query . ' LIMIT ' . (int) $count . ' OFFSET ' . (int) $from, $args, $options);
   }
@@ -263,15 +278,21 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function queryTemporary($query, array $args = [], array $options = []) {
-    $tablename = 'db_temporary_' . uniqid();
+    $tablename = 'db_temporary_' . bin2hex(random_bytes(12));
     $this->query('CREATE TEMPORARY TABLE {' . $tablename . '} AS ' . $query, $args, $options);
     return $tablename;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function driver() {
     return 'pgsql';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function databaseType() {
     return 'pgsql';
   }
@@ -318,6 +339,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function mapConditionOperator($operator) {
     return static::$postgresqlConditionOperatorMap[$operator] ?? NULL;
   }
@@ -362,11 +386,18 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * The main use for this method is to mimic InnoDB functionality, which
    * provides an inherent savepoint before any query in a transaction.
    *
-   * @param $savepoint_name
+   * @param string $savepoint_name
    *   A string representing the savepoint name. By default,
    *   "mimic_implicit_commit" is used.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   TransactionManager to start a transaction then call ::commitOrRelease()
+   *   or ::rollback() on it.
+   *
+   * @see https://www.drupal.org/node/3524461
    */
   public function addSavepoint($savepoint_name = 'mimic_implicit_commit') {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use TransactionManager to start a transaction then call ::commitOrRelease() or ::rollback() on it. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
     if ($this->inTransaction()) {
       $this->savepoints[$savepoint_name] = $this->startTransaction($savepoint_name);
     }
@@ -375,11 +406,18 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * Release a savepoint by name.
    *
-   * @param $savepoint_name
+   * @param string $savepoint_name
    *   A string representing the savepoint name. By default,
    *   "mimic_implicit_commit" is used.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   TransactionManager to start a transaction then call ::commitOrRelease()
+   *   or ::rollback() on it.
+   *
+   * @see https://www.drupal.org/node/3524461
    */
   public function releaseSavepoint($savepoint_name = 'mimic_implicit_commit') {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use TransactionManager to start a transaction then call ::commitOrRelease() or ::rollback() on it. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
     if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
       unset($this->savepoints[$savepoint_name]);
     }
@@ -388,11 +426,18 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * Rollback a savepoint by name if it exists.
    *
-   * @param $savepoint_name
+   * @param string $savepoint_name
    *   A string representing the savepoint name. By default,
    *   "mimic_implicit_commit" is used.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   TransactionManager to start a transaction then call ::commitOrRelease()
+   *   or ::rollback() on it.
+   *
+   * @see https://www.drupal.org/node/3524461
    */
   public function rollbackSavepoint($savepoint_name = 'mimic_implicit_commit') {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use TransactionManager to start a transaction then call ::commitOrRelease() or ::rollback() on it. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
     if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
       $this->savepoints[$savepoint_name]->rollBack();
       unset($this->savepoints[$savepoint_name]);

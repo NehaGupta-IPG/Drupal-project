@@ -7,12 +7,14 @@ namespace Drupal\Tests\filter\Kernel\Migrate\d6;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\FilterFormatInterface;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Upgrade variables to filter.formats.*.yml.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateFilterFormatTest extends MigrateDrupal6TestBase {
 
   /**
@@ -42,7 +44,7 @@ class MigrateFilterFormatTest extends MigrateDrupal6TestBase {
     $this->assertFalse(isset($filters['filter_html_image_secure']));
 
     // Check variables migrated into filter.
-    $this->assertSame('<a href hreflang> <em> <strong> <cite> <code> <ul type> <ol start type> <li> <dl> <dt> <dd>', $filters['filter_html']['settings']['allowed_html']);
+    $this->assertSame('<a href hreflang> <cite> <code> <dd> <dl> <dt> <em> <li> <ol start type> <strong> <ul type>', $filters['filter_html']['settings']['allowed_html']);
     $this->assertTrue($filters['filter_html']['settings']['filter_html_help']);
     $this->assertFalse($filters['filter_html']['settings']['filter_html_nofollow']);
     $this->assertSame(72, $filters['filter_url']['settings']['filter_url_length']);

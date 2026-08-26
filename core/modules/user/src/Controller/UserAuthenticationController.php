@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Controller;
 
+use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 
@@ -62,6 +64,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
 
   /**
    * The user authentication.
+   *
    * @var \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface
    */
   protected $userAuth;
@@ -163,6 +166,15 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   A response which contains the ID and CSRF token.
    */
+  #[Route(
+    path: '/user/login',
+    name: 'user.login.http',
+    methods: ['POST'],
+    requirements: [
+      '_user_is_logged_in' => 'FALSE',
+      '_format' => 'json',
+    ],
+  )]
   public function login(Request $request) {
     $format = $this->getRequestFormat($request);
 
@@ -218,7 +230,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
         if ($account->get('name')->access('view', $account)) {
           $response_data['current_user']['name'] = $account->getAccountName();
         }
-        $response_data['csrf_token'] = $this->csrfToken->get('rest');
+        $response_data['csrf_token'] = $this->csrfToken->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY);
 
         $logout_route = $this->routeProvider->getRouteByName('user.logout.http');
         // Trim '/' off path to match \Drupal\Core\Access\CsrfAccessCheck.
@@ -236,7 +248,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     }
     // Always register an IP-based failed login event.
     $this->userFloodControl->register('user.failed_login_ip', $flood_config->get('ip_window'));
-    throw new BadRequestHttpException('Sorry, unrecognized username or password.');
+    throw new BadRequestHttpException('Unrecognized username or password.');
   }
 
   /**
@@ -248,6 +260,15 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
+  #[Route(
+    path: '/user/password',
+    name: 'user.pass.http',
+    methods: ['POST'],
+    requirements: [
+      '_access' => 'TRUE',
+      '_format' => 'json',
+    ],
+  )]
   public function resetPassword(Request $request) {
     $format = $this->getRequestFormat($request);
 
@@ -286,7 +307,10 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
         throw new BadRequestHttpException('Unable to send email. Contact the site administrator if the problem persists.');
       }
       else {
-        $this->logger->info('Password reset instructions mailed to %name at %email.', ['%name' => $account->getAccountName(), '%email' => $account->getEmail()]);
+        $this->logger->info('Password reset instructions mailed to %name at %email.', [
+          '%name' => $account->getAccountName(),
+          '%email' => $account->getEmail(),
+        ]);
         return new Response();
       }
     }
@@ -309,10 +333,10 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    *
    * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There
    * is no replacement.
-   * @see https://www.drupal.org/node/3425340
+   * @see https://www.drupal.org/node/3427209
    */
   protected function userIsBlocked($name) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3425340', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3427209', E_USER_DEPRECATED);
     return user_is_blocked($name);
   }
 
@@ -332,6 +356,16 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
+  #[Route(
+    path: '/user/logout',
+    name: 'user.logout.http',
+    methods: ['POST'],
+    requirements: [
+      '_user_is_logged_in' => 'TRUE',
+      '_format' => 'json',
+      '_csrf_token' => 'TRUE',
+    ],
+  )]
   public function logout() {
     $this->userLogout();
     return new Response(NULL, 204);
@@ -350,6 +384,15 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
+  #[Route(
+    path: '/user/login_status',
+    name: 'user.login_status.http',
+    methods: ['GET'],
+    requirements: [
+      '_access' => 'TRUE',
+      '_format' => 'json',
+    ],
+  )]
   public function loginStatus() {
     if ($this->currentUser()->isAuthenticated()) {
       $response = new Response(self::LOGGED_IN);
@@ -373,7 +416,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   protected function getRequestFormat(Request $request) {
     $format = $request->getRequestFormat();
     if (!in_array($format, $this->serializerFormats)) {
-      throw new BadRequestHttpException("Unrecognized format: $format.");
+      throw new BadRequestHttpException("Unrecognized format.");
     }
     return $format;
   }

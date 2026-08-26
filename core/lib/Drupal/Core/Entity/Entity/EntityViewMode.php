@@ -36,8 +36,10 @@ use Drupal\Core\Entity\EntityViewModeInterface;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'id',
-      'targetEntityType',
+      'properties' => [
+        'id',
+        'targetEntityType',
+      ],
     ],
   ],
   config_export: [
@@ -46,7 +48,8 @@ use Drupal\Core\Entity\EntityViewModeInterface;
     'description',
     'targetEntityType',
     'cache',
-  ])]
+  ],
+  )]
 class EntityViewMode extends EntityDisplayModeBase implements EntityViewModeInterface {
 
 }

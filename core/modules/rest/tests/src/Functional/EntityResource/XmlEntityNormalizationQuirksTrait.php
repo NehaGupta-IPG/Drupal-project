@@ -39,7 +39,21 @@ trait XmlEntityNormalizationQuirksTrait {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedNormalizedEntity() {
+  protected function doTestPost(): void {
+    // Deserialization of the XML format is not supported.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doTestPatch(): void {
+    // Deserialization of the XML format is not supported.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getExpectedNormalizedEntity(): array {
     $default_normalization = parent::getExpectedNormalizedEntity();
 
     if ($this->entity instanceof FieldableEntityInterface) {
@@ -144,7 +158,7 @@ trait XmlEntityNormalizationQuirksTrait {
    *
    * @see \Symfony\Component\Serializer\Encoder\XmlEncoder
    */
-  protected function applyXmlConfigEntityDecodingQuirks(array $normalization) {
+  protected function applyXmlConfigEntityDecodingQuirks(array $normalization): array {
     $normalization = static::castToString($normalization);
 
     // When a single dependency is listed, it's not decoded into an array.

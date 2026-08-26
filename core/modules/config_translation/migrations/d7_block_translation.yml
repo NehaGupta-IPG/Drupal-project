@@ -23,6 +23,7 @@ process:
       source:
         - module
         - delta
+        - theme
     -
       plugin: skip_on_empty
       method: row
@@ -44,8 +45,6 @@ process:
           new: forum_new_block
         # locale:
         #  0: language_block
-        node:
-          syndicate: node_syndicate_block
         search:
           form: search_form_block
         statistics:

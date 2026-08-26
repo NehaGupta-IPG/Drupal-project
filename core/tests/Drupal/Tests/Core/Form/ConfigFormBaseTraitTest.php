@@ -6,15 +6,18 @@ namespace Drupal\Tests\Core\Form;
 
 use Drupal\Core\Form\ConfigFormBaseTrait;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Form\ConfigFormBaseTrait
- * @group Form
+ * Tests Drupal\Core\Form\ConfigFormBaseTrait.
  */
+#[CoversClass(ConfigFormBaseTrait::class)]
+#[Group('Form')]
 class ConfigFormBaseTraitTest extends UnitTestCase {
 
   /**
-   * @covers ::config
+   * Tests config.
    */
   public function testConfig(): void {
 
@@ -42,35 +45,44 @@ class ConfigFormBaseTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::config
+   * Tests config factory exception.
    */
   public function testConfigFactoryException(): void {
     $testObject = new ConfiguredTrait();
 
     // There is no config factory available this should result in an exception.
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('No config factory available for ConfigFormBaseTrait');
+    $this->expectExceptionMessageIs('No config factory available for ConfigFormBaseTrait');
     $config_method = new \ReflectionMethod($testObject, 'config');
     $config_method->invoke($testObject, 'editable.config');
   }
 
   /**
-   * @covers ::config
+   * Tests config factory exception invalid property.
    */
   public function testConfigFactoryExceptionInvalidProperty(): void {
     $testObject = new ConfiguredTrait();
 
     // There is no config factory available this should result in an exception.
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('No config factory available for ConfigFormBaseTrait');
+    $this->expectExceptionMessageIs('No config factory available for ConfigFormBaseTrait');
     $config_method = new \ReflectionMethod($testObject, 'config');
     $config_method->invoke($testObject, 'editable.config');
   }
 
 }
 
+/**
+ * Test class for testing ConfigFormBaseTrait.
+ */
 class ConfiguredTrait {
   use ConfigFormBaseTrait;
+
+  /**
+   * The configuration factory.
+   *
+   * @var null
+   */
   public $configFactory;
 
   protected function getEditableConfigNames() {}

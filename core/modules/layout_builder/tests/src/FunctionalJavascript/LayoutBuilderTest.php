@@ -5,19 +5,23 @@ declare(strict_types=1);
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Drupal\block_content\Entity\BlockContent;
-use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Url;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Layout Builder UI.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderTest extends WebDriverTestBase {
 
+  use BlockContentCreationTrait;
   use ContextualLinkClickTrait;
   use LayoutBuilderSortTrait;
   use OffCanvasTestTrait;
@@ -63,19 +67,18 @@ class LayoutBuilderTest extends WebDriverTestBase {
 
     $this->drupalPlaceBlock('local_tasks_block');
 
-    $bundle = BlockContentType::create([
+    $this->createBlockContentType([
       'id' => 'basic',
       'label' => 'Basic',
-    ]);
-    $bundle->save();
-    block_content_add_body_field($bundle->id());
+    ], TRUE);
+
     BlockContent::create([
       'info' => 'My content block',
       'type' => 'basic',
       'body' => [
         [
           'value' => 'This is the block content',
-          'format' => filter_default_format(),
+          'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
         ],
       ],
     ])->save();
@@ -114,7 +117,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
     $assert_session->pageTextNotContains('Powered by Drupal');
     $assert_session->linkNotExists('Layout');
 
-    $this->enableLayoutsForBundle('admin/structure/types/manage/bundle_with_section_field/display', TRUE);
+    $this->enableLayoutsForBundle('admin/structure/types/manage/bundle_with_section_field/display/default', TRUE);
 
     // The existing content is still shown until overridden.
     $this->drupalGet($node_url);
@@ -152,6 +155,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
 
     // Save the layout, and the new block is visible.
     $page->pressButton('Save layout');
+    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
     $assert_session->addressEquals($node_url);
     $assert_session->pageTextContains('Powered by Drupal');
     $assert_session->pageTextContains('This is the label');
@@ -189,6 +193,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
 
     // Ensure the dragged block is still in the correct position after save.
     $page->pressButton('Save layout');
+    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
     $assert_session->elementExists('css', '.layout__region--second .block-system-powered-by-block');
     $assert_session->elementTextContains('css', '.layout__region--second', 'Powered by Drupal');
 
@@ -224,6 +229,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
     $this->assertPageNotReloaded();
 
     $page->pressButton('Save layout');
+    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
     $assert_session->elementExists('css', '.layout');
 
     // Test deriver-based blocks.
@@ -255,6 +261,7 @@ class LayoutBuilderTest extends WebDriverTestBase {
     $this->assertPageNotReloaded();
 
     $page->pressButton('Save layout');
+    $this->assertTrue($assert_session->waitForText('The layout override has been saved.'));
 
     // Removing all sections results in no layout being used.
     $assert_session->addressEquals($node_url);

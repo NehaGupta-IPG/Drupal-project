@@ -14,12 +14,14 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group media
- *
- * @coversDefaultClass \Drupal\media\OEmbed\ResourceFetcher
+ * Tests Drupal\media\OEmbed\ResourceFetcher.
  */
+#[CoversClass(ResourceFetcher::class)]
+#[Group('media')]
 class ResourceFetcherTest extends UnitTestCase {
 
   /**
@@ -55,7 +57,7 @@ class ResourceFetcherTest extends UnitTestCase {
   /**
    * Tests how the resource fetcher handles unknown Content-Type headers.
    *
-   * @covers ::fetchResource
+   * @legacy-covers ::fetchResource
    */
   public function testUnknownContentTypeHeader(): void {
     $headers = [
@@ -102,7 +104,7 @@ class ResourceFetcherTest extends UnitTestCase {
 
     // Valid JSON that does not produce an array should also throw an exception.
     $this->expectException(ResourceException::class);
-    $this->expectExceptionMessage('The oEmbed resource could not be decoded.');
+    $this->expectExceptionMessageIs('The oEmbed resource could not be decoded.');
     $fetcher->fetchResource('non_array');
   }
 

@@ -6,12 +6,14 @@ namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\migrate\MigrateException;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Migrate Lookup service.
- *
- * @group migrate
  */
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrateLookupTest extends MigrateTestBase {
 
   use ContentTypeCreationTrait;
@@ -73,7 +75,7 @@ class MigrateLookupTest extends MigrateTestBase {
   public function testInvalidIdLookup(): void {
     $this->executeMigration('sample_lookup_migration');
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage("Extra unknown items for map migrate_map_sample_lookup_migration in source IDs: array (\n  'invalid_id' => 25,\n)");
+    $this->expectExceptionMessageIs("Extra unknown items for map migrate_map_sample_lookup_migration in source IDs: array (\n  'invalid_id' => 25,\n)");
 
     // Test invalidly indexed source id.
     $this->migrateLookup->lookup('sample_lookup_migration', ['invalid_id' => 25]);

@@ -12,9 +12,18 @@ use Drupal\Core\Database\Transaction\StackItemType;
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
 use Drupal\Core\Database\TransactionNameNonUniqueException;
 use Drupal\Core\Database\TransactionOutOfOrderException;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests the transaction abstraction system.
+ *
+ * NOTE: This base test class is mostly testing legacy Transaction processing
+ * occurring when transactions are committed as part of object destruction.
+ * That process is now deprecated, and the tests contained here were replicated
+ * in TransactionTest, that should receive any new test method. This class
+ * should be removed when commit-on-destruct is removed, and its child concrete
+ * test classes be adjusted not to rely on this. While removing, ensure that no
+ * test coverage gets lost and in case move test methods to TransactionTest.
  *
  * We test nesting by having two transaction layers, an outer and inner. The
  * outer layer encapsulates the inner layer. Our transaction nesting abstraction
@@ -38,7 +47,7 @@ use Drupal\Core\Database\TransactionOutOfOrderException;
  * is active, and mysqli does not fail when rolling back and no transaction
  * active.
  */
-class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
+abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
 
   /**
    * Keeps track of the post-transaction callback action executed.
@@ -104,11 +113,11 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * transaction (which was already committed when the inner transaction
    * started).
    *
-   * @param $suffix
+   * @param string $suffix
    *   Suffix to add to field values to differentiate tests.
-   * @param $rollback
+   * @param bool $rollback
    *   Whether or not to try rolling back the transaction when we're done.
-   * @param $ddl_statement
+   * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the inner transaction.
    */
   protected function transactionOuterLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
@@ -145,11 +154,11 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * This "inner layer" transaction is either used alone or nested inside of the
    * "outer layer" transaction.
    *
-   * @param $suffix
+   * @param string $suffix
    *   Suffix to add to field values to differentiate tests.
-   * @param $rollback
+   * @param bool $rollback
    *   Whether or not to try rolling back the transaction when we're done.
-   * @param $ddl_statement
+   * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the transaction.
    */
   protected function transactionInnerLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
@@ -239,6 +248,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    */
   public function testRollbackRootWithActiveSavepoint(): void {
     $transaction = $this->createRootTransaction();
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
     $savepoint = $this->createFirstSavepointTransaction();
 
     // Try to rollback root. Since a savepoint is active, this should fail.
@@ -250,6 +260,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests savepoint transaction rollback.
    */
+  #[IgnoreDeprecations]
   public function testRollbackSavepoint(): void {
     $transaction = $this->createRootTransaction();
     $savepoint = $this->createFirstSavepointTransaction();
@@ -278,6 +289,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * Tests savepoint transaction duplicated rollback.
    */
   public function testRollbackTwiceSameSavepoint(): void {
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
     $transaction = $this->createRootTransaction();
     $savepoint = $this->createFirstSavepointTransaction();
 
@@ -312,11 +324,13 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * Tests savepoint transaction rollback failure when later savepoints exist.
    */
   public function testRollbackSavepointWithLaterSavepoint(): void {
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
     $transaction = $this->createRootTransaction();
     $savepoint1 = $this->createFirstSavepointTransaction();
 
     // Starts another savepoint transaction. Corresponds to 'SAVEPOINT
     // savepoint_2' on the database.
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
     $savepoint2 = $this->connection->startTransaction();
     $this->assertTrue($this->connection->inTransaction());
     $this->assertSame(3, $this->connection->transactionManager()->stackDepth());
@@ -339,6 +353,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * The behavior of this test should be identical for connections that support
    * transactions and those that do not.
    */
+  #[IgnoreDeprecations]
   public function testCommittedTransaction(): void {
     try {
       // Create two nested transactions. The changes should be committed.
@@ -358,6 +373,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests the compatibility of transactions with DDL statements.
    */
+  #[IgnoreDeprecations]
   public function testTransactionWithDdlStatement(): void {
     // First, test that a commit works normally, even with DDL statements.
     $transaction = $this->createRootTransaction('', FALSE);
@@ -424,24 +440,47 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
       unset($transaction);
       $this->assertRowAbsent('row');
     }
-    else {
-      // For database servers that do not support transactional DDL,
-      // the DDL statement should commit the transaction stack.
-      $this->cleanUp();
-      $transaction = $this->createRootTransaction('', FALSE);
-      $this->insertRow('row');
-      $this->executeDDLStatement();
+  }
 
-      // Try to rollback the outer transaction. It should fail and void
-      // the transaction stack.
-      $transaction->rollBack();
-      $manager = $this->connection->transactionManager();
-      $reflectedTransactionState = new \ReflectionMethod($manager, 'getConnectionTransactionState');
-      $this->assertSame(ClientConnectionTransactionState::Voided, $reflectedTransactionState->invoke($manager));
-
-      unset($transaction);
-      $this->assertRowPresent('row');
+  /**
+   * Tests rollback after a DDL statement when no transactional DDL supported.
+   */
+  public function testRollbackAfterDdlStatementForNonTransactionalDdlDatabase(): void {
+    if ($this->connection->supportsTransactionalDDL()) {
+      $this->markTestSkipped('This test only works for database that do not support transactional DDL.');
     }
+
+    // For database servers that do not support transactional DDL,
+    // the DDL statement should commit the transaction stack.
+    $this->cleanUp();
+    $transaction = $this->createRootTransaction('', FALSE);
+    $reflectionMethod = new \ReflectionMethod(get_class($this->connection->transactionManager()), 'getConnectionTransactionState');
+    $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
+    $this->assertEquals(ClientConnectionTransactionState::Active, $reflectionMethod->invoke($this->connection->transactionManager()));
+    $this->insertRow('row');
+    $this->executeDDLStatement();
+
+    // Try to rollback the root transaction. Since the DDL already committed
+    // it, it should fail.
+    set_error_handler(static function (int $errno, string $errstr): bool {
+      throw new \ErrorException($errstr);
+    });
+    try {
+      $transaction->rollBack();
+    }
+    catch (\ErrorException $e) {
+      $this->assertSame('Transaction::rollBack() failed because of a prior execution of a DDL statement.', $e->getMessage());
+    }
+    finally {
+      restore_error_handler();
+    }
+
+    unset($transaction);
+    $manager = $this->connection->transactionManager();
+    $this->assertSame(0, $manager->stackDepth());
+    $reflectedTransactionState = new \ReflectionMethod($manager, 'getConnectionTransactionState');
+    $this->assertSame(ClientConnectionTransactionState::RollbackFailed, $reflectedTransactionState->invoke($manager));
+    $this->assertRowPresent('row');
   }
 
   /**
@@ -493,7 +532,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @internal
    */
   public function assertRowPresent(string $name, ?string $message = NULL): void {
-    $present = (boolean) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
+    $present = (bool) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
     $this->assertTrue($present, $message ?? "Row '{$name}' should be present, but it actually does not exist.");
   }
 
@@ -508,13 +547,14 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @internal
    */
   public function assertRowAbsent(string $name, ?string $message = NULL): void {
-    $present = (boolean) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
+    $present = (bool) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
     $this->assertFalse($present, $message ?? "Row '{$name}' should be absent, but it actually exists.");
   }
 
   /**
    * Tests transaction stacking, commit, and rollback.
    */
+  #[IgnoreDeprecations]
   public function testTransactionStacking(): void {
     // Standard case: pop the inner transaction before the outer transaction.
     $transaction = $this->createRootTransaction('', FALSE);
@@ -552,6 +592,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests that transactions can continue to be used if a query fails.
    */
+  #[IgnoreDeprecations]
   public function testQueryFailureInTransaction(): void {
     $transaction = $this->createRootTransaction('test_transaction', FALSE);
     $this->connection->schema()->dropTable('test');
@@ -670,6 +711,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests releasing a savepoint before last is safe.
    */
+  #[IgnoreDeprecations]
   public function testReleaseIntermediateSavepoint(): void {
     $transaction = $this->createRootTransaction();
     $savepoint1 = $this->createFirstSavepointTransaction('', FALSE);
@@ -680,10 +722,12 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $this->assertSame(3, $this->connection->transactionManager()->stackDepth());
     // Starts a savepoint transaction. Corresponds to 'SAVEPOINT savepoint_3'
     // on the database.
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
     $savepoint3 = $this->connection->startTransaction();
     $this->assertSame(4, $this->connection->transactionManager()->stackDepth());
     // Starts a savepoint transaction. Corresponds to 'SAVEPOINT savepoint_4'
     // on the database.
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
     $savepoint4 = $this->connection->startTransaction();
     $this->assertSame(5, $this->connection->transactionManager()->stackDepth());
 
@@ -708,8 +752,10 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests committing a transaction while savepoints are active.
    */
+  #[IgnoreDeprecations]
   public function testCommitWithActiveSavepoint(): void {
     $transaction = $this->createRootTransaction();
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
     $savepoint1 = $this->createFirstSavepointTransaction('', FALSE);
 
     // Starts a savepoint transaction. Corresponds to 'SAVEPOINT savepoint_2'
@@ -747,8 +793,8 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $this->assertSame('savepoint_1', $savepoint1->name());
 
     $this->expectException(TransactionNameNonUniqueException::class);
-    $this->expectExceptionMessage("savepoint_1 is already in use.");
-    $savepointFailure = $this->connection->startTransaction('savepoint_1');
+    $this->expectExceptionMessageIsOrContains("A transaction named savepoint_1 is already in use.");
+    $this->connection->startTransaction('savepoint_1');
   }
 
   /**
@@ -762,11 +808,13 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests post-transaction callback executes after transaction commit.
    */
+  #[IgnoreDeprecations]
   public function testRootTransactionEndCallbackCalledOnCommit(): void {
     $transaction = $this->createRootTransaction('', FALSE);
     $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallback']);
     $this->insertRow('row');
     $this->assertNull($this->postTransactionCallbackAction);
+    $this->assertRowAbsent('rtcCommit');
     unset($transaction);
     $this->assertSame('rtcCommit', $this->postTransactionCallbackAction);
     $this->assertRowPresent('row');
@@ -804,6 +852,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
   /**
    * Tests post-transaction callback executes after a DDL statement.
    */
+  #[IgnoreDeprecations]
   public function testRootTransactionEndCallbackCalledAfterDdlAndDestruction(): void {
     $transaction = $this->createRootTransaction('', FALSE);
     $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallback']);
@@ -829,6 +878,108 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
     $this->assertSame('rtcCommit', $this->postTransactionCallbackAction);
     $this->assertRowPresent('rtcCommit');
     $this->assertRowAbsent('rtcRollback');
+    $this->assertRowPresent('row');
+  }
+
+  /**
+   * Tests post-transaction rollback executes after a DDL statement.
+   *
+   * For database servers that support transactional DDL, a rollback of a
+   * transaction including DDL statements is possible.
+   */
+  public function testRootTransactionEndCallbackCalledAfterDdlAndRollbackForTransactionalDdlDatabase(): void {
+    if (!$this->connection->supportsTransactionalDDL()) {
+      $this->markTestSkipped('This test only works for database supporting transactional DDL.');
+    }
+
+    $transaction = $this->createRootTransaction('', FALSE);
+    $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallback']);
+    $this->insertRow('row');
+    $this->assertNull($this->postTransactionCallbackAction);
+
+    // Callbacks are processed only when destructing the transaction.
+    // Executing a DDL statement is not sufficient itself.
+    // We cannot use truncate here, since it has protective code to fall back
+    // to a transactional delete when in transaction. We drop an unrelated
+    // table instead.
+    $this->connection->schema()->dropTable('test_people');
+    $this->assertNull($this->postTransactionCallbackAction);
+    $this->assertRowAbsent('rtcCommit');
+    $this->assertRowAbsent('rtcRollback');
+    $this->assertRowPresent('row');
+
+    // Callbacks are processed only when destructing the transaction.
+    // Executing the rollback is not sufficient by itself.
+    $transaction->rollBack();
+    $this->assertNull($this->postTransactionCallbackAction);
+    $this->assertRowAbsent('rtcCommit');
+    $this->assertRowAbsent('rtcRollback');
+    $this->assertRowAbsent('row');
+
+    // Destruct the transaction.
+    unset($transaction);
+
+    // The post-transaction callback should now have inserted a 'rtcRollback'
+    // row.
+    $this->assertSame('rtcRollback', $this->postTransactionCallbackAction);
+    $this->assertRowAbsent('rtcCommit');
+    $this->assertRowPresent('rtcRollback');
+    $this->assertRowAbsent('row');
+  }
+
+  /**
+   * Tests post-transaction rollback failure after a DDL statement.
+   *
+   * For database servers that support transactional DDL, a rollback of a
+   * transaction including DDL statements is not possible, since a commit
+   * happened already. We cannot decide what should be the status of the
+   * callback, an exception is thrown.
+   */
+  public function testRootTransactionEndCallbackFailureUponDdlAndRollbackForNonTransactionalDdlDatabase(): void {
+    if ($this->connection->supportsTransactionalDDL()) {
+      $this->markTestSkipped('This test only works for database that do not support transactional DDL.');
+    }
+
+    $transaction = $this->createRootTransaction('', FALSE);
+    $this->connection->transactionManager()->addPostTransactionCallback([$this, 'rootTransactionCallback']);
+    $this->insertRow('row');
+    $this->assertNull($this->postTransactionCallbackAction);
+
+    // Callbacks are processed only when destructing the transaction.
+    // Executing a DDL statement is not sufficient itself.
+    // We cannot use truncate here, since it has protective code to fall back
+    // to a transactional delete when in transaction. We drop an unrelated
+    // table instead.
+    $this->connection->schema()->dropTable('test_people');
+    $this->assertNull($this->postTransactionCallbackAction);
+    $this->assertRowAbsent('rtcCommit');
+    $this->assertRowAbsent('rtcRollback');
+    $this->assertRowPresent('row');
+
+    set_error_handler(static function (int $errno, string $errstr): bool {
+      throw new \ErrorException($errstr);
+    });
+    try {
+      $transaction->rollBack();
+    }
+    catch (\ErrorException $e) {
+      $this->assertSame('Transaction::rollBack() failed because of a prior execution of a DDL statement.', $e->getMessage());
+    }
+    finally {
+      restore_error_handler();
+    }
+
+    unset($transaction);
+
+    // The post-transaction callback should now have inserted a 'rtcRollback'
+    // row.
+    $this->assertSame('rtcRollback', $this->postTransactionCallbackAction);
+    $this->assertRowAbsent('rtcCommit');
+    $this->assertRowPresent('rtcRollback');
+    $manager = $this->connection->transactionManager();
+    $this->assertSame(0, $manager->stackDepth());
+    $reflectedTransactionState = new \ReflectionMethod($manager, 'getConnectionTransactionState');
+    $this->assertSame(ClientConnectionTransactionState::RollbackFailed, $reflectedTransactionState->invoke($manager));
     $this->assertRowPresent('row');
   }
 

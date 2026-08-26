@@ -9,14 +9,15 @@ use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\help\HelpTopicTwigLoader;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Twig\Error\LoaderError;
 
 /**
  * Unit test for the HelpTopicTwigLoader class.
- *
- * @coversDefaultClass \Drupal\help\HelpTopicTwigLoader
- * @group help
  */
+#[CoversClass(HelpTopicTwigLoader::class)]
+#[Group('help')]
 class HelpTopicTwigLoaderTest extends UnitTestCase {
 
   /**
@@ -56,7 +57,9 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::__construct
+   * Tests constructor.
+   *
+   * @legacy-covers ::__construct
    */
   public function testConstructor(): void {
     // Verify that the module/theme directories were added in the constructor,
@@ -68,7 +71,7 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getSourceContext
+   * Tests get source context.
    */
   public function testGetSourceContext(): void {
     $source = $this->helpLoader->getSourceContext('@' . HelpTopicTwigLoader::MAIN_NAMESPACE . '/test.topic.html.twig');
@@ -76,11 +79,11 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getSourceContext
+   * Tests get source context exception.
    */
   public function testGetSourceContextException(): void {
     $this->expectException(LoaderError::class);
-    $this->expectExceptionMessage("Malformed YAML in help topic \"vfs://root/modules/test/help_topics/test.invalid_yaml.html.twig\":");
+    $this->expectExceptionMessageIs("Malformed YAML in help topic \"vfs://root/modules/test/help_topics/test.invalid_yaml.html.twig\": An error occurred when attempting to parse front matter data on line 2.");
 
     $this->helpLoader->getSourceContext('@' . HelpTopicTwigLoader::MAIN_NAMESPACE . '/test.invalid_yaml.html.twig');
   }

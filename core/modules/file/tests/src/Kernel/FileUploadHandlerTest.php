@@ -9,13 +9,15 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\file\Upload\FileUploadHandler;
 use Drupal\file\Upload\UploadedFileInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * Tests the file upload handler.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileUploadHandlerTest extends KernelTestBase {
 
   /**
@@ -64,7 +66,7 @@ class FileUploadHandlerTest extends KernelTestBase {
     $file_info->expects($this->once())->method('validate')->willReturn(new ConstraintViolationList());
 
     $this->expectException(LockAcquiringException::class);
-    $this->expectExceptionMessage(sprintf('File "temporary://%s" is already locked for writing.', $file_name));
+    $this->expectExceptionMessageIs(sprintf('File "temporary://%s" is already locked for writing.', $file_name));
 
     $fileUploadHandler->handleFileUpload(uploadedFile: $file_info);
   }

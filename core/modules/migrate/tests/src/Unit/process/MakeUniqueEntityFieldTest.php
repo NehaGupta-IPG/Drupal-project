@@ -8,11 +8,15 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\migrate\Plugin\migrate\process\MakeUniqueEntityField;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\process\MakeUniqueEntityField
- * @group migrate
+ * Tests Drupal\migrate\Plugin\migrate\process\MakeUniqueEntityField.
  */
+#[CoversClass(MakeUniqueEntityField::class)]
+#[Group('migrate')]
 class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
 
   /**
@@ -63,9 +67,8 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
 
   /**
    * Tests making an entity field value unique.
-   *
-   * @dataProvider providerTestMakeUniqueEntityField
    */
+  #[DataProvider('providerTestMakeUniqueEntityField')]
   public function testMakeUniqueEntityField($count, $postfix = '', $start = NULL, $length = NULL): void {
     $configuration = [
       'entity_type' => 'test_entity_type',
@@ -96,7 +99,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
     ];
     $plugin = new MakeUniqueEntityField($configuration, 'make_unique', [], $this->getMigration(), $this->entityTypeManager);
     $this->expectException('Drupal\migrate\MigrateException');
-    $this->expectExceptionMessage('The start position configuration key should be an integer. Omit this key to capture from the beginning of the string.');
+    $this->expectExceptionMessageIs('The start position configuration key should be an integer. Omit this key to capture from the beginning of the string.');
     $plugin->transform('test_start', $this->migrateExecutable, $this->row, 'foo');
   }
 
@@ -111,7 +114,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
     ];
     $plugin = new MakeUniqueEntityField($configuration, 'make_unique', [], $this->getMigration(), $this->entityTypeManager);
     $this->expectException('Drupal\migrate\MigrateException');
-    $this->expectExceptionMessage('The character length configuration key should be an integer. Omit this key to capture the entire string.');
+    $this->expectExceptionMessageIs('The character length configuration key should be an integer. Omit this key to capture the entire string.');
     $plugin->transform('test_length', $this->migrateExecutable, $this->row, 'foo');
   }
 

@@ -36,7 +36,7 @@ class TaxonomyTestHooks {
    * Implements hook_query_alter().
    */
   #[Hook('query_alter')]
-  public function queryAlter(AlterableInterface $query) {
+  public function queryAlter(AlterableInterface $query): void {
     $value = \Drupal::state()->get('taxonomy_test_query_alter');
     if (isset($value)) {
       \Drupal::state()->set('taxonomy_test_query_alter', ++$value);
@@ -47,7 +47,7 @@ class TaxonomyTestHooks {
    * Implements hook_query_TAG_alter().
    */
   #[Hook('query_term_access_alter')]
-  public function queryTermAccessAlter(AlterableInterface $query) {
+  public function queryTermAccessAlter(AlterableInterface $query): void {
     $value = \Drupal::state()->get('taxonomy_test_query_term_access_alter');
     if (isset($value)) {
       \Drupal::state()->set('taxonomy_test_query_term_access_alter', ++$value);
@@ -58,7 +58,7 @@ class TaxonomyTestHooks {
    * Implements hook_query_TAG_alter().
    */
   #[Hook('query_taxonomy_term_access_alter')]
-  public function queryTaxonomyTermAccessAlter(AlterableInterface $query) {
+  public function queryTaxonomyTermAccessAlter(AlterableInterface $query): void {
     $value = \Drupal::state()->get('taxonomy_test_query_taxonomy_term_access_alter');
     if (isset($value)) {
       \Drupal::state()->set('taxonomy_test_query_taxonomy_term_access_alter', ++$value);
@@ -79,7 +79,7 @@ class TaxonomyTestHooks {
    * Implements hook_ENTITY_TYPE_load() for the taxonomy term.
    */
   #[Hook('taxonomy_term_load')]
-  public function taxonomyTermLoad($entities) {
+  public function taxonomyTermLoad($entities): void {
     $value = \Drupal::state()->get('taxonomy_test_taxonomy_term_load');
     // Only record loaded terms is the test has set this to an empty array.
     if (is_array($value)) {

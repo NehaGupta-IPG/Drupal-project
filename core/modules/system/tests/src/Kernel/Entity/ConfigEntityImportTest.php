@@ -9,15 +9,16 @@ use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\search\Entity\SearchPage;
 use Drupal\system\Entity\Action;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ConfigEntity importing.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityImportTest extends KernelTestBase {
 
   use BlockCreationTrait;
@@ -30,8 +31,6 @@ class ConfigEntityImportTest extends KernelTestBase {
     'config_test',
     'filter',
     'image',
-    'search',
-    'search_extra_type',
     'system',
   ];
 
@@ -39,7 +38,7 @@ class ConfigEntityImportTest extends KernelTestBase {
    * Runs test methods for each module within a single test run.
    */
   public function testConfigUpdateImport(): void {
-    $this->installConfig(['block', 'filter', 'image']);
+    $this->installConfig(['system', 'block', 'filter', 'image']);
     $this->container->get('theme_installer')->install(['olivero']);
     $config_storage = $this->container->get('config.storage');
     // Ensure the 'system.site' config.
@@ -50,7 +49,6 @@ class ConfigEntityImportTest extends KernelTestBase {
     $this->doBlockUpdate();
     $this->doFilterFormatUpdate();
     $this->doImageStyleUpdate();
-    $this->doSearchPageUpdate();
     $this->doThirdPartySettingsUpdate();
   }
 
@@ -161,28 +159,6 @@ class ConfigEntityImportTest extends KernelTestBase {
     $effect_name = key($original_data['effects']);
 
     $custom_data['effects'][$effect_name]['data']['upscale'] = FALSE;
-    $this->assertConfigUpdateImport($name, $original_data, $custom_data);
-  }
-
-  /**
-   * Tests updating a search page during import.
-   */
-  protected function doSearchPageUpdate(): void {
-    // Create a test search page with a known label.
-    $name = 'search.page.apple';
-    $entity = SearchPage::create([
-      'id' => 'apple',
-      'label' => 'Apple search',
-      'path' => 'apple',
-      'plugin' => 'search_extra_type_search',
-    ]);
-    $entity->save();
-
-    $this->checkSinglePluginConfigSync($entity, 'configuration', 'boost', 'bi');
-
-    // Read the existing data, and prepare an altered version in sync.
-    $custom_data = $original_data = $this->container->get('config.storage')->read($name);
-    $custom_data['configuration']['boost'] = 'asdf';
     $this->assertConfigUpdateImport($name, $original_data, $custom_data);
   }
 

@@ -7,6 +7,8 @@ namespace Drupal\KernelTests\Core\Asset;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests #attached assets: attached asset libraries and JavaScript settings.
@@ -17,10 +19,10 @@ use Drupal\KernelTests\KernelTestBase;
  * $build['#attached']['library'] = …
  * $build['#attached']['drupalSettings'] = …
  * @endcode
- *
- * @group Common
- * @group Asset
  */
+#[Group('Common')]
+#[Group('Asset')]
+#[RunTestsInSeparateProcesses]
 class AttachedAssetsTest extends KernelTestBase {
 
   /**
@@ -186,9 +188,12 @@ class AttachedAssetsTest extends KernelTestBase {
     [$header_js, $footer_js] = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage());
     $this->assertEquals([], \Drupal::service('asset.js.collection_renderer')->render($header_js), 'There are 0 JavaScript assets in the header.');
     $rendered_footer_js = \Drupal::service('asset.js.collection_renderer')->render($footer_js);
-    $this->assertCount(2, $rendered_footer_js, 'There are 2 JavaScript assets in the footer.');
-    $this->assertEquals('drupal-settings-json', $rendered_footer_js[0]['#attributes']['data-drupal-selector'], 'The first of the two JavaScript assets in the footer has drupal settings.');
-    $this->assertStringStartsWith(base_path(), $rendered_footer_js[1]['#attributes']['src'], 'The second of the two JavaScript assets in the footer has the sole aggregated JavaScript asset.');
+    $this->assertCount(5, $rendered_footer_js, 'There are 5 JavaScript assets in the footer.');
+    $this->assertEquals('drupal-settings-json', $rendered_footer_js[0]['#attributes']['data-drupal-selector'], 'The first of the five JavaScript assets in the footer has drupal settings.');
+    $this->assertStringContainsString('jquery.min.js', $rendered_footer_js[1]['#attributes']['src'], 'The second of the five JavaScript assets in the footer is jquery.min.js.');
+    $this->assertStringContainsString('once.min.js', $rendered_footer_js[2]['#attributes']['src'], 'The third of the five JavaScript assets in the footer is once.min.js.');
+    $this->assertStringStartsWith(base_path(), $rendered_footer_js[3]['#attributes']['src'], 'The fourth of the five JavaScript assets in the footer has an aggregated JavaScript asset.');
+    $this->assertStringStartsWith(base_path(), $rendered_footer_js[4]['#attributes']['src']);
   }
 
   /**
@@ -372,6 +377,34 @@ class AttachedAssetsTest extends KernelTestBase {
   }
 
   /**
+   * Tests using 'before' in library definition.
+   */
+  public function testLibraryBefore(): void {
+    $build['#attached']['library'][] = 'common_test/main';
+    $build['#attached']['library'][] = 'common_test/before_main';
+    $assets = AttachedAssets::createFromRenderArray($build);
+
+    $js = $this->assetResolver->getJsAssets($assets, FALSE)[1];
+    $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
+    $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
+    $this->assertLessThan(strpos($rendered_js, 'common_test/main.js'), strpos($rendered_js, 'common_test/before_main.js'));
+  }
+
+  /**
+   * Tests using 'after' in library definition.
+   */
+  public function testLibraryAfter(): void {
+    $build['#attached']['library'][] = 'common_test/after_main';
+    $build['#attached']['library'][] = 'common_test/main';
+    $assets = AttachedAssets::createFromRenderArray($build);
+
+    $js = $this->assetResolver->getJsAssets($assets, FALSE)[1];
+    $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
+    $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
+    $this->assertGreaterThan(strpos($rendered_js, 'common_test/main.js'), strpos($rendered_js, 'common_test/after_main.js'));
+  }
+
+  /**
    * Tests altering a JavaScript's weight via hook_js_alter().
    *
    * @see common_test_js_alter()
@@ -464,6 +497,28 @@ class AttachedAssetsTest extends KernelTestBase {
     $query_string = $this->container->get('asset.query_string')->get();
     $this->assertStringContainsString('<link rel="stylesheet" media="all" href="' . str_replace('&', '&amp;', $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/querystring.css?arg1=value1&arg2=value2')) . '&amp;' . $query_string . '" />', $rendered_css, 'CSS file with query string gets version query string correctly appended..');
     $this->assertStringContainsString('<script src="' . str_replace('&', '&amp;', $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/querystring.js?arg1=value1&arg2=value2')) . '&amp;' . $query_string . '"></script>', $rendered_js, 'JavaScript file with query string gets version query string correctly appended.');
+  }
+
+  /**
+   * Test settings can be loaded even when libraries are not.
+   */
+  public function testAttachedSettingsWithoutLibraries(): void {
+    $assets = new AttachedAssets();
+
+    // First test with no libraries will return no settings.
+    $assets->setSettings(['test' => 'foo']);
+    $js = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage())[1];
+    $this->assertArrayNotHasKey('drupalSettings', $js);
+
+    // Second test with a warm cache.
+    $js = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage())[1];
+    $this->assertArrayNotHasKey('drupalSettings', $js);
+
+    // Now test with different settings when drupalSettings is already loaded.
+    $assets->setSettings(['test' => 'bar']);
+    $assets->setAlreadyLoadedLibraries(['core/drupalSettings']);
+    $js = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage())[1];
+    $this->assertSame('bar', $js['drupalSettings']['data']['test']);
   }
 
 }

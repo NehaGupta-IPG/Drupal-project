@@ -13,6 +13,7 @@ class CacheCollectorHelper extends CacheCollector {
 
   /**
    * Contains data to return on a cache miss.
+   *
    * @var array
    */
   protected $cacheMissData = [];
@@ -27,7 +28,7 @@ class CacheCollectorHelper extends CacheCollector {
   /**
    * {@inheritdoc}
    */
-  public function set($key, $value) {
+  public function set($key, $value): void {
     parent::set($key, $value);
     $this->persist($key);
   }
@@ -52,7 +53,7 @@ class CacheCollectorHelper extends CacheCollector {
    * @param mixed $value
    *   The value to return.
    */
-  public function setCacheMissData($key, $value) {
+  public function setCacheMissData($key, $value): void {
     $this->cacheMissData[$key] = $value;
   }
 
@@ -67,13 +68,16 @@ class CacheCollectorHelper extends CacheCollector {
   }
 
   /**
-   * Setter for the cacheCreated property for use in unit tests.
+   * Simulates having loaded a cache item with the given data, for unit tests.
    *
-   * @param int $cache_created
-   *   A unix timestamp.
+   * Records the loaded data that ::updateCache() fingerprints and compares
+   * against to detect a concurrent change.
+   *
+   * @param array $data
+   *   The data the cache item would have contained when loaded.
    */
-  public function setCacheCreated(int $cache_created):void {
-    $this->cacheCreated = $cache_created;
+  public function setLoadedData(array $data): void {
+    $this->loadedData = $data;
   }
 
 }

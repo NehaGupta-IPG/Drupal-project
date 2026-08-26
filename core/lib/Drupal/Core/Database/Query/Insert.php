@@ -57,6 +57,7 @@ class Insert extends Query implements \Countable {
    *   That makes it safe to use in multi-insert loops.
    */
   public function execute() {
+    @trigger_error('Calling ' . __METHOD__ . '() as a concrete method is deprecated in drupal:11.5.0 and it is made abstract in drupal:12.0.0. Each database driver should should provide its own implementation. See https://www.drupal.org/node/3612421', E_USER_DEPRECATED);
     // If validation fails, simply return NULL. Note that validation routines
     // in preExecute() may throw exceptions instead.
     if (!$this->preExecute()) {
@@ -84,6 +85,7 @@ class Insert extends Query implements \Countable {
         $stmt->execute($insert_values, $this->queryOptions);
         $last_insert_id = $this->connection->lastInsertId();
       }
+      $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
@@ -149,8 +151,8 @@ class Insert extends Query implements \Countable {
       // We have to assume that the used aliases match the insert fields.
       // Regular fields are added to the query before expressions, maintain the
       // same order for the insert fields.
-      // This behavior can be overridden by calling fields() manually as only the
-      // first call to fields() does have an effect.
+      // This behavior can be overridden by calling fields() manually as only
+      // the first call to fields() does have an effect.
       $this->fields(array_merge(array_keys($this->fromQuery->getFields()), array_keys($this->fromQuery->getExpressions())));
     }
     else {

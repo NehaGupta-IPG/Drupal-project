@@ -14,16 +14,18 @@ use Drupal\node\Entity\Node;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 // cspell:ignore esque māori sourceediting splitbutton upcasted
-
 /**
  * Tests for CKEditor 5.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class CKEditor5Test extends CKEditor5TestBase {
 
   use TestFileCreationTrait;
@@ -49,6 +51,7 @@ class CKEditor5Test extends CKEditor5TestBase {
     $page->fillField('title[0][value]', 'My test content');
     $page->fillField('body[0][value]', '<p>This is test content</p>');
     $page->pressButton('Save');
+    $this->assertNotEmpty($assert_session->waitForText('page My test content has been created.'));
     $assert_session->responseNotContains('<p>This is test content</p>');
     $assert_session->responseContains('&lt;p&gt;This is test content&lt;/p&gt;');
 
@@ -60,9 +63,12 @@ class CKEditor5Test extends CKEditor5TestBase {
     $page->selectFieldOption('body[0][format]', 'ckeditor5');
     $this->assertNotEmpty($assert_session->waitForText('Change text format?'));
     $page->pressButton('Continue');
-    // Ensure the editor is loaded.
+    // CKEditor initialization can exceed the normal wait time under CI.
+    // Ensure the editor is loaded and has loaded the existing content.
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-editor'));
+    $this->assertNotEmpty($assert_session->waitForText('This is test content', 20000));
     $page->pressButton('Save');
+    $this->assertNotEmpty($assert_session->waitForText('page My test content has been updated.'));
 
     // Assert that the HTML is rendered correctly.
     $assert_session->responseContains('<p>This is test content</p>');
@@ -78,7 +84,7 @@ class CKEditor5Test extends CKEditor5TestBase {
 
     $this->addNewTextFormat();
     $this->drupalGet('admin/config/content/formats/manage/ckeditor5');
-    $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<br> <p> <h2> <h3> <h4> <h5> <h6> <strong> <em>');
+    $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<br> <em> <h2> <h3> <h4> <h5> <h6> <p> <strong>');
 
     $this->drupalGet('node/add/page');
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-heading-dropdown button'));
@@ -116,7 +122,7 @@ class CKEditor5Test extends CKEditor5TestBase {
     $page->uncheckField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading4]');
     $assert_session->assertWaitOnAjaxRequest();
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading4]'));
-    $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<br> <p> <h1> <h3> <h5> <h6> <strong> <em>');
+    $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<br> <em> <h1> <h3> <h5> <h6> <p> <strong>');
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading4]'));
 
     $page->pressButton('Save configuration');
@@ -213,6 +219,7 @@ JS;
     // Confirm there are no longer any warnings.
     $assert_session->waitForElementRemoved('css', '[data-drupal-messages] [role="alert"]');
     $page->pressButton('Save configuration');
+    $this->assertNotEmpty($assert_session->waitForText('Added text format ckeditor5'));
     $assert_session->responseContains('Added text format <em class="placeholder">ckeditor5</em>.');
   }
 
@@ -232,7 +239,7 @@ JS;
       $assert_session->assertWaitOnAjaxRequest();
     }
     $page->pressButton('Save configuration');
-    $assert_session->responseContains('The text format <em class="placeholder">ckeditor5</em> has been updated.');
+    $this->assertNotEmpty($assert_session->waitForText('The text format ckeditor5 has been updated.'));
   }
 
   /**
@@ -535,6 +542,7 @@ JS;
     $page->fillField('title[0][value]', 'My test content');
     $page->fillField('body[0][value]', '<p>This is a <em>test!</em></p>');
     $page->pressButton('Save');
+    $this->assertNotEmpty($assert_session->waitForText('page My test content has been created.'));
 
     $this->addNewTextFormat();
 
@@ -544,7 +552,9 @@ JS;
     $page->pressButton('Continue');
 
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-editor'));
+    $this->assertTrue($assert_session->waitForText('This is a test!', 20000));
     $page->pressButton('Save');
+    $this->assertNotEmpty($assert_session->waitForText('page My test content has been updated.'));
 
     $assert_session->responseContains('<p>This is a <em>test!</em></p>');
   }
@@ -566,22 +576,48 @@ JS;
       ],
       'settings' => [
         'toolbar' => [
-          'items' => ['sourceEditing', 'numberedList'],
+          'items' => ['numberedList', 'bulletedList'],
         ],
         'plugins' => [
           'ckeditor5_list' => [
             'properties' => [
               'reversed' => FALSE,
               'startIndex' => FALSE,
+              'styles' => FALSE,
             ],
             'multiBlock' => TRUE,
-          ],
-          'ckeditor5_sourceEditing' => [
-            'allowed_tags' => [],
           ],
         ],
       ],
     ])->save();
+
+    // Test that checking the list styles checkbox saves correctly.
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+    $this->drupalGet('admin/config/content/formats/manage/test_format');
+    $this->assertSame(['List'], $this->getVerticalTabs('#plugin-settings-wrapper', FALSE));
+    $this->clickLink('List');
+    $this->assertNotNull($assert_session->waitForElementVisible('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-list-styles"]'));
+    $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_list][styles]'));
+    $page->checkField('editor[settings][plugins][ckeditor5_list][styles]');
+    $page->pressButton('Save');
+
+    /** @var \Drupal\editor\EditorInterface $editor */
+    $editor = Editor::load('test_format');
+    $settings = $editor->getSettings();
+    $this->assertTrue($settings['plugins']['ckeditor5_list']['properties']['styles']);
+    $this->drupalGet('admin/config/content/formats/manage/test_format');
+    $this->assertSame(['List'], $this->getVerticalTabs('#plugin-settings-wrapper', FALSE));
+    $this->clickLink('List');
+    $this->assertNotNull($assert_session->waitForElementVisible('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-list-styles"]'));
+    $this->assertTrue($page->hasCheckedField('editor[settings][plugins][ckeditor5_list][styles]'));
+
+    // Add source editing plugin.
+    $settings['toolbar']['items'] = ['sourceEditing', 'numberedList', 'bulletedList'];
+    $settings['plugins']['ckeditor5_list']['properties']['styles'] = FALSE;
+    $settings['plugins']['ckeditor5_sourceEditing']['allowed_tags'] = [];
+    $editor->setSettings($settings)->save();
+
     $this->assertSame([], array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
@@ -592,8 +628,6 @@ JS;
       ))
     ));
     $ordered_list_html = '<ol><li>apple</li><li>banana</li><li>cantaloupe</li></ol>';
-    $page = $this->getSession()->getPage();
-    $assert_session = $this->assertSession();
     $this->drupalGet('node/add/page');
     $page->fillField('title[0][value]', 'My test content');
     $this->pressEditorButton('Source');
@@ -605,7 +639,7 @@ JS;
     $numbered_list_dropdown_selector = '.ck-splitbutton__arrow';
 
     // Check that there is no dropdown available for the numbered list because
-    // both reversed and startIndex are FALSE.
+    // reversed, startIndex and styles are FALSE.
     $assert_session->elementNotExists('css', $numbered_list_dropdown_selector);
     // Save content so source content is kept after changing the editor config.
     $page->pressButton('Save');
@@ -640,6 +674,70 @@ JS;
     $assert_session->elementExists('css', $reversed_order_button_selector);
     $assert_session->elementTextEquals('css', $reversed_order_button_selector, 'Reversed order');
     $assert_session->elementExists('css', $start_index_element_selector);
+
+    // Enable list style types.
+    $editor = Editor::load('test_format');
+    $settings = $editor->getSettings();
+    $settings['plugins']['ckeditor5_list']['properties']['styles'] = TRUE;
+    $editor->setSettings($settings);
+    $editor->save();
+    $this->getSession()->reload();
+    $this->waitForEditor();
+
+    $list_types = [
+      'ol' => [
+        'Lower-roman' => 'i',
+        'Upper-roman' => 'I',
+        'Lower-latin' => 'a',
+        'Upper-latin' => 'A',
+      ],
+      'ul' => [
+        'Square' => 'square',
+        'Disc' => 'disc',
+        'Circle' => 'circle',
+      ],
+    ];
+
+    foreach ($list_types as $list_tag => $types) {
+      foreach ($types as $type => $type_attribute) {
+        $list_to_edit = $assert_session->waitForElementVisible('css', ".ck-editor__editable_inline > *:first-child");
+        $list_to_edit->click();
+
+        // Open the list type toolbar and choose a type.
+        $list_button_tip_text = $list_tag === 'ol' ? 'Numbered List' : 'Bulleted List';
+        $toolbar_selector = '[aria-label="' . str_replace(' L', ' l', $list_button_tip_text) . ' styles toolbar"]';
+        $button_selector = '[data-cke-tooltip-text="' . $list_button_tip_text . '"]';
+        $page->find('css', '[aria-expanded="false"]' . $button_selector)->click();
+        $open_splitbutton = $assert_session->waitForElementVisible('css', '[aria-expanded="true"]' . $button_selector);
+        $this->assertNotNull($open_splitbutton, "$list_button_tip_text splitbutton is open");
+        $toolbar = $assert_session->waitForElementVisible('css', $toolbar_selector);
+        $this->assertNotNull($toolbar, "Toolbar for selecting $type is available at $toolbar_selector ");
+        $toolbar_with_tips = $assert_session->waitForElementVisible('css', $toolbar_selector . ' [data-cke-tooltip-text]');
+        $this->assertNotNull($toolbar_with_tips);
+        $toolbar_buttons = $toolbar->findAll('css', 'button');
+        // While this is a bit of an indirect way to find the correct button, it
+        // accounts for the mixed dash characters and worked better than other
+        // attempts.
+        $toolbar_button_tips = array_map(fn($item) => str_replace('–', '-', $item->getAttribute('data-cke-tooltip-text')), $toolbar_buttons);
+        $this->assertNotFalse(array_search($type, $toolbar_button_tips));
+        $toolbar_buttons[array_search($type, $toolbar_button_tips)]->click();
+        $widget_selector = '.ck-editor__editable_inline > ' . $list_tag . '[type="' . $type_attribute . '"]';
+        $widget = $assert_session->waitForElementVisible('css', $widget_selector);
+        $this->assertNotNull($widget, "The widget exists at $widget_selector");
+
+        // Confirm the style applied in-editor is for the type of list chosen.
+        $list_style_type = $this->getSession()->evaluateScript('window.getComputedStyle(document.querySelector(\'' . $widget_selector . '\')).listStyleType');
+        $this->assertSame(str_replace('latin', 'alpha', strtolower($type)), $list_style_type, "The $list_style_type list should have the correct style.");
+        $page->pressButton('Save');
+
+        $fe_list_style_type = $this->getSession()->evaluateScript('window.getComputedStyle(document.querySelector(\'' . $list_tag . '[type]\')).listStyleType');
+        // Confirm the style applied on the default theme is for the type of
+        // list chosen.
+        $this->assertSame(str_replace('latin', 'alpha', strtolower($type)), strtolower($fe_list_style_type));
+        $this->drupalGet($edit_url);
+        $this->waitForEditor();
+      }
+    }
   }
 
   /**
@@ -713,7 +811,7 @@ JS;
     $editor = $page->find('css', '.ck-content');
     $editor->setValue('Very important information');
     $page->pressButton('Save');
-    $this->assertSession()->responseContains('Very important information');
+    $this->assertTrue($this->assertSession()->waitForText('Very important information'));
 
     // Test that changes only in source are saved.
     $this->drupalGet('node/1/edit');
@@ -723,7 +821,7 @@ JS;
     $editor = $page->find('css', '.ck-source-editing-area textarea');
     $editor->setValue('Text hidden in the source');
     $page->pressButton('Save');
-    $this->assertSession()->responseContains('Text hidden in the source');
+    $this->assertTrue($this->assertSession()->waitForText('Text hidden in the source'));
   }
 
 }

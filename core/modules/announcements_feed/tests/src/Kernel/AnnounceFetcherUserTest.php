@@ -4,24 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\announcements_feed\Kernel;
 
+use Drupal\announcements_feed\AnnounceFetcher;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\announcements_feed\AnnounceFetcher
- *
- * @group announcements_feed
+ * Tests Drupal\announcements_feed\AnnounceFetcher.
  */
+#[CoversClass(AnnounceFetcher::class)]
+#[Group('announcements_feed')]
+#[RunTestsInSeparateProcesses]
 class AnnounceFetcherUserTest extends AnnounceTestBase {
 
   use UserCreationTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = [
-    'toolbar',
-  ];
 
   /**
    * {@inheritdoc}
@@ -32,7 +30,6 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
 
     // Setting current user.
     $permissions = [
-      'access toolbar',
       'access announcements',
     ];
     $this->setUpCurrentUser(['uid' => 1], $permissions);
@@ -62,7 +59,6 @@ class AnnounceFetcherUserTest extends AnnounceTestBase {
 
     // Create another user and test again.
     $permissions = [
-      'access toolbar',
       'access announcements',
     ];
     $this->setUpCurrentUser(['uid' => 2], $permissions);

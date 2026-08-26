@@ -6,12 +6,14 @@ namespace Drupal\Tests\system\Kernel\Form;
 
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the programmatic form submission behavior.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class ProgrammaticTest extends KernelTestBase {
 
   /**
@@ -73,7 +75,7 @@ class ProgrammaticTest extends KernelTestBase {
     $errors = $form_state->getErrors();
     $valid_form = empty($errors);
     $input_values = print_r($values, TRUE);
-    $validation_errors = $valid_form ? t('None') : implode(' ', $errors);
+    $validation_errors = $valid_form ? 'None' : implode(' ', $errors);
     $this->assertSame($valid_form, $valid_input, sprintf('Input values: %s<br />Validation handler errors: %s', $input_values, $validation_errors));
 
     // We check submitted values only if we have a valid input.

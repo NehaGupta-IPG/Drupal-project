@@ -10,13 +10,16 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\Access\CustomAccessCheck
- * @group Access
+ * Tests Drupal\Core\Access\CustomAccessCheck.
  */
+#[CoversClass(CustomAccessCheck::class)]
+#[Group('Access')]
 class CustomAccessCheckTest extends UnitTestCase {
 
   /**
@@ -131,7 +134,7 @@ class CustomAccessCheckTest extends UnitTestCase {
     $request = Request::create('/foo?example=muh');
 
     $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessage('The "\Drupal\Tests\Core\Access\NonExistentController::nonExistentMethod" method is not callable as a _custom_access callback in route "/test-route"');
+    $this->expectExceptionMessageIs('The "\Drupal\Tests\Core\Access\NonExistentController::nonExistentMethod" method is not callable as a _custom_access callback in route "/test-route"');
 
     // Run the access check.
     $this->accessChecker->access($route, $route_match, $account, $request);
@@ -139,6 +142,9 @@ class CustomAccessCheckTest extends UnitTestCase {
 
 }
 
+/**
+ * Controller for testing custom access.
+ */
 class TestController {
 
   public function accessAllow() {
