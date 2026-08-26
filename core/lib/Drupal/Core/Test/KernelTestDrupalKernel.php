@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Core\Test;
 
 use Drupal\Core\DrupalKernel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The DrupalKernel class is the core of Drupal itself.
