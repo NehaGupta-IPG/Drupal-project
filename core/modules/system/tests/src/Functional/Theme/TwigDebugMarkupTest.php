@@ -122,6 +122,8 @@ class TwigDebugMarkupTest extends BrowserTestBase {
       $html = $this->drupalGet(Url::fromRoute('entity.node.canonical', ['node' => $node->id()]));
       $dom = HTMLDocument::createFromString($html);
       $element = $dom->querySelector('body');
+      $messages = $element->querySelector('[data-drupal-messages]');
+      $messages?->remove();
       return [
         'textContent' => trim($element->textContent),
         'innerHTML' => $element->innerHTML,

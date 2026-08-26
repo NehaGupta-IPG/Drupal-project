@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\FunctionalJavascript\Form;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -32,6 +33,7 @@ class TriggeringElementTest extends WebDriverTestBase {
    * information is included in the POST data, as is sometimes the case when
    * the ENTER key is pressed in a textfield in Internet Explorer.
    */
+  #[DoesNotPerformAssertions]
   public function testNoButtonInfoInPost(): void {
     $path = '/form-test/clicked-button';
     $form_html_id = 'form-test-clicked-button';
