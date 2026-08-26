@@ -217,7 +217,11 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $this->revisionTable = NULL;
     $this->dataTable = NULL;
     $this->revisionDataTable = NULL;
-    $this->langcodeKey = FALSE;
+    // The langcode key is also initialized by the parent constructor, but it
+    // has to be updated here as well, so that a storage instance that is
+    // pointed at a different entity type definition does not keep the key of
+    // the previous one.
+    $this->langcodeKey = $this->entityType->getKey('langcode');
     $this->defaultLangcodeKey = FALSE;
 
     $table_mapping = $this->getTableMapping();
@@ -230,7 +234,6 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $translatable = $this->entityType->isTranslatable();
     if ($translatable) {
       $this->dataTable = $table_mapping->getDataTable();
-      $this->langcodeKey = $this->entityType->getKey('langcode');
       $this->defaultLangcodeKey = $this->entityType->getKey('default_langcode');
     }
     if ($revisionable && $translatable) {
