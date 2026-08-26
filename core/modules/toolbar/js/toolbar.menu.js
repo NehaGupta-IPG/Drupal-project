@@ -128,7 +128,7 @@
         text: '',
       };
       // Initialize items and their links.
-      $menu.find('li > a').wrap('<div class="toolbar-box">');
+      $menu.find('li > a, li > span').wrap('<div class="toolbar-box">');
       // Add a handle to each list item if it has a menu.
       $menu.find('li').each((index, element) => {
         const $item = $(element);

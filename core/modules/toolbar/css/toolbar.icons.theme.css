@@ -91,6 +91,31 @@
   filter: invert(100%);
 }
 
+.toolbar .toolbar-tray-vertical .toolbar-menu ul span {
+  padding-left: 2.75em;
+}
+
+.toolbar .toolbar-tray-vertical .toolbar-menu span {
+  padding-right: 4em;
+  padding-left: 2.75em;
+}
+
+.toolbar .toolbar-menu .toolbar-menu span {
+  color: #434343;
+}
+
+.toolbar-tray span {
+  padding: 1em 1.3333em;
+  cursor: default;
+  text-decoration: none;
+  color: #565656;
+}
+
+.toolbar span {
+  display: block;
+  line-height: 1;
+}
+
 /**
  * Top level icons.
  */
