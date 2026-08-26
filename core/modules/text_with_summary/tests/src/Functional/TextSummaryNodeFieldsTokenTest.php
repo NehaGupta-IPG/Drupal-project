@@ -37,7 +37,7 @@ class TextSummaryNodeFieldsTokenTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['text_with_summary'];
+  protected static $modules = ['body_field', 'text_with_summary'];
 
   /**
    * Tests token replacement for Views tokens supplied by the Node module.

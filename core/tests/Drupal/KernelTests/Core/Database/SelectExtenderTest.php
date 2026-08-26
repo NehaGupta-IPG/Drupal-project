@@ -54,26 +54,6 @@ class SelectExtenderTest extends KernelTestBase {
         '\Drupal\Core\Database\Query\TableSortExtender',
       ],
       [
-        'Drupal\search\SearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        'Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\search\SearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        '\Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\search\ViewsSearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        'Drupal\search\ViewsSearchQuery',
-      ],
-      [
-        'Drupal\search\ViewsSearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        '\Drupal\search\ViewsSearchQuery',
-      ],
-      [
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\PagerSelectExtender',
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
         'Drupal\Core\Database\Query\PagerSelectExtender',
@@ -92,26 +72,6 @@ class SelectExtenderTest extends KernelTestBase {
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\TableSortExtender',
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
         '\Drupal\Core\Database\Query\TableSortExtender',
-      ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\SearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        'Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\SearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        '\Drupal\search\SearchQuery',
-      ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\ViewsSearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        'Drupal\search\ViewsSearchQuery',
-      ],
-      [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\ViewsSearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        '\Drupal\search\ViewsSearchQuery',
       ],
     ];
   }

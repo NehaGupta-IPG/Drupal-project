@@ -4,6 +4,7 @@ namespace Drupal\toolbar\Hook;
 
 use Drupal\announcements_feed\RenderCallbacks;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Hook\Attribute\HookDependsOnModule;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Routing\AdminContext;
 use Drupal\Core\Session\AccountInterface;
@@ -36,7 +37,9 @@ class ToolbarHooks {
     switch ($route_name) {
       case 'help.page.toolbar':
         $output = '<h2>' . $this->t('About') . '</h2>';
-        $output .= '<p>' . $this->t('The Toolbar module provides a toolbar for site administrators, which displays tabs and trays provided by the Toolbar module itself and other modules. For more information, see the <a href=":toolbar_docs">online documentation for the Toolbar module</a>.', [':toolbar_docs' => 'https://www.drupal.org/docs/8/core/modules/toolbar']) . '</p>';
+        $output .= '<p>' . $this->t('The Toolbar module provides a toolbar for site administrators to navigate the menu system to find pages for administrative tasks. The menu displays tabs and trays provided by the Toolbar module itself and other modules. The toolbar displays on the top or left side of the page (right side in right-to-left languages).') . '</p>';
+        $output .= '<p>' . $this->t('If you have the Announcements module enabled, you will see a direct link to announcements in the toolbar.') . '</p>';
+        $output .= '<p>' . $this->t('For more information, see the <a href=":toolbar_docs">online documentation for the Toolbar module</a>.', [':toolbar_docs' => 'https://www.drupal.org/docs/8/core/modules/toolbar']) . '</p>';
         $output .= '<h4>' . $this->t('Terminology') . '</h4>';
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Tabs') . '</dt>';
@@ -143,10 +146,10 @@ class ToolbarHooks {
         '#attached' => $subtrees_attached,
         'toolbar_administration' => [
           '#pre_render' => [
-                      [
-                        ToolbarController::class,
-                        'preRenderAdministrationTray',
-                      ],
+            [
+              ToolbarController::class,
+              'preRenderAdministrationTray',
+            ],
           ],
           '#type' => 'container',
           '#attributes' => [
@@ -418,6 +421,23 @@ class ToolbarHooks {
     $items['workspace']['#pre_render'][] = 'workspaces_ui.lazy_builders:removeTabAttributes';
 
     return $items;
+  }
+
+  /**
+   * Implements hook_toolbar_alter().
+   */
+  #[Hook('toolbar_alter')]
+  #[HookDependsOnModule('announcements_feed')]
+  public function toolbarAlter(&$items): void {
+    // As the "Announcements" link is shown already in the top toolbar bar, we
+    // don't need it again in the administration menu tray, so hide it.
+    if (!empty($items['administration']['tray'])) {
+      $callable = function (array $element) {
+        unset($element['administration_menu']['#items']['announcements_feed.announcement']);
+        return $element;
+      };
+      $items['administration']['tray']['toolbar_administration']['#pre_render'][] = $callable;
+    }
   }
 
 }

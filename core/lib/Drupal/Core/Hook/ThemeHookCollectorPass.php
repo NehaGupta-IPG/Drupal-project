@@ -14,7 +14,6 @@ use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\Attribute\ReorderHook;
-use Drupal\Core\Site\Settings;
 use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -110,7 +109,7 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
     ]);
 
     foreach ($this->deprecatedThemeFiles as $deprecatedThemeFile => $v) {
-      @trigger_error('Using ' . $deprecatedThemeFile . '.theme is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
+      @trigger_error('Using ' . $deprecatedThemeFile . '.theme is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
     }
   }
 
@@ -381,17 +380,12 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
       return $iterator->isDir() || $extension === 'php';
     }
     if ($iterator->isDir()) {
-      if ($subPathName === 'src' || $subPathName === 'src/Hook') {
-        return TRUE;
-      }
-      $ignore_directories = Settings::get('file_scan_ignore_directories', []);
-      // glob() doesn't support streams but scandir() does.
-      return !in_array($fileInfo->getFilename(), array_merge(['tests', 'js', 'css', 'templates'], $ignore_directories)) && !array_filter(scandir($key), static fn($filename) => str_ends_with($filename, '.info.yml'));
+      return $subPathName === 'src' || $subPathName === 'src/Hook';
     }
     if ($fileInfo->getFilename() === 'theme-settings.php') {
       return TRUE;
     }
-    return in_array($extension, ['inc', 'theme']);
+    return in_array($extension, ['theme']);
   }
 
   /**
