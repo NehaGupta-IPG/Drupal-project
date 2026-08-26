@@ -265,6 +265,36 @@ class StyleTableTest extends ViewTestBase {
   }
 
   /**
+   * Test table row header field.
+   */
+  public function testRowHeaderField() {
+    $this->drupalGet('test-table');
+    $view = View::load('test_table');
+    $display = &$view->getDisplay('default');
+    $display['display_options']['style']['options']['row_header'] = 'name';
+
+    /*
+     * Adds a new data point in the views_test_data table to have a new person
+     * to check for row scope attribute.
+     */
+    $data_set = $this->dataSet();
+    $query = Database::getConnection()->insert('views_test_data')
+      ->fields(array_keys($data_set[0]));
+    $query->values([
+      'name' => 'Margaret Hamilton',
+      'age' => 24,
+      'job' => 'Software Engineer',
+      'created' => gmmktime(4, 12, 9, 1, 1, 1972),
+      'status' => 1,
+    ]);
+
+    $query->execute();
+    $view->save();
+    $this->drupalGet('test-table');
+    $this->assertSession()->elementExists('xpath', '//tbody/tr/th[contains(., "Margaret")]')->hasAttribute('scope') == 'row';
+  }
+
+  /**
    * Tests the cacheability of the table display.
    */
   public function testTableCacheability(): void {

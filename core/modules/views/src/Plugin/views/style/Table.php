@@ -74,6 +74,7 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
     $options['class'] = ['default' => ''];
     $options['default'] = ['default' => ''];
     $options['info'] = ['default' => []];
+    $options['row_header'] = ['default' => ''];
     $options['override'] = ['default' => TRUE];
     $options['sticky'] = ['default' => FALSE];
     $options['order'] = ['default' => 'asc'];
@@ -287,6 +288,10 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
     else {
       $default = -1;
     }
+    $row_header = -1;
+    if (isset($this->options['row_header']) && isset($columns[$this->options['row_header']])) {
+      $row_header = $this->options['row_header'];
+    }
 
     foreach ($columns as $field => $column) {
       $column_selector = ':input[name="style_options[columns][' . $field . ']"]';
@@ -342,6 +347,26 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
           ],
         ];
       }
+
+      $row_header_id = Html::getUniqueId('edit-row-header-' . $field);
+      $form['row_header'][$field] = [
+        '#title' => $this->t('Row header for @field', ['@field' => $field]),
+        '#title_display' => 'invisible',
+        '#type' => 'radio',
+        '#return_value' => $field,
+        '#parents' => ['style_options', 'row_header'],
+        '#id' => $row_header_id,
+        // We need to set the id using attributes because 'radio' doesn't fully
+        // support #id.
+        '#attributes' => ['id' => $row_header_id],
+        '#default_value' => $row_header,
+        '#states' => [
+          'visible' => [
+            $column_selector => ['value' => $field],
+          ],
+        ],
+      ];
+
       $form['info'][$field]['align'] = [
         '#title' => $this->t('Alignment for @field', ['@field' => $field]),
         '#title_display' => 'invisible',
@@ -371,6 +396,17 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
           ],
         ],
       ];
+      // Provide a radio for 'no row header'.
+      $form['row_header'][-1] = [
+        '#title' => $this->t('No row header'),
+        '#title_display' => 'invisible',
+        '#type' => 'radio',
+        '#return_value' => -1,
+        '#parents' => ['style_options', 'row_header'],
+        '#id' => 'edit-row_header-0',
+        '#default_value' => $row_header,
+      ];
+
       $form['info'][$field]['empty_column'] = [
         '#title' => $this->t('Hide empty column for @field', ['@field' => $field]),
         '#title_display' => 'invisible',

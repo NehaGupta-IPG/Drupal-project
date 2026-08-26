@@ -133,4 +133,26 @@ class ViewsConfigUpdater {
     return $changed;
   }
 
+  /**
+   * Set table row header option to none by default.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view has any displays that needed to be updated.
+   */
+  public function setRowHeaderOption(ViewEntityInterface $view): bool {
+    $displays = $view->get('display');
+    $row_header_set = FALSE;
+
+    foreach ($displays as &$display) {
+      if (!isset($display['display_options']['style']['options']['row_header'])) {
+        $display['display_options']['style']['options']['row_header'] = '-1';
+        $row_header_set = TRUE;
+      }
+    }
+    return $row_header_set;
+  }
+
 }

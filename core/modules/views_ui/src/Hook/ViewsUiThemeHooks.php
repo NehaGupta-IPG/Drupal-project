@@ -513,6 +513,10 @@ class ViewsUiThemeHooks {
         'align' => 'center',
       ],
       [
+        'data' => $this->t('Row header'),
+        'align' => 'center',
+      ],      
+      [
         'data' => $this->t('Hide empty column'),
         'align' => 'center',
       ],
@@ -548,6 +552,8 @@ class ViewsUiThemeHooks {
         $row[] = '';
         $row[] = '';
       }
+      $row[]['data'] = $form['row_header'][$id];
+
       $row[] = [
         'data' => $form['info'][$id]['empty_column'],
         'align' => 'center',
@@ -561,8 +567,10 @@ class ViewsUiThemeHooks {
 
     // Add the special 'None' row.
     $rows[] = [
-      ['data' => $this->t('None'), 'colspan' => 6],
+      ['data' => t('None'), 'colspan' => 2],
+      ['colspan' => 4],
       ['align' => 'center', 'data' => $form['default'][-1]],
+      ['align' => 'center', 'data' => $form['row_header'][-1]],
       ['colspan' => 2],
     ];
 
@@ -571,6 +579,7 @@ class ViewsUiThemeHooks {
     unset($form['default']);
     unset($form['info']);
     unset($form['columns']);
+    unset($form['row_header']);
 
     $variables['table'] = [
       '#type' => 'table',

@@ -61,3 +61,14 @@ function views_removed_post_updates(): array {
 function views_post_update_counter_field_not_sortable(): void {
   // Empty update to trigger a cache rebuild so updated Views data is applied.
 }
+
+/**
+ * Set table row header option to none.
+ */
+function views_post_update_set_row_header(array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->setRowHeaderOption($view);
+  });
+}
