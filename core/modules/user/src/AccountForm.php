@@ -405,31 +405,31 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
 
     if ($default_supports && $admin_supports) {
       return [
-        '#description' => $this->t('System follows your operating system or browser setting. Applies where supported by site theme.'),
+        '#description' => $this->t('System follows your operating system or browser setting. Applies wherever your site’s theme supports it.'),
       ];
     }
 
     if ($default_supports) {
       return [
-        '#description' => $this->t('System follows your operating system or browser setting. The site follows this setting, administration pages do not.'),
+        '#description' => $this->t('System follows your operating system or browser setting. The site follows this setting, administrative pages do not.'),
       ];
     }
 
     if ($admin_supports) {
       if ($this->accountMayUseAdminTheme($account, $cacheability)) {
         return [
-          '#description' => $this->t('System follows your operating system or browser setting. Administration pages follow this setting, the rest of the site does not.'),
+          '#description' => $this->t('System follows your operating system or browser setting. Administrative pages follow this setting, the rest of the site does not.'),
         ];
       }
       return [
         '#disabled' => TRUE,
-        '#description' => $this->t('Only administration pages follow this setting, and this account does not use the administration theme. The setting has no effect.'),
+        '#description' => $this->t('This setting has no effect on your account. Only administration pages support it, and this account does not use the administration theme.'),
       ];
     }
 
     return [
       '#disabled' => TRUE,
-      '#description' => $this->t('Neither the site theme nor the administration theme follows this setting. The setting has no effect.'),
+      '#description' => $this->t('This setting has no effect. Neither the site not the administration pages support it.'),
     ];
   }
 
