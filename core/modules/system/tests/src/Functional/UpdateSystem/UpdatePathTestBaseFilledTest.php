@@ -339,7 +339,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'phpass',
       'responsive_image',
       'rest',
-      'search',
       'serialization',
       'syslog',
       'system',
