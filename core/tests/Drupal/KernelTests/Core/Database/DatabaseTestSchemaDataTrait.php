@@ -192,7 +192,7 @@ trait DatabaseTestSchemaDataTrait {
   }
 
   /**
-   * Data provider of JSON condition test cases.
+   * Lists the JSON condition test cases shared by the query builder tests.
    *
    * The expectations describe the rows of the 'json' table that addSampleData()
    * inserts, so they apply to any query type that supports jsonCondition().
@@ -572,7 +572,7 @@ trait DatabaseTestSchemaDataTrait {
   }
 
   /**
-   * Data provider of JSON expression test cases.
+   * Lists the JSON expression test cases shared by the query builder tests.
    *
    * The expectations describe the rows of the 'json' table that addSampleData()
    * inserts, so they apply to any query type that supports jsonExpression().

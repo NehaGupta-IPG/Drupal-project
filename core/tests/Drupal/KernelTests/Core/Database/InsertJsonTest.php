@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Query\SelectInterface;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -87,27 +86,23 @@ class InsertJsonTest extends DatabaseTestBase {
    *
    * Every case copies the ID of the matching rows into the marker column, so
    * the rows an INSERT selects can be compared against the rows the same
-   * condition returns in a SELECT.
-   *
-   * @param string $jsonpath
-   *   The jsonpath to compare.
-   * @param mixed $value
-   *   The value to compare against.
-   * @param string $operator
-   *   The comparison operator.
-   * @param array $expected_ids
-   *   The IDs of the sample rows the condition matches.
+   * condition returns in a SELECT. The cases run in a loop instead of a data
+   * provider, so the class boots its isolated test process once for all of
+   * them. Removing the inserted rows after each case restores the sample data
+   * for the next one.
    *
    * @see \Drupal\KernelTests\Core\Database\SelectTest::testJsonCondition()
    */
-  #[DataProvider('providerJsonConditionOperators')]
-  public function testJsonConditionInsert(string $jsonpath, mixed $value, string $operator, array $expected_ids): void {
-    $this->connection->insert('json')
-      ->from($this->sampleSelect())
-      ->jsonCondition('test_field', $jsonpath, $value, $operator)
-      ->execute();
+  public function testJsonConditionInsert(): void {
+    foreach (static::providerJsonConditionOperators() as $label => [$jsonpath, $value, $operator, $expected_ids]) {
+      $this->connection->insert('json')
+        ->from($this->sampleSelect())
+        ->jsonCondition('test_field', $jsonpath, $value, $operator)
+        ->execute();
 
-    $this->assertEqualsCanonicalizing($expected_ids, array_keys($this->insertedRows()));
+      $this->assertEqualsCanonicalizing($expected_ids, array_keys($this->insertedRows()), "Case: $label");
+      $this->resetInsertedRows();
+    }
   }
 
   /**
@@ -200,24 +195,19 @@ class InsertJsonTest extends DatabaseTestBase {
 
   /**
    * Tests JSON expressions on nested, hyphenated and indexed paths.
-   *
-   * @param string $jsonpath
-   *   The jsonpath to extract.
-   * @param int $id
-   *   The ID of the sample row to extract from.
-   * @param string $expected
-   *   The value the extraction writes.
    */
-  #[DataProvider('providerJsonExpressionPaths')]
-  public function testJsonExpressionPaths(string $jsonpath, int $id, string $expected): void {
-    $select = $this->sampleSelect();
-    $select->condition('j.id', $id);
-    $this->connection->insert('json')
-      ->from($select)
-      ->jsonExpression('name', 'test_field', $jsonpath)
-      ->execute();
+  public function testJsonExpressionPaths(): void {
+    foreach (static::providerJsonExpressionPaths() as $label => [$jsonpath, $id, $expected]) {
+      $select = $this->sampleSelect();
+      $select->condition('j.id', $id);
+      $this->connection->insert('json')
+        ->from($select)
+        ->jsonExpression('name', 'test_field', $jsonpath)
+        ->execute();
 
-    $this->assertSame([$id => $expected], $this->insertedRows('name'));
+      $this->assertSame([$id => $expected], $this->insertedRows('name'), "Case: $label");
+      $this->resetInsertedRows();
+    }
   }
 
   /**

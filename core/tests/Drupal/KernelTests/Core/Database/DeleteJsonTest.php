@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\InvalidQueryException;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -51,29 +50,26 @@ class DeleteJsonTest extends DatabaseTestBase {
    *
    * Every case starts from the full sample data, so the rows a DELETE removes
    * can be compared against the rows the same condition returns in a SELECT.
-   *
-   * @param string $jsonpath
-   *   The jsonpath to compare.
-   * @param mixed $value
-   *   The value to compare against.
-   * @param string $operator
-   *   The comparison operator.
-   * @param array $expected_ids
-   *   The IDs of the sample rows the condition matches.
+   * The cases run in a loop instead of a data provider, so the class boots its
+   * isolated test process once for all of them. Reseeding the table after each
+   * case restores the sample data for the next one.
    *
    * @see \Drupal\KernelTests\Core\Database\SelectTest::testJsonCondition()
    */
-  #[DataProvider('providerJsonConditionOperators')]
-  public function testJsonConditionDelete(string $jsonpath, mixed $value, string $operator, array $expected_ids): void {
-    $num_deleted = $this->connection->delete('json')
-      ->jsonCondition('test_field', $jsonpath, $value, $operator)
-      ->execute();
+  public function testJsonConditionDelete(): void {
+    foreach (static::providerJsonConditionOperators() as $label => [$jsonpath, $value, $operator, $expected_ids]) {
+      $num_deleted = $this->connection->delete('json')
+        ->jsonCondition('test_field', $jsonpath, $value, $operator)
+        ->execute();
 
-    $this->assertSame(count($expected_ids), $num_deleted);
-    $this->assertEqualsCanonicalizing(
-      array_values(array_diff(static::ALL_IDS, $expected_ids)),
-      $this->remainingIds(),
-    );
+      $this->assertSame(count($expected_ids), $num_deleted, "Case: $label");
+      $this->assertEqualsCanonicalizing(
+        array_values(array_diff(static::ALL_IDS, $expected_ids)),
+        $this->remainingIds(),
+        "Case: $label",
+      );
+      $this->resetJsonTable();
+    }
   }
 
   /**

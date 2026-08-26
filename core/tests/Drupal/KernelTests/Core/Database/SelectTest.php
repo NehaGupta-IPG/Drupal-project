@@ -643,26 +643,21 @@ class SelectTest extends DatabaseTestBase {
    * when matching JSON documents vs. other data which is stored directly in SQL
    * tables.
    *
-   * @param string $jsonpath
-   *   The jsonpath to compare.
-   * @param mixed $value
-   *   The value to compare against.
-   * @param string $operator
-   *   The comparison operator.
-   * @param array $expected_ids
-   *   The IDs of the sample rows the condition matches.
+   * The cases run in a loop instead of a data provider, so the class boots its
+   * isolated test process once for all of them.
    */
-  #[DataProvider('providerJsonConditionOperators')]
-  public function testJsonCondition(string $jsonpath, mixed $value, string $operator, array $expected_ids): void {
-    $query = $this->connection->select('json', 'j');
-    $query->addField('j', 'id');
-    $query->jsonCondition('j.test_field', $jsonpath, $value, $operator);
-    $ids = $query->execute()->fetchCol();
-    $this->assertEqualsCanonicalizing($expected_ids, $ids);
+  public function testJsonCondition(): void {
+    foreach (static::providerJsonConditionOperators() as $label => [$jsonpath, $value, $operator, $expected_ids]) {
+      $query = $this->connection->select('json', 'j');
+      $query->addField('j', 'id');
+      $query->jsonCondition('j.test_field', $jsonpath, $value, $operator);
+      $ids = $query->execute()->fetchCol();
+      $this->assertEqualsCanonicalizing($expected_ids, $ids, "Case: $label");
+    }
   }
 
   /**
-   * Data provider of JSON conditions with invalid arguments.
+   * Lists JSON conditions with invalid arguments.
    *
    * @return array[]
    *   Test cases, each an array of a field, a jsonpath, a value and an
@@ -691,24 +686,21 @@ class SelectTest extends DatabaseTestBase {
 
   /**
    * Tests that JsonCondition validates its arguments.
-   *
-   * @param string $field
-   *   The field holding the JSON document.
-   * @param string $path
-   *   The jsonpath to compare.
-   * @param mixed $value
-   *   The value to compare against.
-   * @param string $operator
-   *   The comparison operator.
    */
-  #[DataProvider('providerJsonConditionOperatorValidation')]
-  public function testJsonConditionOperatorValidation(string $field, string $path, mixed $value, string $operator): void {
-    $this->expectException(InvalidQueryException::class);
-    new JsonCondition($field, $path, $value, $operator);
+  public function testJsonConditionOperatorValidation(): void {
+    foreach (static::providerJsonConditionOperatorValidation() as $label => [$field, $path, $value, $operator]) {
+      try {
+        new JsonCondition($field, $path, $value, $operator);
+        $this->fail("Case: $label. Expected InvalidQueryException was not thrown.");
+      }
+      catch (InvalidQueryException) {
+        $this->addToAssertionCount(1);
+      }
+    }
   }
 
   /**
-   * Data provider of invalid jsonpath expressions.
+   * Lists invalid jsonpath expressions.
    *
    * @return array[]
    *   Test cases, each an array of a jsonpath.
@@ -730,14 +722,17 @@ class SelectTest extends DatabaseTestBase {
 
   /**
    * Tests that JsonExpression rejects invalid jsonpath expressions.
-   *
-   * @param string $path
-   *   The jsonpath to extract.
    */
-  #[DataProvider('providerJsonExpressionPathValidation')]
-  public function testJsonExpressionPathValidation(string $path): void {
-    $this->expectException(InvalidQueryException::class);
-    $this->connection->jsonExpression('test_field', $path);
+  public function testJsonExpressionPathValidation(): void {
+    foreach (static::providerJsonExpressionPathValidation() as $label => [$path]) {
+      try {
+        $this->connection->jsonExpression('test_field', $path);
+        $this->fail("Case: $label. Expected InvalidQueryException was not thrown.");
+      }
+      catch (InvalidQueryException) {
+        $this->addToAssertionCount(1);
+      }
+    }
   }
 
   /**
@@ -752,7 +747,7 @@ class SelectTest extends DatabaseTestBase {
   }
 
   /**
-   * Data provider of operators that cannot expand a wildcard path.
+   * Lists operators that cannot expand a wildcard path.
    *
    * @return array[]
    *   Test cases, each an array of an operator and a value to compare.
@@ -774,32 +769,32 @@ class SelectTest extends DatabaseTestBase {
    * value satisfies the test. The operators listed here read the document at
    * the path itself, which a wildcard does not address.
    *
-   * @param string $operator
-   *   The comparison operator.
-   * @param mixed $value
-   *   The value to compare against.
-   *
    * @see \Drupal\Core\Database\Query\JsonCondition::WILDCARD_OPERATORS
    */
-  #[DataProvider('providerJsonWildcardUnsupportedOperator')]
-  public function testJsonWildcardUnsupportedOperator(string $operator, mixed $value): void {
-    $query = $this->connection->select('json', 'j');
-    $query->addField('j', 'id');
-    $query->jsonCondition('test_field', '$.deps.*.status', $value, $operator);
+  public function testJsonWildcardUnsupportedOperator(): void {
+    foreach (static::providerJsonWildcardUnsupportedOperator() as $label => [$operator, $value]) {
+      $query = $this->connection->select('json', 'j');
+      $query->addField('j', 'id');
+      $query->jsonCondition('test_field', '$.deps.*.status', $value, $operator);
 
-    try {
-      $query->execute();
-      $this->fail('Expected exception not thrown');
-    }
-    catch (InvalidQueryException $e) {
-      $this->assertStringContainsString("JSON operator {$operator} does not support the wildcard", $e->getMessage());
-    }
+      try {
+        $query->execute();
+        $this->fail("Case: $label. Expected exception not thrown.");
+      }
+      catch (InvalidQueryException $e) {
+        $this->assertStringContainsString("JSON operator {$operator} does not support the wildcard", $e->getMessage(), "Case: $label");
+      }
 
-    // A failed compile leaves the condition recompilable, so executing the
-    // same query object again throws the same exception.
-    $this->expectException(InvalidQueryException::class);
-    $this->expectExceptionMessage("JSON operator {$operator} does not support the wildcard");
-    $query->execute();
+      // A failed compile leaves the condition recompilable, so executing the
+      // same query object again throws the same exception.
+      try {
+        $query->execute();
+        $this->fail("Case: $label. Expected exception not thrown on the second execution.");
+      }
+      catch (InvalidQueryException $e) {
+        $this->assertStringContainsString("JSON operator {$operator} does not support the wildcard", $e->getMessage(), "Case: $label, second execution");
+      }
+    }
   }
 
   /**

@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\JsonCastType;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -16,6 +15,17 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Database')]
 #[RunTestsInSeparateProcesses]
 class UpdateJsonTest extends DatabaseTestBase {
+
+  /**
+   * Empties the 'json' table and inserts the sample data again.
+   *
+   * A test that runs several updates in a row uses this to start every case
+   * from the sample data.
+   */
+  protected function resetJsonTable(): void {
+    $this->connection->delete('json')->execute();
+    $this->addSampleJsonData();
+  }
 
   /**
    * Returns the IDs of the rows of the 'json' table with a given status.
@@ -40,28 +50,24 @@ class UpdateJsonTest extends DatabaseTestBase {
    *
    * Every case marks the matching rows with a new status, so the rows an
    * UPDATE affects can be compared against the rows the same condition
-   * returns in a SELECT.
-   *
-   * @param string $jsonpath
-   *   The jsonpath to compare.
-   * @param mixed $value
-   *   The value to compare against.
-   * @param string $operator
-   *   The comparison operator.
-   * @param array $expected_ids
-   *   The IDs of the sample rows the condition matches.
+   * returns in a SELECT. The cases run in a loop instead of a data provider,
+   * so the class boots its isolated test process once for all of them.
+   * Reseeding the table after each case restores the sample data for the next
+   * one.
    *
    * @see \Drupal\KernelTests\Core\Database\SelectTest::testJsonCondition()
    */
-  #[DataProvider('providerJsonConditionOperators')]
-  public function testJsonConditionUpdate(string $jsonpath, mixed $value, string $operator, array $expected_ids): void {
-    $num_updated = $this->connection->update('json')
-      ->fields(['status' => 2])
-      ->jsonCondition('test_field', $jsonpath, $value, $operator)
-      ->execute();
+  public function testJsonConditionUpdate(): void {
+    foreach (static::providerJsonConditionOperators() as $label => [$jsonpath, $value, $operator, $expected_ids]) {
+      $num_updated = $this->connection->update('json')
+        ->fields(['status' => 2])
+        ->jsonCondition('test_field', $jsonpath, $value, $operator)
+        ->execute();
 
-    $this->assertSame(count($expected_ids), $num_updated);
-    $this->assertEqualsCanonicalizing($expected_ids, $this->idsWithStatus(2));
+      $this->assertSame(count($expected_ids), $num_updated, "Case: $label");
+      $this->assertEqualsCanonicalizing($expected_ids, $this->idsWithStatus(2), "Case: $label");
+      $this->resetJsonTable();
+    }
   }
 
   /**
@@ -222,27 +228,22 @@ class UpdateJsonTest extends DatabaseTestBase {
 
   /**
    * Tests JSON expressions on nested, hyphenated and indexed paths.
-   *
-   * @param string $jsonpath
-   *   The jsonpath to extract.
-   * @param int $id
-   *   The ID of the sample row to extract from.
-   * @param string $expected
-   *   The value the extraction writes.
    */
-  #[DataProvider('providerJsonExpressionPaths')]
-  public function testJsonExpressionPaths(string $jsonpath, int $id, string $expected): void {
-    $this->connection->update('json')
-      ->jsonExpression('name', 'test_field', $jsonpath)
-      ->condition('id', $id)
-      ->execute();
+  public function testJsonExpressionPaths(): void {
+    foreach (static::providerJsonExpressionPaths() as $label => [$jsonpath, $id, $expected]) {
+      $this->connection->update('json')
+        ->jsonExpression('name', 'test_field', $jsonpath)
+        ->condition('id', $id)
+        ->execute();
 
-    $name = $this->connection->select('json', 'j')
-      ->fields('j', ['name'])
-      ->condition('j.id', $id)
-      ->execute()
-      ->fetchField();
-    $this->assertSame($expected, $name);
+      $name = $this->connection->select('json', 'j')
+        ->fields('j', ['name'])
+        ->condition('j.id', $id)
+        ->execute()
+        ->fetchField();
+      $this->assertSame($expected, $name, "Case: $label");
+      $this->resetJsonTable();
+    }
   }
 
   /**

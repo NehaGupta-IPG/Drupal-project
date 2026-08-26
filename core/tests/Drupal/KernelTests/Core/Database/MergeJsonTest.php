@@ -7,7 +7,6 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Query\Merge;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -99,36 +98,32 @@ class MergeJsonTest extends DatabaseTestBase {
    * A condition that matches at least one row makes the merge update every
    * matching row, so the result can be compared against the rows the same
    * condition returns in a SELECT. A condition that matches nothing makes the
-   * merge insert instead.
-   *
-   * @param string $jsonpath
-   *   The jsonpath to compare.
-   * @param mixed $value
-   *   The value to compare against.
-   * @param string $operator
-   *   The comparison operator.
-   * @param array $expected_ids
-   *   The IDs of the sample rows the condition matches.
+   * merge insert instead. The cases run in a loop instead of a data provider,
+   * so the class boots its isolated test process once for all of them.
+   * Resetting the table after each case restores the sample data for the next
+   * one.
    *
    * @see \Drupal\KernelTests\Core\Database\SelectTest::testJsonCondition()
    */
-  #[DataProvider('providerJsonConditionOperators')]
-  public function testJsonConditionMerge(string $jsonpath, mixed $value, string $operator, array $expected_ids): void {
-    $result = $this->connection->merge('json')
-      ->jsonCondition('test_field', $jsonpath, $value, $operator)
-      ->updateFields(['status' => 2])
-      ->insertFields(['id' => static::INSERT_ID, 'status' => 3])
-      ->execute();
+  public function testJsonConditionMerge(): void {
+    foreach (static::providerJsonConditionOperators() as $label => [$jsonpath, $value, $operator, $expected_ids]) {
+      $result = $this->connection->merge('json')
+        ->jsonCondition('test_field', $jsonpath, $value, $operator)
+        ->updateFields(['status' => 2])
+        ->insertFields(['id' => static::INSERT_ID, 'status' => 3])
+        ->execute();
 
-    if ($expected_ids === []) {
-      $this->assertSame(Merge::STATUS_INSERT, $result);
-      $this->assertSame([], $this->idsWithStatus(2));
-      $this->assertSame([static::INSERT_ID], $this->idsWithStatus(3));
-    }
-    else {
-      $this->assertSame(Merge::STATUS_UPDATE, $result);
-      $this->assertEqualsCanonicalizing($expected_ids, $this->idsWithStatus(2));
-      $this->assertSame(11, $this->countRows());
+      if ($expected_ids === []) {
+        $this->assertSame(Merge::STATUS_INSERT, $result, "Case: $label");
+        $this->assertSame([], $this->idsWithStatus(2), "Case: $label");
+        $this->assertSame([static::INSERT_ID], $this->idsWithStatus(3), "Case: $label");
+      }
+      else {
+        $this->assertSame(Merge::STATUS_UPDATE, $result, "Case: $label");
+        $this->assertEqualsCanonicalizing($expected_ids, $this->idsWithStatus(2), "Case: $label");
+        $this->assertSame(11, $this->countRows(), "Case: $label");
+      }
+      $this->resetJsonTable();
     }
   }
 
