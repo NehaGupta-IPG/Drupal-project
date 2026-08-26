@@ -44,7 +44,12 @@ class NodeBlockFunctionalTest extends NodeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'views', 'node_block_test'];
+  protected static $modules = [
+    'block',
+    'views',
+    'node_block_test',
+    'dynamic_page_cache',
+  ];
 
   /**
    * {@inheritdoc}
@@ -78,7 +83,10 @@ class NodeBlockFunctionalTest extends NodeTestBase {
     ]);
 
     // Enable the recent content block with two items.
-    $block = $this->drupalPlaceBlock('views_block:content_recent-block_1', ['id' => 'test_block', 'items_per_page' => 2]);
+    $block = $this->drupalPlaceBlock('views_block:test_content_recent-block_1', [
+      'id' => 'test_block',
+      'items_per_page' => 2,
+    ]);
 
     // Test that block is not visible without nodes.
     $this->drupalGet('');
