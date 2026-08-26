@@ -52,6 +52,9 @@ class FileListingTest extends FileFieldTestBase {
       'access files overview',
       'bypass node access',
       'delete any file',
+      'cancel account',
+      'select account cancellation method',
+      'administer users',
     ]);
     $this->baseUser = $this->drupalCreateUser();
     $this->createFileField('file', 'node', 'article', [], ['file_extensions' => 'txt png']);
@@ -255,6 +258,51 @@ class FileListingTest extends FileFieldTestBase {
     $this->assertSession()->pageTextContains($entity_name);
     $this->assertSession()->linkNotExists($entity_name, 'Linked entity name not added to file usage listing.');
     $this->assertSession()->linkExists($node->getTitle());
+  }
+
+  /**
+   * Tests file deletion operation when a user is "cancelled reassign".
+   */
+  public function testUserCancelReassignFileDelete(): void {
+    $base_user = $this->baseUser;
+    $admin_user = $this->adminUser;
+
+    $this->drupalLogin($this->baseUser);
+    $base_user_id = $base_user->id();
+    // Create a bundle and attach a File field to the bundle.
+    $bundle = $this->randomMachineName();
+    EntityTestHelper::createBundle($bundle, NULL, 'entity_test_constraints');
+    $this->createFileField('field_test_file', 'entity_test_constraints', $bundle, [], ['file_extensions' => 'txt png']);
+
+    // Create file to attach to entity.
+    $file = File::create([
+      'filename' => 'druplicon.txt',
+      'uri' => 'public://druplicon.txt',
+      'filemime' => 'text/plain',
+      'uid' => $base_user_id,
+    ]);
+    $file->setPermanent();
+    file_put_contents($file->getFileUri(), 'hello world');
+    $file->save();
+
+    // Create entity and attach the created file.
+    $entity_name = $this->randomMachineName();
+    $entity = EntityTestConstraints::create([
+      'uid' => 1,
+      'name' => $entity_name,
+      'type' => $bundle,
+      'field_test_file' => [$file],
+    ]);
+    $entity->save();
+
+    $this->drupalLogin($admin_user);
+    $this->drupalGet($base_user->toUrl('cancel-form'));
+    $edit['user_cancel_method'] = 'user_cancel_reassign';
+    $this->submitForm($edit, 'Confirm');
+    $result = \Drupal::database()->query("SELECT fid FROM {file_managed} WHERE  uid = :uid", [':uid' => $base_user_id])->fetchField();
+    self::assertFalse($result);
+    $result_1 = \Drupal::database()->query("SELECT fid FROM {file_managed} WHERE  uid = :uid", [':uid' => '0'])->fetchField();
+    self::assertEquals($result_1, $file->id());
   }
 
   /**

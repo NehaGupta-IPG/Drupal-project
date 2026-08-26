@@ -2,11 +2,14 @@
 
 namespace Drupal\file\Hook;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
+use Drupal\file\FileBulkUpdate;
+use Drupal\user\UserInterface;
 
 /**
  * Hook implementations for file.
@@ -15,6 +18,11 @@ class FileHooks {
 
   // cspell:ignore widthx
   use StringTranslationTrait;
+
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected FileBulkUpdate $fileBulkUpdate,
+  ) {}
 
   /**
    * Implements hook_help().
@@ -78,6 +86,22 @@ class FileHooks {
   #[Hook('file_predelete')]
   public function filePredelete(File $file): void {
     // @todo Remove references to a file that is in-use. See https://www.drupal.org/project/drupal/issues/1506314
+  }
+
+  /**
+   * Implements hook_user_cancel().
+   */
+  #[Hook('user_cancel')]
+  public function userCancel(array $edit, UserInterface $account, string $method): void {
+    // Update files for canceled user to belong to anonymous.
+    if ($method !== 'user_cancel_reassign') {
+      return;
+    }
+    $fids = $this->entityTypeManager->getStorage('file')->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('uid', $account->id())
+      ->execute();
+    $this->fileBulkUpdate->process($fids, ['uid' => 0], TRUE);
   }
 
 }
