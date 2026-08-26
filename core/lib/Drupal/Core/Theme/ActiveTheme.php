@@ -232,8 +232,7 @@ class ActiveTheme {
    * @return bool
    *   TRUE if this theme or any of its base themes declares support.
    *
-   * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
-   * @see \Drupal\system\Hook\PageAttachmentsHook::pageAttachments()
+   * @see \Drupal\Core\Theme\ColorSchemeSupport
    */
   public function supportsColorScheme(): bool {
     $extensions = array_merge([$this->extension], array_values($this->baseThemeExtensions));

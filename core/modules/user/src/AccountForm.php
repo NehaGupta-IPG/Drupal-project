@@ -14,8 +14,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
-use Drupal\Core\Theme\MissingThemeDependencyException;
-use Drupal\Core\Theme\ThemeInitializationInterface;
+use Drupal\Core\Theme\ColorSchemeSupport;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\user\Entity\Role;
@@ -36,14 +35,14 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
   protected $languageManager;
 
   /**
-   * The theme initialization service.
+   * The color scheme support service.
    *
    * This is set by ::create() instead of by the constructor, because the
    * constructor signature is inherited by subclasses outside core.
    *
-   * @var \Drupal\Core\Theme\ThemeInitializationInterface|null
+   * @var \Drupal\Core\Theme\ColorSchemeSupport|null
    */
-  protected ?ThemeInitializationInterface $themeInitialization = NULL;
+  protected ?ColorSchemeSupport $colorSchemeSupport = NULL;
 
   /**
    * Constructs a new AccountForm object.
@@ -72,21 +71,21 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time')
     );
-    $instance->themeInitialization = $container->get('theme.initialization');
+    $instance->colorSchemeSupport = $container->get('theme.color_scheme_support');
     return $instance;
   }
 
   /**
-   * Gets the theme initialization service for this form.
+   * Gets the color scheme support service for this form.
    *
-   * @return \Drupal\Core\Theme\ThemeInitializationInterface
-   *   The theme initialization service.
+   * @return \Drupal\Core\Theme\ColorSchemeSupport
+   *   The color scheme support service.
    */
-  protected function themeInitialization(): ThemeInitializationInterface {
-    if ($this->themeInitialization === NULL) {
-      $this->themeInitialization = \Drupal::service('theme.initialization');
+  protected function colorSchemeSupport(): ColorSchemeSupport {
+    if ($this->colorSchemeSupport === NULL) {
+      $this->colorSchemeSupport = \Drupal::service('theme.color_scheme_support');
     }
-    return $this->themeInitialization;
+    return $this->colorSchemeSupport;
   }
 
   /**
@@ -397,19 +396,12 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    *
    * @return array
    *   Form element properties to add to the color scheme element.
+   *
+   * @see \Drupal\Core\Theme\ColorSchemeSupport
    */
   protected function colorSchemeElementProperties(UserInterface $account, CacheableMetadata $cacheability): array {
-    $theme_config = $this->config('system.theme');
-    $cacheability->addCacheableDependency($theme_config);
-
-    $default_theme = $theme_config->get('default');
-    // An empty 'admin' value means administration pages use the site theme.
-    $admin_theme = $theme_config->get('admin') ?: $default_theme;
-
-    $default_supports = $this->themeSupportsColorScheme($default_theme);
-    $admin_supports = $admin_theme === $default_theme
-      ? $default_supports
-      : $this->themeSupportsColorScheme($admin_theme);
+    $default_supports = $this->colorSchemeSupport()->siteThemeSupports($cacheability);
+    $admin_supports = $this->colorSchemeSupport()->adminThemeSupports($cacheability);
 
     if ($default_supports && $admin_supports) {
       return [
@@ -439,31 +431,6 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#disabled' => TRUE,
       '#description' => $this->t('Neither the site theme nor the administration theme follows this setting. The setting has no effect.'),
     ];
-  }
-
-  /**
-   * Determines whether a theme honors the color scheme preference.
-   *
-   * @param string|null $theme_name
-   *   The machine name of the theme, or NULL if none is configured.
-   *
-   * @return bool
-   *   TRUE if the theme, or one of its base themes, declares support.
-   */
-  protected function themeSupportsColorScheme(?string $theme_name): bool {
-    if ($theme_name === NULL || $theme_name === '') {
-      return FALSE;
-    }
-    try {
-      // For a theme that is not installed, getActiveThemeByName() returns the
-      // default output of core, which declares no support.
-      return $this->themeInitialization()->getActiveThemeByName($theme_name)->supportsColorScheme();
-    }
-    catch (MissingThemeDependencyException) {
-      // The theme is installed but a base theme of it is not. Broken theme
-      // configuration must not break the account form.
-      return FALSE;
-    }
   }
 
   /**

@@ -1673,6 +1673,10 @@ services:
     class: Drupal\Core\Theme\ThemeInitialization
     autowire: true
   Drupal\Core\Theme\ThemeInitializationInterface: '@theme.initialization'
+  theme.color_scheme_support:
+    class: Drupal\Core\Theme\ColorSchemeSupport
+    autowire: true
+  Drupal\Core\Theme\ColorSchemeSupport: '@theme.color_scheme_support'
   theme.registry:
     class: Drupal\Core\Theme\Registry
     arguments: ['@cache.default', '@lock', '@module_handler', '@theme_handler', '@cache.bootstrap', '@extension.list.module', '@kernel', '@keyvalue']

@@ -39,6 +39,7 @@ class ThemePreprocess {
     protected ThemeManagerInterface $themeManager,
     protected ThemeSettingsProvider $themeSettingsProvider,
     protected AccountInterface $currentUser,
+    protected ColorSchemeSupport $colorSchemeSupport,
   ) {
   }
 
@@ -266,10 +267,10 @@ class ThemePreprocess {
     $variables['html_attributes']['dir'] = $language_interface->getDirection();
     // The color scheme is exposed as a variable for theme developers. The
     // data-color-scheme attribute is the rendered counterpart of that value.
-    // Both are only set for themes that declare 'supports color scheme' in
-    // their .info.yml file, so themes that ignore the preference do not
-    // advertise a color scheme they never apply.
-    if ($this->themeManager->getActiveTheme()->supportsColorScheme()) {
+    // Both are only set where the preference has an effect, so a page that
+    // ignores the preference does not advertise a color scheme it never
+    // applies.
+    if ($this->colorSchemeSupport->appliesToAccount($this->currentUser)) {
       $color_scheme = $this->currentUser->getColorScheme();
       $variables['color_scheme'] = $color_scheme;
       $variables['html_attributes']['data-color-scheme'] = $color_scheme;

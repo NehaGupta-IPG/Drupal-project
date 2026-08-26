@@ -143,9 +143,10 @@ trait AssertPageCacheContextsAndTagsTrait {
         $default_contexts[] = 'user.permissions';
 
         // 'user.color_scheme' is deliberately not a default context. It is only
-        // added for themes that declare 'supports color scheme' in their
-        // .info.yml file, so tests running such a theme have to expect it
-        // explicitly.
+        // added where the color scheme preference has an effect, which needs a
+        // theme that declares 'supports color scheme' in its .info.yml file, so
+        // tests running such a theme have to expect it explicitly.
+        // @see \Drupal\Core\Theme\ColorSchemeSupport::appliesToAccount()
         // @see \Drupal\Tests\system\Functional\Cache\ColorSchemeCacheContextTest
         if (!in_array('user.roles', $expected_contexts) && $is_html_response) {
           $default_contexts[] = 'user.roles:authenticated';
