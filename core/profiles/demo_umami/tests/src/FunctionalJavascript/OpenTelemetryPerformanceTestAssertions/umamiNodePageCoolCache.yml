@@ -72,6 +72,7 @@ CacheTagGroupedLookups:
     - 'block_content:1'
     - 'block_content:2'
     - 'config:configurable_language_list'
+    - 'config:system.theme'
   -
     - 'config:system.menu.footer'
   -

@@ -71,6 +71,7 @@ class PageCacheTest extends BrowserTestBase {
     $cache_entry = \Drupal::cache('page')->get($cid);
     sort($cache_entry->tags);
     $expected_tags = [
+      'config:system.theme',
       'config:user.role.anonymous',
       'http_response',
       'pre_render',
@@ -106,6 +107,7 @@ class PageCacheTest extends BrowserTestBase {
     $cache_entry = \Drupal::cache('page')->get($cid);
     sort($cache_entry->tags);
     $expected_tags = [
+      'config:system.theme',
       'config:user.role.anonymous',
       'http_response',
       'pre_render',
