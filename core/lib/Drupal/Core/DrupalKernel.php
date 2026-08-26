@@ -149,15 +149,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $prepared = FALSE;
 
   /**
-   * Whether the container should be retrieved from cache.
-   *
-   * Only overrides when it's TRUE, FALSE does nothing.
-   *
-   * @internal only use in tests.
-   */
-  protected bool $overrideUseCache = FALSE;
-
-  /**
    * Holds the list of enabled modules.
    *
    * @var array
@@ -343,24 +334,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $app_root = static::guessApplicationRoot();
     }
     $this->root = $app_root;
-  }
-
-  /**
-   * Sets whether the container should be rebuilt.
-   *
-   * @internal only use this in tests.
-   */
-  public function setContainerNeedsRebuild(bool $rebuild): void {
-    $this->containerNeedsRebuild = $rebuild;
-  }
-
-  /**
-   * Sets whether the container should be retrieved from cache.
-   *
-   * @internal only use this in tests.
-   */
-  public function setOverrideUseCache(bool $use): void {
-    $this->overrideUseCache = $use;
   }
 
   /**
@@ -994,8 +967,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       Settings::get('deployment_identifier'),
       PHP_OS,
       serialize(Settings::get('container_yamls')),
-      // Add this so that the initial container is unique.
-      (int) $this->overrideUseCache,
     ];
     return implode(':', $parts);
   }
@@ -1057,14 +1028,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $source_storage = $this->container->get('config.installer')->getSourceStorage();
     }
 
+    $container_definition = $this->getContainerFromCacheIfCacheable();
+
     // If the module list hasn't already been set in updateModules and we are
     // not forcing a rebuild, then try and load the container from the cache.
-    if ((empty($this->moduleList) && !$this->containerNeedsRebuild) || $this->overrideUseCache) {
+    if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
       $container_definition = $this->getCachedContainerDefinition();
-    }
-    // Only override once.
-    if ($this->overrideUseCache) {
-      $this->overrideUseCache = FALSE;
     }
 
     // If there is no cached container definition, build a new container from
@@ -1959,6 +1928,21 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function getExtensions(): array|false {
     return $this->getConfigStorage()->read('core.extension');
+  }
+
+  /**
+   * Get the container from cache if it's cacheable.
+   *
+   * @return ?\Symfony\Component\DependencyInjection\ContainerInterface
+   *   An initialized container object or NULL.
+   */
+  protected function getContainerFromCacheIfCacheable(): ?ContainerInterface {
+    // If the module list hasn't already been set in updateModules and we are
+    // not forcing a rebuild, then try and load the container from the cache.
+    if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
+      return $this->getCachedContainerDefinition();
+    }
+    return NULL;
   }
 
 }
