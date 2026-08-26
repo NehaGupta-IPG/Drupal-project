@@ -60,29 +60,6 @@ abstract class WebDriverTestBase extends BrowserTestBase {
 
     try {
       $session = parent::initMink();
-      // According to the W3C WebDriver specification a cookie can only be set if
-      // the cookie domain is equal to the domain of the active document. When the
-      // browser starts up the active document is not our domain but 'about:blank'
-      // or similar. To be able to set our User-Agent and Xdebug cookies at the
-      // start of the test we now do a request to the front page so the active
-      // document matches the domain.
-      // @see https://w3c.github.io/webdriver/webdriver-spec.html#add-cookie
-      // @see https://www.w3.org/Bugs/Public/show_bug.cgi?id=20975
-      $session->visit($this->baseUrl . '/core/misc/druplicon.png');
-
-      // Copies cookies from the current environment, for example, XDEBUG_SESSION
-      // in order to support Xdebug.
-      $cookies = $this->extractCookiesFromRequest(\Drupal::request());
-      foreach ($cookies as $cookie_name => $values) {
-        foreach ($values as $value) {
-          $session->setCookie($cookie_name, $value);
-        }
-      }
-
-      // Set a standard window size so that all javascript tests start with the
-      // same viewport.
-      $session->resizeWindow(1024, 768);
-      return $session;
     }
     catch (\Exception $e) {
       // If it's not possible to get a mink connection ensure that mink's own
@@ -91,6 +68,30 @@ abstract class WebDriverTestBase extends BrowserTestBase {
       $this->mink = NULL;
       throw $e;
     }
+
+    // According to the W3C WebDriver specification a cookie can only be set if
+    // the cookie domain is equal to the domain of the active document. When the
+    // browser starts up the active document is not our domain but 'about:blank'
+    // or similar. To be able to set our User-Agent and Xdebug cookies at the
+    // start of the test we now do a request to the front page so the active
+    // document matches the domain.
+    // @see https://w3c.github.io/webdriver/webdriver-spec.html#add-cookie
+    // @see https://www.w3.org/Bugs/Public/show_bug.cgi?id=20975
+    $session->visit($this->baseUrl . '/core/misc/druplicon.png');
+
+    // Copies cookies from the current environment, for example, XDEBUG_SESSION
+    // in order to support Xdebug.
+    $cookies = $this->extractCookiesFromRequest(\Drupal::request());
+    foreach ($cookies as $cookie_name => $values) {
+      foreach ($values as $value) {
+        $session->setCookie($cookie_name, $value);
+      }
+    }
+
+    // Set a standard window size so that all javascript tests start with the
+    // same viewport.
+    $session->resizeWindow(1024, 768);
+    return $session;
   }
 
   /**
