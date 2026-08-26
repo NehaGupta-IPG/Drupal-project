@@ -93,8 +93,8 @@ class ColorSchemeCacheContextTest extends BrowserTestBase {
    *
    * A page of a theme without support carries administration theme output, so
    * the preference still has an effect for an account that may use the
-   * administration theme. The decision then rests on the permission and on the
-   * theme configuration, and both are declared as dependencies.
+   * administration theme. The decision then rests on the theme configuration
+   * and on the permission, and both are declared as dependencies.
    *
    * @param bool $may_use_admin_theme
    *   TRUE to give the account the 'view the administration theme' permission.
@@ -117,17 +117,16 @@ class ColorSchemeCacheContextTest extends BrowserTestBase {
 
     $contexts = $this->getCacheHeaderValues('X-Drupal-Cache-Contexts');
     $tags = $this->getCacheHeaderValues('X-Drupal-Cache-Tags');
-    // The permission decides the outcome, so the page varies by it either way.
+    // The administration theme is read either way, so the theme configuration
+    // is a dependency either way. It declares support, so the permission
+    // decides the outcome and the page varies by it either way.
+    $this->assertContains('config:system.theme', $tags);
     $this->assertContains('user.permissions', $contexts);
     if ($expected) {
       $this->assertContains('user.color_scheme', $contexts);
-      $this->assertContains('config:system.theme', $tags);
     }
     else {
       $this->assertNotContains('user.color_scheme', $contexts);
-      // Without the permission the administration theme is never read, so the
-      // theme configuration is not a dependency of the decision.
-      $this->assertNotContains('config:system.theme', $tags);
     }
   }
 

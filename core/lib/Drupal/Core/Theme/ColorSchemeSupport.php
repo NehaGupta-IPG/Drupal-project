@@ -86,15 +86,16 @@ class ColorSchemeSupport {
     if ($this->themeManager->getActiveTheme()->supportsColorScheme()) {
       return TRUE;
     }
-    // The permission decides the outcome from here on, so the page varies by
-    // it. Reading the permission before the configuration keeps the dependency
-    // on the administration theme off pages that carry no administration theme
-    // output.
-    $cacheability?->addCacheContexts(['user.permissions']);
-    if (!$account->hasPermission('view the administration theme')) {
+    // The theme configuration is read on every page, so it comes first. The
+    // permission check needs the user module, and a page whose administration
+    // theme cannot honor the preference must not reach it.
+    if (!$this->adminThemeSupports($cacheability)) {
       return FALSE;
     }
-    return $this->adminThemeSupports($cacheability);
+    // The permission decides the outcome from here on, so the page varies by
+    // it.
+    $cacheability?->addCacheContexts(['user.permissions']);
+    return $account->hasPermission('view the administration theme');
   }
 
   /**
