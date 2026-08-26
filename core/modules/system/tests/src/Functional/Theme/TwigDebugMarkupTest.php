@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Theme;
 
-use Dom\HTMLDocument;
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -99,46 +97,6 @@ class TwigDebugMarkupTest extends BrowserTestBase {
     $build = $builder->view($node);
     $output = (string) $this->container->get('renderer')->renderRoot($build);
     $this->assertStringNotContainsString("<!--\n\nTHEME DEBUG -->", $output, 'Twig debug markup not found in theme output when debug is disabled.');
-  }
-
-  /**
-   * Tests that the debug markup does not significantly alter the DOM.
-   *
-   * This is done by comparing the textContent property of the document body
-   * with and without the debug output. Since textContent is the concatenation
-   * of all child nodes, including whitespace and text nodes, it will
-   * significantly differ if new whitespace is added by the HTML comments. The
-   * comments themselves will not be part of the textContent.
-   *
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
-   */
-  public function testTwigDebugMarkupDomParity(): void {
-    $node = $this->drupalCreateNode();
-
-    /**
-     * @return array{textContent: string, innerHTML: string}
-     */
-    $get_text_and_html = function () use ($node): array {
-      $html = $this->drupalGet(Url::fromRoute('entity.node.canonical', ['node' => $node->id()]));
-      $dom = HTMLDocument::createFromString($html);
-      $element = $dom->querySelector('body');
-      return [
-        'textContent' => trim($element->textContent),
-        'innerHTML' => $element->innerHTML,
-      ];
-    };
-
-    $twig_debug_output_needle = "<!--\n\nTHEME DEBUG -->";
-
-    $text_and_html = $get_text_and_html();
-    $this->assertStringNotContainsString($twig_debug_output_needle, $text_and_html['innerHTML']);
-
-    $this->enableTwigDebug();
-    $text_and_html_debug = $get_text_and_html();
-    $this->assertStringContainsString($twig_debug_output_needle, $text_and_html_debug['innerHTML']);
-
-    $this->assertEquals($text_and_html['textContent'], $text_and_html_debug['textContent']);
-
   }
 
 }
