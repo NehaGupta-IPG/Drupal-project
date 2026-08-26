@@ -162,13 +162,6 @@ class InstallerServiceProvider implements ServiceProviderInterface, ServiceModif
       $twig_config = $container->getParameter('twig.config');
       $twig_config['cache'] = FALSE;
       $container->setParameter('twig.config', $twig_config);
-
-      // No service may persist when the early installer kernel is rebooted
-      // into the full environment.
-      foreach ($container->findTaggedServiceIds('persist') as $id => $tags) {
-        $definition = $container->getDefinition($id);
-        $definition->clearTag('persist');
-      }
     }
   }
 
