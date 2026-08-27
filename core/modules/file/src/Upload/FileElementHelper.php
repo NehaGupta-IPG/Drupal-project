@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Drupal\file\Upload;
 
 use Drupal\Core\File\FileExists;
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\File\UploadedFilesExtractor;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
  * Helper class for ManagedFile element form file uploads.
@@ -28,6 +31,10 @@ class FileElementHelper {
     protected readonly MessengerInterface $messenger,
     protected readonly RendererInterface $renderer,
     protected readonly FormFileUploader $formFileUploader,
+    protected readonly UploadedFilesExtractor $uploadedFilesExtractor,
+    protected readonly FileSystemInterface $fileSystem,
+    #[AutowireServiceClosure('logger.channel.file')]
+    protected readonly \Closure $logger,
   ) {}
 
   /**
@@ -57,7 +64,12 @@ class FileElementHelper {
    * @see https://www.drupal.org/project/drupal/issues/3069020
    * @see https://www.drupal.org/project/drupal/issues/2482783
    */
-  public function saveFileUploads(array $element, FormStateInterface $formState, $delta = NULL, FileExists $fileExists = FileExists::Rename) {
+  public function saveFileUploads(
+    array $element,
+    FormStateInterface $formState,
+    $delta = NULL,
+    FileExists $fileExists = FileExists::Rename
+  ): array|\Drupal\file\FileInterface|null|false {
     // Get all errors set before calling this method. This will also clear them
     // from the messenger service.
     $errorsBefore = $this->messenger->deleteByType(MessengerInterface::TYPE_ERROR);
@@ -103,6 +115,56 @@ class FileElementHelper {
     }
 
     return $result;
+  }
+
+  /**
+   * Saves any files that have been uploaded into a managed_file element.
+   *
+   * @param array $element
+   *   The FAPI element whose values are being saved.
+   * @param \Drupal\Core\Form\FormStateInterface $formState
+   *   The current state of the form.
+   *
+   * @return array|false
+   *   An array of file entities for each file that was saved, keyed by its file
+   *   ID. Each array element contains a file entity. Function returns FALSE if
+   *   upload directory could not be created or no files were uploaded.
+   *
+   * @internal
+   */
+  public function managedFileSaveUpload(array $element, FormStateInterface $formState): array|false {
+    $uploadName = implode('_', $element['#parents']);
+    $fileUpload = $this->uploadedFilesExtractor->extractUploadedFiles($uploadName);
+
+    $destination = $element['#upload_location'] ?? NULL;
+    if (isset($destination) && !$this->fileSystem->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY)) {
+      ($this->logger)()->notice('The upload directory %directory for the file field %name could not be created or is not accessible. A newly uploaded file could not be saved in this directory as a consequence, and the upload was canceled.', [
+          '%directory' => $destination,
+          '%name' => $element['#field_name'],
+        ]);
+      $formState->setError($element, t('The file could not be uploaded.'));
+      return FALSE;
+    }
+
+    // Save attached files to the database.
+    $filesUploaded = $element['#multiple'] && count(array_filter($fileUpload)) > 0;
+    $filesUploaded |= !$element['#multiple'] && !empty($fileUpload);
+    if ($filesUploaded) {
+      if (!$files = $this->saveFileUploads($element, $formState)) {
+        ($this->logger)()->notice('The file upload failed. %upload', ['%upload' => $uploadName]);
+        return [];
+      }
+
+      // Value callback expects FIDs to be keys.
+      $files = array_filter($files);
+      $fids = array_map(function ($file) {
+        return $file->id();
+      }, $files);
+
+      return empty($files) ? [] : array_combine($fids, $files);
+    }
+
+    return [];
   }
 
 }

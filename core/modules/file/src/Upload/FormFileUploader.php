@@ -78,7 +78,13 @@ class FormFileUploader {
    *
    * @see FileElementHelper::saveFileUploads()
    */
-  public function saveFormUploadedFiles(string $formFieldName, array $validators = [], string|bool $destination = FALSE, int|null $delta = NULL, FileExists $fileExists = FileExists::Rename) {
+  public function saveFormUploadedFiles(
+    string $formFieldName,
+    array $validators = [],
+    string|bool $destination = FALSE,
+    int|null $delta = NULL,
+    FileExists $fileExists = FileExists::Rename
+  ): array|\Drupal\file\FileInterface|null|false {
     static $uploadCache;
 
     $uploadedFiles = $this->uploadedFilesExtractor->extractUploadedFiles($formFieldName);

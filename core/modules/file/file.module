@@ -114,41 +114,15 @@ function file_save_upload($form_field_name, $validators = [], $destination = FAL
  *   An array of file entities for each file that was saved, keyed by its file
  *   ID. Each array element contains a file entity. Function returns FALSE if
  *   upload directory could not be created or no files were uploaded.
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal::service(FileElementHelper::class)->managedFileSaveUpload() instead.
+ *
+ * @see https://www.drupal.org/node/3382414
  */
 function file_managed_file_save_upload($element, FormStateInterface $form_state) {
-  $upload_name = implode('_', $element['#parents']);
-  $file_upload = \Drupal::service(UploadedFilesExtractor::class)->extractUploadedFiles($upload_name);
-
-  $destination = $element['#upload_location'] ?? NULL;
-  if (isset($destination) && !\Drupal::service('file_system')->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY)) {
-    \Drupal::logger('file')
-      ->notice('The upload directory %directory for the file field %name could not be created or is not accessible. A newly uploaded file could not be saved in this directory as a consequence, and the upload was canceled.', [
-        '%directory' => $destination,
-        '%name' => $element['#field_name'],
-      ]);
-    $form_state->setError($element, t('The file could not be uploaded.'));
-    return FALSE;
-  }
-
-  // Save attached files to the database.
-  $files_uploaded = $element['#multiple'] && count(array_filter($file_upload)) > 0;
-  $files_uploaded |= !$element['#multiple'] && !empty($file_upload);
-  if ($files_uploaded) {
-    if (!$files = \Drupal::service(FileElementHelper::class)->saveFileUploads($element, $form_state)) {
-      \Drupal::logger('file')->notice('The file upload failed. %upload', ['%upload' => $upload_name]);
-      return [];
-    }
-
-    // Value callback expects FIDs to be keys.
-    $files = array_filter($files);
-    $fids = array_map(function ($file) {
-      return $file->id();
-    }, $files);
-
-    return empty($files) ? [] : array_combine($fids, $files);
-  }
-
-  return [];
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(FileElementHelper::class)->managedFileSaveUpload() instead. See https://www.drupal.org/node/3382414', E_USER_DEPRECATED);
+  return \Drupal::service(FileElementHelper::class)->managedFileSaveUpload($element, $form_state);
 }
 
 /**
