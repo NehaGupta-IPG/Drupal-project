@@ -45,6 +45,7 @@ class HookCollectorKeyValueWritePass implements CompilerPassInterface {
     foreach ($hookData as $key => $value) {
       $data_to_write[$key . ':' . Settings::get('deployment_identifier', \Drupal::VERSION)] = $value;
     }
+    $data_to_write['deployment_identifier'] = Settings::get('deployment_identifier', \Drupal::VERSION);
     $keyvalue->setMultiple($data_to_write);
     $container->get('cache.bootstrap')->deleteMultiple(['hook_data', 'theme_hook_data']);
 
