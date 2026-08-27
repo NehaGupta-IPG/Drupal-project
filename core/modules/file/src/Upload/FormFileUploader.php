@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\file\Upload;
 
+use Drupal\file\FileInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\FileExistsException;
 use Drupal\Core\File\Exception\FileWriteException;
@@ -44,7 +45,8 @@ class FormFileUploader {
    *
    * The files will be added to the {file_managed} table as temporary files.
    * Temporary files are periodically cleaned. Use the 'file.usage' service to
-   * register the usage of the file which will automatically mark it as permanent.
+   * register the usage of the file which will automatically mark it as
+   * permanent.
    *
    * Note that this function does not support correct form error handling. The
    * file upload widgets in core do support this. It is advised to use these in
@@ -56,25 +58,27 @@ class FormFileUploader {
    * @param array $validators
    *   (optional) An associative array of Validation Constraint plugins used to
    *   validate the file.
-   *   If the array is empty, 'FileExtension' will be used by default with a safe
-   *   list of extensions, as follows: "jpg jpeg gif png txt doc xls pdf ppt pps
-   *   odt ods odp". To allow all extensions, you must explicitly set this array
-   *   to ['FileExtension' => []]. (Beware: this is not safe and should only be
-   *   allowed for trusted users, if at all.)
+   *   If the array is empty, 'FileExtension' will be used by default with a
+   *   safe list of extensions, as follows: "jpg jpeg gif png txt doc xls pdf
+   *   ppt pps odt ods odp". To allow all extensions, you must explicitly set
+   *   this array to ['FileExtension' => []]. (Beware: this is not safe and
+   *   should only be allowed for trusted users, if at all.)
    * @param string|false $destination
-   *   (optional) A string containing the URI that the file should be copied to.
-   *   This must be a stream wrapper URI. If this value is omitted or set to
-   *   FALSE, Drupal's temporary files scheme will be used ("temporary://").
+   *   (optional) A string containing the URI that the file should be copied
+   *   to. This must be a stream wrapper URI. If this value is omitted or set
+   *   to FALSE, Drupal's temporary files scheme will be used ("temporary://").
    * @param null|int $delta
    *   (optional) The delta of the file to return the file entity.
    *   Defaults to NULL.
    * @param \Drupal\Core\File\FileExists $fileExists
-   *   (optional) The replace behavior when the destination file already exists.
+   *   (optional) The replace behavior when the destination file already
+   *   exists.
    *
    * @return array|\Drupal\file\FileInterface|null|false
-   *   An array of file entities or a single file entity if $delta != NULL. Each
-   *   array element contains the file entity if the upload succeeded or FALSE if
-   *   there was an error. Function returns NULL if no file was uploaded.
+   *   An array of file entities or a single file entity if $delta != NULL.
+   *   Each array element contains the file entity if the upload succeeded or
+   *   FALSE if there was an error. Function returns NULL if no file was
+   *   uploaded.
    *
    * @see FileElementHelper::saveFileUploads()
    */
@@ -83,8 +87,8 @@ class FormFileUploader {
     array $validators = [],
     string|bool $destination = FALSE,
     int|null $delta = NULL,
-    FileExists $fileExists = FileExists::Rename
-  ): array|\Drupal\file\FileInterface|null|false {
+    FileExists $fileExists = FileExists::Rename,
+  ): array|FileInterface|null|false {
     static $uploadCache;
 
     $uploadedFiles = $this->uploadedFilesExtractor->extractUploadedFiles($formFieldName);
@@ -136,9 +140,9 @@ class FormFileUploader {
         // Log security renames to help detect potential malicious uploads.
         if ($result->isSecurityRename()) {
           ($this->logger)()->notice('For security reasons, the uploaded file %original_filename has been renamed to %filename.', [
-              '%original_filename' => $result->getOriginalFilename(),
-              '%filename' => $file->getFilename(),
-            ]);
+            '%original_filename' => $result->getOriginalFilename(),
+            '%filename' => $file->getFilename(),
+          ]);
         }
         $files[$i] = $file;
       }
@@ -153,9 +157,9 @@ class FormFileUploader {
       catch (FileWriteException) {
         $this->messenger->addError($this->t('File upload error. Could not move uploaded file.'));
         ($this->logger)()->notice('Upload error. Could not move uploaded file %file to destination %destination.', [
-            '%file' => $uploadedFile->getClientOriginalName(),
-            '%destination' => $destination . '/' . $uploadedFile->getClientOriginalName(),
-          ]);
+          '%file' => $uploadedFile->getClientOriginalName(),
+          '%destination' => $destination . '/' . $uploadedFile->getClientOriginalName(),
+        ]);
         $files[$i] = FALSE;
       }
       catch (FileException) {
@@ -173,4 +177,5 @@ class FormFileUploader {
 
     return isset($delta) ? $files[$delta] : $files;
   }
+
 }

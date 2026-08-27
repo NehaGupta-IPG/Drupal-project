@@ -7,10 +7,8 @@
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\File\FileExists;
-use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\FileInterface;
-use Drupal\Core\File\UploadedFilesExtractor;
 use Drupal\file\Upload\FileElementHelper;
 use Drupal\file\Upload\FormFileUploader;
 
@@ -38,9 +36,9 @@ use Drupal\file\Upload\FormFileUploader;
  *
  * @internal
  *   This function is internal, and may be removed in a minor version release.
- *   It wraps FormFileUploader::saveFormUploadedFiles() to allow correct error handling in forms.
- *   Contrib and custom code should not call this function, they should use the
- *   managed file upload widgets in core.
+ *   It wraps FormFileUploader::saveFormUploadedFiles() to allow correct error
+ *   handling in forms. Contrib and custom code should not call this function,
+ *   they should use the managed file upload widgets in core.
  *
  * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
  *   \Drupal::service(FileElementHelper::class)->saveFileUploads() instead.
@@ -116,7 +114,8 @@ function file_save_upload($form_field_name, $validators = [], $destination = FAL
  *   upload directory could not be created or no files were uploaded.
  *
  * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
- *   \Drupal::service(FileElementHelper::class)->managedFileSaveUpload() instead.
+ *   \Drupal::service(FileElementHelper::class)->managedFileSaveUpload()
+ *   instead.
  *
  * @see https://www.drupal.org/node/3382414
  */

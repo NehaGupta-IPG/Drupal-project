@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\file\Upload;
 
+use Drupal\file\FileInterface;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\UploadedFilesExtractor;
@@ -42,7 +43,8 @@ class FileElementHelper {
    *
    * The files will be added to the {file_managed} table as temporary files.
    * Temporary files are periodically cleaned. Use the 'file.usage' service to
-   * register the usage of the file which will automatically mark it as permanent.
+   * register the usage of the file which will automatically mark it as
+   * permanent.
    *
    * @param array $element
    *   The FAPI element whose values are being saved.
@@ -55,9 +57,10 @@ class FileElementHelper {
    *   (optional) The replace behavior when the destination file already exists.
    *
    * @return array|\Drupal\file\FileInterface|null|false
-   *   An array of file entities or a single file entity if $delta != NULL. Each
-   *   array element contains the file entity if the upload succeeded or FALSE if
-   *   there was an error. Function returns NULL if no file was uploaded.
+   *   An array of file entities or a single file entity if $delta != NULL.
+   *   Each array element contains the file entity if the upload succeeded or
+   *   FALSE if there was an error. Function returns NULL if no file was
+   *   uploaded.
    *
    * @internal
    *
@@ -68,8 +71,8 @@ class FileElementHelper {
     array $element,
     FormStateInterface $formState,
     $delta = NULL,
-    FileExists $fileExists = FileExists::Rename
-  ): array|\Drupal\file\FileInterface|null|false {
+    FileExists $fileExists = FileExists::Rename,
+  ): array|FileInterface|null|false {
     // Get all errors set before calling this method. This will also clear them
     // from the messenger service.
     $errorsBefore = $this->messenger->deleteByType(MessengerInterface::TYPE_ERROR);
@@ -106,8 +109,8 @@ class FileElementHelper {
       $formState->setError($element, $error_message);
     }
 
-    // Ensure that errors set prior to calling this method are still shown to the
-    // user.
+    // Ensure that errors set prior to calling this method are still shown to
+    // the user.
     if (!empty($errorsBefore)) {
       foreach ($errorsBefore as $error) {
         $this->messenger->addError($error);
@@ -139,10 +142,10 @@ class FileElementHelper {
     $destination = $element['#upload_location'] ?? NULL;
     if (isset($destination) && !$this->fileSystem->prepareDirectory($destination, FileSystemInterface::CREATE_DIRECTORY)) {
       ($this->logger)()->notice('The upload directory %directory for the file field %name could not be created or is not accessible. A newly uploaded file could not be saved in this directory as a consequence, and the upload was canceled.', [
-          '%directory' => $destination,
-          '%name' => $element['#field_name'],
-        ]);
-      $formState->setError($element, t('The file could not be uploaded.'));
+        '%directory' => $destination,
+        '%name' => $element['#field_name'],
+      ]);
+      $formState->setError($element, $this->t('The file could not be uploaded.'));
       return FALSE;
     }
 
