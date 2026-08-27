@@ -318,7 +318,7 @@ class SystemHooks {
     // that was last written. During a code deployment to multiple web heads, it
     // is possible for the deployment identifier to differ momentarily across
     // web heads especially during long running cli processes. Due to this, only
-    // garbage collect hook data that matches neither the identifer stored in
+    // garbage collect hook data that matches neither the identifier stored in
     // key/value nor the current identifier. Also avoid this entirely if
     // a container is being compiled.
     $lock = \Drupal::lock();
