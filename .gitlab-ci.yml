@@ -330,6 +330,7 @@ default:
 
 '🖱️️️ PHPUnit Functional Javascript':
   <<: [ *with-composer, *test-setup ]
+  retry: 1
   parallel: 3
   variables:
     TESTSUITE: functional-javascript
