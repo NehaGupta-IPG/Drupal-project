@@ -319,15 +319,19 @@ class SystemHooks {
     // is possible for the deployment identifier to differ momentarily across
     // web heads especially during long running cli processes. Due to this, only
     // garbage collect hook data that matches neither the identifer stored in
-    // key/value nor the current identifier.
-    $hook_data = \Drupal::service('keyvalue')->get('hook_data');
-    $stored_identifier = $hook_data->get('deployment_identifier');
-    $current_identifier = Settings::get('deployment_identifier', \Drupal::VERSION);
-    foreach ($hook_data->getAllKeys() as $key) {
-      if ($key !== 'deployment_identifier'
-        && !str_ends_with(':' . $stored_identifier, $key)
-        && !str_ends_with(':' . $current_identifier, $key)) {
-        $hook_data->delete($key);
+    // key/value nor the current identifier. Also avoid this entirely if
+    // a container is being compiled.
+    $lock = \Drupal::lock();
+    if ($lock->acquire('container_compile')) {
+      $hook_data = \Drupal::service('keyvalue')->get('hook_data');
+      $stored_identifier = $hook_data->get('deployment_identifier');
+      $current_identifier = Settings::get('deployment_identifier', \Drupal::VERSION);
+      foreach ($hook_data->getAllKeys() as $key) {
+        if ($key !== 'deployment_identifier'
+          && !str_ends_with(':' . $stored_identifier, $key)
+          && !str_ends_with(':' . $current_identifier, $key)) {
+          $hook_data->delete($key);
+        }
       }
     }
     \Drupal::service(FieldPurger::class)->purgeBatch($config_purge_batch_size);
