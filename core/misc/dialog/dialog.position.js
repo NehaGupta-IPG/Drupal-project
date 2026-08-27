@@ -63,6 +63,14 @@
    * @fires event:dialogContentResize
    */
   function resetSize(event) {
+    if (!event?.data?.settings || !event?.data?.$element) {
+      return;
+    }
+    const $element = event.data.$element;
+    const settings = event.data.settings;
+    if (!$element.length || !document.contains($element[0])) {
+      return;
+    }
     const positionOptions = [
       'width',
       'height',
@@ -79,7 +87,7 @@
     let adjustedValue;
     for (let n = 0; n < positionOptions.length; n++) {
       option = positionOptions[n];
-      optionValue = event.data.settings[option];
+      optionValue = settings[option];
       if (optionValue) {
         // jQuery UI does not support percentages on heights, convert to pixels.
         if (
@@ -96,8 +104,7 @@
           // Don't force the dialog to be bigger vertically than needed.
           if (
             option === 'height' &&
-            Math.round(event.data.$element.parent().outerHeight()) <
-              adjustedValue
+            Math.round($element.parent().outerHeight()) < adjustedValue
           ) {
             adjustedValue = 'auto';
           }
@@ -106,12 +113,12 @@
       }
     }
     // Offset the dialog center to be at the center of Drupal.displace.offsets.
-    if (!event.data.settings.modal) {
+    if (!settings.modal) {
       adjustedOptions = resetPosition(adjustedOptions);
     }
-    event.data.$element.dialog('option', adjustedOptions);
+    $element.dialog('option', adjustedOptions);
 
-    event.data.$element
+    $element
       ?.get(0)
       ?.dispatchEvent(
         new CustomEvent('dialogContentResize', { bubbles: true }),
@@ -137,10 +144,42 @@
         eventData,
         autoResize,
       );
+      // Defer reposition so modal centers correctly with AJAX content.
+      const deferredReposition = () => {
+        if (!$element.length || !document.contains($element[0])) {
+          return;
+        }
+        $(window).trigger('resize.dialogResize');
+      };
+      if (typeof requestAnimationFrame !== 'undefined') {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(deferredReposition);
+        });
+      }
+      setTimeout(deferredReposition, 150);
+
+      // Reposition when dialog content changes (e.g. AJAX insert).
+      const contentNode = $element[0];
+      const resizeOnContentChange = () => {
+        deferredReposition();
+      };
+      const positionObserver = new MutationObserver(
+        debounce(resizeOnContentChange, 50),
+      );
+      positionObserver.observe(contentNode, {
+        childList: true,
+        subtree: true,
+      });
+      contentNode._dialogPositionObserver = positionObserver;
     }
   });
 
-  window.addEventListener('dialog:beforeclose', () => {
+  window.addEventListener('dialog:beforeclose', (e) => {
+    const dialogElement = e.target;
+    if (dialogElement._dialogPositionObserver) {
+      dialogElement._dialogPositionObserver.disconnect();
+      delete dialogElement._dialogPositionObserver;
+    }
     $(window).off('.dialogResize');
     $(document).off('.dialogResize');
   });
