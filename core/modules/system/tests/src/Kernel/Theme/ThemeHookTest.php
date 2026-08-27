@@ -19,7 +19,7 @@ class ThemeHookTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     \Drupal::service('theme_installer')->install(['procedural_hook_theme']);
     \Drupal::theme()->setActiveTheme(\Drupal::service(ThemeInitializationInterface::class)->initTheme('procedural_hook_theme'));

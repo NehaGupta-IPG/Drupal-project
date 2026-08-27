@@ -44,7 +44,7 @@ class SvgExtractorTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp():void {
+  protected function setUp():void {
     parent::setUp();
     $this->iconFinder = $this->createMock(IconFinder::class);
     $this->svgExtractorPlugin = new SvgExtractor(

@@ -41,7 +41,7 @@ class WorkspacesMediaLibraryIntegrationTest extends EntityReferenceWidgetTest {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     if (in_array($this->name(), static::SKIP_METHODS, TRUE)) {
       $this->markTestSkipped('Irrelevant for this test');
     }

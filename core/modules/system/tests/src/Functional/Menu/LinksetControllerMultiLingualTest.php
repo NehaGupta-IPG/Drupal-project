@@ -65,7 +65,7 @@ final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase 
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     // Create Basic page node type.
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);

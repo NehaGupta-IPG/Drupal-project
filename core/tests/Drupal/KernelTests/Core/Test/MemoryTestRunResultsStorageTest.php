@@ -29,7 +29,7 @@ class MemoryTestRunResultsStorageTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     $this->testRunResultsStorage = new MemoryTestRunResultsStorage();
   }

@@ -26,7 +26,7 @@ class AnnounceFetcherUnitTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp():void {
+  protected function setUp():void {
     parent::setUp();
     $httpClient = $this->createStub(ClientInterface::class);
     $config = $this->getConfigFactoryStub([

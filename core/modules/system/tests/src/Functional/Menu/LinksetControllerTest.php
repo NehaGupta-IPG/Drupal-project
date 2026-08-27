@@ -60,7 +60,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
 
     $permissions = ['view own unpublished content'];

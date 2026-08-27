@@ -36,7 +36,7 @@ class AccessPolicyProcessorTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
 
     $cache_context_manager = $this->prophesize(CacheContextsManager::class);
