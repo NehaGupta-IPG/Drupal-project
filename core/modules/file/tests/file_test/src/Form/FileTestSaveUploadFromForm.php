@@ -10,7 +10,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\file\Upload\FileElementHelper;
+use Drupal\file\Upload\ManagedFileElementHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -123,7 +123,7 @@ class FileTestSaveUploadFromForm extends FormBase {
 
     // The test for \Drupal::service('file_system')->moveUploadedFile()
     // triggering a warning is unavoidable. We're interested in what happens
-    // afterwards in FileElementHelper::saveFileUploads().
+    // afterwards in ManagedFileElementHelper::saveFileUploads().
     if ($this->state->get('file_test.disable_error_collection')) {
       define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     }
@@ -131,9 +131,9 @@ class FileTestSaveUploadFromForm extends FormBase {
     $form['file_test_upload']['#upload_validators'] = $validators;
     $form['file_test_upload']['#upload_location'] = $destination;
 
-    $this->messenger->addStatus($this->t('Number of error messages before FileElementHelper::saveFileUploads(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
-    $file = \Drupal::service(FileElementHelper::class)->saveFileUploads($form['file_test_upload'], $form_state, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
-    $this->messenger->addStatus($this->t('Number of error messages after FileElementHelper::saveFileUploads(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
+    $this->messenger->addStatus($this->t('Number of error messages before ManagedFileElementHelper::saveFileUploads(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
+    $file = \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads($form['file_test_upload'], $form_state, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
+    $this->messenger->addStatus($this->t('Number of error messages after ManagedFileElementHelper::saveFileUploads(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
 
     if ($file) {
       $form_state->setValue('file_test_upload', $file);

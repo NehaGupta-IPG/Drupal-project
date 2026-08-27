@@ -17,7 +17,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Theme\ThemeManagerInterface;
-use Drupal\file\Upload\FileElementHelper;
+use Drupal\file\Upload\ManagedFileElementHelper;
 
 // cspell:ignore apng
 
@@ -418,7 +418,7 @@ class ThemeSettingsForm extends ConfigFormBase {
 
       // Check for a new uploaded logo.
       if (isset($form['logo'])) {
-        $file = \Drupal::service(FileElementHelper::class)->saveFileUploads($form['logo']['settings']['logo_upload'], $form_state, 0);
+        $file = \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads($form['logo']['settings']['logo_upload'], $form_state, 0);
         if ($file) {
           // Put the temporary file in form_values so we can save it on submit.
           $form_state->setValue('logo_upload', $file);
@@ -427,7 +427,7 @@ class ThemeSettingsForm extends ConfigFormBase {
 
       // Check for a new uploaded favicon.
       if (isset($form['favicon'])) {
-        $file = \Drupal::service(FileElementHelper::class)->saveFileUploads($form['favicon']['settings']['favicon_upload'], $form_state, 0);
+        $file = \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads($form['favicon']['settings']['favicon_upload'], $form_state, 0);
         if ($file) {
           // Put the temporary file in form_values so we can save it on submit.
           $form_state->setValue('favicon_upload', $file);

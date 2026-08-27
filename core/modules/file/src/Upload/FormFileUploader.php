@@ -27,9 +27,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
  * form.
  *
  * For Form API elements or user-facing Messenger messages, use
- * \Drupal\file\Upload\FileElementHelper instead.
+ * \Drupal\file\Upload\ManagedFileElementHelper instead.
  *
- * @see \Drupal\file\Upload\FileElementHelper
+ * @see \Drupal\file\Upload\ManagedFileElementHelper
  */
 class FormFileUploader {
   use StringTranslationTrait;
@@ -85,7 +85,7 @@ class FormFileUploader {
    *   FALSE if there was an error. Function returns NULL if no file was
    *   uploaded.
    *
-   * @see FileElementHelper::saveFileUploads()
+   * @see ManagedFileElementHelper::saveFileUploads()
    */
   public function saveFormUploadedFiles(
     string $formFieldName,

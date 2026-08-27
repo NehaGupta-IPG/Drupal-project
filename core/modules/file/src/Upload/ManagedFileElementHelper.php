@@ -20,12 +20,12 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
  * This class handles the Form API and user-facing messages.
  *
  * For API-level form file uploading, use
- * \Drupal\file\Upload\FormFileUploadHandler instead.
+ * \Drupal\file\Upload\FormFileUploader instead.
  *
  * @see \Drupal\file\Upload\FormFileUploader
  * @see \Drupal\file\Element\ManagedFile::valueCallback()
  */
-class FileElementHelper {
+class ManagedFileElementHelper {
   use StringTranslationTrait;
 
   public function __construct(
