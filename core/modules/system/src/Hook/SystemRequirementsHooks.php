@@ -125,7 +125,7 @@ class SystemRequirementsHooks {
               ':url' => 'https://www.drupal.org/core/experimental',
             ]
           ),
-          'severity' => RequirementSeverity::Warning,
+          'severity' => RequirementSeverity::Info,
         ];
       }
       // Warn if any deprecated modules are installed.
@@ -166,7 +166,7 @@ class SystemRequirementsHooks {
         $requirements['experimental_themes'] = [
           'title' => $this->t('Experimental themes installed'),
           'value' => $this->t('Experimental themes found: %theme_list. Experimental themes are provided for testing purposes only. Use at your own risk.', ['%theme_list' => implode(', ', $experimental_themes)]),
-          'severity' => RequirementSeverity::Warning,
+          'severity' => RequirementSeverity::Info,
         ];
       }
 
@@ -473,6 +473,29 @@ class SystemRequirementsHooks {
     }
 
     // Database information.
+    $allConnections = Database::getAllConnectionInfo();
+    $connection_info = [];
+    foreach ($allConnections as $target) {
+      foreach ($target as $connection_options) {
+        if (!empty($connection_options['host'])) {
+          $connection_info[] = $this->t('Host: %host', ['%host' => $connection_options['host']]);
+        }
+        $connection_info[] = $this->t('Database: %database', ['%database' => $connection_options['database']]);
+        $prefix = !empty($connection_options['prefix']) ? $connection_options['prefix'] : NULL;
+        $connection_info[] = !empty($prefix) ? $this->t('Prefix: %prefix', ['%prefix' => $prefix]) : $this->t('No prefix');
+        $connection_info[] = " ";
+      }
+    }
+    $requirements['database_connection'] = [
+      'title' => new PluralTranslatableMarkup(
+        count($allConnections),
+        'Database connection',
+        'Database connections',
+        ['@version' => \Drupal::VERSION]
+      ),
+      'value' => ['#markup' => implode('<br/>', $connection_info)],
+    ];
+
     $class = Database::getConnection()->getConnectionOptions()['namespace'] . '\\Install\\Tasks';
     /** @var \Drupal\Core\Database\Install\Tasks $tasks */
     $tasks = new $class();

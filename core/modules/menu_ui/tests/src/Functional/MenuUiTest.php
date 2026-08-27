@@ -127,9 +127,9 @@ class MenuUiTest extends BrowserTestBase {
     // number of links in the table.
     /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager */
     $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
-    $before_count = $menu_link_manager->countMenuLinks(NULL);
+    $before_count = $menu_link_manager->countMenuLinks();
     $menu_link_manager->rebuild();
-    $after_count = $menu_link_manager->countMenuLinks(NULL);
+    $after_count = $menu_link_manager->countMenuLinks();
     $this->assertSame($before_count, $after_count, 'MenuLinkManager::rebuild() does not add more links');
     // Do standard user tests.
     // Log in the user.
@@ -811,14 +811,14 @@ class MenuUiTest extends BrowserTestBase {
    * Attempts to add menu link with invalid path or no access permission.
    */
   public function addInvalidMenuLink(): void {
-    foreach (['access' => '/admin/people/permissions'] as $type => $link_path) {
+    foreach (['access' => '/admin/people/permissions'] as $link_path) {
       $edit = [
         'link[0][uri]' => $link_path,
         'title[0][value]' => 'title',
       ];
       $this->drupalGet("admin/structure/menu/manage/{$this->menu->id()}/add");
       $this->submitForm($edit, 'Save');
-      $this->assertSession()->pageTextContains("The path '{$link_path}' is inaccessible.");
+      $this->assertSession()->pageTextContains("The URL '{$link_path}' is inaccessible.");
     }
   }
 

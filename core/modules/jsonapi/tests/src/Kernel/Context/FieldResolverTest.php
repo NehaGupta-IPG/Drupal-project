@@ -110,7 +110,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
       'entity reference' => [[['field_test_ref2']], 'field_test_ref2'],
       'entity reference with multi target bundles' => [[['field_test_ref1']], 'field_test_ref1'],
       'entity reference then another entity reference' => [
-         [['field_test_ref1', 'field_test_ref3']],
+        [['field_test_ref1', 'field_test_ref3']],
         'field_test_ref1.field_test_ref3',
       ],
       'entity reference with multiple target bundles, each with different field, but the same public field name' => [
@@ -165,12 +165,12 @@ class FieldResolverTest extends JsonapiKernelTestBase {
       // field name.
       [
         'entity_test_with_bundle', 'bundle1', 'field_test1',
-        '`field_test1` is not a valid relationship field name.',
+        '`field_test1` is not a valid relationship field name. Possible values: entity_test_with_bundle_type, field_test_ref1, field_test_ref2.',
       ],
       // Should fail because the nested fields is not a valid include path.
       [
         'entity_test_with_bundle', 'bundle1', 'field_test_ref1.field_test3',
-        '`field_test_ref1.field_test3` is not a valid include path.',
+        '`field_test_ref1.field_test3` is not a valid include path. `field_test3` is not a valid relationship field name. Possible values: entity_test_with_bundle_type, field_test_alias, field_test_ref3. `field_test3` is not a valid relationship field name. Possible values: entity_test_with_bundle_type, field_test_ref3, field_test_alias.',
       ],
     ];
   }
