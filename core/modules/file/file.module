@@ -14,11 +14,11 @@ use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Lock\LockAcquiringException;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\file\FileInterface;
 use Drupal\file\Upload\FileUploadHandlerInterface;
 use Drupal\file\Upload\FormUploadedFile;
 use Drupal\Core\File\UploadedFilesExtractor;
+use Drupal\file\Upload\FileElementHelper;
 
 /**
  * Saves form file uploads.
@@ -48,55 +48,17 @@ use Drupal\Core\File\UploadedFilesExtractor;
  *   Contrib and custom code should not call this function, they should use the
  *   managed file upload widgets in core.
  *
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\file\Upload\FileElementHelper::saveFileUploads() instead.
+ *
+ * @see https://www.drupal.org/node/3382414
  * @see https://www.drupal.org/project/drupal/issues/3069020
  * @see https://www.drupal.org/project/drupal/issues/2482783
  */
 function _file_save_upload_from_form(array $element, FormStateInterface $form_state, $delta = NULL, FileExists $fileExists = FileExists::Rename) {
-  // Get all errors set before calling this method. This will also clear them
-  // from the messenger service.
-  $errors_before = \Drupal::messenger()->deleteByType(MessengerInterface::TYPE_ERROR);
-
-  $upload_location = $element['#upload_location'] ?? FALSE;
-  $upload_name = implode('_', $element['#parents']);
-  $upload_validators = $element['#upload_validators'] ?? [];
-
-  $result = file_save_upload($upload_name, $upload_validators, $upload_location, $delta, $fileExists);
-
-  // Get new errors that are generated while trying to save the upload. This
-  // will also clear them from the messenger service.
-  $errors_new = \Drupal::messenger()->deleteByType(MessengerInterface::TYPE_ERROR);
-  if (!empty($errors_new)) {
-
-    if (count($errors_new) > 1) {
-      // Render multiple errors into a single message.
-      // This is needed because only one error per element is supported.
-      $render_array = [
-        'error' => [
-          '#markup' => t('One or more files could not be uploaded.'),
-        ],
-        'item_list' => [
-          '#theme' => 'item_list',
-          '#items' => $errors_new,
-        ],
-      ];
-      $error_message = \Drupal::service('renderer')->renderInIsolation($render_array);
-    }
-    else {
-      $error_message = reset($errors_new);
-    }
-
-    $form_state->setError($element, $error_message);
-  }
-
-  // Ensure that errors set prior to calling this method are still shown to the
-  // user.
-  if (!empty($errors_before)) {
-    foreach ($errors_before as $error) {
-      \Drupal::messenger()->addError($error);
-    }
-  }
-
-  return $result;
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\file\Upload\FileElementHelper::saveFileUploads instead. See https://www.drupal.org/node/3382414', E_USER_DEPRECATED);
+  return \Drupal::service(FileElementHelper::class)->saveFileUploads($element, $form_state, $delta, $fileExists);
 }
 
 /**
@@ -136,7 +98,7 @@ function _file_save_upload_from_form(array $element, FormStateInterface $form_st
  *   array element contains the file entity if the upload succeeded or FALSE if
  *   there was an error. Function returns NULL if no file was uploaded.
  *
- * @see _file_save_upload_from_form()
+ * @see FileElementHelper::saveFileUploads()
  */
 function file_save_upload($form_field_name, $validators = [], $destination = FALSE, $delta = NULL, FileExists $fileExists = FileExists::Rename) {
   static $upload_cache;
@@ -266,7 +228,7 @@ function file_managed_file_save_upload($element, FormStateInterface $form_state)
   $files_uploaded = $element['#multiple'] && count(array_filter($file_upload)) > 0;
   $files_uploaded |= !$element['#multiple'] && !empty($file_upload);
   if ($files_uploaded) {
-    if (!$files = _file_save_upload_from_form($element, $form_state)) {
+    if (!$files = \Drupal::service(FileElementHelper::class)->saveFileUploads($element, $form_state)) {
       \Drupal::logger('file')->notice('The file upload failed. %upload', ['%upload' => $upload_name]);
       return [];
     }
