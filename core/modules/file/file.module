@@ -9,7 +9,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\FileInterface;
-use Drupal\file\Upload\FileElementHelper;
+use Drupal\file\Upload\ManagedFileElementHelper;
 use Drupal\file\Upload\FormFileUploader;
 
 /**
@@ -41,15 +41,16 @@ use Drupal\file\Upload\FormFileUploader;
  *   they should use the managed file upload widgets in core.
  *
  * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
- *   \Drupal::service(FileElementHelper::class)->saveFileUploads() instead.
+ *   \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads()
+ *   instead.
  *
  * @see https://www.drupal.org/node/3382414
  * @see https://www.drupal.org/project/drupal/issues/3069020
  * @see https://www.drupal.org/project/drupal/issues/2482783
  */
 function _file_save_upload_from_form(array $element, FormStateInterface $form_state, $delta = NULL, FileExists $fileExists = FileExists::Rename) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(FileElementHelper::class)->saveFileUploads() instead. See https://www.drupal.org/node/3382414', E_USER_DEPRECATED);
-  return \Drupal::service(FileElementHelper::class)->saveFileUploads($element, $form_state, $delta, $fileExists);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads() instead. See https://www.drupal.org/node/3382414', E_USER_DEPRECATED);
+  return \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads($element, $form_state, $delta, $fileExists);
 }
 
 /**
@@ -93,7 +94,7 @@ function _file_save_upload_from_form(array $element, FormStateInterface $form_st
  *   \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles() instead.
  *
  * @see https://www.drupal.org/node/3382414
- * @see FileElementHelper::saveFileUploads()
+ * @see ManagedFileElementHelper::saveFileUploads()
  */
 function file_save_upload($form_field_name, $validators = [], $destination = FALSE, $delta = NULL, FileExists $fileExists = FileExists::Rename) {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles() instead. See https://www.drupal.org/node/3382414', E_USER_DEPRECATED);
@@ -114,14 +115,14 @@ function file_save_upload($form_field_name, $validators = [], $destination = FAL
  *   upload directory could not be created or no files were uploaded.
  *
  * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
- *   \Drupal::service(FileElementHelper::class)->managedFileSaveUpload()
+ *   \Drupal::service(ManagedFileElementHelper::class)->managedFileSaveUpload()
  *   instead.
  *
  * @see https://www.drupal.org/node/3382414
  */
 function file_managed_file_save_upload($element, FormStateInterface $form_state) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(FileElementHelper::class)->managedFileSaveUpload() instead. See https://www.drupal.org/node/3382414', E_USER_DEPRECATED);
-  return \Drupal::service(FileElementHelper::class)->managedFileSaveUpload($element, $form_state);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(ManagedFileElementHelper::class)->managedFileSaveUpload() instead. See https://www.drupal.org/node/3382414', E_USER_DEPRECATED);
+  return \Drupal::service(ManagedFileElementHelper::class)->managedFileSaveUpload($element, $form_state);
 }
 
 /**
