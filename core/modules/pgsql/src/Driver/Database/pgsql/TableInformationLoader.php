@@ -23,6 +23,8 @@ use Drupal\Core\Database\Connection;
  * Connection::tableInformation(). The pgsql.table_information_prewarmer
  * service prewarms the cache of the default database connection.
  *
+ * @internal
+ *
  * @see \Drupal\pgsql\Driver\Database\pgsql\Connection::tableInformation()
  * @see \Drupal\pgsql\TableInformationPreWarmer
  */
