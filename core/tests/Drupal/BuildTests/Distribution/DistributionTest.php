@@ -8,6 +8,8 @@ use Drupal\BuildTests\Framework\BuildTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Filesystem\Filesystem;
 
+// cspell:ignore worktree
+
 /**
  * Tests the Drupal core distribution package.
  */
