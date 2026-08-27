@@ -2,10 +2,12 @@
  * Menu tree UI styles.
  *
  * Strategy: define a thin bridge layer of --mtu-color-* variables, scoped to
- * .menu-tree-ui, with neutral default values. All color rules in this file
- * use ONLY those bridge variables — never hardcoded hex — so an admin theme
- * (Gin, Claro, or otherwise) can override the bridge variables on its own
- * selectors without this module referencing that theme's custom properties.
+ * .menu-tree-ui. All color rules in this file use ONLY those bridge
+ * variables — never hardcoded hex. Each bridge variable resolves to a
+ * semantic token of the default admin theme (--admin-color-*, dark-mode
+ * aware via light-dark()) with a static light-scheme fallback for themes
+ * that do not define the token, such as Claro. Any theme can also override
+ * the bridge variables on its own selectors.
  *
  * Virtualization: [data-virtualized="true"] is set by RowWindow
  * (IntersectionObserver, see treegrid/js/windowing.js) for rows deep
@@ -14,16 +16,18 @@
  */
 
 .menu-tree-ui {
-  --mtu-color-divider: #e0e0e0;
-  --mtu-color-divider-light: #f0f0f0;
-  --mtu-color-bg: #fff;
-  --mtu-color-text: #1a1a1a;
-  --mtu-color-text-muted: #757575;
-  --mtu-color-text-muted-strong: #4a4a4a;
-  /* Neutral defaults; the admin theme overrides these. */
-  --mtu-color-focus: #2563eb;
-  --mtu-color-link: #2563eb;
-  --mtu-color-focus-bg: rgb(37, 99, 235, 0.08);
+  --mtu-color-divider: var(--admin-color-border, #e0e0e0);
+  --mtu-color-divider-light: var(--admin-color-border-table, #f0f0f0);
+  --mtu-color-bg: var(--admin-color-bg-surface, #fff);
+  --mtu-color-bg-raised: var(--admin-color-bg-raised, #fff);
+  --mtu-color-bg-inset: var(--admin-color-bg-sunken, #f0f0f0);
+  --mtu-color-text: var(--admin-color-text, #1a1a1a);
+  --mtu-color-text-muted: var(--admin-color-text-soft, #757575);
+  --mtu-color-icon: var(--admin-color-icon, #787878);
+  --mtu-color-focus: var(--admin-color-focus, #2563eb);
+  --mtu-color-link: var(--admin-color-link, #2563eb);
+  --mtu-color-focus-bg: var(--admin-color-bg-item, rgb(37, 99, 235, 0.08));
+  --mtu-shadow-popover: var(--admin-shadow-2, 0 8px 24px rgb(0, 0, 0, 0.12));
 
   display: flex;
   flex-direction: column;
@@ -61,8 +65,8 @@
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--mtu-color-divider);
   border-radius: 4px;
-  background: var(--mtu-color-bg);
-  box-shadow: 0 8px 24px rgb(0, 0, 0, 0.12);
+  background: var(--mtu-color-bg-raised);
+  box-shadow: var(--mtu-shadow-popover);
 }
 
 .menu-tree-ui__search-results:not(:has(*)) {
@@ -258,29 +262,26 @@
   cursor: grab;
   user-select: none;
   touch-action: none;
-  color: var(--mtu-color-text-muted-strong);
+  color: var(--mtu-color-icon);
 }
 
 /*
  * Movable handles reuse core's tabledrag move icon so the affordance matches
- * the classic menu admin. The icon swaps to the darker 000000 variant on
- * hover/focus, exactly as tabledrag does. The locked variant overrides this
+ * the classic menu admin. The icon is a mask filled with currentColor, so it
+ * follows the handle's color in both color schemes and picks up the
+ * stronger text color on hover/focus. The locked variant overrides this
  * back to a dimmed dot below.
  */
 .menu-tree-ui-row__handle-icon {
   display: inline-block;
   width: 14px;
   height: 14px;
-  background-image: url(../../../misc/icons/787878/move.svg);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
+  background-color: currentColor;
   font-size: 0;
-}
-
-.menu-tree-ui-row__handle:hover .menu-tree-ui-row__handle-icon,
-.menu-tree-ui-row__handle:focus-visible .menu-tree-ui-row__handle-icon {
-  background-image: url(../../../misc/icons/000000/move.svg);
+  mask-image: url(../../../misc/icons/787878/move.svg);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
 }
 
 .menu-tree-ui-row__handle:hover,
@@ -301,8 +302,9 @@
 .menu-tree-ui-row__handle--locked .menu-tree-ui-row__handle-icon {
   width: auto;
   height: auto;
-  background-image: none;
+  background-color: transparent;
   font-size: 0.6rem;
+  mask-image: none;
 }
 
 .menu-tree-ui-row--dragging {
@@ -478,7 +480,7 @@
   padding: 0.05rem 0.35rem;
   border: 1px solid var(--mtu-color-divider);
   border-radius: 3px;
-  background: var(--mtu-color-divider-light);
+  background: var(--mtu-color-bg-inset);
   font-size: 0.85em;
 }
 
