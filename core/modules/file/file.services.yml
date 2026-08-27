@@ -36,3 +36,4 @@ services:
       - [setLogger, ['@logger.channel.file']]
   Drupal\file\FileReferenceResolver: ~
   Drupal\file\Upload\FileElementHelper: ~
+  Drupal\file\Upload\FormFileUploader: ~

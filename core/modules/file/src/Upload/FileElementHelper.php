@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\file\Upload;
 
 use Drupal\Core\File\FileExists;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Helper class for ManagedFile element form file uploads.
@@ -19,10 +22,12 @@ use Drupal\Core\Render\RendererInterface;
  * @see \Drupal\file\Element\ManagedFile::valueCallback()
  */
 class FileElementHelper {
+  use StringTranslationTrait;
 
   public function __construct(
     protected readonly MessengerInterface $messenger,
     protected readonly RendererInterface $renderer,
+    protected readonly FormFileUploader $formFileUploader,
   ) {}
 
   /**
@@ -61,7 +66,7 @@ class FileElementHelper {
     $uploadName = implode('_', $element['#parents']);
     $uploadValidators = $element['#upload_validators'] ?? [];
 
-    $result = file_save_upload($uploadName, $uploadValidators, $uploadLocation, $delta, $fileExists);
+    $result = $this->formFileUploader->saveFormUploadedFiles($uploadName, $uploadValidators, $uploadLocation, $delta, $fileExists);
 
     // Get new errors that are generated while trying to save the upload. This
     // will also clear them from the messenger service.
@@ -73,7 +78,7 @@ class FileElementHelper {
         // This is needed because only one error per element is supported.
         $render_array = [
           'error' => [
-            '#markup' => t('One or more files could not be uploaded.'),
+            '#markup' => $this->t('One or more files could not be uploaded.'),
           ],
           'item_list' => [
             '#theme' => 'item_list',
