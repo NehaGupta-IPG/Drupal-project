@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\comment\Hook;
 
 use Drupal\Core\Datetime\DateFormatterInterface;
@@ -13,7 +15,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 
 /**
- * Hook implementations for comment.
+ * Theme hook implementations for comment.
  */
 class CommentThemeHooks {
 
@@ -24,9 +26,7 @@ class CommentThemeHooks {
     protected RendererInterface $renderer,
     protected EntityTypeManagerInterface $entityTypeManager,
     protected ThemeSettingsProvider $themeSettingsProvider,
-  ) {
-
-  }
+  ) {}
 
   /**
    * Implements hook_theme().

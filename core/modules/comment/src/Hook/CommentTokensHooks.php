@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\comment\Hook;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -9,13 +11,26 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Utility\Token;
+use Drupal\comment\CommentManagerInterface;
 
 /**
- * Hook implementations for comment.
+ * Token hook implementations for comment.
  */
 class CommentTokensHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly CommentManagerInterface $commentManager,
+    private readonly Token $token,
+    private readonly DateFormatterInterface $dateFormatter,
+    private readonly LanguageManagerInterface $languageManager,
+  ) {}
 
   /**
    * Implements hook_token_info().
@@ -29,11 +44,11 @@ class CommentTokensHooks {
     ];
     $tokens = [];
     // Provides an integration for each entity type except comment.
-    foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type_id => $entity_type) {
+    foreach ($this->entityTypeManager->getDefinitions() as $entity_type_id => $entity_type) {
       if ($entity_type_id == 'comment' || !$entity_type->entityClassImplements(ContentEntityInterface::class)) {
         continue;
       }
-      if (\Drupal::service('comment.manager')->getFields($entity_type_id)) {
+      if ($this->commentManager->getFields($entity_type_id)) {
         // Get the correct token type.
         $token_type = $entity_type_id == 'taxonomy_term' ? 'term' : $entity_type_id;
         // @todo Make this work per field. See https://www.drupal.org/node/2031903.
@@ -106,10 +121,10 @@ class CommentTokensHooks {
    */
   #[Hook('tokens')]
   public function tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
-    $token_service = \Drupal::token();
+    $token_service = $this->token;
     $url_options = ['absolute' => TRUE];
     if (isset($options['langcode'])) {
-      $url_options['language'] = \Drupal::languageManager()->getLanguage($options['langcode']);
+      $url_options['language'] = $this->languageManager->getLanguage($options['langcode']);
       $langcode = $options['langcode'];
     }
     else {
@@ -195,13 +210,13 @@ class CommentTokensHooks {
           case 'created':
             $date_format = DateFormat::load('medium');
             $bubbleable_metadata->addCacheableDependency($date_format);
-            $replacements[$original] = \Drupal::service('date.formatter')->format($comment->getCreatedTime(), 'medium', '', NULL, $langcode);
+            $replacements[$original] = $this->dateFormatter->format($comment->getCreatedTime(), 'medium', '', NULL, $langcode);
             break;
 
           case 'changed':
             $date_format = DateFormat::load('medium');
             $bubbleable_metadata->addCacheableDependency($date_format);
-            $replacements[$original] = \Drupal::service('date.formatter')->format($comment->getChangedTime(), 'medium', '', NULL, $langcode);
+            $replacements[$original] = $this->dateFormatter->format($comment->getChangedTime(), 'medium', '', NULL, $langcode);
             break;
 
           case 'entity':
@@ -237,7 +252,7 @@ class CommentTokensHooks {
         switch ($name) {
           case 'comment-count':
             $count = 0;
-            $fields = array_keys(\Drupal::service('comment.manager')->getFields($entity->getEntityTypeId()));
+            $fields = array_keys($this->commentManager->getFields($entity->getEntityTypeId()));
             $definitions = array_keys($entity->getFieldDefinitions());
             $valid_fields = array_intersect($fields, $definitions);
             foreach ($valid_fields as $field_name) {

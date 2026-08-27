@@ -1,17 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\comment\Hook;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\comment\CommentManagerInterface;
 
 /**
- * Hook implementations for comment.
+ * View hook implementations for comment.
  */
 class CommentViewsHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly CommentManagerInterface $commentManager,
+  ) {}
 
   /**
    * Implements hook_views_data_alter().
@@ -19,11 +28,11 @@ class CommentViewsHooks {
   #[Hook('views_data_alter')]
   public function viewsDataAlter(&$data): void {
     // Provides an integration for each entity type except comment.
-    foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type_id => $entity_type) {
+    foreach ($this->entityTypeManager->getDefinitions() as $entity_type_id => $entity_type) {
       if ($entity_type_id == 'comment' || !$entity_type->entityClassImplements(ContentEntityInterface::class) || !$entity_type->getBaseTable()) {
         continue;
       }
-      $fields = \Drupal::service('comment.manager')->getFields($entity_type_id);
+      $fields = $this->commentManager->getFields($entity_type_id);
       $base_table = $entity_type->getDataTable() ?: $entity_type->getBaseTable();
       $args = ['@entity_type' => $entity_type_id];
       if ($fields) {
