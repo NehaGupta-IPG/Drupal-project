@@ -112,9 +112,9 @@ class DeprecatedModulesTest extends BrowserTestBase {
     $this->submitForm([], 'Continue');
     $assert->pageTextContains('2 modules have been installed: Deprecated module dependency, Deprecated module');
 
-    // Uninstall the modules.
-    $this->uninstallModule('deprecated_module');
+    // Uninstall the modules in dependency order.
     $this->uninstallModule('deprecated_module_dependency');
+    $this->uninstallModule('deprecated_module');
 
     // Check a deprecated module with a non-deprecated dependency.
     $edit = [];
@@ -184,8 +184,8 @@ class DeprecatedModulesTest extends BrowserTestBase {
     $this->submitForm([], 'Continue');
     $assert->pageTextContains('2 modules have been installed: Deprecated module, Deprecated module dependency');
 
-    $this->uninstallModule('deprecated_module');
     $this->uninstallModule('deprecated_module_dependency');
+    $this->uninstallModule('deprecated_module');
 
     // Now, test when installing a non-core deprecated module alone and then
     // with a core deprecated module. First, install 'deprecated_module_test'
