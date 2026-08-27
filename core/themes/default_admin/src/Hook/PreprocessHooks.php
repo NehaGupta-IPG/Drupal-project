@@ -552,17 +552,6 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     $variables['#attached']['library'][] = 'filter/drupal.filter';
   }
 
-  #[Hook('preprocess_form')]
-  public function preprocessForm(array &$variables): void {
-    // Indicate on sidebar toggle button that sidebar has errors.
-    if (!empty($variables['element']['advanced']['#children_errors'])) {
-      if (($form_actions = Helper::formActions()) && !empty($form_actions['default_admin_sidebar_toggle'])) {
-        $form_actions['default_admin_sidebar_toggle']['#attributes']['class'][] = 'has-error';
-        Helper::formActions($form_actions);
-      }
-    }
-  }
-
   /**
    * Implements hook_preprocess_HOOK() for form_element.
    */

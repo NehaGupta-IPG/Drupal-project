@@ -128,10 +128,6 @@ body[data-meta-sidebar="open"] {
     mask-size: var(--admin-icon-size-sidebar-toggle) var(--admin-icon-size-sidebar-toggle);
   }
 
-  &.has-error::before {
-    background-color: var(--admin-color-error);
-  }
-
   &:hover,
   &:focus,
   &.is-active,
