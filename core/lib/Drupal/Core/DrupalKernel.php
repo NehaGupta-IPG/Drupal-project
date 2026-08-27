@@ -1591,16 +1591,16 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Lock the cron service prior to compiling the container, this potentially
     // avoids cron running with a stale container during a code deployment.
     $lock = $container->get('lock');
-    $lock_acquired = $lock->acquire('cron', '900.0');
+    $lock_acquired = $lock->acquire('container_rebuild');
     if (!$lock_acquired) {
       // If we weren't able to acquire a lock, wait, then try to acquire a lock
       // again, but proceed anyway.
-      $lock->wait('cron');
-      $lock_acquired = $lock->acquire('cron', '900.0');
+      $lock->wait('container_rebuild');
+      $lock_acquired = $lock->acquire('container_rebuild');
     }
     $container->compile();
     if ($lock_acquired) {
-      $lock->release('cron');
+      $lock->release('container_rebuild');
     }
     return $container;
   }

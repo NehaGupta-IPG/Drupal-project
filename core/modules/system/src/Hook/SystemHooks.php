@@ -313,12 +313,17 @@ class SystemHooks {
       $config_purge_batch_size = Settings::get('field_purge_batch_size', 50);
     }
 
-    $hook_data = \Drupal::service('keyvalue')->get('hook_data');
-    $suffix = Settings::get('deployment_identifier', \Drupal::VERSION);
-    foreach ($hook_data->getAllKeys() as $key) {
-      if (!str_ends_with(':' . $suffix, $key)) {
-        $hook_data->delete($key);
+    // Only garbage collect hook data when the container isn't rebuilding.
+    $lock = \Drupal::lock();
+    if ($lock->acquire('container_rebuild')) {
+      $hook_data = \Drupal::service('keyvalue')->get('hook_data');
+      $suffix = Settings::get('deployment_identifier', \Drupal::VERSION);
+      foreach ($hook_data->getAllKeys() as $key) {
+        if (!str_ends_with(':' . $suffix, $key)) {
+          $hook_data->delete($key);
+        }
       }
+      $lock->release('container_rebuild');
     }
     \Drupal::service(FieldPurger::class)->purgeBatch($config_purge_batch_size);
   }
