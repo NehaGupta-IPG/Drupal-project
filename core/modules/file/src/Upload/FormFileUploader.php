@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\file\Upload;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\file\FileInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\FileExistsException;
@@ -17,6 +17,7 @@ use Drupal\Core\Lock\LockAcquiringException;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
@@ -38,7 +39,8 @@ class FormFileUploader {
     protected readonly FileUploadHandlerInterface $fileUploadedHandler,
     protected readonly RendererInterface $renderer,
     protected readonly MessengerInterface $messenger,
-    protected MemoryCacheInterface $memoryCache,
+    #[Autowire(service: 'cache.memory')]
+    protected CacheBackendInterface $memoryCache,
     #[AutowireServiceClosure('logger.channel.file')]
     protected readonly \Closure $logger,
   ) {}
@@ -92,13 +94,7 @@ class FormFileUploader {
     int|null $delta = NULL,
     FileExists $fileExists = FileExists::Rename,
   ): array|FileInterface|null|false {
-    $cid = 'file_uploads';
-    if ($cached = $this->memoryCache->get($cid)) {
-      $uploadCache = $cached->data;
-    }
-    else {
-      $uploadCache = [];
-    }
+    $cid = 'file:uploads:' . $formFieldName;
 
     $uploadedFiles = $this->uploadedFilesExtractor->extractUploadedFiles($formFieldName);
     if (empty($uploadedFiles)) {
@@ -107,11 +103,9 @@ class FormFileUploader {
 
     // Return cached objects without processing since the file will have
     // already been processed and the paths in $_FILES will be invalid.
-    if (isset($uploadCache[$formFieldName])) {
-      if (isset($delta)) {
-        return $uploadCache[$formFieldName][$delta];
-      }
-      return $uploadCache[$formFieldName];
+    if ($cached = $this->memoryCache->get($cid)) {
+      $files = $cached->data;
+      return isset($delta) ? $files[$delta] : $files;
     }
 
     if ($destination === FALSE) {
@@ -182,8 +176,7 @@ class FormFileUploader {
     }
 
     // Add files to the cache.
-    $uploadCache[$formFieldName] = $files;
-    $this->memoryCache->set($cid, $uploadCache, Cache::PERMANENT);
+    $this->memoryCache->set($cid, $files, Cache::PERMANENT);
 
     return isset($delta) ? $files[$delta] : $files;
   }
