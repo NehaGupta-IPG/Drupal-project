@@ -672,7 +672,7 @@ services:
   http_handler_stack:
     class: GuzzleHttp\HandlerStack
     public: false
-    factory: Drupal\Core\Http\HandlerStack::create
+    factory: Drupal\Core\Http\HandlerStackFactory::create
     configurator: ['@http_handler_stack_configurator', configure]
   GuzzleHttp\HandlerStack: '@http_handler_stack'
   http_handler_stack_configurator:

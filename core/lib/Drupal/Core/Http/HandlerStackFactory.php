@@ -2,14 +2,14 @@
 
 namespace Drupal\Core\Http;
 
-use GuzzleHttp\HandlerStack as GuzzleHandlerStack;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\TransportSharing;
 use GuzzleHttp\Utils;
 
 /**
  * Helper class to create a HandlerStack with non-default handler options.
  */
-class HandlerStack {
+class HandlerStackFactory {
 
   /**
    * Creates a handler stack that can be used by clients.
@@ -29,10 +29,10 @@ class HandlerStack {
    * @return \GuzzleHttp\HandlerStack<callable(\Psr\Http\Message\RequestInterface, array<array-key, mixed>): \GuzzleHttp\Promise\PromiseInterface<\Psr\Http\Message\ResponseInterface, mixed>>
    *   The handler stack.
    */
-  public static function create(?callable $handler = NULL): GuzzleHandlerStack {
+  public static function create(?callable $handler = NULL): HandlerStack {
     // Opportunistically enable persistent sharing of connections, DNS and TLS
     // sessions across multiple executions.
-    return GuzzleHandlerStack::create($handler ?: Utils::chooseHandler(['transport_sharing' => TransportSharing::PERSISTENT_PREFER]));
+    return HandlerStack::create($handler ?: Utils::chooseHandler(['transport_sharing' => TransportSharing::PERSISTENT_PREFER]));
   }
 
 }
