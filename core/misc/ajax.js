@@ -1865,7 +1865,36 @@
      *   Selector to use.
      */
     scrollTop(ajax, response) {
-      document.querySelector(response.selector)?.scrollIntoView();
+      const target = document.querySelector(response.selector);
+      if (!target) {
+        return;
+      }
+
+      // Only scroll when the top of the target is outside the viewport.
+      //
+      // Scrolling unconditionally is disruptive when the triggering element
+      // sits just above its own target, such as a Views exposed filter
+      // directly above its results. The results are already on screen, so
+      // aligning them to the top of the viewport nudges the page down on
+      // every interaction.
+      //
+      // The check is deliberately on the top edge alone rather than on full
+      // visibility: a results list taller than the viewport is never fully
+      // visible, so a stricter check would never skip the scroll in exactly
+      // the case that needs it. When the target has been scrolled past, top
+      // is negative and the scroll still runs, which is what pager links
+      // rely on.
+      //
+      // A guard along these lines existed before #3478087 and was dropped
+      // during modernization. See #3564586.
+      const { top } = target.getBoundingClientRect();
+      const viewportHeight =
+        window.innerHeight || document.documentElement.clientHeight;
+      if (top >= 0 && top < viewportHeight) {
+        return;
+      }
+
+      target.scrollIntoView();
     },
   };
 
