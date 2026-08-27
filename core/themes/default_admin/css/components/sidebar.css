@@ -113,6 +113,7 @@ body[data-meta-sidebar="open"] {
 
 :is(#extra-specificity-hack, [data-drupal-admin-styles]) .meta-sidebar__trigger,
 .meta-sidebar__trigger {
+  position: relative;
   display: block;
   width: 2rem;
   height: 2rem;
@@ -133,8 +134,31 @@ body[data-meta-sidebar="open"] {
     mask-size: var(--admin-icon-size-sidebar-toggle) var(--admin-icon-size-sidebar-toggle);
   }
 
-  &.has-error::before {
-    background-color: var(--admin-color-error);
+  &.has-error {
+    width: 3.5rem;
+    padding-inline-end: 1.5rem;
+
+    &::before {
+      background-color: var(--admin-color-error);
+    }
+
+    &::after {
+      --admin-icon-size-sidebar-toggle: 18px;
+
+      position: absolute;
+      display: inline-block;
+      width: 2rem;
+      height: 2rem;
+      content: "";
+      border-radius: 50%;
+      background-color: var(--admin-color-error);
+      inset-block-start: -1px;
+      inset-inline-end: 0;
+      mask-repeat: no-repeat;
+      mask-position: center center;
+      mask-image: var(--admin-icon-error);
+      mask-size: var(--admin-icon-size-sidebar-toggle) var(--admin-icon-size-sidebar-toggle);
+    }
   }
 
   &:hover,
