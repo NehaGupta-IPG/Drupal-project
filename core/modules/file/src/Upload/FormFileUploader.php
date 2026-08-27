@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\file\Upload;
 
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\file\FileInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\FileExistsException;
@@ -36,6 +38,7 @@ class FormFileUploader {
     protected readonly FileUploadHandlerInterface $fileUploadedHandler,
     protected readonly RendererInterface $renderer,
     protected readonly MessengerInterface $messenger,
+    protected MemoryCacheInterface $memoryCache,
     #[AutowireServiceClosure('logger.channel.file')]
     protected readonly \Closure $logger,
   ) {}
@@ -89,7 +92,13 @@ class FormFileUploader {
     int|null $delta = NULL,
     FileExists $fileExists = FileExists::Rename,
   ): array|FileInterface|null|false {
-    static $uploadCache;
+    $cid = 'file_uploads';
+    if ($cached = $this->memoryCache->get($cid)) {
+      $uploadCache = $cached->data;
+    }
+    else {
+      $uploadCache = [];
+    }
 
     $uploadedFiles = $this->uploadedFilesExtractor->extractUploadedFiles($formFieldName);
     if (empty($uploadedFiles)) {
@@ -174,6 +183,7 @@ class FormFileUploader {
 
     // Add files to the cache.
     $uploadCache[$formFieldName] = $files;
+    $this->memoryCache->set($cid, $uploadCache, Cache::PERMANENT);
 
     return isset($delta) ? $files[$delta] : $files;
   }
