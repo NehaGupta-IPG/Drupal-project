@@ -159,7 +159,9 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
       // Ensure license information is available as a comment after
       // optimization.
       if ($js_asset['license'] !== $current_license) {
-        $data .= "/* @license " . $js_asset['license']['name'] . " " . $js_asset['license']['url'] . " */\n";
+        // It is possible to have a license name with no URL.
+        $url = $js_asset['license']['url'] ?? 'no URL';
+        $data .= "/* @license " . $js_asset['license']['name'] . " " . $url . " */\n";
       }
       $current_license = $js_asset['license'];
       // Optimize this JS file, but only if it's not yet minified.
