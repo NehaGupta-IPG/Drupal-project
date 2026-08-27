@@ -8,6 +8,7 @@
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Update\EquivalentUpdate;
+use Drupal\system\Entity\Menu;
 
 /**
  * Implements hook_install().
@@ -70,4 +71,40 @@ function system_update_12001(): TranslatableMarkup|null {
     return $equivalent_update->toSkipMessage();
   }
   return NULL;
+}
+
+
+/**
+ * Set maximum length of menu_link_content menu_name field to 32.
+ */
+function system_update_12002(): string {
+  $menus = \Drupal::entityTypeManager()->getStorage('menu')->loadMultiple();
+  $max_length = max(array_map('strlen', array_map(function (Menu $menu) {
+    return $menu->id();
+  }, $menus)));
+  $length = max($max_length, 32);
+  \Drupal::state()->set('menu_link_content_menu_name_max_length', $length);
+
+  $entityUpdateManager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $entityUpdateManager->getEntityType('menu_link_content');
+  $field_storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('menu_link_content');
+  $entityUpdateManager->updateFieldableEntityType($entity_type, $field_storage_definitions);
+  return t("Changed maximum length of menu_link_content menu_name field to {$length}");
+}
+/**
+ * Set maximum length of menu_link_content menu_name field to 32.
+ */
+function system_update_12003(): string {
+  $menus = \Drupal::entityTypeManager()->getStorage('menu')->loadMultiple();
+  $max_length = max(array_map('strlen', array_map(function (Menu $menu) {
+    return $menu->id();
+  }, $menus)));
+  $length = max($max_length, 32);
+  \Drupal::state()->set('menu_link_content_menu_name_max_length', $length);
+
+  $entityUpdateManager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $entityUpdateManager->getEntityType('menu_link_content');
+  $field_storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('menu_link_content');
+  $entityUpdateManager->updateFieldableEntityType($entity_type, $field_storage_definitions);
+  return t('Changed maximum length of menu_link_content menu_name field to @length', ['@length' => $length]);
 }

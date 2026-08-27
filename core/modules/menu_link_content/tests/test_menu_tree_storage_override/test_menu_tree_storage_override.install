@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_update_N().
+ */
+function test_menu_tree_storage_override_install(): void {
+  // Drop the menu tree table so it gets recreated with the updated length.
+  \Drupal::database()->schema()->dropTable('menu_tree');
+  // Rebuild the menu tree.
+  \Drupal::service('plugin.manager.menu.link')->rebuild();
+}

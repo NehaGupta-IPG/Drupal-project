@@ -1,0 +1,7 @@
+name: Test Menu Tree Storage Override
+type: module
+description: Provides a decorator to override menu.tree_storage service.
+hidden: true
+dependencies:
+  - drupal:menu_link_content
+  - drupal:menu_ui
