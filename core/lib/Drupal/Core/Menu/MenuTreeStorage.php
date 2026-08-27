@@ -740,8 +740,15 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $param_key_without_defaults = $route_parameters_without_defaults ? UrlHelper::buildQuery($route_parameters_without_defaults) : '';
     $query = $this->connection->select($this->table, NULL, $this->options);
     $query->fields($this->table, $this->definitionFields());
-    $query->condition('route_name', $route_name)
-      ->condition('route_param_key', [$param_key, $param_key_without_defaults], 'IN');
+    $query->condition('route_name', $route_name);
+    // Adds condition for a route param key without defaults only when it is
+    // different from the route param key with defaults.
+    if (empty(array_diff_assoc($route_parameters, $route_parameters_without_defaults))) {
+      $query->condition('route_param_key', $param_key);
+    }
+    else {
+      $query->condition('route_param_key', [$param_key, $param_key_without_defaults], 'IN');
+    }
     if ($menu_name) {
       $query->condition('menu_name', $menu_name);
     }
