@@ -108,6 +108,7 @@ body[data-meta-sidebar="open"] {
 
 :is(#extra-specificity-hack, [data-drupal-admin-styles]) .meta-sidebar__trigger,
 .meta-sidebar__trigger {
+  position: relative;
   display: block;
   width: 32px;
   height: 32px;
