@@ -105,11 +105,13 @@ class FormattableMarkupTest extends TestCase {
    *   The arguments to replace.
    * @param string $expected_key
    *   The placeholder key expected in the AssertionError message.
+   * @param string $expected
+   *   Unused in this variant; kept for shared provider compatibility.
    *
    * @legacy-covers ::__toString
    */
   #[DataProvider('providerTestNullPlaceholderAssertion')]
-  public function testNullPlaceholderAssertionError(string $string, array $arguments, string $expected_key): void {
+  public function testNullPlaceholderAssertionError(string $string, array $arguments, string $expected_key, string $expected): void {
     ini_set('zend.assertions', 1);
     $this->expectException(\AssertionError::class);
     $this->expectExceptionMessageMatches('/' . preg_quote($expected_key, '/') . '/');
