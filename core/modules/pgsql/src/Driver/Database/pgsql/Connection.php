@@ -76,6 +76,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
   /**
    * The loader for the information about blob and serial columns of tables.
+   *
+   * @var \Drupal\pgsql\Driver\Database\pgsql\TableInformationLoader|null
    */
   protected ?TableInformationLoader $tableInformationLoader = NULL;
 
