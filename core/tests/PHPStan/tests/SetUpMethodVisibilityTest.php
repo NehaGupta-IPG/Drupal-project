@@ -29,6 +29,8 @@ class SetUpMethodVisibilityTest extends RuleTestCase {
 
   /**
    * Tests that test setUp() methods are protected.
+   *
+   * Cspell:ignore analyse
    */
   public function testRule(): void {
     $this->analyse(
