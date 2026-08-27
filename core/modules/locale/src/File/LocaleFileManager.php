@@ -66,7 +66,7 @@ class LocaleFileManager {
     $directory = TranslationsStream::basePath();
     $result = [];
     if (is_dir($directory)) {
-      $result = $this->fileSystem->scanDirectory($directory, '![a-z_]+(\-[0-9a-z\.\-\+]+|)\.[^\./]+\.po$!', ['recurse' => FALSE]);
+      $result = $this->fileSystem->scanDirectory($directory, '![a-z_]+(\-[0-9a-z\.\-\+]+|)\.[^\./]+\.po$!');
     }
 
     foreach ($result as $file) {
