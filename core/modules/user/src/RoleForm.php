@@ -63,7 +63,6 @@ class RoleForm extends EntityForm {
 
     // Prevent leading and trailing spaces in role names.
     $entity->set('label', trim($entity->label()));
-    $entity->setDescription($entity->getDescription());
     $status = $entity->save();
 
     // Create actions but ignore the authenticated and anonymous roles.

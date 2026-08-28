@@ -77,7 +77,7 @@ class RoleListBuilder extends DraggableListBuilder {
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $entity->label();
     $row['description'] = [
-      '#markup' => $entity instanceof RoleInterface ? $entity->getDescription() : '',
+      '#plain_text' => $entity instanceof RoleInterface ? $entity->getDescription() : '',
     ];
     return $row + parent::buildRow($entity);
   }
