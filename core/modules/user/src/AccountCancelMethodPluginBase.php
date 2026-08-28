@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\user;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\Plugin\PluginBase;
@@ -23,6 +24,7 @@ abstract class AccountCancelMethodPluginBase extends PluginBase implements Accou
     array $configuration,
     $pluginId,
     $pluginDefinition,
+    protected ModuleHandlerInterface $moduleHandler,
     #[Autowire(service: 'logger.channel.user')]
     protected LoggerChannelInterface $logger,
   ) {
@@ -34,6 +36,14 @@ abstract class AccountCancelMethodPluginBase extends PluginBase implements Accou
    */
   public function access(AccountInterface $account): bool {
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareOwnedContent(UserInterface $account, string $method, array $context = []): void {
+    // Allow modules to add further sets to this batch.
+    $this->moduleHandler->invokeAll('user_cancel', [$context, $account, $method]);
   }
 
 }

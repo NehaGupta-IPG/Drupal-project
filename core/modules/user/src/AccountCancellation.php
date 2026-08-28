@@ -45,15 +45,6 @@ class AccountCancellation {
     $batchBuilder = new BatchBuilder()->setTitle($this->t('Cancelling account'));
     batch_set($batchBuilder->toArray());
 
-    // When the 'user_cancel_delete' method is used, user_delete() is called,
-    // which invokes hook_ENTITY_TYPE_predelete() and hook_ENTITY_TYPE_delete()
-    // for the user entity. Modules should use those hooks to respond to the
-    // account deletion.
-    if ($method !== 'user_cancel_delete') {
-      // Allow modules to add further sets to this batch.
-      $this->moduleHandler->invokeAll('user_cancel', [$context, $account, $method]);
-    }
-
     // Finish the batch and actually cancel the account.
     $batchBuilder = new BatchBuilder()
       ->setTitle($this->t('Cancelling user account'))

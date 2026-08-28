@@ -36,4 +36,21 @@ interface AccountCancelMethodInterface extends PluginInspectionInterface, Contai
    */
   public function cancel(UserInterface $account, array $options = []): void;
 
+  /**
+   * Prepare all the content owned by an account about to be canceled.
+   *
+   * Identifies all the content owned by an account and add appropriate
+   * operations to delete or disassociate it from the account using the batch
+   * API.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The user account to cancel.
+   * @param string $method
+   *   The account cancellation method to use.
+   * @param array $context
+   *   (optional) Associative array with context value. For instance, when used
+   *   in the form API, the submitted form values can be passed in this array.
+   */
+  public function prepareOwnedContent(UserInterface $account, string $method, array $context = []): void;
+
 }
