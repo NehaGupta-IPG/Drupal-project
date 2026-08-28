@@ -169,5 +169,25 @@ function hook_email_post_render_alter(Email $symfony_email, array $context): voi
 }
 
 /**
+ * Alter the email plugin instance before the email message is sent.
+ *
+ * @param \Drupal\Core\Mailer\EmailPluginInterface $email
+ *   The email plugin instance representing the message about to be sent.
+ * @param \Symfony\Component\Mime\Email $symfony_email
+ *   The Symfony email object.
+ *
+ * @ingroup mailer
+ */
+function hook_email_pre_send_alter(EmailPluginInterface $email, Email $symfony_email): void {
+  if ($email->getPluginId() === 'modulename.messagekey') {
+    if (!example_notifications_optin($email->getTo(), $email->getPluginId())) {
+      // If the recipient has opted to not receive such messages, cancel
+      // sending.
+      $email->setSend(FALSE);
+    }
+  }
+}
+
+/**
  * @} End of "addtogroup hooks".
  */
