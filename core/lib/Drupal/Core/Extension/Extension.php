@@ -32,6 +32,8 @@ class Extension {
   /**
    * The filename of the main extension file (e.g., 'node.module').
    *
+   * This is deprecated and will be removed in Drupal 13.0.0.
+   *
    * @var string|null
    */
   protected $filename;
