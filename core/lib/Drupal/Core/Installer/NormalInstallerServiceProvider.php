@@ -54,7 +54,7 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     $definition = $container->getDefinition('cache.file_parsing');
     $definition->setClass(MemoryBackend::class);
     // Use a service reference rather than an object instance, so that the
-    // container remains dumpable.
+    // container can still be dumped.
     $definition->setArguments([new Reference('datetime.time')]);
     $definition->setFactory(NULL);
 
