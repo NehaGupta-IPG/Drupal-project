@@ -7,6 +7,8 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
+
 /**
  * A deprecated function.
  *
@@ -18,6 +20,7 @@ declare(strict_types=1);
  *
  * @see https://www.drupal.org/project/drupal/issues/2870194
  */
+#[ExtensionFileIsConverted]
 function deprecation_test_function() {
   // phpcs:ignore Drupal.Semantics.FunctionTriggerError
   @trigger_error('This is the deprecation message for deprecation_test_function().', E_USER_DEPRECATED);

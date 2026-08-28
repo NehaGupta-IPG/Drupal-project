@@ -7,9 +7,12 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
+
 /**
  * Dummy shutdown function which registers another shutdown function.
  */
+#[ExtensionFileIsConverted]
 function _system_test_first_shutdown_function($arg1, $arg2): void {
   // Set something to ensure that this function got called.
   \Drupal::state()->set('_system_test_first_shutdown_function', [$arg1, $arg2]);
