@@ -106,16 +106,10 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
     $arguments = $this->getArguments();
     $arguments['@count'] = $this->count;
     $translated_array = explode(PoItem::DELIMITER, $this->translatedString);
-
-    $index = $this->getPluralIndex();
-    if ($this->count == 1 || $index == 0 || count($translated_array) == 1) {
-      // Singular form.
-      $return = $translated_array[0];
-    }
-    else {
-      // Nth plural form, fallback to second plural form.
-      $return = $translated_array[$index] ?? $translated_array[1];
-    }
+    // No need to use plural formula if the translation only contains the singular case.
+    $index = count($translated_array) === 1 ? 0 : $this->getPluralIndex();
+    // Nth plural form, fallback to second plural form.
+    $return = $translated_array[$index] ?? $translated_array[1];
     return $this->placeholderFormat($return, $arguments);
   }
 
