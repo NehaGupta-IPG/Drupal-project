@@ -22,12 +22,9 @@ class InstallerKernel extends DrupalKernel {
    * {@inheritdoc}
    */
   protected function initializeContainer() {
-    // Ensure the InstallerKernel's container is not dumped.
-    $this->allowDumping = FALSE;
-
     // During installation, initializeContainer() can be called multiple times
-    // without any module changes in between. Since allowDumping is FALSE, no
-    // cached container exists, so the parent will always recompile.
+    // without any module changes in between; reuse the existing container in
+    // that case instead of recompiling.
     $extensions = $this->getExtensions();
     if (isset($this->container)
       && count($extensions['module'] ?? []) === count($this->compiledExtensions['module'] ?? [])
@@ -38,11 +35,25 @@ class InstallerKernel extends DrupalKernel {
       $this->containerNeedsRebuild = FALSE;
       return $this->container;
     }
-    else {
+    // When dumping is not allowed (the early installer, which may have no
+    // database), or the extension set changed since the last compilation,
+    // force a fresh compile. Otherwise (fresh boot with dumping allowed) let
+    // the parent try the dumped container from the previous request first.
+    if (isset($this->container) || !$this->allowDumping) {
       $this->containerNeedsRebuild = TRUE;
-      $this->compiledExtensions = $extensions;
-      return parent::initializeContainer();
     }
+    $this->compiledExtensions = $extensions;
+    return parent::initializeContainer();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getContainerCacheKey() {
+    // Isolate the installer's dumped container from the runtime container
+    // cache: the installer container bakes in installer service overrides
+    // that must never leak into the installed site.
+    return parent::getContainerCacheKey() . ':installer';
   }
 
   /**

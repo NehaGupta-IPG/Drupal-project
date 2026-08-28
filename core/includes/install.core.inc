@@ -148,6 +148,10 @@ function install_drupal($class_loader, $settings = [], ?callable $callback = NUL
     // If installation is finished ensure any further container rebuilds do not
     // use the installer's service provider.
     unset($GLOBALS['conf']['container_service_providers']['InstallerServiceProvider']);
+    // Remove any dumped installer container from the cache: it bakes in
+    // installer service overrides and is of no use to the installed site,
+    // which dumps its own container under its own cache key.
+    \Drupal::service('kernel')->invalidateContainer();
   }
 
   // All available tasks for this page request are now complete. Interactive
@@ -435,7 +439,11 @@ function install_begin_request($class_loader, &$install_state): void {
 
   // Note, InstallerKernel::createFromRequest() is not used because Settings is
   // already initialized.
-  $kernel = new InstallerKernel($environment, $class_loader, FALSE);
+  // Allow the container to be dumped once the base system is installed: from
+  // that point on the database is guaranteed to exist, and the container can
+  // be cached across the many requests of the later installer (batches). The
+  // early installer keeps compiling per request, as it may have no database.
+  $kernel = new InstallerKernel($environment, $class_loader, $install_state['base_system_verified']);
   $kernel::bootEnvironment();
 
   // Add list of all available profiles to the installation state.
