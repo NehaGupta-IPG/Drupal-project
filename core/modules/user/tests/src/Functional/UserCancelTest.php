@@ -227,9 +227,8 @@ class UserCancelTest extends BrowserTestBase {
 
     // Create a node with two revisions.
     $node = $this->drupalCreateNode(['uid' => $account->id()]);
-    $settings = get_object_vars($node);
-    $settings['revision'] = 1;
-    $node = $this->drupalCreateNode($settings);
+    $node->setNewRevision(TRUE);
+    $node->save();
 
     // Add a comment to the page.
     $comment_subject = $this->randomMachineName(8);
@@ -483,11 +482,10 @@ class UserCancelTest extends BrowserTestBase {
     // cancelling user.
     $revision_node = $this->drupalCreateNode(['uid' => $account->id()]);
     $revision = $revision_node->getRevisionId();
-    $settings = get_object_vars($revision_node);
-    $settings['revision'] = 1;
+    $revision_node->setNewRevision(TRUE);
     // Set new/current revision to someone else.
-    $settings['uid'] = 1;
-    $revision_node = $this->drupalCreateNode($settings);
+    $revision_node->setOwnerId(1);
+    $revision_node->save();
 
     // Attempt to cancel account.
     $this->drupalGet('user/' . $account->id() . '/cancel');
