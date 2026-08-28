@@ -52,6 +52,9 @@
     @media (min-width: 64rem) {
       --admin-toolbar-z-index-popover: var(--drupal-admin-z-index-popover, -1);
 
+      display: flex;
+      flex-direction: column;
+      justify-content: var(--admin-toolbar-popover-justify-content, flex-start);
       block-size: calc(100vh - var(--drupal-displace-offset-top, 0px));
       padding-block-start: var(--admin-toolbar-space-16);
       transform: translateX(0);
@@ -63,6 +66,10 @@
       inset-block-start: var(--drupal-displace-offset-top, 0);
       inset-inline-start: 1px;
     }
+  }
+
+  .admin-toolbar__footer {
+    --admin-toolbar-popover-justify-content: flex-end;
   }
 
   [data-toolbar-popover-control][aria-expanded="true"] + [data-toolbar-popover-wrapper] {
