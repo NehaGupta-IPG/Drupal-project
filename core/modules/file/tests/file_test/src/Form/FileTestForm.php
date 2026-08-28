@@ -78,7 +78,13 @@ class FileTestForm extends FormBase {
       define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     }
 
-    $file = \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles('file_test_upload', $validators, $destination, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
+    $result = \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles('file_test_upload', $validators, $destination, static::fileExistsFromName($form_state->getValue('file_test_replace')));
+    if ($result !== NULL && $result->hasErrors()) {
+      foreach ($result->getErrors() as $error) {
+        \Drupal::messenger()->addError($error);
+      }
+    }
+    $file = $result?->getFile(0);
     if ($file) {
       $form_state->setValue('file_test_upload', $file);
       \Drupal::messenger()->addStatus($this->t('File @filepath was uploaded.', ['@filepath' => $file->getFileUri()]));

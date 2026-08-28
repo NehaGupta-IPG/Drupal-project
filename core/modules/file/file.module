@@ -101,7 +101,17 @@ function file_save_upload($form_field_name, $validators = [], $destination = FAL
   if ($destination === FALSE || $destination === NULL) {
     $destination = 'temporary://';
   }
-  return \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles($form_field_name, $validators, $destination, $delta, $fileExists);
+  $result = \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles($form_field_name, $validators, $destination, $fileExists);
+  if ($result === NULL) {
+    return NULL;
+  }
+  if ($result->hasErrors()) {
+    $messenger = \Drupal::messenger();
+    foreach ($result->getErrors() as $error) {
+      $messenger->addError($error);
+    }
+  }
+  return isset($delta) ? $result->getFile($delta) : $result->getFiles();
 }
 
 /**
