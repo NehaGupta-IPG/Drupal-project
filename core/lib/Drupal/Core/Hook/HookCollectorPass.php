@@ -9,6 +9,7 @@ use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Core\Extension\ProceduralCall;
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\HookDependsOnModule;
@@ -96,6 +97,16 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
   protected array $preprocessForSuggestions;
 
   /**
+   * Deprecated .module files.
+   *
+   * These are stored to allow emitting deprecation messages.
+   *
+   * @var array<string, true>
+   */
+  protected array $deprecatedModuleFiles = [];
+
+
+  /**
    * Constructor.
    *
    * @param list<string> $modules
@@ -143,6 +154,10 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
       'preprocess_for_suggestions' => $this->preprocessForSuggestions ?? [],
       'packed_order_operations' => $packed_order_operations,
     ]);
+
+    foreach ($this->deprecatedModuleFiles as $deprecatedModuleFile => $v) {
+      @trigger_error('Using ' . $deprecatedModuleFile . '.module is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
+    }
   }
 
   /**
@@ -338,10 +353,14 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
     $procedural_files = array_map(fn (string $extension): string => "$module.$extension", $this->proceduralFileExtensions);
     foreach ($this->getHookFileIterator($dir, $procedural_files) as $fileinfo) {
       assert($fileinfo instanceof \SplFileInfo);
-      $extension = $fileinfo->getExtension();
+      $fileExtension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
 
-      if ($extension === 'php') {
+      if ($fileExtension === 'module') {
+        $this->deprecatedModuleFiles[pathinfo($filename, PATHINFO_FILENAME)] = TRUE;
+      }
+
+      if ($fileExtension === 'php') {
         $cached = $hook_file_cache->get($filename);
         if ($cached) {
           $class = $cached['class'];
@@ -426,8 +445,13 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
         if ($implementations === NULL) {
           $finder = MockFileFinder::create($filename);
           $parser = new StaticReflectionParser('', $finder);
-          $implementations = [];
+          $implementations = [
+            'hooks' => [],
+          ];
           foreach ($parser->getMethodAttributes() as $function => $attributes) {
+            if (StaticReflectionParser::hasAttribute($attributes, ExtensionFileIsConverted::class)) {
+              $implementations['@skip_theme_file_deprecation'] = TRUE;
+            }
             if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
               break;
             }
@@ -456,12 +480,15 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
               }
 
               assert($function === $matches['module'] . '_' . $matches['hook']);
-              $implementations[] = ['module' => $matches['module'], 'hook' => $matches['hook']];
+              $implementations['hooks'][] = ['module' => $matches['module'], 'hook' => $matches['hook']];
             }
           }
           $procedural_hook_file_cache->set($filename, $implementations);
         }
-        foreach ($implementations as $implementation) {
+        if (isset($implementations['@skip_theme_file_deprecation'])) {
+          unset($this->deprecatedThemeFiles[pathinfo($filename, PATHINFO_FILENAME)]);
+        }
+        foreach ($implementations['hooks'] as $implementation) {
           $this->addProceduralImplementation($implementation['hook'], $implementation['module']);
         }
       }
