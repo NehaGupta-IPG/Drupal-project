@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\file\Upload;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\file\FileInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\FileExistsException;
@@ -40,7 +40,7 @@ class FormFileUploader {
     protected readonly RendererInterface $renderer,
     protected readonly MessengerInterface $messenger,
     #[Autowire(service: 'cache.memory')]
-    protected CacheBackendInterface $memoryCache,
+    protected MemoryCacheInterface $memoryCache,
     #[AutowireServiceClosure('logger.channel.file')]
     protected readonly \Closure $logger,
   ) {}
