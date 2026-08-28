@@ -33,7 +33,7 @@ class OptionsAllowedValues implements OptionsAllowedValuesInterface {
       $definition->getTargetEntityTypeId(),
       $definition->getName(),
       $entity ? 'entity' : 'any',
-      $entity ?? $entity->bundle(),
+      $entity ? $entity->bundle() : 'any',
     ]);
 
     if ($cache = $this->cache->get($cid)) {

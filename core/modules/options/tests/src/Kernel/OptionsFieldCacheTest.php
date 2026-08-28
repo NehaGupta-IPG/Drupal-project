@@ -11,6 +11,7 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\entity_test\Entity\EntityTestWithBundle;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\FieldStorageConfigInterface;
+use Drupal\options\OptionsAllowedValuesInterface;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
 use PHPUnit\Framework\Attributes\Group;
@@ -44,22 +45,22 @@ class OptionsFieldCacheTest extends FieldKernelTestBase {
   protected FieldStorageConfigInterface $fieldStorage;
 
   /**
-   * The list field in the bundle 1.
+   * The list field in bundle 1.
    */
   protected FieldConfigInterface $bundle1Field;
 
   /**
-   * The list field in the bundle 2.
+   * The list field in bundle 2.
    */
   protected FieldConfigInterface $bundle2Field;
 
   /**
-   * The entity for the bundle 1.
+   * The entity for bundle 1.
    */
   protected EntityInterface $bundle1Entity;
 
   /**
-   * The entity for the bundle 2.
+   * The entity for bundle 2.
    */
   protected EntityInterface $bundle2Entity;
 
@@ -140,11 +141,11 @@ class OptionsFieldCacheTest extends FieldKernelTestBase {
       ->getFieldDefinitions('entity_test_with_bundle', 'bundle2')[$this->fieldName];
 
     // Get the allowed values for each bundle.
-    $bundle1AllowedValues = options_allowed_values(
+    $bundle1AllowedValues = \Drupal::service(OptionsAllowedValuesInterface::class)->getAllowedValues(
       $bundle1FieldDefinition->getFieldStorageDefinition(),
       $this->bundle1Entity
     );
-    $bundle2AllowedValues = options_allowed_values(
+    $bundle2AllowedValues = \Drupal::service(OptionsAllowedValuesInterface::class)->getAllowedValues(
       $bundle2FieldDefinition->getFieldStorageDefinition(),
       $this->bundle2Entity
     );
