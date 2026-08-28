@@ -15,4 +15,4 @@ use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
  * Suppress deprecations.
  */
 #[ExtensionFileIsConverted]
-function suppress_container_initialize() {}
+function suppress_deprecation_container_initialize(): void {}

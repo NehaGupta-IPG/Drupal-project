@@ -16,4 +16,4 @@ define('MODULE_AUTOLOAD_TEST_CONSTANT', SomeClass::TEST);
  * Suppress deprecation notices.
  */
 #[ExtensionFileIsConverted]
-function deprecation_suppresion_module_autoload_test() {}
+function suppress_deprecation_module_autoload_test(): void {}
