@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Kernel;
 
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\file\Upload\FormFileUploader;
 use Drupal\KernelTests\KernelTestBase;
 use org\bovigo\vfs\vfsStream;
@@ -66,14 +65,15 @@ class FileSaveUploadTest extends KernelTestBase {
   public function testFileSaveUploadEmptyExtensions(): void {
     // Allow all extensions.
     $validators = ['FileExtension' => []];
-    $files = \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles('file', $validators);
+    $result = \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles('file', $validators);
+    $files = $result->getFiles();
     $this->assertCount(1, $files);
     $file = $files[0];
     // @todo work out why move_uploaded_file() is failing.
     $this->assertFalse($file);
-    $messages = \Drupal::messenger()->messagesByType(MessengerInterface::TYPE_ERROR);
-    $this->assertNotEmpty($messages);
-    $this->assertEquals('File upload error. Could not move uploaded file.', $messages[0]);
+    $errors = $result->getErrors();
+    $this->assertNotEmpty($errors);
+    $this->assertEquals('File upload error. Could not move uploaded file.', (string) $errors[0]);
   }
 
 }

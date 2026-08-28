@@ -98,7 +98,17 @@ function _file_save_upload_from_form(array $element, FormStateInterface $form_st
  */
 function file_save_upload($form_field_name, $validators = [], $destination = FALSE, $delta = NULL, FileExists $fileExists = FileExists::Rename) {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles() instead. See https://www.drupal.org/node/3382414', E_USER_DEPRECATED);
-  return \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles($form_field_name, $validators, $destination, $delta, $fileExists);
+  $result = \Drupal::service(FormFileUploader::class)->saveFormUploadedFiles($form_field_name, $validators, $destination, $fileExists);
+  if ($result === NULL) {
+    return NULL;
+  }
+  if ($result->hasErrors()) {
+    $messenger = \Drupal::messenger();
+    foreach ($result->getErrors() as $error) {
+      $messenger->addError($error);
+    }
+  }
+  return isset($delta) ? $result->getFile($delta) : $result->getFiles();
 }
 
 /**

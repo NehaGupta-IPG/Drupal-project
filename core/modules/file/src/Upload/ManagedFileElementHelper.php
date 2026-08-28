@@ -9,7 +9,6 @@ use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\UploadedFilesExtractor;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
@@ -29,7 +28,6 @@ class ManagedFileElementHelper {
   use StringTranslationTrait;
 
   public function __construct(
-    protected readonly MessengerInterface $messenger,
     protected readonly RendererInterface $renderer,
     protected readonly FormFileUploader $formFileUploader,
     protected readonly UploadedFilesExtractor $uploadedFilesExtractor,
@@ -73,22 +71,16 @@ class ManagedFileElementHelper {
     $delta = NULL,
     FileExists $fileExists = FileExists::Rename,
   ): array|FileInterface|null|false {
-    // Get all errors set before calling this method. This will also clear them
-    // from the messenger service.
-    $errorsBefore = $this->messenger->deleteByType(MessengerInterface::TYPE_ERROR);
-
     $uploadLocation = $element['#upload_location'] ?? FALSE;
     $uploadName = implode('_', $element['#parents']);
     $uploadValidators = $element['#upload_validators'] ?? [];
 
-    $result = $this->formFileUploader->saveFormUploadedFiles($uploadName, $uploadValidators, $uploadLocation, $delta, $fileExists);
+    $result = $this->formFileUploader->saveFormUploadedFiles($uploadName, $uploadValidators, $uploadLocation, $fileExists);
 
-    // Get new errors that are generated while trying to save the upload. This
-    // will also clear them from the messenger service.
-    $errors_new = $this->messenger->deleteByType(MessengerInterface::TYPE_ERROR);
-    if (!empty($errors_new)) {
+    if ($result !== NULL && $result->hasErrors()) {
+      $errors = array_values($result->getErrors());
 
-      if (count($errors_new) > 1) {
+      if (count($errors) > 1) {
         // Render multiple errors into a single message.
         // This is needed because only one error per element is supported.
         $render_array = [
@@ -97,27 +89,23 @@ class ManagedFileElementHelper {
           ],
           'item_list' => [
             '#theme' => 'item_list',
-            '#items' => $errors_new,
+            '#items' => $errors,
           ],
         ];
         $error_message = $this->renderer->renderInIsolation($render_array);
       }
       else {
-        $error_message = reset($errors_new);
+        $error_message = reset($errors);
       }
 
       $formState->setError($element, $error_message);
     }
 
-    // Ensure that errors set prior to calling this method are still shown to
-    // the user.
-    if (!empty($errorsBefore)) {
-      foreach ($errorsBefore as $error) {
-        $this->messenger->addError($error);
-      }
+    if ($result === NULL) {
+      return NULL;
     }
-
-    return $result;
+    $files = $result->getFiles();
+    return isset($delta) ? $result->getFile($delta) : $files;
   }
 
   /**
