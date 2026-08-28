@@ -98,6 +98,29 @@ interface RevisionableInterface extends EntityInterface {
   public function wasDefaultRevision();
 
   /**
+   * Checks whether the entity was the default revision when it was loaded.
+   *
+   * ::isDefaultRevision() reports the current status, which callers can
+   * change. This reports the status the entity was loaded with.
+   *
+   * @return bool
+   *   TRUE if the loaded revision was the default one, FALSE otherwise.
+   */
+  public function wasLoadedAsDefaultRevision();
+
+  /**
+   * Updates the loaded default revision status with the current one.
+   *
+   * This method should not be used, it could unintentionally cause the loaded
+   * default revision status to be lost.
+   *
+   * @internal
+   *
+   * @return $this
+   */
+  public function updateLoadedIsDefaultRevision();
+
+  /**
    * Checks if this entity is the latest revision.
    *
    * @return bool
