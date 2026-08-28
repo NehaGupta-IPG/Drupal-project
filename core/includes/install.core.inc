@@ -5,6 +5,7 @@
  * API functions for installing Drupal.
  */
 
+use Drupal\user\LoginFinalizer;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Cache\NullBackend;
@@ -1850,22 +1851,23 @@ function install_finished(&$install_state): void {
   if ($install_state['profile_info']['keep_profile'] ?? TRUE) {
     // Installation profiles are always loaded last.
     \Drupal::service(ModuleWeight::class)->set($profile, 1000);
+    // Build the router once after installing all modules.
+    // This would normally happen upon KernelEvents::TERMINATE, but since the
+    // installer does not use an HttpKernel, that event is never triggered.
+    // This is not necessary when the profile is uninstalled because
+    // uninstalling a module rebuilds the router anyway.
+    \Drupal::service('router.builder')->rebuild();
   }
   else {
     \Drupal::service('module_installer')->uninstall([$profile]);
   }
-
-  // Build the router once after installing all modules.
-  // This would normally happen upon KernelEvents::TERMINATE, but since the
-  // installer does not use an HttpKernel, that event is never triggered.
-  \Drupal::service('router.builder')->rebuild();
 
   if ($install_state['interactive']) {
     // Load current user and perform final login tasks.
     // This has to be done after drupal_flush_all_caches()
     // to avoid session regeneration.
     $account = User::load(1);
-    user_login_finalize($account);
+    \Drupal::service(LoginFinalizer::class)->finalizeLogin($account);
   }
 
   // Record when this install ran.

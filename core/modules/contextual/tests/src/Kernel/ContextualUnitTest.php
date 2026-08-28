@@ -41,8 +41,13 @@ class ContextualUnitTest extends KernelTestBase {
           'metadata' => ['langcode' => 'en', 'admin_langcode' => 'en'],
         ],
       ],
+<<<<<<< core/modules/contextual/tests/src/Kernel/ContextualUnitTest.php
       'node:node=14031991:langcode=en&admin_langcode=en',
-      'olivero',
+      'stark',
+=======
+      'node:node=14031991:langcode=en',
+      'stark',
+>>>>>>> core/modules/contextual/tests/src/Kernel/ContextualUnitTest.php
     ];
 
     $tests['one group, multiple dynamic path arguments, no metadata'] = [
@@ -74,8 +79,13 @@ class ContextualUnitTest extends KernelTestBase {
           ],
         ],
       ],
+<<<<<<< core/modules/contextual/tests/src/Kernel/ContextualUnitTest.php
       'views_ui_edit:view=promoted_content:location=page&display=page_1&langcode=en&admin_langcode=en',
-      'olivero',
+      'stark',
+=======
+      'views_ui_edit:view=promoted_content:location=page&display=page_1&langcode=en',
+      'stark',
+>>>>>>> core/modules/contextual/tests/src/Kernel/ContextualUnitTest.php
     ];
 
     $tests['multiple groups, multiple dynamic path arguments'] = [
