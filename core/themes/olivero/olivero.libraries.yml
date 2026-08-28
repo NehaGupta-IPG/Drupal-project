@@ -67,6 +67,12 @@ global-styling:
     - core/tabbable
     - olivero/navigation-base
 
+form--field-multiple-without-order:
+  version: VERSION
+  css:
+    component:
+      css/components/form--field-multiple-without-order.css: {}
+
 cke-dialog:
   version: VERSION
   css:

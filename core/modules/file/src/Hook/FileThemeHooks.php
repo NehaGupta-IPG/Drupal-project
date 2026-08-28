@@ -327,4 +327,48 @@ class FileThemeHooks {
     $variables['element'] = $element;
   }
 
+  /**
+   * Adds file widget row handling to the non-orderable multiple value template.
+   *
+   * The file widget reuses the 'field_multiple_value_without_order_form' theme
+   * hook when its 'orderable' setting is off. This performs the file-specific
+   * row preparation that self::preprocessFileWidgetMultiple() does for the
+   * orderable (tabledrag) variant.
+   *
+   * @param array<string,mixed> $variables
+   *   An associative array containing:
+   *   - element: A render element representing the widgets.
+   *   - items: The rendered field item widgets.
+   */
+  #[Hook('preprocess_field_multiple_value_without_order_form')]
+  public function preprocessFieldMultipleValueWithoutOrderForm(array &$variables): void {
+    $element = $variables['element'];
+    // Only the file widget sets '#file_upload_title'.
+    if (!isset($element['#file_upload_title']) || empty($variables['items'])) {
+      return;
+    }
+
+    foreach (Element::children($variables['items']) as $delta) {
+      // Save the uploading row for last.
+      if (empty($variables['items'][$delta]['#files'])) {
+        $variables['items'][$delta]['#title'] = $element['#file_upload_title'];
+        $variables['items'][$delta]['#title_display'] = 'hidden';
+        $variables['items'][$delta]['#description'] = $this->renderer->renderInIsolation($element['#file_upload_description']);
+        continue;
+      }
+
+      // Delay rendering of the "Display" option so it can be rendered in its
+      // own column.
+      if ($element['#display_field']) {
+        $variables['items'][$delta]['display']['#printed'] = TRUE;
+      }
+
+      // Render everything else together, without the normal wrappers.
+      $variables['items'][$delta]['#theme_wrappers'] = [];
+      if ($element['#display_field']) {
+        unset($variables['items'][$delta]['display']['#title']);
+      }
+    }
+  }
+
 }

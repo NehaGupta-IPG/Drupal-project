@@ -102,11 +102,11 @@ field.formatter.settings.list_key:
   label: 'Key format settings'
 
 field.widget.settings.options_buttons:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Check boxes/radio buttons format settings'
 
 field.widget.settings.options_select:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Select list format settings'
 
 views.argument.number_list_field:

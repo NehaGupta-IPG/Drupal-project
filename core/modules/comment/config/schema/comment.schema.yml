@@ -21,7 +21,7 @@ field.formatter.settings.comment_default:
       label: 'Pager ID'
 
 field.widget.settings.comment_default:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Comment display format settings'
 
 comment.type.*:

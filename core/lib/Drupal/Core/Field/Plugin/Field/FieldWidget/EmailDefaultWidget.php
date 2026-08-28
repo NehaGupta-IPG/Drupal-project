@@ -33,6 +33,8 @@ class EmailDefaultWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = parent::settingsForm($form, $form_state);
+
     $element['size'] = [
       '#type' => 'number',
       '#title' => $this->t('Textfield size'),
@@ -53,7 +55,7 @@ class EmailDefaultWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    $summary = [];
+    $summary = parent::settingsSummary();
 
     $placeholder = $this->getSetting('placeholder');
     if (!empty($placeholder)) {

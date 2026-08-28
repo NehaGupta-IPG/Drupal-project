@@ -377,6 +377,15 @@ class OliveroHooks {
   }
 
   /**
+   * Implements hook_preprocess_HOOK() for field_multiple_value_without_order_form.
+   */
+  #[Hook('preprocess_field_multiple_value_without_order_form')]
+  public function preprocessFieldMultipleValueWithoutOrderForm(array &$variables): void {
+    // Make disabled available for the template.
+    $variables['disabled'] = !empty($variables['element']['#disabled']);
+  }
+
+  /**
    * Implements hook_preprocess_HOOK() for menu-local-task.
    */
   #[Hook('preprocess_menu_local_task')]

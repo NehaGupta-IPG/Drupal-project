@@ -1,5 +1,5 @@
 field.widget.settings.media_library_widget:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Media library widget settings'
   mapping:
     media_types:

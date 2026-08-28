@@ -180,7 +180,7 @@ field.formatter.settings.image_url:
       label: 'Image style'
 
 field.widget.settings.image_image:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Image field display format settings'
   mapping:
     progress_indicator:
