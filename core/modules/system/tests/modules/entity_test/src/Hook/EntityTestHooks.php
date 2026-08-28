@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Drupal\entity_test\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -21,6 +23,9 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\entity_test\EntityTestHelper;
+use Drupal\entity_test\Callbacks;
+use Drupal\entity_test\Entity\EntityTest;
 
 /**
  * Hook implementations for entity_test.
@@ -29,6 +34,13 @@ class EntityTestHooks {
 
   use StringTranslationTrait;
 
+  public function __construct(
+    protected KeyValueFactoryInterface $keyValueStoreFactory,
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {
+
+  }
+
   /**
    * Implements hook_entity_type_alter().
    */
@@ -36,7 +48,7 @@ class EntityTestHooks {
   public function entityTypeAlter(array &$entity_types) : void {
     $state = \Drupal::state();
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
-    foreach (entity_test_entity_types() as $entity_type) {
+    foreach (EntityTestHelper::getEntityTypes() as $entity_type) {
       // Optionally specify a translation handler for testing translations.
       if ($state->get('entity_test.translation')) {
         $translation = $entity_types[$entity_type]->get('translation');
@@ -45,7 +57,14 @@ class EntityTestHooks {
       }
     }
     // Allow entity_test_rev tests to override the entity type definition.
-    $entity_types['entity_test_rev'] = $state->get('entity_test_rev.entity_type', $entity_types['entity_test_rev']);
+    $entity_test_rev_definition = $state->get('entity_test_rev.entity_type', $entity_types['entity_test_rev']);
+    // Simulate deletion if state value is not an entity type object.
+    if ($entity_test_rev_definition instanceof EntityTypeInterface) {
+      $entity_types['entity_test_rev'] = $entity_test_rev_definition;
+    }
+    else {
+      unset($entity_types['entity_test_rev']);
+    }
     $entity_types['entity_test_revpub'] = $state->get('entity_test_revpub.entity_type', $entity_types['entity_test_revpub']);
     // Enable the entity_test_new only when needed.
     if (!$state->get('entity_test_new')) {
@@ -75,15 +94,15 @@ class EntityTestHooks {
     }
     if ($entity_type->id() === 'entity_test_mul' && \Drupal::state()->get('entity_test.required_multi_default_field')) {
       $fields['required_multi_default_field'] = BaseFieldDefinition::create('string')->setLabel('Required field with default value')->setRequired(TRUE)->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)->setDefaultValue([
-            [
-              'value' => 'this is the first default field item',
-            ],
-            [
-              'value' => 'this is the second default value',
-            ],
-            [
-              'value' => 'you get the idea...',
-            ],
+        [
+          'value' => 'this is the first default field item',
+        ],
+        [
+          'value' => 'this is the second default value',
+        ],
+        [
+          'value' => 'you get the idea...',
+        ],
       ]);
     }
     if ($entity_type->id() == 'entity_test_mulrev' && \Drupal::state()->get('entity_test.field_test_item')) {
@@ -112,8 +131,8 @@ class EntityTestHooks {
     if ($entity_type->id() == 'entity_test' && $state->get('entity_test.remove_name_field')) {
       unset($fields['name']);
     }
-    // In 8001 we are assuming that a new definition with multiple cardinality has
-    // been deployed.
+    // In 8001 we are assuming that a new definition with multiple cardinality
+    // has been deployed.
     // @todo Remove this if we end up using state definitions at runtime. See
     //   https://www.drupal.org/node/2554235.
     if ($entity_type->id() == 'entity_test' && $state->get('entity_test.db_updates.entity_definition_updates') == 8001) {
@@ -123,13 +142,17 @@ class EntityTestHooks {
 
   /**
    * Implements hook_entity_bundle_info().
+   *
+   * @see \Drupal\entity_test\EntityTestHelper::createBundle()
+   * @see \Drupal\entity_test\EntityTestHelper::deleteBundle()
    */
   #[Hook('entity_bundle_info')]
   public function entityBundleInfo(): array {
     $bundles = [];
     $entity_types = \Drupal::entityTypeManager()->getDefinitions();
     foreach ($entity_types as $entity_type_id => $entity_type) {
-      if ($entity_type->getProvider() == 'entity_test' && !in_array($entity_type_id, ['entity_test_with_bundle', 'entity_test_mul_with_bundle'], TRUE)) {
+      if (in_array($entity_type->getProvider(), ['entity_test', 'entity_test_update'], TRUE)
+        && !in_array($entity_type_id, ['entity_test_with_bundle', 'entity_test_mul_with_bundle'], TRUE)) {
         $bundles[$entity_type_id] = \Drupal::state()->get($entity_type_id . '.bundles', [$entity_type_id => ['label' => 'Entity Test Bundle']]);
       }
     }
@@ -211,9 +234,9 @@ class EntityTestHooks {
   public function entityExtraFieldInfo(): array {
     $extra['entity_test']['bundle_with_extra_fields'] = [
       'display' => [
-              // Note: those extra fields do not currently display anything, they are
-              // just used in \Drupal\Tests\field_ui\Kernel\EntityDisplayTest to test
-              // the behavior of entity display objects.
+        // Note: those extra fields do not currently display anything, they are
+        // just used in \Drupal\Tests\field_ui\Kernel\EntityDisplayTest to test
+        // the behavior of entity display objects.
         'display_extra_field' => [
           'label' => $this->t('Display extra field'),
           'description' => $this->t('An extra field on the display side.'),
@@ -237,12 +260,12 @@ class EntityTestHooks {
   public function formEntityTestFormAlter(&$form) : void {
     switch (\Drupal::state()->get('entity_test.form.validate.test')) {
       case 'form-level':
-        $form['#validate'][] = 'entity_test_form_entity_test_form_validate';
-        $form['#validate'][] = 'entity_test_form_entity_test_form_validate_check';
+        $form['#validate'][] = [Callbacks::class, 'entityTestFormValidate'];
+        $form['#validate'][] = [Callbacks::class, 'entityTestFormValidateCheck'];
         break;
 
       case 'button-level':
-        $form['actions']['submit']['#validate'][] = 'entity_test_form_entity_test_form_validate';
+        $form['actions']['submit']['#validate'][] = [Callbacks::class, 'entityTestFormValidateCheck'];
     }
   }
 
@@ -259,7 +282,7 @@ class EntityTestHooks {
    * Implements hook_ENTITY_TYPE_insert() for 'entity_test'.
    */
   #[Hook('entity_test_insert')]
-  public function entityTestInsert($entity) {
+  public function entityTestInsert($entity): void {
     if ($entity->name->value == 'fail_insert') {
       throw new \Exception("Test exception rollback.");
     }
@@ -269,7 +292,7 @@ class EntityTestHooks {
    * Implements hook_entity_insert().
    */
   #[Hook('entity_insert')]
-  public function entityInsert(EntityInterface $entity) {
+  public function entityInsert(EntityInterface $entity): void {
     if ($entity->getEntityTypeId() == 'entity_test_mulrev' && $entity->label() == 'EntityLoadedRevisionTest') {
       $entity->setNewRevision(FALSE);
       $entity->save();
@@ -280,7 +303,7 @@ class EntityTestHooks {
    * Implements hook_entity_update().
    */
   #[Hook('entity_update')]
-  public function entityUpdate(EntityInterface $entity) {
+  public function entityUpdate(EntityInterface $entity): void {
     if ($entity instanceof ContentEntityInterface) {
       \Drupal::state()->set('entity_test.loadedRevisionId', $entity->getLoadedRevisionId());
     }
@@ -360,7 +383,7 @@ class EntityTestHooks {
    * Implements hook_entity_presave().
    */
   #[Hook('entity_presave')]
-  public function entityPresave(EntityInterface $entity) {
+  public function entityPresave(EntityInterface $entity): void {
     if (isset($GLOBALS['entity_test_throw_exception'])) {
       throw new \Exception('Entity presave exception', 1);
     }
@@ -373,24 +396,44 @@ class EntityTestHooks {
    * Implements hook_entity_predelete().
    */
   #[Hook('entity_predelete')]
-  public function entityPredelete(EntityInterface $entity) {
+  public function entityPredelete(EntityInterface $entity): void {
     if (isset($GLOBALS['entity_test_throw_exception'])) {
       throw new \Exception('Entity predelete exception', 2);
     }
   }
 
   /**
+   * Implements hook_entity_operation().
+   */
+  #[Hook('entity_operation')]
+  public function entityOperation(EntityInterface $entity, CacheableMetadata $cacheability): array {
+    if (!$entity instanceof EntityTest) {
+      return [];
+    }
+    $cacheability->addCacheTags(['entity_test_operation_tag_test']);
+    $operations['entity_test_custom_operation'] = [
+      'title' => 'Custom Home',
+      'weight' => 20,
+      'url' => Url::fromRoute('<front>'),
+    ];
+    return $operations;
+  }
+
+  /**
    * Implements hook_entity_operation_alter().
    */
   #[Hook('entity_operation_alter')]
-  public function entityOperationAlter(array &$operations, EntityInterface $entity): void {
+  public function entityOperationAlter(array &$operations, EntityInterface $entity, CacheableMetadata $cacheability): void {
+    if ($entity instanceof EntityTest) {
+      $cacheability->addCacheTags(['entity_test_operation_alter_tag_test']);
+      return;
+    }
+
     $valid_entity_type_ids = ['user_role', 'block'];
     if (in_array($entity->getEntityTypeId(), $valid_entity_type_ids)) {
       if (\Drupal::service('router.route_provider')->getRouteByName("entity.{$entity->getEntityTypeId()}.test_operation")) {
         $operations['test_operation'] = [
-          'title' => new FormattableMarkup('Test Operation: @label', [
-            '@label' => $entity->label(),
-          ]),
+          'title' => "Test Operation: " . $entity->label(),
           'url' => Url::fromRoute("entity.{$entity->getEntityTypeId()}.test_operation", [
             $entity->getEntityTypeId() => $entity->id(),
           ]),
@@ -404,152 +447,152 @@ class EntityTestHooks {
    * Implements hook_entity_translation_create().
    */
   #[Hook('entity_translation_create')]
-  public function entityTranslationCreate(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_translation_create', $translation->language()->getId());
+  public function entityTranslationCreate(EntityInterface $translation): void {
+    $this->recordHooks('entity_translation_create', $translation->language()->getId());
   }
 
   /**
    * Implements hook_entity_translation_insert().
    */
   #[Hook('entity_translation_insert')]
-  public function entityTranslationInsert(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_translation_insert', $translation->language()->getId());
+  public function entityTranslationInsert(EntityInterface $translation): void {
+    $this->recordHooks('entity_translation_insert', $translation->language()->getId());
   }
 
   /**
    * Implements hook_entity_translation_delete().
    */
   #[Hook('entity_translation_delete')]
-  public function entityTranslationDelete(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_translation_delete', $translation->language()->getId());
+  public function entityTranslationDelete(EntityInterface $translation): void {
+    $this->recordHooks('entity_translation_delete', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_create() for 'entity_test_mul'.
    */
   #[Hook('entity_test_mul_translation_create')]
-  public function entityTestMulTranslationCreate(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mul_translation_create', $translation->language()->getId());
+  public function entityTestMulTranslationCreate(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mul_translation_create', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_insert() for 'entity_test_mul'.
    */
   #[Hook('entity_test_mul_translation_insert')]
-  public function entityTestMulTranslationInsert(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mul_translation_insert', $translation->language()->getId());
+  public function entityTestMulTranslationInsert(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mul_translation_insert', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_delete() for 'entity_test_mul'.
    */
   #[Hook('entity_test_mul_translation_delete')]
-  public function entityTestMulTranslationDelete(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mul_translation_delete', $translation->language()->getId());
+  public function entityTestMulTranslationDelete(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mul_translation_delete', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_create() for 'entity_test_mul_changed'.
    */
   #[Hook('entity_test_mul_changed_translation_create')]
-  public function entityTestMulChangedTranslationCreate(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mul_changed_translation_create', $translation->language()->getId());
+  public function entityTestMulChangedTranslationCreate(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mul_changed_translation_create', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_insert() for 'entity_test_mul_changed'.
    */
   #[Hook('entity_test_mul_changed_translation_insert')]
-  public function entityTestMulChangedTranslationInsert(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mul_changed_translation_insert', $translation->language()->getId());
+  public function entityTestMulChangedTranslationInsert(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mul_changed_translation_insert', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_delete().
    */
   #[Hook('entity_test_mul_changed_translation_delete')]
-  public function entityTestMulChangedTranslationDelete(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mul_changed_translation_delete', $translation->language()->getId());
+  public function entityTestMulChangedTranslationDelete(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mul_changed_translation_delete', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_create().
    */
   #[Hook('entity_test_mulrev_translation_create')]
-  public function entityTestMulrevTranslationCreate(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mulrev_translation_create', $translation->language()->getId());
+  public function entityTestMulrevTranslationCreate(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mulrev_translation_create', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_insert().
    */
   #[Hook('entity_test_mulrev_translation_insert')]
-  public function entityTestMulrevTranslationInsert(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mulrev_translation_insert', $translation->language()->getId());
+  public function entityTestMulrevTranslationInsert(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mulrev_translation_insert', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_delete() for 'entity_test_mulrev'.
    */
   #[Hook('entity_test_mulrev_translation_delete')]
-  public function entityTestMulrevTranslationDelete(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mulrev_translation_delete', $translation->language()->getId());
+  public function entityTestMulrevTranslationDelete(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mulrev_translation_delete', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_create() for 'entity_test_mulrev_changed'.
    */
   #[Hook('entity_test_mulrev_changed_translation_create')]
-  public function entityTestMulrevChangedTranslationCreate(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mulrev_changed_translation_create', $translation->language()->getId());
+  public function entityTestMulrevChangedTranslationCreate(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mulrev_changed_translation_create', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_insert() for 'entity_test_mulrev'.
    */
   #[Hook('entity_test_mulrev_changed_translation_insert')]
-  public function entityTestMulrevChangedTranslationInsert(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mulrev_changed_translation_insert', $translation->language()->getId());
+  public function entityTestMulrevChangedTranslationInsert(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mulrev_changed_translation_insert', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_delete().
    */
   #[Hook('entity_test_mulrev_changed_translation_delete')]
-  public function entityTestMulrevChangedTranslationDelete(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mulrev_changed_translation_delete', $translation->language()->getId());
+  public function entityTestMulrevChangedTranslationDelete(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mulrev_changed_translation_delete', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_create() for 'entity_test_mul_langcode_key'.
    */
   #[Hook('entity_test_mul_langcode_key_translation_create')]
-  public function entityTestMulLangcodeKeyTranslationCreate(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mul_langcode_key_translation_create', $translation->language()->getId());
+  public function entityTestMulLangcodeKeyTranslationCreate(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mul_langcode_key_translation_create', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_insert() for 'entity_test_mul_langcode_key'.
    */
   #[Hook('entity_test_mul_langcode_key_translation_insert')]
-  public function entityTestMulLangcodeKeyTranslationInsert(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mul_langcode_key_translation_insert', $translation->language()->getId());
+  public function entityTestMulLangcodeKeyTranslationInsert(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mul_langcode_key_translation_insert', $translation->language()->getId());
   }
 
   /**
    * Implements hook_ENTITY_TYPE_translation_delete() for 'entity_test_mul_langcode_key'.
    */
   #[Hook('entity_test_mul_langcode_key_translation_delete')]
-  public function entityTestMulLangcodeKeyTranslationDelete(EntityInterface $translation) {
-    _entity_test_record_hooks('entity_test_mul_langcode_key_translation_delete', $translation->language()->getId());
+  public function entityTestMulLangcodeKeyTranslationDelete(EntityInterface $translation): void {
+    $this->recordHooks('entity_test_mul_langcode_key_translation_delete', $translation->language()->getId());
   }
 
   /**
    * Implements hook_entity_revision_create().
    */
   #[Hook('entity_revision_create')]
-  public function entityRevisionCreate(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields) {
-    _entity_test_record_hooks('entity_revision_create', [
+  public function entityRevisionCreate(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields): void {
+    $this->recordHooks('entity_revision_create', [
       'new_revision' => $new_revision,
       'entity' => $entity,
       'keep_untranslatable_fields' => $keep_untranslatable_fields,
@@ -560,11 +603,11 @@ class EntityTestHooks {
    * Implements hook_ENTITY_TYPE_revision_create() for 'entity_test_mulrev'.
    */
   #[Hook('entity_test_mulrev_revision_create')]
-  public function entityTestMulrevRevisionCreate(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields) {
+  public function entityTestMulrevRevisionCreate(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields): void {
     if ($new_revision->get('name')->value == 'revision_create_test_it') {
       $new_revision->set('name', 'revision_create_test_it_altered');
     }
-    _entity_test_record_hooks('entity_test_mulrev_revision_create', [
+    $this->recordHooks('entity_test_mulrev_revision_create', [
       'new_revision' => $new_revision,
       'entity' => $entity,
       'keep_untranslatable_fields' => $keep_untranslatable_fields,
@@ -575,7 +618,7 @@ class EntityTestHooks {
    * Implements hook_entity_prepare_view().
    */
   #[Hook('entity_prepare_view')]
-  public function entityPrepareView($entity_type, array $entities, array $displays) {
+  public function entityPrepareView($entity_type, array $entities, array $displays): void {
     if ($entity_type == 'entity_test') {
       foreach ($entities as $entity) {
         /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
@@ -699,6 +742,62 @@ class EntityTestHooks {
     if ($entity->getEntityTypeId() === 'entity_test' && $entity->get('name')->value === 'test_entity_type_form_mode_alter') {
       $form_mode = 'compact';
     }
+  }
+
+  /**
+   * Implements hook_entity_duplicate().
+   */
+  #[Hook('entity_duplicate')]
+  public function entityDuplicateAlter(EntityInterface $duplicate, EntityInterface $entity) : void {
+    if ($duplicate instanceof ContentEntityInterface && str_contains($duplicate->label(), 'UUID CRUD test entity') && $duplicate->hasField('name')) {
+      $duplicate->set('name', $duplicate->label() . ' duplicate');
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_duplicate().
+   */
+  #[Hook('entity_test_duplicate')]
+  public function entityTestDuplicate(EntityTest $duplicate, EntityTest $entity) : void {
+    if (str_contains($duplicate->label(), 'UUID CRUD test entity') && $duplicate->hasField('name')) {
+      $duplicate->set('name', 'prefix ' . $duplicate->label());
+    }
+  }
+
+  /**
+   * Implements hook_entity_preload().
+   *
+   * Loads non-default revision when loading an entity.
+   */
+  #[Hook('entity_preload')]
+  public function entityPreload(array $ids, string $entity_type_id): array {
+    $entities = [];
+    $key_value_store = $this->keyValueStoreFactory->get('entity_test_preload_entities');
+    if ($revisions_load = $key_value_store->get($entity_type_id)) {
+      foreach ($revisions_load as $id => $revision_id) {
+        $revisions = $this->entityTypeManager
+          ->getStorage($entity_type_id)
+          ->loadMultipleRevisions([$revision_id]);
+        $entities[$id] = $revisions[$revision_id];
+      }
+    }
+    return $entities;
+  }
+
+  /**
+   * Helper function to be used to record hook invocations.
+   *
+   * @param string $hook
+   *   The hook name.
+   * @param mixed $data
+   *   Arbitrary data associated with the hook invocation.
+   */
+  protected function recordHooks($hook, $data): void {
+    $state = \Drupal::state();
+    $key = 'entity_test.hooks';
+    $hooks = $state->get($key);
+    $hooks[$hook] = $data;
+    $state->set($key, $hooks);
   }
 
 }

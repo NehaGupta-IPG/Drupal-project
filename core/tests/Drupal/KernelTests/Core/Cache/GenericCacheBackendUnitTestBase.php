@@ -23,9 +23,9 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Array of objects implementing Drupal\Core\Cache\CacheBackendInterface.
    *
-   * @var array
+   * @var array<string,\Drupal\Core\Cache\CacheBackendInterface>|null
    */
-  protected $cacheBackends;
+  protected ?array $cacheBackends = NULL;
 
   /**
    * Cache bin to use for testing.
@@ -42,6 +42,14 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   protected $defaultValue;
 
   /**
+   * Most cache backends ensure changes to objects do not affect the cache.
+   *
+   * Some caches explicitly allow this, for example,
+   * \Drupal\Core\Cache\MemoryCache\MemoryCache.
+   */
+  protected bool $testObjectProperties = TRUE;
+
+  /**
    * Gets the testing bin.
    *
    * Override this method if you want to work on a different bin than the
@@ -50,7 +58,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
    * @return string
    *   Bin name.
    */
-  protected function getTestBin() {
+  protected function getTestBin(): string {
     if (!isset($this->testBin)) {
       $this->testBin = 'page';
     }
@@ -68,12 +76,12 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
    * @return \Drupal\Core\Cache\CacheBackendInterface
    *   Cache backend to test.
    */
-  abstract protected function createCacheBackend($bin);
+  abstract protected function createCacheBackend($bin): CacheBackendInterface;
 
   /**
    * Allows specific implementation to change the environment before a test run.
    */
-  public function setUpCacheBackend() {
+  public function setUpCacheBackend(): void {
   }
 
   /**
@@ -82,7 +90,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
    * Used before the real tear down because the tear down will change things
    * such as the database prefix.
    */
-  public function tearDownCacheBackend() {
+  public function tearDownCacheBackend(): void {
   }
 
   /**
@@ -125,7 +133,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
     foreach ($this->cacheBackends as $bin => $cache_backend) {
       $this->cacheBackends[$bin]->deleteAll();
     }
-    unset($this->cacheBackends);
+    $this->cacheBackends = NULL;
 
     $this->tearDownCacheBackend();
 
@@ -138,7 +146,6 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   public function testSetGet(): void {
     $backend = $this->getCacheBackend();
 
-    $this->assertFalse($backend->get('test1'), "Backend does not contain data for cache id test1.");
     $with_backslash = ['foo' => '\Drupal\foo\Bar'];
     $backend->set('test1', $with_backslash);
     $cached = $backend->get('test1');
@@ -150,7 +157,6 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
     $this->assertLessThanOrEqual(round(microtime(TRUE), 3), $cached->created);
     $this->assertEquals(Cache::PERMANENT, $cached->expire, 'Expire time is correct.');
 
-    $this->assertFalse($backend->get('test2'), "Backend does not contain data for cache id test2.");
     $backend->set('test2', ['value' => 3], \Drupal::time()->getRequestTime() + 3);
     $cached = $backend->get('test2');
     $this->assertIsObject($cached);
@@ -169,7 +175,6 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
     $this->assertLessThanOrEqual(round(microtime(TRUE), 3), $cached->created);
     $this->assertEquals(\Drupal::time()->getRequestTime() - 3, $cached->expire, 'Expire time is correct.');
 
-    $this->assertFalse($backend->get('test4'), "Backend does not contain data for cache id test4.");
     $with_eof = ['foo' => "\nEOF\ndata"];
     $backend->set('test4', $with_eof);
     $cached = $backend->get('test4');
@@ -180,7 +185,6 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
     $this->assertLessThanOrEqual(round(microtime(TRUE), 3), $cached->created);
     $this->assertEquals(Cache::PERMANENT, $cached->expire, 'Expire time is correct.');
 
-    $this->assertFalse($backend->get('test5'), "Backend does not contain data for cache id test5.");
     $with_eof_and_semicolon = ['foo' => "\nEOF;\ndata"];
     $backend->set('test5', $with_eof_and_semicolon);
     $cached = $backend->get('test5');
@@ -208,13 +212,19 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
     $data->this_should_not_be_in_the_cache = TRUE;
     $cached = $backend->get('test7');
     $this->assertIsObject($cached);
-    $this->assertEquals($expected_data, $cached->data);
-    $this->assertFalse(isset($cached->data->this_should_not_be_in_the_cache));
-    // Add a property to the cache data. It should not appear when we fetch
-    // the data from cache again.
-    $cached->data->this_should_not_be_in_the_cache = TRUE;
-    $fresh_cached = $backend->get('test7');
-    $this->assertFalse(isset($fresh_cached->data->this_should_not_be_in_the_cache));
+    if ($this->testObjectProperties) {
+      $this->assertEquals($expected_data, $cached->data);
+      $this->assertFalse(isset($cached->data->this_should_not_be_in_the_cache));
+
+      // Add a property to the cache data. It should not appear when we fetch
+      // the data from cache again.
+      $cached->data->this_should_not_be_in_the_cache = TRUE;
+      $fresh_cached = $backend->get('test7');
+      $this->assertFalse(isset($fresh_cached->data->this_should_not_be_in_the_cache));
+    }
+    else {
+      $this->assertSame($data, $cached->data);
+    }
 
     // Check with a long key.
     $cid = str_repeat('a', 300);
@@ -249,11 +259,9 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   public function testDelete(): void {
     $backend = $this->getCacheBackend();
 
-    $this->assertFalse($backend->get('test1'), "Backend does not contain data for cache id test1.");
     $backend->set('test1', 7);
     $this->assertIsObject($backend->get('test1'));
 
-    $this->assertFalse($backend->get('test2'), "Backend does not contain data for cache id test2.");
     $backend->set('test2', 3);
     $this->assertIsObject($backend->get('test2'));
 
@@ -448,18 +456,20 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\Core\Cache\ApcuBackend::deleteMultiple
-   * @covers \Drupal\Core\Cache\BackendChain::deleteMultiple
-   * @covers \Drupal\Core\Cache\ChainedFastBackend::deleteMultiple
-   * @covers \Drupal\Core\Cache\DatabaseBackend::deleteMultiple
-   * @covers \Drupal\Core\Cache\MemoryBackend::deleteMultiple
-   * @covers \Drupal\Core\Cache\PhpBackend::deleteMultiple
-   * @covers \Drupal\Core\Cache\ApcuBackend::deleteMultiple
-   * @covers \Drupal\Core\Cache\BackendChain::deleteMultiple
-   * @covers \Drupal\Core\Cache\ChainedFastBackend::deleteMultiple
-   * @covers \Drupal\Core\Cache\DatabaseBackend::deleteMultiple
-   * @covers \Drupal\Core\Cache\MemoryBackend::deleteMultiple
-   * @covers \Drupal\Core\Cache\PhpBackend::deleteMultiple
+   * Tests delete multiple.
+   *
+   * @legacy-covers \Drupal\Core\Cache\ApcuBackend::deleteMultiple
+   * @legacy-covers \Drupal\Core\Cache\BackendChain::deleteMultiple
+   * @legacy-covers \Drupal\Core\Cache\ChainedFastBackend::deleteMultiple
+   * @legacy-covers \Drupal\Core\Cache\DatabaseBackend::deleteMultiple
+   * @legacy-covers \Drupal\Core\Cache\MemoryBackend::deleteMultiple
+   * @legacy-covers \Drupal\Core\Cache\PhpBackend::deleteMultiple
+   * @legacy-covers \Drupal\Core\Cache\ApcuBackend::deleteMultiple
+   * @legacy-covers \Drupal\Core\Cache\BackendChain::deleteMultiple
+   * @legacy-covers \Drupal\Core\Cache\ChainedFastBackend::deleteMultiple
+   * @legacy-covers \Drupal\Core\Cache\DatabaseBackend::deleteMultiple
+   * @legacy-covers \Drupal\Core\Cache\MemoryBackend::deleteMultiple
+   * @legacy-covers \Drupal\Core\Cache\PhpBackend::deleteMultiple
    */
   public function testDeleteMultiple(): void {
     $backend = $this->getCacheBackend();
@@ -525,18 +535,20 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\Core\Cache\ApcuBackend::getMultiple
-   * @covers \Drupal\Core\Cache\BackendChain::getMultiple
-   * @covers \Drupal\Core\Cache\ChainedFastBackend::getMultiple
-   * @covers \Drupal\Core\Cache\DatabaseBackend::getMultiple
-   * @covers \Drupal\Core\Cache\MemoryBackend::getMultiple
-   * @covers \Drupal\Core\Cache\PhpBackend::getMultiple
-   * @covers \Drupal\Core\Cache\ApcuBackend::invalidateMultiple
-   * @covers \Drupal\Core\Cache\BackendChain::invalidateMultiple
-   * @covers \Drupal\Core\Cache\ChainedFastBackend::invalidateMultiple
-   * @covers \Drupal\Core\Cache\DatabaseBackend::invalidateMultiple
-   * @covers \Drupal\Core\Cache\MemoryBackend::invalidateMultiple
-   * @covers \Drupal\Core\Cache\PhpBackend::invalidateMultiple
+   * Tests invalidate.
+   *
+   * @legacy-covers \Drupal\Core\Cache\ApcuBackend::getMultiple
+   * @legacy-covers \Drupal\Core\Cache\BackendChain::getMultiple
+   * @legacy-covers \Drupal\Core\Cache\ChainedFastBackend::getMultiple
+   * @legacy-covers \Drupal\Core\Cache\DatabaseBackend::getMultiple
+   * @legacy-covers \Drupal\Core\Cache\MemoryBackend::getMultiple
+   * @legacy-covers \Drupal\Core\Cache\PhpBackend::getMultiple
+   * @legacy-covers \Drupal\Core\Cache\ApcuBackend::invalidateMultiple
+   * @legacy-covers \Drupal\Core\Cache\BackendChain::invalidateMultiple
+   * @legacy-covers \Drupal\Core\Cache\ChainedFastBackend::invalidateMultiple
+   * @legacy-covers \Drupal\Core\Cache\DatabaseBackend::invalidateMultiple
+   * @legacy-covers \Drupal\Core\Cache\MemoryBackend::invalidateMultiple
+   * @legacy-covers \Drupal\Core\Cache\PhpBackend::invalidateMultiple
    */
   public function testInvalidate(): void {
     $backend = $this->getCacheBackend();
@@ -632,27 +644,6 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
     $this->assertFalse($this->getCacheBackend($bin)->get('test_cid_invalidate2'), 'Cache items matching tag were invalidated.');
     // Test that the cache entry with without a matching tag still exists.
     $this->assertNotEmpty($this->getCacheBackend($bin)->get('test_cid_invalidate1'), 'Cache items not matching tag were not invalidated.');
-  }
-
-  /**
-   * Tests Drupal\Core\Cache\CacheBackendInterface::invalidateAll().
-   */
-  public function testInvalidateAll(): void {
-    $backend_a = $this->getCacheBackend();
-    $backend_b = $this->getCacheBackend('bootstrap');
-
-    // Set both expiring and permanent keys.
-    $backend_a->set('test1', 1, Cache::PERMANENT);
-    $backend_a->set('test2', 3, time() + 1000);
-    $backend_b->set('test3', 4, Cache::PERMANENT);
-
-    $backend_a->invalidateAll();
-
-    $this->assertFalse($backend_a->get('test1'), 'First key has been invalidated.');
-    $this->assertFalse($backend_a->get('test2'), 'Second key has been invalidated.');
-    $this->assertNotEmpty($backend_b->get('test3'), 'Item in other bin is preserved.');
-    $this->assertNotEmpty($backend_a->get('test1', TRUE), 'First key has not been deleted.');
-    $this->assertNotEmpty($backend_a->get('test2', TRUE), 'Second key has not been deleted.');
   }
 
   /**

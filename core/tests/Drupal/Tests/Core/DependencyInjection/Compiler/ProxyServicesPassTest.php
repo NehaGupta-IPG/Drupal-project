@@ -7,13 +7,18 @@ namespace Drupal\Tests\Core\DependencyInjection\Compiler;
 use Drupal\Core\DependencyInjection\Compiler\ProxyServicesPass;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Path\CurrentPathStack;
+use Drupal\Tests\Core\DependencyInjection\Fixture\LazyService;
+use Drupal\Tests\ProxyClass\Core\DependencyInjection\Fixture\LazyService as LazyServiceProxy;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
- * @coversDefaultClass \Drupal\Core\DependencyInjection\Compiler\ProxyServicesPass
- * @group DependencyInjection
+ * Tests Drupal\Core\DependencyInjection\Compiler\ProxyServicesPass.
  */
+#[CoversClass(ProxyServicesPass::class)]
+#[Group('DependencyInjection')]
 class ProxyServicesPassTest extends UnitTestCase {
 
   /**
@@ -33,40 +38,46 @@ class ProxyServicesPassTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::process
+   * Tests container without lazy services.
+   *
+   * @legacy-covers ::process
    */
   public function testContainerWithoutLazyServices(): void {
     $container = new ContainerBuilder();
-    $container->register('lock', 'Drupal\Core\Lock\DatabaseLockBackend');
+    $container->register('test_lazy_service', LazyService::class);
 
     $this->proxyServicesPass->process($container);
 
     $this->assertCount(2, $container->getDefinitions());
-    $this->assertEquals('Drupal\Core\Lock\DatabaseLockBackend', $container->getDefinition('lock')->getClass());
+    $this->assertEquals(LazyService::class, $container->getDefinition('test_lazy_service')->getClass());
   }
 
   /**
-   * @covers ::process
+   * Tests container with lazy services.
+   *
+   * @legacy-covers ::process
    */
   public function testContainerWithLazyServices(): void {
     $container = new ContainerBuilder();
-    $container->register('lock', 'Drupal\Core\Lock\DatabaseLockBackend')
+    $container->register('test_lazy_service', LazyService::class)
       ->setLazy(TRUE);
 
     $this->proxyServicesPass->process($container);
 
     $this->assertCount(3, $container->getDefinitions());
 
-    $non_proxy_definition = $container->getDefinition('drupal.proxy_original_service.lock');
-    $this->assertEquals('Drupal\Core\Lock\DatabaseLockBackend', $non_proxy_definition->getClass());
+    $non_proxy_definition = $container->getDefinition('drupal.proxy_original_service.test_lazy_service');
+    $this->assertEquals(LazyService::class, $non_proxy_definition->getClass());
     $this->assertFalse($non_proxy_definition->isLazy());
     $this->assertTrue($non_proxy_definition->isPublic());
 
-    $this->assertEquals('Drupal\Core\ProxyClass\Lock\DatabaseLockBackend', $container->getDefinition('lock')->getClass());
+    $this->assertEquals(LazyServiceProxy::class, $container->getDefinition('test_lazy_service')->getClass());
   }
 
   /**
-   * @covers ::process
+   * Tests container with lazy services without proxy class.
+   *
+   * @legacy-covers ::process
    */
   public function testContainerWithLazyServicesWithoutProxyClass(): void {
     $container = new ContainerBuilder();

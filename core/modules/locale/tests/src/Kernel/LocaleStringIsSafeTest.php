@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\locale\Kernel;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\locale\LocaleXss;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests locale translation safe string handling.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleStringIsSafeTest extends KernelTestBase {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -19,28 +25,33 @@ class LocaleStringIsSafeTest extends KernelTestBase {
   protected static $modules = ['locale', 'locale_test'];
 
   /**
-   * Tests for locale_string_is_safe().
+   * Tests for LocaleXss::stringIsSafe().
    */
   public function testLocaleStringIsSafe(): void {
     // Check a translatable string without HTML.
     $string = 'Hello world!';
-    $result = locale_string_is_safe($string);
+    $result = LocaleXss::stringIsSafe($string);
     $this->assertTrue($result);
 
     // Check a translatable string which includes trustable HTML.
     $string = 'Hello <strong>world</strong>!';
-    $result = locale_string_is_safe($string);
+    $result = LocaleXss::stringIsSafe($string);
     $this->assertTrue($result);
 
     // Check an untranslatable string which includes unsafe HTML (according to
-    // the locale_string_is_safe() function definition).
+    // the LocaleXss::stringIsSafe() function definition).
     $string = 'Hello <img src="world.png" alt="world" />!';
-    $result = locale_string_is_safe($string);
+    $result = LocaleXss::stringIsSafe($string);
     $this->assertFalse($result);
 
     // Check a translatable string which includes a token in an href attribute.
     $string = 'Hi <a href="[current-user:url]">user</a>';
-    $result = locale_string_is_safe($string);
+    $result = LocaleXss::stringIsSafe($string);
+    $this->assertTrue($result);
+
+    // Check a translatable string which includes a wbr tag.
+    $string = 'DrupalLocaleModule<wbr>Test<wbr>Example';
+    $result = LocaleXss::stringIsSafe($string);
     $this->assertTrue($result);
   }
 
@@ -75,7 +86,7 @@ class LocaleStringIsSafeTest extends KernelTestBase {
 
       // Pass the original string to the t() function to get it marked as safe.
       // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-      $safe_string = t($original_string);
+      $safe_string = $this->t($original_string);
       $rendered_safe_string = \Drupal::theme()->render('locale_test_tokenized', ['content' => $safe_string]);
       // t() function always marks the string as safe so it won't be escaped,
       // and should be the same as the original.

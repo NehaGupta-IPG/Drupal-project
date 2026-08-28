@@ -8,12 +8,14 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\locale\StringInterface;
 use Drupal\locale\TranslationString;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that shipped configuration translations are updated correctly.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleConfigSubscriberTest extends KernelTestBase {
 
   /**
@@ -65,10 +67,9 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
     // Simulate this hook invoked which would happen if in a non-kernel test
     // or normal environment.
     // @see locale_modules_installed()
-    // @see locale_system_update()
-    locale_system_set_config_langcodes();
-    $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
     $locale_config_manager = \Drupal::service('locale.config_manager');
+    $locale_config_manager->updateDefaultConfigLangcodes();
+    $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
     $names = $locale_config_manager->getComponentNames();
     $locale_config_manager->updateConfigTranslations($names, $langcodes);
 
@@ -120,8 +121,22 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
   public function testCreateTranslationMultiValue(): void {
     $config_name = 'locale_test.translation_multiple';
 
-    $this->saveLanguageOverride($config_name, 'test_multiple', ['string' => 'String (German)', 'another_string' => 'Another string (German)'], 'de');
-    $this->saveLanguageOverride($config_name, 'test_after_multiple', ['string' => 'After string (German)', 'another_string' => 'After another string (German)'], 'de');
+    $this->saveLanguageOverride(
+      $config_name,
+      'test_multiple',
+      [
+        'string' => 'String (German)',
+        'another_string' => 'Another string (German)',
+      ],
+      'de');
+    $this->saveLanguageOverride(
+      $config_name,
+      'test_after_multiple',
+      [
+        'string' => 'After string (German)',
+        'another_string' => 'After another string (German)',
+      ],
+      'de');
     $strings = $this->stringStorage->getTranslations([
       'type' => 'configuration',
       'name' => $config_name,
@@ -185,6 +200,25 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
   }
 
   /**
+   * Tests that unchanged translations are not re-saved.
+   *
+   * Verifies that updateConfigTranslations() skips saving config overrides
+   * when the computed translation data is identical to the existing override.
+   */
+  public function testUnchangedTranslationNotResaved(): void {
+    $config_name = 'locale_test.translation';
+
+    // After setUp(), the German override already exists. Calling
+    // updateConfigTranslations() again without changes should not re-save it.
+    $this->localeConfigManager->reset();
+    $count = $this->localeConfigManager->updateConfigTranslations([$config_name], ['de']);
+    $this->assertSame(0, $count, 'Unchanged config translation should not be re-saved.');
+
+    // Verify the override is still intact.
+    $this->assertConfigOverride($config_name, 'test', 'German test', 'de');
+  }
+
+  /**
    * Sets up a configuration string without a translation.
    *
    * The actual configuration is already available by installing locale_test
@@ -201,7 +235,7 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
    * @param string $langcode
    *   The language code.
    */
-  protected function setUpNoTranslation($config_name, $key, $source, $langcode): void {
+  protected function setUpNoTranslation(string $config_name, string $key, $source, string $langcode): void {
     $this->localeConfigManager->updateConfigTranslations([$config_name], [$langcode]);
     $this->assertNoConfigOverride($config_name, $key);
     $this->assertNoTranslation($config_name, $langcode);
@@ -228,10 +262,10 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
    * @param bool $is_active
    *   Whether the update will affect the active configuration.
    */
-  protected function setUpTranslation($config_name, $key, $source, $translation, $langcode, $is_active = FALSE): void {
+  protected function setUpTranslation($config_name, string $key, $source, $translation, $langcode, $is_active = FALSE): void {
     // Create source and translation strings for the configuration value and add
     // the configuration name as a location. This would be performed by
-    // locale_translate_batch_import() invoking
+    // \Drupal\locale\LocaleImportBatch::batchImport() invoking
     // LocaleConfigManager::updateConfigTranslations() normally.
     $this->localeConfigManager->reset();
     $this->localeConfigManager
@@ -303,7 +337,7 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
    * @param bool $is_active
    *   Whether the update will affect the active configuration.
    */
-  protected function saveLocaleTranslationData($config_name, $key, $source, $translation, $langcode, $is_active = FALSE): void {
+  protected function saveLocaleTranslationData($config_name, string $key, $source, $translation, $langcode, $is_active = FALSE): void {
     $this->localeConfigManager->reset();
     $this->localeConfigManager
       ->getStringTranslation($config_name, $langcode, $source, '')
@@ -370,7 +404,7 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
    * @param string $langcode
    *   The language code.
    */
-  protected function deleteLocaleTranslationData($config_name, $key, $source_value, $langcode): void {
+  protected function deleteLocaleTranslationData($config_name, string $key, $source_value, $langcode): void {
     $this->localeConfigManager
       ->getStringTranslation($config_name, $langcode, $source_value, '')
       ->delete();

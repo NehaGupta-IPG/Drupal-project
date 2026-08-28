@@ -6,12 +6,14 @@ namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the migrate.stub Service.
- *
- * @group migrate
  */
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrateStubTest extends MigrateTestBase {
   use ContentTypeCreationTrait;
 
@@ -43,13 +45,6 @@ class MigrateStubTest extends MigrateTestBase {
   protected $migrateLookup;
 
   /**
-   * The migration plugin manager.
-   *
-   * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
-   */
-  protected $migrationPluginManager;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -57,7 +52,6 @@ class MigrateStubTest extends MigrateTestBase {
     $this->setTestLogger();
     $this->migrateStub = $this->container->get('migrate.stub');
     $this->migrateLookup = $this->container->get('migrate.lookup');
-    $this->migrationPluginManager = $this->container->get('plugin.manager.migration');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
     $this->installSchema('node', 'node_access');
@@ -126,7 +120,7 @@ class MigrateStubTest extends MigrateTestBase {
    */
   public function testInvalidSourceIdCount(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Expected and provided source id counts do not match.');
+    $this->expectExceptionMessageIs('Expected and provided source id counts do not match.');
     $this->migrateStub->createStub('sample_stubbing_migration_with_multiple_source_ids', [17]);
   }
 
@@ -135,7 +129,7 @@ class MigrateStubTest extends MigrateTestBase {
    */
   public function testInvalidSourceIdKeys(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("'version_id' is defined as a source ID but has no value.");
+    $this->expectExceptionMessageIs("'version_id' is defined as a source ID but has no value.");
     $this->migrateStub->createStub('sample_stubbing_migration_with_multiple_source_ids', ['id' => 17, 'not_a_key' => 17]);
   }
 

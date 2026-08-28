@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Theme;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Runs tests on Views UI using Claro.
- *
- * @group claro
  */
+#[Group('claro')]
+#[RunTestsInSeparateProcesses]
 class ClaroViewsUiTest extends WebDriverTestBase {
 
   /**
@@ -48,7 +50,7 @@ class ClaroViewsUiTest extends WebDriverTestBase {
    * Views UI is updated with AJAX.
    */
   public function testViewsUiTabsCssClasses(): void {
-    $this->drupalGet('admin/structure/views/view/who_s_online');
+    $this->drupalGet('admin/structure/views/view/user_admin_people');
     $assert_session = $this->assertSession();
     $assert_session->elementExists('css', '#views-display-menu-tabs.views-tabs.views-tabs--secondary');
     // Click on the Display name and wait for the Views UI dialog.
@@ -70,7 +72,7 @@ class ClaroViewsUiTest extends WebDriverTestBase {
    * in .views-display-top are preserved when Views UI is refreshed with AJAX.
    */
   public function testViewsUiDropButtonCssClasses(): void {
-    $this->drupalGet('admin/structure/views/view/who_s_online');
+    $this->drupalGet('admin/structure/views/view/user_admin_people');
     $assert_session = $this->assertSession();
     $extra_actions_dropbutton_list = $assert_session->elementExists('css', '#views-display-extra-actions.dropbutton--small');
     $list_item_selectors = ['li:first-child', 'li:last-child'];

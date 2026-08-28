@@ -31,15 +31,6 @@ block.settings.block_content:*:
   constraints:
     FullyValidatable: ~
   mapping:
-    # @see \Drupal\block_content\Plugin\Block\BlockContentBlock::defaultConfiguration()
-    # @todo Deprecate this in https://www.drupal.org/project/drupal/issues/3426302
-    status:
-      type: boolean
-      label: 'Status'
-    # @todo Deprecate this in https://www.drupal.org/project/drupal/issues/3426302
-    info:
-      type: label
-      label: 'Admin info'
     view_mode:
       type: string
       label: 'View mode'

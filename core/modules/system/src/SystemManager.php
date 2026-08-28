@@ -2,17 +2,21 @@
 
 namespace Drupal\system;
 
-use Drupal\Core\Menu\MenuActiveTrailInterface;
-use Drupal\Core\Menu\MenuLinkTreeInterface;
-use Drupal\Core\Menu\MenuLinkInterface;
-use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
+use Drupal\Core\Menu\MenuActiveTrailInterface;
+use Drupal\Core\Menu\MenuLinkInterface;
+use Drupal\Core\Menu\MenuLinkTreeInterface;
+use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * System Manager Service.
  */
 class SystemManager {
+
+  use StringTranslationTrait;
 
   /**
    * Module handler service.
@@ -43,28 +47,6 @@ class SystemManager {
   protected $menuActiveTrail;
 
   /**
-   * A static cache of menu items.
-   *
-   * @var array
-   */
-  protected $menuItems;
-
-  /**
-   * Requirement severity -- Requirement successfully met.
-   */
-  const REQUIREMENT_OK = 0;
-
-  /**
-   * Requirement severity -- Warning condition; proceed but flag warning.
-   */
-  const REQUIREMENT_WARNING = 1;
-
-  /**
-   * Requirement severity -- Error condition; abort installation.
-   */
-  const REQUIREMENT_ERROR = 2;
-
-  /**
    * Constructs a SystemManager object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
@@ -91,7 +73,7 @@ class SystemManager {
    */
   public function checkRequirements() {
     $requirements = $this->listRequirements();
-    return $this->getMaxSeverity($requirements) == static::REQUIREMENT_ERROR;
+    return RequirementSeverity::maxSeverityFromRequirements($requirements) === RequirementSeverity::Error;
   }
 
   /**
@@ -101,9 +83,10 @@ class SystemManager {
    *   An array of system requirements.
    */
   public function listRequirements() {
-    // Load .install files
-    include_once DRUPAL_ROOT . '/core/includes/install.inc';
-    drupal_load_updates();
+    // Load .install files.
+    foreach ($this->moduleHandler->getModuleList() as $module => $extension) {
+      $this->moduleHandler->loadInclude($module, 'install');
+    }
 
     // Check run-time requirements and status information.
     $requirements = $this->moduleHandler->invokeAll('requirements', ['runtime']);
@@ -122,26 +105,6 @@ class SystemManager {
     });
 
     return $requirements;
-  }
-
-  /**
-   * Extracts the highest severity from the requirements array.
-   *
-   * @param array $requirements
-   *   An array of requirements, in the same format as is returned by
-   *   hook_requirements().
-   *
-   * @return int
-   *   The highest severity in the array.
-   */
-  public function getMaxSeverity(&$requirements) {
-    $severity = static::REQUIREMENT_OK;
-    foreach ($requirements as $requirement) {
-      if (isset($requirement['severity'])) {
-        $severity = max($severity, $requirement['severity']);
-      }
-    }
-    return $severity;
   }
 
   /**
@@ -168,7 +131,7 @@ class SystemManager {
     }
     else {
       $output = [
-        '#markup' => t('You do not have any administrative items.'),
+        '#markup' => $this->t('You do not have any administrative items.'),
       ];
     }
     return $output;

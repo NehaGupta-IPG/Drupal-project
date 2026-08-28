@@ -7,12 +7,14 @@ namespace Drupal\Tests\contextual\FunctionalJavascript;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI for correct contextual links.
- *
- * @group contextual
  */
+#[Group('contextual')]
+#[RunTestsInSeparateProcesses]
 class ContextualLinksTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
@@ -62,7 +64,7 @@ class ContextualLinksTest extends WebDriverTestBase {
     $contextualLinks = $this->assertSession()->waitForElement('css', '.contextual button');
     $this->assertNotEmpty($contextualLinks);
 
-    // Confirm touchevents detection is loaded with Contextual Links
+    // Confirm touchevents detection is loaded with Contextual Links.
     $this->assertSession()->elementExists('css', 'html.no-touchevents');
 
     // Ensure visibility remains correct after cached paged load.
@@ -106,17 +108,6 @@ class ContextualLinksTest extends WebDriverTestBase {
 
     // Check to make sure that page was not reloaded.
     $this->assertSession()->pageTextContains($current_page_string);
-
-    // Test clicking contextual link with toolbar.
-    $this->container->get('module_installer')->install(['toolbar']);
-    $this->grantPermissions(Role::load(Role::AUTHENTICATED_ID), ['access toolbar']);
-    $this->drupalGet('user');
-    $this->assertSession()->assertExpectedAjaxRequest(1);
-
-    // Click "Edit" in toolbar to show contextual links.
-    $this->getSession()->getPage()->find('css', '.contextual-toolbar-tab button')->press();
-    $this->clickContextualLink('#block-branding', 'Test Link', FALSE);
-    $this->assertSession()->pageTextContains('Everything is contextual!');
   }
 
   /**

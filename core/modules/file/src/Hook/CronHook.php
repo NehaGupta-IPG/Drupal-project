@@ -21,13 +21,13 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class CronHook {
 
   public function __construct(
-    private readonly EntityTypeManagerInterface $entityTypeManager,
-    private readonly StreamWrapperManagerInterface $streamWrapperManager,
-    private readonly ConfigFactoryInterface $configFactory,
-    private readonly FileUsageInterface $fileUsage,
-    private readonly TimeInterface $time,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly StreamWrapperManagerInterface $streamWrapperManager,
+    protected readonly ConfigFactoryInterface $configFactory,
+    protected readonly FileUsageInterface $fileUsage,
+    protected readonly TimeInterface $time,
     #[Autowire('@logger.channel.file')]
-    private readonly LoggerInterface $logger,
+    protected readonly LoggerInterface $logger,
   ) {}
 
   /**
@@ -36,8 +36,8 @@ class CronHook {
   public function __invoke(): void {
     $age = $this->configFactory->get('system.file')->get('temporary_maximum_age');
     $fileStorage = $this->entityTypeManager->getStorage('file');
-    // Only delete temporary files if older than $age. Note that automatic cleanup
-    // is disabled if $age set to 0.
+    // Only delete temporary files if older than $age. Note that automatic
+    // cleanup is disabled if $age set to 0.
     if ($age) {
       $fids = $fileStorage->getQuery()->accessCheck(FALSE)->condition('status', FileInterface::STATUS_PERMANENT, '<>')->condition('changed', $this->time->getRequestTime() - $age, '<')->range(0, 100)->execute();
       /** @var \Drupal\file\FileInterface[] $files */

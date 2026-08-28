@@ -6,12 +6,14 @@ namespace Drupal\Tests\views\FunctionalJavascript\Plugin\views\Handler;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the contextual filter handler UI.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ContextualFilterTest extends WebDriverTestBase {
 
   /**
@@ -43,9 +45,6 @@ class ContextualFilterTest extends WebDriverTestBase {
     parent::setUp();
 
     ViewTestData::createTestViews(static::class, ['views_test_config']);
-
-    // Always show advanced column.
-    \Drupal::configFactory()->getEditable('views.settings')->set('ui.show.advanced_column', TRUE)->save();
 
     // Disable automatic live preview to make the sequence of calls clearer. And
     // prevent errors on saving the view with the preview ajax load that are
@@ -83,7 +82,7 @@ class ContextualFilterTest extends WebDriverTestBase {
     $add_button->click();
 
     // Wait for the dialog to close.
-    $page->waitFor(10, function () use ($page) {
+    $page->waitFor(10, function () use ($page): bool {
       $field = $page->find('css', '.ui-dialog-buttonset .button--primary');
       return empty($field);
     });

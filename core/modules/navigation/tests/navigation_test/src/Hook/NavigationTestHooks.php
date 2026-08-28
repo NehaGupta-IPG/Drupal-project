@@ -31,7 +31,6 @@ class NavigationTestHooks {
   public function blockAlter(&$definitions): void {
     if ($this->state->get('navigation_safe_alter')) {
       $definitions['navigation_link']['allow_in_navigation'] = TRUE;
-      $definitions['navigation_shortcuts']['allow_in_navigation'] = FALSE;
     }
   }
 
@@ -81,6 +80,43 @@ class NavigationTestHooks {
       unset($content_top['navigation_foo']);
       $content_top['navigation_bar']['#markup'] = 'new bar';
       $content_top['navigation_baz']['#weight'] = '-100';
+    }
+  }
+
+  /**
+   * Implements hook_navigation_menu_link_tree_alter().
+   */
+  #[Hook('navigation_menu_link_tree_alter')]
+  public function navigationMenuLinkTreeAlter(array &$tree): void {
+    foreach ($tree as $key => $item) {
+      // Skip elements where menu is not the 'admin' one.
+      $menu_name = $item->link->getMenuName();
+      // Removes all items from menu1.
+      if ($menu_name == 'menu1') {
+        unset($tree[$key]);
+      }
+
+      // Updates title for items in menu2.
+      if ($menu_name == 'menu2') {
+        $item->link->updateLink(['title' => 'New Link Title'], FALSE);
+      }
+    }
+  }
+
+  /**
+   * Implements hook_menu_links_discovered_alter().
+   */
+  #[Hook('menu_links_discovered_alter')]
+  public function menuLinksDiscoveredAlter(array &$links): void {
+    if (\Drupal::keyValue('navigation_test')->get('menu_links_discovered_alter')) {
+      $links['navigation_test.navigation__no_icon']['options']['icon'] = [
+        'icon_id' => 'radioactive',
+        'pack_id' => 'navigation_test',
+      ];
+      $links['navigation_test.navigation__default_item']['options']['icon'] = [
+        'icon_id' => 'foo',
+        'pack_id' => 'bar',
+      ];
     }
   }
 

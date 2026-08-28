@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Url;
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "BaseFieldOverride" config entity type.
- *
- * @group jsonapi
  */
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class BaseFieldOverrideTest extends ConfigEntityResourceTestBase {
 
   /**
@@ -64,7 +66,7 @@ class BaseFieldOverrideTest extends ConfigEntityResourceTestBase {
       'field_name' => 'promote',
       'entity_type' => 'node',
       'bundle' => 'camelids',
-      'label' => 'Promote to front page',
+      'label' => 'Promoted',
     ]);
     $entity->save();
 
@@ -107,7 +109,7 @@ class BaseFieldOverrideTest extends ConfigEntityResourceTestBase {
           'entity_type' => 'node',
           'field_name' => 'promote',
           'field_type' => 'boolean',
-          'label' => 'Promote to front page',
+          'label' => 'Promoted',
           'langcode' => 'en',
           'required' => FALSE,
           'settings' => [

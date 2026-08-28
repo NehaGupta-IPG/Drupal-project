@@ -8,6 +8,9 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
 use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
+/**
+ * Validation constraint for translatable configuration.
+ */
 #[Constraint(
   id: 'LangcodeRequiredIfTranslatableValues',
   label: new TranslatableMarkup('Translatable config has langcode', [], ['context' => 'Validation']),
@@ -15,18 +18,14 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class LangcodeRequiredIfTranslatableValuesConstraint extends SymfonyConstraint {
 
-  /**
-   * The error message if this config object is missing a `langcode`.
-   *
-   * @var string
-   */
-  public string $missingMessage = "The @name config object must specify a language code, because it contains translatable values.";
-
-  /**
-   * The error message if this config object contains a superfluous `langcode`.
-   *
-   * @var string
-   */
-  public string $superfluousMessage = "The @name config object does not contain any translatable values, so it should not specify a language code.";
+  public function __construct(
+    public string $missingMessage = "The @name config object must specify a language code, because it contains translatable values.",
+    public string $entityMessage = "The @name config object must specify a language code, because it is a configuration entity.",
+    public string $superfluousMessage = "The @name config object does not contain any translatable values, so it should not specify a language code.",
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

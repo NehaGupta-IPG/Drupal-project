@@ -7,17 +7,18 @@ namespace Drupal\Tests\views_ui\FunctionalJavascript;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\locale\SourceString;
+use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\views\Entity\View;
 use Drupal\views\Tests\ViewTestData;
-use Drupal\Tests\node\Traits\NodeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore Blokk hozzáadása
-
 /**
  * Tests the display UI.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class DisplayTest extends WebDriverTestBase {
 
   use NodeCreationTrait;
@@ -43,6 +44,8 @@ class DisplayTest extends WebDriverTestBase {
 
   /**
    * The views used for testing.
+   *
+   * @var array
    */
   public static $testViews = ['test_content_ajax', 'test_display'];
 
@@ -193,7 +196,7 @@ class DisplayTest extends WebDriverTestBase {
   /**
    * Helper function for adding interface text translations.
    */
-  private function addTranslation($langcode, $source_string, $translation_string): void {
+  private function addTranslation(string $langcode, string $source_string, string $translation_string): void {
     $storage = \Drupal::service('locale.storage');
     $string = $storage->findString(['source' => $source_string]);
     if (is_null($string)) {

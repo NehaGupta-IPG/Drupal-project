@@ -2,6 +2,7 @@
 
 namespace Drupal\navigation;
 
+use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Block\BlockPluginInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Handle rendering for different pieces of the navigation.
  *
- * @internal The navigation module is experimental.
+ * @internal
  */
 final class NavigationRenderer {
 
@@ -65,24 +66,8 @@ final class NavigationRenderer {
     private RequestStack $requestStack,
     private ModuleExtensionList $moduleExtensionList,
     private AccountInterface $currentUser,
-    private array $rendererConfig,
     private EntityRouteHelper $entityRouteHelper,
   ) {}
-
-  /**
-   * Remove the toolbar provided by Toolbar module.
-   *
-   * @param array $page_top
-   *   A renderable array representing the top of the page.
-   *
-   * @see toolbar_page_top()
-   * @see hook_page_top()
-   */
-  public function removeToolbar(array &$page_top): void {
-    if (isset($page_top['toolbar'])) {
-      unset($page_top['toolbar']);
-    }
-  }
 
   /**
    * Build out the navigation bar.
@@ -99,7 +84,8 @@ final class NavigationRenderer {
         'keys' => ['navigation', 'navigation'],
         'max-age' => CacheBackendInterface::CACHE_PERMANENT,
       ],
-      '#pre_render' => ['navigation.renderer:doBuildNavigation'],
+      '#lazy_builder' => ['navigation.renderer:doBuildNavigation', []],
+      '#create_placeholder' => TRUE,
     ];
   }
 
@@ -107,7 +93,8 @@ final class NavigationRenderer {
    * Pre-render callback for ::buildNavigation.
    */
   #[TrustedCallback]
-  public function doBuildNavigation($build): array {
+  public function doBuildNavigation(): array {
+    $build = [];
     $logo_settings = $this->configFactory->get('navigation.settings');
     $logo_provider = $logo_settings->get('logo.provider');
 
@@ -120,7 +107,6 @@ final class NavigationRenderer {
     if ($storage) {
       foreach ($storage->getSections() as $delta => $section) {
         $build[$delta] = $section->toRenderArray([]);
-        $build[$delta]['#cache']['contexts'] = $this->rendererConfig['required_cache_contexts'];
       }
     }
     // The render array is built based on decisions made by SectionStorage
@@ -130,23 +116,8 @@ final class NavigationRenderer {
       ->addCacheableDependency($this->configFactory->get('navigation.block_layout'));
     $cacheability->applyTo($build);
 
-    $module_path = $this->requestStack->getCurrentRequest()->getBasePath() . '/' . $this->moduleExtensionList->getPath('navigation');
-    $asset_url = $module_path . '/assets/fonts/inter-var.woff2';
-
     $defaults = [
-      'settings' => ['hide_logo' => $logo_provider === self::LOGO_PROVIDER_HIDE],
-      '#attached' => [
-        'html_head_link' => [
-          [
-            [
-              'rel' => 'preload',
-              'href' => $asset_url,
-              'as' => 'font',
-              'crossorigin' => 'anonymous',
-            ],
-          ],
-        ],
-      ],
+      '#settings' => ['hide_logo' => $logo_provider === self::LOGO_PROVIDER_HIDE],
     ];
     $build[0] = NestedArray::mergeDeepArray([$build[0], $defaults]);
 
@@ -157,10 +128,10 @@ final class NavigationRenderer {
       if (!empty($logo_path) && is_file($logo_path)) {
         $logo_managed_url = $this->fileUrlGenerator->generateAbsoluteString($logo_path);
         $image = $this->imageFactory->get($logo_path);
-        $build[0]['settings']['logo_path'] = $logo_managed_url;
+        $build[0]['#settings']['logo_path'] = $logo_managed_url;
         if ($image->isValid()) {
-          $build[0]['settings']['logo_width'] = $image->getWidth();
-          $build[0]['settings']['logo_height'] = $image->getHeight();
+          $build[0]['#settings']['logo_width'] = $image->getWidth();
+          $build[0]['#settings']['logo_height'] = $image->getHeight();
         }
       }
     }
@@ -204,17 +175,29 @@ final class NavigationRenderer {
    * @see hook_page_top()
    */
   public function buildTopBar(array &$page_top): void {
-    if (!$this->moduleHandler->moduleExists('navigation_top_bar')) {
-      return;
+    $page_top['top_bar']['#cache']['contexts'][] = 'user.permissions';
+    if ($this->currentUser->hasPermission('access navigation')) {
+      $page_top['top_bar'] = [
+        '#cache' => [
+          'keys' => ['navigation', 'top_bar'],
+          'max-age' => CacheBackendInterface::CACHE_PERMANENT,
+        ],
+        '#lazy_builder' => ['navigation.renderer:doBuildTopBar', []],
+        '#placeholder_strategy_denylist' => [
+          BigPipeStrategy::class => TRUE,
+        ],
+        '#create_placeholder' => TRUE,
+      ];
     }
+  }
 
-    $page_top['top_bar'] = [
+  /**
+   * Lazy builder to generate the top bar render array.
+   */
+  #[TrustedCallback]
+  public function doBuildTopBar(): array {
+    return [
       '#type' => 'top_bar',
-      '#access' => $this->currentUser->hasPermission('access navigation'),
-      '#cache' => [
-        'keys' => ['top_bar'],
-        'contexts' => ['user.permissions'],
-      ],
     ];
   }
 
@@ -236,7 +219,7 @@ final class NavigationRenderer {
     if ($block->getPluginId() !== 'local_tasks_block') {
       return;
     }
-    if ($this->hasLocalTasks() && $this->moduleHandler->moduleExists('navigation_top_bar')) {
+    if ($this->hasLocalTasks()) {
       $build['#access'] = FALSE;
     }
   }
@@ -255,7 +238,7 @@ final class NavigationRenderer {
     $cacheability = new CacheableMetadata();
     $cacheability->addCacheableDependency($this->localTaskManager);
     $this->localTasks = [
-      'tasks' => [],
+      'page_actions' => [],
       'cacheability' => $cacheability,
     ];
     // For now, we're only interested in local tasks corresponding to a content
@@ -264,7 +247,14 @@ final class NavigationRenderer {
       return $this->localTasks;
     }
     $entity_local_tasks = $this->localTaskManager->getLocalTasks($this->routeMatch->getRouteName());
-    foreach ($entity_local_tasks['tabs'] as $route_name => $local_task) {
+    uasort($entity_local_tasks['tabs'], [SortArray::class, 'sortByWeightProperty']);
+    foreach ($entity_local_tasks['tabs'] as $local_task_name => $local_task) {
+      // Exclude current route local task, since it is not going to be included
+      // in the page actions link list.
+      $url = $local_task['#link']['url'] ?? NULL;
+      if ($url?->getRouteName() === $entity_local_tasks['route_name']) {
+        continue;
+      }
       // The $local_task array that we get here is tailor-made for use
       // with the menu-local-tasks.html.twig, eg. the menu_local_task
       // theme hook. It has all the information we need, but we're not
@@ -277,8 +267,8 @@ final class NavigationRenderer {
       $link['localized_options'] += [
         'set_active_class' => TRUE,
       ];
-      $this->localTasks['tasks'][$route_name] = [
-        '#theme' => 'top_bar_local_task',
+      $this->localTasks['page_actions'][$local_task_name] = [
+        '#theme' => 'top_bar_page_action',
         '#link' => [
           '#type' => 'link',
           '#title' => $link['title'],
@@ -301,7 +291,7 @@ final class NavigationRenderer {
    */
   public function hasLocalTasks(): bool {
     $local_tasks = $this->getLocalTasks();
-    return !empty($local_tasks['tasks']);
+    return !empty($local_tasks['page_actions']);
   }
 
 }

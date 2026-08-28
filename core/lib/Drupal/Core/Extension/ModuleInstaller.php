@@ -6,6 +6,8 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\DefaultConfigMode;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -66,27 +68,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected $updateRegistry;
 
-  /**
-   * Constructs a new ModuleInstaller instance.
-   *
-   * @param string $root
-   *   The app root.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\DrupalKernelInterface $kernel
-   *   The drupal kernel.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Update\UpdateHookRegistry $update_registry
-   *   The update registry service.
-   * @param \Psr\Log\LoggerInterface|null $logger
-   *   The logger.
-   * @param \Traversable|null $uninstallValidators
-   *   The uninstall validator services.
-   *
-   * @see \Drupal\Core\DrupalKernel
-   * @see \Drupal\Core\CoreServiceProvider
-   */
   public function __construct(
     #[Autowire(param: 'app.root')]
     string $root,
@@ -97,23 +78,19 @@ class ModuleInstaller implements ModuleInstallerInterface {
     #[Autowire(service: 'logger.channel.default')]
     protected LoggerInterface $logger,
     #[AutowireIterator(tag: 'module_install.uninstall_validator')]
-    protected ?\Traversable $uninstallValidators = NULL,
+    protected \Traversable $uninstallValidators,
+    protected ?ModuleWeight $moduleWeight,
   ) {
     $this->root = $root;
     $this->moduleHandler = $module_handler;
     $this->kernel = $kernel;
     $this->connection = $connection;
     $this->updateRegistry = $update_registry;
-    if ($this->uninstallValidators === NULL) {
-      $this->uninstallValidators = \Drupal::service('module_installer.uninstall_validators');
-    }
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function addUninstallValidator(ModuleUninstallValidatorInterface $uninstall_validator) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595', E_USER_DEPRECATED);
+    if (!$this->moduleWeight instanceof ModuleWeight) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleWeight argument is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3595653', E_USER_DEPRECATED);
+      $this->moduleWeight = \Drupal::service(ModuleWeight::class);
+    }
   }
 
   /**
@@ -150,7 +127,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
     }
     if ($enable_dependencies) {
-      $module_list = $module_list ? array_combine($module_list, $module_list) : [];
+      $module_list = array_combine($module_list, $module_list);
       if ($missing_modules = array_diff_key($module_list, $module_data)) {
         // One or more of the given modules doesn't exist.
         throw new MissingDependencyException(sprintf('Unable to install modules %s due to missing modules %s.', implode(', ', $module_list), implode(', ', $missing_modules)));
@@ -274,11 +251,11 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // Save this data without checking schema. This is a performance
     // improvement for module installation.
     $extension_config
-      ->set('module', module_config_sort(array_merge(
+      ->set('module', $this->moduleWeight->sort(array_merge(
         array_fill_keys($module_list, 0),
         $installed_modules
       )))
-      ->save(TRUE);
+      ->save();
 
     // Prepare the new module list, sorted by weight, including filenames.
     // This list is used for both the ModuleHandler and DrupalKernel. It
@@ -292,7 +269,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // weight of 0.
     $current_module_filenames = $this->moduleHandler->getModuleList();
     $current_modules = array_fill_keys(array_keys($current_module_filenames), 0);
-    $current_modules = module_config_sort(array_merge($current_modules, $extension_config->get('module')));
+    $current_modules = $this->moduleWeight->sort(array_merge($current_modules, $extension_config->get('module')));
     $module_filenames = [];
     foreach ($current_modules as $name => $weight) {
       if (isset($current_module_filenames[$name])) {
@@ -354,14 +331,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
 
     $entity_type_providers_to_install = $module_list;
     foreach ($module_list as $module) {
-      // Set the schema version to the number of the last update provided by
-      // the module, or the minimum core schema version.
-      $version = \Drupal::CORE_MINIMUM_SCHEMA_VERSION;
-      $versions = $this->updateRegistry->getAvailableUpdates($module);
-      if ($versions) {
-        $version = max(max($versions), $version);
-      }
-
       // Remove the module from the list of possible entity type providers to
       // install.
       array_shift($entity_type_providers_to_install);
@@ -405,10 +374,20 @@ class ModuleInstaller implements ModuleInstallerInterface {
           }
         }
       }
+    }
 
+    foreach ($module_list as $module) {
       // Install default configuration of the module.
       $config_installer = \Drupal::service('config.installer');
       $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallSimple);
+
+      // Set the schema version to the number of the last update provided by
+      // the module, or the minimum core schema version.
+      $version = \Drupal::CORE_MINIMUM_SCHEMA_VERSION;
+      $versions = $this->updateRegistry->getAvailableUpdates($module);
+      if ($versions) {
+        $version = max(max($versions), $version);
+      }
 
       // If the module has no current updates, but has some that were
       // previously removed, set the version to the value of
@@ -612,7 +591,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       if ($core_extension->get('profile') === $module) {
         $core_extension->clear('profile');
       }
-      $core_extension->save(TRUE);
+      $core_extension->save();
 
       // Update the module handler to remove the module.
       // The current ModuleHandler instance is obsolete with the kernel rebuild
@@ -712,18 +691,11 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   The list of installed modules.
    */
   protected function updateKernel($module_filenames) {
-    // Save current state of config installer, so it can be restored after the
-    // container is rebuilt.
-    /** @var \Drupal\Core\Config\ConfigInstallerInterface $config_installer */
-    $config_installer = $this->kernel->getContainer()->get('config.installer');
-    $sync_status = $config_installer->isSyncing();
-    $source_storage = $config_installer->getSourceStorage();
-
     if (!empty($module_filenames)) {
-      // This reboots the kernel to register the module's bundle and its services
-      // in the service container. The $module_filenames argument is taken over as
-      // %container.modules% parameter, which is passed to a fresh ModuleHandler
-      // instance upon first retrieval.
+      // This reboots the kernel to register the module's bundle and its
+      // services in the service container. The $module_filenames argument is
+      // taken over as %container.modules% parameter, which is passed to a fresh
+      // ModuleHandler instance upon first retrieval.
       $this->kernel->updateModules($module_filenames, $module_filenames);
       $container = $this->kernel->getContainer();
     }
@@ -736,13 +708,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $this->moduleHandler = $container->get('module_handler');
     $this->connection = $container->get('database');
     $this->updateRegistry = $container->get('update.update_hook_registry');
-
-    // Restore state of config installer.
-    if ($sync_status) {
-      $container->get('config.installer')
-        ->setSyncing(TRUE)
-        ->setSourceStorage($source_storage);
-    }
   }
 
   /**
@@ -773,10 +738,17 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * @internal
    */
   protected function installSchema(string $module): void {
-    $tables = $this->invoke($module, 'schema') ?? [];
+    $schemaDefinition = $this->invoke($module, 'schema') ?? [];
     $schema = $this->connection->schema();
-    foreach ($tables as $name => $table) {
-      $schema->createTable($name, $table);
+    if ($schemaDefinition instanceof Schema) {
+      assert($schemaDefinition->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
+      assert($schemaDefinition->name === $module, 'Invalid schema definition name, must be equal to the module name');
+      $schema->createSchemaFromDefinition($schemaDefinition);
+    }
+    else {
+      foreach ($schemaDefinition as $name => $table) {
+        $schema->createTable($name, $table);
+      }
     }
   }
 
@@ -789,9 +761,10 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * @internal
    */
   protected function uninstallSchema(string $module): void {
-    $tables = $this->invoke($module, 'schema') ?? [];
+    $schemaDefinition = $this->invoke($module, 'schema') ?? [];
     $schema = $this->connection->schema();
-    foreach (array_keys($tables) as $table) {
+    $table_names = ($schemaDefinition instanceof Schema) ? $schemaDefinition->tableNames() : array_keys($schemaDefinition);
+    foreach ($table_names as $table) {
       if ($schema->tableExists($table)) {
         $schema->dropTable($table);
       }

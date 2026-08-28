@@ -7,6 +7,9 @@ namespace Drupal\Tests\filter\Functional\Rest;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 
+/**
+ * Resource test base for the FilterFormat entity.
+ */
 abstract class FilterFormatResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**
@@ -43,7 +46,7 @@ abstract class FilterFormatResourceTestBase extends ConfigEntityResourceTestBase
         'filter_html' => [
           'status' => TRUE,
           'settings' => [
-            'allowed_html' => '<p> <a> <b> <lo>',
+            'allowed_html' => '<a> <b> <lo> <p>',
           ],
         ],
       ],
@@ -65,7 +68,7 @@ abstract class FilterFormatResourceTestBase extends ConfigEntityResourceTestBase
           'status' => TRUE,
           'weight' => -10,
           'settings' => [
-            'allowed_html' => '<p> <a> <b> <lo>',
+            'allowed_html' => '<a> <b> <lo> <p>',
             'filter_html_help' => TRUE,
             'filter_html_nofollow' => FALSE,
           ],
