@@ -85,10 +85,8 @@ class AccountCancellation {
    *   a user should be notified when the account was blocked.
    */
   public function cancelAccount(UserInterface $account, string $method, array $options): void {
-    $manager = \Drupal::service(AccountCancelMethodManager::class);
-
-    if ($manager->hasDefinition($method)) {
-      $manager->createInstance($method)->cancel($account, $options);
+    if ($this->accountCancelMethodManager->hasDefinition($method)) {
+      $this->accountCancelMethodManager->createInstance($method)->cancel($account, $options);
     }
     else {
       @trigger_error("Defining account cancellation methods by implementing hook_user_cancel_methods_alter() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. To define a new account cancellation method, create a plugin implementing \Drupal\user\AccountCancelMethodInterface. See https://www.drupal.org/node/3580745", E_USER_DEPRECATED);
@@ -97,7 +95,7 @@ class AccountCancellation {
       // reasons, we replicate the legacy behavior here. This will be removed
       // when the backwards compatibility layer is discontinued.
       // @see https://www.drupal.org/project/drupal/issues/3135592
-      $manager->createInstance('user_cancel_block')->cancel($account, $options);
+      $this->accountCancelMethodManager->createInstance('user_cancel_block')->cancel($account, $options);
     }
 
     // After cancelling the account, ensure that the user is logged out. We
