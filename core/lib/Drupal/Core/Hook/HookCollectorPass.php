@@ -105,7 +105,6 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
    */
   protected array $deprecatedModuleFiles = [];
 
-
   /**
    * Constructor.
    *
@@ -486,7 +485,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
           $procedural_hook_file_cache->set($filename, $implementations);
         }
         if (isset($implementations['@skip_theme_file_deprecation'])) {
-          unset($this->deprecatedThemeFiles[pathinfo($filename, PATHINFO_FILENAME)]);
+          unset($this->deprecatedModuleFiles[pathinfo($filename, PATHINFO_FILENAME)]);
         }
         foreach ($implementations['hooks'] as $implementation) {
           $this->addProceduralImplementation($implementation['hook'], $implementation['module']);
