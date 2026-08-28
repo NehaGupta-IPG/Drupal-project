@@ -232,7 +232,7 @@ function user_cancel($edit, $uid, $method): void {
  */
 function _user_cancel($edit, $account, $method): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::cancelAccount() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
-  AccountCancellation::cancelAccount($account, $method, $edit);
+  \Drupal::service(AccountCancellation::class)->cancelAccount($account, $method, $edit);
 }
 
 /**
@@ -248,7 +248,7 @@ function _user_cancel($edit, $account, $method): void {
  */
 function _user_cancel_session_regenerate(): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::regenerateSession() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
-  AccountCancellation::regenerateSession();
+  \Drupal::service(AccountCancellation::class)->regenerateSession();
 }
 
 /**
