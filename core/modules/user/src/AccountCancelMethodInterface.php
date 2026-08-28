@@ -29,10 +29,11 @@ interface AccountCancelMethodInterface extends PluginInspectionInterface, Contai
    *
    * @param \Drupal\user\UserInterface $account
    *   The user account.
-   * @param array $context
-   *   (optional) Associative array with context value. For instance, when used
-   *   in the form API, the submitted form values can be passed in this array.
+   * @param array $options
+   *   (optional) An associative array of options to control the behavior of
+   *   the cancellation method. E.g., set `user_cancel_notify` to `TRUE` if
+   *   a user should be notified when the account was blocked.
    */
-  public function cancel(UserInterface $account, array $context = []): void;
+  public function cancel(UserInterface $account, array $options = []): void;
 
 }

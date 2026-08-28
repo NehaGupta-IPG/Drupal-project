@@ -23,9 +23,9 @@ class BlockAccount extends AccountCancelMethodPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function cancel(UserInterface $account, array $context = []): void {
+  public function cancel(UserInterface $account, array $options = []): void {
     // Send account blocked notification if it was requested.
-    if (!empty($context['user_cancel_notify'])) {
+    if (!empty($options['user_cancel_notify'])) {
       \Drupal::service(NotificationHandler::class)->sendStatusBlocked($account);
     }
     $account->block()->save();

@@ -57,13 +57,13 @@ class AccountCancellation {
     // Finish the batch and actually cancel the account.
     $batchBuilder = new BatchBuilder()
       ->setTitle($this->t('Cancelling user account'))
-      ->addOperation([static::class, 'cancelAccount'], [$account, $method, $context]);
+      ->addOperation(static::class . ':cancelAccount', [$account, $method, $context]);
 
     // After cancelling the account, ensure that the user is logged out.
     if ($account->id() == $this->currentUser->id()) {
       // Batch API stores data in the session, so use the finished operation to
       // manipulate the current user's session ID.
-      $batchBuilder->setFinishCallback([static::class, 'regenerateSession']);
+      $batchBuilder->setFinishCallback(static::class . ':regenerateSession');
     }
 
     batch_set($batchBuilder->toArray());
@@ -79,15 +79,16 @@ class AccountCancellation {
    *   The user account to cancel.
    * @param string $method
    *   The account cancellation method to use.
-   * @param array $context
-   *   (optional) Associative array with context value. For instance, when used
-   *   in the form API, the submitted form values can be passed in this array.
+   * @param array $options
+   *   (optional) An associative array of options to control the behavior of
+   *   the cancellation method. E.g., set `user_cancel_notify` to `TRUE` if
+   *   a user should be notified when the account was blocked.
    */
-  public static function cancelAccount(UserInterface $account, string $method, array $context): void {
+  public function cancelAccount(UserInterface $account, string $method, array $options): void {
     $manager = \Drupal::service(AccountCancelMethodManager::class);
 
     if ($manager->hasDefinition($method)) {
-      $manager->createInstance($method)->cancel($account, $context);
+      $manager->createInstance($method)->cancel($account, $options);
     }
     else {
       @trigger_error("Defining account cancellation methods by implementing hook_user_cancel_methods_alter() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. To define a new account cancellation method, create a plugin implementing \Drupal\user\AccountCancelMethodInterface. See https://www.drupal.org/node/3580745", E_USER_DEPRECATED);
@@ -96,7 +97,7 @@ class AccountCancellation {
       // reasons, we replicate the legacy behavior here. This will be removed
       // when the backwards compatibility layer is discontinued.
       // @see https://www.drupal.org/project/drupal/issues/3135592
-      $manager->createInstance('user_cancel_block')->cancel($account, $context);
+      $manager->createInstance('user_cancel_block')->cancel($account, $options);
     }
 
     // After cancelling the account, ensure that the user is logged out. We
@@ -111,10 +112,10 @@ class AccountCancellation {
   /**
    * Finishes the batch processing for cancelling a user account.
    */
-  public static function regenerateSession(): void {
+  public function regenerateSession(): void {
     // Regenerate the user's session instead of calling session_destroy() as we
     // want to preserve any messages that might have been set.
-    \Drupal::service('session')->migrate();
+    \Drupal::request()->getSession()->migrate();
   }
 
   /**
