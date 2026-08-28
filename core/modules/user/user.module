@@ -6,14 +6,12 @@
 
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\user\AccountCancellation;
 use Drupal\user\Entity\User;
 use Drupal\user\Hook\UserThemeHooks;
 use Drupal\user\LoginFinalizer;
 use Drupal\user\LogoutFinalizer;
 use Drupal\user\OneTimeAuthentication;
-use Drupal\user\NotificationHandler;
 use Drupal\user\UserInterface;
 
 /**
