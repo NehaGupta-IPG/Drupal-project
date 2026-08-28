@@ -7,4 +7,12 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
+
 \Drupal::getContainer()->getParameter('site.path');
+
+/**
+ * Suppress deprecations.
+ */
+#[ExtensionFileIsConverted]
+function suppress_container_initialize() {}

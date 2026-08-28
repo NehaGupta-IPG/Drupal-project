@@ -4,6 +4,8 @@
  * @file
  */
 
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
+
 /**
  * Array key for denoting type-based filtering access.
  *
@@ -84,3 +86,9 @@ const JSONAPI_FILTER_AMONG_ENABLED = 'filter_among_enabled';
  * @see hook_jsonapi_ENTITY_TYPE_filter_access()
  */
 const JSONAPI_FILTER_AMONG_OWN = 'filter_among_own';
+
+/**
+ * Need to suppress the deprecation.
+ */
+#[ExtensionFileIsConverted]
+function supress_deprecation_json_api() {}

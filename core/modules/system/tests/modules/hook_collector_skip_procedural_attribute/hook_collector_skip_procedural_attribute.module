@@ -7,6 +7,7 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 
 /**
@@ -14,6 +15,7 @@ use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
  *
  * We have set procedural_hooks: scan.
  */
+#[ExtensionFileIsConverted]
 function hook_collector_skip_procedural_attribute_cache_flush(): void {
   // Set a global value we can check in test code.
   $GLOBALS['procedural_attribute_skip_find'] = 'procedural_attribute_skip_find';
