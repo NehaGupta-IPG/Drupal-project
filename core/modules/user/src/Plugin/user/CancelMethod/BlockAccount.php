@@ -7,6 +7,7 @@ namespace Drupal\user\Plugin\user\CancelMethod;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\AccountCancelMethodPluginBase;
 use Drupal\user\Attribute\AccountCancelMethod;
+use Drupal\user\NotificationHandler;
 use Drupal\user\UserInterface;
 
 /**
@@ -25,7 +26,7 @@ class BlockAccount extends AccountCancelMethodPluginBase {
   public function cancel(UserInterface $account, array $context = []): void {
     // Send account blocked notification if it was requested.
     if (!empty($context['user_cancel_notify'])) {
-      _user_mail_notify('status_blocked', $account);
+      \Drupal::service(NotificationHandler::class)->sendStatusBlocked($account);
     }
     $account->block()->save();
     $this->messenger()->addStatus($this->t('Account %name has been disabled.', [
