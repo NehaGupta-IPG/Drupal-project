@@ -1,6 +1,6 @@
 /* eslint-disable func-names, no-mutable-exports, comma-dangle, strict */
 
-((Drupal, drupalSettings, once) => {
+((Drupal, drupalSettings, once, $) => {
   const breakpoint = 1024;
   const breakpointLarge = 1280;
   const storageMobile = 'Drupal.defaultAdmin.sidebarExpanded.mobile';
@@ -11,6 +11,26 @@
   let isResizing = false;
   let startX, startWidth;
 
+  /**
+   * Open parent details elements of a targeted page fragment.
+   *
+   * Opens all (nested) details element on a hash change or fragment link click
+   * when the target is a child element, in order to make sure the targeted
+   * element is visible. Aria attributes on the summary
+   * are set by triggering the click event listener in details-aria.js.
+   *
+   * @param {jQuery.Event} e
+   *   The event triggered.
+   * @param {jQuery} $target
+   *   The targeted node as a jQuery object.
+   */
+  const handleFragmentLinkClickOrHashChange = (e, $target) => {
+    // If $target is in the sidebar, open it.
+    if ($target.parents('#default_admin_sidebar').length) {
+      Drupal.ginSidebar.showSidebar();
+    }
+  };
+
   Drupal.behaviors.adminSidebar = {
     attach: function attach(context) {
       Drupal.adminSidebar.init(context);
@@ -19,6 +39,14 @@
 
   Drupal.adminSidebar = {
     init: function (context) {
+      /**
+       * Binds a listener to handle fragment link clicks and URL hash changes.
+       */
+      $(once('vertical-tabs-fragments', 'body')).on(
+        'formFragmentLinkClickOrHashChange.defaultAdminSidebar',
+        handleFragmentLinkClickOrHashChange,
+      );
+
       once('adminSidebarInit', '#default_admin_sidebar', context).forEach(
         () => {
           // If variable does not exist, create it, default being to show sidebar.
@@ -218,4 +246,4 @@
       }
     },
   };
-})(Drupal, drupalSettings, once);
+})(Drupal, drupalSettings, once, jQuery);
