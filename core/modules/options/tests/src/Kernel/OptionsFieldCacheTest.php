@@ -13,12 +13,14 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the caching behavior for options fields.
- *
- * @group options
  */
+#[Group('options')]
+#[RunTestsInSeparateProcesses]
 class OptionsFieldCacheTest extends FieldKernelTestBase {
 
   /**
@@ -128,7 +130,6 @@ class OptionsFieldCacheTest extends FieldKernelTestBase {
    * Tests that the allowed values cache is correctly set per bundle.
    */
   public function testOptionsAllowedValuesIsCachedPerBundle(): void {
-
     /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager */
     $entityFieldManager = \Drupal::service('entity_field.manager');
 
@@ -149,21 +150,8 @@ class OptionsFieldCacheTest extends FieldKernelTestBase {
     );
 
     // Check that the allowed values are correct for each bundle.
-    $this->assertEquals(
-      [
-        'value1' => 'Value 1',
-      ],
-      $bundle1AllowedValues,
-      'The allowed values for bundle1 match the configured values.'
-    );
-    $this->assertEquals(
-      [
-        'value2' => 'Value 2',
-      ],
-      $bundle2AllowedValues,
-      'The allowed values for bundle2 match the configured values.'
-    );
-
+    $this->assertEquals(['value1' => 'Value 1'], $bundle1AllowedValues);
+    $this->assertEquals(['value2' => 'Value 2'], $bundle2AllowedValues);
   }
 
   /**
