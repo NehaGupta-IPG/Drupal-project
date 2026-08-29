@@ -70,8 +70,10 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    */
   public function getRouteCollectionForRequest(Request $request) {
     // Cache both the system path as well as route parameters and matching
-    // routes.
-    $cid = $this->getRouteCollectionCacheId($request);
+    // routes if the request has no query parameters. Requests with query strings
+    // likely vary widely and are often not requested more than once, that is
+    // especially true for assets and image styles.
+    $cid = $this->useRouteCache($request) ? $this->getRouteCollectionCacheId($request) : NULL;
     if ($cached = $this->cache->get($cid)) {
       $this->currentPath->setPath($cached->data['path'], $request);
       $request->query->replace($cached->data['query']);
@@ -89,7 +91,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       // Incoming path processors may also set query parameters.
       $query_parameters = $request->query->all();
       $routes = $this->getRoutesByPath(rtrim($path, '/'));
-      // Disable caching for routes that are seemingly broken/not found.
+      // Only cache lookups with results.
       if ($routes->all() || $routes->getResources()) {
         $cache_value = [
           'path' => $path,
@@ -101,6 +103,21 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
 
       return $routes;
     }
+  }
+
+  /**
+   * Whether the route lookup for the given request should be cached.
+   *
+   * By default, requests with query parameters are not cached.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request.
+   *
+   * @return bool
+   *   Whether the lookup should be cached.
+   */
+  protected function useRouteCache(Request $request): bool {
+    return $request->query->count() === 0;
   }
 
   /**
@@ -378,8 +395,6 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     // based on the domain.
     $this->addExtraCacheKeyPart('language', $this->getCurrentLanguageCacheIdPart());
 
-    $this->addExtraCacheKeyPart('query_parameters', $this->getQueryParametersCacheIdPart($request));
-
     // Sort the cache key parts by their provider in order to have predictable
     // cache keys.
     ksort($this->extraCacheKeyParts);
@@ -404,10 +419,14 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    *
    * @return string
    *   The query parameters identifier for the route collection cache.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Requests
+   *   with query parameters are no longer cached by default.
+   *
+   * @see https://www.drupal.org/node/3619781
    */
   protected function getQueryParametersCacheIdPart(Request $request) {
-    // @todo Use \Symfony\Component\HttpFoundation\Request::normalizeQueryString
-    //   for recursive key ordering if support is added in the future.
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Requests with query parameters are no longer cached by default. See https://www.drupal.org/node/3619781', E_USER_DEPRECATED);
     $recursive_sort = function (&$array) use (&$recursive_sort) {
       foreach ($array as &$v) {
         if (is_array($v)) {
