@@ -11,6 +11,7 @@ use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\locale\CurrentImportStorage;
 use Drupal\locale\LocaleLanguages;
+use Drupal\locale\LocaleProjectNotFoundException;
 use Drupal\locale\LocaleProjectRepository;
 use Drupal\locale\LocaleSource;
 use Drupal\locale\LocaleTranslatableProject;
@@ -27,9 +28,9 @@ use PHPUnit\Framework\Attributes\Group;
 class LocaleSourceTest extends UnitTestCase {
 
   /**
-   * Tests that missing projects are skipped instead of causing a TypeError.
+   * Tests that missing projects throw a catchable exception, not a TypeError.
    */
-  public function testLoadSourcesSkipsMissingProjects(): void {
+  public function testLoadSourcesThrowsForMissingProjects(): void {
     $repository = $this->createStub(LocaleProjectRepository::class);
     $repository->method('getMultiple')->willReturn([]);
 
@@ -52,8 +53,8 @@ class LocaleSourceTest extends UnitTestCase {
       ->getMock();
     $source->expects($this->never())->method('sourceBuild');
 
-    $this->assertSame([], $source->loadSources(['gone-module'], ['fr']));
-    $this->assertNull($source->loadSource('gone-module', 'fr'));
+    $this->expectException(LocaleProjectNotFoundException::class);
+    $source->loadSource('gone-module', 'fr');
   }
 
   /**
