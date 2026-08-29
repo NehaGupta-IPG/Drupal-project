@@ -5,6 +5,7 @@
  * API functions for installing Drupal.
  */
 
+use Drupal\user\LoginFinalizer;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Cache\NullBackend;
@@ -462,19 +463,6 @@ function install_begin_request($class_loader, &$install_state): void {
   $container->set('string_translator.file_translation', new FileTranslation($directory, $file_system, $install_state['parameters']['profile'] ?? NULL));
   $container->get('string_translation')
     ->addTranslator($container->get('string_translator.file_translation'));
-
-  /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
-  $module_list = \Drupal::service('extension.list.module');
-  /** @var \Drupal\Core\Extension\ProfileExtensionList $profile_list */
-  $profile_list = \Drupal::service('extension.list.profile');
-
-  // Prime \Drupal\Core\Extension\ExtensionList::getPathname()'s static cache.
-  foreach ($install_state['profiles'] as $name => $profile) {
-    // Profile path is set in both module and profile lists. See
-    // \Drupal\Core\Config\ConfigInstaller::getProfileStorages for example.
-    $profile_list->setPathname($name, $profile->getPathname());
-    $module_list->setPathname($name, $profile->getPathname());
-  }
 
   $profile = _install_select_profile($install_state);
   if ($profile !== NULL) {
@@ -1595,6 +1583,17 @@ function install_profile_modules(&$install_state) {
   install_core_entity_type_definitions();
 
   $modules = $install_state['profile_info']['install'];
+  $database_module = _install_get_database_module_name();
+  if ($database_module !== NULL) {
+    array_unshift($modules, $database_module);
+  }
+
+  // Extra module support is only implemented by the testing framework, to
+  // reduce the number of container rebuilds during test runs.
+  $extra_modules = $install_state['extra_modules'] ?? [];
+  if ($extra_modules) {
+    $modules = array_merge($modules, $extra_modules);
+  }
   $files = \Drupal::service('extension.list.module')->getList();
 
   // Always install required modules first. Respect the dependencies between
@@ -1695,6 +1694,12 @@ function install_core_entity_type_definitions(): void {
 function install_profile_themes(&$install_state): void {
   // Install the themes specified by the installation profile.
   $themes = $install_state['profile_info']['themes'];
+
+  // Default theme support is only implemented by the testing framework, to
+  // reduce the number of container rebuilds during test runs.
+  if (isset($install_state['default_theme'])) {
+    $themes = array_unique(array_merge($themes, [$install_state['default_theme']]));
+  }
   \Drupal::service('theme_installer')->install($themes);
 
   // Ensure that the install profile's theme is used.
@@ -1718,7 +1723,15 @@ function install_install_profile(&$install_state): void {
   // any disparities that this creates.
   \Drupal::service('config.installer')->installOptionalConfig();
 
-  \Drupal::service('module_installer')->install([$install_state['parameters']['profile']], FALSE);
+  if (empty($install_state['profile_info']['opt_out_install'])) {
+    \Drupal::service('module_installer')->install([$install_state['parameters']['profile']], FALSE);
+  }
+
+  if (isset($install_state['default_theme'])) {
+    \Drupal::service('config.factory')->getEditable('system.theme')
+      ->set('default', $install_state['default_theme'])
+      ->save();
+  }
 
   // Ensure that the install profile's theme is used.
   // @see _drupal_maintenance_theme()
@@ -1838,22 +1851,23 @@ function install_finished(&$install_state): void {
   if ($install_state['profile_info']['keep_profile'] ?? TRUE) {
     // Installation profiles are always loaded last.
     \Drupal::service(ModuleWeight::class)->set($profile, 1000);
+    // Build the router once after installing all modules.
+    // This would normally happen upon KernelEvents::TERMINATE, but since the
+    // installer does not use an HttpKernel, that event is never triggered.
+    // This is not necessary when the profile is uninstalled because
+    // uninstalling a module rebuilds the router anyway.
+    \Drupal::service('router.builder')->rebuild();
   }
   else {
     \Drupal::service('module_installer')->uninstall([$profile]);
   }
-
-  // Build the router once after installing all modules.
-  // This would normally happen upon KernelEvents::TERMINATE, but since the
-  // installer does not use an HttpKernel, that event is never triggered.
-  \Drupal::service('router.builder')->rebuild();
 
   if ($install_state['interactive']) {
     // Load current user and perform final login tasks.
     // This has to be done after drupal_flush_all_caches()
     // to avoid session regeneration.
     $account = User::load(1);
-    user_login_finalize($account);
+    \Drupal::service(LoginFinalizer::class)->finalizeLogin($account);
   }
 
   // Record when this install ran.
@@ -2540,8 +2554,10 @@ function install_recipe_required_modules(array $install_state) {
   // Always install required modules first.
   $required = [];
 
+  $database_module = _install_get_database_module_name();
+
   foreach ($files as $module => $extension) {
-    if (!empty($extension->info['required'])) {
+    if (!empty($extension->info['required']) || $module === $database_module) {
       $required[$module] = $extension->sort;
     }
   }
@@ -2580,4 +2596,30 @@ function install_recipe_batch(&$install_state) {
   }
 
   return $batch_builder->toArray();
+}
+
+/**
+ * Gets the database driver module name.
+ *
+ * The database driver is provided by a module. That module must be
+ * installed before any other module, as it must be able to override any call
+ * to hook_schema() or any "backend_overridable" service. In edge cases, a
+ * driver module may extend from another driver module. In order for the
+ * extended classes to be autoloadable, the extending module should list the
+ * extended module in its dependencies.
+ *
+ * @return ?string
+ *   The database driver module or NULL if none is found.
+ */
+function _install_get_database_module_name(): ?string {
+  $connection = Database::getConnection();
+  $provider = $connection->getProvider();
+  $database_module = NULL;
+  if ($provider !== 'core') {
+    $autoload = $connection->getConnectionOptions()['autoload'] ?? '';
+    if (str_contains($autoload, 'src/Driver/Database/')) {
+      $database_module = $provider;
+    }
+  }
+  return $database_module;
 }
