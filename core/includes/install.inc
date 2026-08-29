@@ -7,7 +7,6 @@
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\Dependency;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
@@ -216,30 +215,14 @@ function drupal_install_system($install_state): void {
   // Store the installation profile in configuration to populate the
   // 'install_profile' container parameter.
   $config = \Drupal::configFactory()->getEditable('core.extension');
-  if ($install_state['parameters']['profile'] === FALSE) {
+  if ($install_state['parameters']['profile'] === FALSE
+    || !empty($install_state['profile_info']['opt_out_install'])) {
     $config->clear('profile');
   }
   else {
     $config->set('profile', $install_state['parameters']['profile']);
   }
   $config->save();
-
-  $connection = Database::getConnection();
-  $provider = $connection->getProvider();
-  // When the database driver is provided by a module, then install that module.
-  // This module must be installed before any other module, as it must be able
-  // to override any call to hook_schema() or any "backend_overridable" service.
-  // In edge cases, a driver module may extend from another driver module (for
-  // instance, a module to provide backward compatibility with a database
-  // version no longer supported by core). In order for the extended classes to
-  // be autoloadable, the extending module should list the extended module in
-  // its dependencies, and here the dependencies will be installed as well.
-  if ($provider !== 'core') {
-    $autoload = $connection->getConnectionOptions()['autoload'] ?? '';
-    if (str_contains($autoload, 'src/Driver/Database/')) {
-      $kernel->getContainer()->get('module_installer')->install([$provider], TRUE);
-    }
-  }
 }
 
 /**

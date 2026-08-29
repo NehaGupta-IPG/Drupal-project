@@ -68,6 +68,8 @@ parameters:
   tempstore.expire: 604800
   queue.config:
     suspendMaximumWait: 30.0
+  instant_queue.config:
+    maximumItems: 5
   stream_wrapper.allowed_file_extensions:
     module:
       - json
@@ -614,6 +616,9 @@ services:
   logger.channel.menu:
     parent: logger.channel_base
     arguments: ['menu']
+  logger.channel.queue:
+    parent: logger.channel_base
+    arguments: ['queue']
   logger.channel.router:
     parent: logger.channel_base
     arguments: ['router']
@@ -650,6 +655,11 @@ services:
   path.current:
     class: Drupal\Core\Path\CurrentPathStack
     arguments: ['@request_stack']
+  Drupal\Core\Queue\InstantQueueRunnerInterface:
+    class: 'Drupal\Core\Queue\InstantQueueRunner'
+    autowire: true
+    tags:
+      - { name: needs_destruction }
   Drupal\Core\Path\CurrentPathStack: '@path.current'
   http_handler_stack:
     class: GuzzleHttp\HandlerStack
@@ -695,10 +705,6 @@ services:
   container.namespaces:
     class: ArrayObject
     arguments: [ '%container.namespaces%' ]
-  container.trait:
-    abstract: true
-    calls:
-      - [setContainer, ['@service_container']]
   default_plugin_manager:
     abstract: true
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
@@ -1905,6 +1911,8 @@ services:
     class: Drupal\Core\File\HtaccessWriter
     arguments: ['@logger.channel.security', '@stream_wrapper_manager', '@settings']
   Drupal\Core\File\HtaccessWriterInterface: '@file.htaccess_writer'
+  Drupal\Core\File\UploadedFilesExtractor:
+    autowire: true
   file.mime_type.guesser:
     class: Drupal\Core\File\MimeType\MimeTypeGuesser
     arguments: ['@stream_wrapper_manager', !tagged_iterator mime_type_guesser]
@@ -1964,7 +1972,7 @@ services:
   Drupal\Core\Update\UpdateHookRegistry: '@update.update_hook_registry'
   update.post_update_registry:
     class: Drupal\Core\Update\UpdateRegistry
-    arguments: ['%app.root%', '%site.path%', '%container.modules%', '@update.key_value.post_update', '@theme_handler', 'post_update']
+    arguments: ['%app.root%', '%site.path%', '%container.modules%', '@update.key_value.post_update', '@theme_handler', '@cache.memory', 'post_update']
   update.key_value.post_update:
     class: Drupal\Core\KeyValueStore\KeyValueStoreInterface
     factory: ['@keyvalue', 'get']
