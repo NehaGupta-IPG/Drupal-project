@@ -7,6 +7,7 @@ namespace Drupal\Tests\locale\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\locale\File\LocaleFile;
 use Drupal\locale\LocaleFetch;
+use Drupal\locale\LocaleProjectNotFoundException;
 use Drupal\locale\LocaleTranslationSource;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -27,9 +28,9 @@ class LocaleBatchTest extends KernelTestBase {
   ];
 
   /**
-   * Tests that an import batch finishes if its project is no longer tracked.
+   * Tests that a batch operation for an untracked project throws.
    */
-  public function testMissingProjectFinishesImportBatch(): void {
+  public function testMissingProjectThrows(): void {
     $context = [
       'sandbox' => [],
       'results' => [],
@@ -37,9 +38,25 @@ class LocaleBatchTest extends KernelTestBase {
       'message' => '',
     ];
 
+    $this->expectException(LocaleProjectNotFoundException::class);
     \Drupal::service(LocaleFetch::class)->batchImport('missing_project', 'fr', [], $context);
+  }
 
-    $this->assertSame(1, $context['finished']);
+  /**
+   * Tests that a queue task for an untracked project is discarded, not retried.
+   */
+  public function testMissingProjectQueueTaskIsDiscarded(): void {
+    $queue = \Drupal::queue('locale_translation', TRUE);
+    $queue->createItem([LocaleFetch::class . ':batchImport', ['missing_project', 'fr', []]]);
+
+    $worker = \Drupal::service('plugin.manager.queue_worker')->createInstance('locale_translation');
+    $item = $queue->claimItem();
+    // The worker catches the exception so the item can be removed instead of
+    // being left to be processed again on the next cron run.
+    $worker->processItem($item->data);
+    $queue->deleteItem($item);
+
+    $this->assertSame(0, $queue->numberOfItems());
   }
 
   /**
