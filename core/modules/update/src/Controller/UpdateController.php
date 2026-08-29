@@ -5,6 +5,7 @@ namespace Drupal\update\Controller;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\update\UpdateCalculator;
 use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
 
@@ -13,31 +14,15 @@ use Drupal\update\UpdateManagerInterface;
  */
 class UpdateController extends ControllerBase {
 
-  /**
-   * Update manager service.
-   *
-   * @var \Drupal\update\UpdateManagerInterface
-   */
-  protected $updateManager;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * Constructs update status data.
-   *
-   * @param \Drupal\update\UpdateManagerInterface $update_manager
-   *   Update Manager Service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
-  public function __construct(UpdateManagerInterface $update_manager, RendererInterface $renderer) {
-    $this->updateManager = $update_manager;
-    $this->renderer = $renderer;
+  public function __construct(
+    protected UpdateManagerInterface $updateManager,
+    protected RendererInterface $renderer,
+    protected ?UpdateCalculator $updateCalculator = NULL,
+  ) {
+    if (!$updateCalculator) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $updateCalculator argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3587768', E_USER_DEPRECATED);
+      $this->updateCalculator = \Drupal::service(UpdateCalculator::class);
+    }
   }
 
   /**
@@ -50,9 +35,9 @@ class UpdateController extends ControllerBase {
     $build = [
       '#theme' => 'update_report',
     ];
-    if ($available = update_get_available(TRUE)) {
+    if ($available = $this->updateManager->getAvailable(TRUE)) {
       $this->moduleHandler()->loadInclude('update', 'compare.inc');
-      $build['#data'] = update_calculate_project_data($available);
+      $build['#data'] = $this->updateCalculator->getProjectData($available);
 
       // @todo Consider using 'fetch_failures' from the 'update' collection
       // in the key_value_expire service for this?
@@ -81,9 +66,33 @@ class UpdateController extends ControllerBase {
       ->addOperation([$this->updateManager, 'fetchDataBatch'], [])
       ->setProgressMessage($this->t('Trying to check available update data ...'))
       ->setErrorMessage($this->t('Error checking available update data.'))
-      ->setFinishCallback('update_fetch_data_finished');
+      ->setFinishCallback(self::class . ':updateFetchDataFinished');
     batch_set($batch_builder->toArray());
     return batch_process('admin/reports/updates');
+  }
+
+  /**
+   * Finished batch callback.
+   *
+   * @param bool $success
+   *   TRUE if batch successfully completed.
+   * @param array $results
+   *   Batch results.
+   */
+  public function updateFetchDataFinished(bool $success, array $results): void {
+    if ($success) {
+      if (!empty($results)) {
+        if (!empty($results['updated'])) {
+          $this->messenger()->addStatus($this->formatPlural($results['updated'], 'Checked available update data for one project.', 'Checked available update data for @count projects.'));
+        }
+        if (!empty($results['failures'])) {
+          $this->messenger()->addError($this->formatPlural($results['failures'], 'Failed to get available update data for one project.', 'Failed to get available update data for @count projects.'));
+        }
+      }
+    }
+    else {
+      $this->messenger()->addError($this->t('An error occurred trying to get available update data.'), 'error');
+    }
   }
 
 }

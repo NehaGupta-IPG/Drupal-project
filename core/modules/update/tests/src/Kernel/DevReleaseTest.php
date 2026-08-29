@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\update\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\update\UpdateCalculator;
 use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
 use GuzzleHttp\Client;
@@ -121,13 +122,14 @@ class DevReleaseTest extends KernelTestBase {
   }
 
   /**
-   * Gets project data from update_calculate_project_data().
+   * Gets project data from \Drupal\update\UpdateCalculator::projectData().
    *
    * @param array $system_info
    *   System test information as used by update_test_system_info_alter().
    *
    * @return array[]
-   *   The project data as returned by update_calculate_project_data().
+   *   The project data as returned by
+   *   \Drupal\update\UpdateCalculator::projectData().
    *
    * @see update_test_system_info_alter()
    */
@@ -135,9 +137,9 @@ class DevReleaseTest extends KernelTestBase {
     $this->config('update_test.settings')
       ->set('system_info', $system_info)
       ->save();
-    update_storage_clear();
-    $available = update_get_available(TRUE);
-    return update_calculate_project_data($available);
+    \Drupal::service('update.manager')->reset();
+    $available = \Drupal::service('update.manager')->getAvailable(TRUE);
+    return \Drupal::service(UpdateCalculator::class)->getProjectData($available);
   }
 
 }

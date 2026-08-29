@@ -37,7 +37,7 @@ interface UpdateProcessorInterface {
    *   file for the project.
    *
    * @see \Drupal\update\UpdateManager::getProjects()
-   * @see update_get_available()
+   * @see \Drupal\update\UpdateManager::getAvailable()
    * @see \Drupal\update\UpdateManager::refreshUpdateData()
    * @see \Drupal\update\UpdateProcessor::fetchData()
    * @see \Drupal\update\UpdateProcessor::processFetchTask()
