@@ -1,5 +1,15 @@
 # Schema for the configuration files of the Language module.
 
+language.settings:
+  type: config_object
+  label: 'Language settings'
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    default_config_langcode:
+      type: langcode
+      label: 'Configuration default language code'
+
 language_type_negotiation:
   type: mapping
   label: 'Language negotiation per type setting'

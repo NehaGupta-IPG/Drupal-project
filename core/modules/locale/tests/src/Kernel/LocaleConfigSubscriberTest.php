@@ -68,7 +68,6 @@ class LocaleConfigSubscriberTest extends KernelTestBase {
     // or normal environment.
     // @see locale_modules_installed()
     $locale_config_manager = \Drupal::service('locale.config_manager');
-    $locale_config_manager->updateDefaultConfigLangcodes();
     $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
     $names = $locale_config_manager->getComponentNames();
     $locale_config_manager->updateConfigTranslations($names, $langcodes);

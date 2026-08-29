@@ -29,10 +29,17 @@ class ConfigOverride implements ServiceProviderInterface, ConfigFactoryOverrideI
   public function loadOverrides($names) {
     $overrides = [];
     if (InstallerKernel::installationAttempted() && function_exists('drupal_install_profile_distribution_name')) {
+      // During early install, ConfigInstaller may read system.site before the
+      // final system.site values are persisted.
+      global $install_state;
+      $installer_langcode = $install_state['parameters']['langcode'] ?? 'en';
+
       // Early in the installer the site name is unknown. In this case we need
       // to fallback to the distribution's name.
       $overrides['system.site'] = [
         'name' => drupal_install_profile_distribution_name(),
+        'langcode' => $installer_langcode,
+        'default_langcode' => $installer_langcode,
       ];
     }
     return $overrides;
