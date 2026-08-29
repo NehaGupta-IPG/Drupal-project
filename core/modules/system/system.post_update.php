@@ -5,6 +5,13 @@
  * Post update functions for System.
  */
 
+use Drupal\Core\Config\ConfigManagerInterface;
+use Drupal\Core\Config\Schema\Mapping;
+use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -90,4 +97,71 @@ function system_post_update_clear_admin_compact_mode_config(): void {
   $config = \Drupal::configFactory()->getEditable('system.site');
   $config->clear('admin_compact_mode');
   $config->save();
+}
+
+/**
+ * Adds or removes a langcode on simple config to match its translatability.
+ *
+ * Config::save() only reconciles langcode with translatability at save time,
+ * so it cannot fix up configuration that already exists on a site being
+ * updated: a value-based translatability check may now disagree with a
+ * langcode the configuration was given under previous rules. This applies
+ * the same value-based check to all existing simple configuration once.
+ */
+function system_post_update_reconcile_translatable_config_langcode(&$sandbox = NULL): TranslatableMarkup {
+  $config_factory = \Drupal::configFactory();
+
+  // If this is the first run, populate the sandbox with the names of all
+  // config objects.
+  if (!isset($sandbox['names'])) {
+    $sandbox['names'] = $config_factory->listAll();
+    $sandbox['max'] = count($sandbox['names']);
+  }
+
+  $typed_config_manager = \Drupal::service(TypedConfigManagerInterface::class);
+  $config_manager = \Drupal::service(ConfigManagerInterface::class);
+  // The site's default language and the configuration default language are
+  // guaranteed to be the same at this point: nothing before this update has
+  // ever allowed them to diverge.
+  $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
+
+  $names = array_splice($sandbox['names'], 0, Settings::get('entity_update_batch_size', 50));
+  foreach ($names as $name) {
+    // Configuration entities are always considered translatable and always
+    // have a langcode of their own regardless of their current values, so
+    // they never need reconciling here.
+    // @todo Are we really sure that all config entities have langcodes?
+    if ($config_manager->getEntityTypeIdByName($name) || !$typed_config_manager->hasConfigSchema($name)) {
+      continue;
+    }
+
+    $config = $config_factory->getEditable($name);
+    $typed_config = $typed_config_manager->createFromNameAndData($name, $config->getRawData());
+    // Simple config is always a mapping.
+    assert($typed_config instanceof Mapping);
+
+    if ($typed_config->hasTranslatableElements()) {
+      if (array_key_exists('langcode', $config->getRawData())) {
+        continue;
+      }
+      $config->set('langcode', $default_langcode);
+    }
+    else {
+      if (!array_key_exists('langcode', $config->getRawData())) {
+        continue;
+      }
+      $config->clear('langcode');
+    }
+    $config->save();
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) || empty($sandbox['names']) ? 1 : ($sandbox['max'] - count($sandbox['names'])) / $sandbox['max'];
+  if ($sandbox['#finished'] === 1) {
+    return new TranslatableMarkup('Finished reconciling configuration langcodes.');
+  }
+  return new PluralTranslatableMarkup($sandbox['max'] - count($sandbox['names']),
+    'Processed @count item of @total.',
+    'Processed @count items of @total.',
+    ['@total' => $sandbox['max']],
+  );
 }
