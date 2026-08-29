@@ -148,10 +148,6 @@ function install_drupal($class_loader, $settings = [], ?callable $callback = NUL
     // If installation is finished ensure any further container rebuilds do not
     // use the installer's service provider.
     unset($GLOBALS['conf']['container_service_providers']['InstallerServiceProvider']);
-    // Remove any dumped installer container from the cache: it bakes in
-    // installer service overrides and is of no use to the installed site,
-    // which dumps its own container under its own cache key.
-    \Drupal::service('kernel')->invalidateContainer();
   }
 
   // All available tasks for this page request are now complete. Interactive

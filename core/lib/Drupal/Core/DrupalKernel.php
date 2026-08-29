@@ -948,6 +948,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * Returns the container cache key based on the environment.
    *
    * The 'environment' consists of:
+   * - The kernel class, so kernel subclasses that customize the container
+   *   (for example the installer) never share a cached container with the
+   *   main site.
    * - The kernel environment string.
    * - A hash based on all the installed package versions.
    * - The deployment identifier from settings.php. This allows custom
@@ -962,6 +965,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected function getContainerCacheKey() {
     $parts = [
       'service_container',
+      static::class,
       $this->environment,
       class_exists(DrupalInstalled::class) ? DrupalInstalled::VERSIONS_HASH : \Drupal::VERSION,
       Settings::get('deployment_identifier'),

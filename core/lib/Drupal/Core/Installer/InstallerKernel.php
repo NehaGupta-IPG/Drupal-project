@@ -47,16 +47,6 @@ class InstallerKernel extends DrupalKernel {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function getContainerCacheKey() {
-    // Isolate the installer's dumped container from the runtime container
-    // cache: the installer container bakes in installer service overrides
-    // that must never leak into the installed site.
-    return parent::getContainerCacheKey() . ':installer';
-  }
-
-  /**
    * Reset the bootstrap config storage.
    *
    * Use this from a database driver runTasks() if the method overrides the

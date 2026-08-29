@@ -50,13 +50,20 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     }
 
     // Separately override the file_parsing bin as that doesn't use a
-    // tag/parameter.
-    $definition = $container->getDefinition('cache.file_parsing');
-    $definition->setClass(MemoryBackend::class);
-    // Use a service reference rather than an object instance, so that the
-    // container can still be dumped.
-    $definition->setArguments([new Reference('datetime.time')]);
-    $definition->setFactory(NULL);
+    // tag/parameter. Only do so in the early installer, which may have no
+    // database. Once the base system is verified the real backend is kept:
+    // items in this bin persist between cache clears (they are invalidated
+    // by file modification time instead), so writes during the later
+    // installer are reused across installer requests and warm the cache for
+    // the installed site.
+    if (empty($install_state['base_system_verified'])) {
+      $definition = $container->getDefinition('cache.file_parsing');
+      $definition->setClass(MemoryBackend::class);
+      // Use a service reference rather than an object instance, so that the
+      // container can still be dumped.
+      $definition->setArguments([new Reference('datetime.time')]);
+      $definition->setFactory(NULL);
+    }
 
     // When installing from existing config, disabling the config cache entirely
     // yields much faster install times.
