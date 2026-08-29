@@ -97,13 +97,13 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
   protected array $preprocessForSuggestions;
 
   /**
-   * Deprecated .module files.
+   * Deprecated extension files.
    *
    * These are stored to allow emitting deprecation messages.
    *
-   * @var array<string, true>
+   * @var array<string, array<string, true>>
    */
-  protected array $deprecatedModuleFiles = [];
+  protected array $deprecatedFiles = [];
 
   /**
    * Constructor.
@@ -154,8 +154,8 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
       'packed_order_operations' => $packed_order_operations,
     ]);
 
-    foreach ($this->deprecatedModuleFiles as $deprecatedModuleFile => $v) {
-      @trigger_error('Using ' . $deprecatedModuleFile . '.module is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
+    foreach ($this->deprecatedFiles['module'] ?? [] as $deprecatedFile => $v) {
+      @trigger_error('Using ' . $deprecatedFile . '.module is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
     }
   }
 
@@ -356,7 +356,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
       $filename = $fileinfo->getPathname();
 
       if ($fileExtension === 'module') {
-        $this->deprecatedModuleFiles[pathinfo($filename, PATHINFO_FILENAME)] = TRUE;
+        $this->deprecatedFiles[$fileExtension][pathinfo($filename, PATHINFO_FILENAME)] = TRUE;
       }
 
       if ($fileExtension === 'php') {
@@ -449,7 +449,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
           ];
           foreach ($parser->getMethodAttributes() as $function => $attributes) {
             if (StaticReflectionParser::hasAttribute($attributes, ExtensionFileIsConverted::class)) {
-              $implementations['@skip_theme_file_deprecation'] = TRUE;
+              $implementations['@skip_extension_file_deprecation'] = TRUE;
             }
             if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
               break;
@@ -484,8 +484,8 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
           }
           $procedural_hook_file_cache->set($filename, $implementations);
         }
-        if (isset($implementations['@skip_theme_file_deprecation'])) {
-          unset($this->deprecatedModuleFiles[pathinfo($filename, PATHINFO_FILENAME)]);
+        if (isset($implementations['@skip_extension_file_deprecation'])) {
+          unset($this->deprecatedFiles[$fileExtension][pathinfo($filename, PATHINFO_FILENAME)]);
         }
         foreach ($implementations['hooks'] as $implementation) {
           $this->addProceduralImplementation($implementation['hook'], $implementation['module']);
