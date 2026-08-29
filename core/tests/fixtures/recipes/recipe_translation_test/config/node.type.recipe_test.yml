@@ -1,0 +1,9 @@
+langcode: en
+status: true
+name: 'Recipe Test Content Type English'
+type: recipe_test
+description: 'A content type created with a recipe'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: true

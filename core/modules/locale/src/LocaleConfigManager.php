@@ -58,7 +58,7 @@ class LocaleConfigManager {
     protected TypedConfigManagerInterface $typedConfigManager,
     #[Autowire(service: 'language_manager')]
     protected ConfigurableLanguageManagerInterface $languageManager,
-    protected LocaleDefaultConfigStorage $defaultConfigStorage,
+    protected DefaultConfigStorageInterface $defaultConfigStorage,
     protected ConfigManagerInterface $configManager,
     protected readonly LocaleLanguages $localeLanguages,
   ) {}
@@ -564,6 +564,33 @@ class LocaleConfigManager {
   }
 
   /**
+   * Updates config translations reading the list from the provided $storage.
+   *
+   * While the update is running, default configuration is read from $storage
+   * first, falling back to the default config storage. This allows, for
+   * example, a recipe's own configuration to be used to determine
+   * translatability and fetch translatable data before the recipe's
+   * configuration has been installed elsewhere.
+   *
+   * @param \Drupal\Core\Config\StorageInterface $storage
+   *   Additional configuration storage to read default configuration from.
+   *
+   * @return int
+   *   Total number of configuration override and active configuration objects
+   *   updated (saved or removed).
+   */
+  public function updateConfigTranslationsFromStorage(StorageInterface $storage): int {
+    $original_default_config_storage = $this->defaultConfigStorage;
+    $this->defaultConfigStorage = new RecipeDefaultConfigStorage($storage, $original_default_config_storage);
+    try {
+      return $this->updateConfigTranslations($this->defaultConfigStorage->listAll());
+    }
+    finally {
+      $this->defaultConfigStorage = $original_default_config_storage;
+    }
+  }
+
+  /**
    * Filters override data based on default translatable items.
    *
    * @param array $override_data
@@ -600,8 +627,12 @@ class LocaleConfigManager {
 
   /**
    * Updates default configuration when new modules or themes are installed.
+   *
+   * @param array $names
+   *   Optional configuration names to update. If not provided, all
+   *   configuration names from the provided components will be updated.
    */
-  public function updateDefaultConfigLangcodes() {
+  public function updateDefaultConfigLangcodes(?array $names = NULL) {
     $this->isUpdatingFromLocale = TRUE;
     // Need to rewrite some default configuration language codes if the default
     // site language is not English.
@@ -612,7 +643,7 @@ class LocaleConfigManager {
       // shipped with the components just installed, because installing a
       // component such as views may bring in default configuration from prior
       // components.
-      $names = $this->getComponentNames();
+      $names ??= $this->getComponentNames();
       foreach ($names as $name) {
         $config = $this->configFactory->reset($name)->getEditable($name);
         // Should only update if still exists in active configuration. If locale

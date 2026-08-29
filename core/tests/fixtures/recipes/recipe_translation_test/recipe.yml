@@ -1,0 +1,5 @@
+name: 'Recipe Translation Test'
+description: 'Test recipe for translation functionality'
+type: 'Testing'
+install:
+  - node

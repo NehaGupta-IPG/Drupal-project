@@ -5,6 +5,7 @@ namespace Drupal\locale\Hook;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Recipe\Recipe;
 use Drupal\locale\File\LocaleFileManager;
 use Drupal\locale\LocaleConfigBatch;
 use Drupal\locale\LocaleDefaultOptions;
@@ -111,6 +112,15 @@ class LocaleExtensionHooks {
         $this->localeSource->deleteSources($extensions);
       }
     }
+  }
+
+  /**
+   * Implements hook_recipe_batch_operations_alter().
+   */
+  #[Hook('recipe_batch_operations_alter')]
+  public function recipeOperations(array &$operations, Recipe $recipe): void {
+    // @todo download new module translations and update configuration as part
+    //   of the recipe batch.
   }
 
 }

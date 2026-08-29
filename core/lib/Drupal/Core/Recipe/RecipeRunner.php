@@ -34,13 +34,15 @@ final class RecipeRunner {
   /**
    * @param \Drupal\Core\Recipe\Recipe $recipe
    *   The recipe to apply.
+   * @param bool $recursive_call
+   *   Whether this is a recursive call.
    */
-  public static function processRecipe(Recipe $recipe): void {
+  public static function processRecipe(Recipe $recipe, bool $recursive_call = FALSE): void {
     static::processRecipes($recipe->recipes);
     static::processInstall($recipe->install, $recipe->config->getConfigStorage());
     static::processConfiguration($recipe);
     static::processContent($recipe->content);
-    static::triggerEvent($recipe);
+    static::triggerEvent($recipe, $recursive_call);
   }
 
   /**
@@ -48,11 +50,13 @@ final class RecipeRunner {
    *
    * @param \Drupal\Core\Recipe\Recipe $recipe
    *   The recipe to apply.
+   * @param bool $applied_as_sub_recipe
+   *   Whether this is a sub-recipe.
    * @param array<mixed>|null $context
    *   The batch context if called by a batch.
    */
-  public static function triggerEvent(Recipe $recipe, ?array &$context = NULL): void {
-    $event = new RecipeAppliedEvent($recipe);
+  public static function triggerEvent(Recipe $recipe, bool $applied_as_sub_recipe, ?array &$context = NULL): void {
+    $event = new RecipeAppliedEvent($recipe, $applied_as_sub_recipe, $context !== NULL);
     \Drupal::service(EventDispatcherInterface::class)->dispatch($event);
     $context['message'] = t('Applied %recipe recipe.', ['%recipe' => $recipe->name]);
     $context['results']['recipe'][] = $recipe->name;
@@ -66,7 +70,7 @@ final class RecipeRunner {
    */
   protected static function processRecipes(RecipeConfigurator $recipes): void {
     foreach ($recipes->recipes as $recipe) {
-      static::processRecipe($recipe);
+      static::processRecipe($recipe, TRUE);
     }
   }
 
@@ -171,7 +175,9 @@ final class RecipeRunner {
     $modules = [];
     $themes = [];
     $recipes = [];
-    return static::toBatchOperationsRecipe($recipe, $recipes, $modules, $themes);
+    $operations = static::toBatchOperationsRecipe($recipe, $recipes, $modules, $themes);
+    \Drupal::moduleHandler()->alter('recipe_batch_operations', $operations, $recipe);
+    return $operations;
   }
 
   /**
@@ -188,13 +194,15 @@ final class RecipeRunner {
    * @param string[] $themes
    *   The themes that will already be installed due to previous recipes in the
    *   batch.
+   * @param bool $recursive_call
+   *   Whether this is a recursive call.
    *
    * @return array<int, array{0: callable, 1: array{mixed}}>
    *   The array of batch operations. Each value is an array with two values.
    *   The first value is a callable and the second value are the arguments to
    *   pass to the callable.
    */
-  protected static function toBatchOperationsRecipe(Recipe $recipe, array $recipes, array &$modules, array &$themes): array {
+  protected static function toBatchOperationsRecipe(Recipe $recipe, array $recipes, array &$modules, array &$themes, bool $recursive_call = FALSE): array {
     if (in_array($recipe->path, $recipes, TRUE)) {
       return [];
     }
@@ -202,7 +210,7 @@ final class RecipeRunner {
     $recipes[] = $recipe->path;
 
     foreach ($recipe->recipes->recipes as $sub_recipe) {
-      $steps = array_merge($steps, static::toBatchOperationsRecipe($sub_recipe, $recipes, $modules, $themes));
+      $steps = array_merge($steps, static::toBatchOperationsRecipe($sub_recipe, $recipes, $modules, $themes, TRUE));
     }
     $steps = array_merge($steps, static::toBatchOperationsInstall($recipe, $modules, $themes));
     if ($recipe->config->hasTasks()) {
@@ -211,7 +219,7 @@ final class RecipeRunner {
     if (!empty($recipe->content->data)) {
       $steps[] = [[RecipeRunner::class, 'installContent'], [$recipe]];
     }
-    $steps[] = [[RecipeRunner::class, 'triggerEvent'], [$recipe]];
+    $steps[] = [[RecipeRunner::class, 'triggerEvent'], [$recipe, !$recursive_call]];
 
     return $steps;
   }

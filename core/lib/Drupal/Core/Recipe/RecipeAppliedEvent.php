@@ -21,8 +21,12 @@ final class RecipeAppliedEvent extends Event {
    *
    * @param \Drupal\Core\Recipe\Recipe $recipe
    *   The recipe that was applied.
+   * @param bool $subRecipe
+   *   Whether the recipe was applied as a sub-recipe.
+   * @param bool $inBatch
+   *   Whether the recipe was applied in a batch.
    */
-  public function __construct(public readonly Recipe $recipe) {
+  public function __construct(public readonly Recipe $recipe, public readonly bool $subRecipe, public readonly bool $inBatch) {
   }
 
 }
