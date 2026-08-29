@@ -49,7 +49,7 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
   /**
    * The mocked title resolver.
    *
-   * @var \Drupal\Core\Controller\CacheableTitleResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Controller\CacheableTitleResolverInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $titleResolver;
 
@@ -89,20 +89,6 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
   protected $pathMatcher;
 
   /**
-   * The mocked current path service.
-   *
-   * @var \Drupal\Core\Path\CurrentPathStack|\PHPUnit\Framework\MockObject\Stub
-   */
-  protected $currentPath;
-
-  /**
-   * The mocked current user service.
-   *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\Stub
-   */
-  protected $currentUser;
-
-  /**
    * {@inheritdoc}
    *
    * @legacy-covers ::__construct
@@ -118,16 +104,12 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
     $this->context = $this->createStub(RequestContext::class);
 
     $this->accessManager = $this->createStub(AccessManagerInterface::class);
-    $this->titleResolver = $this->createMock('\Drupal\Core\Controller\CacheableTitleResolverInterface');
+    $this->titleResolver = $this->createStub('\Drupal\Core\Controller\CacheableTitleResolverInterface');
     $this->titleResolver
       ->method('getTitle')
       ->willReturnCallback(function (Request $request, Route $route) {
         return $route->getDefault('_title');
       });
-    $this->currentUser = $this->createMock('Drupal\Core\Session\AccountInterface');
-    $this->currentPath = $this->getMockBuilder('Drupal\Core\Path\CurrentPathStack')
-      ->disableOriginalConstructor()
-      ->getMock();
 
     $this->pathMatcher = $this->createStub(PathMatcherInterface::class);
 
@@ -211,7 +193,7 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
     $this->setupAccessManagerToAllow();
     $cacheable_title = new CacheableTitle();
     $cacheable_title->setTitle('Example');
-    $this->titleResolver->expects($this->once())
+    $this->titleResolver
       ->method('getCacheableTitle')
       ->with($this->anything(), $route_1)
       ->willReturn($cacheable_title);
@@ -476,7 +458,7 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
     $this->setupAccessManagerToAllow();
     $cacheable_title = new CacheableTitle();
     $cacheable_title->setTitle('Admin');
-    $this->titleResolver->expects($this->once())
+    $this->titleResolver
       ->method('getCacheableTitle')
       ->with($this->anything(), $route_1)
       ->willReturn($cacheable_title);
