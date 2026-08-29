@@ -9,6 +9,8 @@ use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Utility\CallableResolver;
+use Drupal\locale\LocaleProjectNotFoundException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -35,6 +37,7 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
     protected ModuleHandlerInterface $moduleHandler,
     QueueInterface $queue,
     protected readonly CallableResolver $callableResolver,
+    protected readonly LoggerInterface $logger,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->queue = $queue;
@@ -51,6 +54,7 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
       $container->get('module_handler'),
       $container->get('queue')->get('locale_translation', TRUE),
       $container->get(CallableResolver::class),
+      $container->get('logger.channel.locale'),
     );
   }
 
@@ -92,7 +96,17 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
 
     // Call the batch operation function.
     $resolvedCallable = $this->callableResolver->getCallableFromDefinition($callable);
-    $resolvedCallable(... $args);
+    try {
+      $resolvedCallable(... $args);
+    }
+    catch (LocaleProjectNotFoundException $e) {
+      // The project this task refers to is no longer tracked, for example
+      // because the module was uninstalled after the task was queued. There is
+      // nothing left to do for this item, so log it and return without
+      // requeueing, letting the item be removed from the queue.
+      $this->logger->notice('Skipped a translation update task: @message', ['@message' => $e->getMessage()]);
+      return;
+    }
 
     // If the batch operation is not finished we create a new queue task to
     // continue the task. This is typically the translation import task.
