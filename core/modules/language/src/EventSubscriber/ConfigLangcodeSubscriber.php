@@ -36,7 +36,7 @@ class ConfigLangcodeSubscriber implements EventSubscriberInterface {
     }
 
     // ConfigLangcodeContext::ExtensionInstall: extension-shipped default
-    // configuration is definitionally English unless it ships with its own
+    // configuration is assumed to be English unless it ships with its own
     // explicit langcode.
     if ($current === NULL || $current === 'en') {
       $event->setLangcode($this->getDefaultConfigLangcode());

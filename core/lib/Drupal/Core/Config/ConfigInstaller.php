@@ -455,9 +455,9 @@ class ConfigInstaller implements ConfigInstallerInterface {
   /**
    * Resolves the langcode for configuration being installed.
    *
-   * Extension-shipped default configuration is definitionally English
-   * unless it ships with an explicit langcode of its own. This mutates
-   * $data in place with the resolved langcode.
+   * Extension-shipped default configuration is assumed to be English unless it
+   * ships with an explicit langcode of its own. This mutates $data in place
+   * with the resolved langcode.
    *
    * @param string $name
    *   The configuration name.
