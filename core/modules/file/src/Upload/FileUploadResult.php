@@ -48,6 +48,13 @@ class FileUploadResult {
   protected ConstraintViolationListInterface $violations;
 
   /**
+   * The errors, keyed numerically.
+   *
+   * @var \Throwable[]
+   */
+  protected array $errors = [];
+
+  /**
    * Creates a new FileUploadResult.
    */
   public function __construct() {
@@ -188,6 +195,33 @@ class FileUploadResult {
    */
   public function hasViolations(): bool {
     return $this->violations->count() > 0;
+  }
+
+  /**
+   * Adds an error.
+   *
+   * @param \Throwable $error
+   *   The error.
+   */
+  public function addError(\Throwable $error): void {
+    $this->errors[] = $error;
+  }
+
+  /**
+   * Gets the errors.
+   *
+   * @return \Throwable[]
+   *   The errors.
+   */
+  public function getErrors(): array {
+    return $this->errors;
+  }
+
+  /**
+   * Returns TRUE if there are errors.
+   */
+  public function hasErrors(): bool {
+    return !empty($this->errors);
   }
 
 }

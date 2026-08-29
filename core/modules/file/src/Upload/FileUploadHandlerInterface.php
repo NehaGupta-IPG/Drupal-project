@@ -24,16 +24,14 @@ interface FileUploadHandlerInterface {
    *   The behavior when the destination file already exists.
    *
    * @return \Drupal\file\Upload\FileUploadResult
-   *   The created file entity.
+   *   The result of the upload. FileUploadResult::getErrors() returns any
+   *   FileExistsException or FileException encountered while resolving the
+   *   destination filename.
    *
-   * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
-   *    Thrown when a file upload error occurred and $throws is TRUE.
+   * @throws \Drupal\Core\File\Exception\InvalidStreamWrapperException
+   *   Thrown when the destination scheme is invalid.
    * @throws \Drupal\Core\File\Exception\FileWriteException
-   *    Thrown when there is an error moving the file and $throws is TRUE.
-   * @throws \Drupal\Core\File\Exception\FileException
-   *    Thrown when a file system error occurs and $throws is TRUE.
-   * @throws \Drupal\file\Upload\FileValidationException
-   *    Thrown when file validation fails and $throws is TRUE.
+   *   Thrown when there is an error moving the file.
    * @throws \Drupal\Core\Lock\LockAcquiringException
    *   Thrown when a lock cannot be acquired.
    */

@@ -5,6 +5,7 @@ namespace Drupal\file\Upload;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
+use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\FileExistsException;
 use Drupal\Core\File\Exception\FileWriteException;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
@@ -83,9 +84,16 @@ class FileUploadHandler implements FileUploadHandlerInterface {
     $filename = $event->getFilename();
 
     $mimeType = $this->mimeTypeGuesser->guessMimeType($filename);
-    $destinationFilename = $this->fileSystem->getDestinationFilename($destination . $filename, $fileExists);
+    try {
+      $destinationFilename = $this->fileSystem->getDestinationFilename($destination . $filename, $fileExists);
+    }
+    catch (FileException $e) {
+      $result->addError($e);
+      return $result;
+    }
     if ($destinationFilename === FALSE) {
-      throw new FileExistsException(sprintf('Destination file "%s" exists', $destinationFilename));
+      $result->addError(new FileExistsException(sprintf('Destination file "%s" exists', $destination . $filename)));
+      return $result;
     }
 
     // Lock based on the prepared file URI.
