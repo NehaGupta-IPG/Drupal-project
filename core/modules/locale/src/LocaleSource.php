@@ -45,6 +45,9 @@ class LocaleSource {
    * @return \Drupal\locale\LocaleTranslationSource[][]
    *   Array of source objects. Keyed with <project name>:<language code>.
    *
+   * @throws \Drupal\locale\LocaleProjectNotFoundException
+   *   Thrown if a project is not a tracked translatable project.
+   *
    * @see sourceBuild()
    */
   public function loadSources(?array $projects = NULL, ?array $langcodes = NULL): array {
@@ -65,9 +68,11 @@ class LocaleSource {
         if (!isset($sources[$project_name][$langcode])) {
           $project = $this->localeProjectRepository->getMultiple([$project_name])[$project_name] ?? NULL;
           if (!$project instanceof LocaleTranslatableProject) {
-            // Skip stale project names that are no longer tracked, for example
-            // after a module is uninstalled.
-            continue;
+            // The project name is no longer tracked, for example because the
+            // module was uninstalled after this task was queued. Callers that
+            // may run against stale project names (such as the
+            // locale_translation queue worker) are expected to catch this.
+            throw new LocaleProjectNotFoundException("The project '$project_name' is not a tracked translatable project.");
           }
           $sources[$project_name][$langcode] = $this->sourceBuild($project, $langcode);
         }
@@ -84,11 +89,14 @@ class LocaleSource {
    * @param string $langcode
    *   The language code.
    *
-   * @return \Drupal\locale\LocaleTranslationSource|null
-   *   The source object, or NULL if the project is no longer tracked.
+   * @return \Drupal\locale\LocaleTranslationSource
+   *   The source object.
+   *
+   * @throws \Drupal\locale\LocaleProjectNotFoundException
+   *   Thrown if the project is not a tracked translatable project.
    */
-  public function loadSource(string $project_name, string $langcode): ?LocaleTranslationSource {
-    return $this->loadSources([$project_name], [$langcode])[$project_name][$langcode] ?? NULL;
+  public function loadSource(string $project_name, string $langcode): LocaleTranslationSource {
+    return $this->loadSources([$project_name], [$langcode])[$project_name][$langcode];
   }
 
   /**
@@ -105,10 +113,7 @@ class LocaleSource {
    */
   public function saveSource(string $project, string $langcode, string $type, LocaleFile|CurrentImport $data): void {
     // Load the translation status.
-    $project_sources = $this->loadSources([$project])[$project] ?? NULL;
-    if ($project_sources === NULL) {
-      return;
-    }
+    $project_sources = $this->loadSources([$project])[$project];
 
     // Merge the new status data with the existing status.
     $request_time = $this->time->getRequestTime();
