@@ -22,6 +22,7 @@ SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "cor
 SELECT "name", "route" FROM "router" WHERE "name" IN ( "entity.node.canonical" )
 SELECT 1 AS "expression" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node%" ESCAPE '\\') LIMIT 1 OFFSET 0
 SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "core.entity_view_display.user.user.compact", "core.entity_view_display.user.user.default" )
+SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "core.language" )
 SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "filter.format.plain_text" )
 SELECT "name", "route" FROM "router" WHERE "name" IN ( "view.promoted_content.page_1" )
 INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("state:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")
