@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\default_admin\Hook;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\default_admin\Helper;
 use Drupal\default_admin\Settings;
 use Drupal\Core\Ajax\AjaxHelperTrait;
@@ -716,16 +715,20 @@ class FormHooks {
       ];
     }
 
-    $this->ensureAdvancedSettings($form);
-
     // Add sidebar toggle.
     $hide_panel = $this->t('Hide sidebar panel');
+    // Render arrays for easier manipulation in ::preprocessForm().
     $form['default_admin_sticky_actions']['default_admin_sidebar_toggle'] = [
       '#type' => 'html_tag',
       '#tag' => 'a',
-      '#value' => new FormattableMarkup('<span class="visually-hidden">@text</span>', [
-        '@text' => $hide_panel,
-      ]),
+      'text' => [
+        '#type' => 'html_tag',
+        '#tag' => 'span',
+        '#value' => $hide_panel,
+        '#attributes' => [
+          'class' => 'visually-hidden',
+        ],
+      ],
       '#attributes' => [
         'class' => [
           'meta-sidebar__trigger',
