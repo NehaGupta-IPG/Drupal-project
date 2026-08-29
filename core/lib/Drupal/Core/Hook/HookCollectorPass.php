@@ -155,7 +155,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
     ]);
 
     foreach ($this->deprecatedFiles['module'] ?? [] as $deprecatedFile => $v) {
-      @trigger_error('Using ' . $deprecatedFile . '.module is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
+      @trigger_error('Using ' . $deprecatedFile . '.module is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3619765', E_USER_DEPRECATED);
     }
   }
 
@@ -439,7 +439,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
           }
         }
       }
-      elseif (!$skip_procedural) {
+      else {
         $implementations = $procedural_hook_file_cache->get($filename);
         if ($implementations === NULL) {
           $finder = MockFileFinder::create($filename);
@@ -451,7 +451,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
             if (StaticReflectionParser::hasAttribute($attributes, ExtensionFileIsConverted::class)) {
               $implementations['@skip_extension_file_deprecation'] = TRUE;
             }
-            if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
+            if ($skip_procedural || StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
               break;
             }
 
