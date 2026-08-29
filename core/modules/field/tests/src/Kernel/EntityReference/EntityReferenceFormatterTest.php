@@ -444,6 +444,108 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
   }
 
   /**
+   * Tests a non-cacheable entity rendered again within its own render tree.
+   *
+   * Reproduces issue #3607889: a non-render-cacheable entity (for example a
+   * content block) placed in a region that also renders the same entity - such
+   * as a block shown in a View's entity-area header whose region also contains
+   * the view rows displaying that block - is a legitimate, finite nesting, not
+   * a self-referential (infinite) render. The inner placement begins while the
+   * outer one is still in progress, so it must still render and must not log a
+   * "Recursive rendering attempt aborted" warning.
+   *
+   * Unlike testEntityReferenceRecursionProtectionWithRepeatedReferencingEntity,
+   * which renders siblings (each completes before the next begins), here the
+   * second render is a descendant of the first, which is the condition that
+   * triggers the false positive.
+   */
+  public function testNonCacheableEntityRepeatedWithinOwnRenderTree(): void {
+    // Capture only the recursion warning; let any other warning surface.
+    $warnings = [];
+    set_error_handler(function (int $errno, string $errstr) use (&$warnings): bool {
+      if ($errno === E_USER_WARNING && str_starts_with($errstr, 'Recursive rendering attempt aborted')) {
+        $warnings[] = $errstr;
+        return TRUE;
+      }
+      return FALSE;
+    });
+
+    $renderer = $this->container->get('renderer');
+    $view_builder = $this->entityTypeManager->getViewBuilder($this->entityType);
+
+    $this->createNonCacheableViewMode();
+
+    $storage = $this->entityTypeManager->getStorage($this->entityType);
+    $entity = $storage->create(['name' => $this->randomMachineName()]);
+    $entity->save();
+
+    // Render the entity in a non-cacheable view mode, and nest a second,
+    // independent render of the same entity as a descendant of the first. The
+    // inner render therefore begins while the outer one is still in progress.
+    // It is finite - the inner build does not render itself again - so it is
+    // not recursion and must render without a warning.
+    $build = $view_builder->view($entity, $this->nonCacheableViewMode);
+    $build['nested'] = $view_builder->view($entity, $this->nonCacheableViewMode);
+    $renderer->renderRoot($build);
+
+    restore_error_handler();
+
+    $this->assertSame([], $warnings, 'A repeated non-cacheable render within the same render tree must not be detected as recursion.');
+  }
+
+  /**
+   * Tests that genuine recursion of a cacheable entity is still aborted.
+   *
+   * This is the guarantee the cache-key based protection relies on: an entity
+   * rendered in a cacheable view mode has non-empty #cache[keys], so a
+   * self-referential render re-enters with identical keys and is caught. See
+   * issue #3607889 and the change record https://www.drupal.org/node/3316878.
+   */
+  public function testCacheableEntityRecursionIsAborted(): void {
+    // Capture only the recursion warning; let any other warning surface.
+    $warnings = [];
+    set_error_handler(function (int $errno, string $errstr) use (&$warnings): bool {
+      if ($errno === E_USER_WARNING && str_starts_with($errstr, 'Recursive rendering attempt aborted')) {
+        $warnings[] = $errstr;
+        return TRUE;
+      }
+      return FALSE;
+    });
+
+    $renderer = $this->container->get('renderer');
+    $view_builder = $this->entityTypeManager->getViewBuilder($this->entityType);
+
+    // Render the reference field with the entity view formatter in the default
+    // (cacheable) view mode, so the referenced entity is itself rendered in a
+    // cacheable context with non-empty cache keys.
+    \Drupal::service('entity_display.repository')
+      ->getViewDisplay($this->entityType, $this->bundle)
+      ->setComponent($this->fieldName, [
+        'type' => 'entity_reference_entity_view',
+      ])
+      ->save();
+
+    $storage = $this->entityTypeManager->getStorage($this->entityType);
+    $entity = $storage->create(['name' => $this->randomMachineName()]);
+    $entity->save();
+    // Create a self-reference: rendering the entity renders the same entity
+    // through the reference field, which is genuine (infinite) recursion.
+    $entity->{$this->fieldName}->entity = $entity;
+    $entity->save();
+
+    $build = $view_builder->view($entity, 'default');
+    $output = (string) $renderer->renderRoot($build);
+
+    restore_error_handler();
+
+    // Recursion must be detected and aborted for the cacheable entity.
+    $this->assertNotEmpty($warnings, 'Genuine recursion of a cacheable entity must be aborted.');
+    // The self-referenced inner render is blanked, so the label (printed twice
+    // per fully rendered entity_test entity) appears only for the outer render.
+    $this->assertSame(2, substr_count($output, $entity->label()));
+  }
+
+  /**
    * Tests the label formatter.
    */
   public function testLabelFormatter(): void {
