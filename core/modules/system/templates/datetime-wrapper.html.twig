@@ -17,9 +17,9 @@
 #}
 {%
   set title_classes = [
-  required ? 'js-form-required',
-  required ? 'form-required',
-]
+    required ? 'js-form-required',
+    required ? 'form-required',
+  ]
 %}
 {% if title %}
   <h4{{ title_attributes.addClass(title_classes) }}>{{ title }}</h4>
