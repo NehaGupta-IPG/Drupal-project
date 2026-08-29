@@ -6,28 +6,27 @@
  * @see \Drupal\Core\Form\FormPreprocess::preprocessFormElement()
  */
 #}
-{% if errors %}
 {%
-  set label_attributes = label_attributes.addClass('has-error')
+  set title_classes = [
+  'form-item__label',
+  required ? 'js-form-required',
+  required ? 'form-required',
+  errors ? 'has-error',
+]
 %}
-{% endif %}
-
-<div class="form-item form-datetime-wrapper js-complex-form-item">
-{% if label_display in ['before', 'invisible'] %}
-  {{ label }}
-{% endif %}
-{{ content }}
-{% if errors %}
-  <div class="form-item__error-message">
-    {{ errors }}
-  </div>
-{% endif %}
-{% if description %}
-  <div{{ description_attributes.addClass('form-item__description') }}>
-    {{ description }}
-  </div>
-{% endif %}
-{% if label_display == 'after' %}
-  {{ label }}
-{% endif %}
+<div class="form-item form-datetime-wrapper">
+  {% if title %}
+    <h4{{ title_attributes.addClass(title_classes) }}>{{ title }}</h4>
+  {% endif %}
+  {{ content }}
+  {% if errors %}
+    <div class="form-item__error-message">
+      {{ errors }}
+    </div>
+  {% endif %}
+  {% if description %}
+    <div{{ description_attributes.addClass('form-item__description') }}>
+      {{ description }}
+    </div>
+  {% endif %}
 </div>

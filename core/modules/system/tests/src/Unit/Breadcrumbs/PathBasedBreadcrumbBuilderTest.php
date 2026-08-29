@@ -210,6 +210,7 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
 
     $this->setupAccessManagerToAllow();
     $cacheable_title = new CacheableTitle();
+    $cacheable_title->setTitle('Example');
     $this->titleResolver->expects($this->once())
       ->method('getCacheableTitle')
       ->with($this->anything(), $route_1)
@@ -266,10 +267,13 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
         AccessResult::allowed()->cachePerPermissions(),
         AccessResult::allowed()->addCacheContexts(['bar'])->addCacheTags(['example'])
       );
-    $cacheable_title = new CacheableTitle();
     $this->titleResolver
       ->method('getCacheableTitle')
-      ->willReturn($cacheable_title);
+      ->willReturnCallback(function (Request $request, Route $route) {
+        $cacheable_title = new CacheableTitle();
+        $cacheable_title->setTitle($route->getDefault('_title'));
+        return $cacheable_title;
+      });
     $breadcrumb = $this->builder->build($this->createStub(RouteMatchInterface::class));
     $this->assertEquals([
       new Link('Home', new Url('<front>')),
@@ -326,6 +330,13 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
         AccessResult::allowed()->cachePerPermissions(),
         AccessResult::allowed()->addCacheContexts(['bar'])->addCacheTags(['example'])
       );
+    $this->titleResolver
+      ->method('getCacheableTitle')
+      ->willReturnCallback(function (Request $request, Route $route) {
+        $cacheable_title = new CacheableTitle();
+        $cacheable_title->setTitle($route->getDefault('_title'));
+        return $cacheable_title;
+      });
     $breadcrumb = $this->builder->build($this->createStub(RouteMatchInterface::class));
     $this->assertEquals([
       new Link('Home', new Url('<front>')),
