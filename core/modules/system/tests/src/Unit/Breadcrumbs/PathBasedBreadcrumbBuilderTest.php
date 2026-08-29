@@ -195,7 +195,6 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
     $cacheable_title->setTitle('Example');
     $this->titleResolver
       ->method('getCacheableTitle')
-      ->with($this->anything(), $route_1)
       ->willReturn($cacheable_title);
 
     $breadcrumb = $this->builder->build($this->createStub(RouteMatchInterface::class));
@@ -460,7 +459,6 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
     $cacheable_title->setTitle('Admin');
     $this->titleResolver
       ->method('getCacheableTitle')
-      ->with($this->anything(), $route_1)
       ->willReturn($cacheable_title);
 
     $breadcrumb = $this->builder->build($this->createStub(RouteMatchInterface::class));
