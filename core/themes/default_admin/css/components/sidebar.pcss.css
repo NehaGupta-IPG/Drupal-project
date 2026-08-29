@@ -130,29 +130,33 @@ body[data-meta-sidebar="open"] {
   }
 
   &.has-error {
+    --container-size: 2rem;
+
     width: 3.5rem;
-    padding-inline-end: 1.5rem;
+    padding-inline-start: 1.5rem;
 
     &::before {
+      width: var(--container-size);
+      height: var(--container-size);
       background-color: var(--admin-color-error);
     }
 
     &::after {
-      --admin-icon-size-sidebar-toggle: 18px;
+      --mask-size: 1.125rem;
 
       position: absolute;
       display: inline-block;
-      width: 2rem;
-      height: 2rem;
+      width: var(--container-size);
+      height: var(--container-size);
       content: "";
       border-radius: 50%;
       background-color: var(--admin-color-error);
+      inset-inline-start: 0;
       inset-block-start: -1px;
-      inset-inline-end: 0;
       mask-repeat: no-repeat;
       mask-position: center center;
       mask-image: var(--admin-icon-error);
-      mask-size: var(--admin-icon-size-sidebar-toggle) var(--admin-icon-size-sidebar-toggle);
+      mask-size: var(--mask-size) var(--mask-size);
     }
   }
 
