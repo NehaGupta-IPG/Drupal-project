@@ -3,6 +3,7 @@
 namespace Drupal\Core\Cache;
 
 use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
@@ -194,7 +195,12 @@ class DatabaseBackend implements CacheBackendInterface {
 
     // Unserialize and return the cached data.
     if ($cache->serialized) {
-      $cache->data = $this->serializer->decode($cache->data);
+      try {
+        $cache->data = $this->serializer->decode($cache->data);
+      }
+      catch (InvalidDataTypeException) {
+        return FALSE;
+      }
     }
 
     return $cache;

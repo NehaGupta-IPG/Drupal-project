@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\IgbinarySerialize;
+use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\DatabaseBackend;
 use PHPUnit\Framework\Attributes\Group;
@@ -126,6 +128,47 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
 
     $this->assertSame(1, (int) $row['serialized']);
     $this->assertSame(IgbinarySerialize::encode($data), $row['data']);
+  }
+
+  /**
+   * Tests that serializer decode failures are handled as cache misses.
+   */
+  public function testSerializerDecodeFailureIsACacheMiss(): void {
+    $serializer = new class implements ObjectAwareSerializationInterface {
+
+      /**
+       * {@inheritdoc}
+       */
+      public static function encode($data) {
+        return serialize($data);
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public static function decode($raw) {
+        throw new InvalidDataTypeException('Unable to decode cache data.');
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public static function getFileExtension() {
+        return 'serialized';
+      }
+
+    };
+    $backend = new DatabaseBackend(
+      $this->container->get('database'),
+      $this->container->get('cache_tags.invalidator.checksum'),
+      $this->testBin,
+      $serializer,
+      \Drupal::service(TimeInterface::class),
+      static::$maxRows,
+    );
+    $backend->set('decode_failure', ['cached' => 'data']);
+
+    $this->assertFalse($backend->get('decode_failure'));
   }
 
   /**
