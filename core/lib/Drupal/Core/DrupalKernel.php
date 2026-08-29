@@ -92,7 +92,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           '@database',
           '@cache_tags_provider.container',
           'container',
-          '@serialization.cache_data',
+          '@serialisation.igbinary',
           '@datetime.time',
           DatabaseBackend::MAXIMUM_NONE,
         ],
@@ -101,7 +101,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         'class' => 'Drupal\Core\Cache\DatabaseCacheTagsChecksum',
         'arguments' => ['@database'],
       ],
-      'serialization.cache_data' => [
+      'serialisation.igbinary' => [
         'class' => IgbinarySerialize::class,
       ],
       'serialization.phpserialize' => [
