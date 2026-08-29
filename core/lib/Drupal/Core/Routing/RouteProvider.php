@@ -92,7 +92,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       $query_parameters = $request->query->all();
       $routes = $this->getRoutesByPath(rtrim($path, '/'));
       // Only cache lookups with results.
-      if ($routes->all() || $routes->getResources()) {
+      if ($cid && ($routes->all() || $routes->getResources())) {
         $cache_value = [
           'path' => $path,
           'query' => $query_parameters,
