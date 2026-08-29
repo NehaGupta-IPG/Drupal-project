@@ -11,6 +11,7 @@ use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\DatabaseBackend;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresFunction;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -38,7 +39,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
       $this->container->get('database'),
       $this->container->get('cache_tags.invalidator.checksum'),
       $bin,
-      $this->container->get('serialization.cache_data'),
+      $this->container->get('serialization.igbinary'),
       \Drupal::service(TimeInterface::class),
       static::$maxRows,
     );
@@ -106,11 +107,8 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   /**
    * Tests that new cache rows use the igbinary serializer when available.
    */
+  #[RequiresFunction('igbinary_serialize')]
   public function testIgbinaryPayloadsAreWrittenWhenAvailable(): void {
-    if (!function_exists('igbinary_serialize')) {
-      $this->markTestSkipped('Requires the igbinary extension.');
-    }
-
     $cid = 'igbinary_payload';
     $data = [
       'foo' => 'bar',

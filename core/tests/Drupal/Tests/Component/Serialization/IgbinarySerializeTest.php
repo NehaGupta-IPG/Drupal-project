@@ -8,6 +8,7 @@ use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\IgbinarySerialize;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresFunction;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,11 +21,8 @@ class IgbinarySerializeTest extends TestCase {
   /**
    * Tests igbinary encoding and decoding when the extension is available.
    */
+  #[RequiresFunction('igbinary_serialize')]
   public function testEncodeDecodeWithIgbinary(): void {
-    if (!function_exists('igbinary_serialize')) {
-      $this->markTestSkipped('Requires the igbinary extension.');
-    }
-
     $data = [
       'foo' => 'bar',
       'nested' => ['baz' => TRUE],
@@ -88,11 +86,8 @@ class IgbinarySerializeTest extends TestCase {
   /**
    * Tests that invalid igbinary payloads fail with typed exceptions.
    */
+  #[RequiresFunction('igbinary_unserialize')]
   public function testDecodeInvalidIgbinaryPayloadThrowsException(): void {
-    if (!function_exists('igbinary_unserialize')) {
-      $this->markTestSkipped('Requires the igbinary extension.');
-    }
-
     $this->expectException(InvalidDataTypeException::class);
 
     IgbinarySerialize::decode(TestIgbinarySerializeWithoutExtension::getIgbinaryPrefix() . 'not igbinary');
@@ -101,11 +96,8 @@ class IgbinarySerializeTest extends TestCase {
   /**
    * Tests that igbinary payloads fail clearly without the extension.
    */
+  #[RequiresFunction('igbinary_serialize')]
   public function testDecodeIgbinaryPayloadWithoutExtension(): void {
-    if (!function_exists('igbinary_serialize')) {
-      $this->markTestSkipped('Requires the igbinary extension.');
-    }
-
     $encoded = IgbinarySerialize::encode(['foo' => 'bar']);
     $this->expectException(InvalidDataTypeException::class);
     $this->expectExceptionMessage('The igbinary extension is required to decode igbinary cache data.');
