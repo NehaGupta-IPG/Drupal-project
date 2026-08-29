@@ -22,12 +22,16 @@ readonly class FileReferenceUsage {
    *   The entity ID.
    * @param int|string|null $revisionId
    *   The revision ID.
+   * @param string|null $langcode
+   *   The language of the translation holding the reference, or NULL when the
+   *   reference is not specific to a translation.
    */
   public function __construct(
     public string $entityTypeId,
     public string $fieldName,
     public int|string|null $id = NULL,
     public int|string|null $revisionId = NULL,
+    public ?string $langcode = NULL,
   ) {
     if (is_null($id) && is_null($revisionId)) {
       throw new \InvalidArgumentException('$id and $revisionId cannot both be null.');
