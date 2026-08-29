@@ -42,18 +42,12 @@ class StylePluginManagerKernelTest extends KernelTestBase {
   protected StylePluginManagerInterface $stylePluginManager;
 
   /**
-   * The ModuleWeight service.
-   */
-  protected ModuleWeight $moduleWeight;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
 
     $this->stylePluginManager = $this->container->get(StylePluginManagerInterface::class);
-    $this->moduleWeight = $this->container->get(ModuleWeight::class);
   }
 
   /**
@@ -162,12 +156,12 @@ class StylePluginManagerKernelTest extends KernelTestBase {
     $this->enableModules(['style_override_test']);
 
     // Test when the module overriding the definition is executed before.
-    $this->moduleWeight->set('style_override_test', -1);
+    \Drupal::service(ModuleWeight::class)->set('style_override_test', -1);
     $this->stylePluginManager = $this->container->get(StylePluginManagerInterface::class);
     $this->assertArrayHasKey('test_mode', $this->stylePluginManager->getDefinitions());
 
     // Test when the module overriding the definition is executed after.
-    $this->moduleWeight->set('style_override_test', 1);
+    \Drupal::service(ModuleWeight::class)->set('style_override_test', 1);
     // Need to rebuild the container to get a new style plugin manager instance
     // without cached data.
     // $this->stylePluginManager->clearCachedDefinitions() does not work.
