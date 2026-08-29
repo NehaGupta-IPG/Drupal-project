@@ -50,6 +50,10 @@ class LanguageConfigSchemaTest extends BrowserTestBase {
    * Tests whether the language config schema is valid.
    */
   public function testValidLanguageConfigSchema(): void {
+    // Make sure no language configuration available by default.
+    $config_data = $this->config('language.content_settings.menu_link_content.menu_link_content');
+    $this->assertEmpty($config_data->get());
+
     $settings_path = 'admin/config/regional/content-language';
 
     // Enable translation for menu link.
