@@ -55,18 +55,6 @@ function system_update_11401(): void {
 }
 
 /**
- * Backfill the configuration default language for existing sites.
- */
-function system_update_11502(): void {
-  $core_language = \Drupal::configFactory()->getEditable('core.language');
-  if ($core_language->get('default_config_langcode') === NULL) {
-    $core_language
-      ->set('default_config_langcode', \Drupal::configFactory()->get('system.site')->get('default_langcode'))
-      ->save();
-  }
-}
-
-/**
  * Remove the deprecated sequences table.
  */
 function system_update_12000(): void {

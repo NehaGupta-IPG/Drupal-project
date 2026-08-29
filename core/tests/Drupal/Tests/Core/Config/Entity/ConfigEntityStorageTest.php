@@ -11,7 +11,10 @@ use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigDuplicateUUIDException;
+use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ConfigLangcodeContext;
+use Drupal\Core\Config\ConfigLangcodeResolveEvent;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
@@ -30,6 +33,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Tests Drupal\Core\Config\Entity\ConfigEntityStorage.
@@ -102,6 +106,13 @@ class ConfigEntityStorageTest extends UnitTestCase {
   protected $configManager;
 
   /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcher
+   */
+  protected $eventDispatcher;
+
+  /**
    * {@inheritdoc}
    *
    * @legacy-covers ::__construct
@@ -132,18 +143,27 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->uuidService = $this->prophesize(UuidInterface::class);
 
     $this->languageManager = $this->prophesize(LanguageManagerInterface::class);
-    $this->languageManager->getCurrentLanguage()->willReturn(new Language(['id' => 'hu']));
+    // The current request language is deliberately different from the site's
+    // configuration default language below, to prove doCreate() uses the
+    // latter and not the former.
+    $this->languageManager->getCurrentLanguage()->willReturn(new Language(['id' => 'fr']));
 
     $this->configFactory = $this->prophesize(ConfigFactoryInterface::class);
-    $site_config = $this->prophesize(ImmutableConfig::class);
-    $site_config->get('default_config_langcode')->willReturn('hu');
-    $this->configFactory->get('core.language')->willReturn($site_config->reveal());
+
+    // Stand in for language module's RESOLVE_LANGCODE subscriber, which
+    // would otherwise supply the site's configuration default language.
+    $this->eventDispatcher = new EventDispatcher();
+    $this->eventDispatcher->addListener(ConfigEvents::RESOLVE_LANGCODE, function (ConfigLangcodeResolveEvent $event): void {
+      if ($event->getContext() === ConfigLangcodeContext::Runtime) {
+        $event->setLangcode('hu');
+      }
+    });
 
     $this->entityQuery = $this->prophesize(QueryInterface::class);
     $entity_query_factory = $this->prophesize(QueryFactoryInterface::class);
     $entity_query_factory->get($entity_type, 'AND')->willReturn($this->entityQuery->reveal());
 
-    $this->entityStorage = new ConfigEntityStorage($entity_type, $this->configFactory->reveal(), $this->uuidService->reveal(), $this->languageManager->reveal(), new MemoryCache(new Time()));
+    $this->entityStorage = new ConfigEntityStorage($entity_type, $this->configFactory->reveal(), $this->uuidService->reveal(), $this->languageManager->reveal(), new MemoryCache(new Time()), $this->eventDispatcher);
     $this->entityStorage->setModuleHandler($this->moduleHandler->reveal());
 
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
@@ -217,12 +237,15 @@ class ConfigEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests create with current language.
+   * Tests create with the site's configuration default language.
+   *
+   * The current request language ('fr', set up in setUp()) must not be
+   * used - only the resolved configuration default language ('hu').
    *
    * @legacy-covers ::create
    * @legacy-covers ::doCreate
    */
-  public function testCreateWithCurrentLanguage(): void {
+  public function testCreateWithDefaultConfigLangcode(): void {
     $this->languageManager->getLanguage('hu')->willReturn(new Language(['id' => 'hu']));
 
     $entity = $this->entityStorage->create(['id' => 'foo']);
@@ -232,11 +255,17 @@ class ConfigEntityStorageTest extends UnitTestCase {
   /**
    * Tests create with explicit language.
    *
+   * An explicit langcode, including 'en', must be left untouched and must
+   * not trigger langcode resolution at all.
+   *
    * @legacy-covers ::create
    * @legacy-covers ::doCreate
    */
   public function testCreateWithExplicitLanguage(): void {
     $this->languageManager->getLanguage('en')->willReturn(new Language(['id' => 'en']));
+    $this->eventDispatcher->addListener(ConfigEvents::RESOLVE_LANGCODE, function (): void {
+      $this->fail('RESOLVE_LANGCODE must not be dispatched when an explicit langcode is supplied.');
+    }, 1000);
 
     $entity = $this->entityStorage->create(['id' => 'foo', 'langcode' => 'en']);
     $this->assertSame('en', $entity->language()->getId());

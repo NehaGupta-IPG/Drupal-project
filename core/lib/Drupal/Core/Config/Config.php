@@ -215,8 +215,8 @@ class Config extends StorableConfigBase {
         $this->schemaWrapper = NULL;
         $is_translatable = FALSE;
         $this->data = $this->castValue(NULL, $this->data, $is_translatable);
-        if ($is_translatable && $this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
-          $this->applyDefaultLangcodeIfMissing($this->getSchemaWrapper());
+        if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+          $this->reconcileLangcodeWithTranslatability($is_translatable, $this->getSchemaWrapper());
         }
         // Reclaim the memory used by the schema wrapper.
         $this->schemaWrapper = NULL;
@@ -234,7 +234,9 @@ class Config extends StorableConfigBase {
       }
       if ($this->typedConfigManager->hasConfigSchema($this->name)) {
         if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
-          $this->applyDefaultLangcodeIfMissing($this->getSchemaWrapper());
+          $is_translatable = FALSE;
+          $this->castValue(NULL, $this->data, $is_translatable);
+          $this->reconcileLangcodeWithTranslatability($is_translatable, $this->getSchemaWrapper());
           // Reclaim the memory used by the schema wrapper.
           $this->schemaWrapper = NULL;
         }
@@ -257,26 +259,44 @@ class Config extends StorableConfigBase {
   }
 
   /**
-   * Applies the configuration default langcode when required.
+   * Keeps langcode in step with whether the configuration is translatable.
+   *
+   * Configuration can become translatable, or stop being translatable, as a
+   * side effect of an ordinary data change - for example a plugin being
+   * swapped for one that does, or does not, have a translatable value. This
+   * adds a langcode when translatability just switched on and none is
+   * present yet, and removes it when translatability just switched off.
+   *
+   * This never overwrites an existing langcode. That is what previously made
+   * it impossible to keep deliberately English configuration on a site whose
+   * configuration default language is not English: this method cannot tell
+   * an explicit langcode apart from a merely-present default, so it leaves
+   * any langcode that is already there alone, whatever its value.
+   *
+   * @param bool $is_translatable
+   *   Whether the configuration currently has any translatable value, as
+   *   computed by \Drupal\Core\Config\StorableConfigBase::castValue().
+   * @param \Drupal\Core\Config\Schema\Element $typed_config
+   *   The typed configuration wrapper for this configuration object.
    */
-  protected function applyDefaultLangcodeIfMissing(Element $typed_config): void {
-    // @todo Discuss the hardcoding of english here a bit more. What does
-    //   it mean to be able to install a configuration in a language that
-    //   might not exist or be the default config language.
-    if ((array_key_exists('langcode', $this->data) && $this->data['langcode'] !== 'en')
-      || !$typed_config instanceof Mapping
-      || !in_array('langcode', $typed_config->getValidKeys(), TRUE)
-    ) {
+  protected function reconcileLangcodeWithTranslatability(bool $is_translatable, Element $typed_config): void {
+    if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
       return;
     }
-
-    $core_language = $this->name === 'core.language' ? $this->get() : $this->storage->read('core.language');
-    // Unfortunately, we need to rely on fallbacks too because on existing sites
-    // when this code was added, configuration operations may run before the
-    // update that adds the default_config_langcode key to core.language.
-    $default_config_langcode = $core_language['default_config_langcode'] ?? $core_language['default_langcode'] ?? 'en';
-
-    $this->set('langcode', $default_config_langcode);
+    if (!$is_translatable) {
+      if (array_key_exists('langcode', $this->data)) {
+        unset($this->data['langcode']);
+      }
+      return;
+    }
+    if (array_key_exists('langcode', $this->data)) {
+      return;
+    }
+    $event = new ConfigLangcodeResolveEvent($this->name, NULL, ConfigLangcodeContext::Runtime);
+    $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
+    if ($event->getLangcode() !== NULL) {
+      $this->data['langcode'] = $event->getLangcode();
+    }
   }
 
   /**

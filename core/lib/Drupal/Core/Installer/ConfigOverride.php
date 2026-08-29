@@ -30,9 +30,7 @@ class ConfigOverride implements ServiceProviderInterface, ConfigFactoryOverrideI
     $overrides = [];
     if (InstallerKernel::installationAttempted() && function_exists('drupal_install_profile_distribution_name')) {
       // During early install, ConfigInstaller may read system.site before the
-      // final system.site values are persisted. Provide installer-selected
-      // language values here so any config langcode defaulting logic uses the
-      // chosen install language instead of the shipped YAML default.
+      // final system.site values are persisted.
       global $install_state;
       $installer_langcode = $install_state['parameters']['langcode'] ?? 'en';
 
@@ -42,9 +40,6 @@ class ConfigOverride implements ServiceProviderInterface, ConfigFactoryOverrideI
         'name' => drupal_install_profile_distribution_name(),
         'langcode' => $installer_langcode,
         'default_langcode' => $installer_langcode,
-      ];
-      $overrides['core.language'] = [
-        'default_config_langcode' => $installer_langcode,
       ];
     }
     return $overrides;

@@ -9,6 +9,7 @@ use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -285,6 +286,57 @@ class ConfigInstallTest extends KernelTestBase {
     $data = $storage->read('config_test.dynamic.dotted.french');
     $this->assertEquals('fr', $data['langcode']);
     $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.french')->get('langcode'));
+  }
+
+  /**
+   * Tests installing configuration with no langcode.
+   *
+   * @see \Drupal\Core\Config\ConfigInstaller::resolveInstalledLangcode()
+   */
+  public function testLanguageRelabelsToConfigurationDefault(): void {
+    $this->enableModules(['language']);
+    $this->installConfig(['language']);
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    $this->config('language.settings')->set('default_config_langcode', 'fr')->save();
+
+    $this->installModules(['config_test_language']);
+
+    // config_test.dynamic.dotted.english ships with no langcode: it must be
+    // relabelled to the site's configuration default, not left as 'en'.
+    $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
+
+    // config_test.dynamic.dotted.french ships with an explicit langcode that
+    // is supported on this site: it must be left alone.
+    $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.french')->get('langcode'));
+
+    // A translatable simple configuration object with no langcode of its own
+    // must be relabelled the same way as a config entity.
+    $this->assertEquals('fr', $this->config('config_test.langcode_test')->get('langcode'));
+  }
+
+  /**
+   * Tests configuration shipping with an unsupported langcode is not installed.
+   *
+   * @see \Drupal\Core\Config\ConfigInstaller::resolveInstalledLangcode()
+   */
+  public function testLanguageRejectsUnsupportedShippedLangcode(): void {
+    $this->enableModules(['language']);
+    $this->installConfig(['language']);
+    // Deliberately do not create a 'fr' language: config_test.dynamic.dotted
+    // .french ships with langcode 'fr', which is unsupported here.
+
+    $this->installModules(['config_test_language']);
+
+    // config_test.dynamic.dotted.french must not have been installed at all.
+    $this->assertNull($this->config('config_test.dynamic.dotted.french')->get('id'));
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('config_test');
+    $this->assertNull($storage->load('dotted.french'));
+
+    // Unrelated configuration in the same install batch, including one that
+    // needed relabelling to English, must still have installed normally.
+    $this->assertEquals('en', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
+    $this->assertNotNull($storage->load('dotted.english'));
   }
 
   /**

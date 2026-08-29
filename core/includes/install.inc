@@ -212,13 +212,6 @@ function drupal_install_system($install_state): void {
   // Install base system configuration.
   \Drupal::service('config.installer')->installDefaultConfig('core', 'core');
 
-  // Store the install language as the default config language.
-  if (isset($install_state['parameters']['langcode'])) {
-    \Drupal::configFactory()->getEditable('core.language')
-      ->set('default_config_langcode', $install_state['parameters']['langcode'])
-      ->save();
-  }
-
   // Store the installation profile in configuration to populate the
   // 'install_profile' container parameter.
   $config = \Drupal::configFactory()->getEditable('core.extension');
