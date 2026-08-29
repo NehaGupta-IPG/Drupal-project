@@ -3,6 +3,12 @@ breadcrumb_render_cache_test.title_test:
   defaults:
     _title_callback: '\Drupal\breadcrumb_render_cache_test\Controller\BreadcrumbRenderCacheTestController::getTitle'
     _controller: '\Drupal\breadcrumb_render_cache_test\Controller\BreadcrumbRenderCacheTestController::build'
-    api_id: '12345685'
+  requirements:
+    _permission: 'access content'
+breadcrumb_render_cache_test.title_test_child:
+  path: '/breadcrumb-render-cache-test/title-test/{api_id}/view'
+  defaults:
+    _title_callback: '\Drupal\breadcrumb_render_cache_test\Controller\BreadcrumbRenderCacheTestController::getTitle'
+    _controller: '\Drupal\breadcrumb_render_cache_test\Controller\BreadcrumbRenderCacheTestController::build'
   requirements:
     _permission: 'access content'

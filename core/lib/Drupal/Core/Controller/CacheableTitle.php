@@ -16,7 +16,7 @@ class CacheableTitle extends BubbleableMetadata {
    * @var \Drupal\Core\StringTranslation\TranslatableMarkup|array|string|null
    *   The title.
    */
-  protected TranslatableMarkup|array|string|null $title;
+  protected TranslatableMarkup|array|string|null $title = NULL;
 
   /**
    * Gets the title.

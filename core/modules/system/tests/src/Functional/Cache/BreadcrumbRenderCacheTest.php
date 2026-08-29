@@ -59,24 +59,28 @@ class BreadcrumbRenderCacheTest extends BrowserTestBase {
   }
 
   /**
-   * Tests BreadCrumb Render Cache.
+   * Tests breadcrumb render cache.
    */
   public function testBreadCrumbRenderCache(): void {
-    $url1 = Url::fromRoute('breadcrumb_render_cache_test.title_test', ['api_id' => '564564564'])->toString();
+    // Visit a child page of the title-test route, so the breadcrumb has a
+    // real parent pages.
+    $url1 = Url::fromRoute('breadcrumb_render_cache_test.title_test_child', ['api_id' => '564564564'])->toString();
     $this->drupalGet($url1);
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains('564564564');
+    $assert = $this->assertSession();
+    $assert->statusCodeEquals(200);
+    $assert->pageTextContains('564564564');
 
-    $url2 = Url::fromRoute('breadcrumb_render_cache_test.title_test', ['api_id' => '234264'])->toString();
+    $url2 = Url::fromRoute('breadcrumb_render_cache_test.title_test_child', ['api_id' => '234264'])->toString();
     $this->drupalGet($url2);
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains('234264');
-    $this->assertSession()->pageTextNotContains('564564564');
+    $assert->statusCodeEquals(200);
+    $assert->pageTextContains('234264');
+    $assert->pageTextNotContains('564564564');
     $home_path = Url::fromRoute('<front>')->toString();
+    $ancestor_url = Url::fromRoute('breadcrumb_render_cache_test.title_test', ['api_id' => '234264'])->toString();
 
     $this->assertBreadcrumb($url2, [
       $home_path => 'Home',
-      $url2 => 'API Response for : 234264',
+      $ancestor_url => 'API Response for : 234264',
     ]);
 
   }
