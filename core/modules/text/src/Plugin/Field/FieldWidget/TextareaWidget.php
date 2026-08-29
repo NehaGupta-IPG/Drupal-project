@@ -19,13 +19,30 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 )]
 class TextareaWidget extends StringTextareaWidget {
 
+  use HideTextFormatHelpTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return static::hideOptionsDefaultSettings() + parent::defaultSettings();
+  }
+
   /**
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
+    $element = array_merge($element, $this->hideOptionsSettingsForm($form, $form_state));
     $element['rows']['#description'] = $this->t('Text editors may override this setting.');
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    return array_merge(parent::settingsSummary(), $this->hideOptionsSettingsSummary());
   }
 
   /**
@@ -43,6 +60,8 @@ class TextareaWidget extends StringTextareaWidget {
     if ($allowed_formats && !$this->isDefaultValueWidget($form_state)) {
       $element['#allowed_formats'] = $allowed_formats;
     }
+
+    $element += $this->hideOptionsFormElement();
 
     return $element;
   }
