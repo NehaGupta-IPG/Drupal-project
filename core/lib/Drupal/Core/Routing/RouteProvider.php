@@ -70,9 +70,9 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    */
   public function getRouteCollectionForRequest(Request $request) {
     // Cache both the system path as well as route parameters and matching
-    // routes if the request has no query parameters. Requests with query strings
-    // likely vary widely and are often not requested more than once, that is
-    // especially true for assets and image styles.
+    // routes if the request has no query parameters. Requests with query
+    // strings likely have many variations and are often not requested more
+    // than once.
     $cid = $this->useRouteCache($request) ? $this->getRouteCollectionCacheId($request) : NULL;
     if ($cached = $this->cache->get($cid)) {
       $this->currentPath->setPath($cached->data['path'], $request);
