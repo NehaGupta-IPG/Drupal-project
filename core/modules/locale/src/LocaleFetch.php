@@ -171,9 +171,6 @@ class LocaleFetch {
    */
   public function batchDownload(string $project, string $langcode, array|\ArrayAccess &$context): void {
     $source = $this->localeSource->loadSource($project, $langcode);
-    if (!$source) {
-      return;
-    }
     if (isset($source->type) && $source->type == LOCALE_TRANSLATION_REMOTE) {
       if ($file = $this->localeFileManager->downloadTranslationSource($source->files[LOCALE_TRANSLATION_REMOTE], 'translations://')) {
         $context['message'] = $this->t('Downloaded %langcode translation for %project.', [
@@ -208,10 +205,6 @@ class LocaleFetch {
    */
   public function batchImport(string $project, string $langcode, array $options, array|\ArrayAccess &$context): void {
     $source = $this->localeSource->loadSource($project, $langcode);
-    if (!$source) {
-      $context['finished'] = 1;
-      return;
-    }
     if ($source->type == LOCALE_TRANSLATION_REMOTE || $source->type == LOCALE_TRANSLATION_LOCAL) {
       $file = $source->files[LOCALE_TRANSLATION_LOCAL];
       $options += [
@@ -289,9 +282,6 @@ class LocaleFetch {
     }
 
     $source = $this->localeSource->loadSource($project, $langcode);
-    if (!$source) {
-      return;
-    }
     if ($locale_project->version == $source->version) {
       return;
     }
@@ -328,9 +318,6 @@ class LocaleFetch {
       'use_remote' => $this->configFactory->get('locale.settings')->get('translation.use_source') == LOCALE_TRANSLATION_USE_SOURCE_REMOTE_AND_LOCAL,
     ];
     $source = $this->localeSource->loadSource($project, $langcode);
-    if (!$source) {
-      return;
-    }
 
     // Check the status of local translation files.
     if (isset($source->files[LOCALE_TRANSLATION_LOCAL])) {
