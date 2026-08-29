@@ -273,7 +273,7 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
           }
         }
       }
-      elseif (!$shouldSkipProceduralScan) {
+      else {
         $implementations = $proceduralHookFileCache->get($filename);
         if ($implementations === NULL) {
           $finder = MockFileFinder::create($filename);
@@ -285,7 +285,7 @@ class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassIn
             if (StaticReflectionParser::hasAttribute($attributes, ExtensionFileIsConverted::class)) {
               $implementations['@skip_theme_file_deprecation'] = TRUE;
             }
-            if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
+            if ($shouldSkipProceduralScan || StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
               break;
             }
             if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && (preg_match($currentThemePreg, $function, $matches) || preg_match($allThemesPreg, $function, $matches))) {
