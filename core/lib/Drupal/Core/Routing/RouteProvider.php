@@ -74,7 +74,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     // strings likely have many variations and are often not requested more
     // than once.
     $cid = $this->useRouteCache($request) ? $this->getRouteCollectionCacheId($request) : NULL;
-    if ($cached = $this->cache->get($cid)) {
+    if ($cid && $cached = $this->cache->get($cid)) {
       $this->currentPath->setPath($cached->data['path'], $request);
       $request->query->replace($cached->data['query']);
       if ($cached->data['routes'] === FALSE) {
