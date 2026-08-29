@@ -8,7 +8,8 @@
  * - links: Links to be output.
  *   Each link will have the following elements:
  *   - link: (optional) A render array that returns a link. See
- *     template_preprocess_links() for details how it is generated.
+ *     \Drupal\Core\Theme\ThemePreprocess::preprocessLinks() for details
+ *     how it is generated.
  *   - text: The link text.
  *   - attributes: HTML attributes for the list item element.
  *   - text_attributes: (optional) HTML attributes for the span element if no
@@ -28,7 +29,7 @@
  *   http://juicystudio.com/article/screen-readers-display-none.php and
  *   http://www.w3.org/TR/WCAG-TECHS/H42.html for more information.
  *
- * @see template_preprocess_links()
+ * @see \Drupal\Core\Theme\ThemePreprocess::preprocessLinks()
  */
 #}
 {% if links -%}
