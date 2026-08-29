@@ -36,7 +36,11 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->wrappedSessionHandler = $this->createStub('SessionHandlerInterface');
+    $this->wrappedSessionHandler = $this->createStubForIntersectionOfInterfaces([
+      \SessionHandlerInterface::class,
+      \SessionIdInterface::class,
+      \SessionUpdateTimestampHandlerInterface::class,
+    ]);
     $this->sessionHandler = new WriteSafeSessionHandler($this->wrappedSessionHandler);
   }
 
@@ -44,7 +48,11 @@ class WriteSafeSessionHandlerTest extends UnitTestCase {
    * Reinitializes the wrapped session handler as a mock object.
    */
   protected function setUpMockWrappedSessionHandler(): void {
-    $this->wrappedSessionHandler = $this->createMock(\SessionHandlerInterface::class);
+    $this->wrappedSessionHandler = $this->createMockForIntersectionOfInterfaces([
+      \SessionHandlerInterface::class,
+      \SessionIdInterface::class,
+      \SessionUpdateTimestampHandlerInterface::class,
+    ]);
     $this->sessionHandler = new WriteSafeSessionHandler($this->wrappedSessionHandler);
   }
 
