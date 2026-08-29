@@ -268,21 +268,24 @@ class HookCollectorPass implements CompilerPassInterface {
     ContainerBuilder $container,
     array $implementationsByHook,
   ): void {
+    // Map of class => module name, so we can set the _provider tag.
     $classesMap = [];
     foreach ($implementationsByHook as $hookImplementations) {
-      foreach (array_keys($hookImplementations) as $identifier) {
+      foreach ($hookImplementations as $identifier => $module) {
         $parts = explode('::', $identifier, 2);
         if (isset($parts[1])) {
-          $classesMap[$parts[0]] = TRUE;
+          $classesMap[$parts[0]] = $module;
         }
       }
     }
 
-    foreach (array_keys($classesMap) as $class) {
+    foreach ($classesMap as $class => $module) {
       if (!$container->hasDefinition($class)) {
         $container
           ->register($class, $class)
-          ->setAutowired(TRUE);
+          ->setAutowired(TRUE)
+          ->setAutoconfigured(TRUE)
+          ->addTag('_provider', ['provider' => $module]);
       }
     }
   }

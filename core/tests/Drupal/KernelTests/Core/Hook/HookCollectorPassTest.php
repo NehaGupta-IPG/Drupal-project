@@ -11,9 +11,11 @@ use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\hook_collector_depends_test\Hook\DependsOnModuleClassHooks;
 use Drupal\hook_collector_depends_test\Hook\DependsOnModuleMethodHooks;
 use Drupal\hook_collector_depends_test\Hook\DependsOnModuleMultipleHooks;
+use Drupal\hook_collector_logger_aware_test\Hook\LoggerAwareHook;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\module_handler_test_all1\Hook\ModuleHandlerTestAll1Hooks;
 use Drupal\user_hooks_test\Hook\UserHooksTest;
+use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -355,6 +357,37 @@ class HookCollectorPassTest extends KernelTestBase {
     $this->assertTrue($this->container->has(DependsOnModuleClassHooks::class));
     $this->assertTrue($this->container->has(DependsOnModuleMethodHooks::class));
     $this->assertTrue($this->container->has(DependsOnModuleMultipleHooks::class));
+  }
+
+  /**
+   * Tests hook service autowire/autoconfigure.
+   */
+  public function testHookServicesAutowireAutoconfigure(): void {
+    $container = new ContainerBuilder();
+    $module_filenames = [
+      'module_handler_test_all1' => ['pathname' => "core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/module_handler_test_all1.info.yml"],
+      'user_hooks_test' => ['pathname' => "core/modules/user/tests/modules/user_hooks_test/user_hooks_test.info.yml"],
+    ];
+    include_once 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/src/Hook/ModuleHandlerTestAll1Hooks.php';
+    $container->setParameter('container.modules', $module_filenames);
+    // Pre-register all1's hook class without autoconfiguration to verify it is
+    // not overwritten, while user_hooks_test's class is left for auto-registration.
+    $container->register(ModuleHandlerTestAll1Hooks::class, ModuleHandlerTestAll1Hooks::class)
+      ->setAutoconfigured(FALSE);
+    (new HookCollectorPass())->process($container);
+
+    $this->assertFalse($container->getDefinition(ModuleHandlerTestAll1Hooks::class)->isAutoconfigured());
+    $this->assertTrue($container->getDefinition(UserHooksTest::class)->isAutowired());
+    $this->assertTrue($container->getDefinition(UserHooksTest::class)->isAutoconfigured());
+  }
+
+  /**
+   * Tests autoconfigure of a logger in a hooks class.
+   */
+  public function testHookServiceLoggerAwareAutoconfiguration(): void {
+    $this->enableModules(['hook_collector_logger_aware_test']);
+    $service = $this->container->get(LoggerAwareHook::class);
+    $this->assertInstanceOf(LoggerInterface::class, $service->getLogger());
   }
 
   /**

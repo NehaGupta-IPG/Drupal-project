@@ -66,8 +66,12 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
         ->addTag('stream_wrapper', ['scheme' => 'private']);
     }
 
-    $container->addCompilerPass(new HookCollectorPass());
-    $container->addCompilerPass(new ThemeHookCollectorPass());
+    // Run at priority 200 so that Hooks class service registrations are in
+    // place before Symfony's ResolveInstanceofConditionalsPass (priority 100)
+    // processes autoconfiguration. Without this, setAutoconfigured(TRUE) on
+    // Hooks classes has no effect.
+    $container->addCompilerPass(new HookCollectorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
+    $container->addCompilerPass(new ThemeHookCollectorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
     $container->addCompilerPass(new HookCollectorKeyValueWritePass(), PassConfig::TYPE_OPTIMIZE);
     // Remove dot-prefixed build parameters (e.g. '.hook_data',
     // '.theme_hook_data') that are used to pass data between compiler

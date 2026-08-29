@@ -1,0 +1,5 @@
+name: 'Test Hook LoggerAware autoconfiguration'
+type: module
+description: 'Tests that Hooks classes implementing LoggerAwareInterface receive logger injection via autoconfiguration.'
+package: Testing
+version: VERSION
