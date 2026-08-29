@@ -80,13 +80,11 @@ class StyleDefinitionTest extends UnitTestCase {
     yield 'getTarget:enum:html' => ['getTarget', 'target', Target::Html, Target::Html];
     yield 'getTarget:enum:body' => ['getTarget', 'target', Target::Body, Target::Body];
     yield 'getTarget:enum:meta' => ['getTarget', 'target', Target::Meta, Target::Meta];
-    yield 'getOptions' => ['getOptions', 'options',
-    [
+    yield 'getOptions' => ['getOptions', 'options', [
       'my_class' => [
         'label' => 'My class',
       ],
-    ],
-    [
+    ], [
       'my_class' => [
         'label' => 'My class',
       ],
