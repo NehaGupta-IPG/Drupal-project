@@ -566,7 +566,8 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
     // also what lets the same entity legitimately nest in a non-cacheable
     // render (e.g. a content block used as a Views entity-area header that also
     // appears among that view's rows) render correctly, with no arbitrary
-    // render limit (Drupal 11.4 removed that; https://www.drupal.org/node/3316878).
+    // render limit (Drupal 11.4 removed that, see
+    // https://www.drupal.org/node/3316878).
     if ($recursion_key === '') {
       return $build;
     }
