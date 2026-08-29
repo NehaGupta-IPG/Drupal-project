@@ -49,6 +49,9 @@ class HookCollectorPassTest extends KernelTestBase {
       'user_hooks_test' => ['pathname' => "$this->siteDirectory/user_hooks_test.info.yml"],
     ];
     $container->setParameter('container.modules', $module_filenames);
+    $container->setParameter('container.namespaces', [
+      'user_hooks_test' => "$this->siteDirectory/src",
+    ]);
     $keyvalue = new KeyValueMemoryFactory();
     $container->set('keyvalue', $keyvalue);
     $container->set('cache.bootstrap', new NullBackend('bootstrap'));
@@ -72,6 +75,10 @@ class HookCollectorPassTest extends KernelTestBase {
     ];
     include_once 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/src/Hook/ModuleHandlerTestAll1Hooks.php';
     $container->setParameter('container.modules', $module_filenames);
+    $container->setParameter('container.namespaces', [
+      'module_handler_test_all1' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1/src',
+      'module_handler_test_all2' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2/src',
+    ]);
     $keyvalue = new KeyValueMemoryFactory();
     $container->set('keyvalue', $keyvalue);
     $container->set('cache.bootstrap', new NullBackend('bootstrap'));

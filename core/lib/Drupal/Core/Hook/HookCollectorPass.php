@@ -7,6 +7,7 @@ namespace Drupal\Core\Hook;
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\FileCache\FileCacheInterface;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Core\Extension\ProceduralCall;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -86,7 +87,14 @@ class HookCollectorPass implements CompilerPassInterface {
    *
    * @var array<string, true>
    */
-  protected array $preprocessForSuggestions;
+  protected array $preprocessForSuggestions = [];
+
+  /**
+   * A map of names of classes that contain hooks to their service IDs.
+   *
+   * @var array<class-string, string>
+   */
+  protected array $hookClassToServiceIdMap = [];
 
   /**
    * Constructor.
@@ -116,7 +124,7 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   protected function writeToContainer(ContainerBuilder $container): void {
     $implementationsByHook = $this->calculateImplementations();
-    static::registerHookServices($container, $implementationsByHook);
+    static::registerHookServices($container, $implementationsByHook, $this->hookClassToServiceIdMap);
 
     $packed_order_operations = [];
     $order_operations = $this->getOrderOperations();
@@ -184,7 +192,8 @@ class HookCollectorPass implements CompilerPassInterface {
     // List of hooks and modules formatted for hook_module_implements_alter().
     $moduleImplementsMap = [];
     foreach ($implementationsByHookOrig as $hook => $hookImplementations) {
-      foreach (array_intersect($this->modules, $hookImplementations) as $module) {
+      $modules = array_merge($this->modules, ['core']);
+      foreach (array_intersect($modules, $hookImplementations) as $module) {
         $moduleImplementsMap[$hook][$module] = '';
       }
     }
@@ -205,6 +214,24 @@ class HookCollectorPass implements CompilerPassInterface {
       self::applyOrderOperations($implementationsByHook[$hook], $order_operations);
     }
 
+    // Use the correct service IDs in the hook list in the callable identifiers.
+    // This is done after ordering, so that ordering by identifiers using the
+    // actual class names works.
+    foreach ($implementationsByHook as &$implementation) {
+      foreach ($implementation as $identifier => $module) {
+        // Remove the implementation so that the array can be rebuilt in the
+        // same order, though with possibly new keys.
+        unset($implementation[$identifier]);
+        $parts = explode('::', $identifier, 2);
+        if (isset($parts[1])) {
+          $class = $parts[0];
+          if (isset($this->hookClassToServiceIdMap[$class])) {
+            $identifier = 'hook.' . $class . '::' . $parts[1];
+          }
+        }
+        $implementation[$identifier] = $module;
+      }
+    }
     return $implementationsByHook;
   }
 
@@ -217,11 +244,12 @@ class HookCollectorPass implements CompilerPassInterface {
   protected function getOrderOperations(): array {
     $implementationsByHook = $this->getFilteredImplementations();
     $operations_by_hook = [];
+    $modules = array_merge($this->modules, ['core']);
     foreach ($this->orderOperations as $hook => $order_operations_by_weight) {
       ksort($order_operations_by_weight);
       $order_operations = array_merge(...$order_operations_by_weight);
       foreach ($order_operations as $key => $operation) {
-        if (!isset($implementationsByHook[$hook][$operation->identify()]) || !in_array($implementationsByHook[$hook][$operation->identify()], $this->modules)) {
+        if (!isset($implementationsByHook[$hook][$operation->identify()]) || !in_array($implementationsByHook[$hook][$operation->identify()], $modules)) {
           unset($order_operations[$key]);
         }
       }
@@ -263,26 +291,51 @@ class HookCollectorPass implements CompilerPassInterface {
    * @param array<string, array<string, string>> $implementationsByHook
    *   Implementations, as module names keyed by hook name and "$class::$method"
    *   or $function identifier.
+   * @param array<class-string, string> $hookClassToServiceIdMap
+   *   Map of FQCNs to registered service IDs. Each service ID references a
+   *   definition in the container that uses the class.
    */
   protected static function registerHookServices(
     ContainerBuilder $container,
     array $implementationsByHook,
+    array $hookClassToServiceIdMap,
   ): void {
     $classesMap = [];
     foreach ($implementationsByHook as $hookImplementations) {
       foreach (array_keys($hookImplementations) as $identifier) {
         $parts = explode('::', $identifier, 2);
         if (isset($parts[1])) {
-          $classesMap[$parts[0]] = TRUE;
+          // Hook implementations in registered services will have their class
+          // prefixed with 'hook.', so that the class can be registered
+          // separately with a different 'hook.' ID to be used specifically for
+          // hook implementations. This will ensure that hook definitions
+          // defined in the class will always run, regardless if the original
+          // service is altered or decorated.
+          $class = str_starts_with($parts[0], 'hook.') ? substr($parts[0], 5) : $parts[0];
+          $classesMap[$parts[0]] = $class;
         }
       }
     }
 
-    foreach (array_keys($classesMap) as $class) {
-      if (!$container->hasDefinition($class)) {
-        $container
-          ->register($class, $class)
-          ->setAutowired(TRUE);
+    foreach ($classesMap as $id => $class) {
+      if (!$container->hasDefinition($id)) {
+        $definition = $container
+          ->register($id, $class)
+          ->setAutowired(TRUE)
+          ->addTag('hook');
+
+        // For classes that are registered services, copy over arguments,
+        // properties, and calls from the existing service to the 'hook.'
+        // service.
+        if (array_key_exists($class, $hookClassToServiceIdMap)) {
+          $registeredServiceDefinition = $container->getDefinition($hookClassToServiceIdMap[$class]);
+          $definition->setArguments($registeredServiceDefinition->getArguments())
+            ->setProperties($registeredServiceDefinition->getProperties())
+            ->setMethodCalls($registeredServiceDefinition->getMethodCalls());
+        }
+      }
+      else {
+        $container->getDefinition($id)->addTag('hook');
       }
     }
   }
@@ -308,11 +361,20 @@ class HookCollectorPass implements CompilerPassInterface {
     $modules = array_keys($module_list);
     $all_modules_preg = static::getModuleListPattern($modules);
     $collector = new static($modules);
+    $hook_file_cache = FileCacheFactory::get('hook_implementations');
+    // List of modules must be included in the cache key to ensure rediscovery
+    // takes place when a new module is installed. Some modules define hooks
+    // on behalf of other modules and those hooks need to be found.
+    // Hash to prevent massive key sizes.
+    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . hash('xxh3', $all_modules_preg));
     foreach ($module_list as $module => $info) {
       $skip_procedural = in_array($module, $skip_procedural_modules);
       $current_module_preg = static::getModuleListPattern([$module]);
-      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $current_module_preg, $all_modules_preg, $skip_procedural);
+      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $current_module_preg, $all_modules_preg, $skip_procedural, $hook_file_cache, $procedural_hook_file_cache);
     }
+    $namespaces = $container->getParameter('container.namespaces');
+    $definitions = $container->getDefinitions();
+    $collector->collectRegisteredServicesHookImplementations($namespaces, $definitions, $hook_file_cache);
     return $collector;
   }
 
@@ -351,15 +413,12 @@ class HookCollectorPass implements CompilerPassInterface {
    *   matched first.
    * @param bool $skip_procedural
    *   Skip the procedural check for the current module.
+   * @param \Drupal\Component\FileCache\FileCacheInterface $hook_file_cache
+   *   File cache for hook classes.
+   * @param \Drupal\Component\FileCache\FileCacheInterface $procedural_hook_file_cache
+   *   File cache for procedural hook classes.
    */
-  protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg, bool $skip_procedural): void {
-    $hook_file_cache = FileCacheFactory::get('hook_implementations');
-    // List of modules must be included in the cache key to ensure rediscovery
-    // takes place when a new module is installed. Some modules define hooks
-    // on behalf of other modules and those hooks need to be found.
-    // Hash to prevent massive key sizes.
-    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . hash('xxh3', $all_modules_preg));
-
+  protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg, bool $skip_procedural, FileCacheInterface $hook_file_cache, FileCacheInterface $procedural_hook_file_cache): void {
     $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new \RecursiveCallbackFilterIterator($iterator, static::filterIterator(...));
     $iterator = new \RecursiveIteratorIterator($iterator);
@@ -370,84 +429,10 @@ class HookCollectorPass implements CompilerPassInterface {
       $filename = $fileinfo->getPathname();
 
       if ($extension === 'php') {
-        $cached = $hook_file_cache->get($filename);
-        if ($cached) {
-          $class = $cached['class'];
-          $attributes = $cached['attributes'];
-          $class_attributes = $cached['class_attributes'] ?? [];
-        }
-        else {
-          // Immediately after a deployment, opcache may not yet have refreshed
-          // depending on the value of opcache.revalidation_freq which defaults
-          // to 2 seconds. Ensure that reflection operates on the new code by
-          // forcibly invalidating the opcode cache.
-          // @see https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.revalidate-freq
-          OpCodeCache::invalidate($filename);
-          $namespace = preg_replace('#^src/#', "Drupal/$module/", $iterator->getSubPath());
-          $class = $namespace . '/' . $fileinfo->getBasename('.php');
-          $class = str_replace('/', '\\', $class);
-          $class_attributes = [];
-          $attributes = [];
-          if (class_exists($class)) {
-            $reflectionClass = new \ReflectionClass($class);
-            $class_attributes = $reflectionClass->getAttributes(HookAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
-            $class_attributes = array_map(static fn (\ReflectionAttribute $ra) => $ra->newInstance(), $class_attributes);
-            $attributes = self::getAttributeInstances($reflectionClass);
-            $hook_file_cache->set($filename, [
-              'class' => $class,
-              'attributes' => $attributes,
-              'class_attributes' => $class_attributes,
-            ]);
-          }
-        }
-
-        foreach ($class_attributes as $class_attribute) {
-          // Skip the whole class if it depends on something that isn't
-          // available. It will not be registered in the container then.
-          if ($class_attribute instanceof HookDependsOnModule) {
-            if (!in_array($class_attribute->module, $this->modules)) {
-              continue 2;
-            }
-          }
-        }
-
-        foreach ($attributes as $method => $methodAttributes) {
-          foreach ($methodAttributes as $attribute) {
-            // Skip the method if it depends on something that isn't available.
-            // If all methods are skipped, then the class will not be registered
-            // in the container.
-            if ($attribute instanceof HookDependsOnModule) {
-              if (!in_array($attribute->module, $this->modules)) {
-                continue 2;
-              }
-            }
-          }
-          foreach ($methodAttributes as $attribute) {
-            if ($attribute instanceof Hook) {
-              self::checkForProceduralOnlyHooks($attribute, $class);
-              $this->oopImplementations[$attribute->hook][$class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
-              if ($attribute->order !== NULL) {
-                // Use a lower weight for order operations that are declared
-                // together with the hook listener they apply to.
-                $this->orderOperations[$attribute->hook][0][] = $attribute->order->getOperation("$class::$method");
-              }
-            }
-            elseif ($attribute instanceof ReorderHook) {
-              $identifier = $attribute->class === ProceduralCall::class
-                ? $attribute->method
-                : $attribute->class . '::' . $attribute->method;
-              // Use a higher weight for order operations that target other hook
-              // listeners.
-              $this->orderOperations[$attribute->hook][1][] = $attribute->order->getOperation($identifier);
-            }
-            elseif ($attribute instanceof RemoveHook) {
-              $identifier = $attribute->class === ProceduralCall::class
-                ? $attribute->method
-                : $attribute->class . '::' . $attribute->method;
-              $this->removeHookIdentifiers[$attribute->hook][] = $identifier;
-            }
-          }
-        }
+        $namespace = preg_replace('#^src/#', "Drupal/$module/", $iterator->getSubPath());
+        $class = $namespace . '/' . $fileinfo->getBasename('.php');
+        $class = str_replace('/', '\\', $class);
+        $this->collectHookImplementationsFromClassFile($filename, $class, $module, $hook_file_cache);
       }
       elseif (!$skip_procedural) {
         $implementations = $procedural_hook_file_cache->get($filename);
@@ -497,6 +482,67 @@ class HookCollectorPass implements CompilerPassInterface {
   }
 
   /**
+   * Collects Attribute hook implementations in registered services.
+   *
+   * @param array<string, string> $namespaces
+   *   Map of namespace to directory.
+   * @param array<string, \Symfony\Component\DependencyInjection\Definition> $definitions
+   *   Service definitions.
+   * @param \Drupal\Component\FileCache\FileCacheInterface $hook_file_cache
+   *   File cache for hook classes.
+   */
+  protected function collectRegisteredServicesHookImplementations(array $namespaces, array $definitions, FileCacheInterface $hook_file_cache): void {
+    foreach ($definitions as $id => $definition) {
+      // Hook discovery is not done on abstract services, synthetic services,
+      // deprecated services, services defined with a factory, and services
+      // that decorate other services. Service decorators are skipped so that
+      // the Hook attribute 'order' property and RemoveHook attribute are the
+      // only API to alter other hooks. Skipping service decorators also removes
+      // the complexity of what the expected result is for ordering and removing
+      // hooks by class name when service classes can be changed by decoration.
+      if ($definition->isAbstract() || $definition->isDeprecated() || $definition->isSynthetic() || !empty($definition->getFactory()) || !empty($definition->getDecoratedService())) {
+        continue;
+      }
+
+      // Some services do not have a class property, but instead the ID is the
+      // FQCN.
+      $class = $definition->getClass() ?? $id;
+
+      // Ignore any services not in the Drupal namespace.
+      $parts = explode('\\', $class);
+      $filename = array_pop($parts) . '.php';
+      $root = array_shift($parts);
+      if ($root !== 'Drupal') {
+        continue;
+      }
+
+      $provider = array_shift($parts) ?? '';
+      // Do not allow for hook implementations in Component, but do allow for
+      // them in Core.
+      if ($provider === 'Component') {
+        continue;
+      }
+      elseif ($provider === 'Core') {
+        $provider = 'core';
+        $providerPath = 'core/lib/Drupal/Core';
+      }
+      // Ignore any services in a "Hook" namespace, because they are discovered
+      // in ::collectModuleHookImplementations().
+      elseif (array_first($parts) === 'Hook') {
+        continue;
+      }
+      // Otherwise get the path from the registered namespace of the module.
+      elseif (!($providerPath = $namespaces["Drupal\\$provider"] ?? '')) {
+        continue;
+      }
+
+      $subPath = implode(DIRECTORY_SEPARATOR, $parts);
+      $filename = $providerPath . DIRECTORY_SEPARATOR . $subPath . DIRECTORY_SEPARATOR . $filename;
+      $this->collectHookImplementationsFromClassFile($filename, $class, $provider, $hook_file_cache, $id);
+    }
+  }
+
+  /**
    * Returns whether the existing attributes match any of the expected ones.
    *
    * @param array $existingAttributes
@@ -517,6 +563,105 @@ class HookCollectorPass implements CompilerPassInterface {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Collect Attribute hook implementations from a class file.
+   *
+   * @param string $filename
+   *   The filename including path relative to Drupal root.
+   * @param class-string $class
+   *   (optional) The class name. If passed, and the file name is empty, the
+   *   cache is bypassed and the class is parsed for attributes directly.
+   * @param string $module
+   *   The name of module the class file is in.
+   * @param \Drupal\Component\FileCache\FileCacheInterface $cache
+   *   The cache of hook attribute data associated with file paths.
+   * @param string|null $existingServiceId
+   *   ID of the service definition for this class, if any.
+   */
+  protected function collectHookImplementationsFromClassFile(string $filename, string $class, string $module, FileCacheInterface $cache, ?string $existingServiceId = NULL): void {
+    $cached = $cache->get($filename);
+    if ($cached) {
+      $class = $cached['class'];
+      $attributes = $cached['attributes'];
+      $class_attributes = $cached['class_attributes'] ?? [];
+    }
+    else {
+      // Immediately after a deployment, opcache may not yet have refreshed
+      // depending on the value of opcache.revalidation_freq which defaults
+      // to 2 seconds. Ensure that reflection operates on the new code by
+      // forcibly invalidating the opcode cache.
+      // @see https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.revalidate-freq
+      OpCodeCache::invalidate($filename);
+      $class_attributes = [];
+      $attributes = [];
+      if (class_exists($class)) {
+        $reflectionClass = new \ReflectionClass($class);
+        $class_attributes = $reflectionClass->getAttributes(HookAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
+        $class_attributes = array_map(static fn (\ReflectionAttribute $ra) => $ra->newInstance(), $class_attributes);
+        $attributes = self::getAttributeInstances($reflectionClass);
+        $cache->set($filename, [
+          'class' => $class,
+          'attributes' => $attributes,
+          'class_attributes' => $class_attributes,
+        ]);
+      }
+    }
+
+    foreach ($class_attributes as $class_attribute) {
+      // Skip the whole class if it depends on something that isn't
+      // available. It will not be registered in the container then.
+      if ($class_attribute instanceof HookDependsOnModule) {
+        if (!in_array($class_attribute->module, $this->modules)) {
+          return;
+        }
+      }
+    }
+
+    foreach ($attributes as $method => $methodAttributes) {
+      foreach ($methodAttributes as $attribute) {
+        // Skip the method if it depends on something that isn't available.
+        // If all methods are skipped, then the class will not be registered
+        // in the container.
+        if ($attribute instanceof HookDependsOnModule) {
+          if (!in_array($attribute->module, $this->modules)) {
+            continue 2;
+          }
+        }
+      }
+      foreach ($methodAttributes as $attribute) {
+        if ($attribute instanceof Hook) {
+          self::checkForProceduralOnlyHooks($attribute, $class);
+          // If the class has already been registered as a service, keep a map
+          // of the class to the existing service.
+          // @see ::calculateImplementations()
+          if (isset($existingServiceId)) {
+            $this->hookClassToServiceIdMap[$class] = $existingServiceId;
+          }
+          $this->oopImplementations[$attribute->hook][$class . '::' . ($attribute->method ?: $method)] = $attribute->module ?? $module;
+          if ($attribute->order !== NULL) {
+            // Use a lower weight for order operations that are declared
+            // together with the hook listener they apply to.
+            $this->orderOperations[$attribute->hook][0][] = $attribute->order->getOperation("$class::$method");
+          }
+        }
+        elseif ($attribute instanceof ReorderHook) {
+          $identifier = $attribute->class === ProceduralCall::class
+            ? $attribute->method
+            : $attribute->class . '::' . $attribute->method;
+          // Use a higher weight for order operations that target other hook
+          // listeners.
+          $this->orderOperations[$attribute->hook][1][] = $attribute->order->getOperation($identifier);
+        }
+        elseif ($attribute instanceof RemoveHook) {
+          $identifier = $attribute->class === ProceduralCall::class
+            ? $attribute->method
+            : $attribute->class . '::' . $attribute->method;
+          $this->removeHookIdentifiers[$attribute->hook][] = $identifier;
+        }
+      }
+    }
   }
 
   /**

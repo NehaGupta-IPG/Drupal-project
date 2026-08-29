@@ -24,6 +24,37 @@ class HookCollectorKeyValueWritePass implements CompilerPassInterface {
    * {@inheritdoc}
    */
   public function process(ContainerBuilder $container): void {
+    // First validate that no hook services have been altered or decorated.
+    $hookServiceIds = array_keys($container->findTaggedServiceIds('hook'));
+    $invalidAlteredIds = [];
+    $invalidDecoratorIds = [];
+    foreach ($hookServiceIds as $id) {
+      $definition = $container->getDefinition($id);
+      $class = str_starts_with($id, 'hook.') ? substr($id, 5) : $id;
+      if ($definition->getClass() !== $class) {
+        if (preg_match('/Drupal\\\[^\\\]+\\\Hook\\\/', $id)) {
+          @trigger_error(sprintf('Altering hook service %s is deprecated in drupal:11.5.0 and is not supported in drupal:12.0.0. Use the ReorderHook or RemoveHook attributes to control hook methods instead. See https://www.drupal.org/node/3526437', $id), E_USER_DEPRECATED);
+          continue;
+        }
+
+        $invalidAlteredIds[] = $id;
+      }
+      elseif (!empty($definition->getChanges()['decorated_service'])) {
+        if (preg_match('/Drupal\\\[^\\\]+\\\Hook\\\/', $id)) {
+          @trigger_error(sprintf('Defining service %s to decorate a hook service is deprecated in drupal:11.5.0 and is not supported in drupal:12.0.0. Use the ReorderHook or RemoveHook attributes to control hook methods instead. See https://www.drupal.org/node/3526437', $id), E_USER_DEPRECATED);
+          continue;
+        }
+
+        $invalidDecoratorIds[] = $id;
+      }
+    }
+    if (!empty($invalidAlteredIds)) {
+      throw new \LogicException(sprintf('Hook service(s) "%s" can not be altered', implode(', ', $invalidAlteredIds)));
+    }
+    if (!empty($invalidDecoratorIds)) {
+      throw new \LogicException(sprintf('Service(s) "%s" can not decorate a hook service', implode(', ', $invalidDecoratorIds)));
+    }
+
     $hookData = $container->getParameter('.hook_data');
     if ($container->hasParameter('.theme_hook_data')) {
       $themeHookData = $container->getParameter('.theme_hook_data');

@@ -1,0 +1,7 @@
+name: 'Test hook discovery with a service modifier'
+type: module
+description: 'This module has a service provider that alters an existing Hook service and will throw an exception when installed.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:hook_collector_hook_attribute

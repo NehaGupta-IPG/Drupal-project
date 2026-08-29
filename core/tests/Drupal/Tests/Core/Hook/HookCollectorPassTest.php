@@ -59,6 +59,9 @@ __EOF__
 
     $container = new ContainerBuilder();
     $container->setParameter('container.modules', $module_filenames);
+    $container->setParameter('container.namespaces', [
+      'Drupal\test_module' => 'vfs://drupal_root/modules/test_module/src',
+    ]);
     (new HookCollectorPass())->process($container);
 
     $this->assertEquals(
@@ -99,6 +102,10 @@ __EOF__
 
     $container = new ContainerBuilder();
     $container->setParameter('container.modules', $module_filenames);
+    $container->setParameter('container.namespaces', [
+      'Drupal\test_module' => 'vfs://drupal_root/modules/test_module/src',
+      'Drupal\test_module_theme' => 'vfs://drupal_root/modules/test_module_theme/src',
+    ]);
     (new HookCollectorPass())->process($container);
     // Ensure that the hook is registered for the module it resides in.
     // Even though there is a more specific match the current module takes

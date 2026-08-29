@@ -1,0 +1,8 @@
+services:
+
+  Drupal\hook_collector_altered_services\AnotherServiceWithHookDecorator:
+    class: Drupal\hook_collector_altered_services\AnotherServiceWithHookDecorator
+    decorates: hook.Drupal\hook_collector_hook_attribute\ServiceWithHook
+    public: false
+    tags:
+      - { name: hook }
