@@ -378,7 +378,14 @@ class ConfigInstaller implements ConfigInstallerInterface {
     }
 
     foreach ($config_names as $name) {
-      if ($collection == StorageInterface::DEFAULT_COLLECTION && $config_to_create[$name] !== FALSE && $this->resolveInstalledLangcode($name, $config_to_create[$name])) {
+      // If we are syncing, do not resolve a langcode here. language.settings
+      // itself may only hold its shipped default value temporarily, until
+      // the config importer's own diff-processing corrects it from the sync
+      // storage later in the same operation - resolving against it now could
+      // permanently mislabel configuration based on a value that is about to
+      // change. Sync storage is authoritative for anything it provides;
+      // configuration that sync does not touch keeps its shipped default.
+      if (!$this->isSyncing() && $collection == StorageInterface::DEFAULT_COLLECTION && $config_to_create[$name] !== FALSE && $this->resolveInstalledLangcode($name, $config_to_create[$name])) {
         // The configuration ships with an explicit langcode that is not
         // supported on this site: do not install it at all.
         continue;
@@ -490,27 +497,15 @@ class ConfigInstaller implements ConfigInstallerInterface {
   /**
    * Determines whether typed configuration data has a translatable value.
    *
-   * Mirrors \Drupal\Core\Config\StorableConfigBase::castValue(), which only
-   * considers values actually present in the data, not the full schema.
-   *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $element
+   * @param \Drupal\Core\Config\Schema\Mapping $element
    *   The typed data element to check.
    *
    * @return bool
-   *   TRUE if the element, or any of its present children, is translatable.
+   *   TRUE if the element itself, or any of its present children, is
+   *   translatable.
    */
-  protected function hasTranslatableData($element) {
-    if ($element->getDataDefinition()['translatable']) {
-      return TRUE;
-    }
-    if ($element instanceof \Traversable) {
-      foreach ($element as $child) {
-        if ($this->hasTranslatableData($child)) {
-          return TRUE;
-        }
-      }
-    }
-    return FALSE;
+  protected function hasTranslatableData(Mapping $element) {
+    return $element->getDataDefinition()['translatable'] || $element->hasTranslatableElements();
   }
 
   /**
