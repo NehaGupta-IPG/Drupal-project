@@ -68,11 +68,8 @@ class ViewsConfigUpdater {
    */
   public function updateAll(ViewEntityInterface $view) {
     return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
-      $changed = FALSE;
-      if ($this->processExposedFilterLimitUpdate($handler, $handler_type)) {
-        $changed = TRUE;
-      }
-      return $changed;
+      // @todo leaving this here now but new update hooks will need to update.
+      return FALSE;
     });
   }
 
@@ -134,40 +131,6 @@ class ViewsConfigUpdater {
     }
 
     return $changed;
-  }
-
-  /**
-   * Checks if 'limit' setting of an exposed filter needs to be added.
-   *
-   * @param \Drupal\views\ViewEntityInterface $view
-   *   The view entity.
-   *
-   * @return bool
-   *   TRUE if the view has any exposed filters that need updating.
-   */
-  public function needsExposedFilterLimitUpdate(ViewEntityInterface $view): bool {
-    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) {
-      return $this->processExposedFilterLimitUpdate($handler, $handler_type);
-    });
-  }
-
-  /**
-   * Processes filters and adds limit = false.
-   *
-   * @param array $handler
-   *   A display handler.
-   * @param string $handler_type
-   *   The handler type.
-   *
-   * @return bool
-   *   Whether the handler was updated.
-   */
-  public function processExposedFilterLimitUpdate(array &$handler, string $handler_type): bool {
-    if ($handler_type === 'filter' && !empty($handler['expose']) && isset($handler['expose']['reduce']) && !isset($handler['expose']['limit'])) {
-      $handler['expose']['limit'] = FALSE;
-      return TRUE;
-    }
-    return FALSE;
   }
 
 }
