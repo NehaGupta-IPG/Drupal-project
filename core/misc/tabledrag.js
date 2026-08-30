@@ -242,7 +242,18 @@
       self.makeDraggable(this);
     });
 
-    const $toggleWeightWrapper = $(Drupal.theme('tableDragToggle'));
+    // The dynamic injection of the tabledrag-toggle-weight-wrapper element causes
+    // vertical layout shifting upon page load.
+    // See https://www.drupal.org/project/drupal/issues/3404215 for more details.
+    // To get rid of this issue in the core admin theme Claro we can include
+    // tabledrag-toggle-weight-wrapper element directly in table.html.twig template.
+    // And then we can grab existing element from here instead
+    // of generating it using Drupal.theme().
+    const $toggleWeightWrapper =
+      $table.prev().length &&
+      $table.prev().hasClass('tabledrag-toggle-weight-wrapper')
+        ? $table.prev()
+        : $(Drupal.theme('tableDragToggle'));
     this.$toggleWeightButton = $toggleWeightWrapper.find(
       '[data-drupal-selector="tabledrag-toggle-weight"]',
     );

@@ -167,3 +167,16 @@ td.priority-medium {
     margin-block-start: 0;
   }
 }
+
+@media (scripting: none) {
+  .tabledrag-toggle-weight-wrapper + table,
+  .tabledrag-toggle-weight-wrapper + .tableresponsive-toggle-columns + table {
+    margin-top: var(--space-l);
+  }
+}
+
+@media (scripting: none) {
+  .tabledrag-toggle-weight-wrapper {
+    display: none;
+  }
+}

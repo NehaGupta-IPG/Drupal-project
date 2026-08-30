@@ -150,5 +150,13 @@ td.priority-medium {
   & + table,
   & + .tableresponsive-toggle-columns + table {
     margin-block-start: 0;
+
+    @media (scripting: none) {
+      margin-top: var(--space-l);
+    }
+  }
+
+  @media (scripting: none) {
+    display: none;
   }
 }
