@@ -1,0 +1,32 @@
+importmap:
+  version: '1.0'
+  importmap:
+    imports:
+      importmap-test-foo: js/foo.js
+      importmap-test-prefix/: js/prefix/
+      importmap-test-external: https://example.com/importmap-test-external.mjs
+    scopes:
+      js/scope/:
+        importmap-test-foo: js/scope/foo.js
+    integrity:
+      js/foo.js: sha384-oXiGjHO+NOxR1XH8somfajtqMWa5PTleNh5VGncEbQQTrZZboU8xIMhoDzGBbroU
+
+duplicate:
+  version: '1.0'
+  importmap:
+    imports:
+      importmap-test-foo: js/foo.js
+
+consumer:
+  version: '1.0'
+  js:
+    js/consumer.js: { attributes: { type: module } }
+  dependencies:
+    - importmap_test/importmap
+
+scoped-consumer:
+  version: '1.0'
+  js:
+    js/scope/consumer.js: { attributes: { type: module } }
+  dependencies:
+    - importmap_test/importmap

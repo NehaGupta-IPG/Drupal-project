@@ -402,6 +402,180 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   }
 
   /**
+   * Tests that import map definitions are validated and resolved.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMap(): void {
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module')
+      ->willReturn($path);
+
+    $libraries = $this->libraryDiscoveryParser->buildByExtension('importmap_module');
+    $library = $libraries['importmap'];
+    $this->assertEquals([
+      'imports' => [
+        'importmap-test-foo' => [
+          'data' => $path . '/js/foo.js',
+          'external' => FALSE,
+          'version' => '2.0',
+        ],
+        'importmap-test-absolute' => [
+          'data' => '/core/misc/align-right.js',
+          'external' => FALSE,
+          'version' => '2.0',
+        ],
+        'importmap-test-protocol-free' => [
+          'data' => '//example.com/importmap-test-foo.js',
+          'external' => TRUE,
+          'version' => '2.0',
+        ],
+        'importmap-test-external' => [
+          'data' => 'https://example.com/importmap-test-foo.js',
+          'external' => TRUE,
+          'version' => '2.0',
+        ],
+        'importmap-test-prefix/' => [
+          'data' => $path . '/js/prefix/',
+          'external' => FALSE,
+          'version' => '2.0',
+        ],
+      ],
+      'scopes' => [
+        $path . '/js/v1' => [
+          'importmap-test-foo' => [
+            'data' => $path . '/js/foo-v1.js',
+            'external' => FALSE,
+            'version' => '2.0',
+          ],
+        ],
+        '/absolute-scope' => [
+          'importmap-test-foo' => [
+            'data' => $path . '/js/foo-v2.js',
+            'external' => FALSE,
+            'version' => '2.0',
+          ],
+        ],
+      ],
+      'integrity' => [
+        $path . '/js/foo.js' => [
+          'data' => $path . '/js/foo.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'integrity' => 'sha384-oXiGjHO+NOxR1XH8somfajtqMWa5PTleNh5VGncEbQQTrZZboU8xIMhoDzGBbroU',
+        ],
+        '/core/misc/align-right.js' => [
+          'data' => '/core/misc/align-right.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'integrity' => 'sha384-other',
+        ],
+      ],
+    ], $library['importmap']);
+  }
+
+  /**
+   * Tests that a library can consist of an import map definition only.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMapOnlyLibrary(): void {
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module_only_importmap')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module_only_importmap')
+      ->willReturn($path);
+
+    $libraries = $this->libraryDiscoveryParser->buildByExtension('importmap_module_only_importmap');
+    $library = $libraries['importmap'];
+    $this->assertEquals(-1, $library['importmap']['imports']['importmap-test-foo']['version']);
+    $this->assertEquals($path . '/js/foo.js', $library['importmap']['imports']['importmap-test-foo']['data']);
+  }
+
+  /**
+   * Tests that an import map definition with an unknown key is invalid.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMapWithUnknownKey(): void {
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module_unknown_key')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module_unknown_key')
+      ->willReturn($path);
+
+    $this->expectException(\UnexpectedValueException::class);
+    $this->expectExceptionMessage("Unknown key 'bogus' in the importmap definition of the library importmap_module_unknown_key/importmap. Only the keys 'imports', 'scopes' and 'integrity' are allowed.");
+    $this->libraryDiscoveryParser->buildByExtension('importmap_module_unknown_key');
+  }
+
+  /**
+   * Tests that trailing-slash specifiers require trailing-slash values.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMapWithTrailingSlashMismatch(): void {
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module_trailing_slash')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module_trailing_slash')
+      ->willReturn($path);
+
+    $this->expectException(\UnexpectedValueException::class);
+    $this->expectExceptionMessage("The module specifier 'importmap-test-prefix/' in the importmap definition of the library importmap_module_trailing_slash/importmap ends with a slash, so its value must also end with a slash.");
+    $this->libraryDiscoveryParser->buildByExtension('importmap_module_trailing_slash');
+  }
+
+  /**
+   * Tests that the value of a module specifier must be a string.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMapWithNonStringValue(): void {
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module_non_string')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module_non_string')
+      ->willReturn($path);
+
+    $this->expectException(\UnexpectedValueException::class);
+    $this->expectExceptionMessage("The value of the module specifier 'importmap-test-foo' in the importmap definition of the library importmap_module_non_string/importmap must be a non-empty string.");
+    $this->libraryDiscoveryParser->buildByExtension('importmap_module_non_string');
+  }
+
+  /**
    * Tests a library with CSS/JavaScript and a setting.
    *
    * @legacy-covers ::buildByExtension

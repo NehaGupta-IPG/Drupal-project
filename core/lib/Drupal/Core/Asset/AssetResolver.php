@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -209,6 +210,203 @@ class AssetResolver implements AssetResolverInterface {
     $this->cache->set($cid, $fonts, CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
 
     return $fonts;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getImportMap(): array {
+    $active_theme = $this->themeManager->getActiveTheme()->getName();
+    // The import map is built from all known libraries: core, the enabled
+    // modules, and the active theme including its base themes. Module scripts
+    // attached later (e.g., in an Ajax response) may import any of these,
+    // and browsers without support for multiple import maps cannot update
+    // the map after the initial page load.
+    $extensions = ['core'];
+    foreach (array_keys($this->moduleHandler->getModuleList()) as $module) {
+      $extensions[] = $module;
+    }
+    foreach ($this->getThemeWithBaseThemes($active_theme) as $theme) {
+      $extensions[] = $theme;
+    }
+    $cid = 'importmap:' . $active_theme . ':' . hash('sha256', implode(',', $extensions));
+    if ($cached = $this->cache->get($cid)) {
+      return $cached->data['import_map'];
+    }
+    $import_map = [
+      'imports' => [],
+      'scopes' => [],
+      'integrity' => [],
+    ];
+    $provenance = [
+      'imports' => [],
+      'scopes' => [],
+      'integrity' => [],
+    ];
+    foreach ($extensions as $extension) {
+      foreach ($this->libraryDiscovery->getLibrariesByExtension($extension) as $name => $definition) {
+        if (empty($definition['importmap'])) {
+          continue;
+        }
+        $this->mergeImportMap($import_map, $definition['importmap'], "$extension/$name", $provenance);
+      }
+    }
+    $this->cache->set($cid, [
+      'import_map' => $import_map,
+      'provenance' => $provenance,
+    ], CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
+
+    return $import_map;
+  }
+
+  /**
+   * Merges the import map of a single library into an aggregated import map.
+   *
+   * The first definition of a module specifier or integrity key wins. A
+   * conflicting definition (the same key with a different value) is ignored,
+   * and an error is logged, since it will most likely result in broken
+   * JavaScript.
+   *
+   * @param array $import_map
+   *   The aggregated import map, by reference.
+   * @param array $new_import_map
+   *   The import map of the library being merged in.
+   * @param string $library
+   *   The name of the library being merged in, e.g. 'module/library'.
+   * @param array $provenance
+   *   By reference. The aggregated provenance, keyed by section and key, with
+   *   the name of the library that provided the entry.
+   */
+  protected function mergeImportMap(array &$import_map, array $new_import_map, string $library, array &$provenance): void {
+    foreach ($new_import_map['imports'] as $key => $value) {
+      $this->mergeImportMapEntry($import_map['imports'], $provenance['imports'], (string) $key, $value, "'imports' section", $library);
+    }
+    foreach ($new_import_map['scopes'] as $scope => $entries) {
+      if (!isset($import_map['scopes'][$scope])) {
+        $import_map['scopes'][$scope] = [];
+        $provenance['scopes'][$scope] = [];
+      }
+      foreach ($entries as $key => $value) {
+        $this->mergeImportMapEntry($import_map['scopes'][$scope], $provenance['scopes'][$scope], (string) $key, $value, "'scopes' section, scope '$scope'", $library);
+      }
+    }
+    foreach ($new_import_map['integrity'] as $key => $value) {
+      $this->mergeImportMapEntry($import_map['integrity'], $provenance['integrity'], (string) $key, $value, "'integrity' section", $library);
+    }
+  }
+
+  /**
+   * Merges a single import map entry into an aggregated set of entries.
+   *
+   * @param array $entries
+   *   The aggregated entries, by reference, keyed by the module specifier or
+   *   path.
+   * @param array $provenance
+   *   By reference. The aggregated provenance, keyed like $entries, with the
+   *   name of the library that provided the entry.
+   * @param string $key
+   *   The module specifier or path.
+   * @param mixed $value
+   *   The entry value.
+   * @param string $context
+   *   A description of the section the entry belongs to, for log messages.
+   * @param string $library
+   *   The name of the library providing the entry, e.g. 'module/library'.
+   */
+  protected function mergeImportMapEntry(array &$entries, array &$provenance, string $key, mixed $value, string $context, string $library): void {
+    if (array_key_exists($key, $entries)) {
+      if ($entries[$key] === $value) {
+        // The entry is identical to the existing one: nothing to do.
+        return;
+      }
+      $existing_library = $provenance[$key];
+      \Drupal::logger('asset')->error(sprintf("Import map conflict: the module specifier '%s' in the %s is defined by both %s and %s with different values. The value from %s is used. Remove the duplicate definition from one of the libraries.", $key, $context, $existing_library, $library, $existing_library));
+      return;
+    }
+    $entries[$key] = $value;
+    $provenance[$key] = $library;
+  }
+
+  /**
+   * Returns the given theme and its base themes.
+   *
+   * The base themes come first, starting with the most distant ancestor,
+   * followed by the given theme itself.
+   *
+   * @param string $theme
+   *   The machine name of a theme.
+   *
+   * @return string[]
+   *   The machine names of the base themes and the theme itself.
+   */
+  protected function getThemeWithBaseThemes(string $theme): array {
+    $themes = [];
+    $name = $theme;
+    while (TRUE) {
+      $themes[] = $name;
+      try {
+        $extension = $this->themeHandler->getTheme($name);
+      }
+      catch (UnknownExtensionException) {
+        break;
+      }
+      $name = $extension->info['base theme'] ?? '';
+      if (!is_string($name) || $name === '') {
+        break;
+      }
+    }
+    return array_reverse($themes);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getImportMapPreloads(AttachedAssetsInterface $assets): array {
+    if (!$assets->getLibraries()) {
+      return [];
+    }
+    // Get the complete list of libraries to load, including dependencies.
+    $libraries_to_load = $this->getLibrariesToLoad($assets);
+
+    if (!$libraries_to_load) {
+      return [];
+    }
+    // Add the active theme name to the cache key, since active themes may
+    // implement hook_library_info_alter().
+    $active_theme = $this->themeManager->getActiveTheme()->getName();
+    $cid = 'importmap_preloads:' . $active_theme . ':' . Crypt::hashBase64(serialize($libraries_to_load));
+    if ($cached = $this->cache->get($cid)) {
+      return $cached->data;
+    }
+    $preloads = [];
+    foreach ($libraries_to_load as $library) {
+      [$extension, $name] = explode('/', $library, 2);
+      $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
+      if (empty($definition['importmap'])) {
+        continue;
+      }
+      foreach ($definition['importmap']['imports'] as $entry) {
+        // Module specifier mappings with a trailing slash map a class of
+        // modules to a class of URLs, and there is no single module to
+        // preload.
+        if (str_ends_with($entry['data'], '/')) {
+          continue;
+        }
+        $preloads[$entry['data']] = $entry;
+      }
+      foreach ($definition['importmap']['scopes'] as $entries) {
+        foreach ($entries as $entry) {
+          if (str_ends_with($entry['data'], '/')) {
+            continue;
+          }
+          $preloads[$entry['data']] = $entry;
+        }
+      }
+    }
+    $preloads = array_values($preloads);
+    $this->cache->set($cid, $preloads, CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
+
+    return $preloads;
   }
 
   /**

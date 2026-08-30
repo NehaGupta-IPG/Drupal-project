@@ -1,0 +1,5 @@
+importmap:
+  importmap:
+    imports:
+      importmap-test-foo:
+        - js/foo.js

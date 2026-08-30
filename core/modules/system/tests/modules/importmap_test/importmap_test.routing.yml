@@ -1,0 +1,15 @@
+importmap_test.consumer:
+  path: '/importmap-test/consumer'
+  defaults:
+    _controller: '\Drupal\importmap_test\Controller\ConsumerController::consumerPage'
+    _title: 'Import map consumer'
+  requirements:
+    _access: 'TRUE'
+
+importmap_test.scoped_consumer:
+  path: '/importmap-test/scoped-consumer'
+  defaults:
+    _controller: '\Drupal\importmap_test\Controller\ConsumerController::scopedConsumerPage'
+    _title: 'Import map scoped consumer'
+  requirements:
+    _access: 'TRUE'

@@ -1,0 +1,17 @@
+importmap:
+  version: '2.0'
+  importmap:
+    imports:
+      importmap-test-foo: js/foo.js
+      importmap-test-absolute: /core/misc/align-right.js
+      importmap-test-protocol-free: //example.com/importmap-test-foo.js
+      importmap-test-external: https://example.com/importmap-test-foo.js
+      importmap-test-prefix/: js/prefix/
+    scopes:
+      js/v1:
+        importmap-test-foo: js/foo-v1.js
+      /absolute-scope:
+        importmap-test-foo: js/foo-v2.js
+    integrity:
+      js/foo.js: sha384-oXiGjHO+NOxR1XH8somfajtqMWa5PTleNh5VGncEbQQTrZZboU8xIMhoDzGBbroU
+      /core/misc/align-right.js: sha384-other

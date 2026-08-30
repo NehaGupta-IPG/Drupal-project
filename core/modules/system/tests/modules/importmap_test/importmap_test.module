@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Tests the import map functionality of the libraries API.
+ */
+
+declare(strict_types=1);

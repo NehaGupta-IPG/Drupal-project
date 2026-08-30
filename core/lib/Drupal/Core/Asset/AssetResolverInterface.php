@@ -104,4 +104,40 @@ interface AssetResolverInterface {
    */
   public function getFontAssets(AttachedAssetsInterface $assets, ?LanguageInterface $language = NULL): array;
 
+  /**
+   * Returns the import map for the current response.
+   *
+   * The import map contains the entries of all libraries provided by core,
+   * the enabled modules and the active theme (including its base themes).
+   * It is emitted in the HTML head of the page, so that module scripts that
+   * are attached later (e.g., in an Ajax response) can also resolve their
+   * imports.
+   *
+   * @return array
+   *   The import map, with the keys 'imports', 'scopes' and 'integrity'.
+   *   Entries under 'imports' and 'scopes' are keyed by the module specifier,
+   *   and resolve to an array with the keys 'data' (the resolved path or
+   *   URL), 'external' (a boolean, TRUE for external URLs) and 'version'.
+   *   Entries under 'integrity' are keyed by the resolved path or URL, and
+   *   resolve to an array with the keys 'data', 'external', 'version' and
+   *   'integrity' (the integrity metadata string).
+   */
+  public function getImportMap(): array;
+
+  /**
+   * Returns the import map entries to preload for the current response.
+   *
+   * When a library that defines import map entries is attached to the page,
+   * the browser is instructed to preload the mapped modules, so that module
+   * scripts can start importing them as soon as they execute.
+   *
+   * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+   *   The assets attached to the current response.
+   *
+   * @return array
+   *   An array of import map entries to preload, each with the keys 'data',
+   *   'external' and 'version'.
+   */
+  public function getImportMapPreloads(AttachedAssetsInterface $assets): array;
+
 }
