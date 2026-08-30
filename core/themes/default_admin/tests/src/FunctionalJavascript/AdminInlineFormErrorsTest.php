@@ -77,7 +77,6 @@ class AdminInlineFormErrorsTest extends WebDriverTestBase {
     $assert_session
       ->waitForElementVisible('named', ['button', 'URL alias'])
       ->press();
-    // $details->press();
     // Wait for details to open.
     $session->wait(500);
     $url_alias_field->setValue('no-slash');
