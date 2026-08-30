@@ -4,17 +4,14 @@ namespace Drupal\user\Authentication\Provider;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Authentication\AuthenticationProviderInterface;
-use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Session\UserSession;
 use Drupal\Core\Session\SessionConfigurationInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -33,11 +30,11 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
   protected $sessionConfiguration;
 
   /**
-   * The database connection.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $connection;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The messenger.
@@ -51,14 +48,14 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
    *
    * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
    *   The session configuration.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The Entity Type Manager.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
    */
-  public function __construct(SessionConfigurationInterface $session_configuration, Connection $connection, MessengerInterface $messenger) {
+  public function __construct(SessionConfigurationInterface $session_configuration, EntityTypeManagerInterface $entityTypeManager, MessengerInterface $messenger) {
     $this->sessionConfiguration = $session_configuration;
-    $this->connection = $connection;
+    $this->entityTypeManager = $entityTypeManager;
     $this->messenger = $messenger;
   }
 
@@ -78,41 +75,14 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
    * {@inheritdoc}
    */
   public function authenticate(Request $request) {
-    return $this->getUserFromSession($request->getSession());
-  }
-
-  /**
-   * Returns the UserSession object for the given session.
-   *
-   * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
-   *   The session.
-   *
-   * @return \Drupal\Core\Session\AccountInterface|null
-   *   The UserSession object for the current user, or NULL if this is an
-   *   anonymous session.
-   */
-  protected function getUserFromSession(SessionInterface $session) {
-    if ($uid = $session->get('uid')) {
-      // @todo Load the User entity in SessionHandler so we don't need queries.
-      // @see https://www.drupal.org/node/2345611
-      $values = $this->connection
-        ->query('SELECT * FROM {users_field_data} [u] WHERE [u].[uid] = :uid AND [u].[default_langcode] = 1', [':uid' => $uid])
-        ->fetchAssoc();
-
-      // Check if the user data was found and the user is active.
-      if (!empty($values) && $values['status'] == 1) {
-        // Add the user's roles.
-        $rids = $this->connection
-          ->query('SELECT [roles_target_id] FROM {user__roles} WHERE [entity_id] = :uid', [':uid' => $values['uid']])
-          ->fetchCol();
-        $values['roles'] = array_merge([AccountInterface::AUTHENTICATED_ROLE], $rids);
-
-        return new UserSession($values);
+    if ($uid = $request->getSession()->get('uid')) {
+      /** @var \Drupal\user\UserInterface $user */
+      if ($user = $this->entityTypeManager->getStorage('user')->load($uid)) {
+        if ($user->isActive()) {
+          return $user;
+        }
       }
     }
-
-    // This is an anonymous session.
-    return NULL;
   }
 
   /**

@@ -206,10 +206,10 @@ class User extends ContentEntityBase implements UserInterface {
       }
     }
 
-    foreach ($this->get('roles') as $role) {
-      if ($role->target_id) {
-        $roles[] = $role->target_id;
-      }
+    $delta = 0;
+    while ($role = $this->getFieldValue('roles', 'target_id', $delta)) {
+      $roles[] = $role;
+      $delta++;
     }
 
     return $roles;
