@@ -57,6 +57,7 @@ views.filter.in_operator:
         limit:
           type: boolean
           label: 'Limit results by selected values'
+          requiredKey: false
     group_info:
       mapping:
         group_items:
