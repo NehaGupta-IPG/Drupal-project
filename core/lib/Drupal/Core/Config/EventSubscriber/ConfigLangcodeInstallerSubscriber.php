@@ -29,11 +29,8 @@ class ConfigLangcodeInstallerSubscriber implements EventSubscriberInterface {
     $installer_langcode = $install_state['parameters']['langcode'] ?? NULL;
     if ($installer_langcode !== NULL) {
       $event->setLangcode($installer_langcode);
-      // The language chosen for this installation is authoritative: nothing
-      // downstream should second-guess it, especially not against a langcode
-      // this event was seeded with (which core's own site-default subscriber
-      // can only judge against system.site:default_langcode - not yet
-      // meaningful this early in the install).
+      // Authoritative: nothing later should second-guess the language
+      // chosen for this installation.
       $event->stopPropagation();
     }
   }

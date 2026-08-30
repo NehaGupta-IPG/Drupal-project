@@ -37,12 +37,10 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
    * record when the target langcode matches the object's own langcode -
    * which, having just been relabelled, it now does.
    *
-   * The previous default is passed in too, so the same call also captures the
-   * relabelled object's pre-change content as a configuration override for
-   * that langcode. Without this, whatever the object said in the old default
-   * language - which the relabel itself never touched, only the langcode
-   * field - would simply be gone: overwritten in place by the new default's
-   * translation, with nothing left holding the original.
+   * The previous default is passed in too, so the same call also saves the
+   * relabelled object's pre-change content as an override for that langcode
+   * - otherwise it would simply be gone, overwritten by the new default's
+   * translation.
    *
    * @param string $old_langcode
    *   The previous default langcode.
