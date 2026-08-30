@@ -11,6 +11,7 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\TempStore\SharedTempStoreFactory;
+use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\Event\PostCreateEvent;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
@@ -112,6 +113,7 @@ final class LongLivedSandboxSubscriber implements EventSubscriberInterface {
         $this->container->get(TimeInterface::class),
         $this->container->get(PathFactoryInterface::class),
         $this->container->get(FailureMarker::class),
+        $this->container->get(ComposerInspector::class),
       ) extends SandboxManagerBase {};
 
       // In direct-write mode, getSandboxDirectory() returns the project root.

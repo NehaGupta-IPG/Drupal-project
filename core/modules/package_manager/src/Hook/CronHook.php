@@ -11,6 +11,7 @@ use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\TempStore\SharedTempStoreFactory;
+use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\EventSubscriber\LongLivedSandboxSubscriber;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
@@ -45,6 +46,7 @@ final class CronHook {
     private readonly FailureMarker $failureMarker,
     private readonly StateInterface $state,
     private readonly FileSystemInterface $fileSystem,
+    private readonly ComposerInspector $composerInspector,
   ) {}
 
   /**
@@ -62,6 +64,7 @@ final class CronHook {
       $this->time,
       $this->pathFactory,
       $this->failureMarker,
+      $this->composerInspector,
     ) extends SandboxManagerBase {};
 
     // In direct-write mode, getSandboxDirectory() returns the project root.
