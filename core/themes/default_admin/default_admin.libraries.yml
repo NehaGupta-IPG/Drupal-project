@@ -432,15 +432,6 @@ sticky:
     - core/drupal.displace
     - core/once
 
-sidebar:
-  css:
-    theme:
-      css/components/sidebar.css: { minified: false }
-  js:
-    migration/js/sidebar.js: { minified: false }
-  dependencies:
-    - core/once
-
 settings:
   js:
     migration/js/settings.js: { minified: false }

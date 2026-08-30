@@ -1,0 +1,26 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Sidebar toggle
+noUi: true
+description: Button that shows or hides the meta sidebar panel on entity forms.
+props:
+  type: object
+  required:
+    - label
+    - controls
+  properties:
+    label:
+      type: string
+      title: Label
+      description: Visually hidden label of the button.
+    controls:
+      type: string
+      title: Controls
+      description: ID of the sidebar element the button toggles (aria-controls).
+    expanded:
+      type: boolean
+      title: Expanded
+      description: Initial expanded state of the sidebar (aria-expanded).
+      default: true
+libraryOverrides:
+  dependencies:
+    - core/once

@@ -126,7 +126,7 @@
     }
   }
 
-  button,
+  button:not(.meta-sidebar__trigger),
   input[type="submit"],
   .action-link--icon-trash.action-link--danger,
   .button.button--danger,

@@ -718,12 +718,17 @@ class FormHooks {
     $this->ensureAdvancedSettings($form);
 
     // Add sidebar toggle.
-    $hide_panel = $this->t('Hide sidebar panel');
+    $hide_panel = $this->t('Show sidebar panel');
     $form['default_admin_sticky_actions']['default_admin_sidebar_toggle'] = [
-      '#markup' => '<a href="#toggle-sidebar" class="meta-sidebar__trigger trigger" role="button" title="' . $hide_panel . '" aria-controls="default_admin_sidebar"><span class="visually-hidden">' . $hide_panel . '</span></a>',
+      '#type' => 'component',
+      '#component' => 'default_admin:sidebar-toggle',
+      '#props' => [
+        'label' => $hide_panel,
+        'controls' => 'default_admin_sidebar',
+        'expanded' => TRUE,
+      ],
       '#weight' => 1000,
     ];
-    $form['#attached']['library'][] = 'default_admin/sidebar';
 
     // Create default_admin_sidebar group.
     $form['default_admin_sidebar'] = [

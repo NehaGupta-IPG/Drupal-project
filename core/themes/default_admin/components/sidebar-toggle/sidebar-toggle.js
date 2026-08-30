@@ -3,23 +3,23 @@
 ((Drupal, drupalSettings, once) => {
   const breakpoint = 1024;
   const breakpointLarge = 1280;
-  const storageMobile = 'Drupal.gin.sidebarExpanded.mobile';
-  const storageDesktop = 'Drupal.gin.sidebarExpanded.desktop';
-  const storageWidth = "Drupal.gin.sidebarWidth";
+  const storageMobile = 'Drupal.admin.sidebarExpanded.mobile';
+  const storageDesktop = 'Drupal.admin.sidebarExpanded.desktop';
+  const storageWidth = "Drupal.admin.sidebarWidth";
   const reSizer = document.getElementById('gin-sidebar-draggable');
   const resizable = document.getElementById('default_admin_sidebar');
   let isResizing = false;
   let startX, startWidth;
 
-  Drupal.behaviors.ginSidebar = {
+  Drupal.behaviors.adminSidebar = {
     attach: function attach(context) {
-      Drupal.ginSidebar.init(context);
+      Drupal.adminSidebar.init(context);
     },
   };
 
-  Drupal.ginSidebar = {
+  Drupal.adminSidebar = {
     init: function (context) {
-      once('ginSidebarInit', '#default_admin_sidebar', context).forEach(() => {
+      once('adminSidebarInit', '#default_admin_sidebar', context).forEach(() => {
         // If variable does not exist, create it, default being to show sidebar.
         if (!localStorage.getItem(storageDesktop)) {
           localStorage.setItem(storageDesktop, 'true');
@@ -35,14 +35,6 @@
           }
         }
 
-        // Show navigation with shortcut:
-        // OPTION + S (Mac) / ALT + S (Windows)
-        document.addEventListener('keydown', e => {
-          if (e.altKey === true && e.code === 'KeyS') {
-            this.toggleSidebar();
-          }
-        });
-
         // Resize observer.
         const resizeHandler = new ResizeObserver(entries => {
           for (let entry of entries) {
@@ -56,16 +48,12 @@
       });
 
       // Toolbar toggle
-      once('ginSidebarToggle', '.meta-sidebar__trigger', context).forEach(el => el.addEventListener('click', e => {
-        e.preventDefault();
-        this.removeInlineStyles();
+      once('adminSidebarToggle', '.meta-sidebar__trigger', context).forEach(el => el.addEventListener('click', e => {
         this.toggleSidebar();
       }));
 
       // Toolbar close
-      once('ginSidebarClose', '.meta-sidebar__close, .meta-sidebar__overlay', context).forEach(el => el.addEventListener('click', e => {
-        e.preventDefault();
-        this.removeInlineStyles();
+      once('adminSidebarClose', '.meta-sidebar__close, .meta-sidebar__overlay', context).forEach(el => el.addEventListener('click', e => {
         this.collapseSidebar();
       }));
     },
@@ -73,29 +61,21 @@
     toggleSidebar: () => {
       // Set active state.
       if (document.querySelector('.meta-sidebar__trigger').classList.contains('is-active')) {
-        Drupal.ginSidebar.collapseSidebar();
-        Drupal.ginStickyFormActions?.hideMoreActions();
+        Drupal.adminSidebar.collapseSidebar();
+        Drupal.adminStickyFormActions?.hideMoreActions();
       }
       else {
-        Drupal.ginSidebar.showSidebar();
-        Drupal.ginStickyFormActions?.hideMoreActions();
+        Drupal.adminSidebar.showSidebar();
+        Drupal.adminStickyFormActions?.hideMoreActions();
       }
     },
 
     showSidebar: () => {
       const chooseStorage = window.innerWidth < breakpoint ? storageMobile : storageDesktop;
-      const hideLabel = Drupal.t('Hide sidebar panel');
       const sidebarTrigger = document.querySelector('.meta-sidebar__trigger');
-      if (sidebarTrigger) {
-        sidebarTrigger.querySelector('span').innerHTML = hideLabel;
-        sidebarTrigger.setAttribute('title', hideLabel);
-        if (sidebarTrigger.nextSibling) {
-          sidebarTrigger.nextSibling.innerHTML = hideLabel;
-        }
-        sidebarTrigger.setAttribute('aria-expanded', 'true');
-        sidebarTrigger.classList.add('is-active');
-      }
 
+      sidebarTrigger?.setAttribute('aria-expanded', 'true');
+      sidebarTrigger?.classList.add('is-active');
       document.body.setAttribute('data-meta-sidebar', 'open');
 
       // Expose to localStorage.
@@ -103,24 +83,16 @@
 
       // Check which toolbar is active.
       if (window.innerWidth < breakpointLarge) {
-        Drupal.ginCoreNavigation?.collapseToolbar();
+        Drupal.adminCoreNavigation?.collapseToolbar();
       }
     },
 
     collapseSidebar: () => {
       const chooseStorage = window.innerWidth < breakpoint ? storageMobile : storageDesktop;
-      const showLabel = Drupal.t('Show sidebar panel');
       const sidebarTrigger = document.querySelector('.meta-sidebar__trigger');
-      if (sidebarTrigger) {
-        sidebarTrigger.querySelector('span').innerHTML = showLabel;
-        sidebarTrigger.setAttribute('title', showLabel);
-        if (sidebarTrigger.nextSibling) {
-          sidebarTrigger.nextSibling.innerHTML = showLabel;
-        }
-        sidebarTrigger.setAttribute('aria-expanded', 'false');
-        sidebarTrigger.classList.remove('is-active');
-      }
 
+      sidebarTrigger?.setAttribute('aria-expanded', 'false');
+      sidebarTrigger?.classList.remove('is-active');
       document.body.setAttribute('data-meta-sidebar', 'closed');
 
       // Expose to localStorage.
@@ -128,26 +100,16 @@
     },
 
     handleResize: (windowSize = window) => {
-      Drupal.ginSidebar.removeInlineStyles();
-
       // If small viewport, always collapse sidebar.
       if (windowSize.width < breakpoint) {
-        Drupal.ginSidebar.collapseSidebar();
+        Drupal.adminSidebar.collapseSidebar();
       } else {
         // If large viewport, show sidebar if it was open before.
         if (localStorage.getItem(storageDesktop) === 'true') {
-          Drupal.ginSidebar.showSidebar();
+          Drupal.adminSidebar.showSidebar();
         } else {
-          Drupal.ginSidebar.collapseSidebar();
+          Drupal.adminSidebar.collapseSidebar();
         }
-      }
-    },
-
-    removeInlineStyles: () => {
-      // Remove init styles.
-      const elementToRemove = document.querySelector('.gin-sidebar-inline-styles');
-      if (elementToRemove) {
-        elementToRemove.parentNode.removeChild(elementToRemove);
       }
     },
 

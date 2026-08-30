@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Sidebar toggle button.
+ *
+ * Available variables:
+ * - label: Visually hidden label and title attribute of the button.
+ * - controls: ID of the sidebar element the button toggles.
+ * - expanded: Initial expanded state of the sidebar.
+ * - attributes: Additional attributes for the button element.
+ */
+#}
+{%
+  set attributes = attributes
+    .setAttribute('type', 'button')
+    .setAttribute('aria-controls', controls)
+    .setAttribute('aria-expanded', expanded ? 'true' : 'false')
+    .addClass(['meta-sidebar__trigger', 'trigger'])
+%}
+<button{{ attributes }}>
+  <span class="visually-hidden">{{ label }}</span>
+</button>
