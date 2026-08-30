@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\TestTools\Extension;
 
 use Drupal\Core\Database\SchemaDefinition\Schema;
-use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
@@ -33,11 +32,17 @@ class SchemaInspector {
   public static function getTablesSpecification(ModuleHandlerInterface $handler, string $module): Schema|array {
     if ($handler->loadInclude($module, 'install')) {
       $schema = $handler->invoke($module, 'schema') ?? [];
+      // @todo Remove Schema check in drupal:13.0.0.
       if ($schema instanceof Schema) {
-        assert($schema->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
-        assert($schema->name === $module, 'Invalid schema definition name, must be equal to the module name');
+        return $schema;
       }
-      return $schema;
+      elseif ($schema === []) {
+        return [];
+      }
+      else {
+        @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:11.5.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
+        return $schema;
+      }
     }
     return [];
   }
@@ -61,6 +66,8 @@ class SchemaInspector {
    */
   public static function getTableNames(ModuleHandlerInterface $handler, string $module): array {
     $schema = self::getTablesSpecification($handler, $module);
+    // @todo Remove check on Schema in drupal:13.0.0 when only Schema objects
+    //   are returned.
     return $schema instanceof Schema ? $schema->tableNames() : array_keys($schema);
   }
 

@@ -549,4 +549,22 @@ class SchemaDefinitionTest extends UnitTestCase {
     $this->assertInstanceOf(Table::class, $table);
   }
 
+  /**
+   * Tests passing varchar columns without length.
+   */
+  public function testMissingVarcharColumnLength(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessageIs('Missing \'length\' for varchar column \'id\'');
+    new Table(
+      name: 'test',
+      columns: [
+        Column::varchar(
+          name: 'id',
+          default: new StringValue('foo'),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+  }
+
 }
