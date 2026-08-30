@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the Default Admin theme.
+ * Tests the Default Admin theme with the Inline Form Errors module.
  */
 #[Group('default_admin')]
 #[RunTestsInSeparateProcesses]
@@ -31,7 +31,7 @@ class AdminInlineFormErrorsTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'stark';
+  protected $defaultTheme = 'default_admin';
 
   /**
    * {@inheritdoc}
@@ -39,11 +39,6 @@ class AdminInlineFormErrorsTest extends WebDriverTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->assertTrue(\Drupal::service('theme_installer')->install(['default_admin']));
-    $this->container->get('config.factory')
-      ->getEditable('system.theme')
-      ->set('admin', 'default_admin')
-      ->save();
     $this->applyRecipe('core/tests/fixtures/recipes/article_content_type');
 
     $admin = $this->drupalCreateUser([], NULL, TRUE);
