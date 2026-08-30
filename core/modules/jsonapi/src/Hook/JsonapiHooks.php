@@ -213,18 +213,6 @@ class JsonapiHooks {
   }
 
   /**
-   * Implements hook_jsonapi_ENTITY_TYPE_filter_access() for 'taxonomy_term'.
-   */
-  #[Hook('jsonapi_taxonomy_term_filter_access')]
-  public function jsonapiTaxonomyTermFilterAccess(EntityTypeInterface $entity_type, AccountInterface $account): array {
-    // @see \Drupal\taxonomy\TermAccessControlHandler::checkAccess()
-    return [
-      JsonApiFilter::AMONG_ALL => AccessResult::allowedIfHasPermission($account, 'administer taxonomy'),
-      JsonApiFilter::AMONG_PUBLISHED => AccessResult::allowedIfHasPermission($account, 'access content'),
-    ];
-  }
-
-  /**
    * Implements hook_jsonapi_ENTITY_TYPE_filter_access() for 'user'.
    */
   #[Hook('jsonapi_user_filter_access')]
