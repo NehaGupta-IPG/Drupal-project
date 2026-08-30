@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+// cspell:ignore anonyme
 namespace Drupal\Tests\language\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
