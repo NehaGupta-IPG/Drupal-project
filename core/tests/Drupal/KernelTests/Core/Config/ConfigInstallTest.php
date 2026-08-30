@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config;
 
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\ConfigCollectionEvents;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\PreExistingConfigException;
@@ -337,6 +338,44 @@ class ConfigInstallTest extends KernelTestBase {
     // needed relabelling to English, must still have installed normally.
     $this->assertEquals('en', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
     $this->assertNotNull($storage->load('dotted.english'));
+  }
+
+  /**
+   * Tests the config hash is unaffected by langcode relabelling on install.
+   *
+   * _core.default_config_hash must be calculated from the configuration as
+   * shipped by the extension, before ConfigInstaller resolves its langcode
+   * to the site's default. Otherwise the same shipped configuration would
+   * hash differently depending on the site's default language, breaking any
+   * comparison against a hash calculated from the shipped file.
+   *
+   * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
+   */
+  public function testLanguageRelabellingDoesNotAffectConfigHash(): void {
+    $this->enableModules(['language']);
+    $this->installConfig(['system', 'language']);
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
+
+    $this->installModules(['config_test_language']);
+
+    // config_test.dynamic.dotted.english ships with no langcode of its own,
+    // so it gets relabelled to the site's non-English default.
+    $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
+
+    // The stored hash must still match a hash calculated from the shipped
+    // file's own data, which has no langcode key at all - not from data
+    // that includes the langcode 'fr' resolves to.
+    $shipped_data = (new InstallStorage())->read('config_test.dynamic.dotted.english');
+    $expected_hash = Crypt::hashBase64(serialize($shipped_data));
+    $this->assertEquals($expected_hash, $this->config('config_test.dynamic.dotted.english')->get('_core.default_config_hash'));
+
+    // config_test.dynamic.dotted.french ships with its own explicit,
+    // supported langcode, so it is left alone and its hash is unaffected
+    // either way - included here to confirm this case never regresses.
+    $shipped_data = (new InstallStorage())->read('config_test.dynamic.dotted.french');
+    $expected_hash = Crypt::hashBase64(serialize($shipped_data));
+    $this->assertEquals($expected_hash, $this->config('config_test.dynamic.dotted.french')->get('_core.default_config_hash'));
   }
 
   /**

@@ -5,7 +5,6 @@ namespace Drupal\Core\Config;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Entity\ConfigDependencyManager;
-use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Installer\InstallerKernel;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -378,19 +377,6 @@ class ConfigInstaller implements ConfigInstallerInterface {
     }
 
     foreach ($config_names as $name) {
-      // If we are syncing, do not resolve a langcode here. system.site
-      // itself may only hold its shipped default_langcode temporarily, until
-      // the config importer's own diff-processing corrects it from the sync
-      // storage later in the same operation - resolving against it now could
-      // permanently mislabel configuration based on a value that is about to
-      // change. Sync storage is authoritative for anything it provides;
-      // configuration that sync does not touch keeps its shipped default.
-      if (!$this->isSyncing() && $collection == StorageInterface::DEFAULT_COLLECTION && $config_to_create[$name] !== FALSE && $this->resolveInstalledLangcode($name, $config_to_create[$name])) {
-        // The configuration ships with an explicit langcode that is not
-        // supported on this site: do not install it at all.
-        continue;
-      }
-
       // Allow config factory overriders to use a custom configuration object if
       // they are responsible for the collection.
       $overrider = $this->configManager->getConfigCollectionInfo()->getOverrideService($collection);
@@ -410,6 +396,26 @@ class ConfigInstaller implements ConfigInstallerInterface {
               'default_config_hash' => Crypt::hashBase64(serialize($config_to_create[$name])),
             ],
           ] + $config_to_create[$name];
+
+          if ($this->typedConfig->hasConfigSchema($name)) {
+            // Building typed data here to check translatability is too
+            // expensive to do twice for every piece of configuration being
+            // installed. Resolving unconditionally instead - including for
+            // configuration with no translatable values at all - is harmless: a
+            // resolved langcode that Config::save() finds unwarranted is
+            // stripped straight back out by its own
+            // reconcileLangcodeWithTranslatability().
+            $event = new ConfigLangcodeResolveEvent($name, $config_to_create[$name]['langcode'] ?? NULL, ConfigLangcodeContext::ExtensionInstall);
+            $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
+            if ($event->isRejected()) {
+              // The configuration ships with an explicit langcode that is not
+              // supported on this site: do not install it at all.
+              continue;
+            }
+            if ($event->getLangcode() !== NULL) {
+              $config_to_create[$name]['langcode'] = $event->getLangcode();
+            }
+          }
         }
         $new_config->setData($config_to_create[$name]);
       }
@@ -450,62 +456,6 @@ class ConfigInstaller implements ConfigInstallerInterface {
         $new_config->save();
       }
     }
-  }
-
-  /**
-   * Resolves the langcode for configuration being installed.
-   *
-   * Extension-shipped default configuration is assumed to be English unless it
-   * ships with an explicit langcode of its own. This mutates $data in place
-   * with the resolved langcode.
-   *
-   * @param string $name
-   *   The configuration name.
-   * @param array $data
-   *   The configuration data to be installed, passed by reference.
-   *
-   * @return bool
-   *   TRUE if the configuration was rejected and must not be installed.
-   */
-  protected function resolveInstalledLangcode($name, array &$data) {
-    if (!$this->typedConfig->hasConfigSchema($name)) {
-      return FALSE;
-    }
-    $typed_data = $this->typedConfig->createFromNameAndData($name, $data);
-    if (!$typed_data instanceof Mapping
-      || !in_array('langcode', $typed_data->getValidKeys(), TRUE)
-      || !$this->hasTranslatableData($typed_data)
-    ) {
-      // Do not add a langcode that Config::save() would immediately remove
-      // again because the configuration has no translatable value - doing so
-      // would make the installed _core.default_config_hash inconsistent with
-      // what actually ends up in storage.
-      return FALSE;
-    }
-
-    $event = new ConfigLangcodeResolveEvent($name, $data['langcode'] ?? NULL, ConfigLangcodeContext::ExtensionInstall);
-    $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
-    if ($event->isRejected()) {
-      return TRUE;
-    }
-    if ($event->getLangcode() !== NULL) {
-      $data['langcode'] = $event->getLangcode();
-    }
-    return FALSE;
-  }
-
-  /**
-   * Determines whether typed configuration data has a translatable value.
-   *
-   * @param \Drupal\Core\Config\Schema\Mapping $element
-   *   The typed data element to check.
-   *
-   * @return bool
-   *   TRUE if the element itself, or any of its present children, is
-   *   translatable.
-   */
-  protected function hasTranslatableData(Mapping $element) {
-    return $element->getDataDefinition()['translatable'] || $element->hasTranslatableElements();
   }
 
   /**
