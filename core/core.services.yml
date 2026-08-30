@@ -438,8 +438,6 @@ services:
     autowire: true
   config.importer_subscriber:
     class: Drupal\Core\Config\Importer\FinalMissingContentSubscriber
-  config.langcode_fallback_subscriber:
-    class: Drupal\Core\Config\EventSubscriber\ConfigLangcodeFallbackSubscriber
   config.langcode_site_default_subscriber:
     class: Drupal\Core\Config\EventSubscriber\ConfigLangcodeSiteDefaultSubscriber
     arguments: ['@config.factory']

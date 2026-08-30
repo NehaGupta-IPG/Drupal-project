@@ -65,7 +65,7 @@ class ConfigLangcodeSiteDefaultSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     return [
-      ConfigEvents::RESOLVE_LANGCODE => ['onResolveLangcode', 0],
+      ConfigEvents::RESOLVE_LANGCODE => ['onResolveLangcode', -10000],
     ];
   }
 
