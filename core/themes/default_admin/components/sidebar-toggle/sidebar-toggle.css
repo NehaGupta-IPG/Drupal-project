@@ -47,12 +47,8 @@
     visibility: hidden;
     opacity: 0;
   }
-}
 
-body[data-meta-sidebar="closed"] {
-  --admin-theme-sidebar-offset: 0px;
-
-  .layout-region--secondary {
+  body[data-meta-sidebar="closed"] & {
     visibility: hidden;
     transform: translateX(var(--admin-theme-sidebar-width));
 
@@ -60,16 +56,18 @@ body[data-meta-sidebar="closed"] {
       transform: translateX(calc(var(--admin-theme-sidebar-width) * -1));
     }
   }
-}
 
-body[data-meta-sidebar="open"] {
-  .layout-region--secondary {
+  body[data-meta-sidebar="open"] & {
     @media (max-width: 63.99em) {
       visibility: visible;
       opacity: 1;
       transform: none;
     }
   }
+}
+
+body[data-meta-sidebar="closed"] {
+  --admin-theme-sidebar-offset: 0px;
 }
 
 :is(#extra-specificity-hack, [data-drupal-admin-styles]) .meta-sidebar__close,
@@ -79,6 +77,10 @@ body[data-meta-sidebar="open"] {
   cursor: pointer;
   border-radius: var(--admin-radius-m);
   background: transparent;
+  position: absolute;
+  z-index: 104;
+  inset-block-start: 1.125rem;
+  inset-inline-end: var(--admin-space-m);
 
   &::before {
     display: inline-block;
@@ -88,6 +90,8 @@ body[data-meta-sidebar="open"] {
     background-color: var(--admin-color-icon);
     mask-repeat: no-repeat;
     mask-position: center center;
+    mask-image: url("data:image/svg+xml,%3csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3e  %3cg fill='none' stroke='currentColor' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3e    %3cpath d='M20 4L4 20' /%3e    %3cpath d='M4 4L20 20' /%3e  %3c/g%3e%3c/svg%3e");
+    mask-size: 1rem 1rem;
   }
 
   &:hover,
@@ -105,6 +109,10 @@ body[data-meta-sidebar="open"] {
     &::before {
       background-color: var(--admin-color-primary-active);
     }
+  }
+
+  @media (min-width: 64em) {
+    display: none;
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -153,23 +161,6 @@ body[data-meta-sidebar="open"] {
 
   @media (prefers-reduced-motion: no-preference) {
     transition: background var(--admin-transition-slow);
-  }
-}
-
-:is(#extra-specificity-hack, [data-drupal-admin-styles]) .meta-sidebar__close,
-.meta-sidebar__close {
-  position: absolute;
-  z-index: 104;
-  inset-block-start: 1.125rem;
-  inset-inline-end: var(--admin-space-m);
-
-  &::before {
-    mask-image: url("data:image/svg+xml,%3csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3e  %3cg fill='none' stroke='currentColor' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3e    %3cpath d='M20 4L4 20' /%3e    %3cpath d='M4 4L20 20' /%3e  %3c/g%3e%3c/svg%3e");
-    mask-size: 1rem 1rem;
-  }
-
-  @media (min-width: 64em) {
-    display: none;
   }
 }
 
