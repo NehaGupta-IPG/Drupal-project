@@ -175,9 +175,7 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
    *
    * @throws \Drupal\language\Exception\DeleteDefaultLanguageException
    *   Exception thrown if we're trying to delete the default language entity.
-   *   This is not allowed as a site must have a default language. This also
-   *   covers the configuration default language: system.site:default_langcode
-   *   is the only such concept, so protecting it here protects both.
+   *   This is not allowed as a site must have a default language.
    */
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
     $default_langcode = static::getDefaultLangcode();
@@ -190,10 +188,6 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
 
   /**
    * {@inheritdoc}
-   *
-   * @todo https://www.drupal.org/i/3337864 Handle deletion of a language
-   *   that default collection configuration is still using as its langcode:
-   *   delete that configuration.
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
     parent::postDelete($storage, $entities);
