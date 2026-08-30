@@ -442,6 +442,9 @@ services:
     class: Drupal\Core\Config\EventSubscriber\ConfigLangcodeFallbackSubscriber
   config.langcode_installer_subscriber:
     class: Drupal\Core\Config\EventSubscriber\ConfigLangcodeInstallerSubscriber
+  config.langcode_site_default_subscriber:
+    class: Drupal\Core\Config\EventSubscriber\ConfigLangcodeSiteDefaultSubscriber
+    arguments: ['@config.factory']
   config.installer:
     class: Drupal\Core\Config\ConfigInstaller
     arguments: ['@config.factory', '@config.storage', '@config.typed', '@config.manager', '@event_dispatcher', '%install_profile%', '@extension.path.resolver']

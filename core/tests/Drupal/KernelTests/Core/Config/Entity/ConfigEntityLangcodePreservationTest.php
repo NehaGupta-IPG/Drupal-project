@@ -24,16 +24,16 @@ class ConfigEntityLangcodePreservationTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['language', 'config_test'];
+  protected static $modules = ['system', 'language', 'config_test'];
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->installConfig(['language']);
+    $this->installConfig(['system', 'language']);
     ConfigurableLanguage::createFromLangcode('fr')->save();
-    $this->config('language.settings')->set('default_config_langcode', 'fr')->save();
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
   }
 
   /**

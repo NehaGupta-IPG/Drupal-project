@@ -295,9 +295,9 @@ class ConfigInstallTest extends KernelTestBase {
    */
   public function testLanguageRelabelsToConfigurationDefault(): void {
     $this->enableModules(['language']);
-    $this->installConfig(['language']);
+    $this->installConfig(['system', 'language']);
     ConfigurableLanguage::createFromLangcode('fr')->save();
-    $this->config('language.settings')->set('default_config_langcode', 'fr')->save();
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
 
     $this->installModules(['config_test_language']);
 

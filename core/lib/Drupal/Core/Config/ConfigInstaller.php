@@ -378,8 +378,8 @@ class ConfigInstaller implements ConfigInstallerInterface {
     }
 
     foreach ($config_names as $name) {
-      // If we are syncing, do not resolve a langcode here. language.settings
-      // itself may only hold its shipped default value temporarily, until
+      // If we are syncing, do not resolve a langcode here. system.site
+      // itself may only hold its shipped default_langcode temporarily, until
       // the config importer's own diff-processing corrects it from the sync
       // storage later in the same operation - resolving against it now could
       // permanently mislabel configuration based on a value that is about to

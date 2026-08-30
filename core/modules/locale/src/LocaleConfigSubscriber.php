@@ -60,6 +60,24 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
     // the update itself was not initiated by locale data changes.
     if (!InstallerKernel::installationAttempted() && !$this->localeConfigManager->isUpdatingTranslationsFromLocale()) {
       $config = $event->getConfig();
+
+      // A langcode-only change - the values themselves are unchanged - is a
+      // relabel, not an edit: the config was not actually authored in the
+      // new language, so it must not be fed back as a customized
+      // translation into it. Without this, relabelling configuration to a
+      // new default language (see
+      // \Drupal\language\DefaultLangcodeConfigUpdater) would clobber any
+      // real translation for that language with the still-untranslated
+      // values, before anything has a chance to apply the real translation.
+      if ($event->isChanged('langcode')) {
+        $data = $config->get();
+        $original = $config->getOriginal();
+        unset($data['langcode'], $original['langcode']);
+        if ($data === $original) {
+          return;
+        }
+      }
+
       $langcode = $config->get('langcode') ?: 'en';
       $this->updateLocaleStorage($config, $langcode);
     }

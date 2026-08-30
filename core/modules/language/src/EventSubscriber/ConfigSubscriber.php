@@ -3,12 +3,14 @@
 namespace Drupal\language\EventSubscriber;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\language\ConfigurableLanguageManager;
+use Drupal\language\DefaultLangcodeConfigUpdater;
 use Drupal\language\HttpKernel\PathProcessorLanguage;
 use Drupal\language\LanguageNegotiatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -64,8 +66,12 @@ class ConfigSubscriber implements EventSubscriberInterface {
    *   The configuration factory.
    * @param \Drupal\language\LanguageNegotiatorInterface $language_negotiator
    *   The language negotiator.
+   * @param \Drupal\language\DefaultLangcodeConfigUpdater $defaultLangcodeConfigUpdater
+   *   The default langcode configuration updater.
+   * @param \Drupal\Core\Config\ConfigInstallerInterface $configInstaller
+   *   The config installer, used to check whether configuration is syncing.
    */
-  public function __construct(LanguageManagerInterface $language_manager, LanguageDefault $language_default, ConfigFactoryInterface $config_factory, LanguageNegotiatorInterface $language_negotiator) {
+  public function __construct(LanguageManagerInterface $language_manager, LanguageDefault $language_default, ConfigFactoryInterface $config_factory, LanguageNegotiatorInterface $language_negotiator, protected readonly DefaultLangcodeConfigUpdater $defaultLangcodeConfigUpdater, protected readonly ConfigInstallerInterface $configInstaller) {
     $this->languageManager = $language_manager;
     $this->languageDefault = $language_default;
     $this->configFactory = $config_factory;
@@ -111,6 +117,27 @@ class ConfigSubscriber implements EventSubscriberInterface {
         }
         if ($negotiation_changed) {
           $negotiation_config->save();
+        }
+
+        // Reconcile configuration langcode with the new default - but never
+        // while configuration is syncing. An import's source storage is a
+        // complete, self-consistent snapshot: it is responsible for
+        // providing correct langcodes for anything it changes itself, the
+        // same reasoning that keeps ConfigInstaller and Config::save() from
+        // touching langcode mid-sync. Relabeling live here as well could
+        // fight with what the import is in the middle of applying.
+        //
+        // @todo This has only been confirmed for the form-submission case.
+        //   A non-syncing save with no form behind it - a drush command, a
+        //   plain API call - still needs to be confirmed, and if
+        //   batch_set() is not processed there, this needs to run
+        //   $batch['operations'] inline instead, synchronously, in this
+        //   method. Other options considered: queuing the work for cron
+        //   (rejected for now because it leaves the site with inconsistent
+        //   config langcodes until cron next runs).
+        if (!$this->configInstaller->isSyncing()) {
+          $batch = $this->defaultLangcodeConfigUpdater->buildBatch($old_default_langcode, $new_default_langcode);
+          batch_set($batch);
         }
       }
       // Trigger a container rebuild on the next request by invalidating it.
