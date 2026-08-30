@@ -2,8 +2,6 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
-use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
-use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;

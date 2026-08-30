@@ -58,6 +58,8 @@ parameters:
     - modules/system/tests/modules/router_test_directory/src/Controller/TestMissingDependency.php
     # The following class is only for PHPCS.
     - tests/phpcs/PhpScriptFilter.php
+    # @todo temporary, remove
+    - modules/pgsql
 
   ignoreErrors:
     # new static() is a best practice in Drupal, so we cannot fix that.

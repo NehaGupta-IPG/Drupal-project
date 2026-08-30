@@ -8,7 +8,6 @@ use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\GinIndex;
 use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
-use Drupal\Core\Database\SchemaDefinition\IndexInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
@@ -658,7 +657,7 @@ abstract class Schema implements PlaceholderInterface {
         }
       }
       if ($key instanceof Index) {
-        $indexes[$name] = $tmp->toArray();
+        $indexes[$name] = $key->toArray();
         continue;
       }
       if (in_array(get_class($key), $this->getSupportedIndexTypes(), TRUE)) {
