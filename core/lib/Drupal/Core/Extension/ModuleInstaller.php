@@ -244,7 +244,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   An array of the already installed modules.
    * @param bool $sync_status
    *   The config sync status.
-   * @param list<\Drupal\Core\Extension\Extension> $module_data
+   * @param array<string, \Drupal\Core\Extension\Extension> $module_data
    *   The scanned modules data.
    */
   private function doInstall(array $module_list, array $installed_modules, bool $sync_status, array $module_data): void {

@@ -76,7 +76,7 @@ function database_test_schema(): Schema {
         notNull: TRUE,
         default: new StringValue(''),
       ),
-      Column::varcharAscii(
+      Column::varchar(
         name: 'name',
         description: "A person's name",
         length: 255,
