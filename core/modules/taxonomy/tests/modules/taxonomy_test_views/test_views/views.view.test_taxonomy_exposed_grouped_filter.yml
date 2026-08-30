@@ -179,7 +179,6 @@ display:
             remember_roles:
               authenticated: authenticated
             reduce: false
-            limit: false
           is_grouped: true
           group_info:
             label: 'views_testing_tags (field_views_testing_tags)'

@@ -31,7 +31,6 @@ display:
             label: 'Content: Type'
             operator_id: type_op
             reduce: false
-            limit: false
           exposed: true
           field: type
           id: type
