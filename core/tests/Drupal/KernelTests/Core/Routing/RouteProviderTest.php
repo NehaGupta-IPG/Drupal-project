@@ -620,6 +620,13 @@ class RouteProviderTest extends KernelTestBase {
     $this->assertEquals([], $cache->data['query']);
     $this->assertCount(3, $cache->data['routes']);
 
+    $path = '/non-existing-path';
+    $request = Request::create($path, 'GET');
+    $provider->getRouteCollectionForRequest($request);
+
+    $cache = $this->cache->get('route:[language]=en:/non-existing-path');
+    $this->assertFalse($cache);
+
     // Test with a different current language by switching out the default
     // language.
     $swiss = ConfigurableLanguage::createFromLangcode('gsw-berne');
