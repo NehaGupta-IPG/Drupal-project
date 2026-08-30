@@ -2,15 +2,73 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
+use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Query\Truncate as QueryTruncate;
+
+// cSpell:ignore autoincrement
 
 /**
  * SQLite implementation of \Drupal\Core\Database\Query\Truncate.
  *
  * SQLite doesn't support TRUNCATE, but a DELETE query with no condition has
- * exactly the effect (it is implemented by DROPing the table).
+ * exactly the effect (it is implemented by DROPing the table). A DELETE leaves
+ * the AUTOINCREMENT high-water mark of the table behind in "sqlite_sequence",
+ * so the serial ID is reset by dropping the row that table holds for it. The
+ * "reset_serial_id" option set to FALSE leaves that row alone.
  */
 class Truncate extends QueryTruncate {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function execute(): void {
+    $reset_serial_id = $this->queryOptions['reset_serial_id'] ?? TRUE;
+    if (!$reset_serial_id) {
+      parent::execute();
+      return;
+    }
+
+    // Resetting the serial ID takes a statement of its own here, so the two
+    // run in a transaction. Both are ordinary DML on SQLite, and this class
+    // builds a DELETE with or without a transaction, so a failure leaves the
+    // table and its serial ID as they were.
+    $transaction = $this->connection->startTransaction();
+    try {
+      $this->resetSerialId();
+      parent::execute();
+    }
+    catch (\Throwable $e) {
+      $transaction->rollBack();
+      throw $e;
+    }
+    $transaction->commitOrRelease();
+  }
+
+  /**
+   * Drops the AUTOINCREMENT high-water mark that sqlite_sequence holds.
+   */
+  protected function resetSerialId(): void {
+    // In this driver a prefix is an attached database, so the schema has to be
+    // named explicitly instead of going through the query builder, which would
+    // prefix the name of the internal table as if it were a Drupal one.
+    $schema_name = rtrim($this->connection->getPrefix(), '.') ?: 'main';
+    try {
+      $this->connection->query("DELETE FROM [" . $schema_name . "].sqlite_sequence WHERE name = :name", [':name' => $this->table]);
+    }
+    catch (DatabaseExceptionWrapper $e) {
+      // sqlite_sequence only exists once a table of this schema uses
+      // AUTOINCREMENT, so it is missing while no table has a serial column. The
+      // statement is attempted before checking that, so the common case spends
+      // one query here instead of two. Anything else is a real failure.
+      $sequence_exists = (bool) $this->connection->query("SELECT 1 FROM [" . $schema_name . "].sqlite_master WHERE type = :type AND name = :name", [
+        ':type' => 'table',
+        ':name' => 'sqlite_sequence',
+      ])->fetchField();
+      if ($sequence_exists) {
+        throw $e;
+      }
+    }
+  }
 
   /**
    * {@inheritdoc}

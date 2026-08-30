@@ -171,4 +171,84 @@ class DeleteTruncateTest extends DatabaseTestBase {
     $this->connection->truncate('a-table-that-does-not-exist')->execute();
   }
 
+  /**
+   * Confirms that emptying a table resets its serial ID.
+   */
+  public function testTruncateResetsSerialId(): void {
+    $this->assertGreaterThan(1, $this->connection->select('test')->countQuery()->execute()->fetchField());
+
+    $this->connection->truncate('test')->execute();
+
+    // The serial ID no longer holds the IDs of the removed rows, so the next
+    // row gets the first ID again.
+    $this->assertSame(1, $this->insertPerson('Freddie'));
+  }
+
+  /**
+   * Confirms that refilling leaves the serial ID at the highest ID held.
+   */
+  public function testTruncateResetsSerialIdBeforeRefill(): void {
+    $this->connection->truncate('test')->execute();
+
+    // Refill with fewer rows than the table held, so that the serial ID ends
+    // up below where the removed rows left it.
+    $this->connection->insert('test')
+      ->fields(['id', 'name', 'age', 'job'])
+      ->values(['id' => 1, 'name' => 'John', 'age' => 25, 'job' => 'Singer'])
+      ->values(['id' => 2, 'name' => 'George', 'age' => 27, 'job' => 'Singer'])
+      ->execute();
+
+    $this->assertSame(3, $this->insertPerson('Freddie'));
+  }
+
+  /**
+   * Confirms that a table without a serial column is emptied as well.
+   */
+  public function testTruncateWithoutSerialColumn(): void {
+    // The primary key of test_people is not a serial column, so the table has
+    // no serial ID to reset.
+    $this->assertGreaterThan(0, $this->connection->select('test_people')->countQuery()->execute()->fetchField());
+
+    $this->connection->truncate('test_people')->execute();
+
+    $this->assertEquals(0, $this->connection->select('test_people')->countQuery()->execute()->fetchField());
+  }
+
+  /**
+   * Confirms that the reset_serial_id option set to FALSE keeps the serial ID.
+   *
+   * Every driver empties the table by the fastest statement that leaves the
+   * serial ID where the removed rows put it.
+   */
+  public function testTruncateWithoutResettingSerialId(): void {
+    $last_id = $this->insertPerson('Freddie');
+    $this->assertGreaterThan(1, $last_id);
+
+    $this->connection->truncate('test', ['reset_serial_id' => FALSE])->execute();
+
+    $this->assertEquals(0, $this->connection->select('test')->countQuery()->execute()->fetchField());
+
+    // The serial ID carries on from the rows that are gone.
+    $this->assertSame($last_id + 1, $this->insertPerson('Brian'));
+  }
+
+  /**
+   * Inserts a row into the test table without an explicit ID.
+   *
+   * @param string $name
+   *   The name of the person, unique within the table.
+   *
+   * @return int
+   *   The ID the serial column handed out.
+   */
+  private function insertPerson(string $name): int {
+    return (int) $this->connection->insert('test')
+      ->fields([
+        'name' => $name,
+        'age' => 45,
+        'job' => 'Great singer',
+      ])
+      ->execute();
+  }
+
 }
