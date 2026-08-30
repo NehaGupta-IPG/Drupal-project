@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\language;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\language\Config\LanguageConfigOverride;
 use Drupal\language\Event\LanguageDefaultLangcodeChangeEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -54,6 +56,11 @@ class DefaultLangcodeConfigUpdater {
    * walking every object anyway, this also enforces the standing rule that
    * configuration without a translatable value should not carry a langcode.
    *
+   * A configuration override already existing for the new default langcode
+   * is absorbed into the configuration being relabelled, then removed: the
+   * new default language can no longer have an override of its own once the
+   * active configuration itself becomes its canonical copy.
+   *
    * @param string $old_langcode
    *   The previous default langcode.
    * @param string $new_langcode
@@ -95,7 +102,24 @@ class DefaultLangcodeConfigUpdater {
       }
 
       if ($current_langcode === NULL || $current_langcode === $old_langcode) {
+        $override = static::getRawLanguageConfigOverride($new_langcode, $name);
+        $had_override = !$override->isNew();
+        if ($had_override) {
+          // The override predates the new default and holds deliberately
+          // authored values for it - more authoritative than whatever the
+          // relabelled configuration currently says. Merge it in before the
+          // active configuration is saved, so a subscriber reacting to the
+          // override's removal below sees the merged content already in
+          // place, not the pre-merge values it is replacing.
+          $config->setData(NestedArray::mergeDeepArray([$data, $override->get()], TRUE));
+        }
         $config->set('langcode', $new_langcode)->save();
+        if ($had_override) {
+          // The new default language can no longer have an override of its
+          // own: the active configuration just saved above is now its
+          // canonical copy.
+          $override->delete();
+        }
         // Record which names were actually relabelled to the new default, so
         // other batch operations (for example locale module translating
         // them) know what to act on.
@@ -105,6 +129,40 @@ class DefaultLangcodeConfigUpdater {
 
     $context['sandbox']['progress'] = ($context['sandbox']['progress'] ?? 0) + count($names);
     $context['finished'] = empty($context['sandbox']['max']) ? 1 : $context['sandbox']['progress'] / $context['sandbox']['max'];
+  }
+
+  /**
+   * Gets a language override, bypassing the "skip English" shortcut.
+   *
+   * \Drupal\language\Config\LanguageConfigFactoryOverride::getStorage()
+   * substitutes a dummy, always-empty storage for langcode 'en' whenever
+   * English is currently both the negotiated and the default language,
+   * since an English override could never matter then - a safe assumption
+   * everywhere else, but not here: this runs exactly while the default
+   * language is changing, including changing back to English, precisely
+   * the moment an 'en' override left behind by an earlier change away from
+   * English needs to be found. Going through the real storage collection
+   * directly, rather than through language.config_factory_override, gets
+   * the real answer regardless of what the current request happens to
+   * negotiate.
+   *
+   * @param string $langcode
+   *   The langcode of the override to get.
+   * @param string $name
+   *   The configuration object name.
+   *
+   * @return \Drupal\language\Config\LanguageConfigOverride
+   *   The language override object, reflecting whatever is actually in
+   *   storage.
+   */
+  protected static function getRawLanguageConfigOverride(string $langcode, string $name): LanguageConfigOverride {
+    $storage = \Drupal::service('config.storage')->createCollection('language.' . $langcode);
+    $override = new LanguageConfigOverride($name, $storage, \Drupal::service(TypedConfigManagerInterface::class), \Drupal::service('event_dispatcher'));
+    $data = $storage->read($name);
+    if (!empty($data)) {
+      $override->initWithData($data);
+    }
+    return $override;
   }
 
 }

@@ -20,7 +20,10 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
    * Adds a batch operation to translate whatever the sweep relabels.
    */
   public function onDefaultLangcodeChange(LanguageDefaultLangcodeChangeEvent $event): void {
-    $event->addOperation([static::class, 'translateRelabelledConfigOperation'], [$event->getNewLangcode()]);
+    $event->addOperation(
+      [static::class, 'translateRelabelledConfigOperation'],
+      [$event->getOldLangcode(), $event->getNewLangcode()]
+    );
   }
 
   /**
@@ -34,15 +37,24 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
    * record when the target langcode matches the object's own langcode -
    * which, having just been relabelled, it now does.
    *
+   * The previous default is passed in too, so the same call also captures the
+   * relabelled object's pre-change content as a configuration override for
+   * that langcode. Without this, whatever the object said in the old default
+   * language - which the relabel itself never touched, only the langcode
+   * field - would simply be gone: overwritten in place by the new default's
+   * translation, with nothing left holding the original.
+   *
+   * @param string $old_langcode
+   *   The previous default langcode.
    * @param string $new_langcode
    *   The new default langcode.
    * @param array|\ArrayAccess $context
    *   The batch context.
    */
-  public static function translateRelabelledConfigOperation(string $new_langcode, &$context): void {
+  public static function translateRelabelledConfigOperation(string $old_langcode, string $new_langcode, &$context): void {
     $names = $context['results']['relabelled_names'] ?? [];
     if (!empty($names)) {
-      \Drupal::service(LocaleConfigManager::class)->updateConfigTranslations($names, [$new_langcode]);
+      \Drupal::service(LocaleConfigManager::class)->updateConfigTranslations($names, [$old_langcode, $new_langcode]);
     }
     $context['finished'] = 1;
   }
