@@ -12,6 +12,17 @@ use Drupal\Core\Render\Element\FormElementBase;
 abstract class DateElementBase extends FormElementBase {
 
   /**
+   * Adds form element theming to date elements.
+   */
+  public static function preRenderDate(array $element): array {
+    // The .js-form-wrapper class is required for #states to treat datetime like
+    // containers.
+    static::setAttributes($element, ['js-form-wrapper', 'form-wrapper']);
+
+    return $element;
+  }
+
+  /**
    * Specifies the start and end year to use as a date range.
    *
    * Handles a string like -3:+3 or 2001:2010 to describe a dynamic range of
