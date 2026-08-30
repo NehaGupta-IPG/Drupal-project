@@ -12,8 +12,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Resolves configuration langcode to the language chosen during site install.
  *
- * Always registered, but only acts while a site installation is under way.
+ * Only registered while a site installation is under way.
  *
+ * @see \Drupal\Core\Installer\NormalInstallerServiceProvider
  * @see \Drupal\Core\Installer\ConfigOverride
  */
 class ConfigLangcodeInstallerSubscriber implements EventSubscriberInterface {
@@ -40,7 +41,7 @@ class ConfigLangcodeInstallerSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     return [
-      ConfigEvents::RESOLVE_LANGCODE => ['onResolveLangcode', 100],
+      ConfigEvents::RESOLVE_LANGCODE => ['onResolveLangcode', 10000],
     ];
   }
 
