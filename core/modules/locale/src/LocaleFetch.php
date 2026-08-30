@@ -48,19 +48,22 @@ class LocaleFetch {
   public function buildUpdateBatch(array $projects = [], array $langcodes = [], array $options = []): array {
     $projects = $projects ?: array_keys($this->localeProjectRepository->getAll());
     $langcodes = $langcodes ?: array_keys($this->localeLanguages->getTranslatableLanguages());
-    $status_options = $options;
-    $status_options['finish_feedback'] = FALSE;
 
     $batch_builder = (new BatchBuilder())
       ->setTitle($this->t('Updating translations'))
       ->setErrorMessage($this->t('Error importing translation files'))
       ->setFinishCallback(self::class . ':batchFinished');
-    // Check status of local and remote translation files.
-    $operations = $this->getStatusOperations($projects, $langcodes, $status_options);
-    // Download and import translations.
-    $operations = array_merge($operations, $this->getFetchOperations($projects, $langcodes, $options));
-    foreach ($operations as $operation) {
-      $batch_builder->addOperation(... $operation);
+    // Check the status of local and remote translation files and download
+    // newer remote files in a single operation per project and language,
+    // using a conditional GET request, then import the result. The version
+    // check must run first so that stale files of an old project version are
+    // purged before the fetch decides what is current.
+    foreach ($projects as $project) {
+      foreach ($langcodes as $langcode) {
+        $batch_builder->addOperation(self::class . ':batchVersionCheck', [$project, $langcode]);
+        $batch_builder->addOperation(self::class . ':batchConditionalFetch', [$project, $langcode]);
+        $batch_builder->addOperation(self::class . ':batchImport', [$project, $langcode, $options]);
+      }
     }
 
     return $batch_builder->toArray();
@@ -295,6 +298,95 @@ class LocaleFetch {
   /**
    * Implements callback_batch_operation().
    *
+   * Checks the status of a project's translation and fetches it if newer.
+   *
+   * Combines batchStatusCheck() and batchDownload() into a single operation
+   * for flows that check and fetch in direct succession, such as the
+   * installer and cron. A single conditional GET request replaces the HEAD
+   * request followed by a GET request that the separate operations perform.
+   *
+   * @param string $project
+   *   The name of the project to check and fetch translations for.
+   * @param string $langcode
+   *   Language code.
+   * @param array|\ArrayAccess $context
+   *   The batch context.
+   *
+   * @see \Drupal\locale\LocaleFetch::batchImport()
+   */
+  public function batchConditionalFetch(string $project, string $langcode, array|\ArrayAccess &$context): void {
+    $source = $this->localeSource->loadSource($project, $langcode);
+
+    // Refresh the status of a local translation file, if any.
+    if (isset($source->files[LOCALE_TRANSLATION_LOCAL])) {
+      if ($file = $this->localeSource->sourceCheckFile($source)) {
+        $this->localeSource->saveSource($source->name, $source->langcode, LOCALE_TRANSLATION_LOCAL, $file);
+      }
+    }
+
+    $context['message'] = $this->t('Checked %langcode translation for %project.', [
+      '%langcode' => $langcode,
+      '%project' => $source->project,
+    ]);
+
+    $use_remote = $this->configFactory->get('locale.settings')->get('translation.use_source') == LOCALE_TRANSLATION_USE_SOURCE_REMOTE_AND_LOCAL;
+    if (!$use_remote || !isset($source->files[LOCALE_TRANSLATION_REMOTE])) {
+      $context['results']['files'][] = $source->name;
+      return;
+    }
+
+    $remote_file = $source->files[LOCALE_TRANSLATION_REMOTE];
+    // drupal.org does not serve English translations, so do not make a
+    // request at all for the default server pattern. A custom server pattern
+    // may support English and is still checked.
+    if ($langcode === 'en') {
+      $uri = $this->localeSource->buildServerPattern($source, strtr(\Drupal::TRANSLATION_DEFAULT_SERVER_PATTERN, ['%language' => $langcode]));
+      if ($uri === $remote_file->uri) {
+        $context['results']['failed_files'][] = $source->name;
+        return;
+      }
+    }
+
+    // The stored remote timestamp is the server's modification time from a
+    // previous check or download. Local file times are deliberately not used
+    // as a fallback: they record when a file was written locally, not when
+    // its content was generated on the server (a file shipped by a
+    // distribution can carry a recent time for old content), so they cannot
+    // be trusted for an If-Modified-Since comparison. Without a stored
+    // remote timestamp the file is fetched unconditionally.
+    $since = (int) ($remote_file->timestamp ?? 0);
+
+    $info = $this->localeFileManager->fetchTranslationSource($remote_file, $since);
+    switch ($info->status) {
+      case RemoteFileStatus::Success:
+        // Record the remote file's data. In case of a redirect we store the
+        // resulting uri.
+        $remote_file->uri = $info->location ?? $remote_file->uri;
+        $remote_file->timestamp = $info->lastModified;
+        $this->localeSource->saveSource($source->name, $source->langcode, LOCALE_TRANSLATION_REMOTE, $remote_file);
+        $this->localeSource->saveSource($source->name, $source->langcode, LOCALE_TRANSLATION_LOCAL, $info->file);
+        $context['results']['files'][] = $source->name;
+        $context['message'] = $this->t('Downloaded %langcode translation for %project.', [
+          '%langcode' => $langcode,
+          '%project' => $source->project,
+        ]);
+        break;
+
+      case RemoteFileStatus::NotModified:
+      case RemoteFileStatus::Missing:
+        // Nothing newer to fetch; a missing file is a routine outcome for
+        // projects without a translation on the server.
+        $context['results']['files'][] = $source->name;
+        break;
+
+      default:
+        $context['results']['failed_files'][] = $source->name;
+    }
+  }
+
+  /**
+   * Implements callback_batch_operation().
+   *
    * Checks the presence and creation time po translation files in located at
    * remote server location and local file system.
    *
@@ -338,8 +430,10 @@ class LocaleFetch {
         }
       }
 
-      $remoteFileInfo = $this->localeFileManager->checkRemoteFileStatus($remote_file->uri);
-      if (!$failure && $remoteFileInfo->status !== RemoteFileStatus::Error) {
+      // Do not make a request at all when the source is already known to be
+      // unusable, such as English on the default server pattern.
+      $remoteFileInfo = $failure ? NULL : $this->localeFileManager->checkRemoteFileStatus($remote_file->uri);
+      if ($remoteFileInfo && $remoteFileInfo->status !== RemoteFileStatus::Error) {
         // Update the file object with the result data. In case of a redirect we
         // store the resulting uri.
         if ($remoteFileInfo->lastModified) {

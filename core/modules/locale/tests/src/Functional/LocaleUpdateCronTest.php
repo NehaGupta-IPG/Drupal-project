@@ -108,8 +108,8 @@ class LocaleUpdateCronTest extends LocaleUpdateBase {
     // Check whether tasks are added to the queue.
     // Expected tasks:
     // - \Drupal\locale\LocaleFetch::batchVersionCheck()
-    // - \Drupal\locale\LocaleFetch::batchStatusCheck()
-    // - \Drupal\locale\LocaleProjectChecker::batchFinished()
+    // - \Drupal\locale\LocaleFetch::batchConditionalFetch()
+    // - \Drupal\locale\LocaleFetch::batchImport()
     $queue = \Drupal::queue('locale_translation', TRUE);
     $this->assertEquals(3, $queue->numberOfItems(), 'Queue holds tasks for one project.');
     $item = $queue->claimItem();
