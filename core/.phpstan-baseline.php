@@ -15610,6 +15610,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/language/tests/src/Kernel/Views/LanguageTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Kernel\\\\Views\\\\LanguageTestBase\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/language/tests/src/Kernel/Views/LanguageTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Kernel\\\\Views\\\\LanguageTestBase\\:\\:viewsData\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -30646,6 +30652,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Tests/ViewTestData.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\views\\\\Tests\\\\ViewTestData\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/src/Tests/ViewTestData.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Tests\\\\ViewTestData\\:\\:viewsData\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -31030,6 +31042,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Functional/ViewTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\ViewTestBase\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Functional/ViewTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\ViewTestBase\\:\\:viewsData\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -31096,6 +31114,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FieldDateTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FieldDateTest\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FieldDateTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FieldDateTest\\:\\:viewsData\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -31138,6 +31162,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FieldTimeIntervalTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FieldTimeIntervalTest\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FieldTimeIntervalTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FieldTimeIntervalTest\\:\\:viewsData\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -31162,6 +31192,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterBooleanOperatorStringTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FilterBooleanOperatorStringTest\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterBooleanOperatorStringTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FilterBooleanOperatorStringTest\\:\\:viewsData\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -31174,7 +31210,19 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterBooleanOperatorTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FilterBooleanOperatorTest\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterBooleanOperatorTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FilterCombineTest\\:\\:dataSet\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterCombineTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FilterCombineTest\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterCombineTest.php',
@@ -31199,6 +31247,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FilterStringTest\\:\\:dataSet\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterStringTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FilterStringTest\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterStringTest.php',
@@ -31252,6 +31306,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/RelationshipJoinInTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Plugin\\\\RelationshipJoinTestBase\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/RelationshipJoinTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Plugin\\\\RelationshipJoinTestBase\\:\\:setUpFixtures\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -31283,6 +31343,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\ViewsKernelTestBase\\:\\:executeView\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Kernel/ViewsKernelTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\ViewsKernelTestBase\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/ViewsKernelTestBase.php',
@@ -31858,6 +31924,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views_ui/tests/src/Functional/CustomBooleanTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\views_ui\\\\Functional\\\\HandlerTest\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views_ui/tests/src/Functional/HandlerTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views_ui\\\\Functional\\\\HandlerTest\\:\\:viewsData\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -31877,6 +31949,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views_ui\\\\FunctionalJavascript\\\\PreviewTest\\:\\:dataSet\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views_ui/tests/src/FunctionalJavascript/PreviewTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\views_ui\\\\FunctionalJavascript\\\\PreviewTest\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views_ui/tests/src/FunctionalJavascript/PreviewTest.php',
