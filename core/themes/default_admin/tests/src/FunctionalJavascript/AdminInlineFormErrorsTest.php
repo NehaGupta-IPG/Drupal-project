@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('default_admin')]
 #[RunTestsInSeparateProcesses]
-class AdminTest extends WebDriverTestBase {
+class AdminInlineFormErrorsTest extends WebDriverTestBase {
 
   use RecipeTestTrait;
 
