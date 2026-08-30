@@ -10,12 +10,13 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
 /**
  * The default asset resolver.
  */
-class AssetResolver implements AssetResolverInterface {
+class AssetResolver implements AssetResolverInterface, PreWarmableInterface {
 
   /**
    * The library discovery service.
@@ -542,6 +543,14 @@ class AssetResolver implements AssetResolverInterface {
     else {
       return 0;
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prewarm(): void {
+    $this->libraryDiscovery->get($this->themeHandler->getDefault());
+    $this->libraryDiscovery->get('core');
   }
 
 }
