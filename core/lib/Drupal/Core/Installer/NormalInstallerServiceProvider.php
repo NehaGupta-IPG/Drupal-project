@@ -39,30 +39,23 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     // During the installer user 1 is a superuser.
     $container->setDefinition(InstallerAccessPolicy::class, (new Definition())->addTag('access_policy')->setPublic(FALSE));
 
-    // Explicitly configure all cache bins to use the memory backend. This
-    // results in less queries to set caches which will only be cleared on the
-    // next module install.
-    foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
-      $definition = $container->getDefinition($id);
-      $tags = $definition->getTags();
-      $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
-      $definition->setTags($tags);
-    }
-
-    // Separately override the file_parsing bin as that doesn't use a
-    // tag/parameter. Only do so in the early installer, which may have no
-    // database. Once the base system is verified the real backend is kept:
-    // items in this bin persist between cache clears (they are invalidated
-    // by file modification time instead), so writes during the later
-    // installer are reused across installer requests and warm the cache for
-    // the installed site.
-    if (empty($install_state['base_system_verified'])) {
+    if ($install_state['completed_task'] !== 'install_base_system') {
+      foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
+        $definition = $container->getDefinition($id);
+        $tags = $definition->getTags();
+        $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
+        $definition->setTags($tags);
+      }
       $definition = $container->getDefinition('cache.file_parsing');
       $definition->setClass(MemoryBackend::class);
       // Use a service reference rather than an object instance, so that the
       // container can still be dumped.
       $definition->setArguments([new Reference('datetime.time')]);
       $definition->setFactory(NULL);
+      // Remove the cache tags invalidator tag from the cache tags storage, so
+      // that we don't call it when cache tags are invalidated in the installer.
+      $container->getDefinition('cache_tags.invalidator.checksum')
+        ->clearTag('cache_tags_invalidator');
     }
 
     // When installing from existing config, disabling the config cache entirely
@@ -86,10 +79,6 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     $container
       ->register('lock', NullLockBackend::class);
 
-    // Remove the cache tags invalidator tag from the cache tags storage, so
-    // that we don't call it when cache tags are invalidated in the installer.
-    $container->getDefinition('cache_tags.invalidator.checksum')
-      ->clearTag('cache_tags_invalidator');
 
     // Don't register the lazy route provider in the super early installer.
     if (static::class === NormalInstallerServiceProvider::class) {

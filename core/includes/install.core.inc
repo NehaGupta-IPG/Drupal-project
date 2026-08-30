@@ -172,6 +172,8 @@ function install_drupal($class_loader, $settings = [], ?callable $callback = NUL
         $finish_url = $install_state['profile_info']['distribution']['install']['finish_url'];
       }
       install_goto($finish_url);
+
+      drupal_flush_all_caches();
       \Drupal::service('cache_prewarmer')->preWarmAllCaches();
     }
   }
