@@ -751,12 +751,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected function installSchema(string $module, bool $is_test_module): void {
     $schemaDefinition = $this->invoke($module, 'schema') ?? [];
-    if (!$schemaDefinition instanceof Schema) {
-      if (count($schemaDefinition) !== 0) {
-        @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:11.5.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
-      }
-    }
-    $schema = $this->connection->schema();
     if ($schemaDefinition instanceof Schema) {
       assert(
         $schemaDefinition->type === SchemaDefinitionType::Module ||
@@ -764,11 +758,14 @@ class ModuleInstaller implements ModuleInstallerInterface {
         'Invalid schema definition type, must be SchemaDefinitionType::Module'
       );
       assert($schemaDefinition->name === $module, 'Invalid schema definition name, must be equal to the module name');
-      $schema->createSchemaFromDefinition($schemaDefinition);
+      $this->connection->schema()->createSchemaFromDefinition($schemaDefinition);
     }
     else {
+      if (count($schemaDefinition) !== 0) {
+        @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:11.5.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
+      }
       foreach ($schemaDefinition as $name => $table) {
-        $schema->createTable($name, $table);
+        $this->connection->schema()->createTable($name, $table);
       }
     }
   }

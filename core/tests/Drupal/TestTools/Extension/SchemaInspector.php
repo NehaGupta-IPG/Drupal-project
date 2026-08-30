@@ -41,11 +41,7 @@ class SchemaInspector {
       }
       else {
         @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:11.5.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
-        $temp = [];
-        foreach ($schema as $name => $table) {
-          $temp[$name] = $table;
-        }
-        return $temp;
+        return $schema;
       }
     }
     return [];
