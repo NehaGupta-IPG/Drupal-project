@@ -483,3 +483,12 @@ revisions:
   css:
     component:
       css/components/revisions.css: { minified: false }
+
+edit-sidebar:
+  css:
+    component:
+      css/components/edit-sidebar.css: {}
+  js:
+    js/edit-sidebar.js: {}
+  dependencies:
+    - core/once

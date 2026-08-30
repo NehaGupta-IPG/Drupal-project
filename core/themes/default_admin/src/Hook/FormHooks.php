@@ -729,6 +729,7 @@ class FormHooks {
       ],
       '#weight' => 1000,
     ];
+    $form['#attached']['library'][] = 'default_admin/edit-sidebar';
 
     // Create default_admin_sidebar group.
     $form['default_admin_sidebar'] = [
