@@ -132,7 +132,7 @@ class ConfigSubscriber implements EventSubscriberInterface {
         //   plain API call - still needs to be confirmed, and if
         //   batch_set() is not processed there, this needs to run
         //   $batch['operations'] inline instead, synchronously, in this
-        //   method. Other options considered: queuing the work for cron
+        //   method. Other options considered: queueing the work for cron
         //   (rejected for now because it leaves the site with inconsistent
         //   config langcodes until cron next runs).
         if (!$this->configInstaller->isSyncing()) {
