@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Database\Stub;
 
 use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 
 /**
  * A stub of the abstract Schema class for testing purposes.
@@ -38,7 +39,7 @@ class StubSchema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function addField($table, $field, $spec, $keys_new = []) {
+  public function addField($table, $field, $spec, $keys_new = [], ?SchemaDefinition $schema = NULL) {
   }
 
   /**
@@ -97,7 +98,7 @@ class StubSchema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function changeField($table, $field, $field_new, $spec, $keys_new = []) {
+  public function changeField($table, $field, $field_new, $spec, $keys_new = [], ?SchemaDefinition $schema = NULL) {
   }
 
 }

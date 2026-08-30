@@ -1624,6 +1624,13 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         'default' => 0,
       ],
       [
+        'fields' => [
+          'age' => [
+            'type' => 'int',
+            'not null' => TRUE,
+            'default' => 0,
+          ],
+        ],
         'indexes' => [
           'age_legacy' => ['age'],
           'ages' => TRUE,
@@ -1728,11 +1735,18 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       [
         'type' => 'int',
         'not null' => TRUE,
-        'default' => 0,
+        'default' => 1,
       ],
       [
+        'fields' => [
+          'age_new' => [
+            'type' => 'int',
+            'not null' => TRUE,
+            'default' => 1,
+          ],
+        ],
         'indexes' => [
-          'age_legacy' => ['age'],
+          'age_legacy' => ['age_new'],
           'ages' => TRUE,
           'gin_age' => TRUE,
           'gist_age' => TRUE,

@@ -672,6 +672,9 @@ EOD;
     if ($this->fieldExists($table, $field)) {
       throw new SchemaObjectExistsException("Cannot add field '$table.$field': field already exists.");
     }
+    if ($schema && $keys_new) {
+      $this->resolveNewKeysFromSchemaDefinition($keys_new, $table, $schema);
+    }
 
     [$new_keys, $specialized_indexes] = $this->prepareKeysSpecification($new_keys);
 

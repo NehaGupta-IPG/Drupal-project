@@ -429,27 +429,6 @@ class Schema extends DatabaseSchema {
    *       that will be used as an expression field.
    */
   protected function alterTable($table, $old_schema, $new_schema, array $mapping = []) {
-    // SQLite cannot manage IndexInterface definitions.
-    $indexes = [];
-    foreach ($new_schema['indexes'] ?? [] as $name => $value) {
-      if (is_array($value)) {
-        $indexes[$name] = $value;
-        continue;
-      }
-      if ($value instanceof AlternativeIndexes) {
-        foreach ($value->indexes as $tmp) {
-          if ($tmp instanceof Index) {
-            $indexes[$name] = $tmp->toArray();
-            continue 2;
-          }
-        }
-      }
-      $indexes[$name] = $value->toArray();
-    }
-    if ($indexes) {
-      $new_schema['indexes'] = $indexes;
-    }
-
     $i = 0;
     do {
       $new_table = $table . '_' . $i++;

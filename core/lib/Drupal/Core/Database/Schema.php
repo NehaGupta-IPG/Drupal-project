@@ -645,21 +645,24 @@ abstract class Schema implements PlaceholderInterface {
           }
         }
       }
-      if (!$key instanceof IndexInterface) {
+      if (is_array($key)) {
         $indexes[$name] = $key;
         continue;
       }
       if ($key instanceof AlternativeIndexes) {
         foreach ($key->indexes as $tmp) {
           if (in_array(get_class($tmp), $this->getSupportedIndexTypes(), TRUE)) {
-            $indexes[$name] = $key;
-            continue;
+            $key = $tmp;
+            break;
           }
         }
       }
+      if ($key instanceof Index) {
+        $indexes[$name] = $tmp->toArray();
+        continue;
+      }
       if (in_array(get_class($key), $this->getSupportedIndexTypes(), TRUE)) {
         $indexes[$name] = $key;
-        continue;
       }
     }
     $keys_new['indexes'] = $indexes;

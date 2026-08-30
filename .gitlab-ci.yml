@@ -498,11 +498,6 @@ default:
 
 'PostgreSQL':
   <<: [ *recursive-trigger, *run-on-mr ]
-  # Run automatically on merge requests, because this branch changes
-  # PostgreSQL-only functionality. Remove this rules override before commit.
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      allow_failure: true
   parallel:
     matrix:
       - _TARGET_PHP: !reference [.php_versions]
