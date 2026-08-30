@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Plugin\views\field;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -93,10 +94,20 @@ class UserData extends FieldPluginBase {
     // Don't sanitize if no value was found.
     if (isset($data)) {
       // Non-scalar values (arrays, objects) cannot be passed to
-      // sanitizeValue() which expects a string. Convert them to a JSON
-      // string for display.
-      if (!is_scalar($data)) {
-        $data = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+      // sanitizeValue(). Flatten arrays to a list, and convert anything else
+      // to a JSON string.
+      if (is_array($data)) {
+        $parts = [];
+        foreach ($data as $key => $value) {
+          // Encode nested values.
+          $value = is_scalar($value) ? $value : Json::encode($value);
+          // Only prefix associative ones.
+          $parts[] = is_int($key) ? $value : $key . ': ' . $value;
+        }
+        $data = implode(', ', $parts);
+      }
+      elseif (!is_scalar($data)) {
+        $data = Json::encode($data);
       }
       return $this->sanitizeValue($data);
     }

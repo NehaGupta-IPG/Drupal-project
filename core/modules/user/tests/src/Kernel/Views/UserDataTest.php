@@ -64,6 +64,17 @@ class UserDataTest extends ViewsKernelTestBase {
     $output = $view->field['data']->render($view->result[0]);
     // An invalid configuration does not return anything.
     $this->assertNull($output);
+
+    // Add a non-scalar value to the user data.
+    $user_data->delete('views_test_config', $user->id());
+    $user_data->set('views_test_config', $user->id(), 'test_value_name', ['value' => $random_value]);
+
+    // Assert the non-scalar value is output as a readable key/value list.
+    $view = Views::getView('test_user_data');
+    $this->executeView($view);
+
+    $output = $view->field['data']->render($view->result[0]);
+    $this->assertEquals('value: ' . $random_value, $output);
   }
 
 }
