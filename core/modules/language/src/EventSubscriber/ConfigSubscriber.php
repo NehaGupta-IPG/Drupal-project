@@ -124,17 +124,14 @@ class ConfigSubscriber implements EventSubscriberInterface {
         // complete, self-consistent snapshot: it is responsible for
         // providing correct langcodes for anything it changes itself, the
         // same reasoning that keeps ConfigInstaller and Config::save() from
-        // touching langcode mid-sync. Relabeling live here as well could
-        // fight with what the import is in the middle of applying.
+        // touching langcode mid-sync.
         //
         // @todo This has only been confirmed for the form-submission case.
         //   A non-syncing save with no form behind it - a drush command, a
         //   plain API call - still needs to be confirmed, and if
         //   batch_set() is not processed there, this needs to run
         //   $batch['operations'] inline instead, synchronously, in this
-        //   method. Other options considered: queueing the work for cron
-        //   (rejected for now because it leaves the site with inconsistent
-        //   config langcodes until cron next runs).
+        //   method.
         if (!$this->configInstaller->isSyncing()) {
           $batch = $this->defaultLangcodeConfigUpdater->buildBatch($old_default_langcode, $new_default_langcode);
           batch_set($batch);

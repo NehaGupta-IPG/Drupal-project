@@ -15,10 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * The site's default language (system.site:default_langcode) is the single
  * source of truth for what langcode configuration with none of its own
- * should get - no separate "configuration default language" concept exists.
- * This only ever needs core: whether that langcode is actually supported by
- * the site (an explicit, different langcode that might not exist) is a
- * separate question only language module can answer.
+ * should get.
  *
  * @see \Drupal\language\EventSubscriber\ConfigLangcodeSubscriber
  */
@@ -29,7 +26,7 @@ class ConfigLangcodeSiteDefaultSubscriber implements EventSubscriberInterface {
   ) {}
 
   /**
-   * Resolves a missing or merely-English langcode to the site default.
+   * Resolves langcode to the site default.
    */
   public function onResolveLangcode(ConfigLangcodeResolveEvent $event): void {
     $current = $event->getCurrentLangcode();

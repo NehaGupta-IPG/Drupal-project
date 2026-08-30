@@ -267,11 +267,7 @@ class Config extends StorableConfigBase {
    * adds a langcode when translatability just switched on and none is
    * present yet, and removes it when translatability just switched off.
    *
-   * This never overwrites an existing langcode. That is what previously made
-   * it impossible to keep deliberately English configuration on a site whose
-   * configuration default language is not English: this method cannot tell
-   * an explicit langcode apart from a merely-present default, so it leaves
-   * any langcode that is already there alone, whatever its value.
+   * This never overwrites an existing langcode.
    *
    * @param bool $is_translatable
    *   Whether the configuration currently has any translatable value, as

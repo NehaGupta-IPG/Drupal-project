@@ -134,17 +134,11 @@ class DefaultLangcodeConfigUpdater {
   /**
    * Gets a language override, bypassing the "skip English" shortcut.
    *
-   * \Drupal\language\Config\LanguageConfigFactoryOverride::getStorage()
-   * substitutes a dummy, always-empty storage for langcode 'en' whenever
-   * English is currently both the negotiated and the default language,
-   * since an English override could never matter then - a safe assumption
-   * everywhere else, but not here: this runs exactly while the default
-   * language is changing, including changing back to English, precisely
-   * the moment an 'en' override left behind by an earlier change away from
-   * English needs to be found. Going through the real storage collection
-   * directly, rather than through language.config_factory_override, gets
-   * the real answer regardless of what the current request happens to
-   * negotiate.
+   * LanguageConfigFactoryOverride::getStorage() substitutes an empty storage
+   * for 'en' when English is both negotiated and default, assuming no 'en'
+   * override could exist. That assumption breaks exactly here: switching
+   * back to English is when an 'en' override left by an earlier switch away
+   * from it needs to be found.
    *
    * @param string $langcode
    *   The langcode of the override to get.
