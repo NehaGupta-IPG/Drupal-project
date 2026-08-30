@@ -8,9 +8,12 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\text\Plugin\Field\FieldFormatter\TextTrimmedFormatter;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore afte
 /**
  * Tests the text formatters functionality.
  */
@@ -95,6 +98,94 @@ class TextFormatterTest extends EntityKernelTestBase {
       $this->assertSame("<p>Hello, world!</p>\n", (string) $build[0]['#markup']);
       $this->assertEquals(FilterFormat::load('my_text_format')->getCacheTags(), $build[0]['#cache']['tags'], "The $formatter formatter has the expected cache tags when formatting a formatted text field.");
     }
+  }
+
+  /**
+   * Tests the exclude_html_tags setting on the text_trimmed formatter.
+   */
+  public function testExcludeHtmlTagsSetting(): void {
+    $entity = $this->container->get('entity_type.manager')
+      ->getStorage($this->entityType)
+      ->create(['name' => $this->randomMachineName()]);
+    $entity->formatted_text = [
+      'value' => '<p>abcdefghijklmnopqrst</p>',
+      'format' => 'my_text_format',
+    ];
+    $entity->save();
+
+    $build = $entity->get('formatted_text')->view([
+      'type' => 'text_trimmed',
+      'settings' => [
+        'trim_length' => 10,
+        'exclude_html_tags' => TRUE,
+      ],
+    ]);
+    $this->container->get('renderer')->renderRoot($build[0]);
+    // With tags stripped should get the first 10 letters.
+    $this->assertSame('<p>abcdefghij</p>', (string) $build[0]['#markup']);
+  }
+
+  /**
+   * Tests that <!--break--> is honored when exclude_html_tags is enabled.
+   */
+  public function testExcludeHtmlTagsPreservesBreakDelimiter(): void {
+    $entity = $this->container->get('entity_type.manager')
+      ->getStorage($this->entityType)
+      ->create(['name' => $this->randomMachineName()]);
+    $entity->formatted_text = [
+      'value' => '<p>abcdefghijklmnopqrst</p><!--break--><p>ignored part</p>',
+      'format' => 'my_text_format',
+    ];
+    $entity->save();
+
+    $build = $entity->get('formatted_text')->view([
+      'type' => 'text_trimmed',
+      'settings' => [
+        'trim_length' => 10,
+        'exclude_html_tags' => TRUE,
+      ],
+    ]);
+    $this->container->get('renderer')->renderRoot($build[0]);
+    $markup = (string) $build[0]['#markup'];
+    // The delimiter path returns the substring before <!--break-->.
+    $this->assertStringContainsString('abcdefghij', $markup);
+    $this->assertStringNotContainsString('ignored part', $markup);
+    $this->assertStringNotContainsString('<!--break-->', $markup);
+  }
+
+  /**
+   * Tests TextTrimmedFormatter::truncateHtml() across HTML shapes.
+   */
+  #[DataProvider('providerTruncateHtml')]
+  public function testTruncateHtml(string $input, int $length, string $expected_substring): void {
+    $result = TextTrimmedFormatter::truncateHtml($input, $length);
+    $this->assertStringContainsString($expected_substring, $result);
+  }
+
+  /**
+   * Data provider for ::testTruncateHtml().
+   */
+  public static function providerTruncateHtml(): array {
+    return [
+      'input shorter than limit is returned unchanged' => [
+        '<p>Hello</p>', 100, '<p>Hello</p>',
+      ],
+      'tags are not counted toward the limit' => [
+        '<p>abcdefghij</p>', 5, '<p>abcde</p>',
+      ],
+      'nested tags are repaired when the cut lands inside them' => [
+        '<p><strong>Hello world</strong></p>', 5, '<strong>Hello</strong>',
+      ],
+      'void elements do not corrupt the counter' => [
+        '<p>before<br>after</p>', 10, 'before<br>afte',
+      ],
+      'attribute contents do not count toward the limit' => [
+        '<a href="https://example.com" title="link">click here</a>', 5, '>click</a>',
+      ],
+      'sibling tags share one continuous counter' => [
+        '<p>one</p><p>two</p><p>three</p>', 6, '<p>two</p>',
+      ],
+    ];
   }
 
 }

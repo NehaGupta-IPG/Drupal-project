@@ -111,6 +111,9 @@ field.formatter.settings.text_summary_or_trimmed:
     trim_length:
       type: integer
       label: 'Trim length'
+    exclude_html_tags:
+      type: boolean
+      label: 'Exclude HTML tags from trim length'
 
 field.formatter.settings.text_trimmed:
   type: mapping
@@ -119,6 +122,9 @@ field.formatter.settings.text_trimmed:
     trim_length:
       type: integer
       label: 'Trim length'
+    exclude_html_tags:
+      type: boolean
+      label: 'Exclude HTML tags from trim length'
 
 field.widget.settings.text_textarea:
   type: mapping

@@ -157,6 +157,7 @@ class HandlerFieldFieldTest extends KernelTestBase {
     $view->displayHandlers->get('default')->options['fields'][$this->fieldStorages[5]->getName()]['type'] = 'text_trimmed';
     $view->displayHandlers->get('default')->options['fields'][$this->fieldStorages[5]->getName()]['settings'] = [
       'trim_length' => 3,
+      'exclude_html_tags' => FALSE,
     ];
     $view->preview();
 
