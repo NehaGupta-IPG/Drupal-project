@@ -374,12 +374,6 @@ class ClaroHooks {
       // uploading multiple files, the required state is checked by checking
       // the state of the first child.
       $variables['required'] = $element[0]['#required'] ?? !empty($element['#required']);
-      // If the error is the same as the one in the multiple field widget
-      // element, we have to avoid displaying it twice. Stark has this issue as
-      // well. @todo Revisit when https://www.drupal.org/node/3084906 is fixed.
-      if (isset($element['#errors']) && isset($variables['errors']) && $element['#errors'] === $variables['errors']) {
-        unset($variables['errors']);
-      }
     }
     $variables['disabled'] = !empty($element['#disabled']);
   }

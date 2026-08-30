@@ -25,6 +25,11 @@ class InlineFormErrorsThemeHooks {
    */
   #[Hook('preprocess_details')]
   public function preprocessDetails(&$variables): void {
+    $element = $variables['element'];
+    // Avoid the duplication of errors when file_widget_multiple is used.
+    if (!empty($element['#theme']) && $element['#theme'] === 'file_widget_multiple') {
+      return;
+    }
     $this->setErrors($variables);
   }
 
