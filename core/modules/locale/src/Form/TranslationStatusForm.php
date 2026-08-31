@@ -178,21 +178,35 @@ class TranslationStatusForm extends FormBase {
       foreach ($project as $langcode => $project_info) {
         // No translation file found for this project-language combination.
         if (empty($project_info->type)) {
+          $name = '';
+          if (isset($project_data[$project_info->name])) {
+            $name = $project_data[$project_info->name]->info['name'];
+          }
+          else {
+            $name = $project_info->name;
+          }
           $updates[$langcode]['not_found'][] = [
-            'name' => $project_info->name == 'drupal' ? $this->t('Drupal core') : $project_data[$project_info->name]->info['name'],
+            'name' => $project_info->name == 'drupal' ? $this->t('Drupal core') : $name,
             'version' => $project_info->version,
             'info' => $this->createInfoString($project_info),
           ];
         }
         // Translation update found for this project-language combination.
         elseif ($project_info->type == LOCALE_TRANSLATION_LOCAL || $project_info->type == LOCALE_TRANSLATION_REMOTE) {
+          $name = '';
+          if (isset($project_data[$project_info->name])) {
+            $name = $project_data[$project_info->name]->info['name'];
+          }
+          else {
+            $name = $project_info->name;
+          }
           $local = $project_info->files[LOCALE_TRANSLATION_LOCAL] ?? NULL;
           $remote = $project_info->files[LOCALE_TRANSLATION_REMOTE] ?? NULL;
           $local_timestamp = $local->timestamp ?? 0;
           $remote_timestamp = $remote->timestamp ?? 0;
           $recent = $local_timestamp < $remote_timestamp ? $remote : $local;
           $updates[$langcode]['updates'][] = [
-            'name' => $project_info->name == 'drupal' ? $this->t('Drupal core') : $project_data[$project_info->name]->info['name'],
+            'name' => $project_info->name == 'drupal' ? $this->t('Drupal core') : $name,
             'version' => $project_info->version,
             'timestamp' => $recent->timestamp,
           ];
