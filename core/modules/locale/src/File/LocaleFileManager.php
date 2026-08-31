@@ -6,6 +6,7 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Http\AcceptedContentEncodings;
 use Drupal\Core\Http\ClientFactory;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
@@ -250,10 +251,14 @@ class LocaleFileManager {
     $logger = $this->loggerFactory->get('locale');
     try {
       $actual_uri = NULL;
-      $response = $this->clientFactory->fromOptions([
-        // Translation files compress well, so advertise the compression
-        // formats the client can decode and decode the response with them.
-        'decode_content' => 'gzip, deflate, br',
+      $options = [];
+      // Translation files compress well; advertise the compression formats
+      // the client can decode so the server may compress the response.
+      // Guzzle's default sends no Accept-Encoding header at all.
+      if ($accept_encoding = AcceptedContentEncodings::get()) {
+        $options['decode_content'] = $accept_encoding;
+      }
+      $response = $this->clientFactory->fromOptions($options + [
         'allow_redirects' => [
           'on_redirect' => function (RequestInterface $request, ResponseInterface $response, UriInterface $request_uri) use (&$actual_uri) {
             $actual_uri = (string) $request_uri;
