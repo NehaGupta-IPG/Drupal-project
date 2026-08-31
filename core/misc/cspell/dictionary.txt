@@ -296,6 +296,7 @@ multivalued
 mysqladmin
 mysqldump
 mystarterkit
+mytheme
 namespacing
 navs
 ndocs
