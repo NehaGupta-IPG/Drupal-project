@@ -149,7 +149,7 @@ class Views {
    * Fetches a list of plugin names for a given type.
    *
    * @param string $type
-   *   Either 'display', 'style' or 'row'.
+   *   Either 'display', 'display_extender', 'style' or 'row'.
    * @param string $key
    *   For style plugins, this is an optional type to restrict to. May be
    *   'normal', 'summary', 'feed' or others based on the needs of the display.
@@ -202,11 +202,25 @@ class Views {
 
   /**
    * Gets enabled display extenders.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   Views::getDisplayExtenders() instead.
+   *
+   * @see https://www.drupal.org/node/3387596
    */
   public static function getEnabledDisplayExtenders() {
-    $enabled = array_filter((array) \Drupal::config('views.settings')->get('display_extenders'));
+    @trigger_error("Views::getEnabledDisplayExtenders() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use Views::getDisplayExtenders() instead. See https://www.drupal.org/node/3568650", E_USER_DEPRECATED);
 
-    return array_combine($enabled, $enabled);
+    return self::getDisplayExtenders();
+  }
+
+  /**
+   * Get a list of all display extenders.
+   */
+  public static function getDisplayExtenders(): array {
+    $plugins = array_keys(self::fetchPluginNames('display_extender'));
+
+    return array_combine($plugins, $plugins);
   }
 
   /**

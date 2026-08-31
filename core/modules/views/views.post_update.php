@@ -61,3 +61,12 @@ function views_removed_post_updates(): array {
 function views_post_update_counter_field_not_sortable(): void {
   // Empty update to trigger a cache rebuild so updated Views data is applied.
 }
+
+/**
+ * Delete obsolete display extenders configuration.
+ */
+function views_post_update_delete_display_extenders_config(): void {
+  \Drupal::configFactory()->getEditable('views.settings')
+    ->clear('display_extenders')
+    ->save();
+}

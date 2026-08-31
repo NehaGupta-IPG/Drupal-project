@@ -5,7 +5,6 @@ namespace Drupal\views_ui\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\views\Views;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -72,21 +71,6 @@ class AdvancedSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('sql_signature'),
     ];
 
-    $options = Views::fetchPluginNames('display_extender');
-    if (!empty($options)) {
-      $form['extenders'] = [
-        '#type' => 'details',
-        '#title' => $this->t('Display extenders'),
-        '#open' => TRUE,
-      ];
-      $form['extenders']['display_extenders'] = [
-        '#default_value' => array_filter($config->get('display_extenders')),
-        '#options' => $options,
-        '#type' => 'checkboxes',
-        '#description' => $this->t('Select extensions of the views interface.'),
-      ];
-    }
-
     return $form;
   }
 
@@ -96,7 +80,6 @@ class AdvancedSettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->config('views.settings')
       ->set('sql_signature', $form_state->getValue('sql_signature'))
-      ->set('display_extenders', $form_state->getValue('display_extenders', []))
       ->save();
 
     parent::submitForm($form, $form_state);

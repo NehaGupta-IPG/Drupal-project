@@ -93,7 +93,10 @@ views.display_extender.display_extender_test:
       type: string
       label: 'Test option'
 
-views.display_extender.display_extender_test2:
+views.display_extender.display_extender_test_2:
+  type: views.display_extender.display_extender_test
+
+views.display_extender.display_extender_test_3:
   type: views.display_extender.display_extender_test
 
 views.argument_default.argument_default_test:

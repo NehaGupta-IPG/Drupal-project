@@ -7,7 +7,9 @@ namespace Drupal\Tests\views\Kernel\Plugin;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 use Drupal\views_test_data\Plugin\views\display_extender\DisplayExtenderTest as DisplayExtenderTestData;
+use Drupal\views_test_data\Plugin\views\display_extender\DisplayExtenderTest3;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -29,14 +31,15 @@ class DisplayExtenderTest extends ViewsKernelTestBase {
   /**
    * Tests display extenders.
    */
+  #[IgnoreDeprecations]
   public function testDisplayExtenders(): void {
-    $this->config('views.settings')->set('display_extenders', ['display_extender_test'])->save();
-    $this->assertCount(1, Views::getEnabledDisplayExtenders(), 'Make sure that there is only one enabled display extender.');
+    $this->expectUserDeprecationMessage('Views::getEnabledDisplayExtenders() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use Views::getDisplayExtenders() instead. See https://www.drupal.org/node/3568650');
+    $this->assertArrayHasKey('display_extender_test', Views::getEnabledDisplayExtenders());
 
     $view = Views::getView('test_view');
     $view->initDisplay();
 
-    $this->assertCount(1, $view->display_handler->getExtenders(), 'Make sure that only one extender is initialized.');
+    $this->assertArrayHasKey('display_extender_test', $view->display_handler->getExtenders());
 
     $display_extender = $view->display_handler->getExtenders()['display_extender_test'];
     $this->assertInstanceOf(DisplayExtenderTestData::class, $display_extender);
@@ -51,7 +54,7 @@ class DisplayExtenderTest extends ViewsKernelTestBase {
    * Tests display extenders validation.
    */
   public function testDisplayExtendersValidate(): void {
-    $this->config('views.settings')->set('display_extenders', ['display_extender_test_3'])->save();
+    DisplayExtenderTest3::enableErrors();
 
     $view = Views::getView('test_view');
     $errors = $view->validate();

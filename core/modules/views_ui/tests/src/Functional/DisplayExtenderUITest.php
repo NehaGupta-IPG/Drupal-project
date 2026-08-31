@@ -31,8 +31,6 @@ class DisplayExtenderUITest extends UITestBase {
    * Tests the display extender UI.
    */
   public function testDisplayExtenderUI(): void {
-    $this->config('views.settings')->set('display_extenders', ['display_extender_test'])->save();
-
     $view = Views::getView('test_view');
     $view_edit_url = "admin/structure/views/view/{$view->storage->id()}/edit";
     $display_option_url = 'admin/structure/views/nojs/display/test_view/default/test_extender_test_option';
