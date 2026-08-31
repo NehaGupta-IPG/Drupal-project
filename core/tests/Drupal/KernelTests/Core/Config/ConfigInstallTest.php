@@ -297,7 +297,7 @@ class ConfigInstallTest extends KernelTestBase {
   /**
    * Tests installing configuration with no langcode.
    *
-   * @see \Drupal\Core\Config\ConfigInstaller::resolveInstalledLangcode()
+   * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
    */
   public function testLanguageRelabelsToConfigurationDefault(): void {
     $this->enableModules(['language']);
@@ -323,7 +323,7 @@ class ConfigInstallTest extends KernelTestBase {
   /**
    * Tests configuration shipping with an unsupported langcode is not installed.
    *
-   * @see \Drupal\Core\Config\ConfigInstaller::resolveInstalledLangcode()
+   * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
    */
   public function testLanguageRejectsUnsupportedShippedLangcode(): void {
     $this->enableModules(['language']);

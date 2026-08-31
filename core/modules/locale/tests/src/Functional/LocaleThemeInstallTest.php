@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * the site's configuration default language is not English, ConfigInstaller
  * must relabel that configuration to the site default while installing it.
  *
- * @see \Drupal\Core\Config\ConfigInstaller::resolveInstalledLangcode()
+ * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
  */
 #[Group('locale')]
 #[RunTestsInSeparateProcesses]

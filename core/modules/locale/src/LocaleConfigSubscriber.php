@@ -66,7 +66,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
       // shipped defaults - never a manual edit - no matter what langcode it
       // was installed with. This matters because ConfigInstaller may resolve
       // such a langcode to something other than 'en' (see
-      // \Drupal\Core\Config\ConfigInstaller::resolveInstalledLangcode()),
+      // \Drupal\Core\Config\ConfigInstaller::createConfiguration()),
       // including for a module installed long after the site itself was,
       // which the InstallerKernel::installationAttempted() check above does
       // not cover.
