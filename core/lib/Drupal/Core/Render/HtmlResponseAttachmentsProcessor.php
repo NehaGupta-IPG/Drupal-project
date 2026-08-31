@@ -5,16 +5,15 @@ namespace Drupal\Core\Render;
 // cspell:ignore turbolinks
 
 use Drupal\Core\Asset\AssetCollectionRendererInterface;
-use Drupal\Core\Asset\AssetQueryStringInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Asset\ImportMapRendererInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Component\Serialization\Json;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -53,15 +52,15 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     protected ModuleHandlerInterface $moduleHandler,
     protected LanguageManagerInterface $languageManager,
     protected ?FileUrlGeneratorInterface $fileUrlGenerator = NULL,
-    protected ?AssetQueryStringInterface $assetQueryString = NULL,
+    protected ?ImportMapRendererInterface $importMapRenderer = NULL,
   ) {
     if (!isset($fileUrlGenerator)) {
       $this->fileUrlGenerator = \Drupal::service('file_url_generator');
       @trigger_error('Constructing HtmlResponseAttachmentsProcessor without a file url generator is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3585574', E_USER_DEPRECATED);
     }
-    if (!isset($assetQueryString)) {
-      $this->assetQueryString = \Drupal::service('asset.query_string');
-      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without an asset query string is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    if (!isset($importMapRenderer)) {
+      $this->importMapRenderer = \Drupal::service('asset.importmap.renderer');
+      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without an import map renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
     }
     $this->config = $config_factory->get('system.performance');
   }
@@ -199,7 +198,10 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
         // built in those contexts.
         $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
         if (!$maintenance_mode) {
-          $import_map_elements = $this->renderImportMap($this->assetResolver->getImportMap(), $assets);
+          $import_map_elements = $this->importMapRenderer->render(
+            $this->assetResolver->getImportMap(),
+            $this->assetResolver->getImportMapPreloads($assets)
+          );
           if ($import_map_elements) {
             $variables['head'] = $import_map_elements + ($variables['head'] ?? []);
           }
@@ -356,133 +358,6 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       }
     }
     $response->setContent($content);
-  }
-
-  /**
-   * Renders the import map and the module preloads for the current response.
-   *
-   * @param array $import_map
-   *   The import map, as returned by
-   *   \Drupal\Core\Asset\AssetResolverInterface::getImportMap().
-   * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
-   *   The attached assets.
-   *
-   * @return array
-   *   A render array, keyed for use in the 'head' placeholder. It contains a
-   *   <script type="importmap"> element, followed by a
-   *   <link rel="modulepreload"> element for each import map entry of a
-   *   library attached to the page.
-   */
-  protected function renderImportMap(array $import_map, AttachedAssetsInterface $assets): array {
-    $map = [];
-    if ($import_map['imports']) {
-      $map['imports'] = $this->renderImportMapEntries($import_map['imports']);
-    }
-    if ($import_map['scopes']) {
-      $map['scopes'] = [];
-      foreach ($import_map['scopes'] as $scope => $entries) {
-        $map['scopes'][$this->importMapScopeUrl($scope)] = $this->renderImportMapEntries($entries);
-      }
-    }
-    if ($import_map['integrity']) {
-      $map['integrity'] = [];
-      foreach ($import_map['integrity'] as $entry) {
-        $map['integrity'][$this->importMapEntryUrl($entry)] = $entry['integrity'];
-      }
-    }
-    if (empty($map)) {
-      return [];
-    }
-    $elements = [
-      'importmap' => [
-        '#type' => 'html_tag',
-        '#tag' => 'script',
-        '#value' => Json::encode($map),
-        '#attributes' => ['type' => 'importmap'],
-      ],
-    ];
-    foreach ($this->assetResolver->getImportMapPreloads($assets) as $entry) {
-      $url = $this->importMapEntryUrl($entry);
-      $attributes = [
-        'rel' => 'modulepreload',
-        'href' => $url,
-      ];
-      // A module fetch from another origin is a CORS request, so the preload
-      // must be as well, in order to use the same cache entry.
-      if ($entry['external']) {
-        $attributes['crossorigin'] = 'anonymous';
-      }
-      $elements['importmap:modulepreload:' . $entry['data']] = [
-        '#type' => 'html_tag',
-        '#tag' => 'link',
-        '#attributes' => $attributes,
-      ];
-    }
-    return $elements;
-  }
-
-  /**
-   * Renders the module specifiers of an import map as URLs.
-   *
-   * @param array $entries
-   *   The import map entries, keyed by the module specifier.
-   *
-   * @return array
-   *   The rendered entries, keyed by the module specifier, and resolving to
-   *   the URL of the mapped module.
-   */
-  protected function renderImportMapEntries(array $entries): array {
-    $rendered = [];
-    foreach ($entries as $specifier => $entry) {
-      $rendered[$specifier] = $this->importMapEntryUrl($entry);
-    }
-    return $rendered;
-  }
-
-  /**
-   * Returns the URL for an import map entry.
-   *
-   * The query string is the same as for unaggregated JavaScript assets, so
-   * that a file that is both a JavaScript asset and an import map entry
-   * resolves to the same URL, and the browser reuses the same cache entry.
-   *
-   * @param array $entry
-   *   An import map entry, with the keys 'data', 'external' and 'version'.
-   *
-   * @return string
-   *   The URL of the mapped module.
-   */
-  protected function importMapEntryUrl(array $entry): string {
-    if ($entry['external']) {
-      return $entry['data'];
-    }
-    $url = $this->fileUrlGenerator->generate($entry['data'])->toString();
-    $query_string = $entry['version'] == -1 ? $this->assetQueryString->get() : 'v=' . $entry['version'];
-    $query_string_separator = str_contains($entry['data'], '?') ? '&' : '?';
-    return $url . $query_string_separator . $query_string;
-  }
-
-  /**
-   * Returns the URL for an import map scope key.
-   *
-   * Unlike the values of the import map, the scope key does not get a query
-   * string: the browser prefix-matches the scope against the resolved module
-   * URL, which includes the query string, so a scope with a query string
-   * would never match.
-   *
-   * @param string $scope
-   *   A resolved scope source: a path relative to the Drupal root, or an
-   *   external URL.
-   *
-   * @return string
-   *   The absolute URL of the scope.
-   */
-  protected function importMapScopeUrl(string $scope): string {
-    // External scope URLs are used as-is.
-    if (str_starts_with($scope, 'http://') || str_starts_with($scope, 'https://')) {
-      return $scope;
-    }
-    return $this->fileUrlGenerator->generate($scope)->toString();
   }
 
   /**
