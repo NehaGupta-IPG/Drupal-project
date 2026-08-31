@@ -23,6 +23,7 @@ third_party_settings:
                 entity: layout_builder.entity
             weight: 1
             additional: {  }
+            third_party_settings: {  }
 id: entity_test.bundle_with_extra_fields.default
 targetEntityType: entity_test
 bundle: bundle_with_extra_fields

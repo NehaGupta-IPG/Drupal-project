@@ -470,7 +470,7 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
 
       $section = $this->getDefaultSection();
       $region = $options['region'] ?? $section->getDefaultRegion();
-      $new_component = (new SectionComponent(\Drupal::service('uuid')->generate(), $region, $configuration));
+      $new_component = new SectionComponent(\Drupal::service('uuid')->generate(), $region, $configuration);
       $section->appendComponent($new_component);
     }
     return $this;

@@ -56,6 +56,11 @@ layout_builder.component:
     additional:
       type: ignore
       label: 'Additional data'
+    third_party_settings:
+      type: sequence
+      label: 'Third party settings'
+      sequence:
+        type: '[%parent.%parent.%type].third_party.[%key]'
 
 inline_block:
   type: block_settings

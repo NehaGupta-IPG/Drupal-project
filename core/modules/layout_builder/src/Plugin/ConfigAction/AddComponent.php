@@ -145,7 +145,7 @@ final class AddComponent implements ConfigActionPluginInterface, ContainerFactor
     // default, which will be overridden in insertComponent anyway.
     // We also need to generate the UUID here, or it could be null.
     $uuid = $component['uuid'] ?? $this->uuidGenerator->generate();
-    $component = new SectionComponent($uuid, $region, $component['configuration'], $component['additional'] ?? []);
+    $component = new SectionComponent($uuid, $region, $component['configuration'], $component['additional'] ?? [], $component['third_party_settings'] ?? []);
     // If the position is higher than the number of components, just put it last
     // instead of failing.
     $position = min($position, count($section->getComponentsByRegion($region)));

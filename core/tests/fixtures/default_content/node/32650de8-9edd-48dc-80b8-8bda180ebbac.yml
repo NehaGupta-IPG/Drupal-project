@@ -55,6 +55,7 @@ default:
                 entity: layout_builder.entity
             weight: 1
             additional: {  }
+            third_party_settings: {  }
           03b45f14-cf74-469a-8398-edf3383ce7fa:
             uuid: 03b45f14-cf74-469a-8398-edf3383ce7fa
             region: content
@@ -66,6 +67,7 @@ default:
               context_mapping: {  }
             weight: 0
             additional: {  }
+            third_party_settings: {  }
           1f1533a4-6897-4257-b6d5-8765e5006369:
             uuid: 1f1533a4-6897-4257-b6d5-8765e5006369
             region: content
@@ -78,4 +80,5 @@ default:
               context_mapping: { }
             weight: 1
             additional: { }
+            third_party_settings: {  }
         third_party_settings: {  }
