@@ -689,6 +689,8 @@ trait FunctionalTestSetupTrait {
     $this->classLoader = require __DIR__ . '/../../../../../autoload.php';
     $request = Request::createFromGlobals();
     $kernel = TestRunnerKernel::createFromRequest($request, $this->classLoader);
+    $kernel->updateModules([]);
+    $kernel->updateThemes([]);
     $kernel->boot();
     $kernel->preHandle($request);
     $this->prepareDatabasePrefix();
