@@ -21,3 +21,21 @@ importmap_test.scoped_consumer:
     _title: 'Import map scoped consumer'
   requirements:
     _access: 'TRUE'
+
+importmap_test.htmx_trigger:
+  path: '/importmap-test/htmx-trigger'
+  defaults:
+    _controller: '\Drupal\importmap_test\Controller\ConsumerController::htmxTriggerPage'
+    _title: 'Import map HTMX trigger'
+  requirements:
+    _access: 'TRUE'
+
+importmap_test.htmx_consumer:
+  path: '/importmap-test/htmx-consumer'
+  defaults:
+    _controller: '\Drupal\importmap_test\Controller\ConsumerController::htmxConsumerPage'
+    _title: 'Import map HTMX consumer'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _htmx_route: TRUE

@@ -341,6 +341,26 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       $variables['scripts_bottom'] = $this->jsCollectionRenderer->render($js_assets_footer);
     }
 
+    // Print module preloads - if a placeholder for them is present.
+    //
+    // HTMX responses, rendered by \Drupal\Core\Render\MainContent\HtmxRenderer,
+    // have no head placeholder, so they declare a modulepreload placeholder
+    // instead. The module preloads tell the browser to fetch the modules of
+    // the attached libraries' import maps, so that the module scripts can
+    // start importing them as soon as possible. The HTMX client picks the
+    // preloads up from the response and adds them to the head. See
+    // core/misc/htmx/htmx-assets.js. The import map itself is not rendered:
+    // a page only supports a single import map, and it was already sent with
+    // the main HTML document.
+    //
+    // The preloads are only built during normal site operation. Building them
+    // resolves the libraries to load, which invokes hook_library_info_alter().
+    // Some implementations of that hook make assumptions about the installed
+    // site that do not hold during installation or in maintenance mode.
+    if (isset($placeholders['modulepreload']) && !$maintenance_mode) {
+      $variables['modulepreload'] = $this->modulePreloadRenderer->render($this->assetResolver->getModulePreloads($assets));
+    }
+
     return $variables;
   }
 

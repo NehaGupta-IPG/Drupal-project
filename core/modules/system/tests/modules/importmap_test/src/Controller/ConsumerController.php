@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Drupal\importmap_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Url;
 
 /**
  * Returns pages that attach import map consumer libraries.
@@ -30,6 +32,43 @@ class ConsumerController extends ControllerBase implements TrustedCallbackInterf
    */
   public function scopedConsumerPage(): array {
     return $this->page('importmap_test/scoped-consumer');
+  }
+
+  /**
+   * Returns a page with a button that requests the HTMX consumer route.
+   *
+   * The button attaches the core/drupal.htmx library, which provides the
+   * HTMX client. The requested route has the '_htmx_route' option, so it
+   * returns an HTMX response that attaches the consumer library.
+   */
+  public function htmxTriggerPage(): array {
+    $build['trigger'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#attributes' => ['type' => 'button'],
+      '#value' => 'Load consumer',
+    ];
+    (new Htmx())
+      ->get(Url::fromRoute('importmap_test.htmx_consumer'))
+      ->target('[data-importmap-test-target]')
+      ->applyTo($build['trigger']);
+    $build['target'] = [
+      '#type' => 'container',
+      '#attributes' => ['data-importmap-test-target' => TRUE],
+    ];
+    return $build;
+  }
+
+  /**
+   * Returns an HTMX response that attaches the consumer library.
+   *
+   * This route has the '_htmx_route' option, so it always returns an HTMX
+   * response, rendered by \Drupal\Core\Render\MainContent\HtmxRenderer. The
+   * consumer library's module script imports a bare module specifier, which
+   * is resolved by the import map sent with the main HTML document.
+   */
+  public function htmxConsumerPage(): array {
+    return $this->page('importmap_test/consumer');
   }
 
   /**

@@ -19,6 +19,23 @@
   const requestAssetsLoaded = new WeakMap();
 
   /**
+   * Transforms the attributes of a DOM element into a plain object.
+   *
+   * @param {Element} element
+   *   The DOM element.
+   *
+   * @return {object}
+   *   The attributes of the element, keyed by attribute name.
+   */
+  const elementAttributes = (element) => {
+    const attrs = {};
+    Object.values(element.attributes).forEach(({ name, value }) => {
+      attrs[name] = value;
+    });
+    return attrs;
+  };
+
+  /**
    *
    */
   htmx.on('htmx:beforeRequest', ({ detail }) => {
@@ -112,17 +129,20 @@
     const assetsElements = responseHTML.querySelectorAll(
       'link[rel="stylesheet"][href], script[src]',
     );
+    // Module preloads instruct the browser to fetch modules, so that module
+    // scripts added by the response can start importing them as soon as
+    // possible. They are not loaded with loadjs, but added to the head
+    // directly. The import map that resolves their bare module specifiers was
+    // already sent with the main HTML document.
+    const preloadElements = responseHTML.querySelectorAll(
+      'link[rel="modulepreload"][href]',
+    );
     // Remove all assets from the serverResponse where we handle the loading.
     assetsElements.forEach((element) => element.remove());
+    preloadElements.forEach((element) => element.remove());
 
     // Transform the data from the DOM into an ajax command like format.
-    const data = Array.from(assetsElements).map(({ attributes }) => {
-      const attrs = {};
-      Object.values(attributes).forEach(({ name, value }) => {
-        attrs[name] = value;
-      });
-      return attrs;
-    });
+    const data = Array.from(assetsElements).map(elementAttributes);
 
     // The response is the whole page without the assets we handle with loadjs.
     detail.serverResponse = responseHTML.documentElement.outerHTML;
@@ -131,6 +151,25 @@
     responseHTML = null;
 
     requestAssetsLoaded.get(detail.xhr).then(() => Drupal.htmx.addAssets(data));
+
+    // Add the module preloads to the head. A page only supports a single
+    // import map, which was already sent with the main HTML document; module
+    // preloads may be added to a page multiple times.
+    Array.from(preloadElements)
+      .map(elementAttributes)
+      .forEach((attrs) => {
+        // Do not add the same module preload twice.
+        const alreadyPreloaded = Array.from(
+          document.head.querySelectorAll('link[rel="modulepreload"]'),
+        ).some((link) => link.getAttribute('href') === attrs.href);
+        if (!alreadyPreloaded) {
+          const link = document.createElement('link');
+          Object.entries(attrs).forEach(([name, value]) => {
+            link.setAttribute(name, value);
+          });
+          document.head.appendChild(link);
+        }
+      });
   });
 
   // Trigger the Drupal processing once all assets have been loaded.

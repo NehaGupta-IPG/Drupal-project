@@ -148,6 +148,40 @@ class ImportMapTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that an HTMX response adds module preloads, but not an import map.
+   *
+   * The consumer route has the '_htmx_route' option, so it returns an HTMX
+   * response rendered by
+   * \Drupal\Core\Render\MainContent\HtmxRenderer. A page only supports a
+   * single import map, which is sent with the main HTML document. An HTMX
+   * response can only add module preloads for the libraries attached to the
+   * response; the HTMX client adds them to the head. See
+   * core/misc/htmx/htmx-assets.js.
+   */
+  public function testHtmxResponseAddsModulePreloadsAndNotImportMap(): void {
+    $content = $this->drupalGet('/importmap-test/htmx-consumer');
+    $this->assertStringNotContainsString('<script type="importmap"', $content, 'The HTMX response does not contain an import map.');
+    $path = $this->modulePath();
+    $expected_preloads = [
+      $this->fileUrlGenerator->generate("$path/js/foo.js")->toString() . '?v=1.0',
+      'https://example.com/importmap-test-external.mjs',
+      $this->fileUrlGenerator->generate("$path/js/scope/foo.js")->toString() . '?v=1.0',
+    ];
+    $preloads = $this->getSession()->getPage()->findAll('css', 'link[rel="modulepreload"]');
+    $this->assertCount(count($expected_preloads), $preloads);
+    foreach ($preloads as $index => $preload) {
+      $this->assertSame($expected_preloads[$index], $preload->getAttribute('href'));
+    }
+    // The module preloads come before the consumer module script, so the
+    // modules can be fetched as early as possible.
+    $preload_start = strpos($content, '<link rel="modulepreload"');
+    $consumer_start = strpos($content, 'js/consumer.js');
+    $this->assertNotFalse($preload_start);
+    $this->assertNotFalse($consumer_start);
+    $this->assertLessThan($consumer_start, $preload_start, 'The module preloads come before the consumer module script.');
+  }
+
+  /**
    * Tests that the scoped consumer gets the scoped import map entry.
    */
   public function testImportMapScopedConsumer(): void {
