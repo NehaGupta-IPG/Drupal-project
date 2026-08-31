@@ -3,10 +3,10 @@
 namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Exception\SchemaDefinitionException;
+use Drupal\Core\Database\Exception\SchemaTablePrimaryKeyException;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\GinIndex;
-use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IndexInterface;
@@ -765,7 +765,12 @@ abstract class Schema implements PlaceholderInterface {
 
     // Handles keys/indexes that are impacted by the addition.
     if (in_array($targetColumnName, $table->primaryKey ? $table->primaryKey->columnNames() : [], TRUE)) {
-      $this->dropPrimaryKey($tableName);
+      try {
+        $this->dropPrimaryKey($tableName);
+      }
+      catch (SchemaTablePrimaryKeyException) {
+        unset($tableAsArray['primary key']);
+      }
     }
     else {
       unset($tableAsArray['primary key']);
@@ -836,7 +841,12 @@ abstract class Schema implements PlaceholderInterface {
     // Handles keys/indexes that are impacted by the change.
     $currentKeys = $this->introspectIndexSchema($tableName);
     if (in_array($currentColumnName, $currentKeys['primary key'], TRUE)) {
-      $this->dropPrimaryKey($tableName);
+      try {
+        $this->dropPrimaryKey($tableName);
+      }
+      catch (SchemaTablePrimaryKeyException) {
+        unset($tableAsArray['primary key']);
+      }
     }
     else {
       unset($tableAsArray['primary key']);
