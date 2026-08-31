@@ -110,7 +110,7 @@ class AccentColorContrastJavascriptTest extends WebDriverTestBase {
       $this->assertGreaterThanOrEqual(3.0, $ratios['focusOnBg'], sprintf('%s: focus on bg must be >=3:1 (got %.2f:1).', $label, $ratios['focusOnBg']));
       $this->assertGreaterThanOrEqual(3.0, $ratios['focusOnSurface'], sprintf('%s: focus on surface must be >=3:1 (got %.2f:1).', $label, $ratios['focusOnSurface']));
       $this->assertGreaterThanOrEqual(4.5, $ratios['hoverOnBg'], sprintf('%s: hover (accent-fg) on bg must be >=4.5:1 (got %.2f:1).', $label, $ratios['hoverOnBg']));
-      $this->assertGreaterThanOrEqual(4.5, $ratios['activeOnBg'], sprintf('%s: active (accent-fg) on bg must be >=4.5:1 (got %.2f:1).', $label, $ratios['activeOnBg']));
+      $this->assertGreaterThanOrEqual(4.5, $ratios['activeOnBg'], sprintf('%s: active (dark foreground-safe mix) on bg must be >=4.5:1 (got %.2f:1).', $label, $ratios['activeOnBg']));
     }
   }
 

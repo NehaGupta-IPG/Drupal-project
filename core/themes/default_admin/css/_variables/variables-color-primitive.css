@@ -59,3 +59,18 @@
   --admin-color-accent-700: color-mix(in lch, var(--accent-mix-base-scheme) 30%, var(--admin-color-accent-base));
   --admin-color-accent-900: color-mix(in lch, var(--accent-mix-base-scheme) 60%, var(--admin-color-accent-base));
 }
+
+/*
+ * Red accent: correction for the shared dark foreground floor.
+ *
+ * The shared accent-fg dark branch floors lightness at 0.93 so red, an
+ * inherently lighter-hued saturate colour, resolves to about #ff9699. That is
+ * 4.43:1 on the raised surface, under the 4.5:1 text threshold and too tight to
+ * host a pressed-state colour-mix. Red overrides the dark foreground to full
+ * lightness so it clears 5:1 and leaves contrast headroom. The selector is more
+ * specific than the shared [data-gin-accent], so it wins for the red preset.
+ */
+
+[data-gin-accent="red"] {
+  --admin-color-accent-fg: light-dark(var(--accent-base), oklch(from var(--accent-base) 1 calc(c * 1.1) h));
+}

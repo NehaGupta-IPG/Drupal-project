@@ -494,37 +494,75 @@ class AccentColorContrastTest extends BrowserTestBase {
   /**
    * Link hover and active are separate states, both dark foreground-safe.
    *
-   * Hover and active are distinct in light mode (accent-600 vs accent-700).
-   * In dark mode both use the foreground-safe accent, because the darker
-   * accent steps (600/700) lose contrast on dark surfaces. This guards that
-   * link-active dark no longer uses accent-900 — an accent step designed for
-   * light backgrounds — and resolves to the foreground-safe accent instead.
+   * Hover and active are distinct steps in light mode (accent-600 vs
+   * accent-700). In dark mode both stay foreground-safe: active modifies the
+   * foreground-safe accent toward accent-900 with a color-mix(), instead of
+   * replacing it with the darker accent step, which would lose contrast on dark
+   * surfaces.
+   *
+   * The assertion protects the rendered outcome, never the mix percentage.
+   * The percentage is read from the actual compiled CSS, so changing the mix
+   * amount only passes if every preset's dark active still reaches 4.5:1 on
+   * every dark surface.
    */
   public function testLinkStateContrast(): void {
     $theme = \Drupal::service('extension.list.theme')->getPath('default_admin');
     $semantic = file_get_contents($theme . '/css/_variables/variables-color-semantic.css');
 
     $this->assertStringContainsString(
-      '--admin-color-link-hover: light-dark(var(--admin-color-accent-600), var(--admin-color-accent-fg));',
+      '--admin-color-link-hover: light-dark(var(--admin-color-accent-600),',
       $semantic,
-      'Link hover must be a deeper accent step in light and the foreground-safe accent in dark.',
+      'Link hover must use the accent-600 step in light mode.',
     );
     $this->assertStringContainsString(
-      '--admin-color-link-active: light-dark(var(--admin-color-accent-700), var(--admin-color-accent-fg));',
+      '--admin-color-link-active: light-dark(var(--admin-color-accent-700),',
       $semantic,
-      'Link active must be deeper than hover in light and the foreground-safe accent in dark, not the darker accent step.',
+      'Link active must use a deeper accent-700 step than hover in light mode.',
+    );
+    $this->assertMatchesRegularExpression(
+      '/--admin-color-link-active: light-dark\(\s*var\(--admin-color-accent-700\),\s*color-mix\(in oklch,\s*var\(--admin-color-accent-fg\),\s*var\(--admin-color-accent-900\)\s+\d+%\)\s*\);/',
+      $semantic,
+      'Dark-mode link active must be a color-mix() of the foreground-safe accent toward accent-900.',
     );
     $this->assertStringNotContainsString(
       '--admin-color-link-active: light-dark(var(--admin-color-accent-700), var(--admin-color-accent-900));',
       $semantic,
     );
 
-    // The foreground-safe active must contrast on every dark surface (default accent).
-    $active_dark = '#7bdeff';
+    preg_match('/\bcolor-mix\(in oklch,\s*var\(--admin-color-accent-fg\),\s*var\(--admin-color-accent-900\)\s+(\d+)%\)/', $semantic, $match);
+    $this->assertNotEmpty($match, 'The dark link-active color-mix percentage must be readable from the compiled CSS.');
+    $mix = (int) $match[1] / 100;
+
     $dark_bgs = ['#1b1b1d', '#2a2a2d', '#3b3b3f', '#47474c', '#2d3755'];
-    foreach ($dark_bgs as $bg) {
-      $r = $this->contrastRatio($active_dark, $bg);
-      $this->assertGreaterThanOrEqual(4.5, $r, sprintf('Link active %s on %s must be >=4.5:1 (got %.2f:1).', $active_dark, $bg, $r));
+    $colors = Helper::accentColors();
+    foreach ($colors as $name => $info) {
+      if ($name === 'custom') {
+        continue;
+      }
+      $base = $this->hexToOklch($info['hex']);
+      // Dark foreground-safe accent. Red honours a lighter dark override.
+      $fg_l = $name === 'red' ? 1.0 : max($base['L'] * 1.5, 0.93);
+      $fg = $this->oklchToHex($fg_l, $base['C'] * 1.1, $base['H']);
+      // Dark fill accent-900: lch mix of white 60% and the dark base (0.45 L).
+      $d900 = $this->oklchToHex(0.6 * 1.0 + 0.4 * ($base['L'] * 0.45), 0.6 * 0.0 + 0.4 * ($base['C'] * 0.9), $base['H']);
+      // Active = oklch color-mix of fg and 900 at the shipped percentage.
+      $fg_o = $this->hexToOklch($fg);
+      $d900_o = $this->hexToOklch($d900);
+      $dh = $d900_o['H'] - $fg_o['H'];
+      $dh = $dh > 180 ? $dh - 360 : ($dh < -180 ? $dh + 360 : $dh);
+      $active = $this->oklchToHex(
+        $fg_o['L'] * (1 - $mix) + $d900_o['L'] * $mix,
+        $fg_o['C'] * (1 - $mix) + $d900_o['C'] * $mix,
+        $fg_o['H'] + $dh * $mix,
+      );
+      foreach ($dark_bgs as $bg) {
+        $ratio = $this->contrastRatio($active, $bg);
+        $this->assertGreaterThanOrEqual(
+          4.5,
+          $ratio,
+          sprintf('Link active "%s" (%s) on %s must be >=4.5:1 (got %.2f:1).', $name, $active, $bg, $ratio),
+        );
+      }
     }
   }
 

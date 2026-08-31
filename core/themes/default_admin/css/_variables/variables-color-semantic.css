@@ -135,14 +135,14 @@
    *
    * Hover and active are separate states. In light mode hover uses a deeper
    * accent step than the base link and active uses a deeper step than hover.
-   * In dark mode both use the foreground-safe accent, because the darker
-   * accent steps lose contrast on dark surfaces. The two states stay distinct
-   * where darkening is safe and share the foreground-safe accent where it is
-   * not.
+   * In dark mode both stay foreground-safe: hover uses the foreground-safe
+   * accent, and active shifts that foreground-safe accent toward accent-900.
+   * That mix modifies the foreground accent rather than replacing it with the
+   * darker step, which would lose contrast on dark surfaces.
    */
   --admin-color-link: var(--admin-color-primary);
   --admin-color-link-hover: light-dark(var(--admin-color-accent-600), var(--admin-color-accent-fg));
-  --admin-color-link-active: light-dark(var(--admin-color-accent-700), var(--admin-color-accent-fg));
+  --admin-color-link-active: light-dark(var(--admin-color-accent-700), color-mix(in oklch, var(--admin-color-accent-fg), var(--admin-color-accent-900) 20%));
 
   /*
    * Component interaction states — resolved at semantic level.
