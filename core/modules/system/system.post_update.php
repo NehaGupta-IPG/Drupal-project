@@ -137,8 +137,13 @@ function system_post_update_reconcile_translatable_config_langcode(&$sandbox = N
 
     $config = $config_factory->getEditable($name);
     $typed_config = $typed_config_manager->createFromNameAndData($name, $config->getRawData());
-    // Simple config is always a mapping.
+    // Simple config is always a mapping. Assertions are disabled in
+    // production, so the assert() alone would not stop a fatal error below
+    // if that ever turned out false there - the continue does.
     assert($typed_config instanceof Mapping);
+    if (!$typed_config instanceof Mapping) {
+      continue;
+    }
 
     if ($typed_config->hasTranslatableElements()) {
       if (array_key_exists('langcode', $config->getRawData())) {
