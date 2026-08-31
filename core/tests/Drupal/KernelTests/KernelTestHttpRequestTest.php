@@ -42,9 +42,14 @@ class KernelTestHttpRequestTest extends KernelTestBase {
    * Tests making a request.
    */
   public function testRequest(): void {
+    $this->assertEquals('/', \Drupal::request()->getRequestUri());
+
     $this->drupalGet('/system-test/main-content-handling');
     $this->assertEquals(Response::HTTP_OK, $this->getSession()->getStatusCode());
     $this->assertSession()->pageTextContains('Content to test main content fallback');
+
+    // Make sure the request stack is not polluted.
+    $this->assertEquals('/', \Drupal::request()->getRequestUri());
 
     // Test drupalGet() with Url options.
     $this->drupalGet('/system-test/set-header', [
