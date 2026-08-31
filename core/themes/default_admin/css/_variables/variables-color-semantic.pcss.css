@@ -109,6 +109,12 @@
    *   --admin-color-text-disabled / -bg-disabled / -border-disabled  disabled controls.
    */
   --admin-color-focus: light-dark(#003ecc, #99b8ff);
+  /* Separator ring inside the focus indicator. Where a control is accent-filled,
+     the focus ring alone would sit ring-on-fill (same hue family). A surface gap
+     ring adjacent to the fill isolates the focus ring from that fill. White on
+     light surfaces (the page); in dark mode it is effectively the fill color, so
+     the ring rides directly on the fill, which already passes contrast. */
+  --admin-color-focus-gap: var(--admin-color-bg-surface);
   /* @todo this is used in box-shadow focus states, which will be phased out in favor of outline. */
   --admin-color-focus-border: light-dark(color-mix(in lch, black 20%, transparent), color-mix(in lch, black 80%, transparent));
   --admin-color-focus-neutral: light-dark(#545560, #c2c2c2);

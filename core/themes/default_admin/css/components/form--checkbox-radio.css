@@ -171,6 +171,20 @@
       border-color: var(--admin-color-primary-active);
       background-color: var(--admin-color-primary-active);
     }
+
+    /*
+     * Focus on the checked (accent-filled) checkbox.
+     *
+     * The default single focus ring would sit ring-on-fill on the accent fill
+     * and fail on light surfaces. A two-part indicator adds a surface gap ring
+     * that isolates the focus ring from the fill. See --admin-color-focus-gap.
+     */
+    &:focus {
+      outline: none;
+      box-shadow:
+        0 0 0 2px var(--admin-color-focus-gap),
+        0 0 0 5px var(--admin-color-focus);
+    }
   }
 
   &[disabled] {

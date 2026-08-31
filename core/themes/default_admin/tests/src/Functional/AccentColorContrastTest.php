@@ -417,6 +417,52 @@ class AccentColorContrastTest extends BrowserTestBase {
   }
 
   /**
+   * Focus on an accent-filled control uses a two-part indicator.
+   *
+   * A single focus ring sits ring-on-fill on the primary colour and fails on
+   * light surfaces (blue ring "#003ecc" on primary "#015efe" is about 1.6:1).
+   * The focus-gap semantic token inserts a surface ring between the fill and the
+   * focus ring. This guards that the primary button and checked checkbox consume
+   * that two-part indicator, and that it resolves to >= 3:1 against the fill.
+   */
+  public function testFocusTwoPartIndicatorOnAccentFill(): void {
+    $theme = \Drupal::service('extension.list.theme')->getPath('default_admin');
+    $semantic = file_get_contents($theme . '/css/_variables/variables-color-semantic.css');
+    $button = file_get_contents($theme . '/css/components/button.css');
+    $checkbox = file_get_contents($theme . '/css/components/form--checkbox-radio.css');
+
+    $this->assertStringContainsString(
+      '--admin-color-focus-gap: var(--admin-color-bg-surface);',
+      $semantic,
+      'The focus-gap separator ring must be a semantic token backed by the surface gap.',
+    );
+
+    // Primary button: remove the failing global outline and draw a gap + ring.
+    $this->assertMatchesRegularExpression(
+      '/\.button--primary:focus,[^{]*\{[^}]*outline:[^}]*!important[^}]*var\(--admin-color-focus-gap\)[^}]*var\(--admin-color-focus\)[^}]*\}/s',
+      $button,
+      'Primary button focus must switch to a two-part indicator (outline removed, gap ring + focus ring).',
+    );
+
+    // Checked checkbox (accent-filled) uses the same two-part indicator.
+    $this->assertMatchesRegularExpression(
+      '/&:focus\s*\{[^}]*outline:\s*none[^}]*var\(--admin-color-focus-gap\)[^}]*var\(--admin-color-focus\)[^}]*\}/s',
+      $checkbox,
+      'Checked checkbox focus must use the two-part indicator.',
+    );
+
+    // The indicator must differentiate the focus ring from the accent fill.
+    // Light: gap is white (surface), so it separates blue ring from blue fill.
+    $primary_light = '#015efe';
+    $gap_light = '#ffffff';
+    $ring_light = '#003ecc';
+    $gap_vs_fill = $this->contrastRatio($gap_light, $primary_light);
+    $this->assertGreaterThanOrEqual(3.0, $gap_vs_fill, sprintf('Focus gap on accent fill must be >= 3:1 (got %.2f:1).', $gap_vs_fill));
+    $ring_vs_gap = $this->contrastRatio($ring_light, $gap_light);
+    $this->assertGreaterThanOrEqual(3.0, $ring_vs_gap, sprintf('Focus ring on gap must be >= 3:1 (got %.2f:1).', $ring_vs_gap));
+  }
+
+  /**
    * Link / focus / hover must be visible on all surfaces in both modes.
    *
    * Regression for #0029a5 on #2d3755 (1.04:1) on Appearance Light/Auto.

@@ -128,6 +128,26 @@
     color: var(--admin-color-text-on-primary);
   }
 }
+/*
+ * Focus on the filled primary button.
+ *
+ * The default single focus ring would sit ring-on-fill on the accent fill and
+ * fail contrast on light surfaces (about 1.6:1 against the primary fill). A
+ * two-part indicator adds a surface gap ring that isolates the focus ring from
+ * the fill while it still differentiates from the page. The gap is white in light
+ * mode; in dark mode it is effectively the fill, so the ring rides directly on
+ * the fill, which already passes. The global outline is removed so the failing
+ * single ring never renders.
+ */
+.button--primary:focus,
+#edit-submit.form-submit:focus,
+.ief-entity-submit:focus {
+  outline: none !important;
+  box-shadow:
+    0.1em 0.25em 0.5em var(--admin-color-primary-soft),
+    0 0 0 2px var(--admin-color-focus-gap),
+    0 0 0 5px var(--admin-color-focus);
+}
 /* Danger button styles */
 .button--danger {
   color: var(--button-fg-color--danger);
