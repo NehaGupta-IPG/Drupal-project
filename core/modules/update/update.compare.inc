@@ -425,6 +425,9 @@ function update_calculate_project_update_status(&$project_data, $available): voi
       continue;
     }
 
+    // Store all installable releases.
+    $project_data['releases'][$version] = $release_info;
+
     $release_major_version = $release_module_version->getMajorVersion();
     // See if this is a higher major version than our target and yet still
     // supported. If so, record it as an "Also available" release.
@@ -434,7 +437,6 @@ function update_calculate_project_update_status(&$project_data, $available): voi
       }
       if (!isset($project_data['also'][$release_major_version])) {
         $project_data['also'][$release_major_version] = $version;
-        $project_data['releases'][$version] = $release_info;
       }
       // Otherwise, this release can't matter to us, since it's neither
       // from the release series we're currently using nor the recommended
@@ -451,7 +453,6 @@ function update_calculate_project_update_status(&$project_data, $available): voi
     if (!isset($project_data['latest_version'])
         && $release_major_version == $target_major) {
       $project_data['latest_version'] = $version;
-      $project_data['releases'][$version] = $release_info;
     }
 
     // Look for the development snapshot release for this branch.
@@ -459,7 +460,6 @@ function update_calculate_project_update_status(&$project_data, $available): voi
         && $release_major_version == $target_major
         && $release_module_version->getVersionExtra() === 'dev') {
       $project_data['dev_version'] = $version;
-      $project_data['releases'][$version] = $release_info;
     }
 
     if ($release_module_version->getVersionExtra()) {
