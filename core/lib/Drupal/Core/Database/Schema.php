@@ -6,8 +6,10 @@ use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\GinIndex;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IndexInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
@@ -611,53 +613,21 @@ abstract class Schema implements PlaceholderInterface {
   }
 
   /**
-   * Resolves the new keys to add to a table changing or adding a field.
+   * Resolves the preferred index from a list of alternatives.
    *
-   * @param array $keys_new
-   *   Keys and indexes specification to be created on the table along with the
-   *   column addition/change.
-   * @param string $tableName
-   *   The name of the Table object.
-   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
-   *   The destination Schema definition where the table is defined with all
-   *   defined indexes.
+   * @param \Drupal\Core\Database\SchemaDefinition\AlternativeIndexes $alternativeIndexes
+   *   The alternative indexes list.
    *
-   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
-   *   When the requested table is missing.
+   * @return \Drupal\Core\Database\SchemaDefinition\IndexInterface|null
+   *   The preferred index or NULL if it cannot be determined.
    */
-  protected function resolveNewKeysFromSchemaDefinition(array &$keys_new, string $tableName, SchemaDefinition $schema): void {
-    $tableDefinition = $schema->getTableDefinition($tableName);
-    $indexes = [];
-    foreach ($keys_new['indexes'] as $name => $key) {
-      if ($key === TRUE) {
-        foreach ($tableDefinition->indexes as $tmp) {
-          if ($name === $tmp->name) {
-            $key = $tmp;
-            break;
-          }
-        }
-      }
-      if (is_array($key)) {
-        $indexes[$name] = $key;
-        continue;
-      }
-      if ($key instanceof AlternativeIndexes) {
-        foreach ($key->indexes as $tmp) {
-          if (in_array(get_class($tmp), $this->getSupportedIndexTypes(), TRUE)) {
-            $key = $tmp;
-            break;
-          }
-        }
-      }
-      if ($key instanceof Index) {
-        $indexes[$name] = $key->toArray();
-        continue;
-      }
-      if (in_array(get_class($key), $this->getSupportedIndexTypes(), TRUE)) {
-        $indexes[$name] = $key;
+  protected function resolveAlternativeIndex(AlternativeIndexes $alternativeIndexes): ?IndexInterface {
+    foreach ($alternativeIndexes->indexes as $index) {
+      if (in_array(get_class($index), $this->getSupportedIndexTypes(), TRUE)) {
+        return $index;
       }
     }
-    $keys_new['indexes'] = $indexes;
+    return NULL;
   }
 
   /**
@@ -793,6 +763,36 @@ abstract class Schema implements PlaceholderInterface {
     $table = $targetSchema->getTableDefinition($tableName);
     $tableAsArray = $table->toArray();
 
+    // Handles keys/indexes that are impacted by the addition.
+    if (in_array($targetColumnName, $table->primaryKey ? $table->primaryKey->columnNames() : [], TRUE)) {
+      $this->dropPrimaryKey($tableName);
+    }
+    else {
+      unset($tableAsArray['primary key']);
+    }
+    foreach ($table->uniqueKeys ?? [] as $key) {
+      if (in_array($targetColumnName, $key->columnNames(), TRUE)) {
+        $this->dropUniqueKey($tableName, $key->name);
+      }
+      else {
+        unset($tableAsArray['unique keys'][$key->name]);
+      }
+    }
+    foreach ($table->indexes ?? [] as $key) {
+      if ($key instanceof AlternativeIndexes) {
+        $key = $this->resolveAlternativeIndex($key);
+        if ($key === NULL) {
+          continue;
+        }
+      }
+      if (in_array($targetColumnName, $key->columnNames(), TRUE)) {
+        $this->dropIndex($tableName, $key->name);
+      }
+      else {
+        unset($tableAsArray['indexes'][$key->name]);
+      }
+    }
+
     $this->addField(
       $tableName,
       $targetColumnName,
@@ -828,7 +828,7 @@ abstract class Schema implements PlaceholderInterface {
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If the specified destination field already exists.
    */
-  final public function changeTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName, ?string $currentColumnName): void {
+  final public function changeTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName, ?string $currentColumnName = NULL): void {
     $table = $targetSchema->getTableDefinition($tableName);
     $currentColumnName ??= $targetColumnName;
     $tableAsArray = $table->toArray();
@@ -840,6 +840,22 @@ abstract class Schema implements PlaceholderInterface {
     }
     else {
       unset($tableAsArray['primary key']);
+    }
+    foreach ($currentKeys['unique keys'] as $key => $data) {
+      if (in_array($currentColumnName, $data, TRUE)) {
+        $this->dropUniqueKey($tableName, $key);
+      }
+      else {
+        unset($tableAsArray['unique keys'][$key]);
+      }
+    }
+    foreach ($currentKeys['indexes'] as $key => $data) {
+      if (in_array($currentColumnName, $data, TRUE)) {
+        $this->dropIndex($tableName, $key);
+      }
+      else {
+        unset($tableAsArray['indexes'][$key]);
+      }
     }
 
     $this->changeField(
@@ -883,15 +899,10 @@ abstract class Schema implements PlaceholderInterface {
       throw new SchemaDefinitionException("Index '{$indexName}' is not present in the schema definition");
     }
     if ($index instanceof AlternativeIndexes) {
-      foreach ($index->indexes as $tmp) {
-        if (in_array(get_class($tmp), $this->getSupportedIndexTypes(), TRUE)) {
-          $index = $tmp;
-          break;
-        }
+      $index = $this->resolveAlternativeIndex($index);
+      if ($index === NULL) {
+        return;
       }
-    }
-    if ($index instanceof AlternativeIndexes) {
-      return;
     }
     $indexClass = get_class($index);
     if (in_array($indexClass, $this->getSupportedIndexTypes(), TRUE)) {

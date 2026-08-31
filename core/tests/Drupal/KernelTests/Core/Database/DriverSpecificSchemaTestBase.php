@@ -11,6 +11,7 @@ use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\GinIndex;
 use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
@@ -1468,6 +1469,74 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       'description' => 'Primary Key: Unique ID.',
     ];
     $this->schema->changeField('change_serial_to_big', 'id', 'id', $new_specification);
+    $this->assertTrue($this->schema->fieldExists('change_serial_to_big', 'id'));
+
+    // Test if we can actually add a big int.
+    $id = $this->connection->insert('change_serial_to_big')->fields([
+      'id' => 21474836470,
+    ])->execute();
+
+    $id_two = $this->connection->insert('change_serial_to_big')->fields([
+      'text' => 'Testing for ID generation',
+    ])->execute();
+
+    $this->assertEquals($id + 1, $id_two);
+  }
+
+  /**
+   * Tests changing a field length via schema definition.
+   */
+  public function testChangeSerialColumnLengthFromSpecification(): void {
+    $initialSchema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'change_serial_to_big',
+      tables: [
+        new Table(
+          name: 'change_serial_to_big',
+          columns: [
+            Column::serial(
+              name: 'id',
+              description: 'Primary Key: Unique ID.',
+            ),
+            Column::text(
+              name: 'text',
+              description: 'A text field',
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+      ],
+    );
+    $this->schema->createSchemaFromDefinition($initialSchema);
+
+    // Increase the size of the field.
+    $targetSchema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'change_serial_to_big',
+      tables: [
+        new Table(
+          name: 'change_serial_to_big',
+          columns: [
+            Column::serial(
+              name: 'id',
+              description: 'Primary Key: Unique ID.',
+              size: ColumnSize::Big,
+            ),
+            Column::text(
+              name: 'text',
+              description: 'A text field',
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+      ],
+    );
+    $this->schema->changeTableColumnFromDefinition(
+      targetSchema: $targetSchema,
+      tableName: 'change_serial_to_big',
+      targetColumnName: 'id',
+    );
+
     $this->assertTrue($this->schema->fieldExists('change_serial_to_big', 'id'));
 
     // Test if we can actually add a big int.
