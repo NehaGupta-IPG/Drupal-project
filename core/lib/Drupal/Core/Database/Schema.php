@@ -353,21 +353,14 @@ abstract class Schema implements PlaceholderInterface {
    *   table specification but without the 'fields' element. If you are
    *   adding a type 'serial' field, you MUST specify at least one key
    *   or index including it in this array. See ::changeField() for more
-   *   explanation why. The values of the 'indexes' element may also be
-   *   IndexInterface definition objects. Index definitions of a technology
-   *   not supported by the driver are skipped, and alternative indexes
-   *   fall back to their most preferred supported definition.
-   * phpcs:ignore Drupal.Commenting.FunctionComment.ParamNameNoMatch
-   * @param \Drupal\Core\Database\SchemaDefinition\Schema|null $schema
-   *   (optional) The destination Schema definition where the table is defined
-   *   with the changed column and all defined indexes.
+   *   explanation why.
    *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If the specified table already has a field by that name.
    */
-  abstract public function addField($table, $field, $spec, $keys_new = [] /*, ?SchemaDefinition $schema = NULL */);
+  abstract public function addField($table, $field, $spec, $keys_new = []);
 
   /**
    * Drop a field.
@@ -727,22 +720,14 @@ abstract class Schema implements PlaceholderInterface {
    * @param array|null $keys_new
    *   (optional) Keys and indexes specification to be created on the
    *   table along with changing the field. The format is the same as a
-   *   table specification but without the 'fields' element. The values
-   *   of the 'indexes' element may also be IndexInterface definition objects.
-   *   Index definitions of a technology not supported by the driver are
-   *   skipped, and alternative indexes fall back to their most preferred
-   *   supported definition.
-   * phpcs:ignore Drupal.Commenting.FunctionComment.ParamNameNoMatch
-   * @param \Drupal\Core\Database\SchemaDefinition\Schema|null $schema
-   *   (optional) The destination Schema definition where the table is defined
-   *   with the changed column and all defined indexes.
+   *   table specification but without the 'fields' element.
    *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table or source field doesn't exist.
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If the specified destination field already exists.
    */
-  abstract public function changeField($table, $field, $field_new, $spec, $keys_new = [] /*, ?SchemaDefinition $schema = NULL */);
+  abstract public function changeField($table, $field, $field_new, $spec, $keys_new = []);
 
   /**
    * Creates the tables in a schema definition.
@@ -778,6 +763,92 @@ abstract class Schema implements PlaceholderInterface {
    */
   final public function createTableFromDefinition(SchemaDefinitionType $schemaDefinitionType, string $schemaName, TableDefinition $table): void {
     $this->createTable($table->name, $table->toArray());
+
+    // Handles creation of indexes of types that are not the standard B-Tree.
+    foreach ($table->indexes ?? [] as $index) {
+      if ($index instanceof Index) {
+        continue;
+      }
+      $this->createIndexFromDefinition($table, $index->name);
+    }
+  }
+
+  /**
+   * Adds a table column based on a schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $targetSchema
+   *   The target Schema definition where the table is defined with the changed
+   *   column and all defined indexes.
+   * @param string $tableName
+   *   Name of the table.
+   * @param string $targetColumnName
+   *   The name of the column as defined in the target schema definition.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   *   If the specified table or source field doesn't exist.
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified destination field already exists.
+   */
+  final public function addTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName): void {
+    $table = $targetSchema->getTableDefinition($tableName);
+    $tableAsArray = $table->toArray();
+
+    $this->addField(
+      $tableName,
+      $targetColumnName,
+      $tableAsArray['fields'][$targetColumnName],
+      $tableAsArray,
+    );
+
+    // Handles creation of indexes of types that are not the standard B-Tree.
+    foreach ($table->indexes ?? [] as $index) {
+      if ($index instanceof Index) {
+        continue;
+      }
+      $this->createIndexFromDefinition($table, $index->name);
+    }
+  }
+
+  /**
+   * Changes a table column to a target schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $targetSchema
+   *   The target Schema definition where the table is defined with the changed
+   *   column and all defined indexes.
+   * @param string $tableName
+   *   Name of the table.
+   * @param string $targetColumnName
+   *   The name of the column as defined in the target schema definition.
+   * @param string|null $currentColumnName
+   *   The current name of the column in the table. Skip if the name does not
+   *   change.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   *   If the specified table or source field doesn't exist.
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified destination field already exists.
+   */
+  final public function changeTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName, ?string $currentColumnName): void {
+    $table = $targetSchema->getTableDefinition($tableName);
+    $currentColumnName ??= $targetColumnName;
+    $tableAsArray = $table->toArray();
+
+    // Handles keys/indexes that are impacted by the change.
+    $currentKeys = $this->introspectIndexSchema($tableName);
+    if (in_array($currentColumnName, $currentKeys['primary key'], TRUE)) {
+      $this->dropPrimaryKey($tableName);
+    }
+    else {
+      unset($tableAsArray['primary key']);
+    }
+
+    $this->changeField(
+      $tableName,
+      $currentColumnName,
+      $targetColumnName,
+      $tableAsArray['fields'][$targetColumnName],
+      $tableAsArray,
+    );
 
     // Handles creation of indexes of types that are not the standard B-Tree.
     foreach ($table->indexes ?? [] as $index) {
