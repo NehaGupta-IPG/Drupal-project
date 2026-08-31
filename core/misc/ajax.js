@@ -1763,6 +1763,42 @@
     },
 
     /**
+     * Command to add module preloads.
+     *
+     * Module preloads instruct the browser to fetch a module, so that module
+     * scripts that import it can start executing as soon as possible. The
+     * import map that resolves the bare module specifiers is sent with the
+     * main HTML document; a page only supports a single import map, so this
+     * command only adds <link rel="modulepreload"> elements.
+     *
+     * @param {Drupal.Ajax} [ajax]
+     *   {@link Drupal.Ajax} object created by {@link Drupal.ajax}.
+     * @param {object} response
+     *   The response from the Ajax request.
+     * @param {object[]} response.data
+     *   An array of attributes of the <link rel="modulepreload"> elements to
+     *   be added to the head.
+     * @param {number} [status]
+     *   The XMLHttpRequest status.
+     */
+    add_module_preload(ajax, response, status) {
+      const head = document.head;
+      response.data.forEach((attributes) => {
+        // Do not add the same module preload twice.
+        const alreadyPreloaded = Array.from(
+          head.querySelectorAll('link[rel="modulepreload"]'),
+        ).some((link) => link.getAttribute('href') === attributes.href);
+        if (!alreadyPreloaded) {
+          const link = document.createElement('link');
+          Object.keys(attributes).forEach((attributeKey) => {
+            link.setAttribute(attributeKey, attributes[attributeKey]);
+          });
+          head.appendChild(link);
+        }
+      });
+    },
+
+    /**
      * Command to add a message to the message area.
      *
      * @param {Drupal.Ajax} [ajax]

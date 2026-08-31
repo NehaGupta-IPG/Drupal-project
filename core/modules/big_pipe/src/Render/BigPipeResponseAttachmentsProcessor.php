@@ -4,7 +4,6 @@ namespace Drupal\big_pipe\Render;
 
 use Drupal\Core\Asset\AssetCollectionRendererInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
-use Drupal\Core\Asset\ImportMapRendererInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
@@ -40,7 +39,9 @@ class BigPipeResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
     LanguageManagerInterface $language_manager,
     ?FileUrlGeneratorInterface $file_url_generator = NULL,
     #[Autowire(service: 'asset.importmap.renderer')]
-    ?ImportMapRendererInterface $import_map_renderer = NULL,
+    ?AssetCollectionRendererInterface $import_map_renderer = NULL,
+    #[Autowire(service: 'asset.modulepreload.renderer')]
+    ?AssetCollectionRendererInterface $module_preload_renderer = NULL,
   ) {
     if (!isset($file_url_generator)) {
       $file_url_generator = \Drupal::service('file_url_generator');
@@ -50,8 +51,12 @@ class BigPipeResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
       $import_map_renderer = \Drupal::service('asset.importmap.renderer');
       @trigger_error('Constructing BigPipeResponseAttachmentsProcessor without an import map renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
     }
+    if (!isset($module_preload_renderer)) {
+      $module_preload_renderer = \Drupal::service('asset.modulepreload.renderer');
+      @trigger_error('Constructing BigPipeResponseAttachmentsProcessor without a module preload renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    }
 
-    parent::__construct($asset_resolver, $config_factory, $css_collection_renderer, $js_collection_renderer, $request_stack, $renderer, $module_handler, $language_manager, $file_url_generator, $import_map_renderer);
+    parent::__construct($asset_resolver, $config_factory, $css_collection_renderer, $js_collection_renderer, $request_stack, $renderer, $module_handler, $language_manager, $file_url_generator, $import_map_renderer, $module_preload_renderer);
   }
 
   /**

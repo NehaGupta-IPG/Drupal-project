@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Ajax;
 
 use Drupal\Core\Ajax\AddCssCommand;
+use Drupal\Core\Ajax\AddModulePreloadCommand;
 use Drupal\Core\Ajax\AfterCommand;
 use Drupal\Core\Ajax\AlertCommand;
 use Drupal\Core\Ajax\AnnounceCommand;
@@ -125,6 +126,71 @@ class AjaxCommandsTest extends UnitTestCase {
   #[DataProvider('providerCss')]
   public function testAddCssCommand(array $css, array $expected): void {
     $command = new AddCssCommand($css);
+
+    $this->assertEquals($expected, $command->render());
+  }
+
+  /**
+   * @return array
+   *   - Array of module preload attributes
+   *   - Expected value
+   */
+  public static function providerModulePreload(): array {
+    return [
+      'empty' => [
+        [],
+        [
+          'command' => 'add_module_preload',
+          'data' => [],
+        ],
+      ],
+      'single' => [
+        [
+          [
+            'rel' => 'modulepreload',
+            'href' => 'core/modules/example/js/example.mjs?v=1.0',
+          ],
+        ],
+        [
+          'command' => 'add_module_preload',
+          'data' => [
+            [
+              'rel' => 'modulepreload',
+              'href' => 'core/modules/example/js/example.mjs?v=1.0',
+            ],
+          ],
+        ],
+      ],
+      'external' => [
+        [
+          [
+            'rel' => 'modulepreload',
+            'href' => 'https://example.com/example.mjs',
+            'crossorigin' => 'anonymous',
+          ],
+        ],
+        [
+          'command' => 'add_module_preload',
+          'data' => [
+            [
+              'rel' => 'modulepreload',
+              'href' => 'https://example.com/example.mjs',
+              'crossorigin' => 'anonymous',
+            ],
+          ],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Tests add module preload command.
+   *
+   * @legacy-covers \Drupal\Core\Ajax\AddModulePreloadCommand
+   */
+  #[DataProvider('providerModulePreload')]
+  public function testAddModulePreloadCommand(array $module_preloads, array $expected): void {
+    $command = new AddModulePreloadCommand($module_preloads);
 
     $this->assertEquals($expected, $command->render());
   }

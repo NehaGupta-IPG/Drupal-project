@@ -125,11 +125,12 @@ interface AssetResolverInterface {
   public function getImportMap(): array;
 
   /**
-   * Returns the import map entries to preload for the current response.
+   * Returns the module preloads for the current response.
    *
    * When a library that defines import map entries is attached to the page,
    * the browser is instructed to preload the mapped modules, so that module
-   * scripts can start importing them as soon as they execute.
+   * scripts can start importing them as soon as they execute. The preloads
+   * are rendered as <link rel="modulepreload"> elements.
    *
    * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
    *   The assets attached to the current response.
@@ -137,7 +138,9 @@ interface AssetResolverInterface {
    * @return array
    *   An array of import map entries to preload, each with the keys 'data',
    *   'external' and 'version'.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/modulepreload
    */
-  public function getImportMapPreloads(AttachedAssetsInterface $assets): array;
+  public function getModulePreloads(AttachedAssetsInterface $assets): array;
 
 }

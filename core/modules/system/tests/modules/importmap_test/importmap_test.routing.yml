@@ -6,6 +6,14 @@ importmap_test.consumer:
   requirements:
     _access: 'TRUE'
 
+importmap_test.bigpipe_consumer:
+  path: '/importmap-test/bigpipe-consumer'
+  defaults:
+    _controller: '\Drupal\importmap_test\Controller\ConsumerController::bigPipeConsumerPage'
+    _title: 'Import map BigPipe consumer'
+  requirements:
+    _access: 'TRUE'
+
 importmap_test.scoped_consumer:
   path: '/importmap-test/scoped-consumer'
   defaults:

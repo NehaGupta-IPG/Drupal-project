@@ -361,7 +361,7 @@ class AssetResolver implements AssetResolverInterface {
   /**
    * {@inheritdoc}
    */
-  public function getImportMapPreloads(AttachedAssetsInterface $assets): array {
+  public function getModulePreloads(AttachedAssetsInterface $assets): array {
     if (!$assets->getLibraries()) {
       return [];
     }

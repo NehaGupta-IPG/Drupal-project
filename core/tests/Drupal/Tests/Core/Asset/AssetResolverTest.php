@@ -587,15 +587,15 @@ class AssetResolverTest extends UnitTestCase {
   }
 
   /**
-   * Tests get import map preloads.
+   * Tests get module preloads.
    */
-  #[DataProvider('providerGetImportMapPreloads')]
-  public function testGetImportMapPreloads(array $attached, array $expected): void {
+  #[DataProvider('providerGetModulePreloads')]
+  public function testGetModulePreloads(array $attached, array $expected): void {
     $assets = (new AttachedAssets())->setAlreadyLoadedLibraries([])->setLibraries($attached);
-    $this->assertSame($expected, $this->assetResolver->getImportMapPreloads($assets));
+    $this->assertSame($expected, $this->assetResolver->getModulePreloads($assets));
   }
 
-  public static function providerGetImportMapPreloads(): array {
+  public static function providerGetModulePreloads(): array {
     return [
       'no libraries attached' => [[], []],
       'library without import map' => [

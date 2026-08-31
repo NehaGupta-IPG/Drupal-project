@@ -48,6 +48,10 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    *   The module handler.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
+   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface|null $modulePreloadRenderer
+   *   The module preload renderer. Omitted for backwards compatibility with
+   *   subclasses; the 'asset.modulepreload.renderer' service is used as a
+   *   fallback.
    */
   public function __construct(
     protected AssetResolverInterface $assetResolver,
@@ -58,7 +62,12 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     protected RendererInterface $renderer,
     protected ModuleHandlerInterface $moduleHandler,
     protected LanguageManagerInterface $languageManager,
+    protected ?AssetCollectionRendererInterface $modulePreloadRenderer = NULL,
   ) {
+    if (!isset($modulePreloadRenderer)) {
+      $this->modulePreloadRenderer = \Drupal::service('asset.modulepreload.renderer');
+      @trigger_error('Constructing AjaxResponseAttachmentsProcessor without a module preload renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    }
     $this->config = $config_factory->get('system.performance');
   }
 
@@ -130,6 +139,23 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
 
     // Prepend commands to add the assets, preserving their relative order.
     $resource_commands = [];
+    // Preload the modules of the attached libraries' import maps, so that
+    // module scripts added by the add_js commands can start importing them
+    // as soon as possible. The import map itself is not added: a page only
+    // supports a single import map, and it was already sent with the main
+    // HTML document. Module preloads, in contrast, may be added to a page
+    // multiple times.
+    //
+    // This is only done during normal site operation, since resolving the
+    // libraries to load invokes hook_library_info_alter(), and some
+    // implementations of that hook make assumptions about the installed site
+    // that do not hold during installation or in maintenance mode.
+    if (!$maintenance_mode) {
+      $preloads = $this->modulePreloadRenderer->render($this->assetResolver->getModulePreloads($assets));
+      if ($preloads) {
+        $resource_commands[] = new AddModulePreloadCommand(array_column($preloads, '#attributes'));
+      }
+    }
     if ($css_assets) {
       $css_render_array = $this->cssCollectionRenderer->render($css_assets);
       $resource_commands[] = new AddCssCommand(array_column($css_render_array, '#attributes'));

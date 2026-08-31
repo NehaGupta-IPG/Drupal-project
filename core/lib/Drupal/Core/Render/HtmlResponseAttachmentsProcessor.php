@@ -8,7 +8,6 @@ use Drupal\Core\Asset\AssetCollectionRendererInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
-use Drupal\Core\Asset\ImportMapRendererInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\EnforcedResponseException;
@@ -52,7 +51,8 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     protected ModuleHandlerInterface $moduleHandler,
     protected LanguageManagerInterface $languageManager,
     protected ?FileUrlGeneratorInterface $fileUrlGenerator = NULL,
-    protected ?ImportMapRendererInterface $importMapRenderer = NULL,
+    protected ?AssetCollectionRendererInterface $importMapRenderer = NULL,
+    protected ?AssetCollectionRendererInterface $modulePreloadRenderer = NULL,
   ) {
     if (!isset($fileUrlGenerator)) {
       $this->fileUrlGenerator = \Drupal::service('file_url_generator');
@@ -61,6 +61,10 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     if (!isset($importMapRenderer)) {
       $this->importMapRenderer = \Drupal::service('asset.importmap.renderer');
       @trigger_error('Constructing HtmlResponseAttachmentsProcessor without an import map renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    }
+    if (!isset($modulePreloadRenderer)) {
+      $this->modulePreloadRenderer = \Drupal::service('asset.modulepreload.renderer');
+      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without a module preload renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
     }
     $this->config = $config_factory->get('system.performance');
   }
@@ -187,8 +191,15 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
 
         // Render the import map and the module preloads, and add them to the
         // start of the head. An import map must be processed by the browser
-        // before any module script or module preload, so it has to come
-        // before everything else in the head.
+        // before any module script or module preload, so the import map has
+        // to come first, followed by the module preloads.
+        //
+        // The import map is only rendered for the main HTML document. Browsers
+        // only support a single import map per page, and responses other than
+        // the main document (e.g., Ajax responses and BigPipe placeholder
+        // replacements) must not add a second import map; they can only add
+        // module preloads. See
+        // \Drupal\Core\Ajax\AjaxResponseAttachmentsProcessor::processAttachments().
         //
         // The import map is only built during normal site operation. Building
         // it scans the libraries of all enabled modules, which invokes
@@ -198,12 +209,10 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
         // built in those contexts.
         $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
         if (!$maintenance_mode) {
-          $import_map_elements = $this->importMapRenderer->render(
-            $this->assetResolver->getImportMap(),
-            $this->assetResolver->getImportMapPreloads($assets)
-          );
-          if ($import_map_elements) {
-            $variables['head'] = $import_map_elements + ($variables['head'] ?? []);
+          $head_elements = $this->importMapRenderer->render($this->assetResolver->getImportMap())
+            + $this->modulePreloadRenderer->render($this->assetResolver->getModulePreloads($assets));
+          if ($head_elements) {
+            $variables['head'] = $head_elements + ($variables['head'] ?? []);
           }
         }
       }

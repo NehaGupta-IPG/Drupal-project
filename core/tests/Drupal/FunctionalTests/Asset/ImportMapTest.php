@@ -157,4 +157,52 @@ class ImportMapTest extends BrowserTestBase {
     $this->assertSame($this->expectedImportMap(), Json::decode($script->getText()));
   }
 
+  /**
+   * Tests that an Ajax response adds module preloads, but not an import map.
+   *
+   * A page only supports a single import map, which is sent with the main
+   * HTML document. An Ajax response can only add module preloads for the
+   * libraries attached to the response.
+   */
+  public function testAjaxResponseAddsModulePreloadsAndNotImportMap(): void {
+    $content = $this->drupalGet('/importmap-test/consumer', [
+      'query' => ['_drupal_ajax' => 1, '_wrapper_format' => 'drupal_ajax'],
+    ]);
+    $this->assertStringNotContainsString('<script type="importmap"', $content, 'The Ajax response does not contain an import map.');
+    $commands = Json::decode($content);
+    $this->assertIsArray($commands);
+    $preload_index = NULL;
+    $add_js_index = NULL;
+    foreach ($commands as $index => $command) {
+      if (($command['command'] ?? NULL) === 'add_module_preload') {
+        $preload_index = $index;
+      }
+      elseif (($command['command'] ?? NULL) === 'add_js') {
+        $add_js_index = $index;
+      }
+    }
+    $this->assertNotNull($preload_index, 'The Ajax response adds module preloads for the attached libraries.');
+    $this->assertNotNull($add_js_index, 'The Ajax response adds the attached JavaScript.');
+    $this->assertLessThan($add_js_index, $preload_index, 'The module preloads are added before the attached JavaScript, so the modules can be fetched as early as possible.');
+    $path = $this->modulePath();
+    $this->assertSame([
+      'command' => 'add_module_preload',
+      'data' => [
+        [
+          'rel' => 'modulepreload',
+          'href' => $this->fileUrlGenerator->generate("$path/js/foo.js")->toString() . '?v=1.0',
+        ],
+        [
+          'rel' => 'modulepreload',
+          'href' => 'https://example.com/importmap-test-external.mjs',
+          'crossorigin' => 'anonymous',
+        ],
+        [
+          'rel' => 'modulepreload',
+          'href' => $this->fileUrlGenerator->generate("$path/js/scope/foo.js")->toString() . '?v=1.0',
+        ],
+      ],
+    ], $commands[$preload_index]);
+  }
+
 }

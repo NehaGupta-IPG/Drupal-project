@@ -134,12 +134,12 @@ class ImportMapResolverTest extends KernelTestBase {
   }
 
   /**
-   * Tests the import map preloads for attached libraries.
+   * Tests the module preloads for attached libraries.
    */
-  public function testGetImportMapPreloads(): void {
+  public function testGetModulePreloads(): void {
     $assets = (new AttachedAssets())->setLibraries(['importmap_test/consumer']);
     $path = $this->container->get('extension.list.module')->getPath('importmap_test');
-    $preloads = $this->assetResolver->getImportMapPreloads($assets);
+    $preloads = $this->assetResolver->getModulePreloads($assets);
     $this->assertSame([
       [
         'data' => "$path/js/foo.js",
@@ -162,10 +162,10 @@ class ImportMapResolverTest extends KernelTestBase {
   /**
    * Tests that the preloads of dependency libraries are included.
    */
-  public function testGetImportMapPreloadsWithDependencies(): void {
+  public function testGetModulePreloadsWithDependencies(): void {
     $assets = (new AttachedAssets())->setLibraries(['importmap_test/scoped-consumer']);
     $path = $this->container->get('extension.list.module')->getPath('importmap_test');
-    $preloads = $this->assetResolver->getImportMapPreloads($assets);
+    $preloads = $this->assetResolver->getModulePreloads($assets);
     $this->assertSame([
       [
         'data' => "$path/js/foo.js",
@@ -188,9 +188,9 @@ class ImportMapResolverTest extends KernelTestBase {
   /**
    * Tests that no preloads are returned when no libraries are attached.
    */
-  public function testGetImportMapPreloadsWithoutLibraries(): void {
+  public function testGetModulePreloadsWithoutLibraries(): void {
     $assets = new AttachedAssets();
-    $this->assertSame([], $this->assetResolver->getImportMapPreloads($assets));
+    $this->assertSame([], $this->assetResolver->getModulePreloads($assets));
   }
 
 }

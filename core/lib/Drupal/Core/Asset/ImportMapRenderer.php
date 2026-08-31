@@ -6,9 +6,19 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 
 /**
- * Renders import maps.
+ * Renders the import map.
+ *
+ * The import map is a <script type="importmap"> element in the head of the
+ * main HTML document, mapping bare module specifiers to module URLs. Browsers
+ * only support a single import map per page, so it must not be rendered for
+ * other responses (e.g., Ajax responses); those can only add module preloads.
+ *
+ * @see \Drupal\Core\Asset\ModulePreloadRenderer
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap
  */
-class ImportMapRenderer implements ImportMapRendererInterface {
+class ImportMapRenderer implements AssetCollectionRendererInterface {
+
+  use ImportMapUrlTrait;
 
   /**
    * Constructs an ImportMapRenderer.
@@ -27,7 +37,7 @@ class ImportMapRenderer implements ImportMapRendererInterface {
   /**
    * {@inheritdoc}
    */
-  public function render(array $import_map, array $preloads): array {
+  public function render(array $import_map): array {
     $map = [];
     if ($import_map['imports']) {
       $map['imports'] = $this->renderImportMapEntries($import_map['imports']);
@@ -47,7 +57,7 @@ class ImportMapRenderer implements ImportMapRendererInterface {
     if (empty($map)) {
       return [];
     }
-    $elements = [
+    return [
       'importmap' => [
         '#type' => 'html_tag',
         '#tag' => 'script',
@@ -55,24 +65,6 @@ class ImportMapRenderer implements ImportMapRendererInterface {
         '#attributes' => ['type' => 'importmap'],
       ],
     ];
-    foreach ($preloads as $entry) {
-      $url = $this->importMapEntryUrl($entry);
-      $attributes = [
-        'rel' => 'modulepreload',
-        'href' => $url,
-      ];
-      // A module fetch from another origin is a CORS request, so the preload
-      // must be as well, in order to use the same cache entry.
-      if ($entry['external']) {
-        $attributes['crossorigin'] = 'anonymous';
-      }
-      $elements['importmap:modulepreload:' . $entry['data']] = [
-        '#type' => 'html_tag',
-        '#tag' => 'link',
-        '#attributes' => $attributes,
-      ];
-    }
-    return $elements;
   }
 
   /**
@@ -91,52 +83,6 @@ class ImportMapRenderer implements ImportMapRendererInterface {
       $rendered[$specifier] = $this->importMapEntryUrl($entry);
     }
     return $rendered;
-  }
-
-  /**
-   * Returns the URL for an import map entry.
-   *
-   * The query string is the same as for unaggregated JavaScript assets, so
-   * that a file that is both a JavaScript asset and an import map entry
-   * resolves to the same URL, and the browser reuses the same cache entry.
-   *
-   * @param array $entry
-   *   An import map entry, with the keys 'data', 'external' and 'version'.
-   *
-   * @return string
-   *   The URL of the mapped module.
-   */
-  protected function importMapEntryUrl(array $entry): string {
-    if ($entry['external']) {
-      return $entry['data'];
-    }
-    $url = $this->fileUrlGenerator->generate($entry['data'])->toString();
-    $query_string = $entry['version'] == -1 ? $this->assetQueryString->get() : 'v=' . $entry['version'];
-    $query_string_separator = str_contains($entry['data'], '?') ? '&' : '?';
-    return $url . $query_string_separator . $query_string;
-  }
-
-  /**
-   * Returns the URL for an import map scope key.
-   *
-   * Unlike the values of the import map, the scope key does not get a query
-   * string: the browser prefix-matches the scope against the resolved module
-   * URL, which includes the query string, so a scope with a query string
-   * would never match.
-   *
-   * @param string $scope
-   *   A resolved scope source: a path relative to the Drupal root, or an
-   *   external URL.
-   *
-   * @return string
-   *   The absolute URL of the scope.
-   */
-  protected function importMapScopeUrl(string $scope): string {
-    // External scope URLs are used as-is.
-    if (str_starts_with($scope, 'http://') || str_starts_with($scope, 'https://')) {
-      return $scope;
-    }
-    return $this->fileUrlGenerator->generate($scope)->toString();
   }
 
 }
