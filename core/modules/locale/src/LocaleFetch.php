@@ -329,9 +329,10 @@ class LocaleFetch {
       '%project' => $source->project,
     ]);
 
+    // The 'files' result key is left to batchImport(): it feeds the "@count
+    // translation files imported" feedback, which must only count imports.
     $use_remote = $this->configFactory->get('locale.settings')->get('translation.use_source') == LOCALE_TRANSLATION_USE_SOURCE_REMOTE_AND_LOCAL;
     if (!$use_remote || !isset($source->files[LOCALE_TRANSLATION_REMOTE])) {
-      $context['results']['files'][] = $source->name;
       return;
     }
 
@@ -365,7 +366,6 @@ class LocaleFetch {
         $remote_file->timestamp = $info->lastModified;
         $this->localeSource->saveSource($source->name, $source->langcode, LOCALE_TRANSLATION_REMOTE, $remote_file);
         $this->localeSource->saveSource($source->name, $source->langcode, LOCALE_TRANSLATION_LOCAL, $info->file);
-        $context['results']['files'][] = $source->name;
         $context['message'] = $this->t('Downloaded %langcode translation for %project.', [
           '%langcode' => $langcode,
           '%project' => $source->project,
@@ -376,7 +376,6 @@ class LocaleFetch {
       case RemoteFileStatus::Missing:
         // Nothing newer to fetch; a missing file is a routine outcome for
         // projects without a translation on the server.
-        $context['results']['files'][] = $source->name;
         break;
 
       default:

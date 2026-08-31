@@ -213,11 +213,14 @@ class LocaleFileManager {
         $remoteFileInfo->file = $file;
         return $remoteFileInfo;
       }
+      $this->loggerFactory->get('locale')->error('Unable to save translation file @uri.', ['@uri' => $source_file->uri]);
     }
-    catch (FileException | InvalidStreamWrapperException) {
-      // Fall through to the error status below.
+    catch (FileException | InvalidStreamWrapperException $e) {
+      $this->loggerFactory->get('locale')->error('Unable to save translation file @uri: @message', [
+        '@uri' => $source_file->uri,
+        '@message' => $e->getMessage(),
+      ]);
     }
-    $this->loggerFactory->get('locale')->error('Unable to save translation file @uri.', ['@uri' => $source_file->uri]);
     $remoteFileInfo->status = RemoteFileStatus::Error;
     return $remoteFileInfo;
   }
@@ -248,6 +251,9 @@ class LocaleFileManager {
     try {
       $actual_uri = NULL;
       $response = $this->clientFactory->fromOptions([
+        // Translation files compress well, so advertise the compression
+        // formats the client can decode and decode the response with them.
+        'decode_content' => 'gzip, deflate, br',
         'allow_redirects' => [
           'on_redirect' => function (RequestInterface $request, ResponseInterface $response, UriInterface $request_uri) use (&$actual_uri) {
             $actual_uri = (string) $request_uri;
