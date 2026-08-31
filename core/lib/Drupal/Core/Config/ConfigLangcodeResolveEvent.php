@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Config;
 
-use Drupal\Component\EventDispatcher\Event;
-
 /**
  * Event fired to resolve the langcode for a configuration object.
  *
@@ -13,9 +11,18 @@ use Drupal\Component\EventDispatcher\Event;
  * English, was supplied, and vouch for which langcodes are actually supported
  * on this site.
  *
+ * Deliberately does not extend \Drupal\Component\EventDispatcher\Event
+ * (Symfony's stoppable event base class): stopping propagation would skip
+ * whichever subscribers have not run yet, including ones with nothing to do
+ * with resolving a langcode - such as ones vouching for what languages are
+ * supported, which self::isLangcodeSupported() depends on every subscriber
+ * having had a chance to contribute to. self::setLangcode() already gives an
+ * earlier, more specific subscriber precedence over a later, more general
+ * one without needing to stop anything.
+ *
  * @see \Drupal\Core\Config\ConfigEvents::RESOLVE_LANGCODE
  */
-final class ConfigLangcodeResolveEvent extends Event {
+final class ConfigLangcodeResolveEvent {
 
   /**
    * The resolved langcode, or NULL if nothing has resolved one yet.

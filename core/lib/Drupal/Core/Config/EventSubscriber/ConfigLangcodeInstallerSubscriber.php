@@ -41,11 +41,11 @@ class ConfigLangcodeInstallerSubscriber implements EventSubscriberInterface {
 
     $current = $event->getCurrentLangcode();
     if ($current === NULL || $current === 'en') {
+      // Authoritative: since this runs first, nothing later can second-guess
+      // it - ConfigLangcodeResolveEvent::setLangcode() only ever lets the
+      // first call win.
       $event->setLangcode($installer_langcode);
     }
-    // Authoritative: nothing later should second-guess the language
-    // chosen for this installation.
-    $event->stopPropagation();
   }
 
   /**
