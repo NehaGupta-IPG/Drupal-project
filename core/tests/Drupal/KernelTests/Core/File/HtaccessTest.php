@@ -61,7 +61,7 @@ class HtaccessTest extends KernelTestBase {
     $this->assertStringNotContainsString("Deny from all", $content);
     $this->assertStringContainsString("Options -Indexes -ExecCGI -Includes -MultiViews", $content);
     $this->assertStringContainsString("SetHandler Drupal_Security_Do_Not_Remove_See_SA_2013_003", $content);
-    $this->assertFilePermissions($this->public . '/.htaccess', 0444);
+    $this->assertFilePermissions($this->public . '/.htaccess', 0440);
 
     $this->assertTrue($this->htaccessWriter->write($this->public, FALSE));
 
@@ -74,7 +74,7 @@ class HtaccessTest extends KernelTestBase {
     $this->assertStringContainsString("Deny from all", $content);
     $this->assertStringContainsString("Options -Indexes -ExecCGI -Includes -MultiViews", $content);
     $this->assertStringContainsString("SetHandler Drupal_Security_Do_Not_Remove_See_SA_2013_003", $content);
-    $this->assertFilePermissions($private . '/.htaccess', 0444);
+    $this->assertFilePermissions($private . '/.htaccess', 0440);
 
     $this->assertTrue($this->htaccessWriter->write($private));
 
@@ -87,7 +87,7 @@ class HtaccessTest extends KernelTestBase {
     $this->assertStringContainsString("Deny from all", $content);
     $this->assertStringContainsString("Options -Indexes -ExecCGI -Includes -MultiViews", $content);
     $this->assertStringContainsString("SetHandler Drupal_Security_Do_Not_Remove_See_SA_2013_003", $content);
-    $this->assertFilePermissions($stream . '/.htaccess', 0444);
+    $this->assertFilePermissions($stream . '/.htaccess', 0440);
 
     $this->assertTrue($this->htaccessWriter->write($stream));
   }
@@ -109,7 +109,7 @@ class HtaccessTest extends KernelTestBase {
    * @param string $uri
    *   The URI of the file to check.
    * @param int $expected
-   *   The expected file permissions; e.g., 0444.
+   *   The expected file permissions; e.g., 0440.
    *
    * @internal
    */
