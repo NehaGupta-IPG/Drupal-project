@@ -130,7 +130,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    *   The time to live for items, in seconds.
    */
   protected function doSetWithExpire($key, $value, $expire) {
-    $this->connection->upsert($this->table, ['void_execute_return' => TRUE])
+    $this->connection->upsert($this->table, ['return_affected_rows' => FALSE])
       ->key(['collection', 'name'])
       ->fields([
         'collection' => $this->collection,

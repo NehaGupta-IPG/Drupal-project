@@ -31,7 +31,7 @@ class InlineBlockUsage implements InlineBlockUsageInterface {
    * {@inheritdoc}
    */
   public function addUsage($block_content_id, EntityInterface $entity) {
-    $this->database->upsert('inline_block_usage', ['void_execute_return' => TRUE])
+    $this->database->upsert('inline_block_usage', ['return_affected_rows' => FALSE])
       ->key('block_content_id')
       ->fields([
         'block_content_id' => $block_content_id,

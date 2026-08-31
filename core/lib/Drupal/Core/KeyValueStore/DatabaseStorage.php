@@ -150,7 +150,7 @@ class DatabaseStorage extends StorageBase {
    *   The data to store.
    */
   protected function doSet($key, $value) {
-    $this->connection->upsert($this->table, ['void_execute_return' => TRUE])
+    $this->connection->upsert($this->table, ['return_affected_rows' => FALSE])
       ->key(['collection', 'name'])
       ->fields([
         'collection' => $this->collection,
@@ -187,7 +187,7 @@ class DatabaseStorage extends StorageBase {
    *   An associative array of key/value pairs.
    */
   protected function doSetMultiple(array $data): void {
-    $query = $this->connection->upsert($this->table, ['void_execute_return' => TRUE])
+    $query = $this->connection->upsert($this->table, ['return_affected_rows' => FALSE])
       ->key(['collection', 'name']);
 
     $fieldsSet = FALSE;

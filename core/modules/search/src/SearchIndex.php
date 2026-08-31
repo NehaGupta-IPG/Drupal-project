@@ -169,7 +169,7 @@ class SearchIndex implements SearchIndexInterface {
         // If a word already exists in the database, its score gets increased
         // appropriately. If not, we create a new record with the appropriate
         // starting score.
-        $this->connection->upsert('search_index', ['void_execute_return' => TRUE])
+        $this->connection->upsert('search_index', ['return_affected_rows' => FALSE])
           ->key(['word', 'sid', 'langcode', 'type'])
           ->fields([
             'word',
@@ -277,7 +277,7 @@ class SearchIndex implements SearchIndexInterface {
           ->fetchField();
         // Apply Zipf's law to equalize the probability distribution.
         $total = log10(1 + 1 / (max(1, $total)));
-        $this->connection->upsert('search_total', ['void_execute_return' => TRUE])
+        $this->connection->upsert('search_total', ['return_affected_rows' => FALSE])
           ->key('word')
           ->fields([
             'word' => $word,

@@ -213,7 +213,7 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
   public function testUpsert(): void {
     $num_records_before = $this->testingFakeConnection->query('SELECT COUNT(*) FROM {faking_table}')->fetchField();
 
-    $upsert = $this->testingFakeConnection->upsert('faking_table', ['void_execute_return' => TRUE])
+    $upsert = $this->testingFakeConnection->upsert('faking_table', ['return_affected_rows' => FALSE])
       ->key('id')
       ->fields(['id', 'test_field']);
 

@@ -502,7 +502,7 @@ class StringDatabaseStorage implements StringStorageInterface {
       $values = $string->getValues(['translation', 'customized']);
     }
     if (!empty($values) && $keys = $this->dbStringKeys($string)) {
-      $this->connection->upsert($this->dbStringTable($string), array_merge($this->options, ['void_execute_return' => TRUE]))
+      $this->connection->upsert($this->dbStringTable($string), array_merge($this->options, ['return_affected_rows' => FALSE]))
         ->key(array_keys($keys))
         ->fields(array_merge($keys, $values))
         ->execute();

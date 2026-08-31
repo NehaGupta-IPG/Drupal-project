@@ -38,7 +38,7 @@ class BrokenCacheUpdateTest extends BrowserTestBase {
     $connection = Database::getConnection();
 
     // Create broken element info caches entries.
-    $insert = $connection->upsert('cache_discovery', ['void_execute_return' => TRUE]);
+    $insert = $connection->upsert('cache_discovery', ['return_affected_rows' => FALSE]);
     $insert->key('cid');
     $fields = [
       'cid' => 'element_info',

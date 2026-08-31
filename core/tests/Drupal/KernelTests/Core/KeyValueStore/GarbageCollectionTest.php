@@ -36,7 +36,7 @@ class GarbageCollectionTest extends KernelTestBase {
 
     // Manually expire the data.
     for ($i = 0; $i <= 3; $i++) {
-      $connection->upsert('key_value_expire', ['void_execute_return' => TRUE])
+      $connection->upsert('key_value_expire', ['return_affected_rows' => FALSE])
         ->key(['name', 'collection'])
         ->fields([
           'name' => 'key_' . $i,
