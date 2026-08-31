@@ -14,7 +14,7 @@ import { AUTH_STATE_FILE } from '../lib/auth-setup';
 import { drush } from '../lib/drush-helpers';
 import AxeBuilder from '@axe-core/playwright';
 
-const PRESETS = ['blue','light_blue','dark_purple','purple','teal','green','pink','red','orange','yellow','neutral'] as const;
+const PRESETS = ['blue','purple','teal','green','pink','red','orange','yellow'] as const;
 const MODES = [
   { label: 'Light', enable_dark_mode: '0', hc: 0 },
   { label: 'Dark', enable_dark_mode: '1', hc: 0 },

@@ -394,7 +394,6 @@ class AccentColorContrastTest extends BrowserTestBase {
     // Preset => [light-mode [r,g,b,a], dark-mode [r,g,b,a]] — solid light-dark pairs (see accent.css / variables-color).
     $presets = [
       'gin'    => [[0, 60, 204, 1.0], [153, 184, 255, 1.0]],
-      'green'  => [[0, 120, 104, 1.0], [88, 220, 197, 1.0]],
       'claro'  => [[20, 125, 75, 1.0], [102, 226, 170, 1.0]],
       'orange' => [[175, 88, 55, 1.0], [244, 170, 130, 1.0]],
       'dark'   => [[84, 85, 96, 1.0], [194, 194, 194, 1.0]],

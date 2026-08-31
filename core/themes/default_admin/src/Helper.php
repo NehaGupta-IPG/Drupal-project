@@ -30,14 +30,6 @@ final class Helper {
         'label' => t('Blue (Default)'),
         'hex' => '#015efe',
       ],
-      'light_blue' => [
-        'label' => t('Light Blue'),
-        'hex' => '#2f6dd0',
-      ],
-      'dark_purple' => [
-        'label' => t('Dark Purple'),
-        'hex' => '#4300bf',
-      ],
       'purple' => [
         'label' => t('Purple'),
         'hex' => '#5b00ff',
@@ -65,10 +57,6 @@ final class Helper {
       'yellow' => [
         'label' => t('Yellow'),
         'hex' => '#966705',
-      ],
-      'neutral' => [
-        'label' => t('Neutral'),
-        'hex' => '#111111',
       ],
       'custom' => [
         'label' => t('Custom'),

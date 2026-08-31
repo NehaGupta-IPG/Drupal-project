@@ -612,11 +612,15 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     $settings = Settings::getInstance();
 
     // Old way to set accent color.
-    $variables['html_attributes']['data-gin-accent'] = $settings->get('preset_accent_color');
-
-    // New way to set accent color.
     $accent_colors = Helper::accentColors();
     $preset = $settings->get('preset_accent_color');
+    // Fall back to the default when the stored preset is no longer offered.
+    if ($preset !== 'custom' && !isset($accent_colors[$preset])) {
+      $preset = $settings->getDefault('preset_accent_color');
+    }
+    $variables['html_attributes']['data-gin-accent'] = $preset;
+
+    // New way to set accent color.
     $accent_color = '';
 
     if ($preset === 'custom' && $settings->get('accent_color')) {

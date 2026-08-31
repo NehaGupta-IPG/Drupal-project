@@ -7,14 +7,6 @@
   --admin-color-bg-sticky: rgb(235, 241, 253);
 }
 
-[data-gin-accent="light_blue"] {
-  --admin-color-bg-sticky: rgb(238, 243, 251);
-}
-
-[data-gin-accent="dark_purple"] {
-  --admin-color-bg-sticky: rgb(240, 235, 250);
-}
-
 [data-gin-accent="purple"] {
   --admin-color-bg-sticky: rgb(242, 235, 255);
 }
@@ -43,16 +35,8 @@
   --admin-color-bg-sticky: rgb(251, 238, 244);
 }
 
-[data-gin-accent="neutral"] {
-  --admin-color-bg-sticky: rgb(236, 236, 236);
-}
-
 [data-gin-accent="custom"] {
   --admin-color-bg-sticky: rgb(236, 236, 236);
-}
-
-[data-gin-focus="green"] {
-  --admin-color-focus: light-dark(#007868, #58dcc5);
 }
 
 [data-gin-focus="claro"] {
