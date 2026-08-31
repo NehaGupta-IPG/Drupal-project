@@ -40,7 +40,7 @@ class ManagedFile extends FormElementBase {
       '#pre_render' => [
         [static::class, 'preRenderManagedFile'],
       ],
-      '#value_callback' => ManagedFileValueResolver::class . '::resolveValue',
+      '#value_callback' => ManagedFileValueResolver::class . ':resolveValue',
       '#theme' => 'file_managed_file',
       '#theme_wrappers' => ['form_element'],
       '#progress_indicator' => 'throbber',
