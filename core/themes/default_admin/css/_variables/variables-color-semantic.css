@@ -115,10 +115,10 @@
    *   --admin-color-focus-neutral  neutral focus-ring variant ([data-gin-focus]).
    *   --admin-color-text-disabled / -bg-disabled / -border-disabled  disabled controls.
    */
-  --admin-color-focus: light-dark(color-mix(in srgb, #007dfa 60%, transparent), #51a8ff);
+  --admin-color-focus: light-dark(#003ecc, #99b8ff);
   /* @todo this is used in box-shadow focus states, which will be phased out in favor of outline. */
   --admin-color-focus-border: light-dark(color-mix(in lch, black 20%, transparent), color-mix(in lch, black 80%, transparent));
-  --admin-color-focus-neutral: light-dark(color-mix(in lch, black 40%, transparent), color-mix(in lch, white 80%, transparent));
+  --admin-color-focus-neutral: light-dark(#545560, #c2c2c2);
   --admin-color-text-disabled: light-dark(var(--admin-color-gray-700), #919191);
   --admin-color-bg-disabled: light-dark(#eaeaea, #47474c);
   --admin-color-border-disabled: light-dark(var(--admin-color-gray-300), #646464);
@@ -128,7 +128,7 @@
    * (text, border, and bg).
    */
   --admin-color-link: var(--admin-color-primary);
-  --admin-color-link-hover: light-dark(var(--admin-color-accent-600), var(--admin-color-accent-700));
+  --admin-color-link-hover: light-dark(var(--admin-color-accent-600), var(--admin-color-accent-fg));
   --admin-color-link-active: light-dark(var(--admin-color-accent-700), var(--admin-color-accent-900));
 }
 

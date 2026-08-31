@@ -342,7 +342,7 @@ final class Settings implements ContainerInjectionInterface {
     $form['high_contrast_mode'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Increase contrast') . $experimental_label,
-      '#description' => $this->t('Enables high contrast mode.'),
+      '#description' => $this->t('Increases text and interface contrast while preserving visual hierarchy.'),
       '#default_value' => $account ? $this->get('high_contrast_mode', $account) : $this->getDefault('high_contrast_mode'),
     ];
 

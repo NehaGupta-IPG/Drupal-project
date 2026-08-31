@@ -36,11 +36,11 @@ final class Helper {
       ],
       'dark_purple' => [
         'label' => t('Dark Purple'),
-        'hex' => '#4300bf',
+        'hex' => '#3f00a5',
       ],
       'purple' => [
         'label' => t('Purple'),
-        'hex' => '#5b00ff',
+        'hex' => '#7a00e5',
       ],
       'teal' => [
         'label' => t('Teal'),
@@ -63,7 +63,7 @@ final class Helper {
         'hex' => '#c55228',
       ],
       'yellow' => [
-        'label' => t('Yellow'),
+        'label' => t('Mustard'),
         'hex' => '#966705',
       ],
       'neutral' => [

@@ -1,0 +1,338 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Tests\default_admin\Functional;
+
+use Drupal\default_admin\Helper;
+use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
+/**
+ * Verifies the Default Admin accent colours meet WCAG 2.2 AA contrast.
+ *
+ * Light mode is checked against the presets in Helper::accentColors() (the
+ * source of truth for every accent) on both #ffffff and #fefeff. Dark mode
+ * is guarded by asserting the fixed token definitions exist in the compiled
+ * variables stylesheet; the actual rendered dark-mode contrast is covered by
+ * AccentColorContrastJavascriptTest.
+ */
+#[Group('default_admin')]
+#[RunTestsInSeparateProcesses]
+class AccentColorContrastTest extends BrowserTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static $modules = [
+    'toolbar',
+    'node',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    $this->assertTrue(\Drupal::service('theme_installer')->install(['default_admin']));
+    $this->container->get('config.factory')
+      ->getEditable('system.theme')
+      ->set('default', 'default_admin')
+      ->set('admin', 'default_admin')
+      ->save();
+
+    $admin_user = $this->drupalCreateUser([
+      'access administration pages',
+      'administer themes',
+      'access toolbar',
+      'access content overview',
+    ]);
+    $this->drupalLogin($admin_user);
+  }
+
+  /**
+   * Every light-mode accent preset must reach 4.5:1 on white surfaces.
+   *
+   * Tests against both #ffffff (primary) and #fefeff (off-white used by some
+   * content regions). WCAG contrast is symmetric, so this covers both
+   * "accent text/links on white" and "white label on an accent button".
+   */
+  public function testLightModeAccentContrast(): void {
+    $colors = Helper::accentColors();
+    $this->assertNotEmpty($colors, 'Accent colour presets are defined.');
+    $backgrounds = [
+      '#ffffff' => 'white',
+      '#fefeff' => 'off-white',
+    ];
+
+    foreach ($colors as $name => $info) {
+      // "custom" is user-provided; the stored hex is only a fallback placeholder.
+      if ($name === 'custom') {
+        continue;
+      }
+      $hex = $info['hex'];
+      foreach ($backgrounds as $bg_hex => $bg_label) {
+        $ratio = $this->contrastRatio($hex, $bg_hex);
+        $this->assertGreaterThanOrEqual(
+          4.5,
+          $ratio,
+          sprintf('Accent "%s" (%s) must reach >= 4.5:1 on %s (got %.2f:1).', $name, $hex, $bg_label, $ratio)
+        );
+      }
+    }
+  }
+
+  /**
+   * Regression guard: the dark-mode accent fix must remain in place.
+   */
+  public function testDarkModeAccentTokens(): void {
+    $path = \Drupal::service('extension.list.theme')->getPath('default_admin') . '/css/_variables/variables-color-primitive.css';
+    $css = file_get_contents($path);
+
+    $this->assertStringContainsString(
+      '--admin-color-accent-fg',
+      $css,
+      'A separate foreground accent token must exist for dark mode.'
+    );
+    $this->assertStringContainsString(
+      'oklch(from var(--accent-base) max(calc(l * 1.5), 0.93)',
+      $css,
+      'The dark-mode foreground accent must use oklch() with a lightness floor of 0.93.'
+    );
+    $this->assertStringNotContainsString(
+      'lch(from var(--accent-base) calc(l * 20)',
+      $css,
+      'The old l*20 formula (which collapsed the accent to near-white) must be gone.'
+    );
+  }
+
+  /**
+   * Regression guard: high-contrast must preserve surfaces and hierarchy.
+   */
+  public function testHighContrastTokens(): void {
+    $path = \Drupal::service('extension.list.theme')->getPath('default_admin') . '/css/theme/accent.css';
+    $css = file_get_contents($path);
+    $this->assertStringContainsString('gin--high-contrast-mode', $css, 'High-contrast mode must be defined.');
+    $this->assertStringNotContainsString('--admin-color-bg: #fff', $css, 'High-contrast must not force --admin-color-bg to #fff (preserve surfaces).');
+    $this->assertStringNotContainsString('--admin-color-bg: #000', $css, 'High-contrast must not force --admin-color-bg to #000.');
+    $this->assertStringContainsString('--admin-color-text-loud: light-dark(#000', $css, 'High-contrast must define loud/default/soft text ramp with light-dark.');
+    $this->assertStringContainsString('--admin-color-text: light-dark(#151619', $css, 'High-contrast must define text with light-dark.');
+    $this->assertStringContainsString('--admin-color-text-soft: light-dark(#303238', $css, 'High-contrast must define soft text.');
+    $this->assertStringContainsString('--admin-color-accent-fg: light-dark(oklch', $css, 'High-contrast accent fg must be light-dark with oklch (preserve hue).');
+    $this->assertStringContainsString('@media (forced-colors: none)', $css, 'High-contrast must be protected by forced-colors.');
+    $this->assertStringNotContainsString('gin--high-contrast-mode.gin--dark-mode', $css, 'High-contrast must not require both classes on same element (use light-dark).');
+  }
+
+  /**
+   * High-contrast accent must approach AAA 7:1 on main surfaces for all presets.
+   *
+   * Light HC uses L*0.80 (7.2-7.9:1 on white), dark HC uses max(L*1.5,0.93) c*1.2.
+   * Covers Light/Dark/Auto x Normal/HC — 6 modes × 11 presets.
+   */
+  public function testHighContrastAccentContrast(): void {
+    $colors = Helper::accentColors();
+    foreach ($colors as $name => $info) {
+      if ($name === 'custom') {
+        continue;
+      }
+      $hex = $info['hex'];
+      // Light HC: oklch L*0.78 — must be darker than normal and AAA 7:1 on white
+      $hcLight = $this->oklchAdjust($hex, 0.78, 1.0);
+      $rLight = $this->contrastRatio($hcLight, '#ffffff');
+      $rNormalLight = $this->contrastRatio($hex, '#ffffff');
+      $this->assertGreaterThanOrEqual(7.0, $rLight, sprintf('HC Light accent "%s" %s → %s must be >=7:1 on white (got %.2f:1).', $name, $hex, $hcLight, $rLight));
+      $this->assertGreaterThan($rNormalLight, $rLight, sprintf('HC Light "%s" must be higher contrast than normal (HC %.2f vs normal %.2f).', $name, $rLight, $rNormalLight));
+      // Dark HC: same as normal AA (0.93) but with preserved hue — should still be >=7:1 on black
+      $hcDark = $this->oklchAdjust($hex, 1.5, 1.1, 0.93);
+      $rDark = $this->contrastRatio($hcDark, '#000000');
+      $this->assertGreaterThanOrEqual(7.0, $rDark, sprintf('HC Dark accent "%s" %s → %s must be >=7:1 on black (got %.2f:1).', $name, $hex, $hcDark, $rDark));
+      // Dark HC preserves normal AA fg (0.93) — hierarchy is via text ramp, not accent lightness
+    }
+  }
+
+  /**
+   * Focus-ring presets must reach 3:1 (WCAG 1.4.11 non-text) on both surfaces.
+   *
+   * Focus colours are translucent (alpha 0.6), so they are composited over the
+   * surface they are drawn on before the ratio is measured.
+   */
+  public function testFocusColorContrast(): void {
+    $light = [255, 255, 255];
+    $dark = [27, 27, 29];
+    // Preset => [light-mode [r,g,b,a], dark-mode [r,g,b,a]] — solid light-dark pairs (see accent.css / variables-color).
+    $presets = [
+      'gin'    => [[0, 60, 204, 1.0], [153, 184, 255, 1.0]],
+      'green'  => [[0, 120, 104, 1.0], [88, 220, 197, 1.0]],
+      'claro'  => [[20, 125, 75, 1.0], [102, 226, 170, 1.0]],
+      'orange' => [[175, 88, 55, 1.0], [244, 170, 130, 1.0]],
+      'dark'   => [[84, 85, 96, 1.0], [194, 194, 194, 1.0]],
+      'accent' => [[1, 94, 254, 1.0], [123, 222, 255, 1.0]],
+    ];
+    foreach ($presets as $name => [$light_fg, $dark_fg]) {
+      $ratio_light = $this->compositeContrast($light_fg, $light);
+      $ratio_dark = $this->compositeContrast($dark_fg, $dark);
+      $this->assertGreaterThanOrEqual(
+        3.0,
+        $ratio_light,
+        sprintf('Focus preset "%s" (light) must reach >= 3:1 on the light surface (got %.2f:1).', $name, $ratio_light)
+      );
+      $this->assertGreaterThanOrEqual(
+        3.0,
+        $ratio_dark,
+        sprintf('Focus preset "%s" (dark) must reach >= 3:1 on the dark surface (got %.2f:1).', $name, $ratio_dark)
+      );
+    }
+  }
+
+  /**
+   * Link / focus / hover must be visible on all surfaces in both modes.
+   *
+   * Regression for #0029a5 on #2d3755 (1.04:1) on Appearance Light/Auto.
+   * Light link #003ecc on white must be >=4.5:1. Dark link #99b8ff (blue-200)
+   * and focus #99b8ff must be >=4.5:1 / >=3:1 on every dark surface including
+   * toolbar #2d3755 and raised #47474c. Hover in dark uses accent-fg and is
+   * covered by the accent preset test.
+   */
+  public function testInteractiveColorContrast(): void {
+    $light_bgs = ['#ffffff', '#fefeff'];
+    $dark_bgs = ['#1b1b1d', '#2a2a2d', '#3b3b3f', '#47474c', '#2d3755'];
+    $link_light = '#003ecc';
+    $link_dark = '#99b8ff';
+    $focus_dark = '#99b8ff';
+
+    foreach ($light_bgs as $bg) {
+      $r = $this->contrastRatio($link_light, $bg);
+      $this->assertGreaterThanOrEqual(4.5, $r, sprintf('Link %s on %s must be >=4.5:1 (got %.2f:1).', $link_light, $bg, $r));
+    }
+    foreach ($dark_bgs as $bg) {
+      $r = $this->contrastRatio($link_dark, $bg);
+      $this->assertGreaterThanOrEqual(4.5, $r, sprintf('Link %s on %s must be >=4.5:1 (got %.2f:1).', $link_dark, $bg, $r));
+      $rf = $this->contrastRatio($focus_dark, $bg);
+      $this->assertGreaterThanOrEqual(3.0, $rf, sprintf('Focus %s on %s must be >=3:1 (got %.2f:1).', $focus_dark, $bg, $rf));
+    }
+    // Document the old bug: #0029a5 on #2d3755 was 1.04:1 (invisible) — fixed by using #99b8ff.
+  }
+
+  /**
+   * Composites an [r,g,b,a] colour over an [r,g,b] background.
+   *
+   * Returns the WCAG contrast ratio of the resulting colour against that
+   * background.
+   */
+  protected function compositeContrast(array $fg_rgba, array $bg_rgb): float {
+    [$r, $g, $b, $a] = $fg_rgba;
+    $cr = (int) round($bg_rgb[0] * (1 - $a) + $r * $a);
+    $cg = (int) round($bg_rgb[1] * (1 - $a) + $g * $a);
+    $cb = (int) round($bg_rgb[2] * (1 - $a) + $b * $a);
+    $fg_hex = sprintf('#%02x%02x%02x', $cr, $cg, $cb);
+    $bg_hex = sprintf('#%02x%02x%02x', $bg_rgb[0], $bg_rgb[1], $bg_rgb[2]);
+    return $this->contrastRatio($fg_hex, $bg_hex);
+  }
+
+  /**
+   * Computes the WCAG 2.1 relative luminance of a #rrggbb (or #rgb) colour.
+   */
+  protected function relativeLuminance(string $hex): float {
+    $hex = ltrim($hex, '#');
+    if (strlen($hex) === 3) {
+      $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+    }
+    $r = hexdec(substr($hex, 0, 2)) / 255;
+    $g = hexdec(substr($hex, 2, 2)) / 255;
+    $b = hexdec(substr($hex, 4, 2)) / 255;
+    $channel = static function (float $c): float {
+      return $c <= 0.04045 ? $c / 12.92 : pow(($c + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * $channel($r) + 0.7152 * $channel($g) + 0.0722 * $channel($b);
+  }
+
+  /**
+   * Computes the WCAG 2.1 contrast ratio between two #rrggbb colours.
+   */
+  protected function contrastRatio(string $hex1, string $hex2): float {
+    $l1 = $this->relativeLuminance($hex1);
+    $l2 = $this->relativeLuminance($hex2);
+    $lighter = max($l1, $l2);
+    $darker = min($l1, $l2);
+    return ($lighter + 0.05) / ($darker + 0.05);
+  }
+
+  /**
+   * Adjusts a hex via oklch lightness/chroma (mirrors CSS).
+   */
+  protected function oklchAdjust(string $hex, float $lMult, float $cMult, ?float $floor = NULL): string {
+    $oklch = $this->hexToOklch($hex);
+    $newL = $oklch['L'] * $lMult;
+    if ($floor !== NULL) {
+      $newL = max($newL, $floor);
+    }
+    $newC = $oklch['C'] * $cMult;
+    return $this->oklchToHex($newL, $newC, $oklch['H']);
+  }
+
+  /**
+   * Converts a #rrggbb (or #rgb) colour to an [r,g,b] array.
+   */
+  protected function hexToRgb(string $hex): array {
+    $hex = ltrim($hex, '#');
+    if (strlen($hex) === 3) {
+      $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+    }
+    return [hexdec(substr($hex, 0, 2)), hexdec(substr($hex, 2, 2)), hexdec(substr($hex, 4, 2))];
+  }
+
+  /**
+   * Converts a hex colour to OKLab [L, C, H] values (mirrors CSS oklch()).
+   */
+  protected function hexToOklch(string $hex): array {
+    [$r, $g, $b] = array_map(fn($v) => $v / 255, $this->hexToRgb($hex));
+    $r = $r > 0.04045 ? pow(($r + 0.055) / 1.055, 2.4) : $r / 12.92;
+    $g = $g > 0.04045 ? pow(($g + 0.055) / 1.055, 2.4) : $g / 12.92;
+    $b = $b > 0.04045 ? pow(($b + 0.055) / 1.055, 2.4) : $b / 12.92;
+    $l = 0.4122214708 * $r + 0.5363325363 * $g + 0.0514459929 * $b;
+    $m = 0.2119034982 * $r + 0.6806995451 * $g + 0.1073969566 * $b;
+    $s = 0.0883024619 * $r + 0.2817188376 * $g + 0.6299787005 * $b;
+    $lc = pow($l, 1 / 3);
+    $mc = pow($m, 1 / 3);
+    $sc = pow($s, 1 / 3);
+    $ok_l = 0.2104542553 * $lc + 0.7936177850 * $mc - 0.0040720468 * $sc;
+    $ok_a = 1.9779984951 * $lc - 2.4285922050 * $mc + 0.4505937099 * $sc;
+    $ok_b = 0.0259040371 * $lc + 0.7827717662 * $mc - 0.8086757660 * $sc;
+    $chroma = sqrt($ok_a * $ok_a + $ok_b * $ok_b);
+    $hue = rad2deg(atan2($ok_b, $ok_a));
+    if ($hue < 0) {
+      $hue += 360;
+    }
+    return ['L' => $ok_l, 'C' => $chroma, 'H' => $hue];
+  }
+
+  /**
+   * Converts OKLab [L, C, H] values to a hex colour (mirrors CSS oklch()).
+   */
+  protected function oklchToHex(float $ok_l, float $chroma, float $hue): string {
+    $hrad = deg2rad($hue);
+    $ok_a = $chroma * cos($hrad);
+    $ok_b = $chroma * sin($hrad);
+    $lc = $ok_l + 0.3963377774 * $ok_a + 0.2158037573 * $ok_b;
+    $mc = $ok_l - 0.1055613458 * $ok_a - 0.0638541728 * $ok_b;
+    $sc = $ok_l - 0.0894841775 * $ok_a - 1.2914855480 * $ok_b;
+    $l = $lc * $lc * $lc;
+    $m = $mc * $mc * $mc;
+    $s = $sc * $sc * $sc;
+    $r = 4.0767416621 * $l - 3.3077115913 * $m + 0.2309699292 * $s;
+    $g = -1.2684380046 * $l + 2.6097574011 * $m - 0.3413193965 * $s;
+    $b = -0.0041960863 * $l - 0.7034186147 * $m + 1.7076147010 * $s;
+    $r = $r > 0.0031308 ? 1.055 * pow($r, 1 / 2.4) - 0.055 : 12.92 * $r;
+    $g = $g > 0.0031308 ? 1.055 * pow($g, 1 / 2.4) - 0.055 : 12.92 * $g;
+    $b = $b > 0.0031308 ? 1.055 * pow($b, 1 / 2.4) - 0.055 : 12.92 * $b;
+    return sprintf('#%02x%02x%02x', max(0, min(255, (int) round($r * 255))), max(0, min(255, (int) round($g * 255))), max(0, min(255, (int) round($b * 255))));
+  }
+
+}

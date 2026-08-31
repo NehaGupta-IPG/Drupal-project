@@ -166,8 +166,8 @@
   }
 
   &:hover {
-    color: var(--admin-color-primary-hover);
-    background-color: var(--admin-color-bg-item-hover);
+    color: light-dark(var(--admin-color-primary-hover), var(--admin-color-accent-fg));
+    background-color: light-dark(var(--admin-color-bg-item-hover), color-mix(in sRGB, var(--admin-color-accent-fg) 12%, var(--admin-color-bg-surface)));
   }
 
   &:hover::before,
@@ -222,7 +222,7 @@
 [open] .gin-details__summary--accordion,
 [open] .gin-details__summary--accordion-item,
 [open] .gin-details__summary--vertical-tabs-item {
-  color: var(--admin-color-primary);
+  color: light-dark(var(--admin-color-primary), var(--admin-color-accent-fg));
   text-decoration-style: var(--admin-link-decoration-style);
 }
 
