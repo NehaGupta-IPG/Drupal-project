@@ -135,7 +135,6 @@ class StatusMessages extends RenderElementBase {
           'warning' => t('Warning message'),
         ],
       ];
-
     return $render;
   }
 

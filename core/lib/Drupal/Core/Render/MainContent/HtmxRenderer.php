@@ -47,6 +47,7 @@ class HtmxRenderer implements MainContentRendererInterface {
     protected RendererInterface $renderer,
     protected RenderCacheInterface $renderCache,
     protected array $rendererConfig,
+    protected MessengerInterface $messenger,
   ) {
   }
 
@@ -60,25 +61,23 @@ class HtmxRenderer implements MainContentRendererInterface {
     $token = Crypt::randomBytesBase64(55);
     // Assemble any status messages to update using hx-partials
     // @see https://four.htmx.org/docs#partials-hx-partial
-    $messageTypes = [
-      MessengerInterface::TYPE_ERROR,
-      MessengerInterface::TYPE_WARNING,
-      MessengerInterface::TYPE_STATUS,
-    ];
+    $pendingMessages = $this->messenger->deleteAll();
     $messages = [];
-    foreach ($messageTypes as $type) {
-      $messageArray = StatusMessages::renderMessages($type);
-      if (!empty($messageArray[$type])) {
+    foreach ($messages as $type => $messageList) {
+      foreach ($messageList as $message) {
         $messages[] = [
           '#type' => 'inline_template',
-          '#template' => <<<HTMX_MESSAGES
+          '#template' => <<<HTMX_MESSAGE
 <hx-partial hx-target='[data-drupal-message-list-type="{{ type }}"]' hx-swap="beforeend">
-  {{items}}
+  {{item}}
 </hx-partial>
-HTMX_MESSAGES,
+HTMX_MESSAGE,
           '#context' => [
             'type' => $type,
-            'items' => $messageArray[$type],
+            'item' => [
+              '#theme' => 'status_message_item',
+              '#message' => $message,
+            ],
           ],
         ];
       }

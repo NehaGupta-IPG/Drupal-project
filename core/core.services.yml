@@ -1355,7 +1355,7 @@ services:
       - { name: render.main_content_renderer, format: html }
   main_content_renderer.htmx:
     class: Drupal\Core\Render\MainContent\HtmxRenderer
-    arguments: ['@title_resolver', '@renderer', '@render_cache', '%renderer.config%']
+    arguments: ['@title_resolver', '@renderer', '@render_cache', '%renderer.config%', '@messenger']
     tags:
       - { name: render.main_content_renderer, format: drupal_htmx }
   main_content_renderer.ajax:
