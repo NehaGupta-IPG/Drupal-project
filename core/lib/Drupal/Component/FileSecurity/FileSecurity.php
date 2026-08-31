@@ -125,7 +125,7 @@ EOF;
     // Testing for these conditions introduces windows for concurrency issues to
     // occur.
     if (@file_put_contents($file_path, $contents)) {
-      return @chmod($file_path, 0444);
+      return @chmod($file_path, 0440);
     }
     return FALSE;
   }
