@@ -276,6 +276,21 @@ class AccentColorContrastTest extends BrowserTestBase {
     $this->assertStringContainsString('--admin-color-accent-fg: light-dark(oklch', $css, 'High-contrast accent fg must be light-dark with oklch (preserve hue).');
     $this->assertStringContainsString('@media (forced-colors: none)', $css, 'High-contrast must be protected by forced-colors.');
     $this->assertStringNotContainsString('gin--high-contrast-mode.gin--dark-mode', $css, 'High-contrast must not require both classes on same element (use light-dark).');
+    $this->assertMatchesRegularExpression(
+      '/--admin-color-border-loud:\s*light-dark\(#[0-9a-fA-F]{3,6},\s*#[0-9a-fA-F]{3,6}\)/',
+      $css,
+      'High-contrast must resolve border-loud through light-dark.',
+    );
+    $this->assertStringNotContainsString(
+      '--admin-color-border-table: light-dark(#000, #fff);',
+      $css,
+      'High-contrast table separators must stay subtle, not flatten to black/white.',
+    );
+    $this->assertStringNotContainsString(
+      '--admin-color-border: light-dark(#000, #fff);',
+      $css,
+      'High-contrast default edges must stay distinct from border-loud and border-table.',
+    );
   }
 
   /**

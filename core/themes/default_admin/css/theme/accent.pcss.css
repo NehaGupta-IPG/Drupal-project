@@ -73,18 +73,22 @@
 
 @media (forced-colors: none) {
   .gin--high-contrast-mode {
-    /* Enhanced text ramp — preserves hierarchy, targets 7:1 on light #e2e5ec and dark #47474c */
+    /* Enhanced text ramp — keeps the loud > text > soft hierarchy while
+       strengthening each step against its surface. */
     --admin-color-text-loud: light-dark(#000, #fff);
     --admin-color-text: light-dark(#151619, #f2f2f4);
     --admin-color-text-soft: light-dark(#303238, #e8e8e8);
-    /* Icons remain subordinate but meet 3:1 where required */
+    /* Icons remain subordinate to text but are brightened to meet 3:1. */
     --admin-color-icon: light-dark(#454545, #a5a7ac);
-    /* Borders keep semantic distinction */
-    --admin-color-border: light-dark(#000, #fff);
-    --admin-color-border-soft: light-dark(#444, #888);
+    /* Borders keep their semantic ladder — loud is the strongest divider,
+       default edges are strong, table separators stay subtle, and soft
+       hairlines remain decorative. Form-control boundaries are strongest
+       because they identify controls. */
+    --admin-color-border: light-dark(#333, #e0e0e0);
     --admin-color-border-loud: light-dark(#000, #fff);
-    --admin-color-border-input: light-dark(#767a82, #9a9ca2);
-    --admin-color-border-table: light-dark(#000, #fff);
+    --admin-color-border-input: light-dark(#000, #fff);
+    --admin-color-border-table: light-dark(#707070, #8c8d92);
+    --admin-color-border-soft: light-dark(#444, #888);
     /* Focus stays colored, not black/white — must come last to override [data-gin-focus] presets */
     --admin-color-focus: light-dark(#003ecc, #99b8ff);
     /* Accent fg — preserve hue, increase contrast (not flat white/black) */
