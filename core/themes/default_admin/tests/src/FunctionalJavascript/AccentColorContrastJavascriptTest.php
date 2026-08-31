@@ -225,4 +225,118 @@ JS;
 JS;
   }
 
+  /**
+   * Representative rendered text/surface pairs reach WCAG AA in each appearance.
+   *
+   * Reads computed colours from the browser — which resolves light-dark() for
+   * the active appearance — and measures WCAG ratios. This avoids duplicating
+   * the CSS colour formulas in the test. Covers Light, Dark and Auto.
+   */
+  public function testRenderedSurfaceContrast(): void {
+    $cases = [
+      'Light' => '0',
+      'Dark' => '1',
+      'Auto' => 'auto',
+    ];
+    $config = $this->config('default_admin.settings');
+    $config->set('preset_accent_color', 'blue')->save();
+
+    foreach ($cases as $label => $mode) {
+      $config->set('enable_dark_mode', $mode)->save();
+      $this->drupalGet('/admin/content');
+      $this->assertSession()->statusCodeEquals(200);
+      $ratios = $this->getSession()->evaluateScript($this->surfaceScript());
+      $this->assertGreaterThanOrEqual(4.5, $ratios['textOnBg'], sprintf('%s: page text on main background must be >=4.5:1 (got %.2f:1).', $label, $ratios['textOnBg']));
+      $this->assertGreaterThanOrEqual(4.5, $ratios['textOnSurface'], sprintf('%s: text on surface must be >=4.5:1 (got %.2f:1).', $label, $ratios['textOnSurface']));
+      $this->assertGreaterThanOrEqual(4.5, $ratios['textOnNested'], sprintf('%s: text on nested surface must be >=4.5:1 (got %.2f:1).', $label, $ratios['textOnNested']));
+      $this->assertGreaterThanOrEqual(4.5, $ratios['textOnRaised'], sprintf('%s: text on raised surface must be >=4.5:1 (got %.2f:1).', $label, $ratios['textOnRaised']));
+      $this->assertGreaterThanOrEqual(4.5, $ratios['accentFgOnSurface'], sprintf('%s: accent foreground on surface must be >=4.5:1 (got %.2f:1).', $label, $ratios['accentFgOnSurface']));
+    }
+  }
+
+  /**
+   * The active appearance actually resolves the correct light-dark() branch.
+   *
+   * Proves state selection before any contrast math: Dark must resolve the dark
+   * branch of representative semantic variables; Light must resolve the light
+   * branch. This catches cascade/state failures where a variable never switches.
+   */
+  public function testLightDarkStateSelection(): void {
+    $config = $this->config('default_admin.settings');
+    $config->set('preset_accent_color', 'blue')->save();
+
+    // Dark mode must resolve the dark branch of --admin-color-bg (#1b1b1d).
+    $config->set('enable_dark_mode', '1')->save();
+    $this->drupalGet('/admin/content');
+    $this->assertSession()->statusCodeEquals(200);
+    $darkBg = $this->resolveColor('--admin-color-bg');
+    $this->assertEquals('rgb(27, 27, 29)', $darkBg, 'Dark mode must resolve --admin-color-bg to the dark branch rgb(27, 27, 29).');
+    $this->assertEquals('rgb(42, 42, 45)', $this->resolveColor('--admin-color-bg-surface'), 'Dark mode must resolve --admin-color-bg-surface to the dark branch rgb(42, 42, 45).');
+
+    // Light mode must not resolve the dark branch.
+    $config->set('enable_dark_mode', '0')->save();
+    $this->drupalGet('/admin/content');
+    $this->assertSession()->statusCodeEquals(200);
+    $lightBg = $this->resolveColor('--admin-color-bg');
+    $this->assertNotEquals('rgb(27, 27, 29)', $lightBg, 'Light mode must not resolve --admin-color-bg to the dark branch.');
+    $this->assertNotEquals('rgb(42, 42, 45)', $this->resolveColor('--admin-color-bg-surface'), 'Light mode must not resolve --admin-color-bg-surface to the dark branch.');
+  }
+
+  /**
+   * Resolves and returns a single computed CSS variable's used colour.
+   */
+  protected function resolveColor(string $var): string {
+    $script = '(() => { const t = document.createElement("div"); t.style.display = "none"; document.body.appendChild(t); t.style.backgroundColor = `var(' . $var . ')`; let c = getComputedStyle(t).backgroundColor; c = c || t.style.backgroundColor; t.remove(); return c; })()';
+    try {
+      return (string) $this->getSession()->evaluateScript($script);
+    }
+    catch (\Exception $e) {
+      return '';
+    }
+  }
+
+  /**
+   * Script that resolves text / surface / accent pairs and returns WCAG ratios.
+   *
+   * Custom properties are not resolved by getPropertyValue(), so each variable
+   * is applied to a throwaway element and its used colour is read back. The
+   * active color-scheme selects the matching light-dark() branch.
+   */
+  protected function surfaceScript(): string {
+    return <<<'JS'
+(function () {
+  const temp = document.createElement('div');
+  temp.style.display = 'none';
+  document.body.appendChild(temp);
+  function resolve(varName, property) {
+    temp.style[property] = 'var(' + varName + ')';
+    const v = getComputedStyle(temp)[property];
+    temp.style[property] = '';
+    return v;
+  }
+  function lum(s) {
+    const m = s.match(/rgba?\(([^)]+)\)/);
+    if (!m) return 0;
+    const p = m[1].split(',').map(x => parseFloat(x.trim()) / 255);
+    const f = x => x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+    return 0.2126 * f(p[0]) + 0.7152 * f(p[1]) + 0.0722 * f(p[2]);
+  }
+  function ratio(a, b) { const A = Math.max(a, b), B = Math.min(a, b); return (A + 0.05) / (B + 0.05); }
+  const text = lum(resolve('--admin-color-text', 'color'));
+  const acfg = lum(resolve('--admin-color-accent-fg', 'color'));
+  const bg = lum(resolve('--admin-color-bg', 'backgroundColor'));
+  const surface = lum(resolve('--admin-color-bg-surface', 'backgroundColor'));
+  const nested = lum(resolve('--admin-color-bg-surface-nested', 'backgroundColor'));
+  const raised = lum(resolve('--admin-color-bg-raised', 'backgroundColor'));
+  return {
+    textOnBg: ratio(text, bg),
+    textOnSurface: ratio(text, surface),
+    textOnNested: ratio(text, nested),
+    textOnRaised: ratio(text, raised),
+    accentFgOnSurface: ratio(acfg, surface)
+  };
+})()
+JS;
+  }
+
 }

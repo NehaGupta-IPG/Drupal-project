@@ -129,8 +129,8 @@
     border-radius: var(--admin-radius-xl);
 
     &:hover {
-      color: light-dark(var(--admin-color-primary), var(--admin-color-text-on-primary));
-      background: light-dark(var(--admin-color-primary-soft-hover), var(--admin-color-primary-hover));
+      color: var(--admin-color-radio-hover);
+      background: var(--admin-color-radio-hover-bg);
     }
   }
 

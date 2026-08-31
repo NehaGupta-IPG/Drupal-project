@@ -279,6 +279,68 @@ class AccentColorContrastTest extends BrowserTestBase {
   }
 
   /**
+   * Component interaction states resolve through semantic tokens, not in CSS.
+   *
+   * The details summary and dark-mode-radio hover styles must consume semantic
+   * variables. The Light/Dark decision (the light-dark() branches) lives in the
+   * semantic variables. This also pins the state selection at token level: the
+   * dark branch of each new token must reference the value that used to be
+   * inlined in the component.
+   */
+  public function testComponentSemanticTokens(): void {
+    $semantic = file_get_contents(\Drupal::service('extension.list.theme')->getPath('default_admin') . '/css/_variables/variables-color-semantic.css');
+    $details = file_get_contents(\Drupal::service('extension.list.theme')->getPath('default_admin') . '/css/components/details.css');
+    $settings = file_get_contents(\Drupal::service('extension.list.theme')->getPath('default_admin') . '/css/components/settings.css');
+
+    $this->assertMatchesRegularExpression(
+      '/--admin-color-summary-text:\s*light-dark\(var\(--admin-color-primary-hover\),\s*var\(--admin-color-accent-fg\)\);/',
+      $semantic,
+      'Summary text must resolve light=primary-hover and dark=accent-fg at the semantic level.'
+    );
+    $this->assertMatchesRegularExpression(
+      '/--admin-color-summary-hover-bg:\s*light-dark\(var\(--admin-color-bg-item-hover\),\s*color-mix\(in sRGB, var\(--admin-color-accent-fg\) 12%, var\(--admin-color-bg-surface\)\)\);/',
+      $semantic,
+      'Summary hover background must keep its light/dark branches in the semantic token.'
+    );
+    $this->assertMatchesRegularExpression(
+      '/--admin-color-radio-hover:\s*light-dark\(var\(--admin-color-primary\),\s*var\(--admin-color-text-on-primary\)\);/',
+      $semantic,
+      'Dark-mode radio label hover must resolve dark to text-on-primary at the semantic level.'
+    );
+    $this->assertMatchesRegularExpression(
+      '/--admin-color-radio-hover-bg:\s*light-dark\(var\(--admin-color-primary-soft-hover\),\s*var\(--admin-color-primary-hover\)\);/',
+      $semantic,
+      'Dark-mode radio label hover background must keep both branches in the semantic token.'
+    );
+
+    $this->assertStringContainsString('color: var(--admin-color-summary-text)', $details, 'Details summary hover must consume the semantic summary-text token.');
+    $this->assertStringContainsString('background-color: var(--admin-color-summary-hover-bg)', $details, 'Details summary hover must consume the semantic summary-hover-bg token.');
+    $this->assertStringContainsString('color: var(--admin-color-radio-hover)', $settings, 'Dark-mode radio hover must consume the semantic radio-hover token.');
+    $this->assertStringContainsString('background: var(--admin-color-radio-hover-bg)', $settings, 'Dark-mode radio hover must consume the semantic radio-hover-bg token.');
+
+    $this->assertStringNotContainsString(
+      'light-dark(var(--admin-color-primary-hover), var(--admin-color-accent-fg))',
+      $details,
+      'Details must not inline the light-dark() Light/Dark decision for summary text.'
+    );
+    $this->assertStringNotContainsString(
+      'light-dark(var(--admin-color-bg-item-hover)',
+      $details,
+      'Details must not inline the light-dark() Light/Dark decision for summary hover background.'
+    );
+    $this->assertStringNotContainsString(
+      'light-dark(var(--admin-color-primary), var(--admin-color-text-on-primary))',
+      $settings,
+      'Settings must not inline the light-dark() Light/Dark decision for the radio hover color.'
+    );
+    $this->assertStringNotContainsString(
+      'light-dark(var(--admin-color-primary-soft-hover), var(--admin-color-primary-hover))',
+      $settings,
+      'Settings must not inline the light-dark() Light/Dark decision for the radio hover background.'
+    );
+  }
+
+  /**
    * High-contrast accent must approach AAA 7:1 on main surfaces for all presets.
    *
    * Light HC uses L*0.80 (7.2-7.9:1 on white), dark HC uses max(L*1.5,0.93) c*1.2.

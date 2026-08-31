@@ -94,6 +94,7 @@
 /**
  * Details summary styles.
  */
+
 .gin-details__summary {
   position: relative;
   box-sizing: border-box;
@@ -173,8 +174,8 @@
   }
 
   &:hover {
-    color: light-dark(var(--admin-color-primary-hover), var(--admin-color-accent-fg));
-    background-color: light-dark(var(--admin-color-bg-item-hover), color-mix(in sRGB, var(--admin-color-accent-fg) 12%, var(--admin-color-bg-surface)));
+    color: var(--admin-color-summary-text);
+    background-color: var(--admin-color-summary-hover-bg);
   }
 
   &:hover::before,
@@ -188,6 +189,7 @@
 }
 
 /* Modifiers */
+
 .gin-details__summary--accordion,
 .gin-details__summary--accordion-item,
 .gin-details__summary--vertical-tabs-item {
@@ -205,6 +207,7 @@
  * Accordion list items must not have border radius except they are the first
  * or the last ones.
  */
+
 .gin-details__summary--accordion-item {
   border-radius: 0;
 
@@ -226,10 +229,11 @@
 /**
  * Details summary states.
  */
+
 [open] .gin-details__summary--accordion,
 [open] .gin-details__summary--accordion-item,
 [open] .gin-details__summary--vertical-tabs-item {
-  color: light-dark(var(--admin-color-primary), var(--admin-color-accent-fg));
+  color: var(--admin-color-summary-text);
   text-decoration-style: var(--admin-link-decoration-style);
 }
 
@@ -278,6 +282,7 @@
  * because the elements inside the details content won't cause too big
  * vertical spacing.
  */
+
 .gin-details__wrapper,
 .gin-details__content {
   margin-block: var(--admin-space-m);
@@ -326,6 +331,7 @@
 }
 
 /* Description. */
+
 .gin-details__description {
   margin-block-end: var(--admin-space-m);
   color: var(--admin-color-text-soft);
@@ -347,6 +353,7 @@
 }
 
 /* @todo this probably needs to be moved.  */
+
 .required-mark::after {
   display: inline-block;
   inline-size: 0.4375rem;

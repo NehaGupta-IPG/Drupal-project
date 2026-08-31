@@ -130,6 +130,14 @@
   --admin-color-link: var(--admin-color-primary);
   --admin-color-link-hover: light-dark(var(--admin-color-accent-600), var(--admin-color-accent-fg));
   --admin-color-link-active: light-dark(var(--admin-color-accent-700), var(--admin-color-accent-900));
+
+  /*
+   * Component interaction states — resolved at semantic level.
+   */
+  --admin-color-summary-text: light-dark(var(--admin-color-primary-hover), var(--admin-color-accent-fg));
+  --admin-color-summary-hover-bg: light-dark(var(--admin-color-bg-item-hover), color-mix(in sRGB, var(--admin-color-accent-fg) 12%, var(--admin-color-bg-surface)));
+  --admin-color-radio-hover: light-dark(var(--admin-color-primary), var(--admin-color-text-on-primary));
+  --admin-color-radio-hover-bg: light-dark(var(--admin-color-primary-soft-hover), var(--admin-color-primary-hover));
 }
 
 @media (forced-colors: active) {
