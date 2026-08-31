@@ -70,7 +70,7 @@
   --admin-color-border-loud: light-dark(color-mix(in lch, black 30%, transparent), color-mix(in lch, white 40%, transparent));
   --admin-color-border-input: light-dark(var(--admin-color-gray-500), #76777b);
   --admin-color-border-table: light-dark(color-mix(in srgb, black 10%, transparent), #43454a);
-  --admin-color-text-on-primary: light-dark(var(--admin-color-white), #111);
+  --admin-color-text-on-primary: light-dark(var(--admin-color-white), var(--admin-color-white));
   --admin-color-switch: light-dark(#26a769, var(--admin-color-accent-100));
   --admin-color-bg-inverse: light-dark(var(--admin-color-gray-950), var(--admin-color-bg-raised));
 

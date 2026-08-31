@@ -90,27 +90,175 @@ class AccentColorContrastTest extends BrowserTestBase {
   }
 
   /**
-   * Regression guard: the dark-mode accent fix must remain in place.
+   * Regression guard: the accent tokens stay separate and use one colour model.
+   *
+   * Accent fills (--admin-color-accent-base) and accent foregrounds
+   * (--admin-color-accent-fg) must remain distinct tokens. Both new
+   * derivations must use the same colour model. The foreground formula is not
+   * a test contract: resulting contrast is asserted in
+   * ::testDarkModeForegroundContrast() instead of pinning the literal
+   * lightness/chroma constants.
    */
   public function testDarkModeAccentTokens(): void {
     $path = \Drupal::service('extension.list.theme')->getPath('default_admin') . '/css/_variables/variables-color-primitive.css';
     $css = file_get_contents($path);
 
-    $this->assertStringContainsString(
-      '--admin-color-accent-fg',
+    $this->assertStringContainsString('--admin-color-accent-fg', $css, 'A separate foreground accent token must exist for dark mode.');
+    $this->assertStringContainsString('--admin-color-accent-base', $css, 'A separate fill accent token must exist.');
+    $this->assertMatchesRegularExpression(
+      '/--admin-color-accent-fg:[^;]*oklch\(from var\(--accent-base\)/',
       $css,
-      'A separate foreground accent token must exist for dark mode.'
+      'The foreground accent derivation must use oklch().'
     );
-    $this->assertStringContainsString(
-      'oklch(from var(--accent-base) max(calc(l * 1.5), 0.93)',
+    $this->assertMatchesRegularExpression(
+      '/--admin-color-accent-base:[^;]*oklch\(from var\(--accent-base\)/',
       $css,
-      'The dark-mode foreground accent must use oklch() with a lightness floor of 0.93.'
+      'The fill accent derivation must use the same colour model (oklch()) as the foreground.'
     );
     $this->assertStringNotContainsString(
       'lch(from var(--accent-base) calc(l * 20)',
       $css,
       'The old l*20 formula (which collapsed the accent to near-white) must be gone.'
     );
+  }
+
+  /**
+   * The derived accent foreground must reach WCAG AA on dark surfaces.
+   *
+   * Asserts resulting contrast only, never the derivation constants.
+   */
+  public function testDarkModeForegroundContrast(): void {
+    $colors = Helper::accentColors();
+    foreach ($colors as $name => $info) {
+      if ($name === 'custom') {
+        continue;
+      }
+      $fg = $this->oklchAdjust($info['hex'], 1.5, 1.1, 0.93);
+      foreach (['#1b1b1d', '#2a2a2d', '#3b3b3f'] as $bg) {
+        $ratio = $this->contrastRatio($fg, $bg);
+        $this->assertGreaterThanOrEqual(
+          4.5,
+          $ratio,
+          sprintf('Dark-mode accent "%s" foreground %s on %s must be >=4.5:1 (got %.2f:1).', $name, $fg, $bg, $ratio)
+        );
+      }
+    }
+  }
+
+  /**
+   * Regression guard: text on the dark-mode solid primary must be white.
+   *
+   * The dark-mode primary fill is computed from the accent at oklch L*0.45,
+   * which is a dark tint. `--admin-color-text-on-primary` must stay white in
+   * dark mode; using the light-mode dark value (#111) there produced black on
+   * dark teal (1.49:1 on the green preset). White reaches 4.5:1 on every
+   * preset's dark primary.
+   */
+  public function testDarkModeTextOnPrimaryContrast(): void {
+    $path = \Drupal::service('extension.list.theme')->getPath('default_admin') . '/css/_variables/variables-color-semantic.css';
+    $css = file_get_contents($path);
+
+    $this->assertStringNotContainsString(
+      '--admin-color-text-on-primary: light-dark(var(--admin-color-white), #111);',
+      $css,
+      'Dark-mode text-on-primary must not resolve to #111 on the dark primary fill.'
+    );
+    $this->assertMatchesRegularExpression(
+      '/--admin-color-text-on-primary:\s*light-dark\(var\(--admin-color-white\),\s*(var\(--admin-color-white\)|white|#fff)\);/',
+      $css,
+      'Dark-mode text-on-primary must be white (it sits on a dark primary fill).'
+    );
+
+    $colors = Helper::accentColors();
+    foreach ($colors as $name => $info) {
+      if ($name === 'custom') {
+        continue;
+      }
+      $hex = $info['hex'];
+      $darkPrimary = $this->oklchAdjust($hex, 0.45, 0.9);
+      $ratio = $this->contrastRatio('#ffffff', $darkPrimary);
+      $this->assertGreaterThanOrEqual(
+        4.5,
+        $ratio,
+        sprintf('White label on dark-mode primary of "%s" (%s) must be >=4.5:1 (got %.2f:1).', $name, $darkPrimary, $ratio)
+      );
+    }
+  }
+
+  /**
+   * Regression: accent fill against an adjacent surface is a separate relationship.
+   *
+   * The matrix must report this relationship honestly. The verifier previously
+   * displayed the accent fill on a surface but computed white-on-fill instead,
+   * producing a false PASS. #030089 (blue fill) on #1b1b1d is about 1.12:1.
+   */
+  public function testAccentFillVsSurfaceRatio(): void {
+    $ratio = $this->contrastRatio('#030089', '#1b1b1d');
+    $this->assertEqualsWithDelta(1.12, $ratio, 0.05, sprintf('Accent fill #030089 on #1b1b1d must be ~1.12:1 (got %.4f:1).', $ratio));
+    $this->assertLessThan(3.0, $ratio, 'Accent fill against the dark surface must not exceed the 3:1 UI threshold.');
+  }
+
+  /**
+   * Regression: white text on the accent fill is a separate relationship.
+   *
+   * #ffffff on #030089 (blue fill) is about 15.38:1 and passes WCAG 4.5:1.
+   * Kept as its own test case — it must never be merged with the fill-vs-surface
+   * relationship (they measure different foreground/background pairs).
+   */
+  public function testWhiteOnAccentFillRatio(): void {
+    $ratio = $this->contrastRatio('#ffffff', '#030089');
+    $this->assertEqualsWithDelta(15.38, $ratio, 0.05, sprintf('White #ffffff on accent fill #030089 must be ~15.38:1 (got %.4f:1).', $ratio));
+    $this->assertGreaterThanOrEqual(
+      4.5,
+      $ratio,
+      'White text on the accent fill must meet WCAG 4.5:1.'
+    );
+  }
+
+  /**
+   * The generated matrix must be self-consistent.
+   *
+   * Every row's stored ratio must equal the ratio recomputed from the exact
+   * foreground and background hex it displays. This catches verifier bugs
+   * where a row lists one colour pair but measures a different one.
+   */
+  public function testGeneratedMatrixIntegrity(): void {
+    $csv = \Drupal::root() . '/testing/default-admin-dark-mode-accent/color-contrast-matrix.csv';
+    $this->assertFileExists($csv, 'Generated contrast matrix CSV must exist before integrity is checked.');
+    $fh = fopen($csv, 'r');
+    $this->assertNotFalse($fh, 'Unable to open the generated contrast matrix CSV.');
+    $header = fgetcsv($fh, null, ',', '"', '\\');
+    $this->assertNotFalse($header, 'Matrix CSV must have a header row.');
+    $fgIdx = array_search('fg_hex', $header, TRUE);
+    $bgIdx = array_search('background', $header, TRUE);
+    $ratioIdx = array_search('wcag_ratio', $header, TRUE);
+    $passIdx = array_search('wcag_pass', $header, TRUE);
+    $this->assertNotFalse($fgIdx, 'Matrix CSV must include fg_hex.');
+    $this->assertNotFalse($bgIdx, 'Matrix CSV must include background.');
+    $checked = 0;
+    while (($row = fgetcsv($fh, null, ',', '"', '\\')) !== FALSE) {
+      if (count($row) <= max($fgIdx, $bgIdx, $ratioIdx, $passIdx)) {
+        continue;
+      }
+      $fg = $row[$fgIdx];
+      $bg = $row[$bgIdx];
+      $recomputed = $this->contrastRatio($fg, $bg);
+      $this->assertEqualsWithDelta(
+        (float) $row[$ratioIdx],
+        $recomputed,
+        0.0001,
+        sprintf('Matrix row (%s fg on %s bg) must store the ratio recomputed from its displayed pair (got %.4f, stored %s).', $fg, $bg, $recomputed, $row[$ratioIdx])
+      );
+      $passFromRatio = $recomputed >= (float) $row[array_search('threshold', $header, TRUE)] ? 'PASS' : 'FAIL';
+      $this->assertEquals(
+        $passFromRatio,
+        $row[$passIdx],
+        sprintf('Matrix PASS/FAIL for %s on %s must be derived from its recomputed ratio.', $fg, $bg)
+      );
+      $checked++;
+    }
+    fclose($fh);
+    $this->assertGreaterThan(0, $checked, 'Matrix integrity check must have evaluated at least one row.');
   }
 
   /**
