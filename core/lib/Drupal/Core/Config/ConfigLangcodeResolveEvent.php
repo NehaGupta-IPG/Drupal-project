@@ -9,6 +9,10 @@ use Drupal\Component\EventDispatcher\Event;
 /**
  * Event fired to resolve the langcode for a configuration object.
  *
+ * Subscribers can do two independent things: resolve a langcode when none, or
+ * English, was supplied, and vouch for which langcodes are actually supported
+ * on this site.
+ *
  * @see \Drupal\Core\Config\ConfigEvents::RESOLVE_LANGCODE
  */
 final class ConfigLangcodeResolveEvent extends Event {
@@ -19,14 +23,11 @@ final class ConfigLangcodeResolveEvent extends Event {
   private ?string $langcode;
 
   /**
-   * Whether a subscriber has rejected the configuration outright.
+   * Langcodes subscribers have vouched for as supported on this site.
+   *
+   * @var string[]
    */
-  private bool $rejected = FALSE;
-
-  /**
-   * The reason the configuration was rejected, if it was.
-   */
-  private ?string $rejectionReason = NULL;
+  private array $allowedLangcodes = [];
 
   /**
    * Constructs a ConfigLangcodeResolveEvent.
@@ -98,38 +99,39 @@ final class ConfigLangcodeResolveEvent extends Event {
   }
 
   /**
-   * Rejects the configuration outright.
+   * Vouches for a langcode being supported on this site.
    *
-   * Used for \Drupal\Core\Config\ConfigLangcodeContext::ExtensionInstall,
-   * when configuration ships with an explicit langcode that is not supported
-   * by the site, so it should not be installed at all.
-   *
-   * @param string $reason
-   *   Why the configuration was rejected.
+   * @param string $langcode
+   *   The langcode.
    */
-  public function reject(string $reason): void {
-    $this->rejected = TRUE;
-    $this->rejectionReason = $reason;
+  public function allowLangcode(string $langcode): void {
+    $this->allowedLangcodes[] = $langcode;
   }
 
   /**
-   * Whether the configuration has been rejected.
+   * Vouches for several langcodes being supported on this site.
+   *
+   * @param string[] $langcodes
+   *   The langcodes.
+   */
+  public function allowLangcodes(array $langcodes): void {
+    $this->allowedLangcodes = array_merge($this->allowedLangcodes, $langcodes);
+  }
+
+  /**
+   * Whether the given langcode is supported on this site.
+   *
+   * @param string $langcode
+   *   The langcode to check. There is nothing to check a missing langcode
+   *   against - it is up to whoever dispatched the event to decide what a
+   *   missing langcode means for them.
    *
    * @return bool
-   *   TRUE if rejected.
+   *   TRUE if the langcode has been vouched for by a subscriber, FALSE
+   *   otherwise.
    */
-  public function isRejected(): bool {
-    return $this->rejected;
-  }
-
-  /**
-   * Gets the rejection reason.
-   *
-   * @return string|null
-   *   The reason, or NULL if not rejected.
-   */
-  public function getRejectionReason(): ?string {
-    return $this->rejectionReason;
+  public function isLangcodeSupported(string $langcode): bool {
+    return in_array($langcode, $this->allowedLangcodes, TRUE);
   }
 
 }

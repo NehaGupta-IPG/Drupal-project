@@ -5,20 +5,18 @@ declare(strict_types=1);
 namespace Drupal\language\EventSubscriber;
 
 use Drupal\Core\Config\ConfigEvents;
-use Drupal\Core\Config\ConfigLangcodeContext;
 use Drupal\Core\Config\ConfigLangcodeResolveEvent;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Rejects extension-shipped configuration in an unsupported language.
+ * Vouches for every language configured on this site.
  *
- * Supplying a default langcode when none was shipped is core's job (the
- * site's default language needs no module at all) - see
- * \Drupal\Core\Config\EventSubscriber\ConfigLangcodeSiteDefaultSubscriber.
- * This only handles the part core cannot: an extension can ship
- * configuration with an explicit langcode of its own, and only language
- * module knows which languages are actually configured on this site.
+ * Core alone can only ever vouch for English and the site's own default -
+ * see \Drupal\Core\Config\EventSubscriber\ConfigLangcodeSiteDefaultSubscriber.
+ * Only language module knows the full list of languages actually configured,
+ * so extension-shipped configuration in any other explicit language is
+ * unsupported - and therefore rejected - unless this runs.
  */
 class ConfigLangcodeSubscriber implements EventSubscriberInterface {
 
@@ -27,20 +25,10 @@ class ConfigLangcodeSubscriber implements EventSubscriberInterface {
   ) {}
 
   /**
-   * Rejects an explicit shipped langcode this site does not support.
+   * Vouches for every configured language.
    */
   public function onResolveLangcode(ConfigLangcodeResolveEvent $event): void {
-    if ($event->getContext() !== ConfigLangcodeContext::ExtensionInstall) {
-      return;
-    }
-    $current = $event->getCurrentLangcode();
-    if ($current === NULL || $current === 'en') {
-      // Missing or merely-English: core's subscriber handles this case.
-      return;
-    }
-    if (!array_key_exists($current, $this->languageManager->getLanguages())) {
-      $event->reject("The '$current' language is not supported on this site.");
-    }
+    $event->allowLangcodes(array_keys($this->languageManager->getLanguages()));
   }
 
   /**

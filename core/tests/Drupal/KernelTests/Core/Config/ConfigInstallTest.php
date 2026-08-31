@@ -283,10 +283,15 @@ class ConfigInstallTest extends KernelTestBase {
     $this->assertTrue(!isset($data['langcode']));
     $this->assertEquals('en', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
 
-    // Test imported configuration with explicit language code.
+    // Test imported configuration with an explicit, non-English language
+    // code. Without language module installed, English is the only
+    // supported language, so this must not have been installed at all.
     $data = $storage->read('config_test.dynamic.dotted.french');
     $this->assertEquals('fr', $data['langcode']);
-    $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.french')->get('langcode'));
+    $this->assertNull($this->config('config_test.dynamic.dotted.french')->get('id'));
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $entity_storage */
+    $entity_storage = \Drupal::entityTypeManager()->getStorage('config_test');
+    $this->assertNull($entity_storage->load('dotted.french'));
   }
 
   /**
@@ -338,6 +343,25 @@ class ConfigInstallTest extends KernelTestBase {
     // needed relabelling to English, must still have installed normally.
     $this->assertEquals('en', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
     $this->assertNotNull($storage->load('dotted.english'));
+  }
+
+  /**
+   * Tests a shipped langcode matching a non-English site default installs.
+   *
+   * No language module is installed here: the site's configuration default
+   * language can only ever come from system.site:default_langcode, and
+   * nothing else vouches for it being supported.
+   *
+   * @see \Drupal\Core\Config\EventSubscriber\ConfigLangcodeSiteDefaultSubscriber
+   */
+  public function testLanguageShippedLangcodeMatchingSiteDefault(): void {
+    $this->installConfig(['system']);
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
+    $this->installModules(['config_test_language']);
+    $this->assertNotNull($this->config('config_test.dynamic.dotted.french')->get('id'));
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $entity_storage */
+    $entity_storage = \Drupal::entityTypeManager()->getStorage('config_test');
+    $this->assertNotNull($entity_storage->load('dotted.french'));
   }
 
   /**

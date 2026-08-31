@@ -407,13 +407,13 @@ class ConfigInstaller implements ConfigInstallerInterface {
             // reconcileLangcodeWithTranslatability().
             $event = new ConfigLangcodeResolveEvent($name, $config_to_create[$name]['langcode'] ?? NULL, ConfigLangcodeContext::ExtensionInstall);
             $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
-            if ($event->isRejected()) {
+            if ($event->getLangcode() !== NULL) {
+              $config_to_create[$name]['langcode'] = $event->getLangcode();
+            }
+            if (isset($config_to_create[$name]['langcode']) && !$event->isLangcodeSupported($config_to_create[$name]['langcode'])) {
               // The configuration ships with an explicit langcode that is not
               // supported on this site: do not install it at all.
               continue;
-            }
-            if ($event->getLangcode() !== NULL) {
-              $config_to_create[$name]['langcode'] = $event->getLangcode();
             }
           }
         }
