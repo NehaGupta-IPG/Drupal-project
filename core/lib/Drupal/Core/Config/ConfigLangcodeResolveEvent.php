@@ -20,7 +20,7 @@ final class ConfigLangcodeResolveEvent extends Event {
   /**
    * The resolved langcode, or NULL if nothing has resolved one yet.
    */
-  private ?string $langcode;
+  private ?string $langcode = NULL;
 
   /**
    * Langcodes subscribers have vouched for as supported on this site.
@@ -35,8 +35,7 @@ final class ConfigLangcodeResolveEvent extends Event {
    * @param string $name
    *   The name of the configuration object.
    * @param string|null $currentLangcode
-   *   The langcode currently present on the configuration, if any. Seeds the
-   *   resolved value so a subscriber that does nothing leaves it unchanged.
+   *   The langcode currently present on the configuration, if any.
    * @param \Drupal\Core\Config\ConfigLangcodeContext $context
    *   Why the langcode is being resolved.
    */
@@ -44,9 +43,7 @@ final class ConfigLangcodeResolveEvent extends Event {
     private readonly string $name,
     private readonly ?string $currentLangcode,
     private readonly ConfigLangcodeContext $context,
-  ) {
-    $this->langcode = $currentLangcode;
-  }
+  ) {}
 
   /**
    * Gets the name of the configuration object.
@@ -82,20 +79,38 @@ final class ConfigLangcodeResolveEvent extends Event {
    * Gets the resolved langcode.
    *
    * @return string|null
-   *   The resolved langcode, or NULL if nothing has resolved one.
+   *   The langcode a subscriber resolved, the current langcode if none has,
+   *   or NULL if there was no current langcode either.
    */
   public function getLangcode(): ?string {
-    return $this->langcode;
+    return $this->langcode ?? $this->currentLangcode;
   }
 
   /**
    * Sets the resolved langcode.
    *
+   * The first subscriber to call this wins: a later call is silently
+   * ignored. This lets an earlier, more specific subscriber - for example a
+   * module establishing its own default-langcode policy, such as always
+   * defaulting new configuration to English regardless of the site default
+   * - take precedence over a later, more general one (like core's own
+   * site-default subscriber) without needing to stop propagation, which
+   * would also stop unrelated subscribers - such as ones vouching for
+   * supported langcodes - from running.
+   *
    * @param string $langcode
    *   The langcode to use.
+   *
+   * @return bool
+   *   TRUE if this call resolved the langcode, FALSE if a subscriber had
+   *   already done so and this call was ignored.
    */
-  public function setLangcode(string $langcode): void {
+  public function setLangcode(string $langcode): bool {
+    if ($this->langcode !== NULL) {
+      return FALSE;
+    }
     $this->langcode = $langcode;
+    return TRUE;
   }
 
   /**

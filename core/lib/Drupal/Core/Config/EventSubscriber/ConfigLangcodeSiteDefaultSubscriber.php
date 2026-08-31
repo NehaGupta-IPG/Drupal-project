@@ -15,11 +15,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * The site's default language (system.site:default_langcode) is the single
  * source of truth for what langcode configuration with none of its own
- * should get. It is also always supported, so this vouches for it - even
- * where language module is not installed to vouch for anything else.
- * English is not vouched for separately: a missing or merely-English
- * langcode is always resolved to the site default below instead, so 'en'
- * only ever needs to be supported when it also happens to be that default.
+ * should get - unless something more specific already decided, such as a
+ * module with its own default-langcode policy: this always attempts to
+ * resolve, but \Drupal\Core\Config\ConfigLangcodeResolveEvent::setLangcode()
+ * itself enforces that the first subscriber to resolve wins, so an earlier
+ * decision is never overwritten here. It is also always supported, so this
+ * vouches for it regardless - even where language module is not installed
+ * to vouch for anything else. English is not vouched for separately: a
+ * missing or merely-English langcode is always resolved to the site
+ * default below instead, so 'en' only ever needs to be supported when it
+ * also happens to be that default.
  *
  * @see \Drupal\language\EventSubscriber\ConfigLangcodeSubscriber
  */
