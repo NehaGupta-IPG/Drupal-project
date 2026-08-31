@@ -37,7 +37,7 @@ class SchemaInspector {
         return $schema;
       }
       else {
-        // If the module does not implements hook_schema(), the value of
+        // If the module does not implement hook_schema(), the value of
         // $schema will be an empty array, and we do not need to trigger a
         // deprecation.
         if ($schema !== []) {
