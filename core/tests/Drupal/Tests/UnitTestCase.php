@@ -15,7 +15,6 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use PHPUnit\Framework\MockObject\Stub;
-use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
@@ -34,9 +33,8 @@ use Prophecy\PhpUnit\ProphecyTrait;
  *
  * @ingroup testing
  */
-abstract class UnitTestCase extends TestCase {
+abstract class UnitTestCase extends DrupalTestCase {
 
-  use DrupalTestCaseTrait;
   use ProphecyTrait;
   use RandomGeneratorTrait;
 
@@ -141,8 +139,7 @@ abstract class UnitTestCase extends TestCase {
     $translation
       ->method('formatPlural')
       ->willReturnCallback(function ($count, $singular, $plural, array $args = [], array $options = []) use ($translation): PluralTranslatableMarkup {
-        $wrapper = new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation);
-        return $wrapper;
+        return new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation);
       });
     return $translation;
   }

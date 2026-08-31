@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\toolbar\ckeditor5\FunctionalJavascript;
+namespace Drupal\Tests\toolbar\FunctionalJavascript\ckeditor5;
 
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
@@ -38,8 +38,6 @@ class CKEditor5ToolbarTest extends WebDriverTestBase {
 
   /**
    * The admin user.
-   *
-   * @var \Drupal\user\Entity\User
    */
   protected User $user;
 

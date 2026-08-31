@@ -116,9 +116,9 @@ class StorageComparer implements StorageComparerInterface {
     }
 
     $time = \Drupal::hasService(TimeInterface::class) ? \Drupal::service(TimeInterface::class) : new Time();
-    if ($source_storage instanceof FileStorage) {
-      // FileStorage has its own static cache so that multiple reads of the
-      // same raw configuration object are not costly.
+    if ($source_storage instanceof FileStorage || $source_storage instanceof AutoloadingStorage) {
+      // FileStorage and AutoloadingStorage have their own static cache so that
+      // multiple reads of the same raw configuration object are not costly.
       $this->sourceCacheStorage = new NullBackend('storage_comparer');
       $this->sourceStorage = $source_storage;
     }
@@ -431,11 +431,16 @@ class StorageComparer implements StorageComparerInterface {
    * {@inheritdoc}
    */
   public function validateSiteUuid() {
-    $source = $this->sourceStorage->read('system.site');
     $target = $this->targetStorage->read('system.site');
-    // It is possible that the storage does not contain system.site
+    // If there is no target configuration yet, then the entire site may be
+    // getting reinstalled from config.
+    if (!$target) {
+      return TRUE;
+    }
+    $source = $this->sourceStorage->read('system.site');
+    // It is possible that the source storage does not contain system.site
     // configuration. In such cases the site UUID cannot be valid.
-    return $source && $target && $source['uuid'] === $target['uuid'];
+    return $source && $source['uuid'] === $target['uuid'];
   }
 
   /**

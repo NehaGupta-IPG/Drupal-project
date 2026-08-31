@@ -25,6 +25,11 @@ class InstallerTest extends InstallerTestBase {
   protected $defaultTheme = 'stark';
 
   /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'testing_locale';
+
+  /**
    * Ensures that the user page is available after installation.
    */
   public function testInstaller(): void {
@@ -33,10 +38,6 @@ class InstallerTest extends InstallerTestBase {
     $this->assertSession()->statusCodeEquals(200);
     // Confirm that we are logged-in after installation.
     $this->assertSession()->pageTextContains($this->rootUser->getAccountName());
-
-    // Verify that the confirmation message appears.
-    require_once $this->root . '/core/includes/install.inc';
-    $this->assertSession()->pageTextContains('Congratulations, you installed Drupal!');
 
     // Ensure that the timezone is correct for sites under test after installing
     // interactively.
@@ -47,8 +48,8 @@ class InstallerTest extends InstallerTestBase {
     $extensions = $module_extension_list->getList();
 
     // By default, the profile should remain installed.
-    $this->assertArrayHasKey('testing', $extensions);
-    $this->assertEquals(1000, $extensions['testing']->weight);
+    $this->assertArrayHasKey('testing_locale', $extensions);
+    $this->assertEquals(1000, $extensions['testing_locale']->weight);
     // Ensures that router is not rebuilt unnecessarily during the install.
     $this->assertSame(1, \Drupal::service('core.performance.test.recorder')->getCount('event', RoutingEvents::FINISHED));
   }

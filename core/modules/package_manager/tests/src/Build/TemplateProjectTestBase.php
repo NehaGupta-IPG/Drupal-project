@@ -37,29 +37,21 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
 
   /**
    * The web root of the test site, relative to the workspace directory.
-   *
-   * @var string
    */
   private string $webRoot;
 
   /**
    * The project root of the test site, relative to the workspace directory.
-   *
-   * @var string
    */
   const string PROJECT_ROOT_RELATIVE = 'project/';
 
   /**
    * A secondary server instance, to serve XML metadata about available updates.
-   *
-   * @var \Symfony\Component\Process\Process
    */
   private Process $metadataServer;
 
   /**
    * All output that the PHP web server logs to the error buffer.
-   *
-   * @var string
    */
   private string $serverErrorLog = '';
 
@@ -173,7 +165,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
     $ps = new Process($server, $working_path);
     $ps->setIdleTimeout(30)
       ->setTimeout(30)
-      ->start(function ($output_type, $output): void {
+      ->start(function ($output_type, string $output): void {
         if ($output_type === Process::ERR) {
           $this->serverErrorLog .= $output;
         }
@@ -269,7 +261,9 @@ END;
   protected function createTestProject(string $template): void {
     // Create a copy of core (including its Composer plugins, templates, and
     // metapackages) which we can modify.
-    $this->copyCodebase();
+    $finder = $this->getCodebaseFinder();
+    $finder->exclude('core/tests');
+    $this->copyCodebase($finder->getIterator());
 
     $workspace_dir = $this->getWorkspaceDirectory();
     $project_dir = $workspace_dir . '/project';

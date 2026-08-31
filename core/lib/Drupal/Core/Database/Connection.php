@@ -7,7 +7,6 @@ use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\Core\Database\Exception\EventException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
-use Drupal\Core\Database\Query\Insert;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\Truncate;
@@ -204,7 +203,7 @@ abstract class Connection {
    * @return object
    *   A client connection object.
    */
-  abstract public static function open(array &$connection_options = []);
+  abstract public static function open(#[\SensitiveParameter] array &$connection_options = []);
 
   /**
    * Ensures that the client connection can be garbage collected.
@@ -223,8 +222,15 @@ abstract class Connection {
    *   This method exists only to work around a bug caused by Drupal incorrectly
    *   relying on object destruction order to commit transactions. Xdebug 3.3.0
    *   changes the order of object destruction when the develop mode is enabled.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3524461
    */
   public function commitAll() {
+    // Only soft deprecation (no @trigger_error) to avoid thousands of
+    // occurrences per test run. PHPStan reports usage errors anyway.
     $manager = $this->transactionManager();
     if ($manager->inTransaction() && method_exists($manager, 'commitAll')) {
       $this->transactionManager()->commitAll();
@@ -435,14 +441,17 @@ abstract class Connection {
     assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to prepareStatement() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     try {
-      $query = $this->preprocessStatement($query, $options);
-      $statement = new $this->statementWrapperClass($this, $this->connection, $query, $options['pdo'] ?? [], $allow_row_count);
+      return new $this->statementWrapperClass(
+        $this,
+        $this->connection,
+        $this->preprocessStatement($query, $options),
+        $options['pdo'] ?? [],
+        $allow_row_count,
+      );
     }
     catch (\Exception $e) {
       $this->exceptionHandler()->handleStatementException($e, $query, $options);
     }
-
-    return $statement;
   }
 
   /**
@@ -659,13 +668,12 @@ abstract class Connection {
     $this->expandArguments($query, $args);
     $statement = $this->prepareStatement($query, $options);
     try {
-      $result = $statement->execute($args, $options);
+      $statement->execute($args, $options);
+      return $statement;
     }
     catch (\Exception $e) {
       $this->exceptionHandler()->handleExecutionException($e, $statement, $args, $options);
-      $result = FALSE;
     }
-    return $result ? $statement : NULL;
   }
 
   /**
@@ -744,7 +752,7 @@ abstract class Connection {
    *   The name of the class that should be used for this driver.
    */
   public function getDriverClass($class) {
-    match($class) {
+    match ($class) {
       'Install\\Tasks',
       'ExceptionHandler',
       'Select',
@@ -816,9 +824,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Query\Insert
    * @see \Drupal\Core\Database\Connection::defaultOptions()
    */
-  public function insert($table, array $options = []) {
-    return new Insert($this, $table, $options);
-  }
+  abstract public function insert($table, array $options = []);
 
   /**
    * Returns the ID of the last inserted row or sequence value.
