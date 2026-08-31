@@ -365,6 +365,39 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
   /**
    * {@inheritdoc}
    */
+  public function submitExposeForm($form, FormStateInterface $form_state) {
+    $reduce = $form_state->getValue(['options', 'expose', 'reduce']);
+    $limit = $form_state->getValue(['options', 'expose', 'limit']);
+    // Limit is an optional key, so unset the option if either limit or reduce
+    // are unchecked.
+    if (!$reduce || !$limit) {
+      $form_state->unsetValue(['options', 'expose', 'limit']);
+      unset($this->options['expose']['limit']);
+    }
+    parent::submitExposeForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitFormCalculateOptions(array $options, array $form_state_options) {
+    // \Drupal\views_ui\Form\Ajax\ConfigHandler::submitForm() builds a fresh
+    // handler and init()s it before calling this method, which always
+    // repopulates 'expose.limit' with its FALSE default. That default has to
+    // be dropped again here, on $this->options directly, because the merged
+    // array this method returns is only ever used to overlay known keys onto
+    // storage, never to delete stale ones from it.
+    $reduce = $form_state_options['expose']['reduce'] ?? $options['expose']['reduce'] ?? FALSE;
+    $limit = $form_state_options['expose']['limit'] ?? $options['expose']['limit'] ?? FALSE;
+    if (!$reduce || !$limit) {
+      unset($this->options['expose']['limit']);
+    }
+    return parent::submitFormCalculateOptions($options, $form_state_options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function adminSummary() {
     if ($this->isAGroup()) {
       return $this->t('grouped');
