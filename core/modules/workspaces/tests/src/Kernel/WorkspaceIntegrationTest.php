@@ -621,6 +621,43 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     $result = $query->execute();
 
     $this->assertSame([3 => '2', 1 => '1'], $result);
+
+    // Repeat the checks for an entity type that has no data table. The
+    // workspace entity query re-adds the ID and revision ID columns as SQL
+    // expressions, and sorting on the ID key of such an entity type resolves it
+    // against the base table, which adds another column to the SELECT.
+    $this->switchToLive();
+    $storage = $this->entityTypeManager->getStorage('entity_test_revpub');
+    $storage->create(['name' => 'live - 1'])->save();
+    $entity = $storage->create(['name' => 'live - 2']);
+    $entity->save();
+
+    $this->switchToWorkspace('stage');
+    $entity->set('name', 'stage - 2');
+    $entity->save();
+
+    $query = $storage->getQuery()->accessCheck(FALSE);
+    $query->sort('id');
+    $query->pager(1);
+    $result = $query->execute();
+
+    $this->assertSame([1 => '1'], $result);
+
+    $query = $storage->getQuery()->accessCheck(FALSE);
+    $query->sort('id', 'DESC');
+    $query->pager(10);
+    $result = $query->execute();
+
+    $this->assertSame([3 => '2', 1 => '1'], $result);
+
+    // Sorting on a field which is not an entity key is aggregated rather than
+    // selected, so it can not displace the key columns either.
+    $query = $storage->getQuery()->accessCheck(FALSE);
+    $query->sort('name', 'DESC');
+    $query->pager(10);
+    $result = $query->execute();
+
+    $this->assertSame([3 => '2', 1 => '1'], $result);
   }
 
   /**
