@@ -110,6 +110,7 @@ class AccentColorContrastJavascriptTest extends WebDriverTestBase {
       $this->assertGreaterThanOrEqual(3.0, $ratios['focusOnBg'], sprintf('%s: focus on bg must be >=3:1 (got %.2f:1).', $label, $ratios['focusOnBg']));
       $this->assertGreaterThanOrEqual(3.0, $ratios['focusOnSurface'], sprintf('%s: focus on surface must be >=3:1 (got %.2f:1).', $label, $ratios['focusOnSurface']));
       $this->assertGreaterThanOrEqual(4.5, $ratios['hoverOnBg'], sprintf('%s: hover (accent-fg) on bg must be >=4.5:1 (got %.2f:1).', $label, $ratios['hoverOnBg']));
+      $this->assertGreaterThanOrEqual(4.5, $ratios['activeOnBg'], sprintf('%s: active (accent-fg) on bg must be >=4.5:1 (got %.2f:1).', $label, $ratios['activeOnBg']));
     }
   }
 
@@ -165,6 +166,7 @@ class AccentColorContrastJavascriptTest extends WebDriverTestBase {
   function ratio(a,b){ const A=Math.max(a,b), B=Math.min(a,b); return (A+0.05)/(B+0.05); }
   const link = lum(resolve('--admin-color-link','color'));
   const hover = lum(resolve('--admin-color-link-hover','color'));
+  const active = lum(resolve('--admin-color-link-active','color'));
   const focus = lum(resolve('--admin-color-focus','color'));
   const bg = lum(resolve('--admin-color-bg','backgroundColor'));
   const surface = lum(resolve('--admin-color-bg-surface','backgroundColor'));
@@ -173,7 +175,8 @@ class AccentColorContrastJavascriptTest extends WebDriverTestBase {
     linkOnSurface: ratio(link, surface),
     focusOnBg: ratio(focus, bg),
     focusOnSurface: ratio(focus, surface),
-    hoverOnBg: ratio(hover, bg)
+    hoverOnBg: ratio(hover, bg),
+    activeOnBg: ratio(active, bg)
   };
 })()
 JS;

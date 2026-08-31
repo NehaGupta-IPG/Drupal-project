@@ -492,6 +492,43 @@ class AccentColorContrastTest extends BrowserTestBase {
   }
 
   /**
+   * Link hover and active are separate states, both dark foreground-safe.
+   *
+   * Hover and active are distinct in light mode (accent-600 vs accent-700).
+   * In dark mode both use the foreground-safe accent, because the darker
+   * accent steps (600/700) lose contrast on dark surfaces. This guards that
+   * link-active dark no longer uses accent-900 — an accent step designed for
+   * light backgrounds — and resolves to the foreground-safe accent instead.
+   */
+  public function testLinkStateContrast(): void {
+    $theme = \Drupal::service('extension.list.theme')->getPath('default_admin');
+    $semantic = file_get_contents($theme . '/css/_variables/variables-color-semantic.css');
+
+    $this->assertStringContainsString(
+      '--admin-color-link-hover: light-dark(var(--admin-color-accent-600), var(--admin-color-accent-fg));',
+      $semantic,
+      'Link hover must be a deeper accent step in light and the foreground-safe accent in dark.',
+    );
+    $this->assertStringContainsString(
+      '--admin-color-link-active: light-dark(var(--admin-color-accent-700), var(--admin-color-accent-fg));',
+      $semantic,
+      'Link active must be deeper than hover in light and the foreground-safe accent in dark, not the darker accent step.',
+    );
+    $this->assertStringNotContainsString(
+      '--admin-color-link-active: light-dark(var(--admin-color-accent-700), var(--admin-color-accent-900));',
+      $semantic,
+    );
+
+    // The foreground-safe active must contrast on every dark surface (default accent).
+    $active_dark = '#7bdeff';
+    $dark_bgs = ['#1b1b1d', '#2a2a2d', '#3b3b3f', '#47474c', '#2d3755'];
+    foreach ($dark_bgs as $bg) {
+      $r = $this->contrastRatio($active_dark, $bg);
+      $this->assertGreaterThanOrEqual(4.5, $r, sprintf('Link active %s on %s must be >=4.5:1 (got %.2f:1).', $active_dark, $bg, $r));
+    }
+  }
+
+  /**
    * Composites an [r,g,b,a] colour over an [r,g,b] background.
    *
    * Returns the WCAG contrast ratio of the resulting colour against that

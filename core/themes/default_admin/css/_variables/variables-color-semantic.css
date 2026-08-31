@@ -132,10 +132,17 @@
   /*
    * Link / interactive blue. Used for links and blue focus/selected accents
    * (text, border, and bg).
+   *
+   * Hover and active are separate states. In light mode hover uses a deeper
+   * accent step than the base link and active uses a deeper step than hover.
+   * In dark mode both use the foreground-safe accent, because the darker
+   * accent steps lose contrast on dark surfaces. The two states stay distinct
+   * where darkening is safe and share the foreground-safe accent where it is
+   * not.
    */
   --admin-color-link: var(--admin-color-primary);
   --admin-color-link-hover: light-dark(var(--admin-color-accent-600), var(--admin-color-accent-fg));
-  --admin-color-link-active: light-dark(var(--admin-color-accent-700), var(--admin-color-accent-900));
+  --admin-color-link-active: light-dark(var(--admin-color-accent-700), var(--admin-color-accent-fg));
 
   /*
    * Component interaction states — resolved at semantic level.
