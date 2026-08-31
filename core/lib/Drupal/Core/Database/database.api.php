@@ -342,7 +342,7 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *       might contain "The {users}.uid this record affects."
  *     - 'type': The column datatype, as a case of the
  *       Drupal\Core\Database\SchemaDefinition\ColumnType enumerator: ::Char,
- *       ::Varchar, ::Text, ::Blob, ::Int,::Float, ::Numeric, ::Serial, etc.
+ *       ::Varchar, ::Text, ::Blob, ::Int, ::Float, ::Numeric, ::Serial, etc.
  *       Most types just map to the according database engine specific data
  *       types. Use 'Column::serial' for auto incrementing columns. This will
  *       expand to 'INT auto_increment' on MySQL.
