@@ -21,7 +21,7 @@ class ConfigLangcodeResolveEventTest extends UnitTestCase {
    * Tests the langcode is seeded from, and defaults to, the current one.
    */
   public function testLangcodeSeededFromCurrent(): void {
-    $event = new ConfigLangcodeResolveEvent('test.settings', 'fr', ConfigLangcodeContext::Runtime);
+    $event = new ConfigLangcodeResolveEvent('fr', ConfigLangcodeContext::Runtime);
     $this->assertSame('fr', $event->getCurrentLangcode());
     $this->assertSame('fr', $event->getLangcode());
   }
@@ -30,7 +30,7 @@ class ConfigLangcodeResolveEventTest extends UnitTestCase {
    * Tests setLangcode() succeeds even when setting the same value.
    */
   public function testSetLangcodeSucceedsForSameValue(): void {
-    $event = new ConfigLangcodeResolveEvent('test.settings', 'en', ConfigLangcodeContext::ExtensionInstall);
+    $event = new ConfigLangcodeResolveEvent('en', ConfigLangcodeContext::ExtensionInstall);
 
     // Setting the langcode to the value it already had must still count as
     // resolving it: a subscriber locking configuration to English needs
@@ -55,7 +55,7 @@ class ConfigLangcodeResolveEventTest extends UnitTestCase {
    * @see https://git.drupalcode.org/project/config_language_lock/-/work_items/3613944
    */
   public function testSecondSetLangcodeCallIsIgnored(): void {
-    $event = new ConfigLangcodeResolveEvent('test.settings', NULL, ConfigLangcodeContext::Runtime);
+    $event = new ConfigLangcodeResolveEvent(NULL, ConfigLangcodeContext::Runtime);
     $this->assertTrue($event->setLangcode('en'));
     $this->assertSame('en', $event->getLangcode());
 
@@ -67,7 +67,7 @@ class ConfigLangcodeResolveEventTest extends UnitTestCase {
    * Tests a langcode is only supported once vouched for.
    */
   public function testLangcodeSupportRequiresVouching(): void {
-    $event = new ConfigLangcodeResolveEvent('test.settings', NULL, ConfigLangcodeContext::ExtensionInstall);
+    $event = new ConfigLangcodeResolveEvent(NULL, ConfigLangcodeContext::ExtensionInstall);
     $this->assertFalse($event->isLangcodeSupported('fr'));
 
     $event->allowLangcode('fr');

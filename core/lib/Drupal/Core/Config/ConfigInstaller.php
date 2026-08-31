@@ -405,7 +405,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
             // resolved langcode that Config::save() finds unwarranted is
             // stripped straight back out by its own
             // reconcileLangcodeWithTranslatability().
-            $event = new ConfigLangcodeResolveEvent($name, $config_to_create[$name]['langcode'] ?? NULL, ConfigLangcodeContext::ExtensionInstall);
+            $event = new ConfigLangcodeResolveEvent($config_to_create[$name]['langcode'] ?? NULL, ConfigLangcodeContext::ExtensionInstall);
             $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
             if ($event->getLangcode() !== NULL) {
               $config_to_create[$name]['langcode'] = $event->getLangcode();

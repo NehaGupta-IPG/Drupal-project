@@ -288,7 +288,7 @@ class Config extends StorableConfigBase {
     if (array_key_exists('langcode', $this->data)) {
       return;
     }
-    $event = new ConfigLangcodeResolveEvent($this->name, NULL, ConfigLangcodeContext::Runtime);
+    $event = new ConfigLangcodeResolveEvent(NULL, ConfigLangcodeContext::Runtime);
     $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
     if ($event->getLangcode() !== NULL) {
       $this->data['langcode'] = $event->getLangcode();

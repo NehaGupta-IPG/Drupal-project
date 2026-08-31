@@ -39,28 +39,15 @@ final class ConfigLangcodeResolveEvent {
   /**
    * Constructs a ConfigLangcodeResolveEvent.
    *
-   * @param string $name
-   *   The name of the configuration object.
    * @param string|null $currentLangcode
    *   The langcode currently present on the configuration, if any.
    * @param \Drupal\Core\Config\ConfigLangcodeContext $context
    *   Why the langcode is being resolved.
    */
   public function __construct(
-    private readonly string $name,
     private readonly ?string $currentLangcode,
     private readonly ConfigLangcodeContext $context,
   ) {}
-
-  /**
-   * Gets the name of the configuration object.
-   *
-   * @return string
-   *   The configuration object name.
-   */
-  public function getName(): string {
-    return $this->name;
-  }
 
   /**
    * Gets the current langcode that was present on the configuration.

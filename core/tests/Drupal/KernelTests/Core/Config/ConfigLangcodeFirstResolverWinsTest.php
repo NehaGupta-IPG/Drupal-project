@@ -86,7 +86,7 @@ class ConfigLangcodeFirstResolverWinsTest extends KernelTestBase {
   public function testPolicyWinsForExtensionInstall(): void {
     $this->registerLockToEnglishPolicy();
 
-    $event = new ConfigLangcodeResolveEvent('config_test.langcode_test', 'en', ConfigLangcodeContext::ExtensionInstall);
+    $event = new ConfigLangcodeResolveEvent('en', ConfigLangcodeContext::ExtensionInstall);
     \Drupal::service('event_dispatcher')->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
 
     $this->assertSame('en', $event->getLangcode());
@@ -104,7 +104,7 @@ class ConfigLangcodeFirstResolverWinsTest extends KernelTestBase {
     // Explicitly French: the policy above only ever acts on NULL or 'en',
     // so this is left for the site-default subscriber to leave alone too -
     // an explicit, already-supported langcode is never overwritten.
-    $event = new ConfigLangcodeResolveEvent('config_test.langcode_test', 'fr', ConfigLangcodeContext::ExtensionInstall);
+    $event = new ConfigLangcodeResolveEvent('fr', ConfigLangcodeContext::ExtensionInstall);
     \Drupal::service('event_dispatcher')->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
     $this->assertSame('fr', $event->getLangcode());
     $this->assertTrue($event->isLangcodeSupported('fr'));

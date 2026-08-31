@@ -35,7 +35,7 @@ class ConfigLangcodeSiteDefaultSubscriberTest extends UnitTestCase {
    * Tests a missing runtime langcode resolves to the site default.
    */
   public function testRuntimeMissingLangcodeResolvesToSiteDefault(): void {
-    $event = new ConfigLangcodeResolveEvent('config_test.dynamic.foo', NULL, ConfigLangcodeContext::Runtime);
+    $event = new ConfigLangcodeResolveEvent(NULL, ConfigLangcodeContext::Runtime);
     $this->subscriberWithSiteDefault('fr')->onResolveLangcode($event);
     $this->assertSame('fr', $event->getLangcode());
     $this->assertTrue($event->isLangcodeSupported('fr'));
@@ -45,11 +45,11 @@ class ConfigLangcodeSiteDefaultSubscriberTest extends UnitTestCase {
    * Tests a missing or English install-time langcode resolves to the default.
    */
   public function testInstallMissingOrEnglishLangcodeResolvesToSiteDefault(): void {
-    $event = new ConfigLangcodeResolveEvent('config_test.settings', NULL, ConfigLangcodeContext::ExtensionInstall);
+    $event = new ConfigLangcodeResolveEvent(NULL, ConfigLangcodeContext::ExtensionInstall);
     $this->subscriberWithSiteDefault('fr')->onResolveLangcode($event);
     $this->assertSame('fr', $event->getLangcode());
 
-    $event = new ConfigLangcodeResolveEvent('config_test.settings', 'en', ConfigLangcodeContext::ExtensionInstall);
+    $event = new ConfigLangcodeResolveEvent('en', ConfigLangcodeContext::ExtensionInstall);
     $this->subscriberWithSiteDefault('fr')->onResolveLangcode($event);
     $this->assertSame('fr', $event->getLangcode());
   }
@@ -58,7 +58,7 @@ class ConfigLangcodeSiteDefaultSubscriberTest extends UnitTestCase {
    * Tests an explicit, unrelated install-time langcode is left alone.
    */
   public function testInstallExplicitOtherLangcodeIsUntouched(): void {
-    $event = new ConfigLangcodeResolveEvent('config_test.settings', 'de', ConfigLangcodeContext::ExtensionInstall);
+    $event = new ConfigLangcodeResolveEvent('de', ConfigLangcodeContext::ExtensionInstall);
     $this->subscriberWithSiteDefault('fr')->onResolveLangcode($event);
     $this->assertSame('de', $event->getLangcode());
     // The site default is still vouched for, even though this configuration
@@ -80,7 +80,7 @@ class ConfigLangcodeSiteDefaultSubscriberTest extends UnitTestCase {
   public function testAlreadyResolvedLangcodeIsNotOverridden(): void {
     // Runtime: a policy subscriber already chose 'en' for configuration
     // that had no langcode of its own.
-    $event = new ConfigLangcodeResolveEvent('config_test.dynamic.foo', NULL, ConfigLangcodeContext::Runtime);
+    $event = new ConfigLangcodeResolveEvent(NULL, ConfigLangcodeContext::Runtime);
     $event->setLangcode('en');
     $this->subscriberWithSiteDefault('fr')->onResolveLangcode($event);
     $this->assertSame('en', $event->getLangcode());
@@ -89,7 +89,7 @@ class ConfigLangcodeSiteDefaultSubscriberTest extends UnitTestCase {
     // configuration back to the English it already had - indistinguishable
     // from "untouched" by value alone, which is exactly why this needs to
     // be tracked explicitly rather than inferred by comparison.
-    $event = new ConfigLangcodeResolveEvent('config_test.settings', 'en', ConfigLangcodeContext::ExtensionInstall);
+    $event = new ConfigLangcodeResolveEvent('en', ConfigLangcodeContext::ExtensionInstall);
     $event->setLangcode('en');
     $this->subscriberWithSiteDefault('fr')->onResolveLangcode($event);
     $this->assertSame('en', $event->getLangcode());
@@ -99,7 +99,7 @@ class ConfigLangcodeSiteDefaultSubscriberTest extends UnitTestCase {
    * Tests the site default is vouched for even when outvoted by a policy.
    */
   public function testSiteDefaultStillVouchedForWhenOutvoted(): void {
-    $event = new ConfigLangcodeResolveEvent('config_test.dynamic.foo', NULL, ConfigLangcodeContext::Runtime);
+    $event = new ConfigLangcodeResolveEvent(NULL, ConfigLangcodeContext::Runtime);
     $event->setLangcode('en');
     $this->subscriberWithSiteDefault('fr')->onResolveLangcode($event);
     $this->assertTrue($event->isLangcodeSupported('fr'));

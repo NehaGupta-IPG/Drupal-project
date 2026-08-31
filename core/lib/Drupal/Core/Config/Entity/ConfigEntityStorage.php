@@ -224,7 +224,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     // Resolve a default language for configuration entities created without
     // an explicit one. An explicit langcode, including 'en', is left alone.
     if (!array_key_exists($this->langcodeKey, $values)) {
-      $event = new ConfigLangcodeResolveEvent($this->getEntityType()->getConfigPrefix(), NULL, ConfigLangcodeContext::Runtime);
+      $event = new ConfigLangcodeResolveEvent(NULL, ConfigLangcodeContext::Runtime);
       $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
       $values[$this->langcodeKey] = $event->getLangcode() ?? 'en';
     }
