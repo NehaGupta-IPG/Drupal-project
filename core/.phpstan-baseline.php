@@ -28858,6 +28858,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/filter/InOperator.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\filter\\\\InOperator\\:\\:submitExposeForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/src/Plugin/views/filter/InOperator.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\filter\\\\InOperator\\:\\:valueForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
