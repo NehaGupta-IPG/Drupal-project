@@ -13,6 +13,9 @@ namespace Drupal\locale\File;
  *     - ::Success if the request was successful
  *     - ::Missing if a 404 occurred
  *     - ::Error if an exception other than 404 is encountered
+ *     - ::NotModified if a conditional request found the file unchanged
+ *   - (optional) file: The downloaded local file. It is only set when a
+ *     conditional fetch downloaded a newer file.
  */
 class RemoteFileInfo {
 
@@ -36,5 +39,12 @@ class RemoteFileInfo {
    * @var int|null
    */
   public ?int $lastModified = NULL;
+
+  /**
+   * The downloaded local file, when a conditional fetch downloaded one.
+   *
+   * @var \Drupal\locale\File\LocaleFile|null
+   */
+  public ?LocaleFile $file = NULL;
 
 }

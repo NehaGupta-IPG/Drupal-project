@@ -16,4 +16,7 @@ enum RemoteFileStatus: int {
   // The file was not found.
   case Missing = 404;
 
+  // The file has not been modified since the given timestamp.
+  case NotModified = 304;
+
 }
