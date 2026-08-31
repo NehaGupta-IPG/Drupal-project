@@ -190,9 +190,19 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
         // start of the head. An import map must be processed by the browser
         // before any module script or module preload, so it has to come
         // before everything else in the head.
-        $import_map_elements = $this->renderImportMap($this->assetResolver->getImportMap(), $assets);
-        if ($import_map_elements) {
-          $variables['head'] = $import_map_elements + ($variables['head'] ?? []);
+        //
+        // The import map is only built during normal site operation. Building
+        // it scans the libraries of all enabled modules, which invokes
+        // hook_library_info_alter(). Some implementations of that hook make
+        // assumptions about the installed site that do not hold during
+        // installation or in maintenance mode, so the import map must not be
+        // built in those contexts.
+        $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
+        if (!$maintenance_mode) {
+          $import_map_elements = $this->renderImportMap($this->assetResolver->getImportMap(), $assets);
+          if ($import_map_elements) {
+            $variables['head'] = $import_map_elements + ($variables['head'] ?? []);
+          }
         }
       }
 

@@ -8,6 +8,7 @@ use Drupal\big_pipe\Render\BigPipeResponse;
 use Drupal\big_pipe\Render\BigPipeResponseAttachmentsProcessor;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Asset\AssetCollectionRendererInterface;
+use Drupal\Core\Asset\AssetQueryStringInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -165,7 +166,8 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
       $this->prophesize(RendererInterface::class)->reveal(),
       $this->prophesize(ModuleHandlerInterface::class)->reveal(),
       $this->prophesize(LanguageManagerInterface::class)->reveal(),
-      $this->prophesize(FileUrlGeneratorInterface::class)->reveal()
+      $this->prophesize(FileUrlGeneratorInterface::class)->reveal(),
+      $this->prophesize(AssetQueryStringInterface::class)->reveal()
     );
   }
 
