@@ -88,6 +88,10 @@ class ExceptionHandler extends BaseExceptionHandler {
         4111 => throw new SchemaPrimaryKeyMustBeDroppedException($message, 0, $exception),
         default => throw new DatabaseExceptionWrapper($message, 0, $exception),
       },
+      '22003' =>  match ($errorCode) {
+        1264 => throw new IntegrityConstraintViolationException($message, $code, $exception),
+        default => throw new DatabaseExceptionWrapper($message, 0, $exception),
+      },
       '42000' =>  match ($errorCode) {
         1071 => throw new SchemaTableKeyTooLargeException($message, $code, $exception),
         1074 => throw new SchemaTableColumnSizeTooLargeException($message, $code, $exception),

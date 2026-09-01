@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\dblog\Functional;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -51,7 +52,6 @@ class UpdatePathTest extends UpdatePathTestBase {
     $this->runUpdates();
 
     // After updates, a negative WID should not be allowed.
-    $connection = Database::getConnection();
     $insert = $connection->insert('watchdog');
     $insert->fields([
       'wid'         => -1000,
@@ -64,6 +64,7 @@ class UpdatePathTest extends UpdatePathTestBase {
       'hostname'    => $base_root,
       'timestamp'   => \Drupal::time()->getRequestTime(),
     ]);
+    $this->expectException(IntegrityConstraintViolationException::class);
     $insert->execute();
   }
 
