@@ -5,12 +5,22 @@ namespace Drupal\system\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Configure logging settings for this site.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/config/development/logging',
+  name: 'system.logging_settings',
+  requirements: [
+    '_permission' => 'administer site configuration',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Logging and errors')],
+)]
 class LoggingForm extends ConfigFormBase {
   use RedundantEditableConfigNamesTrait;
 

@@ -16,7 +16,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 // cspell:ignore apng
 
@@ -25,6 +27,22 @@ use Drupal\Core\Theme\ThemeManagerInterface;
  *
  * @internal
  */
+#[Route(
+  path: '/admin/appearance/settings',
+  name: 'system.theme_settings',
+  requirements: [
+    '_permission' => 'administer themes',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Appearance settings')],
+)]
+#[Route(
+  path: '/admin/appearance/settings/{theme}',
+  name: 'system.theme_settings_theme',
+  requirements: [
+    '_permission' => 'administer themes',
+  ],
+  defaults: ['_title_callback' => 'theme_handler:getName'],
+)]
 class ThemeSettingsForm extends ConfigFormBase {
 
   /**

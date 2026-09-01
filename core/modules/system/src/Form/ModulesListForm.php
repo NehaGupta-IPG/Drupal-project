@@ -20,9 +20,11 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\PermissionHandlerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Utility\Xss;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides module installation interface.
@@ -35,6 +37,16 @@ use Drupal\Component\Utility\Xss;
  *
  * @internal
  */
+#[Route(
+  path: '/admin/modules',
+  name: 'system.modules_list',
+  requirements: [
+    '_permission' => 'administer modules',
+  ],
+  defaults: [
+    '_title' => new TranslatableMarkup('Extend', [], ['context' => 'With components']),
+  ],
+)]
 class ModulesListForm extends FormBase {
 
   use ModuleDependencyMessageTrait;

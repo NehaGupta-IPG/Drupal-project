@@ -7,11 +7,21 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteBuilderInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Configure System settings for this site.
  */
+#[Route(
+  path: '/admin/config/services/linkset',
+  name: 'system.linkset_settings',
+  requirements: [
+    '_permission' => 'administer site configuration',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Menu Linkset Settings')],
+)]
 class MenuLinksetSettingsForm extends ConfigFormBase {
 
   /**

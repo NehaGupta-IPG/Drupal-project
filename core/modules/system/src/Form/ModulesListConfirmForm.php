@@ -9,14 +9,24 @@ use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Builds a confirmation form for enabling modules with dependencies.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/modules/list/confirm',
+  name: 'system.modules_list_confirm',
+  requirements: [
+    '_permission' => 'administer modules',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Some required modules must be installed')],
+)]
 class ModulesListConfirmForm extends ConfirmFormBase {
 
   use ModulesEnabledTrait;

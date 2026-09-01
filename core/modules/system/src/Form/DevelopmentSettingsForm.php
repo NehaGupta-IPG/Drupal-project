@@ -6,13 +6,23 @@ use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Configure development settings for this site.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/config/development/settings',
+  name: 'system.development_settings',
+  requirements: [
+    '_permission' => 'administer site configuration',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Development settings')],
+)]
 class DevelopmentSettingsForm extends FormBase {
 
   /**

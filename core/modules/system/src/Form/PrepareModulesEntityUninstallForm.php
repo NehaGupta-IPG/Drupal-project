@@ -13,12 +13,22 @@ use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides a form removing module content entities data before uninstallation.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/modules/uninstall/entity/{entity_type_id}',
+  name: 'system.prepare_modules_entity_uninstall',
+  requirements: [
+    '_permission' => 'administer modules',
+    '_custom_access' => self::class . '::checkAccess',
+  ],
+  defaults: ['_title_callback' => self::class . '::formTitle'],
+)]
 class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
 
   /**

@@ -9,15 +9,25 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Builds a confirmation form to uninstall selected modules.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/modules/uninstall/confirm',
+  name: 'system.modules_uninstall_confirm',
+  requirements: [
+    '_permission' => 'administer modules',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Confirm uninstall')],
+)]
 class ModulesUninstallConfirmForm extends ConfirmFormBase {
   use ConfigDependencyDeleteFormTrait;
 

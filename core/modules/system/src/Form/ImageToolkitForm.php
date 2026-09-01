@@ -7,13 +7,23 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\ImageToolkit\ImageToolkitManager;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Configures image toolkit settings for this site.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/config/media/image-toolkit',
+  name: 'system.image_toolkit_settings',
+  requirements: [
+    '_permission' => 'administer site configuration',
+  ],
+  defaults: ['_title' => new TranslatableMarkup('Image toolkit')],
+)]
 class ImageToolkitForm extends ConfigFormBase {
 
   /**
