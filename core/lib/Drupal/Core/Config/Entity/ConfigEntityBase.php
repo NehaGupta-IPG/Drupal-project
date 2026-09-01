@@ -242,8 +242,8 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
 
   /**
    * Sorts entities by weight and label (using the natural sort order).
-   * 
-   * If this method is overwritten, it is important to use 
+   *
+   * If this method is overwritten, it is important to use
    * SortArray::createSortCollator() in order to get the collator and pass it
    * to the compare() function to preserve multilingual natural sorting.
    */
@@ -255,11 +255,12 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   }
 
   /**
-   * Callback for uasort() to compare entities by weight and label (using the 
-   * natural sort order).
-   * 
-   * If this method is overwritten, it is important to use 
-   * SortArray::sortByString() to compare labels and pass it the collator to 
+   * Callback for uasort() to compare entities by weight and label.
+   *
+   * The comparison uses the natural sort order.
+   *
+   * If this method is overwritten, it is important to use
+   * SortArray::sortByString() to compare labels and pass it the collator to
    * preserve multilingual natural sorting.
    */
   public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, ?\Collator $collator): int {
