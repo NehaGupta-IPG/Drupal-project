@@ -66,6 +66,10 @@ final class Helper {
         'label' => t('Violet'),
         'hex' => '#5e3b9e',
       ],
+      'neutral' => [
+        'label' => t('Neutral'),
+        'hex' => '#555960',
+      ],
       'custom' => [
         'label' => t('Custom'),
         // Fallback value.

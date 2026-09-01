@@ -369,6 +369,137 @@ JS;
   }
 
   /**
+   * Every accent picker swatch must stay visible against its adjacent surface.
+   *
+   * The swatch preview (--admin-color-accent-preview) is presentation-only:
+   * Light resolves the source accent identity, Dark resolves the visible
+   * foreground-safe accent (so dark mode no longer collapses the swatch into
+   * the dark surface). The raw input has no border by default, so the swatch
+   * boundary must read >= 3:1 (WCAG 1.4.11 non-text) against the actual
+   * surface it sits on in each appearance. Auto is covered by forcing the
+   * root colour-scheme to the intended branch; the two forced branches are
+   * also compared to Light/Dark so an Auto regression cannot slip through.
+   *
+   * The preview token references only --accent-base (light) and
+   * --admin-color-accent-fg (dark). Increase-contrast mode overrides
+   * --admin-color-accent-fg with the identical dark formula and leaves
+   * --accent-base untouched, so the preview is invariant under that mode and
+   * no separate HC case is needed here.
+   */
+  public function testAccentSwatchRenderedContrast(): void {
+    $presets = Helper::accentColors();
+    unset($presets['custom']);
+    $cases = [
+      'Light' => ['mode' => '0', 'scheme' => 'light'],
+      'Dark' => ['mode' => '1', 'scheme' => 'dark'],
+      'Auto-light' => ['mode' => 'auto', 'scheme' => 'auto-light'],
+      'Auto-dark' => ['mode' => 'auto', 'scheme' => 'auto-dark'],
+    ];
+    $fillByScheme = [];
+    foreach ($cases as $caseLabel => $case) {
+      $this->config('default_admin.settings')
+        ->set('enable_dark_mode', $case['mode'])
+        ->set('preset_accent_color', 'cobalt')
+        ->save();
+      $this->drupalGet('/admin/appearance/settings/default_admin');
+      $this->assertSession()->statusCodeEquals(200);
+      $ratios = $this->getSession()->evaluateScript($this->accentSwatchScript($case['scheme']));
+      foreach ($presets as $name => $info) {
+        $this->assertArrayHasKey($name, $ratios, sprintf('%s: swatch "%s" found.', $caseLabel, $name));
+        $this->assertGreaterThanOrEqual(
+          3.0,
+          $ratios[$name]['ratio'],
+          sprintf('%s: swatch "%s" preview %s vs adjacent %s must be >=3:1 (got %.2f:1).', $caseLabel, $name, $ratios[$name]['fill'], $ratios[$name]['adjacent'], $ratios[$name]['ratio'])
+        );
+        $fillByScheme[$case['scheme']][$name] = $ratios[$name]['fill'];
+      }
+    }
+    foreach ($presets as $name => $info) {
+      $this->assertEquals(
+        $fillByScheme['light'][$name],
+        $fillByScheme['auto-light'][$name],
+        sprintf('Auto-light swatch "%s" must equal the explicit Light preview (got %s vs %s).', $name, $fillByScheme['light'][$name], $fillByScheme['auto-light'][$name])
+      );
+      $this->assertEquals(
+        $fillByScheme['dark'][$name],
+        $fillByScheme['auto-dark'][$name],
+        sprintf('Auto-dark swatch "%s" must equal the explicit Dark preview (got %s vs %s).', $name, $fillByScheme['dark'][$name], $fillByScheme['auto-dark'][$name])
+      );
+    }
+  }
+
+  /**
+   * Script resolving every preset swatch preview against its adjacent surface.
+   *
+   * Forces the root colour-scheme so light-dark() resolves to the requested
+   * branch independently of the operating system (needed for Auto), reads each
+   * non-custom swatch's computed background plus the nearest opaque ancestor's
+   * background, and returns WCAG ratios of the two.
+   */
+  protected function accentSwatchScript(string $scheme): string {
+    $target = match ($scheme) {
+      'light', 'auto-light' => 'light',
+      'dark', 'auto-dark' => 'dark',
+    };
+    return <<<JS
+(function () {
+  document.documentElement.style.colorScheme = '$target';
+  function lum(s) {
+    if (!CSS.supports('color', s)) {
+      throw new Error('Unsupported computed color: ' + s);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) {
+      throw new Error('Canvas 2D context unavailable while resolving: ' + s);
+    }
+    ctx.fillStyle = s;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    if (a !== 255) {
+      throw new Error('Expected opaque computed color, got: ' + s);
+    }
+    const f = value => {
+      const x = value / 255;
+      return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  }
+  function ratio(a, b) { const A = Math.max(a, b), B = Math.min(a, b); return (A + 0.05) / (B + 0.05); }
+  const out = {};
+  document.querySelectorAll('input[name="preset_accent_color"]').forEach((inp) => {
+    const key = inp.getAttribute('data-gin-accent');
+    if (!key || key === 'custom') {
+      return;
+    }
+    const fill = getComputedStyle(inp).backgroundColor;
+    let el = inp, adjacent = null;
+    while (el && !adjacent) {
+      el = el.parentElement;
+      if (!el) {
+        break;
+      }
+      const bg = getComputedStyle(el).backgroundColor;
+      if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+        adjacent = bg;
+      }
+    }
+    if (!adjacent) {
+      throw new Error('No adjacent opaque surface found for swatch: ' + key);
+    }
+    out[key] = {
+      fill,
+      adjacent,
+      ratio: ratio(lum(fill), lum(adjacent)),
+    };
+  });
+  return out;
+})()
+JS;
+  }
+
+  /**
    * Script resolving the focus colour for a preset against the surfaces.
    */
   protected function focusPresetScript(string $preset): string {

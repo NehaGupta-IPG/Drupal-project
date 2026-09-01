@@ -33,7 +33,7 @@
       &:focus:checked,
       &:focus,
       &:checked {
-        background-color: var(--admin-color-primary);
+        background-color: var(--admin-color-accent-preview);
       }
 
       &[data-gin-accent="custom"] {
@@ -53,7 +53,7 @@
 
     input,
     .gin--dark-mode & input {
-      background-color: var(--admin-color-primary);
+      background-color: var(--admin-color-accent-preview);
     }
 
     .form-item__label {

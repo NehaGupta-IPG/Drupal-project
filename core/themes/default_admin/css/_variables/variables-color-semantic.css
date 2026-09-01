@@ -25,6 +25,17 @@
   --admin-color-bg-item-hover: var(--admin-color-accent-030);
 
   /*
+   * Accent preview (settings UI only).
+   *
+   * Presents an accent choice in the Appearance settings picker. In light mode
+   * it shows the source accent identity; in dark mode it shows the
+   * foreground-safe, visible representation of that hue so a dark fill does
+   * not collapse into the dark settings surface. Presentation-only — it is not
+   * used for accent fills, links, or other application UI.
+   */
+  --admin-color-accent-preview: light-dark(var(--accent-base), var(--admin-color-accent-fg));
+
+  /*
    * Semantic tokens (tier 2).
    */
   /*
