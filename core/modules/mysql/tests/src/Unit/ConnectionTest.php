@@ -10,6 +10,7 @@ use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 // cspell:ignore djarin grogu kuiil
 

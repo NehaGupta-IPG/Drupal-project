@@ -444,11 +444,13 @@ abstract class Database {
       throw new ConnectionNotDefinedException('The specified database connection is not defined: ' . $key);
     }
 
-    if (!self::$databaseInfo[$key][$target]->driver) {
+    $connection_parameters = self::$databaseInfo[$key][$target];
+    $driver = property_exists($connection_parameters, 'driver') ? $connection_parameters->driver : NULL;
+
+    if (!$driver) {
       throw new DriverNotSpecifiedException('Driver not specified for this database connection: ' . $key);
     }
 
-    $connection_parameters = self::$databaseInfo[$key][$target];
     $driver_class = $connection_parameters->getConnectionClass();
     $options = property_exists($connection_parameters, 'driver') ? $connection_parameters : $connection_parameters->toArray();
     $client_connection = $driver_class::open($options);
@@ -489,11 +491,13 @@ abstract class Database {
       $key = self::$activeKey;
     }
     if (isset($target) && isset(self::$connections[$key][$target])) {
+      // @phpstan-ignore method.deprecated
       self::$connections[$key][$target]->commitAll();
       unset(self::$connections[$key][$target]);
     }
     elseif (isset(self::$connections[$key])) {
       foreach (self::$connections[$key] as $connection) {
+        // @phpstan-ignore method.deprecated
         $connection->commitAll();
       }
       unset(self::$connections[$key]);
