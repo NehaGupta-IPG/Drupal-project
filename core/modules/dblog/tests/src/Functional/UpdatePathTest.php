@@ -48,7 +48,12 @@ class UpdatePathTest extends UpdatePathTestBase {
       'hostname'    => $base_root,
       'timestamp'   => \Drupal::time()->getRequestTime(),
     ]);
-    $insert->execute();
+    try {
+      $insert->execute();
+    }
+    catch (DatabaseExceptionWrapper) {
+      // PostgreSQL does not allow negative WID even prior the update.
+    }
 
     $this->runUpdates();
 
