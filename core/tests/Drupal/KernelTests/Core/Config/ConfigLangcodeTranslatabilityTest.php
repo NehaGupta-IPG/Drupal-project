@@ -78,4 +78,32 @@ class ConfigLangcodeTranslatabilityTest extends KernelTestBase {
     $this->assertNull($config->get('langcode'));
   }
 
+  /**
+   * Tests a newly added langcode lands in schema order, not trailing at the end.
+   *
+   * The castValue() method sorts $this->data into schema order before
+   * reconcileLangcodeWithTranslatability() runs, so a langcode it then adds
+   * is not part of that sort and lands wherever PHP puts a newly assigned
+   * array key: at the end. Left uncorrected, the very next unrelated save
+   * would silently re-sort it into its schema position instead, since by
+   * then it is just another already-present key - changing the stored key
+   * order between two saves of otherwise-identical data, a spurious diff
+   * for anyone who exported in between.
+   */
+  public function testLangcodeAddedInSchemaOrder(): void {
+    $config = $this->config('config_test.langcode_test');
+    $config->set('untranslatable_value', 'foo')->save();
+
+    // This save adds langcode for the first time.
+    $config->set('optional_translatable_value', 'Hello')->save();
+    $keys_after_add = array_keys($config->getRawData());
+
+    // This save only changes an already-present value: no key is added or
+    // removed, so any difference in order can only come from re-sorting.
+    $config->set('untranslatable_value', 'bar')->save();
+    $keys_after_unrelated_save = array_keys($config->getRawData());
+
+    $this->assertSame($keys_after_unrelated_save, $keys_after_add);
+  }
+
 }
