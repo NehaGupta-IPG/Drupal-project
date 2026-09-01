@@ -4,8 +4,11 @@ namespace Drupal\Core\Config\Entity;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
+use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigImporterException;
+use Drupal\Core\Config\ConfigLangcodeContext;
+use Drupal\Core\Config\ConfigLangcodeResolveEvent;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageBase;
@@ -15,6 +18,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Defines the storage class for configuration entities.
@@ -84,6 +88,13 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   protected $overrideFree = FALSE;
 
   /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * Constructs a ConfigEntityStorage object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -96,13 +107,24 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    *   The language manager.
    * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
    *   The memory cache backend.
+   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null $event_dispatcher
+   *   The event dispatcher.
    */
-  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache) {
+  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache, ?EventDispatcherInterface $event_dispatcher = NULL) {
     parent::__construct($entity_type, $memory_cache);
 
     $this->configFactory = $config_factory;
     $this->uuidService = $uuid_service;
     $this->languageManager = $language_manager;
+    if ($event_dispatcher === NULL) {
+      // @todo Decide if we want to trigger a deprecation here. Alternatively,
+      //   we could allow the config factory to trigger the event and call it
+      //   from here.
+      // @phpcs:ignore
+      // @trigger_error('Calling ' . __CLASS__ . '::__construct() without the $event_dispatcher argument is deprecated in drupal:11.5.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3337864', E_USER_DEPRECATED);
+      $event_dispatcher = \Drupal::service('event_dispatcher');
+    }
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -114,7 +136,8 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       $container->get('config.factory'),
       $container->get('uuid'),
       $container->get('language_manager'),
-      $container->get('entity.memory_cache')
+      $container->get('entity.memory_cache'),
+      $container->get('event_dispatcher')
     );
   }
 
@@ -198,8 +221,13 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    * {@inheritdoc}
    */
   protected function doCreate(array $values) {
-    // Set default language to current language if not provided.
-    $values += [$this->langcodeKey => $this->languageManager->getCurrentLanguage()->getId()];
+    // Resolve a default language for configuration entities created without
+    // an explicit one. An explicit langcode, including 'en', is left alone.
+    if (!array_key_exists($this->langcodeKey, $values)) {
+      $event = new ConfigLangcodeResolveEvent($this->getEntityType()->getConfigPrefix(), NULL, ConfigLangcodeContext::Runtime);
+      $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
+      $values[$this->langcodeKey] = $event->getLangcode() ?? 'en';
+    }
     $entity_class = $this->getEntityClass();
     $entity = new $entity_class($values, $this->entityTypeId);
 

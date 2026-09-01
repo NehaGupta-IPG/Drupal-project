@@ -10,6 +10,7 @@ use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\language\ConfigurableLanguageManager;
 use Drupal\language\ConfigurableLanguageManagerInterface;
+use Drupal\language\Exception\DeleteDefaultConfigLanguageException;
 use Drupal\language\Exception\DeleteDefaultLanguageException;
 use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\language\Form\LanguageAddForm;
@@ -176,18 +177,34 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
    * @throws \Drupal\language\Exception\DeleteDefaultLanguageException
    *   Exception thrown if we're trying to delete the default language entity.
    *   This is not allowed as a site must have a default language.
+   * @throws \Drupal\language\Exception\DeleteDefaultConfigLanguageException
+   *   Exception thrown if we're trying to delete the configuration default
+   *   language entity. This is not allowed because configuration installed
+   *   or created without an explicit langcode resolves to this language.
    */
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
     $default_langcode = static::getDefaultLangcode();
+    $default_config_langcode = static::getDefaultConfigLangcode();
     foreach ($entities as $entity) {
-      if ($entity->id() == $default_langcode && !$entity->isUninstalling()) {
+      if ($entity->isUninstalling()) {
+        continue;
+      }
+      if ($entity->id() == $default_langcode) {
         throw new DeleteDefaultLanguageException('Can not delete the default language');
+      }
+      if ($entity->id() == $default_config_langcode) {
+        throw new DeleteDefaultConfigLanguageException('Can not delete the configuration default language');
       }
     }
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @todo https://www.drupal.org/i/3337864 Handle deletion of a language
+   *   that default collection configuration is still using as its langcode:
+   *   delete that configuration. Also prevent uninstalling this module while
+   *   the configuration default language is not English.
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
     parent::postDelete($storage, $entities);
@@ -219,6 +236,16 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
   protected static function getDefaultLangcode() {
     $language = \Drupal::service('language.default')->get();
     return $language->getId();
+  }
+
+  /**
+   * Gets the configuration default langcode.
+   *
+   * @return string
+   *   The current configuration default langcode.
+   */
+  protected static function getDefaultConfigLangcode() {
+    return \Drupal::config('language.settings')->get('default_config_langcode') ?? 'en';
   }
 
   /**

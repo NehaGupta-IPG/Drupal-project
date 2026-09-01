@@ -2,12 +2,49 @@
 
 /**
  * @file
- * Update functions for Language module.
+ * Install, update and uninstall functions for the Language module.
  */
+
+use Drupal\Core\Installer\InstallerKernel;
+
+/**
+ * Implements hook_install().
+ */
+function language_install(bool $is_syncing): void {
+  if ($is_syncing) {
+    return;
+  }
+
+  global $install_state;
+  // If language module is being installed as part of the site installer,
+  // the configuration default language is the language the user chose there.
+  // Otherwise language module is being installed on an already-running site
+  // that has been English-only until now, so there is nothing else it could
+  // be.
+  $langcode = 'en';
+  if (InstallerKernel::installationAttempted() && isset($install_state['parameters']['langcode'])) {
+    $langcode = $install_state['parameters']['langcode'];
+  }
+  \Drupal::configFactory()->getEditable('language.settings')
+    ->set('default_config_langcode', $langcode)
+    ->save();
+}
 
 /**
  * Implements hook_update_last_removed().
  */
 function language_update_last_removed(): int {
   return 8001;
+}
+
+/**
+ * Backfill the configuration default language for existing sites.
+ */
+function language_update_11502(): void {
+  $language_settings = \Drupal::configFactory()->getEditable('language.settings');
+  if ($language_settings->get('default_config_langcode') === NULL) {
+    $language_settings
+      ->set('default_config_langcode', \Drupal::configFactory()->get('system.site')->get('default_langcode'))
+      ->save();
+  }
 }

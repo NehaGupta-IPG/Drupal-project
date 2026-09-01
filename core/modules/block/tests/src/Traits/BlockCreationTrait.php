@@ -45,13 +45,14 @@ trait BlockCreationTrait {
       'plugin' => $plugin_id,
       'region' => 'content',
       'id' => $this->randomMachineName(8),
+      'langcode' => 'en',
       'theme' => $config->get('system.theme')->get('default'),
       'label' => $this->randomMachineName(8),
       'visibility' => [],
       'weight' => 0,
     ];
     $values = [];
-    foreach (['region', 'id', 'theme', 'plugin', 'weight', 'visibility'] as $key) {
+    foreach (['region', 'id', 'langcode', 'theme', 'plugin', 'weight', 'visibility'] as $key) {
       $values[$key] = $settings[$key];
       // Remove extra values that do not belong in the settings array.
       unset($settings[$key]);

@@ -438,6 +438,10 @@ services:
     autowire: true
   config.importer_subscriber:
     class: Drupal\Core\Config\Importer\FinalMissingContentSubscriber
+  config.langcode_fallback_subscriber:
+    class: Drupal\Core\Config\EventSubscriber\ConfigLangcodeFallbackSubscriber
+  config.langcode_installer_subscriber:
+    class: Drupal\Core\Config\EventSubscriber\ConfigLangcodeInstallerSubscriber
   config.installer:
     class: Drupal\Core\Config\ConfigInstaller
     arguments: ['@config.factory', '@config.storage', '@config.typed', '@config.manager', '@event_dispatcher', '%install_profile%', '@extension.path.resolver']

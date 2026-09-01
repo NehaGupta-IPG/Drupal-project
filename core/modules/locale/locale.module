@@ -258,7 +258,7 @@ function locale_system_update(array $components): void {
     // components. Do this even if import is not enabled because parsing new
     // configuration may expose new source strings.
     $module_handler->loadInclude('locale', 'inc', 'locale.bulk');
-    if ($batch = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], [], [], TRUE)) {
+    if ($batch = \Drupal::service(LocaleConfigBatch::class)->buildBatch([], [], [])) {
       batch_set($batch);
     }
   }

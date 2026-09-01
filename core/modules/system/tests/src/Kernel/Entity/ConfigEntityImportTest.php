@@ -60,6 +60,7 @@ class ConfigEntityImportTest extends KernelTestBase {
     $name = 'system.action.apple';
     $entity = Action::create([
       'id' => 'apple',
+      'langcode' => 'en',
       'plugin' => 'action_message_action',
     ]);
     $entity->save();
@@ -84,6 +85,7 @@ class ConfigEntityImportTest extends KernelTestBase {
       'label' => 'Red Delicious',
       'theme' => 'stark',
     ]);
+    $block->set('langcode', 'en')->save();
 
     $this->checkSinglePluginConfigSync($block, 'settings', 'label', 'Red Delicious');
 
@@ -172,6 +174,7 @@ class ConfigEntityImportTest extends KernelTestBase {
     /** @var \Drupal\config_test\Entity\ConfigTest $entity */
     $entity = Action::create([
       'id' => 'third_party_settings_test',
+      'langcode' => 'en',
       'plugin' => 'action_message_action',
     ]);
     $entity->save();

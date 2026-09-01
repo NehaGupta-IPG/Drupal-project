@@ -40,6 +40,29 @@ class LocaleConfigSubscriberForeignTest extends LocaleConfigSubscriberTest {
   /**
    * {@inheritdoc}
    */
+  protected function setUpDefaultLanguage(): void {
+    // Setting the configuration default language here, before setUp()
+    // installs locale_test's shipped configuration, means ConfigInstaller
+    // relabels that configuration to 'hu' as it installs it (see
+    // \Drupal\Core\Config\ConfigInstaller::resolveInstalledLangcode()).
+    // updateConfigTranslations(), called later in setUp(), then finds the
+    // active langcode already matches 'hu' and merges in the actual
+    // translated strings via its active-configuration branch, rather than
+    // creating a translation override. So by the time a test method runs,
+    // locale_test's shipped configuration is both labelled 'hu' and holds
+    // the translated values - see testDefaultConfigLanguage().
+    parent::setUpDefaultLanguage();
+    $this->config('system.site')
+      ->set('default_langcode', 'hu')
+      ->save();
+    $this->config('language.settings')
+      ->set('default_config_langcode', 'hu')
+      ->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUpLocale(): void {
     parent::setUpLocale();
     $this->setUpTranslation('locale_test.translation', 'test', 'English test', 'Hungarian test', 'hu', TRUE);
