@@ -15,6 +15,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\Exception\BrokenPostRequestException;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -1165,12 +1166,11 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // a response header.
       $element['#attached']['drupalSettings']['ajaxTrustedUrl'][$element['#action']] = TRUE;
 
-      // If a form contains a single textfield, and the ENTER key is pressed
-      // within it, Internet Explorer submits the form with no POST data
-      // identifying any submit button. Other browsers submit POST data as
-      // though the user clicked the first button. Therefore, to be as
-      // consistent as we can be across browsers, if no 'triggering_element' has
-      // been identified yet, default it to the first button.
+      // A form submission can contain no data identifying a submit button,
+      // for example when a form is submitted via GET, or when the ENTER key
+      // is pressed within a single textfield. If no triggering element has
+      // been identified, default it to the first button to keep form
+      // processing consistent with submissions that include button data.
       $buttons = $form_state->getButtons();
       if (!$form_state->isProgrammed() && !$form_state->getTriggeringElement() && !empty($buttons)) {
         $form_state->setTriggeringElement($buttons[0]);
@@ -1292,10 +1292,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
     // Set the element's #value property.
     if (!isset($element['#value']) && !array_key_exists('#value', $element)) {
-      $value_callable = $element['#value_callback'] ?? NULL;
-      if (!is_callable($value_callable)) {
-        $value_callable = '\Drupal\Core\Render\Element\FormElementBase::valueCallback';
-      }
+      $value_callable = $element['#value_callback'] ?? FormElementBase::class . '::valueCallback';
+      $value_callable = $this->callableResolver->getCallableFromDefinition($form_state->prepareCallback($value_callable));
 
       if ($process_input) {
         // Get the input for the current element. NULL values in the input need
