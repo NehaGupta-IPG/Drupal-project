@@ -21,6 +21,7 @@ class ManagedFileValueResolver {
     protected readonly AccountInterface $currentUser,
     protected readonly PrivateKey $privateKey,
     protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly ManagedFileElementHelper $managedFileElementHelper,
   ) {
   }
 
@@ -54,7 +55,7 @@ class ManagedFileValueResolver {
       $return = $input;
 
       // Uploads take priority over all other values.
-      if ($files = file_managed_file_save_upload($element, $form_state)) {
+      if ($files = $this->managedFileElementHelper->managedFileSaveUpload($element, $form_state)) {
         if ($element['#multiple']) {
           $fids = array_merge($fids, array_keys($files));
           $denied_fids = [];
