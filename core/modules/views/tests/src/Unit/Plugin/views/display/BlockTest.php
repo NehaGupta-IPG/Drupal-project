@@ -81,11 +81,12 @@ class BlockTest extends UnitTestCase {
     ];
     $this->blockDisplay = $this->executable->display_handler = $this->getMockBuilder(Block::class)
       ->setConstructorArgs($args)
-      ->onlyMethods(['calculateConfigurationHash'])
+      ->onlyMethods(['calculateConfigurationHash', 'ajaxEnabled'])
       ->getMock();
     $this->blockDisplay->expects($this->once())
       ->method('calculateConfigurationHash')
       ->willReturn('foobar');
+    $this->blockDisplay->method('ajaxEnabled')->willReturn(TRUE);
 
     $this->blockDisplay->view = $this->executable;
 

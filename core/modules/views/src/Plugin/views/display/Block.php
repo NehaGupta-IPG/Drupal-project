@@ -429,15 +429,13 @@ class Block extends DisplayPluginBase {
       $key = $request->query->get('block_config_key');
     }
     if (empty($key)) {
-      // Calculate a brand new key.
-      $this->blockConfigKey = $this->calculateConfigurationHash($config);
-      $key_value_storage = $this->keyValue->get('views_block_overrides');
-      $view_id = $this->view->id();
-      if (!$key_value_storage->has($view_id)) {
-        $key_value_storage->set($view_id, [$this->blockConfigKey => $config]);
-      }
-      else {
-        $existing_config = $key_value_storage->get($view_id);
+      // The stored configuration is only read back on an AJAX rebuild.
+      if ($this->ajaxEnabled()) {
+        // Calculate a brand new key.
+        $this->blockConfigKey = $this->calculateConfigurationHash($config);
+        $key_value_storage = $this->keyValue->get('views_block_overrides');
+        $view_id = $this->view->id();
+        $existing_config = $key_value_storage->get($view_id, []);
         if (!isset($existing_config[$this->blockConfigKey])) {
           $existing_config[$this->blockConfigKey] = $config;
           $key_value_storage->set($view_id, $existing_config);
