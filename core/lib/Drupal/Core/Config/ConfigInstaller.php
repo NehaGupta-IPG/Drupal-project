@@ -7,6 +7,8 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Entity\ConfigDependencyManager;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -78,6 +80,13 @@ class ConfigInstaller implements ConfigInstallerInterface {
   protected $extensionPathResolver;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Constructs the configuration installer.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -94,8 +103,10 @@ class ConfigInstaller implements ConfigInstallerInterface {
    *   The name of the currently active installation profile.
    * @param \Drupal\Core\Extension\ExtensionPathResolver $extension_path_resolver
    *   The extension path resolver.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, StorageInterface $active_storage, TypedConfigManagerInterface $typed_config, ConfigManagerInterface $config_manager, EventDispatcherInterface $event_dispatcher, $install_profile, ExtensionPathResolver $extension_path_resolver) {
+  public function __construct(ConfigFactoryInterface $config_factory, StorageInterface $active_storage, TypedConfigManagerInterface $typed_config, ConfigManagerInterface $config_manager, EventDispatcherInterface $event_dispatcher, $install_profile, ExtensionPathResolver $extension_path_resolver, LanguageManagerInterface $language_manager) {
     $this->configFactory = $config_factory;
     $this->activeStorages[$active_storage->getCollectionName()] = $active_storage;
     $this->typedConfig = $typed_config;
@@ -103,6 +114,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
     $this->eventDispatcher = $event_dispatcher;
     $this->installProfile = $install_profile;
     $this->extensionPathResolver = $extension_path_resolver;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -376,6 +388,25 @@ class ConfigInstaller implements ConfigInstallerInterface {
       $config_names = array_keys($config_to_create);
     }
 
+    // Langcodes this same install run is itself defining, regardless of
+    // where in $config_names each language.entity.* falls or whether
+    // anything installed alongside it declared a dependency on it - computed
+    // lazily below, the first time an explicit langcode turns out not to
+    // already be a configured language, since scanning for them is
+    // unnecessary the other 99.9% of the time.
+    $locally_defined_langcodes = NULL;
+
+    // The langcode missing-or-'en' shipped configuration resolves to. Every
+    // subscriber answers the same question regardless of which config
+    // object is being installed, so this is asked once for the whole
+    // collection rather than once per object.
+    $default_langcode = NULL;
+    if (!$this->isSyncing() && $collection == StorageInterface::DEFAULT_COLLECTION) {
+      $event = new ConfigLangcodeResolveEvent();
+      $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
+      $default_langcode = $event->getLangcode();
+    }
+
     foreach ($config_names as $name) {
       // Allow config factory overriders to use a custom configuration object if
       // they are responsible for the collection.
@@ -405,15 +436,40 @@ class ConfigInstaller implements ConfigInstallerInterface {
             // resolved langcode that Config::save() finds unwarranted is
             // stripped straight back out by its own
             // reconcileLangcodeWithTranslatability().
-            $event = new ConfigLangcodeResolveEvent($config_to_create[$name]['langcode'] ?? NULL, ConfigLangcodeContext::ExtensionInstall);
-            $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
-            if ($event->getLangcode() !== NULL) {
-              $config_to_create[$name]['langcode'] = $event->getLangcode();
-            }
-            if (isset($config_to_create[$name]['langcode']) && !$event->isLangcodeSupported($config_to_create[$name]['langcode'])) {
-              // The configuration ships with an explicit langcode that is not
-              // supported on this site: do not install it at all.
-              continue;
+            $shipped_langcode = $config_to_create[$name]['langcode'] ?? NULL;
+            // A missing or bare 'en' langcode is treated as equivalent to
+            // having none: extension-shipped configuration is assumed to be
+            // English unless it ships with its own explicit langcode.
+            $is_unlabelled = $shipped_langcode === NULL || $shipped_langcode === 'en';
+            // $default_langcode is never NULL here: reaching this point
+            // means the same !$this->isSyncing() &&
+            // $collection == StorageInterface::DEFAULT_COLLECTION check
+            // already caused it to be resolved, above. When not unlabelled,
+            // $shipped_langcode is a real value too, by definition.
+            $resolved_langcode = $is_unlabelled ? $default_langcode : $shipped_langcode;
+            $config_to_create[$name]['langcode'] = $resolved_langcode;
+            // Checked in order of how likely each is to already answer
+            // the question: most resolved langcodes are already configured
+            // languages. Only once that fails is the (rare) locally-defined
+            // case considered, and system.site read as a last resort -
+            // nothing keeps the language manager's notion of the default in
+            // sync with a system.site:default_langcode change unless
+            // language module is installed to do so.
+            if (!array_key_exists($resolved_langcode, $this->languageManager->getLanguages(LanguageInterface::STATE_ALL))) {
+              if (!isset($locally_defined_langcodes)) {
+                $locally_defined_langcodes = [];
+                foreach ($config_names as $config_name) {
+                  if ($this->configManager->getEntityTypeIdByName($config_name) === 'configurable_language') {
+                    $locally_defined_langcodes[] = $config_to_create[$config_name]['id'];
+                  }
+                }
+              }
+              if (!in_array($resolved_langcode, $locally_defined_langcodes, TRUE)
+                && $resolved_langcode !== ($this->configFactory->get('system.site')->get('default_langcode') ?? 'en')) {
+                // The configuration ships with an explicit langcode that is
+                // not supported on this site: do not install it at all.
+                continue;
+              }
             }
           }
         }

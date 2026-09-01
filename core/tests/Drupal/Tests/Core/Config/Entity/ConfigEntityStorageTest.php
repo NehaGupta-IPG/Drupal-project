@@ -13,7 +13,6 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigDuplicateUUIDException;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\ConfigLangcodeContext;
 use Drupal\Core\Config\ConfigLangcodeResolveEvent;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -154,9 +153,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     // would otherwise supply the site's configuration default language.
     $this->eventDispatcher = new EventDispatcher();
     $this->eventDispatcher->addListener(ConfigEvents::RESOLVE_LANGCODE, function (ConfigLangcodeResolveEvent $event): void {
-      if ($event->getContext() === ConfigLangcodeContext::Runtime) {
-        $event->setLangcode('hu');
-      }
+      $event->setLangcode('hu');
     });
 
     $this->entityQuery = $this->prophesize(QueryInterface::class);

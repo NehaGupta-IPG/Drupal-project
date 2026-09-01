@@ -288,21 +288,19 @@ class Config extends StorableConfigBase {
     if (array_key_exists('langcode', $this->data)) {
       return;
     }
-    $event = new ConfigLangcodeResolveEvent(NULL, ConfigLangcodeContext::Runtime);
+    $event = new ConfigLangcodeResolveEvent();
     $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
-    if ($event->getLangcode() !== NULL) {
-      $this->data['langcode'] = $event->getLangcode();
-      // castValue() already sorted $this->data into schema order before
-      // langcode existed as a key, so it landed here at the end instead.
-      // Left alone, the next unrelated save would silently re-sort it into
-      // its schema position, changing the stored key order for no logical
-      // reason - a spurious diff for anyone who exported in between. Sort
-      // it into place now instead, the same way castValue() would have.
-      $mapping = $typed_config->getDataDefinition()['mapping'];
-      if (is_array($mapping)) {
-        $mapping = array_intersect_key($mapping, $this->data);
-        $this->data = array_replace($mapping, $this->data);
-      }
+    $this->data['langcode'] = $event->getLangcode();
+    // castValue() already sorted $this->data into schema order before
+    // langcode existed as a key, so it landed here at the end instead. Left
+    // alone, the next unrelated save would silently re-sort it into its
+    // schema position, changing the stored key order for no logical reason -
+    // a spurious diff for anyone who exported in between. Sort it into place
+    // now instead, the same way castValue() would have.
+    $mapping = $typed_config->getDataDefinition()['mapping'];
+    if (is_array($mapping)) {
+      $mapping = array_intersect_key($mapping, $this->data);
+      $this->data = array_replace($mapping, $this->data);
     }
   }
 

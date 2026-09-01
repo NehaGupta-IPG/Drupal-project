@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Core\Config\ConfigEvents;
-use Drupal\Core\Config\ConfigLangcodeContext;
 use Drupal\Core\Config\ConfigLangcodeResolveEvent;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -20,10 +19,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * the site default - the scenario behind
  * https://git.drupalcode.org/project/config_language_lock/-/work_items/3613944.
  * That policy has to coexist with core's own subscribers: it must win over
- * \Drupal\Core\Config\EventSubscriber\ConfigLangcodeSiteDefaultSubscriber
- * without stopping propagation, since stopping propagation would also
- * prevent language module from vouching for the site's configured
- * languages.
+ * \Drupal\Core\Config\EventSubscriber\ConfigLangcodeSiteDefaultSubscriber by
+ * running first and stopping propagation, the same way core's own installer
+ * subscriber already does.
  *
  * @see \Drupal\Core\Config\ConfigLangcodeResolveEvent::setLangcode()
  */
@@ -47,13 +45,19 @@ class ConfigLangcodeFirstResolverWinsTest extends KernelTestBase {
   }
 
   /**
-   * Registers a listener that always resolves to English, without stopping.
+   * Registers a listener resolving to English when it has an opinion.
+   *
+   * @param bool $should_act
+   *   Whether the policy has an opinion this time. A real policy would base
+   *   this on its own configuration rather than a parameter, but the effect
+   *   on precedence is the same either way: acting resolves the langcode
+   *   and stops propagation, leaving nothing for a later subscriber to do.
    */
-  protected function registerLockToEnglishPolicy(): void {
+  protected function registerLockToEnglishPolicy(bool $should_act = TRUE): void {
     \Drupal::service('event_dispatcher')->addListener(
       ConfigEvents::RESOLVE_LANGCODE,
-      function (ConfigLangcodeResolveEvent $event): void {
-        if ($event->getCurrentLangcode() === NULL || $event->getCurrentLangcode() === 'en') {
+      function (ConfigLangcodeResolveEvent $event) use ($should_act): void {
+        if ($should_act) {
           $event->setLangcode('en');
         }
       },
@@ -75,39 +79,33 @@ class ConfigLangcodeFirstResolverWinsTest extends KernelTestBase {
     ]);
     $entity->save();
 
-    // The policy's choice survives, even though the site default is 'fr'
-    // and nothing stopped propagation.
+    // The policy's choice survives, even though the site default is 'fr' -
+    // stopping propagation kept ConfigLangcodeSiteDefaultSubscriber from
+    // ever running.
     $this->assertSame('en', $entity->language()->getId());
   }
 
   /**
-   * Tests the policy wins for shipped configuration installed at 'en'.
+   * Tests the policy wins over the site default on a bare dispatch.
    */
-  public function testPolicyWinsForExtensionInstall(): void {
+  public function testPolicyWinsOverSiteDefault(): void {
     $this->registerLockToEnglishPolicy();
 
-    $event = new ConfigLangcodeResolveEvent('en', ConfigLangcodeContext::ExtensionInstall);
+    $event = new ConfigLangcodeResolveEvent();
     \Drupal::service('event_dispatcher')->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
 
     $this->assertSame('en', $event->getLangcode());
-    // The site default was still vouched for, even though this
-    // configuration was not resolved to it.
-    $this->assertTrue($event->isLangcodeSupported('fr'));
   }
 
   /**
    * Tests the site default still wins when the policy has no opinion.
    */
   public function testSiteDefaultAppliesWhenPolicyDoesNotAct(): void {
-    $this->registerLockToEnglishPolicy();
+    $this->registerLockToEnglishPolicy(FALSE);
 
-    // Explicitly French: the policy above only ever acts on NULL or 'en',
-    // so this is left for the site-default subscriber to leave alone too -
-    // an explicit, already-supported langcode is never overwritten.
-    $event = new ConfigLangcodeResolveEvent('fr', ConfigLangcodeContext::ExtensionInstall);
+    $event = new ConfigLangcodeResolveEvent();
     \Drupal::service('event_dispatcher')->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
     $this->assertSame('fr', $event->getLangcode());
-    $this->assertTrue($event->isLangcodeSupported('fr'));
   }
 
 }

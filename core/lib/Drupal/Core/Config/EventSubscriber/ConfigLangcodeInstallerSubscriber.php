@@ -31,21 +31,9 @@ class ConfigLangcodeInstallerSubscriber implements EventSubscriberInterface {
     if ($installer_langcode === NULL) {
       return;
     }
-
-    // Vouch for it regardless of whether anything below resolves to it:
-    // shipped configuration can perfectly validly already carry an explicit
-    // langcode that happens to match the language being installed, and
-    // system.site is not reliably readable this early in install for
-    // ConfigLangcodeSiteDefaultSubscriber to vouch for it instead.
-    $event->allowLangcode($installer_langcode);
-
-    $current = $event->getCurrentLangcode();
-    if ($current === NULL || $current === 'en') {
-      // Authoritative: since this runs first, nothing later can second-guess
-      // it - ConfigLangcodeResolveEvent::setLangcode() only ever lets the
-      // first call win.
-      $event->setLangcode($installer_langcode);
-    }
+    // Authoritative: since this runs first, nothing later can second-guess
+    // it - ConfigLangcodeResolveEvent::setLangcode() stops propagation.
+    $event->setLangcode($installer_langcode);
   }
 
   /**

@@ -7,7 +7,6 @@ use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigImporterException;
-use Drupal\Core\Config\ConfigLangcodeContext;
 use Drupal\Core\Config\ConfigLangcodeResolveEvent;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
@@ -224,9 +223,9 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     // Resolve a default language for configuration entities created without
     // an explicit one. An explicit langcode, including 'en', is left alone.
     if (!array_key_exists($this->langcodeKey, $values)) {
-      $event = new ConfigLangcodeResolveEvent(NULL, ConfigLangcodeContext::Runtime);
+      $event = new ConfigLangcodeResolveEvent();
       $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
-      $values[$this->langcodeKey] = $event->getLangcode() ?? 'en';
+      $values[$this->langcodeKey] = $event->getLangcode();
     }
     $entity_class = $this->getEntityClass();
     $entity = new $entity_class($values, $this->entityTypeId);

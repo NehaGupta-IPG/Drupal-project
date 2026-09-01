@@ -4,143 +4,61 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Config;
 
+use Drupal\Component\EventDispatcher\Event;
+
 /**
- * Event fired to resolve the langcode for a configuration object.
+ * Event fired to determine the default langcode for new configuration.
  *
- * Subscribers can do two independent things: resolve a langcode when none, or
- * English, was supplied, and vouch for which langcodes are actually supported
- * on this site.
+ * Dispatched whenever configuration would otherwise be saved with no
+ * meaningful langcode of its own. It carries no information about the
+ * configuration being saved: every subscriber answers the same question -
+ * "what should unlabelled configuration default to right now" - regardless
+ * of what is asking. Whether a particular piece of configuration actually
+ * needs an answer at all is decided by the caller before dispatching; this
+ * event is never dispatched otherwise.
  *
- * Deliberately does not extend \Drupal\Component\EventDispatcher\Event
- * (Symfony's stoppable event base class): stopping propagation would skip
- * whichever subscribers have not run yet, including ones with nothing to do
- * with resolving a langcode - such as ones vouching for what languages are
- * supported, which self::isLangcodeSupported() depends on every subscriber
- * having had a chance to contribute to. self::setLangcode() already gives an
- * earlier, more specific subscriber precedence over a later, more general
- * one without needing to stop anything.
+ * self::setLangcode() stops propagation as soon as a subscriber answers, so
+ * a higher-priority, more specific policy - for example a module always
+ * defaulting new configuration to English regardless of the site default -
+ * takes precedence over a later, more general one (like core's own
+ * site-default subscriber) simply by running first. Stopping propagation
+ * here is safe: unlike an earlier design, no subscriber also uses this event
+ * to vouch for which langcodes are supported - that question is answered
+ * directly from the language manager, wherever it is needed, so nothing is
+ * ever waiting for propagation to continue.
+ *
+ * core.services.yml always registers a subscriber for the site's default
+ * language at the lowest priority, so self::getLangcode() is guaranteed a
+ * value by the time dispatch() returns.
  *
  * @see \Drupal\Core\Config\ConfigEvents::RESOLVE_LANGCODE
  */
-final class ConfigLangcodeResolveEvent {
+final class ConfigLangcodeResolveEvent extends Event {
 
   /**
-   * The resolved langcode, or NULL if nothing has resolved one yet.
+   * The resolved langcode.
    */
-  private ?string $langcode = NULL;
-
-  /**
-   * Langcodes subscribers have vouched for as supported on this site.
-   *
-   * @var string[]
-   */
-  private array $allowedLangcodes = [];
-
-  /**
-   * Constructs a ConfigLangcodeResolveEvent.
-   *
-   * @param string|null $currentLangcode
-   *   The langcode currently present on the configuration, if any.
-   * @param \Drupal\Core\Config\ConfigLangcodeContext $context
-   *   Why the langcode is being resolved.
-   */
-  public function __construct(
-    private readonly ?string $currentLangcode,
-    private readonly ConfigLangcodeContext $context,
-  ) {}
-
-  /**
-   * Gets the current langcode that was present on the configuration.
-   *
-   * @return string|null
-   *   The current langcode, or NULL if none.
-   */
-  public function getCurrentLangcode(): ?string {
-    return $this->currentLangcode;
-  }
-
-  /**
-   * Gets why the langcode is being resolved.
-   *
-   * @return \Drupal\Core\Config\ConfigLangcodeContext
-   *   The context.
-   */
-  public function getContext(): ConfigLangcodeContext {
-    return $this->context;
-  }
+  private string $langcode;
 
   /**
    * Gets the resolved langcode.
    *
-   * @return string|null
-   *   The langcode a subscriber resolved, the current langcode if none has,
-   *   or NULL if there was no current langcode either.
+   * @return string
+   *   The langcode.
    */
-  public function getLangcode(): ?string {
-    return $this->langcode ?? $this->currentLangcode;
+  public function getLangcode(): string {
+    return $this->langcode;
   }
 
   /**
-   * Sets the resolved langcode.
-   *
-   * The first subscriber to call this wins: a later call is silently
-   * ignored. This lets an earlier, more specific subscriber - for example a
-   * module establishing its own default-langcode policy, such as always
-   * defaulting new configuration to English regardless of the site default
-   * - take precedence over a later, more general one (like core's own
-   * site-default subscriber) without needing to stop propagation, which
-   * would also stop unrelated subscribers - such as ones vouching for
-   * supported langcodes - from running.
+   * Sets the resolved langcode, and stops any further subscriber running.
    *
    * @param string $langcode
    *   The langcode to use.
-   *
-   * @return bool
-   *   TRUE if this call resolved the langcode, FALSE if a subscriber had
-   *   already done so and this call was ignored.
    */
-  public function setLangcode(string $langcode): bool {
-    if ($this->langcode !== NULL) {
-      return FALSE;
-    }
+  public function setLangcode(string $langcode): void {
     $this->langcode = $langcode;
-    return TRUE;
-  }
-
-  /**
-   * Vouches for a langcode being supported on this site.
-   *
-   * @param string $langcode
-   *   The langcode.
-   */
-  public function allowLangcode(string $langcode): void {
-    $this->allowedLangcodes[] = $langcode;
-  }
-
-  /**
-   * Vouches for several langcodes being supported on this site.
-   *
-   * @param string[] $langcodes
-   *   The langcodes.
-   */
-  public function allowLangcodes(array $langcodes): void {
-    $this->allowedLangcodes = array_merge($this->allowedLangcodes, $langcodes);
-  }
-
-  /**
-   * Whether the given langcode is supported on this site.
-   *
-   * @param string $langcode
-   *   The langcode to check. There is nothing to check a missing langcode
-   *   against - it is up to whoever dispatched the event to decide what a
-   *   missing langcode means for them.
-   *
-   * @return bool
-   *   TRUE if the langcode has been vouched for by a subscriber, FALSE
-   *   otherwise.
-   */
-  public function isLangcodeSupported(string $langcode): bool {
-    return in_array($langcode, $this->allowedLangcodes, TRUE);
+    $this->stopPropagation();
   }
 
 }
