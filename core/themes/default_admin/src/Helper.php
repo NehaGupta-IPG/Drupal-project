@@ -79,6 +79,21 @@ final class Helper {
   }
 
   /**
+   * Normalizes legacy focus preset keys to the current focus families.
+   */
+  public static function normalizeFocusPreset(?string $preset): string {
+    return match ($preset) {
+      'gin' => 'blue',
+      'claro' => 'green',
+      'orange' => 'amber',
+      'dark' => 'neutral',
+      'accent' => 'blue',
+      'blue', 'green', 'amber', 'neutral', 'custom' => $preset,
+      default => 'blue',
+    };
+  }
+
+  /**
    * Accent color element.
    */
   public static function accentRadios(array $element): array {
