@@ -140,7 +140,9 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
       // Many routes have dots as route name, while some special ones like
       // <front> have <> characters in them.
       $url = $link->getUrlObject();
-      $id = str_replace(['.', '<', '>'], ['-', '', ''], $url->isRouted() ? $url->getRouteName() : $url->getUri());
+      // If URL is not routed, use the same process to get distinct, safe string
+      // as in toolbar_menu_navigation_links().
+      $id = str_replace(['.', '<', '>'], ['-', '', ''], $url->isRouted() ? $url->getRouteName() : _toolbar_get_link_unrouted_url_hash($url));
 
       $subtrees[$id] = $output;
     }

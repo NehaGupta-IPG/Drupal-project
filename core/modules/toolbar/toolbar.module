@@ -30,7 +30,7 @@ function toolbar_menu_navigation_links(array $tree) {
     $url = $link->getUrlObject();
     if (!$url->isRouted()) {
       // This is an unusual case, so just get a distinct, safe string.
-      $id = substr(Crypt::hashBase64($url->getUri()), 0, 16);
+      $id = _toolbar_get_link_unrouted_url_hash($url);
     }
     else {
       $id = str_replace(['.', '<', '>'], ['-', '', ''], $url->getRouteName());
@@ -87,4 +87,17 @@ function _toolbar_get_subtrees_hash() {
   [$subtrees, $cacheability] = toolbar_get_rendered_subtrees();
   $hash = Crypt::hashBase64(serialize($subtrees));
   return [$hash, $cacheability];
+}
+
+/**
+ * Returns a distinct, safe string to use a DOM ID for link with unrouted URL.
+ *
+ * @param \Drupal\Core\Url $url
+ *   The link URL.
+ *
+ * @return string
+ *   The DOM-safe string to use as ID.
+ */
+function _toolbar_get_link_unrouted_url_hash(Url $url): string {
+  return substr(Crypt::hashBase64($url->getUri()), 0, 16);
 }
