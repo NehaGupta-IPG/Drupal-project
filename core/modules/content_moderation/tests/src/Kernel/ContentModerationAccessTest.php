@@ -84,7 +84,7 @@ class ContentModerationAccessTest extends KernelTestBase {
     $result = $node->access('update', $account, TRUE);
     $this->assertFalse($result->isAllowed());
     $this->assertEqualsCanonicalizing(['user.permissions'], $result->getCacheContexts());
-    $this->assertEqualsCanonicalizing(['config:workflows.workflow.editorial', 'node:' . $node->id()], $result->getCacheTags());
+    $this->assertEqualsCanonicalizing(['node:' . $node->id()], $result->getCacheTags());
     $this->assertEquals(CacheBackendInterface::CACHE_PERMANENT, $result->getCacheMaxAge());
 
     $authenticated->grantPermission('use editorial transition create_new_draft');

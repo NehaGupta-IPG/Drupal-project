@@ -221,14 +221,22 @@ class ContentModerationHooks {
     elseif ($operation === 'update' && $moderation_info->isModeratedEntity($entity) && $entity->moderation_state) {
       /** @var \Drupal\content_moderation\StateTransitionValidation $transition_validation */
       $transition_validation = \Drupal::service('content_moderation.state_transition_validation');
+      // The state transition validation service returns a list of transitions
+      // based on the user's permission to use them.
       $valid_transition_targets = $transition_validation->getValidTransitions($entity, $account);
       $access_result = $valid_transition_targets ? AccessResult::neutral() : AccessResult::forbidden('No valid transitions exist for given account.');
       $access_result->addCacheableDependency($entity);
-      $workflow = $moderation_info->getWorkflowForEntity($entity);
-      $access_result->addCacheableDependency($workflow);
-      // The state transition validation service returns a list of transitions
-      // based on the user's permission to use them.
       $access_result->cachePerPermissions();
+
+      // If the user has valid transition targets, then updates to the workflow
+      // entity might invalidate these. However if it has no valid transition
+      // targets, then both the workflow config entity and user permissions
+      // would need to be updated, therefore permission cache contexts are
+      // enough.
+      if ($access_result->isNeutral()) {
+        $workflow = $moderation_info->getWorkflowForEntity($entity);
+        $access_result->addCacheableDependency($workflow);
+      }
     }
     // Do not allow users to delete the state that is configured as the default
     // state for the workflow.

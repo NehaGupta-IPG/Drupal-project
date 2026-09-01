@@ -16,7 +16,7 @@ CacheGetCountByBin:
 CacheSetCount: 226
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
-CacheTagLookupQueryCount: 24
+CacheTagLookupQueryCount: 23
 CacheTagGroupedLookups:
   -
     - entity_types
@@ -82,8 +82,6 @@ CacheTagGroupedLookups:
     - 'node:1:revisions'
   -
     - 'content_moderation_state:1:revisions'
-  -
-    - 'config:workflows.workflow.editorial'
   -
     - 'config:system.menu.main'
   -
