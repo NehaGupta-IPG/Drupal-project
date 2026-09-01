@@ -368,7 +368,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "75fc9e52a69abab878bb0c63e3844402db55a252"
+                "reference": "32b1413ed97a0e6b77cea99d15a5113fbc862c40"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -456,7 +456,7 @@
                 "drupal/core-version": "self.version"
             },
             "suggest": {
-                "ext-intl": "Needed to improve the sorting of non-english languages."
+                "ext-intl": "Improves sorting of non-english languages."
             },
             "bin": [
                 "scripts/dr"
@@ -10337,10 +10337,10 @@
     },
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
+    "platform": {},
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.5.0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
