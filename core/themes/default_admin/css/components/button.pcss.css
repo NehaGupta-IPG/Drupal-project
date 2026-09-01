@@ -141,14 +141,16 @@
  * the fill, which already passes. The global outline is removed so the failing
  * single ring never renders.
  */
-.button--primary:focus,
-#edit-submit.form-submit:focus,
-.ief-entity-submit:focus {
-  outline: none !important;
-  box-shadow:
-    0.1em 0.25em 0.5em var(--admin-color-primary-soft),
-    0 0 0 2px var(--admin-color-focus-gap),
-    0 0 0 5px var(--admin-color-focus);
+@media (forced-colors: none) {
+  .button--primary:focus,
+  #edit-submit.form-submit:focus,
+  .ief-entity-submit:focus {
+    outline: none !important;
+    box-shadow:
+      0.1em 0.25em 0.5em var(--admin-color-primary-soft),
+      0 0 0 2px var(--admin-color-focus-gap),
+      0 0 0 5px var(--admin-color-focus);
+  }
 }
 
 /* Danger button styles */

@@ -157,11 +157,26 @@ class AccentColorContrastJavascriptTest extends WebDriverTestBase {
     return v;
   }
   function lum(s) {
-    const m = s.match(/rgba?\(([^)]+)\)/);
-    if (!m) return 0;
-    const p = m[1].split(',').map(x => parseFloat(x.trim()) / 255);
-    const f = x => x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
-    return 0.2126 * f(p[0]) + 0.7152 * f(p[1]) + 0.0722 * f(p[2]);
+    if (!CSS.supports('color', s)) {
+      throw new Error('Unsupported computed color: ' + s);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) {
+      throw new Error('Canvas 2D context unavailable while resolving: ' + s);
+    }
+    ctx.fillStyle = s;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    if (a !== 255) {
+      throw new Error('Expected opaque computed color, got: ' + s);
+    }
+    const f = value => {
+      const x = value / 255;
+      return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
   }
   function ratio(a,b){ const A=Math.max(a,b), B=Math.min(a,b); return (A+0.05)/(B+0.05); }
   const link = lum(resolve('--admin-color-link','color'));
@@ -203,22 +218,37 @@ JS;
     temp.style[property] = '';
     return value;
   }
-  function parseRGBFloat(s) {
-    const m = s.match(/rgba?\(([^)]+)\)/);
-    if (!m) return null;
-    const p = m[1].split(',').map(x => parseFloat(x.trim()) / 255);
-    const f = x => x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
-    return 0.2126 * f(p[0]) + 0.7152 * f(p[1]) + 0.0722 * f(p[2]);
+  function lum(s) {
+    if (!CSS.supports('color', s)) {
+      throw new Error('Unsupported computed color: ' + s);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) {
+      throw new Error('Canvas 2D context unavailable while resolving: ' + s);
+    }
+    ctx.fillStyle = s;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    if (a !== 255) {
+      throw new Error('Expected opaque computed color, got: ' + s);
+    }
+    const f = value => {
+      const x = value / 255;
+      return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
   }
   function ratio(l1, l2) {
     const a = Math.max(l1, l2), b = Math.min(l1, l2);
     return (a + 0.05) / (b + 0.05);
   }
 
-  const fgLum = parseRGBFloat(resolve('--admin-color-accent-fg', 'color'));
-  const fillLum = parseRGBFloat(resolve('--admin-color-accent-base', 'backgroundColor'));
-  const bgLum = parseRGBFloat(resolve('--admin-color-bg', 'backgroundColor'));
-  const txtLum = parseRGBFloat(resolve('--admin-color-text-on-primary', 'color'));
+  const fgLum = lum(resolve('--admin-color-accent-fg', 'color'));
+  const fillLum = lum(resolve('--admin-color-accent-base', 'backgroundColor'));
+  const bgLum = lum(resolve('--admin-color-bg', 'backgroundColor'));
+  const txtLum = lum(resolve('--admin-color-text-on-primary', 'color'));
 
   return {
     fgOnBg: ratio(fgLum, bgLum),
@@ -318,11 +348,26 @@ JS;
     return v;
   }
   function lum(s) {
-    const m = s.match(/rgba?\(([^)]+)\)/);
-    if (!m) return 0;
-    const p = m[1].split(',').map(x => parseFloat(x.trim()) / 255);
-    const f = x => x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
-    return 0.2126 * f(p[0]) + 0.7152 * f(p[1]) + 0.0722 * f(p[2]);
+    if (!CSS.supports('color', s)) {
+      throw new Error('Unsupported computed color: ' + s);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) {
+      throw new Error('Canvas 2D context unavailable while resolving: ' + s);
+    }
+    ctx.fillStyle = s;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    if (a !== 255) {
+      throw new Error('Expected opaque computed color, got: ' + s);
+    }
+    const f = value => {
+      const x = value / 255;
+      return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
   }
   function ratio(a, b) { const A = Math.max(a, b), B = Math.min(a, b); return (A + 0.05) / (B + 0.05); }
   const text = lum(resolve('--admin-color-text', 'color'));
