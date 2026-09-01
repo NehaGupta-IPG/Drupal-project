@@ -13,7 +13,7 @@ use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Pdo\Pgsql;
 
-// cSpell:ignore ilike nextval
+// cSpell:ignore ilike nextval setval
 
 /**
  * @addtogroup database
@@ -497,6 +497,19 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function truncate($table, array $options = []) {
     return new Truncate($this, $table, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function truncateWithSerialId(string $table): void {
+    // PostgreSQL hands out serial IDs from a sequence, which TRUNCATE leaves
+    // alone unless it is asked to restart it. Asking for it here keeps both in
+    // one statement, so they cannot come apart. Inserting rows afterwards moves
+    // the sequence back up, because the driver issues setval() for explicit
+    // serial values.
+    // @see \Drupal\pgsql\Driver\Database\pgsql\Insert::execute()
+    $this->truncate($table, ['reset_serial_id' => TRUE])->execute();
   }
 
   /**

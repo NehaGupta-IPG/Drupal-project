@@ -8,6 +8,11 @@ use Drupal\Core\Database\Query\Truncate as QueryTruncate;
 
 /**
  * PostgreSQL implementation of \Drupal\Core\Database\Query\Truncate.
+ *
+ * Honors the "reset_serial_id" option by adding RESTART IDENTITY to the
+ * statement, which rewinds the sequences owned by the columns of the table.
+ * TRUNCATE leaves them alone without it, so the option set to FALSE still gets
+ * a TRUNCATE here instead of the slower DELETE.
  */
 class Truncate extends QueryTruncate {
 
@@ -51,7 +56,11 @@ class Truncate extends QueryTruncate {
     // Create a sanitized comment string to prepend to the query.
     $comments = $this->connection->makeComment($this->comments);
 
-    return $comments . 'TRUNCATE {' . $this->connection->escapeTable($this->table) . '} ';
+    // RESTART IDENTITY rewinds the sequences owned by the columns of the table
+    // to their start value, in the same statement that empties the table.
+    $restart_identity = empty($this->queryOptions['reset_serial_id']) ? '' : 'RESTART IDENTITY ';
+
+    return $comments . 'TRUNCATE {' . $this->connection->escapeTable($this->table) . '} ' . $restart_identity;
   }
 
 }

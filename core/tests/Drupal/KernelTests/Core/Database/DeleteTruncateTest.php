@@ -171,4 +171,116 @@ class DeleteTruncateTest extends DatabaseTestBase {
     $this->connection->truncate('a-table-that-does-not-exist')->execute();
   }
 
+  /**
+   * Confirms that emptying a table rewinds its serial ID.
+   */
+  public function testTruncateWithSerialId(): void {
+    $num_records_before = $this->connection->select('test')->countQuery()->execute()->fetchField();
+    $this->assertGreaterThan(1, $num_records_before, 'The table holds more than one row.');
+
+    $this->connection->truncateWithSerialId('test');
+
+    $num_records_after = $this->connection->select('test')->countQuery()->execute()->fetchField();
+    $this->assertEquals(0, $num_records_after);
+
+    // The IDs of the removed rows are forgotten, so the next row gets the
+    // first one again.
+    $this->assertSame(1, $this->insertPerson('Freddie'));
+  }
+
+  /**
+   * Confirms that refilling leaves the serial ID at the highest ID held.
+   */
+  public function testTruncateWithSerialIdRefill(): void {
+    $this->connection->truncateWithSerialId('test');
+
+    // Refill with fewer rows than the table held, so that the next ID ends up
+    // below where the removed rows left it.
+    $this->connection->insert('test')
+      ->fields(['id', 'name', 'age', 'job'])
+      ->values(['id' => 1, 'name' => 'John', 'age' => 25, 'job' => 'Singer'])
+      ->values(['id' => 2, 'name' => 'George', 'age' => 27, 'job' => 'Singer'])
+      ->execute();
+
+    $this->assertSame(3, $this->insertPerson('Freddie'));
+  }
+
+  /**
+   * Confirms that the serial ID is rewound inside a transaction as well.
+   *
+   * Truncate falls back to DELETE inside a transaction, and DELETE leaves the
+   * serial ID of some databases where the removed rows put it.
+   */
+  public function testTruncateWithSerialIdInTransaction(): void {
+    $transaction = $this->connection->startTransaction('test_truncate_with_serial_id');
+
+    $this->connection->truncateWithSerialId('test');
+    $this->assertSame(1, $this->insertPerson('Freddie'));
+
+    $transaction->commitOrRelease();
+    $num_records_after = $this->connection->select('test')->countQuery()->execute()->fetchField();
+    $this->assertEquals(1, $num_records_after);
+  }
+
+  /**
+   * Confirms that a table without a serial ID is emptied as well.
+   */
+  public function testTruncateWithSerialIdWithoutSerialColumn(): void {
+    // The primary key of test_people is not a serial column, so the table has
+    // no serial ID to rewind.
+    $num_records_before = $this->connection->select('test_people')->countQuery()->execute()->fetchField();
+    $this->assertGreaterThan(0, $num_records_before, 'The table is not empty.');
+
+    $this->connection->truncateWithSerialId('test_people');
+
+    $num_records_after = $this->connection->select('test_people')->countQuery()->execute()->fetchField();
+    $this->assertEquals(0, $num_records_after);
+  }
+
+  /**
+   * Emptying a not existing table throws a DatabaseExceptionWrapper.
+   */
+  public function testTruncateWithSerialIdNonExistingTable(): void {
+    $this->expectException(DatabaseExceptionWrapper::class);
+    $this->connection->truncateWithSerialId('a-table-that-does-not-exist');
+  }
+
+  /**
+   * Confirms that the reset_serial_id option set to FALSE keeps the serial ID.
+   *
+   * Every driver empties the table by the fastest statement that leaves the
+   * serial ID where the removed rows put it.
+   */
+  public function testTruncateWithoutResettingSerialId(): void {
+    $last_id = $this->insertPerson('Freddie');
+    $this->assertGreaterThan(1, $last_id);
+
+    $this->connection->truncate('test', ['reset_serial_id' => FALSE])->execute();
+
+    $num_records_after = $this->connection->select('test')->countQuery()->execute()->fetchField();
+    $this->assertEquals(0, $num_records_after);
+
+    // The serial ID carries on from the rows that are gone.
+    $this->assertSame($last_id + 1, $this->insertPerson('Brian'));
+  }
+
+  /**
+   * Inserts a row into the test table without an explicit identifier.
+   *
+   * @param string $name
+   *   The name of the person, unique within the table.
+   *
+   * @return int
+   *   The serial ID the table handed out.
+   */
+  private function insertPerson(string $name): int {
+    return (int) $this->connection->insert('test')
+      ->fields([
+        'name' => $name,
+        'age' => 45,
+        'job' => 'Great singer',
+      ])
+      ->execute();
+  }
+
 }

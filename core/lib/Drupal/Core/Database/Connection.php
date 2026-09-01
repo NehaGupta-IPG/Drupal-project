@@ -952,6 +952,29 @@ abstract class Connection {
   }
 
   /**
+   * Empties a table and rewinds its serial ID.
+   *
+   * A serial ID does not necessarily follow the rows out of a table, so
+   * emptying a table that had rows inserted into it may leave the next ID
+   * higher than it was before. This empties the table and rewinds its serial ID
+   * to the state of a table that never held a row, so that inserting rows with
+   * explicit IDs afterwards leaves it at the highest ID the table holds.
+   *
+   * Rewinding is only meaningful on an emptied table, so the two operations
+   * are one method. Every driver has to implement both, because neither
+   * ::truncate() alone nor rewinding alone is enough on every database.
+   *
+   * @param string $table
+   *   The name of the table, without any prefix.
+   *
+   * @throws \RuntimeException
+   *   When the driver does not know how to rewind a serial ID.
+   */
+  public function truncateWithSerialId(string $table): void {
+    throw new \RuntimeException(sprintf('The %s database driver does not know how to rewind the serial ID of a table. Drivers have to override %s::truncateWithSerialId() to support it.', $this->databaseType(), Connection::class));
+  }
+
+  /**
    * Returns a DatabaseSchema object for manipulating the schema.
    *
    * This method will lazy-load the appropriate schema library file.

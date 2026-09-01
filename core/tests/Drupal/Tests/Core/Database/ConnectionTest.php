@@ -357,6 +357,16 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
+   * Tests Connection::truncateWithSerialId() without a driver method.
+   */
+  public function testTruncateWithSerialIdUnsupported(): void {
+    $connection = new StubConnection($this->createStub(\PDO::class), []);
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessageIs('The stub database driver does not know how to rewind the serial ID of a table. Drivers have to override Drupal\Core\Database\Connection::truncateWithSerialId() to support it.');
+    $connection->truncateWithSerialId('test');
+  }
+
+  /**
    * Data provider for testMakeComments().
    *
    * @return array

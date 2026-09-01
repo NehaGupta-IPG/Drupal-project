@@ -12,6 +12,8 @@ use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 
+// cSpell:ignore autoincrement
+
 /**
  * SQLite implementation of \Drupal\Core\Database\Connection.
  */
@@ -517,6 +519,16 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function truncate($table, array $options = []) {
     return new Truncate($this, $table, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function truncateWithSerialId(string $table): void {
+    // SQLite has no TRUNCATE, so emptying the table leaves the AUTOINCREMENT
+    // high-water mark behind in "sqlite_sequence". The "reset_serial_id" option
+    // makes Truncate drop it.
+    $this->truncate($table, ['reset_serial_id' => TRUE])->execute();
   }
 
   /**

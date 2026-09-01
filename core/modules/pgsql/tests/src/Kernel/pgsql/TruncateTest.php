@@ -34,4 +34,25 @@ class TruncateTest extends DriverSpecificDatabaseTestBase {
     $transaction->rollBack();
   }
 
+  /**
+   * Tests that the reset_serial_id option reaches the SQL statement.
+   */
+  public function testTruncateResetSerialIdSqlStatement(): void {
+    $this->assertStringNotContainsString('RESTART IDENTITY', (string) $this->connection->truncate('test'));
+    $this->assertStringContainsString('TRUNCATE {test} RESTART IDENTITY', (string) $this->connection->truncate('test', ['reset_serial_id' => TRUE]));
+  }
+
+  /**
+   * Tests that the reset_serial_id option set to FALSE keeps TRUNCATE.
+   *
+   * TRUNCATE leaves the sequences alone on its own, so leaving the serial ID
+   * alone does not cost the slower DELETE here.
+   */
+  public function testTruncateWithoutResetSerialIdSqlStatement(): void {
+    $sql = (string) $this->connection->truncate('test', ['reset_serial_id' => FALSE]);
+    $this->assertStringContainsString('TRUNCATE {test}', $sql);
+    $this->assertStringNotContainsString('RESTART IDENTITY', $sql);
+    $this->assertStringNotContainsString('DELETE', $sql);
+  }
+
 }
