@@ -457,7 +457,7 @@ class Block extends DisplayPluginBase {
 
     if (is_numeric($config['items_per_page']) && $config['items_per_page'] > 0) {
       // @todo Delete the intval() in https://www.drupal.org/project/drupal/issues/3521221
-      $this->view->setItemsPerPage($config['items_per_page']);
+      $this->view->setItemsPerPage(intval($config['items_per_page']));
     }
   }
 
