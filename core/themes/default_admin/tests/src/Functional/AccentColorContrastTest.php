@@ -10,13 +10,11 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Verifies the Default Admin accent colours meet WCAG 2.2 AA contrast.
+ * Provides static contrast and color-system regression coverage.
  *
- * Light mode is checked against the presets in Helper::accentColors() (the
- * source of truth for every accent) on both #ffffff and #fefeff. Dark mode
- * is guarded by asserting the fixed token definitions exist in the compiled
- * variables stylesheet; the actual rendered dark-mode contrast is covered by
- * AccentColorContrastJavascriptTest.
+ * This class verifies fixed palette relationships and guards the semantic
+ * color architecture. Browser-resolved Light/Dark/Auto and interaction-state
+ * contrast is covered by AccentColorContrastJavascriptTest.
  */
 #[Group('default_admin')]
 #[RunTestsInSeparateProcesses]
@@ -146,7 +144,15 @@ class AccentColorContrastTest extends BrowserTestBase {
         $l = max($l, $shared_floor);
       }
       $fg = $this->oklchToHex($l, $c * $this->oklchC($info['hex']), $this->oklchH($info['hex']));
-      foreach (['#1b1b1d', '#2a2a2d', '#3b3b3f'] as $bg) {
+      foreach (
+          [
+            '#1b1b1d',
+            '#2a2a2d',
+            '#3b3b3f',
+            '#47474c',
+            '#2d3755',
+          ] as $bg
+        ) {
         $ratio = $this->contrastRatio($fg, $bg);
         $this->assertGreaterThanOrEqual(
           4.5,
@@ -354,17 +360,14 @@ class AccentColorContrastTest extends BrowserTestBase {
   }
 
   /**
-   * Focus-ring presets must reach 3:1 (WCAG 1.4.11 non-text) on every surface.
+   * Fixed focus presets must reach 3:1 on neutral adjacent surfaces.
    *
-   * The focus ring communicates keyboard focus, so it must be distinguishable
-   * against all the neutral surfaces a focused control can sit on: main,
-   * surface, nested, raised, toolbar and control surfaces. Each focus preset is
-   * independent of accent — it is optimised for focus visibility, not brand
-   * identity. The shipped light/dark hex pairs are read from the compiled
-   * stylesheets, resolving the indirection preset (`neutral` →
-   * focus-neutral) through the same token graph the browser follows. Focus no
-   * longer depends on the accent palette: the former "Accent family" option
-   * was removed.
+   * The focus indicator communicates keyboard focus, so each fixed focus family
+   * must remain distinguishable from the neutral surfaces on which focused
+   * controls appear.
+   *
+   * Accent-filled controls use a composite two-part indicator and are verified
+   * separately in rendered browser tests.
    */
   public function testFocusColorContrast(): void {
     $theme = \Drupal::service('extension.list.theme')->getPath('default_admin');
@@ -426,11 +429,13 @@ class AccentColorContrastTest extends BrowserTestBase {
   /**
    * Focus on an accent-filled control uses a two-part indicator.
    *
-   * A single focus ring sits ring-on-fill on the primary colour and fails on
-   * light surfaces (a blue ring on the accent fill is below 3:1).
-   * The focus-gap semantic token inserts a surface ring between the fill and the
-   * focus ring. This guards that the primary button and checked checkbox consume
-   * that two-part indicator, and that it resolves to >= 3:1 against the fill.
+   * A single focus colour cannot reliably contrast with both an accent-filled
+   * control and every surrounding surface. The focus-gap semantic token
+   * separates the component fill from the outer focus ring.
+   *
+   * This test guards the CSS structure and forced-colors behaviour. Rendered
+   * contrast for the complete indicator is covered by
+   * AccentColorContrastJavascriptTest.
    */
   public function testFocusTwoPartIndicatorOnAccentFill(): void {
     $theme = \Drupal::service('extension.list.theme')->getPath('default_admin');
@@ -470,33 +475,19 @@ class AccentColorContrastTest extends BrowserTestBase {
       $checkbox,
       'Checked checkbox focus override must be wrapped in @media (forced-colors: none).',
     );
-
-    // The indicator must differentiate the focus ring from the accent fill.
-    // Light: gap is white (surface), so it separates blue ring from blue fill.
-    $primary_light = '#0047ab';
-    $gap_light = '#ffffff';
-    $ring_light = '#003ecc';
-    $gap_vs_fill = $this->contrastRatio($gap_light, $primary_light);
-    $this->assertGreaterThanOrEqual(3.0, $gap_vs_fill, sprintf('Focus gap on accent fill must be >= 3:1 (got %.2f:1).', $gap_vs_fill));
-    $ring_vs_gap = $this->contrastRatio($ring_light, $gap_light);
-    $this->assertGreaterThanOrEqual(3.0, $ring_vs_gap, sprintf('Focus ring on gap must be >= 3:1 (got %.2f:1).', $ring_vs_gap));
   }
 
   /**
-   * Link / focus / hover must be visible on all surfaces in both modes.
+   * Default link colours remain readable on supported surfaces.
    *
-   * Regression for #0029a5 on #2d3755 (1.04:1) on Appearance Light/Auto.
-   * Light link #003ecc on white must be >=4.5:1. Dark link #99b8ff (blue-200)
-   * and focus #99b8ff must be >=4.5:1 / >=3:1 on every dark surface including
-   * toolbar #2d3755 and raised #47474c. Hover in dark uses accent-fg and is
-   * covered by the accent preset test.
+   * Detailed accent-specific hover, active, focus, and component-state
+   * relationships are tested separately.
    */
-  public function testInteractiveColorContrast(): void {
+  public function testDefaultLinkContrast(): void {
     $light_bgs = ['#ffffff', '#fefeff'];
     $dark_bgs = ['#1b1b1d', '#2a2a2d', '#3b3b3f', '#47474c', '#2d3755'];
     $link_light = '#003ecc';
     $link_dark = '#99b8ff';
-    $focus_dark = '#99b8ff';
 
     foreach ($light_bgs as $bg) {
       $r = $this->contrastRatio($link_light, $bg);
@@ -505,8 +496,6 @@ class AccentColorContrastTest extends BrowserTestBase {
     foreach ($dark_bgs as $bg) {
       $r = $this->contrastRatio($link_dark, $bg);
       $this->assertGreaterThanOrEqual(4.5, $r, sprintf('Link %s on %s must be >=4.5:1 (got %.2f:1).', $link_dark, $bg, $r));
-      $rf = $this->contrastRatio($focus_dark, $bg);
-      $this->assertGreaterThanOrEqual(3.0, $rf, sprintf('Focus %s on %s must be >=3:1 (got %.2f:1).', $focus_dark, $bg, $rf));
     }
     // Document the old bug: #0029a5 on #2d3755 was 1.04:1 (invisible) — fixed by using #99b8ff.
   }
@@ -720,7 +709,7 @@ class AccentColorContrastTest extends BrowserTestBase {
   }
 
   /**
-   * Computes the WCAG 2.1 relative luminance of a #rrggbb (or #rgb) colour.
+   * Computes the WCAG 2.2 relative luminance of a #rrggbb (or #rgb) colour.
    */
   protected function relativeLuminance(string $hex): float {
     $hex = ltrim($hex, '#');
@@ -737,7 +726,7 @@ class AccentColorContrastTest extends BrowserTestBase {
   }
 
   /**
-   * Computes the WCAG 2.1 contrast ratio between two #rrggbb colours.
+   * Computes the WCAG 2.2 contrast ratio between two #rrggbb colours.
    */
   protected function contrastRatio(string $hex1, string $hex2): float {
     $l1 = $this->relativeLuminance($hex1);

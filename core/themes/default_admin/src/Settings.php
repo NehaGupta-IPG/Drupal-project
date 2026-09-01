@@ -323,7 +323,7 @@ final class Settings implements ContainerInjectionInterface {
       '#title' => $this->t('Focus color picker'),
       '#title_display' => 'invisible',
       '#placeholder' => '#777777',
-      '#default_value' => $account ? $this->get('focus_color', $account) : $this->getDefault('focus_color'),
+      '#default_value' => $focus_preset,
       '#process' => [[__CLASS__, 'processColorPicker']],
     ];
 
