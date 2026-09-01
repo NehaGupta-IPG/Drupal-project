@@ -316,6 +316,169 @@ JS;
   }
 
   /**
+   * Every focus preset keeps >= 3:1 against the main surfaces, rendered.
+   *
+   * --admin-color-focus is switched by data-gin-focus on the element, so each
+   * preset is measured with the matching attribute in place and the active
+   * appearance resolving the correct light-dark() branch.
+   */
+  public function testFocusPresetRendered(): void {
+    $focusPresets = ['blue', 'green', 'amber', 'neutral', 'accent'];
+    $cases = ['Light' => 0, 'Dark' => 1, 'Auto' => 'auto'];
+    $this->config('default_admin.settings')->set('preset_accent_color', 'blue')->save();
+    foreach ($cases as $caseLabel => $mode) {
+      $this->config('default_admin.settings')->set('enable_dark_mode', $mode)->save();
+      $this->drupalGet('/admin/content');
+      $this->assertSession()->statusCodeEquals(200);
+      foreach ($focusPresets as $preset) {
+        $ratios = $this->getSession()->evaluateScript($this->focusPresetScript($preset));
+        foreach (['bg', 'surface', 'nested', 'raised', 'input'] as $surface) {
+          $this->assertGreaterThanOrEqual(
+            3.0,
+            $ratios[$surface],
+            sprintf('%s: focus preset "%s" on %s must be >=3:1 (got %.2f:1).', $caseLabel, $preset, $surface, $ratios[$surface])
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * A meaningful icon stays >= 3:1 on the icon link in each state.
+   *
+   * The icon is drawn with currentColor and only its container background
+   * changes across rest / hover / active. Active uses an accent fill, so the
+   * icon must flip to a contrasting colour (white light, near-black dark).
+   */
+  public function testMeaningfulIconStateContrast(): void {
+    $cases = ['Light' => 0, 'Dark' => 1];
+    $this->config('default_admin.settings')->set('preset_accent_color', 'blue')->save();
+    foreach ($cases as $caseLabel => $mode) {
+      $this->config('default_admin.settings')->set('enable_dark_mode', $mode)->save();
+      $this->drupalGet('/admin/content');
+      $this->assertSession()->statusCodeEquals(200);
+      $ratios = $this->getSession()->evaluateScript($this->iconStateScript());
+      foreach (['rest', 'hover', 'active'] as $state) {
+        $this->assertGreaterThanOrEqual(
+          3.0,
+          $ratios[$state],
+          sprintf('%s: icon on %s background must be >=3:1 (got %.2f:1).', $caseLabel, $state, $ratios[$state])
+        );
+      }
+    }
+  }
+
+  /**
+   * Script resolving the focus colour for a preset against the surfaces.
+   */
+  protected function focusPresetScript(string $preset): string {
+    $json = json_encode($preset);
+    return <<<'JS'
+(function () {
+  const preset = $json;
+  const temp = document.createElement('div');
+  temp.style.display = 'none';
+  temp.setAttribute('data-gin-focus', preset);
+  document.body.appendChild(temp);
+  function resolve(varName, property) {
+    temp.style[property] = 'var(' + varName + ')';
+    const v = getComputedStyle(temp)[property];
+    temp.style[property] = '';
+    return v;
+  }
+  function lum(s) {
+    if (!CSS.supports('color', s)) {
+      throw new Error('Unsupported computed color: ' + s);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) {
+      throw new Error('Canvas 2D context unavailable while resolving: ' + s);
+    }
+    ctx.fillStyle = s;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    if (a !== 255) {
+      throw new Error('Expected opaque computed color, got: ' + s);
+    }
+    const f = value => {
+      const x = value / 255;
+      return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  }
+  function ratio(a, b) { const A = Math.max(a, b), B = Math.min(a, b); return (A + 0.05) / (B + 0.05); }
+  const focus = lum(resolve('--admin-color-focus', 'color'));
+  const surfaces = {
+    bg: '--admin-color-bg',
+    surface: '--admin-color-bg-surface',
+    nested: '--admin-color-bg-surface-nested',
+    raised: '--admin-color-bg-raised',
+    input: '--admin-color-bg-input'
+  };
+  const out = {};
+  for (const key in surfaces) {
+    out[key] = ratio(focus, lum(resolve(surfaces[key], 'backgroundColor')));
+  }
+  return out;
+})()
+JS;
+  }
+
+  /**
+   * Script resolving the rendered icon-link icon vs its state backgrounds.
+   */
+  protected function iconStateScript(): string {
+    return <<<'JS'
+(function () {
+  const temp = document.createElement('div');
+  temp.style.display = 'none';
+  document.body.appendChild(temp);
+  function resolve(varName, property) {
+    temp.style[property] = 'var(' + varName + ')';
+    const v = getComputedStyle(temp)[property];
+    temp.style[property] = '';
+    return v;
+  }
+  function lum(s) {
+    if (!CSS.supports('color', s)) {
+      throw new Error('Unsupported computed color: ' + s);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) {
+      throw new Error('Canvas 2D context unavailable while resolving: ' + s);
+    }
+    ctx.fillStyle = s;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    if (a !== 255) {
+      throw new Error('Expected opaque computed color, got: ' + s);
+    }
+    const f = value => {
+      const x = value / 255;
+      return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  }
+  function ratio(a, b) { const A = Math.max(a, b), B = Math.min(a, b); return (A + 0.05) / (B + 0.05); }
+  const icon = lum(resolve('--admin-color-icon', 'color'));
+  const restBg = lum(resolve('--icon-link-bg-color', 'backgroundColor'));
+  const hoverBg = lum(resolve('--icon-link--hover-bg-color', 'backgroundColor'));
+  const activeBg = lum(resolve('--icon-link--active-bg-color', 'backgroundColor'));
+  const activeIcon = lum(resolve('--icon-link--active-icon-color', 'color'));
+  return {
+    rest: ratio(icon, restBg),
+    hover: ratio(icon, hoverBg),
+    active: ratio(activeIcon, activeBg)
+  };
+})()
+JS;
+  }
+
+  /**
    * Resolves and returns a single computed CSS variable's used colour.
    */
   protected function resolveColor(string $var): string {

@@ -117,7 +117,7 @@
   --admin-color-focus-gap: var(--admin-color-bg-surface);
   /* @todo this is used in box-shadow focus states, which will be phased out in favor of outline. */
   --admin-color-focus-border: light-dark(color-mix(in lch, black 20%, transparent), color-mix(in lch, black 80%, transparent));
-  --admin-color-focus-neutral: light-dark(#545560, #c2c2c2);
+  --admin-color-focus-neutral: light-dark(#4b4f58, #d7dae0);
   --admin-color-text-disabled: light-dark(var(--admin-color-gray-700), #919191);
   --admin-color-bg-disabled: light-dark(#eaeaea, #47474c);
   --admin-color-border-disabled: light-dark(var(--admin-color-gray-300), #646464);

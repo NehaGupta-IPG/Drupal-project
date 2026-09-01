@@ -40,8 +40,9 @@
    * Mix base. These are only used as utilities to compose other colors.
    */
   --admin-color-accent-base: light-dark(var(--accent-base), oklch(from var(--accent-base) calc(l * 0.45) calc(c * 0.9) h));
-  /* Foreground accent (links, active states, focus targets). Lightened and
-     hue-preserved in dark mode so it stays readable on dark surfaces. */
+  /* Foreground accent (links, active states). Lightened and hue-preserved in
+     dark mode so it stays readable on dark surfaces. Also powers the "Accent
+     family" focus option (a foreground-safe accent variation). */
   --admin-color-accent-fg: light-dark(var(--accent-base), oklch(from var(--accent-base) max(calc(l * 1.5), 0.93) calc(c * 1.1) h));
   --accent-mix-base: light-dark(color-mix(in lch, var(--accent-base), white 97%), color-mix(in lch, var(--accent-base), black 80%));
   --accent-mix-base-scheme: light-dark(black, white);

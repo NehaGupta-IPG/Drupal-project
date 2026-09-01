@@ -47,15 +47,19 @@
   --admin-color-bg-sticky: rgb(236, 236, 236);
 }
 
-[data-gin-focus="claro"] {
-  --admin-color-focus: light-dark(#147d4b, #66e2aa);
+[data-gin-focus="blue"] {
+  --admin-color-focus: light-dark(#0050b3, #a9c7ff);
 }
 
-[data-gin-focus="orange"] {
-  --admin-color-focus: light-dark(#af5837, #f4aa82);
+[data-gin-focus="green"] {
+  --admin-color-focus: light-dark(#006b45, #7fe0b5);
 }
 
-[data-gin-focus="dark"] {
+[data-gin-focus="amber"] {
+  --admin-color-focus: light-dark(#795500, #f3c96b);
+}
+
+[data-gin-focus="neutral"] {
   --admin-color-focus: var(--admin-color-focus-neutral);
 }
 
@@ -81,8 +85,8 @@
     --admin-color-border-input: light-dark(#000, #fff);
     --admin-color-border-table: light-dark(#707070, #8c8d92);
     --admin-color-border-soft: light-dark(#444, #888);
-    /* Focus stays colored, not black/white — must come last to override [data-gin-focus] presets */
-    --admin-color-focus: light-dark(#003ecc, #99b8ff);
+    /* Focus keeps the selected focus family's color — the [data-gin-focus] */
+    /* presets stay in effect under Increase contrast. */
     /* Accent fg — preserve hue, increase contrast (not flat white/black) */
     --admin-color-accent-fg: light-dark(oklch(from var(--accent-base) calc(l * 0.78) c h), oklch(from var(--accent-base) max(calc(l * 1.5), 0.93) calc(c * 1.1) h));
   }

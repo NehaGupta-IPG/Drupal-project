@@ -290,11 +290,11 @@ final class Settings implements ContainerInjectionInterface {
       '#title' => $this->t('Focus color'),
       '#default_value' => $account ? $this->get('preset_focus_color', $account) : $this->getDefault('preset_focus_color'),
       '#options' => [
-        'gin' => $this->t('Default Admin Focus color (Default)'),
-        'claro' => $this->t('Claro Green'),
-        'orange' => $this->t('Orange'),
-        'dark' => $this->t('Neutral'),
-        'accent' => $this->t('Same as Accent color'),
+        'blue' => $this->t('Blue (Default)'),
+        'green' => $this->t('Green'),
+        'amber' => $this->t('Amber'),
+        'neutral' => $this->t('Neutral'),
+        'accent' => $this->t('Accent family'),
         'custom' => $this->t('Custom'),
       ],
     ];

@@ -354,11 +354,16 @@ class AccentColorContrastTest extends BrowserTestBase {
   }
 
   /**
-   * Focus-ring presets must reach 3:1 (WCAG 1.4.11 non-text) on both surfaces.
+   * Focus-ring presets must reach 3:1 (WCAG 1.4.11 non-text) on every surface.
    *
-   * The shipped light/dark hex pairs are read from the compiled stylesheets,
-   * resolving the indirection presets (`dark` → focus-neutral, `accent` →
-   * accent-fg) through the same token graph the browser follows.
+   * The focus ring communicates keyboard focus, so it must be distinguishable
+   * against all the neutral surfaces a focused control can sit on: main,
+   * surface, nested, raised, toolbar and control surfaces. Each focus preset is
+   * independent of accent — it is optimised for focus visibility, not brand
+   * identity. The shipped light/dark hex pairs are read from the compiled
+   * stylesheets, resolving the indirection presets (`neutral` →
+   * focus-neutral, `accent` → accent-fg) through the same token graph the
+   * browser follows.
    */
   public function testFocusColorContrast(): void {
     $theme = \Drupal::service('extension.list.theme')->getPath('default_admin');
@@ -366,38 +371,58 @@ class AccentColorContrastTest extends BrowserTestBase {
     $accent = file_get_contents($theme . '/css/theme/accent.css');
     $primitive = file_get_contents($theme . '/css/_variables/variables-color-primitive.css');
 
-    // Base "gin" focus and the neutral fallback used by the "dark" preset.
-    [$base_light, $base_dark] = $this->lightDarkPair($semantic, '--admin-color-focus');
+    // Neutral fallback used by the "neutral" preset.
     [$neutral_light, $neutral_dark] = $this->lightDarkPair($semantic, '--admin-color-focus-neutral');
     // Per-preset pairs as shipped in accent.css.
     $pair = fn(string $preset): array => $this->lightDarkPair($accent, '--admin-color-focus', '[data-gin-focus="' . $preset . '"]');
 
-    $presets['gin'] = [$base_light, $base_dark];
-    foreach (['claro', 'orange'] as $p) {
+    $presets = [];
+    foreach (['blue', 'green', 'amber'] as $p) {
       $presets[$p] = $pair($p);
     }
-    $presets['dark'] = [$neutral_light, $neutral_dark];
-    // "accent" resolves through accent-fg. Evaluate for the default blue accent.
+    $presets['neutral'] = [$neutral_light, $neutral_dark];
+    // "accent" (Accent family) resolves through accent-fg, a foreground-safe
+    // accent variation. Evaluate for the default blue accent.
     [$shared_l, $shared_floor, $shared_c] = $this->oklchDarkFg($primitive, FALSE);
     $blue = Helper::accentColors()['blue']['hex'];
     $accentL = max($shared_l * $this->oklchL($blue), $shared_floor);
     $presets['accent'] = [$blue, $this->oklchToHex($accentL, $shared_c * $this->oklchC($blue), $this->oklchH($blue))];
 
-    $light = '#ffffff';
-    $dark = '#1b1b1d';
+    // Every neutral surface a focused control can sit on, per appearance.
+    $surfaces = [
+      'light' => [
+        'main' => '#fefeff',
+        'surface' => '#ffffff',
+        'nested' => '#edeff5',
+        'raised' => '#ffffff',
+        'toolbar' => '#e1eafc',
+        'input' => '#ffffff',
+      ],
+      'dark' => [
+        'main' => '#1b1b1d',
+        'surface' => '#2a2a2d',
+        'nested' => '#3b3b3f',
+        'raised' => '#47474c',
+        'toolbar' => '#2d3755',
+        'input' => '#3b3b3f',
+      ],
+    ];
+
     foreach ($presets as $name => [$light_fg, $dark_fg]) {
-      $ratio_light = $this->contrastRatio($light_fg, $light);
-      $ratio_dark = $this->contrastRatio($dark_fg, $dark);
-      $this->assertGreaterThanOrEqual(
-        3.0,
-        $ratio_light,
-        sprintf('Focus preset "%s" (light) %s must reach >= 3:1 on %s (got %.2f:1).', $name, $light_fg, $light, $ratio_light)
-      );
-      $this->assertGreaterThanOrEqual(
-        3.0,
-        $ratio_dark,
-        sprintf('Focus preset "%s" (dark) %s must reach >= 3:1 on %s (got %.2f:1).', $name, $dark_fg, $dark, $ratio_dark)
-      );
+      $pairs = [
+        'light' => [$light_fg, $surfaces['light']],
+        'dark' => [$dark_fg, $surfaces['dark']],
+      ];
+      foreach ($pairs as $mode => [$fg, $bgs]) {
+        foreach ($bgs as $surface => $bg) {
+          $ratio = $this->contrastRatio($fg, $bg);
+          $this->assertGreaterThanOrEqual(
+            3.0,
+            $ratio,
+            sprintf('Focus preset "%s" (%s) %s must reach >= 3:1 on %s %s (got %.2f:1).', $name, $mode, $fg, $surface, $bg, $ratio)
+          );
+        }
+      }
     }
   }
 
