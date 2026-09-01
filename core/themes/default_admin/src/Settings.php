@@ -285,10 +285,16 @@ final class Settings implements ContainerInjectionInterface {
     ];
 
     // Focus color setting.
+    $focus_preset = Helper::normalizeFocusPreset(
+      $account
+        ? $this->get('preset_focus_color', $account)
+        : $this->getDefault('preset_focus_color')
+    );
+    
     $form['preset_focus_color'] = [
       '#type' => 'select',
       '#title' => $this->t('Focus color'),
-      '#default_value' => $account ? $this->get('preset_focus_color', $account) : $this->getDefault('preset_focus_color'),
+      '#default_value' => $focus_preset,
       '#options' => [
         'blue' => $this->t('Blue (Default)'),
         'green' => $this->t('Green'),

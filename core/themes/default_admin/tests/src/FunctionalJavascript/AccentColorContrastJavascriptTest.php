@@ -778,7 +778,7 @@ JS;
     foreach ($cases as $caseLabel => $case) {
       $this->config('default_admin.settings')
         ->set('enable_dark_mode', $case['mode'])
-        ->set('preset_accent_color', 'cobalt')
+        ->set('preset_accent_color', 'blue')
         ->save();
       $this->drupalGet('/admin/appearance/settings/default_admin');
       $this->assertSession()->statusCodeEquals(200);

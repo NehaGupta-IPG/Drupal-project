@@ -635,13 +635,9 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     }
 
     // Set focus color.
-    // The 'accent' focus family was removed; fall back to the default family
-    // for any stored value that is no longer offered.
-    $preset_focus = $settings->get('preset_focus_color');
-    if ($preset_focus === 'accent') {
-      $preset_focus = 'blue';
-    }
-    $variables['html_attributes']['data-gin-focus'] = $preset_focus;
+    $variables['html_attributes']['data-gin-focus'] = Helper::normalizeFocusPreset(
+      $settings->get('preset_focus_color')
+    );
 
     // High contrast mode.
     if ($settings->get('high_contrast_mode')) {

@@ -181,7 +181,8 @@ class ThemeHooks implements TrustedCallbackInterface {
     $page['#attached']['drupalSettings']['gin']['accent_colors'] = Helper::accentColors();
     $page['#attached']['drupalSettings']['gin']['preset_accent_color'] = $settings->get('preset_accent_color');
     $page['#attached']['drupalSettings']['gin']['accent_color'] = $settings->get('accent_color');
-    $page['#attached']['drupalSettings']['gin']['preset_focus_color'] = $settings->get('preset_focus_color');
+    $page['#attached']['drupalSettings']['gin']['preset_focus_color'] =
+      Helper::normalizeFocusPreset($settings->get('preset_focus_color'));
     $page['#attached']['drupalSettings']['gin']['focus_color'] = $settings->get('focus_color');
     $page['#attached']['drupalSettings']['gin']['high_contrast_mode'] = $settings->get('high_contrast_mode');
     $page['#attached']['drupalSettings']['gin']['high_contrast_mode_class'] = 'gin--high-contrast-mode';
