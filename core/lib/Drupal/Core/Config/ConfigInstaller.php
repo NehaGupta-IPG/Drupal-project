@@ -399,11 +399,6 @@ class ConfigInstaller implements ConfigInstallerInterface {
 
     // The langcode missing-or-'en' shipped configuration resolves to.
     $default_langcode = NULL;
-    if (!$this->isSyncing() && $collection == StorageInterface::DEFAULT_COLLECTION) {
-      $event = new ConfigLangcodeResolveEvent();
-      $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
-      $default_langcode = $event->getLangcode();
-    }
 
     foreach ($config_names as $name) {
       // Allow config factory overriders to use a custom configuration object if
@@ -427,6 +422,13 @@ class ConfigInstaller implements ConfigInstallerInterface {
           ] + $config_to_create[$name];
 
           if ($this->typedConfig->hasConfigSchema($name)) {
+            // The first time this point is reached, resolve the default
+            // langcode.
+            if (!isset($default_langcode)) {
+              $event = new ConfigLangcodeResolveEvent();
+              $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
+              $default_langcode = $event->getLangcode();
+            }
             // Building typed data here to check translatability is too
             // expensive to do twice for every piece of configuration being
             // installed. Resolving unconditionally instead, including for
