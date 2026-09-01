@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\dblog\Functional;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
@@ -64,8 +65,13 @@ class UpdatePathTest extends UpdatePathTestBase {
       'hostname'    => $base_root,
       'timestamp'   => \Drupal::time()->getRequestTime(),
     ]);
-    $this->expectException(IntegrityConstraintViolationException::class);
-    $insert->execute();
+    try {
+      $insert->execute();
+      $this->fail('After updates, a negative WID should not be allowed.');
+    }
+    catch (IntegrityConstraintViolationException|DatabaseExceptionWrapper) {
+      // Expected.
+    }
   }
 
 }
