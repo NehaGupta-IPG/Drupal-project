@@ -74,10 +74,6 @@
   --admin-color-focus: var(--admin-color-focus-neutral);
 }
 
-[data-gin-focus="accent"] {
-  --admin-color-focus: var(--admin-color-accent-fg);
-}
-
 @media (forced-colors: none) {
   .gin--high-contrast-mode {
     /* Enhanced text ramp — keeps the loud > text > soft hierarchy while

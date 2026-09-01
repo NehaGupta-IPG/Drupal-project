@@ -294,7 +294,6 @@ final class Settings implements ContainerInjectionInterface {
         'green' => $this->t('Green'),
         'amber' => $this->t('Amber'),
         'neutral' => $this->t('Neutral'),
-        'accent' => $this->t('Accent family'),
         'custom' => $this->t('Custom'),
       ],
     ];

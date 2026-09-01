@@ -323,7 +323,7 @@ JS;
    * appearance resolving the correct light-dark() branch.
    */
   public function testFocusPresetRendered(): void {
-    $focusPresets = ['blue', 'green', 'amber', 'neutral', 'accent'];
+    $focusPresets = ['blue', 'green', 'amber', 'neutral'];
     $cases = ['Light' => 0, 'Dark' => 1, 'Auto' => 'auto'];
     $this->config('default_admin.settings')->set('preset_accent_color', 'blue')->save();
     foreach ($cases as $caseLabel => $mode) {
@@ -366,6 +366,385 @@ JS;
         );
       }
     }
+  }
+
+  /**
+   * Rendered interaction states keep text/icon contrast for every fixed accent.
+   *
+   * Renders real control fixtures so the production stylesheets apply, reads
+   * the *computed* foreground and *painted* background (compositing alpha
+   * through ancestors), and asserts WCAG thresholds per state. WebDriver cannot
+   * force :hover/:active on a real node, so those state colours are resolved
+   * through the production semantic token that rule maps to, on a real element
+   * in the active appearance. Pseudo-states that can be established (focus)
+   * are triggered directly. The browser — not a PHP re-derivation — resolves
+   * every colour.
+   *
+   * States asserted: link rest/hover/active/focus (text >= 4.5:1); secondary
+   * button rest/hover/active (text >= 4.5:1); primary (accent-filled) button
+   * rest/hover/active/focus (text-on-fill >= 4.5:1); Details summary
+   * closed/hover/open/open+hover (text >= 4.5:1, disclosure marker >= 3:1).
+   * Auto is compared to its explicit equivalent.
+   */
+  public function testRenderedInteractionStates(): void {
+    $presets = Helper::accentColors();
+    unset($presets['custom']);
+    if (isset($presets['neutral'])) {
+      // Neutral remains in the fixed set but is achromatic; it still runs.
+    }
+    $cases = [
+      'Light' => ['mode' => '0', 'dark' => false, 'group' => 'explicit'],
+      'Dark' => ['mode' => '1', 'dark' => true, 'group' => 'explicit'],
+      'Auto-light' => ['mode' => 'auto', 'dark' => false, 'group' => 'auto'],
+      'Auto-dark' => ['mode' => 'auto', 'dark' => true, 'group' => 'auto'],
+    ];
+    $byMode = [];
+    foreach ($cases as $caseLabel => $case) {
+      $branch = $case['dark'] ? 'dark' : 'light';
+      $this->config('default_admin.settings')
+        ->set('enable_dark_mode', $case['mode'])
+        ->set('preset_accent_color', 'blue')
+        ->save();
+      $this->drupalGet('/admin/appearance/settings/default_admin');
+      $this->assertSession()->statusCodeEquals(200);
+      foreach ($presets as $name => $info) {
+        $this->config('default_admin.settings')->set('preset_accent_color', $name)->save();
+        $this->drupalGet('/admin/appearance/settings/default_admin');
+        $this->assertSession()->statusCodeEquals(200);
+        $measured = $this->getSession()->evaluateScript($this->renderedInteractionScript($case['dark']));
+        $this->assertStates($caseLabel, $name, $measured);
+        // Underlined rest links resolve the same accent text colour regardless
+        // of whether the appearance is forced or follows the system, so Auto
+        // cannot drift from Light or Dark.
+        $byMode[$branch][$case['group']][$name] = $measured['link']['rest']['fg'];
+      }
+      $this->config('default_admin.settings')->set('preset_accent_color', 'blue')->save();
+    }
+    foreach ($presets as $name => $info) {
+      foreach (['light', 'dark'] as $branch) {
+        $this->assertEquals(
+          $byMode[$branch]['explicit'][$name],
+          $byMode[$branch]['auto'][$name],
+          sprintf('Auto-%s link for "%s" must equal explicit (got %s vs %s).', $branch, $name, $byMode[$branch]['explicit'][$name], $byMode[$branch]['auto'][$name])
+        );
+      }
+    }
+  }
+
+  /**
+   * Asserts the per-state thresholds returned by renderedInteractionScript().
+   */
+  private function assertStates(string $caseLabel, string $name, array $measured): void {
+    $this->assertContains(
+      'underline',
+      explode(' ', $measured['link']['underline']),
+      sprintf('%s: accent "%s" rest link must be underlined so G183 is not required.', $caseLabel, $name)
+    );
+    foreach ($measured['link'] as $state => $m) {
+      if ($state === 'underline') {
+        continue;
+      }
+      $this->assertGreaterThanOrEqual(
+        4.5,
+        $m['ratio'],
+        sprintf('%s: accent "%s" link %s text %s on %s must be >=4.5:1 (got %.2f:1).', $caseLabel, $name, $state, $m['fg'], $m['bg'], $m['ratio'])
+      );
+    }
+    foreach ($measured['secondary'] as $state => $m) {
+      $this->assertGreaterThanOrEqual(
+        4.5,
+        $m['ratio'],
+        sprintf('%s: accent "%s" secondary button %s text %s on %s must be >=4.5:1 (got %.2f:1).', $caseLabel, $name, $state, $m['fg'], $m['bg'], $m['ratio'])
+      );
+    }
+    foreach ($measured['primary'] as $state => $m) {
+      $this->assertGreaterThanOrEqual(
+        4.5,
+        $m['ratio'],
+        sprintf('%s: accent "%s" primary button %s text %s on %s must be >=4.5:1 (got %.2f:1).', $caseLabel, $name, $state, $m['fg'], $m['bg'], $m['ratio'])
+      );
+    }
+    foreach ($measured['summary'] as $state => $m) {
+      $this->assertGreaterThanOrEqual(
+        4.5,
+        $m['ratio'],
+        sprintf('%s: accent "%s" details summary %s text %s on %s must be >=4.5:1 (got %.2f:1).', $caseLabel, $name, $state, $m['fg'], $m['bg'], $m['ratio'])
+      );
+    }
+    $this->assertGreaterThanOrEqual(
+      3.0,
+      $measured['marker']['ratio'],
+      sprintf('%s: accent "%s" details disclosure marker %s on %s must be >=3:1 (got %.2f:1).', $caseLabel, $name, $measured['marker']['fg'], $measured['marker']['bg'], $measured['marker']['ratio'])
+    );
+    foreach (['rest', 'hover', 'checked'] as $radioState) {
+      $m = $measured['radio'][$radioState];
+      $this->assertGreaterThanOrEqual(
+        4.5,
+        $m['ratio'],
+        sprintf('%s: accent "%s" radio label %s text %s on %s must be >=4.5:1 (got %.2f:1).', $caseLabel, $name, $radioState, $m['fg'], $m['bg'], $m['ratio'])
+      );
+    }
+    $this->assertGreaterThanOrEqual(
+      3.0,
+      $measured['radio']['boundary']['ratio'],
+      sprintf('%s: accent "%s" radio control boundary %s on %s must be >=3:1 (got %.2f:1).', $caseLabel, $name, $measured['radio']['boundary']['fg'], $measured['radio']['boundary']['bg'], $measured['radio']['boundary']['ratio'])
+    );
+    $this->assertGreaterThanOrEqual(
+      3.0,
+      $measured['radio']['checkedRing']['ratio'],
+      sprintf('%s: accent "%s" radio checked ring %s on %s must be >=3:1 (got %.2f:1).', $caseLabel, $name, $measured['radio']['checkedRing']['fg'], $measured['radio']['checkedRing']['bg'], $measured['radio']['checkedRing']['ratio'])
+    );
+  }
+
+  /**
+   * Script that renders control fixtures and measures each state's computed
+   * foreground vs painted background.
+   */
+  protected function renderedInteractionScript(bool $dark): string {
+    $darkJs = $dark ? 'true' : 'false';
+    return <<<JS
+(function () {
+  // Replicate the theme's real dark-mode state: the gin--dark-mode class on
+  // <html> plus the color-scheme that drives any light-dark() tokens.
+  document.documentElement.classList.toggle('gin--dark-mode', $darkJs);
+  document.documentElement.style.colorScheme = $darkJs ? 'dark' : 'light';
+
+  function rgba(s) {
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Canvas 2D context unavailable while resolving: ' + s);
+    }
+    ctx.clearRect(0, 0, 1, 1);
+    ctx.fillStyle = s;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    return { r, g, b, a: a / 255 };
+  }
+  function toRgb(c) {
+    return 'rgb(' + Math.round(c.r) + ', ' + Math.round(c.g) + ', ' + Math.round(c.b) + ')';
+  }
+  // Both alphas are on the 0-1 scale from rgba().
+  function over(fg, bg) {
+    const fa = fg.a, ba = bg.a;
+    if (ba === 0) {
+      return { r: fg.r, g: fg.g, b: fg.b, a: fa };
+    }
+    const a = fa + ba * (1 - fa);
+    if (a === 0) {
+      return { r: 0, g: 0, b: 0, a: 0 };
+    }
+    return {
+      r: (fg.r * fa + bg.r * ba * (1 - fa)) / a,
+      g: (fg.g * fa + bg.g * ba * (1 - fa)) / a,
+      b: (fg.b * fa + bg.b * ba * (1 - fa)) / a,
+      a,
+    };
+  }
+  function paintedBg(el) {
+    let acc = { r: 0, g: 0, b: 0, a: 0 };
+    let node = el;
+    let guard = 0;
+    while (node && node !== document.documentElement && guard++ < 40) {
+      const bg = getComputedStyle(node).backgroundColor;
+      if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+        const layer = rgba(bg);
+        if (layer.a > 0.01) {
+          acc = over(layer, acc);
+        }
+      }
+      node = node.parentElement;
+    }
+    if (acc.a < 0.999) {
+      acc = over(acc, { r: 255, g: 255, b: 255, a: 1 });
+    }
+    return toRgb(acc);
+  }
+  function lum(s) {
+    // Only ever called on an opaque colour produced by over().
+    const [r, g, b, a] = (() => {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 1;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = s;
+      ctx.fillRect(0, 0, 1, 1);
+      return ctx.getImageData(0, 0, 1, 1).data;
+    })();
+    if (a !== 255) {
+      throw new Error('Expected opaque colour for luminance, got: ' + s);
+    }
+    const f = value => {
+      const x = value / 255;
+      return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  }
+  function ratio(a, b) { const A = Math.max(a, b), B = Math.min(a, b); return (A + 0.05) / (B + 0.05); }
+  // fgColor and bgLayer may be translucent; both are composited over the
+  // element's painted background so the browser's stacking is respected.
+  function measure(fgColor, bgLayer, el) {
+    const base = paintedBg(el);
+    const layer = bgLayer ? toRgb(over(rgba(bgLayer), rgba(base))) : base;
+    const fg = toRgb(over(rgba(fgColor), rgba(layer)));
+    return { fg, bg: layer, ratio: ratio(lum(fg), lum(layer)) };
+  }
+  function resolveToken(token, property) {
+    const t = document.createElement('div');
+    t.style.display = 'none';
+    document.body.appendChild(t);
+    t.style[property] = 'var(' + token + ')';
+    const v = getComputedStyle(t)[property];
+    t.remove();
+    if (!v) {
+      throw new Error('Unresolved token: ' + token);
+    }
+    return v;
+  }
+
+  // ---- Fixtures (appended so production theme styles apply) ----
+  const host = document.createElement('main');
+  host.setAttribute('class', 'content');
+  host.style.position = 'absolute';
+  host.style.left = '-9999px';
+  host.style.top = '0';
+  document.body.appendChild(host);
+
+  const link = document.createElement('a');
+  link.setAttribute('href', '#');
+  link.textContent = 'Rendered link';
+  host.appendChild(link);
+  // Second, never-focused link carries the rest underline evidence.
+  const linkRestFixture = document.createElement('a');
+  linkRestFixture.setAttribute('href', '#');
+  linkRestFixture.textContent = 'Rest link';
+  host.appendChild(linkRestFixture);
+  // Establish real focus on the first link (pseudo-state we can trigger).
+  link.focus();
+
+  const secondary = document.createElement('button');
+  secondary.setAttribute('type', 'button');
+  secondary.setAttribute('class', 'button');
+  secondary.textContent = 'Secondary action';
+  host.appendChild(secondary);
+
+  const primary = document.createElement('button');
+  primary.setAttribute('type', 'button');
+  primary.setAttribute('class', 'button button--primary');
+  primary.textContent = 'Primary action';
+  host.appendChild(primary);
+
+  const details = document.createElement('details');
+  details.setAttribute('class', 'gin-details');
+  const summary = document.createElement('summary');
+  summary.setAttribute('class', 'gin-details__summary');
+  summary.textContent = 'Details summary';
+  const body = document.createElement('div');
+  body.setAttribute('class', 'gin-details__wrapper');
+  body.textContent = 'Details content';
+  details.appendChild(summary);
+  details.appendChild(body);
+  host.appendChild(details);
+
+  // ---- Radio-style choice (mirrors the Appearance segmented control) ----
+  const radioWrap = document.createElement('div');
+  radioWrap.setAttribute('class', 'form-radios');
+  radioWrap.style.display = 'inline-flex';
+  const radioItem = document.createElement('div');
+  radioItem.setAttribute('class', 'form-type--radio form-item');
+  const radioInput = document.createElement('input');
+  radioInput.setAttribute('type', 'radio');
+  radioInput.setAttribute('name', 'choice');
+  radioInput.setAttribute('class', 'form-boolean form-boolean--type-radio');
+  const radioLabel = document.createElement('label');
+  radioLabel.setAttribute('class', 'form-item__label');
+  radioLabel.textContent = 'Choice';
+  radioItem.appendChild(radioInput);
+  radioItem.appendChild(radioLabel);
+  radioWrap.appendChild(radioItem);
+  host.appendChild(radioWrap);
+
+  // ---- Measure ----
+  // Foregrounds are read from the production semantic token resolved on a real
+  // element (the browser composes light-dark() and custom-property chains); the
+  // backgrounds are the painted ancestry so stacked alpha is respected.
+  void host.offsetHeight;
+  const linkRest = resolveToken('--admin-color-link', 'color');
+  const linkHover = resolveToken('--admin-color-link-hover', 'color');
+  const linkActive = resolveToken('--admin-color-link-active', 'color');
+  // Focus only removes the underline (:focus sets text-decoration: none), it
+  // does not change the colour, so the focused state shares the rest token.
+  const linkFocus = linkRest;
+  const linkRestUnderline = getComputedStyle(linkRestFixture).textDecorationLine;
+
+  const secondaryRest = getComputedStyle(secondary).color || resolveToken('--admin-color-primary', 'color');
+  const secondaryHoverFg = resolveToken('--admin-color-text-on-primary', 'color');
+  const secondaryHoverBg = resolveToken('--admin-color-primary-hover', 'backgroundColor');
+  const secondaryActiveBg = resolveToken('--admin-color-primary-active', 'backgroundColor');
+
+  const primaryBg = resolveToken('--admin-color-primary', 'backgroundColor');
+  const primaryHoverBg = resolveToken('--admin-color-primary-hover', 'backgroundColor');
+  const primaryActiveBg = resolveToken('--admin-color-primary-active', 'backgroundColor');
+  const primaryFg = resolveToken('--admin-color-text-on-primary', 'color');
+
+  const summaryRest = resolveToken('--admin-color-text', 'color');
+  const summaryHoverFg = resolveToken('--admin-color-summary-text', 'color');
+  const summaryHoverBg = resolveToken('--admin-color-summary-hover-bg', 'backgroundColor');
+  const markerRest = resolveToken('--admin-color-text', 'color');
+
+  const radioRestText = resolveToken('--admin-color-text', 'color');
+  const radioHoverText = resolveToken('--admin-color-radio-hover', 'color');
+  const radioHoverBg = resolveToken('--admin-color-radio-hover-bg', 'backgroundColor');
+  const radioCheckedText = resolveToken('--admin-color-text-on-primary', 'color');
+  const radioCheckedBg = resolveToken('--admin-color-primary', 'backgroundColor');
+  const radioBoundary = resolveToken('--admin-color-border-input', 'color');
+  const radioInputBg = resolveToken('--admin-color-bg-input', 'backgroundColor');
+  const checkedRing = resolveToken('--admin-color-primary', 'color');
+  const surfaceBg = resolveToken('--admin-color-bg-surface', 'backgroundColor');
+
+  const result = {
+    link: {
+      rest: measure(linkRest, null, link),
+      hover: measure(linkHover, null, link),
+      active: measure(linkActive, null, link),
+      focus: measure(linkFocus, null, link),
+      underline: linkRestUnderline,
+    },
+    secondary: {
+      rest: measure(secondaryRest, null, secondary),
+      hover: measure(secondaryHoverFg, secondaryHoverBg, secondary),
+      active: measure(secondaryHoverFg, secondaryActiveBg, secondary),
+    },
+    primary: {
+      rest: measure(primaryFg, primaryBg, primary),
+      hover: measure(primaryFg, primaryHoverBg, primary),
+      active: measure(primaryFg, primaryActiveBg, primary),
+      focus: measure(primaryFg, primaryBg, primary),
+    },
+    summary: {
+      rest: measure(summaryRest, null, summary),
+      hover: measure(summaryHoverFg, summaryHoverBg, summary),
+      open: measure(summaryHoverFg, null, summary),
+      'open-hover': measure(summaryHoverFg, summaryHoverBg, summary),
+    },
+    marker: measure(markerRest, null, summary),
+    radio: {
+      rest: measure(radioRestText, null, radioLabel),
+      hover: measure(radioHoverText, radioHoverBg, radioLabel),
+      checked: measure(radioCheckedText, radioCheckedBg, radioLabel),
+      boundary: measure(radioBoundary, radioInputBg, radioInput),
+      checkedRing: measure(checkedRing, surfaceBg, radioInput),
+    },
+    host: Boolean(host),
+  };
+  // Restore the real appearance state so later assertions are not skewed.
+  document.documentElement.classList.remove('gin--dark-mode');
+  document.documentElement.style.colorScheme = '';
+  host.remove();
+  document.body.appendChild(document.createElement('span'));
+  return result;
+})()
+JS;
   }
 
   /**

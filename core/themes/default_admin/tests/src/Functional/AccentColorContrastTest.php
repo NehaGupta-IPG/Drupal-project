@@ -361,9 +361,10 @@ class AccentColorContrastTest extends BrowserTestBase {
    * surface, nested, raised, toolbar and control surfaces. Each focus preset is
    * independent of accent — it is optimised for focus visibility, not brand
    * identity. The shipped light/dark hex pairs are read from the compiled
-   * stylesheets, resolving the indirection presets (`neutral` →
-   * focus-neutral, `accent` → accent-fg) through the same token graph the
-   * browser follows.
+   * stylesheets, resolving the indirection preset (`neutral` →
+   * focus-neutral) through the same token graph the browser follows. Focus no
+   * longer depends on the accent palette: the former "Accent family" option
+   * was removed.
    */
   public function testFocusColorContrast(): void {
     $theme = \Drupal::service('extension.list.theme')->getPath('default_admin');
@@ -377,16 +378,12 @@ class AccentColorContrastTest extends BrowserTestBase {
     $pair = fn(string $preset): array => $this->lightDarkPair($accent, '--admin-color-focus', '[data-gin-focus="' . $preset . '"]');
 
     $presets = [];
-    foreach (['blue', 'green', 'amber'] as $p) {
-      $presets[$p] = $pair($p);
+    foreach (['blue', 'green', 'amber', 'neutral'] as $p) {
+      $presets[$p] = $p === 'neutral'
+        ? [$neutral_light, $neutral_dark]
+        : $pair($p);
     }
-    $presets['neutral'] = [$neutral_light, $neutral_dark];
-    // "accent" (Accent family) resolves through accent-fg, a foreground-safe
-    // accent variation. Evaluate for the default blue accent.
-    [$shared_l, $shared_floor, $shared_c] = $this->oklchDarkFg($primitive, FALSE);
-    $blue = Helper::accentColors()['blue']['hex'];
-    $accentL = max($shared_l * $this->oklchL($blue), $shared_floor);
-    $presets['accent'] = [$blue, $this->oklchToHex($accentL, $shared_c * $this->oklchC($blue), $this->oklchH($blue))];
+    unset($primitive);
 
     // Every neutral surface a focused control can sit on, per appearance.
     $surfaces = [

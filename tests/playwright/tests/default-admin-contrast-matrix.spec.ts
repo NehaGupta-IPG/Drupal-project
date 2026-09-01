@@ -1,5 +1,6 @@
 /**
- * Default Admin contrast matrix — 8 appearance states × 10 chromatic presets.
+ * Default Admin contrast matrix — 8 appearance states × 11 fixed presets
+ * (10 chromatic + Neutral).
  *
  * Mechanically verifies WCAG 2.2 AA (4.5:1 text, 3:1 UI) and checks the
  * 7:1 enhanced-contrast target via computed styles, plus axe-core on each page
@@ -14,7 +15,7 @@ import { AUTH_STATE_FILE } from '../lib/auth-setup';
 import { drush } from '../lib/drush-helpers';
 import AxeBuilder from '@axe-core/playwright';
 
-const PRESETS = ['blue','cerulean','teal','green','olive','yellow','orange','red','pink','purple'] as const;
+const PRESETS = ['blue','cerulean','teal','green','olive','yellow','orange','red','pink','purple','neutral'] as const;
 const MODES = [
   { label: 'Light', enable_dark_mode: '0', hc: 0 },
   { label: 'Dark', enable_dark_mode: '1', hc: 0 },
