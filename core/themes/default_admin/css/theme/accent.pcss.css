@@ -7,6 +7,10 @@
   --admin-color-bg-sticky: rgb(235, 241, 253);
 }
 
+[data-gin-accent="cerulean"] {
+  --admin-color-bg-sticky: rgb(235, 244, 248);
+}
+
 [data-gin-accent="purple"] {
   --admin-color-bg-sticky: rgb(242, 235, 255);
 }
@@ -17,6 +21,10 @@
 
 [data-gin-accent="green"] {
   --admin-color-bg-sticky: rgb(235, 245, 242);
+}
+
+[data-gin-accent="olive"] {
+  --admin-color-bg-sticky: rgb(244, 245, 235);
 }
 
 [data-gin-accent="red"] {

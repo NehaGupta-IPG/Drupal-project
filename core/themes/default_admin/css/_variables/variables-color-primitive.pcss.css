@@ -27,7 +27,7 @@
   /*
    * Default accent color. Will get overridden by inline style.
    */
-  --accent-base: #015efe;
+  --accent-base: #0047ab;
 
   /*
    * Mix base. These are only used as utilities to compose other colors.

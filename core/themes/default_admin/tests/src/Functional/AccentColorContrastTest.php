@@ -405,7 +405,7 @@ class AccentColorContrastTest extends BrowserTestBase {
    * Focus on an accent-filled control uses a two-part indicator.
    *
    * A single focus ring sits ring-on-fill on the primary colour and fails on
-   * light surfaces (blue ring "#003ecc" on primary "#015efe" is about 1.6:1).
+   * light surfaces (a blue ring on the accent fill is below 3:1).
    * The focus-gap semantic token inserts a surface ring between the fill and the
    * focus ring. This guards that the primary button and checked checkbox consume
    * that two-part indicator, and that it resolves to >= 3:1 against the fill.
@@ -451,7 +451,7 @@ class AccentColorContrastTest extends BrowserTestBase {
 
     // The indicator must differentiate the focus ring from the accent fill.
     // Light: gap is white (surface), so it separates blue ring from blue fill.
-    $primary_light = '#015efe';
+    $primary_light = '#0047ab';
     $gap_light = '#ffffff';
     $ring_light = '#003ecc';
     $gap_vs_fill = $this->contrastRatio($gap_light, $primary_light);
