@@ -14,6 +14,8 @@ use Drupal\Tests\Core\Database\Stub\Driver\Schema;
  * A stub of the abstract Connection class for testing purposes.
  *
  * Includes minimal implementations of Connection's abstract methods.
+ *
+ * @internal
  */
 class StubConnection extends Connection {
 
@@ -106,6 +108,12 @@ class StubConnection extends Connection {
    */
   public function exceptionHandler(): ExceptionHandler {
     return new ExceptionHandler();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function insert($table, array $options = []): void {
   }
 
   /**

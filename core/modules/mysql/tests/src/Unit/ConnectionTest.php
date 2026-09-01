@@ -21,6 +21,22 @@ use PHPUnit\Framework\Attributes\Group;
 class ConnectionTest extends UnitTestCase {
 
   /**
+   * A mocked MySql connection.
+   */
+  private Connection&MockObject $connection;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->connection = $this->getMockBuilder(Connection::class)
+      ->setConstructorArgs([$this->createStub(Mysql::class), []])
+      ->onlyMethods(['getServerVersion'])
+      ->getMock();
+  }
+
+  /**
    * Tests version and is maria db.
    *
    * @legacy-covers ::version

@@ -2,7 +2,7 @@
 <div class="admin-toolbar__item toolbar-block">
   {% set menu_heading_id = 'menu--' ~ menu_name %}
   <h2 id="{{ menu_heading_id }}" class="toolbar-block__title visually-hidden focusable">{{ title }}</h2>
-  <ul class="toolbar-menu toolbar-menu toolbar-block__content toolbar-block__content--{{ menu_name }}" aria-toolbar-link__labelledby="{{ menu_heading_id }}">
+  <ul class="toolbar-menu toolbar-menu toolbar-block__content toolbar-block__content--{{ menu_name }}" aria-labelledby="{{ menu_heading_id }}">
     {{ menus.menu_items(items, attribute) }}
   </ul>
 </div>
@@ -37,7 +37,7 @@
             </a>
           </li>
           {% for item in item.below %}
-            <li class="{{ item.below ? 'toolbar-menu__item--has-dropdown'}} toolbar-menu__item toolbar-menu__item--level-2">
+            <li class="{{ item.below ? 'toolbar-menu__item--has-dropdown' }} toolbar-menu__item toolbar-menu__item--level-2">
               {% if item.below is empty %}
                 <a href="{{ item.url }}" class="toolbar-link">
                 <span>{{ item.title }}</span>
