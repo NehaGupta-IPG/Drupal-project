@@ -147,7 +147,7 @@ class SortArray {
    * Sort helper for string comparisons using a "natural order" algorithm.
    *
    * Callback for uasort(). Uses language-dependent Collator::compare(),
-   * if intl extension is installed, fallback to strnatcasecmp().
+   * if provided, falls back to strnatcasecmp().
    * Usage examples:
    * ConfigEntityBase::sortEntities()
    * ConfigEntityBase::compare()
