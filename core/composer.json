@@ -130,7 +130,7 @@
         "preferred-install": "dist"
     },
     "suggest": {
-        "ext-intl": "Needed to improve the sorting of non-english languages."
+        "ext-intl": "Improves sorting of non-english languages."
     },
     "extra": {
         "branch-alias": {
