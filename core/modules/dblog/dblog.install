@@ -117,7 +117,7 @@ function dblog_update_last_removed(): int {
 /**
  * Change the 'wid' of the 'watchdog' table to an unsigned big integer.
  */
-function dblog_update_11100(&$sandbox = NULL) {
+function dblog_update_11100(&$sandbox = NULL): void {
   $connection = \Drupal::database();
   $new_specification = [
     'size' => 'big',
