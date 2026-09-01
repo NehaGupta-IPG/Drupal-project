@@ -113,3 +113,18 @@ function dblog_schema(): Schema {
 function dblog_update_last_removed(): int {
   return 10101;
 }
+
+/**
+ * Change the 'wid' of the 'watchdog' table to an unsigned big integer.
+ */
+function dblog_update_11100(&$sandbox = NULL) {
+  $connection = \Drupal::database();
+  $new_specification = [
+    'size' => 'big',
+    'type' => 'serial',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'description' => 'Primary Key: Unique watchdog event ID.',
+  ];
+  $connection->schema()->changeField('watchdog', 'wid', 'wid', $new_specification);
+}
