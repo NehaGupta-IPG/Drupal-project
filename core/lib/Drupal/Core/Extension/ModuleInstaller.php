@@ -151,16 +151,15 @@ class ModuleInstaller implements ModuleInstallerInterface {
           }
         }
       }
-
-      // Set the actual module weights.
-      $module_list = array_map(function ($module) use ($module_data) {
-        return $module_data[$module]->sort;
-      }, $module_list);
-
-      // Sort the module list by their weights (reverse).
-      arsort($module_list);
-      $module_list = array_keys($module_list);
     }
+
+    // This must happen regardless of $enable_dependencies, because even a
+    // caller-supplied list may need to be installed in the correct order.
+    $module_list = array_map(function ($module) use ($module_data) {
+      return $module_data[$module]->sort;
+    }, $module_list);
+    arsort($module_list);
+    $module_list = array_keys($module_list);
 
     // Required for module installation checks.
     include_once $this->root . '/core/includes/install.inc';
