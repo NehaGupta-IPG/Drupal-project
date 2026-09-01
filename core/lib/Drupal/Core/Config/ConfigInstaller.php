@@ -460,11 +460,22 @@ class ConfigInstaller implements ConfigInstallerInterface {
                   }
                 }
               }
-              if (!in_array($resolved_langcode, $locally_defined_langcodes, TRUE)
-                && $resolved_langcode !== ($this->configFactory->get('system.site')->get('default_langcode') ?? 'en')) {
-                // The configuration ships with an explicit langcode that is
-                // not supported on this site: do not install it at all.
-                continue;
+              if (!in_array($resolved_langcode, $locally_defined_langcodes, TRUE)) {
+                // @todo the installer default language is wrong! Maybe there is
+                //   a better way to do this. Perhaps setting the correct value
+                //   for a default language in install_begin_request() or
+                //   overriding either the language manager or this service
+                //   during the install. Till we work that out this ugliness
+                //   will have to suffice.
+                if (InstallerKernel::installationAttempted()) {
+                  global $install_state;
+                  $installer_langcode = $install_state['parameters']['langcode'] ?? NULL;
+                }
+                if ($resolved_langcode !== ($installer_langcode ?? $this->configFactory->get('system.site')->get('default_langcode') ?? 'en')) {
+                  // The configuration ships with an explicit langcode that is
+                  // not supported on this site: do not install it at all.
+                  continue;
+                }
               }
             }
           }
