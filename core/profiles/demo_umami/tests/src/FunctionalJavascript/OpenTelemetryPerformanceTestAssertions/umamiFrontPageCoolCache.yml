@@ -7,7 +7,7 @@ CacheGetCountByBin:
   discovery: 63
   data: 8
   dynamic_page_cache: 1
-  render: 23
+  render: 24
   default: 2
   entity: 16
   routes: 3
