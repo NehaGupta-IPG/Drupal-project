@@ -69,7 +69,7 @@ class UpdatePathTest extends UpdatePathTestBase {
       $insert->execute();
       $this->fail('After updates, a negative WID should not be allowed.');
     }
-    catch (IntegrityConstraintViolationException|DatabaseExceptionWrapper) {
+    catch (IntegrityConstraintViolationException | DatabaseExceptionWrapper) {
       // Expected.
     }
   }
