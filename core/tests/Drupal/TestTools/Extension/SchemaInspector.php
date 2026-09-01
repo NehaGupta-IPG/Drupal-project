@@ -36,11 +36,13 @@ class SchemaInspector {
       if ($schema instanceof Schema) {
         return $schema;
       }
-      elseif ($schema === []) {
-        return [];
-      }
       else {
-        @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:11.5.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
+        // If the module does not implement hook_schema(), the value of
+        // $schema will be an empty array, and we do not need to trigger a
+        // deprecation.
+        if ($schema !== []) {
+          @trigger_error("Not returning a Schema object from {$module}_schema() to " . __METHOD__ . " is deprecated in drupal:11.5.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3557405", E_USER_DEPRECATED);
+        }
         return $schema;
       }
     }

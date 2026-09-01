@@ -745,11 +745,11 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * @param string $module
    *   The module for which the tables will be created.
    * @param bool $is_test_module
-   *   Indicates if the module is a test module.
+   *   (optional) Indicates if the module is a test module.
    *
    * @internal
    */
-  protected function installSchema(string $module, bool $is_test_module): void {
+  protected function installSchema(string $module, bool $is_test_module = FALSE): void {
     $schemaDefinition = $this->invoke($module, 'schema') ?? [];
     if ($schemaDefinition instanceof Schema) {
       assert(

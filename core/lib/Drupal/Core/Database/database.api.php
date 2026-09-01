@@ -318,7 +318,7 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  * By implementing hook_schema() and specifying the tables your module
  * declares, you can easily create and drop these tables on all supported
  * database engines. A SchemaDefinition structure is immutable and database
- * abstract. This implied you do not have to deal with the different SQL
+ * abstract. This implies you do not have to deal with the different SQL
  * dialects for table creation and alteration of the supported database
  * engines.
  *
@@ -342,7 +342,7 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *       might contain "The {users}.uid this record affects."
  *     - 'type': The column datatype, as a case of the
  *       Drupal\Core\Database\SchemaDefinition\ColumnType enumerator: ::Char,
- *       ::Varchar, ::Text, ::Blob, ::Int,::Float, ::Numeric, ::Serial, etc.
+ *       ::Varchar, ::Text, ::Blob, ::Int, ::Float, ::Numeric, ::Serial, etc.
  *       Most types just map to the according database engine specific data
  *       types. Use 'Column::serial' for auto incrementing columns. This will
  *       expand to 'INT auto_increment' on MySQL.
@@ -353,7 +353,7 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *     - 'size': The data size as a case of the
  *       Drupal\Core\Database\SchemaDefinition\ColumnSize enumerator: ::Tiny,
  *       ::Small, ::Medium, ::Normal, ::Big. This is a hint about the largest
- *       value the column  will store and determines which of the database
+ *       value the column will store and determines which of the database
  *       engine specific data types will be used (e.g. on MySQL, TINYINT vs.
  *       INT vs. BIGINT).
  *       ::Normal, the default, selects the base type (e.g. on MySQL, INT,
@@ -366,7 +366,7 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *     - 'length': The maximal length of a type ::Char, ::Varchar or ::Text
  *       column. Ignored for other column types.
  *     - 'unsigned': A boolean indicating whether a type ::Int, ::Float and
- *       ::Numeric' only is signed or unsigned. Defaults to FALSE. Ignored for
+ *       ::Numeric only is signed or unsigned. Defaults to FALSE. Ignored for
  *       other column types.
  *     - 'precision', 'scale': For type ::Numeric columns, indicates the
  *       precision (total number of significant digits) and scale (decimal
@@ -401,11 +401,11 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *    the table foreign keys. Each object contains the name of the referenced
  *    table ('foreignTable'), and an array of column mappings
  *    ('foreignColumns'). Column mappings are defined by matching the 'columns'
- *    property with the 'foreignColumns'). This property is for documentation
+ *    property with 'foreignColumns'. This property is for documentation
  *    purposes only; foreign keys are not created in the database, nor are they
  *    enforced by Drupal.
  *  - 'indexes': An array of Drupal\Core\Database\SchemaDefinition\Index objects
- *    that describes the table indexes. Each objects is an array of one or more
+ *    that describes the table indexes. Each object is an array of one or more
  *    key column specifiers (see below) that form an index on the table.
  *
  * A key column specifier is either a string naming a column or an array of two
