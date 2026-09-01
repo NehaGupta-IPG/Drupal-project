@@ -241,7 +241,11 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   }
 
   /**
-   * Sorts entities using collator.
+   * Sorts entities by weight and label (using the natural sort order).
+   * 
+   * If this method is overwritten, it is important to use 
+   * SortArray::createSortCollator() in order to get the collator and pass it
+   * to the compare() function to preserve multilingual natural sorting.
    */
   public static function sortEntities(array &$entities): bool {
     $collator = SortArray::createSortCollator(\Drupal::service('language_manager')->getCurrentLanguage()->getId());
@@ -251,7 +255,12 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   }
 
   /**
-   * Callback for uasort() to compare configuration entities.
+   * Callback for uasort() to compare entities by weight and label (using the 
+   * natural sort order).
+   * 
+   * If this method is overwritten, it is important to use 
+   * SortArray::sortByString() to compare labels and pass it the collator to 
+   * preserve multilingual natural sorting.
    */
   public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, ?\Collator $collator): int {
     $a_weight = $a->weight ?? 0;

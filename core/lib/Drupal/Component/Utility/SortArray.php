@@ -148,9 +148,6 @@ class SortArray {
    *
    * Callback for uasort(). Uses language-dependent Collator::compare(),
    * if provided, falls back to strnatcasecmp().
-   * Usage examples:
-   * ConfigEntityBase::sortEntities()
-   * ConfigEntityBase::compare()
    *
    * @param string $a
    *   First string for comparison.
@@ -162,8 +159,6 @@ class SortArray {
    * @return int
    *   The comparison result for uasort().
    *
-   * @see Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities()
-   * @see Drupal\Core\Config\Entity\ConfigEntityBase::compare()
    * @see createSortCollator()
    */
   public static function sortByString(string $a, string $b, ?\Collator $collator): int {
