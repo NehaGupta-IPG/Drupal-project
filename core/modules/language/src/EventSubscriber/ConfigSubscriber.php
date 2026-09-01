@@ -125,15 +125,17 @@ class ConfigSubscriber implements EventSubscriberInterface {
         // providing correct langcodes for anything it changes itself, the
         // same reasoning that keeps ConfigInstaller and Config::save() from
         // touching langcode mid-sync.
-        //
-        // @todo This has only been confirmed for the form-submission case.
-        //   A non-syncing save with no form behind it - a drush command, a
-        //   plain API call - still needs to be confirmed, and if
-        //   batch_set() is not processed there, this needs to run
-        //   $batch['operations'] inline instead, synchronously, in this
-        //   method.
         if (!$this->configInstaller->isSyncing()) {
           $batch = $this->defaultLangcodeConfigUpdater->buildBatch($old_default_langcode, $new_default_langcode);
+          // This only registers the batch; nothing here drives it forward.
+          // A form submission's own \Drupal\Core\Form\FormSubmitter does
+          // that automatically once its submit handlers finish. Something
+          // else saving this configuration with no form behind it - a
+          // drush command, a plain API call - is responsible for calling
+          // batch_process() itself if it needs the reconciliation to have
+          // completed by the time this method returns.
+          // @todo Create follow-up - we have this problem today with the locale
+          //   batch set in the modules installed hook.
           batch_set($batch);
         }
       }
