@@ -115,11 +115,11 @@ class AccentColorContrastJavascriptTest extends WebDriverTestBase {
   }
 
   /**
-   * High-contrast must approach AAA 7:1 for all 6 modes × 11 presets.
+   * High-contrast must keep accent-foreground legible on main surfaces.
    *
-   * Light HC accent-fg is l*0.80 (7.x on white), dark HC is max(l*1.5,0.93) c*1.2.
-   * Text/border become pure #000/#fff (was 0.8). Covers the “thin white outline”
-   * regression where HC was invisible in dark.
+   * High-contrast resolves accent-foreground from the accent base and
+   * surfaces text and borders onto the high-contrast ramp. This covers the
+   * “thin white outline” regression where HC was unreadable in dark.
    */
   public function testHighContrastAccent(): void {
     $presets = Helper::accentColors();
@@ -320,12 +320,7 @@ JS;
    */
   protected function resolveColor(string $var): string {
     $script = '(() => { const t = document.createElement("div"); t.style.display = "none"; document.body.appendChild(t); t.style.backgroundColor = `var(' . $var . ')`; let c = getComputedStyle(t).backgroundColor; c = c || t.style.backgroundColor; t.remove(); return c; })()';
-    try {
-      return (string) $this->getSession()->evaluateScript($script);
-    }
-    catch (\Exception $e) {
-      return '';
-    }
+    return (string) $this->getSession()->evaluateScript($script);
   }
 
   /**

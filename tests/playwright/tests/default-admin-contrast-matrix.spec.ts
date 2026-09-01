@@ -1,5 +1,5 @@
 /**
- * Default Admin contrast matrix — Light/Dark/Auto × Normal/HC × 11 presets.
+ * Default Admin contrast matrix — 8 appearance states × 8 chromatic presets.
  *
  * Mechanically verifies WCAG 2.2 AA (4.5:1 text, 3:1 UI) and checks the
  * 7:1 enhanced-contrast target via computed styles, plus axe-core on each page

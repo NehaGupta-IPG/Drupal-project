@@ -323,7 +323,7 @@ class AccentColorContrastTest extends BrowserTestBase {
   }
 
   /**
-   * High-contrast accent must approach AAA 7:1 on main surfaces for all presets.
+   * High-contrast accent must reach the 7:1 target on main surfaces.
    *
    * Light HC darkens the accent (lower chromatic lightness); dark HC raises it
    * to the normal AA foreground. The exact constants are read from the shipped
@@ -434,6 +434,19 @@ class AccentColorContrastTest extends BrowserTestBase {
       '/&:focus\s*\{[^}]*outline:\s*none[^}]*var\(--admin-color-focus-gap\)[^}]*var\(--admin-color-focus\)[^}]*\}/s',
       $checkbox,
       'Checked checkbox focus must use the two-part indicator.',
+    );
+
+    // The two-part overrides must be gated behind forced-colors: none so
+    // forced color mode can use its native focus indicator.
+    $this->assertMatchesRegularExpression(
+      '/@media \(forced-colors: none\)\s*\{\s*\.button--primary:focus,[^{]*\{[^}]*outline:[^}]*!important[^}]*var\(--admin-color-focus-gap\)[^}]*var\(--admin-color-focus\)[^}]*\}\s*\}/s',
+      $button,
+      'Primary button focus override must be wrapped in @media (forced-colors: none).',
+    );
+    $this->assertMatchesRegularExpression(
+      '/@media \(forced-colors: none\)\s*\{\s*&:focus\s*\{[^}]*outline:\s*none[^}]*var\(--admin-color-focus-gap\)[^}]*var\(--admin-color-focus\)[^}]*\}\s*\}/s',
+      $checkbox,
+      'Checked checkbox focus override must be wrapped in @media (forced-colors: none).',
     );
 
     // The indicator must differentiate the focus ring from the accent fill.
