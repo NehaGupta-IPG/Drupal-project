@@ -203,7 +203,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
     }
     foreach ($module_groups as $modules) {
-      $this->doInstall($modules, $installed_modules, $sync_status, $module_data);
+      $this->doInstall($modules, $installed_modules, $sync_status);
       // Refresh the installed modules list from configuration to preserve
       // module weight.
       $extension_config = \Drupal::configFactory()->getEditable('core.extension');
@@ -244,10 +244,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   An array of the already installed modules.
    * @param bool $sync_status
    *   The config sync status.
-   * @param array<string, \Drupal\Core\Extension\Extension> $module_data
-   *   The scanned modules data.
    */
-  private function doInstall(array $module_list, array $installed_modules, bool $sync_status, array $module_data): void {
+  private function doInstall(array $module_list, array $installed_modules, bool $sync_status): void {
     $extension_config = \Drupal::configFactory()->getEditable('core.extension');
 
     // Save this data without checking schema. This is a performance
@@ -324,8 +322,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $this->moduleHandler->invokeAll('module_preinstall', [$module, $sync_status]);
 
       // Now install the module's schema if necessary.
-      $is_test_module = isset($module_data[$module]->info['package']) && $module_data[$module]->info['package'] === 'Testing';
-      $this->installSchema($module, $is_test_module);
+      $this->installSchema($module);
     }
 
     // Clear plugin manager caches.
@@ -744,19 +741,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *
    * @param string $module
    *   The module for which the tables will be created.
-   * @param bool $is_test_module
-   *   (optional) Indicates if the module is a test module.
    *
    * @internal
    */
-  protected function installSchema(string $module, bool $is_test_module = FALSE): void {
+  protected function installSchema(string $module): void {
     $schemaDefinition = $this->invoke($module, 'schema') ?? [];
     if ($schemaDefinition instanceof Schema) {
-      assert(
-        $schemaDefinition->type === SchemaDefinitionType::Module ||
-        ($is_test_module && $schemaDefinition->type === SchemaDefinitionType::Test),
-        'Invalid schema definition type, must be SchemaDefinitionType::Module'
-      );
+      assert($schemaDefinition->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
       assert($schemaDefinition->name === $module, 'Invalid schema definition name, must be equal to the module name');
       $this->connection->schema()->createSchemaFromDefinition($schemaDefinition);
     }
