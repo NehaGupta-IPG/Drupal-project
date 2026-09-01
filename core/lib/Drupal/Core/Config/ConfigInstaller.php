@@ -7,6 +7,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Entity\ConfigDependencyManager;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -418,7 +419,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
         // Add a hash to configuration created through the installer so it is
         // possible to know if the configuration was created by installing an
         // extension and to track which version of the default config was used.
-        if (!$this->isSyncing() && $collection == StorageInterface::DEFAULT_COLLECTION) {
+        if ((!$this->isSyncing() || RecipeRunner::isApplying()) && $collection == StorageInterface::DEFAULT_COLLECTION) {
           $config_to_create[$name] = [
             '_core' => [
               'default_config_hash' => Crypt::hashBase64(serialize($config_to_create[$name])),
