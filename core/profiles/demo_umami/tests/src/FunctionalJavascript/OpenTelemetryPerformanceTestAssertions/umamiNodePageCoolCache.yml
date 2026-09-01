@@ -1,5 +1,5 @@
-QueryCount: 66
-CacheGetCount: 169
+QueryCount: 61
+CacheGetCount: 165
 CacheGetCountByBin:
   page: 1
   config: 34
@@ -9,10 +9,10 @@ CacheGetCountByBin:
   entity: 20
   dynamic_page_cache: 1
   routes: 5
-  render: 16
+  render: 17
   default: 1
   file_parsing: 1
-CacheSetCount: 64
+CacheSetCount: 63
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
 CacheTagLookupQueryCount: 20
