@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\dblog\Functional;
 
 use Drupal\Core\Database\Database;
@@ -18,7 +20,7 @@ class UpdatePathTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../system/tests/fixtures/update/drupal-11.3.0.bare.standard.php.gz',
     ];
@@ -27,7 +29,7 @@ class UpdatePathTest extends UpdatePathTestBase {
   /**
    * Tests that, after update 11100, the 'wid' column is an unsigned integer.
    */
-  public function testLogEntryWithBigId() {
+  public function testLogEntryWithNegativeId(): void {
     global $base_root;
 
     // Before updates, a negative WID should be possible.
