@@ -170,7 +170,7 @@ class AdminTest extends BrowserTestBase {
     // compact mode.
     $this->assertSession()->addressEquals($frontpage_url);
     $this->assertEquals('1', $session->getCookie('Drupal.visitor.admin_compact_mode'), 'Compact mode turns on.');
-    $this->drupalGet('admin/compact/on');
+    $this->reloadPage();
     $this->assertEquals('1', $session->getCookie('Drupal.visitor.admin_compact_mode'), 'Compact mode remains on after a repeat call.');
     $this->drupalGet('');
     $this->assertEquals('1', $session->getCookie('Drupal.visitor.admin_compact_mode'), 'Compact mode persists on new requests.');
@@ -181,7 +181,7 @@ class AdminTest extends BrowserTestBase {
     // compact mode.
     $this->assertSession()->addressEquals($frontpage_url);
     $this->assertNull($session->getCookie('Drupal.visitor.admin_compact_mode'), 'Compact mode turns off.');
-    $this->drupalGet('admin/compact/off');
+    $this->reloadPage();
     $this->assertNull($session->getCookie('Drupal.visitor.admin_compact_mode'), 'Compact mode remains off after a repeat call.');
     $this->drupalGet('');
     $this->assertNull($session->getCookie('Drupal.visitor.admin_compact_mode'), 'Compact mode persists off new requests.');
