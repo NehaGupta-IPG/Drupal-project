@@ -185,7 +185,7 @@ class LocaleJavascriptTranslationTest extends BrowserTestBase {
     $config = $this->config('locale.settings');
 
     // English has no JavaScript translations on a fresh install.
-    _locale_rebuild_js('en');
+    \Drupal::service(LocaleJs::class)->rebuild('en');
 
     $locale_javascripts = \Drupal::state()->get('locale.translation.javascript', []);
     $this->assertNotEmpty($locale_javascripts['en']);
