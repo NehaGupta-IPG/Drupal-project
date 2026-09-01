@@ -396,10 +396,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
     // unnecessary the other 99.9% of the time.
     $locally_defined_langcodes = NULL;
 
-    // The langcode missing-or-'en' shipped configuration resolves to. Every
-    // subscriber answers the same question regardless of which config
-    // object is being installed, so this is asked once for the whole
-    // collection rather than once per object.
+    // The langcode missing-or-'en' shipped configuration resolves to.
     $default_langcode = NULL;
     if (!$this->isSyncing() && $collection == StorageInterface::DEFAULT_COLLECTION) {
       $event = new ConfigLangcodeResolveEvent();
@@ -431,29 +428,28 @@ class ConfigInstaller implements ConfigInstallerInterface {
           if ($this->typedConfig->hasConfigSchema($name)) {
             // Building typed data here to check translatability is too
             // expensive to do twice for every piece of configuration being
-            // installed. Resolving unconditionally instead - including for
-            // configuration with no translatable values at all - is harmless: a
-            // resolved langcode that Config::save() finds unwarranted is
-            // stripped straight back out by its own
+            // installed. Resolving unconditionally instead, including for
+            // configuration with no translatable values at all. This is
+            // harmless: a resolved langcode that Config::save() finds
+            // unwarranted is stripped straight back out by its own
             // reconcileLangcodeWithTranslatability().
-            $shipped_langcode = $config_to_create[$name]['langcode'] ?? NULL;
-            // A missing or bare 'en' langcode is treated as equivalent to
-            // having none: extension-shipped configuration is assumed to be
-            // English unless it ships with its own explicit langcode.
-            $is_unlabelled = $shipped_langcode === NULL || $shipped_langcode === 'en';
+            // Extension-shipped configuration is assumed to be English unless
+            // it ships with its own explicit langcode.
+            $shipped_langcode = $config_to_create[$name]['langcode'] ?? 'en';
             // $default_langcode is never NULL here: reaching this point
             // means the same !$this->isSyncing() &&
             // $collection == StorageInterface::DEFAULT_COLLECTION check
-            // already caused it to be resolved, above. When not unlabelled,
-            // $shipped_langcode is a real value too, by definition.
-            $resolved_langcode = $is_unlabelled ? $default_langcode : $shipped_langcode;
+            // already caused it to be resolved, above. Replace 'en' with the
+            // default langcode to allow the Locale module to translate it, if
+            // it is installed.
+            $resolved_langcode = $shipped_langcode === 'en' ? $default_langcode : $shipped_langcode;
             $config_to_create[$name]['langcode'] = $resolved_langcode;
-            // Checked in order of how likely each is to already answer
-            // the question: most resolved langcodes are already configured
-            // languages. Only once that fails is the (rare) locally-defined
-            // case considered, and system.site read as a last resort -
-            // nothing keeps the language manager's notion of the default in
-            // sync with a system.site:default_langcode change unless
+            // Ensure the langcode is valid. Checked in order of how likely each
+            // is to answer the question: most resolved langcodes are already
+            // configured languages. Only once that fails is the (rare)
+            // locally-defined case considered, and system.site read as a last
+            // resort - nothing keeps the language manager's notion of the
+            // default in sync with a system.site:default_langcode change unless
             // language module is installed to do so.
             if (!array_key_exists($resolved_langcode, $this->languageManager->getLanguages(LanguageInterface::STATE_ALL))) {
               if (!isset($locally_defined_langcodes)) {

@@ -186,7 +186,7 @@ final class ConfigEvents {
   const STORAGE_TRANSFORM_EXPORT = 'config.transform.export';
 
   /**
-   * Name of the event fired to determine the default langcode for configuration.
+   * Name of the event fired to determine configuration's default langcode.
    *
    * The event listener method receives a
    * \Drupal\Core\Config\ConfigLangcodeResolveEvent instance.
