@@ -26,15 +26,11 @@ class UnpackRecipeTest extends BuildTestBase {
 
   /**
    * The Symfony FileSystem component.
-   *
-   * @var \Composer\Util\Filesystem
    */
   protected Filesystem $fileSystem;
 
   /**
    * The Fixtures object.
-   *
-   * @var \Drupal\Tests\Composer\Plugin\Unpack\Fixtures
    */
   protected Fixtures $fixtures;
 
@@ -708,7 +704,7 @@ class UnpackRecipeTest extends BuildTestBase {
     $cwd ??= $this->fixturesDir . '/composer-root';
 
     // Always add --no-interaction and --no-ansi to Composer commands.
-    $output = $this->mustExec("composer $command --no-interaction --no-ansi", $cwd, [], $error_output);
+    $output = $this->mustExec("COMPOSER_NO_AUDIT=1 composer $command --no-interaction --no-ansi", $cwd, [], $error_output);
     if ($command === 'install') {
       $this->assertFileExists($cwd . '/composer.lock');
     }

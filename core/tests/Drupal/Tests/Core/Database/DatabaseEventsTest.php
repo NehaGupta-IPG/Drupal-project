@@ -12,7 +12,6 @@ use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
 use Drupal\Core\Database\Event\StatementExecutionStartEvent;
 use Drupal\Core\Database\Exception\EventException;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
-use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -35,7 +34,7 @@ class DatabaseEventsTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->connection = new StubConnection($this->createStub(StubPDO::class), []);
+    $this->connection = new StubConnection($this->createStub(\PDO::class), []);
   }
 
   /**
@@ -69,7 +68,7 @@ class DatabaseEventsTest extends UnitTestCase {
    */
   public function testEnableInvalidEvent(): void {
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('Event class foo does not exist');
+    $this->expectExceptionMessageIs('Event class foo does not exist');
     $this->connection->enableEvents(['foo']);
   }
 
@@ -80,7 +79,7 @@ class DatabaseEventsTest extends UnitTestCase {
    */
   public function testDisableInvalidEvent(): void {
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('Event class bar does not exist');
+    $this->expectExceptionMessageIs('Event class bar does not exist');
     $this->connection->disableEvents(['bar']);
   }
 
@@ -91,7 +90,7 @@ class DatabaseEventsTest extends UnitTestCase {
    */
   public function testEventDispatchingWhenNoContainerAvailable(): void {
     $this->expectException(EventException::class);
-    $this->expectExceptionMessage('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
+    $this->expectExceptionMessageIs('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
     $this->connection->dispatchEvent($this->createStub(DatabaseEvent::class));
   }
 

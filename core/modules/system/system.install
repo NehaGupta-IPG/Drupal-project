@@ -37,6 +37,18 @@ function system_update_last_removed(): int {
 }
 
 /**
+ * Moved to search_update_11401().
+ */
+function system_update_11400(): void {
+}
+
+/**
+ * Moved to search_update_11402().
+ */
+function system_update_11401(): void {
+}
+
+/**
  * Remove the deprecated sequences table.
  */
 function system_update_12000(): void {

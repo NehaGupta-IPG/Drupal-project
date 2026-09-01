@@ -12,6 +12,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\system\Entity\Menu;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
+use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -149,6 +150,10 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->drupalGet('node/add/page');
     $this->submitForm($edit, 'Preview');
 
+    // Get the current checksum (invalidation count) for the main menu.
+    $menu_cache_tag = 'config:system.menu.main';
+    $current_checksum = \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]);
+
     // Create a node.
     $node_title = $this->randomMachineName();
     $edit = [
@@ -162,6 +167,9 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->drupalGet('test-page');
     $this->assertSession()->linkNotExists($node_title);
 
+    // Saving a node without menu link must not invalidate the menu.
+    $this->assertEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
+
     // Edit the node, enable the menu link setting, but skip the link title.
     $edit = [
       'menu[enabled]' => 1,
@@ -173,6 +181,10 @@ class MenuUiNodeTest extends BrowserTestBase {
     // Assert that there is a link for the node.
     $this->drupalGet('test-page');
     $this->assertSession()->linkExists($node_title);
+
+    // Adding a menu link must update the checksum.
+    $this->assertNotEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
+    $current_checksum = \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]);
 
     // Make sure the menu links only appear when the node is published.
     // These buttons just appear for 'administer nodes' users.
@@ -197,6 +209,10 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
     $this->drupalGet('test-page');
     $this->assertSession()->linkNotExists($node_title, 'Found no menu link with the node unpublished');
+
+    // No change to the menu link, invalidation happened through the node.
+    $this->assertEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
+
     // Assert that the link exists if published.
     $edit = [
       'status[value]' => TRUE,
@@ -205,6 +221,9 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
     $this->drupalGet('test-page');
     $this->assertSession()->linkExists($node_title, 0, 'Found a menu link with the node published');
+
+    // No change to the menu link, invalidation happened through the node.
+    $this->assertEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
 
     // Log back in as normal user.
     $this->drupalLogin($this->editor);
@@ -216,6 +235,10 @@ class MenuUiNodeTest extends BrowserTestBase {
     ];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit, 'Save');
+
+    // Changing the weight must update the checksum.
+    $this->assertNotEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
+
     // Assert that the link exists.
     $this->drupalGet('test-page');
     $this->assertSession()->linkExists($node_title);
@@ -235,10 +258,16 @@ class MenuUiNodeTest extends BrowserTestBase {
     $link = MenuLinkContent::load($link_id);
     $link->set('enabled', FALSE);
     $link->save();
+
+    $current_checksum = \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]);
+
     $this->drupalGet($node->toUrl('edit-form'));
     $this->submitForm($edit, 'Save');
     $link = MenuLinkContent::load($link_id);
     $this->assertFalse($link->isEnabled(), 'Saving a node with a disabled menu link keeps the menu link disabled.');
+
+    // No change to the menu link when saving the node.
+    $this->assertEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
 
     // Edit the node and remove the menu link.
     $edit = [
@@ -249,6 +278,9 @@ class MenuUiNodeTest extends BrowserTestBase {
     // Assert that there is no link for the node.
     $this->drupalGet('test-page');
     $this->assertSession()->linkNotExists($node_title);
+
+    // Deleting the link must update the checksum.
+    $this->assertNotEquals($current_checksum, \Drupal::service('cache_tags.invalidator.checksum')->getCurrentChecksum([$menu_cache_tag]));
 
     // Add a menu link to the Administration menu.
     $item = MenuLinkContent::create([
@@ -392,7 +424,7 @@ class MenuUiNodeTest extends BrowserTestBase {
    */
   public function testMenuNodeWithGrantsFormWidget(): void {
     \Drupal::service('module_installer')->install(['node_access_test']);
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
     $this->assertTrue(\Drupal::moduleHandler()->hasImplementations('node_grants'));
 
     $admin_user = $this->drupalCreateUser([

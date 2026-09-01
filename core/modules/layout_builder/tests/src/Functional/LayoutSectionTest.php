@@ -28,6 +28,7 @@ class LayoutSectionTest extends BrowserTestBase {
     'layout_builder',
     'node',
     'block_test',
+    'dynamic_page_cache',
   ];
 
   /**
@@ -64,7 +65,7 @@ class LayoutSectionTest extends BrowserTestBase {
   /**
    * Provides test data for ::testLayoutSectionFormatter().
    */
-  public static function providerTestLayoutSectionFormatter() {
+  public static function providerTestLayoutSectionFormatter(): array {
     $data = [];
     $data['block_with_global_context'] = [
       [
@@ -173,7 +174,7 @@ class LayoutSectionTest extends BrowserTestBase {
    * Tests layout_section formatter output.
    */
   #[DataProvider('providerTestLayoutSectionFormatter')]
-  public function testLayoutSectionFormatter($layout_data, $expected_selector, $expected_content, $expected_cache_contexts, $expected_cache_tags, $expected_dynamic_cache): void {
+  public function testLayoutSectionFormatter(array $layout_data, $expected_selector, $expected_content, string $expected_cache_contexts, string $expected_cache_tags, string $expected_dynamic_cache): void {
     $node = $this->createSectionNode($layout_data);
 
     $canonical_url = $node->toUrl('canonical');
