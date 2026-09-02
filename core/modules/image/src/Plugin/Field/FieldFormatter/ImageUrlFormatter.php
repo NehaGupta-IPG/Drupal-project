@@ -9,6 +9,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
@@ -134,7 +135,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
         $cacheability->addCacheableDependency(CacheableMetadata::createFromObject($image_style));
       }
 
-      $elements[$delta] = ['#markup' => $url];
+      $elements[$delta] = ['#markup' => Markup::create($url)];
       $cacheability->applyTo($elements[$delta]);
     }
     return $elements;

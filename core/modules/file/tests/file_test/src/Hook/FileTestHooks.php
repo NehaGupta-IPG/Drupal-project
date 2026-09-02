@@ -172,6 +172,24 @@ class FileTestHooks {
         $uri = '/' . base_path() . '/' . $path;
       }
     }
+    elseif ($alter_mode == 'query-parameter') {
+      // Simulate a module that appends a second query parameter to image
+      // derivative URLs, as the contributed crop module does. Only derivative
+      // URLs are altered, matching that module's behavior.
+      if (!str_contains($uri, '/styles/')) {
+        return;
+      }
+      // Resolve to an external URL before appending. Appending to the stream
+      // URI instead would send the query separator through
+      // UrlHelper::encodePath(), turning "?" into "%3F".
+      $scheme = $stream_wrapper_manager::getScheme($uri);
+      if ($scheme && !in_array($scheme, ['http', 'https', 'data'])) {
+        if ($wrapper = $stream_wrapper_manager->getViaUri($uri)) {
+          $uri = $wrapper->getExternalUrl();
+        }
+      }
+      $uri .= (str_contains($uri, '?') ? '&' : '?') . 'h=abc12345';
+    }
   }
 
   /**
