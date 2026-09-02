@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
+use Drupal\Core\Database\Schema\Index;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
+use Drupal\pgsql\Schema\IndexType;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cSpell:ignore attname attnum attrelid objid refobjid refobjsubid regclass
-// cspell:ignore relkind relname
+// cSpell:ignore attname attnum attrelid objid refobjid regclass relkind refobjsubid
+// cSpell:ignore tsvector relname
 
 /**
  * Tests schema API for the PostgreSQL driver.
@@ -136,8 +139,28 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       $new_index_name = $ensure_identifier_length->invoke($this->schema, $table_name, $original_index_name, 'idx');
       $table_specification['indexes'][$new_index_name] = $columns;
     }
+    // This is returned from introspection but is not part of the table
+    // specification used to create the table.
+    $table_specification['index_definitions'] = [
+      'test_field_4' => 'CREATE INDEX ...',
+      'test_field_4_test_field_5' => 'CREATE INDEX ...',
+    ];
+    foreach ($table_specification['index_definitions'] as $original_index_name => $columns) {
+      unset($table_specification['index_definitions'][$original_index_name]);
+      $new_index_name = $ensure_identifier_length->invoke($this->schema, $table_name, $original_index_name, 'idx');
+      $table_specification['index_definitions'][$new_index_name] = $columns;
+    }
 
-    $this->assertEquals($table_specification, $index_schema);
+    $this->assertEquals(
+      array_filter($table_specification, fn ($key) => $key !== 'index_definitions', ARRAY_FILTER_USE_KEY),
+      array_filter($index_schema, fn ($key) => $key !== 'index_definitions', ARRAY_FILTER_USE_KEY)
+    );
+    foreach ($table_specification['index_definitions'] as $k => $v) {
+      $this->assertArrayHasKey($k, $index_schema['index_definitions']);
+      // We are not testing PgSQL's internals, rather that we are successfully
+      // retrieving an index creation statement.
+      $this->assertStringStartsWith('CREATE INDEX ', $v);
+    }
   }
 
   /**
@@ -420,6 +443,179 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     ];
     $this->schema->createTable($table_name, $table_spec);
     $this->assertTrue($this->schema->tableExists($table_name));
+  }
+
+  /**
+   * Provides the definitions for database index creation with GIN/GIST indexes.
+   *
+   * This method returns an array containing configuration details for both GIN
+   * and GIST index types. Each definition includes field specifications, index
+   * configurations, and primary key information, tailored for database indexing
+   * scenarios that benefit from either GIN or GIST characteristics.
+   *
+   * @return array
+   *   The array defining GIN and GIST index configurations.
+   *   Including fields, indexes, and primary keys.
+   */
+  public static function ginGistIndexDefinitionProvider(): array {
+    return [
+      'gin' => [
+        'gin',
+        [
+          'fields' => [
+            'id' => [
+              'type' => 'serial',
+              'not null' => TRUE,
+              'description' => 'Primary Key: Unique ID.',
+            ],
+            'text' => [
+              'type' => 'text',
+              'description' => 'A text field',
+            ],
+          ],
+          'indexes' => [
+            'text_column_index' => new Index(
+              ['text'],
+              [
+                'pgsql' => [
+                  'type' => IndexType::Gin,
+                  'operator' => 'gin_trgm_ops',
+                ],
+              ]
+            ),
+          ],
+          'primary key' => ['id'],
+        ],
+      ],
+      'gist' => [
+        'gist',
+        [
+          'fields' => [
+            'id' => [
+              'type' => 'serial',
+              'not null' => TRUE,
+              'description' => 'Primary Key: Unique ID.',
+            ],
+            'text' => [
+              'type' => 'text',
+              'description' => 'A text field',
+            ],
+          ],
+          'indexes' => [
+            'text_column_index' => new Index(
+              ['text'],
+              [
+                'pgsql' => [
+                  'type' => IndexType::Gist,
+                  'operator' => 'gist_trgm_ops',
+                ],
+              ]
+            ),
+          ],
+          'primary key' => ['id'],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Test CRUD of GIN and GIST indexes.
+   */
+  #[DataProvider('ginGistIndexDefinitionProvider')]
+  public function testGinGistIndexCrud(string $index_type, array $specification): void {
+    $table_name = 'index_with_object';
+    $this->schema->createTable($table_name, $specification);
+    $this->assertIndexOnColumns($table_name, ['text']);
+    $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
+    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
+    $this->assertCount(1, $index_schema['index_definitions']);
+    $this->assertStringContainsString('USING ' . $index_type, current($index_schema['index_definitions']));
+    $this->schema->dropIndex('index_with_object', 'text_column_index');
+    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
+    $this->assertEmpty($index_schema['indexes']);
+    // Test adding an index via ::addIndex().
+    $this->schema->addIndex(
+      'index_with_object',
+      'text_column_index_2',
+      new Index(
+        ['text'],
+        [
+          'pgsql' => $specification['indexes']['text_column_index']->getDatabaseConfig('pgsql'),
+        ]
+      ),
+      array_filter($specification, fn($k) => $k !== 'indexes', ARRAY_FILTER_USE_KEY),
+    );
+    $index_schema = $introspect_index_schema->invoke($this->schema, 'index_with_object');
+    $this->assertCount(1, $index_schema['index_definitions']);
+    $this->assertStringContainsString('USING ' . $index_type, current($index_schema['index_definitions']));
+  }
+
+  /**
+   * Test restriction on substring indexes when using GIN and GIST.
+   */
+  public function testNoGinGistSubstringIndexes(): void {
+    $specification = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+          'description' => 'Primary Key: Unique ID.',
+        ],
+        'text' => [
+          'type' => 'text',
+          'description' => 'A text field',
+        ],
+      ],
+      'indexes' => [
+        'text_column_index' => new Index(
+          [['text', 10]],
+          [
+            'pgsql' => [
+              'type' => IndexType::Gist,
+              'operator' => 'gist_trgm_ops',
+            ],
+          ]
+        ),
+      ],
+      'primary key' => ['id'],
+    ];
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage('Postgres GIST indexes are incompatible with substring column definition.');
+    $this->schema->createTable('exceptional', $specification);
+  }
+
+  /**
+   * Test restriction on multi-column support for GIN and GIST index types.
+   */
+  public function testNoMultiColumnIndexesForGinGist(): void {
+    $specification = [
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+          'description' => 'Primary Key: Unique ID.',
+        ],
+        'text' => [
+          'type' => 'text',
+          'description' => 'A text field',
+        ],
+      ],
+      'indexes' => [
+        'text_column_index' => new Index(
+          ['id', 'text'],
+          [
+            'pgsql' => [
+              'type' => IndexType::Gist,
+              'operator' => 'gist_trgm_ops',
+            ],
+          ]
+        ),
+      ],
+      'primary key' => ['id'],
+    ];
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessageMatches('/^Postgres indexes of GIST type in Drupal are currently limited to single columns..*/');
+    $this->schema->createTable('exceptional', $specification);
   }
 
 }
