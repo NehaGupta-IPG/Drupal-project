@@ -331,6 +331,19 @@
           enableItems($mediaItems);
         }
       }
+
+      function updateModalSelection() {
+        const mediaLibraryModalSelection = document.querySelector(
+          '#media-library-modal-selection',
+        );
+
+        if (mediaLibraryModalSelection) {
+          // Set the selection in the hidden form element.
+          mediaLibraryModalSelection.value = currentSelection.join();
+          $(mediaLibraryModalSelection).trigger('change');
+        }
+      }
+
       // Update the selection array and the hidden form field when a media item
       // is selected.
       $(once('media-item-change', $mediaItems)).on('change', (e) => {
@@ -347,15 +360,7 @@
           currentSelection.splice(currentSelection.indexOf(id), 1);
         }
 
-        const mediaLibraryModalSelection = document.querySelector(
-          '#media-library-modal-selection',
-        );
-
-        if (mediaLibraryModalSelection) {
-          // Set the selection in the hidden form element.
-          mediaLibraryModalSelection.value = currentSelection.join();
-          $(mediaLibraryModalSelection).trigger('change');
-        }
+        updateModalSelection();
 
         // Set the selection in the media library add form. Since the form is
         // not necessarily loaded within the same context, we can't use the
@@ -367,6 +372,7 @@
           });
       });
       checkEnabled();
+      updateModalSelection();
       // The hidden selection form field changes when the selection is updated.
       $(
         once(
