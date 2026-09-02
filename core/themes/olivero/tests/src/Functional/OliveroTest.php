@@ -177,4 +177,16 @@ class OliveroTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Community carpentry');
   }
 
+  public function testMobileNavButtonLabelInName(): void {
+    $this->drupalGet('');
+    $this->assertSession()->statusCodeEquals(200);
+
+    $button = $this->assertSession()
+      ->elementExists('css', 'button[data-drupal-selector="mobile-nav-button"]');
+    $visible_label = $button->find('css', '.mobile-nav-button__label')->getText();
+
+    // WCAG 2.5.3 Label in Name: the accessible name must contain the visible
+    // label text.
+    $this->assertStringContainsString($visible_label, $button->getAttribute('aria-label'));
+  }
 }
