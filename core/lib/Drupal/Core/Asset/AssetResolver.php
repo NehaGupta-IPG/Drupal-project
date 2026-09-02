@@ -12,6 +12,7 @@ use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * The default asset resolver.
@@ -68,6 +69,13 @@ class AssetResolver implements AssetResolverInterface {
   protected $themeHandler;
 
   /**
+   * The logger.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * Constructs a new AssetResolver instance.
    *
    * @param \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery
@@ -84,8 +92,11 @@ class AssetResolver implements AssetResolverInterface {
    *   The cache backend.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler service.
+   * @param \Psr\Log\LoggerInterface|null $logger
+   *   The logger. Omitted for backwards compatibility; the 'asset' logger
+   *   channel is used as a fallback.
    */
-  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler) {
+  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler, ?LoggerInterface $logger = NULL) {
     $this->libraryDiscovery = $library_discovery;
     $this->libraryDependencyResolver = $library_dependency_resolver;
     $this->moduleHandler = $module_handler;
@@ -93,6 +104,13 @@ class AssetResolver implements AssetResolverInterface {
     $this->languageManager = $language_manager;
     $this->cache = $cache;
     $this->themeHandler = $theme_handler;
+    if (!isset($logger)) {
+      $this->logger = \Drupal::logger('asset');
+      @trigger_error('Constructing AssetResolver without a logger is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
+    }
+    else {
+      $this->logger = $logger;
+    }
   }
 
   /**
@@ -231,7 +249,7 @@ class AssetResolver implements AssetResolverInterface {
     }
     $cid = 'importmap:' . $active_theme . ':' . hash('sha256', implode(',', $extensions));
     if ($cached = $this->cache->get($cid)) {
-      return $cached->data['import_map'];
+      return $cached->data;
     }
     $import_map = [
       'imports' => [],
@@ -251,10 +269,11 @@ class AssetResolver implements AssetResolverInterface {
         $this->mergeImportMap($import_map, $definition['importmap'], "$extension/$name", $provenance);
       }
     }
-    $this->cache->set($cid, [
-      'import_map' => $import_map,
-      'provenance' => $provenance,
-    ], CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
+    // The provenance is only used to log conflicts while the map is built;
+    // it is not part of the cached import map. The import map cache is tagged
+    // with 'library_info', so a conflict is logged again whenever the library
+    // information changes.
+    $this->cache->set($cid, $import_map, CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
 
     return $import_map;
   }
@@ -315,12 +334,18 @@ class AssetResolver implements AssetResolverInterface {
    */
   protected function mergeImportMapEntry(array &$entries, array &$provenance, string $key, mixed $value, string $context, string $library): void {
     if (array_key_exists($key, $entries)) {
-      if ($entries[$key] === $value) {
+      // Compare the entries without their version. Two libraries may map the
+      // same module specifier to the same file, with different library
+      // versions. The version only affects the query string of the module
+      // URL, not the module itself, so it is not a conflict.
+      $existing = $entries[$key];
+      unset($existing['version'], $value['version']);
+      if ($existing === $value) {
         // The entry is identical to the existing one: nothing to do.
         return;
       }
       $existing_library = $provenance[$key];
-      \Drupal::logger('asset')->error(sprintf("Import map conflict: the module specifier '%s' in the %s is defined by both %s and %s with different values. The value from %s is used. Remove the duplicate definition from one of the libraries.", $key, $context, $existing_library, $library, $existing_library));
+      $this->logger->error(sprintf("Import map conflict: the module specifier '%s' in the %s is defined by both %s and %s with different values. The value from %s is used. Remove the duplicate definition from one of the libraries.", $key, $context, $existing_library, $library, $existing_library));
       return;
     }
     $entries[$key] = $value;

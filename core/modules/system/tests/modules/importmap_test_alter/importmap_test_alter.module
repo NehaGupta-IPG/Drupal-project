@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Alters import map definitions for testing.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_library_info_alter().
+ *
+ * Adds an import map entry to the importmap library of the importmap_test
+ * module, so that tests can verify that the result of the hook goes through
+ * the import map validation and path resolution of the library parser.
+ */
+function importmap_test_alter_library_info_alter(array &$libraries, $extension): void {
+  if ($extension === 'importmap_test' && isset($libraries['importmap']['importmap'])) {
+    $libraries['importmap']['importmap']['imports']['importmap-test-altered'] = 'js/altered.js';
+  }
+}

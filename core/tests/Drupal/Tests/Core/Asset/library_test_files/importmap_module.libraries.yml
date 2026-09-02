@@ -4,9 +4,11 @@ importmap:
     imports:
       importmap-test-foo: js/foo.js
       importmap-test-absolute: /core/misc/align-right.js
+      importmap-test-libraries: /libraries/llama/lib.mjs
       importmap-test-protocol-free: //example.com/importmap-test-foo.js
       importmap-test-external: https://example.com/importmap-test-foo.js
       importmap-test-prefix/: js/prefix/
+      importmap-test-root: /
     scopes:
       js/v1:
         importmap-test-foo: js/foo-v1.js

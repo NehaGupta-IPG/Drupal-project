@@ -12,7 +12,7 @@ importmap:
       js/foo.js: sha384-oXiGjHO+NOxR1XH8somfajtqMWa5PTleNh5VGncEbQQTrZZboU8xIMhoDzGBbroU
 
 duplicate:
-  version: '1.0'
+  version: '2.0'
   importmap:
     imports:
       importmap-test-foo: js/foo.js

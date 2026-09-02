@@ -1,0 +1,7 @@
+name: 'Import map test alter'
+type: module
+description: 'Alters import map definitions in hook_library_info_alter() for testing.'
+package: Testing
+core_version_requirement: ^12 || ^13
+dependencies:
+  - drupal:importmap_test

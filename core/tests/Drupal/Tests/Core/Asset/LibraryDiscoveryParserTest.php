@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Asset;
 
 use Drupal\Component\Datetime\Time;
 use Drupal\Core\Asset\Exception\IncompleteLibraryDefinitionException;
+use Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException;
 use Drupal\Core\Asset\Exception\InvalidLibraryFileException;
 use Drupal\Core\Asset\Exception\LibraryDefinitionMissingLicenseException;
 use Drupal\Core\Asset\LibrariesDirectoryFileFinder;
@@ -429,7 +430,12 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
           'version' => '2.0',
         ],
         'importmap-test-absolute' => [
-          'data' => '/core/misc/align-right.js',
+          'data' => 'core/misc/align-right.js',
+          'external' => FALSE,
+          'version' => '2.0',
+        ],
+        'importmap-test-libraries' => [
+          'data' => 'libraries/llama/lib.mjs',
           'external' => FALSE,
           'version' => '2.0',
         ],
@@ -448,6 +454,11 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
           'external' => FALSE,
           'version' => '2.0',
         ],
+        'importmap-test-root' => [
+          'data' => '',
+          'external' => FALSE,
+          'version' => '2.0',
+        ],
       ],
       'scopes' => [
         $path . '/js/v1' => [
@@ -457,7 +468,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
             'version' => '2.0',
           ],
         ],
-        '/absolute-scope' => [
+        'absolute-scope' => [
           'importmap-test-foo' => [
             'data' => $path . '/js/foo-v2.js',
             'external' => FALSE,
@@ -472,14 +483,95 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
           'version' => '2.0',
           'integrity' => 'sha384-oXiGjHO+NOxR1XH8somfajtqMWa5PTleNh5VGncEbQQTrZZboU8xIMhoDzGBbroU',
         ],
-        '/core/misc/align-right.js' => [
-          'data' => '/core/misc/align-right.js',
+        'core/misc/align-right.js' => [
+          'data' => 'core/misc/align-right.js',
           'external' => FALSE,
           'version' => '2.0',
           'integrity' => 'sha384-other',
         ],
       ],
     ], $library['importmap']);
+  }
+
+  /**
+   * Tests that an import map entry in the libraries directory is resolved.
+   *
+   * An absolute path to the libraries directory is resolved through the
+   * libraries directory file finder, mirroring the resolution of js and css
+   * asset sources.
+   *
+   * @legacy-covers ::buildByExtension
+   */
+  public function testImportMapLibrariesDirectory(): void {
+    $this->setUpMockLibrariesDirectoryFileFinder();
+    $this->librariesDirectoryFileFinder->expects($this->once())
+      ->method('find')
+      ->with('llama/lib.mjs')
+      ->willReturn('libraries/llama/lib.mjs');
+
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module')
+      ->willReturn(TRUE);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module')
+      ->willReturn($path);
+
+    $libraries = $this->libraryDiscoveryParser->buildByExtension('importmap_module');
+    $this->assertSame('libraries/llama/lib.mjs', $libraries['importmap']['importmap']['imports']['importmap-test-libraries']['data']);
+  }
+
+  /**
+   * Tests that the importmap of a library may not be overridden.
+   *
+   * The importmap has a nested structure (imports, scopes and integrity) that
+   * does not fit the asset-to-asset override format of libraries-override.
+   *
+   * @legacy-covers ::applyLibrariesOverride
+   */
+  public function testImportMapOverride(): void {
+    $mock_theme_path = 'mocked_themes/kittens';
+    $this->themeManager = $this->createStub(ThemeManagerInterface::class);
+    $this->activeTheme = $this->createMock(ActiveTheme::class);
+    $this->activeTheme->expects($this->atLeastOnce())
+      ->method('getLibrariesOverride')
+      ->willReturn([
+        $mock_theme_path => [
+          'importmap_module/importmap' => [
+            'importmap' => [
+              'imports' => [
+                'importmap-test-foo' => 'js/override-foo.js',
+              ],
+            ],
+          ],
+        ],
+      ]);
+    $this->themeManager
+      ->method('getActiveTheme')
+      ->willReturn($this->activeTheme);
+
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+    $this->extensionPathResolver->expects($this->atLeastOnce())
+      ->method('getPath')
+      ->with('module', 'importmap_module')
+      ->willReturn($path);
+    $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
+
+    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
+
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('importmap_module')
+      ->willReturn(TRUE);
+
+    $this->expectException(InvalidLibrariesOverrideSpecificationException::class);
+    $this->expectExceptionMessage("The importmap of the library importmap_module/importmap may not be overridden in libraries-override. Use hook_library_info_alter() instead.");
+    $this->libraryDiscoveryParser->buildByExtension('importmap_module');
   }
 
   /**

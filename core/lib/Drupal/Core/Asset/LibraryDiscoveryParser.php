@@ -539,6 +539,12 @@ class LibraryDiscoveryParser {
                 // drupalSettings may not be overridden.
                 throw new InvalidLibrariesOverrideSpecificationException(sprintf('drupalSettings may not be overridden in libraries-override. Trying to override %s. Use hook_library_info_alter() instead.', "$extension/$library_name/$sub_key"));
               }
+              elseif ($sub_key === 'importmap') {
+                // The importmap has a nested structure (imports, scopes and
+                // integrity) that does not fit the asset-to-asset override
+                // format, so it may not be overridden.
+                throw new InvalidLibrariesOverrideSpecificationException(sprintf("The importmap of the library %s may not be overridden in libraries-override. Use hook_library_info_alter() instead.", "$extension/$library_name"));
+              }
               elseif ($sub_key === 'css') {
                 // SMACSS category should be incorporated into the asset name.
                 foreach ($value as $category => $overrides) {
@@ -775,18 +781,20 @@ class LibraryDiscoveryParser {
    */
   protected function resolveImportMapSource(string $source, string $path, string $id, string $extension): array {
     if ($source[0] === '/') {
-      if ($source[1] !== '/') {
-        // An absolute path maps to DRUPAL_ROOT / base_path().
-        if (str_starts_with($source, 'libraries/')) {
-          $path_to_source = $this->librariesDirectoryFileFinder->find(substr($source, 10));
-          if ($path_to_source) {
-            return [$path_to_source, FALSE];
-          }
-        }
-        return [$source, FALSE];
-      }
       // A protocol-free URI (e.g., //cdn.com/example.mjs) is external.
-      return [$source, TRUE];
+      if (($source[1] ?? '') === '/') {
+        return [$source, TRUE];
+      }
+      // An absolute path maps to DRUPAL_ROOT / base_path().
+      $source = substr($source, 1);
+      // Non core provided libraries can be in multiple locations.
+      if (str_starts_with($source, 'libraries/')) {
+        $path_to_source = $this->librariesDirectoryFileFinder->find(substr($source, 10));
+        if ($path_to_source) {
+          return [$path_to_source, FALSE];
+        }
+      }
+      return [$source, FALSE];
     }
     // A stream wrapper URI (e.g., public://generated_js/example.mjs).
     elseif ($this->streamWrapperManager->isValidUri($source)) {

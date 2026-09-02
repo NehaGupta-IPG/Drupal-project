@@ -605,6 +605,9 @@ services:
   logger.channel.image:
     parent: logger.channel_base
     arguments: ['image']
+  logger.channel.asset:
+    parent: logger.channel_base
+    arguments: ['asset']
   logger.channel.cron:
     parent: logger.channel_base
     arguments: ['cron']
@@ -1844,7 +1847,7 @@ services:
       - [ appendBackend, [ '@cache.data' ] ]
   asset.resolver:
     class: Drupal\Core\Asset\AssetResolver
-    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.asset_chain', '@theme_handler']
+    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.asset_chain', '@theme_handler', '@logger.channel.asset']
   Drupal\Core\Asset\AssetResolverInterface: '@asset.resolver'
   info_parser:
     class: Drupal\Core\Extension\InfoParser

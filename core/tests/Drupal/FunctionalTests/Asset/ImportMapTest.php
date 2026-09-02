@@ -107,7 +107,7 @@ class ImportMapTest extends BrowserTestBase {
     $this->assertNotFalse($importmap_start);
     $this->assertGreaterThan($head_start, $importmap_start);
     $this->assertLessThan($head_end, $importmap_start, 'The import map script is in the head.');
-    $this->assertDoesNotMatchRegularExpression('/<script[^>]*type="module"[^>]*>/', substr($content, 0, $importmap_start), 'No module scripts come before the import map script.');
+    $this->assertDoesNotMatchRegularExpression('/<script[^>]*type="module"[^>]*>|<link[^>]*rel="modulepreload"[^>]*>/', substr($content, 0, $importmap_start), 'No module scripts or module preloads come before the import map script.');
     // No module preloads, since no library with import map entries is
     // attached.
     $this->assertCount(0, $this->getSession()->getPage()->findAll('css', 'link[rel="modulepreload"]'));

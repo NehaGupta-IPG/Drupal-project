@@ -21,7 +21,7 @@ class ImportMapResolverTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['importmap_test', 'importmap_test_conflict'];
+  protected static $modules = ['importmap_test', 'importmap_test_alter', 'importmap_test_conflict'];
 
   /**
    * The asset resolver service.
@@ -81,6 +81,11 @@ class ImportMapResolverTest extends KernelTestBase {
           'external' => TRUE,
           'version' => '1.0',
         ],
+        'importmap-test-altered' => [
+          'data' => "$path/js/altered.js",
+          'external' => FALSE,
+          'version' => '1.0',
+        ],
         'importmap-test-duplicate' => [
           'data' => "$conflict_path/js/duplicate.js",
           'external' => FALSE,
@@ -116,8 +121,24 @@ class ImportMapResolverTest extends KernelTestBase {
     $this->assertStringContainsString("the module specifier 'importmap-test-foo' in the 'imports' section is defined by both", $conflict_message[1]);
     $this->assertStringContainsString('importmap_test/importmap', $conflict_message[1]);
     $this->assertStringContainsString('importmap_test_conflict/conflict', $conflict_message[1]);
-    // The duplicate entry of the same module does not conflict.
+    // The duplicate entry of the same module, with a different library
+    // version, does not conflict.
     $this->assertStringNotContainsString('importmap_test/duplicate', $conflict_message[1]);
+  }
+
+  /**
+   * Tests an import map entry added by hook_library_info_alter().
+   *
+   * The entry is validated, and its path is resolved by the library parser.
+   */
+  public function testGetImportMapAlteredByLibraryInfoAlter(): void {
+    $import_map = $this->assetResolver->getImportMap();
+    $path = $this->container->get('extension.list.module')->getPath('importmap_test');
+    $this->assertSame([
+      'data' => "$path/js/altered.js",
+      'external' => FALSE,
+      'version' => '1.0',
+    ], $import_map['imports']['importmap-test-altered']);
   }
 
   /**
@@ -135,6 +156,10 @@ class ImportMapResolverTest extends KernelTestBase {
 
   /**
    * Tests the module preloads for attached libraries.
+   *
+   * The preloads include the 'importmap-test-altered' entry, added to the
+   * importmap library by the importmap_test_alter module in
+   * hook_library_info_alter().
    */
   public function testGetModulePreloads(): void {
     $assets = (new AttachedAssets())->setLibraries(['importmap_test/consumer']);
@@ -149,6 +174,11 @@ class ImportMapResolverTest extends KernelTestBase {
       [
         'data' => 'https://example.com/importmap-test-external.mjs',
         'external' => TRUE,
+        'version' => '1.0',
+      ],
+      [
+        'data' => "$path/js/altered.js",
+        'external' => FALSE,
         'version' => '1.0',
       ],
       [
@@ -175,6 +205,11 @@ class ImportMapResolverTest extends KernelTestBase {
       [
         'data' => 'https://example.com/importmap-test-external.mjs',
         'external' => TRUE,
+        'version' => '1.0',
+      ],
+      [
+        'data' => "$path/js/altered.js",
+        'external' => FALSE,
         'version' => '1.0',
       ],
       [

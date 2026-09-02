@@ -18,16 +18,13 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Tests Drupal\Core\Asset\AssetResolver.
@@ -81,6 +78,13 @@ class AssetResolverTest extends UnitTestCase {
    * The theme handler.
    */
   protected ThemeHandlerInterface&Stub $themeHandler;
+
+  /**
+   * The logger.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelInterface&\PHPUnit\Framework\MockObject\Stub
+   */
+  protected $logger;
 
   /**
    * A English language object.
@@ -269,7 +273,19 @@ class AssetResolverTest extends UnitTestCase {
       ->method('getTheme')
       ->willReturn(new Extension($this->root, 'theme', 'core/themes/stark/stark.info.yml'));
 
-    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler);
+    $this->logger = $this->createStub(LoggerChannelInterface::class);
+
+    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $this->logger);
+  }
+
+  /**
+   * Re-creates the asset resolver with a mock logger.
+   *
+   * Used by tests that assert on the log messages of the asset resolver.
+   */
+  protected function createAssetResolverWithLogger(): void {
+    $this->logger = $this->createMock(LoggerChannelInterface::class);
+    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $this->logger);
   }
 
   /**
@@ -415,24 +431,6 @@ class AssetResolverTest extends UnitTestCase {
   }
 
   /**
-   * Sets up a container with a stub logger factory.
-   *
-   * @return \Drupal\Core\Logger\LoggerChannelInterface&\PHPUnit\Framework\MockObject\MockObject
-   *   The logger channel mock, to which all log messages are sent.
-   */
-  protected function setUpLoggerChannel(): LoggerChannelInterface&MockObject {
-    $logger_channel = $this->createMock(LoggerChannelInterface::class);
-    $logger_factory = $this->createStub(LoggerChannelFactoryInterface::class);
-    $logger_factory
-      ->method('get')
-      ->willReturn($logger_channel);
-    $container = new ContainerBuilder();
-    $container->set('logger.factory', $logger_factory);
-    \Drupal::setContainer($container);
-    return $logger_channel;
-  }
-
-  /**
    * Tests get import map.
    */
   public function testGetImportMap(): void {
@@ -517,7 +515,7 @@ class AssetResolverTest extends UnitTestCase {
    * Tests that a conflicting import map entry is ignored, and logged.
    */
   public function testGetImportMapWithConflict(): void {
-    $logger_channel = $this->setUpLoggerChannel();
+    $this->createAssetResolverWithLogger();
     $this->modules = ['llama', 'piggy'];
     $this->extensionLibraries = [
       'llama' => [
@@ -543,7 +541,7 @@ class AssetResolverTest extends UnitTestCase {
         ],
       ],
     ];
-    $logger_channel->expects($this->once())
+    $this->logger->expects($this->once())
       ->method('error')
       ->with($this->stringContains("The module specifier 'llama' in the 'imports' section is defined by both llama/llama-library and piggy/piggy-library with different values. The value from llama/llama-library is used."));
     $import_map = $this->assetResolver->getImportMap();
@@ -551,10 +549,14 @@ class AssetResolverTest extends UnitTestCase {
   }
 
   /**
-   * Tests that an identical import map entry is not considered a conflict.
+   * Tests that a duplicate import map entry is not a conflict.
+   *
+   * The entry maps the same module specifier to the same file, but the
+   * library versions differ. The version only affects the query string of
+   * the module URL, so this is not a conflict.
    */
   public function testGetImportMapWithDuplicate(): void {
-    $logger_channel = $this->setUpLoggerChannel();
+    $this->createAssetResolverWithLogger();
     $this->modules = ['llama', 'piggy'];
     $this->extensionLibraries = [
       'llama' => [
@@ -572,7 +574,7 @@ class AssetResolverTest extends UnitTestCase {
         'piggy-library' => [
           'importmap' => [
             'imports' => [
-              'llama' => $this->importMapEntry('modules/llama/llama.mjs', '2.0'),
+              'llama' => $this->importMapEntry('modules/llama/llama.mjs', '1.0'),
             ],
             'scopes' => [],
             'integrity' => [],
@@ -580,7 +582,7 @@ class AssetResolverTest extends UnitTestCase {
         ],
       ],
     ];
-    $logger_channel->expects($this->never())
+    $this->logger->expects($this->never())
       ->method('error');
     $import_map = $this->assetResolver->getImportMap();
     $this->assertCount(1, $import_map['imports']);
