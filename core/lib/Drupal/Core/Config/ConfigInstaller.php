@@ -426,7 +426,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
             // langcode.
             if (!isset($default_langcode)) {
               $event = new ConfigLangcodeResolveEvent();
-              $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
+              $this->eventDispatcher->dispatch($event);
               $default_langcode = $event->getLangcode();
             }
             // Building typed data here to check translatability is too

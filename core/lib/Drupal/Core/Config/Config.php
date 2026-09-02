@@ -289,7 +289,7 @@ class Config extends StorableConfigBase {
       return;
     }
     $event = new ConfigLangcodeResolveEvent();
-    $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
+    $this->eventDispatcher->dispatch($event);
     $this->data['langcode'] = $event->getLangcode();
     // castValue() already sorted $this->data into schema order before
     // langcode existed as a key, so it landed here at the end instead. Left

@@ -11,7 +11,6 @@ use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigDuplicateUUIDException;
-use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigLangcodeResolveEvent;
 use Drupal\Core\Config\ConfigManagerInterface;
@@ -150,10 +149,10 @@ class ConfigEntityStorageTest extends UnitTestCase {
 
     $this->configFactory = $this->prophesize(ConfigFactoryInterface::class);
 
-    // Stand in for language module's RESOLVE_LANGCODE subscriber, which
-    // would otherwise supply the site's configuration default language.
+    // Stand in for language module's ConfigLangcodeResolveEvent subscriber,
+    // which would otherwise supply the site's configuration default language.
     $this->eventDispatcher = new EventDispatcher();
-    $this->eventDispatcher->addListener(ConfigEvents::RESOLVE_LANGCODE, function (ConfigLangcodeResolveEvent $event): void {
+    $this->eventDispatcher->addListener(ConfigLangcodeResolveEvent::class, function (ConfigLangcodeResolveEvent $event): void {
       $event->setLangcode('hu');
     });
 
@@ -261,8 +260,8 @@ class ConfigEntityStorageTest extends UnitTestCase {
    */
   public function testCreateWithExplicitLanguage(): void {
     $this->languageManager->getLanguage('en')->willReturn(new Language(['id' => 'en']));
-    $this->eventDispatcher->addListener(ConfigEvents::RESOLVE_LANGCODE, function (): void {
-      $this->fail('RESOLVE_LANGCODE must not be dispatched when an explicit langcode is supplied.');
+    $this->eventDispatcher->addListener(ConfigLangcodeResolveEvent::class, function (): void {
+      $this->fail('ConfigLangcodeResolveEvent must not be dispatched when an explicit langcode is supplied.');
     }, 1000);
 
     $entity = $this->entityStorage->create(['id' => 'foo', 'langcode' => 'en']);
