@@ -23,7 +23,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Only a response that changes the cookie is uncacheable. The subscriber
  * compares the cookie on the request with the preference of the account and
  * returns without touching the response when they already agree, which is what
- * keeps a Set-Cookie header off every cacheable response.
+ * keeps a Set-Cookie header off every cacheable response. That comparison
+ * needs the server to read back the cookie it wrote, which is a property of
+ * the name of the cookie and only observable over a real request.
  *
  * The attribute in the markup is asserted in HtmlAttributesTest, and that the
  * script applies the cookie in the browser in ColorSchemeScriptTest.
@@ -115,6 +117,50 @@ class ColorSchemeCookieTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderEquals(PageCache::HEADER, 'HIT');
     $this->assertSession()->responseHeaderDoesNotExist('Set-Cookie');
     $this->assertNull($this->getColorSchemeCookie());
+  }
+
+  /**
+   * Tests that the server reads back the cookie it wrote.
+   *
+   * Writing the cookie needs no reading, so the name of the cookie can be one
+   * the server cannot read back and everything still looks like it works: the
+   * preference reaches the browser, and the script applies it. What breaks is
+   * everything the comparison decides. The preference looks absent on every
+   * request, so every response rewrites the cookie and fires the page cache
+   * kill switch, which leaves no page of an account on 'light' or 'dark' ever
+   * cacheable, and a cookie that has to go is never cleared.
+   *
+   * A name is only readable if it survives the parsing of $_COOKIE, and only a
+   * real request goes through that parsing.
+   *
+   * @see \Drupal\Core\EventSubscriber\ColorSchemeCookieSubscriber::COOKIE_NAME
+   * @see \Drupal\Tests\Core\EventSubscriber\ColorSchemeCookieSubscriberTest
+   */
+  public function testTheServerReadsBackTheCookieItWrote(): void {
+    $account = $this->drupalCreateUser();
+    $account->set('color_scheme', 'dark')->save();
+    $this->drupalLogin($account);
+    $this->assertSame('dark', $this->getColorSchemeCookie());
+
+    // The request now carries the cookie the login wrote, and the account
+    // still asks for the same value, so there is nothing left to write.
+    $this->drupalGet(self::CACHEABLE_PATH);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertNoColorSchemeSetCookie();
+
+    // Prove the read from the other side too. The assertion above is the
+    // absence of a header; this one is the presence of a header that the
+    // response can only produce by having read the value the request carried,
+    // because 'auto' is the absence of the cookie and leaves the subscriber
+    // nothing else to compare against.
+    $account->set('color_scheme', 'auto')->save();
+    $this->drupalGet(self::CACHEABLE_PATH);
+    $this->assertColorSchemeCookieCleared();
+    $this->assertNull($this->getColorSchemeCookie());
+
+    // With the cookie gone and the account on 'auto', the two agree again.
+    $this->drupalGet(self::CACHEABLE_PATH);
+    $this->assertNoColorSchemeSetCookie();
   }
 
   /**
@@ -218,9 +264,39 @@ class ColorSchemeCookieTest extends BrowserTestBase {
 
   /**
    * Asserts that the last response leaves the color scheme cookie alone.
+   *
+   * A response only writes the cookie when the value on the request differs
+   * from the preference of the account, so a write here means the two were
+   * compared and found to differ when they should not have been.
    */
   protected function assertNoColorSchemeSetCookie(): void {
-    $this->assertSame([], $this->getColorSchemeSetCookieHeaders());
+    $this->assertSame([], $this->getColorSchemeSetCookieHeaders(), sprintf(
+      'The response writes the %s cookie that the request already carried, '
+      . 'so the server did not read it back. PHP rewrites some characters in '
+      . 'the keys of the cookie array, so a name holding a dot, a space or an '
+      . 'opening bracket is unreadable server side. Every response then '
+      . 'rewrites the cookie and fires the page cache kill switch, which '
+      . 'leaves every page of every account with a customized preference '
+      . 'permanently uncacheable.',
+      ColorSchemeCookieSubscriber::COOKIE_NAME,
+    ));
+  }
+
+  /**
+   * Asserts that the last response clears the color scheme cookie.
+   */
+  protected function assertColorSchemeCookieCleared(): void {
+    $set_cookies = $this->getColorSchemeSetCookieHeaders();
+    $this->assertCount(1, $set_cookies, sprintf(
+      'The response does not clear the %s cookie that the request carried. A '
+      . 'cookie is only cleared by comparing it with the preference of the '
+      . 'account, so a cookie the server cannot read back is never cleared.',
+      ColorSchemeCookieSubscriber::COOKIE_NAME,
+    ));
+    // A cleared cookie is written as the value 'deleted', with an expiry in
+    // the past and no lifetime left.
+    $this->assertStringStartsWith(ColorSchemeCookieSubscriber::COOKIE_NAME . '=deleted;', $set_cookies[0]);
+    $this->assertStringContainsStringIgnoringCase('max-age=0', $set_cookies[0]);
   }
 
   /**

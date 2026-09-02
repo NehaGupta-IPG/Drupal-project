@@ -36,8 +36,22 @@ class ColorSchemeCookieSubscriber implements EventSubscriberInterface {
 
   /**
    * The name of the cookie that carries the color scheme preference.
+   *
+   * The name holds no '.' and no ' ', because PHP replaces both with '_' in
+   * the keys of $_COOKIE, and no '[', because PHP reads that as the start of
+   * array notation. A name holding any of those is not the key the server
+   * reads back: the preference then looks absent on every request, so every
+   * response rewrites the cookie and triggers the kill switch, and a cookie
+   * that has to go is never cleared.
+   *
+   * The dotted 'Drupal.*' cookies elsewhere in core either never reach PHP,
+   * or read themselves back under the converted name. Spelling this one
+   * without a dot keeps the name the server writes and the name it reads the
+   * same, so neither side has to know about the conversion.
+   *
+   * @see \Drupal\Tests\Core\EventSubscriber\ColorSchemeCookieSubscriberTest::testCookieNameSurvivesCookieParsing()
    */
-  public const string COOKIE_NAME = 'Drupal.colorScheme';
+  public const string COOKIE_NAME = 'DrupalColorScheme';
 
   /**
    * The color schemes that the cookie can carry.
