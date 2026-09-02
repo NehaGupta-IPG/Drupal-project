@@ -47,7 +47,7 @@ class HtmxRenderer implements MainContentRendererInterface {
     protected RendererInterface $renderer,
     protected RenderCacheInterface $renderCache,
     protected array $rendererConfig,
-    protected MessengerInterface $messenger,
+    protected ?MessengerInterface $messenger = NULL,
   ) {
   }
 
@@ -63,7 +63,7 @@ class HtmxRenderer implements MainContentRendererInterface {
     // @see https://four.htmx.org/docs#partials-hx-partial
     $pendingMessages = $this->messenger->deleteAll();
     $messages = [];
-    foreach ($messages as $type => $messageList) {
+    foreach ($pendingMessages as $type => $messageList) {
       foreach ($messageList as $message) {
         $messages[] = [
           '#type' => 'inline_template',
