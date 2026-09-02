@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests the deletion of a configuration entity that others depend on.
  *
- * Covers three related behaviours: enforced dependencies are validated during
+ * Covers three related behaviors: enforced dependencies are validated during
  * import, deletes are processed dependents-first, and the entity API heals
  * dependents while the importer blocks instead.
  *
