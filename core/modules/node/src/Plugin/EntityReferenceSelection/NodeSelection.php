@@ -29,23 +29,31 @@ class NodeSelection extends DefaultSelection {
     // 'unpublished'. We need to do that as long as there are no access control
     // modules in use on the site. As long as one access control module is
     // there, it is supposed to handle this check.
-    if (!$this->currentUser->hasPermission('bypass node access') && !$this->moduleHandler->hasImplementations('node_grants')) {
-      // The "view own unpublished content" permission is never granted to
-      // anonymous users.
-      /* @see \Drupal\node\NodeAccessControlHandler::checkAccess() */
-      $view_own = $this->currentUser->isAuthenticated() && $this->currentUser->hasPermission('view own unpublished content');
-      $view_any = $this->currentUser->hasPermission('view any unpublished content');
-
-      if (!$this->getConfiguration()['include_unpublished_entities'] || (!$view_own && !$view_any)) {
-        $query->condition('status', NodeInterface::PUBLISHED);
-      }
-      elseif (!$view_any) {
-        // Only the user's own unpublished nodes are referenceable.
-        $query->condition($query->orConditionGroup()
-          ->condition('status', NodeInterface::PUBLISHED)
-          ->condition('uid', $this->currentUser->id()));
-      }
+    if ($this->currentUser->hasPermission('bypass node access') || $this->moduleHandler->hasImplementations('node_grants')) {
+      return $query;
     }
+
+    // The "view own unpublished content" permission is never granted to
+    // anonymous users.
+    /* @see \Drupal\node\NodeAccessControlHandler::checkAccess() */
+    $view_own = $this->currentUser->isAuthenticated() && $this->currentUser->hasPermission('view own unpublished content');
+    $view_any = $this->currentUser->hasPermission('view any unpublished content');
+
+    // Unpublished nodes are only referenceable when the field asks for them
+    // and the user may view them.
+    $view_unpublished = $this->getConfiguration()['include_unpublished_entities'] && ($view_own || $view_any);
+
+    if (!$view_unpublished) {
+      $query->condition('status', NodeInterface::PUBLISHED);
+    }
+    elseif (!$view_any) {
+      // Only the user's own unpublished nodes are referenceable, the rest of
+      // them needs the "view any unpublished content" permission.
+      $query->condition($query->orConditionGroup()
+        ->condition('status', NodeInterface::PUBLISHED)
+        ->condition('uid', $this->currentUser->id()));
+    }
+
     return $query;
   }
 
