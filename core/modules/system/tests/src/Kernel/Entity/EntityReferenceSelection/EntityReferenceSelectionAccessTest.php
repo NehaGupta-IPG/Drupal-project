@@ -18,6 +18,8 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -798,6 +800,66 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
   }
 
   /**
+   * Tests that unpublished nodes stay hidden without the right permission.
+   */
+  public function testNodeHandlerUnpublishedWithoutPermission(): void {
+    $selection_options = [
+      'target_type' => 'node',
+      'handler' => 'default',
+      'target_bundles' => NULL,
+      'include_unpublished_entities' => TRUE,
+    ];
+
+    $published = Node::create([
+      'type' => 'article',
+      'status' => NodeInterface::PUBLISHED,
+      'title' => 'Node published (<&>)',
+      'uid' => 1,
+    ]);
+    $published->save();
+    $unpublished = Node::create([
+      'type' => 'article',
+      'status' => NodeInterface::NOT_PUBLISHED,
+      'title' => 'Node unpublished (<&>)',
+      'uid' => 1,
+    ]);
+    $unpublished->save();
+    // Owned by the anonymous user, so that granting "view own unpublished
+    // content" to the anonymous role would expose it.
+    $unpublished_anonymous = Node::create([
+      'type' => 'article',
+      'status' => NodeInterface::NOT_PUBLISHED,
+      'title' => 'Node unpublished anonymous (<&>)',
+      'uid' => 0,
+    ]);
+    $unpublished_anonymous->save();
+
+    $referenceable_tests = [
+      [
+        'arguments' => [
+          [NULL, 'CONTAINS'],
+        ],
+        'result' => [
+          'article' => [
+            $published->id() => Html::escape($published->label()),
+          ],
+        ],
+      ],
+    ];
+
+    // A user who may view content but no unpublished node only gets the
+    // published one, even though the field asks for unpublished entities.
+    $this->setCurrentUser($this->createUser(['access content']));
+    $this->assertReferenceable($selection_options, $referenceable_tests, 'Node handler');
+
+    // The "view own unpublished content" permission does not apply to
+    // anonymous users.
+    $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), ['view own unpublished content']);
+    $this->setCurrentUser(User::getAnonymousUser());
+    $this->assertReferenceable($selection_options, $referenceable_tests, 'Node handler');
+  }
+
+  /**
    * Tests the node-specific overrides of the entity handler.
    */
   public function testNodeHandlerWithUnpublishedContentAccessCheck(): void {
@@ -859,7 +921,6 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
         'result' => [
           'article' => [
             $nodes['unpublished1']->id() => $node_labels['unpublished1'],
-            $nodes['unpublished2']->id() => $node_labels['unpublished2'],
             $nodes['published2']->id() => $node_labels['published2'],
           ],
         ],
@@ -872,7 +933,6 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
           'article' => [
             $nodes['published2']->id() => $node_labels['published2'],
             $nodes['unpublished1']->id() => $node_labels['unpublished1'],
-            $nodes['unpublished2']->id() => $node_labels['unpublished2'],
           ],
         ],
       ],
@@ -883,7 +943,6 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
         'result' => [
           'article' => [
             $nodes['unpublished1']->id() => $node_labels['unpublished1'],
-            $nodes['unpublished2']->id() => $node_labels['unpublished2'],
           ],
         ],
       ],
@@ -911,7 +970,6 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
         'result' => [
           'article' => [
             $nodes['unpublished1']->id() => $node_labels['unpublished1'],
-            $nodes['unpublished2']->id() => $node_labels['unpublished2'],
           ],
         ],
       ],
