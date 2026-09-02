@@ -7,6 +7,9 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\user\LoginFinalizer;
+use Drupal\user\LogoutFinalizer;
+use Drupal\user\NotificationHandler;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
@@ -21,7 +24,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * Provides controllers for login, login status and logout via HTTP requests.
  */
-class RestAuthenticationController extends ControllerBase implements ContainerInjectionInterface {
+final class RestAuthenticationController extends ControllerBase implements ContainerInjectionInterface {
 
   /**
    * String sent in responses, to describe the user as being logged in.
@@ -54,6 +57,12 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    *   The available serialization formats.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
+   * @param \Drupal\user\LoginFinalizer $loginFinalizer
+   *   The login finalizer.
+   * @param \Drupal\user\LogoutFinalizer $logoutFinalizer
+   *   The logout finalizer.
+   * @param \Drupal\user\NotificationHandler $notificationHandler
+   *   The user notification handler.
    */
   public function __construct(
     protected UserFloodControlInterface $userFloodControl,
@@ -64,6 +73,9 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
     protected Serializer $serializer,
     protected array $serializerFormats,
     protected LoggerInterface $logger,
+    protected LoginFinalizer $loginFinalizer,
+    protected LogoutFinalizer $logoutFinalizer,
+    protected NotificationHandler $notificationHandler,
   ) {
     $this->entityTypeManager = $entity_type_manager;
   }
@@ -80,7 +92,10 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
       $container->get('router.route_provider'),
       $container->get('serializer'),
       $container->getParameter('serializer.formats'),
-      $container->get('logger.factory')->get('rest')
+      $container->get('logger.factory')->get('rest'),
+      $container->get(LoginFinalizer::class),
+      $container->get(LogoutFinalizer::class),
+      $container->get(NotificationHandler::class),
     );
   }
 
@@ -134,7 +149,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
         }
         $response_data['csrf_token'] = $this->csrfToken->get('rest');
 
-        $logout_route = $this->routeProvider->getRouteByName('rest.logout.http');
+        $logout_route = $this->routeProvider->getRouteByName('rest.logout');
         // Trim '/' off path to match \Drupal\Core\Access\CsrfAccessCheck.
         $logout_path = ltrim($logout_route->getPath(), '/');
         $response_data['logout_token'] = $this->csrfToken->get($logout_path);
@@ -196,7 +211,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
       }
 
       // Send the password reset email.
-      $mail = _user_mail_notify('password_reset', $account);
+      $mail = $this->notificationHandler->sendPasswordReset($account);
       if (empty($mail)) {
         throw new BadRequestHttpException('Unable to send email. Contact the site administrator if the problem persists.');
       }
@@ -223,7 +238,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    *   The user.
    */
   protected function userLoginFinalize(UserInterface $user): void {
-    user_login_finalize($user);
+    $this->loginFinalizer->finalizeLogin($user);
   }
 
   /**
@@ -241,7 +256,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * Logs the user out.
    */
   protected function userLogout(): void {
-    user_logout();
+    $this->logoutFinalizer->finalizeLogout();
   }
 
   /**

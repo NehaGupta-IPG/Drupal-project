@@ -1,4 +1,4 @@
-rest.pass.http:
+rest.pass:
   path: '/user/password'
   defaults:
     _controller: \Drupal\rest\Controller\RestAuthenticationController::resetPassword
@@ -7,7 +7,7 @@ rest.pass.http:
     _access: 'TRUE'
     _format: 'json'
 
-rest.login.http:
+rest.login:
   path: '/user/login'
   defaults:
     _controller: \Drupal\rest\Controller\RestAuthenticationController::login
@@ -16,7 +16,7 @@ rest.login.http:
     _user_is_logged_in: 'FALSE'
     _format: 'json'
 
-rest.login_status.http:
+rest.login_status:
   path: '/user/login_status'
   defaults:
     _controller: \Drupal\rest\Controller\RestAuthenticationController::loginStatus
@@ -25,7 +25,7 @@ rest.login_status.http:
     _access: 'TRUE'
     _format: 'json'
 
-rest.logout.http:
+rest.logout:
   path: '/user/logout'
   defaults:
     _controller: \Drupal\rest\Controller\RestAuthenticationController::logout

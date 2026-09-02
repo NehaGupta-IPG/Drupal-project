@@ -347,7 +347,7 @@ class UserTest extends ResourceTestBase {
       RequestOptions::HEADERS => [],
       RequestOptions::BODY => Json::encode($request_body),
     ];
-    $response = $this->request('POST', Url::fromRoute('rest.login.http')->setRouteParameter('_format', 'json'), $request_options);
+    $response = $this->request('POST', Url::fromRoute('rest.login')->setRouteParameter('_format', 'json'), $request_options);
     $this->assertSame(200, $response->getStatusCode());
   }
 

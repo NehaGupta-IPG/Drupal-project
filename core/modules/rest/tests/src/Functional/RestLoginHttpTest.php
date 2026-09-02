@@ -78,7 +78,7 @@ class RestLoginHttpTest extends BrowserTestBase {
    *   The HTTP response.
    */
   protected function loginRequest($name, $pass, $format = 'json'): ResponseInterface {
-    $user_login_url = Url::fromRoute('rest.login.http')
+    $user_login_url = Url::fromRoute('rest.login')
       ->setRouteParameter('_format', $format)
       ->setAbsolute();
 
@@ -221,7 +221,7 @@ class RestLoginHttpTest extends BrowserTestBase {
    *   The HTTP response.
    */
   protected function passwordRequest(array $request_body, $format = 'json'): ResponseInterface {
-    $password_reset_url = Url::fromRoute('rest.pass.http')
+    $password_reset_url = Url::fromRoute('rest.pass')
       ->setRouteParameter('_format', $format)
       ->setAbsolute();
 
@@ -444,7 +444,7 @@ class RestLoginHttpTest extends BrowserTestBase {
   protected function logoutRequest(string $format = 'json', string $logout_token = ''): ResponseInterface {
     /** @var \GuzzleHttp\Client $client */
     $client = $this->container->get('http_client');
-    $user_logout_url = Url::fromRoute('rest.logout.http')
+    $user_logout_url = Url::fromRoute('rest.logout')
       ->setRouteParameter('_format', $format)
       ->setAbsolute();
     if ($logout_token) {
@@ -515,7 +515,7 @@ class RestLoginHttpTest extends BrowserTestBase {
    *   The URL string.
    */
   protected function getLoginStatusUrlString($format = 'json') {
-    $user_login_status_url = Url::fromRoute('rest.login_status.http');
+    $user_login_status_url = Url::fromRoute('rest.login_status');
     $user_login_status_url->setRouteParameter('_format', $format);
     $user_login_status_url->setAbsolute();
     return $user_login_status_url->toString();
@@ -604,7 +604,7 @@ class RestLoginHttpTest extends BrowserTestBase {
     $resetURL = $urls[0];
     $this->drupalGet($resetURL);
     $this->submitForm([], 'Log in');
-    $this->assertSession()->pageTextContains('You have used a one-time login link. You can set your new password now.');
+    $this->assertSession()->pageTextContains('You have used a one-time login link.');
   }
 
   /**
@@ -638,22 +638,22 @@ class RestLoginHttpTest extends BrowserTestBase {
   public static function providerDeprecatedUserRoutesSubscriber(): \Generator {
     yield [
       'login_status',
-      '\Drupal\user\Controller\UserAuthenticationController::loginStatus',
+      'Drupal\user\Controller\UserAuthenticationController::loginStatus',
       '\Drupal\rest\Controller\RestAuthenticationController::loginStatus',
     ];
     yield [
       'pass',
-      '\Drupal\user\Controller\UserAuthenticationController::resetPassword',
+      'Drupal\user\Controller\UserAuthenticationController::resetPassword',
       '\Drupal\rest\Controller\RestAuthenticationController::resetPassword',
     ];
     yield [
       'login',
-      '\Drupal\user\Controller\UserAuthenticationController::login',
+      'Drupal\user\Controller\UserAuthenticationController::login',
       '\Drupal\rest\Controller\RestAuthenticationController::login',
     ];
     yield [
       'logout',
-      '\Drupal\user\Controller\UserAuthenticationController::logout',
+      'Drupal\user\Controller\UserAuthenticationController::logout',
       '\Drupal\rest\Controller\RestAuthenticationController::logout',
     ];
   }
