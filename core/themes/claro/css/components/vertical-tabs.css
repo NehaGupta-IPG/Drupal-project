@@ -109,6 +109,17 @@
   content: "";
 }
 
+.vertical-tabs__menu-item.is-selected > a.vertical-tabs__menu-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: calc(var(--vertical-tabs-border-size) * -1) calc(var(--vertical-tabs-menu-link--active-border-size) * -1);
+  content: "";
+  pointer-events: none;
+  border: var(--vertical-tabs-menu-link-focus-border-size) solid var(--color-focus);
+  border-radius: var(--vertical-tabs-border-radius);
+}
+
 /**
  * Anchor link inside the vertical tabs menu item.
  */
