@@ -439,12 +439,8 @@ class ConfigInstaller implements ConfigInstallerInterface {
             // Extension-shipped configuration is assumed to be English unless
             // it ships with its own explicit langcode.
             $shipped_langcode = $config_to_create[$name]['langcode'] ?? 'en';
-            // $default_langcode is never NULL here: reaching this point
-            // means the same !$this->isSyncing() &&
-            // $collection == StorageInterface::DEFAULT_COLLECTION check
-            // already caused it to be resolved, above. Replace 'en' with the
-            // default langcode to allow the Locale module to translate it, if
-            // it is installed.
+            // Replace 'en' with the default langcode to allow the Locale module
+            // to translate the configuration if it is installed.
             $resolved_langcode = $shipped_langcode === 'en' ? $default_langcode : $shipped_langcode;
             $config_to_create[$name]['langcode'] = $resolved_langcode;
             // Ensure the langcode is valid. Checked in order of how likely each
