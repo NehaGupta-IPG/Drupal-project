@@ -23,6 +23,9 @@
 # Drupal 13.
 %The "cache.backend.memory" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use cache.backend.memory.memory instead. See https://www.drupal.org/node/3546856%
 %The "cache.static" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use the cache.memory bin instead. See https://www.drupal.org/node/3546856%
+%The "Drupal\\Core\\Entity\\Entity\\EntityViewDisplay::build\(\)" method will require a new "string\|null \$langcode" argument in the next major version of its interface "Drupal\\Core\\Entity\\Display\\EntityViewDisplayInterface", not defining it is deprecated\.%
+%The "Drupal\\Core\\Entity\\Entity\\EntityViewDisplay::buildMultiple\(\)" method will require a new "string\|null \$langcode" argument in the next major version of its interface "Drupal\\Core\\Entity\\Display\\EntityViewDisplayInterface", not defining it is deprecated\.%
+%The "Drupal\\layout_builder\\Entity\\LayoutBuilderEntityViewDisplay::buildMultiple\(\)" method will require a new "string\|null \$langcode" argument in the next major version of its interface "Drupal\\Core\\Entity\\Display\\EntityViewDisplayInterface", not defining it is deprecated\.%
 
 # Symfony 8.
 %Since symfony/dependency-injection 8\.1: Calling "Drupal\\workspaces\\Provider\\DefaultWorkspaceProvider::getId\(\)" to get the "" index is deprecated, use the #\[AsTaggedItem\] attribute instead\.%

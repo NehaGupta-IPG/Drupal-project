@@ -219,7 +219,10 @@ class EntityFieldRenderer extends RendererBase {
       foreach ($values as $result_row) {
         if ($entity = $field->getEntity($result_row)) {
           $relationship = $field->options['relationship'] ?? 'none';
-          $entities_by_bundles[$entity->bundle()][$result_row->index] = $this->getEntityTranslationByRelationship($entity, $result_row, $relationship);
+          $translation = $this->getEntityTranslationByRelationship($entity, $result_row, $relationship);
+          // Group by language too, so that each row keeps being built in the
+          // language of the translation it displays.
+          $entities_by_bundles[$entity->bundle()][$translation->language()->getId()][$result_row->index] = $translation;
         }
       }
 
@@ -240,7 +243,7 @@ class EntityFieldRenderer extends RendererBase {
 
       // For each set of fields, build the output by bundle.
       foreach ($display_sets as $display_fields) {
-        foreach ($entities_by_bundles as $bundle => $bundle_entities) {
+        foreach ($entities_by_bundles as $bundle => $entities_by_langcode) {
           // Create the display, and configure the field display options.
           $display = EntityViewDisplay::create([
             'targetEntityType' => $entity_type_id,
@@ -253,13 +256,15 @@ class EntityFieldRenderer extends RendererBase {
               'settings' => $field->options['settings'],
             ]);
           }
-          // Let the display build the render array for the entities.
-          $display_build = $display->buildMultiple($bundle_entities);
-          // Collect the field render arrays and index them using our internal
-          // row indexes and field IDs.
-          foreach ($display_build as $row_index => $entity_build) {
-            foreach ($display_fields['field_ids'] as $field_id => $field) {
-              $build[$row_index][$field_id] = !empty($entity_build[$field->definition['field_name']]) ? $entity_build[$field->definition['field_name']] : [];
+          foreach ($entities_by_langcode as $langcode => $bundle_entities) {
+            // Let the display build the render array for the entities.
+            $display_build = $display->buildMultiple($bundle_entities, $langcode);
+            // Collect the field render arrays and index them using our internal
+            // row indexes and field IDs.
+            foreach ($display_build as $row_index => $entity_build) {
+              foreach ($display_fields['field_ids'] as $field_id => $field) {
+                $build[$row_index][$field_id] = !empty($entity_build[$field->definition['field_name']]) ? $entity_build[$field->definition['field_name']] : [];
+              }
             }
           }
         }

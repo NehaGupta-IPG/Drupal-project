@@ -167,6 +167,14 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
 
       // Set build defaults.
       $build_list[$key] = $this->getBuildDefaults($entity, $view_mode);
+      // Remember the language asked for, so that the display and the
+      // formatters can build the components in it.
+      $build_list[$key]['#langcode'] = $langcode;
+      if ($langcode !== NULL && isset($build_list[$key]['#cache']['keys']) && !in_array($langcode, $build_list[$key]['#cache']['keys'], TRUE)) {
+        // The components are built in that language, so it is part of what
+        // identifies the render cached output.
+        $build_list[$key]['#cache']['keys'][] = $langcode;
+      }
       $entityType = $this->entityTypeId;
       $this->moduleHandler()->alter([$entityType . '_build_defaults', 'entity_build_defaults'], $build_list[$key], $entity, $view_mode);
 
@@ -344,18 +352,20 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
           }
         }
       }
-      // Group the entities by bundle.
-      $entities_by_bundle[$entity->bundle()][$id] = $entity;
+      // Group the entities by bundle and by the language they are built for.
+      $entities_by_bundle[$entity->bundle()][$build[$id]['#langcode'] ?? ''][$id] = $entity;
     }
 
     // Invoke hook_entity_prepare_view().
     $this->moduleHandler()->invokeAll('entity_prepare_view', [$this->entityTypeId, $entities, $displays, $view_mode]);
 
     // Let the displays build their render arrays.
-    foreach ($entities_by_bundle as $bundle => $bundle_entities) {
-      $display_build = $displays[$bundle]->buildMultiple($bundle_entities);
-      foreach ($bundle_entities as $id => $entity) {
-        $build[$id] += $display_build[$id];
+    foreach ($entities_by_bundle as $bundle => $entities_by_langcode) {
+      foreach ($entities_by_langcode as $langcode => $bundle_entities) {
+        $display_build = $displays[$bundle]->buildMultiple($bundle_entities, $langcode ?: NULL);
+        foreach ($bundle_entities as $id => $entity) {
+          $build[$id] += $display_build[$id];
+        }
       }
     }
   }

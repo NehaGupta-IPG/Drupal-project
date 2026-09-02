@@ -291,7 +291,8 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
    * {@inheritdoc}
    */
   public function buildMultiple(array $entities) {
-    $build_list = parent::buildMultiple($entities);
+    // @todo Add the $langcode parameter in Drupal 13.0.0.
+    $build_list = parent::buildMultiple($entities, func_get_args()[1] ?? NULL);
 
     // Layout Builder can not be enabled for the '_custom' view mode that is
     // used for on-the-fly rendering of fields in isolation from the entity.

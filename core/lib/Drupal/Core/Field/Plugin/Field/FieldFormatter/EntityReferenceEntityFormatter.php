@@ -155,7 +155,7 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $entity) {
       $view_builder = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId());
-      $elements[$delta] = $view_builder->view($entity, $view_mode, $entity->language()->getId());
+      $elements[$delta] = $view_builder->view($entity, $view_mode, $langcode);
 
       // Add a resource attribute to set the mapping property's value to the
       // entity's URL. Since we don't know what the markup of the entity will
