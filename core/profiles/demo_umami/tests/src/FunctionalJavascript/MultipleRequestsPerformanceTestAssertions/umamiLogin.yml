@@ -1,10 +1,10 @@
 QueryCount: 15
-CacheGetCount: 97
+CacheGetCount: 99
 CacheGetCountByBin:
   config: 28
   bootstrap: 17
   discovery: 32
-  data: 5
+  data: 7
   entity: 4
   routes: 5
   dynamic_page_cache: 1
