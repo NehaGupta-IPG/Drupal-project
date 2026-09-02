@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Core\Routing;
 
 use Drupal\Component\Assertion\Inspector;
-use Drupal\Component\Discovery\MissingClassDetectionClassLoader;
 use Drupal\Core\Form\FormInterface;
 use Symfony\Component\Routing\Attribute\DeprecatedAlias;
 use Symfony\Component\Routing\Attribute\Route as RouteAttribute;
@@ -18,18 +17,6 @@ use Symfony\Component\Routing\RouteCollection;
  * @see \Symfony\Component\Routing\Attribute\Route
  */
 class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
-
-  /**
-   * An array of classes to skip because they use a missing trait.
-   *
-   * This must be static because once a class has attempted to use a missing
-   * trait, PHP permanently aliases that trait name to a stub trait, so the
-   * class will incorrectly appear valid on every subsequent check within the
-   * same process.
-   *
-   * @var array<class-string, list<class-string>>
-   */
-  protected static array $skipClasses = [];
 
   /**
    * @param \Traversable<string, string|array<int, string>> $namespaces
@@ -56,75 +43,28 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
       'Form' => $this->createFormRouteCollection(...),
     ];
 
-    // The namespaces are iterated more than once below, so they are read
-    // into an array up front rather than iterated directly from
-    // $this->namespaces, which may be a one-time-use \Traversable.
-    $namespaces = iterator_to_array($this->namespaces);
-    $rootTwoLevelNamespaces = array_unique(array_map(
-      $this->getTwoLevelNamespace(...),
-      array_keys($namespaces)
-    ));
-
-    // PHP handles a class that uses a missing trait as an unrecoverable
-    // fatal error rather than a catchable \Error, unlike a missing parent
-    // class or interface. Register a classloader that detects this and
-    // aliases the missing trait to a stub trait, so the fatal error can be
-    // avoided and the class skipped instead.
-    // @todo a fix for this has been committed to PHP. Once that is
-    // available, attempt to make the class loader registration conditional
-    // on PHP version, then remove the logic entirely once Drupal requires
-    // PHP 8.5.
-    // @see https://github.com/php/php-src/issues/17959
-    $autoloader = new MissingClassDetectionClassLoader();
-    spl_autoload_register([$autoloader, 'loadClass']);
-
-    try {
-      foreach ($namespaces as $namespace => $directories) {
-        foreach ((array) $directories as $directory) {
-          foreach ($routeTypes as $routeType => $factory) {
-            $routeDirectory = $directory . '/' . $routeType;
-            $routeNamespace = $namespace . '\\' . $routeType;
-            if (is_dir($routeDirectory)) {
-              $iterator = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($routeDirectory, \RecursiveDirectoryIterator::SKIP_DOTS)
-              );
-              foreach ($iterator as $fileinfo) {
-                if ($fileinfo->getExtension() == 'php') {
-                  // Skip files that do not contain a Route attribute.
-                  $contents = file_get_contents($fileinfo->getPathname());
-                  if (!str_contains($contents, '#[Route') && !str_contains($contents, 'Routing\\Attribute\\Route')) {
-                    continue;
-                  }
-                  $subPath = $iterator->getSubIterator()->getSubPath();
-                  $subPath = $subPath ? str_replace(DIRECTORY_SEPARATOR, '\\', $subPath) . '\\' : '';
-                  $class = $routeNamespace . '\\' . $subPath . $fileinfo->getBasename('.php');
-
-                  // Once a class has been recorded as using a missing
-                  // trait, PHP has already permanently aliased that trait
-                  // name to a stub trait, so class_exists() can no longer
-                  // be trusted to detect the problem again. Keep skipping
-                  // the class unless the trait's namespace has since become
-                  // available, e.g. because the module providing it was
-                  // installed.
-                  // @see \Drupal\Component\Plugin\Discovery\AttributeClassDiscovery::getDefinitions()
-                  if (array_key_exists($class, self::$skipClasses)) {
-                    $missing_still_unavailable = FALSE;
-                    foreach (self::$skipClasses[$class] as $missing_trait) {
-                      if (!in_array($this->getTwoLevelNamespace($missing_trait), $rootTwoLevelNamespaces, TRUE)) {
-                        $missing_still_unavailable = TRUE;
-                        break;
-                      }
-                    }
-                    if ($missing_still_unavailable) {
-                      $autoloader->reset();
-                      continue;
-                    }
-                  }
-
-                  $reflectionClass = $this->getReflectionClass($class, $autoloader);
-                  if ($reflectionClass !== NULL) {
-                    yield $factory($reflectionClass);
-                  }
+    foreach ($this->namespaces as $namespace => $directories) {
+      foreach ((array) $directories as $directory) {
+        foreach ($routeTypes as $routeType => $factory) {
+          $routeDirectory = $directory . '/' . $routeType;
+          $routeNamespace = $namespace . '\\' . $routeType;
+          if (is_dir($routeDirectory)) {
+            $iterator = new \RecursiveIteratorIterator(
+              new \RecursiveDirectoryIterator($routeDirectory, \RecursiveDirectoryIterator::SKIP_DOTS)
+            );
+            foreach ($iterator as $fileinfo) {
+              if ($fileinfo->getExtension() == 'php') {
+                // Skip files that do not contain a Route attribute.
+                $contents = file_get_contents($fileinfo->getPathname());
+                if (!str_contains($contents, '#[Route') && !str_contains($contents, 'Routing\\Attribute\\Route')) {
+                  continue;
+                }
+                $subPath = $iterator->getSubIterator()->getSubPath();
+                $subPath = $subPath ? str_replace(DIRECTORY_SEPARATOR, '\\', $subPath) . '\\' : '';
+                $class = $routeNamespace . '\\' . $subPath . $fileinfo->getBasename('.php');
+                $reflectionClass = $this->getReflectionClass($class);
+                if ($reflectionClass !== NULL) {
+                  yield $factory($reflectionClass);
                 }
               }
             }
@@ -132,22 +72,6 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
         }
       }
     }
-    finally {
-      spl_autoload_unregister([$autoloader, 'loadClass']);
-    }
-  }
-
-  /**
-   * Gets a string containing the first two levels of a class name or namespace.
-   *
-   * @param string $namespace
-   *   The class name or namespace.
-   *
-   * @return string
-   *   A namespace string containing only two levels.
-   */
-  protected function getTwoLevelNamespace(string $namespace): string {
-    return implode('\\', array_slice(explode('\\', $namespace), 0, 2));
   }
 
   /**
@@ -221,33 +145,19 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
    *
    * @param class-string $className
    *   The class to reflect.
-   * @param \Drupal\Component\Discovery\MissingClassDetectionClassLoader $autoloader
-   *   The classloader registered to detect missing classes and traits.
    *
    * @return \ReflectionClass<object>|null
    *   The Reflection class, is the class is a valid to check for routes,
    *   otherwise NULL. A class is invalid if there is an error on Reflection or
    *   if it is abstract.
    */
-  protected function getReflectionClass(string $className, MissingClassDetectionClassLoader $autoloader): ?\ReflectionClass {
+  protected function getReflectionClass(string $className): ?\ReflectionClass {
     try {
       $exists = class_exists($className);
     }
     catch (\Error) {
       // Ignore errors if a class extends a missing class, interface,
       // or trait.
-      $autoloader->reset();
-      return NULL;
-    }
-
-    if (($missingTraits = $autoloader->getMissingTraits())) {
-      // The class uses a missing trait. PHP does not allow this to be
-      // caught as an \Error, so the class loader above detected and
-      // aliased it instead. Treat the class the same as any other invalid
-      // class, and remember it so that it continues to be skipped even
-      // after the trait's stub alias makes class_exists() succeed.
-      self::$skipClasses[$className] = $missingTraits;
-      $autoloader->reset();
       return NULL;
     }
 

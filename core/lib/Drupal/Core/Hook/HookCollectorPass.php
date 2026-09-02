@@ -6,7 +6,6 @@ namespace Drupal\Core\Hook;
 
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
-use Drupal\Component\Discovery\MissingClassDetectionClassLoader;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Core\Extension\ProceduralCall;
@@ -48,18 +47,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * @internal
  */
 class HookCollectorPass implements CompilerPassInterface {
-
-  /**
-   * An array of classes to skip because they use a trait from a missing module.
-   *
-   * This must be static because once a class has attempted to use a missing
-   * trait, PHP permanently aliases that trait's name to a stub trait, so the
-   * class will incorrectly appear valid on every subsequent check within the
-   * same process.
-   *
-   * @var array<class-string, list<class-string>>
-   */
-  protected static array $skipClasses = [];
 
   /**
    * OOP implementation module names keyed by hook name and "$class::$method".
@@ -476,15 +463,6 @@ class HookCollectorPass implements CompilerPassInterface {
     $iterator = new \RecursiveCallbackFilterIterator($iterator, static::filterIterator(...));
     $iterator = new \RecursiveIteratorIterator($iterator);
     /** @var \RecursiveDirectoryIterator | \RecursiveIteratorIterator $iterator*/
-    // A class in a Hook namespace could use a trait that is defined by a
-    // module that is not installed. PHP handles a missing trait as an
-    // unrecoverable fatal error rather than a catchable \Error, unlike a
-    // missing parent class or interface. Register a classloader that
-    // detects this and aliases the missing trait to a stub trait, so the
-    // fatal error can be avoided and the class skipped instead.
-    // @see \Drupal\Component\Discovery\MissingClassDetectionClassLoader
-    $autoloader = new MissingClassDetectionClassLoader();
-    spl_autoload_register([$autoloader, 'loadClass']);
     foreach ($iterator as $fileinfo) {
       assert($fileinfo instanceof \SplFileInfo);
       $extension = $fileinfo->getExtension();
@@ -509,49 +487,16 @@ class HookCollectorPass implements CompilerPassInterface {
           $class = str_replace('/', '\\', $class);
           $class_attributes = [];
           $attributes = [];
-
-          // Once a class has been recorded as using a missing trait, PHP
-          // has already permanently aliased that trait's name to a stub
-          // trait, so class_exists() can no longer be trusted to detect
-          // the problem again. Keep skipping the class unless the module
-          // providing the trait has since been installed.
-          // @see \Drupal\Core\Routing\AttributeRouteDiscovery::collectRoutes()
-          $skip = FALSE;
-          if (($missing_traits = self::$skipClasses[$class] ?? NULL)) {
-            $skip = TRUE;
-            foreach ($missing_traits as $missing_trait) {
-              if (in_array(explode('\\', $missing_trait)[1] ?? '', $this->modules, TRUE)) {
-                $skip = FALSE;
-                break;
-              }
-            }
-          }
-
-          if (!$skip) {
-            try {
-              $class_exists = class_exists($class);
-            }
-            catch (\Error) {
-              // Ignore errors if a class extends a missing class or
-              // interface.
-              $class_exists = FALSE;
-            }
-            if (($missing_traits = $autoloader->getMissingTraits())) {
-              self::$skipClasses[$class] = $missing_traits;
-              $class_exists = FALSE;
-            }
-            if ($class_exists) {
-              $reflectionClass = new \ReflectionClass($class);
-              $class_attributes = $reflectionClass->getAttributes(HookAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
-              $class_attributes = array_map(static fn (\ReflectionAttribute $ra) => $ra->newInstance(), $class_attributes);
-              $attributes = self::getAttributeInstances($reflectionClass);
-              $hook_file_cache->set($filename, [
-                'class' => $class,
-                'attributes' => $attributes,
-                'class_attributes' => $class_attributes,
-              ]);
-            }
-            $autoloader->reset();
+          if (class_exists($class)) {
+            $reflectionClass = new \ReflectionClass($class);
+            $class_attributes = $reflectionClass->getAttributes(HookAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
+            $class_attributes = array_map(static fn (\ReflectionAttribute $ra) => $ra->newInstance(), $class_attributes);
+            $attributes = self::getAttributeInstances($reflectionClass);
+            $hook_file_cache->set($filename, [
+              'class' => $class,
+              'attributes' => $attributes,
+              'class_attributes' => $class_attributes,
+            ]);
           }
         }
 
@@ -654,7 +599,6 @@ class HookCollectorPass implements CompilerPassInterface {
         }
       }
     }
-    spl_autoload_unregister([$autoloader, 'loadClass']);
   }
 
   /**
