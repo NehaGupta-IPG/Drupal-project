@@ -57,6 +57,10 @@ class UpdatePathTest extends UpdatePathTestBase {
 
     $this->runUpdates();
 
+    // Check the primary key.
+    $method = new \ReflectionMethod($connection->schema(), 'findPrimaryKeyColumns');
+    $this->assertEquals(['wid'], $method->invoke($connection->schema(), 'watchdog'));
+
     // After updates, a negative WID should not be allowed.
     $insert = $connection->insert('watchdog');
     $insert->fields([
