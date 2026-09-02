@@ -7,14 +7,15 @@ namespace Drupal\Tests\field\Functional\Update;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the upgrade path for entity reference selection handler plugin setting.
- *
- * @group field
- * @covers \field_post_update_add_entity_reference_selection_plugin_option
  */
+#[Group('field')]
+#[CoversFunction('field_post_update_add_entity_reference_selection_plugin_option')]
 #[RunTestsInSeparateProcesses]
 class IncludeUnpublishedEntitiesOptionUpdateTest extends UpdatePathTestBase {
 
@@ -38,7 +39,7 @@ class IncludeUnpublishedEntitiesOptionUpdateTest extends UpdatePathTestBase {
       $class = $field_type_manager->getPluginClass($field_config->getType());
       if ($class === EntityReferenceItem::class || is_subclass_of($class, EntityReferenceItem::class)) {
         $settings = $field_config->getSettings();
-        $this->assertArrayNotHasKey('include_unpublished_entities', $settings);
+        $this->assertArrayNotHasKey('include_unpublished_entities', $settings['handler_settings']);
       }
     }
     $this->runUpdates();
