@@ -5,6 +5,53 @@
 
 (function (Drupal, drupalSettings) {
   /**
+   * Builds the current query as a plain object from window.location.
+   *
+   * @return {Object}
+   *   A map of query parameter names to values.
+   */
+  function getCurrentQuery() {
+    const query = {};
+    new URLSearchParams(window.location.search).forEach((value, key) => {
+      query[key] = value;
+    });
+    return query;
+  }
+
+  /**
+   * Determines whether a data-drupal-link-query attribute matches a query.
+   *
+   * The attribute value is parsed with JSON.parse() and compared value by
+   * value against the current query.
+   *
+   * @param {string|null} attributeValue
+   *   The data-drupal-link-query attribute value, or null if the link has
+   *   no such attribute.
+   * @param {Object} currentQuery
+   *   The current query, as returned by getCurrentQuery().
+   *
+   * @return {boolean}
+   *   Whether the attribute represents the same query parameters.
+   */
+  function queryMatches(attributeValue, currentQuery) {
+    const currentKeys = Object.keys(currentQuery);
+    if (attributeValue === null) {
+      return currentKeys.length === 0;
+    }
+    let linkQuery;
+    try {
+      linkQuery = JSON.parse(attributeValue);
+    } catch (error) {
+      return false;
+    }
+    const linkKeys = Object.keys(linkQuery);
+    return (
+      linkKeys.length === currentKeys.length &&
+      linkKeys.every((key) => linkQuery[key] === currentQuery[key])
+    );
+  }
+
+  /**
    * Append is-active class.
    *
    * The link is only active if its path corresponds to the current path, the
@@ -22,14 +69,9 @@
     attach(context) {
       // Start by finding all potentially active links.
       const path = drupalSettings.path;
-      const queryString = JSON.stringify(path.currentQuery);
-      const querySelector = queryString
-        ? `[data-drupal-link-query="${CSS.escape(queryString)}"]`
-        : ':not([data-drupal-link-query])';
       const originalSelectors = [
         `[data-drupal-link-system-path="${CSS.escape(path.currentPath)}"]`,
       ];
-      let selectors;
 
       // If this is the front page, we have to check for the <front> path as
       // well.
@@ -38,7 +80,7 @@
       }
 
       // Add language filtering.
-      selectors = [].concat(
+      const selectors = [].concat(
         // Links without any hreflang attributes (most of them).
         originalSelectors.map(
           (selector) =>
@@ -55,12 +97,20 @@
         ),
       );
 
-      // Add query string selector for pagers, exposed filters.
-      selectors = selectors.map((current) => current + querySelector);
+      // The query is not part of the selectors above: matching it requires
+      // comparing decoded values, so it is read from window.location.
+      const currentQuery = getCurrentQuery();
 
       context.querySelectorAll(selectors.join(',')).forEach((activeLink) => {
-        activeLink.classList.add('is-active');
-        activeLink.setAttribute('aria-current', 'page');
+        if (
+          queryMatches(
+            activeLink.getAttribute('data-drupal-link-query'),
+            currentQuery,
+          )
+        ) {
+          activeLink.classList.add('is-active');
+          activeLink.setAttribute('aria-current', 'page');
+        }
       });
     },
     detach(context, settings, trigger) {
