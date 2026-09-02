@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Command;
 
 use Composer\Autoload\ClassLoader;
-use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\DatabaseExceptionBase;
 use Drupal\Core\Database\Utility\SqlDumper;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
@@ -169,9 +169,10 @@ class DrupalApplication extends Application {
 
     // Database exceptions may carry the information of the executed statement,
     // that can be exported to a more readable dump.
-    if ($t instanceof DatabaseException) {
-      if (property_exists($t, 'info')) {
-        $output->writeln((new SqlDumper())->export($t->info, $output->isDecorated()));
+    if ($t instanceof DatabaseExceptionBase && $t->info !== NULL) {
+      $dump = (new SqlDumper())->export($t->info, $output->isDecorated());
+      if ($dump !== '') {
+        $output->writeln($dump);
       }
     }
   }

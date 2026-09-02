@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
-use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\DatabaseExceptionBase;
 use Drupal\Core\Database\Utility\SqlDumper;
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\Extension\DeprecationBridge\Configuration as DeprecationHandlerConfiguration;
@@ -106,11 +106,11 @@ trait DrupalTestCaseTrait {
    *   A transformed throwable.
    */
   protected function transformException(\Throwable $t): \Throwable {
-    if ($t instanceof DatabaseException) {
-      $exceptionClass = get_class($t);
-      if (property_exists($t, 'info')) {
-        $infoDump = (new SqlDumper())->export($t->info);
-        $t = new $exceptionClass($t->getMessage() . "\n" . $infoDump, $t->getCode(), $t->getPrevious(), $t->info);
+    if ($t instanceof DatabaseExceptionBase && $t->info !== NULL) {
+      $info = $t->info;
+      $infoDump = (new SqlDumper())->export($info);
+      if ($infoDump !== '') {
+        $t = new ($t::class)($t->getMessage() . "\n" . $infoDump, $t->getCode(), $t->getPrevious(), $info);
       }
     }
     return $t;

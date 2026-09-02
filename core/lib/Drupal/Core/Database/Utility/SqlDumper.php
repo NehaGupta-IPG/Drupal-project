@@ -25,8 +25,8 @@ class SqlDumper {
    * and in CLI (tests or dr). The method detects whether we are in a CLI or
    * a HTML environment and dumps information accordingly.
    *
-   * @param \Drupal\Core\Database\SqlExecutionInfo $info
-   *   The SQL statement execution information.
+   * @param \Drupal\Core\Database\SqlExecutionInfo|null $info
+   *   The SQL statement execution information, or NULL if none is available.
    * @param ?bool $color
    *   (optional) whether output should be colored. If not specified, it will
    *   be TRUE for CLI output, irrelevant for HTML output.
@@ -35,13 +35,19 @@ class SqlDumper {
    *   will be FALSE for CLI output, TRUE for HTML output.
    *
    * @return string
-   *   The output for printing.
+   *   The output for printing, or an empty string if there is no information
+   *   to export.
    */
   public function export(
-    SqlExecutionInfo $info,
+    ?SqlExecutionInfo $info,
     ?bool $color = NULL,
     ?bool $html = NULL,
   ): string {
+
+    // This runs while an exception is being reported, so it must never fail.
+    if ($info === NULL) {
+      return '';
+    }
 
     if (PHP_SAPI === 'cli') {
       $color ??= TRUE;

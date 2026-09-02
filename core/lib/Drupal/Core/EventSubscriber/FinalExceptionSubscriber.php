@@ -7,7 +7,7 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\DatabaseExceptionBase;
 use Drupal\Core\Database\Utility\SqlDumper;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -101,10 +101,17 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
 
       unset($error['backtrace'], $error['exception'], $error['severity_level']);
 
-      // For DatabaseException, we dump the information if available.
-      if ($exception instanceof DatabaseException && property_exists($exception, 'info')) {
+      // Database exceptions may carry the information of the executed
+      // statement, that can be exported to a more readable dump. The dump is
+      // safe markup, but the exception message is not: they are kept in
+      // separate placeholders so that the message is still escaped.
+      $sql_dump_placeholder = '';
+      if ($exception instanceof DatabaseExceptionBase && $exception->info !== NULL) {
         $dump = (new SqlDumper())->export($exception->info);
-        $error['@message'] = Markup::create($error['@message'] . $dump);
+        if ($dump !== '') {
+          $error['@sql_dump'] = Markup::create($dump);
+          $sql_dump_placeholder = '@sql_dump';
+        }
       }
 
       if (!$this->isErrorLevelVerbose()) {
@@ -113,7 +120,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
         // We use \Drupal\Component\Render\FormattableMarkup directly here,
         // rather than use t() since we are in the middle of error handling, and
         // we don't want t() to cause further errors.
-        $message = new FormattableMarkup(Error::DEFAULT_ERROR_MESSAGE, $error);
+        $message = new FormattableMarkup(Error::DEFAULT_ERROR_MESSAGE . $sql_dump_placeholder, $error);
       }
       else {
         // With verbose logging, we will also include a backtrace.
@@ -131,7 +138,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
 
         // Generate a backtrace containing only scalar argument values.
         $error['@backtrace'] = Error::formatBacktrace($backtrace);
-        $message = new FormattableMarkup(Error::DEFAULT_ERROR_MESSAGE . ' <pre class="backtrace">@backtrace</pre>', $error);
+        $message = new FormattableMarkup(Error::DEFAULT_ERROR_MESSAGE . $sql_dump_placeholder . ' <pre class="backtrace">@backtrace</pre>', $error);
       }
     }
 
