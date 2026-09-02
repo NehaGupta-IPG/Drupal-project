@@ -27,17 +27,13 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
 
   /**
    * String sent in responses, to describe the user as being logged in.
-   *
-   * @var string
    */
-  const LOGGED_IN = '1';
+  public const string LOGGED_IN = '1';
 
   /**
    * String sent in responses, to describe the user as being logged out.
-   *
-   * @var string
    */
-  const LOGGED_OUT = '0';
+  public const string LOGGED_OUT = '0';
 
   /**
    * @param \Drupal\user\UserFloodControlInterface $userFloodControl
