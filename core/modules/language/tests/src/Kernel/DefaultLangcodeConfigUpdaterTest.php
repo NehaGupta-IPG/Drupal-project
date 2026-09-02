@@ -178,6 +178,69 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   }
 
   /**
+   * Tests the previous default's content is preserved as an override.
+   *
+   * Otherwise it would simply be lost the moment locale module translates
+   * the newly-relabelled config into the new default - locale has no
+   * stored translation "into" English to fall back on, since English is
+   * the language this content was authored in, not translated into.
+   */
+  public function testOldDefaultContentIsPreservedAsOverride(): void {
+    $this->config('config_test.langcode_test')
+      ->set('optional_translatable_value', 'Hello')
+      ->set('untranslatable_value', 'foo')
+      ->save();
+
+    $this->reconcile('en', 'fr');
+
+    /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */
+    $language_manager = \Drupal::service('language_manager');
+    $override = $language_manager->getLanguageConfigOverride('en', 'config_test.langcode_test');
+    $this->assertFalse($override->isNew());
+    $this->assertSame('Hello', $override->get('optional_translatable_value'));
+    // Only the translatable value is preserved - the override mirrors the
+    // shape locale module's own overrides have.
+    $this->assertNull($override->get('untranslatable_value'));
+  }
+
+  /**
+   * Tests moving through several defaults preserves each one along the way.
+   *
+   * Moving en -> fr -> de must leave both an 'en' override (the original
+   * content) and an 'fr' override (whatever was active immediately before
+   * the second switch - standing in here for what locale module's own
+   * translation would have put there) - not just the first one.
+   */
+  public function testRoundTripPreservesEachIntermediateLanguage(): void {
+    $this->config('config_test.langcode_test')
+      ->set('optional_translatable_value', 'Hello')
+      ->save();
+
+    $this->reconcile('en', 'fr');
+
+    // Stand in for locale module translating the newly-relabelled config,
+    // the same way it would for a real French translation.
+    $this->config('config_test.langcode_test')
+      ->set('optional_translatable_value', 'Bonjour')
+      ->save();
+
+    $this->reconcile('fr', 'de');
+
+    /** @var \Drupal\language\ConfigurableLanguageManagerInterface $language_manager */
+    $language_manager = \Drupal::service('language_manager');
+
+    $english_override = $language_manager->getLanguageConfigOverride('en', 'config_test.langcode_test');
+    $this->assertFalse($english_override->isNew());
+    $this->assertSame('Hello', $english_override->get('optional_translatable_value'));
+
+    $french_override = $language_manager->getLanguageConfigOverride('fr', 'config_test.langcode_test');
+    $this->assertFalse($french_override->isNew());
+    $this->assertSame('Bonjour', $french_override->get('optional_translatable_value'));
+
+    $this->assertSame('de', $this->config('config_test.langcode_test')->get('langcode'));
+  }
+
+  /**
    * Runs the reconciliation batch operation to completion.
    *
    * @param string $old_langcode

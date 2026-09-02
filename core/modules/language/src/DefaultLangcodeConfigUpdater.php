@@ -10,6 +10,8 @@ use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\TraversableTypedDataInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\language\Config\LanguageConfigOverride;
 use Drupal\language\Event\LanguageDefaultLangcodeChangeEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -55,6 +57,15 @@ class DefaultLangcodeConfigUpdater {
    * left alone, the same way an ordinary save would leave it alone. While
    * walking every object anyway, this also enforces the standing rule that
    * configuration without a translatable value should not carry a langcode.
+   *
+   * Before relabelling, whatever the configuration's current content
+   * actually is gets saved as an override for the langcode it is about to
+   * stop being - otherwise it would simply be gone the moment locale module
+   * applies the new default's own translation over the top. This is a plain
+   * snapshot of the current values, not a translation: locale module has no
+   * stored translation "into" the langcode being moved away from, since
+   * that langcode was the source language content was authored in, not a
+   * target translators worked into.
    *
    * A configuration override already existing for the new default langcode
    * is absorbed into the configuration being relabelled, then removed: the
@@ -102,6 +113,15 @@ class DefaultLangcodeConfigUpdater {
       }
 
       if ($current_langcode === NULL || $current_langcode === $old_langcode) {
+        if ($current_langcode !== NULL) {
+          $translatable_data = static::extractTranslatableData($typed_config);
+          if ($translatable_data !== []) {
+            static::getRawLanguageConfigOverride($current_langcode, $name)
+              ->setData($translatable_data)
+              ->save();
+          }
+        }
+
         $override = static::getRawLanguageConfigOverride($new_langcode, $name);
         $had_override = !$override->isNew();
         if ($had_override) {
@@ -157,6 +177,60 @@ class DefaultLangcodeConfigUpdater {
       $override->initWithData($data);
     }
     return $override;
+  }
+
+  /**
+   * Extracts the translatable portion of a config object's current data.
+   *
+   * Mirrors the shape a language config override normally has - a nested
+   * array containing only the values under keys the schema marks
+   * translatable - built from this element's actual current values rather
+   * than from locale module's stored translations, since this is a
+   * snapshot of what the configuration currently says, not a translation of
+   * it.
+   *
+   * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $element
+   *   The typed config element to walk - always a Mapping in practice,
+   *   since that is all callers ever have on hand.
+   *
+   * @return array
+   *   A nested array matching the structure under $element, containing
+   *   only the values under keys the schema marks translatable. Empty if
+   *   there is nothing translatable here at all.
+   */
+  protected static function extractTranslatableData(TraversableTypedDataInterface $element): array {
+    $translatable = [];
+    foreach ($element as $key => $property) {
+      $value = static::extractTranslatableValue($property);
+      if ($value !== []) {
+        $translatable[$key] = $value;
+      }
+    }
+    return $translatable;
+  }
+
+  /**
+   * Extracts the translatable value of a single typed config element.
+   *
+   * @param \Drupal\Core\TypedData\TypedDataInterface $element
+   *   The typed config element.
+   *
+   * @return array|string
+   *   Recurses via self::extractTranslatableData() for a traversable
+   *   structure, so this is a nested array in that case; the element's raw
+   *   value directly if it is itself a translatable leaf; or an empty array
+   *   if there is nothing translatable here at all.
+   */
+  private static function extractTranslatableValue(TypedDataInterface $element): array|string {
+    if ($element instanceof TraversableTypedDataInterface) {
+      return static::extractTranslatableData($element);
+    }
+    $definition = $element->getDataDefinition();
+    $value = $element->getValue();
+    if (!empty($definition['translatable']) && $value !== '' && $value !== NULL) {
+      return $value;
+    }
+    return [];
   }
 
 }

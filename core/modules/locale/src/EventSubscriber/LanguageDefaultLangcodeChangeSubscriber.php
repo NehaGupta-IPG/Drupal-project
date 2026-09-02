@@ -22,7 +22,7 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
   public function onDefaultLangcodeChange(LanguageDefaultLangcodeChangeEvent $event): void {
     $event->addOperation(
       [static::class, 'translateRelabelledConfigOperation'],
-      [$event->getOldLangcode(), $event->getNewLangcode()]
+      [$event->getNewLangcode()]
     );
   }
 
@@ -31,28 +31,29 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
    *
    * Runs after \Drupal\language\DefaultLangcodeConfigUpdater's own operation
    * completes, so $context['results']['relabelled_names'] holds every name
-   * it relabelled to the new default. Applying translations here reuses
-   * LocaleConfigManager::updateConfigTranslations(), the same mechanism that
-   * already merges real translated strings into a config object's active
-   * record when the target langcode matches the object's own langcode -
-   * which, having just been relabelled, it now does.
+   * it relabelled to the new default, and its pre-change content already
+   * saved as an override for the previous default. Applying translations
+   * here reuses LocaleConfigManager::updateConfigTranslations(), the same
+   * mechanism that already merges real translated strings into a config
+   * object's active record when the target langcode matches the object's
+   * own langcode - which, having just been relabelled, it now does.
    *
-   * The previous default is passed in too, so the same call also saves the
-   * relabelled object's pre-change content as an override for that langcode
-   * - otherwise it would simply be gone, overwritten by the new default's
-   * translation.
+   * Only the new default is passed: updateConfigTranslations() would happily
+   * accept the previous one too, but asking it for a translation "into" that
+   * langcode is not what's wanted here - it would look up locale's stored
+   * translation of the shipped default text, not preserve whatever the
+   * configuration's real content actually was, which is what
+   * DefaultLangcodeConfigUpdater's own override save already did.
    *
-   * @param string $old_langcode
-   *   The previous default langcode.
    * @param string $new_langcode
    *   The new default langcode.
    * @param array|\ArrayAccess $context
    *   The batch context.
    */
-  public static function translateRelabelledConfigOperation(string $old_langcode, string $new_langcode, &$context): void {
+  public static function translateRelabelledConfigOperation(string $new_langcode, &$context): void {
     $names = $context['results']['relabelled_names'] ?? [];
     if (!empty($names)) {
-      \Drupal::service(LocaleConfigManager::class)->updateConfigTranslations($names, [$old_langcode, $new_langcode]);
+      \Drupal::service(LocaleConfigManager::class)->updateConfigTranslations($names, [$new_langcode]);
     }
     $context['finished'] = 1;
   }
