@@ -9,6 +9,17 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaException;
+use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\GinIndex;
+use Drupal\Core\Database\SchemaDefinition\GistIndex;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -1470,6 +1481,346 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     ])->execute();
 
     $this->assertEquals($id + 1, $id_two);
+  }
+
+  /**
+   * Tests changing a field length via schema definition.
+   */
+  public function testChangeSerialColumnLengthFromSpecification(): void {
+    $initialSchema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'change_serial_to_big',
+      tables: [
+        new Table(
+          name: 'change_serial_to_big',
+          columns: [
+            Column::serial(
+              name: 'id',
+              description: 'Primary Key: Unique ID.',
+            ),
+            Column::text(
+              name: 'text',
+              description: 'A text field',
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+      ],
+    );
+    $this->schema->createSchemaFromDefinition($initialSchema);
+
+    // Increase the size of the field.
+    $targetSchema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'change_serial_to_big',
+      tables: [
+        new Table(
+          name: 'change_serial_to_big',
+          columns: [
+            Column::serial(
+              name: 'id',
+              description: 'Primary Key: Unique ID.',
+              size: ColumnSize::Big,
+            ),
+            Column::text(
+              name: 'text',
+              description: 'A text field',
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+      ],
+    );
+    $this->schema->changeTableColumnFromDefinition(
+      targetSchema: $targetSchema,
+      tableName: 'change_serial_to_big',
+      targetColumnName: 'id',
+    );
+
+    $this->assertTrue($this->schema->fieldExists('change_serial_to_big', 'id'));
+
+    // Test if we can actually add a big int.
+    $id = $this->connection->insert('change_serial_to_big')->fields([
+      'id' => 21474836470,
+    ])->execute();
+
+    $id_two = $this->connection->insert('change_serial_to_big')->fields([
+      'text' => 'Testing for ID generation',
+    ])->execute();
+
+    $this->assertEquals($id + 1, $id_two);
+  }
+
+  /**
+   * Tests creating a table from a definition with specialized indexes.
+   *
+   * By default, drivers only support regular indexes: GIN and GiST index
+   * definitions are skipped, and alternative indexes fall back to their
+   * regular index definition. Drivers supporting specialized indexes
+   * override this method.
+   */
+  public function testCreateTableFromDefinitionWithSpecializedIndexes(): void {
+    $tables[] = new Table(
+      name: 'test_specialized_indexes',
+      description: 'Table with specialized indexes.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
+        Column::varchar(
+          name: 'name',
+          length: 255,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      indexes: [
+        new Index(name: 'ages', columns: ['age']),
+        new GinIndex(name: 'gin_name', columns: ['name']),
+        new GistIndex(name: 'gist_name', columns: ['name']),
+        new AlternativeIndexes(
+          name: 'alternative_ages',
+          indexes: [
+            new GinIndex(name: 'alternative_ages', columns: ['age']),
+            new Index(name: 'alternative_ages', columns: ['age']),
+          ],
+        ),
+        new AlternativeIndexes(
+          name: 'alternative_name',
+          indexes: [
+            new GistIndex(name: 'alternative_name', columns: ['name']),
+          ],
+        ),
+      ],
+    );
+
+    $schema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_specialized_indexes',
+      tables: $tables,
+    );
+
+    $this->schema->createSchemaFromDefinition($schema);
+
+    $this->assertTrue($this->schema->tableExists('test_specialized_indexes'));
+    $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'ages'));
+    // The GIN and GiST indexes are not supported and are skipped.
+    $this->assertFalse($this->schema->indexExists('test_specialized_indexes', 'gin_name'));
+    $this->assertFalse($this->schema->indexExists('test_specialized_indexes', 'gist_name'));
+    // The regular index alternative is created in place of the GIN index.
+    $this->assertTrue($this->schema->indexExists('test_specialized_indexes', 'alternative_ages'));
+    // None of the alternatives is supported, so the index is skipped.
+    $this->assertFalse($this->schema->indexExists('test_specialized_indexes', 'alternative_name'));
+  }
+
+  /**
+   * Initial schema for ::testAddTableColumnFromDefinition.
+   *
+   * @return \Drupal\Core\Database\SchemaDefinition\Schema
+   *   The schema.
+   */
+  protected function initialSchemaForAddTableColumnFromDefinition(): SchemaDefinition {
+    $tables[] = new Table(
+      name: 'test_add_table_column_with_index',
+      description: 'Table with specialized indexes.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+
+    return new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_add_table_column_with_index',
+      tables: $tables,
+    );
+  }
+
+  /**
+   * Target schema for ::testAddTableColumnFromDefinition.
+   *
+   * @return \Drupal\Core\Database\SchemaDefinition\Schema
+   *   The schema.
+   */
+  protected function targetSchemaForTestAddTableColumnFromDefinition(): SchemaDefinition {
+    $tables[] = new Table(
+      name: 'test_add_table_column_with_index',
+      description: 'Table with specialized indexes.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      indexes: [
+        new Index(name: 'ages', columns: ['age']),
+        new GinIndex(name: 'gin_age', columns: ['age']),
+        new GistIndex(name: 'gist_age', columns: ['age']),
+        new AlternativeIndexes(
+          name: 'alternative_ages',
+          indexes: [
+            new GinIndex(name: 'alternative_ages', columns: ['age']),
+            new Index(name: 'alternative_ages', columns: ['age']),
+          ],
+        ),
+        new AlternativeIndexes(
+          name: 'alternative_skipped',
+          indexes: [
+            new GistIndex(name: 'alternative_skipped', columns: ['age']),
+          ],
+        ),
+      ],
+    );
+
+    return new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_add_table_column_with_index',
+      tables: $tables,
+    );
+  }
+
+  /**
+   * Tests adding a field with specialized indexes.
+   *
+   * The $keys_new argument of addField() may contain index definition
+   * objects. By default, drivers only support regular indexes: GIN and GiST
+   * index definitions are skipped, and alternative indexes fall back to
+   * their regular index definition. Drivers supporting specialized indexes
+   * override this method.
+   */
+  public function testAddTableColumnFromDefinition(): void {
+    $this->schema->createSchemaFromDefinition($this->initialSchemaForAddTableColumnFromDefinition());
+
+    $this->schema->addTableColumnFromDefinition(
+      targetSchema: $this->targetSchemaForTestAddTableColumnFromDefinition(),
+      tableName: 'test_add_table_column_with_index',
+      targetColumnName: 'age',
+    );
+
+    $this->assertTrue($this->schema->fieldExists('test_add_table_column_with_index', 'age'));
+    // The regular index is created.
+    $this->assertTrue($this->schema->indexExists('test_add_table_column_with_index', 'ages'));
+    // The GIN and GiST indexes are not supported and are skipped.
+    $this->assertFalse($this->schema->indexExists('test_add_table_column_with_index', 'gin_age'));
+    $this->assertFalse($this->schema->indexExists('test_add_table_column_with_index', 'gist_age'));
+    // The regular index alternative is created in place of the GIN index.
+    $this->assertTrue($this->schema->indexExists('test_add_table_column_with_index', 'alternative_ages'));
+    // None of the alternatives is supported, so the index is skipped.
+    $this->assertFalse($this->schema->indexExists('test_add_table_column_with_index', 'alternative_skipped'));
+  }
+
+  /**
+   * Initial schema for ::testChangeTableColumnFromDefinition.
+   *
+   * @return \Drupal\Core\Database\SchemaDefinition\Schema
+   *   The schema.
+   */
+  protected function initialSchemaForTestChangeTableColumnFromDefinition(): SchemaDefinition {
+    $tables[] = new Table(
+      name: 'test_change_table_column_with_index',
+      description: 'Table with specialized indexes.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+
+    return new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_change_table_column_with_index',
+      tables: $tables,
+    );
+  }
+
+  /**
+   * Target schema for ::testChangeTableColumnFromDefinition.
+   *
+   * @return \Drupal\Core\Database\SchemaDefinition\Schema
+   *   The schema.
+   */
+  protected function targetSchemaForTestChangeTableColumnFromDefinition(): SchemaDefinition {
+    $tables[] = new Table(
+      name: 'test_change_table_column_with_index',
+      description: 'Table with specialized indexes.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age_new',
+          notNull: TRUE,
+          default: new IntValue(1),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      indexes: [
+        new Index(name: 'ages', columns: ['age_new']),
+        new GinIndex(name: 'gin_age', columns: ['age_new']),
+        new GistIndex(name: 'gist_age', columns: ['age_new']),
+        new AlternativeIndexes(
+          name: 'alternative_ages',
+          indexes: [
+            new GinIndex(name: 'alternative_ages', columns: ['age_new']),
+            new Index(name: 'alternative_ages', columns: ['age_new']),
+          ],
+        ),
+        new AlternativeIndexes(
+          name: 'alternative_skipped',
+          indexes: [
+            new GistIndex(name: 'alternative_skipped', columns: ['age_new']),
+          ],
+        ),
+      ],
+    );
+
+    return new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_change_table_column_with_index',
+      tables: $tables,
+    );
+  }
+
+  /**
+   * Tests changing a column with specialized indexes.
+   */
+  public function testChangeTableColumnFromDefinition(): void {
+    $this->schema->createSchemaFromDefinition($this->initialSchemaForTestChangeTableColumnFromDefinition());
+
+    $this->schema->changeTableColumnFromDefinition(
+      targetSchema: $this->targetSchemaForTestChangeTableColumnFromDefinition(),
+      tableName: 'test_change_table_column_with_index',
+      currentColumnName: 'age',
+      targetColumnName: 'age_new',
+    );
+
+    $this->assertTrue($this->schema->fieldExists('test_change_table_column_with_index', 'age_new'));
+    // The regular index is created.
+    $this->assertTrue($this->schema->indexExists('test_change_table_column_with_index', 'ages'));
+    // The GIN and GiST indexes are not supported and are skipped.
+    $this->assertFalse($this->schema->indexExists('test_change_table_column_with_index', 'gin_age'));
+    $this->assertFalse($this->schema->indexExists('test_change_table_column_with_index', 'gist_age'));
+    // The regular index alternative is created in place of the GIN index.
+    $this->assertTrue($this->schema->indexExists('test_change_table_column_with_index', 'alternative_ages'));
+    // None of the alternatives is supported, so the index is skipped.
+    $this->assertFalse($this->schema->indexExists('test_change_table_column_with_index', 'alternative_skipped'));
   }
 
 }

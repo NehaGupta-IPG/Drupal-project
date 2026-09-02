@@ -2,7 +2,14 @@
 
 namespace Drupal\Core\Database;
 
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
+use Drupal\Core\Database\Exception\SchemaTablePrimaryKeyException;
 use Drupal\Core\Database\Query\PlaceholderInterface;
+use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
+use Drupal\Core\Database\SchemaDefinition\GinIndex;
+use Drupal\Core\Database\SchemaDefinition\GistIndex;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IndexInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
@@ -562,6 +569,24 @@ abstract class Schema implements PlaceholderInterface {
   }
 
   /**
+   * Resolves the preferred index from a list of alternatives.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\AlternativeIndexes $alternativeIndexes
+   *   The alternative indexes list.
+   *
+   * @return \Drupal\Core\Database\SchemaDefinition\IndexInterface|null
+   *   The preferred index or NULL if it cannot be determined.
+   */
+  protected function resolveAlternativeIndex(AlternativeIndexes $alternativeIndexes): ?IndexInterface {
+    foreach ($alternativeIndexes->indexes as $index) {
+      if (in_array(get_class($index), $this->getSupportedIndexTypes(), TRUE)) {
+        return $index;
+      }
+    }
+    return NULL;
+  }
+
+  /**
    * Change a field definition.
    *
    * IMPORTANT NOTE: To maintain database portability, you have to explicitly
@@ -664,6 +689,210 @@ abstract class Schema implements PlaceholderInterface {
    */
   final public function createTableFromDefinition(SchemaDefinitionType $schemaDefinitionType, string $schemaName, TableDefinition $table): void {
     $this->createTable($table->name, $table->toArray());
+
+    // Handles creation of indexes of types that are not the standard B-Tree.
+    foreach ($table->indexes ?? [] as $index) {
+      if ($index instanceof Index) {
+        continue;
+      }
+      $this->createIndexFromDefinition($table, $index->name);
+    }
+  }
+
+  /**
+   * Adds a table column based on a schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $targetSchema
+   *   The target Schema definition where the table is defined with the changed
+   *   column and all defined indexes.
+   * @param string $tableName
+   *   Name of the table.
+   * @param string $targetColumnName
+   *   The name of the column as defined in the target schema definition.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   *   If the specified table or source field doesn't exist.
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified destination field already exists.
+   */
+  final public function addTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName): void {
+    $table = $targetSchema->getTableDefinition($tableName);
+    $tableAsArray = $table->toArray();
+
+    // Handles keys/indexes that are impacted by the addition.
+    if (in_array($targetColumnName, $table->primaryKey ? $table->primaryKey->columnNames() : [], TRUE)) {
+      try {
+        $this->dropPrimaryKey($tableName);
+      }
+      catch (SchemaTablePrimaryKeyException) {
+        unset($tableAsArray['primary key']);
+      }
+    }
+    else {
+      unset($tableAsArray['primary key']);
+    }
+    foreach ($table->uniqueKeys ?? [] as $key) {
+      if (in_array($targetColumnName, $key->columnNames(), TRUE)) {
+        $this->dropUniqueKey($tableName, $key->name);
+      }
+      else {
+        unset($tableAsArray['unique keys'][$key->name]);
+      }
+    }
+    foreach ($table->indexes ?? [] as $key) {
+      if ($key instanceof AlternativeIndexes) {
+        $key = $this->resolveAlternativeIndex($key);
+        if ($key === NULL) {
+          continue;
+        }
+      }
+      if (in_array($targetColumnName, $key->columnNames(), TRUE)) {
+        $this->dropIndex($tableName, $key->name);
+      }
+      else {
+        unset($tableAsArray['indexes'][$key->name]);
+      }
+    }
+
+    $this->addField(
+      $tableName,
+      $targetColumnName,
+      $tableAsArray['fields'][$targetColumnName],
+      $tableAsArray,
+    );
+
+    // Handles creation of indexes of types that are not the standard B-Tree.
+    foreach ($table->indexes ?? [] as $index) {
+      if ($index instanceof Index) {
+        continue;
+      }
+      $this->createIndexFromDefinition($table, $index->name);
+    }
+  }
+
+  /**
+   * Changes a table column to a target schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $targetSchema
+   *   The target Schema definition where the table is defined with the changed
+   *   column and all defined indexes.
+   * @param string $tableName
+   *   Name of the table.
+   * @param string $targetColumnName
+   *   The name of the column as defined in the target schema definition.
+   * @param string|null $currentColumnName
+   *   The current name of the column in the table. Skip if the name does not
+   *   change.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   *   If the specified table or source field doesn't exist.
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified destination field already exists.
+   */
+  final public function changeTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName, ?string $currentColumnName = NULL): void {
+    $table = $targetSchema->getTableDefinition($tableName);
+    $currentColumnName ??= $targetColumnName;
+    $tableAsArray = $table->toArray();
+
+    // Handles keys/indexes that are impacted by the change.
+    $currentKeys = $this->introspectIndexSchema($tableName);
+    if (in_array($currentColumnName, $currentKeys['primary key'], TRUE)) {
+      try {
+        $this->dropPrimaryKey($tableName);
+      }
+      catch (SchemaTablePrimaryKeyException) {
+        unset($tableAsArray['primary key']);
+      }
+    }
+    else {
+      unset($tableAsArray['primary key']);
+    }
+    foreach ($currentKeys['unique keys'] as $key => $data) {
+      if (in_array($currentColumnName, $data, TRUE)) {
+        $this->dropUniqueKey($tableName, $key);
+      }
+      else {
+        unset($tableAsArray['unique keys'][$key]);
+      }
+    }
+    foreach ($currentKeys['indexes'] as $key => $data) {
+      if (in_array($currentColumnName, $data, TRUE)) {
+        $this->dropIndex($tableName, $key);
+      }
+      else {
+        unset($tableAsArray['indexes'][$key]);
+      }
+    }
+
+    $this->changeField(
+      $tableName,
+      $currentColumnName,
+      $targetColumnName,
+      $tableAsArray['fields'][$targetColumnName],
+      $tableAsArray,
+    );
+
+    // Handles creation of indexes of types that are not the standard B-Tree.
+    foreach ($table->indexes ?? [] as $index) {
+      if ($index instanceof Index) {
+        continue;
+      }
+      $this->createIndexFromDefinition($table, $index->name);
+    }
+  }
+
+  /**
+   * Creates a new index from a table schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Table $table
+   *   The table definition.
+   * @param string $indexName
+   *   The index name.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified index already exists.
+   * @throws \BadMethodCallException
+   *   When concrete driver class is missing implementations.
+   */
+  final public function createIndexFromDefinition(TableDefinition $table, string $indexName): void {
+    foreach ($table->indexes as $tmp) {
+      if ($tmp->name === $indexName) {
+        $index = $tmp;
+        break;
+      }
+    }
+    if (!isset($index)) {
+      throw new SchemaDefinitionException("Index '{$indexName}' is not present in the schema definition");
+    }
+    if ($index instanceof AlternativeIndexes) {
+      $index = $this->resolveAlternativeIndex($index);
+      if ($index === NULL) {
+        return;
+      }
+    }
+    $indexClass = get_class($index);
+    if (in_array($indexClass, $this->getSupportedIndexTypes(), TRUE)) {
+      match ($indexClass) {
+        GinIndex::class => $this->addGinIndex($table->name, $index->name, $index->toArray()),
+        GistIndex::class => $this->addGistIndex($table->name, $index->name, $index->toArray()),
+        Index::class => $this->addIndex($table->name, $index->name, $index->toArray(), $table->toArray()),
+      };
+    }
+  }
+
+  /**
+   * Returns the index definition classes supported by this driver.
+   *
+   * By default only regular indexes are supported. Drivers for database
+   * engines that can create specialized indexes, like GIN or GiST, override
+   * this method to declare them. Index definitions of an unsupported class
+   * are skipped when a table is created from a table schema definition.
+   *
+   * @return list<class-string<\Drupal\Core\Database\SchemaDefinition\IndexInterface>>
+   *   The supported index definition classes.
+   */
+  protected function getSupportedIndexTypes(): array {
+    return [Index::class];
   }
 
   /**
