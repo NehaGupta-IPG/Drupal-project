@@ -177,6 +177,9 @@ class OliveroTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Community carpentry');
   }
 
+  /**
+   * Tests that the mobile navigation button satisfies WCAG Label in Name.
+   */
   public function testMobileNavButtonLabelInName(): void {
     $this->drupalGet('');
     $this->assertSession()->statusCodeEquals(200);
@@ -189,4 +192,5 @@ class OliveroTest extends BrowserTestBase {
     // label text.
     $this->assertStringContainsString($visible_label, $button->getAttribute('aria-label'));
   }
+
 }
