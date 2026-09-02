@@ -253,8 +253,9 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
    */
   protected function reconcile(string $old_langcode, string $new_langcode): array {
     $context = [];
+    $updater = \Drupal::service(DefaultLangcodeConfigUpdater::class);
     do {
-      DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation($old_langcode, $new_langcode, $context);
+      $updater->reconcileConfigLangcodeOperation($old_langcode, $new_langcode, $context);
     } while ($context['finished'] < 1);
     return $context;
   }

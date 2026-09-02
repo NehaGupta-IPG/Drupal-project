@@ -16,12 +16,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterface {
 
+  public function __construct(
+    protected LocaleConfigManager $localeConfigManager,
+  ) {
+  }
+
   /**
    * Adds a batch operation to translate whatever the sweep relabels.
    */
   public function onDefaultLangcodeChange(LanguageDefaultLangcodeChangeEvent $event): void {
     $event->addOperation(
-      [static::class, 'translateRelabelledConfigOperation'],
+      static::class . ':translateRelabelledConfigOperation',
       [$event->newLangcode]
     );
   }
@@ -50,10 +55,10 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
    * @param array|\ArrayAccess $context
    *   The batch context.
    */
-  public static function translateRelabelledConfigOperation(string $new_langcode, &$context): void {
+  public function translateRelabelledConfigOperation(string $new_langcode, &$context): void {
     $names = $context['results']['relabelled_names'] ?? [];
     if (!empty($names)) {
-      \Drupal::service(LocaleConfigManager::class)->updateConfigTranslations($names, [$new_langcode]);
+      $this->localeConfigManager->updateConfigTranslations($names, [$new_langcode]);
     }
     $context['finished'] = 1;
   }
