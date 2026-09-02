@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional;
 
+use Drupal\Core\EventSubscriber\ColorSchemeCookieSubscriber;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
@@ -16,9 +17,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  *
  * The element is offered or disabled depending on whether the site theme and
  * the administration theme declare 'supports color scheme', and on whether the
- * account being edited may use the administration theme.
+ * account being edited may use the administration theme. Saving the form hands
+ * the new preference to the cookie that carries it to the client.
  *
  * @see \Drupal\user\AccountForm::colorSchemeElementProperties()
+ * @see \Drupal\user\Hook\ColorSchemeHooks::userUpdate()
  */
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
@@ -57,7 +60,7 @@ class UserColorSchemeFormTest extends BrowserTestBase {
   /**
    * Description used when neither theme honors the preference.
    */
-  const DESCRIPTION_NONE = 'This setting has no effect. Neither the site not the administration pages support it.';
+  const DESCRIPTION_NONE = 'This setting has no effect. Neither the site nor the administration pages support it.';
 
   /**
    * {@inheritdoc}
@@ -216,6 +219,42 @@ class UserColorSchemeFormTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that saving the form writes the preference to the cookie.
+   *
+   * The current user is built from the session at the start of the request, so
+   * it still holds the previous preference while the save is processed.
+   * hook_user_update() hands the saved value over, so the response to the save
+   * already carries it and the page that follows the save uses it.
+   *
+   * @see \Drupal\user\Hook\ColorSchemeHooks::userUpdate()
+   * @see \Drupal\Core\EventSubscriber\ColorSchemeCookieSubscriber::onResponse()
+   */
+  public function testSavingWritesTheCookie(): void {
+    // A disabled element submits nothing, so the element has to be offered.
+    $this->setThemes(self::SUPPORTING_THEME, self::SUPPORTING_THEME);
+
+    $account = $this->drupalCreateUser();
+    $this->drupalLogin($account);
+    // The account starts out on 'auto', which is what every page renders, so
+    // there is nothing to carry to the client yet.
+    $this->assertNull($this->getColorSchemeCookie());
+
+    foreach (['dark', 'light'] as $color_scheme) {
+      $this->drupalGet($account->toUrl('edit-form'));
+      $this->submitForm(['color_scheme' => $color_scheme], 'Save');
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertSame($color_scheme, $this->getColorSchemeCookie());
+    }
+
+    // 'auto' is expressed by the absence of the cookie, so saving it removes
+    // the cookie again.
+    $this->drupalGet($account->toUrl('edit-form'));
+    $this->submitForm(['color_scheme' => 'auto'], 'Save');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertNull($this->getColorSchemeCookie());
+  }
+
+  /**
    * Tests the registration form, where the account has no roles yet.
    */
   public function testRegistrationForm(): void {
@@ -230,6 +269,16 @@ class UserColorSchemeFormTest extends BrowserTestBase {
     // permission check would evaluate the anonymous role, which says nothing
     // about the account being created, so the element is offered.
     $this->assertColorSchemeElement(FALSE, self::DESCRIPTION_ADMIN_ONLY);
+  }
+
+  /**
+   * Returns the color scheme cookie the browser holds.
+   *
+   * @return string|null
+   *   The value of the cookie, or NULL if the browser holds no such cookie.
+   */
+  protected function getColorSchemeCookie(): ?string {
+    return $this->getSession()->getCookie(ColorSchemeCookieSubscriber::COOKIE_NAME);
   }
 
   /**
