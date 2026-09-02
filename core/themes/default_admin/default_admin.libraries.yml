@@ -442,6 +442,7 @@ sidebar:
     migration/js/sidebar.js: { minified: false }
   dependencies:
     - core/once
+    - core/jquery
 
 settings:
   js:
