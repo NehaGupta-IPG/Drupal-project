@@ -765,7 +765,10 @@ abstract class Schema implements PlaceholderInterface {
       }
     }
     else {
-      unset($tableAsArray['primary key']);
+      // Rebuild the PK only if is requested but is currently missing.
+      if (!($tableAsArray['primary key'] !== [] && $currentKeys['primary key'] === [])) {
+        unset($tableAsArray['primary key']);
+      }
     }
     foreach ($currentKeys['unique keys'] as $key => $data) {
       if (in_array($currentColumnName, $data, TRUE)) {

@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
-use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\Database;
-use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
-use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\Index;
@@ -18,7 +14,6 @@ use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
-use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -51,7 +46,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * regular index definition. Drivers supporting specialized indexes
    * override this method.
    */
-  public function testCreateTableFromDefinition(): void {
+  public function testCreateTable(): void {
     $tables[] = new Table(
       name: 'test_from_definition',
       description: 'Test table created from definition.',
@@ -92,12 +87,12 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
   }
 
   /**
-   * Initial schema for ::testAddTableColumnFromDefinition.
+   * Initial schema for ::testAddTableColumn.
    *
    * @return \Drupal\Core\Database\SchemaDefinition\Schema
    *   The schema.
    */
-  protected function initialSchemaForAddTableColumnFromDefinition(): SchemaDefinition {
+  protected function initialSchemaForAddTableColumn(): SchemaDefinition {
     $tables[] = new Table(
       name: 'test_add_table_column_from_definition',
       description: 'Test table created from definition for column addition.',
@@ -121,12 +116,12 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
   }
 
   /**
-   * Target schema for ::testAddTableColumnFromDefinition.
+   * Target schema for ::testAddTableColumn.
    *
    * @return \Drupal\Core\Database\SchemaDefinition\Schema
    *   The schema.
    */
-  protected function targetSchemaForTestAddTableColumnFromDefinition(): SchemaDefinition {
+  protected function targetSchemaForTestAddTableColumn(): SchemaDefinition {
     $tables[] = new Table(
       name: 'test_add_table_column_from_definition',
       description: 'Test table created from definition for column addition.',
@@ -161,7 +156,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests adding a field with specialized indexes.
+   * Tests adding a column with specialized indexes.
    *
    * The $keys_new argument of addField() may contain index definition
    * objects. By default, drivers only support regular indexes: GIN and GiST
@@ -169,8 +164,8 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * their regular index definition. Drivers supporting specialized indexes
    * override this method.
    */
-  public function testAddTableColumnFromDefinition(): void {
-    $this->schema->createSchemaFromDefinition($this->initialSchemaForAddTableColumnFromDefinition());
+  public function testAddTableColumn(): void {
+    $this->schema->createSchemaFromDefinition($this->initialSchemaForAddTableColumn());
 
     $this->assertTrue($this->schema->tableExists('test_add_table_column_from_definition'));
     $this->assertFalse($this->schema->fieldExists('test_add_table_column_from_definition', 'age'));
@@ -180,7 +175,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
     $this->assertFalse($this->schema->indexExists('test_add_table_column_from_definition', 'names_by_age'));
 
     $this->schema->addTableColumnFromDefinition(
-      targetSchema: $this->targetSchemaForTestAddTableColumnFromDefinition(),
+      targetSchema: $this->targetSchemaForTestAddTableColumn(),
       tableName: 'test_add_table_column_from_definition',
       targetColumnName: 'age',
     );
@@ -194,12 +189,12 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
   }
 
   /**
-   * Initial schema for ::testChangeTableColumnFromDefinition.
+   * Initial schema for ::testChangeTableColumn.
    *
    * @return \Drupal\Core\Database\SchemaDefinition\Schema
    *   The schema.
    */
-  protected function initialSchemaForTestChangeTableColumnFromDefinition(): SchemaDefinition {
+  protected function initialSchemaForTestChangeTableColumn(): SchemaDefinition {
     $tables[] = new Table(
       name: 'test_change_table_column_from_definition',
       description: 'Test table created from definition for column change.',
@@ -228,12 +223,12 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
   }
 
   /**
-   * Target schema for ::testChangeTableColumnFromDefinition.
+   * Target schema for ::testChangeTableColumn.
    *
    * @return \Drupal\Core\Database\SchemaDefinition\Schema
    *   The schema.
    */
-  protected function targetSchemaForTestChangeTableColumnFromDefinition(): SchemaDefinition {
+  protected function targetSchemaForTestChangeTableColumn(): SchemaDefinition {
     $tables[] = new Table(
       name: 'test_change_table_column_from_definition',
       description: 'Test table created from definition for column change.',
@@ -270,8 +265,8 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
   /**
    * Tests changing a column with specialized indexes.
    */
-  public function testChangeTableColumnFromDefinition(): void {
-    $this->schema->createSchemaFromDefinition($this->initialSchemaForTestChangeTableColumnFromDefinition());
+  public function testChangeTableColumn(): void {
+    $this->schema->createSchemaFromDefinition($this->initialSchemaForTestChangeTableColumn());
 
     $this->assertTrue($this->schema->tableExists('test_change_table_column_from_definition'));
     $this->assertTrue($this->schema->fieldExists('test_change_table_column_from_definition', 'age'));
@@ -282,7 +277,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
     $this->assertFalse($this->schema->indexExists('test_change_table_column_from_definition', 'names_by_age'));
 
     $this->schema->changeTableColumnFromDefinition(
-      targetSchema: $this->targetSchemaForTestChangeTableColumnFromDefinition(),
+      targetSchema: $this->targetSchemaForTestChangeTableColumn(),
       tableName: 'test_change_table_column_from_definition',
       currentColumnName: 'age',
       targetColumnName: 'age_new',
@@ -298,9 +293,9 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests changing a field length via schema definition.
+   * Tests changing a column length via schema definition.
    */
-  public function testChangeSerialColumnLengthFromDefinition(): void {
+  public function testChangeSerialColumnLength(): void {
     $initialSchema = new SchemaDefinition(
       type: SchemaDefinitionType::Test,
       name: 'change_serial_to_big',
@@ -314,7 +309,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
             ),
             Column::text(
               name: 'text',
-              description: 'A text field',
+              description: 'A text column',
             ),
           ],
           primaryKey: new PrimaryKey(['id']),
@@ -323,7 +318,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
     );
     $this->schema->createSchemaFromDefinition($initialSchema);
 
-    // Increase the size of the field.
+    // Increase the size of the column.
     $targetSchema = new SchemaDefinition(
       type: SchemaDefinitionType::Test,
       name: 'change_serial_to_big',
@@ -338,7 +333,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
             ),
             Column::text(
               name: 'text',
-              description: 'A text field',
+              description: 'A text column',
             ),
           ],
           primaryKey: new PrimaryKey(['id']),
@@ -363,6 +358,197 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
     ])->execute();
 
     $this->assertEquals($id + 1, $id_two);
+  }
+
+  /**
+   * Tests various schema changes' effect on the table's primary key.
+   *
+   * @param array $initial_primary_key
+   *   The initial primary key of the test table.
+   * @param array $renamed_primary_key
+   *   The primary key of the test table after renaming the test column.
+   */
+  #[DataProvider('providerTestSchemaCreateTablePrimaryKey')]
+  public function testChangePrimaryKey(array $initial_primary_key, array $renamed_primary_key): void {
+    $table_name = 'test_table';
+    $find_primary_key_columns = new \ReflectionMethod(get_class($this->schema), 'findPrimaryKeyColumns');
+
+    // Test making the column the primary key of the table upon creation.
+    $table = new Table(
+      name: $table_name,
+      description: 'Test table created from definition.',
+      columns: [
+        Column::int(
+          name: 'test_column',
+          notNull: TRUE,
+        ),
+        Column::int(
+          name: 'other_test_column',
+          notNull: TRUE,
+        ),
+      ],
+      primaryKey: new PrimaryKey($initial_primary_key),
+    );
+    $schema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: $table_name,
+      tables: [$table],
+    );
+
+    $this->schema->createSchemaFromDefinition($schema);
+    $this->assertTrue($this->schema->fieldExists($table_name, 'test_column'));
+    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+
+    // Change the column type and make sure the primary key stays in place.
+    $table = new Table(
+      name: $table_name,
+      description: 'Test table created from definition.',
+      columns: [
+        Column::varchar(
+          name: 'test_column',
+          length: 32,
+          notNull: TRUE,
+        ),
+        Column::int(
+          name: 'other_test_column',
+          notNull: TRUE,
+        ),
+      ],
+      primaryKey: new PrimaryKey($initial_primary_key),
+    );
+    $schema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: $table_name,
+      tables: [$table],
+    );
+
+    $this->schema->changeTableColumnFromDefinition(
+      targetSchema: $schema,
+      tableName: $table_name,
+      targetColumnName: 'test_column',
+    );
+    $this->assertTrue($this->schema->fieldExists($table_name, 'test_column'));
+    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+
+    // Add some data and change the column type back, to make sure that changing
+    // the type leaves the primary key in place even with existing data.
+    $this->connection
+      ->insert($table_name)
+      ->fields(['test_column' => 1, 'other_test_column' => 2])
+      ->execute();
+
+    $table = new Table(
+      name: $table_name,
+      description: 'Test table created from definition.',
+      columns: [
+        Column::int(
+          name: 'test_column',
+          notNull: TRUE,
+        ),
+        Column::int(
+          name: 'other_test_column',
+          notNull: TRUE,
+        ),
+      ],
+      primaryKey: new PrimaryKey($initial_primary_key),
+    );
+    $schema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: $table_name,
+      tables: [$table],
+    );
+
+    $this->schema->changeTableColumnFromDefinition(
+      targetSchema: $schema,
+      tableName: $table_name,
+      targetColumnName: 'test_column',
+    );
+    $this->assertTrue($this->schema->fieldExists($table_name, 'test_column'));
+    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+
+    // Make sure that adding the primary key is done as part of changing a
+    // column, as well, in case it is dropped explicitly before the change.
+    $this->schema->dropPrimaryKey($table_name);
+    $this->assertEquals([], $find_primary_key_columns->invoke($this->schema, $table_name));
+    $this->schema->changeTableColumnFromDefinition(
+      targetSchema: $schema,
+      tableName: $table_name,
+      targetColumnName: 'test_column',
+    );
+    $this->assertTrue($this->schema->fieldExists($table_name, 'test_column'));
+    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+
+    // Rename the column and make sure the primary key was updated.
+    $table = new Table(
+      name: $table_name,
+      description: 'Test table created from definition.',
+      columns: [
+        Column::int(
+          name: 'test_column_renamed',
+          notNull: TRUE,
+        ),
+        Column::int(
+          name: 'other_test_column',
+          notNull: TRUE,
+        ),
+      ],
+      primaryKey: new PrimaryKey($renamed_primary_key),
+    );
+    $schema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: $table_name,
+      tables: [$table],
+    );
+
+    $this->schema->changeTableColumnFromDefinition(
+      targetSchema: $schema,
+      tableName: $table_name,
+      currentColumnName: 'test_column',
+      targetColumnName: 'test_column_renamed',
+    );
+    $this->assertTrue($this->schema->fieldExists($table_name, 'test_column_renamed'));
+    $this->assertEquals($renamed_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+
+    // Drop the column and make sure the primary key was dropped, as well.
+    $this->schema->dropField($table_name, 'test_column_renamed');
+    $this->assertFalse($this->schema->fieldExists($table_name, 'test_column_renamed'));
+    $this->assertEquals([], $find_primary_key_columns->invoke($this->schema, $table_name));
+
+    // Add the column again and make sure adding the primary key can be done at
+    // the same time.
+    $this->schema->addField($table_name, 'test_column', ['type' => 'int', 'default' => 0, 'not null' => TRUE], ['primary key' => $initial_primary_key]);
+    $this->assertTrue($this->schema->fieldExists($table_name, 'test_column'));
+    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+
+    // Drop the column again and explicitly add a primary key.
+    $this->schema->dropField($table_name, 'test_column');
+    $this->schema->addPrimaryKey($table_name, ['other_test_column']);
+    $this->assertFalse($this->schema->fieldExists($table_name, 'test_column'));
+    $this->assertEquals(['other_test_column'], $find_primary_key_columns->invoke($this->schema, $table_name));
+
+    // Test that adding a column with a primary key will work even with a
+    // pre-existing primary key.
+    $this->schema->addField($table_name, 'test_column', ['type' => 'int', 'default' => 0, 'not null' => TRUE], ['primary key' => $initial_primary_key]);
+    $this->assertTrue($this->schema->fieldExists($table_name, 'test_column'));
+    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+  }
+
+  /**
+   * Provides test cases for SchemaTest::testSchemaCreateTablePrimaryKey().
+   */
+  public static function providerTestSchemaCreateTablePrimaryKey(): \Generator {
+    yield 'simple_primary_key' => [
+      'initial_primary_key' => ['test_column'],
+      'renamed_primary_key' => ['test_column_renamed'],
+    ];
+    yield 'composite_primary_key' => [
+      'initial_primary_key' => ['test_column', 'other_test_column'],
+      'renamed_primary_key' => ['test_column_renamed', 'other_test_column'],
+    ];
+    yield 'composite_primary_key_different_order' => [
+      'initial_primary_key' => ['other_test_column', 'test_column'],
+      'renamed_primary_key' => ['other_test_column', 'test_column_renamed'],
+    ];
   }
 
 }
