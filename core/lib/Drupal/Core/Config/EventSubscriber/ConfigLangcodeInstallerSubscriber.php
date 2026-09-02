@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Config\EventSubscriber;
 
-use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigLangcodeResolveEvent;
 use Drupal\Core\Installer\InstallerKernel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -41,7 +40,7 @@ class ConfigLangcodeInstallerSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     return [
-      ConfigEvents::RESOLVE_LANGCODE => ['onResolveLangcode', 10000],
+      ConfigLangcodeResolveEvent::class => ['onResolveLangcode', 10000],
     ];
   }
 

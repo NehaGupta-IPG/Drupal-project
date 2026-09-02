@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config;
 
-use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigLangcodeResolveEvent;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -12,7 +11,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests a higher-priority RESOLVE_LANGCODE subscriber can outvote the default.
+ * Tests a ConfigLangcodeResolveEvent subscriber can outvote the default.
  *
  * Simulates a module establishing its own default-langcode policy -
  * for example always defaulting new configuration to English regardless of
@@ -55,7 +54,7 @@ class ConfigLangcodeFirstResolverWinsTest extends KernelTestBase {
    */
   protected function registerLockToEnglishPolicy(bool $should_act = TRUE): void {
     \Drupal::service('event_dispatcher')->addListener(
-      ConfigEvents::RESOLVE_LANGCODE,
+      ConfigLangcodeResolveEvent::class,
       function (ConfigLangcodeResolveEvent $event) use ($should_act): void {
         if ($should_act) {
           $event->setLangcode('en');
@@ -92,7 +91,7 @@ class ConfigLangcodeFirstResolverWinsTest extends KernelTestBase {
     $this->registerLockToEnglishPolicy();
 
     $event = new ConfigLangcodeResolveEvent();
-    \Drupal::service('event_dispatcher')->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
+    \Drupal::service('event_dispatcher')->dispatch($event);
 
     $this->assertSame('en', $event->getLangcode());
   }
@@ -104,7 +103,7 @@ class ConfigLangcodeFirstResolverWinsTest extends KernelTestBase {
     $this->registerLockToEnglishPolicy(FALSE);
 
     $event = new ConfigLangcodeResolveEvent();
-    \Drupal::service('event_dispatcher')->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
+    \Drupal::service('event_dispatcher')->dispatch($event);
     $this->assertSame('fr', $event->getLangcode());
   }
 

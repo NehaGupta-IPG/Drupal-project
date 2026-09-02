@@ -21,8 +21,6 @@ use Drupal\Component\EventDispatcher\Event;
  *
  * Drupal core always registers a subscriber for the site's default language, so
  * self::getLangcode() is guaranteed a value by the time dispatch() returns.
- *
- * @see \Drupal\Core\Config\ConfigEvents::RESOLVE_LANGCODE
  */
 final class ConfigLangcodeResolveEvent extends Event {
 
