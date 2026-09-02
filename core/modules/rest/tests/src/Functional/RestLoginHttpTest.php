@@ -608,26 +608,27 @@ class RestLoginHttpTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that DeprecatedUserRoutesSubscriber correctly alters the controller.
+   * Tests that the REST routes use their own controllers.
    */
   #[DataProvider('providerDeprecatedUserRoutesSubscriber')]
   public function testDeprecatedUserRoutesSubscriber(string $routeName, string $userController, string $restController): void {
-    $this->assertEquals(
-      $restController,
-      \Drupal::service('router.route_provider')
-        ->getRouteByName($routeName)
-        ->getDefault('_controller')
-    );
+    $route_provider = \Drupal::service('router.route_provider');
+    $this->assertSame($restController, $route_provider->getRouteByName("rest.$routeName")->getDefault('_controller'));
+    $this->assertSame($userController, $route_provider->getRouteByName("user.$routeName.http")->getDefault('_controller'));
+  }
 
-    $this->container->get('module_installer')->uninstall(['rest']);
+  /**
+   * Tests that alterations to the user routes are applied to the REST routes.
+   */
+  public function testDeprecatedUserRoutesSubscriberWithRouteAlteration(): void {
+    $this->container->get('module_installer')->install(['user_route_alter_test']);
     $this->rebuildAll();
 
-    $this->assertEquals(
-      $userController,
-      \Drupal::service('router.route_provider')
-        ->getRouteByName($routeName)
-        ->getDefault('_controller')
-    );
+    $route_provider = \Drupal::service('router.route_provider');
+    $route = $route_provider->getRouteByName('rest.pass');
+    $this->assertSame(['_access' => 'FALSE'], $route->getRequirements());
+    $this->assertSame('\Drupal\rest\Controller\RestAuthenticationController::resetPassword', $route->getDefault('_controller'));
+    $this->assertSame(403, $this->passwordRequest(['name' => 'example'])->getStatusCode());
   }
 
   /**
@@ -636,22 +637,22 @@ class RestLoginHttpTest extends BrowserTestBase {
    */
   public static function providerDeprecatedUserRoutesSubscriber(): \Generator {
     yield [
-      'user.login_status.http',
+      'login_status',
       '\Drupal\user\Controller\UserAuthenticationController::loginStatus',
       '\Drupal\rest\Controller\RestAuthenticationController::loginStatus',
     ];
     yield [
-      'user.pass.http',
+      'pass',
       '\Drupal\user\Controller\UserAuthenticationController::resetPassword',
       '\Drupal\rest\Controller\RestAuthenticationController::resetPassword',
     ];
     yield [
-      'user.login.http',
+      'login',
       '\Drupal\user\Controller\UserAuthenticationController::login',
       '\Drupal\rest\Controller\RestAuthenticationController::login',
     ];
     yield [
-      'user.logout.http',
+      'logout',
       '\Drupal\user\Controller\UserAuthenticationController::logout',
       '\Drupal\rest\Controller\RestAuthenticationController::logout',
     ];

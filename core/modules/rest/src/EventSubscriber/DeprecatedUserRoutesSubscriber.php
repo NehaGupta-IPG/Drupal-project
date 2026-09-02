@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class DeprecatedUserRoutesSubscriber implements EventSubscriberInterface {
 
   /**
-   * Replace the deprecated controllers on user.module's routes with ours.
+   * Copies altered deprecated user module routes to the REST module routes.
    *
    * @param \Drupal\Core\Routing\RouteBuildEvent $event
    *   The route build event.
@@ -22,7 +22,13 @@ class DeprecatedUserRoutesSubscriber implements EventSubscriberInterface {
       $user_route = $event->getRouteCollection()->get("user.$route_name.http");
       $rest_route = $event->getRouteCollection()->get("rest.$route_name");
       if ($user_route && $rest_route) {
-        $user_route->setDefault('_controller', $rest_route->getDefault('_controller'));
+        $controller = $rest_route->getDefault('_controller');
+        $rest_route = clone $user_route;
+        $rest_route->setDefault('_controller', $controller);
+        $options = $rest_route->getOptions();
+        unset($options['deprecated']);
+        $rest_route->setOptions($options);
+        $event->getRouteCollection()->add("rest.$route_name", $rest_route);
       }
     }
   }
@@ -31,7 +37,8 @@ class DeprecatedUserRoutesSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
-    $events[RoutingEvents::ALTER] = 'onRouteAlter';
+    // Run after route subscribers with the default priority.
+    $events[RoutingEvents::ALTER] = ['onRouteAlter', -1000];
     return $events;
   }
 
