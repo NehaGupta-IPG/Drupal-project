@@ -438,32 +438,44 @@ class ComposerInspector implements LoggerAwareInterface {
    * The following cached data may be invalidated:
    * - Installed package lists (see ::getInstalledPackageList()).
    *
-   * @param string $working_dir
-   *   A directory that contains a `composer.json` file, and optionally a
-   *   `composer.lock`. If either file has changed since the last time this
-   *   method was called, any cached data for the directory will be invalidated.
+   * @param string $context
+   *   The path of either the directory in which to run Composer, containing a
+   *   `composer.json` file or a specific configuration file (such as a
+   *    particular package's `composer.json`) from which to read specific
+   *    values.
    *
    * @return bool
    *   TRUE if the cached data was invalidated, otherwise FALSE.
    */
-  private function invalidateCacheIfNeeded(string $working_dir): bool {
+  private function invalidateCacheIfNeeded(string $context): bool {
     static $known_hashes = [];
 
     $invalidate = FALSE;
-    foreach (['composer.json', 'composer.lock'] as $filename) {
-      $known_hash = $known_hashes[$working_dir][$filename] ?? '';
-      // If the file doesn't exist, hash_file() will return FALSE.
-      $current_hash = @hash_file('xxh64', $working_dir . DIRECTORY_SEPARATOR . $filename);
-
-      if ($known_hash && $current_hash && hash_equals($known_hash, $current_hash)) {
-        continue;
+    if (!is_dir($context)) {
+      // Use the same array structure as the directory path for consistency
+      // later in the method.
+      $known_hash = $known_hashes[$context][$context] ?? '';
+      $current_hash = @hash_file('xxh64', $context);
+      if (!$known_hash || !$current_hash || !hash_equals($known_hash, $current_hash)) {
+        $invalidate = TRUE;
       }
-      $known_hashes[$working_dir][$filename] = $current_hash;
-      $invalidate = TRUE;
+    }
+    else {
+      foreach (['composer.json', 'composer.lock'] as $filename) {
+        $known_hash = $known_hashes[$context][$filename] ?? '';
+        // If the file doesn't exist, hash_file() will return FALSE.
+        $current_hash = @hash_file('xxh64', $context . DIRECTORY_SEPARATOR . $filename);
+
+        if ($known_hash && $current_hash && hash_equals($known_hash, $current_hash)) {
+          continue;
+        }
+        $known_hashes[$context][$filename] = $current_hash;
+        $invalidate = TRUE;
+      }
     }
     if ($invalidate) {
       $this->configCache = [];
-      unset($this->packageLists[$working_dir]);
+      unset($this->packageLists[$context]);
     }
     return $invalidate;
   }
