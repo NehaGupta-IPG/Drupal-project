@@ -5,11 +5,10 @@ namespace Drupal\media_library\Plugin\views\field;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseDialogCommand;
 use Drupal\Core\Ajax\MessageCommand;
-use Drupal\Core\Ajax\PrependCommand;
-use Drupal\Core\Ajax\RemoveCommand;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Url;
 use Drupal\media_library\MediaLibraryState;
 use Drupal\views\Attribute\ViewsField;
@@ -158,11 +157,23 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
     $field_id = $form_state->getTriggeringElement()['#field_id'];
     $selected_ids = $form_state->getValue($field_id);
     $selected_ids = $selected_ids ? array_filter(explode(',', $selected_ids)) : [];
-    if (empty($selected_ids) || $form_state->hasAnyErrors()) {
+
+    // The openers below assume that at least one item is selected, and the
+    // dialog does not show the errors of the form on its own.
+    if (!$selected_ids || $form_state::hasAnyErrors()) {
       $response = new AjaxResponse();
-      $messages = ['#type' => 'status_messages'];
-      $response->addCommand(new RemoveCommand('#media-library-add-form-wrapper [data-drupal-messages]'));
-      $response->addCommand(new PrependCommand('#media-library-add-form-wrapper', \Drupal::service('renderer')->renderRoot($messages)));
+      // Only the first command clears the container, so that a second error
+      // does not remove the first one.
+      $clear_previous = TRUE;
+      foreach ($form_state->getErrors() as $error) {
+        $response->addCommand(new MessageCommand($error, '#media-library-messages', ['type' => 'error'], $clear_previous));
+        $clear_previous = FALSE;
+      }
+      // The errors are shown in the dialog, so they must not show up again on
+      // the next page the user visits.
+      // @see \Drupal\Core\Form\FormErrorHandler::displayErrorMessages()
+      \Drupal::messenger()->deleteByType(MessengerInterface::TYPE_ERROR);
+
       return $response;
     }
 
@@ -192,8 +203,12 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
    * {@inheritdoc}
    */
   public function viewsFormValidate(array &$form, FormStateInterface $form_state) {
-    $selected = $form_state->getValue($this->options['id']) !== NULL ? array_filter($form_state->getValue($this->options['id'])) : [];
-    if (empty($selected)) {
+    // The selection spans the pages and the media types of the library, so it
+    // is kept in a hidden field. The checkboxes only cover the rows that the
+    // view returned for this request, and the view returns none at all when a
+    // filter matches nothing.
+    $selection = (string) $form_state->getValue($this->options['id'] . '_selection');
+    if (!array_filter(explode(',', $selection))) {
       $form_state->setErrorByName('', $this->t('No items selected.'));
     }
   }

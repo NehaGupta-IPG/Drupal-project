@@ -100,6 +100,52 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
   }
 
   /**
+   * Tests submitting the form when the view has no results.
+   */
+  public function testInsertSelectedWithoutResults(): void {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+    $this->drupalGet('node/add/basic_page');
+    $this->openMediaLibraryForField('field_unlimited_media');
+
+    // Filter the view down to zero rows, so that it renders no checkbox.
+    $page->fillField('Name', 'No media item has this name');
+    $page->pressButton('Apply filters');
+    $this->waitForNoText('Dog');
+
+    $assert_session->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Insert selected');
+    $this->assertNotEmpty($assert_session->waitForElement('css', '#media-library-messages .messages--error'));
+    $assert_session->elementTextContains('css', '#media-library-messages', 'No items selected.');
+
+    // The error is shown in the dialog, so it must not be queued for the next
+    // page the user visits.
+    $this->drupalGet('node/add/basic_page');
+    $assert_session->pageTextNotContains('No items selected.');
+  }
+
+  /**
+   * Tests inserting a selected item that the view no longer shows.
+   */
+  public function testInsertSelectionThatIsNotVisible(): void {
+    $page = $this->getSession()->getPage();
+    $this->drupalGet('node/add/basic_page');
+    $this->openMediaLibraryForField('field_unlimited_media');
+    $page->checkField('Select Dog');
+
+    // Filter the selected item out of the view.
+    $page->fillField('Name', 'Cat');
+    $page->pressButton('Apply filters');
+    $this->waitForNoText('Dog');
+
+    // Toggling another item rewrites the hidden field from the selection that
+    // JavaScript keeps, so it holds Dog again while no checkbox is checked.
+    $page->checkField('Select Cat');
+    $page->uncheckField('Select Cat');
+
+    $this->pressInsertSelected('Added one media item.');
+  }
+
+  /**
    * Tests that the Media library's widget works as expected.
    */
   public function testWidget(): void {

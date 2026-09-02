@@ -182,4 +182,23 @@ class EmbeddedFormWidgetTest extends WebDriverTestBase {
     $assert_session->statusMessageContainsAfterWait('No items selected', 'error');
   }
 
+  /**
+   * Tests the error for users who are not allowed to create media.
+   */
+  public function testEmptySelectionWithoutCreateAccess(): void {
+    $assert_session = $this->assertSession();
+    $this->drupalLogin($this->drupalCreateUser([
+      'access content',
+      'create basic_page content',
+      'edit own basic_page content',
+      'view media',
+    ]));
+    $this->drupalGet('node/add/basic_page');
+    $assert_session->elementExists('css', '#media_image_field-media-library-wrapper')->pressButton('Add media');
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ui-dialog-buttonpane'));
+    $assert_session->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Insert selected');
+    $this->assertNotEmpty($assert_session->waitForElement('css', '#media-library-messages .messages--error'));
+    $assert_session->elementTextContains('css', '#media-library-messages', 'No items selected.');
+  }
+
 }
