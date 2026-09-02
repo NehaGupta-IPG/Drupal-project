@@ -441,41 +441,29 @@ class ConfigInstaller implements ConfigInstallerInterface {
             $shipped_langcode = $config_to_create[$name]['langcode'] ?? 'en';
             // Replace 'en' with the default langcode to allow the Locale module
             // to translate the configuration if it is installed.
-            $resolved_langcode = $shipped_langcode === 'en' ? $default_langcode : $shipped_langcode;
-            $config_to_create[$name]['langcode'] = $resolved_langcode;
-            // Ensure the langcode is valid. Checked in order of how likely each
-            // is to answer the question: most resolved langcodes are already
-            // configured languages. Only once that fails is the (rare)
-            // locally-defined case considered, and system.site read as a last
-            // resort - nothing keeps the language manager's notion of the
-            // default in sync with a system.site:default_langcode change unless
-            // language module is installed to do so.
-            if (!array_key_exists($resolved_langcode, $this->languageManager->getLanguages(LanguageInterface::STATE_ALL))) {
-              if (!isset($locally_defined_langcodes)) {
-                $locally_defined_langcodes = [];
-                foreach ($config_names as $config_name) {
-                  if ($this->configManager->getEntityTypeIdByName($config_name) === 'configurable_language') {
-                    $locally_defined_langcodes[] = $config_to_create[$config_name]['id'];
+            if ($shipped_langcode === 'en' || $shipped_langcode === $default_langcode) {
+              $config_to_create[$name]['langcode'] = $default_langcode;
+            }
+            else {
+              // Ensure the shipped langcode is valid. Check if it is listed by
+              // the language manager, and if not, check if it is defined by
+              // the configuration being installed.
+              if (!array_key_exists($shipped_langcode, $this->languageManager->getLanguages(LanguageInterface::STATE_ALL))) {
+                if (!isset($locally_defined_langcodes)) {
+                  $locally_defined_langcodes = [];
+                  foreach ($config_names as $config_name) {
+                    if ($this->configManager->getEntityTypeIdByName($config_name) === 'configurable_language') {
+                      $locally_defined_langcodes[] = $config_to_create[$config_name]['id'];
+                    }
                   }
                 }
-              }
-              if (!in_array($resolved_langcode, $locally_defined_langcodes, TRUE)) {
-                // @todo the installer default language is wrong! Maybe there is
-                //   a better way to do this. Perhaps setting the correct value
-                //   for a default language in install_begin_request() or
-                //   overriding either the language manager or this service
-                //   during the install. Till we work that out this ugliness
-                //   will have to suffice.
-                if (InstallerKernel::installationAttempted()) {
-                  global $install_state;
-                  $installer_langcode = $install_state['parameters']['langcode'] ?? NULL;
-                }
-                if ($resolved_langcode !== ($installer_langcode ?? $this->configFactory->get('system.site')->get('default_langcode') ?? 'en')) {
+                if (!in_array($shipped_langcode, $locally_defined_langcodes, TRUE)) {
                   // The configuration ships with an explicit langcode that is
                   // not supported on this site: do not install it at all.
                   continue;
                 }
               }
+              $config_to_create[$name]['langcode'] = $shipped_langcode;
             }
           }
         }
