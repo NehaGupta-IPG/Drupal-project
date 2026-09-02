@@ -54,7 +54,8 @@ export default class DrupalMediaToolbar extends Plugin {
       items:
         normalizeDeclarativeConfig(editor.config.get('drupalMedia.toolbar')) ||
         [],
-      // Get the selected image or an image containing the figcaption with the selection inside.
+      // Get the selected image or an image containing the figcaption with the
+      // selection inside.
       getRelatedElement: (selection) =>
         getClosestSelectedDrupalMediaWidget(selection),
     });

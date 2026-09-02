@@ -13,8 +13,8 @@ import ToggleDrupalMediaCaptionCommand from './drupalmediacaptioncommand';
  * A view to model converter for Drupal Media caption.
  *
  * This upcasts the `data-caption` attribute from `<drupal-media>` elements into
- * a `<caption>` model element. This is converted into a model element instead of
- * a model attribute in order to leverage CKEditor 5 built-in editing.
+ * a `<caption>` model element. This is converted into a model element instead
+ * of a model attribute in order to leverage CKEditor 5 built-in editing.
  *
  * @param {module:core/editor/editor~Editor} editor
  *   Editor on which this converter will be used.

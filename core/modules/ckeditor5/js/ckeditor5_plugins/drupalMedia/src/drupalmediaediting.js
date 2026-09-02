@@ -250,8 +250,8 @@ export default class DrupalMediaEditing extends Plugin {
                 if (!modelElement) {
                   return;
                 }
-                // On upcast, get `drupalMediaIsImage` attribute value from media metadata
-                // repository.
+                // On upcast, get `drupalMediaIsImage` attribute value from
+                // media metadata repository.
                 this.upcastDrupalMediaIsImage(modelElement);
                 // Enqueue a model change after getting modelElement.
                 this.editor.model.enqueueChange(
@@ -266,16 +266,16 @@ export default class DrupalMediaEditing extends Plugin {
                 );
               })
               .catch((e) => {
-                // There isn't any UI indication for errors because this should be
-                // always called after the Drupal Media has been upcast, which would
-                // already display an error in the UI.
+                // There isn't any UI indication for errors because this should
+                // be always called after the Drupal Media has been upcast,
+                // which would already display an error in the UI.
                 console.warn(e.toString());
               });
           },
           // This converter needs to have the lowest priority to ensure that the
-          // model element and its attributes have already been converted. It is only used
-          // to gather metadata to make the UI tailored to the specific media entity that
-          // is being dealt with.
+          // model element and its attributes have already been converted. It is
+          // only used to gather metadata to make the UI tailored to the
+          // specific media entity that is being dealt with.
           { priority: 'lowest' },
         );
       });
@@ -385,7 +385,8 @@ export default class DrupalMediaEditing extends Plugin {
         'attribute:drupalElementStyleAlign:drupalMedia',
         (evt, data, conversionApi) => {
           const alignMapping = {
-            // This is a map of CSS classes representing Drupal element styles for alignments.
+            // This is a map of CSS classes representing Drupal element styles
+            // for alignments.
             left: 'drupal-media-style-align-left',
             right: 'drupal-media-style-align-right',
             center: 'drupal-media-style-align-center',

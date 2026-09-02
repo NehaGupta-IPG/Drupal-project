@@ -18,7 +18,8 @@ function getFirstMedia(viewElement) {
 }
 
 /**
- * Returns a converter that consumes the `href` attribute if a link contains a <drupal-media>.
+ * Returns a converter that consumes the `href` attribute if a link contains
+ * a <drupal-media>.
  *
  * @return {Function}
  *   A function that adds an event listener to upcastDispatcher.
@@ -39,8 +40,8 @@ function upcastMediaLink() {
         // won't be picked up by the Link plugin.
         const consumableAttributes = { attributes: ['href'], name: true };
 
-        // Consume the `href` attribute so the default one will not convert it to
-        // $text attribute.
+        // Consume the `href` attribute so the default one will not convert it
+        // to $text attribute.
         if (!conversionApi.consumable.consume(viewLink, consumableAttributes)) {
           // Might be consumed by something else - i.e. other converter with
           // priority=highest - a standard check.
@@ -99,8 +100,8 @@ function dataDowncastMediaLink() {
         const mediaElement = conversionApi.mapper.toViewElement(data.item);
 
         // If so, update the attribute if it's defined or remove the entire link
-        // if the attribute is empty. But if it does not exist. Let's wrap already
-        // converted drupalMedia by newly created link element.
+        // if the attribute is empty. But if it does not exist. Let's wrap
+        // already converted drupalMedia by newly created link element.
         // 1. Create an empty <a> element.
 
         const additionalAttributes = {};
@@ -163,8 +164,8 @@ function editingDowncastMediaLink() {
         // If link already exists, instead of creating new link from scratch,
         // update the existing link. This makes the UI rendering much smoother.
         if (linkInMedia) {
-          // If attribute has a new value, update it. If new value doesn't exist,
-          // the link will be removed.
+          // If attribute has a new value, update it. If new value doesn't
+          // exist, the link will be removed.
           if (data.attributeNewValue) {
             writer.setAttribute('href', data.attributeNewValue, linkInMedia);
           } else {

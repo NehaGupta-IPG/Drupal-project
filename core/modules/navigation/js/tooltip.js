@@ -69,7 +69,8 @@
             });
           };
 
-          // Small trick to avoid tooltip stays on same place when button size changed.
+          // Small trick to avoid tooltip stays on same place when button size
+          // changed.
           const ro = new ResizeObserver(updatePosition);
 
           ro.observe(trigger);

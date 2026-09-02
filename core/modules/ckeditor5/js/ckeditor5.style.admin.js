@@ -21,7 +21,8 @@
           );
           const styleCount = stylesElement.value
             .split('\n')
-            // Minimum length is 5: "p.z|Z" is the shortest possible style definition.
+            // Minimum length is 5: "p.z|Z" is the shortest possible style
+            // definition.
             .filter((line) => line.trim().length >= 5).length;
 
           if (styleCount === 0) {

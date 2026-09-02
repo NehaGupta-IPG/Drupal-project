@@ -472,7 +472,8 @@
        */
       set isOpen(value) {
         this._isOpen = value;
-        // Nested contextual region handling: hide any nested contextual triggers.
+        // Nested contextual region handling: hide any nested contextual
+        // triggers.
         this.$region
           .closest('.contextual-region')
           .find('.contextual .trigger:not(:first)')

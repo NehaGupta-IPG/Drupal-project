@@ -159,15 +159,18 @@ class DrupalEntityLinkSuggestions extends Plugin {
               this.set('entityMetadata', null);
             }
 
-            // If the displayed text is empty use the entity label as the default value.
+            // If the displayed text is empty use the entity label as the
+            // default value.
             if (
               linkFormView.hasOwnProperty('displayedTextInputView') &&
               linkFormView.displayedTextInputView.fieldView.element.value ===
                 '' &&
               item.label
             ) {
-              // The item label has been sanitized for display as HTML. We want this back in the original format so that
-              // characters are not double encoded (e.g. we want "foo &amp; bar" to be "foo & bar").
+              // The item label has been sanitized for display as HTML. We want
+              // this back in the original format so that characters are not
+              // double encoded (e.g. we want "foo &amp; bar" to be
+              // "foo & bar").
               const label = document.createElement('span');
               label.innerHTML = item.label;
               linkFormView.displayedTextInputView.fieldView.value =
@@ -203,8 +206,8 @@ class DrupalEntityLinkSuggestions extends Plugin {
         // Inject the extra attribute value. The highest priority listener here
         // injects the argument (here below 👇).
         // - The high priority listener in
-        //   _addExtraAttributeOnLinkCommandExecute() gets that argument and sets
-        //   the extra attribute.
+        //   _addExtraAttributeOnLinkCommandExecute() gets that argument and
+        //   sets the extra attribute.
         // - The normal (default) priority listener in ckeditor5-link sets
         //   (creates) the actual link.
         linkCommand.once(
@@ -216,7 +219,8 @@ class DrupalEntityLinkSuggestions extends Plugin {
                 'data-link-entity-type': 'external',
               };
             } else {
-              // In CKEditor v45+ decorators go in the second argument (args[1]).
+              // In CKEditor v45+ decorators go in the second argument
+              // (args[1]).
               args[1].entityLinkAttributes = {
                 'data-entity-type': this.entityType,
                 'data-entity-uuid': this.entityUuid,

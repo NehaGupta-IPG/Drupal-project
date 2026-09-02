@@ -45,7 +45,8 @@
 
   /**
    * Closes search bar when focus moves to another target.
-   * Avoids closing search bar if event does not have related target - required for Safari.
+   * Avoids closing search bar if event does not have related target -
+   * required for Safari.
    *
    * @see https://bugs.webkit.org/show_bug.cgi?id=229895
    *

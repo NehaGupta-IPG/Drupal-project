@@ -43,7 +43,8 @@ export default class ImageAlternativeTextFormView extends View {
     this.focusTracker = new FocusTracker();
 
     /**
-     * An instance of the {@link module:utils/keystrokehandler~KeystrokeHandler}.
+     * An instance of the
+     * {@link module:utils/keystrokehandler~KeystrokeHandler}.
      *
      * @readonly
      * @member {module:utils/keystrokehandler~KeystrokeHandler}

@@ -24,7 +24,8 @@ exports.command = function drupalInstall(
 ) {
   const self = this;
 
-  // Ensure no session cookie exists anymore; they won't work on this newly installed Drupal site anyway.
+  // Ensure no session cookie exists anymore; they won't work on this newly
+  // installed Drupal site anyway.
   this.cookies.deleteAll();
 
   try {

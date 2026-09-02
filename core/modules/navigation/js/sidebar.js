@@ -94,8 +94,8 @@
               });
           };
 
-          // Add click event listeners to all buttons and then contains the callback
-          // to expand / collapse the button's menus.
+          // Add click event listeners to all buttons and then contains the
+          // callback to expand / collapse the button's menus.
           sidebar.addEventListener('click', (e) => {
             if (e.target.matches('button, button *')) {
               e.target.closest('button').focus();
@@ -120,7 +120,8 @@
           // When any menu opened we close all others.
           sidebar.addEventListener('toolbar-menu-toggled', (e) => {
             if (e.detail.state) {
-              // We want to close buttons on when new opened only if they are on same level.
+              // We want to close buttons on when new opened only if they are
+              // on same level.
               const targetLevel = e.detail.level;
               buttons.forEach((button) => {
                 const buttonLevel = button.dataset.toolbarMenuTrigger;
@@ -141,8 +142,8 @@
           });
           backButton.addEventListener('click', closePopovers);
 
-          // Tooltips triggered on hover and focus so add an extra event listener
-          // to close all popovers.
+          // Tooltips triggered on hover and focus so add an extra event
+          // listener to close all popovers.
           tooltips.forEach((tooltip) => {
             ['mouseover', 'focus'].forEach((e) => {
               tooltip.addEventListener(e, closePopovers);

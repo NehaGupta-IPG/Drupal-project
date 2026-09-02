@@ -66,8 +66,8 @@
           setClick: true,
           // Form buttons use the 'click' event rather than mousedown.
           event: 'click',
-          // Clicked form buttons look better with the throbber than the progress
-          // bar.
+          // Clicked form buttons look better with the throbber than the
+          // progress bar.
           progress: { type: 'throbber' },
           base: el.id,
           element: el,
@@ -329,7 +329,8 @@
       }
       const httpMethod = $linkElement.data('ajax-http-method');
       /**
-       * In case of setting custom ajax http method for link we rewrite ajax.httpMethod.
+       * In case of setting custom ajax http method for link we rewrite
+       * ajax.httpMethod.
        */
       if (httpMethod) {
         elementSettings.httpMethod = httpMethod;
@@ -629,7 +630,8 @@
     } else {
       ajax.options.url += '&';
     }
-    // If this element has a dialog type use if for the wrapper if not use 'ajax'.
+    // If this element has a dialog type use if for the wrapper if not use
+    // 'ajax'.
     let wrapper = `drupal_${elementSettings.dialogType || 'ajax'}`;
     if (elementSettings.dialogRenderer) {
       wrapper += `.${elementSettings.dialogRenderer}`;
@@ -1807,9 +1809,9 @@
         const uniqueBundleId = script.src;
         if (!loadjs.isDefined(uniqueBundleId)) {
           loadjs(script.src, uniqueBundleId, {
-            // The default loadjs behavior is to load script with async, in Drupal
-            // we need to explicitly tell scripts to load async, this is set in
-            // the before callback below if necessary.
+            // The default loadjs behavior is to load script with async, in
+            // Drupal we need to explicitly tell scripts to load async, this is
+            // set in the before callback below if necessary.
             async: false,
             before(path, scriptEl) {
               // This allows all attributes to be added, like defer, async and
@@ -1821,8 +1823,8 @@
               // By default, loadjs appends the script to the head. When scripts
               // are loaded via AJAX, their location has no impact on
               // functionality. But, since non-AJAX loaded scripts can choose
-              // their parent element, we provide that option here for the sake of
-              // consistency.
+              // their parent element, we provide that option here for the sake
+              // of consistency.
               parentEl.appendChild(scriptEl);
               // Return false to bypass loadjs' default DOM insertion mechanism.
               return false;

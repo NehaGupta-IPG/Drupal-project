@@ -56,11 +56,13 @@ module.exports = {
         .assert.attributeEquals(burgerButtonSelector, 'aria-expanded', 'true')
         // Wait for animation to complete
         .perform(() => waitForSidebarAnimation(browser))
-        // Verify focus trap is active - elements outside toolbar should have inert attribute
+        // Verify focus trap is active - elements outside toolbar should have
+        // inert attribute
         .execute(
           // eslint-disable-next-line func-names, prefer-arrow-callback
           function () {
-            // Get all elements that should be inert (everything except toolbar and overlay)
+            // Get all elements that should be inert (everything except toolbar
+            // and overlay)
             const allBodyChildren = Array.from(
               document.querySelectorAll('body > *'),
             );
@@ -128,7 +130,8 @@ module.exports = {
             browser.assert.ok(result.value, 'Overlay should NOT be inert');
           },
         )
-        // Try to focus an element that should be inert and verify it can't be focused
+        // Try to focus an element that should be inert and verify it can't be
+        // focused
         .execute(
           // eslint-disable-next-line func-names, prefer-arrow-callback
           function () {
@@ -219,7 +222,8 @@ module.exports = {
             browser.assert.ok(result.value, 'Inert should be active');
           },
         )
-        // Click overlay to close using JavaScript since the element might be behind the sidebar
+        // Click overlay to close using JavaScript since the element might be
+        // behind the sidebar
         .execute(
           // eslint-disable-next-line func-names, prefer-arrow-callback
           function () {

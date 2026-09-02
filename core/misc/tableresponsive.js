@@ -112,9 +112,10 @@
           this.$link.show();
           this.$link[0].textContent = this.showText;
         }
-        // When the toggle is pegged, its presence is maintained because the user
-        // has interacted with it. This is necessary to keep the link visible if
-        // the user adjusts screen size and changes the visibility of columns.
+        // When the toggle is pegged, its presence is maintained because the
+        // user has interacted with it. This is necessary to keep the link
+        // visible if the user adjusts screen size and changes the visibility of
+        // columns.
         if (!pegged && hiddenLength === 0) {
           this.$link.hide();
           this.$link[0].textContent = this.hideText;
@@ -165,8 +166,8 @@
             const newProps = [];
             // The hide method adds display none to the element. The element
             // should be returned to the same state it was in before the columns
-            // were revealed, so it is necessary to remove the display none value
-            // from the style attribute.
+            // were revealed, so it is necessary to remove the display none
+            // value from the style attribute.
             const match = /^display\s*:\s*none$/;
             for (let i = 0; i < properties.length; i++) {
               const prop = properties[i];

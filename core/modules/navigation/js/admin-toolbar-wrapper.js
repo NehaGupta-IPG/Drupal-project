@@ -17,13 +17,15 @@
 (
   (Drupal, once) => {
     /**
-     * Constant representing the event name for toggling the admin toolbar state.
+     * Constant representing the event name for toggling the admin toolbar
+     * state.
      * @type {string}
      */
     const HTML_TRIGGER_EVENT = 'toggle-admin-toolbar';
 
     /**
-     * Constant representing the event name for toggling the admin toolbar content.
+     * Constant representing the event name for toggling the admin toolbar
+     * content.
      * @type {string}
      */
     const SIDEBAR_CONTENT_EVENT = 'toggle-admin-toolbar-content';
@@ -143,8 +145,8 @@
      * Initialize Drupal.displace()
      *
      * We add the displace attribute to a separate full width element because we
-     * don't want this element to have transitions. Note that this element and the
-     * navbar share the same exact width.
+     * don't want this element to have transitions. Note that this element and
+     * the navbar share the same exact width.
      *
      * @param {HTMLElement} el - The admin toolbar wrapper.
      */
@@ -173,7 +175,8 @@
         );
 
         /**
-         * Updates the state of all trigger elements based on the provided state.
+         * Updates the state of all trigger elements based on the provided
+         * state.
          *
          * @param {boolean} toState The new state of the sidebar.
          */

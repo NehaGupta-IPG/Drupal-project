@@ -68,8 +68,8 @@
           }
 
           loadjs(prefix + bundleId, bundleId, {
-            // JS files are loaded in order, so this needs to be false when 'src'
-            // is defined.
+            // JS files are loaded in order, so this needs to be false when
+            // 'src' is defined.
             async: !src,
             // Copy asset tag attributes to the new element.
             before(path, element) {

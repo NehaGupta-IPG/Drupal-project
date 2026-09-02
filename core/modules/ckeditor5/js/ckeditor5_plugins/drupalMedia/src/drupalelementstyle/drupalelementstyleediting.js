@@ -102,8 +102,8 @@ function viewToModelStyleAttribute(styles, modelAttribute) {
       return;
     }
 
-    // Stop conversion early if modelAttribute represents an attribute that isn't allowed
-    // for the element.
+    // Stop conversion early if modelAttribute represents an attribute that
+    // isn't allowed for the element.
     if (!conversionApi.schema.checkAttribute(modelElement, modelAttribute)) {
       return;
     }

@@ -92,7 +92,8 @@
       $(once('add-multiple-error', '[data-action="add-multiple-error"]')).on(
         'click',
         () => {
-          // Use the same number of elements to facilitate things on the PHP side.
+          // Use the same number of elements to facilitate things on the PHP
+          // side.
           [0, 1, 2, 3, 4, 5].forEach((i) =>
             messageObjects.default.zone.add(`Msg-${i}`, { type: 'error' }),
           );

@@ -108,7 +108,8 @@
       );
     }
 
-    // Load all assets files. We sent ajax_page_state in the request so this is only the diff with the current page.
+    // Load all assets files. We sent ajax_page_state in the request so this is
+    // only the diff with the current page.
     const assetsElements = responseHTML.querySelectorAll(
       'link[rel="stylesheet"][href], script[src]',
     );

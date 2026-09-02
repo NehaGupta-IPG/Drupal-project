@@ -50,8 +50,8 @@ export default class DrupalEntityLinkSuggestionsEditing extends Plugin {
             { priority: 5 },
           );
 
-          // Without it the isLinkElement() will not recognize the link and the UI will not show up
-          // when the user clicks a link.
+          // Without it the isLinkElement() will not recognize the link and the
+          // UI will not show up when the user clicks a link.
           writer.setCustomProperty('link', true, linkViewElement);
 
           return linkViewElement;
@@ -81,16 +81,17 @@ export default class DrupalEntityLinkSuggestionsEditing extends Plugin {
     linkCommand.on(
       'execute',
       (evt, args) => {
-        // Custom handling is only required if an extra attribute was passed into
-        // editor.execute( 'link', ... ).
+        // Custom handling is only required if an extra attribute was passed
+        // into editor.execute( 'link', ... ).
         if (linkCommandExecuting) {
           linkCommandExecuting = false;
           return;
         }
 
         // If the additional attribute was passed, we stop the default execution
-        // of the LinkCommand. We're going to create Model#change() block for undo
-        // and execute the LinkCommand together with setting the extra attribute.
+        // of the LinkCommand. We're going to create Model#change() block for
+        // undo and execute the LinkCommand together with setting the extra
+        // attribute.
         evt.stop();
 
         // Prevent infinite recursion by keeping records of when link command is
@@ -155,16 +156,19 @@ export default class DrupalEntityLinkSuggestionsEditing extends Plugin {
               } else {
                 writer.removeAttribute(attribute, range);
               }
-              // The following is modeled after CKEditor5's collapseSelectionAtLinkEnd() method.
+              // The following is modeled after CKEditor5's
+              // collapseSelectionAtLinkEnd() method.
               writer.setSelection(range.end);
               const { plugins } = this.editor;
               if (plugins.has('TwoStepCaretMovement')) {
-                // After replacing the text of the link, we need to move the caret to the end of the link,
-                // override it's gravity to forward to prevent keeping e.g. bold attribute on the caret
+                // After replacing the text of the link, we need to move the
+                // caret to the end of the link, override it's gravity to
+                // forward to prevent keeping e.g. bold attribute on the caret
                 // which was previously inside the link.
                 //
-                // If the plugin is not available, the caret will be placed at the end of the link and the
-                // bold attribute will be kept even if command moved caret outside the link.
+                // If the plugin is not available, the caret will be placed at
+                // the end of the link and the bold attribute will be kept even
+                // if command moved caret outside the link.
                 plugins.get('TwoStepCaretMovement')._handleForwardMovement();
               } else {
                 // Remove any attributes to prevent link splitting.
@@ -229,7 +233,8 @@ export default class DrupalEntityLinkSuggestionsEditing extends Plugin {
 
     let isUnlinkingInProgress = false;
 
-    // Make sure all changes are in a single undo step so cancel the original unlink first in the high priority.
+    // Make sure all changes are in a single undo step so cancel the original
+    // unlink first in the high priority.
     unlinkCommand.on(
       'execute',
       (evt) => {
@@ -239,9 +244,11 @@ export default class DrupalEntityLinkSuggestionsEditing extends Plugin {
 
         evt.stop();
 
-        // This single block wraps all changes that should be in a single undo step.
+        // This single block wraps all changes that should be in a single undo
+        // step.
         model.change(() => {
-          // Now, in this single "undo block" let the unlink command flow naturally.
+          // Now, in this single "undo block" let the unlink command flow
+          // naturally.
           isUnlinkingInProgress = true;
 
           // Do the unlinking within a single undo step.

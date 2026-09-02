@@ -123,13 +123,13 @@
         $('body').removeClass('toolbar-loading');
 
         // Load the subtrees if the orientation of the toolbar is changed to
-        // vertical. This condition responds to the case that the toolbar switches
-        // from horizontal to vertical orientation. The toolbar starts in a
-        // vertical orientation by default and then switches to horizontal during
-        // initialization if the media query conditions are met. Simply checking
-        // that the orientation is vertical here would result in the subtrees
-        // always being loaded, even when the toolbar initialization ultimately
-        // results in a horizontal orientation.
+        // vertical. This condition responds to the case that the toolbar
+        // switches from horizontal to vertical orientation. The toolbar starts
+        // in a vertical orientation by default and then switches to horizontal
+        // during initialization if the media query conditions are met. Simply
+        // checking that the orientation is vertical here would result in the
+        // subtrees always being loaded, even when the toolbar initialization
+        // ultimately results in a horizontal orientation.
         //
         // @see Drupal.behaviors.toolbar.attach() where admin menu subtrees
         // loading is invoked during initialization after media query conditions
@@ -308,7 +308,8 @@
         // Update data offset attributes for the trays.
         const dir = document.documentElement.dir;
         const edge = dir === 'rtl' ? 'right' : 'left';
-        // Remove data-offset attributes from the trays so they can be refreshed.
+        // Remove data-offset attributes from the trays so they can be
+        // refreshed.
         $trays.removeAttr('data-offset-left data-offset-right data-offset-top');
         // If an active vertical tray exists, mark it as an offset element.
         $trays
@@ -321,7 +322,8 @@
       },
 
       /**
-       * Sets the tops of the trays so that they align with the bottom of the bar.
+       * Sets the tops of the trays so that they align with the bottom of the
+       * bar.
        */
       adjustPlacement() {
         const $trays = this.$el.find('.toolbar-tray');
@@ -339,8 +341,8 @@
        * The rendered admin menu subtrees HTML is cached on the client in
        * localStorage until the cache of the admin menu subtrees on the server-
        * side is invalidated. The subtreesHash is stored in localStorage as well
-       * and compared to the subtreesHash in drupalSettings to determine when the
-       * admin menu subtrees cache has been invalidated.
+       * and compared to the subtreesHash in drupalSettings to determine when
+       * the admin menu subtrees cache has been invalidated.
        */
       loadSubtrees() {
         const $activeTab = $(this.model.get('activeTab'));
@@ -365,8 +367,8 @@
             localStorage.getItem(`Drupal.toolbar.subtrees.${theme}`),
           );
           const isVertical = this.model.get('orientation') === 'vertical';
-          // If we have the subtrees in localStorage and the subtree hash has not
-          // changed, then use the cached data.
+          // If we have the subtrees in localStorage and the subtree hash has
+          // not changed, then use the cached data.
           if (
             isVertical &&
             subtreesHash === cachedSubtreesHash &&
@@ -380,8 +382,8 @@
             // Remove the cached menu information.
             localStorage.removeItem(`Drupal.toolbar.subtreesHash.${theme}`);
             localStorage.removeItem(`Drupal.toolbar.subtrees.${theme}`);
-            // The AJAX response's command will trigger the resolve method of the
-            // Drupal.toolbar.setSubtrees Promise.
+            // The AJAX response's command will trigger the resolve method of
+            // the Drupal.toolbar.setSubtrees Promise.
             Drupal.ajax({ url: endpoint }).execute();
             // Cache the hash for the subtrees locally.
             localStorage.setItem(

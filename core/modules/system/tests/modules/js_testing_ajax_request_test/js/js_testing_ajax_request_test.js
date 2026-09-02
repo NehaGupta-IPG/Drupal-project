@@ -13,7 +13,8 @@ window.drupalCumulativeXhrCount = 0;
   function decrement() {
     window.drupalActiveXhrCount--;
   }
-  // jQuery.active alone is unable to detect whether an XHR request ever occurred.
+  // jQuery.active alone is unable to detect whether an XHR request ever
+  // occurred.
   /* eslint-disable no-jquery/no-ajax-events */
   if ($) {
     $(document).on('ajaxSend', increment).on('ajaxComplete', decrement);

@@ -385,8 +385,9 @@
       ClassicEditor.create(element, editorConfig)
         .then((editor) => {
           /**
-           * Injects a temporary <p> into CKEditor and then calculates the entire
-           * height of the amount of the <p> tags from the passed in rows value.
+           * Injects a temporary <p> into CKEditor and then calculates the
+           * entire height of the amount of the <p> tags from the passed in rows
+           * value.
            *
            * This takes into account collapsing margins, and line-height of the
            * current theme.
@@ -579,7 +580,8 @@
           editor.model.document.on('change:data', () => {
             const callback = callbacks.get(id);
             if (callback) {
-              // Allow modules to update EditorModel by providing the current data.
+              // Allow modules to update EditorModel by providing the current
+              // data.
               callback(editor.getData());
             }
           });
@@ -677,7 +679,8 @@
     },
   };
 
-  // Redirect on hash change when the original hash has an associated CKEditor 5.
+  // Redirect on hash change when the original hash has an associated
+  // CKEditor 5.
   function redirectTextareaFragmentToCKEditor5Instance() {
     const hash = window.location.hash.substring(1);
     const element = document.getElementById(hash);
@@ -700,7 +703,8 @@
     redirectTextareaFragmentToCKEditor5Instance,
   );
 
-  // Respond to new dialogs that are opened by CKEditor, closing the AJAX loader.
+  // Respond to new dialogs that are opened by CKEditor, closing the AJAX
+  // loader.
   window.addEventListener('dialog:beforecreate', () => {
     const dialogLoading = document.querySelector('.ckeditor5-dialog-loading');
 

@@ -1,6 +1,7 @@
 /**
  * @file
- * Provides interactivity for showing and hiding the primary tabs at mobile widths.
+ * Provides interactivity for showing and hiding the primary tabs at mobile
+ * widths.
  */
 
 ((Drupal, once) => {

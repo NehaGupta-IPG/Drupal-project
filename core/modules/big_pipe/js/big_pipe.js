@@ -149,7 +149,8 @@
   // @ingroup large_chunk
   observer.observe(document.body, {
     childList: true,
-    // Without this options characterData will not be triggered inside child nodes.
+    // Without this options characterData will not be triggered inside child
+    // nodes.
     subtree: true,
     characterData: true,
   });

@@ -223,7 +223,8 @@
               autocomplete.options.renderItem;
           });
 
-          // Use CompositionEvent to handle IME inputs. It requests remote server on "compositionend" event only.
+          // Use CompositionEvent to handle IME inputs. It requests remote
+          // server on "compositionend" event only.
           $autocomplete.on('compositionstart.autocomplete', () => {
             autocomplete.options.isComposing = true;
           });

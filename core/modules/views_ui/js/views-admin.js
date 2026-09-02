@@ -219,7 +219,8 @@
         const transliterated = this.getTransliterated();
         const suffix = this.suffix;
         this.target.each(function (i) {
-          // Ensure that the maxlength is not exceeded by prepopulating the field.
+          // Ensure that the maxlength is not exceeded by prepopulating the
+          // field.
           const maxlength = $(this).attr('maxlength') - suffix.length;
           this.value = transliterated.substring(0, maxlength) + suffix;
         });
@@ -234,7 +235,8 @@
       },
 
       /**
-       * Bind event handlers to new form fields, after they're replaced via Ajax.
+       * Bind event handlers to new form fields, after they're replaced via
+       * Ajax.
        *
        * @param {jQuery} $fields
        *   Fields to rebind functionality to.
@@ -550,9 +552,9 @@
             // Search on the lowercase version of the title text + description.
             searchText: `${$title[0].textContent.toLowerCase()} ${$description[0].textContent.toLowerCase()}
               .toLowerCase()}`,
-            // Maintain a reference to the jQuery object for each row, so we don't
-            // have to create a new object inside the performance-sensitive keyup
-            // handler.
+            // Maintain a reference to the jQuery object for each row,
+            // so we don't have to create a new object inside the
+            // performance-sensitive keyup handler.
             $div: $option,
           };
         }
@@ -560,8 +562,8 @@
       },
 
       /**
-       * Filter handler for the search box and type select that hides or shows the relevant
-       * options.
+       * Filter handler for the search box and type select that hides or shows
+       * the relevant options.
        *
        * @param {jQuery.Event} event
        *   The formUpdated event.
@@ -581,8 +583,8 @@
           }
 
           let found = true;
-          // Each word in the search string has to match the item in order for the
-          // item to be shown.
+          // Each word in the search string has to match the item in order for
+          // the item to be shown.
           if (search) {
             found = words.every(hasWord);
           }
@@ -756,8 +758,8 @@
       insertAddRemoveFilterGroupLinks() {
         // Insert a link for adding a new group at the top of the page, and make
         // it match the action link styling used in a typical page.html.twig.
-        // Since Drupal does not provide a theme function for this markup this is
-        // the best we can do.
+        // Since Drupal does not provide a theme function for this markup this
+        // is the best we can do.
         $(
           once(
             'views-rearrange-filter-handler',
@@ -784,8 +786,8 @@
           $(
             once(
               'views-rearrange-filter-handler',
-              // When the link is clicked, dynamically click the corresponding form
-              // button.
+              // When the link is clicked, dynamically click the corresponding
+              // form button.
               $(
                 `<a href="#" class="views-remove-group-link">${Drupal.t(
                   'Remove group',
@@ -863,8 +865,8 @@
         newRow.find('td').append(this.operator);
         newRow.insertBefore(titleRow);
         const length = titleRows.length;
-        // Starting with the third group, copy the operator to a new row above the
-        // group title.
+        // Starting with the third group, copy the operator to a new row above
+        // the group title.
         for (let i = 2; i < length; i++) {
           titleRow = $(titleRows[i]);
           // Make a copy of the operator dropdown and put it in a new table row.
@@ -951,8 +953,8 @@
             }
             filterHandler.updateRowspans();
           }
-          // Redraw the operator labels that are displayed next to each filter, to
-          // account for the row's new location.
+          // Redraw the operator labels that are displayed next to each filter,
+          // to account for the row's new location.
           filterHandler.redrawOperatorLabels();
         };
 
@@ -1041,11 +1043,11 @@
                 $firstCell.append(operatorLabel);
               }
             }
-            // If the next row doesn't contain a filter, then this is the last row
-            // in the group. We don't want to display the operator there (since
-            // operators should only display between two related filters, e.g.
-            // "filter1 AND filter2 AND filter3"). So we remove any existing label
-            // that this row has.
+            // If the next row doesn't contain a filter, then this is the last
+            // row in the group. We don't want to display the operator there
+            // (since operators should only display between two related
+            // filters, e.g. "filter1 AND filter2 AND filter3"). So we remove
+            // any existing label that this row has.
             else {
               $existingOperatorLabel.remove();
             }

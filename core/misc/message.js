@@ -43,10 +43,10 @@
         document.querySelector('[data-drupal-messages]') ||
         document.querySelector('[data-drupal-messages-fallback]');
       if (!wrapper) {
-        // If no status messages element is found, a fallback element is created to prevent
-        // execution-breaking JS errors when attempting to report a problem.
-        // This scenario can occur on any page that does not include a status_messages
-        // render element.
+        // If no status messages element is found, a fallback element is
+        // created to prevent execution-breaking JS errors when attempting to
+        // report a problem. This scenario can occur on any page that does not
+        // include a status_messages render element.
         wrapper = document.createElement('div');
         document.body.appendChild(wrapper);
       }
