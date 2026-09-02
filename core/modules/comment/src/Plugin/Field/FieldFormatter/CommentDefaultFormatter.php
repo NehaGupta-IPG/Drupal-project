@@ -162,6 +162,7 @@ class CommentDefaultFormatter extends FormatterBase {
               $render_array['#attributes']['class'][] = $class;
 
               $build[$comment->id()] = $render_array;
+            }
             $build['pager']['#type'] = 'pager';
             // CommentController::commentPermalink() calculates the page number
             // where a specific comment appears and does a subrequest pointing
