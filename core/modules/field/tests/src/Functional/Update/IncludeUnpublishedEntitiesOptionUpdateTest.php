@@ -7,6 +7,7 @@ namespace Drupal\Tests\field\Functional\Update;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the upgrade path for entity reference selection handler plugin setting.
@@ -14,6 +15,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
  * @group field
  * @covers \field_post_update_add_entity_reference_selection_plugin_option
  */
+#[RunTestsInSeparateProcesses]
 class IncludeUnpublishedEntitiesOptionUpdateTest extends UpdatePathTestBase {
 
   /**
