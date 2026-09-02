@@ -105,8 +105,6 @@ class UserLoginHttpTest extends BrowserTestBase {
    */
   #[IgnoreDeprecations]
   public function testLogin(): void {
-    $this->expectUserDeprecationMessage('Drupal\user\Controller\UserAuthenticationController is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\rest\Controller\RestAuthenticationController instead. See https://www.drupal.org/node/3552724');
-
     // Without the serialization module only JSON is supported.
     $this->doTestLogin('json');
 
@@ -242,8 +240,6 @@ class UserLoginHttpTest extends BrowserTestBase {
    */
   #[IgnoreDeprecations]
   public function testPasswordReset(): void {
-    $this->expectUserDeprecationMessage('Drupal\user\Controller\UserAuthenticationController is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\rest\Controller\RestAuthenticationController instead. See https://www.drupal.org/node/3552724');
-
     // Create a user account.
     $account = $this->drupalCreateUser();
 

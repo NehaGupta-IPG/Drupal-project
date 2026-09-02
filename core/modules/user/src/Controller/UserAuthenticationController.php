@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * Provides controllers for login, login status and logout via HTTP requests.
  *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
  * \Drupal\rest\Controller\RestAuthenticationController instead.
  * @see https://www.drupal.org/node/3552724
  */

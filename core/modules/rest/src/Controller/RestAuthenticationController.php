@@ -12,7 +12,6 @@ use Drupal\user\LogoutFinalizer;
 use Drupal\user\NotificationHandler;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserFloodControlInterface;
-use Drupal\user\UserInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +23,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * Provides controllers for login, login status and logout via HTTP requests.
  */
-final class RestAuthenticationController extends ControllerBase implements ContainerInjectionInterface {
+class RestAuthenticationController extends ControllerBase implements ContainerInjectionInterface {
 
   /**
    * String sent in responses, to describe the user as being logged in.
@@ -134,7 +133,7 @@ final class RestAuthenticationController extends ControllerBase implements Conta
       $authenticated = $this->userAuth->authenticateAccount($account, $credentials['pass']) && $account->id();
       if ($authenticated) {
         $this->userFloodControl->clear('user.http_login', $this->getLoginFloodIdentifier($request, $credentials['name']));
-        $this->userLoginFinalize($account);
+        $this->loginFinalizer->finalizeLogin($account);
 
         // Send basic metadata about the logged in user.
         $response_data = [];
@@ -232,31 +231,14 @@ final class RestAuthenticationController extends ControllerBase implements Conta
   }
 
   /**
-   * Finalizes the user login.
-   *
-   * @param \Drupal\user\UserInterface $user
-   *   The user.
-   */
-  protected function userLoginFinalize(UserInterface $user): void {
-    $this->loginFinalizer->finalizeLogin($user);
-  }
-
-  /**
    * Logs out a user.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
   public function logout(): Response {
-    $this->userLogout();
-    return new Response(NULL, 204);
-  }
-
-  /**
-   * Logs the user out.
-   */
-  protected function userLogout(): void {
     $this->logoutFinalizer->finalizeLogout();
+    return new Response(NULL, 204);
   }
 
   /**
