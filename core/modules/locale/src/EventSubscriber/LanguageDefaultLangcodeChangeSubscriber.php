@@ -22,7 +22,7 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
   public function onDefaultLangcodeChange(LanguageDefaultLangcodeChangeEvent $event): void {
     $event->addOperation(
       [static::class, 'translateRelabelledConfigOperation'],
-      [$event->getNewLangcode()]
+      [$event->newLangcode]
     );
   }
 
