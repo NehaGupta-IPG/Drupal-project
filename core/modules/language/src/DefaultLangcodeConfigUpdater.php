@@ -7,6 +7,7 @@ namespace Drupal\language;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Schema\Mapping;
+use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -14,6 +15,7 @@ use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\language\Config\LanguageConfigOverride;
 use Drupal\language\Event\LanguageDefaultLangcodeChangeEvent;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -25,6 +27,8 @@ class DefaultLangcodeConfigUpdater {
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly TypedConfigManagerInterface $typedConfigManager,
     protected readonly EventDispatcherInterface $eventDispatcher,
+    #[Autowire(service: 'config.storage')]
+    protected readonly StorageInterface $configStorage,
   ) {}
 
   /**
@@ -40,7 +44,7 @@ class DefaultLangcodeConfigUpdater {
    */
   public function buildBatch(string $old_langcode, string $new_langcode): array {
     $event = new LanguageDefaultLangcodeChangeEvent($old_langcode, $new_langcode);
-    $event->addOperation([static::class, 'reconcileConfigLangcodeOperation'], [$old_langcode, $new_langcode]);
+    $event->addOperation(static::class . ':reconcileConfigLangcodeOperation', [$old_langcode, $new_langcode]);
     $this->eventDispatcher->dispatch($event, LanguageEvents::DEFAULT_LANGCODE_CHANGE);
 
     return [
@@ -79,26 +83,23 @@ class DefaultLangcodeConfigUpdater {
    * @param array|\ArrayAccess $context
    *   The batch context.
    */
-  public static function reconcileConfigLangcodeOperation(string $old_langcode, string $new_langcode, &$context): void {
-    /** @var \Drupal\Core\Config\ConfigFactoryInterface $config_factory */
-    $config_factory = \Drupal::configFactory();
-    /** @var \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager */
-    $typed_config_manager = \Drupal::service(TypedConfigManagerInterface::class);
-
+  public function reconcileConfigLangcodeOperation(string $old_langcode, string $new_langcode, &$context): void {
     if (!isset($context['sandbox']['names'])) {
-      $context['sandbox']['names'] = $config_factory->listAll();
+      $context['sandbox']['names'] = $this->configFactory->listAll();
       $context['sandbox']['max'] = count($context['sandbox']['names']);
     }
 
+    $old_override_storage = $this->configStorage->createCollection('language.' . $old_langcode);
+    $new_override_storage = $this->configStorage->createCollection('language.' . $new_langcode);
     $names = array_splice($context['sandbox']['names'], 0, Settings::get('entity_update_batch_size', 50));
     foreach ($names as $name) {
-      if (!$typed_config_manager->hasConfigSchema($name)) {
+      if (!$this->typedConfigManager->hasConfigSchema($name)) {
         continue;
       }
 
-      $config = $config_factory->getEditable($name);
+      $config = $this->configFactory->getEditable($name);
       $data = $config->getRawData();
-      $typed_config = $typed_config_manager->createFromNameAndData($name, $data);
+      $typed_config = $this->typedConfigManager->createFromNameAndData($name, $data);
       if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
         continue;
       }
@@ -116,13 +117,13 @@ class DefaultLangcodeConfigUpdater {
         if ($current_langcode !== NULL) {
           $translatable_data = static::extractTranslatableData($typed_config);
           if ($translatable_data !== []) {
-            static::getRawLanguageConfigOverride($current_langcode, $name)
+            $this->getRawLanguageConfigOverride($old_override_storage, $name)
               ->setData($translatable_data)
               ->save();
           }
         }
 
-        $override = static::getRawLanguageConfigOverride($new_langcode, $name);
+        $override = $this->getRawLanguageConfigOverride($new_override_storage, $name);
         $had_override = !$override->isNew();
         if ($had_override) {
           // The override predates the new default and holds deliberately
@@ -160,8 +161,8 @@ class DefaultLangcodeConfigUpdater {
    * back to English is when an 'en' override left by an earlier switch away
    * from it needs to be found.
    *
-   * @param string $langcode
-   *   The langcode of the override to get.
+   * @param StorageInterface $storage
+   *   The config storage in the language's collection.
    * @param string $name
    *   The configuration object name.
    *
@@ -169,9 +170,8 @@ class DefaultLangcodeConfigUpdater {
    *   The language override object, reflecting whatever is actually in
    *   storage.
    */
-  protected static function getRawLanguageConfigOverride(string $langcode, string $name): LanguageConfigOverride {
-    $storage = \Drupal::service('config.storage')->createCollection('language.' . $langcode);
-    $override = new LanguageConfigOverride($name, $storage, \Drupal::service(TypedConfigManagerInterface::class), \Drupal::service('event_dispatcher'));
+  protected function getRawLanguageConfigOverride(StorageInterface $storage, string $name): LanguageConfigOverride {
+    $override = new LanguageConfigOverride($name, $storage, $this->typedConfigManager, $this->eventDispatcher);
     $data = $storage->read($name);
     if (!empty($data)) {
       $override->initWithData($data);

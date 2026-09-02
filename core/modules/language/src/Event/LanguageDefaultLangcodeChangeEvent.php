@@ -40,13 +40,13 @@ final class LanguageDefaultLangcodeChangeEvent extends Event {
   /**
    * Adds a batch operation to run as part of the same batch.
    *
-   * @param callable $callback
+   * @param callable|string $callback
    *   The batch operation callback.
    * @param array $arguments
    *   Arguments to pass to the callback, before the $context argument
    *   Batch API appends automatically.
    */
-  public function addOperation(callable $callback, array $arguments = []): void {
+  public function addOperation(callable|string $callback, array $arguments = []): void {
     $this->operations[] = [$callback, $arguments];
   }
 
