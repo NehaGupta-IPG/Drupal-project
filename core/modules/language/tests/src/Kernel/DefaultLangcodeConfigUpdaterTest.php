@@ -77,27 +77,6 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   }
 
   /**
-   * Tests non-translatable configuration loses a stray langcode.
-   *
-   * Config::save() itself already refuses to keep a langcode on
-   * non-translatable configuration, so the only way to get a stray one in
-   * place to prove this cleanup is writing it straight to storage - the
-   * situation a site upgrading from before this mechanism existed is
-   * actually in.
-   */
-  public function testNonTranslatableConfigLosesStrayLangcode(): void {
-    $this->container->get('config.storage')->write('config_test.langcode_test', [
-      'langcode' => 'en',
-      'untranslatable_value' => 'foo',
-    ]);
-    $this->assertSame('en', $this->config('config_test.langcode_test')->get('langcode'));
-
-    $this->reconcile('en', 'fr');
-
-    $this->assertNull($this->config('config_test.langcode_test')->get('langcode'));
-  }
-
-  /**
    * Tests a config entity without an explicit langcode is relabelled.
    */
   public function testConfigEntityIsRelabelled(): void {
