@@ -149,7 +149,19 @@ class CommentDefaultFormatter extends FormatterBase {
           $comments_per_page = $comment_settings['per_page'];
           $comments = $this->storage->loadThread($entity, $field_name, $mode, $comments_per_page, $this->getSetting('pager_id'));
           if ($comments) {
-            $build = $this->viewBuilder->viewMultiple($comments, $this->getSetting('view_mode'));
+            $previous_uid = NULL;
+            $build = [];
+            foreach ($comments as $comment) {
+              $uid = $comment->getOwnerId();
+              $class = ($uid === $previous_uid) ? 'same-author' : 'new-author';
+              $same_author = ($uid === $previous_uid);
+              $previous_uid = $uid;
+
+              $render_array = $this->viewBuilder->view($comment, $this->getSetting('view_mode'));
+              $render_array['#context']['same_author_as_previous'] = $same_author;
+              $render_array['#attributes']['class'][] = $class;
+
+              $build[$comment->id()] = $render_array;
             $build['pager']['#type'] = 'pager';
             // CommentController::commentPermalink() calculates the page number
             // where a specific comment appears and does a subrequest pointing

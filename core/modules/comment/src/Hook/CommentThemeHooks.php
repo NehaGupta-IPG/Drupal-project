@@ -124,6 +124,8 @@ class CommentThemeHooks {
       $variables['permalink'] = Link::fromTextAndUrl($this->t('Permalink'), $comment->permalink())->toString();
     }
 
+    $variables['same_author_as_previous'] = $variables['elements']['#context']['same_author_as_previous'] ?? FALSE;
+
     if (($comment_parent = $comment->getParentComment()) && (!$skip_custom_preprocessing || !$comment->getFieldDefinition('pid')->isDisplayConfigurable('view'))) {
       // Fetch and store the parent comment information for use in templates.
       $account_parent = $comment_parent->getOwner();
