@@ -221,44 +221,60 @@ class AttributeRouteDiscovery extends StaticRouteDiscoveryBase {
    *
    * @param class-string $className
    *   The class to reflect.
-   * @param \Drupal\Component\Discovery\MissingClassDetectionClassLoader $autoloader
-   *   The classloader registered to detect missing classes and traits.
+   * @param \Drupal\Component\Discovery\MissingClassDetectionClassLoader|null $autoloader
+   *   (optional) The classloader registered to detect missing classes and
+   *   traits. If omitted, one is registered for the duration of this call;
+   *   collectRoutes() passes its own instance so that it can be shared
+   *   across many calls in a single scan.
    *
    * @return \ReflectionClass<object>|null
    *   The Reflection class, is the class is a valid to check for routes,
    *   otherwise NULL. A class is invalid if there is an error on Reflection or
    *   if it is abstract.
    */
-  protected function getReflectionClass(string $className, MissingClassDetectionClassLoader $autoloader): ?\ReflectionClass {
+  protected function getReflectionClass(string $className, ?MissingClassDetectionClassLoader $autoloader = NULL): ?\ReflectionClass {
+    $ownsAutoloader = $autoloader === NULL;
+    if ($ownsAutoloader) {
+      $autoloader = new MissingClassDetectionClassLoader();
+      spl_autoload_register([$autoloader, 'loadClass']);
+    }
+
     try {
-      $exists = class_exists($className);
-    }
-    catch (\Error) {
-      // Ignore errors if a class extends a missing class, interface,
-      // or trait.
-      $autoloader->reset();
+      try {
+        $exists = class_exists($className);
+      }
+      catch (\Error) {
+        // Ignore errors if a class extends a missing class, interface,
+        // or trait.
+        $autoloader->reset();
+        return NULL;
+      }
+
+      if (($missingTraits = $autoloader->getMissingTraits())) {
+        // The class uses a missing trait. PHP does not allow this to be
+        // caught as an \Error, so the class loader above detected and
+        // aliased it instead. Treat the class the same as any other invalid
+        // class, and remember it so that it continues to be skipped even
+        // after the trait's stub alias makes class_exists() succeed.
+        self::$skipClasses[$className] = $missingTraits;
+        $autoloader->reset();
+        return NULL;
+      }
+
+      if ($exists) {
+        $class = new \ReflectionClass($className);
+        if (!$class->isAbstract()) {
+          return $class;
+        }
+      }
+
       return NULL;
     }
-
-    if (($missingTraits = $autoloader->getMissingTraits())) {
-      // The class uses a missing trait. PHP does not allow this to be
-      // caught as an \Error, so the class loader above detected and
-      // aliased it instead. Treat the class the same as any other invalid
-      // class, and remember it so that it continues to be skipped even
-      // after the trait's stub alias makes class_exists() succeed.
-      self::$skipClasses[$className] = $missingTraits;
-      $autoloader->reset();
-      return NULL;
-    }
-
-    if ($exists) {
-      $class = new \ReflectionClass($className);
-      if (!$class->isAbstract()) {
-        return $class;
+    finally {
+      if ($ownsAutoloader) {
+        spl_autoload_unregister([$autoloader, 'loadClass']);
       }
     }
-
-    return NULL;
   }
 
   /**
