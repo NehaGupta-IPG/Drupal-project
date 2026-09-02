@@ -7,6 +7,7 @@ namespace Drupal\FunctionalTests\Core\Recipe;
 use Drupal\config_enum_test\EnumValue;
 use Drupal\Core\Config\Checkpoint\Checkpoint;
 use Drupal\Core\Recipe\Command\RecipeCommand;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -82,6 +83,25 @@ class RecipeCommandTest extends BrowserTestBase {
       "Test log message",
     ]);
     $this->assertStringContainsString('[notice] A backup checkpoint was not created because nothing has changed since the "Test log message" checkpoint was created.', $process->getErrorOutput());
+  }
+
+  /**
+   * Tests recipe config langcode matches a non-English site default.
+   *
+   * Applying a recipe through the real `dr recipe` command - not a direct
+   * PHP call - must resolve unlabelled recipe config the same way a module's
+   * own shipped config would: to the site's actual default langcode, not a
+   * hardcoded assumption of English.
+   */
+  public function testRecipeConfigLangcodeMatchesNonEnglishSiteDefault(): void {
+    \Drupal::service('module_installer')->install(['language']);
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
+
+    $process = $this->applyRecipe('core/tests/fixtures/recipes/config_with_langcode');
+    $this->assertSame(0, $process->getExitCode());
+
+    $this->assertSame('fr', $this->config('config_test.dynamic.recipe_default')->get('langcode'));
   }
 
   /**

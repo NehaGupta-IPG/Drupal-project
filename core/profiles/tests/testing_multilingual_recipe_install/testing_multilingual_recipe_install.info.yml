@@ -1,0 +1,7 @@
+name: 'Testing multilingual recipe install'
+type: profile
+description: 'Minimal profile for testing that a recipe applied during a non-English install correctly picks up the language chosen for installation.'
+version: VERSION
+hidden: true
+recipes:
+  - core/tests/fixtures/recipes/config_with_langcode
