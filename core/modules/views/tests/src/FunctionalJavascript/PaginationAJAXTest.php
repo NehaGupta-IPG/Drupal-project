@@ -251,16 +251,30 @@ class PaginationAJAXTest extends WebDriverTestBase {
   /**
    * Assert that assets are not loaded twice on a page.
    *
+   * An asset is loaded twice when the same src appears on two script elements,
+   * which is what an AJAX response does when it re-attaches a library the page
+   * already carries. Only elements that have a src are considered, because a
+   * script element without one loads nothing: a page holds several of those,
+   * such as the drupalSettings JSON and the color scheme script in the head,
+   * and their absent src would otherwise read as a duplicate of each other.
+   *
+   * @see \Drupal\views\Controller\ViewAjaxController::ajaxView()
+   * @see \Drupal\Core\Render\BareHtmlPageRenderer::systemPageAttachments()
+   *
    * @internal
    */
   protected function assertNoDuplicateAssetsOnPage(): void {
     /** @var \Behat\Mink\Element\NodeElement[] $scripts */
-    $scripts = $this->getSession()->getPage()->findAll('xpath', '//script');
+    $scripts = $this->getSession()->getPage()->findAll('xpath', '//script[@src]');
     $script_src = [];
     foreach ($scripts as $script) {
-      $this->assertNotContains($script->getAttribute('src'), $script_src);
-      $script_src[] = $script->getAttribute('src');
+      $src = $script->getAttribute('src');
+      $this->assertNotContains($src, $script_src, "The asset $src is loaded more than once.");
+      $script_src[] = $src;
     }
+    // The loop above also passes when it never runs, so make sure the page
+    // loads assets this way at all.
+    $this->assertNotEmpty($script_src, 'The page loads at least one script asset.');
   }
 
   /**
