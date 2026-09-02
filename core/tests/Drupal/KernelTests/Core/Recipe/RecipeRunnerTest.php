@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Recipe;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Component\Utility\Crypt;
 use Drupal\config_test\Entity\ConfigTest;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipePreExistingConfigException;
 use Drupal\Core\Recipe\RecipeRunner;
+use Drupal\Core\Serialization\Yaml;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\NodeType;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -27,6 +31,21 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class RecipeRunnerTest extends KernelTestBase {
 
   use RecipeTestTrait;
+
+  /**
+   * The value of RecipeRunner::isApplying() during hook_modules_installed().
+   *
+   * @see ::modulesInstalled()
+   */
+  private ?bool $isApplyingDuringModulesInstalled = NULL;
+
+  /**
+   * Implements hook_modules_installed().
+   */
+  #[Hook('modules_installed')]
+  public function modulesInstalled(array $modules, bool $is_syncing): void {
+    $this->isApplyingDuringModulesInstalled = RecipeRunner::isApplying();
+  }
 
   /**
    * Tests modules installed after processing a recipe.
@@ -177,6 +196,47 @@ class RecipeRunnerTest extends KernelTestBase {
     $this->assertSame(['dotted.default', 'override', 'override_unmet'], array_keys($config_test_entities));
     $this->assertSame('Provided by recipe', $config_test_entities['dotted.default']->label());
     $this->assertSame('foo', $this->config('config_test.system')->get('404'));
+  }
+
+  /**
+   * Tests unlabelled recipe config resolves to the site's default langcode.
+   *
+   * A recipe applied to a non-English-default site must not hardcode an
+   * assumption that unlabelled configuration means English - the same rule
+   * that applies to a module's own shipped config applies here too, since
+   * both go through \Drupal\Core\Config\ConfigInstaller::createConfiguration().
+   */
+  public function testConfigLangcodeResolvesToSiteDefault(): void {
+    $this->enableModules(['system', 'language']);
+    $this->installConfig(['system', 'language']);
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    $this->config('system.site')->set('default_langcode', 'fr')->save();
+
+    $recipe = Recipe::createFromDirectory('core/tests/fixtures/recipes/config_with_langcode');
+    RecipeRunner::processRecipe($recipe);
+
+    $this->assertSame('fr', $this->config('config_test.dynamic.recipe_default')->get('langcode'));
+  }
+
+  /**
+   * Tests a recipe's own language installs, and an unsupported one is skipped.
+   *
+   * The recipe ships language.entity.de and config_test.dynamic.recipe_german
+   * together: the language must vouch for its own config regardless of
+   * dependency-declared installation order. config_test.dynamic.
+   * recipe_unsupported ships explicitly labelled 'xx' with no language
+   * vouching for it anywhere, so it must not install at all - the same
+   * rejection a module or profile shipping the same thing would get.
+   */
+  public function testConfigWithRecipeDefinedAndUnsupportedLangcodes(): void {
+    $recipe = Recipe::createFromDirectory('core/tests/fixtures/recipes/config_with_langcode');
+    RecipeRunner::processRecipe($recipe);
+
+    $this->assertSame('de', $this->config('config_test.dynamic.recipe_german')->get('langcode'));
+    $this->assertNotNull(\Drupal::entityTypeManager()->getStorage('config_test')->load('recipe_german'));
+
+    $this->assertFalse($this->container->get('config.storage')->exists('config_test.dynamic.recipe_unsupported'));
+    $this->assertNull(\Drupal::entityTypeManager()->getStorage('config_test')->load('recipe_unsupported'));
   }
 
   /**
@@ -334,6 +394,32 @@ YAML;
     $this->assertSame('triggerEvent', $operations[7][0][1]);
     $this->assertSame('Recipe include', $operations[7][1][0]->name);
     $this->assertSame($this->siteDirectory . '/recipes/recipe_include', $operations[7][1][0]->path);
+  }
+
+  /**
+   * Tests the isApplying flag while a recipe is applied.
+   */
+  public function testIsApplying(): void {
+    $this->assertFalse(RecipeRunner::isApplying());
+    $this->assertNull($this->isApplyingDuringModulesInstalled);
+
+    $recipe = Recipe::createFromDirectory('core/tests/fixtures/recipes/install_two_modules');
+    RecipeRunner::processRecipe($recipe);
+
+    $this->assertTrue($this->isApplyingDuringModulesInstalled, 'RecipeRunner::isApplying() returned TRUE during hook_modules_installed()');
+    $this->assertFalse(RecipeRunner::isApplying());
+  }
+
+  /**
+   * Tests that module config installed by a recipe has a default config hash.
+   */
+  public function testModuleConfigHasDefaultConfigHash(): void {
+    $recipe = Recipe::createFromDirectory('core/tests/fixtures/recipes/install_two_modules');
+    RecipeRunner::processRecipe($recipe);
+
+    $data = $this->container->get('config.storage')->read('node.settings');
+    $module_data = Yaml::decode(file_get_contents('core/modules/node/config/install/node.settings.yml'));
+    $this->assertSame(Crypt::hashBase64(serialize($module_data)), $data['_core']['default_config_hash']);
   }
 
 }

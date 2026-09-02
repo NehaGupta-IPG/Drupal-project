@@ -1,0 +1,8 @@
+id: german_config
+label: 'German config'
+weight: 0
+protected_property: Default
+langcode: de
+dependencies:
+  config:
+    - language.entity.de

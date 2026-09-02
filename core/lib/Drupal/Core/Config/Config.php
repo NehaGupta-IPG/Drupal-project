@@ -4,6 +4,8 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\Schema\Element;
+use Drupal\Core\Config\Schema\Mapping;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -207,16 +209,37 @@ class Config extends StorableConfigBase {
 
     // If there is a schema for this configuration object, cast all values to
     // conform to the schema.
-    if (!$has_trusted_data && $this->typedConfigManager->hasConfigSchema($this->name)) {
-      // Ensure that the schema wrapper has the latest data.
-      $this->schemaWrapper = NULL;
-      $this->data = $this->castValue(NULL, $this->data);
-      // Reclaim the memory used by the schema wrapper.
-      $this->schemaWrapper = NULL;
+    if (!$has_trusted_data) {
+      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
+        // Ensure that the schema wrapper has the latest data.
+        $this->schemaWrapper = NULL;
+        $is_translatable = FALSE;
+        $this->data = $this->castValue(NULL, $this->data, $is_translatable);
+        if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+          $this->reconcileLangcodeWithTranslatability($is_translatable, $this->getSchemaWrapper());
+        }
+        // Reclaim the memory used by the schema wrapper.
+        $this->schemaWrapper = NULL;
+      }
+      else {
+        foreach ($this->data as $key => $value) {
+          $this->validateValue($key, $value);
+        }
+      }
     }
     else {
+      // Deprecated path.
       foreach ($this->data as $key => $value) {
         $this->validateValue($key, $value);
+      }
+      if ($this->typedConfigManager->hasConfigSchema($this->name)) {
+        if ($this->getStorage()->getCollectionName() === StorageInterface::DEFAULT_COLLECTION) {
+          $is_translatable = FALSE;
+          $this->castValue(NULL, $this->data, $is_translatable);
+          $this->reconcileLangcodeWithTranslatability($is_translatable, $this->getSchemaWrapper());
+          // Reclaim the memory used by the schema wrapper.
+          $this->schemaWrapper = NULL;
+        }
       }
     }
 
@@ -233,6 +256,52 @@ class Config extends StorableConfigBase {
     $this->eventDispatcher->dispatch(new ConfigCrudEvent($this), $event_name);
     $this->originalData = $this->data;
     return $this;
+  }
+
+  /**
+   * Keeps langcode in step with whether the configuration is translatable.
+   *
+   * Configuration can become translatable, or stop being translatable, as a
+   * side effect of an ordinary data change - for example a plugin being
+   * swapped for one that does, or does not, have a translatable value. This
+   * adds a langcode when translatability just switched on and none is
+   * present yet, and removes it when translatability just switched off.
+   *
+   * This never overwrites an existing langcode.
+   *
+   * @param bool $is_translatable
+   *   Whether the configuration currently has any translatable value, as
+   *   computed by \Drupal\Core\Config\StorableConfigBase::castValue().
+   * @param \Drupal\Core\Config\Schema\Element $typed_config
+   *   The typed configuration wrapper for this configuration object.
+   */
+  protected function reconcileLangcodeWithTranslatability(bool $is_translatable, Element $typed_config): void {
+    if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
+      return;
+    }
+    if (!$is_translatable) {
+      if (array_key_exists('langcode', $this->data)) {
+        unset($this->data['langcode']);
+      }
+      return;
+    }
+    if (array_key_exists('langcode', $this->data)) {
+      return;
+    }
+    $event = new ConfigLangcodeResolveEvent();
+    $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
+    $this->data['langcode'] = $event->getLangcode();
+    // castValue() already sorted $this->data into schema order before
+    // langcode existed as a key, so it landed here at the end instead. Left
+    // alone, the next unrelated save would silently re-sort it into its
+    // schema position, changing the stored key order for no logical reason -
+    // a spurious diff for anyone who exported in between. Sort it into place
+    // now instead, the same way castValue() would have.
+    $mapping = $typed_config->getDataDefinition()['mapping'];
+    if (is_array($mapping)) {
+      $mapping = array_intersect_key($mapping, $this->data);
+      $this->data = array_replace($mapping, $this->data);
+    }
   }
 
   /**

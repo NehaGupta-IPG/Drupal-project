@@ -60,8 +60,30 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
     // the update itself was not initiated by locale data changes.
     if (!InstallerKernel::installationAttempted() && !$this->localeConfigManager->isUpdatingTranslationsFromLocale()) {
       $config = $event->getConfig();
+      $original = $config->getOriginal();
+
+      // A brand-new configuration object's values are, by definition, the
+      // shipped defaults - never a manual edit - no matter what langcode it
+      // was installed with. This matters because ConfigInstaller may resolve
+      // such a langcode to something other than 'en' (see
+      // \Drupal\Core\Config\ConfigInstaller::createConfiguration()),
+      // including for a module installed long after the site itself was,
+      // which the InstallerKernel::installationAttempted() check above does
+      // not cover.
+      if (empty($original)) {
+        return;
+      }
+
       $langcode = $config->get('langcode') ?: 'en';
-      $this->updateLocaleStorage($config, $langcode);
+      // Pass the pre-save values through so a value that did not actually
+      // change in this save is never fed back as a customized translation.
+      // Without this, an unrelated key changing in the same save - for
+      // example a module's hook_install() setting a non-translatable key as
+      // a follow-up to ConfigInstaller relabelling the object's langcode -
+      // would cause the still-untranslated values to be re-saved as
+      // customized translations, clobbering any real translation before it
+      // gets a chance to apply.
+      $this->updateLocaleStorage($config, $langcode, [], $original);
     }
   }
 
@@ -93,12 +115,17 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    *   (Optional) Reference configuration to check against if $config was an
    *   override. This allows us to update locale keys for data not in the
    *   override but still in the active configuration.
+   * @param array $original_config
+   *   (Optional) The configuration's values before this save, keyed the same
+   *   way as $config. When given, a leaf value unchanged from $original_config
+   *   is never fed back into locale storage, since it was not actually
+   *   (re)authored in $langcode by this save.
    */
-  public function updateLocaleStorage(StorableConfigBase $config, $langcode, array $reference_config = []) {
+  public function updateLocaleStorage(StorableConfigBase $config, $langcode, array $reference_config = [], array $original_config = []) {
     $name = $config->getName();
     if ($this->localeConfigManager->isSupported($name) && $this->localeLanguages->isTranslatable($langcode)) {
       $translatables = $this->localeConfigManager->getTranslatableDefaultConfig($name);
-      $this->processTranslatableData($name, $config->get(), $translatables, $langcode, $reference_config);
+      $this->processTranslatableData($name, $config->get(), $translatables, $langcode, $reference_config, $original_config);
     }
   }
 
@@ -118,8 +145,13 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    *   (Optional) Reference configuration to check against if $config was an
    *   override. This allows us to update locale keys for data not in the
    *   override but still in the active configuration.
+   * @param array $original_config
+   *   (Optional) The configuration's values before this save, keyed the same
+   *   way as $config. When given, a leaf value unchanged from $original_config
+   *   is never fed back into locale storage, since it was not actually
+   *   (re)authored in $langcode by this save.
    */
-  protected function processTranslatableData($name, array $config, array $translatable, $langcode, array $reference_config = []) {
+  protected function processTranslatableData($name, array $config, array $translatable, $langcode, array $reference_config = [], array $original_config = []) {
     foreach ($translatable as $key => $item) {
       if (!isset($config[$key])) {
         if (isset($reference_config[$key])) {
@@ -127,9 +159,16 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
         }
         continue;
       }
+      // A value unchanged from before this save was not (re)authored in
+      // $langcode now, so there is nothing to feed back. See the @param
+      // documentation above for why this matters.
+      if (array_key_exists($key, $original_config) && $original_config[$key] === $config[$key]) {
+        continue;
+      }
       if (is_array($item)) {
         $reference_config_item = $reference_config[$key] ?? [];
-        $this->processTranslatableData($name, $config[$key], $item, $langcode, $reference_config_item);
+        $original_config_item = is_array($original_config[$key] ?? NULL) ? $original_config[$key] : [];
+        $this->processTranslatableData($name, $config[$key], $item, $langcode, $reference_config_item, $original_config_item);
       }
       else {
         $this->saveCustomizedTranslation($name, $item->getUntranslatedString(), $item->getOption('context'), $config[$key], $langcode);

@@ -5,6 +5,7 @@ namespace Drupal\Core\Installer;
 use Drupal\Component\Datetime\Time;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\NullBackendFactory;
+use Drupal\Core\Config\EventSubscriber\ConfigLangcodeInstallerSubscriber;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\Lock\NullLockBackend;
@@ -39,6 +40,11 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
 
     // During the installer user 1 is a superuser.
     $container->setDefinition(InstallerAccessPolicy::class, (new Definition())->addTag('access_policy')->setPublic(FALSE));
+
+    // Only resolve configuration langcode to the language chosen for this
+    // installation while a site installation is under way.
+    $container->register('config.langcode_installer_subscriber', ConfigLangcodeInstallerSubscriber::class)
+      ->addTag('event_subscriber');
 
     // Explicitly configure all cache bins to use the memory backend. This
     // results in less queries to set caches which will only be cleared on the
