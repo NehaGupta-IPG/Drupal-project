@@ -36,7 +36,6 @@ CacheTagGroupedLookups:
     - 'config:image.style.medium_3_2_2x'
     - 'config:image.style.medium_3_2_600x400'
     - 'config:responsive_image.styles.3_2_image'
-    - 'config:system.theme'
     - 'config:views.view.frontpage'
     - 'media:21'
     - 'media:7'

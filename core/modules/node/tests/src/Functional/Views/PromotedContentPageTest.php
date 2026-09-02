@@ -263,15 +263,7 @@ class PromotedContentPageTest extends ViewTestBase {
       $render_cache_tags
     );
     $expected_tags = Cache::mergeTags($empty_node_listing_cache_tags, $cache_context_tags);
-    $expected_tags = Cache::mergeTags($expected_tags, [
-      // Deciding whether the color scheme preference has an effect reads the
-      // theme configuration.
-      // @see \Drupal\Core\Theme\ColorSchemeSupport::appliesToAccount()
-      'config:system.theme',
-      'http_response',
-      'rendered',
-      'config:user.role.anonymous',
-    ]);
+    $expected_tags = Cache::mergeTags($expected_tags, ['http_response', 'rendered', 'config:user.role.anonymous']);
     $this->assertPageCacheContextsAndTags(
       Url::fromRoute('view.promoted_content.page_1'),
       $cache_contexts,
@@ -336,12 +328,7 @@ class PromotedContentPageTest extends ViewTestBase {
     $this->assertPageCacheContextsAndTags(
       Url::fromRoute('view.promoted_content.page_1'),
       $cache_contexts,
-      Cache::mergeTags($first_page_output_cache_tags, [
-        'config:system.theme',
-        'http_response',
-        'rendered',
-        'config:user.role.anonymous',
-      ])
+      Cache::mergeTags($first_page_output_cache_tags, ['http_response', 'rendered', 'config:user.role.anonymous'])
     );
 
     // Second page.
@@ -361,9 +348,6 @@ class PromotedContentPageTest extends ViewTestBase {
       'user:0',
       'http_response',
       'rendered',
-      // Deciding whether the color scheme preference has an effect reads the
-      // theme configuration.
-      'config:system.theme',
       // FinishResponseSubscriber adds this cache tag to responses that have the
       // 'user.permissions' cache context for anonymous users.
       'config:user.role.anonymous',

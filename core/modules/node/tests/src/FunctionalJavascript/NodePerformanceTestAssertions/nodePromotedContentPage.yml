@@ -1,5 +1,5 @@
 QueryCount: 34
-CacheGetCount: 84
+CacheGetCount: 82
 CacheGetCountByBin:
   page: 1
   config: 18
@@ -15,7 +15,7 @@ CacheGetCountByBin:
 CacheSetCount: 41
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
-CacheTagLookupQueryCount: 7
+CacheTagLookupQueryCount: 6
 CacheTagGroupedLookups:
   -
     - route_match
@@ -42,8 +42,6 @@ CacheTagGroupedLookups:
   -
     - 'config:filter.format.plain_text'
     - node_view
-  -
-    - 'config:system.theme'
   -
     - 'config:user.role.anonymous'
 ScriptCount: 0

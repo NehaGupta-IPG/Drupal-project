@@ -69,10 +69,6 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
       'rendered',
       'config:block_list',
       'config:system.menu.llama',
-      // Deciding whether the color scheme preference has an effect reads the
-      // theme configuration.
-      // @see \Drupal\Core\Theme\ColorSchemeSupport::appliesToAccount()
-      'config:system.theme',
       // The cache contexts associated with the (in)accessible menu links are
       // bubbled.
       'config:user.role.anonymous',
@@ -123,15 +119,8 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
     $menu->delete();
     $this->verifyPageCache($url, 'MISS');
 
-    // Verify a cache hit. The theme configuration is still read, so its cache
-    // tag remains on the page without the menu.
-    $this->verifyPageCache($url, 'HIT', [
-      'config:block_list',
-      'config:system.theme',
-      'config:user.role.anonymous',
-      'http_response',
-      'rendered',
-    ]);
+    // Verify a cache hit.
+    $this->verifyPageCache($url, 'HIT', ['config:block_list', 'config:user.role.anonymous', 'http_response', 'rendered']);
   }
 
 }

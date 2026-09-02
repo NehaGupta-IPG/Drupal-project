@@ -334,11 +334,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
     // 'user.permissions' is a required cache context, and responses that vary
     // by this cache context when requested by anonymous users automatically
     // also get this cache tag, to ensure correct invalidation.
-    // The theme configuration is read to decide whether the color scheme
-    // preference has an effect on the page. Rendered entities do not carry that
-    // decision, so the tag stays out of the render cache expectations.
-    // @see \Drupal\Core\Theme\ColorSchemeSupport::appliesToAccount()
-    $page_cache_tags = Cache::mergeTags(['config:system.theme', 'http_response', 'rendered'], ['config:user.role.anonymous']);
+    $page_cache_tags = Cache::mergeTags(['http_response', 'rendered'], ['config:user.role.anonymous']);
     // If the block module is used, the Block page display variant is used,
     // which adds the block config entity type's list cache tags.
     $page_cache_tags = Cache::mergeTags($page_cache_tags, \Drupal::moduleHandler()->moduleExists('block') ? ['config:block_list'] : []);

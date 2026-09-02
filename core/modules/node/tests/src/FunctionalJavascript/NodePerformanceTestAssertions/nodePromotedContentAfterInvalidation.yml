@@ -1,5 +1,5 @@
 QueryCount: 2
-CacheGetCount: 59
+CacheGetCount: 57
 CacheGetCountByBin:
   page: 1
   config: 10
@@ -17,7 +17,6 @@ CacheTagLookupQueryCount: 3
 CacheTagGroupedLookups:
   -
     - 'config:filter.format.plain_text'
-    - 'config:system.theme'
     - 'config:user.role.anonymous'
     - 'config:views.view.promoted_content'
     - http_response

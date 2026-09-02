@@ -24,7 +24,6 @@ CacheTagGroupedLookups:
     - 'config:system.menu.footer'
     - 'config:system.menu.main'
     - 'config:system.site'
-    - 'config:system.theme'
     - 'config:user.role.anonymous'
     - 'config:views.view.recipe_collections'
     - 'config:views.view.related_recipes'

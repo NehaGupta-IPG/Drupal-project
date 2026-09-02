@@ -1,5 +1,5 @@
 QueryCount: 178
-CacheGetCount: 227
+CacheGetCount: 225
 CacheGetCountByBin:
   page: 1
   config: 55
@@ -13,7 +13,7 @@ CacheGetCountByBin:
   routes: 10
   menu: 3
   file_parsing: 2
-CacheSetCount: 241
+CacheSetCount: 240
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
 CacheTagLookupQueryCount: 25
@@ -68,7 +68,6 @@ CacheTagGroupedLookups:
     - 'block_content:2'
     - 'block_content:3'
     - 'config:configurable_language_list'
-    - 'config:system.theme'
   -
     - 'config:system.menu.footer'
   -

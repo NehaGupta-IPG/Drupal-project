@@ -38,22 +38,6 @@ trait AssertPageCacheContextsAndTagsTrait {
   }
 
   /**
-   * Determines whether the last response was rendered by the HtmlRenderer.
-   *
-   * The hook_page_attachments() implementations are only called when dealing
-   * with the HtmlRenderer, so the Content-Type header settles the question.
-   *
-   * @return bool
-   *   TRUE if the last response is an HTML response.
-   *
-   * @see \Drupal\system\Hook\PageAttachmentsHook::pageAttachments()
-   * @see \Drupal\Core\Render\MainContent\HtmlRenderer::invokePageAttachmentHooks()
-   */
-  protected function isHtmlResponse(): bool {
-    return $this->getSession()->getResponseHeader('Content-Type') === 'text/html; charset=utf-8';
-  }
-
-  /**
    * Asserts whether an expected cache context was present in the last response.
    *
    * @param string $expected_cache_context
@@ -123,16 +107,6 @@ trait AssertPageCacheContextsAndTagsTrait {
       if (\Drupal::currentUser()->isAnonymous()) {
         $expected_tags = Cache::mergeTags($expected_tags, ['config:user.role.anonymous']);
       }
-      // Deciding whether the color scheme preference has an effect reads the
-      // theme configuration, so the page depends on it. A theme that declares
-      // 'supports color scheme' in its .info.yml file settles the question on
-      // its own and the page does not get this tag, so tests running such a
-      // theme have to assert the tags themselves.
-      // @see \Drupal\Core\Theme\ColorSchemeSupport::appliesToAccount()
-      // @see \Drupal\Tests\system\Functional\Cache\ColorSchemeCacheContextTest
-      if ($this->isHtmlResponse()) {
-        $expected_tags[] = 'config:system.theme';
-      }
       $expected_tags[] = 'http_response';
     }
     $actual_tags = $this->getCacheHeaderValues('X-Drupal-Cache-Tags');
@@ -161,17 +135,15 @@ trait AssertPageCacheContextsAndTagsTrait {
       // Add the user based contexts to the list of default contexts except when
       // user is already there.
       if (!in_array('user', $expected_contexts)) {
-        $is_html_response = $this->isHtmlResponse();
         $default_contexts[] = 'user.permissions';
 
-        // 'user.color_scheme' is deliberately not a default context. It is only
-        // added where the color scheme preference has an effect, which needs a
-        // theme that declares 'supports color scheme' in its .info.yml file, so
-        // tests running such a theme have to expect it explicitly.
-        // @see \Drupal\Core\Theme\ColorSchemeSupport::appliesToAccount()
-        // @see \Drupal\Tests\system\Functional\Cache\ColorSchemeCacheContextTest
-        if (!in_array('user.roles', $expected_contexts) && $is_html_response) {
-          $default_contexts[] = 'user.roles:authenticated';
+        if (!in_array('user.roles', $expected_contexts)) {
+          // The system_page_attachments() hook is only called when dealing with
+          // the HtmlRenderer, so check the Content-Type header.
+          // @see \Drupal\Core\Render\MainContent\HtmlRenderer::invokePageAttachmentHooks()
+          if ($this->getSession()->getResponseHeader('Content-Type') === 'text/html; charset=utf-8') {
+            $default_contexts[] = 'user.roles:authenticated';
+          }
         }
       }
       $expected_contexts = Cache::mergeContexts($expected_contexts, $default_contexts);
