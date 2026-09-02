@@ -26,8 +26,19 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
   admin_permission: 'administer modules',
   config_export: [
     'id',
-    'label',
+    'name',
   ],
 )]
 class TestConfigType extends ConfigEntityBase {
+
+  /**
+   * The machine name.
+   */
+  protected string $id;
+
+  /**
+   * The human-readable name.
+   */
+  protected string $name;
+
 }
