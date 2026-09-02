@@ -58,9 +58,7 @@ class DefaultLangcodeConfigUpdater {
    *
    * Only configuration whose langcode currently matches the previous
    * default is touched - anything explicitly set to some other langcode is
-   * left alone, the same way an ordinary save would leave it alone. While
-   * walking every object anyway, this also enforces the standing rule that
-   * configuration without a translatable value should not carry a langcode.
+   * left alone, the same way an ordinary save would leave it alone.
    *
    * Before relabelling, whatever the configuration's current content
    * actually is gets saved as an override for the langcode it is about to
@@ -99,28 +97,23 @@ class DefaultLangcodeConfigUpdater {
 
       $config = $this->configFactory->getEditable($name);
       $data = $config->getRawData();
+      if (!array_key_exists('langcode', $data)) {
+        // The configuration does not have a langcode, so it is not
+        // translatable.
+        continue;
+      }
       $typed_config = $this->typedConfigManager->createFromNameAndData($name, $data);
       if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
         continue;
       }
-      $is_translatable = $typed_config->getDataDefinition()['translatable'] || $typed_config->hasTranslatableElements();
-      $current_langcode = $data['langcode'] ?? NULL;
+      $current_langcode = $data['langcode'];
 
-      if (!$is_translatable) {
-        if ($current_langcode !== NULL) {
-          $config->clear('langcode')->save();
-        }
-        continue;
-      }
-
-      if ($current_langcode === NULL || $current_langcode === $old_langcode) {
-        if ($current_langcode !== NULL) {
-          $translatable_data = static::extractTranslatableData($typed_config);
-          if ($translatable_data !== []) {
-            $this->getRawLanguageConfigOverride($old_override_storage, $name)
-              ->setData($translatable_data)
-              ->save();
-          }
+      if ($current_langcode === $old_langcode) {
+        $translatable_data = static::extractTranslatableData($typed_config);
+        if ($translatable_data !== []) {
+          $this->getRawLanguageConfigOverride($old_override_storage, $name)
+            ->setData($translatable_data)
+            ->save();
         }
 
         $override = $this->getRawLanguageConfigOverride($new_override_storage, $name);
