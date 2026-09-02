@@ -14,7 +14,6 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
@@ -38,8 +37,6 @@ class ThemePreprocess {
     protected RouteMatchInterface $routeMatch,
     protected ThemeManagerInterface $themeManager,
     protected ThemeSettingsProvider $themeSettingsProvider,
-    protected AccountInterface $currentUser,
-    protected ColorSchemeSupport $colorSchemeSupport,
   ) {
   }
 
@@ -265,16 +262,13 @@ class ThemePreprocess {
     $language_interface = $this->languageManager->getCurrentLanguage();
     $variables['html_attributes']['lang'] = $language_interface->getId();
     $variables['html_attributes']['dir'] = $language_interface->getDirection();
-    // The color scheme is exposed as a variable for theme developers. The
-    // data-color-scheme attribute is the rendered counterpart of that value.
-    // Both are only set where the preference has an effect, so a page that
-    // ignores the preference does not advertise a color scheme it never
-    // applies.
-    if ($this->colorSchemeSupport->appliesToAccount($this->currentUser)) {
-      $color_scheme = $this->currentUser->getColorScheme();
-      $variables['color_scheme'] = $color_scheme;
-      $variables['html_attributes']['data-color-scheme'] = $color_scheme;
-    }
+    // Always render the default color scheme, so that the markup is the same
+    // for every account and declares no cacheability. It is also what a client
+    // without JavaScript keeps. A customized preference reaches the client in
+    // a cookie, and a script in the head overrides the attribute from it.
+    // @see \Drupal\Core\Render\BareHtmlPageRenderer::systemPageAttachments()
+    // @see \Drupal\Core\EventSubscriber\ColorSchemeCookieSubscriber
+    $variables['html_attributes']['data-color-scheme'] = 'auto';
 
     if (isset($variables['db_is_active']) && !$variables['db_is_active']) {
       $variables['db_offline'] = TRUE;

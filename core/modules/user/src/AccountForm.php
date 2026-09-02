@@ -429,7 +429,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
 
     return [
       '#disabled' => TRUE,
-      '#description' => $this->t('This setting has no effect. Neither the site not the administration pages support it.'),
+      '#description' => $this->t('This setting has no effect. Neither the site nor the administration pages support it.'),
     ];
   }
 

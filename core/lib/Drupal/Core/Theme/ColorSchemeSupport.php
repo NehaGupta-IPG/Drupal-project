@@ -6,26 +6,19 @@ namespace Drupal\Core\Theme;
 
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Session\AccountInterface;
 
 /**
- * Determines where the user color scheme preference has an effect.
+ * Determines which of the configured themes honor the color scheme preference.
  *
  * A theme honors the preference by declaring 'supports color scheme: true' in
  * its .info.yml file. The declaration is inherited from base themes.
  *
- * Two questions follow from that declaration, and both are answered here so
- * that the account form, the html preprocess and the page attachments hook
- * agree:
- * - Which of the configured themes declare support. The account form describes
- *   the effect of the preference from that.
- * - Whether the preference has an effect on the page being rendered for a
- *   given account. The data-color-scheme attribute on the <html> element and
- *   the 'user.color_scheme' cache context follow from that.
+ * The rendered page does not depend on any of this: every page carries
+ * data-color-scheme="auto" and a cookie tells the client what to override it
+ * with. The account form is the only consumer, and it describes to the account
+ * where the preference takes effect.
  *
  * @see \Drupal\Core\Theme\ActiveTheme::supportsColorScheme()
- * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
- * @see \Drupal\system\Hook\PageAttachmentsHook::pageAttachments()
  * @see \Drupal\user\AccountForm::colorSchemeElementProperties()
  */
 class ColorSchemeSupport {
@@ -33,7 +26,6 @@ class ColorSchemeSupport {
   public function __construct(
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly ThemeInitializationInterface $themeInitialization,
-    protected readonly ThemeManagerInterface $themeManager,
   ) {}
 
   /**
@@ -62,40 +54,6 @@ class ColorSchemeSupport {
   public function adminThemeSupports(?RefinableCacheableDependencyInterface $cacheability = NULL): bool {
     $themes = $this->getConfiguredThemeNames($cacheability);
     return $this->themeSupports($themes['admin']);
-  }
-
-  /**
-   * Determines whether the preference has an effect for an account.
-   *
-   * The active theme renders the page, so its declaration settles the question
-   * on its own. A page of a theme without support still carries output of the
-   * administration theme, such as the navigation and its top bar, and only
-   * accounts that may use the administration theme ever see that output.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The account the page is rendered for.
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface|null $cacheability
-   *   (optional) Collects the cacheability of the decision.
-   *
-   * @return bool
-   *   TRUE if the color scheme of the account has an effect on the page.
-   *
-   * @see \Drupal\user\Theme\AdminNegotiator::applies()
-   */
-  public function appliesToAccount(AccountInterface $account, ?RefinableCacheableDependencyInterface $cacheability = NULL): bool {
-    if ($this->themeManager->getActiveTheme()->supportsColorScheme()) {
-      return TRUE;
-    }
-    // The theme configuration is read on every page, so it comes first. The
-    // permission check needs the user module, and a page whose administration
-    // theme cannot honor the preference must not reach it.
-    if (!$this->adminThemeSupports($cacheability)) {
-      return FALSE;
-    }
-    // The permission decides the outcome from here on, so the page varies by
-    // it.
-    $cacheability?->addCacheContexts(['user.permissions']);
-    return $account->hasPermission('view the administration theme');
   }
 
   /**

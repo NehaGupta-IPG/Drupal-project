@@ -19,18 +19,8 @@
  * - db_offline: A flag indicating if the database is offline.
  * - placeholder_token: The token for generating head, css, js and js-bottom
  *   placeholders.
- * - color_scheme: The user's preferred color scheme: 'light', 'dark' or 'auto'.
- *   'auto' means the operating system preference should be followed. This
- *   variable is only present when the preference has an effect on the page, and
- *   so is the matching data-color-scheme attribute in html_attributes. That is
- *   the case when the active theme declares 'supports color scheme: true' in
- *   its .info.yml file, and also when the administration theme declares it and
- *   the user may use the administration theme, because the page then carries
- *   administration theme output. A theme inherits the declaration from its base
- *   theme.
  *
  * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
- * @see \Drupal\Core\Theme\ColorSchemeSupport::appliesToAccount()
  *
  * @ingroup themeable
  */

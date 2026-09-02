@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render;
 
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\EventSubscriber\ColorSchemeCookieSubscriber;
 use Drupal\Core\Extension\ThemeSettingsProvider;
 
 /**
@@ -170,6 +171,35 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
     foreach ($meta_default as $key => $value) {
       $page['#attached']['html_head'][] = [$value, $key];
     }
+
+    // The <html> element carries data-color-scheme="auto" on every page, so
+    // that the markup is the same for every account and needs no cache
+    // context. An account that picked 'light' or 'dark' has that value in a
+    // cookie, and this script overrides the attribute from it. The script is
+    // in the head, so it runs before the stylesheets are requested. It leaves
+    // the document alone when there is no cookie, which is the common case, so
+    // no layout is invalidated then.
+    // @see \Drupal\Core\EventSubscriber\ColorSchemeCookieSubscriber
+    // @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
+    $cookie_name = ColorSchemeCookieSubscriber::COOKIE_NAME;
+    $page['#attached']['html_head'][] = [
+      [
+        '#tag' => 'script',
+        '#value' => <<<JS
+        (function () {
+          var n = '$cookie_name=';
+          var c = document.cookie.split('; ').find(function (v) {
+            return v.indexOf(n) === 0;
+          });
+          var s = c ? c.slice(n.length) : '';
+          if (s === 'light' || s === 'dark') {
+            document.documentElement.setAttribute('data-color-scheme', s);
+          }
+        })();
+        JS,
+      ],
+      'system_color_scheme',
+    ];
 
     // Handle setting the "active" class on links by:
     // - loading the active-link library if the current user is authenticated;
