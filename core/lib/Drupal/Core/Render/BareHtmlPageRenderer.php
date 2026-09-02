@@ -185,7 +185,11 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
     $page['#attached']['html_head'][] = [
       [
         '#tag' => 'script',
-        '#value' => <<<JS
+        // Pass the script as markup, because HtmlTag runs a plain string
+        // through Xss::filterAdmin(), which mangles the operators of any
+        // expression that is added to it later.
+        // @see \Drupal\Core\Render\Element\HtmlTag::preRenderHtmlTag()
+        '#value' => Markup::create(<<<JS
         (function () {
           var n = '$cookie_name=';
           var c = document.cookie.split('; ').find(function (v) {
@@ -196,7 +200,7 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
             document.documentElement.setAttribute('data-color-scheme', s);
           }
         })();
-        JS,
+        JS),
       ],
       'system_color_scheme',
     ];
