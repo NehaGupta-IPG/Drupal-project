@@ -325,7 +325,16 @@ class LibraryDiscoveryParser {
    *   their imports. When a library with import map entries is attached to a
    *   page, its entries are preloaded with <link rel="modulepreload">
    *   elements. Libraries that consume an import map entry should declare a
-   *   normal library dependency on the library that provides the entry.
+   *   normal library dependency on the library that provides the entry. The
+   *   importmap of a library may be overridden in the libraries-override of
+   *   a theme: the override uses the same structure as the definition. The
+   *   sources of the override are relative to the theme, or may be absolute
+   *   paths or URLs; FALSE removes an entry; integrity entries may be added.
+   *   Note that the aggregated import map resolves conflicts between
+   *   extensions in favor of the first definition, so an override has no
+   *   effect when an extension that comes earlier in that order (core, then
+   *   the modules in the module list, then the themes in the theme chain)
+   *   defines the same module specifier with a different value.
    *   @code
    *   importmap:
    *     imports:
@@ -541,9 +550,9 @@ class LibraryDiscoveryParser {
               }
               elseif ($sub_key === 'importmap') {
                 // The importmap has a nested structure (imports, scopes and
-                // integrity) that does not fit the asset-to-asset override
-                // format, so it may not be overridden.
-                throw new InvalidLibrariesOverrideSpecificationException(sprintf("The importmap of the library %s may not be overridden in libraries-override. Use hook_library_info_alter() instead.", "$extension/$library_name"));
+                // integrity), which does not use the asset-to-asset override
+                // format of the other asset types.
+                $this->applyImportMapOverride($libraries[$library_name], $value, $theme_path, $extension, $library_name);
               }
               elseif ($sub_key === 'css') {
                 // SMACSS category should be incorporated into the asset name.
@@ -561,6 +570,118 @@ class LibraryDiscoveryParser {
     }
 
     return $libraries;
+  }
+
+  /**
+   * Applies the importmap override of a library from libraries-override.
+   *
+   * The importmap override uses the same structure as the importmap
+   * definition of the library, with the keys 'imports', 'scopes' and
+   * 'integrity'. The entries address the module specifiers, scopes and URLs
+   * as declared by the library. A string value replaces the source of an
+   * import or scope entry, or the integrity metadata of an integrity entry;
+   * sources are resolved relative to the theme, or may be absolute paths or
+   * URLs. FALSE removes the entry. Entries that do not exist in the library
+   * definition are ignored, like for other asset overrides, except that
+   * integrity entries may be added, so that a theme can provide integrity
+   * metadata for a replacement source.
+   *
+   * The importmap definition is still raw at this point: the sources are
+   * validated and resolved by processImportMapDefinition() after all
+   * overrides have been applied.
+   *
+   * @param array $library
+   *   The library definition, by reference.
+   * @param array $override
+   *   The importmap override, as specified in libraries-override.
+   * @param string $theme_path
+   *   The path of the theme providing the override.
+   * @param string $extension
+   *   The name of the extension providing the library.
+   * @param string $library_name
+   *   The name of the library.
+   */
+  protected function applyImportMapOverride(array &$library, array $override, string $theme_path, string $extension, string $library_name): void {
+    foreach (array_keys($override) as $section) {
+      if (!in_array($section, ['imports', 'scopes', 'integrity'], TRUE)) {
+        throw new InvalidLibrariesOverrideSpecificationException(sprintf("Unknown key '%s' in the importmap override of the library %s/%s. Only the keys 'imports', 'scopes' and 'integrity' are allowed.", $section, $extension, $library_name));
+      }
+    }
+    $importmap = $library['importmap'] ?? [];
+    if (isset($override['imports'])) {
+      if (!is_array($override['imports'])) {
+        throw new InvalidLibrariesOverrideSpecificationException(sprintf("The 'imports' section of the importmap override of the library %s/%s must be an array.", $extension, $library_name));
+      }
+      foreach ($override['imports'] as $specifier => $source) {
+        $specifier = (string) $specifier;
+        if (!isset($importmap['imports'][$specifier])) {
+          continue;
+        }
+        if ($source === FALSE) {
+          unset($importmap['imports'][$specifier]);
+        }
+        elseif (is_string($source)) {
+          $importmap['imports'][$specifier] = $this->resolveThemeAssetPath($theme_path, $source);
+        }
+        else {
+          throw new InvalidLibrariesOverrideSpecificationException(sprintf("The source of the module specifier '%s' in the importmap override of the library %s/%s must be a string, or FALSE to remove the entry.", $specifier, $extension, $library_name));
+        }
+      }
+    }
+    if (isset($override['scopes'])) {
+      if (!is_array($override['scopes'])) {
+        throw new InvalidLibrariesOverrideSpecificationException(sprintf("The 'scopes' section of the importmap override of the library %s/%s must be an array.", $extension, $library_name));
+      }
+      foreach ($override['scopes'] as $scope => $entries) {
+        $scope = (string) $scope;
+        if (!is_array($entries)) {
+          throw new InvalidLibrariesOverrideSpecificationException(sprintf("The entries of the scope '%s' in the importmap override of the library %s/%s must be an array.", $scope, $extension, $library_name));
+        }
+        if (!isset($importmap['scopes'][$scope])) {
+          continue;
+        }
+        foreach ($entries as $specifier => $source) {
+          $specifier = (string) $specifier;
+          if (!isset($importmap['scopes'][$scope][$specifier])) {
+            continue;
+          }
+          if ($source === FALSE) {
+            unset($importmap['scopes'][$scope][$specifier]);
+          }
+          elseif (is_string($source)) {
+            $importmap['scopes'][$scope][$specifier] = $this->resolveThemeAssetPath($theme_path, $source);
+          }
+          else {
+            throw new InvalidLibrariesOverrideSpecificationException(sprintf("The source of the module specifier '%s' in scope '%s' of the importmap override of the library %s/%s must be a string, or FALSE to remove the entry.", $specifier, $scope, $extension, $library_name));
+          }
+        }
+      }
+    }
+    if (isset($override['integrity'])) {
+      if (!is_array($override['integrity'])) {
+        throw new InvalidLibrariesOverrideSpecificationException(sprintf("The 'integrity' section of the importmap override of the library %s/%s must be an array.", $extension, $library_name));
+      }
+      foreach ($override['integrity'] as $url => $integrity) {
+        $url = (string) $url;
+        if ($integrity === FALSE) {
+          unset($importmap['integrity'][$url]);
+        }
+        elseif (is_string($integrity) && $integrity !== '') {
+          // Integrity entries may be added, even when the library does not
+          // define one for the URL yet.
+          $importmap['integrity'][$url] = $integrity;
+        }
+        else {
+          throw new InvalidLibrariesOverrideSpecificationException(sprintf("The integrity metadata for '%s' in the importmap override of the library %s/%s must be a non-empty string, or FALSE to remove the entry.", $url, $extension, $library_name));
+        }
+      }
+    }
+    if ($importmap) {
+      $library['importmap'] = $importmap;
+    }
+    else {
+      unset($library['importmap']);
+    }
   }
 
   /**

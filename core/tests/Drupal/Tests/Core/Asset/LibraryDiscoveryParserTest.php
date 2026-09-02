@@ -526,14 +526,19 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   }
 
   /**
-   * Tests that the importmap of a library may not be overridden.
+   * Builds the library discovery parser for the importmap_module fixture.
    *
-   * The importmap has a nested structure (imports, scopes and integrity) that
-   * does not fit the asset-to-asset override format of libraries-override.
+   * The active theme provides the given importmap override of the
+   * 'importmap' library.
    *
-   * @legacy-covers ::applyLibrariesOverride
+   * @param array $override
+   *   The importmap override of the 'importmap' library, as specified in
+   *   libraries-override.
+   *
+   * @return \Drupal\Tests\Core\Asset\TestLibraryDiscoveryParser
+   *   The library discovery parser.
    */
-  public function testImportMapOverride(): void {
+  protected function buildImportMapOverrideParser(array $override): TestLibraryDiscoveryParser {
     $mock_theme_path = 'mocked_themes/kittens';
     $this->themeManager = $this->createStub(ThemeManagerInterface::class);
     $this->activeTheme = $this->createMock(ActiveTheme::class);
@@ -542,11 +547,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn([
         $mock_theme_path => [
           'importmap_module/importmap' => [
-            'importmap' => [
-              'imports' => [
-                'importmap-test-foo' => 'js/override-foo.js',
-              ],
-            ],
+            'importmap' => $override,
           ],
         ],
       ]);
@@ -562,16 +563,179 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
     $this->componentPluginManager = $this->createStub(ComponentPluginManager::class);
 
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
-
+    $parser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager, $this->yamlCacheCollector);
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
       ->with('importmap_module')
       ->willReturn(TRUE);
+    return $parser;
+  }
 
+  /**
+   * Tests that the importmap of a library can be overridden.
+   *
+   * The override uses the same structure as the importmap definition. The
+   * sources are resolved relative to the theme. Entries that do not exist in
+   * the library definition are ignored, except that integrity entries may be
+   * added.
+   *
+   * @legacy-covers ::applyImportMapOverride
+   */
+  public function testImportMapOverride(): void {
+    $parser = $this->buildImportMapOverrideParser([
+      'imports' => [
+        // Replaced with a theme-relative source.
+        'importmap-test-foo' => 'js/override-foo.js',
+        // Replaced with an absolute path.
+        'importmap-test-absolute' => '/core/misc/other.js',
+        // Removed.
+        'importmap-test-external' => FALSE,
+        // Does not exist in the library definition: ignored.
+        'importmap-test-unknown' => 'js/unknown.js',
+      ],
+      'scopes' => [
+        'js/v1' => [
+          'importmap-test-foo' => 'js/override-foo-v1.js',
+        ],
+        // Does not exist in the library definition: ignored.
+        'js/unknown-scope' => [
+          'importmap-test-foo' => 'js/unknown.js',
+        ],
+      ],
+      'integrity' => [
+        // Replaced.
+        'js/foo.js' => 'sha384-override',
+        // Added, for the replacement source.
+        '/mocked_themes/kittens/js/override-foo.js' => 'sha384-added',
+      ],
+    ]);
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+
+    $libraries = $parser->buildByExtension('importmap_module');
+    $library = $libraries['importmap'];
+    $this->assertEquals([
+      'imports' => [
+        'importmap-test-foo' => [
+          'data' => 'mocked_themes/kittens/js/override-foo.js',
+          'external' => FALSE,
+          'version' => '2.0',
+        ],
+        'importmap-test-absolute' => [
+          'data' => 'core/misc/other.js',
+          'external' => FALSE,
+          'version' => '2.0',
+        ],
+        'importmap-test-libraries' => [
+          'data' => 'libraries/llama/lib.mjs',
+          'external' => FALSE,
+          'version' => '2.0',
+        ],
+        'importmap-test-protocol-free' => [
+          'data' => '//example.com/importmap-test-foo.js',
+          'external' => TRUE,
+          'version' => '2.0',
+        ],
+        'importmap-test-prefix/' => [
+          'data' => $path . '/js/prefix/',
+          'external' => FALSE,
+          'version' => '2.0',
+        ],
+        'importmap-test-root' => [
+          'data' => '',
+          'external' => FALSE,
+          'version' => '2.0',
+        ],
+      ],
+      'scopes' => [
+        $path . '/js/v1' => [
+          'importmap-test-foo' => [
+            'data' => 'mocked_themes/kittens/js/override-foo-v1.js',
+            'external' => FALSE,
+            'version' => '2.0',
+          ],
+        ],
+        'absolute-scope' => [
+          'importmap-test-foo' => [
+            'data' => $path . '/js/foo-v2.js',
+            'external' => FALSE,
+            'version' => '2.0',
+          ],
+        ],
+      ],
+      'integrity' => [
+        $path . '/js/foo.js' => [
+          'data' => $path . '/js/foo.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'integrity' => 'sha384-override',
+        ],
+        'core/misc/align-right.js' => [
+          'data' => 'core/misc/align-right.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'integrity' => 'sha384-other',
+        ],
+        'mocked_themes/kittens/js/override-foo.js' => [
+          'data' => 'mocked_themes/kittens/js/override-foo.js',
+          'external' => FALSE,
+          'version' => '2.0',
+          'integrity' => 'sha384-added',
+        ],
+      ],
+    ], $library['importmap']);
+  }
+
+  /**
+   * Tests that an importmap override with an unknown key is rejected.
+   *
+   * The asset-to-asset override format of the other asset types is not
+   * accepted for the importmap.
+   *
+   * @legacy-covers ::applyImportMapOverride
+   */
+  public function testImportMapOverrideUnknownKey(): void {
+    $parser = $this->buildImportMapOverrideParser([
+      'js/foo.js' => 'js/bar.js',
+    ]);
     $this->expectException(InvalidLibrariesOverrideSpecificationException::class);
-    $this->expectExceptionMessage("The importmap of the library importmap_module/importmap may not be overridden in libraries-override. Use hook_library_info_alter() instead.");
-    $this->libraryDiscoveryParser->buildByExtension('importmap_module');
+    $this->expectExceptionMessage("Unknown key 'js/foo.js' in the importmap override of the library importmap_module/importmap. Only the keys 'imports', 'scopes' and 'integrity' are allowed.");
+    $parser->buildByExtension('importmap_module');
+  }
+
+  /**
+   * Tests that an importmap override with an invalid source is rejected.
+   *
+   * @legacy-covers ::applyImportMapOverride
+   */
+  public function testImportMapOverrideInvalidSource(): void {
+    $parser = $this->buildImportMapOverrideParser([
+      'imports' => [
+        'importmap-test-foo' => 123,
+      ],
+    ]);
+    $this->expectException(InvalidLibrariesOverrideSpecificationException::class);
+    $this->expectExceptionMessage("The source of the module specifier 'importmap-test-foo' in the importmap override of the library importmap_module/importmap must be a string, or FALSE to remove the entry.");
+    $parser->buildByExtension('importmap_module');
+  }
+
+  /**
+   * Tests an importmap override with an invalid integrity value.
+   *
+   * An importmap override is rejected when the integrity metadata is not a
+   * non-empty string or FALSE.
+   *
+   * @legacy-covers ::applyImportMapOverride
+   */
+  public function testImportMapOverrideInvalidIntegrity(): void {
+    $parser = $this->buildImportMapOverrideParser([
+      'integrity' => [
+        'js/foo.js' => '',
+      ],
+    ]);
+    $this->expectException(InvalidLibrariesOverrideSpecificationException::class);
+    $this->expectExceptionMessage("The integrity metadata for 'js/foo.js' in the importmap override of the library importmap_module/importmap must be a non-empty string, or FALSE to remove the entry.");
+    $parser->buildByExtension('importmap_module');
   }
 
   /**
