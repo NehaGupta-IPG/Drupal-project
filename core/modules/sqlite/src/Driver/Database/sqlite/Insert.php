@@ -2,6 +2,7 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
+use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Query\Insert as QueryInsert;
 
 /**
@@ -50,7 +51,9 @@ class Insert extends QueryInsert {
           $transaction = $this->connection->startTransaction();
         }
         catch (\PDOException $e) {
-          $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $insert_values, $this->queryOptions);
+          // $this->connection->exceptionHandler()->handleExecutionException()
+          // requires a $statement argument, so we cannot use that.
+          throw new DatabaseExceptionWrapper($e->getMessage(), 0, $e);
         }
         foreach ($this->insertValues as $insert_values) {
           try {
