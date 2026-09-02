@@ -140,7 +140,6 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       ],
       'auto_create' => FALSE,
       'auto_create_bundle' => NULL,
-      'include_unpublished_entities' => FALSE,
     ] + parent::defaultConfiguration();
   }
 
@@ -306,13 +305,6 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
         '#weight' => -1,
       ];
     }
-
-    $form['include_unpublished_entities'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Include unpublished entities the user has access to view'),
-      '#default_value' => $configuration['include_unpublished_entities'],
-      '#weight' => 0,
-    ];
 
     return $form;
   }

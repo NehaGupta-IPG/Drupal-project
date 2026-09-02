@@ -1060,9 +1060,6 @@ entity_reference_selection.default:
     auto_create_bundle:
       type: string
       label: 'Bundle assigned to the auto-created entities.'
-    include_unpublished_entities:
-      type: boolean
-      label: 'Unpublished entities should be included in autocomplete results or not.'
 
 # Schema for all entity reference 'default:*' selection handlers that are not
 # providing a specific schema.

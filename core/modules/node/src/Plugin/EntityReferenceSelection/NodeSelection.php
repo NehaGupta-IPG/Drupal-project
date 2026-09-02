@@ -4,6 +4,7 @@ namespace Drupal\node\Plugin\EntityReferenceSelection;
 
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\node\NodeInterface;
 
@@ -18,6 +19,35 @@ use Drupal\node\NodeInterface;
   weight: 1
 )]
 class NodeSelection extends DefaultSelection {
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Move this to DefaultSelection in https://www.drupal.org/node/3110677
+   *   so that every entity type implementing EntityPublishedInterface can
+   *   reference its unpublished entities.
+   */
+  public function defaultConfiguration() {
+    return [
+      'include_unpublished_entities' => FALSE,
+    ] + parent::defaultConfiguration();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
+    $form['include_unpublished_entities'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Include unpublished nodes the user has access to view'),
+      '#description' => $this->t('Unpublished nodes are only matched for users who are allowed to view them.'),
+      '#default_value' => $this->getConfiguration()['include_unpublished_entities'],
+      '#weight' => 0,
+    ];
+
+    return $form;
+  }
 
   /**
    * {@inheritdoc}
