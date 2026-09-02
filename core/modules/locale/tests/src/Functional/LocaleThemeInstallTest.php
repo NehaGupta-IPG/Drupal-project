@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\Traits\Core\Locale\InstallerLanguageTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('locale')]
 #[RunTestsInSeparateProcesses]
 class LocaleThemeInstallTest extends BrowserTestBase {
+  use InstallerLanguageTrait;
 
   /**
    * {@inheritdoc}
@@ -34,19 +36,8 @@ class LocaleThemeInstallTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installParameters(): array {
-    $parameters = parent::installParameters();
-    $parameters['parameters']['langcode'] = 'de';
-    // Create a po file so we don't attempt to download one from
-    // localize.drupal.org and to have a test translation that will not change.
-    \Drupal::service('file_system')->mkdir($this->publicFilesDirectory . '/translations', NULL, TRUE);
-    $contents = <<<PO
-msgid ""
-msgstr ""
-
-PO;
-    file_put_contents($this->publicFilesDirectory . '/translations/drupal-' . \Drupal::VERSION . '.de.po', $contents);
-    return $parameters;
+  protected function getInstallLangcode(): string {
+    return 'de';
   }
 
   /**
