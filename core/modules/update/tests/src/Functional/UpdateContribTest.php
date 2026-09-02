@@ -235,7 +235,7 @@ class UpdateContribTest extends UpdateTestBase {
       'update_test_subtheme' => '1_0',
       'update_test_base_theme' => '1_1-sec',
     ];
-    $this->refreshUpdateStatus($xml_mapping);
+    $this->refreshUpdateStatus($xml_mapping, 'update-test', TRUE);
     $this->assertSession()->pageTextContains('Security update required!');
     $this->updateProject = 'update_test_base_theme';
     $this->assertVersionUpdateLinks('Security update', '8.x-1.1');
