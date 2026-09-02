@@ -33,40 +33,20 @@ final class LanguageDefaultLangcodeChangeEvent extends Event {
    *   The new default langcode.
    */
   public function __construct(
-    private readonly string $oldLangcode,
-    private readonly string $newLangcode,
+    public readonly string $oldLangcode,
+    public readonly string $newLangcode,
   ) {}
-
-  /**
-   * Gets the previous default langcode.
-   *
-   * @return string
-   *   The old langcode.
-   */
-  public function getOldLangcode(): string {
-    return $this->oldLangcode;
-  }
-
-  /**
-   * Gets the new default langcode.
-   *
-   * @return string
-   *   The new langcode.
-   */
-  public function getNewLangcode(): string {
-    return $this->newLangcode;
-  }
 
   /**
    * Adds a batch operation to run as part of the same batch.
    *
-   * @param callable|array $callback
-   *   The batch operation callback, in the shape Batch API expects.
+   * @param callable $callback
+   *   The batch operation callback.
    * @param array $arguments
    *   Arguments to pass to the callback, before the $context argument
    *   Batch API appends automatically.
    */
-  public function addOperation(callable|array $callback, array $arguments = []): void {
+  public function addOperation(callable $callback, array $arguments = []): void {
     $this->operations[] = [$callback, $arguments];
   }
 
