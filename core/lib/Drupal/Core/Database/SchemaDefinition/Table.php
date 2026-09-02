@@ -62,7 +62,6 @@ final class Table implements SchemaDefinitionInterface {
    * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
    */
   private function validate(): void {
-
     if ($this->columns && !Inspector::assertAllObjects($this->columns, Column::class)) {
       throw new SchemaDefinitionException("All members of the 'columns' argument of the '{$this->name}' Table must be Column objects");
     }
@@ -75,7 +74,7 @@ final class Table implements SchemaDefinitionInterface {
     if ($this->foreignKeys && !Inspector::assertAllObjects($this->foreignKeys, ForeignKey::class)) {
       throw new SchemaDefinitionException("All members of the 'foreignKeys' argument of the '{$this->name}' Table must be ForeignKey objects");
     }
-
+    // @todo add validation that key columns are defined in the table columns.
   }
 
   /**
