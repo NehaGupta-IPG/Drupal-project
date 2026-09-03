@@ -36,7 +36,6 @@ global-styling:
       css/components/fieldset.css: {}
       css/components/form.css: {}
       css/components/form--checkbox-radio.css: {}
-      css/components/form--checkbox-toggle.css: {}
       css/components/form--field-multiple.css: {}
       css/components/form--managed-file.css: {}
       css/components/form--text.css: {}
