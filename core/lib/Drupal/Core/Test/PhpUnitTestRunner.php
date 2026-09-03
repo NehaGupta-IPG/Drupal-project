@@ -81,6 +81,9 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    *
    * @return \Symfony\Component\Process\Process
    *   The spawned process object.
+   *
+   * @throws \InvalidArgumentException
+   *   If the class is not defined in a file.
    */
   public function startPhpUnitOnSingleTestClass(
     TestRun $test_run,
@@ -89,6 +92,11 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     bool $suppressDeprecations,
   ): Process {
     $testFileName = (new \ReflectionClass($test_class))->getFileName();
+    // An internal class has no file. Without this check the FALSE would reach
+    // ::startPhpUnitOnSingleTestFile() as an empty string.
+    if ($testFileName === FALSE) {
+      throw new \InvalidArgumentException("Test class '{$test_class}' is not defined in a file.");
+    }
     return $this->startPhpUnitOnSingleTestFile($test_run, $testFileName, $colors, $suppressDeprecations);
   }
 
@@ -108,6 +116,9 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    *
    * @return \Symfony\Component\Process\Process
    *   The spawned process object.
+   *
+   * @throws \InvalidArgumentException
+   *   If the argument is not the name of an existing file.
    */
   public function startPhpUnitOnSingleTestFile(
     TestRun $test_run,
@@ -115,6 +126,11 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     bool $colors,
     bool $suppressDeprecations,
   ): Process {
+    // PHPUnit accepts a directory as well, but it would then run every test
+    // it contains, and report all of them under this single test run id.
+    if (!is_file($testFileName)) {
+      throw new \InvalidArgumentException("'{$testFileName}' is not a file containing tests.");
+    }
     $command = $this->prepareCommand($test_run, $testFileName, $colors, $suppressDeprecations);
     $test_run->start(microtime(TRUE));
     $process = new Process($command['cli_command'], $command['work_dir'], $command['environment_vars']);

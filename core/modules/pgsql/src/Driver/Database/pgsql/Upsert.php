@@ -27,21 +27,28 @@ class Upsert extends QueryUpsert {
     $max_placeholder = 0;
     $blobs = [];
     $blob_count = 0;
+    // The values are bound on the client statement, which does not report them
+    // back once execution fails. They are collected here so that the exception
+    // handler can carry them, like the drivers that pass an argument array to
+    // \Drupal\Core\Database\StatementInterface::execute() do.
+    $placeholders = [];
     foreach ($this->insertValues as $insert_values) {
       $insert_values = array_values($insert_values);
       foreach ($this->insertFields as $idx => $field) {
+        $placeholder = ':db_insert_placeholder_' . $max_placeholder++;
+        $placeholders[$placeholder] = $insert_values[$idx];
         if (isset($table_information->blob_fields[$field]) && $insert_values[$idx] !== NULL) {
           $blobs[$blob_count] = fopen('php://memory', 'a');
           fwrite($blobs[$blob_count], $insert_values[$idx]);
           rewind($blobs[$blob_count]);
 
-          $stmt->getClientStatement()->bindParam(':db_insert_placeholder_' . $max_placeholder++, $blobs[$blob_count], \PDO::PARAM_LOB);
+          $stmt->getClientStatement()->bindParam($placeholder, $blobs[$blob_count], \PDO::PARAM_LOB);
 
           // Pre-increment is faster in PHP than increment.
           ++$blob_count;
         }
         else {
-          $stmt->getClientStatement()->bindParam(':db_insert_placeholder_' . $max_placeholder++, $insert_values[$idx]);
+          $stmt->getClientStatement()->bindParam($placeholder, $insert_values[$idx]);
         }
       }
       // Check if values for a serial field has been passed.
@@ -72,6 +79,7 @@ class Upsert extends QueryUpsert {
         // bindParam(), all placeholders would share the loop variable and
         // read its final value when the statement executes.
         $stmt->getClientStatement()->bindValue($argument, $value);
+        $placeholders[$argument] = $value;
       }
     }
 
@@ -101,7 +109,7 @@ class Upsert extends QueryUpsert {
       if (isset($savepoint)) {
         $savepoint->rollback();
       }
-      $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, [], $options);
+      $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $placeholders, $options);
     }
   }
 
