@@ -162,6 +162,17 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($xss_payload);
     $this->assertSession()->responseMatches('/SQL statement.*INSERT.*INTO.*error_test/s');
 
+    // A database exception thrown by Drupal instead of by a driver carries no
+    // statement to dump. It still has to be reported, with no dump and no
+    // dangling placeholder below it.
+    $this->drupalGet('error-test/trigger-database-exception-without-info');
+    $this->assertSession()->statusCodeEquals(500);
+    $this->assertSession()->pageTextContains('SchemaObjectExistsException');
+    $this->assertSession()->pageTextContains('already exists');
+    $this->assertSession()->responseContains('in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;triggerDatabaseExceptionWithoutInfo()</em> (line');
+    $this->assertSession()->responseNotContains('SQL statement');
+    $this->assertSession()->responseNotContains('@sql_dump');
+
     $this->drupalGet('error-test/trigger-renderer-exception');
     $this->assertSession()->statusCodeEquals(500);
     $this->assertSession()->responseMatches($error_renderer_exception);

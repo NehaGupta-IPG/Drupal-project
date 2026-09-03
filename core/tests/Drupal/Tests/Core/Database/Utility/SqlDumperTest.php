@@ -9,6 +9,7 @@ use Drupal\Core\Database\Utility\SqlDumper;
 use Drupal\Tests\Core\Database\Utility\Stub\StubUnformattedSqlDumper;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -70,6 +71,54 @@ class SqlDumperTest extends UnitTestCase {
 
     $this->assertStringContainsString(self::XSS_PAYLOAD, $dump);
     $this->assertStringNotContainsString('&lt;script&gt;', $dump);
+  }
+
+  /**
+   * Tests that a statement the formatter misreads is reported as executed.
+   *
+   * The formatter reads a backslash inside a single quoted string as an escape
+   * character, which is MySQL behaviour rather than SQL standard. The SQLite
+   * driver ends a LIKE condition with ESCAPE '\\', taken literally, so the
+   * formatter loses track of the string and warns about parentheses the
+   * statement does close.
+   *
+   * @param string $escape
+   *   The escape literal the driver appends to a LIKE condition.
+   * @param bool $reformatted
+   *   Whether the statement is expected to be reformatted.
+   */
+  #[DataProvider('providerLikeEscapeLiteral')]
+  public function testStatementTheFormatterMisreads(string $escape, bool $reformatted): void {
+    $sql = 'SELECT "t"."id" FROM "test" "t" WHERE ("t"."name" LIKE :db_condition_placeholder_0 ESCAPE '
+      . $escape . ') AND ("t"."age" > :db_condition_placeholder_1) ORDER BY "t"."age" DESC';
+    $info = new SqlExecutionInfo($sql, [':db_condition_placeholder_0' => '%a%']);
+
+    $dump = (new SqlDumper())->export($info, FALSE, FALSE);
+
+    // Whichever way the statement is rendered, all of it is reported and the
+    // formatter does not claim it is malformed.
+    $this->assertStringContainsString(
+      preg_replace('/\s+/', '', $sql),
+      preg_replace('/\s+/', '', $dump),
+    );
+    $this->assertStringNotContainsString('WARNING', $dump);
+    // A statement the formatter reproduces is reformatted; the other one is
+    // reported as it stands, since reformatting is only cosmetic.
+    $this->assertSame($reformatted, str_contains($dump, "\n  AND ("));
+  }
+
+  /**
+   * Provides test cases for ::testStatementTheFormatterMisreads().
+   */
+  public static function providerLikeEscapeLiteral(): array {
+    return [
+      // \Drupal\Core\Database\Query\Condition::$conditionOperatorMap, for a
+      // database that reads a backslash in a string as an escape character.
+      'two backslashes' => ["'\\\\'", TRUE],
+      // \Drupal\sqlite\Driver\Database\sqlite\Connection::$sqlOperators,
+      // for one that takes it literally.
+      'one backslash' => ["'\\'", FALSE],
+    ];
   }
 
   /**

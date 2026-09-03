@@ -41,6 +41,13 @@ error_test.trigger_escaped_database_exception:
   requirements:
     _access: 'TRUE'
 
+error_test.trigger_database_exception_without_info:
+  path: '/error-test/trigger-database-exception-without-info'
+  defaults:
+    _controller: '\Drupal\error_test\Controller\ErrorTestController::triggerDatabaseExceptionWithoutInfo'
+  requirements:
+    _access: 'TRUE'
+
 error_test.trigger_renderer_exception:
   path: '/error-test/trigger-renderer-exception'
   defaults:

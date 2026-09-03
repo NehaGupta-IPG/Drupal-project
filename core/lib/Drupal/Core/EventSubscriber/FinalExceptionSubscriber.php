@@ -7,7 +7,7 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Database\DatabaseExceptionBase;
+use Drupal\Core\Database\SqlExecutionInfo;
 use Drupal\Core\Database\Utility\SqlDumper;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -106,14 +106,16 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
       // safe markup, but the exception message is not: they are kept in
       // separate placeholders so that the message is still escaped.
       $sql_dump_placeholder = '';
-      if ($exception instanceof DatabaseExceptionBase && $exception->info !== NULL) {
-        $dump = (new SqlDumper())->export($exception->info);
+      $sql_info = SqlExecutionInfo::fromThrowable($exception);
+      if ($sql_info !== NULL) {
+        $dump = (new SqlDumper())->export($sql_info);
         if ($dump !== '') {
           $error['@sql_dump'] = Markup::create($dump);
           $sql_dump_placeholder = '@sql_dump';
           // The message carries the same statement in compact form, which the
-          // dump renders in full right below it.
-          $error['@message'] = $exception->info->stripFromMessage($error['@message']);
+          // dump renders in full right below it. A wrapper that copied the
+          // message of the database exception carries the same suffix.
+          $error['@message'] = $sql_info->stripFromMessage($error['@message']);
         }
       }
 

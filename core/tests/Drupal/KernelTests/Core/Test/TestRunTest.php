@@ -339,6 +339,28 @@ class TestRunTest extends KernelTestBase {
   }
 
   /**
+   * Tests reporting a SQL exception wrapped by another exception.
+   *
+   * The wrapper is not a database exception, so its statement is only found by
+   * walking the chain of previous throwables.
+   *
+   * @see \Drupal\Tests\DrupalTestCaseTrait::transformException()
+   */
+  public function testSqlStatementExceptionDumpWhenWrapped(): void {
+    $process = $this->runTestFixture('SqlExceptionWrappedDumpTest.php');
+    $output = $process->getOutput();
+    $message = $output . $process->getErrorOutput();
+    $this->assertStringContainsString('EntityStorageException', $output, $message);
+    $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*FROM.*bananas_are_awesome.*WHERE.*palm_height/s', $output, $message);
+    $this->assertMatchesRegularExpression('/Placeholders.*:db_condition_placeholder_0.*180/s', $output, $message);
+    // The wrapper copied the message, and PHPUnit reports the wrapped
+    // exception below the failure as well, so the compact statement must not
+    // be repeated anywhere: the dump renders it in full.
+    $this->assertStringNotContainsString(':db_condition_placeholder_0=180', $output, $message);
+    $this->assertNotSame(0, $process->getExitCode(), $message);
+  }
+
+  /**
    * Tests that dumping the execution information keeps the failure location.
    *
    * The dump is appended to the message of the throwable that PHPUnit reports,

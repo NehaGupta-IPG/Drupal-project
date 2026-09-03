@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Database;
 
+use Drupal\Core\Database\ConnectionNotDefinedException;
+use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SqlExecutionInfo;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -88,6 +92,77 @@ class SqlExecutionInfoTest extends UnitTestCase {
     // The options are only exposed by the verbose dump.
     $this->assertStringNotContainsString('assoc', $appended);
     $this->assertSame($message, $info->stripFromMessage($appended));
+  }
+
+  /**
+   * Tests finding the execution information in a chain of throwables.
+   *
+   * @param bool $expected
+   *   Whether the chain is expected to yield the information.
+   * @param \Throwable $throwable
+   *   The head of the chain to inspect.
+   */
+  #[DataProvider('providerFromThrowable')]
+  public function testFromThrowable(bool $expected, \Throwable $throwable): void {
+    $info = SqlExecutionInfo::fromThrowable($throwable);
+
+    if (!$expected) {
+      $this->assertNull($info);
+      return;
+    }
+    $this->assertInstanceOf(SqlExecutionInfo::class, $info);
+    $this->assertSame('SELECT 1', $info->sqlString);
+  }
+
+  /**
+   * Provides test cases for ::testFromThrowable().
+   */
+  public static function providerFromThrowable(): array {
+    $info = new SqlExecutionInfo('SELECT 1');
+    $carrying = new DatabaseExceptionWrapper('Failed', 0, NULL, $info);
+
+    return [
+      'carried directly' => [TRUE, $carrying],
+      // This is how most query failures surface.
+      'wrapped by the entity storage' => [
+        TRUE,
+        new EntityStorageException($carrying->getMessage(), 0, $carrying),
+      ],
+      'wrapped twice' => [
+        TRUE,
+        new \RuntimeException('Outer', 0, new \LogicException('Middle', 0, $carrying)),
+      ],
+      // Not every database exception extends DatabaseExceptionBase, so the
+      // walk cannot stop at the first one it meets.
+      'behind a database exception without the property' => [
+        TRUE,
+        new ConnectionNotDefinedException('Not defined', 0, $carrying),
+      ],
+      // Thrown by Drupal rather than by a driver.
+      'database exception carrying nothing' => [
+        FALSE,
+        new SchemaObjectExistsException('Table exists'),
+      ],
+      'no database exception in the chain' => [
+        FALSE,
+        new \RuntimeException('Outer', 0, new \LogicException('Inner')),
+      ],
+      'nothing to walk' => [FALSE, new \RuntimeException('Alone')],
+    ];
+  }
+
+  /**
+   * Tests that the first information in the chain is the one returned.
+   *
+   * The outermost statement is the one the caller ran, so it is the one that
+   * says what failed.
+   */
+  public function testFromThrowableReturnsTheOutermostInformation(): void {
+    $inner = new DatabaseExceptionWrapper('Inner', 0, NULL, new SqlExecutionInfo('SELECT 2'));
+    $outer = new DatabaseExceptionWrapper('Outer', 0, $inner, new SqlExecutionInfo('SELECT 1'));
+
+    $this->assertSame('SELECT 1', SqlExecutionInfo::fromThrowable($outer)->sqlString);
+    $this->assertSame('SELECT 2', SqlExecutionInfo::fromThrowable($inner)->sqlString);
   }
 
   /**

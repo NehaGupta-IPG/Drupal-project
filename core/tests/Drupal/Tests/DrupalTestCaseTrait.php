@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
-use Drupal\Core\Database\DatabaseExceptionBase;
+use Drupal\Core\Database\SqlExecutionInfo;
 use Drupal\Core\Database\Utility\SqlDumper;
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\Extension\DeprecationBridge\Configuration as DeprecationHandlerConfiguration;
@@ -107,20 +107,35 @@ trait DrupalTestCaseTrait {
    *   A transformed throwable.
    */
   protected function transformException(\Throwable $t): \Throwable {
-    if ($t instanceof DatabaseExceptionBase && $t->info !== NULL) {
-      $infoDump = (new SqlDumper())->export($t->info, self::testRunnerUsesColors());
-      if ($infoDump !== '') {
-        // The dump is appended to the message of the throwable itself, instead
-        // of returning a new one. A new throwable would carry this method's own
-        // ::getFile(), ::getLine() and ::getTrace(), so PHPUnit would report
-        // the failure as happening here instead of in the code that executed
-        // the statement.
-        (function () use ($t, $infoDump): void {
-          // The message carries the same statement in compact form, which the
-          // dump renders in full right below it.
-          $this->message = $t->info->stripFromMessage($this->message) . "\n" . $infoDump;
-        })->call($t);
+    $info = SqlExecutionInfo::fromThrowable($t);
+    if ($info === NULL) {
+      return $t;
+    }
+    $infoDump = (new SqlDumper())->export($info, self::testRunnerUsesColors());
+    if ($infoDump === '') {
+      return $t;
+    }
+
+    // The dump is appended to the message of the throwable itself, instead of
+    // returning a new one. A new throwable would carry this method's own
+    // ::getFile(), ::getLine() and ::getTrace(), so PHPUnit would report the
+    // failure as happening here instead of in the code that executed the
+    // statement.
+    //
+    // The message carries the same statement in compact form, which the dump
+    // renders in full right below it. PHPUnit reports the chain of previous
+    // throwables below the failure too, and a wrapper normally copied the
+    // message of the exception it wraps, so the suffix is taken off wherever
+    // it occurs. Reflection is used rather than a closure bound to the
+    // throwable, because a throwable in the chain can be an internal class -
+    // the innermost one usually is a \PDOException - and a closure cannot be
+    // bound to the scope of an internal class.
+    for ($throwable = $t; $throwable !== NULL; $throwable = $throwable->getPrevious()) {
+      $message = $info->stripFromMessage($throwable->getMessage());
+      if ($throwable === $t) {
+        $message .= "\n" . $infoDump;
       }
+      (new \ReflectionProperty($throwable, 'message'))->setValue($throwable, $message);
     }
     return $t;
   }

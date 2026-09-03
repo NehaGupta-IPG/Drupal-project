@@ -8,6 +8,7 @@ use Drupal\autowire_test\TestInjection;
 use Drupal\console_test\Command\ConsoleDatabaseExceptionCommand;
 use Drupal\console_test\Command\ConsoleDatabaseExceptionConsoleMarkupCommand;
 use Drupal\console_test\Command\ConsoleDatabaseExceptionNoInfoCommand;
+use Drupal\console_test\Command\ConsoleDatabaseExceptionWrappedCommand;
 use Drupal\console_test\Command\ConsoleExampleCommand;
 use Drupal\console_test\Command\ConsoleExampleConfigureCommand;
 use Drupal\console_test\Command\ConsoleExamplePrivateCommand;
@@ -32,6 +33,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(ConsoleDatabaseExceptionCommand::class)]
 #[CoversClass(ConsoleDatabaseExceptionConsoleMarkupCommand::class)]
 #[CoversClass(ConsoleDatabaseExceptionNoInfoCommand::class)]
+#[CoversClass(ConsoleDatabaseExceptionWrappedCommand::class)]
 #[CoversClass(DrupalApplication::class)]
 class ConsoleTest extends KernelTestBase {
   use DrupalApplicationTesterTrait;
@@ -188,6 +190,37 @@ class ConsoleTest extends KernelTestBase {
     $this->assertEquals(Command::FAILURE, $code, $display);
     $this->assertStringContainsString("Unknown column 'palm_height'", $display);
     $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*bananas_are_awesome/s', $display);
+  }
+
+  /**
+   * Tests rendering an exception that wraps a database exception.
+   *
+   * The wrapper is not a database exception, so the statement is only found by
+   * walking the chain of previous throwables.
+   *
+   * @see \Drupal\Core\Command\DrupalApplication::doRenderThrowable()
+   */
+  public function testDatabaseExceptionWrappedRendering(): void {
+    $tester = $this->applicationTester();
+    $code = $tester->run(['command' => 'example:database-exception-wrapped']);
+    $display = $tester->getDisplay();
+
+    $this->assertEquals(Command::FAILURE, $code, $display);
+    $this->assertStringContainsString("Unknown column 'palm_height'", $display);
+    $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*bananas_are_awesome/s', $display);
+    $this->assertMatchesRegularExpression('/Placeholders.*:db_condition_placeholder_0.*180/s', $display);
+    // The wrapper copied the message, so the compact statement it carries is
+    // taken off the rendered exception, since the dump repeats it in full.
+    $this->assertStringNotContainsString(':db_condition_placeholder_0=180', $display);
+
+    // The renderer only names the class at higher verbosity. It is the wrapper
+    // that is reported, and the dump belongs to the exception behind it.
+    $tester = $this->applicationTester();
+    $tester->run(
+      ['command' => 'example:database-exception-wrapped'],
+      ['verbosity' => OutputInterface::VERBOSITY_VERBOSE],
+    );
+    $this->assertStringContainsString('EntityStorageException', $tester->getDisplay());
   }
 
   /**

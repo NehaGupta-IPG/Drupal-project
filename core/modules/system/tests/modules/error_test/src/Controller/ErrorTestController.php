@@ -124,6 +124,25 @@ class ErrorTestController extends ControllerBase {
   }
 
   /**
+   * Trigger a database exception that carries no statement information.
+   *
+   * Most of the database exceptions core throws itself, rather than raising
+   * from a driver, carry no \Drupal\Core\Database\SqlExecutionInfo. The error
+   * page has to report them all the same, with nothing dumped below them.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   */
+  public function triggerDatabaseExceptionWithoutInfo(): void {
+    define('SIMPLETEST_COLLECT_ERRORS', FALSE);
+    // The schema handler refuses this before it builds any statement.
+    $this->database->schema()->createTable('users', [
+      'fields' => [
+        'uid' => ['type' => 'int', 'not null' => TRUE],
+      ],
+    ]);
+  }
+
+  /**
    * Trigger an exception during rendering.
    */
   public function triggerRendererException() {

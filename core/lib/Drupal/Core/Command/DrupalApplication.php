@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Command;
 
 use Composer\Autoload\ClassLoader;
-use Drupal\Core\Database\DatabaseExceptionBase;
+use Drupal\Core\Database\SqlExecutionInfo;
 use Drupal\Core\Database\Utility\SqlDumper;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
@@ -166,9 +166,11 @@ class DrupalApplication extends Application {
    */
   protected function doRenderThrowable(\Throwable $t, OutputInterface $output): void {
     // Database exceptions may carry the information of the executed statement,
-    // that can be exported to a more readable dump.
-    $dump = $t instanceof DatabaseExceptionBase && $t->info !== NULL ?
-      (new SqlDumper())->export($t->info, $output->isDecorated()) :
+    // that can be exported to a more readable dump. The exception may also be
+    // wrapped by the layer that ran the query, so the whole chain is searched.
+    $info = SqlExecutionInfo::fromThrowable($t);
+    $dump = $info !== NULL ?
+      (new SqlDumper())->export($info, $output->isDecorated()) :
       '';
 
     if ($dump === '') {
@@ -177,18 +179,25 @@ class DrupalApplication extends Application {
     }
 
     // The message carries the same statement in compact form, which the dump
-    // renders in full right below it. Throwables are not cloneable and their
-    // message cannot be overridden, so the suffix is taken off for the
+    // renders in full right below it. The parent renders every throwable in
+    // the chain, and a wrapper normally copied the message of the exception it
+    // wraps, so the suffix is taken off wherever it occurs. Throwables are not
+    // cloneable and their message cannot be overridden, so this lasts for the
     // duration of the parent call only: callers may still log or rethrow the
     // throwable afterwards.
-    $message = $t->getMessage();
-    $messageProperty = new \ReflectionProperty($t, 'message');
-    $messageProperty->setValue($t, $t->info->stripFromMessage($message));
+    $originalMessages = [];
+    for ($throwable = $t; $throwable !== NULL; $throwable = $throwable->getPrevious()) {
+      $messageProperty = new \ReflectionProperty($throwable, 'message');
+      $originalMessages[] = [$messageProperty, $throwable, $throwable->getMessage()];
+      $messageProperty->setValue($throwable, $info->stripFromMessage($throwable->getMessage()));
+    }
     try {
       parent::doRenderThrowable($t, $output);
     }
     finally {
-      $messageProperty->setValue($t, $message);
+      foreach ($originalMessages as [$messageProperty, $throwable, $message]) {
+        $messageProperty->setValue($throwable, $message);
+      }
     }
 
     // The dump contains placeholder values, which may look like console

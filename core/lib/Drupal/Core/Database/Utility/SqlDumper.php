@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\Utility;
 
-use Doctrine\SqlFormatter\SqlFormatter;
 use Doctrine\SqlFormatter\CliHighlighter;
+use Doctrine\SqlFormatter\Highlighter;
 use Doctrine\SqlFormatter\HtmlHighlighter;
 use Doctrine\SqlFormatter\NullHighlighter;
+use Doctrine\SqlFormatter\SqlFormatter;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Database\SqlExecutionInfo;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -71,7 +72,7 @@ class SqlDumper {
 
     // Format the SQL statement string.
     $highlighter = $html ? new HtmlHighlighter() : ($color ? new CliHighlighter() : new NullHighlighter());
-    $formattedSql = (new SqlFormatter($highlighter))->format($info->sqlString);
+    $formattedSql = $this->formatSql($info->sqlString, $highlighter);
 
     $cloner = new VarCloner();
     $dumper = $html ? new HtmlDumper() : new CliDumper();
@@ -96,6 +97,60 @@ class SqlDumper {
       $html ? "" : "\n",
       !$html && $color,
     );
+  }
+
+  /**
+   * Renders an SQL statement, reformatting it when that stays faithful.
+   *
+   * @param string $sqlString
+   *   The SQL statement string, as it was executed.
+   * @param \Doctrine\SqlFormatter\Highlighter $highlighter
+   *   The highlighter to render the statement with.
+   *
+   * @return string
+   *   The statement, reformatted if the formatter reproduces it, and only
+   *   highlighted where it stands otherwise.
+   */
+  protected function formatSql(string $sqlString, Highlighter $highlighter): string {
+    $formatter = new SqlFormatter($highlighter);
+
+    // The formatter reads a backslash inside a single quoted string as an
+    // escape character. That is MySQL behaviour rather than SQL standard, and
+    // a database taking the backslash literally needs a LIKE condition to end
+    // in ESCAPE '\', which is what the SQLite driver emits. The formatter then
+    // takes the closing quote for an escaped one, swallows the rest of the
+    // statement into the string and reports parentheses as unclosed that the
+    // statement does close. Reformatting is cosmetic, while a warning about a
+    // statement that is in fact well formed is misleading, so a statement the
+    // formatter cannot reproduce is left as it was executed. Its keywords are
+    // still highlighted, and the string it read wrong is coloured as one.
+    //
+    // Only a statement containing a backslash can be affected, so the check is
+    // made for those alone.
+    //
+    // @see \Drupal\sqlite\Driver\Database\sqlite\Connection::$sqlOperators
+    // @see \Drupal\Core\Database\Query\Condition::$conditionOperatorMap
+    if (str_contains($sqlString, '\\') && !$this->isFormattedFaithfully($sqlString)) {
+      return $formatter->highlight($sqlString);
+    }
+
+    return $formatter->format($sqlString);
+  }
+
+  /**
+   * Checks that reformatting a statement changes nothing but its whitespace.
+   *
+   * @param string $sqlString
+   *   The SQL statement string, as it was executed.
+   *
+   * @return bool
+   *   TRUE if the formatter reproduces the statement, FALSE otherwise.
+   */
+  private function isFormattedFaithfully(string $sqlString): bool {
+    // The plain formatter is used, so that the comparison is not made against
+    // the markup of a highlighter.
+    $formatted = (new SqlFormatter(new NullHighlighter()))->format($sqlString);
+    return preg_replace('/\s+/', '', $formatted) === preg_replace('/\s+/', '', $sqlString);
   }
 
   /**
