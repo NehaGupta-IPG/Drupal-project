@@ -45,7 +45,7 @@ class DefaultLangcodeConfigUpdater {
   public function buildBatch(string $old_langcode, string $new_langcode): array {
     $event = new LanguageDefaultLangcodeChangeEvent($old_langcode, $new_langcode);
     $event->addOperation(static::class . ':reconcileConfigLangcodeOperation', [$old_langcode, $new_langcode]);
-    $this->eventDispatcher->dispatch($event, LanguageEvents::DEFAULT_LANGCODE_CHANGE);
+    $this->eventDispatcher->dispatch($event);
 
     return [
       'title' => new TranslatableMarkup('Updating configuration for the new default language'),
