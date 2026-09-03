@@ -12,8 +12,6 @@ use Drupal\Component\EventDispatcher\Event;
  * Subscribers add their own batch operations - for example, translating
  * relabelled configuration - to run as part of the same batch that
  * reconciles configuration langcode with the new default.
- *
- * @see \Drupal\language\LanguageEvents::DEFAULT_LANGCODE_CHANGE
  */
 final class LanguageDefaultLangcodeChangeEvent extends Event {
 

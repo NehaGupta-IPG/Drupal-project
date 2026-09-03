@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\locale\EventSubscriber;
 
 use Drupal\language\Event\LanguageDefaultLangcodeChangeEvent;
-use Drupal\language\LanguageEvents;
 use Drupal\locale\LocaleConfigManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -68,7 +67,7 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
    */
   public static function getSubscribedEvents(): array {
     return [
-      LanguageEvents::DEFAULT_LANGCODE_CHANGE => 'onDefaultLangcodeChange',
+      LanguageDefaultLangcodeChangeEvent::class => 'onDefaultLangcodeChange',
     ];
   }
 
