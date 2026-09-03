@@ -126,7 +126,7 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       try {
         $form_action = $view->getUrl()->toString();
       }
-      catch (InvalidParameterException $e) {
+      catch (InvalidParameterException) {
         $form_action = NULL;
       }
     }
