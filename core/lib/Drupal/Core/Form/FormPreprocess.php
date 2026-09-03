@@ -211,7 +211,8 @@ class FormPreprocess {
     elseif (!empty($element['#id']) && $variables['tag'] === 'label') {
       $variables['attributes']['for'] = $element['#id'];
     }
-    elseif ($variables['non_labelable'] && !empty($element['#id'])) {
+    // Provide an id so the wrapping div can reference it with aria-describedby.
+    elseif ($non_labelable && !empty($element['#id'])) {
       $variables['attributes']['id'] = $element['#id'] . '--label';
     }
 
