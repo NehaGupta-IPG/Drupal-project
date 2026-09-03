@@ -50,6 +50,10 @@ class UpdateCronHooks {
   public function cron(): void {
     $update_config = $this->configFactory->get('update.settings');
     $frequency = $update_config->get('check.interval_days');
+    if (empty($frequency)) {
+      // Automated checks are turned off.
+      return;
+    }
     $interval = 60 * 60 * 24 * $frequency;
     $last_check = $this->state->get('update.last_check', 0);
     $request_time = $this->time->getRequestTime();
