@@ -21,6 +21,46 @@ use PHPUnit\Framework\Attributes\Group;
 class ErrorTest extends UnitTestCase {
 
   /**
+   * The global database registry, as found before the test ran.
+   */
+  protected array $connectionInfo;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    // Error::decodeException() reads the driver namespace from the global
+    // database registry. Start from an empty registry, so that the tests below
+    // do not depend on what an earlier test class left in it:
+    // Database::addConnectionInfo() keeps the information already registered
+    // for a key instead of overwriting it.
+    $this->connectionInfo = Database::getAllConnectionInfo();
+    $this->removeAllConnectionInfo();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function tearDown(): void {
+    // Put back what was found, rather than leaving the registry emptied for
+    // whichever test class runs next.
+    $this->removeAllConnectionInfo();
+    Database::setMultipleConnectionInfo($this->connectionInfo);
+    parent::tearDown();
+  }
+
+  /**
+   * Empties the global database registry.
+   */
+  private function removeAllConnectionInfo(): void {
+    foreach (array_keys(Database::getAllConnectionInfo()) as $key) {
+      Database::removeConnection($key);
+    }
+  }
+
+  /**
    * Tests the getLastCaller() method.
    *
    * @param array $backtrace
@@ -126,9 +166,6 @@ class ErrorTest extends UnitTestCase {
    * then left untouched instead of failing inside the error handler.
    */
   public function testDecodeExceptionWithoutConnectionInfo(): void {
-    // Make sure no connection info is left over by another test.
-    Database::removeConnection('default');
-
     $exception = new ConnectionNotDefinedException('The specified database connection is not defined: default');
     $decoded = Error::decodeException($exception);
 
@@ -166,14 +203,6 @@ class ErrorTest extends UnitTestCase {
     $this->assertSame(\PDOException::class, $decoded['%type']);
     $this->assertSame(__FILE__, $decoded['%file']);
     $this->assertSame($line, $decoded['%line']);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function tearDown(): void {
-    Database::removeConnection('default');
-    parent::tearDown();
   }
 
   /**
