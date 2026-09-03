@@ -174,10 +174,10 @@ JS;
     $this->drupalGet(Url::fromRoute('big_pipe_test_ajax_form'));
     $this->assertNotNull($assert_session->waitForElement('css', 'script[data-big-pipe-event="stop"]'));
 
-    // The placeholder's final content is in the DOM…
+    // The placeholder's final content is in the DOM.
     $assert_session->elementTextContains('css', '#big-pipe-test-ajax-form-result', 'Not clicked yet.');
-    // …and #ajax actually bound to it: clicking triggers a real AJAX
-    // request whose response replaces the result container.
+    // #ajax actually bound to it: clicking triggers a real AJAX request
+    // whose response replaces the result container.
     $this->getSession()->getPage()->pressButton('Click me');
     $assert_session->waitForElementVisible('css', '#big-pipe-test-ajax-form-result');
     $assert_session->elementTextContains('css', '#big-pipe-test-ajax-form-result', 'Clicked!');

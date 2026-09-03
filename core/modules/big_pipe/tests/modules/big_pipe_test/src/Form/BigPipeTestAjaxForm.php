@@ -51,7 +51,7 @@ class BigPipeTestAjaxForm extends FormBase implements TrustedCallbackInterface {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * AJAX callback: replaces the result container with confirmation markup.
@@ -66,7 +66,7 @@ class BigPipeTestAjaxForm extends FormBase implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback: renders this form, wrapped as a placeholder.
+   * Lazy builder callback: renders this form, wrapped as a placeholder.
    *
    * @return array
    *   The form's render array.
