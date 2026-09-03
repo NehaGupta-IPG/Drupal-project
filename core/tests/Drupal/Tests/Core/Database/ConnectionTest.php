@@ -179,11 +179,6 @@ class ConnectionTest extends UnitTestCase {
         'Schema',
       ],
       [
-        'SearchQuery',
-        'Drupal\CoreFake\Driver\Database\CoreFake',
-        'SearchQuery',
-      ],
-      [
         'Drupal\Core\Database\Query\Select',
         'Drupal\CoreFake\Driver\Database\CoreFake',
         'Select',
@@ -251,11 +246,6 @@ class ConnectionTest extends UnitTestCase {
         'Schema',
       ],
       [
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\SearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        'SearchQuery',
-      ],
-      [
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses\Select',
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
         'Select',
@@ -304,16 +294,6 @@ class ConnectionTest extends UnitTestCase {
         '\Drupal\Core\Database\Query\TableSortExtender',
         'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
         '\Drupal\Core\Database\Query\TableSortExtender',
-      ],
-      [
-        'Drupal\search\SearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        'Drupal\search\SearchQuery',
-      ],
-      [
-        '\Drupal\search\SearchQuery',
-        'Drupal\core_fake\Driver\Database\CoreFakeWithAllCustomClasses',
-        '\Drupal\search\SearchQuery',
       ],
     ];
   }
@@ -661,6 +641,8 @@ class ConnectionTest extends UnitTestCase {
     Database::addConnectionInfo('default', 'default', [
       'driver' => 'test',
       'namespace' => 'Drupal\Tests\Core\Database\Stub',
+      'autoload' => __DIR__ . '/Stub/',
+      'database' => 'test',
     ]);
     $connection = new StubConnection($this->createStub(\PDO::class), []);
     $result = $connection->findCallerFromDebugBacktrace();
