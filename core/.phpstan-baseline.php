@@ -380,12 +380,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/includes/install.core.inc',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Function install_select_profile\\(\\) should return array\\|null but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 2,
-	'path' => __DIR__ . '/includes/install.core.inc',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function install_verify_completed_task\\(\\) should return string\\|null but return statement is missing\\.$#',
 	'identifier' => 'return.missing',
 	'count' => 1,
@@ -782,6 +776,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Component/Annotation/Reflection/MockFileFinder.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method DateTimeInterface\\:\\:setTime\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Component/Datetime/DateTimePlus.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method DateTimeInterface\\:\\:setTimezone\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Component/Datetime/DateTimePlus.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Component\\\\Datetime\\\\DateTimePlus\\:\\:getTimeZone\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -812,6 +818,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Component/Datetime/DateTimePlus.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Component\\\\Datetime\\\\DateTimePlus\\:\\:getPhpDateTime\\(\\) should return DateTime but returns DateTimeInterface\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Component/Datetime/DateTimePlus.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Component\\\\Datetime\\\\DateTimePlus\\:\\:setDefaultDateTime\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -834,6 +846,18 @@ $ignoreErrors[] = [
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Component\\\\Diff\\\\Engine\\\\DiffOp\\:\\:\\$orig \\(array\\<string\\>\\) does not accept false\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Component/Diff/Engine/DiffOpAdd.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Component\\\\Diff\\\\Engine\\\\DiffOp\\:\\:\\$closing \\(array\\<string\\>\\) does not accept false\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Component/Diff/Engine/DiffOpDelete.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\Engine\\\\HWLDFWordAccumulator\\:\\:_flushGroup\\(\\) has no return type specified\\.$#',
@@ -1712,12 +1736,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Access/CsrfRequestHeaderAccessCheck.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Access\\\\CsrfRequestHeaderAccessCheck\\:\\:applies\\(\\) should return bool but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Access/CsrfRequestHeaderAccessCheck.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Access\\\\RouteProcessorCsrf\\:\\:processOutbound\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -2120,6 +2138,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Asset/JsCollectionOptimizerLazy.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Offset \'edges\' does not exist on string\\.$#',
+	'identifier' => 'offsetAccess.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Asset/LibraryDependencyResolver.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Asset\\\\LibraryDiscoveryCollector\\:\\:reset\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -2236,12 +2260,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Batch\\\\BatchStorage\\:\\:load\\(\\) should return array but returns false\\.$#',
 	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Batch/BatchStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Batch\\\\BatchStorage\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Batch/BatchStorage.php',
 ];
@@ -3440,6 +3458,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Action/Plugin/ConfigAction/EntityClone.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\AutoloadingStorage\\:\\:createCollection\\(\\) should return \\$this\\(Drupal\\\\Core\\\\Config\\\\AutoloadingStorage\\) but returns static\\(Drupal\\\\Core\\\\Config\\\\AutoloadingStorage\\)\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/AutoloadingStorage.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\CachedStorage\\:\\:createCollection\\(\\) should return \\$this\\(Drupal\\\\Core\\\\Config\\\\CachedStorage\\) but returns static\\(Drupal\\\\Core\\\\Config\\\\CachedStorage\\)\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
@@ -3450,6 +3474,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/CachedStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Calling hash\\(\\) is forbidden, with \'md5\'\\|\'sha1\'\\|\'crc32\'\\|\'crc32b\' encryption algorithms\\. Use hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 2,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Checkpoint/CheckpointStorage.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Checkpoint\\\\CheckpointStorage\\:\\:createCollection\\(\\) should return \\$this\\(Drupal\\\\Core\\\\Config\\\\Checkpoint\\\\CheckpointStorage\\) but returns Drupal\\\\Core\\\\Config\\\\Checkpoint\\\\CheckpointStorage\\.$#',
@@ -4214,6 +4244,30 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/FileStorage.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^PHPDoc tag @param for parameter \\$yamlCacheCollector with type Drupal\\\\Core\\\\Config\\\\Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface\\|null is not subtype of native type Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface\\|null\\.$#',
+	'identifier' => 'parameter.phpDocType',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/FileStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^PHPDoc type for property Drupal\\\\Core\\\\Config\\\\FileStorage\\:\\:\\$yamlCacheCollector with type Drupal\\\\Core\\\\Config\\\\Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface\\|null is not subtype of native type Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface\\|null\\.$#',
+	'identifier' => 'property.phpDocType',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/FileStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\$yamlCacheCollector of method Drupal\\\\Core\\\\Config\\\\FileStorage\\:\\:__construct\\(\\) has invalid type Drupal\\\\Core\\\\Config\\\\Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface\\.$#',
+	'identifier' => 'class.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/FileStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Core\\\\Config\\\\FileStorage\\:\\:\\$yamlCacheCollector has unknown class Drupal\\\\Core\\\\Config\\\\Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface as its type\\.$#',
+	'identifier' => 'class.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/FileStorage.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\ImportStorageTransformer\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -4568,60 +4622,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Connection.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$statement might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Connection.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:addConnectionInfo\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:closeConnection\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:getConnectionInfo\\(\\) should return array\\|null but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:ignoreTarget\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:openConnection\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:parseConnectionInfo\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:setActiveConnection\\(\\) should return string\\|null but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Database\\:\\:setMultipleConnectionInfo\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Database.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Install\\\\Tasks\\:\\:checkEngineVersion\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -4704,24 +4704,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Delete.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Query\\\\Delete\\:\\:execute\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Delete.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Return type \\(int\\) of method Drupal\\\\Core\\\\Database\\\\Query\\\\Delete\\:\\:execute\\(\\) should be compatible with return type \\(Drupal\\\\Core\\\\Database\\\\StatementInterface\\|null\\) of method Drupal\\\\Core\\\\Database\\\\Query\\\\Query\\:\\:execute\\(\\)$#',
-	'identifier' => 'method.childReturnType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Delete.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Query\\\\Insert\\:\\:execute\\(\\) should return int\\|string\\|null but returns Drupal\\\\Core\\\\Database\\\\StatementInterface\\|null\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Insert.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Query\\\\Merge\\:\\:compile\\(\\) has no return type specified\\.$#',
@@ -4844,26 +4826,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Update.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Query\\\\Update\\:\\:execute\\(\\) should return int\\|null but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Update.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Query\\\\Upsert\\:\\:execute\\(\\) should return int but returns null\\.$#',
 	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Upsert.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Return type \\(int\\) of method Drupal\\\\Core\\\\Database\\\\Query\\\\Upsert\\:\\:execute\\(\\) should be compatible with return type \\(Drupal\\\\Core\\\\Database\\\\StatementInterface\\|null\\) of method Drupal\\\\Core\\\\Database\\\\Query\\\\Query\\:\\:execute\\(\\)$#',
-	'identifier' => 'method.childReturnType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Upsert.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$affected_rows might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Upsert.php',
 ];
@@ -5060,13 +5024,13 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/Entity/DateFormat.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\DefaultContent\\\\ContentExportCommand\\:\\:loadEntities\\(\\) should return iterable\\<Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\> but returns array\\<Drupal\\\\Core\\\\Entity\\\\EntityInterface\\>\\.$#',
+	'message' => '#^Method Drupal\\\\Core\\\\DefaultContent\\\\Command\\\\ContentExportCommand\\:\\:loadEntities\\(\\) should return iterable\\<Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\> but returns array\\<Drupal\\\\Core\\\\Entity\\\\EntityInterface\\>\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/DefaultContent/ContentExportCommand.php',
+	'path' => __DIR__ . '/lib/Drupal/Core/DefaultContent/Command/ContentExportCommand.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$storage of method Drupal\\\\Core\\\\DefaultContent\\\\ContentExportCommand\\:\\:loadEntities\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityStorageInterface, Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface given\\.$#',
+	'message' => '#^Parameter \\#1 \\$storage of method Drupal\\\\Core\\\\DefaultContent\\\\Command\\\\ContentExportCommand\\:\\:loadEntities\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityStorageInterface, Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/DefaultContent/Command/ContentExportCommand.php',
@@ -5168,58 +5132,46 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/DestructableInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Diff\\\\DiffFormatter\\:\\:_added\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Method Drupal\\\\Core\\\\Diff\\\\DiffFormatter\\:\\:_block_header\\(\\) should return string but returns array\\<int, array\\<string, \\(float\\|int\\)\\>\\>\\.$#',
+	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Diff/DiffFormatter.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Diff\\\\DiffFormatter\\:\\:_block_header\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Method Drupal\\\\Core\\\\Diff\\\\DiffFormatter\\:\\:_end_diff\\(\\) should return string but returns array\\.$#',
+	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Diff/DiffFormatter.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Diff\\\\DiffFormatter\\:\\:_changed\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Diff/DiffFormatter.php',
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface\\:\\:destruct\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 2,
+	'path' => __DIR__ . '/lib/Drupal/Core/Discovery/YamlCacheCollectorDiscovery.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Diff\\\\DiffFormatter\\:\\:_context\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^PHPDoc tag @param for parameter \\$yamlCacheCollector with type Drupal\\\\Core\\\\Discovery\\\\Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface is not subtype of native type Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface\\.$#',
+	'identifier' => 'parameter.phpDocType',
 	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Diff/DiffFormatter.php',
+	'path' => __DIR__ . '/lib/Drupal/Core/Discovery/YamlCacheCollectorDiscovery.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Diff\\\\DiffFormatter\\:\\:_deleted\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^PHPDoc type for property Drupal\\\\Core\\\\Discovery\\\\YamlCacheCollectorDiscovery\\:\\:\\$yamlCacheCollector with type Drupal\\\\Core\\\\Discovery\\\\Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface is not subtype of native type Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface\\.$#',
+	'identifier' => 'property.phpDocType',
 	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Diff/DiffFormatter.php',
+	'path' => __DIR__ . '/lib/Drupal/Core/Discovery/YamlCacheCollectorDiscovery.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Diff\\\\DiffFormatter\\:\\:_end_diff\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Parameter \\$yamlCacheCollector of method Drupal\\\\Core\\\\Discovery\\\\YamlCacheCollectorDiscovery\\:\\:__construct\\(\\) has invalid type Drupal\\\\Core\\\\Discovery\\\\Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface\\.$#',
+	'identifier' => 'class.notFound',
 	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Diff/DiffFormatter.php',
+	'path' => __DIR__ . '/lib/Drupal/Core/Discovery/YamlCacheCollectorDiscovery.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Diff\\\\DiffFormatter\\:\\:_lines\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Property Drupal\\\\Core\\\\Discovery\\\\YamlCacheCollectorDiscovery\\:\\:\\$yamlCacheCollector has unknown class Drupal\\\\Core\\\\Discovery\\\\Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface as its type\\.$#',
+	'identifier' => 'class.notFound',
 	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Diff\\\\DiffFormatter\\:\\:_start_block\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Diff\\\\DiffFormatter\\:\\:_start_diff\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Diff/DiffFormatter.php',
+	'path' => __DIR__ . '/lib/Drupal/Core/Discovery/YamlCacheCollectorDiscovery.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\Core\\\\Display\\\\Annotation\\\\DisplayVariant\\:\\:\\$admin_label \\(Drupal\\\\Core\\\\Annotation\\\\Translation\\) does not accept default value of type string\\.$#',
@@ -5272,6 +5224,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\:\\:reset\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Calling crc32\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
 ];
@@ -6000,6 +5958,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/ContentEntityType.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\ContentUninstallValidator\\:\\:validate\\(\\) should return array\\<string\\> but returns list\\<Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup\\>\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Entity/ContentUninstallValidator.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\Controller\\\\EntityController\\:\\:create\\(\\) has no return type specified\\.$#',
@@ -7496,6 +7460,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Query/Sql/Condition.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\Query\\\\ConditionInterface\\:\\:\\$tableIndexPrefix\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Query/Sql/Condition.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface\\:\\:getConnection\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -7574,9 +7544,15 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Query/Sql/Query.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Entity\\\\Query\\\\Sql\\\\Query\\:\\:\\$tables \\(Drupal\\\\Core\\\\Entity\\\\Query\\\\Sql\\\\TablesInterface\\) does not accept null\\.$#',
+	'message' => '#^Property Drupal\\\\Core\\\\Entity\\\\Query\\\\Sql\\\\Query\\:\\:\\$sqlQuery \\(Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface\\) does not accept null\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Query/Sql/Query.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Core\\\\Entity\\\\Query\\\\Sql\\\\Query\\:\\:\\$tables \\(Drupal\\\\Core\\\\Entity\\\\Query\\\\Sql\\\\TablesInterface\\) does not accept null\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 2,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Query/Sql/Query.php',
 ];
 $ignoreErrors[] = [
@@ -7780,13 +7756,13 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\Sql\\\\TableMappingInterface\\:\\:getDedicatedDataTableName\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 9,
+	'count' => 11,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\Sql\\\\TableMappingInterface\\:\\:getDedicatedRevisionTableName\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 9,
+	'count' => 11,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
 ];
 $ignoreErrors[] = [
@@ -9088,30 +9064,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Extension\\\\ModuleInstaller\\:\\:updateKernel\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleInstaller.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @param for parameter \\$logger with type Psr\\\\Log\\\\LoggerInterface\\|null is not subtype of native type Psr\\\\Log\\\\LoggerInterface\\.$#',
-	'identifier' => 'parameter.phpDocType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleInstaller.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @param for parameter \\$uninstallValidators with type Traversable\\|null is not subtype of native type Traversable\\.$#',
-	'identifier' => 'parameter.phpDocType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleInstaller.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc type for property Drupal\\\\Core\\\\Extension\\\\ModuleInstaller\\:\\:\\$logger with type Psr\\\\Log\\\\LoggerInterface\\|null is not subtype of native type Psr\\\\Log\\\\LoggerInterface\\.$#',
-	'identifier' => 'property.phpDocType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleInstaller.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc type for property Drupal\\\\Core\\\\Extension\\\\ModuleInstaller\\:\\:\\$uninstallValidators with type Traversable\\|null is not subtype of native type Traversable\\.$#',
-	'identifier' => 'property.phpDocType',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Extension/ModuleInstaller.php',
 ];
@@ -10922,12 +10874,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Installer/Form/SelectLanguageForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Installer\\\\Form\\\\SelectProfileForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Installer/Form/SelectProfileForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\user\\\\UserInterface\\:\\:\\$init\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
@@ -11594,12 +11540,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/ContextualLinkManager.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Plugin\\\\DefaultPluginManager\\:\\:\\$definitions \\(array\\) does not accept null\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Menu/ContextualLinkManager.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\DefaultMenuLinkTreeManipulators\\:\\:collectNodeLinks\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -11644,12 +11584,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\LocalActionManager\\:\\:clearCachedDefinitions\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Menu/LocalActionManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Plugin\\\\DefaultPluginManager\\:\\:\\$definitions \\(array\\) does not accept null\\.$#',
-	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/LocalActionManager.php',
 ];
@@ -12032,6 +11966,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Password/PhpPassword.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Password/PhpassHashedPasswordBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Password\\\\PhpassHashedPasswordBase\\:\\:crypt\\(\\) should return string but returns false\\.$#',
 	'identifier' => 'return.type',
 	'count' => 4,
@@ -12248,12 +12188,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/DefaultPluginManager.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Plugin\\\\DefaultPluginManager\\:\\:\\$definitions \\(array\\) does not accept null\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/DefaultPluginManager.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Plugin\\\\DefaultSingleLazyPluginCollection\\:\\:addInstanceId\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -12348,6 +12282,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Discovery/InfoHookDecorator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^PHPDoc tag @param for parameter \\$yamlCacheCollector with type Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface is not subtype of native type Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface\\.$#',
+	'identifier' => 'parameter.phpDocType',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Discovery/YamlCacheCollectorDiscovery.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\$yamlCacheCollector of method Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\YamlCacheCollectorDiscovery\\:\\:__construct\\(\\) has invalid type Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\Drupal\\\\Core\\\\Cache\\\\CacheCollectorInterface\\.$#',
+	'identifier' => 'class.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Discovery/YamlCacheCollectorDiscovery.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\YamlDiscovery\\:\\:\\$discovery \\(Drupal\\\\Core\\\\Discovery\\\\YamlDiscovery\\) does not accept Drupal\\\\Component\\\\Discovery\\\\YamlDirectoryDiscovery\\.$#',
@@ -12540,6 +12486,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Queue/DatabaseQueue.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Cannot access property \\$data on object\\|true\\.$#',
+	'identifier' => 'property.nonObject',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Queue/InstantQueueRunner.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$item_id on bool\\|object\\.$#',
@@ -13028,14 +12980,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Routing/AttributeRouteDiscovery.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @param for parameter \\$attribute with type Symfony\\\\Component\\\\Routing\\\\Annotation\\\\Route is not subtype of native type Symfony\\\\Component\\\\Routing\\\\Attribute\\\\Route\\.$#',
-	'identifier' => 'parameter.phpDocType',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/AttributeRouteDiscovery.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\$attribute of method Drupal\\\\Core\\\\Routing\\\\AttributeRouteDiscovery\\:\\:addRoute\\(\\) has invalid type Symfony\\\\Component\\\\Routing\\\\Annotation\\\\Route\\.$#',
-	'identifier' => 'class.notFound',
+	'message' => '#^PHPDoc tag @return with type iterable\\<int, Symfony\\\\Component\\\\Routing\\\\Attribute\\\\Route\\> is not subtype of native type Generator\\.$#',
+	'identifier' => 'return.phpDocType',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Routing/AttributeRouteDiscovery.php',
 ];
@@ -13192,12 +13138,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\RouteProvider\\:\\:addExtraCacheKeyPart\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RouteProvider.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\RouteProvider\\:\\:getAllRoutes\\(\\) should return array\\<Symfony\\\\Component\\\\Routing\\\\Route\\> but returns ArrayIterator\\<\\(int\\|string\\), mixed\\>\\.$#',
-	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RouteProvider.php',
 ];
@@ -13590,12 +13530,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/StreamWrapper/StreamWrapperInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call static method getType\\(\\) on class\\-string\\<Drupal\\\\Core\\\\StreamWrapper\\\\StreamWrapperInterface\\>\\|false\\.$#',
-	'identifier' => 'staticMethod.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/StreamWrapper/StreamWrapperManager.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\StreamWrapper\\\\StreamWrapperManager\\:\\:register\\(\\) has no return type specified\\.$#',
@@ -14818,12 +14752,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/big_pipe/src/EventSubscriber/NoBigPipeRouteAlterSubscriber.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Argument of an invalid type Drupal\\\\Component\\\\Render\\\\MarkupInterface\\|string supplied for foreach, only iterables are supported\\.$#',
-	'identifier' => 'foreach.nonIterable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/big_pipe/src/Render/BigPipe.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Symfony\\\\Component\\\\HttpFoundation\\\\Response\\:\\:getAttachments\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 4,
@@ -15550,6 +15478,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/PageEditTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/PageEditTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$passRaw\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
@@ -15728,12 +15662,6 @@ $ignoreErrors[] = [
 	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/ckeditor5/src/HTMLRestrictions.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Argument of an invalid type Drupal\\\\Component\\\\Render\\\\MarkupInterface\\|string supplied for foreach, only iterables are supported\\.$#',
-	'identifier' => 'foreach.nonIterable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/ckeditor5/src/Hook/Ckeditor5Hooks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot call method getCKEditor5Config\\(\\) on array\\|Drupal\\\\Component\\\\Plugin\\\\Definition\\\\PluginDefinitionInterface\\.$#',
@@ -16336,12 +16264,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/ckeditor5/tests/src/FunctionalJavascript/CKEditor5TestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\ckeditor5\\\\FunctionalJavascript\\\\CKEditor5ToolbarTest\\:\\:\\$user \\(Drupal\\\\user\\\\Entity\\\\User\\) does not accept Drupal\\\\user\\\\UserInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/ckeditor5/tests/src/FunctionalJavascript/CKEditor5ToolbarTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$body\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 2,
@@ -16398,19 +16320,13 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$body\\.$#',
 	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/ckeditor5/tests/src/FunctionalJavascript/MediaLinkabilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$body\\.$#',
-	'identifier' => 'property.notFound',
 	'count' => 4,
 	'path' => __DIR__ . '/modules/ckeditor5/tests/src/FunctionalJavascript/MediaPreviewTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$body\\.$#',
 	'identifier' => 'property.notFound',
-	'count' => 17,
+	'count' => 13,
 	'path' => __DIR__ . '/modules/ckeditor5/tests/src/FunctionalJavascript/MediaTest.php',
 ];
 $ignoreErrors[] = [
@@ -16424,6 +16340,12 @@ $ignoreErrors[] = [
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/ckeditor5/tests/src/FunctionalJavascript/MediaTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$body\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 4,
+	'path' => __DIR__ . '/modules/ckeditor5/tests/src/FunctionalJavascript/MediaViewModeTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$body\\.$#',
@@ -17176,15 +17098,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/comment/src/Plugin/views/row/Rss.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\comment\\\\Plugin\\\\views\\\\row\\\\Rss\\:\\:render\\(\\) should return string but empty return statement found\\.$#',
+	'message' => '#^Method Drupal\\\\comment\\\\Plugin\\\\views\\\\row\\\\Rss\\:\\:render\\(\\) should return array but empty return statement found\\.$#',
 	'identifier' => 'return.empty',
 	'count' => 2,
-	'path' => __DIR__ . '/modules/comment/src/Plugin/views/row/Rss.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\comment\\\\Plugin\\\\views\\\\row\\\\Rss\\:\\:render\\(\\) should return string but returns array\\<string, mixed\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
 	'path' => __DIR__ . '/modules/comment/src/Plugin/views/row/Rss.php',
 ];
 $ignoreErrors[] = [
@@ -17980,18 +17896,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/config/tests/src/Functional/ConfigImportAllTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method delete\\(\\) on null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config/tests/src/Functional/ConfigInstallProfileOverrideTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method label\\(\\) on null\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/config/tests/src/Functional/ConfigInstallProfileOverrideTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\Tests\\\\config\\\\Functional\\\\ConfigInstallProfileUnmetDependenciesTest\\:\\:\\$expectedException \\(Drupal\\\\Core\\\\Config\\\\UnmetDependenciesException\\) does not accept Exception\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
@@ -18102,12 +18006,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\config_translation\\\\ConfigMapperManager\\:\\:processDefinition\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config_translation/src/ConfigMapperManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Core\\\\Plugin\\\\DefaultPluginManager\\:\\:\\$definitions \\(array\\) does not accept null\\.$#',
-	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/config_translation/src/ConfigMapperManager.php',
 ];
@@ -20086,6 +19984,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/content_translation/src/Controller/ContentTranslationController.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\RevisionableInterface\\:\\:getTranslation\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/content_translation/src/Controller/ContentTranslationController.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\RevisionableInterface\\:\\:hasTranslation\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/content_translation/src/Controller/ContentTranslationController.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\content_translation\\\\Controller\\\\ContentTranslationController\\:\\:prepareTranslation\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -20569,12 +20479,6 @@ $ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\Tests\\\\content_translation\\\\Kernel\\\\ContentTranslationFieldSyncRevisionTest\\:\\:\\$storage \\(Drupal\\\\Core\\\\Entity\\\\ContentEntityStorageInterface\\) does not accept Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/content_translation/tests/src/Kernel/ContentTranslationFieldSyncRevisionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$field_storage in PHPDoc tag @var does not match assigned variable \\$field_storage_config\\.$#',
-	'identifier' => 'varTag.differentVariable',
-	'count' => 2,
 	'path' => __DIR__ . '/modules/content_translation/tests/src/Kernel/ContentTranslationFieldSyncRevisionTest.php',
 ];
 $ignoreErrors[] = [
@@ -21100,6 +21004,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/dblog/tests/src/Functional/DbLogTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/dblog/tests/src/Functional/DbLogTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\dblog\\\\Functional\\\\DbLogViewsTest\\:\\:getLogsEntriesTable\\(\\) should return array\\<SimpleXMLElement\\> but returns array\\<Behat\\\\Mink\\\\Element\\\\NodeElement\\>\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
@@ -21344,18 +21254,6 @@ $ignoreErrors[] = [
 	'identifier' => 'property.defaultValue',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/editor/tests/src/Kernel/EditorValidationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$summary\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/editor/tests/src/Kernel/TextWithSummaryFileUsageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$value\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/editor/tests/src/Kernel/TextWithSummaryFileUsageTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Form\\\\FormInterface\\:\\:getEntity\\(\\)\\.$#',
@@ -21658,6 +21556,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field/src/FieldUninstallValidator.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\field\\\\FieldUninstallValidator\\:\\:validate\\(\\) should return array\\<string\\> but returns list\\<Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup\\>\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/field/src/FieldUninstallValidator.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\field\\\\FieldConfigInterface\\:\\:setSetting\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 2,
@@ -21838,7 +21742,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field/tests/src/Functional/FieldImportDeleteUninstallUiTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\entity_test\\\\Entity\\\\EntityTest\\:\\:\\$field_tel \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept string\\.$#',
+	'message' => '#^Property Drupal\\\\entity_test\\\\Entity\\\\EntityTest\\:\\:\\$field_test_field \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept string\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field/tests/src/Functional/FieldImportDeleteUninstallUiTest.php',
@@ -23452,12 +23356,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/file.module',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$file_upload in empty\\(\\) always exists and is not falsy\\.$#',
-	'identifier' => 'empty.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/file.module',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface\\<int\\|string, Drupal\\\\Core\\\\TypedData\\\\TypedDataInterface\\>\\:\\:getEntity\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 2,
@@ -24088,12 +23986,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/src/Upload/FileUploadHandler.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\file_test\\\\Form\\\\FileTestSaveUploadFromForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/file_test/src/Form/FileTestSaveUploadFromForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot call method getDirectoryPath\\(\\) on Drupal\\\\Core\\\\StreamWrapper\\\\StreamWrapperInterface\\|false\\.$#',
 	'identifier' => 'method.nonObject',
 	'count' => 3,
@@ -24124,22 +24016,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/tests/file_test/src/StreamWrapper/DummyExternalReadOnlyWrapper.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\file_test\\\\StreamWrapper\\\\DummyReadOnlyStreamWrapper\\:\\:getInternalUri\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/file_test/src/StreamWrapper/DummyReadOnlyStreamWrapper.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\file_test\\\\StreamWrapper\\\\DummyRemoteStreamWrapper\\:\\:realpath\\(\\) should return string but returns false\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/tests/file_test/src/StreamWrapper/DummyRemoteStreamWrapper.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\file_test\\\\StreamWrapper\\\\DummyStreamWrapper\\:\\:getInternalUri\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/file_test/src/StreamWrapper/DummyStreamWrapper.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method GuzzleHttp\\\\ClientInterface\\:\\:head\\(\\)\\.$#',
@@ -24185,12 +24065,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileFieldTestBase\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileFieldTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileFieldTestBase\\:\\:getLastFileId\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileFieldTestBase.php',
@@ -24326,12 +24200,6 @@ $ignoreErrors[] = [
 	'identifier' => 'property.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileJsonCookieTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileResourceTestBase\\:\\:makeCurrentUserFileOwner\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileResourceTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Static property Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileResourceTestBase\\:\\:\\$patchProtectedFieldNames \\(array\\<string\\>\\) does not accept default value of type array\\<string, null\\>\\.$#',
@@ -25144,8 +25012,32 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/help/src/HelpTopicTwigLoader.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\help\\\\Plugin\\\\Search\\\\HelpSearch\\:\\:indexClear\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/src/Plugin/Search/HelpSearch.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\help\\\\Plugin\\\\Search\\\\HelpSearch\\:\\:markForReindex\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/src/Plugin/Search/HelpSearch.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\help\\\\Plugin\\\\Search\\\\HelpSearch\\:\\:updateIndex\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/src/Plugin/Search/HelpSearch.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^PHPDoc type array of property Drupal\\\\Tests\\\\help\\\\Kernel\\\\ExperimentalHelpTest\\:\\:\\$modules is not covariant with PHPDoc type array\\<string\\> of overridden property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$modules\\.$#',
 	'identifier' => 'property.phpDocType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/ExperimentalHelpTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
+	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/help/tests/src/Kernel/ExperimentalHelpTest.php',
 ];
@@ -25154,6 +25046,12 @@ $ignoreErrors[] = [
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/help/tests/src/Kernel/ExperimentalHelpTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpBlockTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$htmlOutputTestId \\(int\\) does not accept string\\.$#',
@@ -25174,6 +25072,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpEmptyPageTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpPageOrderTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$htmlOutputTestId \\(int\\) does not accept string\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
@@ -25192,19 +25096,13 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$htmlOutputTestId \\(int\\) does not accept string\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\help\\\\Kernel\\\\HelpTest\\:\\:\\$adminUser \\(Drupal\\\\user\\\\Entity\\\\User\\|false\\) does not accept Drupal\\\\user\\\\UserInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\help\\\\Kernel\\\\HelpTest\\:\\:\\$anyUser \\(Drupal\\\\user\\\\Entity\\\\User\\|false\\) does not accept Drupal\\\\user\\\\UserInterface\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTest.php',
@@ -25228,6 +25126,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTopicTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTopicTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$htmlOutputTestId \\(int\\) does not accept string\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
@@ -25240,8 +25144,20 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTopicTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/HelpTopicTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^PHPDoc type array of property Drupal\\\\Tests\\\\help\\\\Kernel\\\\NoHelpTest\\:\\:\\$modules is not covariant with PHPDoc type array\\<string\\> of overridden property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$modules\\.$#',
 	'identifier' => 'property.phpDocType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/tests/src/Kernel/NoHelpTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
+	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/help/tests/src/Kernel/NoHelpTest.php',
 ];
@@ -25696,12 +25612,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageAdminStylesTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$uri on object\\|false\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageDimensionsTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$filename on object\\|false\\.$#',
 	'identifier' => 'property.nonObject',
 	'count' => 1,
@@ -25794,12 +25704,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\ImageStyleFlushTest\\:\\:createSampleImage\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageStyleFlushTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$edit in empty\\(\\) always exists and is not falsy\\.$#',
-	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageStyleFlushTest.php',
 ];
@@ -27262,7 +27166,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method getNormalization\\(\\) on array\\|ArrayObject\\|bool\\|float\\|int\\|string\\.$#',
+	'message' => '#^Cannot call method getNormalization\\(\\) on array\\<mixed\\>\\|ArrayObject\\<\\(int\\|string\\), mixed\\>\\|bool\\|float\\|int\\|string\\.$#',
 	'identifier' => 'method.nonObject',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
@@ -27384,6 +27288,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\ResourceTestBase\\:\\:sortResourceCollection\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^PHPDoc tag @param for parameter \\$key with type mixed is not subtype of native type string\\.$#',
+	'identifier' => 'parameter.phpDocType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
 ];
@@ -27676,12 +27586,6 @@ $ignoreErrors[] = [
 	'identifier' => 'property.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Kernel/TestCoverageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Unit\\\\JsonApiSpecTest\\:\\:providerTestIsValidCustomQueryParameter\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Unit/JsonApiSpecTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$class of method Drupal\\\\jsonapi\\\\Normalizer\\\\JsonApiDocumentTopLevelNormalizer\\:\\:denormalize\\(\\) expects string, null given\\.$#',
@@ -28392,6 +28296,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/language/tests/src/Functional/LanguageBreadcrumbTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/language/tests/src/Functional/LanguageBreadcrumbTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Language\\\\LanguageManagerInterface\\:\\:getLanguageConfigOverride\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -28626,43 +28536,25 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/language/tests/src/Kernel/Views/LanguageTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityStorage\\:\\:method\\(\\)\\.$#',
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityStorageInterface&PHPUnit\\\\Framework\\\\MockObject\\\\Stub\\:\\:expects\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 2,
+	'count' => 1,
+	'path' => __DIR__ . '/modules/language/tests/src/Unit/ContentLanguageSettingsUnitTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:expects\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
 	'path' => __DIR__ . '/modules/language/tests/src/Unit/ContentLanguageSettingsUnitTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface\\:\\:method\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/language/tests/src/Unit/ContentLanguageSettingsUnitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\language\\\\Unit\\\\ContentLanguageSettingsUnitTest\\:\\:\\$configEntityStorageInterface \\(Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityStorage\\) does not accept Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\.$#',
-	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/language/tests/src/Unit/ContentLanguageSettingsUnitTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\language\\\\Unit\\\\ContentLanguageSettingsUnitTest\\:\\:\\$configEntityStorageInterface \\(Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityStorage\\) does not accept Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface&PHPUnit\\\\Framework\\\\MockObject\\\\Stub\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Unit/ContentLanguageSettingsUnitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Language\\\\LanguageManagerInterface\\:\\:expects\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Unit/LanguageNegotiationUrlTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Language\\\\LanguageManagerInterface\\:\\:method\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/language/tests/src/Unit/LanguageNegotiationUrlTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$language_manager of method Drupal\\\\language\\\\LanguageNegotiationMethodBase\\:\\:setLanguageManager\\(\\) expects Drupal\\\\language\\\\ConfigurableLanguageManagerInterface, Drupal\\\\Core\\\\Language\\\\LanguageManagerInterface given\\.$#',
+	'message' => '#^Parameter \\#1 \\$language_manager of method Drupal\\\\language\\\\LanguageNegotiationMethodBase\\:\\:setLanguageManager\\(\\) expects Drupal\\\\language\\\\ConfigurableLanguageManagerInterface, Drupal\\\\Core\\\\Language\\\\LanguageManagerInterface&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 4,
 	'path' => __DIR__ . '/modules/language/tests/src/Unit/LanguageNegotiationUrlTest.php',
@@ -29910,6 +29802,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Kernel/InlineBlockUsageTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$fields of method Drupal\\\\Core\\\\Database\\\\Query\\\\Upsert\\:\\:fields\\(\\) expects array\\<int\\|string, array\\|bool\\|Drupal\\\\Core\\\\Database\\\\Query\\\\UpsertUpdateExpression\\|float\\|int\\|string\\>, array\\<string, int\\|null\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/tests/src/Kernel/InlineBlockUsageTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:enableLayoutBuilder\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -30404,11 +30302,23 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\link\\\\LinkItemInterface\\:\\:\\$uri\\.$#',
 	'identifier' => 'property.notFound',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/link/src/Plugin/Validation/Constraint/LinkNotExistingInternalConstraintValidator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$invalidParameterMessage\\.$#',
+	'identifier' => 'property.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/link/src/Plugin/Validation/Constraint/LinkNotExistingInternalConstraintValidator.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$message\\.$#',
+	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$missingParameterMessage\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/link/src/Plugin/Validation/Constraint/LinkNotExistingInternalConstraintValidator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$notFoundMessage\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/link/src/Plugin/Validation/Constraint/LinkNotExistingInternalConstraintValidator.php',
@@ -30434,11 +30344,23 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\link\\\\LinkItemInterface\\:\\:\\$uri\\.$#',
 	'identifier' => 'property.notFound',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/link/src/Plugin/Validation/Constraint/LinkTypeConstraintValidator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$invalidMessage\\.$#',
+	'identifier' => 'property.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/link/src/Plugin/Validation/Constraint/LinkTypeConstraintValidator.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$message\\.$#',
+	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$onlyExternalMessage\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/link/src/Plugin/Validation/Constraint/LinkTypeConstraintValidator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$onlyInternalMessage\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/link/src/Plugin/Validation/Constraint/LinkTypeConstraintValidator.php',
@@ -30448,12 +30370,6 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/link/tests/src/Functional/LinkFieldTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\link\\\\Functional\\\\LinkFieldUITest\\:\\:\\$helpTextUser \\(Drupal\\\\user\\\\Entity\\\\User\\) does not accept Drupal\\\\user\\\\UserInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/link/tests/src/Functional/LinkFieldUITest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot assign new offset to string\\.$#',
@@ -30582,6 +30498,76 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/link/tests/src/Unit/LinkFormatterTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkAccessConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\link\\\\Plugin\\\\Validation\\\\Constraint\\\\LinkAccessConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkAccessConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 5,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkExternalProtocolsConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\link\\\\Plugin\\\\Validation\\\\Constraint\\\\LinkExternalProtocolsConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 5,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkExternalProtocolsConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkNotExistingInternalConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\link\\\\Plugin\\\\Validation\\\\Constraint\\\\LinkNotExistingInternalConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkNotExistingInternalConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkTitleRequiredConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\link\\\\Plugin\\\\Validation\\\\Constraint\\\\LinkTitleRequiredConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkTitleRequiredConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkTypeConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\link\\\\Plugin\\\\Validation\\\\Constraint\\\\LinkTypeConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkTypeConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Parameter &\\$context by\\-ref type of function locale_translation_batch_fetch_download\\(\\) expects array, array\\|ArrayAccess given\\.$#',
 	'identifier' => 'parameterByRef.type',
 	'count' => 1,
@@ -30592,24 +30578,6 @@ $ignoreErrors[] = [
 	'identifier' => 'parameterByRef.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/locale/locale.batch.inc',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\locale\\\\StringInterface\\:\\:\\$context\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/locale/locale.module',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\locale\\\\StringInterface\\:\\:\\$source\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/locale/locale.module',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\locale\\\\StringInterface\\:\\:\\$translation\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/locale/locale.module',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function locale_string_is_safe\\(\\) has no return type specified\\.$#',
@@ -30634,6 +30602,12 @@ $ignoreErrors[] = [
 	'identifier' => 'property.phpDocType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/locale/src/File/LocaleFile.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method GuzzleHttp\\\\Exception\\\\RequestException\\:\\:getResponse\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/locale/src/File/LocaleFileManager.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\locale\\\\Form\\\\ExportForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -30732,12 +30706,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/locale/src/Form/TranslateFormBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot access property \\$files on array\\.$#',
-	'identifier' => 'property.nonObject',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/locale/src/Form/TranslationStatusForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\locale\\\\Form\\\\TranslationStatusForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -30753,7 +30721,7 @@ $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Form\\\\FormInterface\\:\\:getEntity\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/locale/src/Hook/LocaleHooks.php',
+	'path' => __DIR__ . '/modules/locale/src/Hook/LocaleFormHooks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\locale\\\\StringInterface\\:\\:\\$context\\.$#',
@@ -30856,6 +30824,24 @@ $ignoreErrors[] = [
 	'identifier' => 'return.missing',
 	'count' => 2,
 	'path' => __DIR__ . '/modules/locale/src/LocaleDefaultConfigStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\locale\\\\StringInterface\\:\\:\\$context\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/locale/src/LocaleJs.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\locale\\\\StringInterface\\:\\:\\$source\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/locale/src/LocaleJs.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\locale\\\\StringInterface\\:\\:\\$translation\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/locale/src/LocaleJs.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\locale\\\\LocaleProjectStorage\\:\\:delete\\(\\) has no return type specified\\.$#',
@@ -32253,6 +32239,18 @@ $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Access\\\\AccessResultInterface\\:\\:getCacheContexts\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
+	'path' => __DIR__ . '/modules/media/tests/src/Kernel/MediaAccessControlHandlerCreateTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Access\\\\AccessResultInterface\\:\\:getCacheTags\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/media/tests/src/Kernel/MediaAccessControlHandlerCreateTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Access\\\\AccessResultInterface\\:\\:getCacheContexts\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
 	'path' => __DIR__ . '/modules/media/tests/src/Kernel/MediaAccessControlHandlerTest.php',
 ];
 $ignoreErrors[] = [
@@ -32346,7 +32344,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media/tests/src/Kernel/MediaSourceTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter &\\$requestHistory by\\-ref type of method Drupal\\\\Tests\\\\media\\\\Kernel\\\\MediaSourceValidationTest\\:\\:mockClient\\(\\) expects array, array\\|ArrayAccess\\<int, array\\> given\\.$#',
+	'message' => '#^Parameter &\\$requestHistory by\\-ref type of method Drupal\\\\Tests\\\\media\\\\Kernel\\\\MediaSourceValidationTest\\:\\:mockClient\\(\\) expects array, array\\<array\\<string, mixed\\>\\>\\|ArrayAccess\\<int, array\\<string, mixed\\>\\> given\\.$#',
 	'identifier' => 'parameterByRef.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media/tests/src/Kernel/MediaSourceValidationTest.php',
@@ -32362,6 +32360,20 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media/tests/src/Kernel/MediaTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/media/tests/src/Kernel/OEmbedResourceConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\media\\\\Plugin\\\\Validation\\\\Constraint\\\\OEmbedResourceConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/media/tests/src/Kernel/OEmbedResourceConstraintValidatorTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @var for property Drupal\\\\Tests\\\\media\\\\Unit\\\\ProviderRepositoryTest\\:\\:\\$logger with type Prophecy\\\\Prophecy\\\\ObjectProphecy\\|Psr\\\\Log\\\\LoggerInterface is not subtype of native type Prophecy\\\\Prophecy\\\\ObjectProphecy\\.$#',
@@ -33146,7 +33158,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Form\\\\FormInterface\\:\\:getEntity\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 3,
+	'count' => 4,
 	'path' => __DIR__ . '/modules/menu_ui/src/Hook/MenuUiHooks.php',
 ];
 $ignoreErrors[] = [
@@ -33214,24 +33226,6 @@ $ignoreErrors[] = [
 	'identifier' => 'varTag.variableNotFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/menu_ui/src/MenuUiUtility.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$messageParent\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/menu_ui/src/Plugin/Validation/Constraint/MenuSettingsConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$messageRemove\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_ui/src/Plugin/Validation/Constraint/MenuSettingsConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$messageWeight\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_ui/src/Plugin/Validation/Constraint/MenuSettingsConstraintValidator.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\workflows\\\\WorkflowTypeInterface\\:\\:addEntityTypeAndBundle\\(\\)\\.$#',
@@ -34836,12 +34830,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/mysql/src/Driver/Database/mysql/Connection.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$last_insert_id might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/mysql/src/Driver/Database/mysql/Insert.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Connection\\:\\:isMariaDb\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -34980,19 +34968,19 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/mysql/tests/src/Kernel/mysql/TemporaryQueryTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\mysql\\\\Driver\\\\Database\\\\mysql\\\\Install\\\\Tasks@anonymous/core/modules/mysql/tests/src/Unit/InstallTasksTest\\.php\\:46\\:\\:t\\(\\) should return Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup but returns string\\.$#',
+	'message' => '#^Method Drupal\\\\mysql\\\\Driver\\\\Database\\\\mysql\\\\Install\\\\Tasks@anonymous/core/modules/mysql/tests/src/Unit/InstallTasksTest\\.php\\:31\\:\\:t\\(\\) should return Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup but returns string\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/mysql/tests/src/Unit/InstallTasksTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\mysql\\\\Driver\\\\Database\\\\mysql\\\\Install\\\\Tasks@anonymous/core/modules/mysql/tests/src/Unit/InstallTasksTest\\.php\\:88\\:\\:t\\(\\) should return Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup but returns string\\.$#',
+	'message' => '#^Method Drupal\\\\mysql\\\\Driver\\\\Database\\\\mysql\\\\Install\\\\Tasks@anonymous/core/modules/mysql/tests/src/Unit/InstallTasksTest\\.php\\:73\\:\\:t\\(\\) should return Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup but returns string\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/mysql/tests/src/Unit/InstallTasksTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Return type \\(null\\) of method Drupal\\\\mysql\\\\Driver\\\\Database\\\\mysql\\\\Install\\\\Tasks@anonymous/core/modules/mysql/tests/src/Unit/InstallTasksTest\\.php\\:88\\:\\:getConnection\\(\\) should be compatible with return type \\(Drupal\\\\Core\\\\Database\\\\Connection\\) of method Drupal\\\\Core\\\\Database\\\\Install\\\\Tasks\\:\\:getConnection\\(\\)$#',
+	'message' => '#^Return type \\(null\\) of method Drupal\\\\mysql\\\\Driver\\\\Database\\\\mysql\\\\Install\\\\Tasks@anonymous/core/modules/mysql/tests/src/Unit/InstallTasksTest\\.php\\:73\\:\\:getConnection\\(\\) should be compatible with return type \\(Drupal\\\\Core\\\\Database\\\\Connection\\) of method Drupal\\\\Core\\\\Database\\\\Install\\\\Tasks\\:\\:getConnection\\(\\)$#',
 	'identifier' => 'method.childReturnType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/mysql/tests/src/Unit/InstallTasksTest.php',
@@ -35976,15 +35964,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/Plugin/views/row/Rss.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\views\\\\row\\\\Rss\\:\\:render\\(\\) should return string but empty return statement found\\.$#',
+	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\views\\\\row\\\\Rss\\:\\:render\\(\\) should return array but empty return statement found\\.$#',
 	'identifier' => 'return.empty',
 	'count' => 2,
-	'path' => __DIR__ . '/modules/node/src/Plugin/views/row/Rss.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\views\\\\row\\\\Rss\\:\\:render\\(\\) should return string but returns array\\<string, mixed\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
 	'path' => __DIR__ . '/modules/node/src/Plugin/views/row/Rss.php',
 ];
 $ignoreErrors[] = [
@@ -36330,12 +36312,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeSaveTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeTestBase\\:\\:nodeAccessAssertMessage\\(\\) should return string but returns Drupal\\\\Component\\\\Render\\\\FormattableMarkup\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeTitleTest\\:\\:assertBreadcrumb\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -36355,6 +36331,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTitleTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTitleTest.php',
@@ -36468,16 +36450,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTypeTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Part \\$this\\-\\>defaultLangcode \\(array\\) of encapsed string cannot be cast to string\\.$#',
-	'identifier' => 'encapsedStringPart.nonString',
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTypeTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeTypeTranslationTest\\:\\:\\$defaultLangcode \\(array\\) does not accept default value of type string\\.$#',
-	'identifier' => 'property.defaultValue',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTypeTranslationTest.php',
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTypeTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$uri on object\\|false\\.$#',
@@ -36618,12 +36594,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/FilterNodeAccessTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\views\\\\ResultRow\\:\\:\\$nid\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/FrontPageTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$body\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
@@ -36640,6 +36610,12 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 2,
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/NodeLanguageTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\views\\\\ResultRow\\:\\:\\$nid\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/PromotedContentPageTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$changed\\.$#',
@@ -36760,12 +36736,6 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 3,
 	'path' => __DIR__ . '/modules/node/tests/src/Kernel/NodeTypeValidationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$body\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/node/tests/src/Kernel/TextWithSummaryTokenReplaceTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\Tests\\\\node\\\\Kernel\\\\Views\\\\PathPluginTest\\:\\:\\$nodes \\(array\\<Drupal\\\\node\\\\Entity\\\\Node\\>\\) does not accept array\\<Drupal\\\\node\\\\NodeInterface\\>\\.$#',
@@ -37076,7 +37046,13 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\fixture_manipulator\\\\FixtureManipulator\\:\\:commitChanges\\(\\) invoked with 0 parameters, 1 required\\.$#',
 	'identifier' => 'arguments.count',
-	'count' => 2,
+	'count' => 1,
+	'path' => __DIR__ . '/modules/package_manager/tests/src/Kernel/ComposerValidatorHelpTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\fixture_manipulator\\\\FixtureManipulator\\:\\:commitChanges\\(\\) invoked with 0 parameters, 1 required\\.$#',
+	'identifier' => 'arguments.count',
+	'count' => 1,
 	'path' => __DIR__ . '/modules/package_manager/tests/src/Kernel/ComposerValidatorTest.php',
 ];
 $ignoreErrors[] = [
@@ -37108,6 +37084,12 @@ $ignoreErrors[] = [
 	'identifier' => 'arguments.count',
 	'count' => 2,
 	'path' => __DIR__ . '/modules/package_manager/tests/src/Kernel/OverwriteExistingPackagesValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Tests\\\\package_manager\\\\Kernel\\\\TestDiskSpaceValidator\\:\\:\\$freeSpace \\(array\\<float\\>\\) does not accept array\\<string, int\\>\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/package_manager/tests/src/Kernel/PackageManagerKernelTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Unsafe call to private method Drupal\\\\Tests\\\\package_manager\\\\Kernel\\\\PackageManagerKernelTestBase\\:\\:assertNoFailureMarker\\(\\) through static\\:\\:\\.$#',
@@ -37178,7 +37160,13 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\fixture_manipulator\\\\FixtureManipulator\\:\\:commitChanges\\(\\) invoked with 0 parameters, 1 required\\.$#',
 	'identifier' => 'arguments.count',
-	'count' => 4,
+	'count' => 3,
+	'path' => __DIR__ . '/modules/package_manager/tests/src/Kernel/PhpTufValidatorInvalidConfigTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\fixture_manipulator\\\\FixtureManipulator\\:\\:commitChanges\\(\\) invoked with 0 parameters, 1 required\\.$#',
+	'identifier' => 'arguments.count',
+	'count' => 3,
 	'path' => __DIR__ . '/modules/package_manager/tests/src/Kernel/PhpTufValidatorTest.php',
 ];
 $ignoreErrors[] = [
@@ -37196,6 +37184,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\package_manager\\\\Kernel\\\\SandboxManagerBaseTest\\:\\:providerStoreDestroyInfo\\(\\) should return array\\<array\\<string\\>\\> but returns array\\<string, list\\<bool\\|Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup\\|string\\|null\\>\\>\\.$#',
 	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/package_manager/tests/src/Kernel/SandboxManagerBaseTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^PHPDoc tag @var with type int is not subtype of native type null\\.$#',
+	'identifier' => 'varTag.nativeType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/package_manager/tests/src/Kernel/SandboxManagerBaseTest.php',
 ];
@@ -37222,12 +37216,6 @@ $ignoreErrors[] = [
 	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/package_manager/tests/src/Kernel/StageCommitExceptionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @var for property Drupal\\\\Tests\\\\package_manager\\\\Kernel\\\\StageEventsTest\\:\\:\\$stage with type Drupal\\\\package_manager\\\\SandboxManagerBase is not subtype of native type Drupal\\\\Tests\\\\package_manager\\\\Kernel\\\\TestSandboxManager\\.$#',
-	'identifier' => 'property.phpDocType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/package_manager/tests/src/Kernel/StageEventsTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\Tests\\\\package_manager\\\\Kernel\\\\PackageManagerKernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Symfony\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
@@ -37418,7 +37406,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$pid\\.$#',
 	'identifier' => 'property.notFound',
-	'count' => 1,
+	'count' => 2,
 	'path' => __DIR__ . '/modules/path/src/Plugin/Field/FieldWidget/PathWidget.php',
 ];
 $ignoreErrors[] = [
@@ -37932,12 +37920,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Update.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\pgsql\\\\Driver\\\\Database\\\\pgsql\\\\Update\\:\\:execute\\(\\) should return int\\|null but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Update.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Schema\\:\\:queryTableInformation\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -37946,13 +37928,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\StatementInterface\\:\\:getClientStatement\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Upsert.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\pgsql\\\\Driver\\\\Database\\\\pgsql\\\\Upsert\\:\\:execute\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
+	'count' => 3,
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Upsert.php',
 ];
 $ignoreErrors[] = [
@@ -38388,7 +38364,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/rest/src/Plugin/views/row/DataEntityRow.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\rest\\\\Plugin\\\\views\\\\row\\\\DataEntityRow\\:\\:render\\(\\) should return string but returns Drupal\\\\Core\\\\Entity\\\\EntityInterface\\.$#',
+	'message' => '#^Method Drupal\\\\rest\\\\Plugin\\\\views\\\\row\\\\DataEntityRow\\:\\:render\\(\\) should return array but returns Drupal\\\\Core\\\\Entity\\\\EntityInterface\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/rest/src/Plugin/views/row/DataEntityRow.php',
@@ -38402,12 +38378,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\rest\\\\Plugin\\\\views\\\\row\\\\DataFieldRow\\:\\:init\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/src/Plugin/views/row/DataFieldRow.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\rest\\\\Plugin\\\\views\\\\row\\\\DataFieldRow\\:\\:render\\(\\) should return string but returns array\\<string, mixed\\>\\.$#',
-	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/rest/src/Plugin/views/row/DataFieldRow.php',
 ];
@@ -38850,6 +38820,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/rest/tests/src/Functional/Views/StyleSerializerTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$options of method GuzzleHttp\\\\Client\\:\\:get\\(\\) expects array\\{base_uri\\?\\: Psr\\\\Http\\\\Message\\\\UriInterface\\|string, allow_redirects\\?\\: array\\{max\\?\\: int, strict\\?\\: bool, referer\\?\\: bool, protocols\\?\\: non\\-empty\\-array\\<string\\>, on_redirect\\?\\: callable\\(Psr\\\\Http\\\\Message\\\\RequestInterface, Psr\\\\Http\\\\Message\\\\ResponseInterface, Psr\\\\Http\\\\Message\\\\UriInterface\\)\\: mixed, track_redirects\\?\\: bool\\}\\|bool, auth\\?\\: array\\{0\\: string, 1\\: string, 2\\?\\: string\\|null\\}\\|string\\|false\\|null, body\\?\\: callable\\-object\\|Iterator\\|resource\\|string\\|Stringable\\|null, cert\\?\\: array\\{0\\: string, 1\\?\\: string\\|null\\}\\|string, cert_type\\?\\: string, connect_timeout\\?\\: float\\|int, cookies\\?\\: GuzzleHttp\\\\Cookie\\\\CookieJarInterface\\|false, \\.\\.\\., \\.\\.\\.\\}, array\\{auth\\: array\\{string, Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\}, query\\: array\\{_format\\: \'json\'\\}\\} given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/rest/tests/src/Functional/Views/StyleSerializerTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\Tests\\\\rest\\\\Functional\\\\Views\\\\StyleSerializerTest\\:\\:\\$adminUser \\(Drupal\\\\user\\\\Entity\\\\User\\|false\\) does not accept Drupal\\\\user\\\\UserInterface\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
@@ -38928,6 +38904,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/search/modules/search_help/src/Plugin/Search/SearchHelpSearch.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\search_help\\\\Plugin\\\\Search\\\\SearchHelpSearch\\:\\:findResults\\(\\) should return Drupal\\\\Core\\\\Database\\\\StatementInterface\\|null but returns array\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/modules/search_help/src/Plugin/Search/SearchHelpSearch.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Offset string\\|null does not exist on string\\.$#',
 	'identifier' => 'offsetAccess.notFound',
 	'count' => 2,
@@ -38974,6 +38956,30 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 2,
 	'path' => __DIR__ . '/modules/search/modules/search_node/src/Plugin/Search/SearchNode.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:condition\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/search/modules/search_user/src/Plugin/Search/SearchUser.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:fields\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/search/modules/search_user/src/Plugin/Search/SearchUser.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:limit\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/modules/search_user/src/Plugin/Search/SearchUser.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:orConditionGroup\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/modules/search_user/src/Plugin/Search/SearchUser.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Invalid array key type float\\.$#',
@@ -39372,12 +39378,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/search/src/Plugin/views/row/SearchRow.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\search\\\\Plugin\\\\views\\\\row\\\\SearchRow\\:\\:render\\(\\) should return string but returns array\\<string, mixed\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/src/Plugin/views/row/SearchRow.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\views\\\\Plugin\\\\views\\\\query\\\\QueryPluginBase\\:\\:addOrderBy\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -39660,6 +39660,36 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/search/tests/src/Functional/SearchMultilingualEntityTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to method execute\\(\\) on an unknown class Drupal\\\\node\\\\Plugin\\\\Search\\\\SearchNode\\.$#',
+	'identifier' => 'class.notFound',
+	'count' => 4,
+	'path' => __DIR__ . '/modules/search/tests/src/Functional/SearchMultilingualEntityTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method indexStatus\\(\\) on an unknown class Drupal\\\\node\\\\Plugin\\\\Search\\\\SearchNode\\.$#',
+	'identifier' => 'class.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/tests/src/Functional/SearchMultilingualEntityTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method setSearch\\(\\) on an unknown class Drupal\\\\node\\\\Plugin\\\\Search\\\\SearchNode\\.$#',
+	'identifier' => 'class.notFound',
+	'count' => 4,
+	'path' => __DIR__ . '/modules/search/tests/src/Functional/SearchMultilingualEntityTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method updateIndex\\(\\) on an unknown class Drupal\\\\node\\\\Plugin\\\\Search\\\\SearchNode\\.$#',
+	'identifier' => 'class.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/tests/src/Functional/SearchMultilingualEntityTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Tests\\\\search\\\\Functional\\\\SearchMultilingualEntityTest\\:\\:\\$plugin has unknown class Drupal\\\\node\\\\Plugin\\\\Search\\\\SearchNode as its type\\.$#',
+	'identifier' => 'class.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/tests/src/Functional/SearchMultilingualEntityTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$title\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
@@ -39742,6 +39772,18 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 4,
 	'path' => __DIR__ . '/modules/search/tests/src/Kernel/SearchMatchTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityWithPluginCollectionInterface\\:\\:get\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/search/tests/src/Kernel/SearchPageImportTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityWithPluginCollectionInterface\\:\\:set\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/tests/src/Kernel/SearchPageImportTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\serialization\\\\Encoder\\\\XmlEncoder\\:\\:setBaseEncoder\\(\\) has no return type specified\\.$#',
@@ -40032,12 +40074,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/serialization/tests/src/Unit/Normalizer/DateTimeIso8601NormalizerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\serialization\\\\Unit\\\\Normalizer\\\\DateTimeIso8601NormalizerTestDrupalDateTime\\:\\:setTimezone\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/serialization/tests/src/Unit/Normalizer/DateTimeIso8601NormalizerTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\Tests\\\\serialization\\\\Unit\\\\Normalizer\\\\DateTimeIso8601NormalizerTest\\:\\:\\$data \\(Drupal\\\\Core\\\\TypedData\\\\Plugin\\\\DataType\\\\DateTimeIso8601\\) does not accept Prophecy\\\\Prophecy\\\\ObjectProphecy\\<Drupal\\\\Core\\\\TypedData\\\\Plugin\\\\DataType\\\\DateTimeIso8601\\>\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
@@ -40059,12 +40095,6 @@ $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\TypedData\\\\Type\\\\DateTimeInterface\\:\\:reveal\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 4,
-	'path' => __DIR__ . '/modules/serialization/tests/src/Unit/Normalizer/DateTimeNormalizerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\serialization\\\\Unit\\\\Normalizer\\\\DateTimeNormalizerTestDrupalDateTime\\:\\:setTimezone\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
 	'path' => __DIR__ . '/modules/serialization/tests/src/Unit/Normalizer/DateTimeNormalizerTest.php',
 ];
 $ignoreErrors[] = [
@@ -40134,508 +40164,16 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/serialization/tests/src/Unit/Normalizer/TimestampNormalizerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\serialization\\\\Unit\\\\Normalizer\\\\TimestampNormalizerTestDrupalDateTime\\:\\:setTimezone\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/serialization/tests/src/Unit/Normalizer/TimestampNormalizerTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\Tests\\\\serialization\\\\Unit\\\\Normalizer\\\\TimestampNormalizerTest\\:\\:\\$data \\(Drupal\\\\Core\\\\Field\\\\Plugin\\\\Field\\\\FieldType\\\\TimestampItem\\) does not accept Prophecy\\\\Prophecy\\\\ObjectProphecy\\<Drupal\\\\Core\\\\TypedData\\\\Plugin\\\\DataType\\\\Timestamp\\>\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/serialization/tests/src/Unit/Normalizer/TimestampNormalizerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:\\:getConfigPrefix\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
+	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/settings_tray.module',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Block\\\\BlockEntitySettingTrayForm\\:\\:form\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Block/BlockEntitySettingTrayForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Block\\\\BlockEntitySettingTrayForm\\:\\:getRedirectUrl\\(\\) should return Drupal\\\\Core\\\\Url\\|null but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Block/BlockEntitySettingTrayForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Block\\\\BlockEntitySettingTrayForm\\:\\:submitVisibility\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Block/BlockEntitySettingTrayForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Block\\\\BlockEntitySettingTrayForm\\:\\:validateVisibility\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Block/BlockEntitySettingTrayForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:validateConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Component\\\\Plugin\\\\PluginInspectionInterface\\:\\:getDerivativeId\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface\\:\\:loadOverrideFree\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:\\:getConfigPrefix\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:setPlugin\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:validateConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:\\$plugin \\(Drupal\\\\Core\\\\Block\\\\BlockPluginInterface\\) does not accept Drupal\\\\Component\\\\Plugin\\\\PluginInspectionInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\settings_tray_test\\\\Form\\\\SettingsTrayFormAnnotationIsClassBlockForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/modules/settings_tray_test/src/Form/SettingsTrayFormAnnotationIsClassBlockForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:assertEditModeDisabled\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:assertEditModeEnabled\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:assertOffCanvasBlockFormIsValid\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:disableEditMode\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:enableEditMode\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:openBlockForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:pressToolbarEditButton\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\settings_tray\\\\FunctionalJavascript\\\\SettingsTrayTestBase\\:\\:toggleContextualTriggerVisibility\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/settings_tray/tests/src/FunctionalJavascript/SettingsTrayTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$repeat of method Drupal\\\\Core\\\\Messenger\\\\MessengerInterface\\:\\:addStatus\\(\\) expects bool, string given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Controller/ShortcutController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\link\\\\LinkItemInterface\\:\\:first\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Entity/Shortcut.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\Entity\\\\Shortcut\\:\\:postSave\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Entity/Shortcut.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface\\:\\:deleteAssignedShortcutSets\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Entity/ShortcutSet.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface\\:\\:getDefaultSet\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Entity/ShortcutSet.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\Entity\\\\ShortcutSet\\:\\:postSave\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Entity/ShortcutSet.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\Entity\\\\ShortcutSet\\:\\:preDelete\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Entity/ShortcutSet.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\Form\\\\SetCustomize\\:\\:form\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Form/SetCustomize.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\Form\\\\SetCustomize\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Form/SetCustomize.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$shortcut_set of method Drupal\\\\shortcut\\\\ShortcutSetStorageInterface\\:\\:countAssignedUsers\\(\\) expects Drupal\\\\shortcut\\\\ShortcutSetInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Form/ShortcutSetDeleteForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\Form\\\\SwitchShortcutSet\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Form/SwitchShortcutSet.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\Form\\\\SwitchShortcutSet\\:\\:validateForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Form/SwitchShortcutSet.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\AlterableInterface\\:\\:condition\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Hook/ShortcutHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\AlterableInterface\\:\\:getTables\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Hook/ShortcutHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$account of method Drupal\\\\shortcut\\\\ShortcutSetStorage\\:\\:unassignUser\\(\\) expects Drupal\\\\user\\\\UserInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/Hook/ShortcutHooks.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\ShortcutForm\\:\\:form\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/ShortcutForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\ShortcutForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/ShortcutForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\ShortcutSetForm\\:\\:form\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/ShortcutSetForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\ShortcutSetForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/ShortcutSetForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\ShortcutSetStorage\\:\\:assignUser\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/ShortcutSetStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\ShortcutSetStorage\\:\\:deleteAssignedShortcutSets\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/ShortcutSetStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\ShortcutSetStorage\\:\\:getDefaultSet\\(\\) should return Drupal\\\\shortcut\\\\ShortcutSetInterface but returns Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/ShortcutSetStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\ShortcutSetStorage\\:\\:getDisplayedToUser\\(\\) should return Drupal\\\\shortcut\\\\ShortcutSetInterface but returns Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/ShortcutSetStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\ShortcutSetStorageInterface\\:\\:assignUser\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/ShortcutSetStorageInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\shortcut\\\\ShortcutSetStorageInterface\\:\\:deleteAssignedShortcutSets\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/src/ShortcutSetStorageInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\shortcut\\\\ShortcutInterface\\:\\:\\$shortcut_set\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Jsonapi/ShortcutTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\shortcut\\\\ShortcutInterface\\:\\:setUnpublished\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Jsonapi/ShortcutTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$account of method Drupal\\\\shortcut\\\\ShortcutSetStorage\\:\\:assignUser\\(\\) expects Drupal\\\\user\\\\UserInterface, Drupal\\\\Core\\\\Session\\\\AccountInterface\\|null given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Jsonapi/ShortcutTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$passRaw\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutJsonCookieTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$passRaw\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutJsonCookieTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$passRaw\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetJsonCookieTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$passRaw\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetJsonCookieTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\shortcut\\\\ShortcutSetInterface\\:\\:getFields\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$passRaw\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\shortcut\\\\ShortcutSetInterface\\:\\:getFields\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetXmlCookieTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$passRaw\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetXmlCookieTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\shortcut\\\\ShortcutSetInterface\\:\\:getFields\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetXmlCookieTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$passRaw\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutXmlCookieTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$passRaw\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutXmlCookieTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\link\\\\LinkItemInterface\\:\\:\\$options\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\link\\\\LinkItemInterface\\:\\:\\$uri\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\shortcut\\\\ShortcutInterface\\:\\:\\$link\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\ShortcutLinksTest\\:\\:assertBlockAppears\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\ShortcutLinksTest\\:\\:assertNoBlockAppears\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\shortcut\\\\ShortcutInterface\\:\\:\\$link\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\ShortcutTestBase\\:\\:generateShortcutSet\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getTranslation\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutTranslationUITest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:hasTranslation\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutTranslationUITest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\ShortcutTranslationUITest\\:\\:getNewEntityValues\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutTranslationUITest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\FunctionalJavascript\\\\NavigationBlockUiTest\\:\\:toggleContextualTriggerVisibility\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/FunctionalJavascript/NavigationBlockUiTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\shortcut\\\\Kernel\\\\ShortcutEntityLinksTest\\:\\:\\$filter \\(Drupal\\\\filter\\\\Plugin\\\\Filter\\\\EntityLinks\\) does not accept Drupal\\\\filter\\\\Plugin\\\\FilterInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Kernel/ShortcutEntityLinksTest.php',
+	'path' => __DIR__ . '/modules/sqlite/src/Driver/Database/sqlite/Connection.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\sqlite\\\\Driver\\\\Database\\\\sqlite\\\\Connection\\:\\:createDatabase\\(\\) has no return type specified\\.$#',
@@ -40705,12 +40243,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$args might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/sqlite/src/Driver/Database/sqlite/Connection.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$statement might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/sqlite/src/Driver/Database/sqlite/Connection.php',
@@ -41654,7 +41186,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method GuzzleHttp\\\\ClientInterface\\:\\:get\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 3,
+	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/SecurityAdvisories/SecurityAdvisoriesFetcher.php',
 ];
 $ignoreErrors[] = [
@@ -43154,15 +42686,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/menu_test/src/TestControllers.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\menu_test\\\\TestControllers\\:\\:testDefaults\\(\\) should return string but returns array\\<string, Drupal\\\\Component\\\\Render\\\\FormattableMarkup\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/menu_test/src/TestControllers.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\menu_test\\\\TestControllers\\:\\:testDefaults\\(\\) should return string but returns array\\<string, string\\>\\.$#',
 	'identifier' => 'return.type',
-	'count' => 1,
+	'count' => 2,
 	'path' => __DIR__ . '/modules/system/tests/modules/menu_test/src/TestControllers.php',
 ];
 $ignoreErrors[] = [
@@ -44199,6 +43725,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/Menu/BreadcrumbTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/Menu/BreadcrumbTest.php',
@@ -45746,85 +45278,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationFieldViewTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationFieldViewTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationFieldViewTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationFieldViewTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationFieldViewTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationFieldViewTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationFieldViewTest\\:\\:\\$term \\(Drupal\\\\taxonomy\\\\Entity\\\\Term\\) does not accept Drupal\\\\taxonomy\\\\TermInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationFieldViewTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationFieldViewTest\\:\\:\\$vocabulary \\(Drupal\\\\taxonomy\\\\Entity\\\\Vocabulary\\) does not accept Drupal\\\\taxonomy\\\\VocabularyInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationFieldViewTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:assertBreadcrumb\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:assertBreadcrumbParts\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:assertMenuActiveTrail\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:\\$terms \\(array\\<Drupal\\\\taxonomy\\\\Entity\\\\Term\\>\\) does not accept array\\<Drupal\\\\taxonomy\\\\TermInterface\\>\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTranslationTest\\:\\:\\$vocabulary \\(Drupal\\\\taxonomy\\\\Entity\\\\Vocabulary\\) does not accept Drupal\\\\taxonomy\\\\VocabularyInterface\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTest.php',
@@ -45866,52 +45320,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TaxonomyIndexTidUiTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$field_views_testing_tags\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TaxonomyRelationshipTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\views\\\\ResultRow\\:\\:\\$taxonomy_term_field_data_taxonomy_term__parent_tid\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TaxonomyRelationshipTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\views\\\\ResultRow\\:\\:\\$tid\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TaxonomyRelationshipTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TaxonomyTestBase\\:\\:mockStandardInstall\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TaxonomyTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\taxonomy\\\\TermInterface\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TermNameFieldTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TermTranslationViewsTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TermTranslationViewsTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TermTranslationViewsTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TermTranslationViewsTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Views\\\\TermTranslationViewsTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Views/TermTranslationViewsTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\PendingRevisionTest\\:\\:getTaxonomyIndex\\(\\) has no return type specified\\.$#',
@@ -45974,6 +45386,96 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermKernelTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationFieldViewTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationFieldViewTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationFieldViewTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationFieldViewTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationFieldViewTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationFieldViewTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationFieldViewTest\\:\\:\\$term \\(Drupal\\\\taxonomy\\\\Entity\\\\Term\\) does not accept Drupal\\\\taxonomy\\\\TermInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationFieldViewTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationFieldViewTest\\:\\:\\$vocabulary \\(Drupal\\\\taxonomy\\\\Entity\\\\Vocabulary\\) does not accept Drupal\\\\taxonomy\\\\VocabularyInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationFieldViewTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:assertBreadcrumb\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:assertBreadcrumbParts\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:assertMenuActiveTrail\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:\\$terms \\(array\\<Drupal\\\\taxonomy\\\\Entity\\\\Term\\>\\) does not accept array\\<Drupal\\\\taxonomy\\\\TermInterface\\>\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\TermTranslationTest\\:\\:\\$vocabulary \\(Drupal\\\\taxonomy\\\\Entity\\\\Vocabulary\\) does not accept Drupal\\\\taxonomy\\\\VocabularyInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/TermTranslationTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\taxonomy\\\\TermInterface\\:\\:\\$description\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 2,
@@ -45998,34 +45500,58 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TaxonomyFieldVidTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$field_views_testing_tags\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TaxonomyRelationshipTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\views\\\\ResultRow\\:\\:\\$taxonomy_term_field_data_taxonomy_term__parent_tid\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TaxonomyRelationshipTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\views\\\\ResultRow\\:\\:\\$tid\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TaxonomyRelationshipTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\Views\\\\TaxonomyTestBase\\:\\:mockStandardInstall\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TaxonomyTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\taxonomy\\\\TermInterface\\:\\:\\$name\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TermNameFieldTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\Views\\\\TermTranslationViewsTest\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TermTranslationViewsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\Views\\\\TermTranslationViewsTest\\:\\:setUpTermReferenceField\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TermTranslationViewsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Kernel\\\\Views\\\\TermTranslationViewsTest\\:\\:setupLanguages\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/Views/TermTranslationViewsTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\taxonomy\\\\TermInterface\\:\\:\\$parent\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 2,
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Kernel/VocabularyCrudTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$value\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/telephone/src/Plugin/Field/FieldFormatter/TelephoneLinkFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$value\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/telephone/tests/src/Kernel/TelephoneItemTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\entity_test\\\\Entity\\\\EntityTest\\:\\:\\$field_test \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept string\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/telephone/tests/src/Kernel/TelephoneItemTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$format\\.$#',
@@ -46088,12 +45614,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/text/src/Plugin/Field/FieldWidget/TextareaWidget.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Field\\\\FieldItemInterface\\:\\:\\$summary\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/text/src/Plugin/Field/FieldWidget/TextareaWithSummaryWidget.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface\\<int\\|string, Drupal\\\\Core\\\\TypedData\\\\TypedDataInterface\\>\\:\\:\\$format\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
@@ -46136,6 +45656,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/text/tests/src/Kernel/TextFormatterTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/text/tests/src/Kernel/TextItemBaseTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$formatted_text\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
@@ -46146,18 +45672,6 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/text/tests/src/Kernel/TextProcessedAttachmentsTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$name\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/text/tests/src/Kernel/TextWithSummaryItemTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$summary_field\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 5,
-	'path' => __DIR__ . '/modules/text/tests/src/Kernel/TextWithSummaryItemTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\toolbar\\\\Ajax\\\\SetSubtreesCommand\\:\\:render\\(\\) has no return type specified\\.$#',
@@ -46190,6 +45704,66 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/ToolbarIntegrationTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\ckeditor5\\\\CKEditor5ToolbarTest\\:\\:\\$user \\(Drupal\\\\user\\\\Entity\\\\User\\) does not accept Drupal\\\\user\\\\UserInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/ckeditor5/CKEditor5ToolbarTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\contextual\\\\ContextualLinksTest\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/contextual/ContextualLinksTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\contextual\\\\ContextualLinksTest\\:\\:toggleContextualTriggerVisibility\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/contextual/ContextualLinksTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:createNodeThroughUi\\(\\) should return Drupal\\\\node\\\\NodeInterface but returns Drupal\\\\Core\\\\Entity\\\\EntityInterface\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:isLabelInContentOverview\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:setupWorkspaceSwitcherBlock\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:switchToLive\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:switchToWorkspace\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:\\$editor1 \\(Drupal\\\\user\\\\Entity\\\\User\\) does not accept Drupal\\\\user\\\\UserInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Tests\\\\toolbar\\\\FunctionalJavascript\\\\workspaces\\\\WorkspaceTest\\:\\:\\$editor2 \\(Drupal\\\\user\\\\Entity\\\\User\\) does not accept Drupal\\\\user\\\\UserInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/toolbar/tests/src/FunctionalJavascript/workspaces/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Cannot assign offset \'id\' to string\\.$#',
 	'identifier' => 'offsetAssign.dimType',
 	'count' => 1,
@@ -46210,6 +45784,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\update\\\\Controller\\\\UpdateController\\:\\:updateStatusManually\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/update/src/Controller/UpdateController.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$repeat of method Drupal\\\\Core\\\\Messenger\\\\MessengerInterface\\:\\:addError\\(\\) expects bool, string given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/update/src/Controller/UpdateController.php',
 ];
@@ -46438,7 +46018,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Psr\\\\Log\\\\LoggerInterface\\:\\:hasErrorThatPasses\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 2,
+	'count' => 1,
 	'path' => __DIR__ . '/modules/update/tests/src/Unit/UpdateFetcherTest.php',
 ];
 $ignoreErrors[] = [
@@ -46574,18 +46154,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/Controller/UserAuthenticationController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^PHPDoc tag @param for parameter \\$time with type Drupal\\\\Component\\\\Datetime\\\\TimeInterface\\|null is not subtype of native type Drupal\\\\Component\\\\Datetime\\\\TimeInterface\\.$#',
-	'identifier' => 'parameter.phpDocType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Controller/UserController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^PHPDoc type for property Drupal\\\\user\\\\Controller\\\\UserController\\:\\:\\$time with type Drupal\\\\Component\\\\Datetime\\\\TimeInterface\\|null is not subtype of native type Drupal\\\\Component\\\\Datetime\\\\TimeInterface\\.$#',
-	'identifier' => 'property.phpDocType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Controller/UserController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$identifier of method Drupal\\\\Core\\\\Flood\\\\FloodInterface\\:\\:clear\\(\\) expects string\\|null, int given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
@@ -46680,6 +46248,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/EventSubscriber/UserRequestSubscriber.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\user\\\\Form\\\\EntityPermissionsForm\\:\\:permissionsByProvider\\(\\) has invalid return type Drupal\\\\user\\\\Form\\\\PermissionInfoList\\.$#',
+	'identifier' => 'class.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/Form/EntityPermissionsForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\user\\\\Form\\\\EntityPermissionsForm\\:\\:permissionsByProvider\\(\\) should return array\\<string, Drupal\\\\user\\\\Form\\\\PermissionInfoList\\> but returns array\\<array\\<string, mixed\\>\\>\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/Form/EntityPermissionsForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:setIsAdmin\\(\\)\\.$#',
@@ -46790,8 +46370,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/Form/UserPasswordResetForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Binary operation "\\+\\=" between string and array\\{description\\: \'\', \'restrict access\'\\: false, warning\\: \'\'\\} results in an error\\.$#',
-	'identifier' => 'assignOp.invalid',
+	'message' => '#^Iterating over an object of an unknown class Drupal\\\\user\\\\Form\\\\PermissionInfoList\\.$#',
+	'identifier' => 'class.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/Form/UserPermissionsForm.php',
 ];
@@ -46802,10 +46382,41 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/Form/UserPermissionsForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\user\\\\Form\\\\UserPermissionsForm\\:\\:permissionsByProvider\\(\\) has invalid return type Drupal\\\\user\\\\Form\\\\PermissionInfoList\\.$#',
+	'identifier' => 'class.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/Form/UserPermissionsForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\user\\\\Form\\\\UserPermissionsForm\\:\\:permissionsByProvider\\(\\) should return array\\<string, Drupal\\\\user\\\\Form\\\\PermissionInfoList\\> but returns array\\<array\\<string, mixed\\>\\>\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/Form/UserPermissionsForm.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\Form\\\\UserPermissionsForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/Form/UserPermissionsForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^PHPDoc tag @phpstan\\-import\\-type has invalid value \\(PermissionInfoList from
+  \\\\Drupal\\\\user\\\\PermissionHandlerInterface\\)\\: Unexpected token "\\\\n \\* ", expected type at offset 108 on line 4$#',
+	'identifier' => 'phpDoc.parseError',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/Form/UserPermissionsForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\user\\\\Form\\\\UserPermissionsModuleSpecificForm\\:\\:permissionsByProvider\\(\\) has invalid return type Drupal\\\\user\\\\Form\\\\PermissionInfoList\\.$#',
+	'identifier' => 'class.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/Form/UserPermissionsModuleSpecificForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^PHPDoc tag @phpstan\\-type PermissionInfo has invalid value\\: Unexpected token "\\{", expected TOKEN_PHPDOC_EOL at offset 100 on line 4$#',
+	'identifier' => 'phpDoc.parseError',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/PermissionHandlerInterface.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\Plugin\\\\Action\\\\AddRoleUser\\:\\:execute\\(\\) has no return type specified\\.$#',
@@ -46914,30 +46525,6 @@ $ignoreErrors[] = [
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/Plugin/LanguageNegotiation/LanguageNegotiationUserAdmin.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:condition\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Search/UserSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:fields\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Search/UserSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:limit\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Search/UserSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface\\:\\:orConditionGroup\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Plugin/Search/UserSearch.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$message\\.$#',
@@ -47378,15 +46965,27 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/RegisterForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$account of function user_login_finalize expects Drupal\\\\user\\\\UserInterface, Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\|Drupal\\\\Core\\\\Entity\\\\RevisionLogInterface given\\.$#',
+	'message' => '#^Parameter \\#1 \\$account of method Drupal\\\\user\\\\NotificationHandler\\:\\:sendRegisterAdminCreated\\(\\) expects Drupal\\\\user\\\\UserInterface, Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\|Drupal\\\\Core\\\\Entity\\\\RevisionLogInterface given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/RegisterForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$account of function _user_mail_notify expects Drupal\\\\Core\\\\Session\\\\AccountInterface, Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\|Drupal\\\\Core\\\\Entity\\\\RevisionLogInterface given\\.$#',
+	'message' => '#^Parameter \\#1 \\$account of method Drupal\\\\user\\\\NotificationHandler\\:\\:sendRegisterNoApprovalRequired\\(\\) expects Drupal\\\\user\\\\UserInterface, Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\|Drupal\\\\Core\\\\Entity\\\\RevisionLogInterface given\\.$#',
 	'identifier' => 'argument.type',
-	'count' => 3,
+	'count' => 2,
+	'path' => __DIR__ . '/modules/user/src/RegisterForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$account of method Drupal\\\\user\\\\NotificationHandler\\:\\:sendRegisterPendingApproval\\(\\) expects Drupal\\\\user\\\\UserInterface, Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\|Drupal\\\\Core\\\\Entity\\\\RevisionLogInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/RegisterForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$user of method Drupal\\\\user\\\\LoginFinalizer\\:\\:finalizeLogin\\(\\) expects Drupal\\\\user\\\\UserInterface, Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\|Drupal\\\\Core\\\\Entity\\\\RevisionLogInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/RegisterForm.php',
 ];
 $ignoreErrors[] = [
@@ -47562,6 +47161,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/tests/modules/user_language_test/src/Form/UserLanguageTestForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\user\\\\UserInterface\\:\\:\\$sessionId\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Functional/Command/LoginCommandTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Session\\\\AccountInterface\\:\\:\\$passRaw\\.$#',
@@ -48032,6 +47637,24 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/tests/src/Kernel/Condition/UserRoleConditionTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Language\\\\LanguageManager\\:\\:getLanguageConfigOverride\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/user/tests/src/Kernel/NotificationHandlerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Kernel\\\\NotificationHandlerTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Kernel/NotificationHandlerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Kernel\\\\NotificationHandlerTest\\:\\:assertMailString\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Kernel/NotificationHandlerTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\TypedData\\\\TraversableTypedDataInterface\\:\\:get\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -48048,12 +47671,6 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/tests/src/Kernel/UserEntityReferenceTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Language\\\\LanguageManager\\:\\:getLanguageConfigOverride\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/user/tests/src/Kernel/UserMailNotifyTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Kernel\\\\UserMailNotifyTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
@@ -48110,10 +47727,38 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/tests/src/Kernel/Views/UserKernelTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Unit/Plugin/Validation/Constraint/ProtectedUserFieldConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\user\\\\Plugin\\\\Validation\\\\Constraint\\\\ProtectedUserFieldConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Unit/Plugin/Validation/Constraint/ProtectedUserFieldConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\user\\\\Entity\\\\User\\:\\:\\$_skipProtectedUserFieldConstraint \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept true\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/tests/src/Unit/Plugin/Validation/Constraint/ProtectedUserFieldConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Unit/Plugin/Validation/Constraint/UserMailRequiredValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\user\\\\Plugin\\\\Validation\\\\Constraint\\\\UserMailRequiredValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Unit/Plugin/Validation/Constraint/UserMailRequiredValidatorTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\views\\\\ViewExecutable\\:\\:\\$storage \\(Drupal\\\\views\\\\Entity\\\\View\\) does not accept Drupal\\\\views\\\\ViewEntityInterface&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\.$#',
@@ -48189,6 +47834,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:revokePermission\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/user.module',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\user\\\\NotificationHandler\\:\\:sendStatusCancelled\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/user.module',
@@ -48860,6 +48511,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/FieldViewsDataProvider.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$untranslatable_configs in empty\\(\\) always exists and is not falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/src/FieldViewsDataProvider.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\views\\\\Plugin\\\\views\\\\ViewsHandlerInterface\\:\\:\\$options\\.$#',
 	'identifier' => 'property.notFound',
 	'count' => 1,
@@ -48957,12 +48614,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\views\\\\Plugin\\\\views\\\\area\\\\AreaPluginBase\\:\\:viewsFormEmpty\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Form/ViewsFormMainForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\views\\\\Plugin\\\\views\\\\field\\\\FieldPluginBase\\:\\:form_element_row_id\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Form/ViewsFormMainForm.php',
@@ -54992,12 +54643,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/row/EntityRow.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\row\\\\EntityRow\\:\\:render\\(\\) should return string but returns array\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/row/EntityRow.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\row\\\\EntityRow\\:\\:summaryTitle\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -55018,12 +54663,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\row\\\\OpmlFields\\:\\:buildOptionsForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/row/OpmlFields.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\row\\\\OpmlFields\\:\\:render\\(\\) should return string but returns array\\<string, mixed\\>\\.$#',
-	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/row/OpmlFields.php',
 ];
@@ -55052,12 +54691,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/row/RowPluginBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\row\\\\RowPluginBase\\:\\:render\\(\\) should return string but returns array\\<string, mixed\\>\\.$#',
-	'identifier' => 'return.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/row/RowPluginBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\row\\\\RowPluginBase\\:\\:submitOptionsForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -55078,12 +54711,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\row\\\\RssFields\\:\\:buildOptionsForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/row/RssFields.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\row\\\\RssFields\\:\\:render\\(\\) should return string but returns array\\<string, mixed\\>\\.$#',
-	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/row/RssFields.php',
 ];
@@ -55326,12 +54953,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/style/DefaultSummary.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot assign offset \'\\#post_render\' to string\\.$#',
-	'identifier' => 'offsetAssign.dimType',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/src/Plugin/views/style/EntityReference.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\style\\\\EntityReference\\:\\:buildOptionsForm\\(\\) has no return type specified\\.$#',
@@ -56150,10 +55771,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/modules/views_test_data/src/Plugin/views/query/QueryTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\views_test_data\\\\Plugin\\\\views\\\\row\\\\RowTest\\:\\:render\\(\\) should return array but returns string\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/modules/views_test_data/src/Plugin/views/row/RowTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_test_data\\\\Plugin\\\\views\\\\style\\\\MappingTest\\:\\:filterNumericFields\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/modules/views_test_data/src/Plugin/views/style/MappingTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Binary operation "\\." between array and "\\\\n" results in an error\\.$#',
+	'identifier' => 'binaryOp.invalid',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/modules/views_test_data/src/Plugin/views/style/StyleTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_test_data\\\\Plugin\\\\views\\\\style\\\\StyleTest\\:\\:render\\(\\) has no return type specified\\.$#',
@@ -56564,12 +56197,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Entity/LatestTranslationAffectedRevisionTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$elements of method Drupal\\\\Core\\\\Render\\\\Renderer\\:\\:renderRoot\\(\\) expects array, string given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Entity/RowEntityRenderersTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot call method getReferenceableEntities\\(\\) on object\\|false\\.$#',
 	'identifier' => 'method.nonObject',
 	'count' => 1,
@@ -56608,7 +56235,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\views\\\\Plugin\\\\views\\\\ViewsHandlerInterface\\:\\:\\$options\\.$#',
 	'identifier' => 'property.notFound',
-	'count' => 1,
+	'count' => 3,
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/AreaTextTest.php',
 ];
 $ignoreErrors[] = [
@@ -56778,12 +56405,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterBooleanOperatorDefaultTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$elements of method Drupal\\\\Core\\\\Render\\\\Renderer\\:\\:renderRoot\\(\\) expects array, string given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FilterBooleanOperatorGroupTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$filters of method Drupal\\\\views\\\\ViewExecutable\\:\\:setExposedInput\\(\\) expects array\\<string\\>, array\\<string, int\\> given\\.$#',
@@ -56970,12 +56591,6 @@ $ignoreErrors[] = [
 	'identifier' => 'property.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/DisplayPageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\views\\\\Plugin\\\\views\\\\query\\\\QueryPluginBase\\:\\:getTableQueue\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/EntityReverseJoinTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\views\\\\Plugin\\\\views\\\\ViewsPluginInterface\\:\\:renderExposedForm\\(\\)\\.$#',
@@ -57616,7 +57231,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Cache\\\\CacheBackendInterface\\:\\:expects\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 29,
+	'count' => 43,
 	'path' => __DIR__ . '/modules/views/tests/src/Unit/ViewsDataTest.php',
 ];
 $ignoreErrors[] = [
@@ -59666,6 +59281,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/WorkspaceSwitcherTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\node\\\\NodeInterface\\:\\:\\$workspace\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/WorkspaceTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getOwnerId\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 2,
@@ -60476,12 +60097,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/profiles/standard/tests/src/Functional/StandardTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\standard\\\\FunctionalJavascript\\\\StandardPerformanceTest\\:\\:refreshVariables\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/profiles/standard/tests/src/FunctionalJavascript/StandardPerformanceTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\drupal_system_listing_compatible_test\\\\Kernel\\\\SystemListingCrossProfileCompatibleTest\\:\\:testSystemListing\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -60512,10 +60127,32 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/scripts/run-tests.sh',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Test\\\\PhpUnitTestDiscovery\\:\\:findAllClassFiles\\(\\) invoked with 4 parameters, 0\\-3 required\\.$#',
+	'identifier' => 'arguments.count',
+	'count' => 1,
+	'path' => __DIR__ . '/scripts/run-tests.sh',
+];
+$ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @param for parameter \\$autoloader with type Drupal\\\\Core\\\\Composer\\\\Composer is incompatible with native type Composer\\\\Autoload\\\\ClassLoader\\.$#',
 	'identifier' => 'parameter.phpDocType',
 	'count' => 1,
 	'path' => __DIR__ . '/scripts/run-tests.sh',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Composer/Component/ComponentsIsolatedBuildTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Composer/Template/ComposerProjectTemplatesTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @var with type SplFileInfo is not subtype of native type Symfony\\\\Component\\\\Finder\\\\SplFileInfo\\.$#',
@@ -60530,9 +60167,37 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/BuildTests/Composer/Template/ComposerProjectTemplatesTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/BuildTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/BuildTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\|PHPUnit\\\\Framework\\\\MockObject\\\\MockBuilder\\:\\:expects\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/Tests/BuildTestTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method getDrupalRoot\\(\\) of class Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\:
+in drupal\\:11\\.4\\.0 and is removed from drupal\\:13\\.0\\.0\\. Access
+  \\$this\\-\\>root directly\\.$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/Tests/BuildTestTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^PHPDoc tag @var with type Drupal\\\\BuildTests\\\\Framework\\\\BuildTestBase\\|PHPUnit\\\\Framework\\\\MockObject\\\\MockBuilder is not subtype of native type PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\.$#',
+	'identifier' => 'varTag.nativeType',
+	'count' => 2,
 	'path' => __DIR__ . '/tests/Drupal/BuildTests/Framework/Tests/BuildTestTest.php',
 ];
 $ignoreErrors[] = [
@@ -60776,18 +60441,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Entity/RevisionVersionHistoryTranslatableTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\block_content\\\\Entity\\\\BlockContent\\:\\:setName\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Entity/RevisionViewTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Property Drupal\\\\block_content\\\\Entity\\\\BlockContent\\:\\:\\$foo \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept string\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Entity/RevisionViewTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$options of method Drupal\\\\Core\\\\File\\\\FileSystem\\:\\:prepareDirectory\\(\\) expects int, false given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
@@ -60812,7 +60465,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Image/ToolkitSetupFormTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^PHPDoc type bool\\|string\\|null of property Drupal\\\\FunctionalTests\\\\Installer\\\\InstallerConfigDirectoryTestBase\\:\\:\\$profile is not covariant with PHPDoc type string of overridden property Drupal\\\\FunctionalTests\\\\Installer\\\\InstallerTestBase\\:\\:\\$profile\\.$#',
+	'message' => '#^PHPDoc type bool\\|string\\|null of property Drupal\\\\FunctionalTests\\\\Installer\\\\InstallerConfigDirectoryTestBase\\:\\:\\$profile is not covariant with PHPDoc type string\\|null of overridden property Drupal\\\\FunctionalTests\\\\Installer\\\\InstallerTestBase\\:\\:\\$profile\\.$#',
 	'identifier' => 'property.phpDocType',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerConfigDirectoryTestBase.php',
@@ -60826,7 +60479,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Language\\\\LanguageManagerInterface\\:\\:getLanguageConfigOverride\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 3,
+	'count' => 2,
 	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerExistingConfigSyncDirectoryMultilingualTest.php',
 ];
 $ignoreErrors[] = [
@@ -60839,6 +60492,18 @@ $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\:\\:register\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Installer\\\\InstallerTestBase\\:\\:setUpProfile\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^PHPDoc type string\\|null of property Drupal\\\\FunctionalTests\\\\Installer\\\\InstallerTestBase\\:\\:\\$profile is not covariant with PHPDoc type string of overridden property Drupal\\\\Tests\\\\BrowserTestBase\\:\\:\\$profile\\.$#',
+	'identifier' => 'property.phpDocType',
+	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerTestBase.php',
 ];
 $ignoreErrors[] = [
@@ -61538,6 +61203,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/Storage/FileStorageTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\:\\:getDefinition\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Console/ConsoleTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$column2 on object\\|false\\.$#',
 	'identifier' => 'property.nonObject',
 	'count' => 2,
@@ -61584,6 +61255,18 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 27,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/DriverSpecificTransactionTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$a2 of method Drupal\\\\Core\\\\Database\\\\StatementInterface\\:\\:setFetchMode\\(\\) expects list\\<mixed\\>, array\\{fakeArg\\: 10\\} given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/FetchTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Offset \'function\' does not exist on string\\.$#',
+	'identifier' => 'offsetAccess.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/LoggingTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$age on array\\|object\\|false\\.$#',
@@ -61828,19 +61511,19 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$age on array\\|object\\|false\\.$#',
 	'identifier' => 'property.nonObject',
-	'count' => 6,
+	'count' => 8,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/UpsertTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$job on array\\|object\\|false\\.$#',
 	'identifier' => 'property.nonObject',
-	'count' => 6,
+	'count' => 8,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/UpsertTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot access property \\$name on array\\|object\\|false\\.$#',
 	'identifier' => 'property.nonObject',
-	'count' => 6,
+	'count' => 8,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Database/UpsertTest.php',
 ];
 $ignoreErrors[] = [
@@ -61941,6 +61624,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\RevisionableInterface\\:\\:set\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/ContentEntityCacheTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\block_content\\\\Entity\\\\BlockContent\\:\\:getName\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/ContentEntityCacheTest.php',
@@ -62128,19 +61817,25 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$name\\.$#',
 	'identifier' => 'property.notFound',
-	'count' => 4,
+	'count' => 2,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateBundleTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Field\\\\FieldStorageDefinitionInterface\\:\\:getUniqueIdentifier\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateBundleTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$name\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 2,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Field\\\\FieldStorageDefinitionInterface\\:\\:getUniqueIdentifier\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateMultipleTypesTest.php',
 ];
 $ignoreErrors[] = [
@@ -62306,6 +62001,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityFieldTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\RevisionableInterface\\:\\:get\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 2,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityFieldTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Field\\\\FieldDefinitionInterface\\:\\:getPropertyDefinition\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -62386,7 +62087,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Cannot cast Drupal\\\\Core\\\\Entity\\\\Query\\\\QueryInterface to string\\.$#',
 	'identifier' => 'cast.string',
-	'count' => 2,
+	'count' => 4,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityQueryTest.php',
 ];
 $ignoreErrors[] = [
@@ -62936,6 +62637,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/FieldableEntityDefinitionUpdateTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\block_content\\\\Entity\\\\BlockContent\\:\\:setName\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 2,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/RevisionViewTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\block_content\\\\Entity\\\\BlockContent\\:\\:\\$foo \\(Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\) does not accept string\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 2,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/RevisionViewTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:setNewRevision\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -62988,6 +62701,24 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/Sql/SqlContentEntityStorageSchemaTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/Sql/SqlContentEntityStorageTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getRevisionId\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/Sql/SqlContentEntityStorageTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface\\:\\:loadRevision\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/Sql/SqlContentEntityStorageTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$field_test\\.$#',
@@ -63230,6 +62961,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Image/ToolkitTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^PHPDoc tag @var with type Psr\\\\Http\\\\Message\\\\ResponseInterface is not subtype of native type GuzzleHttp\\\\Psr7\\\\Response\\.$#',
+	'identifier' => 'varTag.nativeType',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Installer/InstallerTranslationDownloadTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\KernelTests\\\\Core\\\\KeyValueStore\\\\StorageTestBase\\:\\:\\$factory \\(bool\\) does not accept string\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
@@ -63336,6 +63073,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Plugin/ContextHandlerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\DrupalKernelInterface\\:\\:terminate\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Queue/InstantQueueRunnerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\KernelTests\\\\Core\\\\Queue\\\\QueueSerializationTest\\:\\:\\$queue \\(Drupal\\\\Core\\\\Queue\\\\DatabaseQueue\\) does not accept Drupal\\\\Core\\\\Queue\\\\QueueInterface\\.$#',
@@ -63686,6 +63429,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Symfony\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
 	'identifier' => 'assign.propertyType',
 	'count' => 2,
@@ -63958,13 +63707,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Behat\\\\Mink\\\\Driver\\\\DriverInterface\\:\\:getClient\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\Client\\:
-Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
-	'identifier' => 'method.deprecated',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
 ];
@@ -64431,12 +64173,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/DependencyInjection/Dumper/OptimizedPhpArrayDumperTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Constructor of class Symfony\\\\Component\\\\ExpressionLanguage\\\\Expression has an unused parameter \\$expression\\.$#',
-	'identifier' => 'constructor.unusedParameter',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Component/DependencyInjection/Dumper/OptimizedPhpArrayDumperTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Component\\\\DependencyInjection\\\\Dumper\\\\OptimizedPhpArrayDumperTest\\:\\:getCollection\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -64803,6 +64539,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Utility/VariableTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Calling sha1\\(\\) is forbidden, use sha256\\(\\) or hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/ComposerIntegrationTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Result of static method Drupal\\\\Composer\\\\Composer\\:\\:ensureComposerVersion\\(\\) \\(void\\) is used\\.$#',
 	'identifier' => 'staticMethod.void',
 	'count' => 1,
@@ -64812,6 +64560,12 @@ $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Composer\\\\IO\\\\IOInterface\\:\\:getOutput\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/Plugin/FixturesBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 2,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/Plugin/FixturesBase.php',
 ];
 $ignoreErrors[] = [
@@ -64879,6 +64633,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/Plugin/Scaffold/Functional/ScaffoldUpgradeTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/Plugin/Unpack/Fixtures.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Routing\\\\RouteProviderInterface\\:\\:method\\(\\)\\.$#',
@@ -64971,12 +64731,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Access/DependentAccessTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property Symfony\\\\Component\\\\HttpFoundation\\\\Request\\:\\:\\$query \\(Symfony\\\\Component\\\\HttpFoundation\\\\InputBag\\<string\\>\\) does not accept Symfony\\\\Component\\\\HttpFoundation\\\\InputBag\\<bool\\|float\\|int\\|string\\|null\\>\\.$#',
-	'identifier' => 'assign.propertyType',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Access/RoutePathGenerationTraitTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Ajax\\\\AjaxResponseTest\\:\\:createCommandMockWithSettingsAndLibrariesAttachments\\(\\) should return Drupal\\\\Core\\\\Ajax\\\\CommandInterface but returns PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
@@ -64993,6 +64747,12 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 3,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Asset/AssetResolverTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Tests\\\\Core\\\\Asset\\\\JsCollectionGrouperUnitTest\\:\\:\\$grouper \\(Drupal\\\\Core\\\\Asset\\\\CssCollectionGrouper\\) does not accept Drupal\\\\Core\\\\Asset\\\\JsCollectionGrouper\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Asset/JsCollectionGrouperUnitTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Asset\\\\LibrariesDirectoryFileFinder&PHPUnit\\\\Framework\\\\MockObject\\\\Stub\\:\\:expects\\(\\)\\.$#',
@@ -65063,13 +64823,13 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Cache\\\\CacheBackendInterface\\:\\:expects\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 17,
+	'count' => 23,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Cache/CacheCollectorTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Lock\\\\LockBackendInterface\\:\\:expects\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 11,
+	'count' => 15,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Cache/CacheCollectorTest.php',
 ];
 $ignoreErrors[] = [
@@ -65433,6 +65193,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Database/Stub/StubConnection.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Return type \\(void\\) of method Drupal\\\\Tests\\\\Core\\\\Database\\\\Stub\\\\StubConnection\\:\\:insert\\(\\) should be compatible with return type \\(Drupal\\\\Core\\\\Database\\\\Query\\\\Insert\\) of method Drupal\\\\Core\\\\Database\\\\Connection\\:\\:insert\\(\\)$#',
+	'identifier' => 'method.childReturnType',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Database/Stub/StubConnection.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Database\\\\Stub\\\\StubSchema\\:\\:addField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -65757,6 +65523,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityFieldManagerTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Prophecy\\\\Prophecy\\\\ProphecyInterface\\<Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\>\\:\\:getLinkTemplates\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityFieldManagerTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Cannot call method shouldBeCalled\\(\\) on object\\{data\\: mixed, created\\: int, tags\\: array\\<string\\>, valid\\: bool, expire\\: int, checksum\\: string, serialized\\: int\\}\\|false\\.$#',
 	'identifier' => 'method.nonObject',
 	'count' => 1,
@@ -65777,7 +65549,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Cannot call method willReturn\\(\\) on array\\.$#',
 	'identifier' => 'method.nonObject',
-	'count' => 6,
+	'count' => 5,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityFieldManagerTest.php',
 ];
 $ignoreErrors[] = [
@@ -65913,7 +65685,19 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityResolverManagerTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Anonymous function should return Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface but returns null\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeBundleInfoTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:\\:will\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeBundleInfoTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Prophecy\\\\Prophecy\\\\ProphecyInterface\\<Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\>\\:\\:getLinkTemplates\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeBundleInfoTest.php',
@@ -65921,7 +65705,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Cannot call method willReturn\\(\\) on array\\.$#',
 	'identifier' => 'method.nonObject',
-	'count' => 5,
+	'count' => 4,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeBundleInfoTest.php',
 ];
 $ignoreErrors[] = [
@@ -65949,25 +65733,37 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeBundleInfoTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:\\:willReturn\\(\\)\\.$#',
+	'message' => '#^Anonymous function should return Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface but returns null\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Prophecy\\\\Prophecy\\\\ProphecyInterface\\<Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\>\\:\\:get\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method willReturn\\(\\) on array\\.$#',
-	'identifier' => 'method.nonObject',
+	'message' => '#^Call to an undefined method Prophecy\\\\Prophecy\\\\ProphecyInterface\\<Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\>\\:\\:getClass\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Prophecy\\\\Prophecy\\\\ProphecyInterface\\<Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\>\\:\\:getLinkTemplates\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Prophecy\\\\Prophecy\\\\ProphecyInterface\\<Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\>\\:\\:setClass\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot call method willReturn\\(\\) on array\\<mixed\\>\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method willReturn\\(\\) on string\\.$#',
 	'identifier' => 'method.nonObject',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
@@ -65979,7 +65775,25 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Anonymous function should return Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface but returns null\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeRepositoryTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\:\\:will\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeRepositoryTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Prophecy\\\\Prophecy\\\\ProphecyInterface\\<Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\>\\:\\:getClass\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeRepositoryTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Prophecy\\\\Prophecy\\\\ProphecyInterface\\<Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\>\\:\\:getLinkTemplates\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeRepositoryTest.php',
@@ -65987,17 +65801,11 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Cannot call method willReturn\\(\\) on array\\.$#',
 	'identifier' => 'method.nonObject',
-	'count' => 3,
+	'count' => 2,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeRepositoryTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot call method willReturn\\(\\) on array\\<Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\>\\.$#',
-	'identifier' => 'method.nonObject',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeRepositoryTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot call method willReturn\\(\\) on string\\.$#',
 	'identifier' => 'method.nonObject',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeRepositoryTest.php',
@@ -66125,7 +65933,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\ContentEntityTypeInterface&PHPUnit\\\\Framework\\\\MockObject\\\\Stub\\:\\:expects\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 26,
+	'count' => 27,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageTest.php',
 ];
 $ignoreErrors[] = [
@@ -66137,7 +65945,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityFieldManagerInterface&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\:\\:reveal\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 6,
+	'count' => 7,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageTest.php',
 ];
 $ignoreErrors[] = [
@@ -66149,13 +65957,13 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\:\\:getActiveDefinition\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 4,
+	'count' => 5,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\:\\:reveal\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
-	'count' => 6,
+	'count' => 7,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageTest.php',
 ];
 $ignoreErrors[] = [
@@ -66217,12 +66025,6 @@ $ignoreErrors[] = [
 	'identifier' => 'method.notFound',
 	'count' => 2,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/TypedData/EntityAdapterUnitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\EventSubscriber\\\\ActiveLinkResponseFilterTest\\:\\:providerTestSetLinkActiveClass\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/EventSubscriber/ActiveLinkResponseFilterTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property Drupal\\\\Tests\\\\Core\\\\EventSubscriber\\\\CustomPageExceptionHtmlSubscriberTest\\:\\:\\$configFactory \\(Drupal\\\\Core\\\\Config\\\\ConfigFactoryInterface&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\) does not accept Drupal\\\\Core\\\\Config\\\\ConfigFactoryInterface&PHPUnit\\\\Framework\\\\MockObject\\\\Stub\\.$#',
@@ -66345,6 +66147,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Field/BaseFieldDefinitionTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Anonymous function should return Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface but returns null\\.$#',
+	'identifier' => 'return.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Field/FieldDefinitionListenerTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface\\:\\:willReturn\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 5,
@@ -66363,8 +66171,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Field/FieldDefinitionListenerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot call method willReturn\\(\\) on array\\.$#',
-	'identifier' => 'method.nonObject',
+	'message' => '#^Call to an undefined method Prophecy\\\\Prophecy\\\\ProphecyInterface\\<Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface\\>\\:\\:getLinkTemplates\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Field/FieldDefinitionListenerTest.php',
 ];
@@ -66627,17 +66435,16 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/SubformStateTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Htmx\\\\HtmxAttributesTest\\:\\:hxSimpleStringAttributesDataProvider\\(\\) should return array\\<array\\{string, string\\|null, string, bool\\|string\\}\\> but returns array\\{array\\{\'select\', \'\\#info\\-details\', \'data\\-hx\\-select\', \'\\#info\\-details\'\\}, array\\{\'select\', \'info\\[data\\-drupal…\', \'data\\-hx\\-select\', \'info\\[data\\-drupal…\'\\}, array\\{\'selectOob\', \'\\#info\\-details\', \'data\\-hx\\-select\\-oob\', \'\\#info\\-details\'\\}, array\\{\'selectOob\', array\\{\'\\#info\\-details…\', \'\\#alert\'\\}, \'data\\-hx\\-select\\-oob\', \'\\#info\\-details…\'\\}, array\\{\'target\', \'descriptor\', \'data\\-hx\\-target\', \'descriptor\'\\}, array\\{\'trigger\', \'event\', \'data\\-hx\\-trigger\', \'event\'\\}, array\\{\'trigger\', array\\{\'load\', \'click delay\\:1s\'\\}, \'data\\-hx\\-trigger\', \'load,click delay\\:1s\'\\}, array\\{\'confirm\', \'A confirmation…\', \'data\\-hx\\-confirm\', \'A confirmation…\'\\}, \\.\\.\\.\\}\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Htmx\\\\HtmxAttributesTest\\:\\:hxOnDataProvider\\(\\) should return array\\<int, array\\<string\\>\\> but returns array\\<int, list\\<array\\<string, string\\>\\|string\\>\\>\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Htmx/HtmxAttributesTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\Client\\:
-Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
-	'identifier' => 'method.deprecated',
+	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Htmx\\\\HtmxAttributesTest\\:\\:hxSimpleStringAttributesDataProvider\\(\\) should return array\\<array\\{string, string\\|null, string, bool\\|string\\}\\> but returns array\\{array\\{\'select\', \'\\#info\\-details\', \'data\\-hx\\-select\', \'\\#info\\-details\'\\}, array\\{\'select\', \'info\\[data\\-drupal…\', \'data\\-hx\\-select\', \'info\\[data\\-drupal…\'\\}, array\\{\'selectOob\', \'\\#info\\-details\', \'data\\-hx\\-select\\-oob\', \'\\#info\\-details\'\\}, array\\{\'selectOob\', array\\{\'\\#info\\-details…\', \'\\#alert\'\\}, \'data\\-hx\\-select\\-oob\', \'\\#info\\-details…\'\\}, array\\{\'target\', \'descriptor\', \'data\\-hx\\-target\', \'descriptor\'\\}, array\\{\'trigger\', \'event\', \'data\\-hx\\-trigger\', \'event\'\\}, array\\{\'trigger\', array\\{\'load\', \'click delay\\:1s\'\\}, \'data\\-hx\\-trigger\', \'load,click delay\\:1s\'\\}, array\\{\'confirm\', \'A confirmation…\', \'data\\-hx\\-confirm\', \'A confirmation…\'\\}, \\.\\.\\.\\}\\.$#',
+	'identifier' => 'return.type',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Http/ClientFactoryTest.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Htmx/HtmxAttributesTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#7 \\$content of method Drupal\\\\Core\\\\Http\\\\TrustedHostsRequestFactory\\:\\:createRequest\\(\\) expects string\\|null, array given\\.$#',
@@ -66826,6 +66633,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/ParamConverter/EntityConverterTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface&PHPUnit\\\\Framework\\\\MockObject\\\\Stub\\:\\:expects\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/ParamConverter/EntityConverterTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\PathProcessor\\\\InboundPathProcessorInterface&PHPUnit\\\\Framework\\\\MockObject\\\\Stub\\:\\:expects\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 14,
@@ -66980,12 +66793,6 @@ $ignoreErrors[] = [
 	'identifier' => 'assign.propertyType',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/DefaultSingleLazyPluginCollectionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Constructor of class Drupal\\\\Tests\\\\Core\\\\Plugin\\\\Discovery\\\\TestContainerDerivativeDiscovery has an unused parameter \\$example_service\\.$#',
-	'identifier' => 'constructor.unusedParameter',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/Discovery/TestContainerDerivativeDiscovery.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @var above a method has no effect\\.$#',
@@ -67636,7 +67443,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Update/UpdateRegistryTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Anonymous function should return array\\{_route\\: \'node_edit\'\\|\'node_view\'\\|\'view\\.frontpage\\.page…\', _raw_variables\\: Symfony\\\\Component\\\\HttpFoundation\\\\InputBag\\<bool\\|float\\|int\\|string\\|null\\>\\} but returns array\\{_route\\: \'node_edit\'\\|\'node_view\'\\|\'view\\.frontpage\\.page…\', _raw_variables\\: Symfony\\\\Component\\\\HttpFoundation\\\\InputBag\\<bool\\|float\\|int\\|string\\|null\\>\\}\\.$#',
+	'message' => '#^Anonymous function should return array\\{_route\\: \'node_edit\'\\|\'node_view\'\\|\'view\\.promoted…\', _raw_variables\\: Symfony\\\\Component\\\\HttpFoundation\\\\InputBag\\<bool\\|float\\|int\\|string\\|null\\>\\} but returns array\\{_route\\: \'node_edit\'\\|\'node_view\'\\|\'view\\.promoted…\', _raw_variables\\: Symfony\\\\Component\\\\HttpFoundation\\\\InputBag\\<bool\\|float\\|int\\|string\\|null\\>\\}\\.$#',
 	'identifier' => 'return.type',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/UrlTest.php',
@@ -67708,8 +67515,20 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Utility/UnroutedUrlAssemblerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to deprecated method getConfig\\(\\) of interface GuzzleHttp\\\\ClientInterface\\:
-ClientInterface\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
+	'message' => '#^Call to protected method updateCache\\(\\) of class Drupal\\\\Core\\\\Cache\\\\CacheCollector\\.$#',
+	'identifier' => 'method.protected',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Utility/YamlCacheCollectorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\Tests\\\\Core\\\\Utility\\\\YamlCacheCollectorTest\\:\\:\\$collector \\(Drupal\\\\Tests\\\\Core\\\\Cache\\\\CacheCollectorHelper\\) does not accept Drupal\\\\Core\\\\Utility\\\\YamlCacheCollector\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Utility/YamlCacheCollectorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
 	'identifier' => 'method.deprecated',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/PrimitiveTypeConstraintValidatorTest.php',
@@ -67734,6 +67553,12 @@ since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
 	'identifier' => 'method.deprecated',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/SerializedConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to an undefined method GuzzleHttp\\\\ClientInterface\\:\\:getConfig\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/DrupalTestBrowser.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot call method getHost\\(\\) on false\\.$#',
@@ -67838,6 +67663,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/themes/claro/src/Hook/ClaroHooks.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#',
+	'identifier' => 'method.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/themes/default_admin/src/Hook/PreprocessHooks.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Template\\\\AttributeValueBase\\:\\:hasClass\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -67856,6 +67687,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/themes/default_admin/src/Hook/PreprocessHooks.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:\\$container \\(Drupal\\\\Core\\\\DependencyInjection\\\\ContainerBuilder\\|null\\) does not accept Drupal\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/themes/default_admin/tests/src/Kernel/ViewsViewFieldStatusTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property Drupal\\\\views\\\\ResultRow\\:\\:\\$_entity \\(Drupal\\\\Core\\\\Entity\\\\EntityInterface\\) does not accept null\\.$#',
+	'identifier' => 'assign.propertyType',
+	'count' => 1,
+	'path' => __DIR__ . '/themes/default_admin/tests/src/Kernel/ViewsViewFieldStatusTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Template\\\\AttributeValueBase\\:\\:hasClass\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -67866,30 +67709,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/themes/olivero/src/OliveroPreRender.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Asset\\\\LibraryDiscoveryInterface\\:\\:clear\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/stable9/tests/Kernel/Stable9LibraryOverrideTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Missing call to parent\\:\\:setUp\\(\\) method\\.$#',
-	'identifier' => 'phpunit.callParent',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/stable9/tests/Kernel/Stable9LibraryOverrideTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Extension\\\\Extension\\:\\:\\$origin\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/stable9/tests/Kernel/Stable9TemplateOverrideTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Extension\\\\Extension\\:\\:\\$status\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/themes/stable9/tests/Kernel/Stable9TemplateOverrideTest.php',
 ];
 
 return ['parameters' => ['ignoreErrors' => $ignoreErrors]];
