@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('views')]
 #[RunTestsInSeparateProcesses]
-class AggregationTest extends ViewsKernelTestBase {
+class AggregationDateFieldTest extends ViewsKernelTestBase {
 
   /**
    * {@inheritdoc}
