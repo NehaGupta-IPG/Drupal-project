@@ -36,6 +36,19 @@
                 break;
 
               case '[object Array]':
+                // Skip an empty incoming array. BigPipe sends one
+                // 'settings' command per placeholder. A placeholder with
+                // no entries for this key (for example no #ajax bindings)
+                // sends `[]`. Applying it would erase settings (for
+                // example drupalSettings.ajax) merged in by an earlier
+                // placeholder.
+                if (
+                  value.length === 0 &&
+                  current[key] &&
+                  typeof current[key] === 'object'
+                ) {
+                  break;
+                }
                 current[key] = Drupal.htmx.mergeSettings(
                   new Array(value.length),
                   value,

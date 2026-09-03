@@ -6,6 +6,7 @@ namespace Drupal\big_pipe_test;
 
 use Drupal\big_pipe\Render\BigPipeMarkup;
 use Drupal\big_pipe_test\EventSubscriber\BigPipeTestSubscriber;
+use Drupal\big_pipe_test\Form\BigPipeTestAjaxForm;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -90,6 +91,23 @@ class BigPipeTestController implements TrustedCallbackInterface {
       ],
       'item3' => [
         '#lazy_builder' => [static::class . '::counter', []],
+        '#create_placeholder' => TRUE,
+      ],
+    ];
+  }
+
+  /**
+   * A page with a placeholder wrapping a form with an #ajax submit button.
+   *
+   * @see \Drupal\Tests\big_pipe\FunctionalJavascript\BigPipeRegressionTest::testAjaxBehaviorsAttachAfterPlaceholderReplacement()
+   *
+   * @return array
+   *   Render array with the #ajax form rendered via a lazy builder.
+   */
+  public function ajaxForm() {
+    return [
+      'ajax_form' => [
+        '#lazy_builder' => [BigPipeTestAjaxForm::class . '::buildAsPlaceholder', []],
         '#create_placeholder' => TRUE,
       ],
     ];

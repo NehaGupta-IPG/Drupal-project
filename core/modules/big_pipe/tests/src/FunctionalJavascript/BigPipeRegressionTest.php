@@ -152,4 +152,35 @@ JS;
     $assert_session->elementExists('css', 'div.container-after');
   }
 
+  /**
+   * Ensure #ajax behaviors bind to a placeholder's final swapped-in content.
+   *
+   * The 'add_js' command fires 'htmx:drupal:load' (which attaches behaviors)
+   * as soon as its own assets finish loading. It always runs before 'insert'
+   * in the command queue. When a placeholder's 'insert' command performs an
+   * 'outerHTML'/'replaceWith' swap, the element that 'add_js' just attached
+   * behaviors to is discarded and replaced with an unbound one, so a
+   * classic Drupal.behaviors.AJAX handler (#ajax) never ends up bound to
+   * anything actually in the DOM.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3620565
+   */
+  public function testAjaxBehaviorsAttachAfterPlaceholderReplacement(): void {
+    \Drupal::service('module_installer')->install(['big_pipe_test']);
+    $user = $this->drupalCreateUser();
+    $this->drupalLogin($user);
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet(Url::fromRoute('big_pipe_test_ajax_form'));
+    $this->assertNotNull($assert_session->waitForElement('css', 'script[data-big-pipe-event="stop"]'));
+
+    // The placeholder's final content is in the DOM…
+    $assert_session->elementTextContains('css', '#big-pipe-test-ajax-form-result', 'Not clicked yet.');
+    // …and #ajax actually bound to it: clicking triggers a real AJAX
+    // request whose response replaces the result container.
+    $this->getSession()->getPage()->pressButton('Click me');
+    $assert_session->waitForElementVisible('css', '#big-pipe-test-ajax-form-result');
+    $assert_session->elementTextContains('css', '#big-pipe-test-ajax-form-result', 'Clicked!');
+  }
+
 }

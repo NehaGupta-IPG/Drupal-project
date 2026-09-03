@@ -47,3 +47,11 @@ big_pipe_test_untrusted_redirect:
     _title: 'BigPipe test untrusted redirect'
   requirements:
     _access: 'TRUE'
+
+big_pipe_test_ajax_form:
+  path: '/big_pipe_test_ajax_form'
+  defaults:
+    _controller: '\Drupal\big_pipe_test\BigPipeTestController::ajaxForm'
+    _title: 'BigPipe test #ajax form placeholder'
+  requirements:
+    _access: 'TRUE'
