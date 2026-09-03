@@ -27,13 +27,14 @@ use Drupal\update\UpdateFetcherInterface;
  *
  * @param array $projects
  *   Reference to an array of the projects installed on the system. This
- *   includes all the metadata documented in the comments below for each project
- *   (either module or theme) that is currently installed. The array is
- *   initially populated inside \Drupal\update\UpdateManager::getProjects() with
- *   the help of \Drupal\Core\Utility\ProjectInfo->processInfoList(), so look
- *   there for examples of how to populate the array with real values.
+ *   includes all the metadata documented in the comments below for each
+ *   project (either module or theme) that is currently installed. The array is
+ *   initially populated inside
+ *   \Drupal\update\UpdateManagerInterface::getProjects() with the help of
+ *   \Drupal\Core\Utility\ProjectInfo->processInfoList(), so look there for
+ *    examples of how to populate the array with real values.
  *
- * @see \Drupal\update\UpdateManager::getProjects()
+ * @see \Drupal\update\UpdateManagerInterface::getProjects()
  * @see \Drupal\Core\Utility\ProjectInfo::processInfoList()
  */
 function hook_update_projects_alter(&$projects) {
@@ -102,36 +103,6 @@ function hook_update_status_alter(&$projects) {
       }
     }
   }
-}
-
-/**
- * Verify an archive after it has been downloaded and extracted.
- *
- * @param string $project
- *   The short name of the project that has been downloaded.
- * @param string $archive_file
- *   The filename of the un-extracted archive.
- * @param string $directory
- *   The directory that the archive was extracted into.
- *
- * @return array
- *   If there are any problems, return an array of error messages. If there are
- *   no problems, return an empty array.
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
- *   replacement. Use composer to manage the code for your site.
- *
- * @see https://www.drupal.org/node/3512364
- * @see update_manager_archive_verify()
- * @ingroup update_manager_file
- */
-function hook_verify_update_archive($project, $archive_file, $directory): array {
-  $errors = [];
-  if (!file_exists($directory)) {
-    $errors[] = t('The %directory does not exist.', ['%directory' => $directory]);
-  }
-  // Add other checks on the archive integrity here.
-  return $errors;
 }
 
 /**

@@ -8,11 +8,13 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\Entity\EntityFormMode;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Exception\EntityTypeIdLengthException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests Drupal\Core\Entity\EntityType.
@@ -41,7 +43,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests get.
    */
   #[DataProvider('providerTestGet')]
-  public function testGet(array $definition, $key, $expected): void {
+  public function testGet(array $definition, string $key, ?string $expected): void {
     $entity_type = $this->setUpEntityType($definition);
     $this->assertSame($expected, $entity_type->get($key));
   }
@@ -53,7 +55,7 @@ class EntityTypeTest extends UnitTestCase {
    * @legacy-covers ::get
    */
   #[DataProvider('providerTestSet')]
-  public function testSet($key, $value): void {
+  public function testSet(string $key, ?string $value): void {
     $entity_type = $this->setUpEntityType([]);
     $this->assertInstanceOf('Drupal\Core\Entity\EntityTypeInterface', $entity_type->set($key, $value));
     $this->assertSame($value, $entity_type->get($key));
@@ -64,7 +66,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests the getKeys() method.
    */
   #[DataProvider('providerTestGetKeys')]
-  public function testGetKeys($entity_keys, $expected): void {
+  public function testGetKeys(array $entity_keys, array $expected): void {
     $entity_type = $this->setUpEntityType(['entity_keys' => $entity_keys]);
     $expected += [
       'default_langcode' => 'default_langcode',
@@ -77,7 +79,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests the getKey() method.
    */
   #[DataProvider('providerTestGetKeys')]
-  public function testGetKey($entity_keys, $expected): void {
+  public function testGetKey(array $entity_keys, array $expected): void {
     $entity_type = $this->setUpEntityType(['entity_keys' => $entity_keys]);
     $this->assertSame($expected['bundle'], $entity_type->getKey('bundle'));
     $this->assertFalse($entity_type->getKey('bananas'));
@@ -87,7 +89,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests the hasKey() method.
    */
   #[DataProvider('providerTestGetKeys')]
-  public function testHasKey($entity_keys, $expected): void {
+  public function testHasKey(array $entity_keys, array $expected): void {
     $entity_type = $this->setUpEntityType(['entity_keys' => $entity_keys]);
     $this->assertSame(!empty($expected['bundle']), $entity_type->hasKey('bundle'));
     $this->assertSame(!empty($expected['id']), $entity_type->hasKey('id'));
@@ -272,32 +274,51 @@ class EntityTypeTest extends UnitTestCase {
    */
   public function testIdExceedsMaxLength(): void {
     $id = $this->randomMachineName(33);
-    $message = 'Attempt to create an entity type with an ID longer than 32 characters: ' . $id;
+    $message = "Attempt to create an entity type with an ID longer than 32 characters: {$id}.";
     $this->expectException('Drupal\Core\Entity\Exception\EntityTypeIdLengthException');
-    $this->expectExceptionMessage($message);
+    $this->expectExceptionMessageIs($message);
     $this->setUpEntityType(['id' => $id]);
   }
 
   /**
-   * Tests get original class unchanged.
-   */
-  public function testGetOriginalClassUnchanged(): void {
-    $class = $this->randomMachineName();
-    $entity_type = $this->setUpEntityType(['class' => $class]);
-    $this->assertEquals($class, $entity_type->getOriginalClass());
-  }
-
-  /**
-   * Tests get original class changed.
+   * Tests maxlength validation of ID when it is a derivative.
    *
-   * @legacy-covers ::setClass
-   * @legacy-covers ::getOriginalClass
+   * Bundle class plugin IDs have derivative form of {entity type ID}:{bundle},
+   * and both the entity type ID and the bundle can be up to 32 characters. As
+   * long as each is 32 or less, the combined ID is valid.
+   *
+   * @param bool $invalid_entity_type
+   *   Whether the entity type ID is too long.
+   * @param bool $invalid_bundle
+   *   Whether the bundle is too long.
    */
-  public function testGetOriginalClassChanged(): void {
-    $class = $this->randomMachineName();
-    $entity_type = $this->setUpEntityType(['class' => $class]);
-    $entity_type->setClass($this->randomMachineName());
-    $this->assertEquals($class, $entity_type->getOriginalClass());
+  #[TestWith([TRUE, TRUE])]
+  #[TestWith([TRUE, FALSE])]
+  #[TestWith([FALSE, TRUE])]
+  #[TestWith([FALSE, FALSE])]
+  public function testDerivativeIdMaxlength(bool $invalid_entity_type, bool $invalid_bundle): void {
+    $entity_type_id = $invalid_entity_type ? $this->randomMachineName(EntityTypeInterface::ID_MAX_LENGTH + 1) : $this->randomMachineName(EntityTypeInterface::ID_MAX_LENGTH);
+    $bundle = $invalid_bundle ? $this->randomMachineName(EntityTypeInterface::BUNDLE_MAX_LENGTH + 1) : $this->randomMachineName(EntityTypeInterface::BUNDLE_MAX_LENGTH);
+
+    try {
+      $t = NULL;
+      $entity_type = $this->setUpEntityType(['id' => "$entity_type_id:$bundle"]);
+    }
+    catch (\Throwable $t) {
+      $entity_type = NULL;
+    }
+    if ($invalid_bundle) {
+      $this->assertInstanceOf(EntityTypeIdLengthException::class, $t);
+      $this->assertSame('Attempt to create an entity type bundle class with an ID longer than ' . EntityTypeInterface::ID_MAX_LENGTH . " characters: $bundle.", $t->getMessage());
+    }
+    elseif ($invalid_entity_type) {
+      $this->assertInstanceOf(EntityTypeIdLengthException::class, $t);
+      $this->assertSame('Attempt to create an entity type with an ID longer than ' . EntityTypeInterface::ID_MAX_LENGTH . " characters: $entity_type_id.", $t->getMessage());
+    }
+    else {
+      $this->assertInstanceOf(EntityTypeInterface::class, $entity_type);
+    }
+
   }
 
   /**
@@ -492,7 +513,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests the ::getBundleLabel() method.
    */
   #[DataProvider('providerTestGetBundleLabel')]
-  public function testGetBundleLabel($definition, $expected): void {
+  public function testGetBundleLabel(array $definition, string $expected): void {
     $entity_type = $this->setUpEntityType($definition);
     $entity_type->setStringTranslation($this->getStringTranslationStub());
     $this->assertEquals($expected, $entity_type->getBundleLabel());

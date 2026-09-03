@@ -37,13 +37,13 @@ class ConfigTargetTest extends UnitTestCase {
       'test' => [
         '#type' => 'text',
         '#default_value' => 'A test',
-        '#config_target' => new ConfigTarget('system.site', 'admin_compact_mode', 'intval', 'boolval'),
+        '#config_target' => new ConfigTarget('system.cron', 'logging', 'intval', 'boolval'),
         '#name' => 'test',
         '#array_parents' => ['test'],
       ],
       'duplicate' => [
         '#type' => 'text',
-        '#config_target' => new ConfigTarget('system.site', 'admin_compact_mode', 'intval', 'boolval'),
+        '#config_target' => new ConfigTarget('system.cron', 'logging', 'intval', 'boolval'),
         '#name' => 'duplicate',
         '#array_parents' => ['duplicate'],
       ],
@@ -63,7 +63,7 @@ class ConfigTargetTest extends UnitTestCase {
     $form_state = new FormState();
 
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Two #config_targets both target "admin_compact_mode" in the "system.site" config: `$form[\'test\']` and `$form[\'duplicate\']`.');
+    $this->expectExceptionMessageIs('Two #config_targets both target "logging" in the "system.cron" config: `$form[\'test\']` and `$form[\'duplicate\']`.');
     $test_form->storeConfigKeyToFormElementMap($form, $form_state);
   }
 
@@ -78,14 +78,18 @@ class ConfigTargetTest extends UnitTestCase {
       'test' => [
         '#type' => 'text',
         '#default_value' => 'A test',
-        '#config_target' => new ConfigTarget('system.site', 'admin_compact_mode', $fromConfig, $toConfig),
+        '#config_target' => new ConfigTarget('system.cron', 'logging', $fromConfig, $toConfig),
         '#name' => 'test',
         '#array_parents' => ['test'],
       ],
     ];
 
+    $config = $this->prophesize(Config::class);
+    $config->getCacheTags()->willReturn([]);
+    $config_factory = $this->prophesize(ConfigFactoryInterface::class);
+    $config_factory->getEditable('system.cron')->willReturn($config->reveal());
     $test_form = new class(
-      $this->prophesize(ConfigFactoryInterface::class)->reveal(),
+      $config_factory->reveal(),
       $this->prophesize(TypedConfigManagerInterface::class)->reveal(),
     ) extends ConfigFormBase {
       use RedundantEditableConfigNamesTrait;
@@ -154,14 +158,14 @@ class ConfigTargetTest extends UnitTestCase {
       'test' => [
         '#type' => 'text',
         '#default_value' => 'A test',
-        '#config_target' => new ConfigTarget('system.site', 'admin_compact_mode', 'intval', 'boolval'),
+        '#config_target' => new ConfigTarget('system.cron', 'logging', 'intval', 'boolval'),
         '#name' => 'test',
         '#parents' => ['test'],
       ],
     ];
     $config_target = ConfigTarget::fromForm(['test'], $form);
-    $this->assertSame('system.site', $config_target->configName);
-    $this->assertSame(['admin_compact_mode'], $config_target->propertyPaths);
+    $this->assertSame('system.cron', $config_target->configName);
+    $this->assertSame(['logging'], $config_target->propertyPaths);
     $this->assertSame(['test'], $config_target->elementParents);
     $this->assertSame(1, ($config_target->fromConfig)(TRUE));
     $this->assertFalse(($config_target->toConfig)('0'));
@@ -175,7 +179,7 @@ class ConfigTargetTest extends UnitTestCase {
   #[DataProvider('providerTestFromFormException')]
   public function testFromFormException(array $form, array $array_parents, string $exception_message): void {
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage($exception_message);
+    $this->expectExceptionMessageIs($exception_message);
     ConfigTarget::fromForm($array_parents, $form);
   }
 
@@ -227,7 +231,7 @@ class ConfigTargetTest extends UnitTestCase {
   #[DataProvider('providerMultiTargetWithoutCallables')]
   public function testMultiTargetWithoutCallables(...$arguments): void {
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('The $fromConfig and $toConfig arguments must be passed to Drupal\Core\Form\ConfigTarget::__construct() if multiple property paths are targeted.');
+    $this->expectExceptionMessageIs('The $fromConfig and $toConfig arguments must be passed to Drupal\Core\Form\ConfigTarget::__construct() if multiple property paths are targeted.');
     new ConfigTarget(...$arguments);
   }
 
@@ -244,7 +248,7 @@ class ConfigTargetTest extends UnitTestCase {
     $config->getName()->willReturn('bar.settings');
 
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Config target is associated with foo.settings but bar.settings given.');
+    $this->expectExceptionMessageIs('Config target is associated with foo.settings but bar.settings given.');
     $sut->getValue($config->reveal());
   }
 
@@ -255,7 +259,7 @@ class ConfigTargetTest extends UnitTestCase {
     $config->getName()->willReturn('bar.settings');
 
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('Config target is associated with foo.settings but bar.settings given.');
+    $this->expectExceptionMessageIs('Config target is associated with foo.settings but bar.settings given.');
     $sut->setValue($config->reveal(), $this->randomString(), $this->prophesize(FormStateInterface::class)->reveal());
   }
 
@@ -386,7 +390,7 @@ class ConfigTargetTest extends UnitTestCase {
     $config->getName()->willReturn('foo.settings');
 
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage($expected_exception_message);
+    $this->expectExceptionMessageIs($expected_exception_message);
     $config_target->setValue($config->reveal(), '1988|1992', $this->prophesize(FormStateInterface::class)->reveal());
   }
 

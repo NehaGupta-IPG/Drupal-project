@@ -22,80 +22,48 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 class PluginExistsConstraint extends SymfonyConstraint implements ContainerFactoryPluginInterface {
 
   /**
-   * The error message if a plugin does not exist.
-   *
-   * @var string
-   */
-  public string $unknownPluginMessage = "The '@plugin_id' plugin does not exist.";
-
-  /**
-   * The error message if a plugin does not implement the expected interface.
-   *
-   * @var string
-   */
-  public string $invalidInterfaceMessage = "The '@plugin_id' plugin must implement or extend @interface.";
-
-  /**
-   * The ID of the plugin manager service.
-   *
-   * @var string
-   */
-  protected string $manager;
-
-  /**
-   * Optional name of the interface that the plugin must implement.
-   *
-   * @var string|null
-   */
-  public ?string $interface = NULL;
-
-  /**
-   * Whether or not to consider fallback plugin IDs as valid.
-   *
-   * @var bool
-   */
-  public bool $allowFallback = FALSE;
-
-  /**
-   * Constructs a PluginExistsConstraint.
+   * Constructs a PluginExistsConstraint object.
    *
    * @param \Drupal\Component\Plugin\PluginManagerInterface $pluginManager
-   *   The plugin manager associated with the constraint.
-   * @param mixed|null $options
-   *   The options (as associative array) or the value for the default option
-   *   (any other type).
+   *   The plugin manager.
+   * @param string $manager
+   *   The ID of the plugin manager service.
+   * @param string|null $interface
+   *   Optional name of the interface that the plugin must implement.
+   * @param bool|null $allowFallback
+   *   Whether to consider fallback plugin IDs as valid.
+   * @param string $unknownPluginMessage
+   *   The error message if a plugin does not exist.
+   * @param string $invalidInterfaceMessage
+   *   The error message if a plugin does not implement the expected interface.
    * @param array|null $groups
-   *   An array of validation groups.
+   *   The groups that the constraint belongs to.
    * @param mixed|null $payload
    *   Domain-specific data attached to a constraint.
    */
-  public function __construct(public readonly PluginManagerInterface $pluginManager, mixed $options = NULL, ?array $groups = NULL, mixed $payload = NULL) {
-    parent::__construct($options, $groups, $payload);
+  public function __construct(
+    public readonly PluginManagerInterface $pluginManager,
+    protected string $manager,
+    public ?string $interface = NULL,
+    public bool $allowFallback = FALSE,
+    public string $unknownPluginMessage = "The '@plugin_id' plugin does not exist.",
+    public string $invalidInterfaceMessage = "The '@plugin_id' plugin must implement or extend @interface.",
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(NULL, $groups, $payload);
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    $plugin_manager_id = $configuration['manager'] ?? $configuration['value'] ?? NULL;
+    $configuration['manager'] ??= NULL;
+    $plugin_manager_id = $configuration['manager'];
     if ($plugin_manager_id === NULL) {
       throw new MissingOptionsException(sprintf('The option "manager" must be set for constraint "%s".', static::class), ['manager']);
     }
-    return new static($container->get($plugin_manager_id), $configuration);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefaultOption(): ?string {
-    return 'manager';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRequiredOptions(): array {
-    return ['manager'];
+    return new static($container->get($plugin_manager_id), ...$configuration);
   }
 
 }

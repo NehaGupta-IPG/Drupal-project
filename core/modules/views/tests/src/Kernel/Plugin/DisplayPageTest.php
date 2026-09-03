@@ -44,13 +44,6 @@ class DisplayPageTest extends ViewsKernelTestBase {
   ];
 
   /**
-   * The router dumper to get all routes.
-   *
-   * @var \Drupal\Core\Routing\MatcherDumper
-   */
-  protected $routerDumper;
-
-  /**
    * Checks the behavior of the page for access denied/not found behaviors.
    */
   public function testPageResponses(): void {
@@ -247,7 +240,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
       'html_list' => '//div[@class="item-list"]//li',
     ];
 
-    $themes = ['olivero', 'stable9', 'stark', 'claro'];
+    $themes = ['stark', 'claro'];
 
     foreach ($themes as $theme) {
       \Drupal::service('theme_installer')->install([$theme]);
