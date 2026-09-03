@@ -33,8 +33,6 @@ trait HttpKernelUiHelperTrait {
    * Mink session manager.
    *
    * This is lazily initialized by the first call to self::drupalGet().
-   *
-   * @var \Behat\Mink\Mink|null
    */
   protected ?Mink $mink;
 
@@ -45,9 +43,9 @@ trait HttpKernelUiHelperTrait {
    *
    * @param \Drupal\Core\Url|string $path
    *   The Drupal path to load into Mink controlled browser, as a string or a
-   *   Url object. (Note that the Symfony browser's functionality of paths
-   *   relative to the previous request is not available, because an initial '/'
-   *   is assumed if not present.)
+   *   Url object. Relative paths (without a leading '/') are made absolute by
+   *   prepending '/'. Query strings starting with '?' are resolved relative to
+   *   the current page URL.
    * @param array $options
    *   (optional) Options to be forwarded to the URL generator. The 'absolute'
    *   option is not supported.
@@ -67,7 +65,10 @@ trait HttpKernelUiHelperTrait {
   protected function drupalGet($path, array $options = [], array $headers = []): string {
     $session = $this->getSession();
 
-    if (is_string($path) && !str_starts_with($path, '/')) {
+    // Ensure relative paths are made absolute by prepending '/'. Query strings
+    // (starting with '?') are left as-is so they resolve relative to the
+    // current page URL.
+    if (is_string($path) && !str_starts_with($path, '?') && !str_starts_with($path, '/')) {
       $path = '/' . $path;
     }
 
@@ -77,6 +78,7 @@ trait HttpKernelUiHelperTrait {
 
     foreach ($headers as $header_name => $header_value) {
       assert(is_string($header_name));
+      assert(!is_null($header_name));
 
       $session->setRequestHeader($header_name, $header_value);
     }
@@ -84,6 +86,7 @@ trait HttpKernelUiHelperTrait {
     $session->visit($path);
 
     $out = $session->getPage()->getContent();
+    $this->content = $out;
 
     if ($this->htmlOutputEnabled) {
       $html_output = 'GET request to: ' . $path;
@@ -181,6 +184,10 @@ trait HttpKernelUiHelperTrait {
    * Initializes Mink sessions.
    *
    * Helper for static::getSession().
+   *
+   * This should be called after changes to the service container, such as
+   * installing modules, as otherwise it will contain a reference to a stale
+   * container.
    */
   protected function initMink(): void {
     $driver = $this->getDefaultDriverInstance();
@@ -206,8 +213,7 @@ trait HttpKernelUiHelperTrait {
   protected function getDefaultDriverInstance(): DriverInterface {
     $http_kernel = $this->container->get('http_kernel');
     $browserkit_client = new HttpKernelBrowser($http_kernel);
-    $driver = new BrowserKitDriver($browserkit_client);
-    return $driver;
+    return new BrowserKitDriver($browserkit_client);
   }
 
   /**
@@ -256,6 +262,19 @@ trait HttpKernelUiHelperTrait {
    */
   protected function getUrl(): string {
     return $this->getSession()->getCurrentUrl();
+  }
+
+  /**
+   * Rebuilds the container.
+   *
+   * Provided for compatibility with traits that call $this->rebuildContainer(),
+   * such as those shared with functional tests.
+   *
+   * @see \Drupal\Core\Test\FunctionalTestSetupTrait::rebuildContainer
+   */
+  protected function rebuildContainer(): void {
+    \Drupal::service('kernel')->rebuildContainer();
+    $this->container = \Drupal::getContainer();
   }
 
 }

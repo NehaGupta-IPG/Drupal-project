@@ -824,87 +824,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Component/Datetime/DateTimePlus.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\DiffFormatter\\:\\:_added\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\DiffFormatter\\:\\:_block\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\DiffFormatter\\:\\:_block_header\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\DiffFormatter\\:\\:_changed\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\DiffFormatter\\:\\:_context\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\DiffFormatter\\:\\:_deleted\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\DiffFormatter\\:\\:_end_block\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\DiffFormatter\\:\\:_end_diff\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\DiffFormatter\\:\\:_lines\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\DiffFormatter\\:\\:_start_block\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Diff\\\\DiffFormatter\\:\\:_start_diff\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$x0 might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 4,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$xi in empty\\(\\) always exists and is not falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$y0 might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 4,
 	'path' => __DIR__ . '/lib/Drupal/Component/Diff/DiffFormatter.php',
 ];
 $ignoreErrors[] = [
@@ -3428,6 +3350,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Command/DbImportCommand.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Calling md5\\(\\) is forbidden, use hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Command/GenerateTheme.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Command\\\\ServerCommand\\:\\:openBrowser\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -5141,7 +5069,7 @@ $ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$storage of method Drupal\\\\Core\\\\DefaultContent\\\\ContentExportCommand\\:\\:loadEntities\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityStorageInterface, Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/DefaultContent/ContentExportCommand.php',
+	'path' => __DIR__ . '/lib/Drupal/Core/DefaultContent/Command/ContentExportCommand.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @return with type array\\<null\\>\\|string\\|Stringable is not subtype of native type array\\.$#',
@@ -8134,7 +8062,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
 	'identifier' => 'isset.variable',
-	'count' => 2,
+	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
 ];
 $ignoreErrors[] = [
@@ -12512,42 +12440,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Batch/BatchStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\DatabaseLockBackend\\:\\:release\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/DatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\DatabaseLockBackend\\:\\:releaseAll\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/DatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\DatabaseLockBackend\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/DatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\PersistentDatabaseLockBackend\\:\\:release\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/PersistentDatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\PersistentDatabaseLockBackend\\:\\:releaseAll\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/PersistentDatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\PersistentDatabaseLockBackend\\:\\:schemaDefinition\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Lock/PersistentDatabaseLockBackend.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Menu\\\\MenuActiveTrail\\:\\:clear\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -13290,6 +13182,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RouteBuilderInterface.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Calling sha1\\(\\) is forbidden, use sha256\\(\\) or hash\\(\\) with an xxHash algorithm instead\\.$#',
+	'identifier' => 'disallowed.function',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Routing/RouteProvider.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Routing\\\\RouteProvider\\:\\:addExtraCacheKeyPart\\(\\) has no return type specified\\.$#',
@@ -14450,6 +14348,20 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/TypedDataManagerInterface.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of interface Symfony\\\\Component\\\\Validator\\\\ConstraintValidatorInterface\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/Validation/RecursiveContextualValidator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of interface Symfony\\\\Component\\\\Validator\\\\ConstraintValidatorInterface\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/TypedData/Validation/RecursiveContextualValidator.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\TypedData\\\\Validation\\\\RecursiveContextualValidator\\:\\:validateConstraints\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -15603,6 +15515,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/BlockContentTypeTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/BlockContentTypeTest.php',
@@ -35866,6 +35784,36 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/NodeViewBuilder.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:indexClear\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:indexStatus\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:markForReindex\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:updateIndex\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\views\\\\argument\\\\Type\\:\\:node_type\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -42888,12 +42836,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/form_test/src/Form/FormTestCheckboxTypeJugglingForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\form_test\\\\Form\\\\FormTestDetailsContainsRequiredTextfieldForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/form_test/src/Form/FormTestDetailsContainsRequiredTextfieldForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\form_test\\\\Form\\\\FormTestDetailsForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -44227,6 +44169,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
+	'identifier' => 'empty.variable',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/Menu/BreadcrumbFrontCacheContextsTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Variable \\$trail in empty\\(\\) always exists and is always falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/Menu/BreadcrumbFrontCacheContextsTest.php',
@@ -45879,7 +45827,7 @@ $ignoreErrors[] = [
 	'message' => '#^Variable \\$parts in empty\\(\\) always exists and is always falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTranslationTest.php',
+	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/TermTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getTranslation\\(\\)\\.$#',
@@ -58104,12 +58052,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views_ui/src/ViewEditForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$group_info might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/views_ui/src/ViewEditForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_ui\\\\ViewFormBase\\:\\:getDisplayLabel\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -59270,12 +59212,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceMerger\\:\\:merge\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceMerger.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceMerger.php',
 ];
@@ -63912,12 +63848,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteInstallCommand.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\TestSite\\\\Commands\\\\TestSiteInstallCommand\\:\\:refreshVariables\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteInstallCommand.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\TestSite\\\\Commands\\\\TestSiteInstallCommand\\:\\:resetAll\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -64156,12 +64086,6 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\BrowserTestBase\\:\\:rebuildContainer\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\BrowserTestBase\\:\\:refreshVariables\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 2,
 	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
 ];
 $ignoreErrors[] = [
@@ -67788,7 +67712,28 @@ $ignoreErrors[] = [
 ClientInterface\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
 	'identifier' => 'method.deprecated',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/DrupalTestBrowser.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/PrimitiveTypeConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\Core\\\\Validation\\\\Plugin\\\\Validation\\\\Constraint\\\\PrimitiveTypeConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/PrimitiveTypeConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method initialize\\(\\) of class Symfony\\\\Component\\\\Validator\\\\ConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/SerializedConstraintValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method validate\\(\\) of class Drupal\\\\Core\\\\Validation\\\\Plugin\\\\Validation\\\\Constraint\\\\SerializedConstraintValidator\\:
+since Symfony 8\\.1, use "validateInContext\\(\\)" instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/SerializedConstraintValidatorTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot call method getHost\\(\\) on false\\.$#',

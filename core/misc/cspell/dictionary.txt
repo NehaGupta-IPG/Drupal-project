@@ -95,7 +95,6 @@ classmaps
 classtype
 cldr
 closethick
-codesniffer
 colgroups
 colinodell
 colspans
@@ -184,6 +183,7 @@ fieldgroups
 fieldnames
 fieldsets
 filemime
+finalizer
 findwith
 flickr
 flipfit
@@ -227,17 +227,16 @@ imagecache
 inglés
 inited
 inno
-instantiator
 interruptible
 introspectable
 invalidators
 invokable
 isam
+iterability
 jangregor
 javascripts
 jessebeach
 jqueryui
-jsonlint
 justinrainbow
 keypresses
 kinberg
@@ -265,7 +264,6 @@ longtext
 lrdd
 lstitle
 ltitle
-lzma
 mainpage
 maryjane
 maximumred
@@ -279,8 +277,6 @@ metapackage
 metapackages
 metatag
 metatags
-mglaman
-micheh
 mikey
 mimetypes
 minusthick
@@ -298,14 +294,12 @@ multisite
 multistep
 multivalue
 multivalued
-myclabs
 mysqladmin
 mysqldump
 mystarterkit
 namespacing
 navs
 ndocs
-necolas
 newcol
 newwin
 nids
@@ -347,7 +341,6 @@ persistable
 phpass
 phpcbf
 phpcodesniffer
-phpdocumentor
 phpserialize
 phpspec
 pickable
@@ -381,7 +374,6 @@ quicklinks
 quinlan
 qvalue
 qvalues
-ralouphie
 rasterizable
 rasterizes
 realpaths
@@ -418,7 +410,6 @@ schemaapi
 schemeless
 scorewords
 scriptable
-seld
 selectbox
 sess
 settingstray
@@ -431,7 +422,6 @@ smacss
 smalldatetime
 smartdate
 smtps
-spaze
 squaresmall
 squiz
 squizlabs
@@ -498,7 +488,6 @@ tablesort
 tablesorts
 tabset
 tabwidth
-tbachert
 tenderwolf
 testbot
 testlogger
@@ -508,7 +497,6 @@ themename
 themer
 themers
 themey
-theseer
 threecol
 tids
 timegate
@@ -530,6 +518,8 @@ translatables
 trayblock
 trgm
 truecolor
+twigcs
+twigcsfixercache
 twistie
 twocol
 ufffd
@@ -563,6 +553,7 @@ userinfo
 versionable
 vfsstream
 viewports
+vincentlanglet
 warmable
 wcag
 webcal

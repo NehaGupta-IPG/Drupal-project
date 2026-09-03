@@ -14,7 +14,9 @@ use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\Exception\BrokenPostRequestException;
 use Drupal\Core\Htmx\Htmx;
+use Drupal\Core\Htmx\HtmxRequestInfoTrait;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -31,6 +33,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * @ingroup form_api
  */
 class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormSubmitterInterface, FormCacheInterface, TrustedCallbackInterface {
+
+  use HtmxRequestInfoTrait;
 
   /**
    * The module handler.
@@ -246,7 +250,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // Ensure the form ID is prepared.
     $form_id = $this->getFormId($form_arg, $form_state);
 
-    $request = $this->requestStack->getCurrentRequest();
+    $request = $this->getRequest();
 
     // Inform $form_state about the request method that's building it, so that
     // it can prevent persisting state changes during HTTP methods for which
@@ -325,7 +329,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // If this form is an AJAX request or an HTMX request,
     // disable all form redirects.
     $ajax_form_request = $request->query->has(static::AJAX_FORM_REQUEST);
-    if ($ajax_form_request || $request->headers->has(static::HTMX_REQUEST)) {
+    if ($ajax_form_request || $this->isHtmxRequest()) {
       $form_state->disableRedirect();
     }
 
@@ -767,7 +771,6 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       '#attributes' => ['autocomplete' => 'off'],
     ];
 
-    $current_request_headers = $this->requestStack->getCurrentRequest()->headers;
     // Figure out if we need to update the form_build_id value, this is
     // specific to HTMX requests. The corresponding code path in the Ajax
     // framework is in `FormAjaxResponseBuilder::buildResponse`.
@@ -776,18 +779,17 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     $input = $form_state->getUserInput();
     $old_build_id = $input['form_build_id'] ?? NULL;
     $returned_form_id = $input['form_id'] ?? NULL;
-    if ($current_request_headers->has(self::HTMX_REQUEST) && $form_id === $returned_form_id && $old_build_id) {
+    if ($this->isHtmxRequest() && $form_id === $returned_form_id && $old_build_id) {
       // Update the build_id by using an oob swap only
       // in the following situation:
-      // - Headers `HX-Target` and `HX-Trigger` on the request show this is an
-      //   HTMX request.
-      // - The target to replace is not a whole form, the build_id will not be
-      //   part of the main swap.
+      // - This is an HTMX request.
+      // - The target to replace is not a whole form, so the build_id will not
+      //   be part of the main swap.
       // - The target is a different form from the one that triggered the
       //   call, update the build id of the calling form.
-      $hx_target = $current_request_headers->get('hx-target');
-      $hx_trigger = $current_request_headers->get('hx-trigger');
-      $target_is_form = str_ends_with($hx_target ?? '', '-form');
+      $hx_target = $this->getHtmxTarget();
+      $hx_trigger = $this->getHtmxSource();
+      $target_is_form = str_starts_with($hx_target, 'form');
       if (!$target_is_form || ($target_is_form && $hx_target !== $hx_trigger)) {
         (new Htmx())
           ->swapOob('outerHTML:input[name="form_build_id"][value="' . $old_build_id . '"]')
@@ -1021,7 +1023,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
             // Ignore all submitted values.
             $form_state->setUserInput([]);
 
-            $request = $this->requestStack->getCurrentRequest();
+            $request = $this->getRequest();
             // Do not trust any POST data.
             $request->request = new InputBag();
             // Make sure file uploads do not get processed.
@@ -1045,11 +1047,13 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // Provide a selector usable by JavaScript. As the ID is unique, it's not
       // possible to rely on it in JavaScript.
       $element['#attributes']['data-drupal-selector'] = Html::getId($unprocessed_id);
+      $element['#wrapper_attributes']['data-drupal-wrapper-selector'] = Html::getId($unprocessed_id);
     }
     else {
       // Provide a selector usable by JavaScript. As the ID is unique, it's not
       // possible to rely on it in JavaScript.
       $element['#attributes']['data-drupal-selector'] = Html::getId($element['#id']);
+      $element['#wrapper_attributes']['data-drupal-wrapper-selector'] = Html::getId($element['#id']);
     }
 
     // Add the aria-describedby attribute to associate the form control with its
@@ -1163,12 +1167,11 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // a response header.
       $element['#attached']['drupalSettings']['ajaxTrustedUrl'][$element['#action']] = TRUE;
 
-      // If a form contains a single textfield, and the ENTER key is pressed
-      // within it, Internet Explorer submits the form with no POST data
-      // identifying any submit button. Other browsers submit POST data as
-      // though the user clicked the first button. Therefore, to be as
-      // consistent as we can be across browsers, if no 'triggering_element' has
-      // been identified yet, default it to the first button.
+      // A form submission can contain no data identifying a submit button,
+      // for example when a form is submitted via GET, or when the ENTER key
+      // is pressed within a single textfield. If no triggering element has
+      // been identified, default it to the first button to keep form
+      // processing consistent with submissions that include button data.
       $buttons = $form_state->getButtons();
       if (!$form_state->isProgrammed() && !$form_state->getTriggeringElement() && !empty($buttons)) {
         $form_state->setTriggeringElement($buttons[0]);
@@ -1290,10 +1293,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
     // Set the element's #value property.
     if (!isset($element['#value']) && !array_key_exists('#value', $element)) {
-      $value_callable = $element['#value_callback'] ?? NULL;
-      if (!is_callable($value_callable)) {
-        $value_callable = '\Drupal\Core\Render\Element\FormElementBase::valueCallback';
-      }
+      $value_callable = $element['#value_callback'] ?? FormElementBase::class . '::valueCallback';
+      $value_callable = $this->callableResolver->getCallableFromDefinition($form_state->prepareCallback($value_callable));
 
       if ($process_input) {
         // Get the input for the current element. NULL values in the input need
@@ -1478,6 +1479,18 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       $this->currentUser = \Drupal::currentUser();
     }
     return $this->currentUser;
+  }
+
+  /**
+   * Gets the current request.
+   *
+   * Required by HtmxRequestInfoTrait.
+   *
+   * @return \Symfony\Component\HttpFoundation\Request
+   *   The current request.
+   */
+  protected function getRequest() {
+    return $this->requestStack->getCurrentRequest();
   }
 
   /**

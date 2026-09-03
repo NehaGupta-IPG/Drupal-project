@@ -9,6 +9,7 @@ use Drupal\node\Entity\Node;
 use Drupal\system\Entity\Action;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore hola testblock usuario
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Update')]
 #[Group('#slow')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
 
   /**
@@ -85,7 +87,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->pageTextNotContains('Test 12');
     // Make sure all other field labels are there.
     for ($i = 1; $i <= 23; $i++) {
-      if (($i != 11) && ($i != 12)) {
+      if (($i != 11) && ($i != 12) && ($i != 7) && ($i != 14)) {
         $this->assertSession()->pageTextContains('Test ' . $i);
       }
     }
@@ -111,15 +113,13 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     // Make sure the content for node 8 is still in the edit form.
     $this->drupalGet('node/8/edit');
     $this->assertSession()->pageTextContains('Test title');
-    $this->assertSession()->pageTextContains('Test body');
+    $this->assertSession()->pageTextContains('Body');
     $this->assertSession()->checkboxChecked('edit-field-test-1-value');
     $this->assertSession()->responseContains('2015-08-16');
     $this->assertSession()->responseContains('test@example.com');
     $this->assertSession()->responseContains('drupal.org');
     $this->assertSession()->pageTextContains('0.1');
     $this->assertSession()->pageTextContains('0.2');
-    $this->assertSession()->responseContains('+31612345678');
-    $this->assertSession()->responseContains('+31612345679');
     $this->assertSession()->pageTextContains('Test Article - New title');
     $this->assertSession()->pageTextContains('test.txt');
     $this->assertSession()->pageTextContains('druplicon.small');
@@ -131,7 +131,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->drupalGet('node/8/edit', ['language' => $spanish]);
     $this->assertSession()->pageTextContains('Test title Spanish');
-    $this->assertSession()->pageTextContains('Test body Spanish');
 
     // Make sure the user page is correct.
     $this->drupalGet('user/3');
@@ -224,14 +223,13 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('admin/structure/types/manage/test_content_type/fields');
 
     // Make sure fields are the right type.
-    $assert_session->elementContains('css', '#body', 'Long text with summary');
+    $assert_session->elementContains('css', '#field-body', 'Long text');
     $assert_session->elementContains('css', '#field-test-1', 'Boolean');
     $assert_session->elementContains('css', '#field-test-2', 'Comments');
     $assert_session->elementContains('css', '#field-test-3', 'Date');
     $assert_session->elementContains('css', '#field-test-4', 'Email');
     $assert_session->elementContains('css', '#field-test-5', 'Link');
     $assert_session->elementContains('css', '#field-test-6', 'Float');
-    $assert_session->elementContains('css', '#field-test-7', 'Telephone number');
     $assert_session->elementContains('css', '#field-test-8', 'Entity reference');
     $assert_session->elementContains('css', '#field-test-9', 'File');
     $assert_session->elementContains('css', '#field-test-10', 'Image');
@@ -273,12 +271,6 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->drupalGet('admin/config/media/responsive-image-style/test');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('Test');
-
-    // Make sure our custom shortcut exists.
-    $this->drupalGet('admin/config/user-interface/shortcut');
-    $this->assertSession()->pageTextContains('Test shortcut');
-    $this->drupalGet('admin/config/user-interface/shortcut/manage/test/customize');
-    $this->assertSession()->pageTextContains('All content');
 
     // Make sure our language detection settings are still correct.
     $this->drupalGet('admin/config/regional/language/detection');
@@ -347,15 +339,11 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
       'phpass',
       'responsive_image',
       'rest',
-      'search',
       'serialization',
-      'shortcut',
       'syslog',
       'system',
       'taxonomy',
-      'telephone',
       'text',
-      'toolbar',
       'update',
       'user',
       'views_ui',

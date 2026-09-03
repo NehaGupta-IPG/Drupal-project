@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\Query\QueryException;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\entity_test\EntityTestHelper;
@@ -288,6 +289,28 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->execute();
     // Bit 0 or 1 is on but 2 and 3 are not.
     $this->assertResult(1, 2, 3);
+
+    // Passing LanguageInterface::LANGCODE_DEFAULT as the langcode makes the
+    // query join via the 'default_langcode' column instead of a literal
+    // language code match, so the condition applies to whichever language is
+    // the entity's default.
+    $entity = EntityTestMulRev::load(1);
+    $default_name = $entity->name->value;
+    $tr_name = $entity->getTranslation('tr')->name->value;
+    $this->queryResults = $this->storage
+      ->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('name.value', $default_name, '=', LanguageInterface::LANGCODE_DEFAULT)
+      ->execute();
+    $this->assertResult(1);
+    // A name that lives only in a non-default translation must not match.
+    $this->queryResults = $this->storage
+      ->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('name.value', $tr_name, '=', LanguageInterface::LANGCODE_DEFAULT)
+      ->execute();
+    $this->assertResult();
+
     // Now update the 'merhaba' string to xsiemax which is not a meaningful
     // word but allows us to test revisions and string operations.
     $ids = $this->storage
@@ -1381,7 +1404,9 @@ class EntityQueryTest extends EntityKernelTestBase {
    * Test the entity query alter hooks are invoked.
    *
    * Hook functions in field_test.module add additional conditions to the query
-   * removing entities with specific ids.
+   * removing entities with specific ids. The alterations are also applied when
+   * the query is cast to a string, so its string representation matches the
+   * query that is executed.
    */
   public function testAlterHook(): void {
     $basicQuery = $this->storage
@@ -1393,15 +1418,18 @@ class EntityQueryTest extends EntityKernelTestBase {
 
     // Verify assumptions about the unaltered result.
     $query = clone $basicQuery;
+    // The unaltered query does not contain the condition added by the hook.
+    $this->assertDoesNotMatchRegularExpression("/<>\s*'5'/", (string) $query);
     $this->queryResults = $query->execute();
     $this->assertResult(5, 7, 13, 15);
 
     // field_test_entity_query_alter() removes the entity with id '5'.
     $query = clone $basicQuery;
-    $this->queryResults = $query
-      // Add a tag that no hook function matches.
-      ->addTag('entity_query_alter_hook_test')
-      ->execute();
+    $query->addTag('entity_query_alter_hook_test');
+    // Casting the query to a string applies the alter hooks, so the added
+    // condition is reflected even before the query is executed.
+    $this->assertMatchesRegularExpression("/<>\s*'5'/", (string) $query);
+    $this->queryResults = $query->execute();
     $this->assertResult(7, 13, 15);
 
     // field_test_entity_query_entity_test_mulrev_alter() removes the
@@ -1545,7 +1573,7 @@ class EntityQueryTest extends EntityKernelTestBase {
    */
   public function testAccessCheckSpecified(): void {
     $this->expectException(QueryException::class);
-    $this->expectExceptionMessage('Entity queries must explicitly set whether the query should be access checked or not. See Drupal\Core\Entity\Query\QueryInterface::accessCheck().');
+    $this->expectExceptionMessageIs('Entity queries must explicitly set whether the query should be access checked or not. See Drupal\Core\Entity\Query\QueryInterface::accessCheck().');
     // We are purposely testing an entity query without access check, so we need
     // to tell PHPStan to ignore this.
     // @phpstan-ignore-next-line

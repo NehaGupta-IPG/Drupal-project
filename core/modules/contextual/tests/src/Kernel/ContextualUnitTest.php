@@ -42,7 +42,7 @@ class ContextualUnitTest extends KernelTestBase {
         ],
       ],
       'node:node=14031991:langcode=en',
-      'olivero',
+      'stark',
     ];
 
     $tests['one group, multiple dynamic path arguments, no metadata'] = [
@@ -64,7 +64,7 @@ class ContextualUnitTest extends KernelTestBase {
       [
         'views_ui_edit' => [
           'route_parameters' => [
-            'view' => 'frontpage',
+            'view' => 'promoted_content',
           ],
           'metadata' => [
             'location' => 'page',
@@ -73,8 +73,8 @@ class ContextualUnitTest extends KernelTestBase {
           ],
         ],
       ],
-      'views_ui_edit:view=frontpage:location=page&display=page_1&langcode=en',
-      'olivero',
+      'views_ui_edit:view=promoted_content:location=page&display=page_1&langcode=en',
+      'stark',
     ];
 
     $tests['multiple groups, multiple dynamic path arguments'] = [
