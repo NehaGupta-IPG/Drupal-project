@@ -120,8 +120,8 @@ class FormTestLabelForm extends FormBase {
     $form['form_textfield_test_title_no_show'] = [
       '#type' => 'textfield',
     ];
-    // Item test. Do not use a label element since the title references the
-    // wrapper through aria-describedby.
+    // Item test. Do not use a label element since the wrapper references the
+    // title through aria-describedby.
     $form['form_item_test_no_label'] = [
       '#type' => 'item',
       '#title' => $this->t('Item test'),
