@@ -35,6 +35,13 @@ class Schema extends DatabaseSchema {
   protected $tableInformation = [];
 
   /**
+   * A cache of native PostgreSQL field types, keyed by table and field.
+   *
+   * @var array<string, string|null>
+   */
+  protected array $nativeFieldTypes = [];
+
+  /**
    * The maximum allowed length for index, primary key and constraint names.
    *
    * Value will usually be set to a 63 chars limit but PostgreSQL allows
@@ -60,6 +67,129 @@ class Schema extends DatabaseSchema {
     // If the schema is not set in the connection options then schema defaults
     // to public.
     $this->defaultSchema = $connection->getConnectionOptions()['schema'] ?? 'public';
+  }
+
+  /**
+   * Checks whether a value can be represented by a PostgreSQL integer field.
+   *
+   * This uses the native field type rather than Drupal's Schema API size hint,
+   * because PostgreSQL can map or widen Schema API integer definitions
+   * differently from other database drivers.
+   *
+   * @param string $table
+   *   The non-prefixed table name.
+   * @param string $field
+   *   The field name.
+   * @param mixed $value
+   *   The value to check.
+   *
+   * @return bool|null
+   *   TRUE when the field is an integer type and the value is representable,
+   *   FALSE when the field is an integer type and the value is not
+   *   representable, or NULL when the field is not an integer type or the
+   *   value type is not handled here.
+   *
+   * @internal
+   */
+  public function isStorableIntegerValue(string $table, string $field, mixed $value): ?bool {
+    if (!is_int($value) && !is_string($value)) {
+      return NULL;
+    }
+
+    $native_type = $this->getNativeFieldType($table, $field);
+    $limits = match ($native_type) {
+      'smallint' => ['-32768', '32767'],
+      'integer' => ['-2147483648', '2147483647'],
+      'bigint' => ['-9223372036854775808', '9223372036854775807'],
+      default => NULL,
+    };
+    if ($limits === NULL) {
+      return NULL;
+    }
+
+    $value = trim((string) $value);
+    if (!preg_match('/^[+-]?\d+$/D', $value)) {
+      return FALSE;
+    }
+    $value = static::normalizeIntegerString($value);
+
+    return static::compareIntegerStrings($value, $limits[0]) >= 0
+      && static::compareIntegerStrings($value, $limits[1]) <= 0;
+  }
+
+  /**
+   * Gets the native PostgreSQL type for a table field.
+   *
+   * @param string $table
+   *   The non-prefixed table name.
+   * @param string $field
+   *   The field name.
+   *
+   * @return string|null
+   *   The native PostgreSQL type, or NULL when it cannot be determined.
+   */
+  protected function getNativeFieldType(string $table, string $field): ?string {
+    $prefixed_table = $this->connection->getPrefix() . $table;
+    if (str_contains($table, 'db_temporary_')) {
+      $qualified_table = $this->getTempNamespaceName() . '.' . $prefixed_table;
+    }
+    else {
+      $qualified_table = '"' . $this->defaultSchema . '"."' . $prefixed_table . '"';
+    }
+    $cache_key = $qualified_table . '.' . $field;
+
+    if (!array_key_exists($cache_key, $this->nativeFieldTypes)) {
+      $sql = <<<'EOD'
+SELECT format_type(pg_attribute.atttypid, pg_attribute.atttypmod)
+FROM pg_attribute
+WHERE pg_attribute.attnum > 0
+AND NOT pg_attribute.attisdropped
+AND pg_attribute.attrelid = to_regclass(:table)
+AND pg_attribute.attname = :field
+EOD;
+      $type = $this->connection->query($sql, [
+        ':table' => $qualified_table,
+        ':field' => $field,
+      ])->fetchField();
+      $this->nativeFieldTypes[$cache_key] = $type !== FALSE ? $type : NULL;
+    }
+
+    return $this->nativeFieldTypes[$cache_key];
+  }
+
+  /**
+   * Normalizes an integer string for range comparisons.
+   */
+  protected static function normalizeIntegerString(string $value): string {
+    $negative = str_starts_with($value, '-');
+    if ($negative || str_starts_with($value, '+')) {
+      $value = substr($value, 1);
+    }
+    $value = ltrim($value, '0');
+    if ($value === '') {
+      return '0';
+    }
+    return $negative ? '-' . $value : $value;
+  }
+
+  /**
+   * Compares two normalized integer strings without relying on PHP int size.
+   */
+  protected static function compareIntegerStrings(string $left, string $right): int {
+    $left_negative = str_starts_with($left, '-');
+    $right_negative = str_starts_with($right, '-');
+    if ($left_negative !== $right_negative) {
+      return $left_negative ? -1 : 1;
+    }
+
+    $left_digits = $left_negative ? substr($left, 1) : $left;
+    $right_digits = $right_negative ? substr($right, 1) : $right;
+    $comparison = strlen($left_digits) <=> strlen($right_digits);
+    if ($comparison === 0) {
+      $comparison = strcmp($left_digits, $right_digits) <=> 0;
+    }
+
+    return $left_negative ? -$comparison : $comparison;
   }
 
   /**

@@ -479,6 +479,13 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
+  public function condition($conjunction) {
+    return new Condition($conjunction);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function select($table, $alias = NULL, array $options = []) {
     return new Select($this, $table, $alias, $options);
   }
