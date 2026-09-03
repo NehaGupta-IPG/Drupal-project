@@ -366,7 +366,7 @@ class LocaleSource {
    */
   public function buildServerPattern(/* LocaleTranslationSource */ $source, string $template): string {
     if (!$source instanceof LocaleTranslationSource) {
-      @trigger_error('The first argument to ' . __METHOD__ . '() not being a LocaleTranslationSource is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3593802', E_USER_DEPRECATED);
+      @trigger_error('The first argument to ' . __METHOD__ . '() not being a LocaleTranslationSource is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3593802', E_USER_DEPRECATED);
     }
     $variables = [
       // Fall back to name in case a project object is passed in.
