@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Utility;
 
+use Drupal\Core\Database\ConnectionNotDefinedException;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Utility\Error;
+use Drupal\Tests\Core\Utility\Stub\StubDriverStatement;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -112,6 +115,64 @@ class ErrorTest extends UnitTestCase {
     $data[] = [$second_item_args, "test_function() (Line: 10)\ntest_function_2('string', 10, Object) (Line: 10)\n"];
 
     return $data;
+  }
+
+  /**
+   * Tests that decodeException() does not need connection info to be defined.
+   *
+   * ConnectionNotDefinedException and DriverNotSpecifiedException implement
+   * DatabaseException, but are thrown precisely when the connection info is
+   * absent, so the driver namespace cannot be determined. The backtrace is
+   * then left untouched instead of failing inside the error handler.
+   */
+  public function testDecodeExceptionWithoutConnectionInfo(): void {
+    // Make sure no connection info is left over by another test.
+    Database::removeConnection('default');
+
+    $exception = new ConnectionNotDefinedException('The specified database connection is not defined: default');
+    $decoded = Error::decodeException($exception);
+
+    $this->assertSame(ConnectionNotDefinedException::class, $decoded['%type']);
+    $this->assertSame('The specified database connection is not defined: default', $decoded['@message']);
+    $this->assertSame(__FILE__, $decoded['%file']);
+  }
+
+  /**
+   * Tests that decodeException() trims the backtrace of client exceptions.
+   *
+   * Client exceptions such as \PDOException do not implement Drupal's
+   * DatabaseException interface, but can still escape the database layer, for
+   * example from the statement fetch methods.
+   */
+  public function testDecodeExceptionWithClientException(): void {
+    Database::addConnectionInfo('default', 'default', [
+      'driver' => 'test',
+      'namespace' => 'Drupal\\Tests\\Core\\Utility\\Stub',
+    ]);
+
+    try {
+      $line = __LINE__ + 1;
+      (new StubDriverStatement())->execute();
+      $this->fail('No client exception was thrown.');
+    }
+    catch (\PDOException $exception) {
+      $decoded = Error::decodeException($exception);
+    }
+
+    // The entries of the stub driver are removed, so that the caller is the
+    // line in this test calling into the driver, and not the line throwing
+    // the exception inside it.
+    $this->assertSame(\PDOException::class, $decoded['%type']);
+    $this->assertSame(__FILE__, $decoded['%file']);
+    $this->assertSame($line, $decoded['%line']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function tearDown(): void {
+    Database::removeConnection('default');
+    parent::tearDown();
   }
 
   /**

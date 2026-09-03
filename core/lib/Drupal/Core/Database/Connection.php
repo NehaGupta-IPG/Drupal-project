@@ -1605,6 +1605,12 @@ abstract class Connection {
       }
     }
 
+    // No call to the database layer was found in the backtrace. Return it
+    // unchanged; slicing on the negative $n would keep the last entry only.
+    if ($n < 0) {
+      return array_values($backtrace);
+    }
+
     return array_values(array_slice($backtrace, $n));
   }
 

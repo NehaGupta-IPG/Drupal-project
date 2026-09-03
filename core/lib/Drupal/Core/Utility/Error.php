@@ -50,11 +50,18 @@ class Error {
     // Add the line throwing the exception to the backtrace.
     array_unshift($backtrace, ['line' => $exception->getLine(), 'file' => $exception->getFile()]);
 
-    // For database exceptions, we try to return the initial caller,
-    // skipping internal functions of the database layer.
-    if ($exception instanceof DatabaseException) {
-      $driver_namespace = Database::getConnectionInfo()['default']['namespace'];
-      $backtrace = Connection::removeDatabaseEntriesFromDebugBacktrace($backtrace, $driver_namespace);
+    // For database exceptions, we try to return the initial caller, skipping
+    // internal functions of the database layer. Client exceptions such as
+    // \PDOException do not implement DatabaseException, but can still escape
+    // the database layer, so they are trimmed as well. The driver namespace is
+    // unknown when no connection info is registered, which is precisely the
+    // case for exceptions such as ConnectionNotDefinedException; the backtrace
+    // is then left untouched rather than failing inside the error handler.
+    if ($exception instanceof DatabaseException || $exception instanceof \PDOException) {
+      $driver_namespace = Database::getConnectionInfo()['default']['namespace'] ?? NULL;
+      if ($driver_namespace !== NULL) {
+        $backtrace = Connection::removeDatabaseEntriesFromDebugBacktrace($backtrace, $driver_namespace);
+      }
     }
 
     $caller = static::getLastCaller($backtrace);

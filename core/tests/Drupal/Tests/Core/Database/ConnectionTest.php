@@ -868,6 +868,47 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
+   * Tests that a backtrace without database entries is left untouched.
+   *
+   * A database exception can be re-thrown after all database frames have
+   * returned, for example by the Views SQL query plugin. The backtrace then
+   * contains no database entry at all and must be returned in full, rather
+   * than sliced down to its last entry.
+   *
+   * @legacy-covers ::removeDatabaseEntriesFromDebugBacktrace
+   */
+  public function testRemoveDatabaseEntriesFromDebugBacktraceWithoutDatabaseEntries(): void {
+    $stack = [
+      [
+        'file' => '/var/www/core/modules/views/src/Plugin/views/query/Sql.php',
+        'line' => 1592,
+        'function' => 'execute',
+        'class' => 'Drupal\\views\\Plugin\\views\\query\\Sql',
+        'type' => '->',
+        'args' => [],
+      ],
+      [
+        'file' => '/var/www/core/modules/views/src/ViewExecutable.php',
+        'line' => 1290,
+        'function' => 'execute',
+        'class' => 'Drupal\\views\\ViewExecutable',
+        'type' => '->',
+        'args' => [],
+      ],
+      [
+        'file' => '/var/www/index.php',
+        'line' => 19,
+        'function' => 'handle',
+        'class' => 'Drupal\\Core\\DrupalKernel',
+        'type' => '->',
+        'args' => [],
+      ],
+    ];
+
+    $this->assertSame($stack, Connection::removeDatabaseEntriesFromDebugBacktrace($stack, 'Drupal\\Driver\\Database\\fake'));
+  }
+
+  /**
    * Provides data for testSupportedFetchModes.
    *
    * @return array<string,array<\Drupal\Core\Database\Statement\FetchAs>>
