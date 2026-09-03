@@ -190,8 +190,9 @@ class FormPreprocess {
       $variables['title'] = ['#markup' => $element['#title']];
     }
 
-    $variables['non_labelable'] = !empty($element['#non_labelable']);
-    $variables['tag'] = $element['#title_tag'] ?? ($variables['non_labelable'] ? 'span' : 'label');
+    // Set tag to title_tag, defaulting to 'span' or 'label'.
+    $non_labelable = !empty($element['#non_labelable']);
+    $variables['tag'] = $element['#title_tag'] ?? ($non_labelable ? 'span' : 'label');
 
     // Pass elements title_display to template.
     $variables['title_display'] = $element['#title_display'];
