@@ -161,7 +161,7 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
       ->willReturn($entity_reference)
       ->shouldBeCalled();
     $field_item->get('target_id')
-      ->willReturn($entity_reference)
+      ->willReturn('test')
       ->shouldBeCalled();
     $target_id = $this->prophesize(DataDefinitionInterface::class);
     $target_id->isInternal()
@@ -239,7 +239,7 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
       ->willReturn($entity_reference)
       ->shouldBeCalled();
     $field_item->get('target_id')
-      ->willReturn($entity_reference)
+      ->willReturn('test')
       ->shouldBeCalled();
     $target_id = $this->prophesize(DataDefinitionInterface::class);
     $target_id->isInternal()
@@ -319,7 +319,7 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
       ->willReturn($entity_reference)
       ->shouldBeCalled();
     $field_item->get('target_id')
-      ->willReturn($entity_reference)
+      ->willReturn('test')
       ->shouldBeCalled();
 
     $normalized = $this->normalizer->normalize($field_item->reveal());
@@ -352,7 +352,7 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
       ->willReturn($entity_reference)
       ->shouldBeCalled();
     $field_item->get('target_id')
-      ->willReturn($entity_reference)
+      ->willReturn('test')
       ->shouldBeCalled();
     $target_id = $this->prophesize(DataDefinitionInterface::class);
     $target_id->isInternal()
