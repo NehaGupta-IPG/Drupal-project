@@ -101,12 +101,10 @@ class FormPreprocess {
     ];
     $variables['attributes'] = $element['#wrapper_attributes'];
 
-    // Add element #id for #type 'item'.
-    if (isset($element['#markup']) && !empty($element['#id'])) {
+    // A non-labelable element exposes its #id on the wrapping div.
+    if (isset($element['#non_labelable']) && !empty($element['#id'])) {
       $variables['attributes']['id'] = $element['#id'];
-      if (!empty($element['#non_labelable'])) {
-        $variables['attributes']['aria-describedby'] = $element['#id'] . '--label';
-      }
+      $variables['attributes']['aria-describedby'] = $element['#id'] . '--label';
     }
 
     // Pass elements #type and #name to template.
