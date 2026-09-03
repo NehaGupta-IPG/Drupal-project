@@ -167,8 +167,8 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    */
   public function testAddTableColumn(): void {
     $tableName = 'test_add_table_column_from_definition';
-    $initalSchema = $this->initialSchemaForAddTableColumn($tableName);
-    $this->schema->createSchemaFromDefinition($initalSchema);
+    $initialSchema = $this->initialSchemaForAddTableColumn($tableName);
+    $this->schema->createSchemaFromDefinition($initialSchema);
 
     $this->assertTrue($this->schema->tableExists($tableName));
     $this->assertFalse($this->schema->fieldExists($tableName, 'age'));
@@ -271,8 +271,8 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    */
   public function testChangeTableColumn(): void {
     $tableName = 'test_change_table_column_from_definition';
-    $initalSchema = $this->initialSchemaForTestChangeTableColumn($tableName);
-    $this->schema->createSchemaFromDefinition($initalSchema);
+    $initialSchema = $this->initialSchemaForTestChangeTableColumn($tableName);
+    $this->schema->createSchemaFromDefinition($initialSchema);
 
     $this->assertTrue($this->schema->tableExists($tableName));
     $this->assertTrue($this->schema->fieldExists($tableName, 'age'));
