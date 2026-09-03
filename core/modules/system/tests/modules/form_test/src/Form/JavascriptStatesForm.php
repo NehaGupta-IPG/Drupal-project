@@ -795,6 +795,11 @@ class JavascriptStatesForm extends FormBase {
       '#title' => 'Shared Checkbox Trigger',
       '#description' => 'This trigger is shared by a dependent inside the Ajax wrapper and a dependent outside it.',
     ];
+    $form['shared_textfield_trigger'] = [
+      '#type' => 'textfield',
+      '#title' => 'Shared Textfield Trigger',
+      '#description' => 'This trigger provides different states to dependents inside and outside the Ajax wrapper.',
+    ];
     // Ajax wrappers.
     $form['states_ajax_test'] = [
       '#type' => 'details',
@@ -826,6 +831,17 @@ class JavascriptStatesForm extends FormBase {
         '#states' => [
           'enabled' => [
             ':input[name="shared_checkbox_trigger"]' => ['checked' => TRUE],
+            ':input[name="ajax_select_trigger"]' => ['value' => 1],
+          ],
+        ],
+      ];
+      $form['states_ajax_test']['ajax_removed_textfield_with_shared_trigger_state'] = [
+        '#type' => 'textfield',
+        '#title' => 'Ajax removed Textfield with shared trigger state',
+        '#description' => 'This dependent uses the empty state of the shared textfield trigger and is removed when Ajax Reload is checked.',
+        '#states' => [
+          'enabled' => [
+            ':input[name="shared_textfield_trigger"]' => ['empty' => FALSE],
             ':input[name="ajax_select_trigger"]' => ['value' => 1],
           ],
         ],
@@ -875,6 +891,16 @@ class JavascriptStatesForm extends FormBase {
       '#states' => [
         'enabled' => [
           ':input[name="shared_checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['textfield_enabled_when_shared_textfield_trigger_value'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield enabled when Shared Textfield Trigger has value1',
+      '#description' => 'This dependent remains after the Ajax wrapper is replaced and uses the value state of the shared textfield trigger.',
+      '#states' => [
+        'enabled' => [
+          ':input[name="shared_textfield_trigger"]' => ['value' => 'value1'],
         ],
       ],
     ];
