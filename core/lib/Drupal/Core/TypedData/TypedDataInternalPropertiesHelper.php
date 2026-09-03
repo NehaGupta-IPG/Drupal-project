@@ -10,7 +10,7 @@ class TypedDataInternalPropertiesHelper {
   /**
    * A WeakMap static cache of internal property names.
    */
-  protected static ?\WeakMap $nonInternalPropertyNames;
+  protected static ?\WeakMap $nonInternalPropertyNames = NULL;
 
   /**
    * Gets an array non-internal properties from a complex data object.
@@ -32,9 +32,7 @@ class TypedDataInternalPropertiesHelper {
     // definitions and only then getting the property values, this saves
     // initializing properties that won't be returned.
     if (!isset(static::$nonInternalPropertyNames[$definition])) {
-      if (!isset(static::$nonInternalPropertyNames)) {
-        static::$nonInternalPropertyNames = new \WeakMap();
-      }
+      static::$nonInternalPropertyNames ??= new \WeakMap();
       $non_internal_properties = [];
       foreach ($definition->getPropertyDefinitions() as $name => $property_definition) {
         if (!$property_definition->isInternal()) {

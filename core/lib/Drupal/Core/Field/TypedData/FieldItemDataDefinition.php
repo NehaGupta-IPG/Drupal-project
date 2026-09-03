@@ -68,9 +68,7 @@ class FieldItemDataDefinition extends DataDefinition implements FieldItemDataDef
    */
   public function getPropertyDefinitions() {
     if (!isset(static::$propertyDefinitions[$this->fieldDefinition])) {
-      if (static::$propertyDefinitions === NULL) {
-        static::$propertyDefinitions = new \WeakMap();
-      }
+      static::$propertyDefinitions ??= new \WeakMap();
       static::$propertyDefinitions[$this->fieldDefinition] = $this->fieldDefinition->getFieldStorageDefinition()->getPropertyDefinitions();
     }
     return static::$propertyDefinitions[$this->fieldDefinition];

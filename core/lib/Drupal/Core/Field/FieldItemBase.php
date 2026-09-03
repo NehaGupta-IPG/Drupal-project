@@ -22,7 +22,7 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
   /**
    * A weakmap static cache of property keys.
    */
-  protected static ?\WeakMap $keyCache;
+  protected static ?\WeakMap $keyCache = NULL;
 
   /**
    * {@inheritdoc}
@@ -132,9 +132,7 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
         $keys = static::$keyCache[$this->definition];
       }
       else {
-        if (!isset(static::$keyCache)) {
-          static::$keyCache = new \WeakMap();
-        }
+        static::$keyCache ??= new \WeakMap();
         static::$keyCache[$this->definition] = $keys = array_keys($this->definition->getPropertyDefinitions());
       }
 
