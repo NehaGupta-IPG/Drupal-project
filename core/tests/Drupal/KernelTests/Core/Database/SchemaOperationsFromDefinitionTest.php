@@ -368,7 +368,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * @param array $renamed_primary_key
    *   The primary key of the test table after renaming the test column.
    */
-  #[DataProvider('providerTestSchemaCreateTablePrimaryKey')]
+  #[DataProvider('providerTestChangePrimaryKey')]
   public function testChangePrimaryKey(array $initial_primary_key, array $renamed_primary_key): void {
     $table_name = 'test_table';
     $find_primary_key_columns = new \ReflectionMethod(get_class($this->schema), 'findPrimaryKeyColumns');
@@ -516,19 +516,50 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
 
     // Add the column again and make sure adding the primary key can be done at
     // the same time.
-    $this->schema->addField($table_name, 'test_column', ['type' => 'int', 'default' => 0, 'not null' => TRUE], ['primary key' => $initial_primary_key]);
+    $table = new Table(
+      name: $table_name,
+      description: 'Test table created from definition.',
+      columns: [
+        Column::int(
+          name: 'test_column',
+          default: new IntValue(0),
+          notNull: TRUE,
+        ),
+        Column::int(
+          name: 'other_test_column',
+          notNull: TRUE,
+        ),
+      ],
+      primaryKey: new PrimaryKey($initial_primary_key),
+    );
+    $schema = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: $table_name,
+      tables: [$table],
+    );
+    $this->schema->addTableColumnFromDefinition(
+      targetSchema: $schema,
+      tableName: $table_name,
+      targetColumnName: 'test_column',
+    );
     $this->assertTrue($this->schema->fieldExists($table_name, 'test_column'));
     $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
 
     // Drop the column again and explicitly add a primary key.
+    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
     $this->schema->dropField($table_name, 'test_column');
-    $this->schema->addPrimaryKey($table_name, ['other_test_column']);
     $this->assertFalse($this->schema->fieldExists($table_name, 'test_column'));
+    $this->assertEquals([], $find_primary_key_columns->invoke($this->schema, $table_name));
+    $this->schema->addPrimaryKey($table_name, ['other_test_column']);
     $this->assertEquals(['other_test_column'], $find_primary_key_columns->invoke($this->schema, $table_name));
 
     // Test that adding a column with a primary key will work even with a
     // pre-existing primary key.
-    $this->schema->addField($table_name, 'test_column', ['type' => 'int', 'default' => 0, 'not null' => TRUE], ['primary key' => $initial_primary_key]);
+    $this->schema->addTableColumnFromDefinition(
+      targetSchema: $schema,
+      tableName: $table_name,
+      targetColumnName: 'test_column',
+    );
     $this->assertTrue($this->schema->fieldExists($table_name, 'test_column'));
     $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
   }
@@ -536,7 +567,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
   /**
    * Provides test cases for SchemaTest::testSchemaCreateTablePrimaryKey().
    */
-  public static function providerTestSchemaCreateTablePrimaryKey(): \Generator {
+  public static function providerTestChangePrimaryKey(): \Generator {
     yield 'simple_primary_key' => [
       'initial_primary_key' => ['test_column'],
       'renamed_primary_key' => ['test_column_renamed'],

@@ -8,6 +8,7 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\FloatValue;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
@@ -523,6 +524,30 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests passing invalid columns to primary key.
+   */
+  public function testInvalidColumnsInPrimaryKey(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Table \'test\' specifies a primary key with undefined column(s): boo');
+    $table = new Table(
+      name: 'test',
+      columns: [
+        Column::text(
+          name: 'id',
+          length: 40,
+          default: new StringValue('foo'),
+        ),
+        Column::int(
+          name: 'test_column',
+          notNull: TRUE,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id', 'boo']),
+    );
+    $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
    * Tests passing limited length columns to an unique key.
    */
   public function testInvalidUniqueKeyForPartialLengthColumn(): void {
@@ -543,6 +568,92 @@ class SchemaDefinitionTest extends UnitTestCase {
           name: 'invalid',
           // @phpstan-ignore argument.type
           columns: [['id', 10]],
+        ),
+      ],
+    );
+    $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
+   * Tests passing invalid columns to a unique key.
+   */
+  public function testInvalidColumnsInUniqueKey(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Table \'test\' specifies a unique key \'id_boo\' with undefined column(s): boo');
+    $table = new Table(
+      name: 'test',
+      columns: [
+        Column::text(
+          name: 'id',
+          length: 40,
+          default: new StringValue('foo'),
+        ),
+        Column::int(
+          name: 'test_column',
+          notNull: TRUE,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      uniqueKeys: [
+        new UniqueKey(name: 'id_boo', columns: ['id', 'boo']),
+      ],
+    );
+    $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
+   * Tests passing invalid columns to a unique key.
+   */
+  public function testInvalidColumnsInIndex(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Table \'test\' specifies an index \'id_boo\' with undefined column(s): boo');
+    $table = new Table(
+      name: 'test',
+      columns: [
+        Column::text(
+          name: 'id',
+          length: 40,
+          default: new StringValue('foo'),
+        ),
+        Column::int(
+          name: 'test_column',
+          notNull: TRUE,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      indexes: [
+        new Index(name: 'id_boo', columns: ['id', 'boo']),
+      ],
+    );
+    $this->assertInstanceOf(Table::class, $table);
+  }
+
+  /**
+   * Tests passing invalid columns to a unique key.
+   */
+  public function testInvalidColumnsInForeignKey(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Table \'test\' specifies a foreign key \'id_boo\' with undefined column(s): boo');
+    $table = new Table(
+      name: 'test',
+      columns: [
+        Column::text(
+          name: 'id',
+          length: 40,
+          default: new StringValue('foo'),
+        ),
+        Column::int(
+          name: 'test_column',
+          notNull: TRUE,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      foreignKeys: [
+        new ForeignKey(
+          name: 'id_boo',
+          foreignTable: 'test_boo',
+          columns: ['id', 'boo'],
+          foreignColumns: ['id', 'boo'],
         ),
       ],
     );

@@ -65,16 +65,58 @@ final class Table implements SchemaDefinitionInterface {
     if ($this->columns && !Inspector::assertAllObjects($this->columns, Column::class)) {
       throw new SchemaDefinitionException("All members of the 'columns' argument of the '{$this->name}' Table must be Column objects");
     }
-    if ($this->uniqueKeys && !Inspector::assertAllObjects($this->uniqueKeys, UniqueKey::class)) {
-      throw new SchemaDefinitionException("All members of the 'uniqueKeys' argument of the '{$this->name}' Table must be UniqueKey objects");
+    if ($this->primaryKey) {
+      $invalidKeyColumnNames = array_diff($this->primaryKey->columnNames(), $this->columnNames());
+      if ($invalidKeyColumnNames) {
+        throw new SchemaDefinitionException("Table '{$this->name}' specifies a primary key with undefined column(s): " . implode(', ', $invalidKeyColumnNames));
+      }
     }
-    if ($this->indexes && !Inspector::assertAllObjects($this->indexes, Index::class)) {
-      throw new SchemaDefinitionException("All members of the 'indexes' argument of the '{$this->name}' Table must be Index objects");
+    if ($this->uniqueKeys) {
+      if (!Inspector::assertAllObjects($this->uniqueKeys, UniqueKey::class)) {
+        throw new SchemaDefinitionException("All members of the 'uniqueKeys' argument of the '{$this->name}' Table must be UniqueKey objects");
+      }
+      foreach ($this->uniqueKeys as $uniqueKey) {
+        $invalidKeyColumnNames = array_diff($uniqueKey->columnNames(), $this->columnNames());
+        if ($invalidKeyColumnNames) {
+          throw new SchemaDefinitionException("Table '{$this->name}' specifies a unique key '{$uniqueKey->name}' with undefined column(s): " . implode(', ', $invalidKeyColumnNames));
+        }
+      }
     }
-    if ($this->foreignKeys && !Inspector::assertAllObjects($this->foreignKeys, ForeignKey::class)) {
-      throw new SchemaDefinitionException("All members of the 'foreignKeys' argument of the '{$this->name}' Table must be ForeignKey objects");
+    if ($this->indexes) {
+      if (!Inspector::assertAllObjects($this->indexes, Index::class)) {
+        throw new SchemaDefinitionException("All members of the 'indexes' argument of the '{$this->name}' Table must be Index objects");
+      }
+      foreach ($this->indexes as $index) {
+        $invalidKeyColumnNames = array_diff($index->columnNames(), $this->columnNames());
+        if ($invalidKeyColumnNames) {
+          throw new SchemaDefinitionException("Table '{$this->name}' specifies an index '{$index->name}' with undefined column(s): " . implode(', ', $invalidKeyColumnNames));
+        }
+      }
     }
-    // @todo add validation that key columns are defined in the table columns.
+    if ($this->foreignKeys) {
+      if (!Inspector::assertAllObjects($this->foreignKeys, ForeignKey::class)) {
+        throw new SchemaDefinitionException("All members of the 'foreignKeys' argument of the '{$this->name}' Table must be ForeignKey objects");
+      }
+      foreach ($this->foreignKeys as $foreignKey) {
+        $invalidKeyColumnNames = array_diff($foreignKey->columnNames(), $this->columnNames());
+        if ($invalidKeyColumnNames) {
+          throw new SchemaDefinitionException("Table '{$this->name}' specifies a foreign key '{$foreignKey->name}' with undefined column(s): " . implode(', ', $invalidKeyColumnNames));
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns the names of the columns in the table.
+   *
+   * @return list<string>
+   *   The names of the columns.
+   */
+  public function columnNames(): array {
+    return array_map(
+      fn(Column $column): string => $column->name,
+      $this->columns,
+    );
   }
 
   /**
