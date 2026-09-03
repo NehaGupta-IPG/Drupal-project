@@ -153,6 +153,7 @@ default:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
     - if: $PERFORMANCE_TEST != "1"
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
 
 .composer-setup: &composer-setup
   - echo -e "\e[0Ksection_start:`date +%s`:composer_setup[collapsed=true]\r\e[0K\e[0;30;103m*** Composer setup ***\e[0m"
@@ -678,6 +679,7 @@ default:
   <<: [ *yarn-install-from-cache ]
   stage: 🪄 Lint
   rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $CI_COMMIT_BRANCH == "main"
@@ -790,6 +792,7 @@ default:
       when: never
     - <<: *on-commit
       allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - core/.eslint*
@@ -823,6 +826,7 @@ default:
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
     - <<: *on-commit
       allow_failure: true
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
