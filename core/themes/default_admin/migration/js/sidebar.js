@@ -42,7 +42,7 @@
       /**
        * Binds a listener to handle fragment link clicks and URL hash changes.
        */
-      $(once('ginSidebarFragments', 'body')).on(
+      $(once('adminSidebarFragments', 'body')).on(
         'formFragmentLinkClickOrHashChange.defaultAdminSidebar',
         handleFragmentLinkClickOrHashChange,
       );
