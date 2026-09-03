@@ -40,7 +40,7 @@ class AggregationTest extends ViewsKernelTestBase {
 
   /**
    * Tests an aggregated date field.
-   * 
+   *
    * @todo: Edit the test view 'test_aggregation' to add a date field.
    *   Add a new view display or a new view altogether.
    */
