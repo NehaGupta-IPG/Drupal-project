@@ -181,7 +181,8 @@ class FormPreprocess {
    * @param array $variables
    *   An associative array containing:
    *   - element: An associative array containing the properties of the element.
-   *     Properties used: #required, #title, #id, #value, #description, #for.
+   *     Properties used: #for, #id, #non_labelable, #required, #title,
+   *     #title_tag.
    */
   public function preprocessFormElementLabel(array &$variables): void {
     $element = $variables['element'];
