@@ -26,8 +26,9 @@ class Condition extends BaseCondition {
       parent::compile($connection, $queryPlaceholder);
     }
     finally {
-      // Keep Condition::conditions() stable for callers. The compiled string and
-      // arguments retain the PostgreSQL-specific filtering performed above.
+      // Keep Condition::conditions() stable for callers.
+      // The compiled string and arguments retain the PostgreSQL-specific
+      // filtering performed above.
       $this->conditions = $original_conditions;
     }
   }
