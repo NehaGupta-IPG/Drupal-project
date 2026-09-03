@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Core\Recipe;
 
+use Composer\InstalledVersions;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\Composer\ComposerIntegrationTrait;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -14,6 +16,8 @@ use Symfony\Component\Process\Process;
  * Contains helper methods for interacting with recipes in functional tests.
  */
 trait RecipeTestTrait {
+
+  use ComposerIntegrationTrait;
 
   /**
    * Creates a recipe in a temporary directory.
@@ -97,10 +101,12 @@ trait RecipeTestTrait {
   protected function runDrupalCommand(array $arguments, int $timeout = 500): Process {
     assert($this instanceof BrowserTestBase);
 
-    array_unshift($arguments, (new PhpExecutableFinder())->find(), 'core/scripts/dr');
+    // `dr` must be run from the project root.
+    ['install_path' => $project_root] = InstalledVersions::getRootPackage();
+    array_unshift($arguments, (new PhpExecutableFinder())->find(), static::binDir() . '/dr');
 
     $process = (new Process($arguments))
-      ->setWorkingDirectory($this->root)
+      ->setWorkingDirectory($project_root)
       ->setEnv([
         'DRUPAL_DEV_SITE_PATH' => $this->siteDirectory,
         // Ensure that the command boots Drupal into a state where it knows it's

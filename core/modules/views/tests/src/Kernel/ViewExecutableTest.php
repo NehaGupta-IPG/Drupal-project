@@ -133,22 +133,19 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $this->assertInstanceOf(DefaultDisplay::class, $view->display_handler);
     $this->assertInstanceOf(DefaultDisplay::class, $view->displayHandlers->get('default'));
 
-    $view_hash = spl_object_hash($view);
-    $display_hash = spl_object_hash($view->display_handler);
-
     // Test the initStyle() method.
     $view->initStyle();
     $this->assertInstanceOf(DefaultStyle::class, $view->style_plugin);
     // Test the plugin has been invited and view have references to the view and
     // display handler.
-    $this->assertEquals($view_hash, spl_object_hash($view->style_plugin->view));
-    $this->assertEquals($display_hash, spl_object_hash($view->style_plugin->displayHandler));
+    $this->assertSame($view, $view->style_plugin->view);
+    $this->assertSame($view->display_handler, $view->style_plugin->displayHandler);
 
     // Test the initQuery method().
     $view->initQuery();
     $this->assertInstanceOf(Sql::class, $view->query);
-    $this->assertEquals($view_hash, spl_object_hash($view->query->view));
-    $this->assertEquals($display_hash, spl_object_hash($view->query->displayHandler));
+    $this->assertSame($view, $view->query->view);
+    $this->assertSame($view->display_handler, $view->query->displayHandler);
 
     $view->destroy();
 
@@ -216,7 +213,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $this->assertEquals(serialize($arguments), $logged);
 
     $this->assertEquals('default', $view->current_display, 'If setDisplay is called with an invalid display id the default display should be used.');
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('default')), spl_object_hash($view->display_handler));
+    $this->assertSame($view->displayHandlers->get('default'), $view->display_handler);
   }
 
   /**
@@ -235,25 +232,25 @@ class ViewExecutableTest extends ViewsKernelTestBase {
 
     // After initializing the default display is the current used display.
     $this->assertEquals('default', $view->current_display);
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('default')), spl_object_hash($view->display_handler));
+    $this->assertSame($view->displayHandlers->get('default'), $view->display_handler);
 
     // All handlers should have a reference to the default display.
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('default')), spl_object_hash($view->displayHandlers->get('page_1')->default_display));
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('default')), spl_object_hash($view->displayHandlers->get('page_2')->default_display));
+    $this->assertSame($view->displayHandlers->get('default'), $view->displayHandlers->get('page_1')->default_display);
+    $this->assertSame($view->displayHandlers->get('default'), $view->displayHandlers->get('page_2')->default_display);
 
     // Tests Drupal\views\ViewExecutable::setDisplay().
     $view->setDisplay();
     $this->assertEquals('default', $view->current_display, 'If setDisplay is called with no parameter the default display should be used.');
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('default')), spl_object_hash($view->display_handler));
+    $this->assertSame($view->displayHandlers->get('default'), $view->display_handler);
 
     // Set two different valid displays.
     $view->setDisplay('page_1');
     $this->assertEquals('page_1', $view->current_display, 'If setDisplay is called with a valid display id the appropriate display should be used.');
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('page_1')), spl_object_hash($view->display_handler));
+    $this->assertSame($view->displayHandlers->get('page_1'), $view->display_handler);
 
     $view->setDisplay('page_2');
     $this->assertEquals('page_2', $view->current_display, 'If setDisplay is called with a valid display id the appropriate display should be used.');
-    $this->assertEquals(spl_object_hash($view->displayHandlers->get('page_2')), spl_object_hash($view->display_handler));
+    $this->assertSame($view->displayHandlers->get('page_2'), $view->display_handler);
 
     // Destroy the view, so we can start again and test an invalid display.
     $view->destroy();
@@ -328,7 +325,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $this->assertInstanceOf(Response::class, $view->getResponse());
     $new_response = new Response();
     $view->setResponse($new_response);
-    $this->assertSame(spl_object_hash($view->getResponse()), spl_object_hash($new_response), 'New response object correctly set.');
+    $this->assertSame($new_response, $view->getResponse(), 'New response object correctly set.');
 
     // Test the getPath() method.
     $path = $this->randomMachineName();
@@ -474,9 +471,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     $executable->newDisplay('display_test');
     $errors = $executable->validate();
     $total_error_count = array_reduce($errors, function (float|int|null $carry, $item): float|int {
-      $carry += count($item);
-
-      return $carry;
+      return $carry + count($item);
     });
     // Assert that there were 9 total errors across 3 displays.
     $this->assertSame(9, $total_error_count);
@@ -548,10 +543,17 @@ class ViewExecutableTest extends ViewsKernelTestBase {
 
     $view = Views::getView('test_argument_dependency');
     $view->setDisplay('page_1');
-    $view->setArguments([(string) $account->id(), 'this value should be replaced']);
+    // The view has two arguments: uid_touch (comment module) and uid (with
+    // argument_validator_test as its validator). Both are needed to verify
+    // that calculateDependencies() picks up dependencies from both default
+    // and validator plugins. uid receives the value the validator intercepts
+    // and overrides to '1'.
+    $view->setArguments([$account->id(), 'this value should be replaced']);
     $view->execute();
     $account = User::load(1);
     $expected = [
+      '{{ arguments.uid_touch }}' => $account->label(),
+      '{{ raw_arguments.uid_touch }}' => (string) $account->id(),
       '{{ arguments.uid }}' => $account->label(),
       '{{ raw_arguments.uid }}' => (string) $account->id(),
     ];

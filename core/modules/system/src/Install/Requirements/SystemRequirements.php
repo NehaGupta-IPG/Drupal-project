@@ -48,7 +48,10 @@ class SystemRequirements implements InstallRequirementsInterface {
     'migrate_drupal' => 'Migrate Drupal',
     'quickedit' => 'Quick Edit',
     'rdf' => 'RDF',
+    'settings_tray' => 'Settings Tray',
+    'shortcut' => 'Shortcut',
     'statistics' => 'Statistics',
+    'telephone' => 'Telephone',
     'tour' => 'Tour',
     'tracker' => 'Tracker',
   ];
@@ -61,6 +64,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     'classy' => 'Classy',
     'seven' => 'Seven',
     'stable' => 'Stable',
+    'stable9' => 'Stable 9',
   ];
 
   /**

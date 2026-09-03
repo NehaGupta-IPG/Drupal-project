@@ -85,6 +85,7 @@ class UserPasswordResetTest extends BrowserTestBase {
    * Tests password reset functionality.
    */
   public function testUserPasswordReset(): void {
+    \Drupal::service('module_installer')->install(['page_cache']);
     // Verify that accessing the password reset form without having the session
     // variables set results in an access denied message.
     $this->drupalGet(Url::fromRoute('user.reset.form', ['uid' => $this->account->id()]));
@@ -569,11 +570,6 @@ class UserPasswordResetTest extends BrowserTestBase {
     $this->drupalGet('user/' . $this->account->id() . '/edit');
     $this->submitForm($edit, 'Save');
     $this->drupalLogout();
-
-    $edit = [
-      'name' => $this->account->getAccountName(),
-      'pass' => $password,
-    ];
 
     // The next request should *not* trigger flood control, since the
     // password change should have cleared flood events for this user.
