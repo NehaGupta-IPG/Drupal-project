@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Plugin\Discovery;
 
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Plugin')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class CustomAnnotationClassDiscoveryTest extends DiscoveryTestBase {
 
   /**

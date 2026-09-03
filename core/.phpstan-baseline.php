@@ -8498,6 +8498,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/DefaultLazyPluginCollection.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to method __construct\\(\\) of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+  discovery instead\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/DefaultPluginManager.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Instantiation of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+  discovery instead\\.$#',
+	'identifier' => 'new.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/DefaultPluginManager.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Plugin\\\\DefaultPluginManager\\:\\:alterDefinitions\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17930,6 +17946,62 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate/src/MigrateMessageInterface.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to property \\$fileCache of deprecated class Drupal\\\\Component\\\\Annotation\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+  discovery instead\\.$#',
+	'identifier' => 'property.deprecatedClass',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/migrate/src/Plugin/Discovery/AnnotatedClassDiscoveryAutomatedProviders.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to property \\$pluginDefinitionAnnotationName of deprecated class Drupal\\\\Component\\\\Annotation\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+  discovery instead\\.$#',
+	'identifier' => 'property.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/src/Plugin/Discovery/AnnotatedClassDiscoveryAutomatedProviders.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method __construct\\(\\) of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+  discovery instead\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/src/Plugin/Discovery/AnnotatedClassDiscoveryAutomatedProviders.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method getAnnotationReader\\(\\) of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+  discovery instead\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/src/Plugin/Discovery/AnnotatedClassDiscoveryAutomatedProviders.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method getPluginNamespaces\\(\\) of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+  discovery instead\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/src/Plugin/Discovery/AnnotatedClassDiscoveryAutomatedProviders.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method getProviderFromNamespace\\(\\) of deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+  discovery instead\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/src/Plugin/Discovery/AnnotatedClassDiscoveryAutomatedProviders.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Class Drupal\\\\migrate\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscoveryAutomatedProviders extends deprecated class Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\AnnotatedClassDiscovery\\:
+in drupal\\:11\\.5\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use attribute
+  discovery instead\\.$#',
+	'identifier' => 'class.extendsDeprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/src/Plugin/Discovery/AnnotatedClassDiscoveryAutomatedProviders.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$finder of static method Drupal\\\\migrate\\\\Plugin\\\\Discovery\\\\StaticReflectionParser\\:\\:getParentParser\\(\\) expects Doctrine\\\\Common\\\\Reflection\\\\ClassFinderInterface, Drupal\\\\Component\\\\ClassFinder\\\\ClassFinderInterface given\\.$#',
