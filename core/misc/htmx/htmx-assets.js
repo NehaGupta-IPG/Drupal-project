@@ -130,7 +130,12 @@
     // Helps with memory management.
     responseHTML = null;
 
-    requestAssetsLoaded.get(detail.xhr).then(() => Drupal.htmx.addAssets(data));
+    requestAssetsLoaded.set(
+      detail.xhr,
+      (requestAssetsLoaded.get(detail.xhr) || Promise.resolve()).then(() =>
+        Drupal.htmx.addAssets(data),
+      ),
+    );
   });
 
   // Trigger the Drupal processing once all assets have been loaded.
