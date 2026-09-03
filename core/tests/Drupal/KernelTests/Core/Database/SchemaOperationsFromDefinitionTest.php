@@ -31,11 +31,51 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
   protected Schema $schema;
 
   /**
+   * Unique key name resolver.
+   */
+  protected \ReflectionMethod $uniqueKeyNameResolver;
+
+  /**
+   * Index name resolver.
+   */
+  protected \ReflectionMethod $indexNameResolver;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
     $this->schema = $this->connection->schema();
+    $this->uniqueKeyNameResolver = new \ReflectionMethod($this->schema, 'resolveUniqueKeyIdentifierFromDefinition');
+    $this->indexNameResolver = new \ReflectionMethod($this->schema, 'resolveIndexIdentifierFromDefinition');
+  }
+
+  /**
+   * Returns the machine identifier of a unique key.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
+   *   The Schema definition where the table is defined.
+   * @param string $tableName
+   *   Name of the table.
+   * @param string $uniqueKeyName
+   *   The name of the unique key as defined in the schema definition.
+   */
+  protected function getUniqueKeyName(SchemaDefinition $schema, string $tableName, string $uniqueKeyName): string {
+    return $this->uniqueKeyNameResolver->invoke($this->schema, $schema, $tableName, $uniqueKeyName);
+  }
+
+  /**
+   * Returns the machine identifier of an index.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
+   *   The Schema definition where the table is defined.
+   * @param string $tableName
+   *   Name of the table.
+   * @param string $indexName
+   *   The name of the index as defined in the schema definition.
+   */
+  protected function getIndexName(SchemaDefinition $schema, string $tableName, string $indexName): string {
+    return $this->indexNameResolver->invoke($this->schema, $schema, $tableName, $indexName);
   }
 
   /**
@@ -47,8 +87,9 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * override this method.
    */
   public function testCreateTable(): void {
-    $tables[] = new Table(
-      name: 'test_from_definition',
+    $tableName = 'test_from_definition';
+    $table = new Table(
+      name: $tableName,
       description: 'Test table created from definition.',
       columns: [
         Column::serial(
@@ -75,15 +116,15 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
 
     $schema = new SchemaDefinition(
       type: SchemaDefinitionType::Test,
-      name: 'test_from_definition',
-      tables: $tables,
+      name: $tableName,
+      tables: [$table],
     );
 
     $this->schema->createSchemaFromDefinition($schema);
 
-    $this->assertTrue($this->schema->tableExists('test_from_definition'));
-    $this->assertTrue($this->schema->indexExists('test_from_definition', 'ages'));
-    $this->assertTrue($this->schema->indexExists('test_from_definition', 'names_by_age'));
+    $this->assertTrue($this->schema->tableExists($tableName));
+    $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'ages'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'names_by_age'));
   }
 
   /**
@@ -92,9 +133,9 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * @return \Drupal\Core\Database\SchemaDefinition\Schema
    *   The schema.
    */
-  protected function initialSchemaForAddTableColumn(): SchemaDefinition {
-    $tables[] = new Table(
-      name: 'test_add_table_column_from_definition',
+  protected function initialSchemaForAddTableColumn(string $tableName): SchemaDefinition {
+    $table = new Table(
+      name: $tableName,
       description: 'Test table created from definition for column addition.',
       columns: [
         Column::serial(
@@ -110,8 +151,8 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
 
     return new SchemaDefinition(
       type: SchemaDefinitionType::Test,
-      name: 'test_add_table_column_from_definition',
-      tables: $tables,
+      name: $tableName,
+      tables: [$table],
     );
   }
 
@@ -121,9 +162,9 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * @return \Drupal\Core\Database\SchemaDefinition\Schema
    *   The schema.
    */
-  protected function targetSchemaForTestAddTableColumn(): SchemaDefinition {
-    $tables[] = new Table(
-      name: 'test_add_table_column_from_definition',
+  protected function targetSchemaForTestAddTableColumn(string $tableName): SchemaDefinition {
+    $table = new Table(
+      name: $tableName,
       description: 'Test table created from definition for column addition.',
       columns: [
         Column::serial(
@@ -150,8 +191,8 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
 
     return new SchemaDefinition(
       type: SchemaDefinitionType::Test,
-      name: 'test_add_table_column_from_definition',
-      tables: $tables,
+      name: $tableName,
+      tables: [$table],
     );
   }
 
@@ -165,27 +206,30 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * override this method.
    */
   public function testAddTableColumn(): void {
-    $this->schema->createSchemaFromDefinition($this->initialSchemaForAddTableColumn());
+    $tableName = 'test_add_table_column_from_definition';
+    $initalSchema = $this->initialSchemaForAddTableColumn($tableName);
+    $this->schema->createSchemaFromDefinition($initalSchema);
 
-    $this->assertTrue($this->schema->tableExists('test_add_table_column_from_definition'));
-    $this->assertFalse($this->schema->fieldExists('test_add_table_column_from_definition', 'age'));
+    $this->assertTrue($this->schema->tableExists($tableName));
+    $this->assertFalse($this->schema->fieldExists($tableName, 'age'));
     $method = new \ReflectionMethod($this->schema, 'findPrimaryKeyColumns');
-    $this->assertEquals(['id'], $method->invoke($this->schema, 'test_add_table_column_from_definition'));
-    $this->assertFalse($this->schema->indexExists('test_add_table_column_from_definition', 'ages'));
-    $this->assertFalse($this->schema->indexExists('test_add_table_column_from_definition', 'names_by_age'));
+    $this->assertEquals(['id'], $method->invoke($this->schema, $tableName));
+    $this->assertFalse($this->schema->uniqueKeyExists($tableName, 'ages'));
+    $this->assertFalse($this->schema->indexExists($tableName, 'names_by_age'));
 
+    $targetSchema = $this->targetSchemaForTestAddTableColumn($tableName);
     $this->schema->addTableColumnFromDefinition(
-      targetSchema: $this->targetSchemaForTestAddTableColumn(),
-      tableName: 'test_add_table_column_from_definition',
+      targetSchema: $targetSchema,
+      tableName: $tableName,
       targetColumnName: 'age',
     );
 
-    $this->assertTrue($this->schema->tableExists('test_add_table_column_from_definition'));
-    $this->assertTrue($this->schema->fieldExists('test_add_table_column_from_definition', 'age'));
+    $this->assertTrue($this->schema->tableExists($tableName));
+    $this->assertTrue($this->schema->fieldExists($tableName, 'age'));
     $method = new \ReflectionMethod($this->schema, 'findPrimaryKeyColumns');
-    $this->assertEquals(['id'], $method->invoke($this->schema, 'test_add_table_column_from_definition'));
-    $this->assertTrue($this->schema->indexExists('test_add_table_column_from_definition', 'ages'));
-    $this->assertTrue($this->schema->indexExists('test_add_table_column_from_definition', 'names_by_age'));
+    $this->assertEquals(['id'], $method->invoke($this->schema, $tableName));
+    $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'ages'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'names_by_age'));
   }
 
   /**
@@ -194,9 +238,9 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * @return \Drupal\Core\Database\SchemaDefinition\Schema
    *   The schema.
    */
-  protected function initialSchemaForTestChangeTableColumn(): SchemaDefinition {
-    $tables[] = new Table(
-      name: 'test_change_table_column_from_definition',
+  protected function initialSchemaForTestChangeTableColumn(string $tableName): SchemaDefinition {
+    $table = new Table(
+      name: $tableName,
       description: 'Test table created from definition for column change.',
       columns: [
         Column::serial(
@@ -217,8 +261,8 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
 
     return new SchemaDefinition(
       type: SchemaDefinitionType::Test,
-      name: 'test_change_table_column_from_definition',
-      tables: $tables,
+      name: $tableName,
+      tables: [$table],
     );
   }
 
@@ -228,9 +272,9 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * @return \Drupal\Core\Database\SchemaDefinition\Schema
    *   The schema.
    */
-  protected function targetSchemaForTestChangeTableColumn(): SchemaDefinition {
-    $tables[] = new Table(
-      name: 'test_change_table_column_from_definition',
+  protected function targetSchemaForTestChangeTableColumn(string $tableName): SchemaDefinition {
+    $table = new Table(
+      name: $tableName,
       description: 'Test table created from definition for column change.',
       columns: [
         Column::serial(
@@ -248,17 +292,17 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
       ],
       primaryKey: new PrimaryKey(['id']),
       uniqueKeys: [
-        new UniqueKey(name: 'ages', columns: ['age_new']),
+        new UniqueKey(name: 'ages_new', columns: ['age_new']),
       ],
       indexes: [
-        new Index(name: 'names_by_age', columns: ['name', 'age_new']),
+        new Index(name: 'names_by_age_new', columns: ['name', 'age_new']),
       ],
     );
 
     return new SchemaDefinition(
       type: SchemaDefinitionType::Test,
-      name: 'test_change_table_column_from_definition',
-      tables: $tables,
+      name: $tableName,
+      tables: [$table],
     );
   }
 
@@ -266,30 +310,33 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * Tests changing a column with specialized indexes.
    */
   public function testChangeTableColumn(): void {
-    $this->schema->createSchemaFromDefinition($this->initialSchemaForTestChangeTableColumn());
+    $tableName = 'test_change_table_column_from_definition';
+    $initalSchema = $this->initialSchemaForTestChangeTableColumn($tableName);
+    $this->schema->createSchemaFromDefinition($initalSchema);
 
-    $this->assertTrue($this->schema->tableExists('test_change_table_column_from_definition'));
-    $this->assertTrue($this->schema->fieldExists('test_change_table_column_from_definition', 'age'));
-    $this->assertFalse($this->schema->fieldExists('test_change_table_column_from_definition', 'age_new'));
+    $this->assertTrue($this->schema->tableExists($tableName));
+    $this->assertTrue($this->schema->fieldExists($tableName, 'age'));
+    $this->assertFalse($this->schema->fieldExists($tableName, 'age_new'));
     $method = new \ReflectionMethod($this->schema, 'findPrimaryKeyColumns');
-    $this->assertEquals(['id'], $method->invoke($this->schema, 'test_change_table_column_from_definition'));
-    $this->assertFalse($this->schema->indexExists('test_change_table_column_from_definition', 'ages'));
-    $this->assertFalse($this->schema->indexExists('test_change_table_column_from_definition', 'names_by_age'));
+    $this->assertEquals(['id'], $method->invoke($this->schema, $tableName));
+    $this->assertFalse($this->schema->uniqueKeyExists($tableName, 'ages_new'));
+    $this->assertFalse($this->schema->indexExists($tableName, 'names_by_age_new'));
 
+    $targetSchema = $this->targetSchemaForTestChangeTableColumn($tableName);
     $this->schema->changeTableColumnFromDefinition(
-      targetSchema: $this->targetSchemaForTestChangeTableColumn(),
-      tableName: 'test_change_table_column_from_definition',
+      targetSchema: $targetSchema,
+      tableName: $tableName,
       currentColumnName: 'age',
       targetColumnName: 'age_new',
     );
 
-    $this->assertTrue($this->schema->tableExists('test_change_table_column_from_definition'));
-    $this->assertFalse($this->schema->fieldExists('test_change_table_column_from_definition', 'age'));
-    $this->assertTrue($this->schema->fieldExists('test_change_table_column_from_definition', 'age_new'));
+    $this->assertTrue($this->schema->tableExists($tableName));
+    $this->assertFalse($this->schema->fieldExists($tableName, 'age'));
+    $this->assertTrue($this->schema->fieldExists($tableName, 'age_new'));
     $method = new \ReflectionMethod($this->schema, 'findPrimaryKeyColumns');
-    $this->assertEquals(['id'], $method->invoke($this->schema, 'test_change_table_column_from_definition'));
-    $this->assertTrue($this->schema->indexExists('test_change_table_column_from_definition', 'ages'));
-    $this->assertTrue($this->schema->indexExists('test_change_table_column_from_definition', 'names_by_age'));
+    $this->assertEquals(['id'], $method->invoke($this->schema, $tableName));
+    $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'ages_new'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'names_by_age_new'));
   }
 
   /**

@@ -2,6 +2,7 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
@@ -763,6 +764,13 @@ EOD;
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function uniqueKeyExists(string $tableName, string $uniqueKeyName): bool {
+    return $this->constraintExists($tableName, $uniqueKeyName . '__key');
+  }
+
+  /**
    * Helper function: check if a constraint (PK, FK, UK) exists.
    *
    * @param string $table
@@ -1159,6 +1167,20 @@ EOD;
         ':column' => $column,
       ])
       ->fetchField();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resolveUniqueKeyIdentifierFromDefinition(SchemaDefinition $schema, string $tableName, string $uniqueKeyName): string {
+    return $uniqueKeyName;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function resolveIndexIdentifierFromDefinition(SchemaDefinition $schema, string $tableName, string $indexName): string {
+    return $indexName;
   }
 
 }
