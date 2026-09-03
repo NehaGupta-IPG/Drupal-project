@@ -185,6 +185,7 @@ class ErrorTest extends UnitTestCase {
     Database::addConnectionInfo('default', 'default', [
       'driver' => 'test',
       'namespace' => 'Drupal\\Tests\\Core\\Utility\\Stub',
+      'autoload' => 'core/tests/Drupal/Tests/Core/Utility/Stub/',
       'database' => 'test',
     ]);
 
