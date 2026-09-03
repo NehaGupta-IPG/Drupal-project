@@ -71,6 +71,14 @@ abstract class GenericModuleTestBase extends BrowserTestBase {
         $this->assertTrue(\Drupal::service('module_installer')->uninstall([$module]), "Failed to uninstall '$module' module");
         $this->assertTrue(\Drupal::service('module_installer')->install([$module]), "Failed to install '$module' module");
       }
+      else {
+        // Check that the module is protected from being uninstalled instead.
+        // A hidden module provides nothing for ::assertHookHelp() to check, so
+        // without this the test would perform no assertion at all.
+        $provider = $connection->getProvider();
+        $reasons = \Drupal::service('module_installer')->validateUninstall([$provider]);
+        $this->assertArrayHasKey($provider, $reasons, "The '$provider' module provides the database driver, so it must not be uninstallable");
+      }
     }
   }
 
