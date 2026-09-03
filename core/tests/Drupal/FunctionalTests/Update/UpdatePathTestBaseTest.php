@@ -7,6 +7,7 @@ namespace Drupal\FunctionalTests\Update;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Site\Settings;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('Update')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class UpdatePathTestBaseTest extends UpdatePathTestBase {
 
   /**
@@ -28,7 +30,6 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-11.3.0.bare.standard.php.gz';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-8.update-test-schema-enabled.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/drupal-8.update-test-semver-update-n-enabled.php';
-    $this->databaseDumpFiles[] = __DIR__ . '/../../../../modules/system/tests/fixtures/update/install-mysqli.php';
   }
 
   /**
@@ -183,7 +184,7 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
    * Tests that setup is done correctly.
    */
   public function testSetup(): void {
-    $this->assertCount(4, $this->databaseDumpFiles);
+    $this->assertCount(3, $this->databaseDumpFiles);
     $this->assertSame(1, Settings::get('entity_update_batch_size'));
   }
 

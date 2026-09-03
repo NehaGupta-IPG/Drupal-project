@@ -66,7 +66,6 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
    */
   protected $allThemes = [
     'claro',
-    'olivero',
     'stark',
   ];
 
@@ -206,7 +205,7 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   /**
    * Checks that all the library files exist.
    *
-   * @param array[] $library_definitions
+   * @param array<\Drupal\Core\Extension\Extension> $library_definitions
    *   An array of library definitions, keyed by extension, then by library, and
    *   so on.
    */

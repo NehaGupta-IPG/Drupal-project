@@ -10,6 +10,7 @@ use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Template\TwigNodeTrans;
 use Drupal\help\HelpTopicDiscovery;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\locale\LocaleXss;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -28,6 +29,7 @@ use Twig\NodeVisitor\NodeVisitorInterface;
  * Verifies that all core Help topics can be rendered and comply with standards.
  */
 #[Group('help')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class HelpTopicsSyntaxTest extends KernelTestBase implements NodeVisitorInterface {
 
@@ -190,7 +192,7 @@ class HelpTopicsSyntaxTest extends KernelTestBase implements NodeVisitorInterfac
         $this->assertNotEmpty($text, 'Topic ' . $chunk_str . ' contains text');
 
         // Verify the chunk is OK.
-        $this->assertTrue(locale_string_is_safe($text), 'Topic ' . $chunk_str . ' translatable string is locale-safe');
+        $this->assertTrue(LocaleXss::stringIsSafe($text), 'Topic ' . $chunk_str . ' translatable string is locale-safe');
         $this->validateHtml($text, $chunk_str);
       }
       $chunk_num++;

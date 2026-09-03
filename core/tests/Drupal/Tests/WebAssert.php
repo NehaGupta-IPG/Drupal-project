@@ -528,7 +528,7 @@ class WebAssert extends MinkWebAssert {
       $replacement = function ($matches) use ($value) {
         return $value;
       };
-      $xpath = preg_replace_callback('/' . preg_quote($placeholder, NULL) . '\b/', $replacement, $xpath);
+      $xpath = preg_replace_callback('/' . preg_quote($placeholder) . '\b/', $replacement, $xpath);
     }
     return $xpath;
   }
@@ -594,7 +594,7 @@ class WebAssert extends MinkWebAssert {
    * @throws \Behat\Mink\Exception\ExpectationException
    *   When the condition is not fulfilled.
    */
-  public function assert($condition, $message) {
+  public function assert($condition, $message): void {
     if ($condition) {
       return;
     }

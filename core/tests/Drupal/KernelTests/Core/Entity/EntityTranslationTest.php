@@ -961,6 +961,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     // langcodes are in the deleted languages list.
     $actual = \Drupal::state()->get('entity_test.delete.translatable_test_field');
     $expected_translatable = ['l1', 'l2'];
+    /** @var list<string> $actual */
     sort($actual);
     sort($expected_translatable);
     $this->assertEquals($expected_translatable, $actual);
@@ -974,6 +975,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $actual = \Drupal::state()->get('entity_test.delete.translatable_test_field');
     $expected_translatable[] = 'en';
     $expected_translatable[] = 'l0';
+    /** @var list<string> $actual */
     sort($actual);
     sort($expected_translatable);
     $this->assertEquals($expected_translatable, $actual);
@@ -982,6 +984,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     // default langcode.
     $actual = \Drupal::state()->get('entity_test.delete.untranslatable_test_field');
     $expected_untranslatable = ['en'];
+    /** @var list<string> $actual */
     sort($actual);
     sort($expected_untranslatable);
     $this->assertEquals($expected_untranslatable, $actual);
@@ -1085,14 +1088,13 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     // Test that the default translation object is put into the translation
     // object cache when a new translation object is initialized.
     $entity = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId())->loadUnchanged($entity->id());
-    $default_translation_spl_object_hash = spl_object_hash($entity);
-    $this->assertEquals($default_translation_spl_object_hash, spl_object_hash($entity->getTranslation($translation_langcode)->getTranslation($default_langcode)));
+    $this->assertSame($entity, $entity->getTranslation($translation_langcode)->getTranslation($default_langcode));
 
     // Test that non-default translations are always served from the translation
     // object cache.
     $entity = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId())->loadUnchanged($entity->id());
-    $this->assertEquals(spl_object_hash($entity->getTranslation($translation_langcode)), spl_object_hash($entity->getTranslation($translation_langcode)));
-    $this->assertEquals(spl_object_hash($entity->getTranslation($translation_langcode)), spl_object_hash($entity->getTranslation($translation_langcode)->getTranslation($default_langcode)->getTranslation($translation_langcode)));
+    $this->assertSame($entity->getTranslation($translation_langcode), $entity->getTranslation($translation_langcode));
+    $this->assertSame($entity->getTranslation($translation_langcode), $entity->getTranslation($translation_langcode)->getTranslation($default_langcode)->getTranslation($translation_langcode));
   }
 
 }

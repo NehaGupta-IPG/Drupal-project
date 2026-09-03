@@ -36,8 +36,6 @@ class ImporterTest extends KernelTestBase implements EventSubscriberInterface {
   /**
    * Whether the imported content entities were syncing.
    *
-   * @var bool
-   *
    * @see ::onPreSave()
    */
   private bool $wasSyncing = FALSE;
@@ -94,7 +92,7 @@ class ImporterTest extends KernelTestBase implements EventSubscriberInterface {
   public function testChangeDataOnImport(): void {
     $this->setUpCurrentUser(admin: TRUE);
 
-    $finder = new Finder($this->getDrupalRoot() . '/core/tests/fixtures/pre_entity_import_default_content');
+    $finder = new Finder($this->root . '/core/tests/fixtures/pre_entity_import_default_content');
     $this->container->get(Importer::class)->importContent($finder);
     self::assertTrue($this->wasSyncing);
 
