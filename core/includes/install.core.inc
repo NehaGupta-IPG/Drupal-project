@@ -1728,8 +1728,11 @@ function install_download_additional_translations_operations(&$install_state): v
   }
   $language->save();
 
-  if ($langcode != 'en' && empty($install_state['profile_info']['keep_english'])) {
-    ConfigurableLanguage::load('en')?->delete();
+  if ($langcode != 'en') {
+    \Drupal::service('language.default')->set($language);
+    if (empty($install_state['profile_info']['keep_english'])) {
+      ConfigurableLanguage::load('en')?->delete();
+    }
   }
 
 }
