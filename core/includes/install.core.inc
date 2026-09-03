@@ -1761,19 +1761,8 @@ function install_download_additional_translations_operations(&$install_state): v
   }
   $language->save();
 
-  // If a non-English language was selected, change the default language and
-  // remove English.
-  if ($langcode != 'en') {
-    \Drupal::configFactory()->getEditable('system.site')
-      ->set('langcode', $langcode)
-      ->set('default_langcode', $langcode)
-      ->save();
-    \Drupal::service('language.default')->set($language);
-    if (empty($install_state['profile_info']['keep_english'])) {
-      if ($lang = ConfigurableLanguage::load('en')) {
-        $lang->delete();
-      }
-    }
+  if ($langcode != 'en' && empty($install_state['profile_info']['keep_english'])) {
+    ConfigurableLanguage::load('en')?->delete();
   }
 
 }
