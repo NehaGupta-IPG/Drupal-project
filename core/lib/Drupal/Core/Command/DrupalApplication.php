@@ -168,9 +168,12 @@ class DrupalApplication extends Application {
     // Database exceptions may carry the information of the executed statement,
     // that can be exported to a more readable dump. The exception may also be
     // wrapped by the layer that ran the query, so the whole chain is searched.
+    // A console application writes to a terminal, and gets colors only when
+    // the output reports itself as decorated: --no-ansi and a redirected
+    // stream must stay free of escape sequences.
     $info = SqlExecutionInfo::fromThrowable($t);
     $dump = $info !== NULL ?
-      (new SqlDumper())->export($info, $output->isDecorated()) :
+      (new SqlDumper())->export($info, $output->isDecorated(), FALSE) :
       '';
 
     if ($dump === '') {

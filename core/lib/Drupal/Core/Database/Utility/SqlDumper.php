@@ -24,17 +24,21 @@ class SqlDumper {
    * Exports the SQL statement information to a string.
    *
    * This is used to make database exceptions more readable both on site pages
-   * and in CLI (tests or dr). The method detects whether we are in a CLI or
-   * a HTML environment and dumps information accordingly.
+   * and in CLI (tests or dr). The format is not detected here: every caller
+   * renders the exception for a known destination, and the SAPI does not
+   * decide it. A CLI hosted kernel still responds with a page, and 'cli-server'
+   * and 'phpdbg' are not 'cli'.
    *
    * @param \Drupal\Core\Database\SqlExecutionInfo|null $info
    *   The SQL statement execution information, or NULL if none is available.
-   * @param ?bool $color
-   *   (optional) whether output should be colored. If not specified, it will
-   *   be TRUE for CLI output, irrelevant for HTML output.
-   * @param ?bool $html
-   *   (optional) whether output should be in HTML format. If not specified, it
-   *   will be FALSE for CLI output, TRUE for HTML output.
+   * @param bool $color
+   *   Whether the output should be colored with ANSI escape sequences. Only a
+   *   stream reporting itself as decorated may get them: a redirected stream
+   *   must not, and neither must the JUnit log that run-tests.sh parses.
+   *   Irrelevant for HTML output.
+   * @param bool $html
+   *   Whether the output should be in HTML format, for a page, rather than
+   *   plain text for a terminal.
    *
    * @return string
    *   The output for printing, or an empty string if there is no information
@@ -42,22 +46,13 @@ class SqlDumper {
    */
   public function export(
     ?SqlExecutionInfo $info,
-    ?bool $color = NULL,
-    ?bool $html = NULL,
+    bool $color,
+    bool $html,
   ): string {
 
     // This runs while an exception is being reported, so it must never fail.
     if ($info === NULL) {
       return '';
-    }
-
-    if (PHP_SAPI === 'cli') {
-      $color ??= TRUE;
-      $html ??= FALSE;
-    }
-    else {
-      $color ??= FALSE;
-      $html ??= TRUE;
     }
 
     // In prod environments, keep using a minimal output.
@@ -186,7 +181,7 @@ class SqlDumper {
    *   The output for printing.
    */
   protected function output(
-    ?string $sqlDump,
+    string $sqlDump,
     ?string $placeholderDump,
     ?string $optionDump,
     string $delimiter,
@@ -194,12 +189,10 @@ class SqlDumper {
     bool $resetColor,
   ): string {
     $output = $this->stringOutput($delimiter . $newLine, $resetColor);
-    if ($sqlDump !== NULL) {
-      $output .= $this->stringOutput("SQL statement" . $newLine, $resetColor);
-      $output .= $this->stringOutput($delimiter . $newLine, $resetColor);
-      $output .= $this->stringOutput($sqlDump . $newLine, $resetColor);
-      $output .= $this->stringOutput($delimiter . $newLine, $resetColor);
-    }
+    $output .= $this->stringOutput("SQL statement" . $newLine, $resetColor);
+    $output .= $this->stringOutput($delimiter . $newLine, $resetColor);
+    $output .= $this->stringOutput($sqlDump . $newLine, $resetColor);
+    $output .= $this->stringOutput($delimiter . $newLine, $resetColor);
     if ($placeholderDump !== NULL) {
       $output .= $this->stringOutput("Placeholders" . $newLine, $resetColor);
       $output .= $this->stringOutput($delimiter . $newLine, $resetColor);

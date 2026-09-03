@@ -125,8 +125,8 @@ class SqlDumperTest extends UnitTestCase {
    * Tests that no information produces no dump.
    */
   public function testNoExecutionInfo(): void {
-    $this->assertSame('', (new SqlDumper())->export(NULL));
-    $this->assertSame('', (new StubUnformattedSqlDumper())->export(NULL));
+    $this->assertSame('', (new SqlDumper())->export(NULL, FALSE, FALSE));
+    $this->assertSame('', (new StubUnformattedSqlDumper())->export(NULL, FALSE, FALSE));
   }
 
 }

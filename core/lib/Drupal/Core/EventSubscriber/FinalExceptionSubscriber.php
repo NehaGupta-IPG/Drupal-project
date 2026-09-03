@@ -108,7 +108,10 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
       $sql_dump_placeholder = '';
       $sql_info = SqlExecutionInfo::fromThrowable($exception);
       if ($sql_info !== NULL) {
-        $dump = (new SqlDumper())->export($sql_info);
+        // The dump goes into the response body, so it is HTML, and never
+        // carries terminal escape sequences. This holds for a kernel hosted
+        // by a CLI process too, which still responds with a page.
+        $dump = (new SqlDumper())->export($sql_info, FALSE, TRUE);
         if ($dump !== '') {
           $error['@sql_dump'] = Markup::create($dump);
           $sql_dump_placeholder = '@sql_dump';

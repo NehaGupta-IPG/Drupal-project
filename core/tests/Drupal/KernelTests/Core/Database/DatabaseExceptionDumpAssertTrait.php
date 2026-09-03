@@ -56,9 +56,8 @@ trait DatabaseExceptionDumpAssertTrait {
     $info = $this->executionInfo($e);
     $this->assertNull($info, 'The exception carries no SQL execution information.');
 
-    // Every flavour, since a caller passing the flags explicitly must get the
-    // same empty result as one letting them be sniffed. The minimal dump a
-    // production site gets is checked too.
+    // Every flavour, since none of them may produce anything to report. The
+    // minimal dump a production site gets is checked too.
     foreach ([new SqlDumper(), new StubUnformattedSqlDumper()] as $dumper) {
       $this->assertSame('', $dumper->export($info, FALSE, TRUE));
       $this->assertSame('', $dumper->export($info, TRUE, FALSE));

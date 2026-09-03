@@ -57,7 +57,7 @@ class LargeQueryTest extends DriverSpecificDatabaseTestBase {
       $this->assertStringNotContainsString($long_name, $e->getMessage());
       $this->assertStringNotContainsString('; []', $e->getMessage());
       $this->assertLessThanOrEqual(Connection::MIN_MAX_ALLOWED_PACKET, strlen($e->info->sqlString));
-      $this->assertLessThanOrEqual($max_allowed_packet, strlen((new SqlDumper())->export($e->info)));
+      $this->assertLessThanOrEqual($max_allowed_packet, strlen((new SqlDumper())->export($e->info, FALSE, FALSE)));
     }
   }
 

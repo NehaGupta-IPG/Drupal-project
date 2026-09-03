@@ -111,7 +111,9 @@ trait DrupalTestCaseTrait {
     if ($info === NULL) {
       return $t;
     }
-    $infoDump = (new SqlDumper())->export($info, self::testRunnerUsesColors());
+    // PHPUnit reports the failure on a terminal, and colors it only when the
+    // test run asked for them.
+    $infoDump = (new SqlDumper())->export($info, self::testRunnerUsesColors(), FALSE);
     if ($infoDump === '') {
       return $t;
     }
