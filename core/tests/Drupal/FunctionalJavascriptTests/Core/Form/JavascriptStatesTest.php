@@ -640,8 +640,10 @@ class JavascriptStatesTest extends WebDriverTestBase {
     // Find trigger and target elements.
     $ajax_reload = $page->findField('ajax_reload');
     $this->assertNotEmpty($ajax_reload);
+    $shared_ajax_states_trigger = $page->findField('shared_ajax_states_trigger');
+    $this->assertNotEmpty($shared_ajax_states_trigger);
     $checkbox_trigger = $page->findField('checkbox_trigger');
-    $this->assertNotEmpty($ajax_reload);
+    $this->assertNotEmpty($checkbox_trigger);
     $not_ajax_select_trigger = $page->findField('not_ajax_select_trigger');
     $this->assertNotEmpty($not_ajax_select_trigger);
     $ajax_affected_select_trigger = $page->findField('ajax_select_trigger');
@@ -670,8 +672,11 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertNotEmpty($textfield_visible_single_ajax_added);
     $textfield_visible_single_ajax_set = $page->findField('textfield_visible_when_ajax_set_trigger_is_value1_form_selector');
     $this->assertNotEmpty($textfield_visible_single_ajax_set);
+    $ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1 = $page->findField('ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1');
+    $this->assertEmpty($ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1);
 
     // Verify initial state.
+    $this->assertEquals('', $shared_ajax_states_trigger->getValue());
     $this->assertEquals('', $ajax_set_trigger->getValue());
     $this->assertFalse($textfield_visible_ajax_single->isVisible());
     $this->assertFalse($textfield_visible_not_ajax_single->isVisible());
@@ -873,6 +878,63 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $ajax_added_textfield_enabled_when_checkbox_trigger_checked = $page->findField('ajax_added_textfield_enabled_when_checkbox_trigger_checked');
     $this->assertEmpty($ajax_added_textfield_enabled_when_checkbox_trigger_checked);
     $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
+
+    // Trigger Shared Ajax & States trigger.
+    $shared_ajax_states_trigger->setValue('0');
+    $this->assertTrue($textfield_visible_ajax_single->isVisible());
+    $this->assertTrue($textfield_visible_not_ajax_single->isVisible());
+    $this->assertTrue($textfield_visible_multiple->isVisible());
+    $this->assertTrue($textfield_invisible_single_ajax_added->isVisible());
+    $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
+    $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
+    $this->assertTrue($textfield_visible_single_ajax_set->isVisible());
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
+    $ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1 = $page->findField('ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1');
+    $this->assertNotEmpty($ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1);
+    $this->assertTrue($ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1->hasAttribute('disabled'));
+
+    // Trigger Ajax & Change state: set shared ajax states trigger to 1.
+    $shared_ajax_states_trigger->setValue('1');
+    $this->assertTrue($textfield_visible_ajax_single->isVisible());
+    $this->assertTrue($textfield_visible_not_ajax_single->isVisible());
+    $this->assertTrue($textfield_visible_multiple->isVisible());
+    $this->assertTrue($textfield_invisible_single_ajax_added->isVisible());
+    $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
+    $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
+    $this->assertTrue($textfield_visible_single_ajax_set->isVisible());
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
+    $this->assertFalse($ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1->hasAttribute('disabled'));
+
+    // Trigger Ajax & Change state: set shared ajax states trigger to ''.
+    $shared_ajax_states_trigger->setValue('');
+    $this->assertTrue($textfield_visible_ajax_single->isVisible());
+    $this->assertTrue($textfield_visible_not_ajax_single->isVisible());
+    $this->assertTrue($textfield_visible_multiple->isVisible());
+    $this->assertTrue($textfield_invisible_single_ajax_added->isVisible());
+    $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
+    $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
+    $this->assertTrue($textfield_visible_single_ajax_set->isVisible());
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
+    $ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1 = $page->findField('ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1');
+    $this->assertEmpty($ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1);
+
+    // Trigger Ajax & Change state: set shared ajax states trigger to 1.
+    $shared_ajax_states_trigger->setValue('1');
+    $this->assertTrue($textfield_visible_ajax_single->isVisible());
+    $this->assertTrue($textfield_visible_not_ajax_single->isVisible());
+    $this->assertTrue($textfield_visible_multiple->isVisible());
+    $this->assertTrue($textfield_invisible_single_ajax_added->isVisible());
+    $this->assertTrue($textfield_invisible_multiple_ajax_added_and->isVisible());
+    $this->assertFalse($textfield_invisible_multiple_ajax_added_or->isVisible());
+    $this->assertFalse($textfield_visible_single_ajax_added->isVisible());
+    $this->assertTrue($textfield_visible_single_ajax_set->isVisible());
+    $this->assertTrue($textfield_enabled_when_checkbox_trigger_is_checked->hasAttribute('disabled'));
+    $ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1 = $page->findField('ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1');
+    $this->assertNotEmpty($ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1);
+    $this->assertFalse($ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1->hasAttribute('disabled'));
 
   }
 

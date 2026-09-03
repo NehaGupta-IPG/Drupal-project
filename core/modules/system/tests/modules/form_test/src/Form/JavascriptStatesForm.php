@@ -780,14 +780,25 @@ class JavascriptStatesForm extends FormBase {
         'wrapper' => 'states_ajax_test_wrapper',
       ],
     ];
+    // Ajax trigger that is also a States trigger.
+    $form['shared_ajax_states_trigger'] = [
+      '#type' => 'select',
+      '#options' => ['' => 'Select', '0' => '0', '1' => '1'],
+      '#title' => 'Change me to reload elements with the shared_ajax_states_trigger_test_wrapper',
+      '#ajax' => [
+        'callback' => '::buildAjaxShared',
+        'wrapper' => 'shared_ajax_states_trigger_test_wrapper',
+      ],
+    ];
     $form['checkbox_trigger'] = [
       '#type' => 'checkbox',
       '#title' => 'Checkbox Trigger',
     ];
 
-    // Ajax wrapper.
+    // Ajax wrappers.
     $form['states_ajax_test'] = [
       '#type' => 'details',
+      '#title' => 'states_ajax_test_wrapper',
       '#open' => TRUE,
       '#prefix' => '<div id="states_ajax_test_wrapper">',
       '#suffix' => '</div>',
@@ -822,6 +833,26 @@ class JavascriptStatesForm extends FormBase {
         ],
       ];
       $form['states_ajax_test']['ajax_set_trigger']['#default_value'] = 'value1';
+    }
+    $form['shared_ajax_states_trigger_test'] = [
+      '#type' => 'details',
+      '#title' => 'shared_ajax_states_trigger_test_wrapper',
+      '#open' => TRUE,
+      '#prefix' => '<div id="shared_ajax_states_trigger_test_wrapper">',
+      '#suffix' => '</div>',
+    ];
+    // Add elements added via ajax when shared_ajax_states_trigger has value.
+    $shared_ajax_states_trigger = $form_state->getValue('shared_ajax_states_trigger');
+    if ($shared_ajax_states_trigger === '0' || $shared_ajax_states_trigger === '1') {
+      $form['shared_ajax_states_trigger_test']['ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1'] = [
+        '#type' => 'textfield',
+        '#title' => 'Ajax added Textfield enabled when Shared Ajax States Trigger is 1',
+        '#states' => [
+          'enabled' => [
+            ':input[name="shared_ajax_states_trigger"]' => ['value' => '1'],
+          ],
+        ],
+      ];
     }
     $form['textfield_enabled_when_checkbox_trigger_is_checked'] = [
       '#type' => 'textfield',
@@ -931,6 +962,13 @@ class JavascriptStatesForm extends FormBase {
    */
   public function buildAjax(array &$form, FormStateInterface $form_state): array {
     return $form['states_ajax_test'];
+  }
+
+  /**
+   * Return ajax.
+   */
+  public function buildAjaxShared(array &$form, FormStateInterface $form_state): array {
+    return $form['shared_ajax_states_trigger_test'];
   }
 
 }
