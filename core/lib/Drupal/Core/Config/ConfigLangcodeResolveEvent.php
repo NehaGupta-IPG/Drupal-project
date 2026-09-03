@@ -13,14 +13,18 @@ use Drupal\Component\EventDispatcher\Event;
  * meaningful langcode of its own.
  *
  * self::setLangcode() stops propagation as soon as a subscriber answers, so
- * a higher-priority, more specific policy - for example a module always
- * defaulting new configuration to English regardless of the site default -
- * takes precedence over a later, more general one (like core's own
- * site-default subscriber) simply by running first. It is up to the subscriber
- * to ensure the langcode is valid for the site.
+ * a higher-priority, more specific policy takes precedence over a later, more
+ * general one simply by running first. It is up to the subscriber to ensure the
+ * langcode is valid for the site.
+ *
+ * If a subscriber is added by a contributed or custom module, the
+ * DefaultConfigLangcodeSubscriber event must be changed to account for the new
+ * source of truth.
  *
  * Drupal core always registers a subscriber for the site's default language, so
  * self::getLangcode() is guaranteed a value by the time dispatch() returns.
+ *
+ * @see \Drupal\language\EventSubscriber\DefaultConfigLangcodeSubscriber
  */
 final class ConfigLangcodeResolveEvent extends Event {
 

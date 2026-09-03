@@ -16,6 +16,8 @@ services:
   Drupal\language\LanguageNegotiatorInterface: '@language_negotiator'
   language.config_subscriber:
     class: Drupal\language\EventSubscriber\ConfigSubscriber
+    arguments: ['@language_manager', '@language.default', '@config.factory', '@language_negotiator']
+  Drupal\language\EventSubscriber\DefaultConfigLangcodeSubscriber:
     autowire: true
   language.default_langcode_config_updater:
     class: Drupal\language\DefaultLangcodeConfigUpdater
