@@ -12,6 +12,7 @@ use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\ProjectInfo;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Default implementation of UpdateManagerInterface.
@@ -28,20 +29,6 @@ class UpdateManager implements UpdateManagerInterface {
   protected $updateSettings;
 
   /**
-   * Module Handler Service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * Update Processor Service.
-   *
-   * @var \Drupal\update\UpdateProcessorInterface
-   */
-  protected $updateProcessor;
-
-  /**
    * An array of installed projects.
    *
    * @var array
@@ -49,7 +36,7 @@ class UpdateManager implements UpdateManagerInterface {
   protected $projects;
 
   /**
-   * The key/value store.
+   * The key/value store for the updates.
    *
    * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
    */
@@ -62,58 +49,22 @@ class UpdateManager implements UpdateManagerInterface {
    */
   protected $availableReleasesTempStore;
 
-  /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
-   * The module extension list.
-   *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  protected $moduleExtensionList;
-
-  /**
-   * The theme extension list.
-   *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
-   */
-  protected ThemeExtensionList $themeExtensionList;
-
-  /**
-   * Constructs an UpdateManager.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The Module Handler service
-   * @param \Drupal\update\UpdateProcessorInterface $update_processor
-   *   The Update Processor service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
-   *   The translation service.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_expirable_factory
-   *   The expirable key/value factory.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $extension_list_theme
-   *   The theme extension list.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, UpdateProcessorInterface $update_processor, TranslationInterface $translation, KeyValueFactoryInterface $key_value_expirable_factory, ThemeHandlerInterface $theme_handler, ModuleExtensionList $extension_list_module, ThemeExtensionList $extension_list_theme) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected UpdateProcessorInterface $updateProcessor,
+    TranslationInterface $translation,
+    #[Autowire(service: 'keyvalue.expirable')]
+    KeyValueFactoryInterface $key_value_expirable_factory,
+    protected ThemeHandlerInterface $themeHandler,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected ThemeExtensionList $themeExtensionList,
+  ) {
     $this->updateSettings = $config_factory->get('update.settings');
-    $this->moduleHandler = $module_handler;
-    $this->updateProcessor = $update_processor;
     $this->stringTranslation = $translation;
     $this->keyValueStore = $key_value_expirable_factory->get('update');
-    $this->themeHandler = $theme_handler;
     $this->availableReleasesTempStore = $key_value_expirable_factory->get('update_available_releases');
     $this->projects = [];
-    $this->moduleExtensionList = $extension_list_module;
-    $this->themeExtensionList = $extension_list_theme;
   }
 
   /**
@@ -125,8 +76,8 @@ class UpdateManager implements UpdateManagerInterface {
     // of both the projects we care about, and the current update status of the
     // site. We do *not* want to clear the cache of available releases just yet,
     // since that data (even if it's stale) can be useful during
-    // \Drupal\update\UpdateManager::getProjects(); for example, to modules
-    // that implement hook_system_info_alter() such as cvs_deploy.
+    // \Drupal\update\UpdateManagerInterface::getProjects(); for example, to
+    // modules that implement hook_system_info_alter() such as cvs_deploy.
     $this->keyValueStore->delete('update_project_projects');
     $this->keyValueStore->delete('update_project_data');
 
@@ -178,16 +129,12 @@ class UpdateManager implements UpdateManagerInterface {
     // On certain paths, we should clear the data and recompute the projects for
     // update status of the site to avoid presenting stale information.
     $route_names = [
-      'update.theme_update',
       'system.modules_list',
       'system.theme_install',
-      'update.module_update',
       'update.status',
-      'update.report_update',
       'update.settings',
       'system.status',
       'update.manual_status',
-      'update.confirmation_page',
       'system.themes_page',
     ];
     if (in_array(\Drupal::routeMatch()->getRouteName(), $route_names)) {
@@ -241,6 +188,66 @@ class UpdateManager implements UpdateManagerInterface {
         return;
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAvailable(bool $refresh = FALSE): array {
+    \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.compare');
+    $needs_refresh = FALSE;
+
+    // Grab whatever data we currently have.
+    $available = $this->availableReleasesTempStore->getAll();
+    $projects = $this->getProjects();
+    foreach ($projects as $key => $project) {
+      // If there's no data at all, we clearly need to fetch some.
+      if (empty($available[$key])) {
+        $this->updateProcessor->createFetchTask($project);
+        $needs_refresh = TRUE;
+        continue;
+      }
+
+      // See if the .info.yml file is newer than the last time we checked for
+      // data, and if so, mark this project's data as needing to be re-fetched.
+      // Any time an admin upgrades their local installation, the .info.yml file
+      // will be changed, so this is the only way we can be sure we're not
+      // showing bogus information right after they upgrade.
+      if ($project['info']['_info_file_ctime'] > $available[$key]['last_fetch']) {
+        $available[$key]['fetch_status'] = UpdateFetcherInterface::FETCH_PENDING;
+      }
+
+      // If we have project data but no release data, we need to fetch. This
+      // can be triggered when we fail to contact a release history server.
+      if (empty($available[$key]['releases']) && !$available[$key]['last_fetch']) {
+        $available[$key]['fetch_status'] = UpdateFetcherInterface::FETCH_PENDING;
+      }
+
+      // If we think this project needs to fetch, actually create the task now
+      // and remember that we think we're missing some data.
+      if (!empty($available[$key]['fetch_status']) && $available[$key]['fetch_status'] == UpdateFetcherInterface::FETCH_PENDING) {
+        $this->updateProcessor->createFetchTask($project);
+        $needs_refresh = TRUE;
+      }
+    }
+
+    if ($needs_refresh && $refresh) {
+      // Attempt to drain the queue of fetch tasks.
+      $this->updateProcessor->fetchData();
+      // After processing the queue, we've (hopefully) got better data, so pull
+      // the latest data again and use that directly.
+      $available = $this->availableReleasesTempStore->getAll();
+    }
+
+    return $available;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function reset(): void {
+    $this->keyValueStore->deleteAll();
+    $this->availableReleasesTempStore->deleteAll();
   }
 
 }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Hooks provided by the Update Manager module.
+ * Hooks provided by the Update Status module.
  */
 
 use Drupal\update\UpdateFetcherInterface;
@@ -16,7 +16,7 @@ use Drupal\update\UpdateFetcherInterface;
  * Alter the list of projects before fetching data and comparing versions.
  *
  * Most modules will never need to implement this hook. It is for advanced
- * interaction with the Update Manager module. The primary use-case for this
+ * interaction with the Update Status module. The primary use-case for this
  * hook is to add projects to the list; for example, to provide update status
  * data on uninstalled modules and themes. A contributed module might want to
  * hide projects from the list; for example, if there is a site-specific module
@@ -25,15 +25,16 @@ use Drupal\update\UpdateFetcherInterface;
  * updates report. In rare cases, a module might want to alter the data
  * associated with a project already in the list.
  *
- * @param $projects
+ * @param array $projects
  *   Reference to an array of the projects installed on the system. This
- *   includes all the metadata documented in the comments below for each project
- *   (either module or theme) that is currently installed. The array is
- *   initially populated inside \Drupal\update\UpdateManager::getProjects() with
- *   the help of \Drupal\Core\Utility\ProjectInfo->processInfoList(), so look
- *   there for examples of how to populate the array with real values.
+ *   includes all the metadata documented in the comments below for each
+ *   project (either module or theme) that is currently installed. The array is
+ *   initially populated inside
+ *   \Drupal\update\UpdateManagerInterface::getProjects() with the help of
+ *   \Drupal\Core\Utility\ProjectInfo->processInfoList(), so look there for
+ *    examples of how to populate the array with real values.
  *
- * @see \Drupal\update\UpdateManager::getProjects()
+ * @see \Drupal\update\UpdateManagerInterface::getProjects()
  * @see \Drupal\Core\Utility\ProjectInfo::processInfoList()
  */
 function hook_update_projects_alter(&$projects) {
@@ -78,7 +79,7 @@ function hook_update_projects_alter(&$projects) {
 /**
  * Alter the information about available updates for projects.
  *
- * @param $projects
+ * @param array $projects
  *   Reference to an array of information about available updates to each
  *   project installed on the system.
  *
@@ -102,32 +103,6 @@ function hook_update_status_alter(&$projects) {
       }
     }
   }
-}
-
-/**
- * Verify an archive after it has been downloaded and extracted.
- *
- * @param string $project
- *   The short name of the project that has been downloaded.
- * @param string $archive_file
- *   The filename of the un-extracted archive.
- * @param string $directory
- *   The directory that the archive was extracted into.
- *
- * @return array
- *   If there are any problems, return an array of error messages. If there are
- *   no problems, return an empty array.
- *
- * @see update_manager_archive_verify()
- * @ingroup update_manager_file
- */
-function hook_verify_update_archive($project, $archive_file, $directory) {
-  $errors = [];
-  if (!file_exists($directory)) {
-    $errors[] = t('The %directory does not exist.', ['%directory' => $directory]);
-  }
-  // Add other checks on the archive integrity here.
-  return $errors;
 }
 
 /**

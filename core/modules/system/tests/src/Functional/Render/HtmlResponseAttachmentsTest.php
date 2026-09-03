@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Render;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Functional tests for HtmlResponseAttachmentsProcessor.
- *
- * @group Render
  */
+#[Group('Render')]
+#[RunTestsInSeparateProcesses]
 class HtmlResponseAttachmentsTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $modules = ['render_attached_test'];
+  protected static $modules = ['render_attached_test', 'page_cache'];
 
   /**
    * {@inheritdoc}

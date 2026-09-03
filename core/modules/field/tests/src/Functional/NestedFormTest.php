@@ -7,18 +7,18 @@ namespace Drupal\Tests\field\Functional;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests field elements in nested forms.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class NestedFormTest extends FieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field_test', 'entity_test'];
 
@@ -28,17 +28,17 @@ class NestedFormTest extends FieldTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * @var array
+   * Single field storage.
    */
   protected array $fieldStorageSingle;
 
   /**
-   * @var array
+   * Unlimited field storage.
    */
   protected array $fieldStorageUnlimited;
 
   /**
-   * @var array
+   * The field.
    */
   protected array $field;
 
@@ -85,7 +85,7 @@ class NestedFormTest extends FieldTestBase {
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
 
-    // Add two fields on the 'entity_test'
+    // Add two fields on the 'entity_test'.
     FieldStorageConfig::create($this->fieldStorageSingle)->save();
     FieldStorageConfig::create($this->fieldStorageUnlimited)->save();
     $this->field['field_name'] = 'field_single';

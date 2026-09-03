@@ -8,13 +8,14 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\search\Entity\SearchPage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verify the search config settings form.
- *
- * @group search
- * @group #slow
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchConfigSettingsFormTest extends BrowserTestBase {
 
   /**
@@ -26,6 +27,8 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
     'node',
     'search',
     'search_extra_type',
+    'search_node',
+    'search_user',
     'test_page_test',
   ];
 
@@ -92,7 +95,8 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
    */
   public function testSearchSettingsPage(): void {
 
-    // Test that the settings form displays the correct count of items left to index.
+    // Test that the settings form displays the correct count of items left to
+    // index.
     $this->drupalGet('admin/config/search/pages');
     $this->assertSession()->pageTextContains('There are 0 items left to index.');
 
@@ -146,7 +150,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
     $this->drupalGet('admin/config/search/pages');
     $this->clickLink('Edit', 1);
 
-    // Ensure that the default setting was picked up from the default config
+    // Ensure that the default setting was picked up from the default config.
     $this->assertTrue($this->assertSession()->optionExists('edit-extra-type-settings-boost', 'bi')->isSelected());
 
     // Change extra type setting and also modify a common search setting.
@@ -214,7 +218,11 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
       $this->drupalGet('node');
       $this->submitForm($terms, 'Search');
       $current = $this->getURL();
-      $expected = Url::fromRoute('search.view_' . $entity->id(), [], ['query' => ['keys' => $info['keys']], 'absolute' => TRUE])->toString();
+      $expected = Url::fromRoute(
+        'search.view_' . $entity->id(),
+        [],
+        ['query' => ['keys' => $info['keys']], 'absolute' => TRUE],
+      )->toString();
       $this->assertEquals($expected, $current, 'Block redirected to right search page');
 
       // Try an invalid search path, which should 404.
@@ -385,7 +393,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
    * @param bool $enable
    *   Whether the enable link is expected.
    */
-  protected function verifySearchPageOperations($id, $edit, $delete, $disable, $enable) {
+  protected function verifySearchPageOperations($id, $edit, $delete, $disable, $enable): void {
     if ($edit) {
       $this->assertSession()->linkByHrefExists("admin/config/search/pages/manage/$id");
     }
@@ -434,7 +442,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
    * @param string $entity_id
    *   The search page entity ID to enable.
    */
-  protected function setDefaultThroughUi($entity_id) {
+  protected function setDefaultThroughUi(string $entity_id): void {
     $this->drupalGet('admin/config/search/pages');
     preg_match('|href="([^"]+' . $entity_id . '/set-default[^"]+)"|', $this->getSession()->getPage()->getContent(), $matches);
 

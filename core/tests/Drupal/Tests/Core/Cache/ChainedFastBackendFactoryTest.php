@@ -10,11 +10,15 @@ use Drupal\Core\Cache\CacheFactoryInterface;
 use Drupal\Core\Cache\ChainedFastBackend;
 use Drupal\Core\Cache\ChainedFastBackendFactory;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * @coversDefaultClass \Drupal\Core\Cache\ChainedFastBackendFactory
- * @group Cache
+ * Tests Drupal\Core\Cache\ChainedFastBackendFactory.
  */
+#[CoversClass(ChainedFastBackendFactory::class)]
+#[Group('Cache')]
 class ChainedFastBackendFactoryTest extends UnitTestCase {
 
   /**
@@ -23,7 +27,7 @@ class ChainedFastBackendFactoryTest extends UnitTestCase {
   public function testIdenticalService(): void {
     $container = $this->createMock(ContainerInterface::class);
     $testCacheFactory = $this->createMock(CacheFactoryInterface::class);
-    $testCacheBackend = $this->createMock(CacheBackendInterface::class);
+    $testCacheBackend = $this->createStub(CacheBackendInterface::class);
 
     $container->expects($this->once())
       ->method('get')
@@ -51,13 +55,13 @@ class ChainedFastBackendFactoryTest extends UnitTestCase {
     $container = $this->createMock(ContainerInterface::class);
     $testConsistentCacheFactory = $this->createMock(CacheFactoryInterface::class);
     $testFastCacheFactory = $this->createMock(CacheFactoryInterface::class);
-    $testConsistentCacheBackend = $this->createMock(CacheBackendInterface::class);
-    $testFastCacheBackend = $this->createMock(CacheBackendInterface::class);
+    $testConsistentCacheBackend = $this->createStub(CacheBackendInterface::class);
+    $testFastCacheBackend = $this->createStub(CacheBackendInterface::class);
 
     $container->expects($this->exactly(2))
       ->method('get')
       ->willReturnCallback(
-        function ($service) use ($testFastCacheFactory, $testConsistentCacheFactory) {
+        function ($service) use ($testFastCacheFactory, $testConsistentCacheFactory): MockObject {
           return match ($service) {
             'cache.backend.test_consistent' => $testConsistentCacheFactory,
             'cache.backend.test_fast' => $testFastCacheFactory,

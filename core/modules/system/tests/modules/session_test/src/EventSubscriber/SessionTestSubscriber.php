@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\session_test\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -25,7 +27,7 @@ class SessionTestSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The Event to process.
    */
-  public function onKernelRequestSessionTest(RequestEvent $event) {
+  public function onKernelRequestSessionTest(RequestEvent $event): void {
     $session = $event->getRequest()->getSession();
     $this->emptySession = !($session && $session->start());
   }
@@ -36,7 +38,7 @@ class SessionTestSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
    *   The Event to process.
    */
-  public function onKernelResponseSessionTest(ResponseEvent $event) {
+  public function onKernelResponseSessionTest(ResponseEvent $event): void {
     // Set header for session testing.
     $response = $event->getResponse();
     $response->headers->set('X-Session-Empty', $this->emptySession ? '1' : '0');

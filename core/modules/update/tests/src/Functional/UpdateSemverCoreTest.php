@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\update\Functional;
 
 use Drupal\Core\Url;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests edge cases of the Available Updates report UI.
  *
  * For example, manually checking for updates, recovering from problems
  * connecting to the release history server, clearing the disk cache, and more.
- *
- * @group update
- * @group #slow
  */
+#[Group('update')]
+#[RunTestsInSeparateProcesses]
 class UpdateSemverCoreTest extends UpdateSemverCoreTestBase {
 
   /**
@@ -40,7 +41,7 @@ class UpdateSemverCoreTest extends UpdateSemverCoreTestBase {
   }
 
   /**
-   * Tests the Update Manager module when the update server returns 503 errors.
+   * Tests the Update Status module when the update server returns 503 errors.
    */
   public function testServiceUnavailable(): void {
     $this->refreshUpdateStatus([], '503-error');
@@ -61,17 +62,17 @@ class UpdateSemverCoreTest extends UpdateSemverCoreTestBase {
     ];
     $queue = \Drupal::queue('update_fetch_tasks');
     $this->assertEquals(0, $queue->numberOfItems(), 'Queue is empty');
-    update_create_fetch_task($project_a);
+    \Drupal::service('update.processor')->createFetchTask($project_a);
     $this->assertEquals(1, $queue->numberOfItems(), 'Queue contains one item');
-    update_create_fetch_task($project_b);
+    \Drupal::service('update.processor')->createFetchTask($project_b);
     $this->assertEquals(2, $queue->numberOfItems(), 'Queue contains two items');
     // Try to add a project again.
-    update_create_fetch_task($project_a);
+    \Drupal::service('update.processor')->createFetchTask($project_a);
     $this->assertEquals(2, $queue->numberOfItems(), 'Queue still contains two items');
 
     // Clear storage and try again.
-    update_storage_clear();
-    update_create_fetch_task($project_a);
+    \Drupal::service('update.manager')->reset();
+    \Drupal::service('update.processor')->createFetchTask($project_a);
     $this->assertEquals(2, $queue->numberOfItems(), 'Queue contains two items');
   }
 
@@ -105,13 +106,60 @@ class UpdateSemverCoreTest extends UpdateSemverCoreTestBase {
     $this->assertSession()->pageTextContains('There was a problem checking available updates for Drupal.');
     $this->mockReleaseHistory(['drupal' => 'sec.8.0.2']);
     // Simulate the update_available_releases state expiring before cron is run
-    // and the state is used by \Drupal\update\UpdateManager::getProjects().
+    // and the state is used by \Drupal\update\UpdateManagerInterface::getProjects().
     \Drupal::keyValueExpirable('update_available_releases')->deleteAll();
     // This cron run should retrieve fixed updates.
     $this->cronRun();
     $this->drupalGet('admin/config');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('There is a security update available for your version of Drupal.');
+  }
+
+  /**
+   * Tests the available link appears to users with the right permissions.
+   */
+  public function testAvailableUpdateLink(): void {
+    // Test that a user with the correct permissions is shown the available
+    // updates link.
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer site configuration',
+      'view update notifications',
+      'administer themes',
+      'access administration pages',
+    ]));
+
+    $this->setProjectInstalledVersion('8.0.0');
+    // Instead of using refreshUpdateStatus(), set these manually.
+    $this->config('update.settings')
+      ->set('fetch.url', Url::fromRoute('update_test.update_test')
+        ->setAbsolute()
+        ->toString())
+      ->save();
+    // Use update XML that has no information to simulate a broken response from
+    // the update server.
+    $this->config('update_test.settings')
+      ->set('xml_map', ['drupal' => 'broken'])
+      ->save();
+
+    // This will retrieve broken updates.
+    $this->cronRun();
+
+    $this->drupalGet('admin/appearance');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->linkExists('available updates');
+
+    // Test that a user without the correct permissions is not shown the
+    // available updates link.
+    $this->drupalLogin($this->drupalCreateUser([
+      'view update notifications',
+      'administer themes',
+      'access administration pages',
+    ]));
+
+    $this->drupalGet('admin/appearance');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->linkNotExists('available updates');
+    $this->assertSession()->pageTextContains('available updates');
   }
 
   /**

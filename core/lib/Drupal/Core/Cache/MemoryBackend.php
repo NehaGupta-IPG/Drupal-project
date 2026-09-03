@@ -24,6 +24,8 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
 
   /**
    * Array to store cache objects.
+   *
+   * @var object[]
    */
   protected $cache = [];
 
@@ -186,16 +188,11 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   /**
    * {@inheritdoc}
    */
-  public function invalidateAll() {
-    foreach ($this->cache as $cid => $item) {
-      $this->cache[$cid]->expire = $this->time->getRequestTime() - 1;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function garbageCollection() {
+    $requestTime = $this->time->getRequestTime();
+    $this->cache = array_filter($this->cache, function ($item) use ($requestTime) {
+      return $item->expire == Cache::PERMANENT || $item->expire >= $requestTime;
+    });
   }
 
   /**

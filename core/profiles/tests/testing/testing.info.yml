@@ -1,0 +1,6 @@
+name: Testing
+type: profile
+description: 'Minimal profile for running tests. Includes absolutely required modules only.'
+version: VERSION
+hidden: true
+opt_out_install: true

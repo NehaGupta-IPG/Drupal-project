@@ -187,15 +187,6 @@ class BackendChain implements CacheBackendInterface, CacheTagsInvalidatorInterfa
   /**
    * {@inheritdoc}
    */
-  public function invalidateAll() {
-    foreach ($this->backends as $backend) {
-      $backend->invalidateAll();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function garbageCollection() {
     foreach ($this->backends as $backend) {
       $backend->garbageCollection();

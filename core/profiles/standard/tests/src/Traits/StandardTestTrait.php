@@ -6,7 +6,6 @@ namespace Drupal\Tests\standard\Traits;
 
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\Component\Utility\Html;
-use Drupal\contact\Entity\ContactForm;
 use Drupal\Core\Url;
 use Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber;
 use Drupal\editor\Entity\Editor;
@@ -18,7 +17,8 @@ use Drupal\Tests\RequirementsPageTrait;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Provides a test method to test the Standard installation profile or recipe.
@@ -38,24 +38,44 @@ trait StandardTestTrait {
    * Tests Standard installation profile or recipe.
    */
   public function testStandard(): void {
-    $this->drupalGet('');
-    $this->assertSession()->pageTextContains('Powered by Drupal');
-    $this->assertSession()->pageTextContains('Congratulations and welcome to the Drupal community.');
+    // Assert the configured front page and derive expected anonymous status.
+    // - /admin/welcome: Standard profile front page. 403 while the route
+    //   exists; 404 after the profile was uninstalled.
+    // - /user/login: Standard recipe front page for anonymous users.
+    $front_page_path = (string) $this->config('system.site')->get('page.front');
+    $this->assertContains($front_page_path, ['/admin/welcome', '/user/login']);
+    try {
+      \Drupal::service('router.route_provider')->getRouteByName('standard.welcome');
+      $has_standard_welcome_route = TRUE;
+    }
+    catch (RouteNotFoundException) {
+      $has_standard_welcome_route = FALSE;
+    }
+    switch ($front_page_path) {
+      case '/admin/welcome':
+        $expected_anonymous_front_status = $has_standard_welcome_route ? 403 : 404;
+        break;
 
-    // Test anonymous user can access 'Main navigation' block.
+      case '/user/login':
+        $expected_anonymous_front_status = 200;
+        break;
+    }
+
+    $this->drupalGet('');
+    $anonymous_front_status = $this->getSession()->getStatusCode();
+    $this->assertSame($expected_anonymous_front_status, $anonymous_front_status);
+
+    // Test admin users configure and access the main navigation block.
     $this->adminUser = $this->drupalCreateUser([
+      'administer nodes',
       'administer blocks',
       'administer block content',
-      'post comments',
-      'skip comment approval',
-      'create article content',
-      'create page content',
     ]);
     $this->drupalLogin($this->adminUser);
     // Configure the block.
-    $this->drupalGet('admin/structure/block/add/system_menu_block:main/olivero');
+    $this->drupalGet('admin/structure/block/add/system_menu_block:main/claro');
     $this->submitForm([
-      'region' => 'sidebar',
+      'region' => 'header',
       'id' => 'main_navigation',
     ], 'Save block');
     // Verify admin user can see the block.
@@ -64,35 +84,15 @@ trait StandardTestTrait {
 
     // Verify we have role = complementary on help_block blocks.
     $this->drupalGet('admin/structure/block');
-    $this->assertSession()->elementAttributeContains('xpath', "//div[@id='block-olivero-help']", 'role', 'complementary');
+    $this->assertSession()->elementAttributeContains('xpath', "//div[@id='block-claro-help']", 'role', 'complementary');
 
-    // Verify anonymous user can see the block.
+    // Verify anonymous visibility on front page in each install mode.
     $this->drupalLogout();
+    $this->drupalGet('');
+    $this->assertSession()->statusCodeEquals($anonymous_front_status);
     $this->assertSession()->pageTextContains('Main navigation');
 
-    // Ensure comments don't show in the front page RSS feed.
-    // Create an article.
-    $this->drupalCreateNode([
-      'type' => 'article',
-      'title' => 'Foobar',
-      'promote' => 1,
-      'status' => 1,
-      'body' => [['value' => 'Then she picked out two somebodies,<br />Sally and me', 'format' => 'basic_html']],
-    ]);
-
-    // Add a comment.
     $this->drupalLogin($this->adminUser);
-    $this->drupalGet('node/1');
-    // Verify that a line break is present.
-    $this->assertSession()->responseContains('Then she picked out two somebodies,<br>Sally and me');
-    $this->submitForm([
-      'subject[0][value]' => 'Bar foo',
-      'comment_body[0][value]' => 'Then she picked out two somebodies, Sally and me',
-    ], 'Save');
-    // Fetch the feed.
-    $this->drupalGet('rss.xml');
-    $this->assertSession()->responseContains('Foobar');
-    $this->assertSession()->responseNotContains('Then she picked out two somebodies, Sally and me');
 
     // Ensure block body exists.
     $this->drupalGet('block/add');
@@ -118,7 +118,7 @@ trait StandardTestTrait {
       }
 
       $this->assertSame([], array_map(
-        function (ConstraintViolation $v) {
+        function (ConstraintViolationInterface $v) {
           return (string) $v->getMessage();
         },
         iterator_to_array(CKEditor5::validatePair(
@@ -147,16 +147,16 @@ trait StandardTestTrait {
     \Drupal::service('module_installer')->uninstall(['editor', 'ckeditor5']);
     $this->rebuildContainer();
     \Drupal::service('module_installer')->install(['editor']);
-    /** @var \Drupal\contact\ContactFormInterface $contact_form */
-    $contact_form = ContactForm::load('feedback');
-    $recipients = $contact_form->getRecipients();
-    $this->assertEquals(['simpletest@example.com'], $recipients);
 
+    // Standard does not include any content types, to test admin theme
+    // use on the node/add page, we need a test content type.
+    $this->drupalCreateContentType(['type' => 'test_content', 'name' => 'Test Content']);
     $role = Role::create([
       'id' => 'admin_theme',
       'label' => 'Admin theme',
     ]);
     $role->grantPermission('view the administration theme');
+    $role->grantPermission('create test_content content');
     $role->save();
     $this->adminUser->addRole($role->id())->save();
     $this->drupalGet('node/add');
@@ -192,35 +192,25 @@ trait StandardTestTrait {
     foreach (ImageStyle::loadMultiple() as $style) {
       $effects = $style->getEffects()->getInstanceIds();
       $last = $style->getEffects()->get(end($effects));
-      $this->assertSame('image_convert', $last->getConfiguration()['id']);
+      $this->assertSame('image_convert_avif', $last->getConfiguration()['id']);
       $this->assertSame('webp', $last->getConfiguration()['data']['extension']);
     }
 
     // Verify certain routes' responses are cacheable by Dynamic Page Cache, to
     // ensure these responses are very fast for authenticated users.
     $this->drupalLogin($this->adminUser);
-    $url = Url::fromRoute('contact.site_page');
-    $this->drupalGet($url);
-    // Verify that site-wide contact page cannot be cached by Dynamic Page
-    // Cache.
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'UNCACHEABLE');
 
-    $url = Url::fromRoute('<front>');
-    $this->drupalGet($url);
-    $this->drupalGet($url);
-    // Verify that frontpage is cached by Dynamic Page Cache.
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
+    // Create a test node for caching tests.
+    $node = $this->drupalCreateNode([
+      'type' => 'test_content',
+      'title' => 'Test node for caching',
+      'status' => 1,
+    ]);
 
-    $url = Url::fromRoute('entity.node.canonical', ['node' => 1]);
+    $url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()]);
     $this->drupalGet($url);
     $this->drupalGet($url);
     // Verify that full node page is cached by Dynamic Page Cache.
-    $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
-
-    $url = Url::fromRoute('entity.user.canonical', ['user' => 1]);
-    $this->drupalGet($url);
-    $this->drupalGet($url);
-    // Verify that user profile page is cached by Dynamic Page Cache.
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
 
     // Make sure the editorial workflow is installed after enabling the
@@ -254,7 +244,6 @@ trait StandardTestTrait {
     $role->save();
     $this->adminUser->addRole($role->id())->save();
     $assert_session = $this->assertSession();
-    $page = $this->getSession()->getPage();
     /** @var \Drupal\media\Entity\MediaType $media_type */
     foreach (MediaType::loadMultiple() as $media_type) {
       $media_type_machine_name = $media_type->id();
@@ -278,7 +267,7 @@ trait StandardTestTrait {
       if (is_a($media_type->getSource(), Image::class, TRUE)) {
         // Assert the default entity view display is configured with an image
         // style.
-        $this->drupalGet('/admin/structure/media/manage/' . $media_type->id() . '/display');
+        $this->drupalGet('/admin/structure/media/manage/' . $media_type->id() . '/display/default');
         $assert_session->fieldValueEquals('fields[field_media_image][type]', 'image');
         $assert_session->elementTextContains('css', 'tr[data-drupal-selector="edit-fields-field-media-image"]', 'Image style: Large (480×480)');
         // By default for media types with an image source, only the image

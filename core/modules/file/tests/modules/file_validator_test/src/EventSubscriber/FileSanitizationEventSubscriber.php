@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\file_validator_test\EventSubscriber;
 
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
@@ -20,7 +22,7 @@ class FileSanitizationEventSubscriber implements EventSubscriberInterface {
   /**
    * Handles the file sanitization event.
    */
-  public function onFileSanitization(FileUploadSanitizeNameEvent $event) {
+  public function onFileSanitization(FileUploadSanitizeNameEvent $event): void {
     $this->allowedExtensions = $event->getAllowedExtensions();
   }
 

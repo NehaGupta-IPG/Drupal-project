@@ -6,7 +6,7 @@ namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Installer\Form\SelectProfileForm;
+use Drupal\Core\Extension\ModuleWeight;
 
 /**
  * Provides a base class for testing installing from existing configuration.
@@ -17,11 +17,13 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
    * This is set by the profile in the core.extension extracted.
    *
    * If set to FALSE, then the install will proceed without an install profile.
+   *
+   * @var string|null|bool
    */
-  protected $profile = NULL;
+  protected $profile;
 
   /**
-   * @todo Fill out docblock.
+   * @var bool
    */
   protected $existingSyncDirectory = FALSE;
 
@@ -55,7 +57,7 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
 
     if ($this->profile === NULL) {
@@ -65,8 +67,9 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
     }
 
     if ($this->profile !== FALSE) {
-      // Create a profile for testing. We set core_version_requirement to '*' for
-      // the test so that it does not need to be updated between major versions.
+      // Create a profile for testing. We set core_version_requirement to '*'
+      // for the test so that it does not need to be updated between major
+      // versions.
       $info = [
         'type' => 'profile',
         'core_version_requirement' => '*',
@@ -107,7 +110,7 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
       $module = Database::getConnection()->getProvider();
       if ($module !== 'core') {
         $core_extension['module'][$module] = 0;
-        $core_extension['module'] = module_config_sort($core_extension['module']);
+        $core_extension['module'] = \Drupal::service(ModuleWeight::class)->sort($core_extension['module']);
       }
       if ($this->profile === FALSE && array_key_exists('profile', $core_extension)) {
         // Remove the profile.
@@ -136,7 +139,7 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $parameters = parent::installParameters();
 
     // The options that change configuration are disabled when installing from
@@ -147,6 +150,26 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
     unset($parameters['forms']['install_configure_form']['enable_update_status_emails']);
 
     return $parameters;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function visitInstaller(array $query = []): void {
+    if ($this->existingSyncDirectory) {
+      $query['existing_config'] = TRUE;
+    }
+    parent::visitInstaller($query);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpLanguage(): void {
+    if ($this->existingSyncDirectory) {
+      return;
+    }
+    parent::setUpLanguage();
   }
 
   /**
@@ -164,21 +187,6 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
       'rename' => [],
     ];
     $this->assertEquals($expected, $change_list);
-  }
-
-  /**
-   * Installer step: Select installation profile.
-   */
-  protected function setUpProfile() {
-    if ($this->existingSyncDirectory) {
-      $edit = [
-        'profile' => SelectProfileForm::CONFIG_INSTALL_PROFILE_KEY,
-      ];
-      $this->submitForm($edit, $this->translations['Save and continue']);
-    }
-    else {
-      parent::setUpProfile();
-    }
   }
 
 }

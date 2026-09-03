@@ -6,16 +6,28 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides a confirmation form for cancelling multiple user accounts.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/people/cancel',
+  name: 'user.multiple_cancel_confirm',
+  requirements: [
+    '_permission' => 'administer users',
+  ],
+  defaults: [
+    '_title' => new TranslatableMarkup('Cancel user'),
+  ],
+)]
 class UserMultipleCancelConfirm extends ConfirmFormBase {
 
   /**
@@ -206,7 +218,8 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
         if ($uid <= 1) {
           continue;
         }
-        // Prevent user administrators from deleting themselves without confirmation.
+        // Prevent user administrators from deleting themselves without
+        // confirmation.
         if ($uid == $current_user_id) {
           $admin_form_mock = [];
           $admin_form_state = $form_state;

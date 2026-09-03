@@ -45,9 +45,4 @@ interface LibraryDiscoveryInterface {
    */
   public function getLibraryByName($extension, $name);
 
-  /**
-   * Clears static and persistent library definition caches.
-   */
-  public function clearCachedDefinitions();
-
 }

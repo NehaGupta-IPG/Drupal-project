@@ -16,7 +16,7 @@
  * - context: A list of contextual data associated with the list. May contain:
  *   - list_style: The custom list style.
  *
- * @see template_preprocess_item_list()
+ * @see \Drupal\Core\Theme\ThemePreprocess::preprocessItemList()
  */
 #}
 {% if context.list_style %}
@@ -29,7 +29,7 @@
   {%- if items -%}
     <{{ list_type }}{{ attributes }}>
     {%- for item in items -%}
-      <li{{ item.attributes.addClass(listClasses) }}>{{ item.value }}</li>
+      <li{{ item.attributes.addClass(item_classes) }}>{{ item.value }}</li>
     {%- endfor -%}
     </{{ list_type }}>
   {%- else -%}

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\error_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -85,7 +87,7 @@ class ErrorTestController extends ControllerBase {
   /**
    * Trigger an exception to test the PDO exception handler.
    */
-  public function triggerPDOException() {
+  public function triggerPDOException(): void {
     define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     $this->database->select('bananas_are_awesome', 'b')
       ->fields('b')

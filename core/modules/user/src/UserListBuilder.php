@@ -144,7 +144,7 @@ class UserListBuilder extends EntityListBuilder {
       CacheableMetadata::createFromObject($last_access)->applyTo($row['access']['data']);
     }
     else {
-      $row['access']['data']['#markup'] = t('never');
+      $row['access']['data']['#markup'] = $this->t('never');
     }
     return $row + parent::buildRow($entity);
   }
@@ -152,8 +152,8 @@ class UserListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getOperations(EntityInterface $entity) {
-    $operations = parent::getOperations($entity);
+  public function getOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL) {
+    $operations = parent::getOperations($entity, $cacheability);
     if (isset($operations['edit'])) {
       $destination = $this->redirectDestination->getAsArray();
       $operations['edit']['query'] = $destination;

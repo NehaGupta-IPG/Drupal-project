@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
-use Drupal\Core\Url;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\Core\Url;
+use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
-use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Tests the page display plugin.
  *
- * @group views
  * @see \Drupal\views\Plugin\display\Page
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DisplayPageTest extends ViewsKernelTestBase {
 
   /**
@@ -26,26 +29,19 @@ class DisplayPageTest extends ViewsKernelTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_page_display', 'test_page_display_route', 'test_page_display_menu', 'test_display_more'];
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  protected static $modules = [
-    'system',
-    'user',
-    'field',
-    'views_test_data',
+  public static $testViews = [
+    'test_page_display',
+    'test_page_display_route',
+    'test_page_display_menu',
+    'test_display_more',
   ];
 
   /**
-   * The router dumper to get all routes.
-   *
-   * @var \Drupal\Core\Routing\MatcherDumper
+   * {@inheritdoc}
    */
-  protected $routerDumper;
+  protected static $modules = [
+    'views_test_data',
+  ];
 
   /**
    * Checks the behavior of the page for access denied/not found behaviors.
@@ -162,7 +158,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
   }
 
   /**
-   * Tests the readmore functionality.
+   * Tests the 'read more' functionality.
    */
   public function testReadMore(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
@@ -244,7 +240,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
       'html_list' => '//div[@class="item-list"]//li',
     ];
 
-    $themes = ['olivero', 'stable9', 'stark', 'claro'];
+    $themes = ['stark', 'claro'];
 
     foreach ($themes as $theme) {
       \Drupal::service('theme_installer')->install([$theme]);

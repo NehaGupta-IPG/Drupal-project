@@ -10,21 +10,22 @@ use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the generic entity area handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\area\Entity
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaEntityTest extends ViewsKernelTestBase {
 
   use BlockCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'user', 'block'];
 
@@ -45,10 +46,10 @@ class AreaEntityTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpFixtures() {
+  protected function setUpFixtures(): void {
     // Install the themes used for this test.
-    $this->container->get('theme_installer')->install(['olivero']);
-    $this->container->get('config.factory')->getEditable('system.theme')->set('default', 'olivero')->save();
+    $this->container->get('theme_installer')->install(['stark']);
+    $this->container->get('config.factory')->getEditable('system.theme')->set('default', 'stark')->save();
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
@@ -77,7 +78,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
       $this->assertEquals($data['entity_' . $entity]['area']['entity_type'], $entity, "Correct entity_type set for $entity");
     }
 
-    $expected_entities = array_filter($entity_types, function (EntityTypeInterface $type) {
+    $expected_entities = array_filter($entity_types, function (EntityTypeInterface $type): bool {
       return !$type->hasViewBuilderClass();
     });
 
@@ -121,7 +122,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
    * @param \Drupal\Core\Entity\EntityInterface[] $entities
    *   The entities.
    */
-  public function doTestRender($entities) {
+  public function doTestRender(array $entities): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_entity_area');
@@ -190,7 +191,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
   /**
    * Tests the calculation of the rendered dependencies.
    */
-  public function doTestCalculateDependencies() {
+  public function doTestCalculateDependencies(): void {
     $view = View::load('test_entity_area');
 
     $dependencies = $view->calculateDependencies()->getDependencies();

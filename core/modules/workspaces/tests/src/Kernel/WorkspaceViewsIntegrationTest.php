@@ -12,23 +12,27 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 use Drupal\views_ui\ViewUI;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the views integration for workspaces.
- *
- * @group views
- * @group workspaces
  */
+#[Group('views')]
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
 
   use ContentTypeCreationTrait;
   use EntityReferenceFieldCreationTrait;
   use NodeCreationTrait;
+  use PromotedContentViewTestTrait;
   use UserCreationTrait;
   use WorkspaceTestTrait;
 
@@ -73,7 +77,7 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
     $this->installConfig(['filter', 'node', 'system', 'language', 'content_translation']);
 
     $this->installSchema('node', ['node_access']);
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
     $language = ConfigurableLanguage::createFromLangcode('ro');
     $language->save();
@@ -100,8 +104,8 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
   /**
    * Tests workspace query alter for views.
    *
-   * @covers \Drupal\workspaces\ViewsQueryAlter::alterQueryForEntityType
-   * @covers \Drupal\workspaces\ViewsQueryAlter::getRevisionTableJoin
+   * @legacy-covers \Drupal\workspaces\Hook\ViewsOperations::alterQueryForEntityType
+   * @legacy-covers \Drupal\workspaces\Hook\ViewsOperations::getRevisionTableJoin
    */
   public function testViewsQueryAlter(): void {
     // Create a test entity and two nodes.
@@ -114,18 +118,26 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
       'body' => 'node 1',
       'created' => $this->createdTimestamp++,
       'field_reference' => $test_entity->id(),
+      'promote' => TRUE,
     ]);
     $node_2 = $this->createNode([
       'title' => 'node - live - 2',
       'body' => 'node 2',
       'created' => $this->createdTimestamp++,
+      'promote' => TRUE,
     ]);
+
+    // Enable the promoted_content view since it's disabled by default.
+    // This must be done before switching to a workspace since view entities
+    // can only be saved in the default workspace.
+    $this->enablePromotedContentView(FALSE);
 
     // Create a new workspace and activate it.
     Workspace::create(['id' => 'stage', 'label' => 'Stage'])->save();
     $this->switchToWorkspace('stage');
 
-    $view = Views::getView('frontpage');
+    // Load the view again in this workspace.
+    $view = Views::getView('promoted_content');
 
     // Add a filter on a field that is stored in a dedicated table in order to
     // test field joins with extra conditions (e.g. 'deleted' and 'langcode').
