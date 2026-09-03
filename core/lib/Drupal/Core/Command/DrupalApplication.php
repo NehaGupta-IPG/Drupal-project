@@ -172,7 +172,12 @@ class DrupalApplication extends Application {
     if ($t instanceof DatabaseExceptionBase && $t->info !== NULL) {
       $dump = (new SqlDumper())->export($t->info, $output->isDecorated());
       if ($dump !== '') {
-        $output->writeln($dump);
+        // The dump contains placeholder values, which may look like console
+        // markup. OUTPUT_RAW keeps the formatter away from them: it would eat
+        // registered tags such as <error>, and throw on an unknown color, from
+        // inside the exception renderer. The parent writes the exception at
+        // VERBOSITY_QUIET, so the dump uses it too and is not dropped by -q.
+        $output->writeln($dump, OutputInterface::OUTPUT_RAW | OutputInterface::VERBOSITY_QUIET);
       }
     }
   }

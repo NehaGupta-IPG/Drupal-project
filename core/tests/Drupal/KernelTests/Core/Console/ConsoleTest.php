@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Console;
 
 use Drupal\autowire_test\TestInjection;
 use Drupal\console_test\Command\ConsoleDatabaseExceptionCommand;
+use Drupal\console_test\Command\ConsoleDatabaseExceptionConsoleMarkupCommand;
 use Drupal\console_test\Command\ConsoleDatabaseExceptionNoInfoCommand;
 use Drupal\console_test\Command\ConsoleExampleCommand;
 use Drupal\console_test\Command\ConsoleExampleConfigureCommand;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Tests integration with Symfony Console.
@@ -28,6 +30,7 @@ use Symfony\Component\Console\Command\LazyCommand;
 #[CoversClass(ConsoleCompilerPass::class)]
 #[CoversClass(ConsoleExampleCommand::class)]
 #[CoversClass(ConsoleDatabaseExceptionCommand::class)]
+#[CoversClass(ConsoleDatabaseExceptionConsoleMarkupCommand::class)]
 #[CoversClass(ConsoleDatabaseExceptionNoInfoCommand::class)]
 #[CoversClass(DrupalApplication::class)]
 class ConsoleTest extends KernelTestBase {
@@ -140,6 +143,48 @@ class ConsoleTest extends KernelTestBase {
     $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*FROM.*bananas_are_awesome.*WHERE.*palm_height/s', $display);
     $this->assertMatchesRegularExpression('/Placeholders.*:db_condition_placeholder_0.*180/s', $display);
     $this->assertMatchesRegularExpression('/Options.*allow_delimiter_in_query.*false/s', $display);
+  }
+
+  /**
+   * Tests that the dump is written without going through the formatter.
+   *
+   * Placeholder values are user input. The console output formatter would eat
+   * a registered tag such as <error>, and throw on a color that does not
+   * exist, from inside the exception renderer itself.
+   *
+   * @see \Drupal\Core\Command\DrupalApplication::doRenderThrowable()
+   */
+  public function testDatabaseExceptionConsoleMarkupRendering(): void {
+    $tester = $this->applicationTester();
+    $code = $tester->run(['command' => 'example:database-exception-console-markup'], ['decorated' => FALSE]);
+    $display = $tester->getDisplay();
+
+    $this->assertEquals(Command::FAILURE, $code, $display);
+    // The renderer did not fail on the unknown color.
+    $this->assertStringNotContainsString('nosuchcolor" color', $display);
+    // The values are dumped as they were bound.
+    $this->assertMatchesRegularExpression('/Placeholders.*<error>eaten\?<\/error> <fg=nosuchcolor>invalid<\/>/s', $display);
+  }
+
+  /**
+   * Tests that the dump is not dropped at quiet verbosity.
+   *
+   * The parent renders the exception at VERBOSITY_QUIET, so the dump that
+   * belongs to it has to be written at that verbosity too.
+   *
+   * @see \Drupal\Core\Command\DrupalApplication::doRenderThrowable()
+   */
+  public function testDatabaseExceptionRenderingAtQuietVerbosity(): void {
+    $tester = $this->applicationTester();
+    $code = $tester->run(
+      ['command' => 'example:database-exception'],
+      ['verbosity' => OutputInterface::VERBOSITY_QUIET],
+    );
+    $display = $tester->getDisplay();
+
+    $this->assertEquals(Command::FAILURE, $code, $display);
+    $this->assertStringContainsString("Unknown column 'palm_height'", $display);
+    $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*bananas_are_awesome/s', $display);
   }
 
   /**
