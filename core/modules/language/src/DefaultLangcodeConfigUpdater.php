@@ -137,6 +137,8 @@ class DefaultLangcodeConfigUpdater implements DefaultLangcodeConfigUpdaterInterf
    * @return \Drupal\language\Config\LanguageConfigOverride
    *   The language override object, reflecting whatever is actually in
    *   storage.
+   *
+   * @see \Drupal\language\Config\LanguageConfigFactoryOverride::getStorage()
    */
   protected function getRawLanguageConfigOverride(StorageInterface $storage, string $name): LanguageConfigOverride {
     $override = new LanguageConfigOverride($name, $storage, $this->typedConfigManager, $this->eventDispatcher);

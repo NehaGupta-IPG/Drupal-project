@@ -11,8 +11,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Resolves configuration langcode to the language chosen during site install.
  *
- * Only registered while a site installation is under way.
- *
  * @see \Drupal\Core\Installer\NormalInstallerServiceProvider
  * @see \Drupal\Core\Installer\ConfigOverride
  */
@@ -30,8 +28,7 @@ class ConfigLangcodeInstallerSubscriber implements EventSubscriberInterface {
     if ($installer_langcode === NULL) {
       return;
     }
-    // Authoritative: since this runs first, nothing later can second-guess
-    // it - ConfigLangcodeResolveEvent::setLangcode() stops propagation.
+
     $event->setLangcode($installer_langcode);
   }
 
@@ -40,6 +37,8 @@ class ConfigLangcodeInstallerSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     return [
+      // During the installer this event must set the default configuration
+      // language so the priority is high.
       ConfigLangcodeResolveEvent::class => ['onResolveLangcode', 10000],
     ];
   }

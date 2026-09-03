@@ -41,8 +41,8 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     // During the installer user 1 is a superuser.
     $container->setDefinition(InstallerAccessPolicy::class, (new Definition())->addTag('access_policy')->setPublic(FALSE));
 
-    // Only resolve configuration langcode to the language chosen for this
-    // installation while a site installation is under way.
+    // Ensure the configuration langcode is resolved to the language selected in
+    // the installer.
     $container->register('config.langcode_installer_subscriber', ConfigLangcodeInstallerSubscriber::class)
       ->addTag('event_subscriber');
 
