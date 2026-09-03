@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Console;
 
 use Drupal\autowire_test\TestInjection;
+use Drupal\console_test\Command\ConsoleDatabaseExceptionCommand;
+use Drupal\console_test\Command\ConsoleDatabaseExceptionNoInfoCommand;
 use Drupal\console_test\Command\ConsoleExampleCommand;
 use Drupal\console_test\Command\ConsoleExampleConfigureCommand;
 use Drupal\console_test\Command\ConsoleExamplePrivateCommand;
+use Drupal\Core\Command\DrupalApplication;
 use Drupal\Core\DependencyInjection\Compiler\ConsoleCompilerPass;
 use Drupal\KernelTests\DrupalApplicationTesterTrait;
 use Drupal\KernelTests\KernelTestBase;
@@ -24,6 +27,9 @@ use Symfony\Component\Console\Command\LazyCommand;
 #[RunTestsInSeparateProcesses]
 #[CoversClass(ConsoleCompilerPass::class)]
 #[CoversClass(ConsoleExampleCommand::class)]
+#[CoversClass(ConsoleDatabaseExceptionCommand::class)]
+#[CoversClass(ConsoleDatabaseExceptionNoInfoCommand::class)]
+#[CoversClass(DrupalApplication::class)]
 class ConsoleTest extends KernelTestBase {
   use DrupalApplicationTesterTrait;
 
@@ -115,6 +121,46 @@ class ConsoleTest extends KernelTestBase {
     $code = $tester->run(['command' => 'example:sub:command'], ['capture_stderr_separately' => TRUE]);
     $this->assertEquals(Command::SUCCESS, $code, $tester->getErrorOutput());
     $this->assertStringContainsString('[OK] Done', $tester->getDisplay());
+  }
+
+  /**
+   * Tests that a database exception is rendered with its statement dump.
+   *
+   * @see \Drupal\Core\Command\DrupalApplication::doRenderThrowable()
+   */
+  public function testDatabaseExceptionRendering(): void {
+    $tester = $this->applicationTester();
+    $code = $tester->run(['command' => 'example:database-exception']);
+    $display = $tester->getDisplay();
+
+    $this->assertEquals(Command::FAILURE, $code, $display);
+    $this->assertStringContainsString("Unknown column 'palm_height'", $display);
+    // The statement, its placeholders and its options are dumped below the
+    // rendered exception.
+    $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*FROM.*bananas_are_awesome.*WHERE.*palm_height/s', $display);
+    $this->assertMatchesRegularExpression('/Placeholders.*:db_condition_placeholder_0.*180/s', $display);
+    $this->assertMatchesRegularExpression('/Options.*allow_delimiter_in_query.*false/s', $display);
+  }
+
+  /**
+   * Tests rendering a database exception that carries no statement information.
+   *
+   * Database exceptions thrown by Drupal rather than by a driver carry no
+   * \Drupal\Core\Database\SqlExecutionInfo, and must still be rendered.
+   *
+   * @see \Drupal\Core\Command\DrupalApplication::doRenderThrowable()
+   */
+  public function testDatabaseExceptionWithoutInfoRendering(): void {
+    $tester = $this->applicationTester();
+    $code = $tester->run(['command' => 'example:database-exception-no-info']);
+    $display = $tester->getDisplay();
+
+    $this->assertEquals(Command::FAILURE, $code, $display);
+    // The exception itself is reported, and not an error from the renderer.
+    $this->assertStringContainsString("Table 'bananas_are_awesome' already exists.", $display);
+    $this->assertStringNotContainsString('TypeError', $display);
+    // With no information to dump, nothing is added below the exception.
+    $this->assertStringNotContainsString('SQL statement', $display);
   }
 
 }
