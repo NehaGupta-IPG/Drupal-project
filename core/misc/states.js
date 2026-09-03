@@ -193,7 +193,11 @@
    *   arbitrary AND and OR clauses.
    */
   states.Dependent = function (args) {
-    $.extend(this, { values: {}, oldValue: null, triggers: [] }, args);
+    $.extend(
+      this,
+      { values: {}, oldValue: null, triggers: [], destroyed: false },
+      args,
+    );
 
     this.dependees = this.getDependees();
 
@@ -325,8 +329,11 @@
      * Remove all the event listeners.
      */
     destroy() {
-      // Remove all the trigger associated events for this Dependent.
-      this.triggers.forEach((trigger) => trigger.destroy());
+      // Prevent duplicate cleanup during Ajax detach.
+      if (this.destroyed) {
+        return;
+      }
+      this.destroyed = true;
       // Loop through the dependee selectors.
       Object.keys(this.values).forEach((selector) => {
         const dependeeStates = this.dependees[selector];
@@ -346,6 +353,18 @@
           states.processedDependees[selector] = states.processedDependees[
             selector
           ].filter((obj) => obj.dependent !== this);
+        }
+      });
+      // Remove triggers which are not used by another Dependent.
+      this.triggers.forEach((trigger) => {
+        const triggerIsUsed = states.processedDependees[trigger.selector]?.some(
+          (obj) =>
+            obj.dependent.dependees[trigger.selector].includes(
+              trigger.state.name,
+            ),
+        );
+        if (!triggerIsUsed) {
+          trigger.destroy();
         }
       });
       // Remove the drupal once id to ensure states get reprocessed for this
