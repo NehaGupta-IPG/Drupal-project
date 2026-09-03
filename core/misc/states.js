@@ -154,18 +154,17 @@
         // Keep track of any empty states.processedDependees keys to clean up.
         const keysToDelete = [];
         Object.keys(states.processedDependees).forEach((selector) => {
-          keysToDelete.forEach((key) => {
-            delete states.processedDependees[key];
-          });
-          if ($(selector).closest(context).length) {
-            // Dependee is being unloaded. Remove all existing events to ensure
-            // associated states are re-processed.
-            states.processedDependees[selector].forEach((item) => {
+          const dependeeIsUnloading = $(selector).closest(context).length;
+          // Use a copy because destroy() removes items from the registry.
+          [...states.processedDependees[selector]].forEach((item) => {
+            const dependentIsUnloading =
+              item.dependent.element.closest(context).length;
+            if (dependeeIsUnloading || dependentIsUnloading) {
               item.dependent.destroy();
-            });
-            if (states.processedDependees[selector].length === 0) {
-              keysToDelete.push(selector);
             }
+          });
+          if (states.processedDependees[selector].length === 0) {
+            keysToDelete.push(selector);
           }
         });
         // Cleanup empty states.processedDependees selectors.
