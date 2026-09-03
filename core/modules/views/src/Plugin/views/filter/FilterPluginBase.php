@@ -1508,6 +1508,13 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         return FALSE;
       }
 
+      // The selected group must be a scalar to be used as an array offset
+      // below. A non-scalar value (e.g. an array from a malformed request or
+      // a stale "remember" session value) means there is no valid selection.
+      if (!is_scalar($selected_group)) {
+        return FALSE;
+      }
+
       if ($selected_group == 'All' && !empty($this->options['group_info']['optional'])) {
         return NULL;
       }
