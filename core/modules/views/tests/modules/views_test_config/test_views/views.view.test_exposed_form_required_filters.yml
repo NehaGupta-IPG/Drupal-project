@@ -4,7 +4,7 @@ dependencies:
   module:
     - node
 id: test_exposed_form_required_filters
-label: ''
+label: test_exposed_form_required_filters
 module: views
 description: ''
 tag: ''
