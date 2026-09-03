@@ -71,15 +71,19 @@ class ExceptionHandler extends BaseExceptionHandler {
     // @see https://www.php.net/manual/en/class.pdoexception.php
     $code = (int) $sqlState;
 
-    $info = new SqlExecutionInfo($queryString, $arguments, $options);
-
     // If a max_allowed_packet error occurs the message length is truncated.
     // This should prevent the error from recurring if the exception is logged
     // to the database using dblog or the like.
     if ($errorCode === 1153) {
       $message = Unicode::truncateBytes($exception->getMessage(), Connection::MIN_MAX_ALLOWED_PACKET);
+      // By definition, the statement and its arguments exceeded
+      // max_allowed_packet. They are not retained, since exporting them would
+      // re-expand what the truncation above exists to keep out of the output.
+      $info = new SqlExecutionInfo(Unicode::truncateBytes($queryString, Connection::MIN_MAX_ALLOWED_PACKET), [], $options);
       throw new DatabaseExceptionWrapper($message, $code, $exception, $info);
     }
+
+    $info = new SqlExecutionInfo($queryString, $arguments, $options);
 
     $message = $exception->getMessage();
 

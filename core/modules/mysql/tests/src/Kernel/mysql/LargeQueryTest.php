@@ -7,6 +7,8 @@ namespace Drupal\Tests\mysql\Kernel\mysql;
 use Drupal\Component\Utility\Environment;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\Utility\SqlDumper;
+use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\KernelTests\Core\Database\DriverSpecificDatabaseTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -46,6 +48,12 @@ class LargeQueryTest extends DriverSpecificDatabaseTestBase {
       // 'max_allowed_packet' exception message truncated.
       // Use strlen() to count the bytes exactly, not the unicode chars.
       $this->assertLessThanOrEqual($max_allowed_packet, strlen($e->getMessage()));
+      // The arguments that exceeded 'max_allowed_packet' are not retained, and
+      // the statement is truncated like the message, so that exporting the SQL
+      // execution information cannot re-expand them.
+      $this->assertSame([], $e->info->placeholders);
+      $this->assertLessThanOrEqual(Connection::MIN_MAX_ALLOWED_PACKET, strlen($e->info->sqlString));
+      $this->assertLessThanOrEqual($max_allowed_packet, strlen((new SqlDumper())->export($e->info)));
     }
   }
 
