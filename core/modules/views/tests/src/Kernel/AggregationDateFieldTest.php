@@ -22,6 +22,8 @@ class AggregationTest extends ViewsKernelTestBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @todo Add necessary modules including 'datetime'
    */
   protected static $modules = ['views_test_aggregation', 'user'];
 
@@ -38,19 +40,18 @@ class AggregationTest extends ViewsKernelTestBase {
 
   /**
    * Tests an aggregated date field.
+   * 
+   * @todo: Edit the test view 'test_aggregation' to add a date field.
+   *   Add a new view display or a new view altogether.
    */
   public function testDateFieldAggregationResultSet(): void {
-    // todo: Edit the test view 'test_aggregation' to add a date field e.g.
-    // perhaps a new view display or a new view altogether.
     $view = Views::getView('test_aggregation');
     $view->setDisplay();
 
     // Execute the view.
     $this->executeView($view);
 
-    // todo: create assertions to test that the aggregated date field is output
-    // correctly.
-    // Verify that the aggregated date is formatted correctly.
+    // @todo: Test the format of the aggregated date field.
   }
 
 }
