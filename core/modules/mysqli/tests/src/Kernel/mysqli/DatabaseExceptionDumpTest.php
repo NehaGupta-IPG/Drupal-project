@@ -8,6 +8,8 @@ use Drupal\Tests\mysql\Kernel\mysql\DatabaseExceptionDumpTest as BaseMySqlTest;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore normalise
+
 /**
  * Tests dumping the statement of the failures MySQL reports by error code.
  *

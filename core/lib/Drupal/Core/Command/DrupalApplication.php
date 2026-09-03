@@ -21,6 +21,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+// cspell:ignore cloneable
+
 /**
  * Customize the Symfony Application for Drupal.
  *

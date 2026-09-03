@@ -15,6 +15,8 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
+// cspell:ignore behaviour phpdbg
+
 /**
  * An utility class for dumping an SQL statement and its placeholders.
  */

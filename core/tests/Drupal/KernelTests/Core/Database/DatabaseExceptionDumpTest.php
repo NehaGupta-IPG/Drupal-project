@@ -18,6 +18,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore dumpable ilike nosuchcolor recognise recognises
+
 /**
  * Tests dumping the statement of every kind of failing database operation.
  *

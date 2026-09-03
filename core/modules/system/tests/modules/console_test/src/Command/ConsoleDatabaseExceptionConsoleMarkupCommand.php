@@ -11,6 +11,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+// cspell:ignore nosuchcolor
+
 /**
  * A command throwing a database exception with console markup in the values.
  *

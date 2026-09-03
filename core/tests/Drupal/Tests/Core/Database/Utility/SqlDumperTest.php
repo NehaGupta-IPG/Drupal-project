@@ -12,6 +12,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
+// cspell:ignore behaviour
+
 /**
  * Tests Drupal\Core\Database\Utility\SqlDumper.
  */
