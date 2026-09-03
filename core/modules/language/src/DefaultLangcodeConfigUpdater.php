@@ -64,10 +64,7 @@ class DefaultLangcodeConfigUpdater {
    * actually is gets saved as an override for the langcode it is about to
    * stop being - otherwise it would simply be gone the moment locale module
    * applies the new default's own translation over the top. This is a plain
-   * snapshot of the current values, not a translation: locale module has no
-   * stored translation "into" the langcode being moved away from, since
-   * that langcode was the source language content was authored in, not a
-   * target translators worked into.
+   * snapshot of the current values, not a translation.
    *
    * A configuration override already existing for the new default langcode
    * is absorbed into the configuration being relabelled, then removed: the
@@ -160,6 +157,8 @@ class DefaultLangcodeConfigUpdater {
    * @return \Drupal\language\Config\LanguageConfigOverride
    *   The language override object, reflecting whatever is actually in
    *   storage.
+   *
+   * @see \Drupal\language\Config\LanguageConfigFactoryOverride::getStorage()
    */
   protected function getRawLanguageConfigOverride(StorageInterface $storage, string $name): LanguageConfigOverride {
     $override = new LanguageConfigOverride($name, $storage, $this->typedConfigManager, $this->eventDispatcher);

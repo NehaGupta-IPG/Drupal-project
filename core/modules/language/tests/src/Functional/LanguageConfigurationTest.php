@@ -151,11 +151,6 @@ class LanguageConfigurationTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/language/add');
     $this->submitForm($edit, 'Add language');
     $language = $this->config('language.entity.de')->get();
-    // The site default language changed to French earlier in this test, and
-    // there is no separate "configuration default language" - it is
-    // system.site:default_langcode. So a language entity created now, after
-    // that change, gets 'fr', unlike the French language entity created
-    // earlier in this test while the default was still 'en'.
     $this->assertEquals('fr', $language['langcode']);
 
     // Ensure that German language has a weight of 5 after being created through

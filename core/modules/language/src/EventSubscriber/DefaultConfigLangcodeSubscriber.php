@@ -41,8 +41,8 @@ class DefaultConfigLangcodeSubscriber implements EventSubscriberInterface {
    *
    * This event subscriber assumes that the new default langcode and old default
    * langcode are valid langcodes. If the source of truth for the default
-   * langcode is altered by a contributed or custom module then this event must
-   * be changed.
+   * langcode is altered by a contributed or custom module, then it must replace
+   * this event with its own implementation.
    *
    * @param \Drupal\Core\Config\ConfigCrudEvent $event
    *   The configuration event.

@@ -9,8 +9,8 @@ use Drupal\Component\EventDispatcher\Event;
 /**
  * Event fired to determine the default langcode for new configuration.
  *
- * Dispatched whenever configuration would otherwise be saved with no
- * meaningful langcode of its own.
+ * Dispatched whenever translatable configuration has no langcode set and during
+ * extension install when the langcode is 'en'.
  *
  * self::setLangcode() stops propagation as soon as a subscriber answers, so
  * a higher-priority, more specific policy takes precedence over a later, more

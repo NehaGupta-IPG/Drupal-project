@@ -213,7 +213,9 @@ abstract class StorableConfigBase extends ConfigBase {
    * @param mixed $value
    *   Value to associate with the key.
    * @param bool $is_translatable
-   *   Records whether the value is translatable.
+   *   Records whether the value is translatable. This is passed in by reference
+   *   so that it can be used to determine whether the config object is
+   *   translatable.
    *
    * @return mixed
    *   The value cast to the type indicated in the schema.
