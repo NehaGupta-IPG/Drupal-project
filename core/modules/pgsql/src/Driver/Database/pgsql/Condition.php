@@ -15,7 +15,7 @@ class Condition extends BaseCondition {
   /**
    * {@inheritdoc}
    */
-  public function compile(DatabaseConnection $connection, PlaceholderInterface $queryPlaceholder) {
+  public function compile(DatabaseConnection $connection, PlaceholderInterface $queryPlaceholder): void {
     $original_conditions = $this->conditions;
 
     if ($queryPlaceholder instanceof SelectInterface && $connection->schema() instanceof Schema) {
