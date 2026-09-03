@@ -77,6 +77,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->doNestedTriggerTests();
     $this->doElementsDisabledStateTests();
     $this->doAjaxAffectedTriggerTests();
+    $this->doAjaxDependentCleanupTests();
   }
 
   /**
@@ -1038,6 +1039,41 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertNotEmpty($ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1);
     $this->assertFalse($ajax_added_textfield_enabled_when_shared_ajax_states_trigger_1->hasAttribute('disabled'));
 
+  }
+
+  /**
+   * Tests cleanup when Ajax removes a dependent but not its dependee.
+   */
+  protected function doAjaxDependentCleanupTests(): void {
+    $this->drupalGet('form-test/javascript-states-form');
+    $page = $this->getSession()->getPage();
+    $ajax_reload = $page->findField('ajax_reload');
+    $this->assertNotEmpty($ajax_reload);
+    $dependent = $page->findField('ajax_added_textfield_enabled_when_checkbox_trigger_checked');
+    $this->assertEmpty($dependent);
+
+    $count_dependents = <<<'JS'
+return Drupal.states.processedDependees[':input[name="checkbox_trigger"]'].length;
+JS;
+    $initial_count = $this->getSession()->evaluateScript($count_dependents);
+
+    $ajax_reload->check();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $dependent = $page->findField('ajax_added_textfield_enabled_when_checkbox_trigger_checked');
+    $this->assertNotEmpty($dependent);
+    $this->assertEquals($initial_count + 1, $this->getSession()->evaluateScript($count_dependents));
+
+    $ajax_reload->uncheck();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $dependent = $page->findField('ajax_added_textfield_enabled_when_checkbox_trigger_checked');
+    $this->assertEmpty($dependent);
+    $this->assertEquals($initial_count, $this->getSession()->evaluateScript($count_dependents));
+
+    $ajax_reload->check();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $dependent = $page->findField('ajax_added_textfield_enabled_when_checkbox_trigger_checked');
+    $this->assertNotEmpty($dependent);
+    $this->assertEquals($initial_count + 1, $this->getSession()->evaluateScript($count_dependents));
   }
 
 }
