@@ -610,7 +610,6 @@ default:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
-    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
     - if: ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /Test lint cache warming/)
     - if: $PERFORMANCE_TEST == "1"
   script:
