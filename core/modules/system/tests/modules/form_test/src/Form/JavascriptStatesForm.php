@@ -790,11 +790,6 @@ class JavascriptStatesForm extends FormBase {
         'wrapper' => 'shared_ajax_states_trigger_test_wrapper',
       ],
     ];
-    $form['checkbox_trigger'] = [
-      '#type' => 'checkbox',
-      '#title' => 'Checkbox Trigger',
-    ];
-
     // Ajax wrappers.
     $form['states_ajax_test'] = [
       '#type' => 'details',
