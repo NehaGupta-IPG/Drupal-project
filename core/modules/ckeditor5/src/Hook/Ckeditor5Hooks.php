@@ -14,8 +14,10 @@ use Drupal\Core\Ajax\RemoveCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\LibraryDependencyResolverInterface;
+use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -45,7 +47,23 @@ class Ckeditor5Hooks {
     protected ConfigFactoryInterface $configFactory,
     protected ThemeExtensionList $themeExtensionList,
     protected MessengerInterface $messenger,
+    protected LibraryDiscoveryInterface $libraryDiscovery,
   ) {}
+
+  /**
+   * Implements hook_runtime_requirements().
+   */
+  #[Hook('runtime_requirements')]
+  public function runtimeRequirements(): array {
+    $library = $this->libraryDiscovery->getLibraryByName('core', 'ckeditor5');
+    return [
+      'ckeditor5' => [
+        'title' => $this->t('CKEditor 5'),
+        'value' => $library['version'] ?? $this->t('Unknown'),
+        'severity' => RequirementSeverity::Info,
+      ],
+    ];
+  }
 
   /**
    * Implements hook_help().
