@@ -6,9 +6,9 @@ namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests attributes inserted in the 'html' and 'body' elements on the page.
@@ -67,7 +67,9 @@ class HtmlAttributesTest extends BrowserTestBase {
    * @see \Drupal\Core\EventSubscriber\ColorSchemeCookieSubscriber
    * @see \Drupal\FunctionalTests\EventSubscriber\ColorSchemeCookieTest
    */
-  #[DataProvider('providerColorSchemeAttributeIsInvariant')]
+  #[TestWith(['test_color_scheme_theme'])]
+  #[TestWith(['test_color_scheme_subtheme'])]
+  #[TestWith(['stark'])]
   public function testColorSchemeAttributeIsInvariant(string $theme): void {
     \Drupal::service('theme_installer')->install([$theme]);
     $this->config('system.theme')->set('default', $theme)->save();
@@ -85,20 +87,6 @@ class HtmlAttributesTest extends BrowserTestBase {
       $this->assertSession()->statusCodeEquals(200);
       $this->assertColorSchemeAttribute();
     }
-  }
-
-  /**
-   * Provides test cases for ::testColorSchemeAttributeIsInvariant().
-   *
-   * @return array[]
-   *   An array of test cases.
-   */
-  public static function providerColorSchemeAttributeIsInvariant(): array {
-    return [
-      'theme declaring support' => ['test_color_scheme_theme'],
-      'subtheme inheriting support' => ['test_color_scheme_subtheme'],
-      'theme not declaring support' => ['stark'],
-    ];
   }
 
   /**

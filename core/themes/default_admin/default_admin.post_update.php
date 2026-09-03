@@ -39,3 +39,73 @@ function default_admin_post_update_rename_focus_color_presets(): void {
     }
   }
 }
+
+/**
+ * Removes the legacy 'enable_dark_mode' setting from theme configuration.
+ */
+function default_admin_post_update_remove_enable_dark_mode(): void {
+  \Drupal::configFactory()->getEditable('default_admin.settings')
+    ->clear('enable_dark_mode')
+    ->save();
+}
+
+/**
+ * Migrates per-user dark mode overrides to the color_scheme user field.
+ */
+function default_admin_post_update_migrate_dark_mode_to_color_scheme(): void {
+  $mapping = [
+    '0' => 'light',
+    '1' => 'dark',
+    'auto' => 'auto',
+  ];
+
+  $database = \Drupal::database();
+  $result = $database->select('users_data', 'ud')
+    ->fields('ud', ['uid', 'name', 'value', 'serialized'])
+    ->condition('ud.module', 'default_admin')
+    ->condition('ud.name', ['settings', 'enable_dark_mode'], 'IN')
+    ->execute();
+
+  // Collect the legacy value per user. The 'settings' array takes precedence
+  // over the scalar 'enable_dark_mode' row, matching Settings::get().
+  $legacy_value = [];
+  $user_data = \Drupal::service('user.data');
+  foreach ($result as $row) {
+    $uid = (int) $row->uid;
+    if ($uid === 0) {
+      continue;
+    }
+
+    if ($row->name === 'settings' && $row->serialized) {
+      $settings = unserialize($row->value);
+      if (is_array($settings) && array_key_exists('enable_dark_mode', $settings)) {
+        if ($settings['enable_dark_mode'] !== NULL) {
+          $legacy_value[$uid] = $settings['enable_dark_mode'];
+        }
+        unset($settings['enable_dark_mode']);
+        if ($settings === []) {
+          $user_data->delete('default_admin', $uid, 'settings');
+        }
+        else {
+          $user_data->set('default_admin', $uid, 'settings', $settings);
+        }
+      }
+    }
+    elseif ($row->name === 'enable_dark_mode') {
+      // The scalar row only applies when no 'settings' value is present.
+      $legacy_value[$uid] ??= $row->value;
+    }
+  }
+  $user_data->delete('default_admin', NULL, 'enable_dark_mode');
+
+  $storage = \Drupal::entityTypeManager()->getStorage('user');
+  foreach ($legacy_value as $uid => $value) {
+    $key = (string) $value;
+    if ($key !== 'auto' && isset($mapping[$key])) {
+      $user = $storage->load($uid);
+      if ($user) {
+        $user->set('color_scheme', $mapping[$key])->save();
+      }
+    }
+  }
+}

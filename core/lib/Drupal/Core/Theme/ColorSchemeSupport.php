@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Theme;
 
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
@@ -31,45 +30,35 @@ class ColorSchemeSupport {
   /**
    * Determines whether the site theme honors the color scheme preference.
    *
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface|null $cacheability
-   *   (optional) Collects the cacheability of the decision.
-   *
    * @return bool
    *   TRUE if the configured site theme declares support.
    */
-  public function siteThemeSupports(?RefinableCacheableDependencyInterface $cacheability = NULL): bool {
-    $themes = $this->getConfiguredThemeNames($cacheability);
+  public function siteThemeSupports(): bool {
+    $themes = $this->getConfiguredThemeNames();
     return $this->themeSupports($themes['default']);
   }
 
   /**
    * Determines whether the administration theme honors the preference.
    *
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface|null $cacheability
-   *   (optional) Collects the cacheability of the decision.
-   *
    * @return bool
    *   TRUE if the configured administration theme declares support.
    */
-  public function adminThemeSupports(?RefinableCacheableDependencyInterface $cacheability = NULL): bool {
-    $themes = $this->getConfiguredThemeNames($cacheability);
+  public function adminThemeSupports(): bool {
+    $themes = $this->getConfiguredThemeNames();
     return $this->themeSupports($themes['admin']);
   }
 
   /**
    * Returns the configured site theme and administration theme names.
    *
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface|null $cacheability
-   *   Collects the cacheability of reading the theme configuration.
-   *
    * @return array{default: string, admin: string}
    *   The site theme name and the administration theme name. An empty 'admin'
    *   value means administration pages use the site theme, so the site theme
    *   name is returned for both.
    */
-  protected function getConfiguredThemeNames(?RefinableCacheableDependencyInterface $cacheability): array {
+  protected function getConfiguredThemeNames(): array {
     $config = $this->configFactory->get('system.theme');
-    $cacheability?->addCacheableDependency($config);
     $default = (string) $config->get('default');
     return [
       'default' => $default,

@@ -4,7 +4,6 @@ namespace Drupal\user;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
@@ -37,12 +36,9 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
   /**
    * The color scheme support service.
    *
-   * This is set by ::create() instead of by the constructor, because the
-   * constructor signature is inherited by subclasses outside core.
-   *
-   * @var \Drupal\Core\Theme\ColorSchemeSupport|null
+   * @var \Drupal\Core\Theme\ColorSchemeSupport
    */
-  protected ?ColorSchemeSupport $colorSchemeSupport = NULL;
+  protected ColorSchemeSupport $colorSchemeSupport;
 
   /**
    * Constructs a new AccountForm object.
@@ -51,14 +47,17 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    *   The entity repository.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param \Drupal\Core\Theme\ColorSchemeSupport $color_scheme_support
+   *   The color scheme support service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param \Drupal\Component\Datetime\TimeInterface|null $time
    *   The time service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
+  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, ColorSchemeSupport $color_scheme_support, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->languageManager = $language_manager;
+    $this->colorSchemeSupport = $color_scheme_support;
   }
 
   /**
@@ -68,24 +67,11 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     $instance = new static(
       $container->get('entity.repository'),
       $container->get('language_manager'),
+      $container->get('theme.color_scheme_support'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time')
     );
-    $instance->colorSchemeSupport = $container->get('theme.color_scheme_support');
     return $instance;
-  }
-
-  /**
-   * Gets the color scheme support service for this form.
-   *
-   * @return \Drupal\Core\Theme\ColorSchemeSupport
-   *   The color scheme support service.
-   */
-  protected function colorSchemeSupport(): ColorSchemeSupport {
-    if ($this->colorSchemeSupport === NULL) {
-      $this->colorSchemeSupport = \Drupal::service('theme.color_scheme_support');
-    }
-    return $this->colorSchemeSupport;
   }
 
   /**
@@ -357,7 +343,6 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       '#open' => TRUE,
       '#weight' => 7,
     ];
-    $cacheability = CacheableMetadata::createFromRenderArray($form);
     $form['user_settings']['color_scheme'] = [
       '#type' => 'radios',
       '#title' => $this->t('Color scheme'),
@@ -367,8 +352,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
         'auto' => $this->t('System'),
       ],
       '#default_value' => $account->get('color_scheme')->value ?: 'auto',
-    ] + $this->colorSchemeElementProperties($account, $cacheability);
-    $cacheability->applyTo($form);
+    ] + $this->colorSchemeElementProperties($account);
 
     return parent::form($form, $form_state);
   }
@@ -391,17 +375,15 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    *
    * @param \Drupal\user\UserInterface $account
    *   The account the form is built for.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
-   *   Collects the cacheability of the decision.
    *
    * @return array
    *   Form element properties to add to the color scheme element.
    *
    * @see \Drupal\Core\Theme\ColorSchemeSupport
    */
-  protected function colorSchemeElementProperties(UserInterface $account, CacheableMetadata $cacheability): array {
-    $default_supports = $this->colorSchemeSupport()->siteThemeSupports($cacheability);
-    $admin_supports = $this->colorSchemeSupport()->adminThemeSupports($cacheability);
+  protected function colorSchemeElementProperties(UserInterface $account): array {
+    $default_supports = $this->colorSchemeSupport->siteThemeSupports();
+    $admin_supports = $this->colorSchemeSupport->adminThemeSupports();
 
     if ($default_supports && $admin_supports) {
       return [
@@ -416,7 +398,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     }
 
     if ($admin_supports) {
-      if ($this->accountMayUseAdminTheme($account, $cacheability)) {
+      if ($this->accountMayUseAdminTheme($account)) {
         return [
           '#description' => $this->t('System follows your operating system or browser setting. Administrative pages follow this setting, the rest of the site does not.'),
         ];
@@ -438,13 +420,11 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    *
    * @param \Drupal\user\UserInterface $account
    *   The account the form is built for.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
-   *   Collects the cacheability of the decision.
    *
    * @return bool
    *   TRUE if the account may use the administration theme.
    */
-  protected function accountMayUseAdminTheme(UserInterface $account, CacheableMetadata $cacheability): bool {
+  protected function accountMayUseAdminTheme(UserInterface $account): bool {
     // A new account holds no roles yet: it is not authenticated, so a
     // permission check evaluates the anonymous role, which says nothing about
     // the account being created. Offer the setting instead of disabling it on
@@ -454,12 +434,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       return TRUE;
     }
     // The permission belongs to the account being edited, not to the account
-    // filling in the form, so the result varies with the roles of the edited
-    // account and with the permissions those roles carry.
-    $cacheability->addCacheableDependency($account);
-    foreach (Role::loadMultiple($account->getRoles()) as $role) {
-      $cacheability->addCacheableDependency($role);
-    }
+    // filling in the form.
     return $account->hasPermission('view the administration theme');
   }
 
