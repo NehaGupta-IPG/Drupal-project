@@ -790,6 +790,11 @@ class JavascriptStatesForm extends FormBase {
         'wrapper' => 'shared_ajax_states_trigger_test_wrapper',
       ],
     ];
+    $form['shared_checkbox_trigger'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Shared Checkbox Trigger',
+      '#description' => 'This trigger is shared by a dependent inside the Ajax wrapper and a dependent outside it.',
+    ];
     // Ajax wrappers.
     $form['states_ajax_test'] = [
       '#type' => 'details',
@@ -812,6 +817,20 @@ class JavascriptStatesForm extends FormBase {
         'value2' => 'Value 2',
       ],
     ];
+    // Add an Ajax removed dependent which shares an external trigger.
+    if (!$form_state->getValue('ajax_reload')) {
+      $form['states_ajax_test']['ajax_removed_textfield_with_shared_trigger'] = [
+        '#type' => 'textfield',
+        '#title' => 'Ajax removed Textfield with shared trigger',
+        '#description' => 'This dependent is removed when Ajax Reload is checked and uses triggers inside and outside the Ajax wrapper.',
+        '#states' => [
+          'enabled' => [
+            ':input[name="shared_checkbox_trigger"]' => ['checked' => TRUE],
+            ':input[name="ajax_select_trigger"]' => ['value' => 1],
+          ],
+        ],
+      ];
+    }
     // Add element added via ajax when ajax_reload is checked.
     if ($form_state->getValue('ajax_reload')) {
       $form['states_ajax_test']['ajax_added_trigger'] = [
@@ -849,6 +868,16 @@ class JavascriptStatesForm extends FormBase {
         ],
       ];
     }
+    $form['textfield_enabled_when_shared_checkbox_trigger_checked'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield enabled when Shared Checkbox Trigger is checked',
+      '#description' => 'This dependent remains after the Ajax wrapper is replaced and shares the external trigger with the removed dependent.',
+      '#states' => [
+        'enabled' => [
+          ':input[name="shared_checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
     $form['textfield_enabled_when_checkbox_trigger_is_checked'] = [
       '#type' => 'textfield',
       '#title' => 'Textfield enabled when Checkbox Trigger is checked',
