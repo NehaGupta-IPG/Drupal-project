@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\session_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\session_test\Session\TestSessionBag;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,12 @@ class SessionTestController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The incoming request.
    */
+  #[Route(
+    path: '/session-test/get',
+    name: 'session_test.get',
+    requirements: ['_access' => 'TRUE'],
+    options: ['no_cache' => TRUE],
+  )]
   public function get(Request $request): array {
     $value = $request->getSession()->get('session_test_value');
     return empty($value)
@@ -34,6 +41,12 @@ class SessionTestController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The incoming request.
    */
+  #[Route(
+    path: '/session-test/get-from-session-object',
+    name: 'session_test.get_from_session_object',
+    requirements: ['_access' => 'TRUE'],
+    options: ['no_cache' => TRUE],
+  )]
   public function getFromSessionObject(Request $request): array {
     $value = $request->getSession()->get("session_test_key");
     return empty($value)
@@ -47,6 +60,12 @@ class SessionTestController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The incoming request.
    */
+  #[Route(
+    path: '/session-test/id',
+    name: 'session_test.id',
+    requirements: ['_access' => 'TRUE'],
+    options: ['no_cache' => TRUE],
+  )]
   public function getId(Request $request): array {
     // Set a value in session, so that SessionManager::save() will start
     // a session.
@@ -63,6 +82,11 @@ class SessionTestController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    */
+  #[Route(
+    path: '/session-test/id-from-cookie',
+    name: 'session_test.id_from_cookie',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function getIdFromCookie(Request $request): array {
     return [
       '#markup' => 'session_id:' . $request->cookies->get(session_name()) . "\n",
@@ -78,6 +102,12 @@ class SessionTestController extends ControllerBase {
    * @param string $test_value
    *   A session value.
    */
+  #[Route(
+    path: '/session-test/set/{test_value}',
+    name: 'session_test.set',
+    requirements: ['_access' => 'TRUE'],
+    options: ['no_cache' => TRUE, 'converters' => ['test_value' => '\\s+']],
+  )]
   public function set(Request $request, $test_value): array {
     $request->getSession()->set('session_test_value', $test_value);
 
@@ -92,6 +122,12 @@ class SessionTestController extends ControllerBase {
    * @param string $test_value
    *   A session value.
    */
+  #[Route(
+    path: '/session-test/no-set/{test_value}',
+    name: 'session_test.no_set',
+    requirements: ['_access' => 'TRUE'],
+    options: ['no_cache' => TRUE, 'converters' => ['test_value' => '\\s+']],
+  )]
   public function noSet(Request $request, $test_value): array {
     \Drupal::service('session_handler.write_safe')->setSessionWritable(FALSE);
     $this->set($request, $test_value);
@@ -101,6 +137,11 @@ class SessionTestController extends ControllerBase {
   /**
    * Sets a message to me displayed on the following page.
    */
+  #[Route(
+    path: '/session-test/set-message',
+    name: 'session_test.set_message',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function setMessage(): Response {
     $this->messenger()->addStatus($this->t('This is a dummy message.'));
     return new Response((string) $this->t('A message was set.'));
@@ -112,6 +153,11 @@ class SessionTestController extends ControllerBase {
   /**
    * Sets a message but call drupal_save_session(FALSE).
    */
+  #[Route(
+    path: '/session-test/set-message-but-do-not-save',
+    name: 'session_test.set_message_but_do_not_save',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function setMessageButDoNotSave(): array {
     \Drupal::service('session_handler.write_safe')->setSessionWritable(FALSE);
     $this->setMessage();
@@ -121,6 +167,11 @@ class SessionTestController extends ControllerBase {
   /**
    * Only available if current user is logged in.
    */
+  #[Route(
+    path: '/session-test/is-logged-in',
+    name: 'session_test.is_logged_in',
+    requirements: ['_user_is_logged_in' => 'TRUE'],
+  )]
   public function isLoggedIn(): array {
     return ['#markup' => $this->t('User is logged in.')];
   }
@@ -131,6 +182,11 @@ class SessionTestController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The incoming request.
    */
+  #[Route(
+    path: '/session-test/trace-handler',
+    name: 'session_test.trace_handler',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function traceHandler(Request $request): Response {
     // Increment trace-handler counter and save the session.
     $session = $request->getSession();
@@ -158,6 +214,11 @@ class SessionTestController extends ControllerBase {
    *
    * @throws \AssertionError
    */
+  #[Route(
+    path: '/session-test/trace-handler-rewrite-unmodified',
+    name: 'session_test.trace_handler_rewrite_unmodified',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function traceHandlerRewriteUnmodified(Request $request): Response {
     // Assert that there is an existing session with stacked handler trace data.
     $session = $request->getSession();
@@ -185,6 +246,18 @@ class SessionTestController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    */
+  #[Route(
+    path: '/session-test/get-session',
+    name: 'session_test.get_session_basic_auth',
+    requirements: ['_permission' => 'administer site configuration'],
+    options: ['no_cache' => TRUE, '_auth' => ['basic_auth']],
+  )]
+  #[Route(
+    path: '/session-test/get-session-no-auth',
+    name: 'session_test.get_session_no_auth',
+    requirements: ['_access' => 'TRUE'],
+    options: ['no_cache' => TRUE],
+  )]
   public function getSession(Request $request): Response {
     return new JsonResponse(['session' => $request->getSession()->all(), 'user' => $this->currentUser()->id()]);
   }
@@ -197,6 +270,12 @@ class SessionTestController extends ControllerBase {
    * @param string $test_value
    *   A value to set on the session.
    */
+  #[Route(
+    path: '/session-test/set-session/{test_value}',
+    name: 'session_test.set_session',
+    requirements: ['_permission' => 'administer site configuration'],
+    options: ['no_cache' => TRUE, '_auth' => ['basic_auth'], 'converters' => ['test_value' => '\\s+']],
+  )]
   public function setSession(Request $request, $test_value): Response {
     $session = $request->getSession();
     $session->set('test_value', $test_value);
@@ -209,6 +288,12 @@ class SessionTestController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    */
+  #[Route(
+    path: '/session-test/set-bag-flag',
+    name: 'session_test.set_bag_flag',
+    requirements: ['_access' => 'TRUE'],
+    options: ['no_cache' => TRUE],
+  )]
   public function setSessionBagFlag(Request $request): Response {
     /** @var \Drupal\session_test\Session\TestSessionBag */
     $bag = $request->getSession()->getBag(TestSessionBag::BAG_NAME);
@@ -222,6 +307,12 @@ class SessionTestController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    */
+  #[Route(
+    path: '/session-test/clear-bag-flag',
+    name: 'session_test.clear_bag_flag',
+    requirements: ['_access' => 'TRUE'],
+    options: ['no_cache' => TRUE],
+  )]
   public function clearSessionBagFlag(Request $request): Response {
     /** @var \Drupal\session_test\Session\TestSessionBag */
     $bag = $request->getSession()->getBag(TestSessionBag::BAG_NAME);
@@ -235,6 +326,12 @@ class SessionTestController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    */
+  #[Route(
+    path: '/session-test/has-bag-flag',
+    name: 'session_test.has_bag_flag',
+    requirements: ['_access' => 'TRUE'],
+    options: ['no_cache' => TRUE],
+  )]
   public function hasSessionBagFlag(Request $request): Response {
     /** @var \Drupal\session_test\Session\TestSessionBag */
     $bag = $request->getSession()->getBag(TestSessionBag::BAG_NAME);
@@ -250,6 +347,12 @@ class SessionTestController extends ControllerBase {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    */
+  #[Route(
+    path: '/session-test/trigger-write-exception',
+    name: 'session_test.trigger_write_exception',
+    requirements: ['_access' => 'TRUE'],
+    options: ['no_cache' => TRUE],
+  )]
   public function triggerWriteException(Request $request): Response {
     $session = $request->getSession();
     $session->set('test_value', 'Ensure session contains some data');

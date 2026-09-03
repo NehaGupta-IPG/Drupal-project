@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\binary_file_response_test\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -19,6 +20,11 @@ class BinaryFileResponseTestController {
    * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
    *   The response wrapping the file content.
    */
+  #[Route(
+    path: '/binary_file_response_test/download',
+    name: 'binary_file_response_test.download',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function download(Request $request) {
     if (!$request->query->has('relative_file_url')) {
       throw new BadRequestHttpException();

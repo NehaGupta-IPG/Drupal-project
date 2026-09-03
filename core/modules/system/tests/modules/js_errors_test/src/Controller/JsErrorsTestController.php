@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\js_errors_test\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
+
 /**
  * Test Controller loading js_errors_test/errors_test library.
  */
@@ -15,6 +17,11 @@ class JsErrorsTestController {
    * @return string[][]
    *   Render array.
    */
+  #[Route(
+    path: '/js_errors_test',
+    name: 'js_errors_test.errors',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function jsErrorsTest(): array {
     return [
       '#attached' => ['library' => ['js_errors_test/errors_test']],
@@ -27,6 +34,11 @@ class JsErrorsTestController {
    * @return string[][]
    *   Render array.
    */
+  #[Route(
+    path: '/js_errors_async_test',
+    name: 'js_errors_async_test.errors',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function jsErrorsAsyncTest(): array {
     return [
       '#attached' => ['library' => ['js_errors_test/errors_async_test']],

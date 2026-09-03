@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\cache_test\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Url;
 
 /**
@@ -14,6 +15,11 @@ class CacheTestController {
   /**
    * Early renders a URL to test bubbleable metadata bubbling.
    */
+  #[Route(
+    path: '/cache-test/url-bubbling',
+    name: 'cache_test.url_bubbling',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function urlBubbling() {
     $url = Url::fromRoute('<current>')->setAbsolute();
     return [
@@ -32,6 +38,11 @@ class CacheTestController {
    * @return array
    *   Renderable array.
    */
+  #[Route(
+    path: '/cache-test-list/{entity_type_id}/{bundle}',
+    name: 'cache_test_list.bundle_tags',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function bundleTags($entity_type_id, $bundle) {
     $storage = \Drupal::entityTypeManager()->getStorage($entity_type_id);
     $entity_ids = $storage->getQuery()->accessCheck(TRUE)->condition('type', $bundle)->execute();

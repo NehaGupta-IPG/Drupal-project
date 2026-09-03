@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\off_canvas_test\Controller;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -18,6 +20,12 @@ class TestController {
    * @return string
    *   Return Hello string.
    */
+  #[Route(
+    path: '/off-canvas-thing1',
+    name: 'off_canvas_test.thing1',
+    requirements: ['_access' => 'TRUE'],
+    title: new TranslatableMarkup('Thing 1'),
+  )]
   public function thing1() {
     return [
       '#type' => 'markup',
@@ -31,6 +39,11 @@ class TestController {
    * @return string
    *   Return Hello string.
    */
+  #[Route(
+    path: '/off-canvas-thing2',
+    name: 'off_canvas_test.thing2',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function thing2() {
     return [
       '#type' => 'markup',
@@ -44,6 +57,11 @@ class TestController {
    * @return array
    *   Render array with links.
    */
+  #[Route(
+    path: '/off-canvas-test-links',
+    name: 'off_canvas_test.links',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function linksDisplay() {
     return [
       'off_canvas_link_1' => [
@@ -141,6 +159,11 @@ class TestController {
    * @return array
    *   Render array with links.
    */
+  #[Route(
+    path: '/off-canvas-dialog-links',
+    name: 'off_canvas_test.dialog_links',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function otherDialogLinks() {
     return [
       '#theme' => 'links',

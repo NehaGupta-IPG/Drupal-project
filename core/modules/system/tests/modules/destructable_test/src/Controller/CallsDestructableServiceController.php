@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\destructable_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\destructable_test\Destructable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +32,11 @@ final class CallsDestructableServiceController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\Response
    *   Response.
    */
+  #[Route(
+    path: '/destructable',
+    name: 'destructable',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function render(Request $request): Response {
     $this->destructable->setSemaphore($request->query->get('semaphore'));
     return new Response('This is a longer-ish string of content to send to the client, to invoke any trivial transfer buffers both on the server and client side.');

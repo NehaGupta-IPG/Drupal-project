@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\views_test_data\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Security\TrustedCallbackInterface;
 
 /**
@@ -17,6 +18,11 @@ class ViewsTestDataController implements TrustedCallbackInterface {
    * This contains a form that will contain an error and an embedded view with
    * an exposed form.
    */
+  #[Route(
+    path: '/views_test_data_error_form_page',
+    name: 'views_test_data.error_form_page',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function errorFormPage() {
     $build = [];
     $build['view'] = [

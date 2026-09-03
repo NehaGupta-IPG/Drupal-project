@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\batch_test\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\batch_test\BatchInjectionCallbacks;
 use Drupal\batch_test\BatchTestCallbacks;
 use Drupal\batch_test\BatchTestDefinitions;
@@ -22,6 +23,11 @@ class BatchTestController {
    * @return array
    *   Render array containing success message.
    */
+  #[Route(
+    path: '/batch-test/redirect',
+    name: 'batch_test.redirect',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testRedirect() {
     return [
       'success' => [
@@ -37,6 +43,11 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value
    *   otherwise.
    */
+  #[Route(
+    path: '/batch-test/large-percentage',
+    name: 'batch_test.large_percentage',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testLargePercentage() {
     $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
@@ -56,6 +67,12 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value
    *   otherwise.
    */
+  #[Route(
+    path: '/batch-test/nested-programmatic/{value}',
+    name: 'batch_test.nested_programmatic',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['value' => '1'],
+  )]
   public function testNestedDrupalFormSubmit($value = 1) {
     $batch_test_helper = new BatchTestHelper();
     // Set the batch and process it.
@@ -72,6 +89,11 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value
    *   otherwise.
    */
+  #[Route(
+    path: '/batch-test/no-form',
+    name: 'batch_test.no_form',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testNoForm() {
     $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
@@ -88,6 +110,11 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value
    *   otherwise.
    */
+  #[Route(
+    path: '/batch-test/finish-redirect',
+    name: 'batch_test.finish_redirect',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testFinishRedirect() {
     $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
@@ -110,6 +137,12 @@ class BatchTestController {
    * @return array
    *   Render array containing markup.
    */
+  #[Route(
+    path: '/batch-test/programmatic/{value}',
+    name: 'batch_test.programmatic',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['value' => '1'],
+  )]
   public function testProgrammatic($value = 1) {
     $form_state = (new FormState())->setValues([
       'value' => $value,
@@ -129,6 +162,11 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value
    *   otherwise.
    */
+  #[Route(
+    path: '/admin/batch-test/test-theme',
+    name: 'batch_test.test_theme',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testThemeBatch() {
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
@@ -146,6 +184,11 @@ class BatchTestController {
    *   A redirect response if the batch is progressive. No return value
    *   otherwise.
    */
+  #[Route(
+    path: '/batch-test/test-title',
+    name: 'batch_test.test_title',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testTitleBatch() {
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);

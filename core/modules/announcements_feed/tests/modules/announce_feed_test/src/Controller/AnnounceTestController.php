@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\announce_feed_test\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,6 +27,11 @@ class AnnounceTestController {
    *   JsonResponse will be returned using the contents of the file, otherwise a
    *   Response will be returned with a 404 status code.
    */
+  #[Route(
+    path: '/announce-feed-json/{json_name}',
+    name: 'announce_feed_test.json_test',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function setFeedConfig(string $json_name): JsonResponse|Response {
     $file = __DIR__ . "/../../../../announce_feed/$json_name.json";
     $headers = ['Content-Type' => 'application/json; charset=utf-8'];

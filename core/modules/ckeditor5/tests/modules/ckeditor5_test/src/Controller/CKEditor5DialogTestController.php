@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\ckeditor5_test\Controller;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Url;
 
 /**
@@ -18,6 +19,11 @@ class CKEditor5DialogTestController {
    * @return array
    *   A render array.
    */
+  #[Route(
+    path: '/ckeditor5_test/dialog',
+    name: 'ckeditor5_test.dialog',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testDialog() {
     $build['link'] = [
       '#type' => 'link',

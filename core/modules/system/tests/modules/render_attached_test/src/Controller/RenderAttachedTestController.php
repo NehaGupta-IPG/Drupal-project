@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\render_attached_test\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
+
 /**
  * Controller for various permutations of #attached in the render array.
  */
@@ -15,6 +17,11 @@ class RenderAttachedTestController {
    * @return array
    *   A render array using features of the 'http_header' directive.
    */
+  #[Route(
+    path: '/render_attached_test/teapot',
+    name: 'render_attached.teapot',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function teapotHeaderStatus() {
     $render = [];
     $render['#attached']['http_header'][] = ['Status', 418];
@@ -27,6 +34,11 @@ class RenderAttachedTestController {
    * @return array
    *   A render array using the 'http_head' directive.
    */
+  #[Route(
+    path: '/render_attached_test/header',
+    name: 'render_attached.header',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function header() {
     $render = [];
     $render['#attached']['http_header'][] = ['X-Test-Teapot-Replace', 'This value gets replaced'];
@@ -43,6 +55,11 @@ class RenderAttachedTestController {
    * @return array
    *   A render array using the 'html_head' directive.
    */
+  #[Route(
+    path: '/render_attached_test/head',
+    name: 'render_attached.head',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function head() {
     $head = [
       [
@@ -65,6 +82,11 @@ class RenderAttachedTestController {
    * @return array
    *   A render array using the 'feed' directive.
    */
+  #[Route(
+    path: '/render_attached_test/feed',
+    name: 'render_attached.feed_single',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function feed() {
     $render = [];
     $render['#attached']['feed'][] = ['test://url', 'Your RSS feed.'];
@@ -77,6 +99,11 @@ class RenderAttachedTestController {
    * @return array
    *   A render array using the 'html_head_link' directive.
    */
+  #[Route(
+    path: '/render_attached_test/html_header_link',
+    name: 'render_attached.html_header_link',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function htmlHeaderLink() {
     $render = [];
     $render['#attached']['html_head_link'][] = [['href' => '/foo?bar=<baz>&baz=false', 'rel' => 'alternate'], TRUE];

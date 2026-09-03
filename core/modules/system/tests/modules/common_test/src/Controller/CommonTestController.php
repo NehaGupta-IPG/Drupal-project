@@ -6,7 +6,9 @@ namespace Drupal\common_test\Controller;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Extension\ExtensionList;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -23,6 +25,12 @@ class CommonTestController {
    * Using #type 'link' causes these links to be rendered with the link
    * generator.
    */
+  #[Route(
+    path: '/common-test/type-link-active-class',
+    name: 'common_test.l_active_class',
+    title: new TranslatableMarkup('Test active link class'),
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function typeLinkActiveClass() {
     return [
       'no_query' => [
@@ -66,6 +74,11 @@ class CommonTestController {
    * @return string
    *   An empty string.
    */
+  #[Route(
+    path: '/common-test/query-string',
+    name: 'common_test.js_and_css_querystring',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function jsAndCssQuerystring() {
     $module_extension_list = \Drupal::service('extension.list.module');
     assert($module_extension_list instanceof ExtensionList);
@@ -91,6 +104,11 @@ class CommonTestController {
    *   A new Response object containing a string with the destination query
    *   parameter.
    */
+  #[Route(
+    path: '/common-test/destination',
+    name: 'common_test.destination',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function destination() {
     $destination = \Drupal::destination()->getAsArray();
     $output = "The destination: " . Html::escape($destination['destination']);
@@ -103,6 +121,11 @@ class CommonTestController {
    * @return \Symfony\Component\HttpFoundation\Response
    *   A new Response object.
    */
+  #[Route(
+    path: '/common/attachments-test',
+    name: 'common_test.page_attachments',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function attachments() {
     \Drupal::state()->set('common_test.hook_page_attachments.early_rendering', TRUE);
     $build = [

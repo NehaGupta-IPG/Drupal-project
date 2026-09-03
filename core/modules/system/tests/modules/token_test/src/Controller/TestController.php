@@ -6,6 +6,7 @@ namespace Drupal\token_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Utility\Token;
 use Drupal\node\NodeInterface;
 
@@ -44,6 +45,11 @@ class TestController extends ControllerBase {
    * @return array
    *   The render array.
    */
+  #[Route(
+    path: 'token-test/{node}',
+    name: 'token_test.test',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function tokenReplace(NodeInterface $node) {
     $bubbleable_metadata = new BubbleableMetadata();
     $build['#markup'] = $this->token->replace('Tokens: [node:nid] [current-user:uid]', ['node' => $node], [], $bubbleable_metadata);
@@ -65,6 +71,11 @@ class TestController extends ControllerBase {
    * @return array
    *   The render array.
    */
+  #[Route(
+    path: 'token-test-without-bubbleable-metadata/{node}',
+    name: 'token_test.test_without_bubbleable_metadata',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function tokenReplaceWithoutPassedBubbleableMetadata(NodeInterface $node) {
     $build['#markup'] = $this->token->replace('Tokens: [node:nid] [current-user:uid]', ['node' => $node], []);
 

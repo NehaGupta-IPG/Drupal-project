@@ -6,11 +6,18 @@ namespace Drupal\block_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Routing\Attribute\Route;
 
 /**
  * Controller for block_test module.
  */
 class TestMultipleFormController extends ControllerBase {
+
+  #[Route(
+    path: '/test-multiple-forms',
+    name: 'block_test.test_multiple_forms',
+    requirements: ['_access' => 'TRUE'],
+  )]
 
   public function testMultipleForms() {
     $form_state = new FormState();

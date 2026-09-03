@@ -8,6 +8,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\Query\TableSortExtender;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -44,6 +45,11 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the names of the test entries.
    */
+  #[Route(
+    path: '/database_test/pager_query_even/{limit}',
+    name: 'database_test.pager_query_even',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function pagerQueryEven($limit) {
     $query = $this->connection->select('test', 't');
     $query
@@ -71,6 +77,11 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the names of the test entries.
    */
+  #[Route(
+    path: '/database_test/pager_query_odd/{limit}',
+    name: 'database_test.pager_query_odd',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function pagerQueryOdd($limit) {
     $query = $this->connection->select('test_task', 't');
     $query
@@ -98,6 +109,11 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the test tasks.
    */
+  #[Route(
+    path: '/database_test/tablesort',
+    name: 'database_test.tablesort',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testTablesort() {
     $header = [
       'tid' => ['data' => $this->t('Task ID'), 'field' => 'tid', 'sort' => 'desc'],
@@ -131,6 +147,11 @@ class DatabaseTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the test tasks.
    */
+  #[Route(
+    path: '/database_test/tablesort_first',
+    name: 'database_test.tablesort_first',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testTablesortFirst() {
     $header = [
       'tid' => ['data' => $this->t('Task ID'), 'field' => 'tid', 'sort' => 'desc'],

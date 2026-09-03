@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\js_once_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
 
 /**
  * Controller for testing the @drupal/once library integration.
@@ -17,6 +18,11 @@ class JsOnceTestController extends ControllerBase {
    * @return array
    *   The render array.
    */
+  #[Route(
+    path: '/js_once_test',
+    name: 'js_once_test',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function onceTest() {
     $output = [
       '#attached' => ['library' => ['core/once']],

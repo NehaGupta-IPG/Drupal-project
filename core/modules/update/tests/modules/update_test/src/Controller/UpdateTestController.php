@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\update_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -19,6 +20,11 @@ class UpdateTestController extends ControllerBase {
    * @return \Symfony\Component\HttpFoundation\Response
    *   Returns the response with a special header.
    */
+  #[Route(
+    path: '/503-error',
+    name: 'update_test.503',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function updateError() {
     $response = new Response();
     $response->setStatusCode(503);
@@ -49,6 +55,12 @@ class UpdateTestController extends ControllerBase {
    *   file for the specified project if one is available; a Response object
    *   with no content otherwise.
    */
+  #[Route(
+    path: '/update-test/{project_name}/{version}',
+    name: 'update_test.update_test',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['version' => NULL, 'project_name' => NULL],
+  )]
   public function updateTest($project_name, $version) {
     $xml_map = $this->config('update_test.settings')->get('xml_map');
     if (isset($xml_map[$project_name])) {

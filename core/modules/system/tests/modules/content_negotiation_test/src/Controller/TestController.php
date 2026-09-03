@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\content_negotiation_test\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +20,11 @@ class TestController {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The Json response value.
    */
+  #[Route(
+    path: 'content_negotiation/simple.json',
+    name: 'content_negotiation.test',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function simple() {
     return new JsonResponse(['some' => 'data']);
   }
@@ -29,6 +35,11 @@ class TestController {
    * @return array
    *   A render array with only '#markup'.
    */
+  #[Route(
+    path: 'content_negotiation/html',
+    name: 'content_negotiation.html',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function html() {
     return [
       '#markup' => 'here',
@@ -44,6 +55,16 @@ class TestController {
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
+  #[Route(
+    path: 'content_negotiation/html',
+    name: 'content_negotiation.simple_content_negotiation',
+    requirements: ['_access' => 'TRUE', '_format' => 'json|xml'],
+  )]
+  #[Route(
+    path: 'content_negotiation/negotiate',
+    name: 'content_negotiation.full_content_negotiation',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function format(Request $request) {
     switch ($request->getRequestFormat()) {
       case 'json':
@@ -66,6 +87,11 @@ class TestController {
    * @return array
    *   The render array
    */
+  #[Route(
+    path: 'content_negotiation/plugin/{plugin_id}',
+    name: 'content_negotiation.variable_with_period',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function variable($plugin_id) {
     return [
       '#markup' => $plugin_id,

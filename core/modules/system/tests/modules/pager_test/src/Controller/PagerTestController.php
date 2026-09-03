@@ -8,6 +8,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Pager\PagerParametersInterface;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Security\TrustedCallbackInterface;
 
 /**
@@ -73,6 +74,11 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
    * The 'pager_calls' parameter counts the calls to the pager, subsequent
    * to the initial call.
    */
+  #[Route(
+    path: '/pager-test/query-parameters',
+    name: 'pager_test.query_parameters',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function queryParameters() {
 
     // Example query.
@@ -101,6 +107,11 @@ class PagerTestController extends ControllerBase implements TrustedCallbackInter
   /**
    * Returns a page with multiple pagers.
    */
+  #[Route(
+    path: '/pager-test/multiple-pagers',
+    name: 'pager_test.multiple_pagers',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function multiplePagers() {
 
     // Build three tables with same query and different pagers.

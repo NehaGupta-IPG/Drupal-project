@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\dialog_renderer_test\Controller;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Url;
 
 /**
@@ -18,6 +19,11 @@ class TestController {
    * @return array
    *   Render array for display in modal.
    */
+  #[Route(
+    path: '/dialog_renderer-content',
+    name: 'dialog_renderer_test.modal_content',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function modalContent() {
     return [
       '#type' => 'markup',
@@ -31,6 +37,11 @@ class TestController {
    * @return array
    *   Render array for display in modal.
    */
+  #[Route(
+    path: '/dialog_renderer-content-link',
+    name: 'dialog_renderer_test.modal_content_link',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function modalContentLink() {
     return [
       '#type' => 'container',
@@ -51,6 +62,11 @@ class TestController {
    * @return array
    *   Render array for display in modal.
    */
+  #[Route(
+    path: '/dialog_renderer-content-input',
+    name: 'dialog_renderer_test.modal_content_input',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function modalContentInput() {
     return [
       '#type' => 'container',
@@ -74,6 +90,11 @@ class TestController {
    * @return array
    *   Render array with links.
    */
+  #[Route(
+    path: '/dialog_renderer-test-links',
+    name: 'dialog_renderer_test.links',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function linksDisplay() {
     return [
       'normal_modal' => [
@@ -247,6 +268,11 @@ class TestController {
    * @return array
    *   Render array with links.
    */
+  #[Route(
+    path: '/dialog_renderer-collapsed-opener',
+    name: 'dialog_renderer_test.collapsed_opener',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function collapsedOpener() {
     return [
       '#markup' => '<h2>Honk</h2>',

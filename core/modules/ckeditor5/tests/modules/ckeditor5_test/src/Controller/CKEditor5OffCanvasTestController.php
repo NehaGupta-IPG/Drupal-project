@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\ckeditor5_test\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\Core\Url;
 
 /**
@@ -17,6 +18,11 @@ class CKEditor5OffCanvasTestController {
    * @return array
    *   A render array.
    */
+  #[Route(
+    path: '/ckeditor5_test/off_canvas',
+    name: 'ckeditor5_test.off_canvas',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function testOffCanvas() {
     $build['link'] = [
       '#type' => 'link',

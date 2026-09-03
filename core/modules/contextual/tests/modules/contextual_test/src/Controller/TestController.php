@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\contextual_test\Controller;
 
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\contextual\ContextualLinksSerializer;
 use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -25,6 +26,11 @@ class TestController implements ContainerInjectionInterface {
    * @return array
    *   Render array.
    */
+  #[Route(
+    path: '/contextual-tests',
+    name: 'contextual_test',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function render() {
     return [
       '#type' => 'markup',
@@ -35,6 +41,11 @@ class TestController implements ContainerInjectionInterface {
   /**
    * Renders two regions with the same contextual links.
    */
+  #[Route(
+    path: '/contextual-tests/duplicate-links',
+    name: 'contextual_test.duplicate_links',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function duplicateContextualLinks(): array {
     $contextual_id = $this->serializer->linksToId([
       'contextual_test' => ['route_parameters' => []],

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\position_shim_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
 
 /**
  * The position shim test controller.
@@ -17,6 +18,11 @@ class PositionShimTestController extends ControllerBase {
    * @return array
    *   The render array.
    */
+  #[Route(
+    path: '/position-shim-test',
+    name: 'position_test_page',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function build() {
     return [
       'reference1' => [

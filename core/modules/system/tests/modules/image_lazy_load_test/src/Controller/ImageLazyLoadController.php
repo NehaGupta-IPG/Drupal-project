@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\image_lazy_load_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
 
 /**
  * The ImageLazyLoadController class.
@@ -17,6 +18,11 @@ class ImageLazyLoadController extends ControllerBase {
    * @return array
    *   The render array.
    */
+  #[Route(
+    path: '/image-lazy-load-test',
+    name: 'image_lazy_load_test',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function renderImage() {
     $images['with-dimensions'] = [
       '#theme' => 'image',

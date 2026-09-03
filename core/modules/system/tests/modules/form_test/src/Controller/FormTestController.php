@@ -7,6 +7,7 @@ namespace Drupal\form_test\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Routing\Attribute\Route;
 use Drupal\form_test\FormTestObject;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -21,6 +22,11 @@ class FormTestController extends ControllerBase {
    * @return string
    *   A HTML-formatted string with the double node form page content.
    */
+  #[Route(
+    path: '/form-test/two-instances-of-same-form',
+    name: 'form_test.two_instances',
+    requirements: ['_module_dependencies' => 'node', '_permission' => 'create page content'],
+  )]
   public function twoFormInstances() {
     $user = $this->currentUser();
     $values = [
@@ -45,6 +51,12 @@ class FormTestController extends ControllerBase {
    * testing whether \Drupal::formBuilder()->setCache() prevents resaving of
    * immutable forms.
    */
+  #[Route(
+    path: '/form-test/form-storage-legacy/{form_build_id}',
+    name: 'form_test.storage_legacy_handler',
+    requirements: ['_access' => 'TRUE'],
+    defaults: ['form_build_id' => NULL],
+  )]
   public function storageLegacyHandler($form_build_id) {
     $form_state = new FormState();
     $form = $this->formBuilder()->getCache($form_build_id, $form_state);
@@ -64,6 +76,11 @@ class FormTestController extends ControllerBase {
    * @return array
    *   A render array containing the form and the button.
    */
+  #[Route(
+    path: '/form-test/button-form-attribute',
+    name: 'form_test.button_attribute',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function buttonWithFormAttribute(): array {
     $return['form'] = $this->formBuilder()->getForm(FormTestObject::class);
     $return['button'] = [

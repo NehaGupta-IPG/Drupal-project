@@ -6,6 +6,7 @@ namespace Drupal\entity_test\Controller;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
 
 /**
  * Controller routines for entity_test routes.
@@ -34,6 +35,11 @@ class EntityTestController extends ControllerBase {
    * @return array
    *   A renderable array.
    */
+  #[Route(
+    path: '/entity_test/list/{entity_reference_field_name}/{referenced_entity_type}/{referenced_entity_id}',
+    name: 'entity.entity_test.collection_referencing_entities',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function listReferencingEntities($entity_reference_field_name, $referenced_entity_type, $referenced_entity_id) {
     // Early return if the referenced entity does not exist (or is deleted).
     $referenced_entity = $this->entityTypeManager()
@@ -63,6 +69,11 @@ class EntityTestController extends ControllerBase {
    * @return array
    *   A renderable array.
    */
+  #[Route(
+    path: '/entity_test/list_labels_alphabetically/{entity_type_id}',
+    name: 'entity.entity_test.collection_labels_alphabetically',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function listEntitiesAlphabetically($entity_type_id) {
     $entity_type_definition = $this->entityTypeManager()->getDefinition($entity_type_id);
     $query = $this->entityTypeManager()->getStorage($entity_type_id)->getQuery()->accessCheck(TRUE);
@@ -111,6 +122,11 @@ class EntityTestController extends ControllerBase {
    * @return array
    *   A renderable array.
    */
+  #[Route(
+    path: '/entity_test/list_empty/{entity_type_id}',
+    name: 'entity.entity_test.collection_empty',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function listEntitiesEmpty($entity_type_id) {
     $entity_type_definition = $this->entityTypeManager()->getDefinition($entity_type_id);
     return [

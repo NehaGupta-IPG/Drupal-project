@@ -6,6 +6,7 @@ namespace Drupal\mailer_transport_factory_functional_test\Controller;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Routing\Attribute\Route;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,6 +44,11 @@ class TransportInfoController implements ContainerInjectionInterface {
   /**
    * Returns info about the configured mailer dsn and the resulting transport.
    */
+  #[Route(
+    path: '/mailer-transport-factory-functional-test/transport-info',
+    name: 'mailer_transport_factory_functional_test.transport_info',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function transportInfo(): Response {
     $mailerDsn = $this->configFactory->get('system.mail')->get('mailer_dsn');
     return new JsonResponse([

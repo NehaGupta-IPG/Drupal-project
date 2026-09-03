@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\tabbingmanager_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Routing\Attribute\Route;
 
 /**
  * For testing the Tabbing Manager.
@@ -17,6 +18,11 @@ class TabbingManagerTestController extends ControllerBase {
    * @return array
    *   The render array.
    */
+  #[Route(
+    path: '/tabbingmanager-test',
+    name: 'tabbingmanager_test_page',
+    requirements: ['_access' => 'TRUE'],
+  )]
   public function build() {
     return [
       'container' => [

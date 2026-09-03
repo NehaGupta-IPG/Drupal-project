@@ -5,11 +5,18 @@ declare(strict_types=1);
 namespace Drupal\jswebassert_test\Controller;
 
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Routing\Attribute\Route;
 
 /**
  * Provides a test page for JavaScript assertions.
  */
 class TestController {
+
+  #[Route(
+    path: '/jswebassert_test_page',
+    name: 'jswebassert_test.jswebassert_test_page',
+    requirements: ['_access' => 'TRUE'],
+  )]
 
   public function page() {
     $markup = <<<JS
