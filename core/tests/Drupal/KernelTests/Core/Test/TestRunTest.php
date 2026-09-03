@@ -339,6 +339,30 @@ class TestRunTest extends KernelTestBase {
   }
 
   /**
+   * Tests that dumping the execution information keeps the failure location.
+   *
+   * The dump is appended to the message of the throwable that PHPUnit reports,
+   * so the reported file, line and stack trace remain those of the code that
+   * executed the statement.
+   *
+   * @see \Drupal\Tests\DrupalTestCaseTrait::transformException()
+   */
+  public function testSqlStatementExceptionDumpKeepsFailureLocation(): void {
+    $process = $this->runTestFixture('SqlExceptionDumpTest.php');
+    $output = $process->getOutput();
+    $message = $output . $process->getErrorOutput();
+
+    // The primary report is what precedes the chain of previous exceptions.
+    $primaryReport = explode("\nCaused by\n", $output)[0];
+    $this->assertStringContainsString('SqlExceptionDumpTest.php:18', $primaryReport, $message);
+    $this->assertStringNotContainsString('DrupalTestCaseTrait.php', $primaryReport, $message);
+
+    // The fixture runs without colors, so the dump must not be colored either.
+    // The same string is written to the JUnit log that run-tests.sh parses.
+    $this->assertStringNotContainsString("\e[", $output, $message);
+  }
+
+  /**
    * Runs a test fixture file in a PHPUnit subprocess.
    *
    * @param string $fixture

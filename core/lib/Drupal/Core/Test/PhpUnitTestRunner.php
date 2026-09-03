@@ -302,9 +302,10 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       '--log-junit',
       $log_junit_file_path,
     ];
-    if ($colors) {
-      $command[] = '--colors=always';
-    }
+    // Colors have to be explicitly disabled: core/phpunit.xml.dist enables
+    // them, so without this the subprocess would emit ANSI sequences that end
+    // up in the JUnit log that run-tests.sh parses.
+    $command[] = $colors ? '--colors=always' : '--colors=never';
 
     if (!$suppressDeprecations) {
       // If the deprecation handler bridge is active, we need to fail when there
