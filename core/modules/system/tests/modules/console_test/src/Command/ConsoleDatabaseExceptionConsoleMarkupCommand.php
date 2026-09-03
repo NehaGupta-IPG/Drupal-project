@@ -31,14 +31,15 @@ class ConsoleDatabaseExceptionConsoleMarkupCommand extends Command {
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
     $markup = '<error>eaten?</error> <fg=nosuchcolor>invalid</>';
+    $info = new SqlExecutionInfo(
+      'INSERT INTO "key_value" ("name") VALUES (:db_insert_placeholder_0)',
+      [':db_insert_placeholder_0' => $markup],
+    );
     throw new DatabaseExceptionWrapper(
-      "SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '$markup' for key 'PRIMARY'",
+      $info->appendToMessage("SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '$markup' for key 'PRIMARY'"),
       0,
       NULL,
-      new SqlExecutionInfo(
-        'INSERT INTO "key_value" ("name") VALUES (:db_insert_placeholder_0)',
-        [':db_insert_placeholder_0' => $markup],
-      ),
+      $info,
     );
   }
 

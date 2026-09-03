@@ -80,12 +80,14 @@ class ExceptionHandler extends BaseExceptionHandler {
       // max_allowed_packet. They are not retained, since exporting them would
       // re-expand what the truncation above exists to keep out of the output.
       $info = new SqlExecutionInfo(Unicode::truncateBytes($queryString, Connection::MIN_MAX_ALLOWED_PACKET), [], $options);
+      // For the same reason the statement is not appended to the message here,
+      // while it is for every other error below.
       throw new DatabaseExceptionWrapper($message, $code, $exception, $info);
     }
 
     $info = new SqlExecutionInfo($queryString, $arguments, $options);
 
-    $message = $exception->getMessage();
+    $message = $info->appendToMessage($exception->getMessage());
 
     // SQLSTATE 23xxx errors indicate an integrity constraint violation. Also,
     // in case of attempted INSERT of a record with an undefined column and no

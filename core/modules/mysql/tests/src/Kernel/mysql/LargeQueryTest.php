@@ -52,6 +52,10 @@ class LargeQueryTest extends DriverSpecificDatabaseTestBase {
       // the statement is truncated like the message, so that exporting the SQL
       // execution information cannot re-expand them.
       $this->assertSame([], $e->info->placeholders);
+      // For the same reason the statement is not appended to the message, as
+      // it is for every other database exception.
+      $this->assertStringNotContainsString($long_name, $e->getMessage());
+      $this->assertStringNotContainsString('; []', $e->getMessage());
       $this->assertLessThanOrEqual(Connection::MIN_MAX_ALLOWED_PACKET, strlen($e->info->sqlString));
       $this->assertLessThanOrEqual($max_allowed_packet, strlen((new SqlDumper())->export($e->info)));
     }

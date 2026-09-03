@@ -111,14 +111,15 @@ class ErrorTestController extends ControllerBase {
   public function triggerEscapedDatabaseException(): void {
     define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     $payload = "<script>alert('xss')</script>";
+    $info = new SqlExecutionInfo(
+      'INSERT INTO {error_test} (name) VALUES (:db_insert_placeholder_0)',
+      [':db_insert_placeholder_0' => $payload],
+    );
     throw new DatabaseExceptionWrapper(
-      "SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '$payload' for key 'PRIMARY'",
+      $info->appendToMessage("SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '$payload' for key 'PRIMARY'"),
       0,
       NULL,
-      new SqlExecutionInfo(
-        'INSERT INTO {error_test} (name) VALUES (:db_insert_placeholder_0)',
-        [':db_insert_placeholder_0' => $payload],
-      ),
+      $info,
     );
   }
 

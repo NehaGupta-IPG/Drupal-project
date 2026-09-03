@@ -165,21 +165,38 @@ class DrupalApplication extends Application {
    * {@inheritdoc}
    */
   protected function doRenderThrowable(\Throwable $t, OutputInterface $output): void {
-    parent::doRenderThrowable($t, $output);
-
     // Database exceptions may carry the information of the executed statement,
     // that can be exported to a more readable dump.
-    if ($t instanceof DatabaseExceptionBase && $t->info !== NULL) {
-      $dump = (new SqlDumper())->export($t->info, $output->isDecorated());
-      if ($dump !== '') {
-        // The dump contains placeholder values, which may look like console
-        // markup. OUTPUT_RAW keeps the formatter away from them: it would eat
-        // registered tags such as <error>, and throw on an unknown color, from
-        // inside the exception renderer. The parent writes the exception at
-        // VERBOSITY_QUIET, so the dump uses it too and is not dropped by -q.
-        $output->writeln($dump, OutputInterface::OUTPUT_RAW | OutputInterface::VERBOSITY_QUIET);
-      }
+    $dump = $t instanceof DatabaseExceptionBase && $t->info !== NULL ?
+      (new SqlDumper())->export($t->info, $output->isDecorated()) :
+      '';
+
+    if ($dump === '') {
+      parent::doRenderThrowable($t, $output);
+      return;
     }
+
+    // The message carries the same statement in compact form, which the dump
+    // renders in full right below it. Throwables are not cloneable and their
+    // message cannot be overridden, so the suffix is taken off for the
+    // duration of the parent call only: callers may still log or rethrow the
+    // throwable afterwards.
+    $message = $t->getMessage();
+    $messageProperty = new \ReflectionProperty($t, 'message');
+    $messageProperty->setValue($t, $t->info->stripFromMessage($message));
+    try {
+      parent::doRenderThrowable($t, $output);
+    }
+    finally {
+      $messageProperty->setValue($t, $message);
+    }
+
+    // The dump contains placeholder values, which may look like console
+    // markup. OUTPUT_RAW keeps the formatter away from them: it would eat
+    // registered tags such as <error>, and throw on an unknown color, from
+    // inside the exception renderer. The parent writes the exception at
+    // VERBOSITY_QUIET, so the dump uses it too and is not dropped by -q.
+    $output->writeln($dump, OutputInterface::OUTPUT_RAW | OutputInterface::VERBOSITY_QUIET);
   }
 
 }

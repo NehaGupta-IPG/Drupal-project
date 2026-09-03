@@ -118,7 +118,7 @@ class ErrorHandlerTest extends BrowserTestBase {
       '%line' => 64,
       '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
-    $error_renderer_exception = '<em class="placeholder">Exception</em>: This is an exception that occurs during rendering in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():132}()</em> (line';
+    $error_renderer_exception = '<em class="placeholder">Exception</em>: This is an exception that occurs during rendering in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():133}()</em> (line';
     $this->drupalGet('error-test/trigger-exception');
     $this->assertSession()->statusCodeEquals(500);
     $this->assertSession()->responseContains($error_exception);
@@ -134,6 +134,9 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertSession()->responseMatches('/SQL statement.*SELECT.*FROM.*bananas_are_awesome.*WHERE.*palm_height.*\>.*:db_condition_placeholder_0/s');
     $this->assertSession()->responseMatches('/Placeholders.*:db_condition_placeholder_0.*180/s');
     $this->assertSession()->responseMatches('/Options.*allow_delimiter_in_query.*false/s');
+    // The compact statement that the message carries for logs is taken off
+    // the reported message, since the dump repeats it in full.
+    $this->assertSession()->responseNotContains(':db_condition_placeholder_0=180');
 
     $error_details = 'in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;triggerPDOException()</em> (line';
     $this->assertSession()->responseContains($error_details);

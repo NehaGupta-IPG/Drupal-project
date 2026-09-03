@@ -143,6 +143,9 @@ class ConsoleTest extends KernelTestBase {
     $this->assertMatchesRegularExpression('/SQL statement.*SELECT.*FROM.*bananas_are_awesome.*WHERE.*palm_height/s', $display);
     $this->assertMatchesRegularExpression('/Placeholders.*:db_condition_placeholder_0.*180/s', $display);
     $this->assertMatchesRegularExpression('/Options.*allow_delimiter_in_query.*false/s', $display);
+    // The compact statement that the message carries for logs is taken off
+    // the rendered exception, since the dump repeats it in full.
+    $this->assertStringNotContainsString(':db_condition_placeholder_0=180', $display);
   }
 
   /**

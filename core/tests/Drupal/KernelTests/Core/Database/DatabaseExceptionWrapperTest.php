@@ -30,6 +30,11 @@ class DatabaseExceptionWrapperTest extends KernelTestBase {
       $this->assertInstanceOf(DatabaseExceptionWrapper::class, $e);
       $this->assertMatchesRegularExpression('/SELECT \* FROM ".*does_not_exist" WHERE "not_a_column" = :not_a_value/', $e->info->sqlString);
       $this->assertSame([':not_a_value' => 'not a value'], $e->info->placeholders);
+      // The message keeps the statement in compact form, so that it still
+      // reaches the log and any consumer rendering the throwable itself.
+      $this->assertStringContainsString('does_not_exist', $e->getMessage());
+      $this->assertStringContainsString(":not_a_value='not a value'", $e->getMessage());
+      $this->assertStringNotContainsString("\n", $e->getMessage());
       $this->assertSame([
         'fetch' => FetchAs::Object,
         'allow_delimiter_in_query' => FALSE,

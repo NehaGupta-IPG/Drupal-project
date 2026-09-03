@@ -34,7 +34,7 @@ class ExceptionHandler {
       // overriding Exception::getMessage(). Its message is the extra database
       // debug information.
       $info = new SqlExecutionInfo($sql, [], $options);
-      throw new DatabaseExceptionWrapper($exception->getMessage(), 0, $exception, $info);
+      throw new DatabaseExceptionWrapper($info->appendToMessage($exception->getMessage()), 0, $exception, $info);
     }
 
     throw $exception;
@@ -65,7 +65,7 @@ class ExceptionHandler {
       // overriding Exception::getMessage(). Its message is the extra database
       // debug information.
       $info = new SqlExecutionInfo($statement->getQueryString(), $arguments, $options);
-      $message = $exception->getMessage();
+      $message = $info->appendToMessage($exception->getMessage());
       // Match all SQLSTATE 23xxx errors.
       if (substr($exception->getCode(), -6, -3) == '23') {
         throw new IntegrityConstraintViolationException($message, $exception->getCode(), $exception, $info);

@@ -115,8 +115,10 @@ trait DrupalTestCaseTrait {
         // ::getFile(), ::getLine() and ::getTrace(), so PHPUnit would report
         // the failure as happening here instead of in the code that executed
         // the statement.
-        (function () use ($infoDump): void {
-          $this->message .= "\n" . $infoDump;
+        (function () use ($t, $infoDump): void {
+          // The message carries the same statement in compact form, which the
+          // dump renders in full right below it.
+          $this->message = $t->info->stripFromMessage($this->message) . "\n" . $infoDump;
         })->call($t);
       }
     }

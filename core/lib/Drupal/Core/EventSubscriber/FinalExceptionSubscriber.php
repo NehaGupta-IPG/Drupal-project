@@ -111,6 +111,9 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
         if ($dump !== '') {
           $error['@sql_dump'] = Markup::create($dump);
           $sql_dump_placeholder = '@sql_dump';
+          // The message carries the same statement in compact form, which the
+          // dump renders in full right below it.
+          $error['@message'] = $exception->info->stripFromMessage($error['@message']);
         }
       }
 

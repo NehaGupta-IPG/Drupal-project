@@ -27,15 +27,16 @@ class ConsoleDatabaseExceptionCommand extends Command {
    * {@inheritdoc}
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
+    $info = new SqlExecutionInfo(
+      'SELECT "b".* FROM "bananas_are_awesome" "b" WHERE "palm_height" > :db_condition_placeholder_0',
+      [':db_condition_placeholder_0' => 180],
+      ['fetch' => FetchAs::Object, 'allow_delimiter_in_query' => FALSE],
+    );
     throw new DatabaseExceptionWrapper(
-      "SQLSTATE[42S22]: Column not found: 1054 Unknown column 'palm_height'",
+      $info->appendToMessage("SQLSTATE[42S22]: Column not found: 1054 Unknown column 'palm_height'"),
       0,
       NULL,
-      new SqlExecutionInfo(
-        'SELECT "b".* FROM "bananas_are_awesome" "b" WHERE "palm_height" > :db_condition_placeholder_0',
-        [':db_condition_placeholder_0' => 180],
-        ['fetch' => FetchAs::Object, 'allow_delimiter_in_query' => FALSE],
-      ),
+      $info,
     );
   }
 
