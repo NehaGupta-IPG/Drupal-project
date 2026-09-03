@@ -118,7 +118,7 @@ class ErrorHandlerTest extends BrowserTestBase {
       '%line' => 64,
       '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
-    $error_renderer_exception = '<em class="placeholder">Exception</em>: This is an exception that occurs during rendering in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():105}()</em> (line';
+    $error_renderer_exception = '<em class="placeholder">Exception</em>: This is an exception that occurs during rendering in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():132}()</em> (line';
     $this->drupalGet('error-test/trigger-exception');
     $this->assertSession()->statusCodeEquals(500);
     $this->assertSession()->responseContains($error_exception);
@@ -137,6 +137,20 @@ class ErrorHandlerTest extends BrowserTestBase {
 
     $error_details = 'in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;triggerPDOException()</em> (line';
     $this->assertSession()->responseContains($error_details);
+
+    // A driver message can repeat values from the failing statement, and those
+    // values are user input. Neither the message nor the placeholder values
+    // are trusted markup, so both have to be escaped, while the dump around
+    // them is rendered as markup.
+    $xss_payload = "<script>alert('xss')</script>";
+    $this->drupalGet('error-test/trigger-escaped-database-exception');
+    $this->assertSession()->statusCodeEquals(500);
+    $this->assertSession()->responseNotContains($xss_payload);
+    $this->assertSession()->responseContains('&lt;script&gt;');
+    // The message is still reported, as text.
+    $this->assertSession()->pageTextContains($xss_payload);
+    $this->assertSession()->responseMatches('/SQL statement.*INSERT.*INTO.*error_test/s');
+
     $this->drupalGet('error-test/trigger-renderer-exception');
     $this->assertSession()->statusCodeEquals(500);
     $this->assertSession()->responseContains($error_renderer_exception);
