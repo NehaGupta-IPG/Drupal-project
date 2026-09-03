@@ -50,7 +50,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
         $string_ascii_check = $column->Collation;
       }
     }
-    $this->assertMatchesRegularExpression('#^(utf8mb4_general_ci|utf8mb4_0900_ai_ci)$#', $string_check, 'test_field_string should have a utf8mb4_general_ci or a utf8mb4_0900_ai_ci collation, but it has not.');
+    $this->assertMatchesRegularExpression('#^(utf8mb4_general_ci|utf8mb4_0900_ai_ci|utf8mb4_uca1400_ai_ci)$#', $string_check, 'test_field_string should have a supported utf8mb4 collation, but it has not.');
     $this->assertSame('ascii_general_ci', $string_ascii_check, 'test_field_string_ascii should have a ascii_general_ci collation, but it has not.');
   }
 
@@ -307,7 +307,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
    */
   public function testSchemaTableColumnSizeTooLargeException(): void {
     $this->expectException(SchemaTableColumnSizeTooLargeException::class);
-    $this->expectExceptionMessage("Column length too big for column 'too_large' (max = 16383); use BLOB or TEXT instead");
+    $this->expectExceptionMessageIsOrContains("Column length too big for column 'too_large' (max = 16383); use BLOB or TEXT instead");
     $this->schema->createTable('test_schema', [
       'description' => 'Tests SchemaTableColumnSizeTooLargeException.',
       'fields' => [

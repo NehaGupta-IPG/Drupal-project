@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\locale\Functional;
 
+use Drupal\locale\CurrentImportStorage;
 use Drupal\locale\LocaleSource;
+use Drupal\locale\Model\Overwrite;
+use Drupal\locale\Model\SourceType;
+use Drupal\locale\Model\TranslationUpdateMode;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -42,16 +46,25 @@ class LocaleFileHashTest extends LocaleUpdateBase {
     $this->setCurrentTranslations();
 
     $edit = [
-      'use_source' => LOCALE_TRANSLATION_USE_SOURCE_LOCAL,
-      'overwrite' => LOCALE_TRANSLATION_OVERWRITE_ALL,
+      'use_source' => TranslationUpdateMode::Local->value,
+      'overwrite' => Overwrite::All->value,
     ];
     $this->drupalGet('admin/config/regional/translate/settings');
     $this->submitForm($edit, 'Save configuration');
 
     // Check for available translations and update them via the UI.
-    $this->drupalGet('admin/reports/translations/check');
+    $this->checkTranslations();
     $this->assertSession()->addressEquals('admin/reports/translations');
     $this->submitForm([], 'Update translations');
+  }
+
+  /**
+   * Check for translation updates via the UI.
+   */
+  protected function checkTranslations(): void {
+    $this->drupalGet('admin/reports/translations');
+    $this->clickLink('Check manually');
+    $this->checkForMetaRefresh();
   }
 
   /**
@@ -59,7 +72,7 @@ class LocaleFileHashTest extends LocaleUpdateBase {
    */
   public function testModifiedFileProducesDifferentHash(): void {
     // Check for translation updates via the UI.
-    $this->drupalGet('admin/reports/translations/check');
+    $this->checkTranslations();
     // The translation status page should show no updates are available.
     $this->assertSession()->addressEquals('admin/reports/translations');
     $this->assertSession()->pageTextNotContains('Updates for:');
@@ -75,7 +88,7 @@ class LocaleFileHashTest extends LocaleUpdateBase {
     touch($uri, time() + 20000);
 
     // Run check again via the UI.
-    $this->drupalGet('admin/reports/translations/check');
+    $this->checkTranslations();
     // The translation status page should show no updates are available.
     $this->assertSession()->addressEquals('admin/reports/translations');
     $this->assertSession()->pageTextNotContains('Updates for:');
@@ -88,7 +101,7 @@ class LocaleFileHashTest extends LocaleUpdateBase {
     touch($uri, filemtime($uri));
 
     // Run check again via the UI.
-    $this->drupalGet('admin/reports/translations/check');
+    $this->checkTranslations();
     // The translation status page should show an update is available.
     $this->assertSession()->addressEquals('admin/reports/translations');
     $this->assertSession()->pageTextContains('Updates for: Contributed module two');
@@ -104,7 +117,7 @@ class LocaleFileHashTest extends LocaleUpdateBase {
     $this->assertHashes($expected_hash, $expected_hash, 'contrib_module_two', 'de');
 
     // Check for translation updates via the UI.
-    $this->drupalGet('admin/reports/translations/check');
+    $this->checkTranslations();
     // The translation status page should show no updates are available.
     $this->assertSession()->addressEquals('admin/reports/translations');
     $this->assertSession()->pageTextNotContains('Updates for:');
@@ -113,13 +126,13 @@ class LocaleFileHashTest extends LocaleUpdateBase {
     // Change the mtime of the file and empty the hash to prove that fallback
     // works.
     touch($uri, time() + 20000);
-    $status = locale_translation_get_status(['contrib_module_two']);
+    $status = \Drupal::service(LocaleSource::class)->loadSources(['contrib_module_two']);
     $status['contrib_module_two']['de']->hash = '';
-    $status['contrib_module_two']['de']->files[LOCALE_TRANSLATION_LOCAL]->hash = '';
+    $status['contrib_module_two']['de']->getFile(SourceType::Local)->hash = '';
     \Drupal::keyValue('locale.translation_status')->set('contrib_module_two', $status['contrib_module_two']);
 
     // Test fallback to mtime if the hash is not available.
-    $this->drupalGet('admin/reports/translations/check');
+    $this->checkTranslations();
     // The translation status page should show no updates are available.
     $this->assertSession()->addressEquals('admin/reports/translations');
     $this->assertSession()->pageTextContains('Updates for: Contributed module two');
@@ -138,12 +151,11 @@ class LocaleFileHashTest extends LocaleUpdateBase {
    *   The langcode.
    */
   public function assertHashes(string $history_hash, string $status_hash, string $project, string $langcode): void {
-    drupal_static_reset('locale_translation_get_file_history');
-    $history = locale_translation_get_file_history();
-    $this->assertSame($history_hash, $history[$project][$langcode]->hash);
-    $status = locale_translation_get_status([$project]);
+    $current_import = \Drupal::service(CurrentImportStorage::class)->get($project, $langcode);
+    $this->assertSame($history_hash, $current_import->hash);
+    $status = \Drupal::service(LocaleSource::class)->loadSources([$project]);
     $this->assertSame($status_hash, $status[$project][$langcode]->hash);
-    $this->assertSame($status_hash, $status[$project][$langcode]->files[LOCALE_TRANSLATION_LOCAL]->hash);
+    $this->assertSame($status_hash, $status[$project][$langcode]->getFile(SourceType::Local)->hash);
   }
 
 }

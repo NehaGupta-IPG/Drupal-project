@@ -9,6 +9,7 @@ use Drupal\Core\File\FileExists;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\locale\Model\TranslationUpdateMode;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -77,7 +78,7 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
     // tests.
     $this->config('locale.settings')
       ->set('translation.import_enabled', TRUE)
-      ->set('translation.use_source', LOCALE_TRANSLATION_USE_SOURCE_LOCAL)
+      ->set('translation.use_source', TranslationUpdateMode::Local->value)
       ->save();
   }
 
@@ -435,7 +436,7 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
   /**
    * Helper function that returns a proper .po file.
    */
-  public function getPoFile() {
+  public function getPoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""
@@ -476,14 +477,14 @@ EOF;
   /**
    * Helper function that returns an empty .po file.
    */
-  public function getEmptyPoFile() {
+  public function getEmptyPoFile(): string {
     return '';
   }
 
   /**
    * Helper function that returns a bad .po file.
    */
-  public function getBadPoFile() {
+  public function getBadPoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""
@@ -508,7 +509,7 @@ EOF;
   /**
    * Helper function that returns a proper .po file for testing.
    */
-  public function getOverwritePoFile() {
+  public function getOverwritePoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""
@@ -529,7 +530,7 @@ EOF;
   /**
    * Returns a .po file that will be marked as customized.
    */
-  public function getCustomPoFile() {
+  public function getCustomPoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""
@@ -564,7 +565,7 @@ EOF;
   /**
    * Helper function that returns a .po file for testing customized strings.
    */
-  public function getCustomOverwritePoFile() {
+  public function getCustomOverwritePoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""
@@ -588,7 +589,7 @@ EOF;
   /**
    * Helper function that returns a .po file with context.
    */
-  public function getPoFileWithContext() {
+  public function getPoFileWithContext(): string {
     // Croatian (code hr) is one of the languages that have a different
     // form for the full name and the abbreviated name for the month of May.
     return <<< EOF
@@ -623,7 +624,7 @@ EOF;
   /**
    * Helper function that returns a .po file with an empty last item.
    */
-  public function getPoFileWithEmptyMsgstr() {
+  public function getPoFileWithEmptyMsgstr(): string {
     return <<< EOF
 msgid ""
 msgstr ""
@@ -642,7 +643,7 @@ EOF;
   /**
    * Helper function that returns a .po file with an empty last item.
    */
-  public function getPoFileWithMsgstr() {
+  public function getPoFileWithMsgstr(): string {
     return <<< EOF
 msgid ""
 msgstr ""
@@ -664,7 +665,7 @@ EOF;
   /**
    * Helper function that returns a .po file with configuration translations.
    */
-  public function getPoFileWithConfig() {
+  public function getPoFileWithConfig(): string {
     return <<< EOF
 msgid ""
 msgstr ""
@@ -686,7 +687,7 @@ EOF;
   /**
    * Helper function that returns a .po file with configuration translations.
    */
-  public function getPoFileWithConfigDe() {
+  public function getPoFileWithConfigDe(): string {
     return <<< EOF
 msgid ""
 msgstr ""
@@ -708,7 +709,7 @@ EOF;
   /**
    * Helper function that returns a .po file with invalid encoding.
    */
-  public function getInvalidEncodedPoFile() {
+  public function getInvalidEncodedPoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""

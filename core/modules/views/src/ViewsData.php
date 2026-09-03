@@ -7,6 +7,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Class to manage and lazy load cached views data.
@@ -19,18 +20,19 @@ use Drupal\Core\Language\LanguageManagerInterface;
 class ViewsData {
 
   /**
+   * The cache tags to apply to all cache entries.
+   */
+  const array CACHE_TAGS = [
+    'views_data',
+    'config:core.extension',
+  ];
+
+  /**
    * The base cache ID to use.
    *
    * @var string
    */
   protected $baseCid = 'views_data';
-
-  /**
-   * The cache backend to use.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cacheBackend;
 
   /**
    * Table data storage.
@@ -70,34 +72,14 @@ class ViewsData {
    */
   protected $langcode;
 
-  /**
-   * Stores a module manager to invoke hooks.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
-   * Constructs this ViewsData object.
-   *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler class to use for invoking hooks.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   */
-  public function __construct(CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager) {
-    $this->cacheBackend = $cache_backend;
-    $this->moduleHandler = $module_handler;
-    $this->languageManager = $language_manager;
+  public function __construct(
+    #[Autowire(service: 'cache.default')]
+    protected CacheBackendInterface $cacheBackend,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected LanguageManagerInterface $languageManager,
+    #[Autowire(service: 'cache.discovery')]
+    protected CacheBackendInterface $chainedFastBackend,
+  ) {
     $this->langcode = $this->languageManager->getCurrentLanguage()->getId();
   }
 
@@ -151,10 +133,10 @@ class ViewsData {
 
     if (!isset($this->storage[$key])) {
       // Prepare a cache ID for get and set.
-      $cid = $this->baseCid . ':' . $key;
+      $cid = $this->prepareCid($this->baseCid . ':' . $key);
       $from_cache = FALSE;
 
-      if ($data = $this->cacheGet($cid)) {
+      if ($data = $this->chainedFastBackend->get($cid)) {
         $this->storage[$key] = $data->data;
         $from_cache = TRUE;
       }
@@ -177,7 +159,7 @@ class ViewsData {
         }
 
         // Create a cache entry for the requested table.
-        $this->cacheSet($cid, $this->allStorage[$key]);
+        $this->chainedFastBackend->set($cid, $this->allStorage[$key], Cache::PERMANENT, static::CACHE_TAGS);
       }
     }
     return $this->storage[$key];
@@ -191,8 +173,13 @@ class ViewsData {
    *
    * @return mixed
    *   The cached data.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. There is no
+   * replacement.
+   * @see https://www.drupal.org/project/drupal/issues/3587797
    */
   protected function cacheGet($cid) {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/project/drupal/issues/3587797', E_USER_DEPRECATED);
     return $this->cacheBackend->get($this->prepareCid($cid));
   }
 
@@ -203,8 +190,13 @@ class ViewsData {
    *   The cache ID to set.
    * @param mixed $data
    *   The data that will be cached.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. There is no
+   * replacement.
+   * @see https://www.drupal.org/project/drupal/issues/3587797
    */
   protected function cacheSet($cid, $data) {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/project/drupal/issues/3587797', E_USER_DEPRECATED);
     return $this->cacheBackend->set($this->prepareCid($cid), $data, Cache::PERMANENT, [
       'views_data',
       'config:core.extension',
@@ -233,7 +225,8 @@ class ViewsData {
    *   An array of all data.
    */
   protected function getData() {
-    if ($cache = $this->cacheGet($this->baseCid)) {
+    $cid = $this->prepareCid($this->baseCid);
+    if ($cache = $this->cacheBackend->get($cid)) {
       $data = $cache->data;
     }
     else {
@@ -259,7 +252,7 @@ class ViewsData {
       $this->processEntityTypes($data);
 
       // Keep a record with all data.
-      $this->cacheSet($this->baseCid, $data);
+      $this->cacheBackend->set($cid, $data, Cache::PERMANENT, static::CACHE_TAGS);
     }
 
     $this->fullyLoaded = TRUE;

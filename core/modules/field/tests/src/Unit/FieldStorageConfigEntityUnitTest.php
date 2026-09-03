@@ -17,6 +17,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\field\Entity\FieldStorageConfig.
@@ -41,10 +42,8 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
 
   /**
    * The field type manager.
-   *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $fieldTypeManager;
+  protected FieldTypePluginManagerInterface&MockObject $fieldTypeManager;
 
   /**
    * {@inheritdoc}
@@ -174,7 +173,7 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
    * @legacy-covers ::getCardinality
    */
   #[DataProvider('providerInvalidEnforcedCardinality')]
-  public function testInvalidEnforcedCardinality($enforced_cardinality): void {
+  public function testInvalidEnforcedCardinality(int|string $enforced_cardinality): void {
     $this->fieldTypeManager->expects($this->atLeastOnce())
       ->method('getDefinition')
       ->with('test_field_type')
@@ -191,7 +190,7 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
     ]);
 
     $this->expectException(FieldException::class);
-    $this->expectExceptionMessage("Invalid enforced cardinality '$enforced_cardinality'. Allowed values: a positive integer or -1.");
+    $this->expectExceptionMessageIs("Invalid enforced cardinality '$enforced_cardinality'. Allowed values: a positive integer or -1.");
     $field_storage->getCardinality();
   }
 
@@ -201,7 +200,7 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
    * @return array
    *   Test cases.
    */
-  public static function providerInvalidEnforcedCardinality() {
+  public static function providerInvalidEnforcedCardinality(): array {
     return [
       'zero' => [0],
       'negative_other_than_-1' => [-70],
@@ -221,7 +220,7 @@ class TestFieldType {
   /**
    * {@inheritdoc}
    */
-  public static function calculateStorageDependencies(FieldStorageDefinitionInterface $field_definition) {
+  public static function calculateStorageDependencies(FieldStorageDefinitionInterface $field_definition): array {
     $dependencies = [];
     $dependencies['module'] = ['entity_test'];
     $dependencies['theme'] = ['stark'];
