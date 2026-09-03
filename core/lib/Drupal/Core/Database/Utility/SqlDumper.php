@@ -8,6 +8,7 @@ use Doctrine\SqlFormatter\SqlFormatter;
 use Doctrine\SqlFormatter\CliHighlighter;
 use Doctrine\SqlFormatter\HtmlHighlighter;
 use Doctrine\SqlFormatter\NullHighlighter;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Database\SqlExecutionInfo;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
@@ -59,8 +60,13 @@ class SqlDumper {
     }
 
     // In prod environments, keep using a minimal output.
-    if (!class_exists(SqlFormatter::class) || !class_exists(VarCloner::class)) {
-      return ": " . $info->sqlString . "; " . print_r($info->placeholders, TRUE);
+    if (!$this->hasFormatter()) {
+      $dump = ": " . $info->sqlString . "; " . print_r($info->placeholders, TRUE);
+      // The formatted output below is escaped by the highlighter and by the
+      // var dumper. This one is not, and it contains the placeholder values,
+      // which are usually user input. Callers mark the returned dump as safe
+      // markup, so it has to be escaped here.
+      return $html ? Html::escape($dump) : $dump;
     }
 
     // Format the SQL statement string.
@@ -90,6 +96,19 @@ class SqlDumper {
       $html ? "" : "\n",
       !$html && $color,
     );
+  }
+
+  /**
+   * Determines whether the libraries for a formatted dump are available.
+   *
+   * The SQL formatter is a development dependency, so production sites get
+   * the minimal dump instead.
+   *
+   * @return bool
+   *   TRUE if the dump can be formatted, FALSE otherwise.
+   */
+  protected function hasFormatter(): bool {
+    return class_exists(SqlFormatter::class) && class_exists(VarCloner::class);
   }
 
   /**
