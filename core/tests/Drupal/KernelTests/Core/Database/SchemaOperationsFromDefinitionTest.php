@@ -31,51 +31,11 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
   protected Schema $schema;
 
   /**
-   * Unique key name resolver.
-   */
-  protected \ReflectionMethod $uniqueKeyNameResolver;
-
-  /**
-   * Index name resolver.
-   */
-  protected \ReflectionMethod $indexNameResolver;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
     $this->schema = $this->connection->schema();
-    $this->uniqueKeyNameResolver = new \ReflectionMethod($this->schema, 'resolveUniqueKeyIdentifierFromDefinition');
-    $this->indexNameResolver = new \ReflectionMethod($this->schema, 'resolveIndexIdentifierFromDefinition');
-  }
-
-  /**
-   * Returns the machine identifier of a unique key.
-   *
-   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
-   *   The Schema definition where the table is defined.
-   * @param string $tableName
-   *   Name of the table.
-   * @param string $uniqueKeyName
-   *   The name of the unique key as defined in the schema definition.
-   */
-  protected function getUniqueKeyName(SchemaDefinition $schema, string $tableName, string $uniqueKeyName): string {
-    return $this->uniqueKeyNameResolver->invoke($this->schema, $schema, $tableName, $uniqueKeyName);
-  }
-
-  /**
-   * Returns the machine identifier of an index.
-   *
-   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
-   *   The Schema definition where the table is defined.
-   * @param string $tableName
-   *   Name of the table.
-   * @param string $indexName
-   *   The name of the index as defined in the schema definition.
-   */
-  protected function getIndexName(SchemaDefinition $schema, string $tableName, string $indexName): string {
-    return $this->indexNameResolver->invoke($this->schema, $schema, $tableName, $indexName);
   }
 
   /**

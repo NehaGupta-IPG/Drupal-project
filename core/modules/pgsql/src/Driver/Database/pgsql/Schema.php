@@ -1169,20 +1169,6 @@ EOD;
       ->fetchField();
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function resolveUniqueKeyIdentifierFromDefinition(SchemaDefinition $schema, string $tableName, string $uniqueKeyName): string {
-    return $uniqueKeyName;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function resolveIndexIdentifierFromDefinition(SchemaDefinition $schema, string $tableName, string $indexName): string {
-    return $indexName;
-  }
-
 }
 
 /**

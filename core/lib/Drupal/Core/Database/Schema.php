@@ -812,34 +812,6 @@ abstract class Schema implements PlaceholderInterface {
   }
 
   /**
-   * Returns the machine identifier of a unique key.
-   *
-   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
-   *   The Schema definition where the table is defined.
-   * @param string $tableName
-   *   Name of the table.
-   * @param string $uniqueKeyName
-   *   The name of the unique key as defined in the schema definition.
-   */
-  protected function resolveUniqueKeyIdentifierFromDefinition(SchemaDefinition $schema, string $tableName, string $uniqueKeyName): string {
-    return $uniqueKeyName;
-  }
-
-  /**
-   * Returns the machine identifier of an index.
-   *
-   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
-   *   The Schema definition where the table is defined.
-   * @param string $tableName
-   *   Name of the table.
-   * @param string $indexName
-   *   The name of the index as defined in the schema definition.
-   */
-  protected function resolveIndexIdentifierFromDefinition(SchemaDefinition $schema, string $tableName, string $indexName): string {
-    return $indexName;
-  }
-
-  /**
    * Create a new table from a Drupal array table definition.
    *
    * @param string $name
