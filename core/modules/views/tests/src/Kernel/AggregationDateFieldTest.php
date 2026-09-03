@@ -43,7 +43,7 @@ class AggregationDateFieldTest extends ViewsKernelTestBase {
    */
   public function testDateFieldAggregation(): void {
     // Edit the test view 'test_aggregation' to add a date field.
-   // Add a new view display or a new view altogether.
+    // Add a new view display or a new view altogether.
     $view = Views::getView('test_aggregation');
     $view->setDisplay();
 
