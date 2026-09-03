@@ -641,7 +641,8 @@
       const trigger = states.Trigger.states[this.state];
       if (typeof trigger !== 'function') {
         Object.keys(trigger || {}).forEach((event) => {
-          this.element.off(`${event}.drupalStates`);
+          // Remove only handlers for this state.
+          this.element.off(`${event}.drupalStates.${this.state.name}`);
         });
       }
       // Mark this trigger as not initialized for this element.
@@ -661,7 +662,8 @@
 
       // Attach the event callback.
       this.element.on(
-        `${event}.drupalStates`,
+        // Namespace the handler by state for independent cleanup.
+        `${event}.drupalStates.${this.state.name}`,
         function (e) {
           const value = valueFn.call(this.element, e);
           // Only trigger the event if the value has actually changed.

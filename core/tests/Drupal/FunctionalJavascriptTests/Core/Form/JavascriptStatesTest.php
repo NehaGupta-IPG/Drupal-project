@@ -923,7 +923,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
 
     // Change state: select the ajax_affected_select_trigger 1 option.
     $ajax_affected_select_trigger->setValue(1);
-    $this->assertTrue($ajax_removed_textfield_with_shared_trigger_state->hasAttribute('disabled'));
+    // $ajax_removed_textfield_with_shared_trigger_state is now enabled.
+    $this->assertFalse($ajax_removed_textfield_with_shared_trigger_state->hasAttribute('disabled'));
     // $ajax_removed_textfield_with_shared_trigger is now enabled.
     $this->assertFalse($ajax_removed_textfield_with_shared_trigger->hasAttribute('disabled'));
     // $textfield_visible_ajax_single is now visible.
@@ -973,8 +974,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
 
     // Change state: unset shared textfield trigger.
     $shared_textfield_trigger->setValue('');
-    // $ajax_removed_textfield_with_shared_trigger_state is now enabled.
-    $this->assertFalse($ajax_removed_textfield_with_shared_trigger_state->hasAttribute('disabled'));
+    // $ajax_removed_textfield_with_shared_trigger_state is now disabled.
+    $this->assertTrue($ajax_removed_textfield_with_shared_trigger_state->hasAttribute('disabled'));
     // $textfield_enabled_when_shared_textfield_trigger_value is now disabled.
     $this->assertTrue($textfield_enabled_when_shared_textfield_trigger_value->hasAttribute('disabled'));
 
