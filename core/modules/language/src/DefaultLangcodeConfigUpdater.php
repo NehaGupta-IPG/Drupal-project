@@ -106,9 +106,7 @@ class DefaultLangcodeConfigUpdater {
       if (!$typed_config instanceof Mapping || !in_array('langcode', $typed_config->getValidKeys(), TRUE)) {
         continue;
       }
-      $current_langcode = $data['langcode'];
-
-      if ($current_langcode === $old_langcode) {
+      if ($data['langcode'] === $old_langcode) {
         $translatable_data = static::extractTranslatableData($typed_config);
         if ($translatable_data !== []) {
           $this->getRawLanguageConfigOverride($old_override_storage, $name)
