@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\EventSubscriber;
 
+use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\EventSubscriber\FinalExceptionSubscriber;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -45,6 +46,36 @@ class FinalExceptionSubscriberTest extends UnitTestCase {
     $this->assertEquals('POST, PUT', $response->headers->get('Allow'));
     // Also check that the text/plain content type was added.
     $this->assertEquals('text/plain', $response->headers->get('Content-Type'));
+  }
+
+  /**
+   * Tests on exception with a database exception carrying no statement info.
+   *
+   * Most of the database exceptions thrown by core carry no SqlExecutionInfo,
+   * so there is no dump to append. The response then holds the exception
+   * message only - escaped, since a driver message can contain user input -
+   * and no leftover dump placeholder.
+   */
+  public function testOnExceptionWithDatabaseExceptionWithoutInfo(): void {
+    $config_factory = $this->getConfigFactoryStub();
+
+    $kernel = $this->prophesize(HttpKernelInterface::class);
+    $request = Request::create('/test');
+    $e = new SchemaObjectExistsException('Table "<script>alert(\'xss\')</script>" already exists.');
+    $event = new ExceptionEvent($kernel->reveal(), $request, HttpKernelInterface::MAIN_REQUEST, $e);
+    $subscriber = new TestDefaultExceptionSubscriber($config_factory);
+    $subscriber->setStringTranslation($this->getStringTranslationStub());
+    $subscriber->onException($event);
+    $response = $event->getResponse();
+
+    $this->assertInstanceOf(Response::class, $response);
+    $this->assertEquals(500, $response->getStatusCode());
+    $content = $response->getContent();
+    $this->assertStringContainsString('<em class="placeholder">Drupal\Core\Database\SchemaObjectExistsException</em>: Table &quot;&lt;script&gt;alert(&#039;xss&#039;)&lt;/script&gt;&quot; already exists. in ', $content);
+    $this->assertStringNotContainsString('<script>', $content);
+    // No SqlExecutionInfo means no dump, and no dangling placeholder either.
+    $this->assertStringNotContainsString('SQL statement', $content);
+    $this->assertStringNotContainsString('@sql_dump', $content);
   }
 
 }
