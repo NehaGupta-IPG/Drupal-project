@@ -112,6 +112,46 @@ class StylePluginManagerTest extends UnitTestCase {
   }
 
   /**
+   * Tests that definitions are altered before disabled styles are removed.
+   */
+  public function testAlterDefinitionsOrder(): void {
+    $moduleHandler = $this->createMock(ModuleHandlerInterface::class);
+    $moduleHandler->expects($this->once())
+      ->method('alter')
+      ->willReturnCallback(function ($type, &$definitions): void {
+        $this->assertSame('style', $type);
+        // Enable the disabled style.
+        $definitions['disabled'] = new StyleDefinition([
+          'id' => 'disabled',
+        ]);
+        // Disable the enabled style.
+        $definitions['enabled'] = new StyleDefinition([
+          'id' => 'enabled',
+          'enabled' => FALSE,
+        ]);
+      });
+    $stylePluginManager = new TestStylePluginManager(
+      $moduleHandler,
+      $this->createStub(ThemeHandlerInterface::class),
+      $this->createStub(CacheBackendInterface::class),
+      $this->root,
+    );
+    $stylePluginManager->setStyles([
+      'disabled' => [
+        'id' => 'disabled',
+        'enabled' => FALSE,
+      ],
+      'enabled' => [
+        'id' => 'enabled',
+      ],
+    ]);
+
+    $definitions = $stylePluginManager->getDefinitions();
+
+    $this->assertSame(['disabled'], array_keys($definitions));
+  }
+
+  /**
    * Test getCategories.
    */
   public function testGetCategories(): void {

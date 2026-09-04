@@ -367,6 +367,15 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
 
   /**
    * Implements the magic __toString() method.
+   *
+   * Stringifying an Attribute object with attachments renders an empty render
+   * array so that those attachments bubble to the current render context. Such
+   * objects must therefore only be stringified while rendering. Attribute
+   * objects without attachments can be stringified outside a render context.
+   *
+   * @throws \LogicException
+   *   Thrown when the object has attachments and there is no active render
+   *   context.
    */
   #[JsonSchema(['type' => 'string', 'description' => 'Rendered HTML element attributes'])]
   public function __toString() {

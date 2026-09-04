@@ -18,6 +18,7 @@ use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\PlaceholderGenerator;
 use Drupal\Core\Render\PlaceholderingRenderCache;
 use Drupal\Core\Render\Renderer;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\Style\StylePluginManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -207,6 +208,7 @@ abstract class RendererTestBase extends UnitTestCase {
     $container->set('cache_contexts_manager', $this->cacheContextsManager);
     $container->set('render_cache', $this->renderCache);
     $container->set('renderer', $this->renderer);
+    $container->set(RendererInterface::class, $this->renderer);
     $container->set('datetime.time', $this->datetimeTime);
     \Drupal::setContainer($container);
   }

@@ -242,14 +242,14 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * @phpstan-ignore-next-line
    */
   protected function alterDefinitions(&$definitions) {
+    parent::alterDefinitions($definitions);
+
     /** @var \Drupal\Core\Theme\Style\StyleDefinitionInterface[] $definitions */
     foreach ($definitions as $definition_key => $definition) {
       if (!$definition->isEnabled()) {
         unset($definitions[$definition_key]);
       }
     }
-
-    parent::alterDefinitions($definitions);
   }
 
   /**

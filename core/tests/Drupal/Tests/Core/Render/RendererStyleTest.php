@@ -6,7 +6,9 @@ namespace Drupal\Tests\Core\Render;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\Renderer;
+use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Style\Exception\StyleDefinitionErrorException;
 use Drupal\Core\Theme\Style\StyleDefinitionInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -143,6 +145,100 @@ class RendererStyleTest extends RendererTestBase {
 
     $this->renderer->renderRoot($element);
     $this->assertArrayNotHasKey('#styles', $element);
+  }
+
+  /**
+   * Tests that Attribute attachments bubble when stringified during rendering.
+   */
+  public function testAttributeAttachmentBubbling(): void {
+    $attribute = new Attribute();
+    $attribute->setAttachments([
+      'styles' => [
+        'my_style' => 'my_option',
+      ],
+    ]);
+    $context = new RenderContext();
+
+    $this->renderer->executeInRenderContext(
+      $context,
+      static fn (): string => (string) $attribute,
+    );
+
+    $this->assertCount(1, $context);
+    $this->assertSame([
+      'styles' => [
+        'my_style' => 'my_option',
+      ],
+    ], $context->pop()->getAttachments());
+  }
+
+  /**
+   * Tests that Attribute attachments require an active render context.
+   */
+  public function testAttributeAttachmentsRequireRenderContext(): void {
+    $attribute = new Attribute();
+    $attribute->setAttachments([
+      'styles' => [
+        'my_style' => 'my_option',
+      ],
+    ]);
+
+    $this->expectException(\LogicException::class);
+    (string) $attribute;
+  }
+
+  /**
+   * Tests style option precedence while render metadata bubbles.
+   */
+  public function testStyleAttachmentPrecedence(): void {
+    $element = [
+      '#attached' => [
+        'styles' => [
+          'my_style' => 'ancestor_option',
+        ],
+      ],
+      'first' => [
+        '#markup' => 'first',
+        '#attached' => [
+          'styles' => [
+            'my_style' => 'first_option',
+          ],
+        ],
+      ],
+      'second' => [
+        '#markup' => 'second',
+        '#attached' => [
+          'styles' => [
+            'my_style' => 'second_option',
+          ],
+        ],
+      ],
+    ];
+
+    $this->renderer->renderRoot($element);
+    $this->assertSame('ancestor_option', $element['#attached']['styles']['my_style']);
+
+    $element = [
+      'first' => [
+        '#markup' => 'first',
+        '#attached' => [
+          'styles' => [
+            'my_style' => 'first_option',
+          ],
+        ],
+      ],
+      'second' => [
+        '#markup' => 'second',
+        '#attached' => [
+          'styles' => [
+            'my_style' => 'second_option',
+          ],
+        ],
+      ],
+    ];
+
+    $this->renderer->renderRoot($element);
+    $this->assertSame('second_option', $element['#attached']['styles']['my_style']);
   }
 
 }

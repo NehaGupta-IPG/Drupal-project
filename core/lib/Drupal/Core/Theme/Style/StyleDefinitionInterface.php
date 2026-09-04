@@ -70,7 +70,8 @@ interface StyleDefinitionInterface {
    * @param string $optionId
    *   The style option ID.
    * @param array $element
-   *   The render array to apply style to.
+   *   The render array to apply style to. Local attributes are only applied
+   *   when the element does not declare '#accept_attributes' as FALSE.
    * @param string $attributesKey
    *   The render array key containing the attributes.
    */

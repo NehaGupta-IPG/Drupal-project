@@ -137,6 +137,12 @@ class BubbleableMetadata extends CacheableMetadata implements AttachmentsInterfa
    *   returned settings are merged by JavaScript, the resulting settings are
    *   the same as if rendered in one PHP request and merged by PHP.
    *
+   * Style attachments are keyed by style ID. If both arguments select an
+   * option for the same style, the first argument takes precedence. During
+   * render-tree bubbling this means an ancestor's option takes precedence over
+   * its descendants, and a later-rendered sibling takes precedence over an
+   * earlier sibling.
+   *
    * @param array $a
    *   An attachments array.
    * @param array $b
@@ -162,7 +168,8 @@ class BubbleableMetadata extends CacheableMetadata implements AttachmentsInterfa
       unset($a['placeholders']);
       unset($b['placeholders']);
     }
-    // Optimize merging of styles: keep one value per key.
+    // Optimize merging of styles. Array union makes the first argument take
+    // precedence when both arrays select an option for the same style ID.
     if (!empty($a['styles']) && !empty($b['styles'])) {
       $styles = $a['styles'] + $b['styles'];
       // No need for re-merging them.
