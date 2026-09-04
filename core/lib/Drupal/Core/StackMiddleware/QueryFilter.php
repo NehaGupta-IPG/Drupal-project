@@ -44,7 +44,7 @@ readonly class QueryFilter implements HttpKernelInterface {
       parse_str($query_string, $query);
       foreach ($query as $key => $value) {
         foreach ($query_parameter_filters as $query_parameter_filter) {
-          if (preg_match($query_parameter_filter, $key)) {
+          if (preg_match('/' . $query_parameter_filter . '/', $key)) {
             unset($query[$key]);
             $request->query->remove($key);
           }
