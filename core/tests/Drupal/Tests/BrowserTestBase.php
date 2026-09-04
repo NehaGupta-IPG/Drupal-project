@@ -590,6 +590,25 @@ abstract class BrowserTestBase extends TestCase {
    *   The list of elements matching the xpath expression.
    */
   protected function xpath($xpath, array $arguments = []) {
+    return $this->getNodeElementsByXpath($xpath, $arguments);
+  }
+
+  /**
+   * Performs an xpath search on the contents of the internal browser.
+   *
+   * The search is relative to the root element (HTML tag normally) of the page.
+   *
+   * @param string $xpath
+   *   The xpath string to use in the search.
+   * @param array $arguments
+   *   An array of arguments with keys in the form ':name' matching the
+   *   placeholders in the query. The values may be either strings or numeric
+   *   values.
+   *
+   * @return \Behat\Mink\Element\NodeElement[]
+   *   The list of elements matching the xpath expression.
+   */
+  protected function getNodeElementsByXpath($xpath, array $arguments = []): array {
     $xpath = $this->assertSession()->buildXPathQuery($xpath, $arguments);
     return $this->getSession()->getPage()->findAll('xpath', $xpath);
   }

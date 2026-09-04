@@ -209,6 +209,29 @@ trait AssertContentTrait {
    * @see http://php.net/manual/function.simplexml-element-xpath.php
    */
   protected function xpath($xpath, array $arguments = []) {
+    return $this->getSimpleXmlElementsByXpath($xpath, $arguments);
+  }
+
+  /**
+   * Performs an xpath search on the contents of the internal browser.
+   *
+   * The search is relative to the root element (HTML tag normally) of the page.
+   *
+   * @param string $xpath
+   *   The xpath string to use in the search.
+   * @param array $arguments
+   *   An array of arguments with keys in the form ':name' matching the
+   *   placeholders in the query. The values may be either strings or numeric
+   *   values.
+   *
+   * @return \SimpleXMLElement[]|false
+   *   The return value of the xpath search or FALSE on failure. For details on
+   *   the xpath string format and return values see the SimpleXML
+   *   documentation.
+   *
+   * @see http://php.net/manual/function.simplexml-element-xpath.php
+   */
+  protected function getSimpleXmlElementsByXpath($xpath, array $arguments = []): array|false {
     if ($this->parse()) {
       $xpath = $this->buildXPathQuery($xpath, $arguments);
       $result = $this->elements->xpath($xpath);
