@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Update;
 
+use Drupal\Component\Datetime\Time;
+use Drupal\Core\Cache\MemoryCache\MemoryCache;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Site\Settings;
@@ -13,8 +16,10 @@ use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Tests UpdateRegistry.
@@ -29,14 +34,36 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class UpdateRegistryTest extends UnitTestCase {
 
   /**
+   * The memory cache.
+   */
+  protected MemoryCacheInterface $memoryCache;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
 
+    $this->memoryCache = new MemoryCache(new Time());
+
     $settings = [];
     $settings['extension_discovery_scan_tests'] = TRUE;
     new Settings($settings);
+  }
+
+  /**
+   * Tests the deprecated constructor signature.
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecatedConstructorSignature(): void {
+    $container = new ContainerBuilder();
+    $container->set('cache.memory', $this->memoryCache);
+    \Drupal::setContainer($container);
+
+    $theme_handler = $this->createStub(ThemeHandlerInterface::class);
+    $theme_handler->method('listInfo')->willReturn([]);
+    $this->expectUserDeprecationMessage('Calling Drupal\\Core\\Update\\UpdateRegistry::__construct() without the $memoryCache argument is deprecated in drupal:11.5.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3618917');
+    new UpdateRegistry('vfs://drupal', 'sites/default', [], $this->createStub(KeyValueStoreInterface::class), $theme_handler, 'post_update');
   }
 
   /**
@@ -187,8 +214,6 @@ EOS;
 
   /**
    * Tests get pending update functions no existing updates.
-   *
-   * @legacy-covers ::getPendingUpdateFunctions
    */
   public function testGetPendingUpdateFunctionsNoExistingUpdates(): void {
     $this->setupBasicExtensions();
@@ -219,7 +244,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, 'post_update');
+    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
 
     // Confirm the updates are sorted alphabetically.
     $this->assertEquals([
@@ -233,8 +258,6 @@ EOS;
 
   /**
    * Tests get pending update functions with loaded modules but not enabled.
-   *
-   * @legacy-covers ::getPendingUpdateFunctions
    */
   public function testGetPendingUpdateFunctionsWithLoadedModulesButNotEnabled(): void {
     $this->setupBasicExtensions();
@@ -249,7 +272,9 @@ EOS;
 
     // Preload modules to ensure that ::getAvailableUpdateFunctions filters out
     // not enabled modules.
+    // @phpstan-ignore includeOnce.fileNotFound
     include_once 'vfs://drupal/sites/default/modules/module_a/module_a.post_update.php';
+    // @phpstan-ignore includeOnce.fileNotFound
     include_once 'vfs://drupal/sites/default/modules/module_b/module_b.post_update.php';
 
     $update_registry = new UpdateRegistry('vfs://drupal', 'sites/default', [
@@ -259,7 +284,7 @@ EOS;
           'pathname' => 'core/modules/module_a/module_a.info.yml',
           'filename' => 'module_a.module',
         ],
-    ], $key_value, $theme_handler, 'post_update');
+    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
 
     // Confirm the updates are sorted alphabetically.
     $this->assertEquals([
@@ -270,8 +295,6 @@ EOS;
 
   /**
    * Tests get pending update functions existing updates.
-   *
-   * @legacy-covers ::getPendingUpdateFunctions
    */
   public function testGetPendingUpdateFunctionsExistingUpdates(): void {
     $this->setupBasicExtensions();
@@ -306,7 +329,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, 'post_update');
+    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
 
     // Confirm the updates are sorted alphabetically.
     $this->assertEquals(array_values([
@@ -319,8 +342,6 @@ EOS;
 
   /**
    * Tests get pending update information.
-   *
-   * @legacy-covers ::getPendingUpdateInformation
    */
   public function testGetPendingUpdateInformation(): void {
     $this->setupBasicExtensions();
@@ -351,7 +372,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, 'post_update');
+    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
 
     // Confirm the updates are sorted alphabetically.
     $expected = [];
@@ -369,8 +390,6 @@ EOS;
 
   /**
    * Tests get pending update information with existing updates.
-   *
-   * @legacy-covers ::getPendingUpdateInformation
    */
   public function testGetPendingUpdateInformationWithExistingUpdates(): void {
     $this->setupBasicExtensions();
@@ -405,7 +424,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, 'post_update');
+    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
 
     // Confirm the updates are sorted alphabetically.
     $expected = [];
@@ -421,8 +440,6 @@ EOS;
 
   /**
    * Tests get pending update information with removed updates.
-   *
-   * @legacy-covers ::getPendingUpdateInformation
    */
   public function testGetPendingUpdateInformationWithRemovedUpdates(): void {
     $this->setupBasicExtensions();
@@ -442,7 +459,7 @@ EOS;
           'pathname' => 'core/modules/module_c/module_c.info.yml',
           'filename' => 'module_c.module',
         ],
-    ], $key_value, $theme_handler, 'post_update');
+    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
 
     $this->expectException(RemovedPostUpdateNameException::class);
     $update_registry->getPendingUpdateInformation();
@@ -450,8 +467,6 @@ EOS;
 
   /**
    * Tests get update functions.
-   *
-   * @legacy-covers ::getUpdateFunctions
    */
   public function testGetUpdateFunctions(): void {
     $this->setupBasicExtensions();
@@ -479,7 +494,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, 'post_update');
+    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
 
     $this->assertEquals(['module_a_post_update_a', 'module_a_post_update_b'], array_values($update_registry->getUpdateFunctions('module_a')));
     $this->assertEquals(['module_b_post_update_a'], array_values($update_registry->getUpdateFunctions('module_b')));
@@ -488,8 +503,6 @@ EOS;
 
   /**
    * Tests register invoked updates without existing updates.
-   *
-   * @legacy-covers ::registerInvokedUpdates
    */
   public function testRegisterInvokedUpdatesWithoutExistingUpdates(): void {
     $this->setupBasicExtensions();
@@ -524,14 +537,12 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, 'post_update');
+    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
     $update_registry->registerInvokedUpdates(['module_a_post_update_a']);
   }
 
   /**
    * Tests register invoked updates with multiple.
-   *
-   * @legacy-covers ::registerInvokedUpdates
    */
   public function testRegisterInvokedUpdatesWithMultiple(): void {
     $this->setupBasicExtensions();
@@ -566,14 +577,16 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, 'post_update');
-    $update_registry->registerInvokedUpdates(['module_a_post_update_a', 'module_a_post_update_b', 'theme_d_post_update_c']);
+    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
+    $update_registry->registerInvokedUpdates([
+      'module_a_post_update_a',
+      'module_a_post_update_b',
+      'theme_d_post_update_c',
+    ]);
   }
 
   /**
    * Tests register invoked updates with existing updates.
-   *
-   * @legacy-covers ::registerInvokedUpdates
    */
   public function testRegisterInvokedUpdatesWithExistingUpdates(): void {
     $this->setupBasicExtensions();
@@ -603,20 +616,23 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, 'post_update');
+    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
     $update_registry->registerInvokedUpdates(['module_a_post_update_a']);
   }
 
   /**
    * Tests filter out invoked updates by extension.
-   *
-   * @legacy-covers ::filterOutInvokedUpdatesByExtension
    */
   public function testFilterOutInvokedUpdatesByExtension(): void {
     $this->setupBasicExtensions();
     $key_value = $this->prophesize(KeyValueStoreInterface::class);
     $key_value->get('existing_updates', [])
-      ->willReturn(['module_a_post_update_b', 'module_a_post_update_a', 'module_b_post_update_a', 'theme_d_post_update_c'])
+      ->willReturn([
+        'module_a_post_update_b',
+        'module_a_post_update_a',
+        'module_b_post_update_a',
+        'theme_d_post_update_c',
+      ])
       ->shouldBeCalledTimes(1);
     $key_value->set('existing_updates', ['module_b_post_update_a', 'theme_d_post_update_c'])
       ->willReturn(NULL)
@@ -645,7 +661,7 @@ EOS;
           'pathname' => 'core/modules/module_b/module_b.info.yml',
           'filename' => 'module_b.module',
         ],
-    ], $key_value, $theme_handler, 'post_update');
+    ], $key_value, $theme_handler, $this->memoryCache, 'post_update');
     $update_registry->filterOutInvokedUpdatesByExtension('module_a');
   }
 
@@ -729,7 +745,7 @@ EOS;
           'pathname' => 'core/modules/module_a/module_a.info.yml',
           'filename' => 'module_a.module',
         ],
-    ], $key_value, $theme_handler, 'custom_update');
+    ], $key_value, $theme_handler, $this->memoryCache, 'custom_update');
 
     // Themes are not supported.
     $this->assertEquals([

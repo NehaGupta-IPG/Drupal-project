@@ -36,7 +36,6 @@ class EntityStateChangeValidationTest extends KernelTestBase {
     'user',
     'system',
     'language',
-    'content_translation',
     'workflows',
   ];
 
@@ -343,7 +342,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
  * Tests transition access validation.
  */
   #[DataProvider('transitionAccessValidationTestCases')]
-  public function testTransitionAccessValidation($permissions, $target_state, $messages): void {
+  public function testTransitionAccessValidation(array $permissions, string $target_state, array $messages): void {
     $node_type = NodeType::create([
       'type' => 'example',
       'name' => 'Example',
@@ -374,7 +373,7 @@ class EntityStateChangeValidationTest extends KernelTestBase {
   /**
    * Test cases for ::testTransitionAccessValidation.
    */
-  public static function transitionAccessValidationTestCases() {
+  public static function transitionAccessValidationTestCases(): array {
     return [
       'Invalid transition, no permissions validated' => [
         [],

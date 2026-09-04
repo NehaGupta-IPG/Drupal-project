@@ -36,12 +36,10 @@ class CKEditor5FragmentLinkTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'ckeditor5'];
+  protected static $modules = ['node', 'ckeditor5', 'body_field'];
 
   /**
    * The admin user.
-   *
-   * @var \Drupal\user\Entity\User
    */
   protected User $account;
 
@@ -75,7 +73,7 @@ class CKEditor5FragmentLinkTest extends WebDriverTestBase {
       'field_storage' => $field_storage,
       'bundle' => 'page',
       'label' => 'Body',
-      'settings' => ['display_summary' => TRUE],
+      'settings' => [],
       'required' => TRUE,
     ])->save();
 
@@ -85,7 +83,7 @@ class CKEditor5FragmentLinkTest extends WebDriverTestBase {
       'bundle' => 'page',
       'mode' => 'default',
       'status' => TRUE,
-    ])->setComponent('body', ['type' => 'text_textarea_with_summary'])
+    ])->setComponent('body', ['type' => 'text_textarea'])
       ->save();
 
     $this->account = $this->drupalCreateUser([

@@ -25,7 +25,6 @@ class BlockConfigSchemaTest extends KernelTestBase {
   protected static $modules = [
     'block',
     'block_content',
-    'comment',
     'node',
     // \Drupal\block\Entity\Block->preSave() calls system_region_list().
     'system',
@@ -67,10 +66,6 @@ class BlockConfigSchemaTest extends KernelTestBase {
    */
   public function testBlockConfigSchema(): void {
     foreach ($this->blockManager->getDefinitions() as $block_id => $definition) {
-      // Skip the syndicate block as it is deprecated.
-      if ($block_id === 'node_syndicate_block') {
-        continue;
-      }
       $id = $this->randomMachineName();
       $block = Block::create([
         'id' => $id,
@@ -82,7 +77,7 @@ class BlockConfigSchemaTest extends KernelTestBase {
         'settings' => [
           'label' => $this->randomMachineName(),
           'provider' => 'system',
-          'label_display' => FALSE,
+          'label_display' => '0',
         ],
         'visibility' => [],
       ]);

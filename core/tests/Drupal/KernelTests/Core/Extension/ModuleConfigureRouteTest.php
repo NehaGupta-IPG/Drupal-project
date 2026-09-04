@@ -27,6 +27,8 @@ class ModuleConfigureRouteTest extends KernelTestBase {
   protected static $modules = ['system', 'user', 'path_alias'];
 
   /**
+   * The route provider.
+   *
    * @var \Drupal\Core\Routing\RouteProviderInterface
    */
   protected $routeProvider;
@@ -43,6 +45,7 @@ class ModuleConfigureRouteTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig('system');
     $this->routeProvider = \Drupal::service('router.route_provider');
     $this->moduleInfo = \Drupal::service('extension.list.module')->getList();
     $this->installEntitySchema('path_alias');
@@ -66,7 +69,7 @@ class ModuleConfigureRouteTest extends KernelTestBase {
       return;
     }
     $module_lifecycle = $module_info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
-    if (isset($module_lifecycle) && $module_lifecycle === ExtensionLifecycle::DEPRECATED) {
+    if (isset($module_lifecycle) && ($module_lifecycle === ExtensionLifecycle::DEPRECATED || $module_lifecycle === ExtensionLifecycle::OBSOLETE)) {
       return;
     }
     $this->container->get('module_installer')->install([$module_name]);
@@ -76,8 +79,8 @@ class ModuleConfigureRouteTest extends KernelTestBase {
   /**
    * Tests if the module with lifecycle deprecated configure routes exists.
    *
-   * Note: This test is part of group legacy, to make sure installing the
-   * deprecated module doesn't trigger a deprecation notice.
+   * Ignore deprecations because installing a deprecated module will trigger
+   * a deprecation notice.
    */
   #[IgnoreDeprecations]
   public function testDeprecatedModuleConfigureRoutes(): void {

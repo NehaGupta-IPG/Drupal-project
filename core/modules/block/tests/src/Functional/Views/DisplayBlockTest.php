@@ -206,7 +206,7 @@ class DisplayBlockTest extends ViewTestBase {
     $this->assertSession()->fieldNotExists('label');
     // Test that the machine name field is hidden from display and has been
     // saved as expected from the default value.
-    $this->assertSession()->fieldNotExists('edit-machine-name', NULL);
+    $this->assertSession()->fieldNotExists('edit-machine-name');
 
     // Save the block.
     $edit = ['region' => 'content'];
@@ -287,14 +287,13 @@ class DisplayBlockTest extends ViewTestBase {
     $this->assertSession()->elementTextEquals('xpath', "{$block_xpath}//footer", 'test_view_block');
 
     // Hide the title.
-    $block->getPlugin()->setConfigurationValue('label_display', FALSE);
+    $block->getPlugin()->setConfigurationValue('label_display', '0');
     $block->save();
 
     $this->drupalGet('');
     $this->assertSession()->elementNotExists('xpath', "{$block_xpath}/h2");
 
     $this->assertCacheTags(array_merge($block->getCacheTags(), [
-      'block_view',
       'config:block_list',
       'config:system.site',
       'config:views.view.test_view_block',
@@ -334,7 +333,6 @@ class DisplayBlockTest extends ViewTestBase {
     // Ensure that the view cacheability metadata is propagated even, for an
     // empty block.
     $this->assertCacheTags(array_merge($block->getCacheTags(), [
-      'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
       'http_response',
@@ -358,7 +356,6 @@ class DisplayBlockTest extends ViewTestBase {
     $this->drupalGet($url);
     $this->assertSession()->elementsCount('xpath', $block_xpath, 1);
     $this->assertCacheTags(array_merge($block->getCacheTags(), [
-      'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
       'http_response',
@@ -382,7 +379,6 @@ class DisplayBlockTest extends ViewTestBase {
     $this->drupalGet($url);
     $this->assertSession()->elementNotExists('xpath', $block_xpath);
     $this->assertCacheTags(array_merge($block->getCacheTags(), [
-      'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
       'http_response',
@@ -405,7 +401,6 @@ class DisplayBlockTest extends ViewTestBase {
     $this->drupalGet($url);
     $this->assertSession()->elementsCount('xpath', $block_xpath, 1);
     $this->assertCacheTags(array_merge($block->getCacheTags(), [
-      'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
       'http_response',

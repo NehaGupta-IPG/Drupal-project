@@ -45,10 +45,11 @@ class ConfigActionsTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig('system');
     $this->container->get(ThemeInstallerInterface::class)->install([
       'olivero',
       'claro',
-      'umami',
+      'block_test_theme',
     ]);
     $this->config('system.theme')
       ->set('default', 'olivero')
@@ -88,7 +89,7 @@ class ConfigActionsTest extends KernelTestBase {
   #[TestWith(["placeBlockInAdminTheme"])]
   public function testPlaceBlockActionOnlyWorksOnBlocks(string $action): void {
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage("The \"user_role\" entity does not support the \"$action\" config action.");
+    $this->expectExceptionMessageIsOrContains("The \"user_role\" entity does not support the \"$action\" config action.");
     $this->configActionManager->applyAction($action, 'user.role.anonymous', []);
   }
 
@@ -131,7 +132,7 @@ class ConfigActionsTest extends KernelTestBase {
     $this->assertSame($expected_region, $block->getRegion());
 
     $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage('Cannot determine which region to place this block into, because no default region was provided.');
+    $this->expectExceptionMessageIs('Cannot determine which region to place this block into, because no default region was provided.');
     $this->configActionManager->applyAction($action, 'block.block.no_region', [
       'plugin' => 'system_powered_by_block',
       'region' => [],
@@ -160,8 +161,8 @@ class ConfigActionsTest extends KernelTestBase {
    * Tests placing a block in the default theme's region.
    */
   public function testPlaceBlockInDefaultRegion(): void {
-    $this->config('system.theme')->set('default', 'umami')->save();
-    $this->testPlaceBlockInDynamicRegion('placeBlockInDefaultTheme', 'umami', 'content');
+    $this->config('system.theme')->set('default', 'block_test_theme')->save();
+    $this->testPlaceBlockInDynamicRegion('placeBlockInDefaultTheme', 'block_test_theme', 'content');
   }
 
   /**

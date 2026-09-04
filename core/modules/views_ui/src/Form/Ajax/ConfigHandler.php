@@ -74,18 +74,26 @@ class ConfigHandler extends ViewsFormBase {
     if ($item) {
       $handler = $executable->display_handler->getHandler($type, $id);
       if (empty($handler)) {
-        $form['markup'] = ['#markup' => $this->t("Error: handler for @table > @field doesn't exist!", ['@table' => $item['table'], '@field' => $item['field']])];
+        $form['markup'] = [
+          '#markup' => $this->t("Error: handler for @table > @field doesn't exist!", [
+            '@table' => $item['table'],
+            '@field' => $item['field'],
+          ]),
+        ];
       }
       else {
         $types = ViewExecutable::getHandlerTypes();
-        $form['#title'] = $this->t('Configure @type: @item', ['@type' => $types[$type]['lstitle'], '@item' => $handler->adminLabel()]);
+        $form['#title'] = $this->t('Configure @type: @item', [
+          '@type' => $types[$type]['lstitle'],
+          '@item' => $handler->adminLabel(),
+        ]);
 
         // If this item can come from the default display, show a dropdown
         // that lets the user choose which display the changes should apply to.
         if ($executable->display_handler->defaultableSections($types[$type]['plural'])) {
           $section = $types[$type]['plural'];
           $form_state->set('section', $section);
-          views_ui_standard_display_dropdown($form, $form_state, $section);
+          $this->standardDisplayDropdown($form, $form_state, $section);
         }
 
         // A whole bunch of code to figure out what relationships are valid for
@@ -99,7 +107,7 @@ class ConfigHandler extends ViewsFormBase {
           if ($type == 'relationship' && $id == $relationship['id']) {
             break;
           }
-          $relationship_handler = Views::handlerManager('relationship')->getHandler($relationship);
+          $relationship_handler = \Drupal::service('plugin.manager.views.relationship')->getHandler($relationship);
           // Ignore invalid/broken relationships.
           if (empty($relationship_handler)) {
             continue;
@@ -236,7 +244,7 @@ class ConfigHandler extends ViewsFormBase {
 
     // Create a new handler and unpack the options from the form onto it. We
     // can use that for storage.
-    $handler = Views::handlerManager($handler_type)->getHandler($item, $override);
+    $handler = \Drupal::service('views.plugin_managers')->get($handler_type)->getHandler($item, $override);
     $handler->init($executable, $executable->display_handler, $item);
 
     // Add the incoming options to existing options because items using

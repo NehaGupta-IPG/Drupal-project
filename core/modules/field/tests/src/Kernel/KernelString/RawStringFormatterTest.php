@@ -28,7 +28,6 @@ class RawStringFormatterTest extends KernelTestBase {
     'field', 'text',
     'entity_test',
     'system',
-    'filter',
     'user',
   ];
 
@@ -100,10 +99,9 @@ class RawStringFormatterTest extends KernelTestBase {
    * @return string
    *   The rendered entity fields.
    */
-  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display) {
+  protected function renderEntityFields(FieldableEntityInterface $entity, EntityViewDisplayInterface $display): string {
     $content = $display->build($entity);
-    $content = $this->render($content);
-    return $content;
+    return $this->render($content);
   }
 
   /**

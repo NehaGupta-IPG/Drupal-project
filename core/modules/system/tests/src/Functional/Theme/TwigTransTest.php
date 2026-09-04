@@ -74,8 +74,8 @@ class TwigTransTest extends BrowserTestBase {
     $this->installLanguages();
 
     // Assign Lolspeak (xx) to be the default language.
-    $this->config('system.site')->set('default_langcode', 'xx')->save();
     $this->rebuildContainer();
+    $this->config('system.site')->set('default_langcode', 'xx')->save();
 
     // Check that lolspeak is the default language for the site.
     $this->assertEquals('xx', \Drupal::languageManager()->getDefaultLanguage()->getId(), 'Lolspeak is the default language');
@@ -254,14 +254,14 @@ class TwigTransTest extends BrowserTestBase {
    * @return string|false
    *   The .po contents for the specified language or FALSE if none exists.
    */
-  protected function poFileContents($langcode) {
+  protected function poFileContents($langcode): string|false {
     if ($langcode === 'xx') {
       return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 
@@ -303,7 +303,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 

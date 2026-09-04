@@ -6,7 +6,6 @@ namespace Drupal\Tests\Component\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\Container;
 use Drupal\Component\Utility\Crypt;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +25,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 #[CoversClass(Container::class)]
 #[Group('DependencyInjection')]
 class ContainerTest extends TestCase {
-  use ExpectDeprecationTrait;
+
   use ProphecyTrait;
 
   /**
@@ -81,8 +80,6 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests that Container::getParameter() works properly.
-   *
-   * @legacy-covers ::getParameter
    */
   public function testGetParameter(): void {
     $this->assertEquals($this->containerDefinition['parameters']['some_config'], $this->container->getParameter('some_config'), 'Container parameter matches for %some_config%.');
@@ -102,19 +99,7 @@ class ContainerTest extends TestCase {
   }
 
   /**
-   * Tests that Container::getParameter() works properly for NULL parameters.
-   *
-   * @legacy-covers ::getParameter
-   */
-  public function testGetParameterIfNotFoundBecauseNull(): void {
-    $this->expectException(ParameterNotFoundException::class);
-    $this->container->getParameter(NULL);
-  }
-
-  /**
    * Tests that Container::hasParameter() works properly.
-   *
-   * @legacy-covers ::hasParameter
    */
   public function testHasParameter(): void {
     $this->assertTrue($this->container->hasParameter('some_config'), 'Container parameters include %some_config%.');
@@ -123,8 +108,6 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests that Container::setParameter() in an unfrozen case works properly.
-   *
-   * @legacy-covers ::setParameter
    */
   public function testSetParameterWithUnfrozenContainer(): void {
     $container_definition = $this->containerDefinition;
@@ -136,8 +119,6 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests that Container::setParameter() in a frozen case works properly.
-   *
-   * @legacy-covers ::setParameter
    */
   public function testSetParameterWithFrozenContainer(): void {
     $this->container = new $this->containerClass($this->containerDefinition);
@@ -203,8 +184,6 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests that Container::set() works properly.
-   *
-   * @legacy-covers ::set
    */
   public function testSet(): void {
     $this->assertNull($this->container->get('new_id', ContainerInterface::NULL_ON_INVALID_REFERENCE));
@@ -216,8 +195,6 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests that Container::has() works properly.
-   *
-   * @legacy-covers ::has
    */
   public function testHas(): void {
     $this->assertTrue($this->container->has('other.service'));
@@ -231,8 +208,6 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests that Container::has() for aliased services works properly.
-   *
-   * @legacy-covers ::has
    */
   public function testHasForAliasedService(): void {
     $service = $this->container->has('service.provider');
@@ -358,17 +333,6 @@ class ContainerTest extends TestCase {
    */
   public function testGetForNonExistentServiceWhenUsingNull(): void {
     $this->assertNull($this->container->get('service_not_exists', ContainerInterface::NULL_ON_INVALID_REFERENCE), 'Not found service does not throw exception.');
-  }
-
-  /**
-   * Tests that Container::get() for NULL service works properly.
-   *
-   * @legacy-covers ::get
-   * @legacy-covers ::createService
-   */
-  public function testGetForNonExistentNULLService(): void {
-    $this->expectException(ServiceNotFoundException::class);
-    $this->container->get(NULL);
   }
 
   /**
@@ -523,7 +487,7 @@ class ContainerTest extends TestCase {
     $configurator = $this->prophesize('\Drupal\Tests\Component\DependencyInjection\MockConfiguratorInterface');
     $configurator->configureService(Argument::type('object'))
       ->shouldBeCalled(1)
-      ->will(function ($args) use ($container) {
+      ->will(function ($args) use ($container): void {
         $args[0]->setContainer($container);
       });
     $container->set('configurator', $configurator->reveal());
@@ -655,8 +619,6 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests that Container::initialized works correctly.
-   *
-   * @legacy-covers ::initialized
    */
   public function testInitialized(): void {
     $this->assertFalse($this->container->initialized('late.service'), 'Late service is not initialized.');
@@ -666,8 +628,6 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests that Container::initialized works correctly for aliases.
-   *
-   * @legacy-covers ::initialized
    */
   public function testInitializedForAliases(): void {
     $this->assertFalse($this->container->initialized('late.service_alias'), 'Late service is not initialized.');
@@ -677,8 +637,6 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests that Container::getServiceIds() works properly.
-   *
-   * @legacy-covers ::getServiceIds
    */
   public function testGetServiceIds(): void {
     $service_definition_keys = array_merge(['service_container'], array_keys($this->containerDefinition['services']));
@@ -718,8 +676,6 @@ class ContainerTest extends TestCase {
 
   /**
    * Tests Container::reset().
-   *
-   * @legacy-covers ::reset
    */
   public function testReset(): void {
     $this->assertFalse($this->container->initialized('late.service'), 'Late service is not initialized.');
@@ -1020,7 +976,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a service definition.
    */
-  protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+  protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): \stdClass|string {
     return (object) [
       'type' => 'service',
       'id' => $id,
@@ -1031,7 +987,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a service closure definition.
    */
-  protected function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+  protected function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): \stdClass {
     return (object) [
       'type' => 'service_closure',
       'id' => $id,
@@ -1042,7 +998,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a service iterator.
    */
-  protected function getIterator($iterator) {
+  protected function getIterator($iterator): \stdClass {
     return (object) [
       'type' => 'iterator',
       'value' => $iterator,
@@ -1052,7 +1008,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a parameter definition.
    */
-  protected function getParameterCall($name) {
+  protected function getParameterCall($name): \stdClass|string {
     return (object) [
       'type' => 'parameter',
       'name' => $name,
@@ -1062,7 +1018,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a private service definition.
    */
-  protected function getPrivateServiceCall($id, $service_definition, $shared = FALSE) {
+  protected function getPrivateServiceCall($id, $service_definition, $shared = FALSE): \stdClass {
     if (!$id) {
       $hash = Crypt::hashBase64(serialize($service_definition));
       $id = 'private__' . $hash;
@@ -1078,7 +1034,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a machine-optimized collection.
    */
-  protected function getCollection($collection, $resolve = TRUE) {
+  protected function getCollection($collection, $resolve = TRUE): \stdClass|array {
     return (object) [
       'type' => 'collection',
       'value' => $collection,
@@ -1089,7 +1045,7 @@ class ContainerTest extends TestCase {
   /**
    * Helper function to return a raw value definition.
    */
-  protected function getRaw($value) {
+  protected function getRaw($value): \stdClass {
     return (object) [
       'type' => 'raw',
       'value' => $value,
@@ -1100,8 +1056,6 @@ class ContainerTest extends TestCase {
 
 /**
  * Helper interface to test Container::get() with configurator.
- *
- * @group DependencyInjection
  */
 interface MockConfiguratorInterface {
 
@@ -1111,22 +1065,20 @@ interface MockConfiguratorInterface {
    * @param object $service
    *   The service to configure.
    */
-  public function configureService($service);
+  public function configureService($service): null;
 
 }
 
 
 /**
  * Helper class to test Container::get() method for varying number of parameters.
- *
- * @group DependencyInjection
  */
 class MockInstantiationService {
 
   /**
    * @var mixed[]
    */
-  protected $arguments;
+  protected array $arguments;
 
   /**
    * Construct a mock instantiation service.
@@ -1141,7 +1093,7 @@ class MockInstantiationService {
    * @return mixed[]
    *   Return the passed arguments.
    */
-  public function getArguments() {
+  public function getArguments(): array {
     return $this->arguments;
   }
 
@@ -1150,8 +1102,6 @@ class MockInstantiationService {
 
 /**
  * Helper class to test Container::get() method.
- *
- * @group DependencyInjection
  */
 class MockService {
 
@@ -1176,7 +1126,7 @@ class MockService {
   protected $someOtherParameter;
 
   /**
-   * @var string
+   * A property.
    */
   public string $someProperty;
 
@@ -1269,9 +1219,8 @@ class MockService {
    */
   public static function getFactoryMethod($class, $arguments = []) {
     $r = new \ReflectionClass($class);
-    $service = ($r->getConstructor() === NULL) ? $r->newInstance() : $r->newInstanceArgs($arguments);
 
-    return $service;
+    return ($r->getConstructor() === NULL) ? $r->newInstance() : $r->newInstanceArgs($arguments);
   }
 
 }

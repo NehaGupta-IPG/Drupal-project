@@ -169,7 +169,9 @@ class NodeForm extends ContentEntityForm {
       '#wrapper_attributes' => ['class' => ['entity-meta__author']],
     ];
 
-    $form['status']['#group'] = 'footer';
+    if (isset($form['status'])) {
+      $form['status']['#group'] = 'footer';
+    }
 
     // Node author information for administrators.
     $form['author'] = [
@@ -178,9 +180,6 @@ class NodeForm extends ContentEntityForm {
       '#group' => 'advanced',
       '#attributes' => [
         'class' => ['node-form-author'],
-      ],
-      '#attached' => [
-        'library' => ['node/drupal.node'],
       ],
       '#weight' => 90,
       '#optional' => TRUE,
@@ -202,9 +201,6 @@ class NodeForm extends ContentEntityForm {
       '#attributes' => [
         'class' => ['node-form-options'],
       ],
-      '#attached' => [
-        'library' => ['node/drupal.node'],
-      ],
       '#weight' => 95,
       '#optional' => TRUE,
     ];
@@ -217,7 +213,7 @@ class NodeForm extends ContentEntityForm {
       $form['sticky']['#group'] = 'options';
     }
 
-    $form['#attached']['library'][] = 'node/form';
+    $form['#attached']['library'][] = 'node/drupal.node';
 
     return $form;
   }
@@ -285,7 +281,10 @@ class NodeForm extends ContentEntityForm {
       $node->save();
       $node_link = $node->toLink($this->t('View'))->toString();
       $context = ['@type' => $node->getType(), '%title' => $node->label(), 'link' => $node_link];
-      $t_args = ['@type' => $node->getBundleEntity()->label(), '%title' => $node->access('view') ? $node->toLink()->toString() : $node->label()];
+      $t_args = [
+        '@type' => $node->getBundleEntity()->label(),
+        '%title' => $node->access('view') ? $node->toLink()->toString() : $node->label(),
+      ];
 
       if ($insert) {
         $this->logger('content')->info('@type: added %title.', $context);

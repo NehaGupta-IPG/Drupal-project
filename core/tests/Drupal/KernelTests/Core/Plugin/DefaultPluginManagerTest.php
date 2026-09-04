@@ -40,27 +40,15 @@ class DefaultPluginManagerTest extends KernelTestBase {
       new \ReflectionClass('\Drupal\plugin_test\Plugin\plugin_test\custom_annotation\ExtendingNonInstalledClass');
     }
     catch (\Throwable $e) {
-    } finally {
+    }
+    finally {
       $this->assertInstanceOf(\Throwable::class, $e);
       $this->assertSame('Class "Drupal\non_installed_module\NonExisting" not found', $e->getMessage());
     }
     // Ensure there is a class with the expected name. We cannot reflect on this
     // as it triggers a fatal error.
     $this->assertFileExists($base_directory . '/' . $subdir . '/UsingNonInstalledTraitClass.php');
-    $this->expectDeprecation('Using @PluginExample annotation for plugin with ID example_1 is deprecated and is removed from drupal:13.0.0. Use a Drupal\plugin_test\Plugin\Attribute\PluginExample attribute instead. See https://www.drupal.org/node/3395575');
-
-    // Annotation only.
-    $manager = new DefaultPluginManager($subdir, $namespaces, $module_handler, NULL, AnnotationPluginExample::class);
-    $definitions = $manager->getDefinitions();
-    $this->assertArrayHasKey('example_1', $definitions);
-    $this->assertArrayHasKey('example_2', $definitions);
-    $this->assertArrayNotHasKey('example_3', $definitions);
-    $this->assertArrayNotHasKey('example_4', $definitions);
-    $this->assertArrayNotHasKey('example_5', $definitions);
-    // For the plugin class with both an annotation and attribute, the
-    // annotation should be picked up.
-    $this->assertArrayHasKey('example_annotation_not_attribute', $definitions);
-    $this->assertArrayNotHasKey('example_attribute_not_annotation', $definitions);
+    $this->expectUserDeprecationMessage('Using @PluginExample annotation for plugin with ID example_1 is deprecated and is removed from drupal:13.0.0. Use a Drupal\plugin_test\Plugin\Attribute\PluginExample attribute instead. See https://www.drupal.org/node/3395575');
 
     // Annotations and attributes together.
     $manager = new DefaultPluginManager($subdir, $namespaces, $module_handler, NULL, AttributePluginExample::class, AnnotationPluginExample::class);
@@ -124,7 +112,7 @@ class DefaultPluginManagerTest extends KernelTestBase {
     $namespaces = new \ArrayObject(['Drupal\plugin_test' => $base_directory]);
     $module_handler = $this->container->get('module_handler');
 
-    $this->expectDeprecation('Not supporting attribute discovery in Drupal\Core\Plugin\DefaultPluginManager is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Provide an Attribute class and an Annotation class for BC. See https://www.drupal.org/node/3395582');
+    $this->expectExceptionMessage('Drupal\Core\Plugin\DefaultPluginManager only supports annotation-based discovery, which is no longer supported as of Drupal 12.0. Provide an Attribute class and an Annotation class for BC. See https://www.drupal.org/node/3395582');
 
     $manager = new DefaultPluginManager($subdir, $namespaces, $module_handler, NULL, AnnotationPluginExample::class);
     $manager->getDefinitions();

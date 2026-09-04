@@ -51,13 +51,11 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate no theme dependency.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidateNoThemeDependency(): void {
     $this->themeExtensionList->getAllInstalledInfo()->willReturn([
-      'stable9' => [
-        'name' => 'Stable 9',
+      'stark' => [
+        'name' => 'Stark',
         'dependencies' => [],
       ],
       'claro' => [
@@ -74,8 +72,6 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate one theme dependency.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidateOneThemeDependency(): void {
     $module = 'single_module';
@@ -83,8 +79,8 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
     $theme = 'one_theme';
     $theme_name = 'One Theme';
     $this->themeExtensionList->getAllInstalledInfo()->willReturn([
-      'stable9' => [
-        'name' => 'Stable 9',
+      'stark' => [
+        'name' => 'Stark',
         'dependencies' => [],
       ],
       'claro' => [
@@ -115,8 +111,6 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate two theme dependencies.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidateTwoThemeDependencies(): void {
     $module = 'popular_module';
@@ -126,8 +120,8 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
     $theme_name_1 = 'First Theme';
     $theme_name_2 = 'Second Theme';
     $this->themeExtensionList->getAllInstalledInfo()->willReturn([
-      'stable9' => [
-        'name' => 'Stable 9',
+      'stark' => [
+        'name' => 'Stark',
         'dependencies' => [],
       ],
       'claro' => [

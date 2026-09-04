@@ -21,8 +21,6 @@ class NavigationMenuLinkTreeTest extends KernelTestBase {
 
   /**
    * The tested navigation menu link tree.
-   *
-   * @var \Drupal\navigation\Menu\NavigationMenuLinkTree
    */
   protected NavigationMenuLinkTree $linkTree;
 
@@ -30,9 +28,7 @@ class NavigationMenuLinkTreeTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'field',
     'layout_builder',
-    'layout_discovery',
     'link',
     'menu_link_content',
     'menu_test',

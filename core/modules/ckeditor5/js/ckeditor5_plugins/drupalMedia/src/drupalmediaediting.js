@@ -3,8 +3,7 @@
 /* cspell:ignore imagetextalternative insertdrupalmedia */
 /* cspell:ignore insertdrupalmediacommand mediaimagetextalternative */
 
-import { Plugin } from 'ckeditor5/src/core';
-import { toWidget, Widget } from 'ckeditor5/src/widget';
+import { Plugin, toWidget, Widget } from 'ckeditor5';
 
 import InsertDrupalMediaCommand from './insertdrupalmedia';
 import { getPreviewContainer, isDrupalMedia } from './utils';
@@ -36,6 +35,9 @@ export default class DrupalMediaEditing extends Plugin {
       drupalMediaAlt: 'alt',
       drupalMediaEntityType: 'data-entity-type',
       drupalMediaEntityUuid: 'data-entity-uuid',
+      drupalLinkEntityUuid: 'data-link-entity-uuid',
+      drupalLinkEntityType: 'data-link-entity-type',
+      drupalLinkEntityMetadata: 'data-link-entity-metadata',
     };
     this.converterAttributes = [
       'drupalMediaEntityUuid',

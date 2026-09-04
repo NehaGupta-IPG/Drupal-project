@@ -12,6 +12,7 @@ use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Routing\AccessAwareRouter;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Access check for routes implementing _access_admin_menu_block_page.
@@ -21,18 +22,9 @@ use Drupal\Core\Session\AccountInterface;
  */
 class SystemAdminMenuBlockAccessCheck implements AccessInterface {
 
-  /**
-   * Constructs a new SystemAdminMenuBlockAccessCheck.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
-   *   The menu link tree service.
-   * @param \Drupal\Core\Routing\AccessAwareRouter $router
-   *   The router service.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
-   *   The menu link manager service.
-   */
   public function __construct(
     private readonly MenuLinkTreeInterface $menuLinkTree,
+    #[Autowire(service: 'router')]
     private readonly AccessAwareRouter $router,
     private readonly MenuLinkManagerInterface $menuLinkManager,
   ) {
@@ -42,7 +34,7 @@ class SystemAdminMenuBlockAccessCheck implements AccessInterface {
    * Checks access.
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The cron key.
+   *   The route match object to be checked.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
    *

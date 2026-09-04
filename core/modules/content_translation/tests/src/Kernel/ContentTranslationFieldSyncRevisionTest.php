@@ -65,6 +65,8 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
+
     $entity_type_id = 'entity_test_mulrev';
     $this->installEntitySchema($entity_type_id);
     $this->installEntitySchema('file');
@@ -73,7 +75,6 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     ConfigurableLanguage::createFromLangcode('it')->save();
     ConfigurableLanguage::createFromLangcode('fr')->save();
 
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     $field_storage_config = FieldStorageConfig::create([
       'field_name' => $this->fieldName,
       'type' => 'image',
@@ -389,7 +390,6 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
       $entity->save();
     }
 
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     $field_storage_config = FieldStorageConfig::create([
       'field_name' => $file_field_name,
       'type' => 'file',

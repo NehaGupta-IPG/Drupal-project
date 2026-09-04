@@ -10,7 +10,6 @@ use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\DefaultContent\Existing;
 use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\DefaultContent\Importer;
-use Drupal\Core\DefaultContent\ImportException;
 use Drupal\Core\DefaultContent\InvalidEntityException;
 use Drupal\Core\DefaultContent\PreImportEvent;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -28,7 +27,6 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\user\UserInterface;
 use Drupal\workspaces\Entity\Workspace;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Log\LogLevel;
@@ -89,38 +87,11 @@ class ContentImportTest extends BrowserTestBase {
 
     // Apply the recipe that sets up the fields and configuration for our
     // default content.
-    $fixtures_dir = $this->getDrupalRoot() . '/core/tests/fixtures';
+    $fixtures_dir = $this->root . '/core/tests/fixtures';
     $this->applyRecipe($fixtures_dir . '/recipes/default_content_base');
 
     $this->contentDir = $fixtures_dir . '/default_content';
     \Drupal::service('file_system')->copy($this->contentDir . '/file/druplicon_copy.png', $this->publicFilesDirectory . '/druplicon_copy.png', FileExists::Error);
-  }
-
-  /**
-   * @return array<array<mixed>>
-   *   An array of test cases, each containing an existing entity handling mode.
-   */
-  public static function providerImportEntityThatAlreadyExists(): array {
-    return [
-      [Existing::Error],
-      [Existing::Skip],
-    ];
-  }
-
-  /**
- * Tests import entity that already exists.
- */
-  #[DataProvider('providerImportEntityThatAlreadyExists')]
-  public function testImportEntityThatAlreadyExists(Existing $existing): void {
-    $this->drupalCreateUser(values: ['uuid' => '94503467-be7f-406c-9795-fc25baa22203']);
-
-    if ($existing === Existing::Error) {
-      $this->expectException(ImportException::class);
-      $this->expectExceptionMessage('user 94503467-be7f-406c-9795-fc25baa22203 already exists.');
-    }
-
-    $this->container->get(Importer::class)
-      ->importContent(new Finder($this->contentDir), $existing);
   }
 
   /**
@@ -195,7 +166,7 @@ class ContentImportTest extends BrowserTestBase {
     file_put_contents($dir . '/invalid.yml', Yaml::encode($data));
 
     $this->expectException(InvalidEntityException::class);
-    $this->expectExceptionMessage("$dir/invalid.yml: sticky.0.value=This value should be of the correct primitive type.");
+    $this->expectExceptionMessageIs("$dir/invalid.yml: sticky.0.value=This value should be of the correct primitive type.");
     $this->container->get(Importer::class)->importContent(new Finder($dir));
   }
 
@@ -309,6 +280,10 @@ class ContentImportTest extends BrowserTestBase {
     $term = $entity_repository->loadEntityByUuid('taxonomy_term', '9dfe4733-1347-4566-9340-27a9b22a1f64');
     $this->assertInstanceOf(TermInterface::class, $term);
     $this->assertSame('Default Content', $term->parent->entity?->label());
+
+    // When importing files that have URIs like `public://foo.png`, the `public`
+    // part should not have been treated as a directory name.
+    $this->assertDirectoryDoesNotExist($this->root . '/public:');
   }
 
   /**

@@ -78,7 +78,7 @@ class SelectTest extends DatabaseTestBase {
   /**
    * Provides expected and input values for testVulnerableComment().
    */
-  public function makeCommentsProvider() {
+  public function makeCommentsProvider(): array {
     return [
       [
         '/*  */ ',
@@ -222,7 +222,7 @@ class SelectTest extends DatabaseTestBase {
 
     $names = $this->connection->select('test_null', 'tn')
       ->fields('tn', ['name'])
-      ->condition('age', NULL)
+      ->condition('age')
       ->execute()->fetchCol();
 
     $this->assertCount(0, $names, 'No records found when comparing to NULL.');
@@ -503,7 +503,7 @@ class SelectTest extends DatabaseTestBase {
    *     - the regular expression pattern to search for.
    *     - the regular expression operator 'REGEXP' or 'NOT REGEXP'.
    */
-  public static function providerRegularExpressionCondition() {
+  public static function providerRegularExpressionCondition(): array {
     return [
       [['John'], 'name', 'hn$', 'REGEXP'],
       [['Paul'], 'name', '^Pau', 'REGEXP'],
@@ -525,7 +525,7 @@ class SelectTest extends DatabaseTestBase {
    * Tests that filter by 'REGEXP' and 'NOT REGEXP' works as expected.
    */
   #[DataProvider('providerRegularExpressionCondition')]
-  public function testRegularExpressionCondition($expected, $column, $pattern, $operator): void {
+  public function testRegularExpressionCondition(array $expected, string $column, string $pattern, string $operator): void {
     $database = $this->container->get('database');
     $database->insert('test')
       ->fields([
@@ -602,7 +602,7 @@ class SelectTest extends DatabaseTestBase {
    *   Array of non array compatible operators and its value in the expected
    *   exception message.
    */
-  public static function providerNonArrayOperatorWithArrayValueCondition() {
+  public static function providerNonArrayOperatorWithArrayValueCondition(): array {
     return [
       '=' => ['=', '='],
       '>' => ['>', '>'],
@@ -620,9 +620,9 @@ class SelectTest extends DatabaseTestBase {
    * Tests thrown exception for non array operator conditions with array value.
    */
   #[DataProvider('providerNonArrayOperatorWithArrayValueCondition')]
-  public function testNonArrayOperatorWithArrayValueCondition($operator, $operator_in_exception_message): void {
+  public function testNonArrayOperatorWithArrayValueCondition(?string $operator, string $operator_in_exception_message): void {
     $this->expectException(InvalidQueryException::class);
-    $this->expectExceptionMessage("Query condition 'age " . $operator_in_exception_message . " 26, 27' must have an array compatible operator.");
+    $this->expectExceptionMessageIs("Query condition 'age " . $operator_in_exception_message . " 26, 27' must have an array compatible operator.");
 
     $this->connection->select('test', 't')
       ->fields('t')
