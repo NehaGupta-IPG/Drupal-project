@@ -7,12 +7,14 @@ namespace Drupal\Tests\search\Functional\views;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests search integration filters.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class ViewsIntegrationTest extends ViewTestBase {
 
@@ -21,12 +23,19 @@ class ViewsIntegrationTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search', 'search_node'];
+  protected static $modules = ['node', 'search', 'search_node', 'search_test_views'];
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['search_test_views']): void {
+    parent::setUp($import_test_views, $modules);
+  }
 
   /**
    * Views used by this test.
