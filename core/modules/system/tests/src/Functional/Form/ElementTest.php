@@ -243,6 +243,8 @@ class ElementTest extends BrowserTestBase {
   protected function testDetailsSummaryAttributes(): void {
     $this->drupalGet('form-test/group-details');
     $this->assertSession()->elementExists('css', 'summary[data-summary-attribute="test"]');
+    $this->assertSession()->elementExists('css', 'summary[data-summary-attribute="test"][aria-expanded="false"]');
+    $this->assertSession()->elementNotExists('css', 'summary[data-summary-attribute="test"][role]');
   }
 
   /**
