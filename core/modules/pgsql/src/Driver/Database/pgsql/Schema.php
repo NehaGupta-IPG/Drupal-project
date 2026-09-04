@@ -916,7 +916,7 @@ EOD;
       if (!$this->indexExists($table, $name)) {
         return FALSE;
       }
-      $identifier = $this->ensureIdentifiersLength($table, $name, 'key');
+      $identifier = $this->ensureIdentifiersLength($table, $name, 'idx');
     }
 
     $this->executeDdlStatement('DROP INDEX ' . $this->defaultSchema . '.' . $identifier);
