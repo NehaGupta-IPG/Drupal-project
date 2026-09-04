@@ -128,8 +128,7 @@ final class RecipeRunner {
       $config_manager,
       \Drupal::service('event_dispatcher'),
       NULL,
-      \Drupal::service('extension.path.resolver'),
-      \Drupal::service('language_manager'));
+      \Drupal::service('extension.path.resolver'));
 
     $config = $recipe->config;
     // Create configuration that is either supplied by the recipe or listed in

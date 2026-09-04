@@ -13,16 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * The site is installed in English throughout. The profile itself defines
  * German as an additional configured language and ships configuration
  * explicitly labelled 'de' - neither the language chosen for installation
- * nor English. \Drupal\Core\Config\EventSubscriber\
- * ConfigLangcodeInstallerSubscriber must not stop propagation while
- * resolving the installer's own language, or language module's subscriber
- * never gets a chance to vouch for German as a configured language, and
- * this configuration would be wrongly rejected as unsupported.
- *
- * The profile also ships configuration explicitly labelled 'es' (Spanish),
- * but defines no corresponding language - nothing vouches for that one, so
- * it must be rejected the same way as any other unsupported explicit
- * langcode.
+ * nor English.
  *
  * @see \Drupal\Core\Config\ConfigLangcodeResolveEvent
  */
@@ -49,9 +40,6 @@ class InstallerMultilingualProfileConfigLangcodeTest extends InstallerTestBase {
 
     $this->assertSame('de', $this->config('config_test.dynamic.german_config')->get('langcode'));
     $this->assertNotNull(\Drupal::entityTypeManager()->getStorage('config_test')->load('german_config'));
-
-    $this->assertNull($this->config('config_test.dynamic.spanish_config')->get('id'));
-    $this->assertNull(\Drupal::entityTypeManager()->getStorage('config_test')->load('spanish_config'));
   }
 
 }

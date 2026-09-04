@@ -1,5 +1,0 @@
-id: spanish_config
-label: 'Spanish config'
-weight: 0
-protected_property: Default
-langcode: es
