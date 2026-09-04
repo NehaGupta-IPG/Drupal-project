@@ -4,17 +4,14 @@
  * https://www.drupal.org/node/3084859
  * @preserve
  */
-
 /**
  * @file
  * Admin Toolbar styles.
  */
-
 /**
  * Sidebar width is attached to the <body> element because it's used as a
  * fallback value to the margin-inline-start property of the layout container.
  */
-
 body {
   --admin-toolbar-sidebar-width: 80vw;
   --admin-toolbar-sidebar-header: calc(3.75 * var(--admin-toolbar-rem));
@@ -33,7 +30,6 @@ body {
 }
 
 /* We apply transitions after page load to avoid shifts. */
-
 [data-admin-toolbar-transitions] {
   :is(#extra-specificity-hack, [data-drupal-admin-styles]) {
     &.admin-toolbar {
@@ -61,7 +57,6 @@ body {
  * Drupal.displace() to measure. It purposefully does not have any transitions
  * because we want Drupal.displace() to measure the width immediately
  */
-
 :is(#extra-specificity-hack, [data-drupal-admin-styles]) {
   .admin-toolbar__displace-placeholder {
     position: absolute;
@@ -77,7 +72,6 @@ body {
 /**
  * The Admin toolbar component.
  */
-
 :is(#extra-specificity-hack, [data-drupal-admin-styles]) {
   &.admin-toolbar {
     position: fixed;
@@ -359,7 +353,6 @@ body {
  * Element is used to overlay the content when Toolbar is expanded in smaller devices.
  * It is created in the template templates/navigation.html.twig.
  */
-
 :is(#extra-specificity-hack, [data-drupal-admin-styles]) {
   &.admin-toolbar-overlay {
     position: fixed;

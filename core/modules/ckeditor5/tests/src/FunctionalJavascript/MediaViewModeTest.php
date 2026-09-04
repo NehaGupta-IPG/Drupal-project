@@ -12,8 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cspell:ignore alternatif drupalelementstyle hurlant layercake tatou texte
-// cspell:ignore zartan
+// cspell:ignore drupalelementstyle
 /**
  * Tests Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media.
  *
