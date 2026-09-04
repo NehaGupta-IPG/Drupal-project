@@ -67,11 +67,11 @@
     },
     "type": {
       "title": "Type",
-      "description": "If the style is a mode or an utility.",
+      "description": "If the style is a theme or an utility.",
       "type": "string",
       "enum": [
         "utility",
-        "mode"
+        "theme"
       ]
     },
     "attribute": {
@@ -81,7 +81,7 @@
     },
     "target": {
       "title": "Target",
-      "description": "The HTML tag to which the style is applied. If present the mode is global only, otherwise the style can be applied on any tag.",
+      "description": "The HTML tag to which the style is applied. If present the theme is global only, otherwise the style can be applied on any tag.",
       "type": "string",
       "enum": [
         "html",

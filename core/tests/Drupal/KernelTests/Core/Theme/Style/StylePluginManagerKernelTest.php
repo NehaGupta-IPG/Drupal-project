@@ -55,13 +55,13 @@ class StylePluginManagerKernelTest extends KernelTestBase {
    */
   public function testDetectedPlugins(): void {
     $expectations = [
-      'test_mode' => [
+      'test_theme' => [
         'enabled' => TRUE,
-        'id' => 'test_mode',
+        'id' => 'test_theme',
         'provider' => 'style_test',
-        'label' => new TranslatableMarkup('Mode label'),
-        'description' => new TranslatableMarkup('Test mode.'),
-        'type' => 'mode',
+        'label' => new TranslatableMarkup('Theme label'),
+        'description' => new TranslatableMarkup('Test theme.'),
+        'type' => 'theme',
         'options' => [
           'any' => [
             'label' => 'Any',
@@ -158,7 +158,7 @@ class StylePluginManagerKernelTest extends KernelTestBase {
     // Test when the module overriding the definition is executed before.
     \Drupal::service(ModuleWeight::class)->set('style_override_test', -1);
     $this->stylePluginManager = $this->container->get(StylePluginManagerInterface::class);
-    $this->assertArrayHasKey('test_mode', $this->stylePluginManager->getDefinitions());
+    $this->assertArrayHasKey('test_theme', $this->stylePluginManager->getDefinitions());
 
     // Test when the module overriding the definition is executed after.
     \Drupal::service(ModuleWeight::class)->set('style_override_test', 1);
@@ -170,7 +170,7 @@ class StylePluginManagerKernelTest extends KernelTestBase {
     $kernel->rebuildContainer();
 
     $this->stylePluginManager = $this->container->get(StylePluginManagerInterface::class);
-    $this->assertArrayNotHasKey('test_mode', $this->stylePluginManager->getDefinitions());
+    $this->assertArrayNotHasKey('test_theme', $this->stylePluginManager->getDefinitions());
   }
 
 }

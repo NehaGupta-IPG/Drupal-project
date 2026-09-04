@@ -11,7 +11,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 enum Type: string {
 
-  case Mode = 'mode';
+  case Theme = 'theme';
   case Utility = 'utility';
 
   /**
@@ -19,7 +19,7 @@ enum Type: string {
    */
   public function label(): TranslatableMarkup {
     return match ($this) {
-      self::Mode => new TranslatableMarkup('Mode'),
+      self::Theme => new TranslatableMarkup('Theme'),
       self::Utility => new TranslatableMarkup('Utility'),
     };
   }

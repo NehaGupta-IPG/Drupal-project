@@ -548,9 +548,9 @@ class StylePluginManagerTest extends UnitTestCase {
       ],
       TRUE,
     ];
-    yield 'Type: mode' => [
+    yield 'Type: theme' => [
       [
-        'type' => 'mode',
+        'type' => 'theme',
       ],
       TRUE,
     ];

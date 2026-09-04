@@ -1,4 +1,4 @@
-test_mode:
+test_theme:
   enabled: false
   label: 'Overridden style'
   options:

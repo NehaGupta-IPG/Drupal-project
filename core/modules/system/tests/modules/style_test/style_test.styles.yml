@@ -1,7 +1,7 @@
-test_mode:
-  label: 'Mode label'
-  description: 'Test mode.'
-  type: 'mode'
+test_theme:
+  label: 'Theme label'
+  description: 'Test theme.'
+  type: 'theme'
   options:
     any:
       label: 'Any'

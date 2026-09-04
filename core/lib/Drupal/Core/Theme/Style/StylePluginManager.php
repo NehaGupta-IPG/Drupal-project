@@ -56,7 +56,7 @@ use JsonSchema\Validator;
  *     Using a style or an option marked as `deprecated` or `obsolete` will log
  *     warnings.
  *   type: (string) The type of the style. Possible values are:
- *     - `mode`: The style is a mode and depending on target, its application is
+ *     - `theme`: The style is a theme and depending on target, its application is
  *         limited to specific elements.
  *     - `utility`: The style can be applied on anything. Default value.
  *   attribute: (string) The attribute to set on the element. Default is

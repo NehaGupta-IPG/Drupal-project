@@ -159,7 +159,7 @@ class StyleDefinition extends PluginDefinition implements StyleDefinitionInterfa
     $optionValue = $options[$optionId]['value'];
     $attachments = [];
 
-    if ($type == Type::Mode && $optionTarget == Target::Meta) {
+    if ($type == Type::Theme && $optionTarget == Target::Meta) {
       $meta = [
         '#tag' => 'meta',
         '#attributes' => [
@@ -170,7 +170,7 @@ class StyleDefinition extends PluginDefinition implements StyleDefinitionInterfa
       $attachments['html_head'][] = [$meta, "style:{$styleId}:{$optionId}"];
     }
     // Target: HTML or body.
-    elseif ($type == Type::Mode && $optionTarget != Target::Any) {
+    elseif ($type == Type::Theme && $optionTarget != Target::Any) {
       $attachments['styles'][$styleId] = $optionId;
     }
     else {
@@ -221,8 +221,8 @@ class StyleDefinition extends PluginDefinition implements StyleDefinitionInterfa
     $optionAttribute = $options[$optionId]['attribute'];
     $optionValue = $options[$optionId]['value'];
 
-    // Ignore type 'mode' with target 'meta' as it is too late.
-    if ($type == Type::Utility || ($type == Type::Mode && $optionTarget != Target::Meta)) {
+    // Ignore type 'theme' with target 'meta' as it is too late.
+    if ($type == Type::Utility || ($type == Type::Theme && $optionTarget != Target::Meta)) {
       $attribute->merge(new Attribute([$optionAttribute => $optionValue]));
     }
   }
@@ -262,7 +262,7 @@ class StyleDefinition extends PluginDefinition implements StyleDefinitionInterfa
     $optionValue = $options[$optionId]['value'];
     $element['#attached'] = $element['#attached'] ?? [];
 
-    if ($type == Type::Mode && $optionTarget == Target::Meta) {
+    if ($type == Type::Theme && $optionTarget == Target::Meta) {
       $meta = [
         '#tag' => 'meta',
         '#attributes' => [
@@ -273,7 +273,7 @@ class StyleDefinition extends PluginDefinition implements StyleDefinitionInterfa
       $element['#attached']['html_head'][] = [$meta, "style:{$styleId}:{$optionId}"];
     }
     // Target: HTML or body.
-    elseif ($type == Type::Mode && $optionTarget != Target::Any) {
+    elseif ($type == Type::Theme && $optionTarget != Target::Any) {
       $element['#attached']['styles'][$styleId] = $optionId;
     }
     elseif (!isset($element['#accept_attributes']) || $element['#accept_attributes'] === TRUE) {

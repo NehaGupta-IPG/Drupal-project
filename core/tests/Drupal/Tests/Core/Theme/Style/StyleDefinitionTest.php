@@ -66,9 +66,9 @@ class StyleDefinitionTest extends UnitTestCase {
     yield 'getStatus:enum:deprecated' => ['getStatus', 'status', Status::Deprecated, Status::Deprecated];
     yield 'getStatus:enum:obsolete' => ['getStatus', 'status', Status::Obsolete, Status::Obsolete];
     yield 'getWeight' => ['getWeight', 'weight', 10, 10];
-    yield 'getType:string:mode' => ['getType', 'type', 'mode', Type::Mode];
+    yield 'getType:string:theme' => ['getType', 'type', 'theme', Type::Theme];
     yield 'getType:string:utility' => ['getType', 'type', 'utility', Type::Utility];
-    yield 'getType:enum:mode' => ['getType', 'type', Type::Mode, Type::Mode];
+    yield 'getType:enum:theme' => ['getType', 'type', Type::Theme, Type::Theme];
     yield 'getType:enum:utility' => ['getType', 'type', Type::Utility, Type::Utility];
     yield 'getAttribute' => ['getAttribute', 'attribute', 'my-attribute', 'my-attribute'];
     yield 'getTarget:string:empty' => ['getTarget', 'target', '', Target::Any];
@@ -402,8 +402,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: default' => [
-      'mode',
+    yield 'Theme: default' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',
@@ -413,8 +413,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: on an attribute' => [
-      'mode',
+    yield 'Theme: on an attribute' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'data',
@@ -425,8 +425,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: inline style' => [
-      'mode',
+    yield 'Theme: inline style' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'font-size: 15px',
@@ -437,8 +437,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: target body' => [
-      'mode',
+    yield 'Theme: target body' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',
@@ -449,8 +449,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: target html' => [
-      'mode',
+    yield 'Theme: target html' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',
@@ -461,8 +461,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: target meta' => [
-      'mode',
+    yield 'Theme: target meta' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',
@@ -693,8 +693,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: default' => [
-      'mode',
+    yield 'Theme: default' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',
@@ -704,8 +704,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: on an attribute' => [
-      'mode',
+    yield 'Theme: on an attribute' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'data',
@@ -716,8 +716,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: inline style' => [
-      'mode',
+    yield 'Theme: inline style' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'font-size: 15px',
@@ -728,8 +728,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: target body' => [
-      'mode',
+    yield 'Theme: target body' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',
@@ -743,8 +743,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: target html' => [
-      'mode',
+    yield 'Theme: target html' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',
@@ -758,8 +758,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: target meta' => [
-      'mode',
+    yield 'Theme: target meta' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',
@@ -1019,8 +1019,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: default' => [
-      'mode',
+    yield 'Theme: default' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',
@@ -1033,8 +1033,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: on an attribute' => [
-      'mode',
+    yield 'Theme: on an attribute' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'data',
@@ -1048,8 +1048,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: inline style' => [
-      'mode',
+    yield 'Theme: inline style' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'font-size: 15px',
@@ -1063,8 +1063,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: target body' => [
-      'mode',
+    yield 'Theme: target body' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',
@@ -1079,8 +1079,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: target html' => [
-      'mode',
+    yield 'Theme: target html' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',
@@ -1095,8 +1095,8 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ];
 
-    yield 'Mode: target meta' => [
-      'mode',
+    yield 'Theme: target meta' => [
+      'theme',
       [
         'label' => 'Label',
         'value' => 'my-class',

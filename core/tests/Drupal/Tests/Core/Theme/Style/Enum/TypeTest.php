@@ -44,11 +44,11 @@ class TypeTest extends UnitTestCase {
    *   The test cases.
    */
   public static function providerEnum(): iterable {
-    yield 'mode' => [
-      Type::Mode,
-      'mode',
-      'Mode',
-      new TranslatableMarkup('Mode'),
+    yield 'theme' => [
+      Type::Theme,
+      'theme',
+      'Theme',
+      new TranslatableMarkup('Theme'),
     ];
     yield 'utility' => [
       Type::Utility,
