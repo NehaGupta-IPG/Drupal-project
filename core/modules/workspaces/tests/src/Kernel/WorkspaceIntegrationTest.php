@@ -650,6 +650,14 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     $this->assertSame([3 => '2', 1 => '1'], $result);
 
+    // A workspace query is never a simple query, so the same sort without a
+    // pager goes through the grouped code path as well.
+    $query = $storage->getQuery()->accessCheck(FALSE);
+    $query->sort('id', 'DESC');
+    $result = $query->execute();
+
+    $this->assertSame([3 => '2', 1 => '1'], $result);
+
     // Sorting on a field which is not an entity key is aggregated rather than
     // selected, so it can not displace the key columns either.
     $query = $storage->getQuery()->accessCheck(FALSE);

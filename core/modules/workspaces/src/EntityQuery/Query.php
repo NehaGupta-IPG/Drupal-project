@@ -45,18 +45,16 @@ class Query extends BaseQuery {
   /**
    * {@inheritdoc}
    */
-  protected function addSort() {
-    parent::addSort();
-
-    // The parent registers the sorted column in $this->sqlFields, and a Select
-    // renders plain fields before expressions. ::finish() would then put it
-    // ahead of the key expressions the result is keyed by, so empty the array
-    // again. Both entity keys are in the GROUP BY, so the ORDER BY still works.
+  protected function finish() {
+    // A Select renders plain fields before expressions, so a field left in
+    // $this->sqlFields would displace the key expressions that the result is
+    // keyed by. Both entity keys are in the GROUP BY, so the ORDER BY that
+    // ::addSort() added still works.
     if ($this->sqlQuery->getMetaData('active_workspace_id')) {
       $this->sqlFields = [];
     }
 
-    return $this;
+    return parent::finish();
   }
 
 }
