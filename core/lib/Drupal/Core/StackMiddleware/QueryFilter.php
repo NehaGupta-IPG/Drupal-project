@@ -10,14 +10,13 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 /**
  * Filters out irrelevant query parameters.
  *
- * Requests often contain tracking parameters such as utm, fbclid and more.
+ * Requests often contain tracking parameters such as utm_* and others.
  *
  * To use this, set query_parameter_filters in your settings.php, each
  * item may contain regular expression placeholders.
  *
  * @code
  * $settings['query_parameter_filters'] = [
- *   'fbclid',
  *   'utm.*',
  * ];
  * @endcode
