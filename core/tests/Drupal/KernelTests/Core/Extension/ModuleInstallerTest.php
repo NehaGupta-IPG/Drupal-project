@@ -144,6 +144,28 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
   }
 
   /**
+   * Tests install with a module that does not exist.
+   *
+   * @legacy-covers ::install
+   */
+  #[DataProvider('providerTestNonExistentModuleInstall')]
+  public function testNonExistentModuleInstall(bool $install_dependencies): void {
+    $this->expectException(MissingDependencyException::class);
+    $this->expectExceptionMessage("Unable to install modules: module 'this_module_does_not_exist' does not exist.");
+    $this->container->get('module_installer')->install(['this_module_does_not_exist'], $install_dependencies);
+  }
+
+  /**
+   * Data provider for testNonExistentModuleInstall().
+   */
+  public static function providerTestNonExistentModuleInstall(): array {
+    return [
+      'no dependencies' => [FALSE],
+      'install_dependencies' => [TRUE],
+    ];
+  }
+
+  /**
    * Tests install with a dependency with an invalid core version constraint.
    *
    * @legacy-covers ::install
