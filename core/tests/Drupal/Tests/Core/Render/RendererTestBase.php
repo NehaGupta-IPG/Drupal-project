@@ -207,8 +207,8 @@ abstract class RendererTestBase extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->set('cache_contexts_manager', $this->cacheContextsManager);
     $container->set('render_cache', $this->renderCache);
-    $container->set('renderer', $this->renderer);
-//    $container->set(RendererInterface::class, $this->renderer);
+//    $container->set('renderer', $this->renderer);
+    $container->set(RendererInterface::class, $this->renderer);
     $container->set('datetime.time', $this->datetimeTime);
     \Drupal::setContainer($container);
   }
