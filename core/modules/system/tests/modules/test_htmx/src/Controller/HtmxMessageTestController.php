@@ -26,7 +26,7 @@ class HtmxMessageTestController {
    * Prepares a message and returns a log entry.
    *
    * @param string $type
-   *  The type of message to add.
+   *   The type of message to add.
    *
    * @return array
    *   Render array for the log entry.
@@ -46,7 +46,7 @@ class HtmxMessageTestController {
       '#attributes' => [
         'class' => 'message-log',
       ],
-      '#value' => "Message of type $type requested."
+      '#value' => "Message of type $type requested.",
     ];
   }
 

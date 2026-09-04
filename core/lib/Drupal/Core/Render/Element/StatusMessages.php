@@ -111,30 +111,30 @@ class StatusMessages extends RenderElementBase {
       $messages = \Drupal::messenger()->deleteAll();
     }
 
-      $messageItems = [
-        MessengerInterface::TYPE_ERROR => [],
-        MessengerInterface::TYPE_WARNING => [],
-        MessengerInterface::TYPE_STATUS => [],
-      ];
-      foreach ($messages as $type => $messageList) {
-        foreach ($messageList as $message) {
-          $item = [
-            '#theme' => 'status_message_item',
-            '#message' => $message,
-          ];
-          $messageItems[$type][] = $item;
-        }
+    $messageItems = [
+      MessengerInterface::TYPE_ERROR => [],
+      MessengerInterface::TYPE_WARNING => [],
+      MessengerInterface::TYPE_STATUS => [],
+    ];
+    foreach ($messages as $type => $messageList) {
+      foreach ($messageList as $message) {
+        $item = [
+          '#theme' => 'status_message_item',
+          '#message' => $message,
+        ];
+        $messageItems[$type][] = $item;
       }
-      // Render the messages.
-      $render = [
-        '#theme' => 'status_messages',
-        '#message_list' => $messageItems,
-        '#status_headings' => [
-          'status' => t('Status message'),
-          'error' => t('Error message'),
-          'warning' => t('Warning message'),
-        ],
-      ];
+    }
+    // Render the messages.
+    $render = [
+      '#theme' => 'status_messages',
+      '#message_list' => $messageItems,
+      '#status_headings' => [
+        'status' => t('Status message'),
+        'error' => t('Error message'),
+        'warning' => t('Warning message'),
+      ],
+    ];
     return $render;
   }
 
