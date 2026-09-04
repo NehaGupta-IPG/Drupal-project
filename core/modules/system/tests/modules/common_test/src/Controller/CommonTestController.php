@@ -10,6 +10,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Response;
 
+// cspell:ignore комацу
 /**
  * Controller routines for common_test routes.
  */
@@ -53,6 +54,28 @@ class CommonTestController {
           'query' => [
             'one' => 'two',
             'foo' => 'bar',
+          ],
+          'set_active_class' => TRUE,
+        ],
+      ],
+      'with_special_chars_query' => [
+        '#type' => 'link',
+        '#title' => $this->t('Link with special characters in the query string'),
+        '#url' => Url::fromRoute('<current>'),
+        '#options' => [
+          'query' => [
+            'foo' => '<bar>&\'"/',
+          ],
+          'set_active_class' => TRUE,
+        ],
+      ],
+      'with_non_latin_query' => [
+        '#type' => 'link',
+        '#title' => $this->t('Link with non-Latin characters in the query string'),
+        '#url' => Url::fromRoute('<current>'),
+        '#options' => [
+          'query' => [
+            'foo' => 'комацу',
           ],
           'set_active_class' => TRUE,
         ],
