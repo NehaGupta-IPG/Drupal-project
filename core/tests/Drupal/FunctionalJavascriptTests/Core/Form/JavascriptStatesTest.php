@@ -982,6 +982,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
 
     // Trigger Shared Ajax & States trigger.
     $shared_ajax_states_trigger->setValue('0');
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertTrue($ajax_removed_textfield_with_shared_trigger->hasAttribute('disabled'));
     $this->assertTrue($textfield_visible_ajax_single->isVisible());
     $this->assertTrue($textfield_visible_not_ajax_single->isVisible());
@@ -999,6 +1000,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
 
     // Trigger Ajax & Change state: set shared ajax states trigger to 1.
     $shared_ajax_states_trigger->setValue('1');
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertTrue($textfield_visible_ajax_single->isVisible());
     $this->assertTrue($textfield_visible_not_ajax_single->isVisible());
     $this->assertTrue($textfield_visible_multiple->isVisible());
@@ -1012,6 +1014,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
 
     // Trigger Ajax & Change state: set shared ajax states trigger to ''.
     $shared_ajax_states_trigger->setValue('');
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertTrue($textfield_visible_ajax_single->isVisible());
     $this->assertTrue($textfield_visible_not_ajax_single->isVisible());
     $this->assertTrue($textfield_visible_multiple->isVisible());
@@ -1026,6 +1029,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
 
     // Trigger Ajax & Change state: set shared ajax states trigger to 1.
     $shared_ajax_states_trigger->setValue('1');
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertTrue($textfield_visible_ajax_single->isVisible());
     $this->assertTrue($textfield_visible_not_ajax_single->isVisible());
     $this->assertTrue($textfield_visible_multiple->isVisible());
