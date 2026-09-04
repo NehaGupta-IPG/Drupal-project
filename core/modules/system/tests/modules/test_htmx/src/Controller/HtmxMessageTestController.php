@@ -23,13 +23,13 @@ class HtmxMessageTestController {
   }
 
   /**
-   * Displays links to show messages via JavaScript with messages from backend.
+   * Prepares a message and returns a log entry.
    *
    * @param string $type
    *  The type of message to add.
    *
-   * @return void Render array for links.
-   *   Render array for links.
+   * @return array
+   *   Render array for the log entry.
    */
   public function addMessageType(string $type): array {
     // Add PHP rendered messages to the page.
@@ -58,6 +58,7 @@ class HtmxMessageTestController {
    */
   public function messageButtons(): array {
     $buttons = [];
+    $buttons['#attached']['library'][] = 'test_htmx/assets';
     $buttons['content'] = [
       '#type' => 'details',
       '#open' => TRUE,

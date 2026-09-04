@@ -73,3 +73,19 @@ test_htmx.form_builder_test:
     selected: NULL
   requirements:
     _permission: 'access content'
+
+test_htmx.message_test:
+  path: '/htmx-test/message-test'
+  defaults:
+    _title: 'Test message delivery'
+    _controller: '\Drupal\test_htmx\Controller\HtmxMessageTestController::messageButtons'
+  requirements:
+    _permission: 'access content'
+
+test_htmx.message:
+  path: '/htmx-test/{type}/message'
+  defaults:
+    _title: 'Single message with log'
+    _controller: '\Drupal\test_htmx\Controller\HtmxMessageTestController::addMessageType'
+  requirements:
+    _permission: 'access content'
