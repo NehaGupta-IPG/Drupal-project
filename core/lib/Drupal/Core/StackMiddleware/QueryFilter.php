@@ -41,20 +41,24 @@ readonly class QueryFilter implements HttpKernelInterface {
 
     if ($query_string && $query_parameter_filters = Settings::get('query_parameter_filters', ['utm.*'])) {
       parse_str($query_string, $query);
+      $changed = FALSE;
       foreach ($query as $key => $value) {
         foreach ($query_parameter_filters as $query_parameter_filter) {
           if (preg_match('/' . $query_parameter_filter . '/', $key)) {
             unset($query[$key]);
             $request->query->remove($key);
+            $changed = TRUE;
           }
         }
       }
-      $new_query_string = http_build_query($query, '', '&');
-      $request_uri = $request->server->get('REQUEST_URI');
-      if ($request_uri && str_contains($request_uri, $query_string)) {
-        $request->server->set('REQUEST_URI', str_replace($query_string, $new_query_string, $request_uri));
+      if ($changed) {
+        $new_query_string = http_build_query($query, '', '&');
+        $request_uri = $request->server->get('REQUEST_URI');
+        if ($request_uri && str_contains($request_uri, $query_string)) {
+          $request->server->set('REQUEST_URI', str_replace($query_string, $new_query_string, $request_uri));
+        }
+        $request->server->set('QUERY_STRING', $new_query_string);
       }
-      $request->server->set('QUERY_STRING', $new_query_string);
     }
 
     return $this->httpKernel->handle($request, $type, $catch);
