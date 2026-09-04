@@ -43,8 +43,8 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   (optional) An array with placeholder replacements, keyed by placeholder.
    *   See \Drupal\Component\Render\FormattableMarkup::placeholderFormat() for
    *   additional information about placeholders. Note that you do not need to
-   *   include @count in this array; this replacement is done automatically
-   *   for the plural cases.
+   *   include @count in this array; it defaults to the count. Pass it
+   *   explicitly to substitute a formatted representation of the count.
    * @param array $options
    *   (optional) An associative array of additional options. See t() for
    *   allowed keys.
@@ -75,8 +75,9 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   of any key in this array are replaced with the corresponding value.
    *   Based on the first character of the key, the value is escaped and/or
    *   themed. See \Drupal\Component\Render\FormattableMarkup. Note that you
-   *   do not need to include @count in this array; this replacement is done
-   *   automatically for the plural cases.
+   *   do not need to include @count in this array; it defaults to the count.
+   *   Pass it explicitly to substitute a formatted representation of the
+   *   count.
    * @param array $options
    *   An associative array of additional options. See t() for allowed keys.
    *
@@ -104,7 +105,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
     }
 
     $arguments = $this->getArguments();
-    $arguments['@count'] = $this->count;
+    $arguments += ['@count' => $this->count];
     $translated_array = explode(PoItem::DELIMITER, $this->translatedString);
 
     $index = $this->getPluralIndex();

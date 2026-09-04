@@ -176,12 +176,15 @@ class NumericField extends FieldPluginBase {
       return '';
     }
 
+    $number = $value;
     $value = number_format($value, $precision, $this->options['decimal'], $this->options['separator']);
 
     // If we should format as plural, take the (possibly) translated plural
-    // setting and format with the current language.
+    // setting and format with the current language. The plural variant is
+    // selected from the number itself, while the formatted number is what
+    // replaces @count.
     if (!empty($this->options['format_plural'])) {
-      $value = PluralTranslatableMarkup::createFromTranslatedString($value, $this->options['format_plural_string']);
+      $value = PluralTranslatableMarkup::createFromTranslatedString($number, $this->options['format_plural_string'], ['@count' => $value]);
     }
 
     return $this->sanitizeValue($this->options['prefix'], 'xss')
