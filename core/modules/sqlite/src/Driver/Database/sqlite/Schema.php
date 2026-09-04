@@ -395,7 +395,11 @@ class Schema extends DatabaseSchema {
       }
 
       // Add the new indexes.
+      $tempUniqueKeys = $new_schema['unique keys'];
+      $tempIndexes = $new_schema['indexes'];
       $new_schema = array_merge($new_schema, $keys_new);
+      $new_schema['unique keys'] = array_merge($new_schema['unique keys'], $tempUniqueKeys);
+      $new_schema['indexes'] = array_merge($new_schema['indexes'], $tempIndexes);
 
       $this->alterTable($table, $old_schema, $new_schema, $mapping);
     }
