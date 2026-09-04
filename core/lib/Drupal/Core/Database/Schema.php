@@ -724,20 +724,20 @@ abstract class Schema implements PlaceholderInterface {
       }
     }
     // Add target keys that are needed.
-    $tmp = [];
+    $newKeys = [];
     $hasPrimaryKey = $this->findPrimaryKeyColumns($tableName) !== [];
     $needsPrimaryKey = (bool) $table->primaryKey;
     if (!$hasPrimaryKey && $needsPrimaryKey) {
-      $tmp['primary key'] = $table->primaryKey->toArray();
+      $newKeys['primary key'] = $table->primaryKey->toArray();
     }
     foreach ($table->uniqueKeys ?? [] as $key) {
       if (!$this->uniqueKeyExists($tableName, $key->name)) {
-        $tmp['unique keys'][$key->name] = $key->toArray();
+        $newKeys['unique keys'][$key->name] = $key->toArray();
       }
     }
     foreach ($table->indexes ?? [] as $index) {
       if (!$this->indexExists($tableName, $index->name)) {
-        $tmp['indexes'][$index->name] = $index->toArray();
+        $newKeys['indexes'][$index->name] = $index->toArray();
       }
     }
 
@@ -747,7 +747,7 @@ abstract class Schema implements PlaceholderInterface {
       $tableName,
       $targetColumnName,
       $tableAsArray['fields'][$targetColumnName],
-      array_merge($tableAsArray, $tmp),
+      array_merge($tableAsArray, $newKeys),
     );
   }
 
@@ -773,7 +773,6 @@ abstract class Schema implements PlaceholderInterface {
   final public function changeTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName, ?string $currentColumnName = NULL): void {
     $table = $targetSchema->getTableDefinition($tableName);
     $currentColumnName ??= $targetColumnName;
-    $tableAsArray = $table->toArray();
 
     // Handles keys/indexes that are impacted by the change.
     $currentKeys = $this->introspectIndexSchema($tableName);
@@ -781,19 +780,16 @@ abstract class Schema implements PlaceholderInterface {
     foreach ($currentKeys['indexes'] as $key => $data) {
       if (in_array($currentColumnName, $data, TRUE)) {
         $this->dropIndex($tableName, $key);
-        unset($currentKeys['indexes'][$key]);
       }
     }
     foreach ($currentKeys['unique keys'] as $key => $data) {
       if (in_array($currentColumnName, $data, TRUE)) {
         $this->dropUniqueKey($tableName, $key);
-        unset($currentKeys['unique keys'][$key]);
       }
     }
     if (in_array($currentColumnName, $currentKeys['primary key'], TRUE)) {
       try {
         $this->dropPrimaryKey($tableName);
-        unset($currentKeys['primary key']);
       }
       catch (SchemaTablePrimaryKeyException) {
         // It may not be possible to drop the primary key. For example, in
@@ -801,30 +797,31 @@ abstract class Schema implements PlaceholderInterface {
       }
     }
     // Add target keys that are needed.
-    $tmp = [];
-    $hasPrimaryKey = ($currentKeys['primary key'] ?? []) !== [];
-    $needsPrimaryKey = ($tableAsArray['primary key'] ?? []) !== [];
+    $newKeys = [];
+    $hasPrimaryKey = $this->findPrimaryKeyColumns($tableName) !== [];
+    $needsPrimaryKey = (bool) $table->primaryKey;
     if (!$hasPrimaryKey && $needsPrimaryKey) {
-      $tmp['primary key'] = $tableAsArray['primary key'];
+      $newKeys['primary key'] = $table->primaryKey->toArray();
     }
-    foreach ($tableAsArray['unique keys'] ?? [] as $key => $data) {
-      if (!$this->uniqueKeyExists($tableName, $key)) {
-        $tmp['unique keys'][$key] = $data;
+    foreach ($table->uniqueKeys ?? [] as $key) {
+      if (!$this->uniqueKeyExists($tableName, $key->name)) {
+        $newKeys['unique keys'][$key->name] = $key->toArray();
       }
     }
-    foreach ($tableAsArray['indexes'] ?? [] as $key => $data) {
-      if (!$this->indexExists($tableName, $key)) {
-        $tmp['indexes'][$key] = $data;
+    foreach ($table->indexes ?? [] as $index) {
+      if (!$this->indexExists($tableName, $index->name)) {
+        $newKeys['indexes'][$index->name] = $index->toArray();
       }
     }
 
+    $tableAsArray = $table->toArray();
     unset($tableAsArray['primary key'], $tableAsArray['unique keys'], $tableAsArray['indexes']);
     $this->changeField(
       $tableName,
       $currentColumnName,
       $targetColumnName,
       $tableAsArray['fields'][$targetColumnName],
-      array_merge($tableAsArray, $tmp),
+      array_merge($tableAsArray, $newKeys),
     );
   }
 
