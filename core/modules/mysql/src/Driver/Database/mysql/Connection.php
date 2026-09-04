@@ -69,9 +69,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function __construct(\PDO $connection, array $connection_options) {
-    // @phpstan-ignore class.notFound
-    assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Mysql : TRUE);
+  public function __construct(Mysql $connection, array $connection_options) {
     // If the SQL mode doesn't include 'ANSI_QUOTES' (explicitly or via a
     // combination mode), then MySQL doesn't interpret a double quote as an
     // identifier quote, in which case use the non-ANSI-standard backtick.
@@ -100,7 +98,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(#[\SensitiveParameter] array &$connection_options = []) {
     // The DSN should use either a socket or a host/port.
     if (isset($connection_options['unix_socket'])) {
       $dsn = 'mysql:unix_socket=' . $connection_options['unix_socket'];
@@ -122,36 +120,36 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     ];
     $connection_options['pdo'] += [
       \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-      // So we don't have to mess around with cursors and unbuffered queries by
-      // default.
-      // @phpstan-ignore class.notFound
-      (\PHP_VERSION_ID < 80400 ? \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY : Mysql::ATTR_USE_BUFFERED_QUERY) => TRUE,
-      // Make sure MySQL returns all matched rows on update queries including
-      // rows that actually didn't have to be updated because the values didn't
-      // change. This matches common behavior among other database systems.
-      // @phpstan-ignore class.notFound
-      (\PHP_VERSION_ID < 80400 ? \PDO::MYSQL_ATTR_FOUND_ROWS : Mysql::ATTR_FOUND_ROWS) => TRUE,
-      // Because MySQL's prepared statements skip the query cache, because it's
-      // dumb.
+    ];
+    // So we don't have to mess around with cursors and unbuffered queries by
+    // default.
+    $connection_options['pdo'] += [
+      Mysql::ATTR_USE_BUFFERED_QUERY => TRUE,
+    ];
+    // Make sure MySQL returns all matched rows on update queries including
+    // rows that actually didn't have to be updated because the values didn't
+    // change. This matches common behavior among other database systems.
+    $connection_options['pdo'] += [
+      Mysql::ATTR_FOUND_ROWS => TRUE,
+    ];
+    // Because MySQL's prepared statements skip the query cache.
+    $connection_options['pdo'] += [
       \PDO::ATTR_EMULATE_PREPARES => TRUE,
-      // Limit SQL to a single statement like mysqli.
-      // @phpstan-ignore class.notFound
-      (\PHP_VERSION_ID < 80400 ? \PDO::MYSQL_ATTR_MULTI_STATEMENTS : Mysql::ATTR_MULTI_STATEMENTS) => FALSE,
-      // Convert numeric values to strings when fetching. In PHP 8.1,
-      // \PDO::ATTR_EMULATE_PREPARES now behaves the same way as non emulated
-      // prepares and returns integers. See https://externals.io/message/113294
-      // for further discussion.
+    ];
+    // Limit SQL to a single statement like mysqli.
+    $connection_options['pdo'] += [
+      Mysql::ATTR_MULTI_STATEMENTS => FALSE,
+    ];
+    // Convert numeric values to strings when fetching. In PHP 8.1,
+    // \PDO::ATTR_EMULATE_PREPARES now behaves the same way as non emulated
+    // prepares and returns integers. See https://externals.io/message/113294
+    // for further discussion.
+    $connection_options['pdo'] += [
       \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
     ];
 
     try {
-      if (\PHP_VERSION_ID >= 80400) {
-        // @phpstan-ignore class.notFound
-        $mysql = new Mysql($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
-      }
-      else {
-        $mysql = new \PDO($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
-      }
+      $mysql = new Mysql($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
     }
     catch (\PDOException $e) {
       switch ($e->getCode()) {
@@ -237,7 +235,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function queryTemporary($query, array $args = [], array $options = []) {
-    $tablename = 'db_temporary_' . uniqid();
+    $tablename = 'db_temporary_' . bin2hex(random_bytes(12));
     $this->query('CREATE TEMPORARY TABLE {' . $tablename . '} Engine=MEMORY ' . $query, $args, $options);
     return $tablename;
   }

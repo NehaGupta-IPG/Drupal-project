@@ -7,13 +7,13 @@
  * - responsive_image: A collection of responsive image data.
  * - url: An optional URL the image can be linked to.
  *
- * @see template_preprocess_responsive_image_formatter()
+ * @see \Drupal\responsive_image\Hook\ResponsiveImageThemeHooks::preprocessResponsiveImageFormatter()
  *
  * @ingroup themeable
  */
 #}
 {% if url %}
-  <a href="{{ url }}">{{ responsive_image }}</a>
+  {{ link(responsive_image, url) }}
 {% else %}
   {{ responsive_image }}
 {% endif %}

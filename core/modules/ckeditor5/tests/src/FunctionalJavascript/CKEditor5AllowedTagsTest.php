@@ -7,6 +7,7 @@ namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\filter\Plugin\Filter\FilterHtml;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Yaml\Yaml;
@@ -38,7 +39,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
    *
    * @var string
    */
-  protected $allowedElements = '<br> <p> <h2> <h3> <h4> <h5> <h6> <strong> <em>';
+  protected $allowedElements = '<br> <em> <h2> <h3> <h4> <h5> <h6> <p> <strong>';
 
   /**
    * The default allowed elements for filter_html's "allowed_html" setting.
@@ -47,14 +48,14 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
    *
    * @see \Drupal\filter\Plugin\Filter\FilterHtml
    */
-  protected $defaultElementsWhenUpdatingNotCkeditor5 = "<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type='1 A I'> <li> <dl> <dt> <dd> <h2 id='jump-*'> <h3 id> <h4 id> <h5 id> <h6 id>";
+  protected $defaultElementsWhenUpdatingNotCkeditor5 = "<a href hreflang> <blockquote cite> <cite> <code> <dd> <dl> <dt> <em> <h2 id='jump-*'> <h3 id> <h4 id> <h5 id> <h6 id> <li> <ol start type='1 A I'> <strong> <ul type>";
 
   /**
    * The expected allowed elements after updating to CKEditor 5.
    *
    * @var string
    */
-  protected $defaultElementsAfterUpdatingToCkeditor5 = '<br> <p> <h2 id="jump-*"> <h3 id> <h4 id> <h5 id> <h6 id> <cite> <dl> <dt> <dd> <a hreflang href> <blockquote cite> <strong> <em> <code> <ul type> <ol type reversed start> <li>';
+  protected $defaultElementsAfterUpdatingToCkeditor5 = '<a hreflang href> <blockquote cite> <br> <cite> <code> <dd> <dl> <dt> <em> <h2 id="jump-*"> <h3 id> <h4 id> <h5 id> <h6 id> <li> <ol type reversed start> <p> <strong> <ul type>';
 
   /**
    * Test enabling CKEditor 5 in a way that triggers validation.
@@ -189,7 +190,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-active .ckeditor5-toolbar-item-drupalInsertImage'));
 
     // The image insert plugin is enabled and inserting <img> is allowed.
-    $this->assertEquals($this->allowedElements . ' <img src alt height width>', $allowed_html_field->getValue());
+    $this->assertEquals(FilterHtml::sortAllowedHtmlTags($this->allowedElements . ' <img src alt height width>'), $allowed_html_field->getValue());
 
     $page->clickLink('Image');
     $assert_session->waitForText('Enable image uploads');
@@ -199,21 +200,21 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
 
     // Enabling image uploads adds <img> with several attributes to allowed
     // tags.
-    $this->assertEquals($this->allowedElements . ' <img src alt height width data-entity-uuid data-entity-type>', $allowed_html_field->getValue());
+    $this->assertEquals(FilterHtml::sortAllowedHtmlTags($this->allowedElements . ' <img src alt height width data-entity-uuid data-entity-type>'), $allowed_html_field->getValue());
 
     // Also enabling the caption filter will add the data-caption attribute to
     // <img>.
     $this->assertTrue($page->hasUncheckedField('filters[filter_caption][status]'));
     $page->checkField('filters[filter_caption][status]');
     $assert_session->assertWaitOnAjaxRequest();
-    $this->assertEquals($this->allowedElements . ' <img src alt height width data-entity-uuid data-entity-type data-caption>', $allowed_html_field->getValue());
+    $this->assertEquals(FilterHtml::sortAllowedHtmlTags($this->allowedElements . ' <img src alt height width data-entity-uuid data-entity-type data-caption>'), $allowed_html_field->getValue());
 
     // Also enabling the alignment filter will add the data-align attribute to
     // <img>.
     $this->assertTrue($page->hasUncheckedField('filters[filter_align][status]'));
     $page->checkField('filters[filter_align][status]');
     $assert_session->assertWaitOnAjaxRequest();
-    $this->assertEquals($this->allowedElements . ' <img src alt height width data-entity-uuid data-entity-type data-caption data-align>', $allowed_html_field->getValue());
+    $this->assertEquals(FilterHtml::sortAllowedHtmlTags($this->allowedElements . ' <img src alt height width data-entity-uuid data-entity-type data-caption data-align>'), $allowed_html_field->getValue());
 
     // Disable image upload.
     $page->clickLink('Image');
@@ -223,7 +224,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $assert_session->assertWaitOnAjaxRequest();
 
     // The image insert is still allowed when image uploads are disabled.
-    $this->assertEquals($this->allowedElements . ' <img src alt height width data-caption data-align>', $allowed_html_field->getValue());
+    $this->assertEquals(FilterHtml::sortAllowedHtmlTags($this->allowedElements . ' <img src alt height width data-caption data-align>'), $allowed_html_field->getValue());
 
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ckeditor5-toolbar-item-drupalInsertImage'));
     $this->triggerKeyUp('.ckeditor5-toolbar-item-drupalInsertImage', 'ArrowUp');
@@ -264,7 +265,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $this->triggerKeyUp('.ckeditor5-toolbar-item-blockQuote', 'ArrowDown');
     $assert_session->assertWaitOnAjaxRequest();
 
-    $allowed_with_blockquote = $this->allowedElements . ' <blockquote>';
+    $allowed_with_blockquote = '<blockquote> ' . $this->allowedElements;
     $assert_session->fieldExists('filters[filter_html][settings][allowed_html]');
     $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', $allowed_with_blockquote);
 
@@ -298,7 +299,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $source_edit_tags_field->setValue('<aside>');
     $assert_session->assertWaitOnAjaxRequest();
 
-    $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<br> <p> <h2> <h3> <h4> <h5> <h6> <aside> <strong> <em> <blockquote>');
+    $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<aside> <blockquote> <br> <em> <h2> <h3> <h4> <h5> <h6> <p> <strong>');
     $allowed_html_field = $assert_session->fieldExists('filters[filter_html][settings][allowed_html]');
     $this->assertTrue($allowed_html_field->hasAttribute('readonly'));
 
@@ -380,8 +381,8 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $page->checkField('filters[media_embed][settings][allowed_view_modes][view_mode_1]');
     $page->checkField('filters[media_embed][settings][allowed_view_modes][view_mode_2]');
 
-    $allowed_with_media = $this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt data-view-mode>';
-    $allowed_with_media_without_view_mode = $this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt>';
+    $allowed_with_media = FilterHtml::sortAllowedHtmlTags($this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt data-view-mode>');
+    $allowed_with_media_without_view_mode = FilterHtml::sortAllowedHtmlTags($this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt>');
     $page->clickLink('Media');
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][media_media][allow_view_mode_override]'));
     $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', $allowed_with_media_without_view_mode);
@@ -405,7 +406,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     // filter_align is enabled.
     $page->checkField('filters[filter_align][status]');
     $assert_session->assertExpectedAjaxRequest(1);
-    $this->assertEquals($this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt data-view-mode data-align>', $allowed_html_field->getValue());
+    $this->assertEquals(FilterHtml::sortAllowedHtmlTags($this->allowedElements . ' <drupal-media data-entity-type data-entity-uuid alt data-view-mode data-align>'), $allowed_html_field->getValue());
 
     // Disable media embed.
     $this->assertTrue($page->hasCheckedField('filters[media_embed][status]'));
@@ -435,6 +436,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $page->fillField('title[0][value]', 'My test content');
     $page->fillField('body[0][value]', '<foo bar="baz">⬅️✌️➡️</foo><p><a style="color:#ff0000;" foo="bar" hreflang="en" href="https://example.com"><abbr title="National Aeronautics and Space Administration">NASA</abbr> is an acronym.</a></p>');
     $page->pressButton('Save');
+    $this->assertTrue($assert_session->waitForText('My test content'));
 
     // Configure Full HTML text format to use CKEditor 5.
     $this->drupalGet('admin/config/content/formats/manage/full_html');
@@ -460,6 +462,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     // Ensure the editor is loaded and ensure that arbitrary markup is retained.
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-editor'));
     $page->pressButton('Save');
+    $this->assertTrue($assert_session->waitForText('NASA is an acronym.'));
 
     // But note that the `style` attribute was stripped by
     // \Drupal\editor\EditorXssFilter\Standard.
@@ -475,6 +478,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $this->drupalGet('node/1/edit');
     $page->pressButton('Save');
 
+    $this->assertTrue($assert_session->waitForText('NASA is an acronym.'));
     $assert_session->responseContains('<p><a foo="bar" hreflang="en" href="https://example.com"><abbr title="National Aeronautics and Space Administration">NASA</abbr> is an acronym.</a></p>');
 
     // Configure Basic HTML text format to use CKE5 and enable the link plugin.
@@ -495,6 +499,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     $page->pressButton('Continue');
     $assert_session->assertWaitOnAjaxRequest();
     $page->pressButton('Save');
+    $this->assertTrue($assert_session->waitForText('NASA is an acronym.'));
 
     // The `style` and foo` attributes should have been removed, as should the
     // `<abbr>` and `<foo>` tags.

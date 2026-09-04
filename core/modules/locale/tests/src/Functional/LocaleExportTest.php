@@ -32,7 +32,7 @@ class LocaleExportTest extends BrowserTestBase {
    *
    * @var \Drupal\user\Entity\User|false
    */
-  protected $adminUser = NULL;
+  protected $adminUser;
 
   /**
    * {@inheritdoc}
@@ -133,7 +133,7 @@ class LocaleExportTest extends BrowserTestBase {
    */
   public function testExportTranslationTemplateFile(): void {
     // Load an admin page with JavaScript so _drupal_add_library() fires at
-    // least once and _locale_parse_js_file() gets to run at least once so that
+    // least once and LocaleJs::parseJsFile() gets to run at least once so that
     // the locales_source table gets populated with something.
     $this->drupalGet('admin/config/regional/language');
     // Get the translation template file.
@@ -146,13 +146,13 @@ class LocaleExportTest extends BrowserTestBase {
   /**
    * Helper function that returns a proper .po file.
    */
-  public function getPoFile() {
+  public function getPoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 
@@ -164,13 +164,13 @@ EOF;
   /**
    * Returns a .po file that will be marked as customized.
    */
-  public function getCustomPoFile() {
+  public function getCustomPoFile(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 
@@ -185,7 +185,7 @@ EOF;
    * @return string
    *   A .po file fragment with an untranslated string.
    */
-  public function getUntranslatedString() {
+  public function getUntranslatedString(): string {
     return <<< EOF
 msgid "February"
 msgstr ""

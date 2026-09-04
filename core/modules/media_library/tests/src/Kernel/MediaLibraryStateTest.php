@@ -99,14 +99,12 @@ class MediaLibraryStateTest extends KernelTestBase {
    *   library.
    * @param string $exception_message
    *   The expected exception message.
-   *
-   * @legacy-covers ::create
    */
   #[DataProvider('providerCreate')]
   public function testCreate($opener_id, array $allowed_media_type_ids, $selected_type_id, $remaining_slots, $exception_message = ''): void {
     if ($exception_message) {
       $this->expectException(\InvalidArgumentException::class);
-      $this->expectExceptionMessage($exception_message);
+      $this->expectExceptionMessageIs($exception_message);
     }
     $state = MediaLibraryState::create($opener_id, $allowed_media_type_ids, $selected_type_id, $remaining_slots);
     $this->assertInstanceOf(MediaLibraryState::class, $state);
@@ -123,7 +121,7 @@ class MediaLibraryStateTest extends KernelTestBase {
    * @return array
    *   The data sets to test.
    */
-  public static function providerCreate() {
+  public static function providerCreate(): array {
     $test_data = [];
 
     // Assert no exception is thrown when we add the parameters as expected.
@@ -277,8 +275,6 @@ class MediaLibraryStateTest extends KernelTestBase {
    *   The query parameters to override.
    * @param bool $exception_expected
    *   Whether an AccessDeniedHttpException is expected or not.
-   *
-   * @legacy-covers ::fromRequest
    */
   #[DataProvider('providerFromRequest')]
   public function testFromRequest(array $query_overrides, $exception_expected): void {
@@ -288,7 +284,7 @@ class MediaLibraryStateTest extends KernelTestBase {
     $query = array_merge($query, $query_overrides);
     if ($exception_expected) {
       $this->expectException(BadRequestHttpException::class);
-      $this->expectExceptionMessage("Invalid media library parameters specified.");
+      $this->expectExceptionMessageIs("Invalid media library parameters specified.");
     }
 
     $state = MediaLibraryState::fromRequest(new Request($query));
@@ -297,12 +293,10 @@ class MediaLibraryStateTest extends KernelTestBase {
 
   /**
    * Tests from request query less.
-   *
-   * @legacy-covers ::fromRequest
    */
   public function testFromRequestQueryLess(): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage('The opener ID parameter is required and must be a string.');
+    $this->expectExceptionMessageIs('The opener ID parameter is required and must be a string.');
     $state = MediaLibraryState::fromRequest(new Request());
     $this->assertInstanceOf(MediaLibraryState::class, $state);
   }
@@ -313,7 +307,7 @@ class MediaLibraryStateTest extends KernelTestBase {
    * @return array
    *   The data sets to test.
    */
-  public static function providerFromRequest() {
+  public static function providerFromRequest(): array {
     $test_data = [];
 
     // Assert no exception is thrown when we use valid state parameters.

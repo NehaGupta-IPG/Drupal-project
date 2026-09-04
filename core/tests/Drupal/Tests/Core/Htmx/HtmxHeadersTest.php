@@ -11,6 +11,7 @@ use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Test all header-related Htmx public methods.
@@ -27,7 +28,7 @@ class HtmxHeadersTest extends UnitTestCase {
   /**
    * Mocked Url object.
    */
-  protected Url $url;
+  protected Url&Stub $url;
 
   /**
    * {@inheritdoc}
@@ -37,11 +38,8 @@ class HtmxHeadersTest extends UnitTestCase {
     $this->htmx = new Htmx();
     $generated = new GeneratedUrl();
     $generated->setGeneratedUrl('https://www.example.test/common-test/destination');
-    $this->url = $this->getMockBuilder(Url::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['toString'])
-      ->getMock();
-    $this->url->expects($this->any())
+    $this->url = $this->createStub(Url::class);
+    $this->url
       ->method('toString')
       ->willReturn($generated);
   }
@@ -216,7 +214,7 @@ class HtmxHeadersTest extends UnitTestCase {
   }
 
   /**
-   * Test target header with complex data.
+   * Test trigger header with complex data.
    */
   public function testTriggerHeaderComplex(): void {
     $this->htmx->triggerHeader([
@@ -230,72 +228,6 @@ class HtmxHeadersTest extends UnitTestCase {
     $this->assertIsArray($render['#attached']['http_header']);
     $value = reset($render['#attached']['http_header']);
     $this->assertEquals('hx-trigger', $value[0]);
-    $this->assertEquals('{"showMessage":{"level":"info","message":"Trigger Set"}}', $value[1]);
-    $this->assertEquals(TRUE, $value[2]);
-  }
-
-  /**
-   * Test trigger header with simple data.
-   */
-  public function testTriggerAfterSettleHeader(): void {
-    $this->htmx->triggerAfterSettleHeader('foo');
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attached']['http_header']));
-    $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
-    $this->assertEquals('hx-trigger-after-settle', $value[0]);
-    $this->assertEquals('foo', $value[1]);
-    $this->assertEquals(TRUE, $value[2]);
-  }
-
-  /**
-   * Test trigger after settle header is correctly set with provided parameters.
-   */
-  public function testTriggerAfterSettleHeaderComplex(): void {
-    $this->htmx->triggerAfterSettleHeader([
-      'showMessage' => [
-        'level' => 'info',
-        'message' => 'Trigger Set',
-      ],
-    ]);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attached']['http_header']));
-    $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
-    $this->assertEquals('hx-trigger-after-settle', $value[0]);
-    $this->assertEquals('{"showMessage":{"level":"info","message":"Trigger Set"}}', $value[1]);
-    $this->assertEquals(TRUE, $value[2]);
-  }
-
-  /**
-   * Test trigger header with simple data.
-   */
-  public function testTriggerAfterSwapHeader(): void {
-    $this->htmx->triggerAfterSwapHeader('foo');
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attached']['http_header']));
-    $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
-    $this->assertEquals('hx-trigger-after-swap', $value[0]);
-    $this->assertEquals('foo', $value[1]);
-    $this->assertEquals(TRUE, $value[2]);
-  }
-
-  /**
-   * Test trigger after settle header is correctly set with provided parameters.
-   */
-  public function testTriggerAfterSwapHeaderComplex(): void {
-    $this->htmx->triggerAfterSwapHeader([
-      'showMessage' => [
-        'level' => 'info',
-        'message' => 'Trigger Set',
-      ],
-    ]);
-    $render = $this->apply();
-    $this->assertTrue(isset($render['#attached']['http_header']));
-    $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
-    $this->assertEquals('hx-trigger-after-swap', $value[0]);
     $this->assertEquals('{"showMessage":{"level":"info","message":"Trigger Set"}}', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
   }

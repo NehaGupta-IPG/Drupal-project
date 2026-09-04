@@ -10,7 +10,10 @@ use Drupal\Core\Access\AccessResultNeutral;
 use Drupal\Core\Access\AccessResultReasonInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -24,25 +27,16 @@ use PHPUnit\Framework\Attributes\Group;
 class AccessResultTest extends UnitTestCase {
 
   /**
-   * The cache contexts manager.
-   *
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $cacheContextsManager;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
 
-    $this->cacheContextsManager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $cacheContextsManager = $this->createStub(CacheContextsManager::class);
 
-    $this->cacheContextsManager->method('assertValidTokens')->willReturn(TRUE);
+    $cacheContextsManager->method('assertValidTokens')->willReturn(TRUE);
     $container = new ContainerBuilder();
-    $container->set('cache_contexts_manager', $this->cacheContextsManager);
+    $container->set('cache_contexts_manager', $cacheContextsManager);
     \Drupal::setContainer($container);
   }
 
@@ -144,6 +138,31 @@ class AccessResultTest extends UnitTestCase {
   }
 
   /**
+   * Tests access neutral reason.
+   *
+   * @legacy-covers ::neutral
+   */
+  public function testAccessNeutralReason(): void {
+    $verify = function (AccessResult $access, $reason): void {
+      $this->assertInstanceOf(AccessResultReasonInterface::class, $access);
+      $this->assertSame($reason, $access->getReason());
+    };
+
+    $b = AccessResult::neutral();
+    $verify($b, '');
+
+    $reason = $this->getRandomGenerator()->string();
+    $b = AccessResult::neutral($reason);
+    $verify($b, $reason);
+
+    $b = AccessResult::forbiddenIf(FALSE, '', $reason);
+    $verify($b, $reason);
+
+    $b = AccessResult::allowedIf(FALSE, $reason);
+    $verify($b, $reason);
+  }
+
+  /**
    * Tests access conditionally allowed.
    *
    * @legacy-covers ::allowedIf
@@ -189,8 +208,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests and if.
-   *
-   * @legacy-covers ::andIf
    */
   public function testAndIf(): void {
     $neutral = AccessResult::neutral('neutral message');
@@ -282,8 +299,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests or if.
-   *
-   * @legacy-covers ::orIf
    */
   public function testOrIf(): void {
     $neutral = AccessResult::neutral('neutral message');
@@ -478,7 +493,8 @@ class AccessResultTest extends UnitTestCase {
 
     // ::allowIfHasPermission and ::allowedIfHasPermission convenience methods.
     $account = $this->createMock('\Drupal\Core\Session\AccountInterface');
-    $account->expects($this->any())
+    $account
+      ->expects($this->once())
       ->method('hasPermission')
       ->with('may herd llamas')
       ->willReturn(FALSE);
@@ -532,14 +548,14 @@ class AccessResultTest extends UnitTestCase {
     $verify($access, ['bar:baz', 'bar:qux', 'foo:bar', 'foo:baz']);
 
     // ::addCacheableDependency() convenience method.
-    $node = $this->createMock('\Drupal\node\NodeInterface');
-    $node->expects($this->any())
+    $node = $this->createStub(NodeInterface::class);
+    $node
       ->method('getCacheTags')
       ->willReturn(['node:20011988']);
-    $node->expects($this->any())
+    $node
       ->method('getCacheMaxAge')
       ->willReturn(600);
-    $node->expects($this->any())
+    $node
       ->method('getCacheContexts')
       ->willReturn(['user']);
     $tags = ['node:20011988'];
@@ -551,8 +567,6 @@ class AccessResultTest extends UnitTestCase {
 
   /**
    * Tests inherit cacheability.
-   *
-   * @legacy-covers ::inheritCacheability
    */
   public function testInheritCacheability(): void {
     // andIf(); 1st has defaults, 2nd has custom tags, contexts and max-age.
@@ -876,7 +890,7 @@ class AccessResultTest extends UnitTestCase {
    * @legacy-covers ::inheritCacheability
    */
   #[DataProvider('andOrCacheabilityPropagationProvider')]
-  public function testAndOrCacheabilityPropagation(AccessResultInterface $first, $op, AccessResultInterface $second, $implements_cacheable_dependency_interface, $is_cacheable): void {
+  public function testAndOrCacheabilityPropagation(AccessResultInterface $first, string $op, AccessResultInterface $second, bool $implements_cacheable_dependency_interface, ?bool $is_cacheable): void {
     if ($op === 'OR') {
       $result = $first->orIf($second);
     }
@@ -888,9 +902,7 @@ class AccessResultTest extends UnitTestCase {
     }
     if ($implements_cacheable_dependency_interface) {
       $this->assertInstanceOf(CacheableDependencyInterface::class, $result);
-      if ($result instanceof CacheableDependencyInterface) {
-        $this->assertSame($is_cacheable, $result->getCacheMaxAge() !== 0, 'getCacheMaxAge() matches expectations.');
-      }
+      $this->assertSame($is_cacheable, $result->getCacheMaxAge() !== 0, 'getCacheMaxAge() matches expectations.');
     }
     else {
       $this->assertNotInstanceOf(CacheableDependencyInterface::class, $result);
@@ -905,8 +917,6 @@ class AccessResultTest extends UnitTestCase {
    * This is only the case for non-forbidden access results; we still abort the
    * ORing process as soon as a forbidden access result is encountered. This is
    * tested in ::testOrIf().
-   *
-   * @legacy-covers ::orIf
    */
   public function testOrIfCacheabilityMerging(): void {
     $merge_both_directions = function (AccessResult $a, AccessResult $b): void {
@@ -939,13 +949,11 @@ class AccessResultTest extends UnitTestCase {
    *   The conjunction to use when checking for permission. 'AND' or 'OR'.
    * @param \Drupal\Core\Access\AccessResult $expected_access
    *   The expected access check result.
-   *
-   * @legacy-covers ::allowedIfHasPermissions
    */
   #[DataProvider('providerTestAllowedIfHasPermissions')]
   public function testAllowedIfHasPermissions($permissions, $conjunction, AccessResult $expected_access): void {
-    $account = $this->createMock('\Drupal\Core\Session\AccountInterface');
-    $account->expects($this->any())
+    $account = $this->createStub(AccountInterface::class);
+    $account
       ->method('hasPermission')
       ->willReturnMap([
         ['allowed', TRUE],

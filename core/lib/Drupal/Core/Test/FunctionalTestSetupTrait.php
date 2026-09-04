@@ -178,6 +178,11 @@ trait FunctionalTestSetupTrait {
       'tags' => [['name' => 'http_middleware', 'priority' => -1024]],
     ];
     $services['parameters']['drupal.test_wait_terminate'] = FALSE;
+
+    // Relax the password hashing cost in tests to avoid performance issues.
+    $services['parameters']['password.algorithm'] = PASSWORD_BCRYPT;
+    $services['parameters']['password.options'] = ['cost' => 4];
+
     file_put_contents($directory . '/services.yml', $yaml->dump($services));
     // Since Drupal is bootstrapped already, install_begin_request() will not
     // bootstrap again. Hence, we have to reload the newly written custom
@@ -485,18 +490,12 @@ trait FunctionalTestSetupTrait {
   }
 
   /**
-   * Install modules defined by `static::$modules`.
+   * Gets a list of modules recursively from inherited class properties.
    *
-   * To install test modules outside of the testing environment, add
-   * @code
-   * $settings['extension_discovery_scan_tests'] = TRUE;
-   * @endcode
-   * to your settings.php.
-   *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The container.
+   * @return array
+   *   The modules to install, or an empty array if none are specified.
    */
-  protected function installModulesFromClassProperty(ContainerInterface $container) {
+  protected function getModulesFromClassProperty(): array {
     $class = static::class;
     $modules = [];
     while ($class) {
@@ -507,6 +506,30 @@ trait FunctionalTestSetupTrait {
     }
     if ($modules) {
       $modules = array_unique($modules);
+    }
+    return $modules;
+  }
+
+  /**
+   * Install modules defined by `static::$modules`.
+   *
+   * To install test modules outside of the testing environment, add
+   * @code
+   * $settings['extension_discovery_scan_tests'] = TRUE;
+   * @endcode
+   * to your settings.php.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The container.
+   *
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no
+   * replacement.
+   * @see https://www.drupal.org/node/3616201
+   */
+  protected function installModulesFromClassProperty(ContainerInterface $container) {
+    trigger_error(__METHOD__ . 'is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3616201', E_USER_DEPRECATED);
+    $modules = $this->getModulesFromClassProperty();
+    if ($modules) {
       try {
         $success = $container->get('module_installer')->install($modules, TRUE);
         $this->assertTrue($success, 'Enabled modules: ' . implode(', ', $modules));
@@ -527,16 +550,9 @@ trait FunctionalTestSetupTrait {
     // Reset/rebuild all data structures after enabling the modules, primarily
     // to synchronize all data structures and caches between the test runner and
     // the child site.
-    // @see \Drupal\Core\DrupalKernel::bootCode()
     // @todo Test-specific setUp() methods may set up further fixtures; find a
     //   way to execute this after setUp() is done, or to eliminate it entirely.
     $this->resetAll();
-
-    // Explicitly call register() again on the container registered in \Drupal.
-    // @todo This should already be called through
-    //   DrupalKernel::prepareLegacyRequest() -> DrupalKernel::boot() but that
-    //   appears to be calling a different container.
-    $this->container->get('stream_wrapper_manager')->register();
   }
 
   /**
@@ -548,11 +564,11 @@ trait FunctionalTestSetupTrait {
    * @return array
    *   Array of parameters for use in install_drupal().
    */
-  protected function installParameters() {
+  protected function installParameters(): array {
     $formInput = Database::getConnectionInfo()['default'];
     $driverName = $formInput['driver'];
     $driverNamespace = $formInput['namespace'];
-
+    $modules = $this->getModulesFromClassProperty();
     unset($formInput['driver']);
     unset($formInput['namespace']);
     unset($formInput['autoload']);
@@ -573,6 +589,7 @@ trait FunctionalTestSetupTrait {
         'profile' => $this->profile,
         'langcode' => 'en',
       ],
+      'extra_modules' => $modules,
       'forms' => [
         'install_settings_form' => [
           'driver' => $driverNamespace,
@@ -597,6 +614,9 @@ trait FunctionalTestSetupTrait {
         ],
       ],
     ];
+    if (isset($this->defaultTheme)) {
+      $parameters['default_theme'] = $this->defaultTheme;
+    }
 
     // If we only have one db driver available, we cannot set the driver.
     if (count(Database::getDriverList()->getInstallableList()) == 1) {

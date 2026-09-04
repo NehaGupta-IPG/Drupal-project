@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Tests\workspaces\Kernel;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
@@ -28,8 +32,8 @@ class WorkspaceAccessTest extends KernelTestBase {
     'user',
     'system',
     'workspaces',
-    'workspace_access_test',
     'workspaces_test',
+    'workspaces_ui',
   ];
 
   /**
@@ -53,7 +57,7 @@ class WorkspaceAccessTest extends KernelTestBase {
    * @return array
    *   An array of operations and permissions to test with.
    */
-  public static function operationCases() {
+  public static function operationCases(): array {
     return [
       ['create', 'administer workspaces'],
       ['create', 'create workspace'],
@@ -78,7 +82,7 @@ class WorkspaceAccessTest extends KernelTestBase {
    *   The permission to test with.
    */
   #[DataProvider('operationCases')]
-  public function testWorkspaceAccess($operation, $permission): void {
+  public function testWorkspaceAccess(string $operation, string $permission): void {
     $user = $this->createUser();
     $this->setCurrentUser($user);
     $workspace = Workspace::create(['id' => 'oak']);
@@ -90,6 +94,14 @@ class WorkspaceAccessTest extends KernelTestBase {
     $role = $this->createRole([$permission]);
     $user->addRole($role);
     $this->assertTrue($workspace->access($operation, $user));
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_access() for the 'workspace' entity type.
+   */
+  #[Hook('workspace_access')]
+  public function workspaceAccess(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
+    return \Drupal::keyValue('workspace_access_test')->get("result.{$operation}", AccessResult::neutral());
   }
 
   /**
@@ -110,7 +122,7 @@ class WorkspaceAccessTest extends KernelTestBase {
 
     // Simulate an external factor which decides that a workspace can not be
     // published.
-    \Drupal::state()->set('workspace_access_test.result.publish', AccessResult::forbidden());
+    \Drupal::keyValue('workspace_access_test')->set('result.publish', AccessResult::forbidden());
     \Drupal::entityTypeManager()->getAccessControlHandler('workspace')->resetCache();
     $this->assertFalse($workspace->access('publish'));
   }

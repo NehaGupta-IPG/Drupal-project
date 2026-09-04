@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Controller;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Extension\ExtensionLifecycle;
@@ -12,10 +13,14 @@ use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\Core\Routing\Attribute\Route;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeAccessCheck;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\system\SystemManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * Returns responses for System routes.
@@ -24,79 +29,18 @@ class SystemController extends ControllerBase {
 
   use ModuleDependencyMessageTrait;
 
-  /**
-   * System Manager Service.
-   *
-   * @var \Drupal\system\SystemManager
-   */
-  protected $systemManager;
-
-  /**
-   * The theme access checker service.
-   *
-   * @var \Drupal\Core\Theme\ThemeAccessCheck
-   */
-  protected $themeAccess;
-
-  /**
-   * The form builder service.
-   *
-   * @var \Drupal\Core\Form\FormBuilderInterface
-   */
-  protected $formBuilder;
-
-  /**
-   * The menu link tree service.
-   *
-   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
-   */
-  protected $menuLinkTree;
-
-  /**
-   * The module extension list.
-   *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  protected $moduleExtensionList;
-
-  /**
-   * The theme extension list.
-   *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
-   */
-  protected ThemeExtensionList $themeExtensionList;
-
-  /**
-   * Constructs a new SystemController.
-   *
-   * @param \Drupal\system\SystemManager $systemManager
-   *   System manager service.
-   * @param \Drupal\Core\Theme\ThemeAccessCheck $theme_access
-   *   The theme access checker service.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The form builder.
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_link_tree
-   *   The menu link tree service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
-   *   The theme extension list.
-   */
   public function __construct(
-    SystemManager $systemManager,
+    protected SystemManager $systemManager,
     #[Autowire(service: 'access_check.theme')]
-    ThemeAccessCheck $theme_access,
+    protected ThemeAccessCheck $themeAccess,
     FormBuilderInterface $form_builder,
-    MenuLinkTreeInterface $menu_link_tree,
-    ModuleExtensionList $module_extension_list,
-    ThemeExtensionList $theme_extension_list,
+    protected MenuLinkTreeInterface $menuLinkTree,
+    protected ModuleExtensionList $moduleExtensionList,
+    protected ThemeExtensionList $themeExtensionList,
+    protected ThemeManagerInterface $themeManager,
+    readonly protected TimeInterface $time,
   ) {
-    $this->systemManager = $systemManager;
-    $this->themeAccess = $theme_access;
     $this->formBuilder = $form_builder;
-    $this->menuLinkTree = $menu_link_tree;
-    $this->moduleExtensionList = $module_extension_list;
-    $this->themeExtensionList = $theme_extension_list;
   }
 
   /**
@@ -111,6 +55,15 @@ class SystemController extends ControllerBase {
    * @return array
    *   A renderable array of the administration overview page.
    */
+  #[Route(
+    path: '/admin/config',
+    name: 'system.admin_config',
+    title: new TranslatableMarkup('Configuration'),
+    requirements: ['_permission' => 'access administration pages'],
+    defaults: [
+      'link_id' => 'system.admin_config',
+    ],
+  )]
   public function overview($link_id) {
     // Check for status report errors.
     if ($this->currentUser()->hasPermission('administer site configuration') && $this->systemManager->checkRequirements()) {
@@ -174,15 +127,111 @@ class SystemController extends ControllerBase {
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A redirect response to the front page.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3588109
    */
+  #[Route(
+    path: '/admin/compact/{mode}',
+    name: 'system.admin_compact_page',
+    requirements: ['_permission' => 'access administration pages'],
+    defaults: ['mode' => 'off'],
+  )]
   public function compactPage($mode) {
-    user_cookie_save(['admin_compact_mode' => ($mode == 'on')]);
-    return $this->redirect('<front>');
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3588109', E_USER_DEPRECATED);
+    $response = $this->redirect('<front>');
+    if ($mode === 'on') {
+      $response->headers->setCookie(new Cookie('Drupal.visitor.admin_compact_mode', '1', $this->time->getRequestTime() + 31536000));
+    }
+    else {
+      $response->headers->clearCookie('Drupal.visitor.admin_compact_mode');
+    }
+    return $response;
   }
 
   /**
    * Provides a single block from the administration menu as a page.
    */
+  #[Route(
+    path: '/admin',
+    name: 'system.admin',
+    title: new TranslatableMarkup('Administration'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/structure',
+    name: 'system.admin_structure',
+    title: new TranslatableMarkup('Structure'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/reports',
+    name: 'system.admin_reports',
+    title: new TranslatableMarkup('Reports'),
+    requirements: ['_permission' => 'access site reports'],
+  )]
+  #[Route(
+    path: '/admin/config/media',
+    name: 'system.admin_config_media',
+    title: new TranslatableMarkup('Media'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/services',
+    name: 'system.admin_config_services',
+    title: new TranslatableMarkup('Web services'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/development',
+    name: 'system.admin_config_development',
+    title: new TranslatableMarkup('Development'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/regional',
+    name: 'system.admin_config_regional',
+    title: new TranslatableMarkup('Region and language'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/search',
+    name: 'system.admin_config_search',
+    title: new TranslatableMarkup('Search and metadata'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/system',
+    name: 'system.admin_config_system',
+    title: new TranslatableMarkup('System'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/user-interface',
+    name: 'system.admin_config_ui',
+    title: new TranslatableMarkup('User interface'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/workflow',
+    name: 'system.admin_config_workflow',
+    title: new TranslatableMarkup('Workflow'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/config/content',
+    name: 'system.admin_config_content',
+    title: new TranslatableMarkup('Content authoring'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
+  #[Route(
+    path: '/admin/content',
+    name: 'system.admin_content',
+    title: new TranslatableMarkup('Content'),
+    requirements: ['_permission' => 'access administration pages'],
+  )]
   public function systemAdminMenuBlockPage() {
     return $this->systemManager->getBlockContents();
   }
@@ -195,10 +244,16 @@ class SystemController extends ControllerBase {
    *
    * @todo Move into ThemeController.
    */
+  #[Route(
+    path: '/admin/appearance',
+    name: 'system.themes_page',
+    title: new TranslatableMarkup('Appearance'),
+    requirements: ['_permission' => 'administer themes'],
+  )]
   public function themesPage() {
     $config = $this->config('system.theme');
     // Get all available themes.
-    $themes = $this->themeExtensionList->reset()->getList();
+    $themes = $this->themeExtensionList->getList(TRUE);
 
     // Remove obsolete themes.
     $themes = array_filter($themes, function ($theme) {
@@ -257,7 +312,7 @@ class SystemController extends ControllerBase {
         // Confirm that all base themes are available.
         $theme->incompatible_base = (isset($theme->info['base theme']) && !($theme->base_themes === array_filter($theme->base_themes)));
         // Confirm that the theme engine is available.
-        $theme->incompatible_engine = isset($theme->info['engine']) && !isset($theme->owner);
+        $theme->incompatible_engine = isset($theme->info['engine']) && !$this->themeManager->getThemeEngine($theme->info['engine']);
         // Confirm that module dependencies are available.
         $theme->incompatible_module = FALSE;
         // Confirm that the user has permission to enable modules.
@@ -384,7 +439,17 @@ class SystemController extends ControllerBase {
       $theme_group_titles['uninstalled'] = $this->formatPlural(count($theme_groups['uninstalled']), 'Uninstalled theme', 'Uninstalled themes');
     }
 
-    uasort($theme_groups['installed'], 'system_sort_themes');
+    $sortThemes = static function ($a, $b) {
+      if ($a->is_default) {
+        return -1;
+      }
+      if ($b->is_default) {
+        return 1;
+      }
+      return strcasecmp($a->info['name'], $b->info['name']);
+    };
+
+    uasort($theme_groups['installed'], $sortThemes);
     $this->moduleHandler()->alter('system_themes_page', $theme_groups);
 
     $build = [];
