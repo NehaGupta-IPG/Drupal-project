@@ -361,4 +361,18 @@ class UserHooks {
     ];
   }
 
+  /**
+   * Implements hook_user_cancel_method_info_alter().
+   */
+  #[Hook('user_cancel_method_info_alter')]
+  public function userCancelMethodInfoAlter(array &$definitions): void {
+    if (isset($definitions['user_cancel_reassign'])) {
+      $anonymousName = \Drupal::configFactory()->get('user.settings')->get('anonymous');
+      $arguments = ['%anonymous-name' => $anonymousName];
+      // Can't replace the placeholder in the plugin's attribute definition.
+      $definitions['user_cancel_reassign']['label'] = $this->t('Delete the account and make its content belong to the %anonymous-name user. This action cannot be undone.', $arguments);
+      $definitions['user_cancel_reassign']['description'] = $this->t('Your account will be removed and all account information deleted. All of your content will be assigned to the %anonymous-name user.', $arguments);
+    }
+  }
+
 }

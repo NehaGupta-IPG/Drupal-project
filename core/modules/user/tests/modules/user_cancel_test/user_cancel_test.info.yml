@@ -1,0 +1,5 @@
+name: 'User account cancellation tests'
+type: module
+description: 'Support module for user account cancellation testing.'
+package: Testing
+version: VERSION

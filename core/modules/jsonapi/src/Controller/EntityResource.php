@@ -53,6 +53,8 @@ use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeField;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 use Drupal\jsonapi\Revisions\ResourceVersionRouteEnhancer;
+use Drupal\user\AccountCancellation;
+use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -77,6 +79,13 @@ class EntityResource {
 
   use EntityValidationTrait;
 
+  /**
+   * Account cancellation service.
+   *
+   * @var \Drupal\user\AccountCancellation
+   */
+  protected AccountCancellation $accountCancellation;
+
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected EntityFieldManagerInterface $fieldManager,
@@ -91,7 +100,13 @@ class EntityResource {
     protected TimeInterface $time,
     protected AccountInterface $user,
     protected EventDispatcherInterface $eventDispatcher,
-  ) {}
+    ?AccountCancellation $account_cancellation = NULL,
+  ) {
+    if ($account_cancellation === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $account_cancellation argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
+    }
+    $this->accountCancellation = $account_cancellation ?? \Drupal::service(AccountCancellation::class);
+  }
 
   /**
    * Gets the individual entity.
@@ -272,14 +287,14 @@ class EntityResource {
    */
   public function deleteIndividual(EntityInterface $entity) {
     // @todo Replace with entity handlers in: https://www.drupal.org/project/drupal/issues/3230434
-    if ($entity->getEntityTypeId() === 'user') {
+    if ($entity instanceof UserInterface) {
       $cancel_method = \Drupal::service('config.factory')->get('user.settings')->get('cancel_method');
 
       // Allow other modules to act.
 
-      user_cancel([], $entity->id(), $cancel_method);
-      // Since user_cancel() is not invoked via Form API, batch processing
-      // needs to be invoked manually.
+      $this->accountCancellation->cancel($entity, $cancel_method);
+      // Since \Drupal\user\AccountCancellation::cancel() is not invoked via
+      // Form API, batch processing needs to be invoked manually.
       $batch =& batch_get();
       // Mark this batch as non-progressive to bypass the progress bar and
       // redirect.

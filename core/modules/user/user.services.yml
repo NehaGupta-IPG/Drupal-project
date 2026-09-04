@@ -71,3 +71,6 @@ services:
   Drupal\user\LoginFinalizer: ~
   Drupal\user\LogoutFinalizer: ~
   Drupal\user\NotificationHandler: ~
+  Drupal\user\AccountCancellation: ~
+  Drupal\user\AccountCancelMethodManager:
+    parent: default_plugin_manager
