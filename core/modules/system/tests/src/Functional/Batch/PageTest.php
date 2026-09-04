@@ -83,7 +83,7 @@ class PageTest extends BrowserTestBase {
     $this->drupalGet('batch-test/test-title');
     // Check that the initial progress message appears correctly and is not
     // double escaped.
-    $this->assertSession()->responseContains('<div class="progress__description">Initializing.<br />&nbsp;</div>');
+    $this->assertSession()->responseContains('<div class="progress__description">Initializing.<br>&nbsp;</div>');
     $this->assertSession()->responseNotContains('&amp;nbsp;');
     // Now also go to the next step.
     $this->maximumMetaRefreshCount = 1;

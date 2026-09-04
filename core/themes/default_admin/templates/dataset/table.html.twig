@@ -69,7 +69,7 @@
               type="checkbox"
               class="form-checkbox form-boolean form-boolean--type-checkbox"
               title="{{ 'Select all rows in this table'|t }}"
-            />
+            >
           {% endif %}
         </{{ cell.tag }}>
       {% endfor %}
@@ -95,11 +95,11 @@
         {% if colgroup.cols %}
           <colgroup{{ colgroup.attributes }}>
             {% for col in colgroup.cols %}
-              <col{{ col.attributes }} />
+              <col{{ col.attributes }}>
             {% endfor %}
           </colgroup>
         {% else %}
-          <colgroup{{ colgroup.attributes }} />
+          <colgroup{{ colgroup.attributes }}>
         {% endif %}
       {% endfor %}
 

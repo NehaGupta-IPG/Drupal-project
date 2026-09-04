@@ -142,7 +142,7 @@ function _drupal_exception_handler_additional($exception, $exception2): void {
   if (error_displayable()) {
     print '<h1>Additional uncaught exception thrown while handling exception.</h1>';
     print '<h2>Original</h2><p>' . Error::renderExceptionSafe($exception) . '</p>';
-    print '<h2>Additional</h2><p>' . Error::renderExceptionSafe($exception2) . '</p><hr />';
+    print '<h2>Additional</h2><p>' . Error::renderExceptionSafe($exception2) . '</p><hr>';
   }
 }
 
@@ -537,7 +537,7 @@ function _drupal_shutdown_function_handle_exception($exception): void {
     require_once __DIR__ . '/errors.inc';
     if (error_displayable()) {
       print '<h1>Uncaught exception thrown in shutdown function.</h1>';
-      print '<p>' . Error::renderExceptionSafe($exception) . '</p><hr />';
+      print '<p>' . Error::renderExceptionSafe($exception) . '</p><hr>';
     }
   }
   error_log($exception);

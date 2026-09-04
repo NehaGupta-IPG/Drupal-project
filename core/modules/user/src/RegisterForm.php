@@ -204,7 +204,7 @@ class RegisterForm extends AccountForm {
     // Administrator approval required.
     else {
       $this->notificationHandler->sendRegisterPendingApproval($account);
-      $this->messenger()->addStatus($this->t('Thank you for applying for an account. Your account is currently pending approval by the site administrator.<br />In the meantime, a welcome message with further instructions has been sent to your email address.'));
+      $this->messenger()->addStatus($this->t('Thank you for applying for an account. Your account is currently pending approval by the site administrator.<br>In the meantime, a welcome message with further instructions has been sent to your email address.'));
       $form_state->setRedirect('<front>');
     }
   }

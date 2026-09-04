@@ -420,7 +420,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
         if (!empty($summary)) {
           $field_row['settings_summary'] = [
             '#type' => 'inline_template',
-            '#template' => '<div class="field-plugin-summary">{{ summary|safe_join("<br />") }}</div>',
+            '#template' => '<div class="field-plugin-summary">{{ summary|safe_join("<br>") }}</div>',
             '#context' => ['summary' => $summary],
             '#cell_attributes' => ['class' => ['field-plugin-summary-cell']],
           ];

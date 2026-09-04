@@ -130,7 +130,7 @@ use JsonSchema\Validator;
  *       minimum: 24
  *       default: 32
  *   template: >
- *     <img src={{ source }} width="{{ size|default(32) }}" height="{{ size|default(32) }}"/>
+ *     <img src={{ source }} width="{{ size|default(32) }}" height="{{ size|default(32) }}">
  *   library: "my_theme/my_lib"
  * @endcode
  *

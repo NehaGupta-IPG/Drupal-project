@@ -34,7 +34,7 @@ class BatchTestMultiStepForm extends FormBase {
     }
 
     $form['step_display'] = [
-      '#markup' => 'step ' . $step . '<br/>',
+      '#markup' => 'step ' . $step . '<br>',
     ];
     $form['submit'] = [
       '#type' => 'submit',

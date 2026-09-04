@@ -50,11 +50,11 @@
     {% if colgroup.cols %}
       <colgroup{{ colgroup.attributes }}>
         {% for col in colgroup.cols %}
-          <col{{ col.attributes }} />
+          <col{{ col.attributes }}>
         {% endfor %}
       </colgroup>
     {% else %}
-      <colgroup{{ colgroup.attributes }} />
+      <colgroup{{ colgroup.attributes }}>
     {% endif %}
   {% endfor %}
 

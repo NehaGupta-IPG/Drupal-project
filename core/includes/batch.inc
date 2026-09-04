@@ -167,7 +167,7 @@ function _batch_progress_page(): array {
     // function), it will output whatever is in the output buffer, followed by
     // the error message.
     ob_start();
-    $fallback = $current_set['error_message'] . '<br />' . $batch['error_message'];
+    $fallback = $current_set['error_message'] . '<br>' . $batch['error_message'];
 
     // We strip the end of the page using a marker in the template, so any
     // additional HTML output by PHP shows up inside the page rather than below
@@ -227,7 +227,7 @@ function _batch_progress_page(): array {
       // enabled.
       'drupalSettings' => [
         'batch' => [
-          'errorMessage' => $current_set['error_message'] . '<br />' . $batch['error_message'],
+          'errorMessage' => $current_set['error_message'] . '<br>' . $batch['error_message'],
           'initMessage' => $current_set['init_message'],
           'uri' => $url,
         ],

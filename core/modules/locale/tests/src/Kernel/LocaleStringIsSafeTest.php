@@ -40,7 +40,7 @@ class LocaleStringIsSafeTest extends KernelTestBase {
 
     // Check an untranslatable string which includes unsafe HTML (according to
     // the LocaleXss::stringIsSafe() function definition).
-    $string = 'Hello <img src="world.png" alt="world" />!';
+    $string = 'Hello <img src="world.png" alt="world">!';
     $result = LocaleXss::stringIsSafe($string);
     $this->assertFalse($result);
 

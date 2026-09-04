@@ -82,7 +82,7 @@ trait BrowserHtmlDebugTrait {
         return $header;
       }
     }, $headers);
-    return '<hr />Headers: <pre>' . Html::escape(var_export($flattened_headers, TRUE)) . '</pre>';
+    return '<hr>Headers: <pre>' . Html::escape(var_export($flattened_headers, TRUE)) . '</pre>';
   }
 
   /**
@@ -111,7 +111,7 @@ trait BrowserHtmlDebugTrait {
       return;
     }
     $message = $message ?: $this->getSession()->getPage()->getContent();
-    $message = '<hr />ID #' . $this->htmlOutputCounter . ' (<a href="' . $this->htmlOutputClassName . '-' . ($this->htmlOutputCounter - 1) . '-' . $this->htmlOutputTestId . '.html">Previous</a> | <a href="' . $this->htmlOutputClassName . '-' . ($this->htmlOutputCounter + 1) . '-' . $this->htmlOutputTestId . '.html">Next</a>)<hr />' . $message;
+    $message = '<hr>ID #' . $this->htmlOutputCounter . ' (<a href="' . $this->htmlOutputClassName . '-' . ($this->htmlOutputCounter - 1) . '-' . $this->htmlOutputTestId . '.html">Previous</a> | <a href="' . $this->htmlOutputClassName . '-' . ($this->htmlOutputCounter + 1) . '-' . $this->htmlOutputTestId . '.html">Next</a>)<hr>' . $message;
     $html_output_filename = $this->htmlOutputClassName . '-' . $this->htmlOutputCounter . '-' . $this->htmlOutputTestId . '.html';
     file_put_contents($this->htmlOutputDirectory . '/' . $html_output_filename, $message);
     file_put_contents($this->htmlOutputCounterStorage, $this->htmlOutputCounter++);
@@ -165,7 +165,7 @@ trait BrowserHtmlDebugTrait {
 
               $caller = $this->getTestMethodCaller();
               $html_output = 'Called from ' . $caller['function'] . ' line ' . $caller['line'];
-              $html_output .= '<hr />' . $request->getMethod() . ' request to: ' . $request->getUri();
+              $html_output .= '<hr>' . $request->getMethod() . ' request to: ' . $request->getUri();
 
               /** @var \Psr\Http\Message\StreamInterface $stream */
               $stream = $response->getBody();
@@ -183,9 +183,9 @@ trait BrowserHtmlDebugTrait {
               // debug output file in their browser.
               $status_code = (string) $response->getStatusCode();
               if ($status_code[0] === '3') {
-                $body = preg_replace('#<meta http-equiv="refresh" content=.+/>#', '', $body, 1);
+                $body = preg_replace('#<meta http-equiv="refresh" content=.+>#', '', $body, 1);
               }
-              $html_output .= '<hr />' . $body;
+              $html_output .= '<hr>' . $body;
               $html_output .= $this->formatHtmlOutputHeaders($response->getHeaders());
 
               $this->htmlOutput($html_output);

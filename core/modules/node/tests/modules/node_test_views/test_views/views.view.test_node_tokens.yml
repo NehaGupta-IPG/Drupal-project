@@ -93,7 +93,7 @@ display:
           exclude: false
           alter:
             alter_text: true
-            text: "Body: {{ body }}<br />\nRaw value: {{ body__value }}<br />\nRaw summary: {{ body__summary }}<br />\nRaw format: {{ body__format }}"
+            text: "Body: {{ body }}<br>\nRaw value: {{ body__value }}<br>\nRaw summary: {{ body__summary }}<br>\nRaw format: {{ body__format }}"
             make_link: false
             path: ''
             absolute: false

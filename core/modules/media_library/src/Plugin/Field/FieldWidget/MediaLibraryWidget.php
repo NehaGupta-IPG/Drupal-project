@@ -476,7 +476,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
 
       // Add a line break between the field message and the cardinality message.
       if (!empty($element['#description'])) {
-        $element['#description'] .= '<br />';
+        $element['#description'] .= '<br>';
       }
       $element['#description'] .= $cardinality_message;
     }

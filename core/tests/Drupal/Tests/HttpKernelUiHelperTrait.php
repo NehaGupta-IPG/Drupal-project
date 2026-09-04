@@ -90,7 +90,7 @@ trait HttpKernelUiHelperTrait {
 
     if ($this->htmlOutputEnabled) {
       $html_output = 'GET request to: ' . $path;
-      $html_output .= '<hr />' . $out;
+      $html_output .= '<hr>' . $out;
       $html_output .= $this->getHtmlOutputHeaders();
       $this->htmlOutput($html_output);
     }

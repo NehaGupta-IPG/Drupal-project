@@ -29,7 +29,7 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
     $form['styles'] = [
       '#title' => $this->t('Styles'),
       '#type' => 'textarea',
-      '#description' => $this->t('A list of classes that will be provided in the "Style" dropdown. Enter one or more classes on each line in the format: element.classA.classB|Label. Example: h1.title|Title. Advanced example: h1.fancy.title|Fancy title.<br />These styles should be available in your theme\'s CSS file.'),
+      '#description' => $this->t('A list of classes that will be provided in the "Style" dropdown. Enter one or more classes on each line in the format: element.classA.classB|Label. Example: h1.title|Title. Advanced example: h1.fancy.title|Fancy title.<br>These styles should be available in your theme\'s CSS file.'),
     ];
     if (!empty($this->configuration['styles'])) {
       $as_selectors = '';

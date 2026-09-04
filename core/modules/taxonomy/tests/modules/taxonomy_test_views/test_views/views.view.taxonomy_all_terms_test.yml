@@ -200,7 +200,7 @@ display:
           exclude: false
           alter:
             alter_text: true
-            text: "Term: {{ term_node_tid }}<br />\nThe taxonomy term ID for the term: {{ term_node_tid__tid }}<br />\nThe taxonomy term name for the term: {{ term_node_tid__name }}<br />\nThe machine name for the vocabulary the term belongs to: {{ term_node_tid__vocabulary_vid }}<br />\nThe name for the vocabulary the term belongs to: {{ term_node_tid__vocabulary }}<br />"
+            text: "Term: {{ term_node_tid }}<br>\nThe taxonomy term ID for the term: {{ term_node_tid__tid }}<br>\nThe taxonomy term name for the term: {{ term_node_tid__name }}<br>\nThe machine name for the vocabulary the term belongs to: {{ term_node_tid__vocabulary_vid }}<br>\nThe name for the vocabulary the term belongs to: {{ term_node_tid__vocabulary }}<br>"
             make_link: false
             path: ''
             absolute: false
@@ -238,7 +238,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           type: separator
-          separator: '<br />'
+          separator: '<br>'
           link_to_taxonomy: false
           limit: false
           vids:

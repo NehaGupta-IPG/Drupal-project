@@ -365,7 +365,7 @@ function batch_set($batch_definition): void {
 
     // Tweak init_message to avoid the bottom of the page flickering down after
     // init phase.
-    $batch_set['init_message'] .= '<br/>&nbsp;';
+    $batch_set['init_message'] .= '<br>&nbsp;';
 
     // The non-concurrent workflow of batch execution allows us to save
     // numberOfItems() queries by handling our own counter.

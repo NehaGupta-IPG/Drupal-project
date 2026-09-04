@@ -63,9 +63,9 @@ class ResponsiveImageBuilder {
    * The above responsive image style will result in a <picture> tag like this:
    * @code
    * <picture>
-   *   <source media="(min-width: 0px)" srcset="sites/default/files/styles/thumbnail/image.jpeg" />
-   *   <source media="(min-width: 560px)" sizes="(min-width: 700px) 700px, 100vw" srcset="sites/default/files/styles/large/image.jpeg 480w, sites/default/files/styles/medium/image.jpeg 220w" />
-   *   <img src="fallback.jpeg" />
+   *   <source media="(min-width: 0px)" srcset="sites/default/files/styles/thumbnail/image.jpeg">
+   *   <source media="(min-width: 560px)" sizes="(min-width: 700px) 700px, 100vw" srcset="sites/default/files/styles/large/image.jpeg 480w, sites/default/files/styles/medium/image.jpeg 220w">
+   *   <img src="fallback.jpeg">
    * </picture>
    * @endcode
    *
@@ -77,14 +77,14 @@ class ResponsiveImageBuilder {
    * For example:
    * A <source> tag can contain multiple images:
    * @code
-   * <source [...] srcset="image1.jpeg 1x, image2.jpeg 2x, image3.jpeg 3x" />
+   * <source [...] srcset="image1.jpeg 1x, image2.jpeg 2x, image3.jpeg 3x">
    * @endcode
    * In the above example we can add the 'mime-type' attribute ('image/jpeg')
    * since all images in the 'srcset' attribute of the <source> tag have the
    * same MIME type.
    * If a <source> tag were to look like this:
    * @code
-   * <source [...] srcset="image1.jpeg 1x, image2.webp 2x, image3.jpeg 3x" />
+   * <source [...] srcset="image1.jpeg 1x, image2.webp 2x, image3.jpeg 3x">
    * @endcode
    * We can't add the 'mime-type' attribute ('image/jpeg' vs 'image/webp').
    * So in order to add the 'mime-type' attribute to the <source> tag all images
@@ -92,9 +92,9 @@ class ResponsiveImageBuilder {
    * type. This way, a <picture> tag could look like this:
    * @code
    * <picture>
-   *   <source [...] mime-type="image/webp" srcset="image1.webp 1x, image2.webp 2x, image3.webp 3x"/>
-   *   <source [...] mime-type="image/jpeg" srcset="image1.jpeg 1x, image2.jpeg 2x, image3.jpeg 3x"/>
-   *   <img src="fallback.jpeg" />
+   *   <source [...] mime-type="image/webp" srcset="image1.webp 1x, image2.webp 2x, image3.webp 3x">
+   *   <source [...] mime-type="image/jpeg" srcset="image1.jpeg 1x, image2.jpeg 2x, image3.jpeg 3x">
+   *   <img src="fallback.jpeg">
    * </picture>
    * @endcode
    * This way a browser can decide which <source> tag is preferred based on the
@@ -105,7 +105,7 @@ class ResponsiveImageBuilder {
    * For image style mappings of the type 'sizes', a width descriptor is added
    * to each source. For example:
    * @code
-   * <source media="(min-width: 0px)" srcset="image1.jpeg 100w" />
+   * <source media="(min-width: 0px)" srcset="image1.jpeg 100w">
    * @endcode
    * The width descriptor here is "100w". This way the browser knows this image
    * is 100px wide without having to load it. According to the spec, a
@@ -113,22 +113,22 @@ class ResponsiveImageBuilder {
    * For example:
    * Valid:
    * @code
-   * <source media="(min-width:0px)" srcset="img1.jpeg 50w, img2.jpeg=100w" />
+   * <source media="(min-width:0px)" srcset="img1.jpeg 50w, img2.jpeg=100w">
    * @endcode
    * Invalid:
    * @code
-   * <source media="(min-width:0px)" srcset="img1.jpeg 50w 1x, img2.jpeg=100w 1x" />
+   * <source media="(min-width:0px)" srcset="img1.jpeg 50w 1x, img2.jpeg=100w 1x">
    * @endcode
    *
    * Note: Since the specs do not allow width descriptors and multipliers
    * combined inside one 'srcset' attribute, we either have to use something
    * like
    * @code
-   * <source [...] srcset="image1.jpeg 1x, image2.webp 2x, image3.jpeg 3x" />
+   * <source [...] srcset="image1.jpeg 1x, image2.webp 2x, image3.jpeg 3x">
    * @endcode
    * to support multipliers or
    * @code
-   * <source [...] sizes"(min-width: 40em) 80vw, 100vw" srcset="image1.jpeg 300w, image2.webp 600w, image3.jpeg 1200w" />
+   * <source [...] sizes"(min-width: 40em) 80vw, 100vw" srcset="image1.jpeg 300w, image2.webp 600w, image3.jpeg 1200w">
    * @endcode
    * to support the 'sizes' attribute.
    *
@@ -137,12 +137,12 @@ class ResponsiveImageBuilder {
    * breakpointA.1x and breakpointA.2x. If we would output those we will end up
    * with something like
    * @code
-   * <source [...] sizes="(min-width: 40em) 80vw, 100vw" srcset="a1.jpeg 300w 1x, a2.jpeg 600w 1x, a3.jpeg 1200w 1x, b1.jpeg 250w 2x, b2.jpeg 680w 2x, b3.jpeg 1240w 2x" />
+   * <source [...] sizes="(min-width: 40em) 80vw, 100vw" srcset="a1.jpeg 300w 1x, a2.jpeg 600w 1x, a3.jpeg 1200w 1x, b1.jpeg 250w 2x, b2.jpeg 680w 2x, b3.jpeg 1240w 2x">
    * @endcode
    * which is invalid. So the solution is to merge both arrays into one and
    * disregard the multiplier. Which, in this case, would output
    * @code
-   * <source [...] sizes="(min-width: 40em) 80vw, 100vw" srcset="b1.jpeg 250w, a1.jpeg 300w, a2.jpeg 600w, b2.jpeg 680w, a3.jpeg 1200w,  b3.jpeg 1240w" />
+   * <source [...] sizes="(min-width: 40em) 80vw, 100vw" srcset="b1.jpeg 250w, a1.jpeg 300w, a2.jpeg 600w, b2.jpeg 680w, a3.jpeg 1200w,  b3.jpeg 1240w">
    * @endcode
    * See https://www.w3.org/html/wg/drafts/html/master/embedded-content.html#image-candidate-string
    * for further information.

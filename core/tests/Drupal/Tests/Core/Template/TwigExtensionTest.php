@@ -312,8 +312,8 @@ class TwigExtensionTest extends UnitTestCase {
       $markup,
       ['#markup' => '<strong>will be rendered</strong>'],
     ];
-    $result = $this->systemUnderTest->safeJoin($twig_environment, $items, '<br/>');
-    $this->assertEquals('&lt;em&gt;will be escaped&lt;/em&gt;<br/><em>will be markup</em><br/><strong>will be rendered</strong>', $result);
+    $result = $this->systemUnderTest->safeJoin($twig_environment, $items, '<br>');
+    $this->assertEquals('&lt;em&gt;will be escaped&lt;/em&gt;<br><em>will be markup</em><br><strong>will be rendered</strong>', $result);
 
     // Ensure safe_join Twig filter supports Traversable variables.
     $items = new \ArrayObject([
