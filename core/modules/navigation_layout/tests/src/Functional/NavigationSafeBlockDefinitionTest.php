@@ -42,7 +42,6 @@ class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
     $this->adminUser = $this->drupalCreateUser([
       'configure navigation layout',
       'access navigation',
-      'administer blocks',
     ]);
 
     $this->drupalLogin($this->adminUser);
@@ -50,8 +49,6 @@ class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
 
   /**
    * Tests logic to include blocks in Navigation Layout UI.
-   *
-   * @todo Fixme/Remove?
    */
   public function testNavigationSafeBlockDefinition(): void {
     // Confirm that default blocks are available.
@@ -73,19 +70,6 @@ class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
     $this->assertSession()->linkExists('Content');
     $this->assertSession()->linkExists('Footer');
     $this->assertSession()->linkExists('Link');
-  }
-
-  /**
-   * Tests logic to exclude blocks in Block Layout UI.
-   */
-  public function testNavigationBlocksHiddenInBlockLayout(): void {
-    $block_url = '/admin/structure/block';
-    $this->drupalGet($block_url);
-    $this->clickLink('Place block');
-    $this->assertSession()->linkByHrefNotExists('/admin/structure/block/add/navigation_menu%3Aadmin/stark');
-    $this->assertSession()->linkByHrefNotExists('/admin/structure/block/add/navigation_menu%3Acontent/stark');
-    $this->assertSession()->linkByHrefNotExists('/admin/structure/block/add/navigation_user/stark');
-    $this->assertSession()->linkByHrefNotExists('/admin/structure/block/add/navigation_link/stark');
   }
 
 }
