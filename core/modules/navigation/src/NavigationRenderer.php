@@ -160,6 +160,10 @@ final class NavigationRenderer {
 
     $content = $block->build();
 
+    // Capture the cache metadata of the block content even if it is empty, as
+    // the reason for the content being empty may change.
+    $cacheability_metadata->addCacheableDependency(CacheableMetadata::createFromRenderArray($content));
+
     if (Element::isEmpty($content)) {
       return $build;
     }
