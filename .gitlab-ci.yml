@@ -128,8 +128,10 @@ default:
   needs:
     - job: '🧹 PHP Coding standards (PHPCS)'
       optional: true
+      artifacts: false
     - job: '🧹 PHP Static Analysis (phpstan)'
       optional: true
+      artifacts: false
     - job: '📦 Composer'
       optional: true
 
@@ -281,8 +283,8 @@ default:
 
 '📦 Composer':
   stage: 🪄 Lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
   needs: []
   script:
     - *composer-setup
