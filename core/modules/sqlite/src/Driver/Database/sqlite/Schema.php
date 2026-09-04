@@ -415,6 +415,12 @@ class Schema extends DatabaseSchema {
           'arguments' => [':new_field_initial' => $specification['initial']],
         ];
       }
+      elseif (isset($specification['initialization_expression'])) {
+        $mapping[$field] = [
+          'expression' => $specification['initialization_expression']->expression,
+          'arguments' => $specification['initialization_expression']->arguments,
+        ];
+      }
       else {
         // Else use the default of the field.
         $mapping[$field] = NULL;

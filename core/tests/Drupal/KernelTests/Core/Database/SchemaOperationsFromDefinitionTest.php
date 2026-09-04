@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
+use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
@@ -129,7 +131,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * @return \Drupal\Core\Database\SchemaDefinition\Schema
    *   The schema.
    */
-  protected function targetSchemaForTestAddTableColumn(string $tableName): SchemaDefinition {
+  protected function targetSchemaForTestAddTableColumnStep1(string $tableName): SchemaDefinition {
     $table = new Table(
       name: $tableName,
       description: 'Test table created from definition for column addition.',
@@ -140,7 +142,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
         Column::int(
           name: 'age',
           notNull: TRUE,
-          default: new IntValue(0),
+          default: new IntValue(42),
         ),
         Column::varchar(
           name: 'name',
@@ -153,7 +155,180 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
       ],
       primaryKey: new PrimaryKey(['id']),
       uniqueKeys: [
-        new UniqueKey(name: 'ages', columns: ['age']),
+        new UniqueKey(name: 'ages', columns: ['age', 'id']),
+        new UniqueKey(name: 'job_ids', columns: ['job', 'id']),
+        new UniqueKey(name: 'test_add_unique', columns: ['name', 'id', 'age']),
+      ],
+      indexes: [
+        new Index(name: 'test_add_index', columns: ['job', 'id', 'age']),
+        new Index(name: 'id_jobs', columns: ['id', 'job']),
+        new Index(name: 'names_by_age', columns: ['name', 'age']),
+      ],
+    );
+
+    return new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: $tableName,
+      tables: [$table],
+    );
+  }
+
+  /**
+   * Target schema for ::testAddTableColumn.
+   *
+   * @return \Drupal\Core\Database\SchemaDefinition\Schema
+   *   The schema.
+   */
+  protected function targetSchemaForTestAddTableColumnStep2(string $tableName): SchemaDefinition {
+    $table = new Table(
+      name: $tableName,
+      description: 'Test table created from definition for column addition.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+          notNull: TRUE,
+          default: new IntValue(42),
+        ),
+        Column::varchar(
+          name: 'name',
+          length: 255,
+        ),
+        Column::varchar(
+          name: 'job',
+          length: 255,
+        ),
+        Column::int(
+          name: 'age_2',
+          notNull: FALSE,
+          default: new NullValue(),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      uniqueKeys: [
+        new UniqueKey(name: 'ages', columns: ['age', 'id']),
+        new UniqueKey(name: 'job_ids', columns: ['job', 'id']),
+        new UniqueKey(name: 'test_add_unique', columns: ['name', 'id', 'age']),
+      ],
+      indexes: [
+        new Index(name: 'test_add_index', columns: ['job', 'id', 'age']),
+        new Index(name: 'id_jobs', columns: ['id', 'job']),
+        new Index(name: 'names_by_age', columns: ['name', 'age']),
+      ],
+    );
+
+    return new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: $tableName,
+      tables: [$table],
+    );
+  }
+
+  /**
+   * Target schema for ::testAddTableColumn.
+   *
+   * @return \Drupal\Core\Database\SchemaDefinition\Schema
+   *   The schema.
+   */
+  protected function targetSchemaForTestAddTableColumnStep3(string $tableName): SchemaDefinition {
+    $table = new Table(
+      name: $tableName,
+      description: 'Test table created from definition for column addition.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+          notNull: TRUE,
+          default: new IntValue(42),
+        ),
+        Column::varchar(
+          name: 'name',
+          length: 255,
+        ),
+        Column::varchar(
+          name: 'job',
+          length: 255,
+        ),
+        Column::int(
+          name: 'age_2',
+          notNull: FALSE,
+          default: new NullValue(),
+        ),
+        Column::int(
+          name: 'age_3',
+          notNull: FALSE,
+          default: new NullValue(),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      uniqueKeys: [
+        new UniqueKey(name: 'ages', columns: ['age', 'id']),
+        new UniqueKey(name: 'job_ids', columns: ['job', 'id']),
+        new UniqueKey(name: 'test_add_unique', columns: ['name', 'id', 'age']),
+      ],
+      indexes: [
+        new Index(name: 'test_add_index', columns: ['job', 'id', 'age']),
+        new Index(name: 'id_jobs', columns: ['id', 'job']),
+        new Index(name: 'names_by_age', columns: ['name', 'age']),
+      ],
+    );
+
+    return new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: $tableName,
+      tables: [$table],
+    );
+  }
+
+  /**
+   * Target schema for ::testAddTableColumn.
+   *
+   * @return \Drupal\Core\Database\SchemaDefinition\Schema
+   *   The schema.
+   */
+  protected function targetSchemaForTestAddTableColumnStep4(string $tableName): SchemaDefinition {
+    $table = new Table(
+      name: $tableName,
+      description: 'Test table created from definition for column addition.',
+      columns: [
+        Column::serial(
+          name: 'id',
+        ),
+        Column::int(
+          name: 'age',
+          notNull: TRUE,
+          default: new IntValue(42),
+        ),
+        Column::varchar(
+          name: 'name',
+          length: 255,
+        ),
+        Column::varchar(
+          name: 'job',
+          length: 255,
+        ),
+        Column::int(
+          name: 'age_2',
+          notNull: FALSE,
+          default: new NullValue(),
+        ),
+        Column::int(
+          name: 'age_3',
+          notNull: FALSE,
+          default: new NullValue(),
+        ),
+        Column::int(
+          name: 'age_4',
+          notNull: TRUE,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+      uniqueKeys: [
+        new UniqueKey(name: 'ages', columns: ['age', 'id']),
         new UniqueKey(name: 'job_ids', columns: ['job', 'id']),
         new UniqueKey(name: 'test_add_unique', columns: ['name', 'id', 'age']),
       ],
@@ -196,9 +371,18 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
     $this->assertTrue($this->schema->indexExists($tableName, 'id_jobs'));
     $this->assertFalse($this->schema->indexExists($tableName, 'names_by_age'));
 
-    $targetSchema = $this->targetSchemaForTestAddTableColumn($tableName);
+    $this->connection->insert($tableName)->fields([
+      'name' => 'Richard',
+      'job' => 'Mark Antony',
+    ])->execute();
+    $this->connection->insert($tableName)->fields([
+      'name' => 'Liz',
+      'job' => 'Cleopatra',
+    ])->execute();
+
+    // Add the 'age' column, no initialization, defaults to '42'.
     $this->schema->addTableColumnFromDefinition(
-      targetSchema: $targetSchema,
+      targetSchema: $this->targetSchemaForTestAddTableColumnStep1($tableName),
       tableName: $tableName,
       targetColumnName: 'age',
     );
@@ -213,6 +397,44 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
     $this->assertTrue($this->schema->indexExists($tableName, 'test_add_index'));
     $this->assertTrue($this->schema->indexExists($tableName, 'id_jobs'));
     $this->assertTrue($this->schema->indexExists($tableName, 'names_by_age'));
+
+    $this->assertSame(['42', '42'], $this->connection->query("SELECT [age] FROM {{$tableName}}")->fetchCol());
+
+    // Add the 'age_2' column, initialize to copy from 'age'.
+    $this->schema->addTableColumnFromDefinition(
+      targetSchema: $this->targetSchemaForTestAddTableColumnStep2($tableName),
+      tableName: $tableName,
+      targetColumnName: 'age_2',
+      initializationExpression: new Expression('[age]'),
+    );
+
+    $this->assertSame(['42', '42'], $this->connection->query("SELECT [age_2] FROM {{$tableName}}")->fetchCol());
+
+    // Add the 'age_3' column, initialize to '10'.
+    $this->schema->addTableColumnFromDefinition(
+      targetSchema: $this->targetSchemaForTestAddTableColumnStep3($tableName),
+      tableName: $tableName,
+      targetColumnName: 'age_3',
+      initializationExpression: new Expression(':initial_value', [':initial_value' => 10]),
+    );
+
+    $this->assertSame(['10', '10'], $this->connection->query("SELECT [age_3] FROM {{$tableName}}")->fetchCol());
+
+    $this->connection->insert($tableName)->fields([
+      'name' => 'Rex',
+      'job' => 'Julius Caesar',
+      'age' => 15,
+    ])->execute();
+
+    // Add the 'age_4' column, initialize to copy from 'age_3' or 59 if NULL.
+    $this->schema->addTableColumnFromDefinition(
+      targetSchema: $this->targetSchemaForTestAddTableColumnStep4($tableName),
+      tableName: $tableName,
+      targetColumnName: 'age_4',
+      initializationExpression: new Expression('COALESCE([age_3], :fallback_value)', [':fallback_value' => 59]),
+    );
+
+    $this->assertSame(['10', '10', '59'], $this->connection->query("SELECT [age_4] FROM {{$tableName}}")->fetchCol());
   }
 
   /**

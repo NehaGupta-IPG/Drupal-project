@@ -698,7 +698,7 @@ abstract class Schema implements PlaceholderInterface {
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If the specified destination field already exists.
    */
-  final public function addTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName): void {
+  final public function addTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName, ?Expression $initializationExpression = NULL): void {
     $table = $targetSchema->getTableDefinition($tableName);
 
     // Handles keys/indexes that are impacted by the addition.
@@ -743,6 +743,9 @@ abstract class Schema implements PlaceholderInterface {
 
     $tableAsArray = $table->toArray();
     unset($tableAsArray['primary key'], $tableAsArray['unique keys'], $tableAsArray['indexes']);
+    if ($initializationExpression) {
+      $tableAsArray['fields'][$targetColumnName]['initialization_expression'] = $initializationExpression;
+    }
     $this->addField(
       $tableName,
       $targetColumnName,
