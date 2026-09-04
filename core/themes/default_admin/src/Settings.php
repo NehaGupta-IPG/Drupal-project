@@ -285,17 +285,21 @@ final class Settings implements ContainerInjectionInterface {
     ];
 
     // Focus color setting.
+    $focus_preset = Helper::normalizeFocusPreset(
+      $account
+        ? $this->get('preset_focus_color', $account)
+        : $this->getDefault('preset_focus_color')
+    );
+    
     $form['preset_focus_color'] = [
       '#type' => 'select',
       '#title' => $this->t('Focus color'),
-      '#default_value' => $account ? $this->get('preset_focus_color', $account) : $this->getDefault('preset_focus_color'),
+      '#default_value' => $focus_preset,
       '#options' => [
-        'gin' => $this->t('Default Admin Focus color (Default)'),
+        'blue' => $this->t('Blue (Default)'),
         'green' => $this->t('Green'),
-        'claro' => $this->t('Claro Green'),
-        'orange' => $this->t('Orange'),
-        'dark' => $this->t('Neutral'),
-        'accent' => $this->t('Same as Accent color'),
+        'amber' => $this->t('Amber'),
+        'neutral' => $this->t('Neutral'),
         'custom' => $this->t('Custom'),
       ],
     ];
@@ -319,7 +323,7 @@ final class Settings implements ContainerInjectionInterface {
       '#title' => $this->t('Focus color picker'),
       '#title_display' => 'invisible',
       '#placeholder' => '#777777',
-      '#default_value' => $account ? $this->get('focus_color', $account) : $this->getDefault('focus_color'),
+      '#default_value' => $focus_preset,
       '#process' => [[__CLASS__, 'processColorPicker']],
     ];
 
@@ -342,7 +346,7 @@ final class Settings implements ContainerInjectionInterface {
     $form['high_contrast_mode'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Increase contrast') . $experimental_label,
-      '#description' => $this->t('Enables high contrast mode.'),
+      '#description' => $this->t('Increases text and interface contrast while preserving visual hierarchy.'),
       '#default_value' => $account ? $this->get('high_contrast_mode', $account) : $this->getDefault('high_contrast_mode'),
     ];
 

@@ -34,12 +34,16 @@
   /*
    * Default accent color. Will get overridden by inline style.
    */
-  --accent-base: #015efe;
+  --accent-base: #0047ab;
 
   /*
    * Mix base. These are only used as utilities to compose other colors.
    */
-  --admin-color-accent-base: light-dark(var(--accent-base), color-mix(in lch, lch(from var(--accent-base) calc(l * 20) c h), black 12%));
+  --admin-color-accent-base: light-dark(var(--accent-base), oklch(from var(--accent-base) calc(l * 0.45) calc(c * 0.9) h));
+  /* Foreground accent (links, active states). Lightened and hue-preserved in
+     dark mode so it stays readable on dark surfaces. Also powers the "Accent
+     family" focus option (a foreground-safe accent variation). */
+  --admin-color-accent-fg: light-dark(var(--accent-base), oklch(from var(--accent-base) max(calc(l * 1.5), 0.93) calc(c * 1.1) h));
   --accent-mix-base: light-dark(color-mix(in lch, var(--accent-base), white 97%), color-mix(in lch, var(--accent-base), black 80%));
   --accent-mix-base-scheme: light-dark(black, white);
 
@@ -55,4 +59,19 @@
   --admin-color-accent-600: color-mix(in lch, var(--accent-mix-base-scheme) 15%, var(--admin-color-accent-base));
   --admin-color-accent-700: color-mix(in lch, var(--accent-mix-base-scheme) 30%, var(--admin-color-accent-base));
   --admin-color-accent-900: color-mix(in lch, var(--accent-mix-base-scheme) 60%, var(--admin-color-accent-base));
+}
+
+/*
+ * Red accent: correction for the shared dark foreground floor.
+ *
+ * The shared accent-fg dark branch floors lightness at 0.93 so red, an
+ * inherently lighter-hued saturate colour, resolves to about #ff9699. That is
+ * 4.43:1 on the raised surface, under the 4.5:1 text threshold and too tight to
+ * host a pressed-state colour-mix. Red overrides the dark foreground to full
+ * lightness so it clears 5:1 and leaves contrast headroom. The selector is more
+ * specific than the shared [data-gin-accent], so it wins for the red preset.
+ */
+
+[data-gin-accent="red"] {
+  --admin-color-accent-fg: light-dark(var(--accent-base), oklch(from var(--accent-base) 1 calc(c * 1.1) h));
 }

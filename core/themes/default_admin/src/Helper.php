@@ -27,48 +27,48 @@ final class Helper {
   public static function accentColors(): array {
     return [
       'blue' => [
-        'label' => t('Blue (Default)'),
-        'hex' => '#015efe',
+        'label' => t('Cobalt (Default)'),
+        'hex' => '#0047ab',
       ],
-      'light_blue' => [
-        'label' => t('Light Blue'),
-        'hex' => '#2f6dd0',
-      ],
-      'dark_purple' => [
-        'label' => t('Dark Purple'),
-        'hex' => '#4300bf',
-      ],
-      'purple' => [
-        'label' => t('Purple'),
-        'hex' => '#5b00ff',
+      'cerulean' => [
+        'label' => t('Cerulean'),
+        'hex' => '#006b8f',
       ],
       'teal' => [
         'label' => t('Teal'),
-        'hex' => '#0e7772',
+        'hex' => '#006b5e',
       ],
       'green' => [
-        'label' => t('Green'),
-        'hex' => '#02742d',
+        'label' => t('Emerald'),
+        'hex' => '#08783e',
       ],
-      'pink' => [
-        'label' => t('Pink'),
-        'hex' => '#d12f70',
+      'olive' => [
+        'label' => t('Olive'),
+        'hex' => '#5d6b1c',
       ],
-      'red' => [
-        'label' => t('Red'),
-        'hex' => '#d8002f',
+      'yellow' => [
+        'label' => t('Amber'),
+        'hex' => '#765c00',
       ],
       'orange' => [
         'label' => t('Orange'),
-        'hex' => '#c55228',
+        'hex' => '#9b4b00',
       ],
-      'yellow' => [
-        'label' => t('Yellow'),
-        'hex' => '#966705',
+      'red' => [
+        'label' => t('Vermilion'),
+        'hex' => '#a83218',
+      ],
+      'pink' => [
+        'label' => t('Magenta'),
+        'hex' => '#8d3b75',
+      ],
+      'purple' => [
+        'label' => t('Violet'),
+        'hex' => '#5e3b9e',
       ],
       'neutral' => [
         'label' => t('Neutral'),
-        'hex' => '#111111',
+        'hex' => '#555960',
       ],
       'custom' => [
         'label' => t('Custom'),
@@ -76,6 +76,21 @@ final class Helper {
         'hex' => '#000',
       ],
     ];
+  }
+
+  /**
+   * Normalizes legacy focus preset keys to the current focus families.
+   */
+  public static function normalizeFocusPreset(?string $preset): string {
+    return match ($preset) {
+      'gin' => 'blue',
+      'claro' => 'green',
+      'orange' => 'amber',
+      'dark' => 'neutral',
+      'accent' => 'blue',
+      'blue', 'green', 'amber', 'neutral', 'custom' => $preset,
+      default => 'blue',
+    };
   }
 
   /**

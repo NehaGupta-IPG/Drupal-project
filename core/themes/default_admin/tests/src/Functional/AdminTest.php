@@ -56,7 +56,7 @@ class AdminTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertStringContainsString('"dark_mode":"auto"', $response);
     $this->assertStringContainsString('"preset_accent_color":"blue"', $response);
-    $this->assertStringContainsString('"preset_focus_color":"gin"', $response);
+    $this->assertStringContainsString('"preset_focus_color":"blue"', $response);
   }
 
   /**
@@ -87,6 +87,53 @@ class AdminTest extends BrowserTestBase {
     $response = $this->drupalGet('/admin/content');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertStringContainsString('"preset_focus_color":"blue"', $response);
+  }
+
+  /**
+   * Tests legacy focus color settings are normalized.
+   */
+  public function testLegacyFocusColorSettings(): void {
+    $legacy = [
+      'gin' => 'blue',
+      'claro' => 'green',
+      'orange' => 'amber',
+      'dark' => 'neutral',
+      'accent' => 'blue',
+    ];
+
+    foreach ($legacy as $stored => $expected) {
+      \Drupal::configFactory()
+        ->getEditable('default_admin.settings')
+        ->set('preset_focus_color', $stored)
+        ->save();
+
+      $response = $this->drupalGet('/admin/content');
+
+      $this->assertSession()
+        ->statusCodeEquals(200);
+
+      // JavaScript settings must expose the normalized value.
+      $this->assertStringContainsString(
+        '"preset_focus_color":"' . $expected . '"',
+        $response,
+      );
+
+      // The rendered HTML must use the normalized focus family.
+      $this->assertSession()->elementAttributeContains(
+        'css',
+        'html',
+        'data-gin-focus',
+        $expected,
+      );
+
+      // The Appearance form must also resolve the legacy value to a currently
+      // available focus option.
+      $this->drupalGet('/admin/appearance/settings/default_admin');
+      $this->assertSession()->fieldValueEquals(
+        'preset_focus_color',
+        $expected,
+      );
+    }
   }
 
   /**

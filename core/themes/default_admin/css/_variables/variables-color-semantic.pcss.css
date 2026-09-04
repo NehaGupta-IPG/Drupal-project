@@ -18,6 +18,17 @@
   --admin-color-bg-item-hover: var(--admin-color-accent-030);
 
   /*
+   * Accent preview (settings UI only).
+   *
+   * Presents an accent choice in the Appearance settings picker. In light mode
+   * it shows the source accent identity; in dark mode it shows the
+   * foreground-safe, visible representation of that hue so a dark fill does
+   * not collapse into the dark settings surface. Presentation-only — it is not
+   * used for accent fills, links, or other application UI.
+   */
+  --admin-color-accent-preview: light-dark(var(--accent-base), var(--admin-color-accent-fg));
+
+  /*
    * Semantic tokens (tier 2).
    */
   /*
@@ -70,7 +81,7 @@
   --admin-color-border-loud: light-dark(color-mix(in lch, black 30%, transparent), color-mix(in lch, white 40%, transparent));
   --admin-color-border-input: light-dark(var(--admin-color-gray-500), #76777b);
   --admin-color-border-table: light-dark(color-mix(in srgb, black 10%, transparent), #43454a);
-  --admin-color-text-on-primary: light-dark(var(--admin-color-white), #111);
+  --admin-color-text-on-primary: light-dark(var(--admin-color-white), var(--admin-color-white));
   --admin-color-switch: light-dark(#26a769, var(--admin-color-accent-100));
   --admin-color-bg-inverse: light-dark(var(--admin-color-gray-950), var(--admin-color-bg-raised));
 
@@ -108,10 +119,16 @@
    *   --admin-color-focus-neutral  neutral focus-ring variant ([data-gin-focus]).
    *   --admin-color-text-disabled / -bg-disabled / -border-disabled  disabled controls.
    */
-  --admin-color-focus: light-dark(color-mix(in srgb, #007dfa 60%, transparent), #51a8ff);
+  --admin-color-focus: light-dark(#003ecc, #99b8ff);
+  /* Separator ring inside the focus indicator. Where a control is accent-filled,
+     the focus ring alone would sit ring-on-fill (same hue family). A surface gap
+     ring adjacent to the fill isolates the focus ring from that fill. White on
+     light surfaces (the page); in dark mode it is effectively the fill color, so
+     the ring rides directly on the fill, which already passes contrast. */
+  --admin-color-focus-gap: var(--admin-color-bg-surface);
   /* @todo this is used in box-shadow focus states, which will be phased out in favor of outline. */
   --admin-color-focus-border: light-dark(color-mix(in lch, black 20%, transparent), color-mix(in lch, black 80%, transparent));
-  --admin-color-focus-neutral: light-dark(color-mix(in lch, black 40%, transparent), color-mix(in lch, white 80%, transparent));
+  --admin-color-focus-neutral: light-dark(#4b4f58, #d7dae0);
   --admin-color-text-disabled: light-dark(var(--admin-color-gray-700), #919191);
   --admin-color-bg-disabled: light-dark(#eaeaea, #47474c);
   --admin-color-border-disabled: light-dark(var(--admin-color-gray-300), #646464);
@@ -119,10 +136,28 @@
   /*
    * Link / interactive blue. Used for links and blue focus/selected accents
    * (text, border, and bg).
+   *
+   * Hover and active are separate states. In light mode hover uses a deeper
+   * accent step than the base link and active uses a deeper step than hover.
+   * In dark mode both stay foreground-safe: hover uses the foreground-safe
+   * accent, and active shifts that foreground-safe accent toward accent-900.
+   * That mix modifies the foreground accent rather than replacing it with the
+   * darker step, which would lose contrast on dark surfaces.
    */
   --admin-color-link: var(--admin-color-primary);
-  --admin-color-link-hover: light-dark(var(--admin-color-accent-600), var(--admin-color-accent-700));
-  --admin-color-link-active: light-dark(var(--admin-color-accent-700), var(--admin-color-accent-900));
+  --admin-color-link-hover: light-dark(var(--admin-color-accent-600), var(--admin-color-accent-fg));
+  --admin-color-link-active: light-dark(
+    var(--admin-color-accent-700),
+    color-mix(in oklch, var(--admin-color-accent-fg), var(--admin-color-accent-900) 20%)
+  );
+
+  /*
+   * Component interaction states — resolved at semantic level.
+   */
+  --admin-color-summary-text: light-dark(var(--admin-color-primary-hover), var(--admin-color-accent-fg));
+  --admin-color-summary-hover-bg: light-dark(var(--admin-color-bg-item-hover), color-mix(in sRGB, var(--admin-color-accent-fg) 12%, var(--admin-color-bg-surface)));
+  --admin-color-radio-hover: light-dark(var(--admin-color-primary), var(--admin-color-text-on-primary));
+  --admin-color-radio-hover-bg: light-dark(var(--admin-color-primary-soft-hover), var(--admin-color-primary-hover));
 }
 
 @media (forced-colors: active) {

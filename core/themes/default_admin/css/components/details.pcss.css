@@ -166,8 +166,8 @@
   }
 
   &:hover {
-    color: var(--admin-color-primary-hover);
-    background-color: var(--admin-color-bg-item-hover);
+    color: var(--admin-color-summary-text);
+    background-color: var(--admin-color-summary-hover-bg);
   }
 
   &:hover::before,
@@ -222,7 +222,7 @@
 [open] .gin-details__summary--accordion,
 [open] .gin-details__summary--accordion-item,
 [open] .gin-details__summary--vertical-tabs-item {
-  color: var(--admin-color-primary);
+  color: var(--admin-color-summary-text);
   text-decoration-style: var(--admin-link-decoration-style);
 }
 
