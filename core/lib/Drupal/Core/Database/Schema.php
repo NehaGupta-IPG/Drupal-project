@@ -386,21 +386,6 @@ abstract class Schema implements PlaceholderInterface {
   abstract public function indexExists($table, $name);
 
   /**
-   * Checks if a unique key exists in the given table.
-   *
-   * @param string $tableName
-   *   The name of the table in drupal (no prefixing).
-   * @param string $uniqueKeyName
-   *   The name of the key in drupal (no prefixing).
-   *
-   * @return bool
-   *   TRUE if the given key exists, otherwise FALSE.
-   */
-  public function uniqueKeyExists(string $tableName, string $uniqueKeyName): bool {
-    return $this->indexExists($tableName, $uniqueKeyName);
-  }
-
-  /**
    * Add a primary key.
    *
    * @param string $table
@@ -477,6 +462,21 @@ abstract class Schema implements PlaceholderInterface {
    *   that name to begin with.
    */
   abstract public function dropUniqueKey($table, $name);
+
+  /**
+   * Checks if a unique key exists in the given table.
+   *
+   * @param string $tableName
+   *   The name of the table in drupal (no prefixing).
+   * @param string $uniqueKeyName
+   *   The name of the key in drupal (no prefixing).
+   *
+   * @return bool
+   *   TRUE if the given key exists, otherwise FALSE.
+   */
+  public function uniqueKeyExists(string $tableName, string $uniqueKeyName): bool {
+    return $this->indexExists($tableName, $uniqueKeyName);
+  }
 
   /**
    * Add an index.
@@ -700,48 +700,54 @@ abstract class Schema implements PlaceholderInterface {
    */
   final public function addTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName): void {
     $table = $targetSchema->getTableDefinition($tableName);
-    $tableAsArray = $table->toArray();
 
     // Handles keys/indexes that are impacted by the addition.
-    if (in_array($targetColumnName, $table->primaryKey ? $table->primaryKey->columnNames() : [], TRUE)) {
-      try {
-        if ($this->findPrimaryKeyColumns($tableName)) {
-          $this->dropPrimaryKey($tableName);
-        }
+    // Remove existing current keys if in the target schema the added column
+    // is part of them.
+    foreach ($table->indexes ?? [] as $index) {
+      if (in_array($targetColumnName, $index->columnNames(), TRUE) && $this->indexExists($tableName, $index->name)) {
+        $this->dropIndex($tableName, $index->name);
       }
-      catch (SchemaTablePrimaryKeyException) {
-        unset($tableAsArray['primary key']);
-      }
-    }
-    else {
-      unset($tableAsArray['primary key']);
     }
     foreach ($table->uniqueKeys ?? [] as $key) {
-      if (in_array($targetColumnName, $key->columnNames(), TRUE)) {
-        if ($this->indexExists($tableName, $key->name)) {
-          $this->dropUniqueKey($tableName, $key->name);
-        }
-      }
-      else {
-        unset($tableAsArray['unique keys'][$key->name]);
+      if (in_array($targetColumnName, $key->columnNames(), TRUE) && $this->uniqueKeyExists($tableName, $key->name)) {
+        $this->dropUniqueKey($tableName, $key->name);
       }
     }
-    foreach ($table->indexes ?? [] as $key) {
-      if (in_array($targetColumnName, $key->columnNames(), TRUE)) {
-        if ($this->indexExists($tableName, $key->name)) {
-          $this->dropUniqueKey($tableName, $key->name);
-        }
+    if (in_array($targetColumnName, $table->primaryKey?->columnNames() ?? [], TRUE)) {
+      try {
+        $this->dropPrimaryKey($tableName);
       }
-      else {
-        unset($tableAsArray['indexes'][$key->name]);
+      catch (SchemaTablePrimaryKeyException) {
+        // It may not be possible to drop the primary key. For example, in
+        // MySQL primary keys based on a serial column.
+      }
+    }
+    // Add target keys that are needed.
+    $tmp = [];
+    $hasPrimaryKey = $this->findPrimaryKeyColumns($tableName) !== [];
+    $needsPrimaryKey = (bool) $table->primaryKey;
+    if (!$hasPrimaryKey && $needsPrimaryKey) {
+      $tmp['primary key'] = $table->primaryKey->toArray();
+    }
+    foreach ($table->uniqueKeys ?? [] as $key) {
+      if (!$this->uniqueKeyExists($tableName, $key->name)) {
+        $tmp['unique keys'][$key->name] = $key->toArray();
+      }
+    }
+    foreach ($table->indexes ?? [] as $index) {
+      if (!$this->indexExists($tableName, $index->name)) {
+        $tmp['indexes'][$index->name] = $index->toArray();
       }
     }
 
+    $tableAsArray = $table->toArray();
+    unset($tableAsArray['primary key'], $tableAsArray['unique keys'], $tableAsArray['indexes']);
     $this->addField(
       $tableName,
       $targetColumnName,
       $tableAsArray['fields'][$targetColumnName],
-      $tableAsArray,
+      array_merge($tableAsArray, $tmp),
     );
   }
 
@@ -771,43 +777,54 @@ abstract class Schema implements PlaceholderInterface {
 
     // Handles keys/indexes that are impacted by the change.
     $currentKeys = $this->introspectIndexSchema($tableName);
-    if (in_array($currentColumnName, $currentKeys['primary key'], TRUE)) {
-      try {
-        $this->dropPrimaryKey($tableName);
-      }
-      catch (SchemaTablePrimaryKeyException) {
-        unset($tableAsArray['primary key']);
-      }
-    }
-    else {
-      // Rebuild the PK only if is requested but is currently missing.
-      if (!($tableAsArray['primary key'] !== [] && $currentKeys['primary key'] === [])) {
-        unset($tableAsArray['primary key']);
+    // Remove current keys that include the column to be changed.
+    foreach ($currentKeys['indexes'] as $key => $data) {
+      if (in_array($currentColumnName, $data, TRUE)) {
+        $this->dropIndex($tableName, $key);
+        unset($currentKeys['indexes'][$key]);
       }
     }
     foreach ($currentKeys['unique keys'] as $key => $data) {
       if (in_array($currentColumnName, $data, TRUE)) {
         $this->dropUniqueKey($tableName, $key);
-      }
-      else {
-        unset($tableAsArray['unique keys'][$key]);
+        unset($currentKeys['unique keys'][$key]);
       }
     }
-    foreach ($currentKeys['indexes'] as $key => $data) {
-      if (in_array($currentColumnName, $data, TRUE)) {
-        $this->dropIndex($tableName, $key);
+    if (in_array($currentColumnName, $currentKeys['primary key'], TRUE)) {
+      try {
+        $this->dropPrimaryKey($tableName);
+        unset($currentKeys['primary key']);
       }
-      else {
-        unset($tableAsArray['indexes'][$key]);
+      catch (SchemaTablePrimaryKeyException) {
+        // It may not be possible to drop the primary key. For example, in
+        // MySQL primary keys based on a serial column.
+      }
+    }
+    // Add target keys that are needed.
+    $tmp = [];
+    $hasPrimaryKey = ($currentKeys['primary key'] ?? []) !== [];
+    $needsPrimaryKey = ($tableAsArray['primary key'] ?? []) !== [];
+    if (!$hasPrimaryKey && $needsPrimaryKey) {
+      $tmp['primary key'] = $tableAsArray['primary key'];
+    }
+    foreach ($tableAsArray['unique keys'] ?? [] as $key => $data) {
+      if (!$this->uniqueKeyExists($tableName, $key)) {
+        $tmp['unique keys'][$key] = $data;
+      }
+    }
+    foreach ($tableAsArray['indexes'] ?? [] as $key => $data) {
+      if (!$this->indexExists($tableName, $key)) {
+        $tmp['indexes'][$key] = $data;
       }
     }
 
+    unset($tableAsArray['primary key'], $tableAsArray['unique keys'], $tableAsArray['indexes']);
     $this->changeField(
       $tableName,
       $currentColumnName,
       $targetColumnName,
       $tableAsArray['fields'][$targetColumnName],
-      $tableAsArray,
+      array_merge($tableAsArray, $tmp),
     );
   }
 

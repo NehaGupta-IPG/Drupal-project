@@ -105,8 +105,20 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
           name: 'name',
           length: 255,
         ),
+        Column::varchar(
+          name: 'job',
+          length: 255,
+        ),
       ],
       primaryKey: new PrimaryKey(['id']),
+      uniqueKeys: [
+        new UniqueKey(name: 'test_add_unique', columns: ['name', 'id']),
+        new UniqueKey(name: 'job_ids', columns: ['job', 'id']),
+      ],
+      indexes: [
+        new Index(name: 'test_add_index', columns: ['job', 'id']),
+        new Index(name: 'id_jobs', columns: ['id', 'job']),
+      ],
     );
 
     return new SchemaDefinition(
@@ -139,12 +151,20 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
           name: 'name',
           length: 255,
         ),
+        Column::varchar(
+          name: 'job',
+          length: 255,
+        ),
       ],
       primaryKey: new PrimaryKey(['id']),
       uniqueKeys: [
         new UniqueKey(name: 'ages', columns: ['age']),
+        new UniqueKey(name: 'job_ids', columns: ['job', 'id']),
+        new UniqueKey(name: 'test_add_unique', columns: ['name', 'id', 'age']),
       ],
       indexes: [
+        new Index(name: 'test_add_index', columns: ['job', 'id', 'age']),
+        new Index(name: 'id_jobs', columns: ['id', 'job']),
         new Index(name: 'names_by_age', columns: ['name', 'age']),
       ],
     );
@@ -175,6 +195,10 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
     $method = new \ReflectionMethod($this->schema, 'findPrimaryKeyColumns');
     $this->assertEquals(['id'], $method->invoke($this->schema, $tableName));
     $this->assertFalse($this->schema->uniqueKeyExists($tableName, 'ages'));
+    $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'job_ids'));
+    $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'test_add_unique'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'test_add_index'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'id_jobs'));
     $this->assertFalse($this->schema->indexExists($tableName, 'names_by_age'));
 
     $targetSchema = $this->targetSchemaForTestAddTableColumn($tableName);
@@ -189,6 +213,10 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
     $method = new \ReflectionMethod($this->schema, 'findPrimaryKeyColumns');
     $this->assertEquals(['id'], $method->invoke($this->schema, $tableName));
     $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'ages'));
+    $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'job_ids'));
+    $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'test_add_unique'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'test_add_index'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'id_jobs'));
     $this->assertTrue($this->schema->indexExists($tableName, 'names_by_age'));
   }
 
@@ -215,8 +243,20 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
           name: 'name',
           length: 255,
         ),
+        Column::varchar(
+          name: 'job',
+          length: 255,
+        ),
       ],
       primaryKey: new PrimaryKey(['id']),
+      uniqueKeys: [
+        new UniqueKey(name: 'id_ages', columns: ['id', 'age']),
+        new UniqueKey(name: 'name_id', columns: ['name', 'id']),
+      ],
+      indexes: [
+        new Index(name: 'id_jobs_age', columns: ['id', 'job', 'age']),
+        new Index(name: 'job_id', columns: ['job', 'id']),
+      ],
     );
 
     return new SchemaDefinition(
@@ -249,12 +289,20 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
           name: 'name',
           length: 255,
         ),
+        Column::varchar(
+          name: 'job',
+          length: 255,
+        ),
       ],
       primaryKey: new PrimaryKey(['id']),
       uniqueKeys: [
+        new UniqueKey(name: 'id_age_new', columns: ['id', 'age_new']),
+        new UniqueKey(name: 'name_id', columns: ['name', 'id']),
         new UniqueKey(name: 'ages_new', columns: ['age_new']),
       ],
       indexes: [
+        new Index(name: 'id_jobs_age_new', columns: ['id', 'job', 'age_new']),
+        new Index(name: 'job_id', columns: ['job', 'id']),
         new Index(name: 'names_by_age_new', columns: ['name', 'age_new']),
       ],
     );
@@ -279,7 +327,12 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
     $this->assertFalse($this->schema->fieldExists($tableName, 'age_new'));
     $method = new \ReflectionMethod($this->schema, 'findPrimaryKeyColumns');
     $this->assertEquals(['id'], $method->invoke($this->schema, $tableName));
+    $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'id_ages'));
+    $this->assertFalse($this->schema->uniqueKeyExists($tableName, 'id_age_new'));
+    $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'name_id'));
     $this->assertFalse($this->schema->uniqueKeyExists($tableName, 'ages_new'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'id_jobs_age'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'job_id'));
     $this->assertFalse($this->schema->indexExists($tableName, 'names_by_age_new'));
 
     $targetSchema = $this->targetSchemaForTestChangeTableColumn($tableName);
@@ -295,7 +348,12 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
     $this->assertTrue($this->schema->fieldExists($tableName, 'age_new'));
     $method = new \ReflectionMethod($this->schema, 'findPrimaryKeyColumns');
     $this->assertEquals(['id'], $method->invoke($this->schema, $tableName));
+    $this->assertFalse($this->schema->uniqueKeyExists($tableName, 'id_ages'));
+    $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'id_age_new'));
+    $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'name_id'));
     $this->assertTrue($this->schema->uniqueKeyExists($tableName, 'ages_new'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'id_jobs_age_new'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'job_id'));
     $this->assertTrue($this->schema->indexExists($tableName, 'names_by_age_new'));
   }
 
