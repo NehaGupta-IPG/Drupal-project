@@ -55,7 +55,6 @@ global-styling:
       css/components/skip-link.css: {}
       css/components/tables.css: {}
       css/components/table--file-multiple-widget.css: {}
-      css/components/search-admin-settings.css: {}
       css/components/system-themes.css: {}
       css/components/tableselect.css: {}
       css/components/tabs.css: {}
@@ -268,6 +267,9 @@ views:
   css:
     component:
       css/components/views-exposed-form.css: {}
+  after:
+    # Load after form.css.
+    - default_admin/global-styling
 
 views_ui:
   css:
