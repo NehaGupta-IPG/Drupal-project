@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Core\Recipe;
 
 use Drupal\Component\Assertion\Inspector;
-use Drupal\Core\Extension\Dependency;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 
@@ -45,7 +44,6 @@ final class InstallConfigurator {
    */
   public function __construct(array $extensions, ModuleExtensionList $module_list, ThemeExtensionList $theme_list) {
     assert(Inspector::assertAllStrings($extensions), 'Extension names must be strings.');
-    $extensions = array_map(fn($extension) => Dependency::createFromString($extension)->getName(), $extensions);
     $extensions = array_combine($extensions, $extensions);
     $module_data = $module_list->reset()->getList();
     $theme_data = $theme_list->reset()->getList();
