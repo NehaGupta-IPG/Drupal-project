@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\navigation\Plugin\ConfigAction;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
 use Drupal\Core\Config\Action\ConfigActionException;
@@ -48,62 +49,44 @@ final class AddNavigationBlock implements ConfigActionPluginInterface, Container
     }
 
     $config = $this->configFactory->getEditable('navigation.block_layout');
-
-    $sections = $config->get('sections') ?? [
-      0 => [
-        'components' => [],
-      ],
-    ];
-
-    // Either find the right weight/delta or adjust existing weights.
-    $append = FALSE;
-    $max_delta = 0;
-    foreach ($sections[0]['components'] as $component) {
-      if ($component['region'] === 'content') {
-        if ($max_delta < $component['weight']) {
-          $max_delta = $component['weight'];
-        }
-      }
+    $components = $config->get('sections.0.components');
+    if (!is_array($components)) {
+      throw new ConfigActionException('Unable to load the Navigation layout.');
     }
 
-    // If the delta is either not set or is above the max delta, switch
-    // into append mode and set the delta to the max + 1.
-    if (!isset($value['delta']) || $value['delta'] > $max_delta) {
-      $append = TRUE;
-      $value['delta'] = $max_delta + 1;
-    }
+    // The delta is the position of the new block among the blocks of the
+    // content region, ordered by weight, and defaults to the first position. A
+    // delta beyond the last position appends the block.
+    $content = array_filter($components, fn (array $component): bool => $component['region'] === 'content');
+    uasort($content, [SortArray::class, 'sortByWeightElement']);
+    $uuids = array_keys($content);
+    $delta = max(0, min((int) ($value['delta'] ?? 0), count($uuids)));
 
     $uuid = $this->uuidGenerator->generate();
-
-    // Create the component from the recipe values.
-    $component_to_add = [
+    $components[$uuid] = [
       'uuid' => $uuid,
       'region' => 'content',
+      'weight' => 0,
       'configuration' => $value['configuration'] ?? [],
-      'weight' => $value['delta'],
       'additional' => $value['additional'] ?? [],
     ];
 
-    $new_components = [];
-    foreach ($sections[0]['components'] as $key => $component) {
-      if ($component['region'] === 'content') {
-        if (!$append && $component['weight'] === $value['delta']) {
-          $new_components[$uuid] = $component_to_add;
-        }
-        if ($component['weight'] >= $value['delta']) {
-          $component['weight']++;
-        }
-      }
-
-      $new_components[$key] = $component;
-
-      if ($append && ($component['weight'] + 1) === $value['delta']) {
-        $new_components[$uuid] = $component_to_add;
+    if ($delta === count($uuids)) {
+      // Append the block after the last one.
+      $weights = array_column($content, 'weight');
+      $components[$uuid]['weight'] = $weights ? max($weights) + 1 : 0;
+    }
+    else {
+      // Take over the weight of the block currently at the requested position
+      // and move that block and all the following ones down by one.
+      $weight = $content[$uuids[$delta]]['weight'];
+      $components[$uuid]['weight'] = $weight++;
+      foreach (array_slice($uuids, $delta) as $existing_uuid) {
+        $components[$existing_uuid]['weight'] = $weight++;
       }
     }
 
-    $config->set('sections.0.components', $new_components);
-    $config->save();
+    $config->set('sections.0.components', $components)->save();
   }
 
 }
