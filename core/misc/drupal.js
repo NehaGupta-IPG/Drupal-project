@@ -579,6 +579,15 @@ window.Drupal = { behaviors: {}, locale: {} };
     });
   };
 
+  if (drupalSettings.path) {
+    drupalSettings.path = Drupal.deprecatedProperty({
+      target: drupalSettings.path,
+      deprecatedProperty: 'currentQuery',
+      message:
+        'drupalSettings.path.currentQuery is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. It has no cache context of its own and can leak query string values into cached pages. Read the current query from window.location instead. See https://www.drupal.org/node/3620505',
+    });
+  }
+
   /**
    * Generates the themed representation of a Drupal object.
    *
