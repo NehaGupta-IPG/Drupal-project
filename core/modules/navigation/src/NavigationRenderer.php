@@ -111,8 +111,6 @@ final class NavigationRenderer {
       }
 
       $build[$delta] = $layout->build($regions);
-      // @todo Obsolete?
-      $build[$delta]['#cache']['contexts'] = ['user.permissions', 'theme', 'languages:language_interface'];
     }
     // The render array is built based on decisions made by SectionStorage
     // plugins and therefore it needs to depend on the accumulated
