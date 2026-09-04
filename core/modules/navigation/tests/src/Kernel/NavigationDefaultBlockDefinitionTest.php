@@ -22,7 +22,7 @@ class NavigationDefaultBlockDefinitionTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['test_page_test', 'block', 'user', 'system', 'layout_discovery', 'layout_builder'];
+  protected static $modules = ['test_page_test', 'block', 'user', 'system', 'layout_discovery'];
 
   /**
    * {@inheritdoc}
