@@ -1044,6 +1044,9 @@ services:
     arguments: ['@settings']
     tags:
       - { name: http_middleware, priority: 300 }
+  Drupal\Core\StackMiddleware\QueryFilter:
+    tags:
+      - { name: http_middleware, priority: 250 }
   http_middleware.kernel_pre_handle:
     class: Drupal\Core\StackMiddleware\KernelPreHandle
     arguments: ['@kernel', '@request_stack']
