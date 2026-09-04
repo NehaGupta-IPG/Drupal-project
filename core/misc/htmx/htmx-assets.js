@@ -60,8 +60,7 @@
       ).some((link) => link.getAttribute('href') === el.getAttribute('href'));
       if (!alreadyPreloaded) {
         document.head.appendChild(el);
-      }
-      else {
+      } else {
         el.remove();
       }
     });
