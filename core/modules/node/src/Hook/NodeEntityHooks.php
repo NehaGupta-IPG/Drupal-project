@@ -23,8 +23,8 @@ class NodeEntityHooks {
   use StringTranslationTrait;
 
   public function __construct(
-    protected EntityTypeManagerInterface $entityTypeManager,
-    protected LanguageManagerInterface $languageManager,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly LanguageManagerInterface $languageManager,
   ) {}
 
   /**
