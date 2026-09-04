@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\toolbar\FunctionalJavascript\workspaces;
+namespace Drupal\Tests\toolbar\Functional\workspaces;
 
 use Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber;
 use Drupal\Tests\BrowserTestBase;
@@ -88,7 +88,7 @@ class WorkspaceTest extends BrowserTestBase {
     $page->fillField('label', 'workspace2');
     $page->fillField('id', 'A!"£%^&*{}#~@?');
     $page->findButton('Save')->click();
-    $page->hasContent("This value is not valid");
+    $this->assertSession()->pageTextContains('This value is not valid');
   }
 
   /**

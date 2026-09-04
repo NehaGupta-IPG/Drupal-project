@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\announcements_feed\FunctionalJavascript;
+namespace Drupal\Tests\announcements_feed\Functional;
 
 use Drupal\announce_feed_test\AnnounceTestHttpClientMiddleware;
 use Drupal\block\BlockInterface;
 use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Access\AccessResultNeutral;
 use Drupal\Core\Session\AnonymousUserSession;
-use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -18,7 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('announcements_feed')]
 #[RunTestsInSeparateProcesses]
-class AnnounceBlockTest extends WebDriverTestBase {
+class AnnounceBlockTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
