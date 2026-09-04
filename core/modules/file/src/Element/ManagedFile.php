@@ -5,12 +5,16 @@ namespace Drupal\file\Element;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\Variable;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\FormElementBase;
+use Drupal\Core\Security\Attribute\TrustedCallback;
+use Drupal\Core\Security\StaticTrustedCallbackHelper;
+use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
@@ -96,7 +100,13 @@ class ManagedFile extends FormElementBase {
         // functionality to allow File fields to be extended through FAPI.
         if (isset($element['#file_value_callbacks'])) {
           foreach ($element['#file_value_callbacks'] as $callback) {
-            $callback($element, $input, $form_state);
+            $message = sprintf(
+              'ManagedFile element #file_value_callbacks callbacks must be tagged with the %s attribute, be methods of a class that implements %s, or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3620771',
+              TrustedCallback::class,
+              TrustedCallbackInterface::class,
+              Variable::callableToString($callback)
+            );
+            StaticTrustedCallbackHelper::callback($callback, [&$element, $input, $form_state], $message);
           }
         }
 
