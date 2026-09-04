@@ -39,12 +39,7 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests creating a table from a definition with specialized indexes.
-   *
-   * By default, drivers only support regular indexes: GIN and GiST index
-   * definitions are skipped, and alternative indexes fall back to their
-   * regular index definition. Drivers supporting specialized indexes
-   * override this method.
+   * Tests creating a table from a schema definition.
    */
   public function testCreateTable(): void {
     $tableName = 'test_from_definition';
