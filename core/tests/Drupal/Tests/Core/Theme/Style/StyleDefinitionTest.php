@@ -8,6 +8,9 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\Theme\Style\Enum\ModeColorScheme;
+use Drupal\Core\Theme\Style\Enum\ModeContrast;
+use Drupal\Core\Theme\Style\Enum\ModeReducedMotion;
 use Drupal\Core\Theme\Style\Enum\Type;
 use Drupal\Core\Theme\Style\Enum\Status;
 use Drupal\Core\Theme\Style\Enum\Target;
@@ -90,6 +93,46 @@ class StyleDefinitionTest extends UnitTestCase {
       ],
     ],
     ];
+    yield 'getOptions:modes:string' => ['getOptions', 'options', [
+      'my_class' => [
+        'label' => 'My class',
+        'modes' => [
+          'color_scheme' => 'dark',
+          'contrast' => 'more',
+          'reduced_motion' => 'reduce',
+        ],
+      ],
+    ], [
+      'my_class' => [
+        'label' => 'My class',
+        'modes' => [
+          'color_scheme' => ModeColorScheme::Dark,
+          'contrast' => ModeContrast::More,
+          'reduced_motion' => ModeReducedMotion::Reduce,
+        ],
+      ],
+    ],
+    ];
+    yield 'getOptions:modes:enum' => ['getOptions', 'options', [
+      'my_class' => [
+        'label' => 'My class',
+        'modes' => [
+          'color_scheme' => ModeColorScheme::Light,
+          'contrast' => ModeContrast::Less,
+          'reduced_motion' => ModeReducedMotion::Any,
+        ],
+      ],
+    ], [
+      'my_class' => [
+        'label' => 'My class',
+        'modes' => [
+          'color_scheme' => ModeColorScheme::Light,
+          'contrast' => ModeContrast::Less,
+          'reduced_motion' => ModeReducedMotion::Any,
+        ],
+      ],
+    ],
+    ];
     yield 'getLibrary' => ['getLibrary', 'library', 'my_module/my_library', 'my_module/my_library'];
   }
 
@@ -146,6 +189,29 @@ class StyleDefinitionTest extends UnitTestCase {
             'description' => 'Description',
             'status' => 'experimental',
           ],
+          // With a single mode.
+          'single_mode' => [
+            'label' => 'Single mode',
+            'modes' => [
+              'color_scheme' => 'dark',
+            ],
+          ],
+          // With all the modes.
+          'all_modes' => [
+            'label' => 'All modes',
+            'modes' => [
+              'color_scheme' => 'light',
+              'contrast' => 'more',
+              'reduced_motion' => 'reduce',
+            ],
+          ],
+          // With modes already set as enum.
+          'modes_as_enum' => [
+            'label' => 'Modes as enum',
+            'modes' => [
+              'contrast' => ModeContrast::Less,
+            ],
+          ],
           // With other property.
           'other_property' => [
             'label' => 'Label',
@@ -161,6 +227,11 @@ class StyleDefinitionTest extends UnitTestCase {
           'attribute' => 'my-attribute',
           'target' => Target::Body,
           'status' => Status::Stable,
+          'modes' => [
+            'color_scheme' => ModeColorScheme::Any,
+            'contrast' => ModeContrast::Any,
+            'reduced_motion' => ModeReducedMotion::Any,
+          ],
         ],
         'medium' => [
           'label' => new TranslatableMarkup('Medium'),
@@ -169,6 +240,11 @@ class StyleDefinitionTest extends UnitTestCase {
           'attribute' => 'my-attribute',
           'target' => Target::Body,
           'status' => Status::Stable,
+          'modes' => [
+            'color_scheme' => ModeColorScheme::Any,
+            'contrast' => ModeContrast::Any,
+            'reduced_motion' => ModeReducedMotion::Any,
+          ],
         ],
         'large' => [
           'label' => new TranslatableMarkup('Large'),
@@ -177,6 +253,11 @@ class StyleDefinitionTest extends UnitTestCase {
           'attribute' => 'style',
           'target' => Target::Body,
           'status' => Status::Stable,
+          'modes' => [
+            'color_scheme' => ModeColorScheme::Any,
+            'contrast' => ModeContrast::Any,
+            'reduced_motion' => ModeReducedMotion::Any,
+          ],
         ],
         'extra large' => [
           'label' => new TranslatableMarkup('Extra large'),
@@ -185,6 +266,11 @@ class StyleDefinitionTest extends UnitTestCase {
           'attribute' => 'my-attribute',
           'target' => Target::Html,
           'status' => Status::Stable,
+          'modes' => [
+            'color_scheme' => ModeColorScheme::Any,
+            'contrast' => ModeContrast::Any,
+            'reduced_motion' => ModeReducedMotion::Any,
+          ],
         ],
         'description_status' => [
           'label' => new TranslatableMarkup('@label (@status)', [
@@ -196,6 +282,50 @@ class StyleDefinitionTest extends UnitTestCase {
           'attribute' => 'my-attribute',
           'target' => Target::Body,
           'status' => Status::Experimental,
+          'modes' => [
+            'color_scheme' => ModeColorScheme::Any,
+            'contrast' => ModeContrast::Any,
+            'reduced_motion' => ModeReducedMotion::Any,
+          ],
+        ],
+        'single_mode' => [
+          'label' => new TranslatableMarkup('Single mode'),
+          'description' => '',
+          'value' => 'single_mode',
+          'attribute' => 'my-attribute',
+          'target' => Target::Body,
+          'status' => Status::Stable,
+          'modes' => [
+            'color_scheme' => ModeColorScheme::Dark,
+            'contrast' => ModeContrast::Any,
+            'reduced_motion' => ModeReducedMotion::Any,
+          ],
+        ],
+        'all_modes' => [
+          'label' => new TranslatableMarkup('All modes'),
+          'description' => '',
+          'value' => 'all_modes',
+          'attribute' => 'my-attribute',
+          'target' => Target::Body,
+          'status' => Status::Stable,
+          'modes' => [
+            'color_scheme' => ModeColorScheme::Light,
+            'contrast' => ModeContrast::More,
+            'reduced_motion' => ModeReducedMotion::Reduce,
+          ],
+        ],
+        'modes_as_enum' => [
+          'label' => new TranslatableMarkup('Modes as enum'),
+          'description' => '',
+          'value' => 'modes_as_enum',
+          'attribute' => 'my-attribute',
+          'target' => Target::Body,
+          'status' => Status::Stable,
+          'modes' => [
+            'color_scheme' => ModeColorScheme::Any,
+            'contrast' => ModeContrast::Less,
+            'reduced_motion' => ModeReducedMotion::Any,
+          ],
         ],
         'other_property' => [
           'label' => new TranslatableMarkup('Label'),
@@ -204,6 +334,11 @@ class StyleDefinitionTest extends UnitTestCase {
           'attribute' => 'my-attribute',
           'target' => Target::Body,
           'status' => Status::Stable,
+          'modes' => [
+            'color_scheme' => ModeColorScheme::Any,
+            'contrast' => ModeContrast::Any,
+            'reduced_motion' => ModeReducedMotion::Any,
+          ],
           'foo' => 'bar',
         ],
       ],

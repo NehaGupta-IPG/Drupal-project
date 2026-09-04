@@ -8,6 +8,9 @@ use Drupal\Component\Plugin\Definition\PluginDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeHelper;
+use Drupal\Core\Theme\Style\Enum\ModeColorScheme;
+use Drupal\Core\Theme\Style\Enum\ModeContrast;
+use Drupal\Core\Theme\Style\Enum\ModeReducedMotion;
 use Drupal\Core\Theme\Style\Enum\Type;
 use Drupal\Core\Theme\Style\Enum\Status;
 use Drupal\Core\Theme\Style\Enum\Target;
@@ -19,6 +22,17 @@ use Drupal\Core\Theme\Style\Enum\Target;
  *   This API is experimental.
  */
 class StyleDefinition extends PluginDefinition implements StyleDefinitionInterface {
+
+  /**
+   * The enumeration of each option mode.
+   *
+   * @var array<string, class-string<\BackedEnum>>
+   */
+  protected const array MODES = [
+    'color_scheme' => ModeColorScheme::class,
+    'contrast' => ModeContrast::class,
+    'reduced_motion' => ModeReducedMotion::class,
+  ];
 
   /**
    * Style definition.
@@ -111,6 +125,7 @@ class StyleDefinition extends PluginDefinition implements StyleDefinitionInterfa
       $options[$optionId]['attribute'] = $option['attribute'] ?? $attribute;
       $options[$optionId]['target'] = $option['target'] ?? $target;
       $options[$optionId]['status'] = $option['status'] ?? Status::Stable;
+      $options[$optionId]['modes'] = \array_merge(static::getDefaultModes(), $option['modes'] ?? []);
 
       if ($options[$optionId]['status'] != Status::Stable) {
         $options[$optionId]['label'] = new TranslatableMarkup('@label (@status)', [
@@ -520,11 +535,31 @@ class StyleDefinition extends PluginDefinition implements StyleDefinitionInterfa
       if (isset($option['status']) && !($option['status'] instanceof Status)) {
         $options[$optionId]['status'] = Status::from($option['status']);
       }
+
+      foreach (static::MODES as $mode => $enum) {
+        if (isset($option['modes'][$mode]) && !($option['modes'][$mode] instanceof $enum)) {
+          $options[$optionId]['modes'][$mode] = $enum::from($option['modes'][$mode]);
+        }
+      }
     }
 
     $this->definition['options'] = $options;
     $this->processedOptions = NULL;
     return $this;
+  }
+
+  /**
+   * Get the modes matching any user preference.
+   *
+   * @return array<string, \BackedEnum>
+   *   The modes, keyed by mode name, all set to their `any` case.
+   */
+  protected static function getDefaultModes(): array {
+    $modes = [];
+    foreach (static::MODES as $mode => $enum) {
+      $modes[$mode] = $enum::from('any');
+    }
+    return $modes;
   }
 
   /**

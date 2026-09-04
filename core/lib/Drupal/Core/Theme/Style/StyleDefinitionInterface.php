@@ -19,6 +19,11 @@ use Drupal\Core\Theme\Style\Enum\Target;
  *   attribute: string,
  *   target: \Drupal\Core\Theme\Style\Enum\Target,
  *   status: \Drupal\Core\Theme\Style\Enum\Status,
+ *   modes: array{
+ *     color_scheme: \Drupal\Core\Theme\Style\Enum\ModeColorScheme,
+ *     contrast: \Drupal\Core\Theme\Style\Enum\ModeContrast,
+ *     reduced_motion: \Drupal\Core\Theme\Style\Enum\ModeReducedMotion,
+ *   },
  * }>
  *
  * @internal

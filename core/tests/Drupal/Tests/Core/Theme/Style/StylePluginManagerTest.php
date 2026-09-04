@@ -635,6 +635,20 @@ class StylePluginManagerTest extends UnitTestCase {
             'label' => 'Obsolete',
             'status' => 'obsolete',
           ],
+          'modes_partial' => [
+            'label' => 'Dark',
+            'modes' => [
+              'color_scheme' => 'dark',
+            ],
+          ],
+          'modes_full' => [
+            'label' => 'All modes',
+            'modes' => [
+              'color_scheme' => 'light',
+              'contrast' => 'less',
+              'reduced_motion' => 'reduce',
+            ],
+          ],
           'additional_property' => [
             'label' => 'bar',
             'baz' => 'bar',
@@ -681,6 +695,58 @@ class StylePluginManagerTest extends UnitTestCase {
           'foo' => [
             'label' => 'bar',
             'status' => 'bar',
+          ],
+        ],
+      ],
+      FALSE,
+    ];
+    yield 'Options: invalid mode name' => [
+      [
+        'options' => [
+          'foo' => [
+            'label' => 'bar',
+            'modes' => [
+              'font_size' => 'large',
+            ],
+          ],
+        ],
+      ],
+      FALSE,
+    ];
+    yield 'Options: invalid color scheme mode' => [
+      [
+        'options' => [
+          'foo' => [
+            'label' => 'bar',
+            'modes' => [
+              'color_scheme' => 'any',
+            ],
+          ],
+        ],
+      ],
+      FALSE,
+    ];
+    yield 'Options: invalid contrast mode' => [
+      [
+        'options' => [
+          'foo' => [
+            'label' => 'bar',
+            'modes' => [
+              'contrast' => 'high',
+            ],
+          ],
+        ],
+      ],
+      FALSE,
+    ];
+    yield 'Options: invalid reduced motion mode' => [
+      [
+        'options' => [
+          'foo' => [
+            'label' => 'bar',
+            'modes' => [
+              'reduced_motion' => 'no-preference',
+            ],
           ],
         ],
       ],

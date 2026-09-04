@@ -127,6 +127,40 @@
                 "meta"
               ]
             },
+            "modes": {
+              "title": "Modes",
+              "description": "The user preferences the option is adapted to. An unspecified mode means the option is adapted to any value of this user preference.",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "color_scheme": {
+                  "title": "Color scheme",
+                  "description": "Matches the CSS media feature prefers-color-scheme.",
+                  "type": "string",
+                  "enum": [
+                    "light",
+                    "dark"
+                  ]
+                },
+                "contrast": {
+                  "title": "Contrast",
+                  "description": "Matches the CSS media feature prefers-contrast.",
+                  "type": "string",
+                  "enum": [
+                    "more",
+                    "less"
+                  ]
+                },
+                "reduced_motion": {
+                  "title": "Reduced motion",
+                  "description": "Matches the CSS media feature prefers-reduced-motion.",
+                  "type": "string",
+                  "enum": [
+                    "reduce"
+                  ]
+                }
+              }
+            },
             "status": {
               "type": "string",
               "title": "Option Status",
