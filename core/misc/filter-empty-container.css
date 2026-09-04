@@ -1,0 +1,8 @@
+/**
+ * @file
+ * Utility style to hide empty containers.
+ */
+
+[data-filter-empty-container]:empty {
+  display: none;
+}

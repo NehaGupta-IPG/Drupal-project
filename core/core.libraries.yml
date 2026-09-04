@@ -808,3 +808,9 @@ drupal.fieldListKeyboardNavigation:
   dependencies:
     - core/drupal
     - core/tabbable
+
+filter-empty-container:
+  version: VERSION
+  css:
+    component:
+      misc/filter-empty-container.css: {}
