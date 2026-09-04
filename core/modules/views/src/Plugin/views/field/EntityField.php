@@ -1099,7 +1099,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   /**
    * Returns the field formatter instance.
    *
-   * @return \Drupal\Core\Field\FormatterInterface|null
+   * @return \Drupal\Core\Field\FormatterInterface<\Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>>|null
    *   The field formatter instance.
    */
   protected function getFormatterInstance($format = NULL) {

@@ -2,10 +2,14 @@
 
 namespace Drupal\user\Controller;
 
+use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\user\LoginFinalizer;
+use Drupal\user\LogoutFinalizer;
+use Drupal\user\NotificationHandler;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
@@ -16,15 +20,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 
 /**
  * Provides controllers for login, login status and logout via HTTP requests.
- *
- * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
- * \Drupal\rest\Controller\RestAuthenticationController instead.
- * @see https://www.drupal.org/node/3552724
  */
 class UserAuthenticationController extends ControllerBase implements ContainerInjectionInterface {
 
@@ -99,27 +100,33 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   protected $logger;
 
   /**
-   * Constructs a new UserAuthenticationController object.
-   *
-   * @param \Drupal\user\UserFloodControlInterface $user_flood_control
-   *   The user flood control service.
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
-   *   The CSRF token generator.
-   * @param \Drupal\user\UserAuthenticationInterface $user_auth
-   *   The user authentication.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
-   * @param \Symfony\Component\Serializer\Serializer $serializer
-   *   The serializer.
-   * @param array $serializer_formats
-   *   The available serialization formats.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
+   * The login finalizer.
    */
-  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\rest\Controller\RestAuthenticationController instead. See https://www.drupal.org/node/3552724', E_USER_DEPRECATED);
+  protected LoginFinalizer $loginFinalizer;
+
+  /**
+   * The logout finalizer.
+   */
+  protected LogoutFinalizer $logoutFinalizer;
+
+  /**
+   * The user notification handler.
+   */
+  protected readonly NotificationHandler $notificationHandler;
+
+  public function __construct(
+    UserFloodControlInterface $user_flood_control,
+    UserStorageInterface $user_storage,
+    CsrfTokenGenerator $csrf_token,
+    UserAuthenticationInterface $user_auth,
+    RouteProviderInterface $route_provider,
+    Serializer $serializer,
+    array $serializer_formats,
+    LoggerInterface $logger,
+    ?LoginFinalizer $loginFinalizer = NULL,
+    ?LogoutFinalizer $logoutFinalizer = NULL,
+    ?NotificationHandler $notification_handler = NULL,
+  ) {
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
     $this->csrfToken = $csrf_token;
@@ -128,6 +135,20 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     $this->serializerFormats = $serializer_formats;
     $this->routeProvider = $route_provider;
     $this->logger = $logger;
+    if ($loginFinalizer === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $loginFinalizer argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3379194', E_USER_DEPRECATED);
+      $loginFinalizer = \Drupal::service(LoginFinalizer::class);
+    }
+    $this->loginFinalizer = $loginFinalizer;
+    if ($logoutFinalizer === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $logoutFinalizer argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3379194', E_USER_DEPRECATED);
+      $logoutFinalizer = \Drupal::service(LogoutFinalizer::class);
+    }
+    $this->logoutFinalizer = $logoutFinalizer;
+    if ($notification_handler === NULL) {
+      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $notificationHandler argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3539363', E_USER_DEPRECATED);
+    }
+    $this->notificationHandler = $notification_handler ?? \Drupal::service(NotificationHandler::class);
   }
 
   /**
@@ -152,7 +173,10 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       $container->get('router.route_provider'),
       $serializer,
       $formats,
-      $container->get('logger.factory')->get('user')
+      $container->get('logger.factory')->get('user'),
+      $container->get(LoginFinalizer::class),
+      $container->get(LogoutFinalizer::class),
+      $container->get(NotificationHandler::class),
     );
   }
 
@@ -165,6 +189,15 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   A response which contains the ID and CSRF token.
    */
+  #[Route(
+    path: '/user/login',
+    name: 'user.login.http',
+    methods: ['POST'],
+    requirements: [
+      '_user_is_logged_in' => 'FALSE',
+      '_format' => 'json',
+    ],
+  )]
   public function login(Request $request) {
     $format = $this->getRequestFormat($request);
 
@@ -204,7 +237,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
         if ($account->get('name')->access('view', $account)) {
           $response_data['current_user']['name'] = $account->getAccountName();
         }
-        $response_data['csrf_token'] = $this->csrfToken->get('rest');
+        $response_data['csrf_token'] = $this->csrfToken->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY);
 
         $logout_route = $this->routeProvider->getRouteByName('user.logout.http');
         // Trim '/' off path to match \Drupal\Core\Access\CsrfAccessCheck.
@@ -234,6 +267,15 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
+  #[Route(
+    path: '/user/password',
+    name: 'user.pass.http',
+    methods: ['POST'],
+    requirements: [
+      '_access' => 'TRUE',
+      '_format' => 'json',
+    ],
+  )]
   public function resetPassword(Request $request) {
     $format = $this->getRequestFormat($request);
 
@@ -267,8 +309,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       }
 
       // Send the password reset email.
-      $mail = _user_mail_notify('password_reset', $account);
-      if (empty($mail)) {
+      if (!$this->notificationHandler->sendPasswordReset($account)) {
         throw new BadRequestHttpException('Unable to send email. Contact the site administrator if the problem persists.');
       }
       else {
@@ -294,7 +335,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    *   The user.
    */
   protected function userLoginFinalize(UserInterface $user) {
-    user_login_finalize($user);
+    $this->loginFinalizer->finalizeLogin($user);
   }
 
   /**
@@ -303,6 +344,16 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    */
+  #[Route(
+    path: '/user/logout',
+    name: 'user.logout.http',
+    methods: ['POST'],
+    requirements: [
+      '_user_is_logged_in' => 'TRUE',
+      '_format' => 'json',
+      '_csrf_token' => 'TRUE',
+    ],
+  )]
   public function logout() {
     $this->userLogout();
     return new Response(NULL, 204);
@@ -312,7 +363,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * Logs the user out.
    */
   protected function userLogout() {
-    user_logout();
+    $this->logoutFinalizer->finalizeLogout();
   }
 
   /**
@@ -321,6 +372,15 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
    */
+  #[Route(
+    path: '/user/login_status',
+    name: 'user.login_status.http',
+    methods: ['GET'],
+    requirements: [
+      '_access' => 'TRUE',
+      '_format' => 'json',
+    ],
+  )]
   public function loginStatus() {
     if ($this->currentUser()->isAuthenticated()) {
       $response = new Response(self::LOGGED_IN);

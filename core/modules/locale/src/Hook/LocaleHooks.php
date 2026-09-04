@@ -2,17 +2,14 @@
 
 namespace Drupal\locale\Hook;
 
-use Drupal\Core\Link;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\locale\StreamWrapper\TranslationsStream;
+use Drupal\locale\LocaleSource;
 use Drupal\locale\File\LocaleFileManager;
+use Drupal\locale\LocaleJs;
 
 /**
  * Hook implementations for locale.
@@ -102,7 +99,7 @@ class LocaleHooks {
     // Changing the language settings impacts the interface: clear render cache.
     \Drupal::cache('render')->deleteAll();
     // Force JavaScript translation file re-creation for the new language.
-    _locale_invalidate_js($language->id());
+    \Drupal::service(LocaleJs::class)->invalidate($language->id());
   }
 
   /**
@@ -115,7 +112,7 @@ class LocaleHooks {
     // Changing the language settings impacts the interface: clear render cache.
     \Drupal::cache('render')->deleteAll();
     // Force JavaScript translation file re-creation for the modified language.
-    _locale_invalidate_js($language->id());
+    \Drupal::service(LocaleJs::class)->invalidate($language->id());
   }
 
   /**
@@ -131,47 +128,11 @@ class LocaleHooks {
     // Remove translated configuration objects.
     \Drupal::service('locale.config_manager')->deleteLanguageTranslations($language->id());
     // Changing the language settings impacts the interface:
-    _locale_invalidate_js($language->id());
+    \Drupal::service(LocaleJs::class)->invalidate($language->id());
     \Drupal::cache('render')->deleteAll();
     // Clear locale translation caches.
-    locale_translation_status_delete_languages([$language->id()]);
+    \Drupal::service(LocaleSource::class)->deleteSourcesByLanguage($language->id());
     \Drupal::cache()->delete('locale:' . $language->id());
-  }
-
-  /**
-   * Implements hook_modules_installed().
-   */
-  #[Hook('modules_installed')]
-  public function modulesInstalled($modules): void {
-    $components['module'] = $modules;
-    locale_system_update($components);
-  }
-
-  /**
-   * Implements hook_module_preuninstall().
-   */
-  #[Hook('module_preuninstall')]
-  public function modulePreuninstall($module): void {
-    $components['module'] = [$module];
-    locale_system_remove($components);
-  }
-
-  /**
-   * Implements hook_themes_installed().
-   */
-  #[Hook('themes_installed')]
-  public function themesInstalled($themes): void {
-    $components['theme'] = $themes;
-    locale_system_update($components);
-  }
-
-  /**
-   * Implements hook_themes_uninstalled().
-   */
-  #[Hook('themes_uninstalled')]
-  public function themesUninstalled($themes): void {
-    $components['theme'] = $themes;
-    locale_system_remove($components);
   }
 
   /**
@@ -180,139 +141,6 @@ class LocaleHooks {
   #[Hook('cache_flush')]
   public function cacheFlush(): void {
     \Drupal::state()->delete('system.javascript_parsed');
-  }
-
-  /**
-   * Implements hook_js_alter().
-   */
-  #[Hook('js_alter')]
-  public function jsAlter(&$javascript, AttachedAssetsInterface $assets, LanguageInterface $language): void {
-    $files = [];
-    foreach ($javascript as $item) {
-      if (isset($item['type']) && $item['type'] == 'file') {
-        // Ignore the JS translation placeholder file.
-        if ($item['data'] === 'core/modules/locale/locale.translation.js') {
-          continue;
-        }
-        $files[] = $item['data'];
-      }
-    }
-    // Replace the placeholder file with the actual JS translation file.
-    $placeholder_file = 'core/modules/locale/locale.translation.js';
-    if (isset($javascript[$placeholder_file])) {
-      if ($translation_file = locale_js_translate($files, $language)) {
-        $js_translation_asset =& $javascript[$placeholder_file];
-        $js_translation_asset['data'] = $translation_file;
-        // @todo Remove this when https://www.drupal.org/node/1945262 lands.
-        // Decrease the weight so that the translation file is loaded first.
-        $js_translation_asset['weight'] = $javascript['core/misc/drupal.js']['weight'] - 0.001;
-      }
-      else {
-        // If no translation file exists, then remove the placeholder JS asset.
-        unset($javascript[$placeholder_file]);
-      }
-    }
-  }
-
-  /**
-   * Implements hook_library_info_alter().
-   *
-   * Provides language support.
-   */
-  #[Hook('library_info_alter')]
-  public function libraryInfoAlter(array &$libraries, $module): void {
-    // When the locale module is enabled, we update the core/drupal library to
-    // have a dependency on the locale/translations library, which provides
-    // window.drupalTranslations, containing the translations for all strings in
-    // JavaScript assets in the current language.
-    // @see locale_js_alter()
-    if ($module === 'core' && isset($libraries['drupal'])) {
-      $libraries['drupal']['dependencies'][] = 'locale/translations';
-    }
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter() for language_admin_overview_form().
-   */
-  #[Hook('form_language_admin_overview_form_alter')]
-  public function formLanguageAdminOverviewFormAlter(&$form, FormStateInterface $form_state) : void {
-    $languages = $form['languages']['#languages'];
-    $total_strings = \Drupal::service('locale.storage')->countStrings();
-    $stats = array_fill_keys(array_keys($languages), []);
-    // If we have source strings, count translations and calculate progress.
-    if (!empty($total_strings)) {
-      $translations = \Drupal::service('locale.storage')->countTranslations();
-      foreach ($translations as $langcode => $translated) {
-        $stats[$langcode]['translated'] = $translated;
-        if ($translated > 0) {
-          $stats[$langcode]['ratio'] = round($translated / $total_strings * 100, 2);
-        }
-      }
-    }
-    array_splice($form['languages']['#header'], -1, 0, ['translation-interface' => $this->t('Interface translation')]);
-    foreach ($languages as $langcode => $language) {
-      $stats[$langcode] += ['translated' => 0, 'ratio' => 0];
-      if (!$language->isLocked() && locale_is_translatable($langcode)) {
-        $form['languages'][$langcode]['locale_statistics'] = Link::fromTextAndUrl($this->t('@translated/@total (@ratio%)', [
-          '@translated' => $stats[$langcode]['translated'],
-          '@total' => $total_strings,
-          '@ratio' => $stats[$langcode]['ratio'],
-        ]), Url::fromRoute('locale.translate_page', [], ['query' => ['langcode' => $langcode]]))->toRenderable();
-      }
-      else {
-        $form['languages'][$langcode]['locale_statistics'] = ['#markup' => $this->t('not applicable')];
-      }
-      // #type = link doesn't work with #weight on table.
-      // reset and set it back after locale_statistics to get it at the right
-      // end.
-      $operations = $form['languages'][$langcode]['operations'];
-      unset($form['languages'][$langcode]['operations']);
-      $form['languages'][$langcode]['operations'] = $operations;
-    }
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter() for language_admin_add_form().
-   */
-  #[Hook('form_language_admin_add_form_alter')]
-  public function formLanguageAdminAddFormAlter(&$form, FormStateInterface $form_state) : void {
-    $form['predefined_submit']['#submit'][] = 'locale_form_language_admin_add_form_alter_submit';
-    $form['custom_language']['submit']['#submit'][] = 'locale_form_language_admin_add_form_alter_submit';
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter() for language_admin_edit_form().
-   */
-  #[Hook('form_language_admin_edit_form_alter')]
-  public function formLanguageAdminEditFormAlter(&$form, FormStateInterface $form_state) : void {
-    /** @var \Drupal\language\ConfigurableLanguageInterface $language */
-    $language = $form_state->getFormObject()->getEntity();
-    if ($language->id() == 'en') {
-      $form['locale_translate_english'] = [
-        '#title' => $this->t('Enable interface translation to English'),
-        '#type' => 'checkbox',
-        '#default_value' => \Drupal::configFactory()->getEditable('locale.settings')->get('translate_english'),
-      ];
-      $form['actions']['submit']['#submit'][] = 'locale_form_language_admin_edit_form_alter_submit';
-    }
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter() for system_file_system_settings().
-   *
-   * Add interface translation directory setting to directories configuration.
-   */
-  #[Hook('form_system_file_system_settings_alter')]
-  public function formSystemFileSystemSettingsAlter(&$form, FormStateInterface $form_state) : void {
-    $form['translation_path'] = [
-      '#type' => 'item',
-      '#title' => $this->t('Interface translations directory'),
-      '#markup' => TranslationsStream::basePath(),
-      '#description' => $this->t('A local file system path where interface translation files will be stored. This must be changed in settings.php file as the "locale_translation_path" setting.'),
-    ];
-    if ($form['file_default_scheme']) {
-      $form['file_default_scheme']['#weight'] = 20;
-    }
   }
 
 }

@@ -9,12 +9,14 @@ use Drupal\Core\Url;
 use Drupal\search\Entity\SearchPage;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verify the search config settings form.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchConfigSettingsFormTest extends BrowserTestBase {
 
@@ -28,6 +30,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
     'search',
     'search_extra_type',
     'search_node',
+    'search_user',
     'test_page_test',
   ];
 

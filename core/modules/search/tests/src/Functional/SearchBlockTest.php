@@ -7,12 +7,14 @@ namespace Drupal\Tests\search\Functional;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests if the search form block is available.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchBlockTest extends BrowserTestBase {
 
@@ -24,6 +26,7 @@ class SearchBlockTest extends BrowserTestBase {
     'node',
     'search',
     'search_node',
+    'search_user',
     'dblog',
     'user',
   ];

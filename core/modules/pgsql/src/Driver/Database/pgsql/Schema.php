@@ -167,7 +167,7 @@ WHERE pg_attribute.attnum > 0
 AND NOT pg_attribute.attisdropped
 AND pg_attribute.attrelid = :key::regclass
 AND (format_type(pg_attribute.atttypid, pg_attribute.atttypmod) = 'bytea'
-OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid) LIKE 'nextval%')
+OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid)::text LIKE 'nextval%')
 EOD;
         $result = $this->connection->query($sql, [
           ':key' => $quoted_key,
@@ -943,7 +943,7 @@ EOD;
     // Type 'serial' is known to PostgreSQL, but only during table creation,
     // not when altering. Because of that, we create it here as an 'int'. After
     // we create it we manually re-apply the sequence.
-    $field_def = match($spec['pgsql_type']) {
+    $field_def = match ($spec['pgsql_type']) {
       'serial' => 'int',
       'bigserial' => 'bigint',
       default => $spec['pgsql_type'],
