@@ -104,6 +104,20 @@ final class Table implements SchemaDefinitionInterface {
         }
       }
     }
+    // MariaDB and SQLite do not allow generated columns in the primary key.
+    if ($this->columns && $this->primaryKey) {
+      $generatedColumnNames = array_map(
+        static fn (Column $column): string => $column->name,
+        array_filter($this->columns, static fn (Column $column): bool => $column->generatedExpression !== NULL),
+      );
+      $primaryKeyColumnNames = array_map(
+        static fn (KeyColumn $keyColumn): string => $keyColumn->name,
+        $this->primaryKey->columns,
+      );
+      if (array_intersect($primaryKeyColumnNames, $generatedColumnNames)) {
+        throw new SchemaDefinitionException("The primary key of the '{$this->name}' Table cannot include generated columns");
+      }
+    }
   }
 
   /**
