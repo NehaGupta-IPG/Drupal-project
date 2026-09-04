@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\navigation\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests moving search from node to search_node.
+ * Tests the update functions of the Navigation module.
  */
 #[Group('navigation')]
 #[RunTestsInSeparateProcesses]
@@ -52,6 +53,37 @@ class NavigationUpdateTest extends UpdatePathTestBase {
     $config = \Drupal::config('navigation.block_layout');
     $sections = $config->get('sections');
     $this->assertArrayNotHasKey($uuid, $sections[0]['components']);
+  }
+
+  /**
+   * Tests that the Navigation Layout module is installed on update.
+   */
+  public function testNavigationLayoutInstall(): void {
+    $module_handler = \Drupal::moduleHandler();
+    $this->assertTrue($module_handler->moduleExists('layout_builder'));
+    $this->assertFalse($module_handler->moduleExists('navigation_layout'));
+
+    // Grant the permission that moved to Navigation Layout by editing the role
+    // config directly. Saving the role entity would drop the permission, as no
+    // installed module provides it until the update function runs.
+    $permission = 'configure navigation layout';
+    $role_config = $this->config('user.role.authenticated');
+    $role_config->set('permissions', [...$role_config->get('permissions'), $permission])->save();
+
+    $this->runUpdates();
+
+    $this->assertTrue(\Drupal::moduleHandler()->moduleExists('navigation_layout'));
+
+    // The role kept the permission and now depends on the new module.
+    $role = Role::load('authenticated');
+    $this->assertContains($permission, $role->getPermissions());
+    $this->assertContains('navigation_layout', $role->getDependencies()['module']);
+
+    // The navigation blocks UI is still available.
+    $this->drupalLogin($this->rootUser);
+    $this->drupalGet('admin/config/user-interface/navigation-block');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->buttonExists('Enable edit mode');
   }
 
 }
