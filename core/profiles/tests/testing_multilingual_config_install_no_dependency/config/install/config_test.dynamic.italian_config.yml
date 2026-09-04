@@ -1,5 +1,0 @@
-id: italian_config
-label: 'Italian config'
-weight: 0
-protected_property: Default
-langcode: it

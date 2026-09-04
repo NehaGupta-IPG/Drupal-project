@@ -72,14 +72,9 @@ class InstallerMultilingualRecipeLangcodeTest extends InstallerTestBase {
     // installation, not be hardcoded to English.
     $this->assertSame('fr', $this->config('config_test.dynamic.recipe_default')->get('langcode'));
 
-    // The recipe's own shipped language still vouches for its own config,
-    // regardless of what language the site itself was installed in.
+    // The recipe's configuration shipped in german should still be german.
     $this->assertSame('de', $this->config('config_test.dynamic.recipe_german')->get('langcode'));
     $this->assertNotNull(\Drupal::entityTypeManager()->getStorage('config_test')->load('recipe_german'));
-
-    // An explicit, unsupported langcode is still rejected.
-    $this->assertNull($this->config('config_test.dynamic.recipe_unsupported')->get('id'));
-    $this->assertNull(\Drupal::entityTypeManager()->getStorage('config_test')->load('recipe_unsupported'));
   }
 
 }

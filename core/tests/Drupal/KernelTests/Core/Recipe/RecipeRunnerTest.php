@@ -219,24 +219,17 @@ class RecipeRunnerTest extends KernelTestBase {
   }
 
   /**
-   * Tests a recipe's own language installs, and an unsupported one is skipped.
+   * Tests a recipe's own explicitly labelled language installs.
    *
    * The recipe ships language.entity.de and config_test.dynamic.recipe_german
-   * together: the language must vouch for its own config regardless of
-   * dependency-declared installation order. config_test.dynamic.
-   * recipe_unsupported ships explicitly labelled 'xx' with no language
-   * vouching for it anywhere, so it must not install at all - the same
-   * rejection a module or profile shipping the same thing would get.
+   * together.
    */
-  public function testConfigWithRecipeDefinedAndUnsupportedLangcodes(): void {
+  public function testConfigWithRecipeDefinedLangcode(): void {
     $recipe = Recipe::createFromDirectory('core/tests/fixtures/recipes/config_with_langcode');
     RecipeRunner::processRecipe($recipe);
 
     $this->assertSame('de', $this->config('config_test.dynamic.recipe_german')->get('langcode'));
     $this->assertNotNull(\Drupal::entityTypeManager()->getStorage('config_test')->load('recipe_german'));
-
-    $this->assertFalse($this->container->get('config.storage')->exists('config_test.dynamic.recipe_unsupported'));
-    $this->assertNull(\Drupal::entityTypeManager()->getStorage('config_test')->load('recipe_unsupported'));
   }
 
   /**

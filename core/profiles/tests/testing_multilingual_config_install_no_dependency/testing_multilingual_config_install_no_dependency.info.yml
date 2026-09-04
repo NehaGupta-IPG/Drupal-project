@@ -1,8 +1,0 @@
-name: 'Testing multilingual config install without a declared dependency'
-type: profile
-description: 'Minimal profile for testing that shipped configuration in another language installs even when it does not declare a dependency on the language.entity.* it needs.'
-version: VERSION
-hidden: true
-install:
-  - language
-  - config_test

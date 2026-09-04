@@ -284,14 +284,14 @@ class ConfigInstallTest extends KernelTestBase {
     $this->assertEquals('en', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
 
     // Test imported configuration with an explicit, non-English language
-    // code. Without language module installed, English is the only
-    // supported language, so this must not have been installed at all.
+    // code. It installs with that langcode even though the language module
+    // is not installed and no language.entity.fr exists on this site.
     $data = $storage->read('config_test.dynamic.dotted.french');
     $this->assertEquals('fr', $data['langcode']);
-    $this->assertNull($this->config('config_test.dynamic.dotted.french')->get('id'));
+    $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.french')->get('langcode'));
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $entity_storage */
     $entity_storage = \Drupal::entityTypeManager()->getStorage('config_test');
-    $this->assertNull($entity_storage->load('dotted.french'));
+    $this->assertNotNull($entity_storage->load('dotted.french'));
   }
 
   /**
@@ -311,8 +311,8 @@ class ConfigInstallTest extends KernelTestBase {
     // relabelled to the site's configuration default, not left as 'en'.
     $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
 
-    // config_test.dynamic.dotted.french ships with an explicit langcode that
-    // is supported on this site: it must be left alone.
+    // config_test.dynamic.dotted.french ships with its own explicit
+    // langcode: it must be left alone.
     $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.french')->get('langcode'));
 
     // A translatable simple configuration object with no langcode of its own
@@ -321,36 +321,10 @@ class ConfigInstallTest extends KernelTestBase {
   }
 
   /**
-   * Tests configuration shipping with an unsupported langcode is not installed.
-   *
-   * @see \Drupal\Core\Config\ConfigInstaller::createConfiguration()
-   */
-  public function testLanguageRejectsUnsupportedShippedLangcode(): void {
-    $this->enableModules(['language']);
-    $this->installConfig(['language']);
-    // Deliberately do not create a 'fr' language: config_test.dynamic.dotted
-    // .french ships with langcode 'fr', which is unsupported here.
-
-    $this->installModules(['config_test_language']);
-
-    // config_test.dynamic.dotted.french must not have been installed at all.
-    $this->assertNull($this->config('config_test.dynamic.dotted.french')->get('id'));
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
-    $storage = \Drupal::entityTypeManager()->getStorage('config_test');
-    $this->assertNull($storage->load('dotted.french'));
-
-    // Unrelated configuration in the same install batch, including one that
-    // needed relabelling to English, must still have installed normally.
-    $this->assertEquals('en', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
-    $this->assertNotNull($storage->load('dotted.english'));
-  }
-
-  /**
    * Tests a shipped langcode matching a non-English site default installs.
    *
    * No language module is installed here: the site's configuration default
-   * language can only ever come from system.site:default_langcode, and
-   * nothing else vouches for it being supported.
+   * language can only ever come from system.site:default_langcode.
    *
    * @see \Drupal\Core\Config\EventSubscriber\ConfigLangcodeSiteDefaultSubscriber
    */
@@ -394,9 +368,9 @@ class ConfigInstallTest extends KernelTestBase {
     $expected_hash = Crypt::hashBase64(serialize($shipped_data));
     $this->assertEquals($expected_hash, $this->config('config_test.dynamic.dotted.english')->get('_core.default_config_hash'));
 
-    // config_test.dynamic.dotted.french ships with its own explicit,
-    // supported langcode, so it is left alone and its hash is unaffected
-    // either way - included here to confirm this case never regresses.
+    // config_test.dynamic.dotted.french ships with its own explicit
+    // langcode, so it is left alone and its hash is unaffected either way -
+    // included here to confirm this case never regresses.
     $shipped_data = (new InstallStorage())->read('config_test.dynamic.dotted.french');
     $expected_hash = Crypt::hashBase64(serialize($shipped_data));
     $this->assertEquals($expected_hash, $this->config('config_test.dynamic.dotted.french')->get('_core.default_config_hash'));
