@@ -228,13 +228,11 @@ class MergeTest extends DatabaseTestBase {
 
   /**
    * Tests merge to string.
-   *
-   * @legacy-covers \Drupal\Core\Database\Query\Merge::__toString
    */
   public function testMergeToString(): void {
     $this->expectException(\BadMethodCallException::class);
     $this->expectExceptionMessageIs('The merge query can not be converted to a string');
-    $this->connection->merge('test_people');
+    (string) $this->connection->merge('test_people');
   }
 
 }
