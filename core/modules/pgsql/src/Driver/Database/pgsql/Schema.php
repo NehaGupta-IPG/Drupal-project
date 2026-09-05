@@ -913,7 +913,6 @@ EOD;
     // index whose name was already processed (most likely resulting from a
     // schema introspection.
     if (str_ends_with($name, '_idx')) {
-      $identifier = $name;
       $this->executeDdlStatement('DROP INDEX ' . $this->defaultSchema . '."' . $name . '"');
     }
     else {
