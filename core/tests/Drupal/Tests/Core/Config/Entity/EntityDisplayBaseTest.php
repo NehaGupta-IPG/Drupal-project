@@ -84,7 +84,7 @@ class EntityDisplayBaseTest extends UnitTestCase {
 class EntityDisplayBaseMockableClass extends EntityDisplayBase {
 
   // @phpstan-ignore-next-line
-  public function __construct() {
+  public function __construct(array $values, $entity_type) {
   }
 
   public function getPluginCollections(): array {
