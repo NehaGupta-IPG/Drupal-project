@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\navigation_layout\Hook;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
