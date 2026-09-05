@@ -77,6 +77,10 @@ class FieldCrudTest extends FieldKernelTestBase {
     $field = FieldConfig::create($this->fieldDefinition);
     $field->save();
 
+    // Field configuration does not declare a data definition default value.
+    $this->assertFalse($field->hasDefault());
+    $this->assertNull($field->getDefault());
+
     $field = FieldConfig::load($field->id());
     $this->assertEquals('TRUE', $field->getSetting('field_setting_from_config_data'));
     $this->assertNull($field->getSetting('config_data_from_field_setting'));

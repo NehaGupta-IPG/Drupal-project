@@ -117,6 +117,37 @@ interface DataDefinitionInterface {
   public function isRequired();
 
   /**
+   * Returns the declared default value.
+   *
+   * The default value is descriptive metadata only. The typed data system does
+   * not apply it when creating a typed data object, and it is not taken into
+   * account during validation. Consumers may use it, for example, to
+   * pre-populate a form element or to emit a JSON Schema "default" keyword.
+   *
+   * A NULL return value is ambiguous: it can mean that no default value was
+   * declared, or that the declared default value is NULL. Use ::hasDefault()
+   * to tell these apart.
+   *
+   * @return mixed
+   *   The default value, or NULL if no default value was declared.
+   *
+   * @see \Drupal\Core\TypedData\DataDefinitionInterface::hasDefault()
+   * @see \Drupal\Core\TypedData\DataDefinition::setDefault()
+   */
+  public function getDefault(): mixed;
+
+  /**
+   * Determines whether a default value was declared.
+   *
+   * @return bool
+   *   TRUE if a default value was declared, even if that value is NULL. FALSE
+   *   otherwise.
+   *
+   * @see \Drupal\Core\TypedData\DataDefinitionInterface::getDefault()
+   */
+  public function hasDefault(): bool;
+
+  /**
    * Returns the class used for creating the typed data object.
    *
    * If not specified, the default class of the data type will be returned.

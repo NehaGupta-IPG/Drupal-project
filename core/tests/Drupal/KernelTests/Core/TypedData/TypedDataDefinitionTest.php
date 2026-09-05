@@ -105,6 +105,52 @@ class TypedDataDefinitionTest extends KernelTestBase {
   }
 
   /**
+   * Tests that a declared default value is metadata only.
+   */
+  public function testDefault(): void {
+    $definition = DataDefinition::create('string')->setDefault('foo');
+
+    // Creating typed data does not apply the declared default value.
+    $data = $this->typedDataManager->create($definition);
+    $this->assertNull($data->getValue());
+    $this->assertTrue($data->getDataDefinition()->hasDefault());
+    $this->assertSame('foo', $data->getDataDefinition()->getDefault());
+
+    // Neither does applying the default value of the typed data object.
+    $data->applyDefaultValue();
+    $this->assertNull($data->getValue());
+
+    // A value passed to ::create() is used as-is.
+    $data = $this->typedDataManager->create($definition, 'bar');
+    $this->assertSame('bar', $data->getValue());
+
+    // A declared default value does not influence validation: the violations
+    // are the same as for a definition without a default value.
+    $definition = DataDefinition::create('string')->setRequired(TRUE);
+    $expected = (string) $this->typedDataManager->create($definition)->validate();
+    $definition->setDefault('foo');
+    $violations = $this->typedDataManager->create($definition)->validate();
+    $this->assertCount(1, $violations);
+    $this->assertSame($expected, (string) $violations);
+
+    // The default value of list items and map properties is not applied
+    // either.
+    $list_definition = ListDataDefinition::create('string');
+    $list_definition->getItemDefinition()->setDefault('foo');
+    $list = $this->typedDataManager->create($list_definition);
+    $this->assertSame([], $list->getValue());
+    $list->applyDefaultValue();
+    $this->assertSame([], $list->getValue());
+
+    $map_definition = MapDataDefinition::create()
+      ->setPropertyDefinition('one', DataDefinition::create('string')->setDefault('foo'));
+    $map = $this->typedDataManager->create($map_definition);
+    $this->assertNull($map->get('one')->getValue());
+    $map->applyDefaultValue();
+    $this->assertNull($map->get('one')->getValue());
+  }
+
+  /**
    * Tests getString() throws exception when getType() is not implemented.
    */
   public function testNotImplementedGetType(): void {

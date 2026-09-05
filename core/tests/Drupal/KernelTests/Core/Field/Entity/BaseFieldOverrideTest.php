@@ -121,6 +121,26 @@ class BaseFieldOverrideTest extends KernelTestBase {
   }
 
   /**
+   * Tests that the data definition default is inherited from the base field.
+   *
+   * @legacy-covers ::getDefault
+   * @legacy-covers ::hasDefault
+   */
+  public function testDefault(): void {
+    $base_field = BaseFieldDefinition::create('string')
+      ->setName('Test Field')
+      ->setTargetEntityTypeId('entity_test');
+    $override = BaseFieldOverride::createFromBaseFieldDefinition($base_field, 'test_bundle');
+    $this->assertFalse($override->hasDefault());
+    $this->assertNull($override->getDefault());
+
+    $base_field->setDefault('foo');
+    $override = BaseFieldOverride::createFromBaseFieldDefinition($base_field, 'test_bundle');
+    $this->assertTrue($override->hasDefault());
+    $this->assertSame('foo', $override->getDefault());
+  }
+
+  /**
    * A default value callback which returns a primitive value.
    *
    * @return int

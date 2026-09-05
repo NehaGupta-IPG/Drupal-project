@@ -196,6 +196,32 @@ class BaseFieldDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests that the field default value and the data default are independent.
+   *
+   * @legacy-covers ::setDefaultValue
+   * @legacy-covers ::getDefaultValueLiteral
+   * @legacy-covers ::getDefault
+   * @legacy-covers ::hasDefault
+   * @legacy-covers ::setDefault
+   */
+  public function testFieldDefaultValueAndDataDefault(): void {
+    $definition = BaseFieldDefinition::create($this->fieldType);
+    $definition->setItemDefinition(DataDefinition::createFromDataType('string')->setClass(FieldItemBase::class));
+
+    // A field default value does not declare a data definition default.
+    $definition->setDefaultValue('foo');
+    $this->assertEquals([['value' => 'foo']], $definition->getDefaultValueLiteral());
+    $this->assertFalse($definition->hasDefault());
+    $this->assertNull($definition->getDefault());
+
+    // A data definition default does not change the field default value.
+    $definition->setDefault('bar');
+    $this->assertTrue($definition->hasDefault());
+    $this->assertSame('bar', $definition->getDefault());
+    $this->assertEquals([['value' => 'foo']], $definition->getDefaultValueLiteral());
+  }
+
+  /**
    * Tests field initial value.
    *
    * @legacy-covers ::getInitialValue
