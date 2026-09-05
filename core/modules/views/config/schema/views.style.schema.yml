@@ -127,6 +127,9 @@ views.style.table:
     class:
       type: string
       label: 'Table class'
+    row_header:
+      type: string
+      label: 'Field to use as row header'
 
 views.style.default_summary:
   type: views_style

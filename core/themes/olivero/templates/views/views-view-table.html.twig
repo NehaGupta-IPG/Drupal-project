@@ -24,6 +24,8 @@
  *     - content: The column content.
  *   - default_classes: A flag indicating whether default classes should be
  *     used.
+ *   - row_header: The field that should be marked up as a table header on each
+ *     row.
  * - responsive: A flag indicating whether table is responsive.
  * - sticky: A flag indicating whether table header is sticky.
  * - summary_element: A render array with table summary information (if any).
@@ -101,7 +103,11 @@
               {% set column_classes = column_classes|merge(['views-field-' ~ field]) %}
             {% endfor %}
           {% endif %}
-          <td{{ column.attributes.addClass(column_classes) }}>
+          {% if key == row_header %}
+            <th scope="row" {{ column.attributes.addClass(column_classes) }}>
+          {% else %}
+            <td{{column.attributes.addClass(column_classes)}}>
+          {% endif %}
             {%- if column.wrapper_element -%}
               <{{ column.wrapper_element }}>
               {% for content in column.content %}
@@ -113,7 +119,11 @@
                 {{- content.separator }}{{ content.field_output -}}
               {% endfor %}
             {%- endif %}
-          </td>
+          {% if key == row_header %}
+            </th>
+          {% else %}
+            </td>
+          {% endif %}
         {% endfor %}
       </tr>
     {% endfor %}

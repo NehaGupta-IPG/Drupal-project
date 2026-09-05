@@ -872,6 +872,7 @@ class ViewsThemeHooks {
       // This is needed to target tables constructed by this function.
       $variables['responsive'] = TRUE;
     }
+    $variables['row_header'] = $handler->options['row_header'];
 
     // Fetch classes from handler options.
     if ($handler->options['class']) {
