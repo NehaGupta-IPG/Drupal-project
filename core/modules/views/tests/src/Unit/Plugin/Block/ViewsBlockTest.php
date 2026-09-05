@@ -35,7 +35,7 @@ class ViewsBlockTest extends UnitTestCase {
    *
    * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $executable;
+  protected MockObject $executable;
 
   /**
    * The view executable factory.
@@ -54,7 +54,7 @@ class ViewsBlockTest extends UnitTestCase {
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $storage;
+  protected MockObject $storage;
 
   /**
    * The mocked user account.

@@ -79,7 +79,6 @@ class WorkspaceEntityDeleteTest extends KernelTestBase {
    * Test entity deletion in a workspace.
    */
   public function testEntityDeletion(): void {
-    /** @var \Drupal\workspaces\WorkspaceTrackerInterface $workspace_association */
     $workspace_tracker = \Drupal::service('workspaces.tracker');
     $storage = $this->entityTypeManager->getStorage('node');
 

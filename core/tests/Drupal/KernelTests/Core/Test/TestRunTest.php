@@ -67,9 +67,6 @@ class TestRunTest extends KernelTestBase {
     $this->assertEquals(1, $this->connection->select('simpletest')->countQuery()->execute()->fetchField());
     $this->assertEquals(1, $this->connection->select('simpletest_test_id')->countQuery()->execute()->fetchField());
 
-    // Explicitly void the $test_run variable.
-    $test_run = NULL;
-
     // Test ::get.
     $test_run = TestRun::get($this->testRunResultsStorage, 1);
     $this->assertEquals(1, $test_run->id());

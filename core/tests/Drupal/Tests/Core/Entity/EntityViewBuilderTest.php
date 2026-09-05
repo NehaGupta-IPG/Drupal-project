@@ -12,7 +12,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\Entity\EntityViewBuilder.
@@ -50,7 +49,6 @@ class EntityViewBuilderTest extends UnitTestCase {
     $bundle = $this->randomMachineName();
     $entity_id = mt_rand(20, 30);
     $field_item_list = $this->createStub(FieldItemListInterface::class);
-    assert($field_item_list instanceof Stub);
     assert($field_item_list instanceof \Iterator);
     $item = new \stdClass();
     $this->setupMockIterator($field_item_list, [$item]);

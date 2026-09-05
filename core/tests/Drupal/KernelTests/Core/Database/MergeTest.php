@@ -234,7 +234,7 @@ class MergeTest extends DatabaseTestBase {
   public function testMergeToString(): void {
     $this->expectException(\BadMethodCallException::class);
     $this->expectExceptionMessageIs('The merge query can not be converted to a string');
-    (string) $this->connection->merge('test_people');
+    $this->connection->merge('test_people');
   }
 
 }

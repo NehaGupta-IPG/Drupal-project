@@ -80,8 +80,6 @@ class ConfiguredTrait {
 
   /**
    * The configuration factory.
-   *
-   * @var null
    */
   public $configFactory;
 

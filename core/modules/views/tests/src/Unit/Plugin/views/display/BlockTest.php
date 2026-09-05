@@ -11,6 +11,7 @@ use Drupal\views\Plugin\views\display\Block;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\views\Plugin\views\display\Block.
@@ -24,14 +25,14 @@ class BlockTest extends UnitTestCase {
    *
    * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $executable;
+  protected MockObject $executable;
 
   /**
    * The views block plugin.
    *
    * @var \Drupal\views\Plugin\Block\ViewsBlock|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $blockPlugin;
+  protected MockObject $blockPlugin;
 
   /**
    * The tested block display plugin.

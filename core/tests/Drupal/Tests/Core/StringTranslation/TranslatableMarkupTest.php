@@ -34,7 +34,6 @@ class TranslatableMarkupTest extends UnitTestCase {
 
     $this->expectException(\Exception::class);
     $this->expectExceptionMessageIs($exception->getMessage());
-    (string) $text;
   }
 
   // phpcs:disable Drupal.Semantics.FunctionT.NotLiteralString

@@ -15,6 +15,7 @@ use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\access\None;
 use Drupal\views\ViewExecutable;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -83,7 +84,7 @@ class CollectRoutesTest extends UnitTestCase {
     $locator = $this->createStub(ServiceLocator::class);
     $locator
       ->method('get')
-      ->willReturnCallback(fn($type) => match ($type) {
+      ->willReturnCallback(fn($type): MockObject => match ($type) {
         'access' => $access_manager,
         'display' => $display_manager,
         'style' => $style_manager,

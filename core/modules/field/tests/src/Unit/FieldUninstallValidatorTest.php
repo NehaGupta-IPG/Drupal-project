@@ -8,6 +8,7 @@ use Drupal\field\FieldUninstallValidator;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\field\FieldUninstallValidator.
@@ -21,7 +22,7 @@ class FieldUninstallValidatorTest extends UnitTestCase {
    *
    * @var \Drupal\field\FieldUninstallValidator|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $fieldUninstallValidator;
+  protected MockObject $fieldUninstallValidator;
 
   /**
    * {@inheritdoc}

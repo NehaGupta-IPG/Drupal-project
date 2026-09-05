@@ -92,7 +92,6 @@ class EntityFilteringThemeTest extends BrowserTestBase {
     // Install all available non-testing themes.
     $listing = new ExtensionDiscovery(\Drupal::root());
     $this->themes = $listing->scan('theme', FALSE);
-    /** @var \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler */
     $theme_data = \Drupal::service('extension.list.theme')->reset()->getList();
     foreach (array_keys($this->themes) as $theme) {
       // Skip obsolete and deprecated themes.

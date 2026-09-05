@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Unit\Plugin\Action;
 
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Provides a base class for user role action tests.
@@ -17,7 +18,7 @@ abstract class RoleUserTestBase extends UnitTestCase {
    *
    * @var \Drupal\user\UserInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $account;
+  protected MockObject $account;
 
   /**
    * The user role entity type.

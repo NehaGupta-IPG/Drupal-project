@@ -14,6 +14,7 @@ use Drupal\sqlite\Driver\Database\sqlite\Statement;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\comment\CommentStatistics.
@@ -41,7 +42,7 @@ class CommentStatisticsUnitTest extends UnitTestCase {
    *
    * @var \Drupal\Core\Database\Connection
    */
-  protected $database;
+  protected MockObject $database;
 
   /**
    * CommentStatistics service under test.

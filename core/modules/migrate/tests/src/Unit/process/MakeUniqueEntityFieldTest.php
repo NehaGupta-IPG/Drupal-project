@@ -11,6 +11,7 @@ use Drupal\migrate\Plugin\migrate\process\MakeUniqueEntityField;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\migrate\Plugin\migrate\process\MakeUniqueEntityField.
@@ -24,7 +25,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
    *
    * @var \Drupal\Core\Entity\Query\QueryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityQuery;
+  protected MockObject $entityQuery;
 
   /**
    * The mocked entity type manager.
