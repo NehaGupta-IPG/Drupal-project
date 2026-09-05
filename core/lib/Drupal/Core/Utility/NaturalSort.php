@@ -64,4 +64,25 @@ final class NaturalSort {
     return self::$collators[$langcode]->compare($string1, $string2);
   }
 
+  /**
+   * Sorts arrays using a language-aware "natural order" algorithm.
+   *
+   * This method is a drop-in replacement for natcasesort() using 
+   * NaturalSort::strnatcasecmp().
+   *
+   * @param array $array
+   *   The input array.
+   * @param string|null $langcode
+   *   (optional) The language code to determine the collation rules. Defaults
+   *   to the current language if the language manager service is available.
+   *
+   * @return true
+   *   Always returns true.
+   */
+  public static function natcasesort(array &$array, ?string $langcode = NULL): true {
+    return uasort($array, function ($a, $b) use ($langcode) {
+      return self::strnatcasecmp($a, $b, $langcode);
+    });
+  }
+
 }

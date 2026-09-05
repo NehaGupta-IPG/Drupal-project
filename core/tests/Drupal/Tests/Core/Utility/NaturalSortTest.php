@@ -32,14 +32,38 @@ class NaturalSortTest extends UnitTestCase {
     $this->assertLessThan(0, NaturalSort::strnatcasecmp('Format 10x10', 'Format 100x100', 'en'));
     $this->assertSame(0, NaturalSort::strnatcasecmp('Format 10x10', 'Format 10x10', 'en'));
 
+    $list1 = ['Format 100x100', 'Format 10x10'];
+    NaturalSort::natcasesort($list1, 'en');
+    $this->assertSame('Format 10x10', reset($list1));
+    $list2 = ['Format 10x10', 'Format 100x100'];
+    NaturalSort::natcasesort($list2, 'en');
+    $this->assertSame('Format 10x10', reset($list2));
+    $list3 = ['Format 10x10', 'Format 10x10'];
+    NaturalSort::natcasesort($list3, 'en');
+    $this->assertSame('Format 10x10', reset($list3));
+
     // Accented characters are sorted by their base letter, unlike
     // strnatcasecmp(), which sorts them after all ASCII characters.
     $this->assertLessThan(0, NaturalSort::strnatcasecmp('Émission', 'Format', 'en'));
     $this->assertGreaterThan(0, NaturalSort::strnatcasecmp('Format', 'Émission', 'en'));
 
+    $list4 = ['Émission', 'Format'];
+    NaturalSort::natcasesort($list4, 'en');
+    $this->assertSame('Émission', reset($list4));
+    $list5 = ['Format', 'Émission'];
+    NaturalSort::natcasesort($list5, 'en');
+    $this->assertSame('Émission', reset($list5));
+
     // Comparing is case-insensitive for different letters.
     $this->assertLessThan(0, NaturalSort::strnatcasecmp('apple', 'Banana', 'en'));
     $this->assertGreaterThan(0, NaturalSort::strnatcasecmp('Banana', 'apple', 'en'));
+
+    $list6 = ['apple', 'Banana'];
+    NaturalSort::natcasesort($list6, 'en');
+    $this->assertSame('apple', reset($list6));
+    $list7 = ['Banana', 'apple'];
+    NaturalSort::natcasesort($list7, 'en');
+    $this->assertSame('apple', reset($list7));
   }
 
   /**
@@ -57,6 +81,13 @@ class NaturalSortTest extends UnitTestCase {
 
     $this->assertLessThan(0, NaturalSort::strnatcasecmp('Émission', 'Format'));
     $this->assertGreaterThan(0, NaturalSort::strnatcasecmp('Format 100x100', 'Format 10x10'));
+    
+    $list1 = ['Émission', 'Format'];
+    NaturalSort::natcasesort($list1);
+    $this->assertSame('Émission', reset($list1));
+    $list2 = ['Format 100x100', 'Format 10x10'];
+    NaturalSort::natcasesort($list2);
+    $this->assertSame('Format 10x10', reset($list2));
   }
 
   /**
@@ -69,6 +100,16 @@ class NaturalSortTest extends UnitTestCase {
     $this->assertGreaterThan(0, NaturalSort::strnatcasecmp('Émission', 'Format'));
     $this->assertLessThan(0, NaturalSort::strnatcasecmp('Format', 'Émission'));
     $this->assertGreaterThan(0, NaturalSort::strnatcasecmp('Format 100x100', 'Format 10x10'));
+
+    $list1 = ['Émission', 'Format'];
+    NaturalSort::natcasesort($list1);
+    $this->assertSame('Format', reset($list1));
+    $list2 = ['Format', 'Émission'];
+    NaturalSort::natcasesort($list2);
+    $this->assertSame('Format', reset($list2));
+    $list3 = ['Format 100x100', 'Format 10x10'];
+    NaturalSort::natcasesort($list3);
+    $this->assertSame('Format 10x10', reset($list3));
   }
 
 }
