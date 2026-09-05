@@ -2,9 +2,10 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaObjectDoesNotExistException;
+use Drupal\Core\Database\SchemaObjectExistsException;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
@@ -167,7 +168,7 @@ WHERE pg_attribute.attnum > 0
 AND NOT pg_attribute.attisdropped
 AND pg_attribute.attrelid = :key::regclass
 AND (format_type(pg_attribute.atttypid, pg_attribute.atttypmod) = 'bytea'
-OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid) LIKE 'nextval%')
+OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid)::text LIKE 'nextval%')
 EOD;
         $result = $this->connection->query($sql, [
           ':key' => $quoted_key,
@@ -370,6 +371,14 @@ EOD;
     }
     elseif (isset($spec['precision']) && isset($spec['scale'])) {
       $sql .= '(' . $spec['precision'] . ', ' . $spec['scale'] . ')';
+    }
+
+    if (isset($spec['generated'])) {
+      $sql .= ' GENERATED ALWAYS AS (' . $spec['generated']->generatedExpression->expression . ') ';
+      $sql .= match ($spec['generated']->generatedStorage) {
+        GeneratedColumnStorage::Virtual => 'VIRTUAL',
+        GeneratedColumnStorage::Stored => 'STORED',
+      };
     }
 
     if (!empty($spec['unsigned'])) {
