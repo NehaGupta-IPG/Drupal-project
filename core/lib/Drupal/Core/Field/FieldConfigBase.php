@@ -626,6 +626,14 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
+  public function getExamples(): array {
+    // Field configuration does not declare data definition examples.
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isInternal() {
     // Respect the definition, otherwise default to TRUE for computed fields.
     if (isset($this->definition['internal'])) {
