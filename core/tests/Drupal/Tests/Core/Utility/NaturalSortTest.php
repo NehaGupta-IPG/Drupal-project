@@ -81,7 +81,7 @@ class NaturalSortTest extends UnitTestCase {
 
     $this->assertLessThan(0, NaturalSort::strnatcasecmp('Émission', 'Format'));
     $this->assertGreaterThan(0, NaturalSort::strnatcasecmp('Format 100x100', 'Format 10x10'));
-    
+
     $list1 = ['Émission', 'Format'];
     NaturalSort::natcasesort($list1);
     $this->assertSame('Émission', reset($list1));

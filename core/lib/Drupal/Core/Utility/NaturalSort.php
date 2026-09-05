@@ -65,9 +65,9 @@ final class NaturalSort {
   }
 
   /**
-   * Sorts arrays using a language-aware "natural order" algorithm.
+   * Sorts array using a language-aware "natural order" algorithm.
    *
-   * This method is a drop-in replacement for natcasesort() using 
+   * This method is a drop-in replacement for natcasesort() using
    * NaturalSort::strnatcasecmp().
    *
    * @param array $array
