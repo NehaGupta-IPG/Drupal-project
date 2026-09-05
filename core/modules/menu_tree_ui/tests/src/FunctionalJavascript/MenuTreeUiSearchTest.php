@@ -1,0 +1,81 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Tests\menu_tree_ui\FunctionalJavascript;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
+/**
+ * Tests the htmx-driven search popover on the menu tree page.
+ *
+ * Typing into the search field issues an htmx GET to the search route and
+ * swaps the returned HTML partial into the results popover. Picking a result
+ * expands its ancestors and focuses the matching row in the tree.
+ */
+#[Group('menu_tree_ui')]
+#[RunTestsInSeparateProcesses]
+final class MenuTreeUiSearchTest extends MenuTreeUiJavascriptTestBase {
+
+  /**
+   * Seeds Apple, Banana and Cherry at top level, with Apricot under Banana.
+   *
+   * Three top-level rows keep the tree above the small-tree auto-expand
+   * threshold, so Banana starts collapsed.
+   */
+  protected function seedMenu(): void {
+    $this->createTestMenu();
+    $this->linkIds['Apple'] = $this->createLink('Apple', '', 0);
+    $this->linkIds['Banana'] = $this->createLink('Banana', '', 1);
+    $this->linkIds['Cherry'] = $this->createLink('Cherry', '', 2);
+    $this->linkIds['Apricot'] = $this->createLink('Apricot', $this->linkIds['Banana'], 0);
+  }
+
+  /**
+   * Typing swaps results in, an empty query swaps them out, a result jumps.
+   */
+  public function testSearchSwapsResultsAndJumps(): void {
+    $page = $this->getSession()->getPage();
+    $assert = $this->assertSession();
+
+    $input = $page->find('css', '#menu-tree-ui-search-input');
+    $this->assertNotNull($input);
+    $assert->elementNotExists('css', '#menu-tree-ui-search-results > *');
+    $this->assertNull($this->row('Apricot'), 'Apricot is not loaded while Banana is collapsed.');
+
+    // A query with matches swaps the result list into the popover.
+    $input->setValue('Ap');
+    $assert->waitForElementVisible('css', '#menu-tree-ui-search-results .menu-tree-ui-search-results__list');
+    $titles = array_map(
+      static fn($element) => $element->getText(),
+      $page->findAll('css', '.menu-tree-ui-search-results__title'),
+    );
+    sort($titles);
+    $this->assertSame(['Apple', 'Apricot'], $titles);
+    $assert->elementTextContains('css', '.menu-tree-ui-search-results__summary', '2 results for "Ap"');
+    $assert->elementTextContains('css', '.menu-tree-ui-search-results__breadcrumb', 'Banana');
+
+    // A query without matches swaps in the empty message.
+    $input->setValue('zzz');
+    $assert->waitForElementVisible('css', '.menu-tree-ui-search-results__empty');
+    $assert->elementTextContains('css', '.menu-tree-ui-search-results__empty', 'No matches for "zzz"');
+
+    // Clearing the field swaps in nothing, which closes the popover.
+    $input->setValue('');
+    $assert->waitForElementRemoved('css', '#menu-tree-ui-search-results > *');
+
+    // Picking a result expands the collapsed parent and focuses the row.
+    $input->setValue('Apricot');
+    $assert->waitForElementVisible('css', '.menu-tree-ui-search-results__title');
+    $page->find('css', '.menu-tree-ui-search-results__title')->click();
+    $apricot_id = $this->linkIds['Apricot'];
+    $assert->waitForElementVisible('css', sprintf('tr[role="row"][data-id="%s"]', $apricot_id));
+    $this->assertSame('true', $this->row('Banana')->getAttribute('aria-expanded'));
+    $focused_id = $this->getSession()->evaluateScript(
+      'document.activeElement.closest("tr[role=\"row\"]")?.dataset.id ?? null',
+    );
+    $this->assertSame($apricot_id, $focused_id, 'The jumped-to row receives focus.');
+  }
+
+}
