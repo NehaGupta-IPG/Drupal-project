@@ -692,6 +692,29 @@ abstract class Schema implements PlaceholderInterface {
    *   Name of the table.
    * @param string $targetColumnName
    *   The name of the column as defined in the target schema definition.
+   * @param Expression|null $initializationExpression
+   *   (optional) An expression to be used to initialize the newly added
+   *   column. This is most useful for creating NOT NULL columns with no
+   *   default value in existing tables. If not specified, the column will be
+   *   initialized to the default vaòue indicated in the schema definition (if
+   *   present).
+   *   Examples:
+   *   @code
+   *     new Expression('[age]')
+   *   @endcode
+   *   copies the content of the 'age' column to the new column;
+   *   @code
+   *     new Expression(':initial_value', [':initial_value' => 10])
+   *   @endcode
+   *   sets the new column's values to 10 for all rows;
+   *   @code
+   *     new Expression(
+   *       'COALESCE([age], :fallback_value)',
+   *       [':fallback_value' => 59],
+   *     )
+   *   @endcode
+   *   copies the content of the 'age' column to the new column, falling back
+   *   to the value 59 if the 'age' column of a row is missing.
    *
    * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
    *   If the specified table or source field doesn't exist.

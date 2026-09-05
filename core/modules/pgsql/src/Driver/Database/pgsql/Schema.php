@@ -709,6 +709,11 @@ EOD;
         ->fields([$field => $spec['initial']])
         ->execute();
     }
+    elseif (isset($spec['initialization_expression'])) {
+      $this->connection->update($table)
+        ->expression($field, $spec['initialization_expression']->expression, $spec['initialization_expression']->arguments)
+        ->execute();
+    }
     if ($fix_null) {
       $this->executeDdlStatement("ALTER TABLE {" . $table . "} ALTER $field SET NOT NULL");
     }
