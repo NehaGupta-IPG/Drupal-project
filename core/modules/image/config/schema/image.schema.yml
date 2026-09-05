@@ -122,6 +122,12 @@ field.storage_settings.image:
     default_image:
       type: field_default_image
       label: 'Default value'
+    display_field:
+      type: boolean
+      label: 'Enable Display field'
+    display_default:
+      type: boolean
+      label: 'Files displayed by default'
 
 field.field_settings.image:
   type: base_file_field_field_settings
