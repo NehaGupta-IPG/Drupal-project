@@ -7,7 +7,9 @@ namespace Drupal\Tests\views\Unit\Plugin\views\display;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\views\Plugin\Block\ViewsBlock;
 use Drupal\views\Plugin\views\display\Block;
+use Drupal\views\ViewExecutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -22,17 +24,13 @@ class BlockTest extends UnitTestCase {
 
   /**
    * The view executable.
-   *
-   * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected MockObject $executable;
+  protected ViewExecutable&MockObject $executable;
 
   /**
    * The views block plugin.
-   *
-   * @var \Drupal\views\Plugin\Block\ViewsBlock|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected MockObject $blockPlugin;
+  protected ViewsBlock&MockObject $blockPlugin;
 
   /**
    * The tested block display plugin.
@@ -47,7 +45,7 @@ class BlockTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
+    $this->executable = $this->getMockBuilder(ViewExecutable::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['executeDisplay', 'setDisplay', 'setItemsPerPage'])
       ->getMock();
@@ -60,7 +58,7 @@ class BlockTest extends UnitTestCase {
 
     $this->blockDisplay->view = $this->executable;
 
-    $this->blockPlugin = $this->getMockBuilder('Drupal\views\Plugin\Block\ViewsBlock')
+    $this->blockPlugin = $this->getMockBuilder(ViewsBlock::class)
       ->disableOriginalConstructor()
       ->getMock();
   }

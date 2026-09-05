@@ -735,6 +735,11 @@ if (!class_exists('\Symfony\Component\ExpressionLanguage\Expression')) {
    */
   class Expression {
 
+    public function __construct(
+      private readonly string $expression,
+    ) {
+    }
+
     /**
      * Gets the string representation of the expression.
      */

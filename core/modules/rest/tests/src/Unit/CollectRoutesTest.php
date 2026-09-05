@@ -13,6 +13,7 @@ use Drupal\rest\Plugin\views\display\RestExport;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\access\None;
+use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\ViewExecutable;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -84,7 +85,7 @@ class CollectRoutesTest extends UnitTestCase {
     $locator = $this->createStub(ServiceLocator::class);
     $locator
       ->method('get')
-      ->willReturnCallback(fn($type): MockObject => match ($type) {
+      ->willReturnCallback(fn($type): ViewsPluginManager&MockObject => match ($type) {
         'access' => $access_manager,
         'display' => $display_manager,
         'style' => $style_manager,

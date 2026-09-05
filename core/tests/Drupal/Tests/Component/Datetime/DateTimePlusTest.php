@@ -165,8 +165,10 @@ class DateTimePlusTest extends TestCase {
    *
    * @param string $input
    *   Input argument for DateTimePlus().
-   *   @see testTimestamp()
-   *   @see testTimestamp()
+   * @param array $initial
+   *   See ::testTimestamp().
+   * @param array $transform
+   *   See ::testTimestamp().
    */
   #[DataProvider('providerTestDateTimestamp')]
   public function testDateTimestamp(string $input, array $initial, array $transform): void {
@@ -182,8 +184,10 @@ class DateTimePlusTest extends TestCase {
    *   DateTimePlus to test.
    * @param string|int $input
    *   The original input passed to the test method.
-   *   @see testTimestamp()
-   *   @see testTimestamp()
+   * @param array $initial
+   *   See ::testTimestamp().
+   * @param array $transform
+   *   See ::testTimestamp().
    *
    * @internal
    */

@@ -36,6 +36,8 @@ class EntityRevisionTest extends UnitTestCase {
 
   /**
    * The destination storage.
+   *
+   * @var \Prophecy\Prophecy\ObjectProphecy<RevisionableStorageInterface>
    */
   protected ObjectProphecy $storage;
 

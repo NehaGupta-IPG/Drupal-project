@@ -46,7 +46,7 @@ class SchemaTest extends UnitTestCase {
 
     $connection->expects($this->exactly(2))
       ->method('query')
-      ->willReturnCallback(function (string $query) use ($expected, $statement, $matched_statement): Stub {
+      ->willReturnCallback(function (string $query) use ($expected, $statement, $matched_statement): StatementInterface&Stub {
         if ($query === 'SHOW max_identifier_length') {
           return $statement;
         }

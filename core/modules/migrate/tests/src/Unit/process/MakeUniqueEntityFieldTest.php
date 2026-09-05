@@ -22,10 +22,8 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
 
   /**
    * The mock entity query.
-   *
-   * @var \Drupal\Core\Entity\Query\QueryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected MockObject $entityQuery;
+  protected QueryInterface&MockObject $entityQuery;
 
   /**
    * The mocked entity type manager.
@@ -47,7 +45,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    $this->entityQuery = $this->getMockBuilder('Drupal\Core\Entity\Query\QueryInterface')
+    $this->entityQuery = $this->getMockBuilder(QueryInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
     $this->entityQuery

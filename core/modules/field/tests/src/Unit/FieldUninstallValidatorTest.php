@@ -19,17 +19,15 @@ class FieldUninstallValidatorTest extends UnitTestCase {
 
   /**
    * The mock field uninstall validator.
-   *
-   * @var \Drupal\field\FieldUninstallValidator|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected MockObject $fieldUninstallValidator;
+  protected FieldUninstallValidator&MockObject $fieldUninstallValidator;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->fieldUninstallValidator = $this->getMockBuilder('Drupal\field\FieldUninstallValidator')
+    $this->fieldUninstallValidator = $this->getMockBuilder(FieldUninstallValidator::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getFieldStoragesByModule', 'getFieldTypeLabel'])
       ->getMock();

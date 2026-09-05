@@ -6,6 +6,7 @@ namespace Drupal\Tests\comment\Unit;
 
 use Drupal\comment\CommentStatistics;
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -39,10 +40,8 @@ class CommentStatisticsUnitTest extends UnitTestCase {
 
   /**
    * Mock database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
    */
-  protected MockObject $database;
+  protected Connection&MockObject $database;
 
   /**
    * CommentStatistics service under test.
@@ -83,7 +82,7 @@ class CommentStatisticsUnitTest extends UnitTestCase {
       ->method('execute')
       ->willReturn($this->statement);
 
-    $this->database = $this->getMockBuilder('Drupal\Core\Database\Connection')
+    $this->database = $this->getMockBuilder(Connection::class)
       ->disableOriginalConstructor()
       ->getMock();
 
