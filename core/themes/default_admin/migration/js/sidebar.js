@@ -27,7 +27,7 @@
   const handleFragmentLinkClickOrHashChange = (e, $target) => {
     // If $target is in the sidebar, open it.
     if ($target.parents('#default_admin_sidebar').length) {
-      Drupal.ginSidebar.showSidebar();
+      Drupal.adminSidebar.showSidebar();
     }
   };
 
