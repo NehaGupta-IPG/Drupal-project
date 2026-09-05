@@ -124,6 +124,10 @@ interface DataDefinitionInterface {
    * account during validation. Consumers may use it, for example, to
    * pre-populate a form element or to emit a JSON Schema "default" keyword.
    *
+   * The default value should use the same format as accepted by
+   * \Drupal\Core\TypedData\TypedDataInterface::setValue() for the described
+   * data.
+   *
    * A NULL return value is ambiguous: it can mean that no default value was
    * declared, or that the declared default value is NULL. Use ::hasDefault()
    * to tell these apart.

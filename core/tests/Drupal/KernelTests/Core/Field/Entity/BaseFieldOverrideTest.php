@@ -126,7 +126,7 @@ class BaseFieldOverrideTest extends KernelTestBase {
    * @legacy-covers ::getDefault
    * @legacy-covers ::hasDefault
    */
-  public function testDefault(): void {
+  public function testDataDefinitionDefault(): void {
     $base_field = BaseFieldDefinition::create('string')
       ->setName('Test Field')
       ->setTargetEntityTypeId('entity_test');

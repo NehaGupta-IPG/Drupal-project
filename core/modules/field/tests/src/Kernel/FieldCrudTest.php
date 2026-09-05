@@ -77,10 +77,6 @@ class FieldCrudTest extends FieldKernelTestBase {
     $field = FieldConfig::create($this->fieldDefinition);
     $field->save();
 
-    // Field configuration does not declare a data definition default value.
-    $this->assertFalse($field->hasDefault());
-    $this->assertNull($field->getDefault());
-
     $field = FieldConfig::load($field->id());
     $this->assertEquals('TRUE', $field->getSetting('field_setting_from_config_data'));
     $this->assertNull($field->getSetting('config_data_from_field_setting'));
@@ -243,6 +239,15 @@ class FieldCrudTest extends FieldKernelTestBase {
     $entity = EntityTest::load($entity->id());
 
     $this->assertNull($entity->{$field_name}->value, 'The loaded entity field value is NULL.');
+  }
+
+  /**
+   * Tests that field configuration declares no data definition default.
+   */
+  public function testDataDefinitionDefault(): void {
+    $field = FieldConfig::create($this->fieldDefinition);
+    $this->assertFalse($field->hasDefault());
+    $this->assertNull($field->getDefault());
   }
 
   /**
