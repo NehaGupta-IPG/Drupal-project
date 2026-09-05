@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Form;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBaseTrait;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -81,8 +80,10 @@ class ConfiguredTrait {
 
   /**
    * The configuration factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  public ConfigFactoryInterface $configFactory;
+  public $configFactory;
 
   protected function getEditableConfigNames(): array {
     return [];

@@ -201,9 +201,9 @@ class FormBuilderTest extends FormTestBase {
 
     $this->callableResolver->method('getCallableFromDefinition')
       ->willReturnCallback(fn ($definition): callable|array => is_callable($definition) ? $definition : [
-          $form_arg,
-          'submitForm',
-        ]);
+        $form_arg,
+        'submitForm',
+      ]);
 
     $form_state = new FormState();
     try {
@@ -252,9 +252,9 @@ class FormBuilderTest extends FormTestBase {
 
     $this->callableResolver->method('getCallableFromDefinition')
       ->willReturnCallback(fn ($definition): callable|array => is_callable($definition) ? $definition : [
-          $form_arg,
-          'submitForm',
-        ]);
+        $form_arg,
+        'submitForm',
+      ]);
 
     $form_state = new FormState();
     try {
@@ -593,9 +593,9 @@ class FormBuilderTest extends FormTestBase {
 
     $this->callableResolver->method('getCallableFromDefinition')
       ->willReturnCallback(fn ($definition): callable|array => is_callable($definition) ? $definition : [
-          $form_arg,
-          'submitForm',
-        ]);
+        $form_arg,
+        'submitForm',
+      ]);
 
     $this->formCache->expects($this->once())
       ->method('deleteCache')
