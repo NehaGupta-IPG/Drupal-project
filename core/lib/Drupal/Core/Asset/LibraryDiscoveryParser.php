@@ -334,7 +334,9 @@ class LibraryDiscoveryParser {
    *   extensions in favor of the first definition, so an override has no
    *   effect when an extension that comes earlier in that order (core, then
    *   the modules in the module list, then the themes in the theme chain)
-   *   defines the same module specifier with a different value.
+   *   defines the same module specifier with a different value. Such a
+   *   conflict is logged as an error; it can be resolved, and the log message
+   *   suppressed, by implementing hook_importmap_alter().
    *   @code
    *   importmap:
    *     imports:

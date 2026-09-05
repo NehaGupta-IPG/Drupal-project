@@ -113,6 +113,14 @@ interface AssetResolverInterface {
    * are attached later (e.g., in an Ajax response) can also resolve their
    * imports.
    *
+   * When a module specifier or integrity key is defined by multiple libraries
+   * with different values, the first definition in the merge order (core,
+   * then the modules in the module list, then the themes in the theme chain)
+   * is used, and the conflict is logged as an error. Modules and themes can
+   * change that in hook_importmap_alter(), which also allows any other
+   * alteration of the aggregated import map. The hook is invoked when the
+   * cached import map is built, and the altered map is cached.
+   *
    * @return array
    *   The import map, with the keys 'imports', 'scopes' and 'integrity'.
    *   Entries under 'imports' and 'scopes' are keyed by the module specifier,
@@ -121,6 +129,8 @@ interface AssetResolverInterface {
    *   Entries under 'integrity' are keyed by the resolved path or URL, and
    *   resolve to an array with the keys 'data', 'external', 'version' and
    *   'integrity' (the integrity metadata string).
+   *
+   * @see hook_importmap_alter()
    */
   public function getImportMap(): array;
 

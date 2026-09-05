@@ -19,3 +19,37 @@ function importmap_test_alter_library_info_alter(array &$libraries, $extension):
     $libraries['importmap']['importmap']['imports']['importmap-test-altered'] = 'js/altered.js';
   }
 }
+
+/**
+ * Implements hook_importmap_alter().
+ *
+ * The behavior is controlled by the 'importmap_test_alter.mode' state value,
+ * so that tests can exercise the hook without affecting other tests:
+ * - 'modify': changes the 'importmap-test-foo' entry to point to the
+ *   altered.js file of the importmap_test module, without resolving the
+ *   conflict.
+ * - 'resolve': resolves the 'importmap-test-foo' conflict by using the
+ *   definition of the importmap_test_conflict module, and unsets the
+ *   conflict.
+ */
+function importmap_test_alter_importmap_alter(array &$import_map, array &$conflicts): void {
+  $mode = \Drupal::state()->get('importmap_test_alter.mode');
+  if ($mode === 'modify') {
+    $path = \Drupal::service('extension.list.module')->getPath('importmap_test');
+    $import_map['imports']['importmap-test-foo'] = [
+      'data' => "$path/js/altered.js",
+      'external' => FALSE,
+      'version' => '1.0',
+    ];
+  }
+  elseif ($mode === 'resolve') {
+    if (isset($conflicts['imports']['importmap-test-foo'])) {
+      foreach ($conflicts['imports']['importmap-test-foo'] as $library => $entry) {
+        if ($library === 'importmap_test_conflict/conflict') {
+          $import_map['imports']['importmap-test-foo'] = $entry;
+        }
+      }
+      unset($conflicts['imports']['importmap-test-foo']);
+    }
+  }
+}

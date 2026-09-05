@@ -164,6 +164,24 @@ class ImportMapOverrideResolverTest extends KernelTestBase {
   }
 
   /**
+   * Tests that a theme can resolve a conflict in hook_importmap_alter().
+   *
+   * The importmap_test_theme theme unsets the 'importmap-test-foo' conflict,
+   * keeping the entry of its libraries-override, so the conflicts are not
+   * logged.
+   */
+  public function testImportMapOverrideConflictResolvedByThemeAlter(): void {
+    $this->container->get('state')->set('importmap_test_theme.resolve_conflict', TRUE);
+    $import_map = $this->assetResolver->getImportMap();
+    $theme_path = $this->container->get('extension.list.theme')->getPath('importmap_test_theme');
+    $this->assertSame("$theme_path/js/theme-foo.js", $import_map['imports']['importmap-test-foo']['data']);
+    $conflict_messages = array_filter($this->logger->messages, static function (array $message) {
+      return str_contains($message[1], 'Import map conflict');
+    });
+    $this->assertCount(0, $conflict_messages);
+  }
+
+  /**
    * Tests that the module preloads of attached libraries use the override.
    */
   public function testGetModulePreloadsOverride(): void {

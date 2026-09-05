@@ -261,18 +261,33 @@ class AssetResolver implements AssetResolverInterface {
       'scopes' => [],
       'integrity' => [],
     ];
+    $conflicts = [
+      'imports' => [],
+      'scopes' => [],
+      'integrity' => [],
+    ];
     foreach ($extensions as $extension) {
       foreach ($this->libraryDiscovery->getLibrariesByExtension($extension) as $name => $definition) {
         if (empty($definition['importmap'])) {
           continue;
         }
-        $this->mergeImportMap($import_map, $definition['importmap'], "$extension/$name", $provenance);
+        $this->mergeImportMap($import_map, $definition['importmap'], "$extension/$name", $provenance, $conflicts);
       }
     }
+    // Allow modules and themes to alter the aggregated import map, e.g. to
+    // resolve a conflict between libraries that define the same module
+    // specifier with different values. The altered map is cached, tagged with
+    // 'library_info', so the hook is only invoked when the library information
+    // changes; implementations must therefore be static, like
+    // hook_library_info_alter(). A conflict that is not resolved (by unsetting
+    // it from $conflicts) is logged as an error.
+    $this->moduleHandler->alter('importmap', $import_map, $conflicts);
+    $this->themeManager->alter('importmap', $import_map, $conflicts);
     // The provenance is only used to log conflicts while the map is built;
     // it is not part of the cached import map. The import map cache is tagged
     // with 'library_info', so a conflict is logged again whenever the library
     // information changes.
+    $this->logImportMapConflicts($conflicts, $provenance);
     $this->cache->set($cid, $import_map, CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
 
     return $import_map;
@@ -282,9 +297,10 @@ class AssetResolver implements AssetResolverInterface {
    * Merges the import map of a single library into an aggregated import map.
    *
    * The first definition of a module specifier or integrity key wins. A
-   * conflicting definition (the same key with a different value) is ignored,
-   * and an error is logged, since it will most likely result in broken
-   * JavaScript.
+   * conflicting definition (the same key with a different value) is recorded
+   * in $conflicts, so that it can be resolved in hook_importmap_alter().
+   * Conflicts that are not resolved are logged as errors, since they will
+   * most likely result in broken JavaScript.
    *
    * @param array $import_map
    *   The aggregated import map, by reference.
@@ -295,22 +311,26 @@ class AssetResolver implements AssetResolverInterface {
    * @param array $provenance
    *   By reference. The aggregated provenance, keyed by section and key, with
    *   the name of the library that provided the entry.
+   * @param array $conflicts
+   *   By reference. The conflicts found while merging, with the same
+   *   structure as passed to hook_importmap_alter().
    */
-  protected function mergeImportMap(array &$import_map, array $new_import_map, string $library, array &$provenance): void {
+  protected function mergeImportMap(array &$import_map, array $new_import_map, string $library, array &$provenance, array &$conflicts): void {
     foreach ($new_import_map['imports'] as $key => $value) {
-      $this->mergeImportMapEntry($import_map['imports'], $provenance['imports'], (string) $key, $value, "'imports' section", $library);
+      $this->mergeImportMapEntry($import_map['imports'], $provenance['imports'], $conflicts['imports'], (string) $key, $value, $library);
     }
     foreach ($new_import_map['scopes'] as $scope => $entries) {
       if (!isset($import_map['scopes'][$scope])) {
         $import_map['scopes'][$scope] = [];
         $provenance['scopes'][$scope] = [];
+        $conflicts['scopes'][$scope] = [];
       }
       foreach ($entries as $key => $value) {
-        $this->mergeImportMapEntry($import_map['scopes'][$scope], $provenance['scopes'][$scope], (string) $key, $value, "'scopes' section, scope '$scope'", $library);
+        $this->mergeImportMapEntry($import_map['scopes'][$scope], $provenance['scopes'][$scope], $conflicts['scopes'][$scope], (string) $key, $value, $library);
       }
     }
     foreach ($new_import_map['integrity'] as $key => $value) {
-      $this->mergeImportMapEntry($import_map['integrity'], $provenance['integrity'], (string) $key, $value, "'integrity' section", $library);
+      $this->mergeImportMapEntry($import_map['integrity'], $provenance['integrity'], $conflicts['integrity'], (string) $key, $value, $library);
     }
   }
 
@@ -323,33 +343,100 @@ class AssetResolver implements AssetResolverInterface {
    * @param array $provenance
    *   By reference. The aggregated provenance, keyed like $entries, with the
    *   name of the library that provided the entry.
+   * @param array $conflicts
+   *   By reference. The conflicts found while merging, keyed by the module
+   *   specifier or path, for the section the entry belongs to. Each conflict
+   *   lists the definitions involved, keyed by the name of the library that
+   *   provided the definition.
    * @param string $key
    *   The module specifier or path.
    * @param mixed $value
    *   The entry value.
-   * @param string $context
-   *   A description of the section the entry belongs to, for log messages.
    * @param string $library
    *   The name of the library providing the entry, e.g. 'module/library'.
    */
-  protected function mergeImportMapEntry(array &$entries, array &$provenance, string $key, mixed $value, string $context, string $library): void {
+  protected function mergeImportMapEntry(array &$entries, array &$provenance, array &$conflicts, string $key, mixed $value, string $library): void {
     if (array_key_exists($key, $entries)) {
       // Compare the entries without their version. Two libraries may map the
       // same module specifier to the same file, with different library
       // versions. The version only affects the query string of the module
       // URL, not the module itself, so it is not a conflict.
       $existing = $entries[$key];
-      unset($existing['version'], $value['version']);
-      if ($existing === $value) {
+      $existing_without_version = $existing;
+      $value_without_version = $value;
+      unset($existing_without_version['version'], $value_without_version['version']);
+      if ($existing_without_version === $value_without_version) {
         // The entry is identical to the existing one: nothing to do.
         return;
       }
+      // A conflicting definition: the entry of the library that defined the
+      // key first is kept. Record the definitions involved in the conflict,
+      // so that it can be resolved in hook_importmap_alter().
       $existing_library = $provenance[$key];
-      $this->logger->error(sprintf("Import map conflict: the module specifier '%s' in the %s is defined by both %s and %s with different values. The value from %s is used. Remove the duplicate definition from one of the libraries.", $key, $context, $existing_library, $library, $existing_library));
+      if (!isset($conflicts[$key])) {
+        $conflicts[$key] = [$existing_library => $existing];
+      }
+      $conflicts[$key][$library] = $value;
       return;
     }
     $entries[$key] = $value;
     $provenance[$key] = $library;
+  }
+
+  /**
+   * Logs the import map conflicts not resolved in hook_importmap_alter().
+   *
+   * A conflict is a module specifier or integrity key that is defined by
+   * multiple libraries with different values. The merge resolves the conflict
+   * in favor of the first definition in the merge order, so the other
+   * definitions are dropped, and will most likely result in broken
+   * JavaScript.
+   *
+   * @param array $conflicts
+   *   The conflicts remaining after hook_importmap_alter(), with the same
+   *   structure as passed to the hook.
+   * @param array $provenance
+   *   The provenance of the merged import map, keyed by section and key, with
+   *   the name of the library that provided the entry that was used.
+   */
+  protected function logImportMapConflicts(array $conflicts, array $provenance): void {
+    foreach ($conflicts['imports'] as $key => $definitions) {
+      $this->logImportMapConflict($key, "'imports' section", $definitions, $provenance['imports'][$key]);
+    }
+    foreach ($conflicts['scopes'] as $scope => $conflicts_by_key) {
+      foreach ($conflicts_by_key as $key => $definitions) {
+        $this->logImportMapConflict($key, sprintf("'scopes' section, scope '%s'", $scope), $definitions, $provenance['scopes'][$scope][$key]);
+      }
+    }
+    foreach ($conflicts['integrity'] as $key => $definitions) {
+      $this->logImportMapConflict($key, "'integrity' section", $definitions, $provenance['integrity'][$key]);
+    }
+  }
+
+  /**
+   * Logs an import map conflict for a module specifier or integrity key.
+   *
+   * The conflict is logged for each definition that was not used by the
+   * merge.
+   *
+   * @param string $key
+   *   The module specifier or path.
+   * @param string $context
+   *   A description of the section the entry belongs to, for the log message.
+   * @param array $definitions
+   *   The definitions involved in the conflict, keyed by the name of the
+   *   library that provided the definition.
+   * @param string $winner
+   *   The name of the library whose definition was used by the merge, e.g.
+   *   'module/library'.
+   */
+  protected function logImportMapConflict(string $key, string $context, array $definitions, string $winner): void {
+    foreach ($definitions as $library => $value) {
+      if ($library === $winner) {
+        continue;
+      }
+      $this->logger->error(sprintf("Import map conflict: the module specifier '%s' in the %s is defined by both %s and %s with different values. The value from %s is used. Remove the duplicate definition from one of the libraries, or resolve the conflict in hook_importmap_alter().", $key, $context, $winner, $library, $winner));
+    }
   }
 
   /**

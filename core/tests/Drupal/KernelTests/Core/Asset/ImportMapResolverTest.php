@@ -121,9 +121,71 @@ class ImportMapResolverTest extends KernelTestBase {
     $this->assertStringContainsString("the module specifier 'importmap-test-foo' in the 'imports' section is defined by both", $conflict_message[1]);
     $this->assertStringContainsString('importmap_test/importmap', $conflict_message[1]);
     $this->assertStringContainsString('importmap_test_conflict/conflict', $conflict_message[1]);
+    // The message points to hook_importmap_alter() to resolve the conflict.
+    $this->assertStringContainsString('hook_importmap_alter', $conflict_message[1]);
     // The duplicate entry of the same module, with a different library
     // version, does not conflict.
     $this->assertStringNotContainsString('importmap_test/duplicate', $conflict_message[1]);
+  }
+
+  /**
+   * Tests that the import map can be altered in hook_importmap_alter().
+   *
+   * The importmap_test_alter module changes the 'importmap-test-foo' entry,
+   * without resolving its conflict, so the conflict is still logged.
+   */
+  public function testGetImportMapAlteredByImportMapAlter(): void {
+    $this->container->get('state')->set('importmap_test_alter.mode', 'modify');
+    $import_map = $this->assetResolver->getImportMap();
+    $path = $this->container->get('extension.list.module')->getPath('importmap_test');
+    $this->assertSame([
+      'data' => "$path/js/altered.js",
+      'external' => FALSE,
+      'version' => '1.0',
+    ], $import_map['imports']['importmap-test-foo']);
+    // The alteration does not resolve the conflict, so it is still logged.
+    $conflict_messages = array_filter($this->logger->messages, static function (array $message) {
+      return str_contains($message[1], 'Import map conflict');
+    });
+    $this->assertCount(1, $conflict_messages);
+  }
+
+  /**
+   * Tests that a conflict resolved in hook_importmap_alter() is not logged.
+   *
+   * The importmap_test_alter module resolves the 'importmap-test-foo'
+   * conflict by using the definition of the importmap_test_conflict module,
+   * and unsetting the conflict.
+   */
+  public function testGetImportMapConflictResolvedByImportMapAlter(): void {
+    $this->container->get('state')->set('importmap_test_alter.mode', 'resolve');
+    $import_map = $this->assetResolver->getImportMap();
+    $conflict_path = $this->container->get('extension.list.module')->getPath('importmap_test_conflict');
+    $this->assertSame([
+      'data' => "$conflict_path/js/conflict-foo.js",
+      'external' => FALSE,
+      'version' => '1.0',
+    ], $import_map['imports']['importmap-test-foo']);
+    // The conflict is resolved in hook_importmap_alter(), so it is not
+    // logged.
+    $conflict_messages = array_filter($this->logger->messages, static function (array $message) {
+      return str_contains($message[1], 'Import map conflict');
+    });
+    $this->assertCount(0, $conflict_messages);
+  }
+
+  /**
+   * Tests that the import map altered in hook_importmap_alter() is cached.
+   */
+  public function testGetImportMapAlteredIsCached(): void {
+    $this->container->get('state')->set('importmap_test_alter.mode', 'modify');
+    $import_map = $this->assetResolver->getImportMap();
+    $this->assertSame($import_map, $this->assetResolver->getImportMap());
+    // The conflict is only logged once, on the cache miss.
+    $conflict_messages = array_filter($this->logger->messages, static function (array $message) {
+      return str_contains($message[1], 'Import map conflict');
+    });
+    $this->assertCount(1, $conflict_messages);
   }
 
   /**
