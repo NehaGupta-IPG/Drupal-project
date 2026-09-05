@@ -439,13 +439,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
     $database['database'] = $url_components['path'];
 
-    // User credentials and system port are irrelevant for SQLite.
-    unset(
-      $database['username'],
-      $database['password'],
-      $database['port']
-    );
-
     return $database;
   }
 

@@ -12,20 +12,17 @@ use Drupal\Core\Database\ConnectionParametersBase;
 class ConnectionParameters extends ConnectionParametersBase {
 
   public function __construct(
-    public readonly string $driver,
-    public readonly string $namespace,
-    public readonly string $autoload,
-    public readonly string $database,
-    public readonly string $prefix = '',
-    public readonly string $module = 'sqlite',
+    public string $driver,
+    public string $namespace,
+    public string $autoload,
+    public string $database,
+    public string $prefix = '',
+    public string $module = 'sqlite',
     public readonly array $init_commands = [],
     public readonly array $pdo = [],
-    // Backfill connection options. This is meant for BC to ensure options
-    // unexpected by the driver can still be handled.
-    // @todo remove in drupal:43.0.0.
-    array $optionsBackfill = [],
+    array $unknownOptions = [],
   ) {
-    parent::__construct($optionsBackfill);
+    parent::__construct($unknownOptions);
   }
 
   /**
@@ -53,12 +50,12 @@ class ConnectionParameters extends ConnectionParametersBase {
     ];
 
     // Additional keys found in the options array, that are not first-class
-    // properties, will be stored in the $optionsBackfill property.
-    $optionsBackfill = array_diff_key($options, array_flip(static::getNames()));
-    foreach (array_keys($optionsBackfill) as $key) {
+    // properties, will be stored in the $unknownOptions property.
+    $unknownOptions = array_diff_key($options, array_flip(static::getNames()));
+    foreach (array_keys($unknownOptions) as $key) {
       unset($options[$key]);
     }
-    $options['optionsBackfill'] = $optionsBackfill;
+    $options['unknownOptions'] = $unknownOptions;
 
     return $options;
   }

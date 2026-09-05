@@ -9,11 +9,84 @@ namespace Drupal\Core\Database;
  */
 abstract class ConnectionParametersBase implements ConnectionParametersInterface, \ArrayAccess {
 
+  // phpcs:disable
+  /**
+   * {@inheritdoc}
+   */
+  public string $driver {
+    set(string $value) {
+      if (isset($this->driver)) {
+        throw new \RuntimeException('The $driver property is already set');
+      }
+      $this->driver = $value;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public string $module {
+    set(string $value) {
+      if (isset($this->module)) {
+        throw new \RuntimeException('The $module property is already set');
+      }
+      $this->module = $value;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public string $namespace {
+    set(string $value) {
+      if (isset($this->namespace)) {
+        throw new \RuntimeException('The $namespace property is already set');
+      }
+      $this->namespace = $value;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public string $autoload {
+    set(string $value) {
+      if (isset($this->autoload)) {
+        throw new \RuntimeException('The $autoload property is already set');
+      }
+      $this->autoload = $value;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public string $database {
+    set(string $value) {
+      if (isset($this->database)) {
+        throw new \RuntimeException('The $database property is already set');
+      }
+      $this->database = $value;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public string $prefix {
+    set(string $value) {
+      if (isset($this->prefix)) {
+        throw new \RuntimeException('The $prefix property is already set');
+      }
+      $this->prefix = $value;
+    }
+  }
+  // phpcs:enable
+
   public function __construct(
-    // Backfill connection options. This is meant for BC to ensure options
-    // unexpected by the driver can still be handled.
-    // @todo remove in drupal:43.0.0.
-    protected array $optionsBackfill = [],
+    // Unknown connection options. The user input may include options that the
+    // driver cannot handle, but we still can provide access to them.
+    protected array $unknownOptions = [],
   ) {
   }
 
@@ -24,7 +97,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     $properties = [];
     foreach ((new \ReflectionClass(static::class))->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
       $name = $property->getName();
-      if ($name !== 'optionsBackfill') {
+      if ($name !== 'unknownOptions') {
         $properties[] = $property->getName();
       }
     }
@@ -35,7 +108,6 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * {@inheritdoc}
    */
   public function getConnectionClass(): string {
-    // @phpstan-ignore property.notFound
     return $this->namespace . '\\Connection';
   }
 
@@ -51,8 +123,8 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public function toArray(): array {
     $tmp = get_object_vars($this);
-    unset($tmp['optionsBackfill']);
-    return array_merge($this->optionsBackfill, $tmp);
+    unset($tmp['unknownOptions']);
+    return array_merge($this->unknownOptions, $tmp);
   }
 
   /**
@@ -70,22 +142,18 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
 
     $host = empty($this->host) ? 'localhost' : $this->host;
 
-    // @phpstan-ignore property.notFound
     $url = $this->driver . '://' . $user . $host;
 
     if (isset($this->port)) {
       $url .= ':' . $this->port;
     }
 
-    // @phpstan-ignore property.notFound
     $url .= '/' . $this->database;
 
     // Add the module.
-    // @phpstan-ignore property.notFound
     $module = $this->module ?? explode('\\', $this->namespace)[1];
     $url .= '?module=' . $module;
 
-    // @phpstan-ignore property.notFound
     if ($this->prefix !== '') {
       $url .= '#' . $this->prefix;
     }
@@ -94,20 +162,20 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   }
 
   /**
-   * Gets an optionsBackfill element as a property value.
+   * Gets an unknownOptions element as a property value.
    */
   public function __get(string $name): mixed {
-    if (array_key_exists($name, $this->optionsBackfill)) {
-      return $this->optionsBackfill[$name];
+    if (array_key_exists($name, $this->unknownOptions)) {
+      return $this->unknownOptions[$name];
     }
-    throw new \RuntimeException("There is no '{$name}' property or backfilled property in " . get_class($this));
+    throw new \RuntimeException("There is no '{$name}' property or undefined option in " . get_class($this));
   }
 
   /**
-   * Check if an optionsBackfill element can be provided as a property value.
+   * Check if an unknownOptions element can be provided as a property value.
    */
   public function __isset(string $name): bool {
-    return array_key_exists($name, $this->optionsBackfill);
+    return array_key_exists($name, $this->unknownOptions);
   }
 
   /**
@@ -126,7 +194,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     if (property_exists($this, $offset)) {
       return TRUE;
     }
-    return array_key_exists($offset, $this->optionsBackfill);
+    return array_key_exists($offset, $this->unknownOptions);
   }
 
   /**
@@ -141,7 +209,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
       $tmp = $this->{$offset};
       return $tmp;
     }
-    return $this->optionsBackfill[$offset];
+    return $this->unknownOptions[$offset];
   }
 
   /**
@@ -152,7 +220,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
       $this->{$offset} = $value;
       return;
     }
-    $this->optionsBackfill[$offset] = $value;
+    $this->unknownOptions[$offset] = $value;
   }
 
   /**
@@ -163,7 +231,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
       $this->{$offset} = NULL;
       return;
     }
-    unset($this->optionsBackfill[$offset]);
+    unset($this->unknownOptions[$offset]);
   }
 
 }

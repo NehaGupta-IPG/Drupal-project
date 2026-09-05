@@ -41,7 +41,7 @@ class ConnectionTest extends UnitTestCase {
     $connectionParameters = ConnectionParametersFactory::createFromOptionsArray($connectionArray);
     $this->assertInstanceOf(ConnectionParameters::class, $connectionParameters);
     $sqlite_connection = new Connection($this->createStub(SqliteConnection::class), $connectionParameters);
-    $database = $sqlite_connection->createConnectionOptionsFromUrl($url, NULL);
+    $database = $sqlite_connection->createConnectionOptionsFromUrl($url);
     $this->assertEquals('sqlite', $database['driver']);
     $this->assertEquals($expected, $database['database']);
   }

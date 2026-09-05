@@ -12,11 +12,43 @@ namespace Drupal\Core\Database;
  */
 interface ConnectionParametersInterface {
 
+  // phpcs:disable
+  /**
+   * The driver name.
+   */
+  public string $driver { set; }
+
+  /**
+   * The module extension providing the driver.
+   */
+  public string $module { set; }
+
+  /**
+   * The driver PHP namespace.
+   */
+  public string $namespace { set; }
+
+  /**
+   * The driver PHP namespace autoload directory.
+   */
+  public string $autoload { set; }
+
+  /**
+   * The database name.
+   */
+  public string $database { set; }
+
+  /**
+   * The tables prefix.
+   */
+  public string $prefix { set; }
+  // phpcs:enable
+
   /**
    * Returns the list of parameters.
    *
    * Only the parameters defined as properties are returned, those added to
-   * static::$optionsBackfill are ignored.
+   * static::$unknownOptions are ignored.
    *
    * @return list<string>
    *   The list of parameters' names.

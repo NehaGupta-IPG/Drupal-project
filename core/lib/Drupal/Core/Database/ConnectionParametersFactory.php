@@ -123,9 +123,9 @@ abstract class ConnectionParametersFactory {
         // Backfill connection options. This is meant for BC to ensure options
         // unexpected by the driver can still be handled.
         // @todo remove in drupal:43.0.0.
-        array $optionsBackfill = [],
+        array $unknownOptions = [],
       ) {
-        $optionsBackfill = array_merge([
+        $unknownOptions = array_merge([
           'prefix' => '',
           'module' => NULL,
           'username' => NULL,
@@ -133,8 +133,8 @@ abstract class ConnectionParametersFactory {
           'host' => NULL,
           'port' => NULL,
           'dependencies' => NULL,
-        ], $optionsBackfill);
-        parent::__construct($optionsBackfill);
+        ], $unknownOptions);
+        parent::__construct($unknownOptions);
       }
 
     };
@@ -208,7 +208,7 @@ abstract class ConnectionParametersFactory {
 
     $additional_class_loader->register(TRUE);
 
-    $options = $connection_class::createConnectionOptionsFromUrl($url, NULL);
+    $options = $connection_class::createConnectionOptionsFromUrl($url);
 
     // Add the necessary information to autoload code.
     // @see \Drupal\Core\Site\Settings::initialize()
