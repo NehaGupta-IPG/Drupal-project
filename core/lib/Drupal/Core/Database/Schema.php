@@ -722,7 +722,17 @@ abstract class Schema implements PlaceholderInterface {
    *   If the specified destination field already exists.
    */
   final public function addTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName, ?Expression $initializationExpression = NULL): void {
+    if (!$this->tableExists($tableName)) {
+      throw new SchemaObjectDoesNotExistException("Cannot add column '$tableName.$targetColumnName': table doesn't exist.");
+    }
+    if ($this->fieldExists($tableName, $targetColumnName)) {
+      throw new SchemaObjectExistsException("Cannot add column '$tableName.$targetColumnName': column already exists.");
+    }
+
     $table = $targetSchema->getTableDefinition($tableName);
+    if (!in_array($targetColumnName, $table->columnNames())) {
+      throw new SchemaException("Cannot add column '$tableName.$targetColumnName': column is not defined in the schema.");
+    }
 
     // Handles keys/indexes that are impacted by the addition.
     // Remove existing current keys if in the target schema the added column
@@ -797,8 +807,21 @@ abstract class Schema implements PlaceholderInterface {
    *   If the specified destination field already exists.
    */
   final public function changeTableColumnFromDefinition(SchemaDefinition $targetSchema, string $tableName, string $targetColumnName, ?string $currentColumnName = NULL): void {
-    $table = $targetSchema->getTableDefinition($tableName);
     $currentColumnName ??= $targetColumnName;
+    if (!$this->tableExists($tableName)) {
+      throw new SchemaObjectDoesNotExistException("Cannot change the definition of column '$tableName.$currentColumnName': table doesn't exist.");
+    }
+    if (!$this->fieldExists($tableName, $currentColumnName)) {
+      throw new SchemaObjectDoesNotExistException("Cannot change the definition of column '$tableName.$currentColumnName': column doesn't exist.");
+    }
+    if (($currentColumnName != $targetColumnName) && $this->fieldExists($tableName, $targetColumnName)) {
+      throw new SchemaObjectExistsException("Cannot rename column '$tableName.$currentColumnName' to '$targetColumnName': target column already exists.");
+    }
+
+    $table = $targetSchema->getTableDefinition($tableName);
+    if (!in_array($targetColumnName, $table->columnNames())) {
+      throw new SchemaException("Cannot handle changes to column '$tableName.$currentColumnName': the target column '$targetColumnName' is not defined in the schema.");
+    }
 
     // Handles keys/indexes that are impacted by the change.
     $currentKeys = $this->introspectIndexSchema($tableName);

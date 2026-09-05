@@ -878,16 +878,14 @@ EOD;
     // whose name was already processed (most likely resulting from a schema
     // introspection.
     if (str_ends_with($name, '_key')) {
-      $identifier = $name;
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP CONSTRAINT "' . $name . '"');
     }
     else {
       if (!$this->constraintExists($table, $name . '__key')) {
         return FALSE;
       }
-      $identifier = $this->ensureIdentifiersLength($table, $name, 'key');
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP CONSTRAINT ' . $this->ensureIdentifiersLength($table, $name, 'key'));
     }
-
-    $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP CONSTRAINT ' . $identifier);
     $this->resetTableInformation($table);
     return TRUE;
   }
@@ -916,15 +914,14 @@ EOD;
     // schema introspection.
     if (str_ends_with($name, '_idx')) {
       $identifier = $name;
+      $this->executeDdlStatement('DROP INDEX ' . $this->defaultSchema . '."' . $name . '"');
     }
     else {
       if (!$this->indexExists($table, $name)) {
         return FALSE;
       }
-      $identifier = $this->ensureIdentifiersLength($table, $name, 'idx');
+      $this->executeDdlStatement('DROP INDEX ' . $this->defaultSchema . '.' . $this->ensureIdentifiersLength($table, $name, 'idx'));
     }
-
-    $this->executeDdlStatement('DROP INDEX ' . $this->defaultSchema . '.' . $identifier);
     $this->resetTableInformation($table);
     return TRUE;
   }

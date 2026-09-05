@@ -439,7 +439,9 @@ class SchemaOperationsFromDefinitionTest extends DatabaseTestBase {
    * Tests changing a column with specialized indexes.
    */
   public function testChangeTableColumn(): void {
-    $tableName = 'test_change_table_column';
+    // We set up a table with long name to check that databases that require
+    // identifier hashing to limit length (PostgreSQL) still work properly.
+    $tableName = 'test_change_table_column_with_long_name';
     $initialSchema = $this->initialSchemaForTestChangeTableColumn($tableName);
     $this->schema->createSchemaFromDefinition($initialSchema);
 
