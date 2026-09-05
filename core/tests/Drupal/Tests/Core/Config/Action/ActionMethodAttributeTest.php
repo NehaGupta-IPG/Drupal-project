@@ -7,20 +7,25 @@ namespace Drupal\Tests\Core\Config\Action;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Config\Action\Attribute\ActionMethod
- * @group Config
+ * Tests Drupal\Core\Config\Action\Attribute\ActionMethod.
  */
+#[CoversClass(ActionMethod::class)]
+#[Group('Config')]
 class ActionMethodAttributeTest extends UnitTestCase {
 
   /**
-   * @covers ::__construct
+   * Tests invalid function name.
+   *
+   * @legacy-covers ::__construct
    */
   public function testInvalidFunctionName(): void {
     $name = "hello Goodbye";
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage("'$name' is not a valid PHP function name.");
+    $this->expectExceptionMessageIs("'$name' is not a valid PHP function name.");
     new ActionMethod(name: $name);
   }
 

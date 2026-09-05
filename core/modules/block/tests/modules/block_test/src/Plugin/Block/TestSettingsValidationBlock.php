@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\block_test\Plugin\Block;
 
 use Drupal\Core\Block\Attribute\Block;
@@ -26,7 +28,7 @@ class TestSettingsValidationBlock extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function blockValidate($form, FormStateInterface $form_state) {
+  public function blockValidate($form, FormStateInterface $form_state): void {
     if (!ctype_digit($form_state->getValue('digits'))) {
       $form_state->setErrorByName('digits', $this->t('Only digits are allowed'));
     }

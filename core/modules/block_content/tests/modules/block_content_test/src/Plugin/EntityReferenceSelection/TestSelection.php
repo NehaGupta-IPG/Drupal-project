@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\block_content_test\Plugin\EntityReferenceSelection;
 
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
@@ -31,7 +33,7 @@ class TestSelection extends DefaultSelection {
    * @param bool $is_reusable
    *   Whether to set the condition for reusable or non-reusable blocks.
    */
-  public function setTestMode($condition_type = NULL, $is_reusable = NULL) {
+  public function setTestMode($condition_type = NULL, $is_reusable = NULL): void {
     $this->conditionType = $condition_type;
     $this->isReusable = $is_reusable;
   }

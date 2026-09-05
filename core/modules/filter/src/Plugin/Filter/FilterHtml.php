@@ -27,7 +27,7 @@ use Masterminds\HTML5\Parser\Tokenizer;
   type: FilterInterface::TYPE_HTML_RESTRICTOR,
   weight: -10,
   settings: [
-    "allowed_html" => "<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type='1 A I'> <li> <dl> <dt> <dd> <h2 id='jump-*'> <h3 id> <h4 id> <h5 id> <h6 id>",
+    "allowed_html" => "<a href hreflang> <blockquote cite> <cite> <code> <dd> <dl> <dt> <em> <h2 id='jump-*'> <h3 id> <h4 id> <h5 id> <h6 id> <li> <ol start type='1 A I'> <strong> <ul type>",
     "filter_html_help" => TRUE,
     "filter_html_nofollow" => FALSE,
   ],
@@ -73,10 +73,39 @@ class FilterHtml extends FilterBase {
       // removes new lines and double spaces so, for consistency when javascript
       // is disabled, remove them.
       $configuration['settings']['allowed_html'] = preg_replace('/\s+/', ' ', $configuration['settings']['allowed_html']);
+
+      $tags = self::sortAllowedHtmlTags($configuration['settings']['allowed_html']);
+
+      $configuration['settings']['allowed_html'] = $tags;
     }
     parent::setConfiguration($configuration);
     // Force restrictions to be calculated again.
     $this->restrictions = NULL;
+  }
+
+  /**
+   * Sort the allowed HTML tags.
+   *
+   * We want to sort the data to make sure that the order of the tags is
+   * consistent. This makes reading diffs a lot easier when exporting config.
+   *
+   * @param string $html_tags
+   *   HTML tags as used by the allowed_html setting.
+   *
+   * @return string
+   *   Sorted string of HTML tags.
+   */
+  public static function sortAllowedHtmlTags(string $html_tags): string {
+    $matches = [];
+    preg_match_all('/<[^>]+>/', $html_tags, $matches);
+
+    // Extract the tags into an array.
+    $tags = $matches[0];
+
+    // Sort the tags alphabetically.
+    sort($tags, SORT_STRING);
+
+    return implode(' ', $tags);
   }
 
   /**
@@ -196,6 +225,7 @@ class FilterHtml extends FilterBase {
    *   The name to find or match against a prefix.
    *
    * @return bool|array
+   *   The allowed value if found, or FALSE if no match is found.
    */
   protected function findAllowedValue(array $allowed, $name) {
     if (isset($allowed['exact'][$name])) {
@@ -220,6 +250,8 @@ class FilterHtml extends FilterBase {
    *   TRUE, FALSE, or an array of allowed values.
    *
    * @return bool|array
+   *   An array containing 'exact' and 'prefix' lists of allowed values,
+   *   or TRUE/FALSE if all or no values are allowed.
    */
   protected function prepareAttributeValues($attribute_values) {
     if ($attribute_values === TRUE || $attribute_values === FALSE) {
@@ -264,6 +296,10 @@ class FilterHtml extends FilterBase {
     $scanner = new Scanner('<body>' . $html);
     $parser = new class($scanner, $events) extends Tokenizer {
 
+      /**
+       * phpcs:ignore Drupal.Commenting.FunctionComment.Missing
+       * @phpstan-ignore-next-line
+       */
       public function setTextMode($textMode, $untilTag = NULL) {
         // Do nothing, we never enter text mode.
       }
@@ -346,7 +382,7 @@ class FilterHtml extends FilterBase {
     // added by hand to content, and especially the class attribute can have
     // undesired visual effects by allowing content authors to apply any
     // available style, so specific values should be explicitly allowed.
-    // @see http://www.w3.org/TR/html5/dom.html#global-attributes
+    // @see https://www.w3.org/TR/html5/dom.html#global-attributes
     $restrictions['allowed']['*'] = [
       'style' => FALSE,
       'on*' => FALSE,
@@ -381,10 +417,23 @@ class FilterHtml extends FilterBase {
     $output .= '<p>' . $this->t('This site allows HTML content. While learning all of HTML may feel intimidating, learning how to use a very small number of the most basic HTML "tags" is very easy. This table provides examples for each tag that is enabled on this site.') . '</p>';
     $output .= '<p>' . $this->t('For more information see the <a href=":html-specifications">HTML Living Standard</a> or use your favorite search engine to find other sites that explain HTML.', [':html-specifications' => 'https://html.spec.whatwg.org/']) . '</p>';
     $tips = [
-      'a' => [$this->t('Anchors are used to make links to other pages.'), '<a href="' . $base_url . '">' . Html::escape(\Drupal::config('system.site')->get('name')) . '</a>'],
-      'br' => [$this->t('By default line break tags are automatically added, so use this tag to add additional ones. Use of this tag is different because it is not used with an open/close pair like all the others. Use the extra " /" inside the tag to maintain XHTML 1.0 compatibility'), $this->t('Text with <br />line break')],
-      'p' => [$this->t('By default paragraph tags are automatically added, so use this tag to add additional ones.'), '<p>' . $this->t('Paragraph one.') . '</p> <p>' . $this->t('Paragraph two.') . '</p>'],
-      'strong' => [$this->t('Strong', [], ['context' => 'Font weight']), '<strong>' . $this->t('Strong', [], ['context' => 'Font weight']) . '</strong>'],
+      'a' => [
+        $this->t('Anchors are used to make links to other pages.'),
+        '<a href="' . $base_url . '">' . Html::escape(\Drupal::config('system.site')
+          ->get('name')) . '</a>',
+      ],
+      'br' => [
+        $this->t('By default line break tags are automatically added, so use this tag to add additional ones. Use of this tag is different because it is not used with an open/close pair like all the others. Use the extra " /" inside the tag to maintain XHTML 1.0 compatibility'),
+        $this->t('Text with <br />line break'),
+      ],
+      'p' => [
+        $this->t('By default paragraph tags are automatically added, so use this tag to add additional ones.'),
+        '<p>' . $this->t('Paragraph one.') . '</p> <p>' . $this->t('Paragraph two.') . '</p>',
+      ],
+      'strong' => [
+        $this->t('Strong', [], ['context' => 'Font weight']),
+        '<strong>' . $this->t('Strong', [], ['context' => 'Font weight']) . '</strong>',
+      ],
       'em' => [$this->t('Emphasized'), '<em>' . $this->t('Emphasized') . '</em>'],
       'cite' => [$this->t('Cited'), '<cite>' . $this->t('Cited') . '</cite>'],
       'code' => [$this->t('Coded text used to show programming source code'), '<code>' . $this->t('Coded') . '</code>'],
@@ -399,18 +448,30 @@ class FilterHtml extends FilterBase {
       'blockquote' => [$this->t('Block quoted'), '<blockquote>' . $this->t('Block quoted') . '</blockquote>'],
       'q' => [$this->t('Quoted inline'), '<q>' . $this->t('Quoted inline') . '</q>'],
       // Assumes and describes tr, td, th.
-      'table' => [$this->t('Table'), '<table> <tr><th>' . $this->t('Table header') . '</th></tr> <tr><td>' . $this->t('Table cell') . '</td></tr> </table>'],
+      'table' => [
+        $this->t('Table'),
+        '<table> <tr><th>' . $this->t('Table header') . '</th></tr> <tr><td>' . $this->t('Table cell') . '</td></tr> </table>',
+      ],
       'tr' => NULL,
       'td' => NULL,
       'th' => NULL,
       'del' => [$this->t('Deleted'), '<del>' . $this->t('Deleted') . '</del>'],
       'ins' => [$this->t('Inserted'), '<ins>' . $this->t('Inserted') . '</ins>'],
        // Assumes and describes li.
-      'ol' => [$this->t('Ordered list - use the &lt;li&gt; to begin each list item'), '<ol> <li>' . $this->t('First item') . '</li> <li>' . $this->t('Second item') . '</li> </ol>'],
-      'ul' => [$this->t('Unordered list - use the &lt;li&gt; to begin each list item'), '<ul> <li>' . $this->t('First item') . '</li> <li>' . $this->t('Second item') . '</li> </ul>'],
+      'ol' => [
+        $this->t('Ordered list - use the &lt;li&gt; to begin each list item'),
+        '<ol> <li>' . $this->t('First item') . '</li> <li>' . $this->t('Second item') . '</li> </ol>',
+      ],
+      'ul' => [
+        $this->t('Unordered list - use the &lt;li&gt; to begin each list item'),
+        '<ul> <li>' . $this->t('First item') . '</li> <li>' . $this->t('Second item') . '</li> </ul>',
+      ],
       'li' => NULL,
       // Assumes and describes dt and dd.
-      'dl' => [$this->t('Definition lists are similar to other HTML lists. &lt;dl&gt; begins the definition list, &lt;dt&gt; begins the definition term and &lt;dd&gt; begins the definition description.'), '<dl> <dt>' . $this->t('First term') . '</dt> <dd>' . $this->t('First definition') . '</dd> <dt>' . $this->t('Second term') . '</dt> <dd>' . $this->t('Second definition') . '</dd> </dl>'],
+      'dl' => [
+        $this->t('Definition lists are similar to other HTML lists. &lt;dl&gt; begins the definition list, &lt;dt&gt; begins the definition term and &lt;dd&gt; begins the definition description.'),
+        '<dl> <dt>' . $this->t('First term') . '</dt> <dd>' . $this->t('First definition') . '</dd> <dt>' . $this->t('Second term') . '</dt> <dd>' . $this->t('Second definition') . '</dd> </dl>',
+      ],
       'dt' => NULL,
       'dd' => NULL,
       'h1' => [$this->t('Heading'), '<h1>' . $this->t('Title') . '</h1>'],
@@ -443,7 +504,11 @@ class FilterHtml extends FilterBase {
       }
       else {
         $rows[] = [
-          ['data' => $this->t('No help provided for tag %tag.', ['%tag' => $tag]), 'class' => ['description'], 'colspan' => 3],
+          [
+            'data' => $this->t('No help provided for tag %tag.', ['%tag' => $tag]),
+            'class' => ['description'],
+            'colspan' => 3,
+          ],
         ];
       }
     }
@@ -455,7 +520,7 @@ class FilterHtml extends FilterBase {
     $output .= \Drupal::service('renderer')->render($table);
 
     $output .= '<p>' . $this->t('Most unusual characters can be directly entered without any problems.') . '</p>';
-    $output .= '<p>' . $this->t('If you do encounter problems, try using HTML character entities. A common example looks like &amp;amp; for an ampersand &amp; character. For a full list of entities see HTML\'s <a href=":html-entities">entities</a> page. Some of the available characters include:', [':html-entities' => 'http://www.w3.org/TR/html4/sgml/entities.html']) . '</p>';
+    $output .= '<p>' . $this->t('If you do encounter problems, try using HTML character entities. A common example looks like &amp;amp; for an ampersand &amp; character. For a full list of entities see HTML\'s <a href=":html-entities">entities</a> page. Some of the available characters include:', [':html-entities' => 'https://www.w3.org/TR/html4/sgml/entities.html']) . '</p>';
 
     $entities = [
       [$this->t('Ampersand'), '&amp;'],

@@ -22,7 +22,7 @@ trait RefreshVariablesTrait {
    *
    * This method clears the cache and loads a fresh copy.
    */
-  protected function refreshVariables() {
+  protected function refreshVariables(): void {
     // Clear the tag cache.
     \Drupal::service('cache_tags.invalidator')->resetChecksums();
     foreach (Cache::getBins() as $backend) {
@@ -38,6 +38,7 @@ trait RefreshVariablesTrait {
 
     \Drupal::service('config.factory')->reset();
     \Drupal::service('state')->reset();
+    \Drupal::service('entity.memory_cache')->deleteAll();
   }
 
 }

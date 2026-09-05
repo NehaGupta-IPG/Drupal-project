@@ -72,7 +72,7 @@ class FieldUiTable extends Table {
           $region_name = call_user_func_array($row['#region_callback'], [&$row]);
 
           // Add the element in the tree.
-          // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+          // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
           $target = &$trees[$region_name][''];
           foreach ($parents[$name] as $key) {
             $target = &$target['children'][$key];
@@ -108,7 +108,10 @@ class FieldUiTable extends Table {
 
     // Determine rendering order from the tree structure.
     foreach ($regions as $region_name => $region) {
-      $elements['#regions'][$region_name]['rows_order'] = array_reduce($trees[$region_name], [static::class, 'reduceOrder']);
+      $elements['#regions'][$region_name]['rows_order'] = array_reduce(
+        $trees[$region_name],
+        [static::class, 'reduceOrder'],
+      );
     }
 
     $elements['#attached']['drupalSettings']['fieldUIRowsData'] = $js_settings;
@@ -227,7 +230,7 @@ class FieldUiTable extends Table {
    *   Array where rendering order has been determined.
    */
   public static function reduceOrder($array, $a) {
-    $array = !$array ? [] : $array;
+    $array = $array ?: [];
     if (!empty($a['name'])) {
       $array[] = $a['name'];
     }

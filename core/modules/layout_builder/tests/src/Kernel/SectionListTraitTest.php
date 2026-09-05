@@ -7,33 +7,39 @@ namespace Drupal\Tests\layout_builder\Kernel;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionListInterface;
 use Drupal\layout_builder\SectionListTrait;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\layout_builder\SectionListTrait
- *
- * @group layout_builder
- * @group #slow
+ * Tests Drupal\layout_builder\SectionListTrait.
  */
+#[CoversTrait(SectionListTrait::class)]
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class SectionListTraitTest extends SectionListTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function getSectionList(array $section_data) {
+  protected function getSectionList(array $section_data): TestSectionList {
     return new TestSectionList($section_data);
   }
 
   /**
-   * @covers ::addBlankSection
+   * Tests add blank section.
    */
   public function testAddBlankSection(): void {
     $this->expectException(\Exception::class);
-    $this->expectExceptionMessage('A blank section must only be added to an empty list');
+    $this->expectExceptionMessageIs('A blank section must only be added to an empty list');
     $this->sectionList->addBlankSection();
   }
 
 }
 
+/**
+ * Test item list class for layout section fields.
+ */
 class TestSectionList implements SectionListInterface {
 
   use SectionListTrait {

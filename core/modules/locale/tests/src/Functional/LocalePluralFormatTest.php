@@ -6,16 +6,18 @@ namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cspell:ignore heure heures jours lundi ponedjeljak
-
+// cspell:ignore nmsgid nmsgstr heure heures jours lundi ponedjeljak
 /**
  * Tests plural handling for various languages.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocalePluralFormatTest extends BrowserTestBase {
 
   /**
@@ -26,9 +28,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
   protected $adminUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale'];
 
@@ -173,6 +173,15 @@ class LocalePluralFormatTest extends BrowserTestBase {
 
     // Set French as the site default language.
     $this->config('system.site')->set('default_langcode', 'fr')->save();
+    // Switch the user display to show the created time as time ago, so the
+    // translatable string "seconds" is used.
+    EntityViewDisplay::collectRenderDisplay($this->adminUser, 'default')
+      ->setComponent('created', [
+        'label' => 'above',
+        'type' => 'timestamp_ago',
+        'weight' => 5,
+      ])
+      ->save();
 
     // Visit User Info page before updating translation strings. Change the
     // created time to ensure that the we're dealing in seconds and it can't be
@@ -223,7 +232,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
     $this->drupalGet($path);
     $this->submitForm($edit, 'Save translations');
 
-    // User interface input for translating seconds should not be duplicated
+    // User interface input for translating seconds should not be duplicated.
     $this->assertSession()->pageTextContainsOnce('@count seconds');
 
     // Member for time should be translated. Change the created time to ensure
@@ -387,7 +396,7 @@ class LocalePluralFormatTest extends BrowserTestBase {
    * @param array $options
    *   Additional options to pass to the translation import form.
    */
-  public function importPoFile($contents, array $options = []) {
+  public function importPoFile($contents, array $options = []): void {
     $file_system = \Drupal::service('file_system');
     $name = $file_system->tempnam('temporary://', "po_") . '.po';
     file_put_contents($name, $contents);
@@ -400,13 +409,13 @@ class LocalePluralFormatTest extends BrowserTestBase {
   /**
    * Returns a .po file with a simple plural formula.
    */
-  public function getPoFileWithSimplePlural() {
+  public function getPoFileWithSimplePlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 
@@ -428,13 +437,13 @@ EOF;
   /**
    * Returns a .po file with a complex plural formula.
    */
-  public function getPoFileWithComplexPlural() {
+  public function getPoFileWithComplexPlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\\n"
 
@@ -452,13 +461,13 @@ EOF;
   /**
    * Returns a .po file with a missing plural formula.
    */
-  public function getPoFileWithMissingPlural() {
+  public function getPoFileWithMissingPlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 
 msgid "Monday"
@@ -469,13 +478,13 @@ EOF;
   /**
    * Returns a .po file with a broken plural formula.
    */
-  public function getPoFileWithBrokenPlural() {
+  public function getPoFileWithBrokenPlural(): string {
     return <<< EOF
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: broken, will not parse\\n"
 

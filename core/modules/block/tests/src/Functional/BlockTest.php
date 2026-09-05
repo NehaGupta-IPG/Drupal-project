@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Functional;
 
-use Drupal\Component\Utility\Html;
 use Drupal\block\Entity\Block;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests basic block functionality.
- *
- * @group block
- * @group #slow
  */
+#[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockTest extends BlockTestBase {
 
   /**
@@ -184,7 +185,7 @@ class BlockTest extends BlockTestBase {
       $this->assertSession()->elementTextEquals('xpath', $xpath, 'Place block');
 
       $link = $this->getSession()->getPage()->find('xpath', $xpath);
-      [$path, $query_string] = explode('?', $link->getAttribute('href'), 2);
+      [, $query_string] = explode('?', $link->getAttribute('href'), 2);
       parse_str($query_string, $query_parts);
       $this->assertEquals($weight, $query_parts['weight'], 'Found the expected weight query string.');
 
@@ -225,7 +226,8 @@ class BlockTest extends BlockTestBase {
     $block['theme'] = $this->config('system.theme')->get('default');
     $block['region'] = 'header';
 
-    // Set block title to confirm that interface works and override any custom titles.
+    // Set block title to confirm that interface works and override any custom
+    // titles.
     $this->drupalGet('admin/structure/block/add/' . $block['id'] . '/' . $block['theme']);
     $this->submitForm([
       'settings[label]' => $block['settings[label]'],
@@ -296,7 +298,6 @@ class BlockTest extends BlockTestBase {
   public function testBlockThemeSelector(): void {
     // Install all themes.
     $themes = [
-      'olivero',
       'claro',
       'stark',
     ];
@@ -331,11 +332,11 @@ class BlockTest extends BlockTestBase {
     $this->drupalPlaceBlock('help_block', ['region' => 'help']);
     $this->drupalPlaceBlock('local_tasks_block');
     // Explicitly set the default and admin themes.
-    $theme = 'block_test_specialchars_theme';
+    $theme = 'block_test_special_chars_theme';
     \Drupal::service('theme_installer')->install([$theme]);
     $this->drupalGet('admin/structure/block');
     $this->assertSession()->assertEscaped('<"Cat" & \'Mouse\'>');
-    $this->drupalGet('admin/structure/block/list/block_test_specialchars_theme');
+    $this->drupalGet('admin/structure/block/list/block_test_special_chars_theme');
     $this->assertSession()->assertEscaped('Demonstrate block regions (<"Cat" & \'Mouse\'>)');
   }
 
@@ -389,7 +390,7 @@ class BlockTest extends BlockTestBase {
    *   The machine name of the theme region to move the block to, for example
    *   'header' or 'sidebar_first'.
    */
-  public function moveBlockToRegion(array $block, $region) {
+  public function moveBlockToRegion(array $block, string $region): void {
     // Set the created block to a specific region.
     $block += ['theme' => $this->config('system.theme')->get('default')];
     $edit = [];
@@ -405,11 +406,11 @@ class BlockTest extends BlockTestBase {
     $this->assertSession()->pageTextContains($block['settings[label]']);
 
     $region_xpath = [
-      'header' => '//header[@role = "banner"]',
+      'header' => '//header',
       'sidebar_first' => '//aside[contains(@class, "layout-sidebar-first")]',
       'content' => '//div[contains(@class, "layout-content")]',
       'sidebar_second' => '//aside[contains(@class, "layout-sidebar-second")]',
-      'footer' => '//footer[@role = "contentinfo"]',
+      'footer' => '//footer',
     ];
 
     // Confirm that the content block was found at the proper region.
@@ -427,6 +428,7 @@ class BlockTest extends BlockTestBase {
    * - "block_plugin:<block plugin ID>"
    */
   public function testBlockCacheTags(): void {
+    \Drupal::service('module_installer')->install(['page_cache']);
     // The page cache only works for anonymous users.
     $this->drupalLogout();
 
@@ -451,19 +453,18 @@ class BlockTest extends BlockTestBase {
     $cache_entry = \Drupal::cache('page')->get($cid);
     $expected_cache_tags = [
       'config:block_list',
-      'block_view',
-      'config:block.block.powered',
       'config:user.role.anonymous',
       'http_response',
       'rendered',
     ];
     sort($expected_cache_tags);
-    $keys = \Drupal::service('cache_contexts_manager')->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])->getKeys();
+    $keys = \Drupal::service('cache_contexts_manager')
+      ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
+      ->getKeys();
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
     $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . implode(':', $keys));
     $expected_cache_tags = [
-      'block_view',
-      'config:block.block.powered',
+      'config:block_list',
       'rendered',
     ];
     sort($expected_cache_tags);
@@ -492,9 +493,6 @@ class BlockTest extends BlockTestBase {
     $cache_entry = \Drupal::cache('page')->get($cid);
     $expected_cache_tags = [
       'config:block_list',
-      'block_view',
-      'config:block.block.powered',
-      'config:block.block.powered_2',
       'config:user.role.anonymous',
       'http_response',
       'rendered',
@@ -502,21 +500,23 @@ class BlockTest extends BlockTestBase {
     sort($expected_cache_tags);
     $this->assertEquals($expected_cache_tags, $cache_entry->tags);
     $expected_cache_tags = [
-      'block_view',
-      'config:block.block.powered',
+      'config:block_list',
       'rendered',
     ];
     sort($expected_cache_tags);
-    $keys = \Drupal::service('cache_contexts_manager')->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])->getKeys();
+    $keys = \Drupal::service('cache_contexts_manager')
+      ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
+      ->getKeys();
     $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . implode(':', $keys));
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
     $expected_cache_tags = [
-      'block_view',
-      'config:block.block.powered_2',
+      'config:block_list',
       'rendered',
     ];
     sort($expected_cache_tags);
-    $keys = \Drupal::service('cache_contexts_manager')->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])->getKeys();
+    $keys = \Drupal::service('cache_contexts_manager')
+      ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
+      ->getKeys();
     $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered_2:' . implode(':', $keys));
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
 
@@ -577,7 +577,7 @@ class BlockTest extends BlockTestBase {
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextNotContains('Hello test world');
 
-    \Drupal::state()->set('test_block_access', TRUE);
+    \Drupal::keyValue('block_test')->set('access', TRUE);
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains('Hello test world');
   }
@@ -635,12 +635,31 @@ class BlockTest extends BlockTestBase {
     $this->submitForm($edit, 'Save block');
 
     // Ensure that the title is displayed as plain text.
-    $elements = $this->xpath('//table/tbody/tr//td[contains(@class, "block")]');
+    $elements = $this->getNodeElementsByXpath('//table/tbody/tr//td[contains(@class, "block")]');
     $this->assertEquals($title, $elements[0]->getText());
 
     $this->clickLink('Disable');
-    $elements = $this->xpath('//table/tbody/tr//td[contains(@class, "block")]');
+    $elements = $this->getNodeElementsByXpath('//table/tbody/tr//td[contains(@class, "block")]');
     $this->assertEquals("$title (disabled)", $elements[0]->getText());
+  }
+
+  /**
+   * Tests a combined page title, content, and messages block.
+   */
+  public function testTitleContentMessagesSingleBlock(): void {
+    // Place block which implements MainContentBlockPluginInterface,
+    // TitleBlockPluginInterface, and MessagesBlockPluginInterface.
+    $this->drupalPlaceBlock('test_title_content_message_block');
+    $this->drupalGet('');
+
+    // Ensure the block's setTitle function was called.
+    $this->assertSession()->pageTextContains('Page title has been placed in the block.');
+
+    // Ensure the block's setMainContent function was called.
+    $this->assertSession()->pageTextContains('Main content has been placed in the block.');
+
+    // Ensure the status message is shown.
+    $this->assertSession()->statusMessageContains('This is a status message.', 'status');
   }
 
 }

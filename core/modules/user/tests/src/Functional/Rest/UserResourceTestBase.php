@@ -8,8 +8,10 @@ use Drupal\Core\Url;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
 use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
-use PHPUnit\Framework\Attributes\Before;
 
+/**
+ * Resource test base for the user entity.
+ */
 abstract class UserResourceTestBase extends EntityResourceTestBase {
 
   /**
@@ -50,19 +52,18 @@ abstract class UserResourceTestBase extends EntityResourceTestBase {
   protected static $secondCreatedEntityId = 5;
 
   /**
-   * Marks some tests as skipped because XML cannot be deserialized.
+   * {@inheritdoc}
    */
-  #[Before]
-  public function userResourceTestBaseSkipTests(): void {
+  protected function setUp(): void {
     if (in_array($this->name(), ['testPatchDxForSecuritySensitiveBaseFields', 'testPatchSecurityOtherUser'], TRUE)) {
       if (static::$format === 'xml') {
         $this->markTestSkipped('Deserialization of the XML format is not supported.');
       }
-
       if (static::$auth === FALSE) {
         $this->markTestSkipped('The anonymous user is never allowed to modify itself.');
       }
     }
+    parent::setUp();
   }
 
   /**
@@ -171,7 +172,10 @@ abstract class UserResourceTestBase extends EntityResourceTestBase {
     /** @var \Drupal\user\UserInterface $user */
     $user = static::$auth ? $this->account : User::load(0);
     // @todo Remove the array_diff_key() call in https://www.drupal.org/node/2821077.
-    $original_normalization = array_diff_key($this->serializer->normalize($user, static::$format), ['created' => TRUE, 'changed' => TRUE, 'name' => TRUE]);
+    $original_normalization = array_diff_key(
+      $this->serializer->normalize($user, static::$format),
+      ['created' => TRUE, 'changed' => TRUE, 'name' => TRUE],
+    );
 
     // Since this test must be performed by the user that is being modified,
     // we cannot use $this->getUrl().

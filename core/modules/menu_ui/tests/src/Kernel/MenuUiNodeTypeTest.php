@@ -8,12 +8,14 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\system\Entity\Menu;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests menu settings when creating and editing content types.
- *
- * @group menu_ui
  */
+#[Group('menu_ui')]
+#[RunTestsInSeparateProcesses]
 class MenuUiNodeTypeTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -23,6 +25,7 @@ class MenuUiNodeTypeTest extends KernelTestBase {
    */
   protected static $modules = [
     'field',
+    'filter',
     'menu_ui',
     'node',
     'system',
@@ -52,6 +55,7 @@ class MenuUiNodeTypeTest extends KernelTestBase {
    * Tests node type-specific settings for Menu UI.
    */
   public function testContentTypeMenuSettings(): void {
+    $this->installEntitySchema('node');
     $this->installConfig(['node']);
     Menu::create(['id' => 'a', 'label' => 'Z'])->save();
     Menu::create(['id' => 'b', 'label' => 'X'])->save();

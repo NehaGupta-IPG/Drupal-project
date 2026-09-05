@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests user-account links.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserAccountLinksTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['menu_ui', 'block', 'test_page_test'];
 
@@ -77,7 +77,7 @@ class UserAccountLinksTest extends BrowserTestBase {
     // auto-increment is 1. Use XPath to obtain input element id and name using
     // the consistent label text.
     $this->drupalGet('admin/structure/menu/manage/account');
-    $label = $this->xpath('//label[contains(.,:text)]/@for', [':text' => 'Enable My account menu link']);
+    $label = $this->getNodeElementsByXpath('//label[contains(.,:text)]/@for', [':text' => 'Enable My account menu link']);
     $this->assertSession()->checkboxChecked($label[0]->getText());
 
     // Disable the 'My account' link.

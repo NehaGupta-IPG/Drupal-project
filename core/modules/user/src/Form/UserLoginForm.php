@@ -4,22 +4,38 @@ namespace Drupal\user\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\BareHtmlPageRendererInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\user\UserAuthenticationInterface;
-use Drupal\user\UserAuthInterface;
 use Drupal\user\UserInterface;
+use Drupal\user\LoginFinalizer;
 use Drupal\user\UserStorageInterface;
 use Drupal\user\UserFloodControlInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides a user login form.
  *
  * @internal
  */
-class UserLoginForm extends FormBase {
+#[Route(
+  path: '/user/login',
+  name: 'user.login',
+  requirements: [
+    '_user_is_logged_in' => 'FALSE',
+  ],
+  options: [
+    '_maintenance_access' => TRUE,
+  ],
+  defaults: [
+    '_title' => new TranslatableMarkup('Log in'),
+  ],
+)]
+class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
 
   /**
    * The user flood control service.
@@ -38,7 +54,7 @@ class UserLoginForm extends FormBase {
   /**
    * The user authentication object.
    *
-   * @var \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface
+   * @var \Drupal\user\UserAuthenticationInterface
    */
   protected $userAuth;
 
@@ -57,28 +73,28 @@ class UserLoginForm extends FormBase {
   protected $bareHtmlPageRenderer;
 
   /**
-   * Constructs a new UserLoginForm.
-   *
-   * @param \Drupal\user\UserFloodControlInterface $user_flood_control
-   *   The user flood control service.
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
-   * @param \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface $user_auth
-   *   The user authentication object.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bare_html_renderer
-   *   The renderer.
+   * The login finalizer.
    */
-  public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, UserAuthInterface|UserAuthenticationInterface $user_auth, RendererInterface $renderer, BareHtmlPageRendererInterface $bare_html_renderer) {
+  protected LoginFinalizer $loginFinalizer;
+
+  public function __construct(
+    UserFloodControlInterface $user_flood_control,
+    UserStorageInterface $user_storage,
+    UserAuthenticationInterface $user_auth,
+    RendererInterface $renderer,
+    BareHtmlPageRendererInterface $bare_html_renderer,
+    ?LoginFinalizer $loginFinalizer = NULL,
+  ) {
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
-    if (!$user_auth instanceof UserAuthenticationInterface) {
-      @trigger_error('The $user_auth parameter not implementing UserAuthenticationInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3411040');
-    }
     $this->userAuth = $user_auth;
     $this->renderer = $renderer;
     $this->bareHtmlPageRenderer = $bare_html_renderer;
+    if ($loginFinalizer === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $loginFinalizer argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3379194', E_USER_DEPRECATED);
+      $loginFinalizer = \Drupal::service(LoginFinalizer::class);
+    }
+    $this->loginFinalizer = $loginFinalizer;
   }
 
   /**
@@ -90,7 +106,8 @@ class UserLoginForm extends FormBase {
       $container->get('entity_type.manager')->getStorage('user'),
       $container->get('user.auth'),
       $container->get('renderer'),
-      $container->get('bare_html_page_renderer')
+      $container->get('bare_html_page_renderer'),
+      $container->get(LoginFinalizer::class)
     );
   }
 
@@ -164,7 +181,7 @@ class UserLoginForm extends FormBase {
       $this->getRequest()->query->set('destination', $this->getRequest()->request->get('destination'));
     }
 
-    user_login_finalize($account);
+    $this->loginFinalizer->finalizeLogin($account);
   }
 
   /**
@@ -181,18 +198,13 @@ class UserLoginForm extends FormBase {
       // reached. Default is 50 failed attempts allowed in one hour. This is
       // independent of the per-user limit to catch attempts from one IP to log
       // in to many different user accounts.  We have a reasonably high limit
-      // since there may be only one apparent IP for all users at an institution.
+      // since there may be only one apparent IP for all users at an
+      // institution.
       if (!$this->userFloodControl->isAllowed('user.failed_login_ip', $flood_config->get('ip_limit'), $flood_config->get('ip_window'))) {
         $form_state->set('flood_control_triggered', 'ip');
         return;
       }
-      if ($this->userAuth instanceof UserAuthenticationInterface) {
-        $account = $this->userAuth->lookupAccount($form_state->getValue('name'));
-      }
-      else {
-        $accounts = $this->userStorage->loadByProperties(['name' => $form_state->getValue('name')]);
-        $account = reset($accounts);
-      }
+      $account = $this->userAuth->lookupAccount($form_state->getValue('name'));
       if ($account && $account->isBlocked()) {
         $form_state->setErrorByName('name', $this->t('The username %name has not been activated or is blocked.', ['%name' => $form_state->getValue('name')]));
       }
@@ -229,20 +241,7 @@ class UserLoginForm extends FormBase {
         }
         // We are not limited by flood control, so try to authenticate.
         // Store the user ID in form state as a flag for self::validateFinal().
-        if ($this->userAuth instanceof UserAuthenticationInterface) {
-          $form_state->set('uid', $this->userAuth->authenticateAccount($account, $password) ? $account->id() : FALSE);
-        }
-        // The userAuth object is decorated by an object that that has not
-        // been upgraded to the new UserAuthenticationInterface. Fallback
-        // to the authenticate() method.
-        else {
-          $uid = $this->userAuth->authenticate($form_state->getValue('name'), $password);
-          $form_state->set('uid', $uid);
-        }
-      }
-      elseif (!$this->userAuth instanceof UserAuthenticationInterface) {
-        $uid = $this->userAuth->authenticate($form_state->getValue('name'), $password);
-        $form_state->set('uid', $uid);
+        $form_state->set('uid', $this->userAuth->authenticateAccount($account, $password) ? $account->id() : FALSE);
       }
     }
   }
@@ -270,7 +269,7 @@ class UserLoginForm extends FormBase {
           // We did not find a uid, so the limit is IP-based.
           $message = $this->t('Too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or <a href=":url">request a new password</a>.', [':url' => Url::fromRoute('user.pass')->toString()]);
         }
-        $response = $this->bareHtmlPageRenderer->renderBarePage(['#markup' => $message], $this->t('Login failed'), 'maintenance_page');
+        $response = $this->bareHtmlPageRenderer->renderBarePage(['#markup' => $message], $this->t('Login failed'), 'maintenance_page__flood');
         $response->setStatusCode(403);
         $form_state->setResponse($response);
       }

@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel\Entity\Update;
 
-use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
-use Drupal\Core\State\StateInterface;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that schema changes in fields with data are detected during updates.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class SqlContentEntityStorageSchemaColumnTest extends KernelTestBase {
 
   use EntityDefinitionTestTrait;
@@ -47,20 +47,6 @@ class SqlContentEntityStorageSchemaColumnTest extends KernelTestBase {
    * @var \Drupal\field\FieldStorageConfigInterface
    */
   protected $fieldStorage;
-
-  /**
-   * The entity definition update manager.
-   *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
-   */
-  protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
-
-  /**
-   * The state object.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected StateInterface $state;
 
   /**
    * {@inheritdoc}
