@@ -376,6 +376,13 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *       ::Varchar or ::Text columns to use case-sensitive binary collation.
  *       This has no effect on other database types for which case sensitivity
  *       is already the default behavior.
+ *     - 'generated': A \Drupal\Core\Database\SchemaDefinition\Column object
+ *       returned by Column::generated(). It holds the expression the database
+ *       computes the column value from, and whether that value is stored on
+ *       write or computed on read. A generated column cannot have a 'default'
+ *       or a 'not null' constraint, and cannot be part of the primary key.
+ *       Prefer stored over virtual for portability: PostgreSQL supports virtual
+ *       columns only from version 18 and cannot index them.
  *     - 'dbSpecificExtra': If you need to use a column type not included in
  *       the officially supported list of types above, you can specify a type
  *       for each database backend. Specify this as an associative array having
