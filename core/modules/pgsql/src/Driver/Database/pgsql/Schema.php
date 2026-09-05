@@ -874,10 +874,10 @@ EOD;
    * {@inheritdoc}
    */
   public function dropUniqueKey($table, $name) {
-    // If we have a $name argument that ends with '__key' we are dropping a key
+    // If we have a $name argument that ends with '_key' we are dropping a key
     // whose name was already processed (most likely resulting from a schema
     // introspection.
-    if (str_ends_with($name, '__key')) {
+    if (str_ends_with($name, '_key')) {
       $identifier = $name;
     }
     else {
@@ -911,10 +911,10 @@ EOD;
    * {@inheritdoc}
    */
   public function dropIndex($table, $name) {
-    // If we have a $name argument that ends with '__idx' we are dropping an
+    // If we have a $name argument that ends with '_idx' we are dropping an
     // index whose name was already processed (most likely resulting from a
     // schema introspection.
-    if (str_ends_with($name, '__idx')) {
+    if (str_ends_with($name, '_idx')) {
       $identifier = $name;
     }
     else {
