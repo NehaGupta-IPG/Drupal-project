@@ -696,7 +696,7 @@ abstract class Schema implements PlaceholderInterface {
    *   (optional) An expression to be used to initialize the newly added
    *   column. This is most useful for creating NOT NULL columns with no
    *   default value in existing tables. If not specified, the column will be
-   *   initialized to the default vaòue indicated in the schema definition (if
+   *   initialized to the default value indicated in the schema definition (if
    *   present).
    *   Examples:
    *   @code
