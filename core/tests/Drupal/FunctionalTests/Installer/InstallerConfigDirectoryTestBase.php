@@ -6,7 +6,6 @@ namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Extension\ModuleWeight;
 
 /**
  * Provides a base class for testing installing from existing configuration.
