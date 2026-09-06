@@ -229,6 +229,10 @@ class ConfigSchemaTest extends KernelTestBase {
       'ValidKeys' => ['allowedKeys' => '<infer>'],
       'FullyValidatable' => NULL,
     ];
+    // Config entities are always considered translatable, regardless of
+    // which values are currently present.
+    // @see \Drupal\Core\Config\StorableConfigBase::castValue()
+    $expected['translatable'] = TRUE;
 
     $this->assertEquals($expected, $definition);
 

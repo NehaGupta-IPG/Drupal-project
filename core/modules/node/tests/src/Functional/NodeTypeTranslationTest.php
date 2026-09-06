@@ -183,7 +183,15 @@ class NodeTypeTranslationTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->drupalGet("es/admin/structure/types/manage/$type/fields/node.$type.field_email/translate");
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains("The configuration objects have different language codes so they cannot be translated");
+    // Changing the site default language above also retroactively relabels
+    // existing configuration that was labelled with the previous default -
+    // including field.storage.node.field_email, reused above and created
+    // while the default was still 'fr' (see
+    // \Drupal\language\DefaultLangcodeConfigUpdater). The field instance
+    // created by re-using it is added after the change, so it resolves to
+    // 'es' directly. Both end up labelled 'es', so they never end up with
+    // mismatched language codes.
+    $this->assertSession()->pageTextNotContains("The configuration objects have different language codes so they cannot be translated");
   }
 
 }

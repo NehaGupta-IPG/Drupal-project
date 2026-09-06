@@ -396,6 +396,26 @@ class ConfigInstaller implements ConfigInstallerInterface {
               'default_config_hash' => Crypt::hashBase64(serialize($config_to_create[$name])),
             ],
           ] + $config_to_create[$name];
+
+          if ($this->typedConfig->hasConfigSchema($name)) {
+            // Building typed data here to check translatability is too
+            // expensive to do twice for every piece of configuration being
+            // installed. Resolving unconditionally instead - including for
+            // configuration with no translatable values at all - is harmless: a
+            // resolved langcode that Config::save() finds unwarranted is
+            // stripped straight back out by its own
+            // reconcileLangcodeWithTranslatability().
+            $event = new ConfigLangcodeResolveEvent($name, $config_to_create[$name]['langcode'] ?? NULL, ConfigLangcodeContext::ExtensionInstall);
+            $this->eventDispatcher->dispatch($event, ConfigEvents::RESOLVE_LANGCODE);
+            if ($event->getLangcode() !== NULL) {
+              $config_to_create[$name]['langcode'] = $event->getLangcode();
+            }
+            if (isset($config_to_create[$name]['langcode']) && !$event->isLangcodeSupported($config_to_create[$name]['langcode'])) {
+              // The configuration ships with an explicit langcode that is not
+              // supported on this site: do not install it at all.
+              continue;
+            }
+          }
         }
         $new_config->setData($config_to_create[$name]);
       }

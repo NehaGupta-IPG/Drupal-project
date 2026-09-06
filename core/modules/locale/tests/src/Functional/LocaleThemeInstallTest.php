@@ -10,11 +10,13 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests that locale rewrites config langcodes after theme install.
+ * Tests that installing a theme relabels its shipped English config.
  *
- * When a theme ships config with langcode 'en' and locale is enabled with a
- * non-English site default, locale's updateDefaultConfigLangcodes() batch
- * must rewrite those langcodes to the site default after install.
+ * When a theme ships config with langcode 'en' (or no langcode at all) and
+ * the site's configuration default language is not English, ConfigInstaller
+ * must relabel that configuration to the site default while installing it.
+ *
+ * @see \Drupal\Core\Config\ConfigInstaller::resolveInstalledLangcode()
  */
 #[Group('locale')]
 #[RunTestsInSeparateProcesses]
@@ -55,8 +57,8 @@ class LocaleThemeInstallTest extends BrowserTestBase {
    * Tests that installing a theme via the UI updates config language.
    *
    * The olivero theme ships core.date_format.olivero_medium with langcode
-   * 'en'. With locale enabled and a non-English site default, that langcode
-   * should be rewritten to the site default after the install batch runs.
+   * 'en'. With a non-English configuration default language, ConfigInstaller
+   * relabels it to that default while installing the theme's configuration.
    */
   public function testThemeInstallRewritesConfigLangcode(): void {
     // Install olivero via the Appearance UI.
@@ -67,8 +69,8 @@ class LocaleThemeInstallTest extends BrowserTestBase {
     $this->checkForMetaRefresh();
     $this->rebuildContainer();
 
-    // core.date_format.olivero_medium ships with langcode 'en'. Locale's
-    // updateDefaultConfigLangcodes() should have rewritten it to 'de'.
+    // core.date_format.olivero_medium ships with langcode 'en'. ConfigInstaller
+    // should have relabelled it to 'de'.
     $langcode = $this->config('core.date_format.olivero_medium')->get('langcode');
     $this->assertSame('de', $langcode);
 

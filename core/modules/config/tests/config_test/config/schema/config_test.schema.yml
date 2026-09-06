@@ -64,6 +64,19 @@ config_test.query.*:
       type: integer
       label: 'number'
 
+config_test.langcode_test:
+  type: config_object
+  label: 'Configuration langcode test'
+  mapping:
+    optional_translatable_value:
+      type: label
+      requiredKey: false
+      label: 'Optional translatable value'
+    untranslatable_value:
+      type: string
+      requiredKey: false
+      label: 'Untranslatable value'
+
 config_test.types:
   type: config_object
   label: 'Configuration type'

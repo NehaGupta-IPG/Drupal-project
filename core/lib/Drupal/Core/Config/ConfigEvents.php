@@ -185,4 +185,19 @@ final class ConfigEvents {
    */
   const STORAGE_TRANSFORM_EXPORT = 'config.transform.export';
 
+  /**
+   * Name of the event fired to resolve the langcode for configuration.
+   *
+   * The event listener method receives a
+   * \Drupal\Core\Config\ConfigLangcodeResolveEvent instance.
+   *
+   * @Event
+   *
+   * @see \Drupal\Core\Config\ConfigLangcodeResolveEvent
+   * @see \Drupal\Core\Config\ConfigLangcodeContext
+   *
+   * @var string
+   */
+  const RESOLVE_LANGCODE = 'config.resolve_langcode';
+
 }

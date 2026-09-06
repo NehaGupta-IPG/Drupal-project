@@ -423,6 +423,11 @@ config_dependencies:
 
 config_entity:
   type: mapping
+  # Config entities support third-party settings and other extension points
+  # that can add translatable values at any time, so they are always
+  # considered translatable regardless of which values are currently present.
+  # @see \Drupal\Core\Config\StorableConfigBase::castValue()
+  translatable: true
   mapping:
     uuid:
       type: uuid
