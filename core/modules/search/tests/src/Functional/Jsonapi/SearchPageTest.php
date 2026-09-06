@@ -9,6 +9,7 @@ use Drupal\jsonapi\JsonApiSpec;
 use Drupal\search\Entity\SearchPage;
 use Drupal\Tests\jsonapi\Functional\ConfigEntityResourceTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore hinode
@@ -16,13 +17,14 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * JSON:API integration test for the "SearchPage" config entity type.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchPageTest extends ConfigEntityResourceTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search'];
+  protected static $modules = ['node', 'search', 'search_node'];
 
   /**
    * {@inheritdoc}
@@ -106,7 +108,7 @@ class SearchPageTest extends ConfigEntityResourceTestBase {
           ],
           'dependencies' => [
             'module' => [
-              'node',
+              'search_node',
             ],
           ],
           'label' => 'Search of magnetic activity of the Sun',

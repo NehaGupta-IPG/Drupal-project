@@ -98,8 +98,16 @@ abstract class TextItemBase extends FieldItemBase {
    * {@inheritdoc}
    */
   public function applyDefaultValue($notify = TRUE) {
-    // @todo Add in the filter default format here.
-    $this->setValue(['format' => NULL], $notify);
+    $allowed_formats = $this->getSetting('allowed_formats') ?? [];
+    $format = \Drupal::service(FilterFormatRepositoryInterface::class)->getFallbackFormatId();
+
+    // If the site fallback format is not one of the allowed formats, fall back
+    // to the first allowed format so the default value is usable on save.
+    if (!empty($allowed_formats) && !in_array($format, $allowed_formats, TRUE)) {
+      $format = reset($allowed_formats);
+    }
+
+    $this->setValue(['format' => $format], $notify);
     return $this;
   }
 
@@ -132,6 +140,12 @@ abstract class TextItemBase extends FieldItemBase {
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     $random = new Random();
     $settings = $field_definition->getSettings();
+    $allowed_formats = $settings['allowed_formats'];
+    $fallback = \Drupal::service(FilterFormatRepositoryInterface::class)->getFallbackFormatId();
+
+    if (!empty($allowed_formats) && !in_array($fallback, $allowed_formats)) {
+      $fallback = reset($allowed_formats);
+    }
 
     if (empty($settings['max_length'])) {
       // Textarea handling.
@@ -146,7 +160,7 @@ abstract class TextItemBase extends FieldItemBase {
     $values = [
       'value' => $value,
       'summary' => $value,
-      'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getFallbackFormatId(),
+      'format' => $fallback,
     ];
     return $values;
   }

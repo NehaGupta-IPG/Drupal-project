@@ -54,7 +54,7 @@ class TaggedHandlersPassTest extends UnitTestCase {
 
     $handler_pass = new TaggedHandlersPass();
     $this->expectException(LogicException::class);
-    $this->expectExceptionMessage("At least one service tagged with 'consumer_id' is required.");
+    $this->expectExceptionMessageIs("At least one service tagged with 'consumer_id' is required.");
     $handler_pass->process($container);
   }
 
@@ -66,7 +66,7 @@ class TaggedHandlersPassTest extends UnitTestCase {
    */
   public function testIdCollectorProcessRequiredHandlers(): void {
     $this->expectException(LogicException::class);
-    $this->expectExceptionMessage("At least one service tagged with 'consumer_id' is required.");
+    $this->expectExceptionMessageIs("At least one service tagged with 'consumer_id' is required.");
     $container = $this->buildContainer();
     $container
       ->register('consumer_id', __NAMESPACE__ . '\ValidConsumer')
@@ -92,7 +92,7 @@ class TaggedHandlersPassTest extends UnitTestCase {
 
     $handler_pass = new TaggedHandlersPass();
     $this->expectException(LogicException::class);
-    $this->expectExceptionMessage("Service consumer 'consumer_id1' class method Drupal\Tests\Core\DependencyInjection\Compiler\InvalidConsumer::addHandler() has to type-hint an interface.");
+    $this->expectExceptionMessageIs("Service consumer 'consumer_id1' class method Drupal\Tests\Core\DependencyInjection\Compiler\InvalidConsumer::addHandler() has to type-hint an interface.");
     $handler_pass->process($container);
   }
 
@@ -444,13 +444,13 @@ interface HandlerInterface {
  */
 class ValidConsumer {
 
-  public function addHandler(HandlerInterface $instance, $priority = 0) {
+  public function addHandler(HandlerInterface $instance, $priority = 0): void {
   }
 
-  public function addNoPriority(HandlerInterface $instance) {
+  public function addNoPriority(HandlerInterface $instance): void {
   }
 
-  public function addWithId(HandlerInterface $instance, $id, $priority = 0) {
+  public function addWithId(HandlerInterface $instance, $id, $priority = 0): void {
   }
 
 }
@@ -460,7 +460,7 @@ class ValidConsumer {
  */
 class InvalidConsumer {
 
-  public function addHandler($instance, $priority = 0) {
+  public function addHandler($instance, $priority = 0): void {
   }
 
 }
@@ -470,16 +470,16 @@ class InvalidConsumer {
  */
 class ValidConsumerWithExtraArguments {
 
-  public function addHandler(HandlerInterface $instance, $priority = 0, $extra1 = '', $extra2 = '') {
+  public function addHandler(HandlerInterface $instance, $priority = 0, $extra1 = '', $extra2 = ''): void {
   }
 
-  public function addNoPriority(HandlerInterface $instance, $extra) {
+  public function addNoPriority(HandlerInterface $instance, $extra): void {
   }
 
-  public function addWithId(HandlerInterface $instance, $id, $priority = 0, $extra1 = '', $extra2 = NULL) {
+  public function addWithId(HandlerInterface $instance, $id, $priority = 0, $extra1 = '', $extra2 = NULL): void {
   }
 
-  public function addWithDifferentOrder(HandlerInterface $instance, $extra1, $priority = 0, $extra2 = 'default2', $extra3 = 'default3') {
+  public function addWithDifferentOrder(HandlerInterface $instance, $extra1, $priority = 0, $extra2 = 'default2', $extra3 = 'default3'): void {
   }
 
 }

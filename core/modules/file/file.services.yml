@@ -34,3 +34,6 @@ services:
   Drupal\file\EventSubscriber\DefaultContentSubscriber:
     calls:
       - [setLogger, ['@logger.channel.file']]
+  Drupal\file\FileReferenceResolver: ~
+  Drupal\file\Upload\ManagedFileElementHelper: ~
+  Drupal\file\Upload\FormFileUploader: ~
