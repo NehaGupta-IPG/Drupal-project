@@ -21,11 +21,15 @@ final class Schema implements SchemaDefinitionInterface {
    *   The schema name.
    * @param list<Table> $tables
    *   A list of Table objects.
+   * @param int|null $version
+   *   (optional) The version of the schema. It is mandatory to indicate if the
+   *   schema is added to a VersionedSchema.
    */
   public function __construct(
     public readonly SchemaDefinitionType $type,
     public readonly string $name,
     public readonly array $tables,
+    public readonly ?int $version = NULL,
   ) {
     $this->validate();
   }

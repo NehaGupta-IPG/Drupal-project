@@ -16,6 +16,7 @@ use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\VersionedSchema;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\locale\LocaleDefaultOptions;
@@ -70,13 +71,13 @@ function locale_uninstall(): void {
  * Implements hook_schema().
  */
 function locale_schema(): Schema {
-  return _locale_schema_11401();
+  return _locale_schema_versions()->getLatestSchemaVersionDefinition();
 }
 
 /**
- * Version 11401 of the locale schema.
+ * Holds the most recent versions of the module Schema.
  */
-function _locale_schema_11401(): Schema {
+function _locale_schema_versions(): VersionedSchema {
   $locales_source = new Table(
     name: 'locales_source',
     description: 'List of English source strings.',
@@ -280,14 +281,21 @@ function _locale_schema_11401(): Schema {
     primaryKey: new PrimaryKey(['project', 'langcode']),
   );
 
-  return new Schema(
+  return new VersionedSchema(
     type: SchemaDefinitionType::Module,
     name: 'locale',
-    tables: [
-      $locales_source,
-      $locales_target,
-      $locales_location,
-      $locale_file,
+    schemaVersions: [
+      new Schema(
+        type: SchemaDefinitionType::Module,
+        name: 'locale',
+        version: 11401,
+        tables: [
+          $locales_source,
+          $locales_target,
+          $locales_location,
+          $locale_file,
+        ],
+      )
     ],
   );
 }
@@ -305,6 +313,10 @@ function locale_update_last_removed(): int {
 function locale_update_11401(): void {
   $schema = \Drupal::database()->schema();
   if (!$schema->fieldExists('locale_file', 'hash')) {
-    $schema->addTableColumnFromDefinition(_locale_schema_11401(), 'locale_file', 'hash');
+    $schema->addTableColumnFromDefinition(
+      _locale_schema_versions()->getSchemaVersionDefinition(11401),
+      'locale_file',
+      'hash',
+    );
   }
 }
