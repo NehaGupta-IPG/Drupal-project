@@ -7,12 +7,14 @@ namespace Drupal\Tests\system\Functional\UpdateSystem;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that modules can define their last removed update function.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class UpdatePathLastRemovedTest extends BrowserTestBase {
   use UpdatePathTestTrait;
 
@@ -56,7 +58,7 @@ class UpdatePathLastRemovedTest extends BrowserTestBase {
   /**
    * Tests that a module with a too old schema version can not be updated.
    */
-  public function testLastRemovedVersion() {
+  public function testLastRemovedVersion(): void {
     /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
     $update_registry = \Drupal::service('update.update_hook_registry');
 

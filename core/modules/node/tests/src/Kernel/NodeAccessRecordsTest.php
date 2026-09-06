@@ -6,12 +6,14 @@ namespace Drupal\Tests\node\Kernel;
 
 use Drupal\Core\Database\Database;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests hook_node_access_records when acquiring grants.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeAccessRecordsTest extends NodeAccessTestBase {
 
   /**
@@ -24,7 +26,7 @@ class NodeAccessRecordsTest extends NodeAccessTestBase {
   /**
    * Creates a node and tests the creation of node access rules.
    */
-  public function testNodeAccessRecords() {
+  public function testNodeAccessRecords(): void {
     // Create an article node.
     $node1 = $this->drupalCreateNode(['type' => 'article']);
     $this->assertNotEmpty(Node::load($node1->id()), 'Article node created.');
@@ -88,7 +90,7 @@ class NodeAccessRecordsTest extends NodeAccessTestBase {
     // Create a user that is allowed to access content.
     $web_user = $this->drupalCreateUser(['access content']);
     foreach ($operations as $op) {
-      $grants = node_test_node_grants($web_user, $op);
+      $grants = \Drupal::moduleHandler()->invoke('node', 'node_grants', [$web_user, $op]);
       $altered_grants = $grants;
       \Drupal::moduleHandler()->alter('node_grants', $altered_grants, $web_user, $op);
       $this->assertNotEquals($grants, $altered_grants, "Altered the $op grant for a user.");

@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views_ui\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the UI of generic display path plugin.
  *
- * @group views_ui
- * @group #slow
  * @see \Drupal\views\Plugin\views\display\PathPluginBase
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class DisplayPathTest extends UITestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -45,7 +48,7 @@ class DisplayPathTest extends UITestBase {
   /**
    * Runs the tests.
    */
-  public function testPathUI() {
+  public function testPathUI(): void {
     $this->doBasicPathUITest();
     $this->doAdvancedPathsValidationTest();
     $this->doPathXssFilterTest();
@@ -54,7 +57,7 @@ class DisplayPathTest extends UITestBase {
   /**
    * Tests basic functionality in configuring a view.
    */
-  protected function doBasicPathUITest() {
+  protected function doBasicPathUITest(): void {
     $this->drupalGet('admin/structure/views/view/test_view');
 
     // Add a new page display and check the appearing text.
@@ -78,7 +81,7 @@ class DisplayPathTest extends UITestBase {
   /**
    * Tests that View paths are properly filtered for XSS.
    */
-  public function doPathXssFilterTest() {
+  public function doPathXssFilterTest(): void {
     $this->drupalGet('admin/structure/views/view/test_view');
     $this->submitForm([], 'Add Page');
     $this->drupalGet('admin/structure/views/nojs/display/test_view/page_2/path');
@@ -104,7 +107,7 @@ class DisplayPathTest extends UITestBase {
   /**
    * Tests a couple of invalid path patterns.
    */
-  protected function doAdvancedPathsValidationTest() {
+  protected function doAdvancedPathsValidationTest(): void {
     $url = 'admin/structure/views/nojs/display/test_view/page_1/path';
 
     $this->drupalGet($url);
@@ -121,7 +124,7 @@ class DisplayPathTest extends UITestBase {
   /**
    * Tests deleting a page display that has no path.
    */
-  public function testDeleteWithNoPath() {
+  public function testDeleteWithNoPath(): void {
     $this->drupalGet('admin/structure/views/view/test_view');
     $this->submitForm([], 'Add Page');
     $this->submitForm([], 'Delete Page');
@@ -132,7 +135,7 @@ class DisplayPathTest extends UITestBase {
   /**
    * Tests the menu and tab option form.
    */
-  public function testMenuOptions() {
+  public function testMenuOptions(): void {
     $this->drupalGet('admin/structure/views/view/test_view');
 
     // Add a new page display.
@@ -182,7 +185,7 @@ class DisplayPathTest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/display/test_page_display_menu/page_5/menu');
     $this->assertSession()->statusCodeEquals(200);
     $menu_options = $this->assertSession()->selectExists('edit-menu-parent')->findAll('css', 'option');
-    $menu_options = array_map(function ($element) {
+    $menu_options = array_map(function (NodeElement $element) {
       return $element->getText();
     }, $menu_options);
 
@@ -194,7 +197,6 @@ class DisplayPathTest extends UITestBase {
       '<Footer>',
       '<Main navigation>',
       '<Tools>',
-      '-- Compose tips (disabled)',
       '-- Test menu link',
     ], $menu_options);
 
@@ -206,8 +208,8 @@ class DisplayPathTest extends UITestBase {
   /**
    * Tests the regression in https://www.drupal.org/node/2532490.
    */
-  public function testDefaultMenuTabRegression() {
-    $this->container->get('module_installer')->install(['menu_link_content', 'toolbar', 'system']);
+  public function testDefaultMenuTabRegression(): void {
+    $this->container->get('module_installer')->install(['menu_link_content', 'system']);
     $this->resetAll();
     $admin_user = $this->drupalCreateUser([
       'administer views',
@@ -218,7 +220,6 @@ class DisplayPathTest extends UITestBase {
       'administer permissions',
       'administer menu',
       'link to any page',
-      'access toolbar',
       'access administration pages',
     ]);
     $this->drupalLogin($admin_user);

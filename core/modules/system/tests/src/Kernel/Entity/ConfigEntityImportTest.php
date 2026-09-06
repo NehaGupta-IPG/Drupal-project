@@ -9,15 +9,16 @@ use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\search\Entity\SearchPage;
 use Drupal\system\Entity\Action;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ConfigEntity importing.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityImportTest extends KernelTestBase {
 
   use BlockCreationTrait;
@@ -30,17 +31,15 @@ class ConfigEntityImportTest extends KernelTestBase {
     'config_test',
     'filter',
     'image',
-    'search',
-    'search_extra_type',
     'system',
   ];
 
   /**
    * Runs test methods for each module within a single test run.
    */
-  public function testConfigUpdateImport() {
-    $this->installConfig(['block', 'filter', 'image']);
-    $this->container->get('theme_installer')->install(['olivero']);
+  public function testConfigUpdateImport(): void {
+    $this->installConfig(['system', 'block', 'filter', 'image']);
+    $this->container->get('theme_installer')->install(['stark']);
     $config_storage = $this->container->get('config.storage');
     // Ensure the 'system.site' config.
     $config_storage->write('system.site', ['uuid' => (new Php())->generate()]);
@@ -50,14 +49,13 @@ class ConfigEntityImportTest extends KernelTestBase {
     $this->doBlockUpdate();
     $this->doFilterFormatUpdate();
     $this->doImageStyleUpdate();
-    $this->doSearchPageUpdate();
     $this->doThirdPartySettingsUpdate();
   }
 
   /**
    * Tests updating an action during import.
    */
-  protected function doActionUpdate() {
+  protected function doActionUpdate(): void {
     // Create a test action with a known label.
     $name = 'system.action.apple';
     $entity = Action::create([
@@ -78,13 +76,13 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Tests updating a block during import.
    */
-  protected function doBlockUpdate() {
+  protected function doBlockUpdate(): void {
     // Create a test block with a known label.
     $name = 'block.block.apple';
     $block = $this->placeBlock('system_powered_by_block', [
       'id' => 'apple',
       'label' => 'Red Delicious',
-      'theme' => 'olivero',
+      'theme' => 'stark',
     ]);
 
     $this->checkSinglePluginConfigSync($block, 'settings', 'label', 'Red Delicious');
@@ -98,7 +96,7 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Tests updating a filter format during import.
    */
-  protected function doFilterFormatUpdate() {
+  protected function doFilterFormatUpdate(): void {
     // Create a test filter format with a known label.
     $name = 'filter.format.plain_text';
 
@@ -130,7 +128,7 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Tests updating an image style during import.
    */
-  protected function doImageStyleUpdate() {
+  protected function doImageStyleUpdate(): void {
     // Create a test image style with a known label.
     $name = 'image.style.thumbnail';
 
@@ -165,29 +163,9 @@ class ConfigEntityImportTest extends KernelTestBase {
   }
 
   /**
-   * Tests updating a search page during import.
-   */
-  protected function doSearchPageUpdate() {
-    // Create a test search page with a known label.
-    $name = 'search.page.apple';
-    $entity = SearchPage::create([
-      'id' => 'apple',
-      'plugin' => 'search_extra_type_search',
-    ]);
-    $entity->save();
-
-    $this->checkSinglePluginConfigSync($entity, 'configuration', 'boost', 'bi');
-
-    // Read the existing data, and prepare an altered version in sync.
-    $custom_data = $original_data = $this->container->get('config.storage')->read($name);
-    $custom_data['configuration']['boost'] = 'asdf';
-    $this->assertConfigUpdateImport($name, $original_data, $custom_data);
-  }
-
-  /**
    * Tests updating of third party settings.
    */
-  protected function doThirdPartySettingsUpdate() {
+  protected function doThirdPartySettingsUpdate(): void {
     // Create a test action with a known label.
     $name = 'system.action.third_party_settings_test';
 
@@ -224,7 +202,7 @@ class ConfigEntityImportTest extends KernelTestBase {
    * @param mixed $expected
    *   The expected default value of the plugin config setting.
    */
-  protected function checkSinglePluginConfigSync(EntityWithPluginCollectionInterface $entity, $config_key, $setting_key, $expected) {
+  protected function checkSinglePluginConfigSync(EntityWithPluginCollectionInterface $entity, $config_key, $setting_key, $expected): void {
     $plugin_collection = $entity->getPluginCollections()[$config_key];
     $settings = $entity->get($config_key);
 

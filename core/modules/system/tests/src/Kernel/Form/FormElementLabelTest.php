@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Form;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
  * Tests for form_element_label theme hook.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class FormElementLabelTest extends KernelTestBase {
 
   /**
@@ -22,7 +24,7 @@ class FormElementLabelTest extends KernelTestBase {
   /**
    * Ensures that attributes can be placed for form element label.
    */
-  public function testAttributes() {
+  public function testAttributes(): void {
     $render_array = [
       '#type' => 'label',
       '#attributes' => ['class' => ['kitten']],
@@ -31,7 +33,7 @@ class FormElementLabelTest extends KernelTestBase {
     ];
     $css_selector_converter = new CssSelectorConverter();
     $this->render($render_array);
-    $elements = $this->xpath($css_selector_converter->toXPath('.kitten'));
+    $elements = $this->getSimpleXmlElementsByXpath($css_selector_converter->toXPath('.kitten'));
     $this->assertCount(1, $elements);
 
     // Add label attributes to a form element.
@@ -41,7 +43,7 @@ class FormElementLabelTest extends KernelTestBase {
       '#title' => 'Kitten sounds',
     ];
     $this->render($render_array);
-    $elements = $this->xpath($css_selector_converter->toXPath('label.meow'));
+    $elements = $this->getSimpleXmlElementsByXpath($css_selector_converter->toXPath('label.meow'));
     $this->assertCount(1, $elements);
   }
 

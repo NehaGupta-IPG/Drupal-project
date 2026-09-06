@@ -8,7 +8,7 @@
 /**
  * Implements hook_removed_post_updates().
  */
-function views_removed_post_updates() {
+function views_removed_post_updates(): array {
   return [
     'views_post_update_update_cacheability_metadata' => '9.0.0',
     'views_post_update_cleanup_duplicate_views_data' => '9.0.0',
@@ -46,5 +46,18 @@ function views_removed_post_updates() {
     'views_post_update_taxonomy_filter_user_context' => '11.0.0',
     'views_post_update_pager_heading' => '11.0.0',
     'views_post_update_rendered_entity_field_cache_metadata' => '11.0.0',
+    'views_post_update_views_data_argument_plugin_id' => '12.0.0',
+    'views_post_update_format_plural' => '12.0.0',
+    'views_post_update_update_remember_role_empty' => '12.0.0',
+    'views_post_update_table_css_class' => '12.0.0',
+    'views_post_update_block_items_per_page' => '12.0.0',
+    'views_post_update_add_date_default_arguments' => '12.0.0',
   ];
+}
+
+/**
+ * Clear cache to apply non-sortable counter field change.
+ */
+function views_post_update_counter_field_not_sortable(): void {
+  // Empty update to trigger a cache rebuild so updated Views data is applied.
 }

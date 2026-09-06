@@ -10,12 +10,14 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests PathElement validation and conversion functionality.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class TextFormatElementFormTest extends KernelTestBase implements FormInterface {
 
   /**
@@ -26,16 +28,13 @@ class TextFormatElementFormTest extends KernelTestBase implements FormInterface 
   protected $testUser;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
     'user',
     'filter',
     'filter_test',
-    'editor',
   ];
 
   /**
@@ -73,22 +72,21 @@ class TextFormatElementFormTest extends KernelTestBase implements FormInterface 
       'name' => 'foobar',
       'mail' => 'foobar@example.com',
     ]);
-    $this->testUser->addRole($role->id());
-    $this->testUser->save();
+    $this->testUser->addRole($role->id())->save();
     \Drupal::service('current_user')->setAccount($this->testUser);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'test_text_area_element';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     // A text_format field.
     $form['text_format'] = [
       '#type' => 'text_format',
@@ -120,7 +118,7 @@ class TextFormatElementFormTest extends KernelTestBase implements FormInterface 
   /**
    * Tests that values are returned.
    */
-  public function testTextFormatElement() {
+  public function testTextFormatElement(): void {
     /** @var \Drupal\Core\Form\FormBuilder $form_builder */
     $form_builder = $this->container->get('form_builder');
     $form = $form_builder->getForm($this);

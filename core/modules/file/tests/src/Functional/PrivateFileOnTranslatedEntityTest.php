@@ -7,12 +7,14 @@ namespace Drupal\Tests\file\Functional;
 use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Uploads private files to translated node and checks access.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class PrivateFileOnTranslatedEntityTest extends FileFieldTestBase {
 
   use ContentTranslationTestTrait;
@@ -72,7 +74,7 @@ class PrivateFileOnTranslatedEntityTest extends FileFieldTestBase {
   /**
    * Tests private file fields on translated nodes.
    */
-  public function testPrivateLanguageFile() {
+  public function testPrivateLanguageFile(): void {
     // Verify that the file field on the "Basic page" node type is translatable.
     $definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('node', 'page');
     $this->assertTrue($definitions[$this->fieldName]->isTranslatable(), 'Node file field is translatable.');
@@ -96,7 +98,6 @@ class PrivateFileOnTranslatedEntityTest extends FileFieldTestBase {
     $this->rebuildContainer();
 
     // Ensure the file can be downloaded.
-    \Drupal::entityTypeManager()->getStorage('node')->resetCache([$default_language_node->id()]);
     $node = Node::load($default_language_node->id());
     $node_file = File::load($node->{$this->fieldName}->target_id);
     $this->drupalGet($node_file->createFileUrl(FALSE));
@@ -131,7 +132,6 @@ class PrivateFileOnTranslatedEntityTest extends FileFieldTestBase {
     $last_fid = $this->getLastFileId();
 
     // Verify the translation was created.
-    \Drupal::entityTypeManager()->getStorage('node')->resetCache([$default_language_node->id()]);
     $default_language_node = Node::load($default_language_node->id());
     $this->assertTrue($default_language_node->hasTranslation('fr'), 'Node found in database.');
     // Verify that the new file got saved.

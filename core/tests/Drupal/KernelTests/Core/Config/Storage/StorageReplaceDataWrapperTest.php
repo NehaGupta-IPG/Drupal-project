@@ -6,12 +6,15 @@ namespace Drupal\KernelTests\Core\Config\Storage;
 
 use Drupal\config\StorageReplaceDataWrapper;
 use Drupal\Core\Config\StorageInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests StorageReplaceDataWrapper operations.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
 
   /**
@@ -25,35 +28,35 @@ class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function read($name) {
+  protected function read($name): array|object {
     return $this->storage->read($name);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function insert($name, $data) {
+  protected function insert($name, $data): void {
     $this->storage->write($name, $data);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function update($name, $data) {
+  protected function update($name, $data): void {
     $this->storage->write($name, $data);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function delete($name) {
+  protected function delete($name): void {
     $this->storage->delete($name);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function testInvalidStorage() {
+  public function testInvalidStorage(): void {
     $this->markTestSkipped('No-op as this test does not make sense');
   }
 
@@ -62,10 +65,9 @@ class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
    *
    * @param string $collection
    *   The collection name.
-   *
-   * @dataProvider providerCollections
    */
-  public function testCreateCollection($collection) {
+  #[DataProvider('providerCollections')]
+  public function testCreateCollection(string $collection): void {
     $initial_collection_name = $this->storage->getCollectionName();
 
     // Create new storage with given collection and check it is set correctly.
@@ -82,7 +84,7 @@ class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
    * @return array
    *   Returns an array of collection names.
    */
-  public static function providerCollections() {
+  public static function providerCollections(): array {
     return [
       [StorageInterface::DEFAULT_COLLECTION],
       ['foo.bar'],

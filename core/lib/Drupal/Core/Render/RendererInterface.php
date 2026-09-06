@@ -62,14 +62,6 @@ interface RendererInterface {
   public function renderInIsolation(&$elements);
 
   /**
-   * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use
-   *   \Drupal\Core\Render\RendererInterface::renderInIsolation() instead.
-   *
-   * @see https://www.drupal.org/node/3407994
-   */
-  public function renderPlain(&$elements);
-
-  /**
    * Renders final HTML for a placeholder.
    *
    * Renders the placeholder in isolation.
@@ -123,6 +115,15 @@ interface RendererInterface {
    * know all of the assets (CSS and JavaScript) required by the rendered HTML,
    * and this must also bubble from child to parent. Therefore,
    * \Drupal\Core\Render\BubbleableMetadata includes that data as well.
+   *
+   * The first time RendererInterface::render() is called on an element tree,
+   * as each element in the tree is rendered, it is marked with a #printed flag
+   * and the rendered children of the element are cached. Subsequent calls to
+   * RendererInterface::render() will not traverse the child trees of elements
+   * again: they will just use the cached children. So if you want to hide an
+   * element, be sure to set element['#printed'] = TRUE before its parent
+   * tree is rendered for the first time, as it will have no effect on
+   * subsequent renderings of the parent tree.
    *
    * The process of rendering an element is recursive unless the element defines
    * an implemented theme hook in #theme. During each call to
@@ -241,24 +242,24 @@ interface RendererInterface {
    *   of overrides as the value in #theme_wrappers array.
    *   For example, if we have a render element as follows:
    *   @code
-   *   array(
+   *   [
    *     '#theme' => 'image',
-   *     '#attributes' => array('class' => array('foo')),
-   *     '#theme_wrappers' => array('container'),
-   *   );
+   *     '#attributes' => ['class' => ['foo']],
+   *     '#theme_wrappers' => ['container'],
+   *   ];
    *   @endcode
    *   and we need to pass the class 'bar' as an attribute for 'container', we
    *   can rewrite our element thus:
    *   @code
-   *   array(
+   *   [
    *     '#theme' => 'image',
-   *     '#attributes' => array('class' => array('foo')),
-   *     '#theme_wrappers' => array(
-   *       'container' => array(
-   *         '#attributes' => array('class' => array('bar')),
-   *       ),
-   *     ),
-   *   );
+   *     '#attributes' => ['class' => ['foo']],
+   *     '#theme_wrappers' => [
+   *       'container' => [
+   *         '#attributes' => ['class' => ['bar']],
+   *       ],
+   *     ],
+   *   ];
    *    @endcode
    * - If this element has an array of #post_render functions defined, they
    *   are called sequentially to modify the rendered #children. Unlike
@@ -319,11 +320,8 @@ interface RendererInterface {
    *
    * @param array $elements
    *   The structured array describing the data to be rendered.
-   * @param bool $is_root_call
-   *   (Internal use only.) Whether this is a recursive call or not. See
-   *   ::renderRoot().
    *
-   * @return \Drupal\Component\Render\MarkupInterface
+   * @return \Drupal\Component\Render\MarkupInterface|string
    *   The rendered HTML.
    *
    * @throws \LogicException
@@ -340,7 +338,7 @@ interface RendererInterface {
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
    * @see \Drupal\Core\Render\RendererInterface::renderRoot()
    */
-  public function render(&$elements, $is_root_call = FALSE);
+  public function render(array &$elements);
 
   /**
    * Checks whether a render context is active.

@@ -6,12 +6,14 @@ namespace Drupal\Tests\datetime\Kernel\Views;
 
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Drupal\datetime\Plugin\views schemas.
- *
- * @group datetime
  */
+#[Group('datetime')]
+#[RunTestsInSeparateProcesses]
 class DateTimeSchemaTest extends DateTimeHandlerTestBase {
 
   use SchemaCheckTestTrait;
@@ -24,7 +26,7 @@ class DateTimeSchemaTest extends DateTimeHandlerTestBase {
   /**
    * Tests argument plugin schema.
    */
-  public function testDateTimeSchema() {
+  public function testDateTimeSchema(): void {
     // Test argument schema.
     $view = Views::getView('test_argument_datetime');
     $view->initHandlers();

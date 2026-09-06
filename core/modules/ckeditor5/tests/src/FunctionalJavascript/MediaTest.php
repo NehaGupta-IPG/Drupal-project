@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
-use Drupal\Core\Entity\Entity\EntityViewDisplay;
-use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\field\Entity\FieldConfig;
@@ -15,22 +13,40 @@ use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\media\Entity\Media;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use Symfony\Component\Validator\ConstraintViolation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
-// cspell:ignore alternatif hurlant layercake tatou texte zartan
-
+// cspell:ignore alternatif drupalelementstyle hurlant layercake tatou texte
+// cspell:ignore zartan
 /**
- * @coversDefaultClass \Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media
- * @group ckeditor5
- * @group #slow
+ * Tests Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media.
+ *
  * @internal
  */
+#[CoversClass(\Drupal\ckeditor5\Plugin\CKEditor5Plugin\Media::class)]
+#[Group('ckeditor5')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class MediaTest extends MediaTestBase {
+
+  /**
+   * Tests the drupal-media tag.
+   */
+  public function testDrupalMedia(): void {
+    $this->testConversion();
+    $this->testOnlyDrupalMediaTagProcessed();
+    $this->testEditableCaption();
+    $this->testAlignment();
+    $this->testAlt();
+    $this->testMediaSplitList();
+  }
 
   /**
    * Tests that `<drupal-media>` is converted into a block element.
    */
-  public function testConversion() {
+  protected function testConversion(): void {
     // Wrap the `<drupal-media>` markup in a `<p>`.
     $original_value = $this->host->body->value;
     $this->host->body->value = '<p>foo' . $original_value . '</p>';
@@ -50,7 +66,7 @@ class MediaTest extends MediaTestBase {
    *
    * @see \Drupal\Tests\media\Kernel\MediaEmbedFilterTest::testOnlyDrupalMediaTagProcessed()
    */
-  public function testOnlyDrupalMediaTagProcessed() {
+  protected function testOnlyDrupalMediaTagProcessed(): void {
     $original_value = $this->host->body->value;
     $this->host->body->value = str_replace('drupal-media', 'p', $original_value);
     $this->host->save();
@@ -75,7 +91,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests adding media to a list does not split the list.
    */
-  public function testMediaSplitList() {
+  protected function testMediaSplitList(): void {
     $assert_session = $this->assertSession();
 
     $editor = Editor::load('test_format');
@@ -86,6 +102,7 @@ class MediaTest extends MediaTestBase {
       'properties' => [
         'reversed' => FALSE,
         'startIndex' => FALSE,
+        'styles' => FALSE,
       ],
       'multiBlock' => TRUE,
     ];
@@ -104,7 +121,7 @@ class MediaTest extends MediaTestBase {
     $filter_format->save();
 
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -136,7 +153,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests that arbitrary attributes are allowed via GHS.
    */
-  public function testMediaArbitraryHtml() {
+  public function testMediaArbitraryHtml(): void {
     $assert_session = $this->assertSession();
 
     $editor = Editor::load('test_format');
@@ -158,7 +175,7 @@ class MediaTest extends MediaTestBase {
     ]);
     $filter_format->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -193,7 +210,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests caption editing in the CKEditor widget.
    */
-  public function testEditableCaption() {
+  protected function testEditableCaption(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
     // Test that setting caption to blank string doesn't break 'Edit media'
@@ -319,7 +336,7 @@ class MediaTest extends MediaTestBase {
     $this->assertNotEmpty($assert_session->waitForElement('css', '.drupal-media figcaption.ck-editor__nested-editable'));
     $this->pressEditorButton('Link');
     $this->assertVisibleBalloon('.ck-link-form');
-    $link_input = $page->find('css', '.ck-balloon-panel .ck-link-form input[type=text]');
+    $link_input = $page->find('css', '.ck-balloon-panel .ck-link-form input[type=text][inputmode=url]');
     $link_input->setValue('https://example.com');
     $page->find('css', '.ck-balloon-panel .ck-link-form button[type=submit]')->click();
     $this->assertNotEmpty($assert_session->waitForElement('css', '.drupal-media figcaption > a'));
@@ -362,7 +379,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests the CKEditor 5 media plugin can override image media's alt attribute.
    */
-  public function testAlt() {
+  protected function testAlt(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
     $this->drupalGet($this->host->toUrl('edit-form'));
@@ -383,7 +400,7 @@ class MediaTest extends MediaTestBase {
     $this->getBalloonButton('Override media image alternative text')->click();
     $this->assertVisibleBalloon('.ck-media-alternative-text-form');
     // Assert that the default alt text is visible in the UI.
-    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form__default-alt-text-value', 'default alt');
+    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form .ck-labeled-field-view__status', 'Leave blank to use the default alternative text: "default alt".');
     // Assert that the value is currently empty.
     $alt_override_input = $page->find('css', '.ck-balloon-panel .ck-media-alternative-text-form input[type=text]');
     $this->assertSame('', $alt_override_input->getValue());
@@ -413,7 +430,7 @@ class MediaTest extends MediaTestBase {
     $alt_override_input = $page->find('css', '.ck-balloon-panel .ck-media-alternative-text-form input[type=text]');
     $this->assertSame($who_is_zartan, $alt_override_input->getValue());
     // Assert that the default alt text is still visible in the UI.
-    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form__default-alt-text-value', 'default alt');
+    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form .ck-labeled-field-view__status', 'Leave blank to use the default alternative text: "default alt".');
 
     // Test the process again with a different alt text to make sure it works
     // the second time around.
@@ -456,6 +473,9 @@ class MediaTest extends MediaTestBase {
     // media item.
     $this->getBalloonButton('Override media image alternative text')->click();
     $this->assertVisibleBalloon('.ck-media-alternative-text-form');
+    // The 'decorative image' toggle is enabled because the alt was set to `""`.
+    // Set the toggle to "off" to override the alt text value.
+    $page->pressButton('Decorative image');
     $alt_override_input = $page->find('css', '.ck-balloon-panel .ck-media-alternative-text-form input[type=text]');
     $alt_override_input->setValue('');
     $this->getBalloonButton('Save')->click();
@@ -469,7 +489,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests the CKEditor 5 media plugin loads the translated alt attribute.
    */
-  public function testTranslationAlt() {
+  public function testTranslationAlt(): void {
     \Drupal::service('module_installer')->install(['language', 'content_translation']);
     $this->resetAll();
     ConfigurableLanguage::createFromLangcode('fr')->save();
@@ -545,7 +565,7 @@ class MediaTest extends MediaTestBase {
     // Assert that the default alt on the UI is the default alt text from the
     // media entity.
     // cSpell:disable-next-line
-    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form__default-alt-text-value', 'texte alternatif par dÃ©faut');
+    $assert_session->elementTextEquals('css', '.ck-media-alternative-text-form .ck-labeled-field-view__status', 'Leave blank to use the default alternative text: "texte alternatif par dÃ©faut".');
 
     // Fill in the alt field in the balloon form.
     // cSpell:disable-next-line
@@ -559,7 +579,7 @@ class MediaTest extends MediaTestBase {
     $this->assertNotEmpty($assert_session->waitForElementVisible('xpath', '//img[contains(@alt, "' . $qui_est_zartan . '")]'));
     $this->getSession()->switchToIFrame();
     $page->pressButton('Save');
-    $assert_session->elementExists('xpath', '//img[contains(@alt, "' . $qui_est_zartan . '")]');
+    $this->assertNotEmpty($assert_session->waitForElementVisible('xpath', '//img[contains(@alt, "' . $qui_est_zartan . '")]'));
   }
 
   /**
@@ -569,7 +589,7 @@ class MediaTest extends MediaTestBase {
    * the media style toolbar allows altering the alignment and that the changes
    * are reflected on the widget and downcast drupal-media tag.
    */
-  public function testAlignment() {
+  protected function testAlignment(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->drupalGet($this->host->toUrl('edit-form'));
@@ -580,7 +600,7 @@ class MediaTest extends MediaTestBase {
     // Ensure that by default the "Break text" alignment option is selected.
     $this->click('.ck-widget.drupal-media');
     $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
-    $this->assertTrue(($align_button = $this->getBalloonButton('Break text'))->hasClass('ck-on'));
+    $this->assertTrue($this->getBalloonButton('Break text')->hasClass('ck-on'));
     $editor_dom = $this->getEditorDataAsDom();
     $drupal_media_element = $editor_dom->getElementsByTagName('drupal-media')
       ->item(0);
@@ -595,7 +615,8 @@ class MediaTest extends MediaTestBase {
     $this->assertEquals('center', $drupal_media_element->getAttribute('data-align'));
 
     $page->pressButton('Save');
-    // Check that the 'content has been updated' message status appears to confirm we left the editor.
+    // Check that the 'content has been updated' message status appears to
+    // confirm we left the editor.
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.messages.messages--status'));
     // Check that the class is correct in the front end.
     $assert_session->elementExists('css', 'figure.align-center');
@@ -620,7 +641,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Ensures that Drupal Media Styles can be displayed in a dropdown.
    */
-  public function testDrupalMediaStyleInDropdown() {
+  public function testDrupalMediaStyleInDropdown(): void {
     \Drupal::service('module_installer')->install(['ckeditor5_drupalelementstyle_test']);
     $this->resetAll();
 
@@ -657,7 +678,7 @@ class MediaTest extends MediaTestBase {
   /**
    * Tests Drupal Media Style with a CSS class.
    */
-  public function testDrupalMediaStyleWithClass() {
+  public function testDrupalMediaStyleWithClass(): void {
     $editor = Editor::load('test_format');
     $editor->setSettings([
       'toolbar' => [
@@ -695,7 +716,7 @@ class MediaTest extends MediaTestBase {
     $editor->save();
 
     $this->assertSame([], array_map(
-      function (ConstraintViolation $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -727,291 +748,13 @@ class MediaTest extends MediaTestBase {
     $assert_session->elementNotExists('css', '.ck-widget.drupal-media.arbitrary-class');
     $page->pressButton('Save');
 
-    // Check that the 'content has been updated' message status appears to confirm we left the editor.
+    // Check that the 'content has been updated' message status appears to
+    // confirm we left the editor.
     $assert_session->waitForElementVisible('css', 'messages messages--status');
 
     // Ensure that the class is correct in the front end.
     $assert_session->elementExists('css', 'figure.layercake-side');
     $assert_session->elementNotExists('css', 'figure.arbitrary-class');
-  }
-
-  /**
-   * Tests view mode integration.
-   *
-   * Tests that view mode is reflected onto the CKEditor 5 Widget wrapper, that
-   * the media style toolbar allows changing the view mode and that the changes
-   * are reflected on the widget and downcast drupal-media tag.
-   *
-   * @dataProvider providerTestViewMode
-   */
-  public function testViewMode(bool $with_alignment) {
-    EntityViewMode::create([
-      'id' => 'media.view_mode_3',
-      'targetEntityType' => 'media',
-      'status' => TRUE,
-      'enabled' => TRUE,
-      'label' => 'View Mode 3',
-    ])->save();
-    EntityViewMode::create([
-      'id' => 'media.view_mode_4',
-      'targetEntityType' => 'media',
-      'status' => TRUE,
-      'enabled' => TRUE,
-      'label' => 'View Mode 4',
-    ])->save();
-    // Enable view mode 1, 2, 4 for Image.
-    EntityViewDisplay::create([
-      'id' => 'media.image.view_mode_4',
-      'targetEntityType' => 'media',
-      'status' => TRUE,
-      'bundle' => 'image',
-      'mode' => 'view_mode_4',
-    ])->save();
-
-    $filter_format = FilterFormat::load('test_format');
-    $filter_format->setFilterConfig('media_embed', [
-      'status' => TRUE,
-      'settings' => [
-        'default_view_mode' => 'view_mode_1',
-        'allowed_media_types' => [],
-        'allowed_view_modes' => [
-          'view_mode_1' => 'view_mode_1',
-          '22222' => '22222',
-          'view_mode_3' => 'view_mode_3',
-        ],
-      ],
-    ])->save();
-
-    if (!$with_alignment) {
-      $filter_format->filters('filter_align')->setConfiguration(array_merge($filter_format->filters('filter_align')->getConfiguration(), ['status' => FALSE]));
-    }
-
-    // Test that view mode dependencies are returned from the MediaEmbed
-    // filter's ::getDependencies() method.
-    $expected_config_dependencies = [
-      'core.entity_view_mode.media.view_mode_1',
-      'core.entity_view_mode.media.22222',
-      'core.entity_view_mode.media.view_mode_3',
-    ];
-
-    $dependencies = $filter_format->getDependencies();
-    $this->assertArrayHasKey('config', $dependencies);
-    $this->assertEqualsCanonicalizing($expected_config_dependencies, $dependencies['config']);
-    $assert_session = $this->assertSession();
-    $page = $this->getSession()->getPage();
-    $this->drupalGet($this->host->toUrl('edit-form'));
-    $this->waitForEditor();
-    // Wait for the media preview to load.
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-widget.drupal-media img'));
-    $this->click('.ck-widget.drupal-media');
-    $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
-    // Check that there is no data-view-mode set after embedding media.
-    $editor_dom = $this->getEditorDataAsDom();
-    $drupal_media_element = $editor_dom->getElementsByTagName('drupal-media')
-      ->item(0);
-    $this->assertFalse($drupal_media_element->hasAttribute('data-view-mode'));
-    $this->click('.ck-widget.drupal-media');
-    $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
-    $this->getBalloonButton('View Mode 1')->click();
-
-    // Set view mode.
-    $this->getBalloonButton('View Mode 2 has Numeric ID')->click();
-    $editor_dom = $this->getEditorDataAsDom();
-    // Check that “data-view-mode” exists inside source editing.
-    $drupal_media_element = $editor_dom->getElementsByTagName('drupal-media')
-      ->item(0);
-    $this->assertEquals('22222', $drupal_media_element->getAttribute('data-view-mode'));
-
-    // Check that toolbar matches current view mode.
-    $dropdown_button = $page->find('css', 'button.ck-dropdown__button > span.ck-button__label');
-    $this->assertEquals('View Mode 2 has Numeric ID', $dropdown_button->getText());
-    // Enter source mode.
-    $this->pressEditorButton('Source');
-    // Leave source mode to force CKEditor 5 to upcast again to check data
-    // persistence.
-    $this->pressEditorButton('Source');
-    $this->click('.ck-widget.drupal-media');
-    $dropdown_button = $page->find('css', 'button.ck-dropdown__button > span.ck-button__label');
-    // Check that view mode 2 persisted.
-    $this->assertEquals('View Mode 2 has Numeric ID', $dropdown_button->getText());
-
-    // Check that selecting a caption that is the child of a drupal-media will
-    // inherit the drupalElementStyle of its parent element.
-    $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
-    $this->getBalloonButton('Toggle caption off')->click();
-    $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
-    // Select the caption by toggling it on.
-    $this->getBalloonButton('Toggle caption on')->click();
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.drupal-media figcaption'));
-    // Ensure that the media contextual toolbar is visible after toggling
-    // caption on.
-    $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
-    $dropdown_button = $page->find('css', 'button.ck-dropdown__button > span.ck-button__label');
-    $this->assertEquals('View Mode 2 has Numeric ID', $dropdown_button->getText());
-
-    // Remove the current view mode by setting it to Default.
-    $this->click('.ck-widget.drupal-media');
-    $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
-    $this->getBalloonButton('View Mode 2 has Numeric ID')->click();
-    // Unset view mode.
-    $this->getBalloonButton('View Mode 1')->click();
-    $this->waitForEditor();
-    $editor_dom = $this->getEditorDataAsDom();
-    $drupal_media_element = $editor_dom->getElementsByTagName('drupal-media')
-      ->item(0);
-    // Test that setting the view mode back to the default removes the
-    // `data-view-mode` attribute.
-    $this->assertFalse($drupal_media_element->hasAttribute('data-view-mode'));
-    $assert_session->elementExists('css', 'article.media--view-mode-view-mode-1');
-
-    // Check that the toolbar status matches "no view mode".
-    $dropdown_button = $page->find('css', 'button.ck-dropdown__button > span.ck-button__label');
-    $this->assertEquals('View Mode 1', $dropdown_button->getText());
-
-    // Test that setting the allowed_view_modes option to only one option hides
-    // the field (it requires more than one option).
-    $filter_format->setFilterConfig('media_embed', [
-      'status' => TRUE,
-      'settings' => [
-        'default_view_mode' => 'view_mode_1',
-        'allowed_media_types' => [],
-        'allowed_view_modes' => [
-          'view_mode_1' => 'view_mode_1',
-        ],
-      ],
-    ])->save();
-
-    // Test that the dependencies change when the allowed_view_modes change.
-    $dependencies = $filter_format->getDependencies();
-    $this->assertArrayHasKey('config', $dependencies);
-    $this->assertSame(['core.entity_view_mode.media.view_mode_1'], $dependencies['config']);
-    // Reload page to get new configuration.
-    $this->getSession()->reload();
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-widget.drupal-media img'));
-    $this->click('.ck-widget.drupal-media');
-    // Check that view mode dropdown is gone because there is only one option.
-    $this->assertEmpty($assert_session->waitForElementVisible('css', '.ck.ck-dropdown', 1000));
-    $editor_dom = $this->getEditorDataAsDom();
-    $drupal_media_element = $editor_dom->getElementsByTagName('drupal-media')
-      ->item(0);
-    $this->assertFalse($drupal_media_element->hasAttribute('data-view-mode'));
-    $assert_session->waitForElement('css', 'article.media--view-mode-view-mode-1');
-
-    // Test that setting allowed_view_modes back to two items restores the
-    // field.
-    $filter_format->setFilterConfig('media_embed', [
-      'status' => TRUE,
-      'settings' => [
-        'default_view_mode' => 'view_mode_1',
-        'allowed_media_types' => [],
-        'allowed_view_modes' => [
-          'view_mode_1' => 'view_mode_1',
-          '22222' => '22222',
-        ],
-      ],
-    ])->save();
-
-    // Test that the dependencies change when the allowed_view_modes change.
-    $expected_config_dependencies = [
-      'core.entity_view_mode.media.view_mode_1',
-      'core.entity_view_mode.media.22222',
-    ];
-    $dependencies = $filter_format->getDependencies();
-    $this->assertArrayHasKey('config', $dependencies);
-    $this->assertEqualsCanonicalizing($expected_config_dependencies, $dependencies['config']);
-    // Reload page to get new configuration.
-    $this->getSession()->reload();
-    $this->waitForEditor();
-
-    // Test that changing the view mode with an empty editable caption
-    // preserves the empty editable caption when the preview reloads.
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.drupal-media figcaption'));
-    $original_value = $this->host->body->value;
-    $this->host->body->value = str_replace('data-caption="baz"', '', $original_value);
-    $this->host->save();
-    $this->getSession()->reload();
-    $this->waitForEditor();
-    $assert_session->elementExists('css', 'article.media--view-mode-view-mode-1');
-
-    $this->assertEmpty($assert_session->waitForElementVisible('css', '.drupal-media figcaption'));
-    $this->click('.ck-widget.drupal-media');
-    $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
-    $this->getBalloonButton('View Mode 1')->click();
-    $this->getBalloonButton('View Mode 2 has Numeric ID')->click();
-    $assert_session->waitForElement('css', 'article.media--view-mode-_2222');
-    $this->assertEmpty($assert_session->waitForElementVisible('css', '.drupal-media figcaption'));
-
-    // Test that a media with no view modes configured will be
-    // set to the default view mode.
-    $filter_format->setFilterConfig('media_embed', [
-      'status' => TRUE,
-      'settings' => [
-        'default_view_mode' => 'view_mode_1',
-        'allowed_media_types' => [],
-        'allowed_view_modes' => [],
-      ],
-    ])->save();
-    $dependencies = $filter_format->getDependencies();
-    $this->assertArrayHasKey('config', $dependencies);
-    $this->assertSame(['core.entity_view_mode.media.view_mode_1'], $dependencies['config']);
-    $this->host->body->value = '<drupal-media data-caption="armadillo" data-entity-type="media" data-entity-uuid="' . $this->mediaFile->uuid() . '"></drupal-media>';
-    $this->host->save();
-    // Reload page to get new configuration.
-    $this->getSession()->reload();
-    $this->waitForEditor();
-    $assert_session->waitForElementVisible('css', 'article.media--view-mode-view-mode-1');
-
-    // Test that having a default_view_mode that is not an allowed_view_mode
-    // will still be added to the editor.
-    $filter_format->setFilterConfig('media_embed', [
-      'status' => TRUE,
-      'settings' => [
-        'default_view_mode' => 'view_mode_1',
-        'allowed_media_types' => [],
-        'allowed_view_modes' => [
-          '22222' => '22222',
-          'view_mode_4' => 'view_mode_4',
-        ],
-      ],
-    ])->save();
-
-    // Test that the dependencies change when the allowed_view_modes change.
-    $expected_config_dependencies = [
-      'core.entity_view_mode.media.22222',
-      'core.entity_view_mode.media.view_mode_1',
-      'core.entity_view_mode.media.view_mode_4',
-    ];
-    $dependencies = $filter_format->getDependencies();
-    $this->assertArrayHasKey('config', $dependencies);
-    $this->assertEqualsCanonicalizing($expected_config_dependencies, $dependencies['config']);
-    $this->host->body->value = '<drupal-media data-entity-type="media" data-entity-uuid="' . $this->media->uuid() . '" data-caption="baz"></drupal-media>';
-    $this->host->save();
-    // Reload page to get new configuration.
-    $this->getSession()->reload();
-    $this->waitForEditor();
-    // Wait for the media preview to load.
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-widget.drupal-media img'));
-    $this->click('.ck-widget.drupal-media');
-    $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
-
-    $this->assertNotEmpty($dropdown = $this->getBalloonButton('View Mode 1'));
-    $dropdown->click();
-
-    // Check that all three view modes exist including the default view mode
-    // that was not originally included in the allowed_view_modes.
-    $this->assertNotEmpty($this->getBalloonButton('View Mode 1'));
-    $this->assertNotEmpty($this->getBalloonButton('View Mode 2 has Numeric ID'));
-    $this->assertNotEmpty($this->getBalloonButton('View Mode 4'));
-  }
-
-  /**
-   * For testing view modes in different scenarios.
-   */
-  public static function providerTestViewMode(): array {
-    return [
-      'with alignment' => [TRUE],
-      'without alignment' => [FALSE],
-    ];
   }
 
 }

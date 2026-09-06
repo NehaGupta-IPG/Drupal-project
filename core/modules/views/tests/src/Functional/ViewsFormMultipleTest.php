@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests a page with multiple Views forms.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewsFormMultipleTest extends ViewTestBase {
 
   /**
@@ -48,7 +51,7 @@ class ViewsFormMultipleTest extends ViewTestBase {
   /**
    * Tests the a page with multiple View forms in it.
    */
-  public function testViewsFormMultiple() {
+  public function testViewsFormMultiple(): void {
     // Get the test page.
     $this->drupalGet('views_test_form_multiple');
 

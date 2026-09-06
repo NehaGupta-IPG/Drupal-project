@@ -5,25 +5,27 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that blocks are not added to hidden regions on theme installation.
- *
- * @group block
  */
+#[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockHiddenRegionTest extends BrowserTestBase {
 
   /**
    * An administrative user to configure the test environment.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $modules = ['block', 'block_test', 'search'];
+  protected static $modules = ['block', 'block_test'];
 
   /**
    * {@inheritdoc}
@@ -40,22 +42,21 @@ class BlockHiddenRegionTest extends BrowserTestBase {
     $this->adminUser = $this->drupalCreateUser([
       'administer blocks',
       'administer themes',
-      'search content',
     ]);
 
     $this->drupalLogin($this->adminUser);
-    $this->drupalPlaceBlock('search_form_block');
+    $this->drupalPlaceBlock('test_form_in_block');
     $this->drupalPlaceBlock('local_tasks_block');
   }
 
   /**
    * Tests that hidden regions do not inherit blocks when a theme is installed.
    */
-  public function testBlockNotInHiddenRegion() {
+  public function testBlockNotInHiddenRegion(): void {
 
-    // Ensure that the search form block is displayed.
+    // Ensure that the test_form_in_block form block is displayed.
     $this->drupalGet('');
-    $this->assertSession()->pageTextContains('Search');
+    $this->assertSession()->pageTextContains('Your .com email address.');
 
     // Install "block_test_theme" and set it as the default theme.
     $theme = 'block_test_theme';
@@ -73,9 +74,9 @@ class BlockHiddenRegionTest extends BrowserTestBase {
     $this->drupalGet('admin/structure/block');
     $this->assertSession()->pageTextContains('Block test theme');
 
-    // Ensure that the search form block is displayed.
+    // Ensure that the test_form_in_block form block is displayed.
     $this->drupalGet('');
-    $this->assertSession()->pageTextContains('Search');
+    $this->assertSession()->pageTextContains('Your .com email address.');
   }
 
 }

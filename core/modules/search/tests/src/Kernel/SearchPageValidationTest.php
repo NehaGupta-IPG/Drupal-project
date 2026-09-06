@@ -8,18 +8,24 @@ use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\search\Entity\SearchPage;
 use Drupal\search\Plugin\Derivative\SearchLocalTask;
 use Drupal\search\SearchPageRepository;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of search_page entities.
- *
- * @group search
  */
+#[Group('search')]
+#[Group('config')]
+#[Group('Validation')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class SearchPageValidationTest extends ConfigEntityValidationTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['search', 'user'];
+  protected static $modules = ['search', 'search_user', 'user'];
 
   /**
    * {@inheritdoc}
@@ -30,6 +36,7 @@ class SearchPageValidationTest extends ConfigEntityValidationTestBase {
     $this->entity = SearchPage::create([
       'id' => 'test',
       'label' => 'Test',
+      'path' => 'test',
       'plugin' => 'user_search',
     ]);
     $this->entity->save();

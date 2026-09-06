@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Form\FormState;
 use Drupal\views\Plugin\views\area\Broken as BrokenArea;
 use Drupal\views\Plugin\views\field\Broken as BrokenField;
@@ -12,12 +11,15 @@ use Drupal\views\Plugin\views\filter\Broken as BrokenFilter;
 use Drupal\views\Plugin\views\filter\Standard;
 use Drupal\views\Plugin\views\ViewsHandlerInterface;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests basic functions from the Views module.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ModuleTest extends ViewsKernelTestBase {
 
   /**
@@ -28,27 +30,16 @@ class ModuleTest extends ViewsKernelTestBase {
   public static $testViews = ['test_view_status', 'test_view', 'test_argument'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field', 'user', 'block'];
-
-  /**
-   * Stores the last triggered error.
-   *
-   * @var string
-   *
-   * @see \Drupal\views\Tests\ModuleTest::errorHandler()
-   */
-  protected $lastErrorMessage;
 
   /**
    * Tests the  ViewsHandlerManager::getHandler() method.
    *
    * @see \Drupal\views\Plugin\ViewsHandlerManager::getHandler()
    */
-  public function testViewsGetHandler() {
+  public function testViewsGetHandler(): void {
     $types = [
       'field' => BrokenField::class,
       'area' => BrokenArea::class,
@@ -80,7 +71,7 @@ class ModuleTest extends ViewsKernelTestBase {
         $this->assertEquals($description_bottom, $form['description']['description_bottom']['#markup']);
         $details = [];
         foreach ($item as $key => $value) {
-          $details[] = new FormattableMarkup('@key: @value', ['@key' => $key, '@value' => $value]);
+          $details[] = "$key: $value";
         }
         $this->assertEquals($details, $form['description']['detail_list']['#items']);
       }
@@ -116,20 +107,12 @@ class ModuleTest extends ViewsKernelTestBase {
   /**
    * Tests the load wrapper/helper functions.
    */
-  public function testLoadFunctions() {
+  public function testLoadFunctions(): void {
     $this->enableModules(['text', 'node']);
     $this->installEntitySchema('node');
     $this->installConfig(['node']);
     $storage = $this->container->get('entity_type.manager')->getStorage('view');
 
-    // Test views_view_is_enabled/disabled.
-    $archive = $storage->load('archive');
-    $this->assertTrue(views_view_is_disabled($archive), 'views_view_is_disabled works as expected.');
-    // Enable the view and check this.
-    $archive->enable();
-    $this->assertTrue(views_view_is_enabled($archive), ' views_view_is_enabled works as expected.');
-
-    // We can store this now, as we have enabled/disabled above.
     $all_views = $storage->loadMultiple();
 
     // Test Views::getAllViews().
@@ -138,13 +121,13 @@ class ModuleTest extends ViewsKernelTestBase {
 
     // Test Views::getEnabledViews().
     $expected_enabled = array_filter($all_views, function ($view) {
-      return views_view_is_enabled($view);
+      return $view->status();
     });
     $this->assertEquals(array_keys($expected_enabled), array_keys(Views::getEnabledViews()), 'Expected enabled views returned.');
 
     // Test Views::getDisabledViews().
-    $expected_disabled = array_filter($all_views, function ($view) {
-      return views_view_is_disabled($view);
+    $expected_disabled = array_filter($all_views, function ($view): bool {
+      return !$view->status();
     });
     $this->assertEquals(array_keys($expected_disabled), array_keys(Views::getDisabledViews()), 'Expected disabled views returned.');
 
@@ -170,9 +153,11 @@ class ModuleTest extends ViewsKernelTestBase {
     $this->assertSame(array_keys($all_views_sorted), array_keys(Views::getViewsAsOptions(TRUE, 'all', NULL, FALSE, TRUE)), 'All view id keys returned in expected sort order');
 
     // Test $exclude_view parameter.
-    $this->assertArrayNotHasKey('archive', Views::getViewsAsOptions(TRUE, 'all', 'archive'));
-    $this->assertArrayNotHasKey('archive:default', Views::getViewsAsOptions(FALSE, 'all', 'archive:default'));
-    $this->assertArrayNotHasKey('archive', Views::getViewsAsOptions(TRUE, 'all', $archive->getExecutable()));
+    $promoted_content = $storage->load('promoted_content');
+    $promoted_content->enable();
+    $this->assertArrayNotHasKey('promoted_content', Views::getViewsAsOptions(TRUE, 'all', 'promoted_content'));
+    $this->assertArrayNotHasKey('promoted_content:default', Views::getViewsAsOptions(FALSE, 'all', 'promoted_content:default'));
+    $this->assertArrayNotHasKey('promoted_content', Views::getViewsAsOptions(TRUE, 'all', $promoted_content->getExecutable()));
 
     // Test the $opt_group parameter.
     $expected_opt_groups = [];
@@ -185,26 +170,9 @@ class ModuleTest extends ViewsKernelTestBase {
   }
 
   /**
-   * Tests view enable and disable procedural wrapper functions.
-   */
-  public function testStatusFunctions() {
-    $view = Views::getView('test_view_status')->storage;
-
-    $this->assertFalse($view->status(), 'The view status is disabled.');
-
-    views_enable_view($view);
-    $this->assertTrue($view->status(), 'A view has been enabled.');
-    $this->assertEquals(views_view_is_enabled($view), $view->status(), 'views_view_is_enabled is correct.');
-
-    views_disable_view($view);
-    $this->assertFalse($view->status(), 'A view has been disabled.');
-    $this->assertEquals(views_view_is_disabled($view), !$view->status(), 'views_view_is_disabled is correct.');
-  }
-
-  /**
    * Tests the \Drupal\views\Views::fetchPluginNames() method.
    */
-  public function testViewsFetchPluginNames() {
+  public function testViewsFetchPluginNames(): void {
     // All style plugins should be returned, as we have not specified a type.
     $plugins = Views::fetchPluginNames('style');
     $definitions = $this->container->get('plugin.manager.views.style')->getDefinitions();
@@ -228,7 +196,7 @@ class ModuleTest extends ViewsKernelTestBase {
   /**
    * Tests the \Drupal\views\Views::pluginList() method.
    */
-  public function testViewsPluginList() {
+  public function testViewsPluginList(): void {
     $plugin_list = Views::pluginList();
     // Only plugins used by 'test_view' should be in the plugin list.
     foreach (['display:default', 'pager:none'] as $key) {
@@ -248,7 +216,8 @@ class ModuleTest extends ViewsKernelTestBase {
   /**
    * Tests views.module: views_embed_view().
    */
-  public function testViewsEmbedView() {
+  #[IgnoreDeprecations]
+  public function testViewsEmbedView(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -276,7 +245,7 @@ class ModuleTest extends ViewsKernelTestBase {
   /**
    * Tests the \Drupal\views\ViewsExecutable::preview() method.
    */
-  public function testViewsPreview() {
+  public function testViewsPreview(): void {
     $view = Views::getView('test_argument');
     $result = $view->preview('default');
     $this->assertCount(5, $result['#view']->result);
@@ -324,7 +293,7 @@ class ModuleTest extends ViewsKernelTestBase {
    * @return array
    *   A formatted options array that matches the expected output.
    */
-  protected function formatViewOptions(array $views = []) {
+  protected function formatViewOptions(array $views = []): array {
     $expected_options = [];
     foreach ($views as $view) {
       foreach ($view->get('display') as $display) {

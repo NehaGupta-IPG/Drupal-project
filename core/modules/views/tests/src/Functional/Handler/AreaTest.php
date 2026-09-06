@@ -6,14 +6,17 @@ namespace Drupal\Tests\views\Functional\Handler;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the plugin base of the area handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\area\AreaPluginBase
  * @see \Drupal\views_test\Plugin\views\area\TestExample
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaTest extends ViewTestBase {
 
   /**
@@ -24,9 +27,7 @@ class AreaTest extends ViewTestBase {
   public static $testViews = ['test_example_area'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views_ui'];
 
@@ -44,6 +45,9 @@ class AreaTest extends ViewTestBase {
     $this->enableViewsTestModule();
   }
 
+  /**
+   * Provides additional Views data for testing.
+   */
   protected function viewsData() {
     $data = parent::viewsData();
     $data['views']['test_example'] = [
@@ -60,7 +64,7 @@ class AreaTest extends ViewTestBase {
   /**
    * Tests the generic UI of an area handler.
    */
-  public function testUI() {
+  public function testUI(): void {
     $admin_user = $this->drupalCreateUser([
       'administer views',
       'administer site configuration',
@@ -96,7 +100,7 @@ class AreaTest extends ViewTestBase {
   /**
    * Tests global tokens.
    */
-  public function testRenderAreaToken() {
+  public function testRenderAreaToken(): void {
     $admin_user = $this->drupalCreateUser([
       'administer views',
       'administer site configuration',
@@ -138,8 +142,10 @@ class AreaTest extends ViewTestBase {
   /**
    * Tests overriding the view title using the area title handler.
    */
-  public function testTitleArea() {
-    $view = Views::getView('frontpage');
+  public function testTitleArea(): void {
+    // Enable the promoted_content view since it's disabled by default.
+    $view = Views::getView('promoted_content');
+    $view->storage->enable()->save();
     $view->initDisplay('page_1');
 
     // Add the title area handler to the empty area.
@@ -155,8 +161,8 @@ class AreaTest extends ViewTestBase {
       ],
     ]);
 
-    $view->storage->enable()->save();
-
+    $view->storage->save();
+    \Drupal::service('router.builder')->rebuild();
     $this->drupalGet('node');
     $this->assertSession()->pageTextContains('Overridden title');
   }

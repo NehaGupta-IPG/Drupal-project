@@ -7,12 +7,14 @@ namespace Drupal\Tests\system\Functional\Entity;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests creating entity reference fields in the UI.
- *
- * @group entity
  */
+#[Group('entity')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceFieldCreationTest extends BrowserTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -25,23 +27,19 @@ class EntityReferenceFieldCreationTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
-   */
-  protected bool $usesSuperUserAccessPolicy = TRUE;
-
-  /**
-   * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
   /**
    * Tests that entity reference fields cannot target entity types without IDs.
    */
-  public function testAddReferenceFieldTargetingEntityTypeWithoutId() {
-    $this->drupalLogin($this->rootUser);
+  public function testAddReferenceFieldTargetingEntityTypeWithoutId(): void {
+
     $node_type = $this->drupalCreateContentType()->id();
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer content types',
+      'administer node fields',
+    ]));
 
     // Entity types without an ID key should not be presented as options when
     // creating an entity reference field in the UI.
@@ -50,7 +48,7 @@ class EntityReferenceFieldCreationTest extends BrowserTestBase {
 
     // Trying to do it programmatically should raise an exception.
     $this->expectException('\Drupal\Core\Field\FieldException');
-    $this->expectExceptionMessage('Entity type "entity_test_no_id" has no ID key and cannot be targeted by entity reference field "test_reference_field"');
+    $this->expectExceptionMessageIs('Entity type "entity_test_no_id" has no ID key and cannot be targeted by entity reference field "test_reference_field"');
     $this->createEntityReferenceField('node', $node_type, 'test_reference_field', 'Test Field', 'entity_test_no_id');
   }
 

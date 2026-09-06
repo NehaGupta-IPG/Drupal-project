@@ -17,6 +17,10 @@ use Drupal\Core\TypedData\Plugin\DataType\ItemList;
  * properties. Note that even single-valued entity fields are represented as
  * list of field items, however for easy access to the contained item the entity
  * field delegates __get() and __set() calls directly to the first item.
+ *
+ * @template T of \Drupal\Core\Field\FieldItemInterface
+ * @extends \Drupal\Core\TypedData\Plugin\DataType\ItemList<T>
+ * @implements \Drupal\Core\Field\FieldItemListInterface<T>
  */
 class FieldItemList extends ItemList implements FieldItemListInterface {
 
@@ -149,7 +153,7 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
   /**
    * {@inheritdoc}
    */
-  public function access($operation = 'view', AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($operation = 'view', ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     $access_control_handler = \Drupal::entityTypeManager()->getAccessControlHandler($this->getEntity()->getEntityTypeId());
     return $access_control_handler->fieldAccess($operation, $this->getFieldDefinition(), $account, $this, $return_as_object);
   }
@@ -157,7 +161,7 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
   /**
    * {@inheritdoc}
    */
-  public function defaultAccess($operation = 'view', AccountInterface $account = NULL) {
+  public function defaultAccess($operation = 'view', ?AccountInterface $account = NULL) {
     // Grant access per default.
     return AccessResult::allowed();
   }
@@ -267,7 +271,10 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
     if ($cardinality != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
       $options['max'] = $cardinality;
       if ($label = $this->getFieldDefinition()->getLabel()) {
-        $options['maxMessage'] = $this->t('%name: this field cannot hold more than @count values.', ['%name' => $label, '@count' => $cardinality]);
+        $options['maxMessage'] = $this->t('%name: this field cannot hold more than @count values.', [
+          '%name' => $label,
+          '@count' => $cardinality,
+        ]);
       }
       $constraints[] = $this->getTypedDataManager()
         ->getValidationConstraintManager()

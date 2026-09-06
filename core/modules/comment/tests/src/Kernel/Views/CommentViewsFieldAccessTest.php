@@ -6,14 +6,16 @@ namespace Drupal\Tests\comment\Kernel\Views;
 
 use Drupal\comment\Entity\Comment;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\user\Entity\User;
 use Drupal\Tests\views\Kernel\Handler\FieldFieldAccessTestBase;
+use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests base field access in Views for the comment entity.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentViewsFieldAccessTest extends FieldFieldAccessTestBase {
 
   /**
@@ -34,7 +36,7 @@ class CommentViewsFieldAccessTest extends FieldFieldAccessTestBase {
   /**
    * Check access for comment fields.
    */
-  public function testCommentFields() {
+  public function testCommentFields(): void {
     $user = User::create([
       'name' => 'test user',
     ]);

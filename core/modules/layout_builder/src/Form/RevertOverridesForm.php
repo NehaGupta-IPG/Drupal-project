@@ -2,6 +2,7 @@
 
 namespace Drupal\layout_builder\Form;
 
+use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceDynamicSafeFormInterface;
@@ -76,7 +77,27 @@ class RevertOverridesForm extends ConfirmFormBase implements WorkspaceDynamicSaf
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to revert this to defaults?');
+    return $this->t('Revert to the default layout');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDescription() {
+    $default = $this->t('The layout will be reverted to its default state. All layout modifications and inline blocks will be reset.');
+    try {
+      $entity = $this->sectionStorage->getContextValue('entity');
+      if ($entity === NULL) {
+        return $default;
+      }
+      return $this->t("The layout for %label will be reverted to its default state. All layout modifications and inline blocks will be reset.", [
+        '%label' => $entity->label(),
+      ]);
+    }
+    catch (ContextException) {
+      // If the entity is not available, just return a generic message.
+      return $default;
+    }
   }
 
   /**
@@ -96,7 +117,7 @@ class RevertOverridesForm extends ConfirmFormBase implements WorkspaceDynamicSaf
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, SectionStorageInterface $section_storage = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?SectionStorageInterface $section_storage = NULL) {
     if (!$section_storage instanceof OverridesSectionStorageInterface) {
       throw new \InvalidArgumentException(sprintf('The section storage with type "%s" and ID "%s" does not provide overrides', $section_storage->getStorageType(), $section_storage->getStorageId()));
     }

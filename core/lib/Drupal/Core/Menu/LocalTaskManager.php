@@ -5,6 +5,7 @@ namespace Drupal\Core\Menu;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheCollectorInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
@@ -12,8 +13,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
-use Drupal\Core\Plugin\Discovery\YamlDiscovery;
-use Drupal\Core\Plugin\Factory\ContainerFactory;
+use Drupal\Core\Plugin\Discovery\YamlCacheCollectorDiscovery;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -51,27 +51,6 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
   ];
 
   /**
-   * An argument resolver object.
-   *
-   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface
-   */
-  protected $argumentResolver;
-
-  /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * The current route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
    * The plugin instances.
    *
    * @var array
@@ -86,56 +65,32 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
   protected $taskData;
 
   /**
-   * The route provider to load routes by name.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * The YAML cache collector.
    */
-  protected $routeProvider;
+  protected CacheCollectorInterface $yamlCacheCollector;
 
   /**
-   * The access manager.
-   *
-   * @var \Drupal\Core\Access\AccessManagerInterface
+   * Flag that indicates if local tasks are currently being loaded.
    */
-  protected $accessManager;
+  protected bool $loadingLocalTasks = FALSE;
 
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
-   * Constructs a \Drupal\Core\Menu\LocalTaskManager object.
-   *
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
-   *   An object to use in resolving route arguments.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request object to use for building titles and paths for plugin instances.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider to load routes by name.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
-   *   The access manager.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   */
-  public function __construct(ArgumentResolverInterface $argument_resolver, RequestStack $request_stack, RouteMatchInterface $route_match, RouteProviderInterface $route_provider, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, AccessManagerInterface $access_manager, AccountInterface $account) {
-    $this->factory = new ContainerFactory($this, '\Drupal\Core\Menu\LocalTaskInterface');
-    $this->argumentResolver = $argument_resolver;
-    $this->requestStack = $request_stack;
-    $this->routeMatch = $route_match;
-    $this->routeProvider = $route_provider;
-    $this->accessManager = $access_manager;
-    $this->account = $account;
+  public function __construct(
+    protected ArgumentResolverInterface $argumentResolver,
+    protected RequestStack $requestStack,
+    protected RouteMatchInterface $routeMatch,
+    protected RouteProviderInterface $routeProvider,
+    ModuleHandlerInterface $module_handler,
+    CacheBackendInterface $cache,
+    LanguageManagerInterface $language_manager,
+    protected AccessManagerInterface $accessManager,
+    protected AccountInterface $account,
+    ?CacheCollectorInterface $yaml_cache_collector = NULL,
+  ) {
+    if (!isset($yaml_cache_collector)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $yamlCacheCollector argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3593485', E_USER_DEPRECATED);
+      $yaml_cache_collector = \Drupal::service('local_task.yaml_cache_collector');
+    }
+    $this->yamlCacheCollector = $yaml_cache_collector;
     $this->moduleHandler = $module_handler;
     $this->alterInfo('local_tasks');
     $this->setCacheBackend($cache, 'local_task_plugins:' . $language_manager->getCurrentLanguage()->getId(), ['local_task']);
@@ -146,7 +101,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
    */
   protected function getDiscovery() {
     if (!isset($this->discovery)) {
-      $yaml_discovery = new YamlDiscovery('links.task', $this->moduleHandler->getModuleDirectories());
+      $yaml_discovery = new YamlCacheCollectorDiscovery('links.task', $this->moduleHandler->getModuleDirectories(), $this->yamlCacheCollector);
       $yaml_discovery->addTranslatableProperty('title', 'title_context');
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($yaml_discovery);
     }
@@ -223,8 +178,8 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
             }
             // Tabs that link to the current route are viable parents
             // and their parent and children should be visible also.
-            // @todo - this only works for 2 levels of tabs.
-            // instead need to iterate up.
+            // @todo This only works for 2 levels of tabs instead
+            //   need to iterate up.
             $parents[$plugin_id] = TRUE;
             if (!empty($task_info['parent_id'])) {
               $parents[$task_info['parent_id']] = TRUE;
@@ -343,15 +298,26 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
    * {@inheritdoc}
    */
   public function getLocalTasks($route_name, $level = 0) {
+
+    if ($this->loadingLocalTasks && \Fiber::getCurrent() !== NULL) {
+      // Primary and secondary task are rendered in separate blocks, each within
+      // their own fiber. Both call this method for a different level, but the
+      // data is built for both levels on the first call. If the first call
+      // gets suspended, for example due to an entity load in a URL access
+      // check, the second block will then call into this. If the data is
+      // already being built, and we're in a fiber, suspend once to allow the
+      // first fiber to complete building the data. If it is still not done,
+      // proceed anyway, which may build that information twice but will not
+      // return incomplete local task data.
+      \Fiber::suspend();
+    }
+
     if (!isset($this->taskData[$route_name])) {
+      $this->loadingLocalTasks = TRUE;
       $cacheability = new CacheableMetadata();
       $cacheability->addCacheContexts(['route']);
-      // Look for route-based tabs.
-      $this->taskData[$route_name] = [
-        'tabs' => [],
-        'cacheability' => $cacheability,
-      ];
 
+      // Look for route-based tabs.
       if (!$this->requestStack->getCurrentRequest()->attributes->has('exception')) {
         // Safe to build tasks only when no exceptions raised.
         $data = [];
@@ -359,11 +325,23 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
         foreach ($local_tasks as $tab_level => $items) {
           $data[$tab_level] = empty($data[$tab_level]) ? $items : array_merge($data[$tab_level], $items);
         }
-        $this->taskData[$route_name]['tabs'] = $data;
+        $this->taskData[$route_name] = [
+          'tabs' => $data,
+          'cacheability' => $cacheability,
+        ];
+
         // Allow modules to alter local tasks.
         $this->moduleHandler->alter('menu_local_tasks', $this->taskData[$route_name], $route_name, $cacheability);
         $this->taskData[$route_name]['cacheability'] = $cacheability;
       }
+      else {
+        $this->taskData[$route_name] = [
+          'tabs' => [],
+          'cacheability' => $cacheability,
+        ];
+      }
+
+      $this->loadingLocalTasks = FALSE;
     }
 
     if (isset($this->taskData[$route_name]['tabs'][$level])) {

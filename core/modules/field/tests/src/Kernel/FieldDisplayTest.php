@@ -8,19 +8,19 @@ use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
  * Tests Field display.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldDisplayTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'entity_test',
@@ -101,7 +101,7 @@ class FieldDisplayTest extends KernelTestBase {
   /**
    * Tests that visually hidden works with core.
    */
-  public function testFieldVisualHidden() {
+  public function testFieldVisualHidden(): void {
     $value = $this->randomMachineName();
 
     // Set the formatter to link to the entity.
@@ -121,7 +121,7 @@ class FieldDisplayTest extends KernelTestBase {
     $this->setRawContent($content);
 
     $css_selector_converter = new CssSelectorConverter();
-    $elements = $this->xpath($css_selector_converter->toXPath('.visually-hidden'));
+    $elements = $this->getSimpleXmlElementsByXpath($css_selector_converter->toXPath('.visually-hidden'));
     $this->assertCount(1, $elements, $content);
   }
 

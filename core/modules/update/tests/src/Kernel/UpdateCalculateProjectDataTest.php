@@ -11,12 +11,15 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Utils;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Test the values set in update_calculate_project_data().
- *
- * @group update
+ * Test the values set in \Drupal\update\UpdateManagerInterface::calculateProjectData().
  */
+#[Group('update')]
+#[RunTestsInSeparateProcesses]
 class UpdateCalculateProjectDataTest extends KernelTestBase {
 
   /**
@@ -37,8 +40,8 @@ class UpdateCalculateProjectDataTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    // The Update module's default configuration must be installed for our
-    // fake release metadata to be fetched.
+    // The Update Status module's default configuration must be installed for
+    // our fake release metadata to be fetched.
     $this->installConfig('update');
     $this->installConfig('update_test');
     $this->setCoreVersion('8.0.1');
@@ -46,7 +49,7 @@ class UpdateCalculateProjectDataTest extends KernelTestBase {
   }
 
   /**
-   * Sets the installed version of core, as known to the Update module.
+   * Sets the installed version of core, as known to the Update Status module.
    *
    * @param string $version
    *   The core version.
@@ -87,7 +90,7 @@ class UpdateCalculateProjectDataTest extends KernelTestBase {
    * @return array[]
    *   Test data.
    */
-  public function providerProjectStatus(): array {
+  public static function providerProjectStatus(): array {
     return [
       'revoked' => [
         'fixture' => '/../../fixtures/release-history/drupal.project_status.revoked.0.2.xml',
@@ -112,16 +115,12 @@ class UpdateCalculateProjectDataTest extends KernelTestBase {
 
   /**
    * Tests the project_status of the project.
-   *
-   * @dataProvider providerProjectStatus
-   *
-   * @covers update_calculate_project_update_status
    */
+  #[DataProvider('providerProjectStatus')]
   public function testProjectStatus(string $fixture, int $status, string $label, string $expected_error_message): void {
-    update_storage_clear();
     $this->setReleaseMetadata(__DIR__ . $fixture);
-    $available = update_get_available(TRUE);
-    $project_data = update_calculate_project_data($available);
+    $available = \Drupal::service(UpdateManagerInterface::class)->getAvailable(TRUE);
+    $project_data = \Drupal::service(UpdateManagerInterface::class)->calculateProjectData($available);
     $this->assertArrayHasKey('status', $project_data['drupal']);
     $this->assertEquals($status, $project_data['drupal']['status']);
     $this->assertArrayHasKey('extra', $project_data['drupal']);

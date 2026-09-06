@@ -4,22 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
+use Drupal\Tests\block\Traits\BlockCreationTrait;
+use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\Block\ViewsBlock;
 use Drupal\views\Tests\ViewTestData;
-use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests native behaviors of the block views plugin.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewsBlockTest extends ViewsKernelTestBase {
 
+  use BlockCreationTrait;
+
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'block_test_views'];
 
@@ -44,7 +47,7 @@ class ViewsBlockTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\views\Plugin\Block::getMachineNameSuggestion()
    */
-  public function testMachineNameSuggestion() {
+  public function testMachineNameSuggestion(): void {
     $plugin_definition = [
       'provider' => 'views',
     ];
@@ -59,7 +62,7 @@ class ViewsBlockTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\views\Plugin\Block::build()
    */
-  public function testBuildWithTitleToken() {
+  public function testBuildWithTitleToken(): void {
     $view = Views::getView('test_view_block');
     $view->setDisplay();
 
@@ -93,7 +96,7 @@ class ViewsBlockTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\views\Plugin\Block::build()
    */
-  public function testBuildWithTitleOverride() {
+  public function testBuildWithTitleOverride(): void {
     $view = Views::getView('test_view_block');
     $view->setDisplay();
 
@@ -134,7 +137,7 @@ class ViewsBlockTest extends ViewsKernelTestBase {
    *
    * @see \Drupal\views\Plugin\Block\ViewsBlockBase::getPreviewFallbackString()
    */
-  public function testGetPreviewFallbackString() {
+  public function testGetPreviewFallbackString(): void {
     $plugin_definition = [
       'provider' => 'views',
     ];

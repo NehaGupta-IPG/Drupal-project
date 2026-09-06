@@ -10,7 +10,7 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 
 /**
- * ResourceTestBase for Editor entity.
+ * Resource test base for Editor entity.
  */
 abstract class EditorResourceTestBase extends ConfigEntityResourceTestBase {
 
@@ -51,7 +51,7 @@ abstract class EditorResourceTestBase extends ConfigEntityResourceTestBase {
         'filter_html' => [
           'status' => TRUE,
           'settings' => [
-            'allowed_html' => '<p> <a> <b> <lo>',
+            'allowed_html' => '<a> <b> <lo> <p>',
           ],
         ],
       ],
@@ -63,16 +63,19 @@ abstract class EditorResourceTestBase extends ConfigEntityResourceTestBase {
     $camelids = Editor::create([
       'format' => 'llama',
       'editor' => 'ckeditor5',
+      'image_upload' => [
+        'status' => FALSE,
+      ],
     ]);
     $camelids
       ->setImageUploadSettings([
         'status' => TRUE,
         'scheme' => 'public',
         'directory' => 'inline-images',
-        'max_size' => '',
+        'max_size' => NULL,
         'max_dimensions' => [
-          'width' => '',
-          'height' => '',
+          'width' => NULL,
+          'height' => NULL,
         ],
       ])
       ->save();

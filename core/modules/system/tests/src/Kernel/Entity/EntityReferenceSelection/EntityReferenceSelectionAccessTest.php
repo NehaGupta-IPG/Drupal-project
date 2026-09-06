@@ -4,27 +4,29 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Entity\EntityReferenceSelection;
 
+use Drupal\comment\CommentInterface;
+use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\comment\CommentInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\node\NodeInterface;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
-use Drupal\comment\Entity\Comment;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for the base handlers provided by Entity Reference.
- *
- * @group entity_reference
  */
+#[Group('entity_reference')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceSelectionAccessTest extends KernelTestBase {
 
   use CommentTestTrait;
@@ -33,14 +35,13 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
   use UserCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'comment',
     'field',
     'file',
+    'filter',
     'image',
     'node',
     'media',
@@ -49,14 +50,6 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
     'text',
     'user',
   ];
-
-  /**
-   * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
-   */
-  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -74,7 +67,7 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('user');
 
-    $this->installConfig(['comment', 'field', 'media', 'node', 'taxonomy', 'user']);
+    $this->installConfig(['comment', 'field', 'media', 'node', 'taxonomy', 'user', 'system']);
 
     // Create the anonymous and the admin users.
     $anonymous_user = User::create([
@@ -82,10 +75,13 @@ class EntityReferenceSelectionAccessTest extends KernelTestBase {
       'name' => '',
     ]);
     $anonymous_user->save();
+
+    // Create role for administrator.
     $admin_user = User::create([
       'uid' => 1,
       'name' => 'admin',
       'status' => 1,
+      'roles' => [$this->createRole(['administer users'])],
     ]);
     $admin_user->save();
   }

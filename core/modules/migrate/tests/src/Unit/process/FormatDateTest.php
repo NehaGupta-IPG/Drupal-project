@@ -6,27 +6,28 @@ namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\process\FormatDate;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the format date process plugin.
- *
- * @group migrate
- *
- * @coversDefaultClass Drupal\migrate\Plugin\migrate\process\FormatDate
  */
+#[CoversClass(FormatDate::class)]
+#[Group('migrate')]
 class FormatDateTest extends MigrateProcessTestCase {
 
   /**
    * Tests that missing configuration will throw an exception.
    */
-  public function testMigrateExceptionMissingFromFormat() {
+  public function testMigrateExceptionMissingFromFormat(): void {
     $configuration = [
       'from_format' => '',
       'to_format' => 'Y-m-d',
     ];
 
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('Format date plugin is missing from_format configuration.');
+    $this->expectExceptionMessageIs('Format date plugin is missing from_format configuration.');
     $this->plugin = new FormatDate($configuration, 'test_format_date', []);
     $this->plugin->transform('01/05/1955', $this->migrateExecutable, $this->row, 'field_date');
   }
@@ -34,14 +35,14 @@ class FormatDateTest extends MigrateProcessTestCase {
   /**
    * Tests that missing configuration will throw an exception.
    */
-  public function testMigrateExceptionMissingToFormat() {
+  public function testMigrateExceptionMissingToFormat(): void {
     $configuration = [
       'from_format' => 'm/d/Y',
       'to_format' => '',
     ];
 
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('Format date plugin is missing to_format configuration.');
+    $this->expectExceptionMessageIs('Format date plugin is missing to_format configuration.');
     $this->plugin = new FormatDate($configuration, 'test_format_date', []);
     $this->plugin->transform('01/05/1955', $this->migrateExecutable, $this->row, 'field_date');
   }
@@ -49,14 +50,14 @@ class FormatDateTest extends MigrateProcessTestCase {
   /**
    * Tests that date format mismatches will throw an exception.
    */
-  public function testMigrateExceptionBadFormat() {
+  public function testMigrateExceptionBadFormat(): void {
     $configuration = [
       'from_format' => 'm/d/Y',
       'to_format' => 'Y-m-d',
     ];
 
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage("Format date plugin could not transform 'January 5, 1955' using the format 'm/d/Y'. Error: The date cannot be created from a format.");
+    $this->expectExceptionMessageIs("Format date plugin could not transform 'January 5, 1955' using the format 'm/d/Y'. Error: The date cannot be created from a format.");
     $this->plugin = new FormatDate($configuration, 'test_format_date', []);
     $this->plugin->transform('January 5, 1955', $this->migrateExecutable, $this->row, 'field_date');
   }
@@ -64,14 +65,14 @@ class FormatDateTest extends MigrateProcessTestCase {
   /**
    * Tests that an unexpected date value will throw an exception.
    */
-  public function testMigrateExceptionUnexpectedValue() {
+  public function testMigrateExceptionUnexpectedValue(): void {
     $configuration = [
       'from_format' => 'm/d/Y',
       'to_format' => 'Y-m-d',
     ];
 
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage("Format date plugin could not transform '01/05/55' using the format 'm/d/Y'. Error: The created date does not match the input value.");
+    $this->expectExceptionMessageIs("Format date plugin could not transform '01/05/55' using the format 'm/d/Y'. Error: The created date does not match the input value.");
     $this->plugin = new FormatDate($configuration, 'test_format_date', []);
     $this->plugin->transform('01/05/55', $this->migrateExecutable, $this->row, 'field_date');
   }
@@ -79,18 +80,15 @@ class FormatDateTest extends MigrateProcessTestCase {
   /**
    * Tests transformation.
    *
-   * @covers ::transform
-   *
-   * @dataProvider datesDataProvider
-   *
-   * @param $configuration
+   * @param array $configuration
    *   The configuration of the migration process plugin.
-   * @param $value
+   * @param string $value
    *   The source value for the migration process plugin.
-   * @param $expected
+   * @param string $expected
    *   The expected value of the migration process plugin.
    */
-  public function testTransform($configuration, $value, $expected) {
+  #[DataProvider('datesDataProvider')]
+  public function testTransform(array $configuration, string|int $value, string $expected): void {
     $this->plugin = new FormatDate($configuration, 'test_format_date', []);
     $actual = $this->plugin->transform($value, $this->migrateExecutable, $this->row, 'field_date');
 
@@ -103,7 +101,7 @@ class FormatDateTest extends MigrateProcessTestCase {
    * @return array
    *   Array of date formats and actual/expected values.
    */
-  public static function datesDataProvider() {
+  public static function datesDataProvider(): array {
     return [
       'datetime_date' => [
         'configuration' => [

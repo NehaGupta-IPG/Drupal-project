@@ -6,8 +6,10 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\Form\WorkspaceSafeFormTrait;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceDynamicSafeFormInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Routing\RedirectDestinationTrait;
@@ -20,17 +22,18 @@ use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\style\Table;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Defines an actions-based bulk operation form element.
  */
 #[ViewsField("bulk_form")]
-class BulkForm extends FieldPluginBase implements CacheableDependencyInterface {
+class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, WorkspaceDynamicSafeFormInterface {
 
   use RedirectDestinationTrait;
   use UncacheableFieldHandlerTrait;
   use EntityTranslationRenderTrait;
+  use WorkspaceSafeFormTrait;
 
   /**
    * The entity type manager.
@@ -104,7 +107,17 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface {
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, MessengerInterface $messenger, EntityRepositoryInterface $entity_repository, ResettableStackedRouteMatchInterface $route_match) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EntityTypeManagerInterface $entity_type_manager,
+    LanguageManagerInterface $language_manager,
+    MessengerInterface $messenger,
+    EntityRepositoryInterface $entity_repository,
+    #[Autowire(service: 'current_route_match')]
+    ResettableStackedRouteMatchInterface $route_match,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
@@ -118,23 +131,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager'),
-      $container->get('language_manager'),
-      $container->get('messenger'),
-      $container->get('entity.repository'),
-      $container->get('current_route_match')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
     $entity_type = $this->getEntityType();
@@ -325,7 +322,8 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface {
       // Replace the form submit button label.
       $form['actions']['submit']['#value'] = $this->t('Apply to selected items');
 
-      // Ensure a consistent container for filters/operations in the view header.
+      // Ensure a consistent container for filters/operations in the view
+      // header.
       $form['header'] = [
         '#type' => 'container',
         '#weight' => -100,
@@ -578,6 +576,14 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface {
     }
 
     return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isWorkspaceSafeForm(array $form, FormStateInterface $form_state): bool {
+    $entity_type = $this->entityTypeManager->getDefinition($this->getEntityTypeId());
+    return $this->isWorkspaceSafeEntityType($entity_type);
   }
 
 }

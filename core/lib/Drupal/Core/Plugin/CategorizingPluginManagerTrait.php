@@ -51,31 +51,10 @@ trait CategorizingPluginManagerTrait {
     try {
       return $this->getModuleExtensionList()->getName($provider);
     }
-    catch (UnknownExtensionException $e) {
+    catch (UnknownExtensionException) {
       // Otherwise, return the machine name.
       return $provider;
     }
-  }
-
-  /**
-   * Returns the module handler used.
-   *
-   * @return \Drupal\Core\Extension\ModuleHandlerInterface
-   *   The module handler.
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3310017
-   */
-  public function getModuleHandler() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
-    // If the class has an injected module handler, use it. Otherwise fall back
-    // to fetch it from the service container.
-    if (isset($this->moduleHandler)) {
-      return $this->moduleHandler;
-    }
-    return \Drupal::moduleHandler();
   }
 
   /**
@@ -108,7 +87,7 @@ trait CategorizingPluginManagerTrait {
   /**
    * {@inheritdoc}
    */
-  public function getSortedDefinitions(array $definitions = NULL, $label_key = 'label') {
+  public function getSortedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
     // Sort the plugins first by category, then by label.
     $definitions = $definitions ?? $this->getDefinitions();
     uasort($definitions, function ($a, $b) use ($label_key) {
@@ -123,8 +102,8 @@ trait CategorizingPluginManagerTrait {
   /**
    * {@inheritdoc}
    */
-  public function getGroupedDefinitions(array $definitions = NULL, $label_key = 'label') {
-    /** @var \Drupal\Core\Plugin\CategorizingPluginManagerTrait|\Drupal\Component\Plugin\PluginManagerInterface $this */
+  public function getGroupedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
+    // @phpstan-ignore arguments.count
     $definitions = $this->getSortedDefinitions($definitions ?? $this->getDefinitions(), $label_key);
     $grouped_definitions = [];
     foreach ($definitions as $id => $definition) {
@@ -132,5 +111,10 @@ trait CategorizingPluginManagerTrait {
     }
     return $grouped_definitions;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  abstract public function getDefinitions();
 
 }

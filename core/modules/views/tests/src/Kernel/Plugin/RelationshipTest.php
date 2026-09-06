@@ -7,13 +7,16 @@ namespace Drupal\Tests\views\Kernel\Plugin;
 use Drupal\Core\Database\Database;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the base relationship handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\relationship\RelationshipPluginBase
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class RelationshipTest extends RelationshipJoinTestBase {
   use UserCreationTrait;
 
@@ -37,7 +40,7 @@ class RelationshipTest extends RelationshipJoinTestBase {
   /**
    * Tests the query result of a view with a relationship.
    */
-  public function testRelationshipQuery() {
+  public function testRelationshipQuery(): void {
     $connection = Database::getConnection();
     // Set the first entry to have the admin as author.
     $connection->update('views_test_data')
@@ -145,7 +148,7 @@ class RelationshipTest extends RelationshipJoinTestBase {
   /**
    * Tests rendering of a view with a relationship.
    */
-  public function testRelationshipRender() {
+  public function testRelationshipRender(): void {
     $connection = Database::getConnection();
     $author1 = $this->createUser();
     $connection->update('views_test_data')
@@ -200,9 +203,15 @@ class RelationshipTest extends RelationshipJoinTestBase {
 
     // Check that the output contains correct values.
     $xpath = '//div[@class="views-row" and div[@class="views-field views-field-id"]=:id and div[@class="views-field views-field-author"]=:author]';
-    $this->assertCount(1, $this->xpath($xpath, [':id' => 1, ':author' => $author1->getAccountName()]));
-    $this->assertCount(1, $this->xpath($xpath, [':id' => 2, ':author' => $author2->getAccountName()]));
-    $this->assertCount(1, $this->xpath($xpath, [':id' => 3, ':author' => '']));
+    $this->assertCount(1, $this->getSimpleXmlElementsByXpath($xpath, [
+      ':id' => 1,
+      ':author' => $author1->getAccountName(),
+    ]));
+    $this->assertCount(1, $this->getSimpleXmlElementsByXpath($xpath, [
+      ':id' => 2,
+      ':author' => $author2->getAccountName(),
+    ]));
+    $this->assertCount(1, $this->getSimpleXmlElementsByXpath($xpath, [':id' => 3, ':author' => '']));
   }
 
 }

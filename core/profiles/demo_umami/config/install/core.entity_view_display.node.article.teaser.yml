@@ -3,10 +3,9 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.teaser
-    - field.field.node.article.body
+    - field.field.node.article.field_body
     - field.field.node.article.field_media_image
     - field.field.node.article.field_tags
-    - field.field.node.article.layout_builder__layout
     - node.type.article
   module:
     - text
@@ -16,8 +15,8 @@ targetEntityType: node
 bundle: article
 mode: teaser
 content:
-  body:
-    type: text_summary_or_trimmed
+  field_body:
+    type: text_trimmed
     label: hidden
     settings:
       trim_length: 600
@@ -49,4 +48,3 @@ content:
 hidden:
   content_moderation_control: true
   langcode: true
-  layout_builder__layout: true

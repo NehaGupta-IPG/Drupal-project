@@ -6,12 +6,14 @@ namespace Drupal\Tests\layout_builder\Functional;
 
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Layout Builder local tasks.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderLocalTaskTest extends BrowserTestBase {
 
   /**
@@ -40,7 +42,7 @@ class LayoutBuilderLocalTaskTest extends BrowserTestBase {
   /**
    * Tests the cacheability of local tasks with Layout Builder module installed.
    */
-  public function testLocalTaskLayoutBuilderInstalledCacheability() {
+  public function testLocalTaskLayoutBuilderInstalledCacheability(): void {
     // Create only one bundle and do not enable layout builder on its display.
     $this->drupalCreateContentType([
       'type' => 'bundle_no_lb_display',
@@ -68,7 +70,7 @@ class LayoutBuilderLocalTaskTest extends BrowserTestBase {
   /**
    * Tests the cacheability of local tasks with multiple content types.
    */
-  public function testLocalTaskMultipleContentTypesCacheability() {
+  public function testLocalTaskMultipleContentTypesCacheability(): void {
     // Test when there are two content types, one with a display having Layout
     // Builder enabled with overrides, and another with display not having
     // Layout Builder enabled.

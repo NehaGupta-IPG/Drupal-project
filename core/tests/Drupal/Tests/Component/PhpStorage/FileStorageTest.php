@@ -2,22 +2,23 @@
 
 declare(strict_types=1);
 
+// cspell:ignore errfile errline
+
 namespace Drupal\Tests\Component\PhpStorage;
 
 use Drupal\Component\PhpStorage\FileStorage;
 use Drupal\Component\Utility\Random;
-use Drupal\Tests\Traits\PhpUnitWarnings;
 use org\bovigo\vfs\vfsStreamDirectory;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Component\PhpStorage\FileStorage
- * @group Drupal
- * @group PhpStorage
+ * Tests Drupal\Component\PhpStorage\FileStorage.
  */
+#[CoversClass(FileStorage::class)]
+#[Group('Drupal')]
+#[Group('PhpStorage')]
 class FileStorageTest extends PhpStorageTestBase {
-
-  use PhpUnitWarnings, ExpectDeprecationTrait;
 
   /**
    * Standard test settings to pass to storage instances.
@@ -41,20 +42,20 @@ class FileStorageTest extends PhpStorageTestBase {
   /**
    * Tests basic load/save/delete operations.
    *
-   * @covers ::load
-   * @covers ::save
-   * @covers ::exists
-   * @covers ::delete
+   * @legacy-covers ::load
+   * @legacy-covers ::save
+   * @legacy-covers ::exists
+   * @legacy-covers ::delete
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $php = new FileStorage($this->standardSettings);
     $this->assertCRUD($php);
   }
 
   /**
-   * @covers ::deleteAll
+   * Tests delete all.
    */
-  public function testDeleteAll() {
+  public function testDeleteAll(): void {
     // Random generator.
     $random_generator = new Random();
 
@@ -87,18 +88,31 @@ class FileStorageTest extends PhpStorageTestBase {
   }
 
   /**
-   * @covers ::createDirectory
+   * Tests create directory fail warning.
    */
-  public function testCreateDirectoryFailWarning() {
+  public function testCreateDirectoryFailWarning(): void {
     $directory = new vfsStreamDirectory('permissionDenied', 0200);
     $storage = new FileStorage([
       'directory' => $directory->url(),
       'bin' => 'test',
     ]);
     $code = "<?php\n echo 'here';";
-    $this->expectWarning();
-    $this->expectWarningMessage('mkdir(): Permission Denied');
+
+    // PHPUnit cannot expect warnings, so we have to catch them ourselves.
+    $messages = [];
+    set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) use (&$messages): bool {
+      $messages[] = [$errno, $errstr];
+      return TRUE;
+    });
+
     $storage->save('subdirectory/foo.php', $code);
+
+    restore_error_handler();
+    $this->assertCount(2, $messages);
+    $this->assertSame(E_USER_WARNING, $messages[0][0]);
+    $this->assertSame('mkdir(): Permission Denied', $messages[0][1]);
+    $this->assertSame(E_WARNING, $messages[1][0]);
+    $this->assertMatchesRegularExpression('/file_put_contents(.*): Failed to open stream: ".*vfsStreamWrapper::stream_open" call failed/', $messages[1][1]);
   }
 
 }

@@ -4,6 +4,7 @@ namespace Drupal\comment\Plugin\migrate\destination;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\Core\State\StateInterface;
@@ -39,7 +40,7 @@ class EntityComment extends EntityContentBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
@@ -54,18 +55,20 @@ class EntityComment extends EntityContentBase {
    *   The field type plugin manager service.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state storage object.
-   * @param \Drupal\Core\Session\AccountSwitcherInterface|null $account_switcher
+   * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
    *   The account switcher service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle info service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, EntityFieldManagerInterface $entity_field_manager, FieldTypePluginManagerInterface $field_type_manager, StateInterface $state, AccountSwitcherInterface $account_switcher = NULL) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles, $entity_field_manager, $field_type_manager, $account_switcher);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, EntityFieldManagerInterface $entity_field_manager, FieldTypePluginManagerInterface $field_type_manager, StateInterface $state, AccountSwitcherInterface $account_switcher, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles, $entity_field_manager, $field_type_manager, $account_switcher, $entity_type_bundle_info);
     $this->state = $state;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     $entity_type = static::getEntityTypeId($plugin_id);
     return new static(
       $configuration,
@@ -77,22 +80,9 @@ class EntityComment extends EntityContentBase {
       $container->get('entity_field.manager'),
       $container->get('plugin.manager.field.field_type'),
       $container->get('state'),
-      $container->get('account_switcher')
+      $container->get('account_switcher'),
+      $container->get('entity_type.bundle.info'),
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function import(Row $row, array $old_destination_id_values = []) {
-    if ($row->isStub() && ($state = $this->state->get('comment.maintain_entity_statistics', 0))) {
-      $this->state->set('comment.maintain_entity_statistics', 0);
-    }
-    $return = parent::import($row, $old_destination_id_values);
-    if ($row->isStub() && $state) {
-      $this->state->set('comment.maintain_entity_statistics', $state);
-    }
-    return $return;
   }
 
   /**

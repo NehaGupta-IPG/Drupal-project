@@ -4,6 +4,7 @@ namespace Drupal\Core\Update;
 
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -24,20 +25,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class UpdateRegistry implements EventSubscriberInterface {
 
   /**
-   * The used update name.
-   *
-   * @var string
-   */
-  protected $updateType = 'post_update';
-
-  /**
-   * The app root.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * The filename of the log file.
    *
    * @var string
@@ -50,20 +37,6 @@ class UpdateRegistry implements EventSubscriberInterface {
   protected $enabledExtensions;
 
   /**
-   * The key value storage.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
-   */
-  protected $keyValue;
-
-  /**
-   * The site path.
-   *
-   * @var string
-   */
-  protected $sitePath;
-
-  /**
    * A static cache of all the extension updates scanned for.
    *
    * This array is keyed by Drupal root, site path, extension name and update
@@ -74,42 +47,30 @@ class UpdateRegistry implements EventSubscriberInterface {
   protected static array $loadedFiles = [];
 
   /**
-   * Constructs a new UpdateRegistry.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $site_path
-   *   The site path.
-   * @param array $module_list
-   *   An associative array whose keys are the names of installed modules.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $key_value
-   *   The key value store.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface|bool|null $theme_handler
-   *   The theme handler.
-   * @param string $update_type
-   *   The used update name.
+   * The memory cache.
    */
+  protected MemoryCacheInterface $memoryCache;
+
   public function __construct(
-    $root,
-    $site_path,
-    $module_list,
-    KeyValueStoreInterface $key_value,
-    ThemeHandlerInterface|bool $theme_handler = NULL,
-    string $update_type = 'post_update',
+    protected $root,
+    protected $sitePath,
+    array $module_list,
+    protected KeyValueStoreInterface $keyValue,
+    ThemeHandlerInterface $theme_handler,
+    MemoryCacheInterface|string|null $memoryCache = NULL,
+    protected string $updateType = 'post_update',
   ) {
-    $this->root = $root;
-    $this->sitePath = $site_path;
-    if ($module_list !== [] && array_is_list($module_list)) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $enabled_extensions argument is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use an associative array whose keys are the names of installed modules instead. See https://www.drupal.org/node/3423659', E_USER_DEPRECATED);
-      $module_list = \Drupal::service('module_handler')->getModuleList();
+    if (is_string($memoryCache)) {
+      $updateType = $memoryCache;
+      $memoryCache = NULL;
     }
-    if ($theme_handler === NULL || is_bool($theme_handler)) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $include_tests argument is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3423659', E_USER_DEPRECATED);
-      $theme_handler = \Drupal::service('theme_handler');
+    if (!isset($memoryCache)) {
+      $memoryCache = \Drupal::service('cache.memory');
+      @trigger_error('Calling ' . __METHOD__ . '() without the $memoryCache argument is deprecated in drupal:11.5.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3618917', E_USER_DEPRECATED);
     }
+    $this->updateType = $updateType;
+    $this->memoryCache = $memoryCache;
     $this->enabledExtensions = array_merge(array_keys($module_list), array_keys($theme_handler->listInfo()));
-    $this->keyValue = $key_value;
-    $this->updateType = $update_type;
   }
 
   /**
@@ -131,7 +92,7 @@ class UpdateRegistry implements EventSubscriberInterface {
    * Gets all available update functions.
    *
    * @return callable[]
-   *   A list of update functions.
+   *   An alphabetical list of available update functions.
    */
   protected function getAvailableUpdateFunctions() {
     $regexp = '/^(?<extension>.+)_' . $this->updateType . '_(?<name>.+)$/';
@@ -163,7 +124,7 @@ class UpdateRegistry implements EventSubscriberInterface {
    * Find all update functions that haven't been executed.
    *
    * @return callable[]
-   *   A list of update functions.
+   *   An alphabetical list of update functions that have not been executed.
    */
   public function getPendingUpdateFunctions() {
     // We need a) the list of active extensions (we get that from the config
@@ -283,23 +244,41 @@ class UpdateRegistry implements EventSubscriberInterface {
   }
 
   /**
+   * Discovers all module, theme, and profile extensions.
+   *
+   * @return \Drupal\Core\Extension\Extension[]
+   *   The discovered extensions, keyed by name.
+   */
+  protected function discoverExtensions(): array {
+    $cache_id = 'update_registry.extensions';
+    if ($cache = $this->memoryCache->get($cache_id)) {
+      $extensions = $cache->data;
+    }
+    else {
+      $extension_discovery = new ExtensionDiscovery($this->root, TRUE, [], $this->sitePath);
+      $module_extensions = $extension_discovery->scan('module');
+      $theme_extensions = $this->includeThemes() ? $extension_discovery->scan('theme') : [];
+      $profile_extensions = $extension_discovery->scan('profile');
+      $extensions = array_merge($module_extensions, $theme_extensions, $profile_extensions);
+      $this->memoryCache->set($cache_id, $extensions, tags: ['config:core.extension']);
+    }
+
+    return $extensions;
+  }
+
+  /**
    * Scans all module, theme, and profile extensions and load the update files.
    *
    * @param string|null $extension
    *   (optional) Limits the extension update files loaded to the provided
    *   extension.
    */
-  protected function scanExtensionsAndLoadUpdateFiles(string $extension = NULL) {
+  protected function scanExtensionsAndLoadUpdateFiles(?string $extension = NULL) {
     if ($extension !== NULL && isset(self::$loadedFiles[$this->root][$this->sitePath][$extension][$this->updateType])) {
       // We've already checked for this file and, if it exists, loaded it.
       return;
     }
-    // Scan for extensions.
-    $extension_discovery = new ExtensionDiscovery($this->root, TRUE, [], $this->sitePath);
-    $module_extensions = $extension_discovery->scan('module');
-    $theme_extensions = $this->includeThemes() ? $extension_discovery->scan('theme') : [];
-    $profile_extensions = $extension_discovery->scan('profile');
-    $extensions = array_merge($module_extensions, $theme_extensions, $profile_extensions);
+    $extensions = $this->discoverExtensions();
 
     // Limit to a single extension.
     if ($extension) {
@@ -327,6 +306,7 @@ class UpdateRegistry implements EventSubscriberInterface {
 
   /**
    * @return bool
+   *   TRUE if themes are to be updated, FALSE otherwise.
    */
   protected function includeThemes(): bool {
     return $this->updateType === 'post_update';
@@ -362,7 +342,6 @@ class UpdateRegistry implements EventSubscriberInterface {
       // Set the list of enabled extensions correctly so update function
       // discovery works as expected.
       $this->enabledExtensions = $new_extension_list;
-
       foreach ($uninstalled_extensions as $uninstalled_extension) {
         $this->filterOutInvokedUpdatesByExtension($uninstalled_extension);
       }

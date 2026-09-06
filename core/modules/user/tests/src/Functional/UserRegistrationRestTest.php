@@ -11,12 +11,15 @@ use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
 use Drupal\Tests\rest\Functional\ResourceTestBase;
 use Drupal\user\UserInterface;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Tests registration of user using REST.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserRegistrationRestTest extends ResourceTestBase {
 
   use CookieResourceTestTrait;
@@ -47,8 +50,6 @@ class UserRegistrationRestTest extends ResourceTestBase {
 
   /**
    * Entity type ID for this storage.
-   *
-   * @var string
    */
   protected static string $entityTypeId;
 
@@ -71,7 +72,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
   /**
    * Tests that only anonymous users can register users.
    */
-  public function testRegisterUser() {
+  public function testRegisterUser(): void {
     $config = $this->config('user.settings');
 
     // Test out different setting User Registration and Email Verification.
@@ -84,7 +85,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
     $this->assertNotEmpty($user->getPassword());
     $email_count = count($this->drupalGetMails());
 
-    $this->assertEquals(0, $email_count);
+    $this->assertEquals(1, $email_count);
 
     // Attempt to register without sending a password.
     $response = $this->registerRequest('PhilipK.Dick', FALSE);
@@ -103,8 +104,8 @@ class UserRegistrationRestTest extends ResourceTestBase {
     $config->save();
     $name = 'Jason.Taverner';
     $user = $this->registerUser($name, FALSE);
-    $this->assertEmpty($user->getPassword());
-    $this->assertTrue($user->isBlocked());
+    $this->assertNotEmpty($user->getPassword());
+    $this->assertFalse($user->isBlocked());
     $this->resetAll();
 
     $this->assertMailString('body', 'You may now log in by clicking this link', 1);
@@ -128,7 +129,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
     $name = 'PhilipK.Dick';
     $user = $this->registerUser($name, FALSE);
     $this->resetAll();
-    $this->assertEmpty($user->getPassword());
+    $this->assertNotEmpty($user->getPassword());
     $this->assertTrue($user->isBlocked());
 
     $this->assertMailString('body', 'Your application for an account is', 2);
@@ -156,7 +157,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
    * @return array
    *   Return the request body.
    */
-  protected function createRequestBody($name, $include_password = TRUE, $include_email = TRUE) {
+  protected function createRequestBody(string $name, $include_password = TRUE, $include_email = TRUE): array {
     $request_body = [
       'langcode' => [['value' => 'en']],
       'name' => [['value' => $name]],
@@ -182,7 +183,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
    * @return array
    *   Return the request options.
    */
-  protected function createRequestOptions(array $request_body) {
+  protected function createRequestOptions(array $request_body): array {
     $request_options = $this->getAuthenticationRequestOptions('POST');
     $request_options[RequestOptions::BODY] = $this->serializer->encode($request_body, static::$format);
     $request_options[RequestOptions::HEADERS]['Content-Type'] = static::$mimeType;
@@ -203,11 +204,15 @@ class UserRegistrationRestTest extends ResourceTestBase {
    * @return bool|\Drupal\user\Entity\User
    *   Return bool or the user.
    */
-  protected function registerUser($name, $include_password = TRUE, $include_email = TRUE) {
+  protected function registerUser(string $name, $include_password = TRUE, $include_email = TRUE) {
     // Verify that an anonymous user can register.
     $response = $this->registerRequest($name, $include_password, $include_email);
     $this->assertResourceResponse(200, FALSE, $response);
-    $user = user_load_by_name($name);
+    $users = \Drupal::entityTypeManager()
+      ->getStorage('user')
+      ->loadByProperties(['name' => $name]);
+    $user = reset($users);
+
     $this->assertNotEmpty($user, 'User was create as expected');
     return $user;
   }
@@ -225,20 +230,19 @@ class UserRegistrationRestTest extends ResourceTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   Return the Response.
    */
-  protected function registerRequest($name, $include_password = TRUE, $include_email = TRUE) {
+  protected function registerRequest(string $name, $include_password = TRUE, $include_email = TRUE): ResponseInterface {
     $user_register_url = Url::fromRoute('user.register')
       ->setRouteParameter('_format', static::$format);
     $request_body = $this->createRequestBody($name, $include_password, $include_email);
     $request_options = $this->createRequestOptions($request_body);
-    $response = $this->request('POST', $user_register_url, $request_options);
 
-    return $response;
+    return $this->request('POST', $user_register_url, $request_options);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     switch ($method) {
       case 'POST':
         $this->grantPermissionsToAuthenticatedRole(['restful post user_registration']);
@@ -258,14 +262,14 @@ class UserRegistrationRestTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessMessage($method) {
+  protected function getExpectedUnauthorizedAccessMessage($method): string {
     return '';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedUnauthorizedAccessCacheability() {
+  protected function getExpectedUnauthorizedAccessCacheability(): CacheableMetadata {
     return new CacheableMetadata();
   }
 

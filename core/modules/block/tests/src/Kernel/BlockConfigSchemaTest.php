@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\Kernel;
 
 use Drupal\block\Entity\Block;
-use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\SchemaCheckTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the block config schema.
- *
- * @group block
  */
+#[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockConfigSchemaTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;
@@ -23,7 +25,6 @@ class BlockConfigSchemaTest extends KernelTestBase {
   protected static $modules = [
     'block',
     'block_content',
-    'comment',
     'node',
     // \Drupal\block\Entity\Block->preSave() calls system_region_list().
     'system',
@@ -63,7 +64,7 @@ class BlockConfigSchemaTest extends KernelTestBase {
   /**
    * Tests the block config schema for block plugins.
    */
-  public function testBlockConfigSchema() {
+  public function testBlockConfigSchema(): void {
     foreach ($this->blockManager->getDefinitions() as $block_id => $definition) {
       $id = $this->randomMachineName();
       $block = Block::create([
@@ -76,7 +77,7 @@ class BlockConfigSchemaTest extends KernelTestBase {
         'settings' => [
           'label' => $this->randomMachineName(),
           'provider' => 'system',
-          'label_display' => FALSE,
+          'label_display' => '0',
         ],
         'visibility' => [],
       ]);

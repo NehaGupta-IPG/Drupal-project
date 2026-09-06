@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Cache;
 
-use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Site\Settings;
 use Psr\Container\ContainerInterface;
 
@@ -54,7 +53,7 @@ class ChainedFastBackendFactory implements CacheFactoryInterface {
    *   - 'cache.backend.apcu' (if the PHP process has APCu enabled)
    *   - NULL (if the PHP process doesn't have APCu enabled)
    */
-  public function __construct(Settings $settings = NULL, $consistent_service_name = NULL, $fast_service_name = NULL) {
+  public function __construct(?Settings $settings = NULL, $consistent_service_name = NULL, $fast_service_name = NULL) {
     // Default the consistent backend to the site's default backend.
     if (!isset($consistent_service_name)) {
       $cache_settings = isset($settings) ? $settings->get('cache') : [];
@@ -68,12 +67,8 @@ class ChainedFastBackendFactory implements CacheFactoryInterface {
 
     $this->consistentServiceName = $consistent_service_name;
 
-    // Do not use the fast chained backend during installation. In those cases,
-    // we expect many cache invalidations and writes, the fast chained cache
-    // backend performs badly in such a scenario.
-    if (!InstallerKernel::installationAttempted()) {
-      $this->fastServiceName = $fast_service_name;
-    }
+    $this->fastServiceName = $fast_service_name;
+
   }
 
   /**

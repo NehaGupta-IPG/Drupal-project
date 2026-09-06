@@ -8,30 +8,30 @@ use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies the field order in user account forms.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserAccountFormFieldsTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'user', 'field'];
 
   /**
-   * @var \Drupal\user\UserInterface
+   * An user.
    */
   protected UserInterface $user;
 
   /**
    * Tests the root user account form section in the "Configure site" form.
    */
-  public function testInstallConfigureForm() {
+  public function testInstallConfigureForm(): void {
     require_once $this->root . '/core/includes/install.core.inc';
     require_once $this->root . '/core/includes/install.inc';
     $install_state = install_state_defaults();
@@ -53,7 +53,7 @@ class UserAccountFormFieldsTest extends KernelTestBase {
   /**
    * Tests the user registration form.
    */
-  public function testUserRegistrationForm() {
+  public function testUserRegistrationForm(): void {
     // Install default configuration; required for AccountFormController.
     $this->installConfig(['user']);
 
@@ -77,7 +77,7 @@ class UserAccountFormFieldsTest extends KernelTestBase {
   /**
    * Tests the user edit form.
    */
-  public function testUserEditForm() {
+  public function testUserEditForm(): void {
     // Install default configuration; required for AccountFormController.
     $this->installConfig(['user']);
     $this->installEntitySchema('user');
@@ -105,25 +105,18 @@ class UserAccountFormFieldsTest extends KernelTestBase {
    * @internal
    */
   protected function assertFieldOrder(array $elements): void {
-    $name_index = 0;
     $name_weight = 0;
-    $pass_index = 0;
     $pass_weight = 0;
-    $index = 0;
     foreach ($elements as $key => $element) {
       if ($key === 'name') {
-        $name_index = $index;
         $name_weight = $element['#weight'];
         $this->assertTrue($element['#sorted'], "'name' field is #sorted.");
       }
       elseif ($key === 'pass') {
-        $pass_index = $index;
         $pass_weight = $element['#weight'];
         $this->assertTrue($element['#sorted'], "'pass' field is #sorted.");
       }
-      $index++;
     }
-    $this->assertEquals($pass_index - 1, $name_index, "'name' field ({$name_index}) appears before 'pass' field ({$pass_index}).");
     $this->assertLessThan($pass_weight, $name_weight, "'name' field weight ($name_weight) should be smaller than 'pass' field weight ($pass_weight).");
   }
 

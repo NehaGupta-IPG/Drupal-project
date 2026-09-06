@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Component\Plugin\Definition\PluginDefinition;
+use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\Exception\EntityTypeIdLengthException;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -23,6 +24,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $static_cache = TRUE;
 
   /**
@@ -30,6 +32,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $render_cache = TRUE;
 
   /**
@@ -37,6 +40,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $persistent_cache = TRUE;
 
   /**
@@ -44,6 +48,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var array
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $entity_keys = [];
 
   /**
@@ -63,6 +68,13 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   protected $originalClass;
 
   /**
+   * The list of the classes when overridden.
+   *
+   * @var class-string[]
+   */
+  protected array $decoratedClasses = [];
+
+  /**
    * An array of handlers.
    *
    * @var array
@@ -74,6 +86,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $admin_permission;
 
   /**
@@ -81,6 +94,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $collection_permission;
 
   /**
@@ -90,6 +104,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $permission_granularity = 'entity_type';
   /**
    * Link templates using the URI template syntax.
@@ -103,6 +118,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $bundle_entity_type = NULL;
 
   /**
@@ -110,6 +126,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string|null
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $bundle_of = NULL;
 
   /**
@@ -117,6 +134,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string|null
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $bundle_label = NULL;
 
   /**
@@ -124,6 +142,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string|null
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $base_table = NULL;
 
   /**
@@ -131,6 +150,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string|null
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $revision_data_table = NULL;
 
   /**
@@ -138,6 +158,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string|null
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $revision_table = NULL;
 
   /**
@@ -145,6 +166,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string|null
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $data_table = NULL;
 
   /**
@@ -166,6 +188,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $show_revision_ui = FALSE;
 
   /**
@@ -184,6 +207,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @see \Drupal\Core\Entity\EntityTypeInterface::getCollectionLabel()
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $label_collection = '';
 
   /**
@@ -193,6 +217,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @see \Drupal\Core\Entity\EntityTypeInterface::getSingularLabel()
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $label_singular = '';
 
   /**
@@ -202,10 +227,13 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @see \Drupal\Core\Entity\EntityTypeInterface::getPluralLabel()
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $label_plural = '';
 
   /**
    * A definite singular/plural name of the type.
+   *
+   * @var string[]
    *
    * Needed keys: "singular" and "plural". Can also have key: "context".
    * @code
@@ -214,18 +242,24 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *    'plural' => '@count entities',
    *    'context' => 'Entity context',
    * ]
-   *
-   * @var string[]
+   * @endcode
    *
    * @see \Drupal\Core\Entity\EntityTypeInterface::getCountLabel()
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $label_count = [];
 
   /**
    * A callable that can be used to provide the entity URI.
    *
    * @var callable|null
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use link
+   *   templates or a route provider to specify entity URIs.
+   *
+   * @see https://www.drupal.org/node/3575062
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $uri_callback = NULL;
 
   /**
@@ -244,6 +278,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @see \Drupal\Core\Entity\EntityTypeInterface::getGroupLabel()
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $group_label;
 
   /**
@@ -251,6 +286,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $field_ui_base_route;
 
   /**
@@ -261,6 +297,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var bool
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $common_reference_target = FALSE;
 
   /**
@@ -268,6 +305,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string[]
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $list_cache_contexts = [];
 
   /**
@@ -275,6 +313,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @var string[]
    */
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $list_cache_tags = [];
 
   /**
@@ -302,8 +341,17 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    */
   public function __construct($definition) {
     // Throw an exception if the entity type ID is longer than 32 characters.
-    if (mb_strlen($definition['id']) > static::ID_MAX_LENGTH) {
-      throw new EntityTypeIdLengthException('Attempt to create an entity type with an ID longer than ' . static::ID_MAX_LENGTH . " characters: {$definition['id']}.");
+    if (str_contains($definition['id'], PluginBase::DERIVATIVE_SEPARATOR)) {
+      [$entity_type_id, $bundle] = explode(PluginBase::DERIVATIVE_SEPARATOR, $definition['id']);
+      if (mb_strlen($bundle) > static::BUNDLE_MAX_LENGTH) {
+        throw new EntityTypeIdLengthException('Attempt to create an entity type bundle class with an ID longer than ' . static::BUNDLE_MAX_LENGTH . " characters: $bundle.");
+      }
+    }
+    else {
+      $entity_type_id = $definition['id'];
+    }
+    if (mb_strlen($entity_type_id) > static::ID_MAX_LENGTH) {
+      throw new EntityTypeIdLengthException('Attempt to create an entity type with an ID longer than ' . static::ID_MAX_LENGTH . " characters: $entity_type_id.");
     }
 
     foreach ($definition as $property => $value) {
@@ -359,7 +407,10 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    * {@inheritdoc}
    */
   public function set($property, $value) {
-    if (property_exists($this, $property)) {
+    if ($property === 'class') {
+      $this->setClass($value);
+    }
+    elseif (property_exists($this, $property)) {
       $this->{$property} = $value;
     }
     else {
@@ -422,18 +473,21 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function getOriginalClass() {
-    return $this->originalClass ?: $this->class;
+  public function getDecoratedClasses(): array {
+    return $this->decoratedClasses;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setClass($class) {
-    if (!$this->originalClass && $this->class) {
-      // If the original class is currently not set, set it to the current
-      // class, assume that is the original class name.
-      $this->originalClass = $this->class;
+    if ($this->class) {
+      if (!$this->originalClass) {
+        // If the original class is currently not set, set it to the current
+        // class, assume that is the original class name.
+        $this->originalClass = $this->class;
+      }
+      $this->decoratedClasses[] = $this->class;
     }
 
     return parent::setClass($class);
@@ -801,6 +855,9 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    * {@inheritdoc}
    */
   public function getUriCallback() {
+    if ($this->uri_callback) {
+      @trigger_error('The "uri_callback" property on entity types is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use link templates or a route provider to specify entity URIs. See https://www.drupal.org/node/3575062', E_USER_DEPRECATED);
+    }
     return $this->uri_callback;
   }
 
@@ -808,6 +865,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    * {@inheritdoc}
    */
   public function setUriCallback($callback) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use link templates or a route provider to specify entity URIs. See https://www.drupal.org/node/3575062', E_USER_DEPRECATED);
     $this->uri_callback = $callback;
     return $this;
   }
@@ -838,6 +896,13 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    */
   public function getListCacheTags() {
     return $this->list_cache_tags;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBundleListCacheTags(string $bundle): array {
+    return [$this->id() . '_list:' . $bundle];
   }
 
   /**
@@ -875,7 +940,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function addConstraint($constraint_name, $options = NULL) {
+  public function addConstraint(string $constraint_name, ?array $options = NULL): static {
     $this->constraints[$constraint_name] = $options;
     return $this;
   }
@@ -904,6 +969,13 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
     }
 
     return $config_dependency;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasIntegerId(): ?bool {
+    return FALSE;
   }
 
 }

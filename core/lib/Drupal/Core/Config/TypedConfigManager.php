@@ -43,12 +43,17 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   protected $definitions;
 
   /**
+   * The array of base definitions, keyed by type.
+   */
+  protected array $baseDefinitions = [];
+
+  /**
    * Creates a new typed configuration manager.
    *
    * @param \Drupal\Core\Config\StorageInterface $configStorage
-   *   The storage object to use for reading schema data
+   *   The storage object to use for reading schema data.
    * @param \Drupal\Core\Config\StorageInterface $schemaStorage
-   *   The storage object to use for reading schema data
+   *   The storage object to use for reading schema data.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend to use for caching the definitions.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
@@ -56,7 +61,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
    *   (optional) The class resolver.
    */
-  public function __construct(StorageInterface $configStorage, StorageInterface $schemaStorage, CacheBackendInterface $cache, ModuleHandlerInterface $module_handler, ClassResolverInterface $class_resolver = NULL) {
+  public function __construct(StorageInterface $configStorage, StorageInterface $schemaStorage, CacheBackendInterface $cache, ModuleHandlerInterface $module_handler, ?ClassResolverInterface $class_resolver = NULL) {
     $this->configStorage = $configStorage;
     $this->schemaStorage = $schemaStorage;
     $this->setCacheBackend($cache, 'typed_config_definitions');
@@ -191,7 +196,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $object
    *   A config schema object to get the static type root for.
    *
-   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface
+   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface<int|string, \Drupal\Core\TypedData\TypedDataInterface>
    *   The ancestral config schema object at which the static type root lies:
    *   either the first ancestor with a dynamic type (for example:
    *   `block.block.*:settings`, which has the `block.settings.[%parent.plugin]`
@@ -278,7 +283,10 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $definition = $definitions[$type];
     // Check whether this type is an extension of another one and compile it.
     if (isset($definition['type'])) {
-      $merge = $this->getDefinition($definition['type'], $exception_on_invalid);
+      if (!isset($this->baseDefinitions[$definition['type']])) {
+        $this->baseDefinitions[$definition['type']] = $this->getDefinition($definition['type'], $exception_on_invalid);
+      }
+      $merge = $this->baseDefinitions[$definition['type']];
       // Preserve integer keys on merge, so sequence item types can override
       // parent settings as opposed to adding unused second, third, etc. items.
       $definition = NestedArray::mergeDeepArray([$merge, $definition], TRUE);
@@ -298,7 +306,9 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       }
       // Unset type so we try the merge only once per type.
       unset($definition['type']);
-      $this->definitions[$type] = $definition;
+      if (!empty($replacements)) {
+        $this->definitions[$type] = $definition;
+      }
     }
     // Add type and default definition class.
     $definition += [
@@ -321,6 +331,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    */
   public function clearCachedDefinitions() {
     $this->schemaStorage->reset();
+    $this->baseDefinitions = [];
     parent::clearCachedDefinitions();
   }
 
@@ -376,62 +387,16 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       else {
         // No definition for this level. Collapse multiple wildcards to a single
         // wildcard to see if there is a greedy match. For example,
-        // breakpoint.breakpoint.*.* becomes
-        // breakpoint.breakpoint.*
+        // "breakpoint.breakpoint.*.*" becomes "breakpoint.breakpoint.*".
         $one_star = preg_replace('/\.([:\.\*]*)$/', '.*', $replaced);
         if ($one_star != $replaced && isset($this->definitions[$one_star])) {
           return $one_star;
         }
-        // Check for next level. For example, if breakpoint.breakpoint.* has
-        // been checked and no match found then check breakpoint.*.*
+        // Check for next level. For example, if "breakpoint.breakpoint.*" has
+        // been checked and no match found then check "breakpoint.*.*".
         return $this->getFallbackName($replaced);
       }
     }
-  }
-
-  /**
-   * Replaces dynamic type expressions in configuration type.
-   *
-   * @param string $name
-   *   Configuration type, potentially with expressions in square brackets.f
-   * @param array $data
-   *   Configuration data for the element.
-   *
-   * @return string
-   *   Configuration type name with all expressions resolved.
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *   \Drupal\Core\Config\Schema\TypeResolver::resolveDynamicTypeName::resolveDynamicTypeName()
-   *   instead.
-   *
-   * @see https://www.drupal.org/node/3408266
-   */
-  protected function replaceName($name, $data) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Config\Schema\TypeResolver::resolveDynamicTypeName() instead. See https://www.drupal.org/node/3408266', E_USER_DEPRECATED);
-    return TypeResolver::resolveDynamicTypeName($name, $data);
-  }
-
-  /**
-   * Resolves a dynamic type expression using configuration data.
-   *
-   * @param string $value
-   *   Expression to be resolved.
-   * @param array $data
-   *   Configuration data for the element.
-   *
-   * @return string
-   *   The value the expression resolves to, or the given expression if it
-   *   cannot be resolved.
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *   \Drupal\Core\Config\Schema\TypeResolver::resolveDynamicTypeName::resolveExpression()
-   *   instead.
-   *
-   * @see https://www.drupal.org/node/3408266
-   */
-  protected function replaceVariable($value, $data) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Config\Schema\TypeResolver::resolveExpression() instead. See https://www.drupal.org/node/3408266', E_USER_DEPRECATED);
-    return TypeResolver::resolveExpression($value, $data);
   }
 
   /**
@@ -473,50 +438,6 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $definition = $this->getDefinition($config_name);
     $data_definition = $this->buildDataDefinition($definition, $config_data);
     return $this->create($data_definition, $config_data, $config_name);
-  }
-
-  /**
-   * Resolves a dynamic type name.
-   *
-   * @param string $type
-   *   Configuration type, potentially with expressions in square brackets.
-   * @param array $data
-   *   Configuration data for the element.
-   *
-   * @return string
-   *   Configuration type name with all expressions resolved.
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *   \Drupal\Core\Config\Schema\TypeResolver::resolveDynamicTypeName()
-   *   instead.
-   *
-   * @see https://www.drupal.org/node/3413264
-   */
-  protected function resolveDynamicTypeName(string $type, array $data): string {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Config\Schema\TypeResolver::' . __FUNCTION__ . '() instead. See https://www.drupal.org/node/3413264', E_USER_DEPRECATED);
-    return TypeResolver::resolveDynamicTypeName($type, $data);
-  }
-
-  /**
-   * Resolves a dynamic expression.
-   *
-   * @param string $expression
-   *   Expression to be resolved.
-   * @param array|\Drupal\Core\TypedData\TypedDataInterface $data
-   *   Configuration data for the element.
-   *
-   * @return string
-   *   The value the expression resolves to, or the given expression if it
-   *   cannot be resolved.
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use
-   *   \Drupal\Core\Config\Schema\TypeResolver::resolveExpression() instead.
-   *
-   * @see https://www.drupal.org/node/3413264
-   */
-  protected function resolveExpression(string $expression, array $data): string {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Use \Drupal\Core\Config\Schema\TypeResolver::' . __FUNCTION__ . '() instead. See https://www.drupal.org/node/3413264', E_USER_DEPRECATED);
-    return TypeResolver::resolveExpression($expression, $data);
   }
 
 }

@@ -7,17 +7,17 @@ namespace Drupal\Tests\views\Functional\Handler;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Entity\View;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\HandlerBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore wõrd
-
 /**
  * Tests abstract handler definitions.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class HandlerTest extends ViewTestBase {
 
   use CommentTestTrait;
@@ -27,12 +27,16 @@ class HandlerTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_view', 'test_view_handler_weight', 'test_handler_relationships', 'test_handler_test_access', 'test_filter_in_operator_ui'];
+  public static $testViews = [
+    'test_view',
+    'test_view_handler_weight',
+    'test_handler_relationships',
+    'test_handler_test_access',
+    'test_filter_in_operator_ui',
+  ];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['views_ui', 'comment', 'node'];
 
@@ -58,31 +62,17 @@ class HandlerTest extends ViewTestBase {
     $data = parent::viewsData();
     // Override the name handler to be able to call placeholder() from outside.
     $data['views_test_data']['name']['field']['id'] = 'test_field';
-
-    // Setup one field with an access callback and one with an access callback
-    // and arguments.
-    $data['views_test_data']['access_callback'] = $data['views_test_data']['id'];
-    $data['views_test_data']['access_callback_arguments'] = $data['views_test_data']['id'];
-    foreach (ViewExecutable::getHandlerTypes() as $type => $info) {
-      if (isset($data['views_test_data']['access_callback'][$type]['id'])) {
-        $data['views_test_data']['access_callback'][$type]['access callback'] = 'views_test_data_handler_test_access_callback';
-
-        $data['views_test_data']['access_callback_arguments'][$type]['access callback'] = 'views_test_data_handler_test_access_callback_argument';
-        $data['views_test_data']['access_callback_arguments'][$type]['access arguments'] = [TRUE];
-      }
-    }
-
     return $data;
   }
 
   /**
    * Tests the breakString method.
    */
-  public function testBreakString() {
+  public function testBreakString(): void {
     // Check defaults.
     $this->assertEquals((object) ['value' => [], 'operator' => NULL], HandlerBase::breakString(''));
 
-    // Test ors
+    // Test ors.
     $handler = HandlerBase::breakString('word1 word2+word');
     $this->assertEquals(['word1', 'word2', 'word'], $handler->value);
     $this->assertEquals('or', $handler->operator);
@@ -116,13 +106,13 @@ class HandlerTest extends ViewTestBase {
     $this->assertEquals(['wõrd1', 'wõrd2', 'wõrd'], $handler->value);
     $this->assertEquals('and', $handler->operator);
 
-    // Test a single word
+    // Test a single word.
     $handler = HandlerBase::breakString('word');
     $this->assertEquals(['word'], $handler->value);
     $this->assertEquals('and', $handler->operator);
 
     $s1 = $this->randomMachineName();
-    // Generate three random numbers which can be used below;
+    // Generate three random numbers which can be used below.
     $n1 = rand(0, 100);
     $n2 = rand(0, 100);
     $n3 = rand(0, 100);
@@ -170,7 +160,7 @@ class HandlerTest extends ViewTestBase {
     $this->assertEquals([(int) $s1, $n2, $n3], $handlerBase->value);
     $this->assertEquals('or', $handlerBase->operator);
 
-    // Generate three random decimals which can be used below;
+    // Generate three random decimals which can be used below.
     $d1 = rand(0, 10) / 10;
     $d2 = rand(0, 10) / 10;
     $d3 = rand(0, 10) / 10;
@@ -205,7 +195,7 @@ class HandlerTest extends ViewTestBase {
   /**
    * Tests the order of handlers is the same before and after saving.
    */
-  public function testHandlerWeights() {
+  public function testHandlerWeights(): void {
     $handler_types = ['fields', 'filters', 'sorts'];
 
     $view = Views::getView('test_view_handler_weight');
@@ -231,7 +221,7 @@ class HandlerTest extends ViewTestBase {
   /**
    * Tests the relationship ui for field/filter/argument/relationship.
    */
-  public function testRelationshipUI() {
+  public function testRelationshipUI(): void {
     $views_admin = $this->drupalCreateUser(['administer views']);
     $this->drupalLogin($views_admin);
 
@@ -295,7 +285,7 @@ class HandlerTest extends ViewTestBase {
   /**
    * Tests the relationship method on the base class.
    */
-  public function testSetRelationship() {
+  public function testSetRelationship(): void {
     $view = Views::getView('test_handler_relationships');
     $view->setDisplay();
     // Setup a broken relationship.
@@ -334,7 +324,7 @@ class HandlerTest extends ViewTestBase {
    *
    * @see \Drupal\views\Plugin\views\HandlerBase::placeholder()
    */
-  public function testPlaceholder() {
+  public function testPlaceholder(): void {
     $view = Views::getView('test_view');
     $view->initHandlers();
     $view->initQuery();
@@ -359,44 +349,6 @@ class HandlerTest extends ViewTestBase {
     $this->assertEquals($string, $handler->getPlaceholder());
     $this->assertEquals($string . 1, $handler->getPlaceholder());
     $this->assertEquals($string . 2, $handler->getPlaceholder());
-  }
-
-  /**
-   * Tests access to a handler.
-   *
-   * @see views_test_data_handler_test_access_callback
-   */
-  public function testAccess() {
-    $view = Views::getView('test_handler_test_access');
-    $views_data = $this->viewsData();
-    $views_data = $views_data['views_test_data'];
-
-    // Enable access to callback only field and deny for callback + arguments.
-    $this->config('views_test_data.tests')->set('handler_access_callback', TRUE)->save();
-    $this->config('views_test_data.tests')->set('handler_access_callback_argument', FALSE)->save();
-    $view->initDisplay();
-    $view->initHandlers();
-
-    foreach ($views_data['access_callback'] as $type => $info) {
-      if (!in_array($type, ['title', 'help'])) {
-        $this->assertInstanceOf(HandlerBase::class, $view->field['access_callback']);
-        $this->assertFalse(isset($view->field['access_callback_arguments']), 'Make sure the user got no access to the access_callback_arguments field ');
-      }
-    }
-
-    // Enable access to the callback + argument handlers and deny for callback.
-    $this->config('views_test_data.tests')->set('handler_access_callback', FALSE)->save();
-    $this->config('views_test_data.tests')->set('handler_access_callback_argument', TRUE)->save();
-    $view->destroy();
-    $view->initDisplay();
-    $view->initHandlers();
-
-    foreach ($views_data['access_callback'] as $type => $info) {
-      if (!in_array($type, ['title', 'help'])) {
-        $this->assertFalse(isset($view->field['access_callback']), 'Make sure the user got no access to the access_callback field ');
-        $this->assertInstanceOf(HandlerBase::class, $view->field['access_callback_arguments']);
-      }
-    }
   }
 
 }

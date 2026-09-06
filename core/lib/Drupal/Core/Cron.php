@@ -7,13 +7,11 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
-use Drupal\Core\Queue\DelayableQueueInterface;
-use Drupal\Core\Queue\DelayedRequeueException;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\QueueInterface;
+use Drupal\Core\Queue\QueueProcessTrait;
 use Drupal\Core\Queue\QueueWorkerInterface;
 use Drupal\Core\Queue\QueueWorkerManagerInterface;
-use Drupal\Core\Queue\RequeueException;
 use Drupal\Core\Queue\SuspendQueueException;
 use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\Core\Session\AnonymousUserSession;
@@ -26,62 +24,7 @@ use Psr\Log\NullLogger;
  * The Drupal core Cron service.
  */
 class Cron implements CronInterface {
-
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The lock service.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface
-   */
-  protected $lock;
-
-  /**
-   * The queue service.
-   *
-   * @var \Drupal\Core\Queue\QueueFactory
-   */
-  protected $queueFactory;
-
-  /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
-   * The account switcher service.
-   *
-   * @var \Drupal\Core\Session\AccountSwitcherInterface
-   */
-  protected $accountSwitcher;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * The queue plugin manager.
-   *
-   * @var \Drupal\Core\Queue\QueueWorkerManagerInterface
-   */
-  protected $queueManager;
-
-  /**
-   * The time service.
-   *
-   * @var \Drupal\Component\Datetime\TimeInterface
-   */
-  protected $time;
+  use QueueProcessTrait;
 
   /**
    * The queue config.
@@ -93,42 +36,36 @@ class Cron implements CronInterface {
   /**
    * Constructs a cron object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock service.
-   * @param \Drupal\Core\Queue\QueueFactory $queue_factory
+   * @param \Drupal\Core\Queue\QueueFactory $queueFactory
    *   The queue service.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
+   * @param \Drupal\Core\Session\AccountSwitcherInterface $accountSwitcher
    *   The account switching service.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Queue\QueueWorkerManagerInterface $queue_manager
+   * @param \Drupal\Core\Queue\QueueWorkerManagerInterface $queueManager
    *   The queue plugin manager.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
-   * @param mixed[]|null $queue_config
+   * @param array $queue_config
    *   Queue configuration from the service container.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, LockBackendInterface $lock, QueueFactory $queue_factory, StateInterface $state, AccountSwitcherInterface $account_switcher, LoggerInterface $logger, QueueWorkerManagerInterface $queue_manager, TimeInterface $time = NULL, ?array $queue_config = NULL) {
-    $this->moduleHandler = $module_handler;
-    $this->lock = $lock;
-    $this->queueFactory = $queue_factory;
-    $this->state = $state;
-    $this->accountSwitcher = $account_switcher;
-    $this->logger = $logger;
-    $this->queueManager = $queue_manager;
-    if (!isset($time)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $time argument is deprecated in drupal:10.1.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3343743', E_USER_DEPRECATED);
-      $time = \Drupal::service('datetime.time');
-    }
-    $this->time = $time;
-    if (!isset($queue_config)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $queue_config argument is deprecated in drupal:10.1.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3343743', E_USER_DEPRECATED);
-      $queue_config = \Drupal::getContainer()->getParameter('queue.config');
-    }
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected LockBackendInterface $lock,
+    protected QueueFactory $queueFactory,
+    protected StateInterface $state,
+    protected AccountSwitcherInterface $accountSwitcher,
+    protected LoggerInterface $logger,
+    protected QueueWorkerManagerInterface $queueManager,
+    protected TimeInterface $time,
+    array $queue_config,
+  ) {
     $this->queueConfig = $queue_config + [
       'suspendMaximumWait' => 30.0,
     ];
@@ -166,7 +103,10 @@ class Cron implements CronInterface {
       // Release cron lock.
       $this->lock->release('cron');
 
-      // Return TRUE so other functions can check if it did run successfully
+      // Add watchdog message.
+      $this->logger->info('Cron run completed.');
+
+      // Return TRUE so other functions can check if it did run successfully.
       $return = TRUE;
     }
 
@@ -183,7 +123,6 @@ class Cron implements CronInterface {
     // Record cron time.
     $request_time = $this->time->getRequestTime();
     $this->state->set('system.cron_last', $request_time);
-    $this->logger->info('Cron run completed.');
   }
 
   /**
@@ -226,7 +165,7 @@ class Cron implements CronInterface {
       // Each queue will be processed immediately when it is reached for the
       // first time, as zero > currentTime will never be true.
       if ($process_from > $this->time->getCurrentMicroTime()) {
-        $this->usleep(round($process_from - $this->time->getCurrentMicroTime(), 3) * 1000000);
+        $this->usleep((int) round($process_from - $this->time->getCurrentMicroTime(), 3) * 1000000);
       }
 
       try {
@@ -263,43 +202,10 @@ class Cron implements CronInterface {
   protected function processQueue(QueueInterface $queue, QueueWorkerInterface $worker) {
     $lease_time = $worker->getPluginDefinition()['cron']['time'];
     $end = $this->time->getCurrentTime() + $lease_time;
-    while ($this->time->getCurrentTime() < $end && ($item = $queue->claimItem($lease_time))) {
-      try {
-        $worker->processItem($item->data);
-        $queue->deleteItem($item);
-      }
-      catch (DelayedRequeueException $e) {
-        // The worker requested the task not be immediately re-queued.
-        // - If the queue doesn't support ::delayItem(), we should leave the
-        // item's current expiry time alone.
-        // - If the queue does support ::delayItem(), we should allow the
-        // queue to update the item's expiry using the requested delay.
-        if ($queue instanceof DelayableQueueInterface) {
-          // This queue can handle a custom delay; use the duration provided
-          // by the exception.
-          $queue->delayItem($item, $e->getDelay());
-        }
-      }
-      catch (RequeueException) {
-        // The worker requested the task be immediately requeued.
-        $queue->releaseItem($item);
-      }
-      catch (SuspendQueueException $e) {
-        // If the worker indicates the whole queue should be skipped, release
-        // the item and go to the next queue.
-        $queue->releaseItem($item);
-
-        $this->logger->debug('A worker for @queue queue suspended further processing of the queue.', [
-          '@queue' => $worker->getPluginId(),
-        ]);
-
-        // Skip to the next queue.
-        throw $e;
-      }
-      catch (\Exception $e) {
-        // In case of any other kind of exception, log it and leave the item
-        // in the queue to be processed again later.
-        Error::logException($this->logger, $e);
+    while ($this->time->getCurrentTime() < $end) {
+      $claimed = $this->processItem($queue, $worker);
+      if (!$claimed) {
+        break;
       }
     }
   }

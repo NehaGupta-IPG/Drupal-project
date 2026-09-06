@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Functional;
 
+use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore ditka
-
 /**
  * Tests access bypass permission controls on workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceBypassTest extends BrowserTestBase {
 
   use WorkspaceTestUtilities;
@@ -22,7 +24,7 @@ class WorkspaceBypassTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'user', 'block', 'workspaces'];
+  protected static $modules = ['node', 'user', 'block', 'workspaces', 'workspaces_ui'];
 
   /**
    * {@inheritdoc}
@@ -32,7 +34,7 @@ class WorkspaceBypassTest extends BrowserTestBase {
   /**
    * Verifies that a user can edit anything in a workspace they own.
    */
-  public function testBypassOwnWorkspace() {
+  public function testBypassOwnWorkspace(): void {
     $permissions = [
       'create workspace',
       'edit own workspace',
@@ -50,7 +52,11 @@ class WorkspaceBypassTest extends BrowserTestBase {
     $bears = $this->createAndActivateWorkspaceThroughUi('Bears', 'bears');
 
     // Now create a node in the Bears workspace, as the owner of that workspace.
-    $coach_bears_node = $this->createNodeThroughUi('Ditka Bears node', 'test');
+    $coach_bears_node = $this->drupalCreateNode([
+      'title' => 'Ditka Bears node',
+      'type' => 'test',
+      'status' => NodeInterface::PUBLISHED,
+    ]);
     $coach_bears_node_id = $coach_bears_node->id();
 
     // Editing both nodes should be possible.

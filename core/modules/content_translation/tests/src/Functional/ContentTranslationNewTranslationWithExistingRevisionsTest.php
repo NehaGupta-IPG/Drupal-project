@@ -6,12 +6,14 @@ namespace Drupal\Tests\content_translation\Functional;
 
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that new translations do not delete existing ones.
- *
- * @group content_translation
  */
+#[Group('content_translation')]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationNewTranslationWithExistingRevisionsTest extends ContentTranslationPendingRevisionTestBase {
 
   /**
@@ -24,14 +26,6 @@ class ContentTranslationNewTranslationWithExistingRevisionsTest extends ContentT
     'language',
     'node',
   ];
-
-  /**
-   * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
-   */
-  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -50,7 +44,7 @@ class ContentTranslationNewTranslationWithExistingRevisionsTest extends ContentT
   /**
    * Tests a translation with a draft is not deleted.
    */
-  public function testDraftTranslationIsNotDeleted() {
+  public function testDraftTranslationIsNotDeleted(): void {
     $this->drupalLogin($this->translator);
 
     // Create a test node.
@@ -116,7 +110,7 @@ class ContentTranslationNewTranslationWithExistingRevisionsTest extends ContentT
   /**
    * Test translation delete hooks are not invoked.
    */
-  public function testCreatingNewDraftDoesNotInvokeDeleteHook() {
+  public function testCreatingNewDraftDoesNotInvokeDeleteHook(): void {
     $this->drupalLogin($this->translator);
 
     // Create a test node.

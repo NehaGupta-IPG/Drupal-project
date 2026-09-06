@@ -107,7 +107,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
    * @return array
    *   The form array.
    */
-  public function buildForm(array $form, FormStateInterface $form_state, SectionStorageInterface $section_storage = NULL, $delta = NULL, $region = NULL, $uuid = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?SectionStorageInterface $section_storage = NULL, $delta = NULL, $region = NULL, $uuid = NULL) {
     $parameters = array_slice(func_get_args(), 2);
     foreach ($parameters as $parameter) {
       if (is_null($parameter)) {
@@ -157,7 +157,10 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
     ];
     $current_section = $sections[$selected_delta];
 
-    $aria_label = $this->t('Blocks in Section: @section, Region: @region', ['@section' => $selected_delta + 1, '@region' => $selected_region]);
+    $aria_label = $this->t('Blocks in Section: @section, Region: @region', [
+      '@section' => $selected_delta + 1,
+      '@region' => $selected_region,
+    ]);
 
     $form['components_wrapper']['components'] = [
       '#type' => 'table',

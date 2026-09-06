@@ -6,18 +6,19 @@ namespace Drupal\Tests\system\Kernel\Entity;
 
 use Drupal\Component\Utility\Html;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\node\Entity\NodeType;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\NodeType;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore xyabz
-
 /**
  * Tests entity reference selection plugins.
- *
- * @group entity_reference
- * @group #slow
  */
+#[Group('entity_reference')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -47,7 +48,6 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'field',
     'node',
@@ -96,8 +96,6 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
   /**
    * Tests referenceable entities with no target entity type 'label' key.
    *
-   * @see \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface::getReferenceableEntities()
-   *
    * @param mixed $match
    *   The input text to be checked.
    * @param string $match_operator
@@ -111,9 +109,10 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
    * @param int $count_all
    *   The total number (unlimited) of entities to be retrieved.
    *
-   * @dataProvider providerTestCases
+   * @see \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface::getReferenceableEntities()
    */
-  public function testReferenceablesWithNoLabelKey($match, $match_operator, $limit, $count_limited, array $items, $count_all) {
+  #[DataProvider('providerTestCases')]
+  public function testReferenceablesWithNoLabelKey(string|array|null $match, string $match_operator, int $limit, int $count_limited, array $items, int $count_all): void {
     // Test ::getReferenceableEntities().
     $referenceables = $this->selectionHandler->getReferenceableEntities($match, $match_operator, $limit);
 
@@ -143,8 +142,9 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
    * Provides test cases for ::testReferenceablesWithNoLabelKey() test.
    *
    * @return array[]
+   *   An array of test cases.
    */
-  public static function providerTestCases() {
+  public static function providerTestCases(): array {
     return [
       // All referenceables, no limit. Expecting 9 items.
       [NULL, 'CONTAINS', 0, 9, static::$labels, 9],

@@ -14,7 +14,7 @@ interface ConfigEntityStorageInterface extends EntityStorageInterface {
    *
    * @param string $config_name
    *   The full configuration name to extract the ID from; for example,
-   *   'views.view.archive'.
+   *   'views.view.content'.
    * @param string $config_prefix
    *   The config prefix of the configuration entity; for example, 'views.view'.
    *
@@ -73,13 +73,13 @@ interface ConfigEntityStorageInterface extends EntityStorageInterface {
   /**
    * Loads one or more entities in their original form without overrides.
    *
-   * @param $ids
+   * @param string[]|null $ids
    *   An array of entity IDs, or NULL to load all entities.
    *
    * @return \Drupal\Core\Entity\EntityInterface[]
    *   An array of entity objects indexed by their IDs. Returns an empty array
    *   if no matching entities are found.
    */
-  public function loadMultipleOverrideFree(array $ids = NULL);
+  public function loadMultipleOverrideFree(?array $ids = NULL);
 
 }

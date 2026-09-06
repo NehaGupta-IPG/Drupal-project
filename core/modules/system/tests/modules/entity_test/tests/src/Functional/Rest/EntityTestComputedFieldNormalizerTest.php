@@ -6,12 +6,14 @@ namespace Drupal\Tests\entity_test\Functional\Rest;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Tests\rest\Functional\AnonResourceTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test normalization of computed field.
- *
- * @group rest
  */
+#[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class EntityTestComputedFieldNormalizerTest extends EntityTestResourceTestBase {
 
   use AnonResourceTestTrait;
@@ -91,25 +93,8 @@ class EntityTestComputedFieldNormalizerTest extends EntityTestResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testPost() {
-    // Post test not required.
-    $this->markTestSkipped();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPatch() {
-    // Patch test not required.
-    $this->markTestSkipped();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testDelete() {
-    // Delete test not required.
-    $this->markTestSkipped();
+  public function testCrud(): void {
+    $this->doTestGet();
   }
 
 }

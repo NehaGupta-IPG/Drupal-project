@@ -6,18 +6,21 @@ namespace Drupal\Tests\system\Functional\Render;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Performs tests for the effects of the ajax_page_state query parameter.
- *
- * @group Render
  */
+#[Group('Render')]
+#[RunTestsInSeparateProcesses]
 class AjaxPageStateTest extends BrowserTestBase {
 
+  use PromotedContentViewTestTrait;
+
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'views'];
 
@@ -38,6 +41,9 @@ class AjaxPageStateTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->enablePromotedContentView();
+
     // Create an administrator with all permissions.
     $this->adminUser = $this->drupalCreateUser(array_keys(\Drupal::service('user.permissions')
       ->getPermissions()));
@@ -52,7 +58,7 @@ class AjaxPageStateTest extends BrowserTestBase {
    * The libraries active-link and drupalSettings are loaded default from core
    * and available in code as scripts. Do this as the base test.
    */
-  public function testLibrariesAvailable() {
+  public function testLibrariesAvailable(): void {
     $this->drupalGet('node', []);
     // The active link library from core should be loaded.
     $this->assertSession()->responseContains('/core/misc/active-link.js');
@@ -67,7 +73,7 @@ class AjaxPageStateTest extends BrowserTestBase {
    * should be excluded as it is already loaded. This should not affect other
    * libraries so test if active-link is still available.
    */
-  public function testDrupalSettingsIsNotLoaded() {
+  public function testDrupalSettingsIsNotLoaded(): void {
     $this->drupalGet('node',
       [
         'query' =>
@@ -91,7 +97,7 @@ class AjaxPageStateTest extends BrowserTestBase {
    * The ajax_page_state[libraries] should be able to support multiple libraries
    * comma separated.
    */
-  public function testMultipleLibrariesAreNotLoaded() {
+  public function testMultipleLibrariesAreNotLoaded(): void {
     $this->drupalGet('node', [
       'query' => [
         'ajax_page_state' => [
@@ -112,6 +118,40 @@ class AjaxPageStateTest extends BrowserTestBase {
 
     // The drupalSettings library from core should be included in loading.
     $this->assertSession()->responseContains('/core/misc/drupalSettingsLoader.js');
+  }
+
+  /**
+   * Tests that an invalid library name does not inject HTML.
+   */
+  public function testInvalidLibraryNameDoesNotInjectHtml(): void {
+    // Display all errors and warnings.
+    $this->config('system.logging')->set('error_level', ERROR_REPORTING_DISPLAY_ALL)->save();
+
+    // A value without an extension/name separator is discarded before it can
+    // reach the asset system, where the raw value would be embedded in an
+    // error message.
+    $this->drupalGet('node', [
+      'query' => [
+        'ajax_page_state' => [
+          'libraries' => UrlHelper::compressQueryParameter('<b>foo'),
+        ],
+      ],
+    ]);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseNotContains('<b>foo');
+
+    // A value with a separator but an unknown library name is resolved as
+    // extension "core" and library "<b>foo", which does not exist and is
+    // silently ignored, so it cannot generate error output either.
+    $this->drupalGet('node', [
+      'query' => [
+        'ajax_page_state' => [
+          'libraries' => UrlHelper::compressQueryParameter('core/<b>foo'),
+        ],
+      ],
+    ]);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseNotContains('<b>foo');
   }
 
 }

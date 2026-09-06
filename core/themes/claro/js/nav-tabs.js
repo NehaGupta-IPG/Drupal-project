@@ -13,6 +13,12 @@
 
     const openMenu = () => {
       $target.toggleClass('is-open');
+      const isOpen = $target.hasClass('is-open');
+
+      $target.find('button').attr('aria-expanded', isOpen);
+
+      $tab.find('.hamburger-icon').toggle(!isOpen).attr('aria-hidden', isOpen);
+      $tab.find('.close-icon').toggle(isOpen).attr('aria-hidden', !isOpen);
     };
 
     const toggleOrder = (reset) => {
@@ -54,9 +60,11 @@
         // the width of the parent container.
         const isHorizontal = $tab.attr('data-width') <= $tab.outerWidth();
         $tab.toggleClass('is-horizontal', isHorizontal);
+        $tab.find('button').attr('aria-expanded', null);
         toggleOrder(isHorizontal);
       } else {
         toggleOrder(false);
+        $tab.find('button').attr('aria-expanded', 'false');
       }
     };
 

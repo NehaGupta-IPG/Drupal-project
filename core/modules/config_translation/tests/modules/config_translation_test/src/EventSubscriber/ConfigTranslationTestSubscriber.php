@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\config_translation_test\EventSubscriber;
 
 use Drupal\config_translation\Event\ConfigMapperPopulateEvent;
@@ -28,7 +30,7 @@ class ConfigTranslationTestSubscriber implements EventSubscriberInterface {
    * @param \Drupal\config_translation\Event\ConfigMapperPopulateEvent $event
    *   The configuration mapper event.
    */
-  public function addConfigNames(ConfigMapperPopulateEvent $event) {
+  public function addConfigNames(ConfigMapperPopulateEvent $event): void {
     $mapper = $event->getMapper();
     if ($mapper->getBaseRouteName() === 'system.site_information_settings' && $mapper->getLangcode() === 'en') {
       $mapper->addConfigName('config_translation_test.content');

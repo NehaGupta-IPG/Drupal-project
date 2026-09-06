@@ -212,12 +212,12 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    */
   protected function findBinOverlap(array $binaries, array $clean_paths): array {
     // Make a filesystem model to explore. This is a keyed array that looks like
-    // all the places that will be removed by cleanup. 'tests/src' becomes
-    // $filesystem['tests']['src'] = TRUE;
+    // all the places that will be removed by cleanup. For example, the path
+    // "tests/src" becomes "$filesystem['tests']['src'] = TRUE".
     $filesystem = [];
     foreach ($clean_paths as $clean_path) {
       $clean_pieces = explode("/", $clean_path);
-      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
       $current = &$filesystem;
       foreach ($clean_pieces as $clean_piece) {
         $current = &$current[$clean_piece];
@@ -331,8 +331,8 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    *
    * @param \Composer\Package\PackageInterface $package
    *   The package to clean.
-   * @param string $paths_for_package
-   *   List of directories in $package_name to remove
+   * @param string[] $paths_for_package
+   *   List of directories in $package_name to remove.
    */
   protected function cleanPathsForPackage(PackageInterface $package, $paths_for_package): void {
     // Whatever happens here, this package counts as cleaned so that we don't

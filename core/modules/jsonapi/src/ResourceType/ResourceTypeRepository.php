@@ -17,6 +17,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\TypedData\DataReferenceTargetDefinition;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 
@@ -45,41 +46,6 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   use LoggerChannelTrait;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The bundle manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
-   */
-  protected $entityTypeBundleInfo;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
-   * The cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cache;
-
-  /**
-   * The event dispatcher.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
-
-  /**
    * Cache tags used for caching the repository.
    *
    * @var string[]
@@ -94,27 +60,14 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     'entity_types',
   ];
 
-  /**
-   * Instantiates a ResourceTypeRepository object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_bundle_info
-   *   The entity type bundle info service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
-   *   The event dispatcher.
-   */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_bundle_info, EntityFieldManagerInterface $entity_field_manager, CacheBackendInterface $cache, EventDispatcherInterface $dispatcher) {
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityTypeBundleInfo = $entity_bundle_info;
-    $this->entityFieldManager = $entity_field_manager;
-    $this->cache = $cache;
-    $this->eventDispatcher = $dispatcher;
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+    protected EntityFieldManagerInterface $entityFieldManager,
+    #[Autowire(service: 'cache.jsonapi_resource_types')]
+    protected CacheBackendInterface $cache,
+    protected EventDispatcherInterface $eventDispatcher,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -239,7 +192,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     //   cases.
     // - exposing its revision ID as an attribute will compete with any profile
     //   defined meta members used for resource object versioning.
-    // @see http://jsonapi.org/format/#document-resource-identifier-objects
+    // @see https://jsonapi.org/format/#document-resource-identifier-objects
     $id_field_name = $entity_type->getKey('id');
     $uuid_field_name = $entity_type->getKey('uuid');
     if ($uuid_field_name && $uuid_field_name !== 'id') {
@@ -266,7 +219,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     // For all other fields,  use their internal field name also as their public
     // field name.  Unless they're called "id" or "type": those names are
     // reserved by the JSON:API spec.
-    // @see http://jsonapi.org/format/#document-resource-object-fields
+    // @see https://jsonapi.org/format/#document-resource-object-fields
     $reserved_field_names = ['id', 'type'];
     foreach (array_diff($field_names, array_keys($fields)) as $field_name) {
       $alias = $field_name;
@@ -301,7 +254,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     // access the display name of a user. This is useful when displaying the
     // name of a node's author.
     // @see \Drupal\jsonapi\JsonApiResource\ResourceObject::extractContentEntityFields()
-    // @todo: eliminate this special casing in https://www.drupal.org/project/drupal/issues/3079254.
+    // @todo Eliminate this special casing in https://www.drupal.org/project/drupal/issues/3079254.
     if ($entity_type->id() === 'user') {
       $fields['display_name'] = new ResourceTypeAttribute('display_name');
     }
@@ -492,9 +445,11 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     /** @var \Drupal\Core\Field\TypedData\FieldItemDataDefinition $item_definition */
     $item_definition = $field_definition->getItemDefinition();
     $main_property = $item_definition->getMainPropertyName();
-    $property_definition = $item_definition->getPropertyDefinition($main_property);
+    if ($main_property !== NULL) {
+      $property_definition = $item_definition->getPropertyDefinition($main_property);
+    }
 
-    return $field_type_is_reference[$field_definition->getType()] = $property_definition instanceof DataReferenceTargetDefinition;
+    return $field_type_is_reference[$field_definition->getType()] = isset($property_definition) && $property_definition instanceof DataReferenceTargetDefinition;
   }
 
   /**

@@ -12,25 +12,30 @@ interface ConfigInstallerInterface {
    *
    * When an extension is installed, it searches all the default configuration
    * directories for all other extensions to locate any configuration with its
-   * name prefix. For example, the Node module provides the frontpage view as a
-   * default configuration file:
-   * core/modules/node/config/optional/views.view.frontpage.yml
+   * name prefix. For example, the Node module provides the promoted_content
+   * view as a default configuration file:
+   * core/modules/node/config/optional/views.view.promoted_content.yml
    * When the Views module is installed after the Node module is already
-   * enabled, the frontpage view will be installed.
+   * enabled, the promoted_content view will be installed.
    *
    * Additionally, the default configuration directory for the extension being
    * installed is searched to discover if it contains default configuration
-   * that is owned by other enabled extensions. So, the frontpage view will also
+   * that is owned by other enabled extensions. So, the promoted_content view
+   * will also
    * be installed when the Node module is installed after Views.
    *
    * @param string $type
    *   The extension type; e.g., 'module' or 'theme'.
    * @param string $name
    *   The name of the module or theme to install default configuration for.
+   * @param \Drupal\Core\Config\DefaultConfigMode $mode
+   *   The default value DefaultConfigMode::All means create install, optional
+   *   and site optional configuration. The other modes create a single type
+   *   config.
    *
    * @see \Drupal\Core\Config\ExtensionInstallStorage
    */
-  public function installDefaultConfig($type, $name);
+  public function installDefaultConfig($type, $name, DefaultConfigMode $mode = DefaultConfigMode::All);
 
   /**
    * Installs optional configuration.
@@ -40,7 +45,7 @@ interface ConfigInstallerInterface {
    * - it's a configuration entity.
    * - its dependencies can be met.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param \Drupal\Core\Config\StorageInterface|null $storage
    *   (optional) The configuration storage to search for optional
    *   configuration. If not provided, all enabled extension's optional
    *   configuration directories including the install profile's will be
@@ -49,9 +54,9 @@ interface ConfigInstallerInterface {
    *   (optional) If set, ensures that the configuration being installed has
    *   this dependency. The format is dependency type as the key ('module',
    *   'theme', or 'config') and the dependency name as the value
-   *   ('node', 'olivero', 'views.view.frontpage').
+   *   ('node', 'olivero', 'views.view.promoted_content').
    */
-  public function installOptionalConfig(StorageInterface $storage = NULL, $dependency = []);
+  public function installOptionalConfig(?StorageInterface $storage = NULL, $dependency = []);
 
   /**
    * Installs all default configuration in the specified collection.
@@ -108,8 +113,8 @@ interface ConfigInstallerInterface {
    *
    * @param string $type
    *   Type of extension to install.
-   * @param string $name
-   *   Name of extension to install.
+   * @param string|array $name
+   *   Name or names of extensions to install.
    *
    * @throws \Drupal\Core\Config\UnmetDependenciesException
    * @throws \Drupal\Core\Config\PreExistingConfigException

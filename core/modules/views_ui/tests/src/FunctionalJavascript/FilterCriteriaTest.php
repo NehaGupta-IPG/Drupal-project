@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the View UI filter criteria group dialog.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class FilterCriteriaTest extends WebDriverTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'views', 'views_ui'];
+  protected static $modules = ['node', 'views', 'views_ui', 'node_block_test'];
 
   /**
    * {@inheritdoc}
@@ -44,19 +46,23 @@ class FilterCriteriaTest extends WebDriverTestBase {
   /**
    * Tests dialog for filter criteria.
    */
-  public function testFilterCriteriaDialog() {
-    // Checks that the admin summary is not double escaped.
-    $this->drupalGet('admin/structure/views/view/who_s_online');
-    $page = $this->getSession()->getPage();
-    $this->assertNotNull($page->findLink('User: Last access (>= -15 minutes)'));
-
-    $this->drupalGet('admin/structure/views/view/content_recent');
+  public function testFilterCriteriaDialog(): void {
     $assert_session = $this->assertSession();
     $session = $this->getSession();
     $page = $session->getPage();
 
-    $this->openFilterDialog();
+    // Checks that the admin summary is not double escaped.
+    $this->drupalGet('admin/structure/views/nojs/add-handler/test_content_recent/block_1/filter');
+    $this->getSession()->getPage()->checkField('name[node_field_data.changed]');
+    $this->submitForm([], 'Add and configure filter criteria');
+    $this->submitForm([
+      'options[operator]' => '>',
+      'options[value][value]' => '1 day',
+      'options[value][type]' => 'offset',
+    ], 'Apply');
+    $this->assertNotNull($page->findLink('Content: Changed (> 1 day)'));
 
+    $this->openFilterDialog();
     // Add a new filter group.
     $create_new_filter_group = $page->findById('views-add-group-link');
     $this->assertTrue($create_new_filter_group->isVisible(), 'Add group link found.');
@@ -130,9 +136,9 @@ class FilterCriteriaTest extends WebDriverTestBase {
   /**
    * Tests operator labels.
    */
-  public function testOperatorLabels() {
-    // Open the "Frontpage" view.
-    $this->drupalGet('admin/structure/views/view/frontpage');
+  public function testOperatorLabels(): void {
+    // Open the "Promoted Content" view.
+    $this->drupalGet('admin/structure/views/view/promoted_content');
     $session = $this->getSession();
     $page = $session->getPage();
 
@@ -178,7 +184,7 @@ class FilterCriteriaTest extends WebDriverTestBase {
   /**
    * Uses the 'And/Or Rearrange' link for filters to open a dialog.
    */
-  protected function openFilterDialog() {
+  protected function openFilterDialog(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $dropbutton = $page->find('css', '.views-ui-display-tab-bucket.filter .dropbutton-toggle button');

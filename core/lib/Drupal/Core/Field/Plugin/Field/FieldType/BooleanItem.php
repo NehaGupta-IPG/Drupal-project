@@ -18,7 +18,7 @@ use Drupal\Core\TypedData\OptionsProviderInterface;
 #[FieldType(
   id: "boolean",
   label: new TranslatableMarkup("Boolean"),
-  description: new TranslatableMarkup("Field to store a true or false value."),
+  description: new TranslatableMarkup("True or false value"),
   default_widget: "boolean_checkbox",
   default_formatter: "boolean",
 )]
@@ -84,14 +84,14 @@ class BooleanItem extends FieldItemBase implements OptionsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPossibleValues(AccountInterface $account = NULL) {
+  public function getPossibleValues(?AccountInterface $account = NULL) {
     return [0, 1];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getPossibleOptions(AccountInterface $account = NULL) {
+  public function getPossibleOptions(?AccountInterface $account = NULL) {
     return [
       0 => $this->getSetting('off_label'),
       1 => $this->getSetting('on_label'),
@@ -101,14 +101,14 @@ class BooleanItem extends FieldItemBase implements OptionsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getSettableValues(AccountInterface $account = NULL) {
+  public function getSettableValues(?AccountInterface $account = NULL) {
     return [0, 1];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getSettableOptions(AccountInterface $account = NULL) {
+  public function getSettableOptions(?AccountInterface $account = NULL) {
     return $this->getPossibleOptions($account);
   }
 

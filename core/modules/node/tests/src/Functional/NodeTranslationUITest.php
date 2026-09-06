@@ -4,30 +4,33 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional;
 
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
-use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
-use Drupal\Tests\language\Traits\LanguageTestTrait;
-use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
+use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
+use Drupal\Tests\language\Traits\LanguageTestTrait;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Node Translation UI.
- *
- * @group node
- * @group #slow
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTranslationUITest extends ContentTranslationUITestBase {
 
   use LanguageTestTrait;
   use CommentTestTrait;
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -46,9 +49,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   ];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -81,7 +82,16 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests the basic translation UI.
    */
-  public function testTranslationUI() {
+  public function testTranslationUI(): void {
+    // Enable promote and sticky fields.
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'article')
+      ->setComponent('promote', [
+        'type' => 'boolean_checkbox',
+      ])
+      ->setComponent('sticky', [
+        'type' => 'boolean_checkbox',
+      ])
+      ->save();
     parent::testTranslationUI();
     $this->doUninstallTest();
   }
@@ -89,7 +99,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests changing the published status on a node without fields.
    */
-  public function testPublishedStatusNoFields() {
+  public function testPublishedStatusNoFields(): void {
     // Test changing the published status of an article without fields.
     $this->drupalLogin($this->administrator);
     // Delete all fields.
@@ -103,7 +113,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     $this->entityId = $this->createEntity($values[$default_langcode], $default_langcode);
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
 
     // Add a content translation.
@@ -122,7 +131,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     $this->drupalGet($add_url);
     $this->submitForm($edit, 'Save (this translation)');
 
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     $translation = $entity->getTranslation($langcode);
     // Make sure we unpublished the node correctly.
@@ -132,22 +140,31 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getTranslatorPermissions() {
+  protected function getTranslatorPermissions(): array {
     return array_merge(parent::getTranslatorPermissions(), ['administer nodes', "edit any $this->bundle content"]);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEditorPermissions() {
+  protected function getEditorPermissions(): array {
     return ['administer nodes', 'create article content'];
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getAdministratorPermissions() {
-    return array_merge(parent::getAdministratorPermissions(), ['access administration pages', 'administer content types', 'administer node fields', 'access content overview', 'bypass node access', 'administer languages', 'administer themes', 'view the administration theme']);
+  protected function getAdministratorPermissions(): array {
+    return array_merge(parent::getAdministratorPermissions(), [
+      'access administration pages',
+      'administer content types',
+      'administer node fields',
+      'access content overview',
+      'bypass node access',
+      'administer languages',
+      'administer themes',
+      'view the administration theme',
+    ]);
   }
 
   /**
@@ -160,10 +177,9 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function doTestPublishedStatus() {
+  protected function doTestPublishedStatus(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     $languages = $this->container->get('language_manager')->getLanguages();
 
@@ -183,7 +199,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
           'status[value]' => $value,
         ], 'Save' . $this->getFormSubmitSuffix($entity, $langcode));
       }
-      $storage->resetCache([$this->entityId]);
       $entity = $storage->load($this->entityId);
       foreach ($this->langcodes as $langcode) {
         // The node is created as unpublished thus we switch to the published
@@ -198,10 +213,9 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function doTestAuthoringInfo() {
+  protected function doTestAuthoringInfo(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     $languages = $this->container->get('language_manager')->getLanguages();
     $values = [];
@@ -230,7 +244,6 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
       $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
     }
 
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     foreach ($this->langcodes as $langcode) {
       $translation = $entity->getTranslation($langcode);
@@ -245,27 +258,25 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests that translation page inherits admin status of edit page.
    */
-  public function testTranslationLinkTheme() {
+  public function testTranslationLinkTheme(): void {
     $this->drupalLogin($this->administrator);
     $article = $this->drupalCreateNode(['type' => 'article', 'langcode' => $this->langcodes[0]]);
 
     // Set up the default admin theme and use it for node editing.
     $this->container->get('theme_installer')->install(['claro']);
-    $edit = [];
-    $edit['admin_theme'] = 'claro';
-    $edit['use_admin_theme'] = TRUE;
-    $this->drupalGet('admin/appearance');
-    $this->submitForm($edit, 'Save configuration');
-    $this->drupalGet('node/' . $article->id() . '/translations');
+    $this->config('system.theme')->set('admin', 'claro')->save();
+
     // Verify that translation uses the admin theme if edit is admin.
+    $this->drupalGet('node/' . $article->id() . '/translations');
     $this->assertSession()->responseContains('core/themes/claro/css/base/elements.css');
 
     // Turn off admin theme for editing, assert inheritance to translations.
-    $edit['use_admin_theme'] = FALSE;
-    $this->drupalGet('admin/appearance');
-    $this->submitForm($edit, 'Save configuration');
-    $this->drupalGet('node/' . $article->id() . '/translations');
+    $this->config('node.settings')->set('use_admin_theme', FALSE)->save();
+    // Changing node.settings:use_admin_theme requires a route rebuild.
+    $this->container->get('router.builder')->rebuild();
+
     // Verify that translation uses the frontend theme if edit is frontend.
+    $this->drupalGet('node/' . $article->id() . '/translations');
     $this->assertSession()->responseNotContains('core/themes/claro/css/base/elements.css');
 
     // Assert presence of translation page itself (vs. DisabledBundle below).
@@ -275,7 +286,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests that no metadata is stored for a disabled bundle.
    */
-  public function testDisabledBundle() {
+  public function testDisabledBundle(): void {
     // Create a bundle that does not have translation enabled.
     $disabledBundle = $this->randomMachineName();
     $this->drupalCreateContentType(['type' => $disabledBundle, 'name' => $disabledBundle]);
@@ -304,7 +315,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests that translations are rendered properly.
    */
-  public function testTranslationRendering() {
+  public function testTranslationRendering(): void {
     // Add a comment field to the article content type.
     \Drupal::service('module_installer')->install(['comment']);
     $this->addDefaultCommentField('node', 'article');
@@ -329,13 +340,16 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     }
     $node->save();
 
-    // Test that the frontpage view displays the correct translations.
+    // Test that the promoted content view displays the correct translations.
     \Drupal::service('module_installer')->install(['views'], TRUE);
     $this->rebuildContainer();
+
+    $this->enablePromotedContentView();
+
     $this->doTestTranslations('node', $values);
 
     // Enable the translation language renderer.
-    $view = \Drupal::entityTypeManager()->getStorage('view')->load('frontpage');
+    $view = \Drupal::entityTypeManager()->getStorage('view')->load('promoted_content');
     $display = &$view->getDisplay('default');
     $display['display_options']['rendering_language'] = '***LANGUAGE_entity_translation***';
     $view->save();
@@ -359,7 +373,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
         $expected_href = $base_path . $langcode . '/' . $node_href;
       }
       $pattern = '|^' . $expected_href . '$|';
-      foreach ($this->xpath("//a[text()='Read more']") as $link) {
+      foreach ($this->getNodeElementsByXpath("//a[text()='Read more']") as $link) {
         if (preg_match($pattern, $link->getAttribute('href'), $matches) == TRUE) {
           $num_match_found++;
         }
@@ -381,7 +395,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
         $expected_href = $base_path . $langcode . '/' . $comment_form_href;
       }
       $pattern = '|^' . $expected_href . '$|';
-      foreach ($this->xpath("//a[text()='Add new comment']") as $link) {
+      foreach ($this->getNodeElementsByXpath("//a[text()='Add new comment']") as $link) {
         if (preg_match($pattern, $link->getAttribute('href'), $matches) == TRUE) {
           $num_match_found++;
         }
@@ -404,7 +418,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
    * @param array $values
    *   The translation values to be found.
    */
-  protected function doTestTranslations($path, array $values) {
+  protected function doTestTranslations($path, array $values): void {
     $languages = $this->container->get('language_manager')->getLanguages();
     foreach ($this->langcodes as $langcode) {
       $this->drupalGet($path, ['language' => $languages[$langcode]]);
@@ -418,7 +432,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
    * @param \Drupal\node\Entity\Node $node
    *   The node to be tested.
    */
-  protected function doTestAlternateHreflangLinks(Node $node) {
+  protected function doTestAlternateHreflangLinks(Node $node): void {
     $url = $node->toUrl();
     $languages = $this->container->get('language_manager')->getLanguages();
     $url->setAbsolute();
@@ -457,7 +471,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getFormSubmitSuffix(EntityInterface $entity, $langcode) {
+  protected function getFormSubmitSuffix(EntityInterface $entity, $langcode): string {
     if (!$entity->isNew() && $entity->isTranslatable()) {
       $translations = $entity->getTranslationLanguages();
       if ((count($translations) > 1 || !isset($translations[$langcode])) && ($field = $entity->getFieldDefinition('status'))) {
@@ -470,7 +484,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests uninstalling content_translation.
    */
-  protected function doUninstallTest() {
+  protected function doUninstallTest(): void {
     // Delete all the nodes so there is no data.
     $nodes = Node::loadMultiple();
     foreach ($nodes as $node) {
@@ -485,13 +499,12 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function doTestTranslationEdit() {
+  protected function doTestTranslationEdit(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
-    $storage->resetCache([$this->entityId]);
     $entity = $storage->load($this->entityId);
     $languages = $this->container->get('language_manager')->getLanguages();
-    $type_name = node_get_type_label($entity);
+    $type_name = $entity->getBundleEntity()->label();
 
     foreach ($this->langcodes as $langcode) {
       // We only want to test the title for non-english translations.
@@ -507,7 +520,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests that revision translations are rendered properly.
    */
-  public function testRevisionTranslationRendering() {
+  public function testRevisionTranslationRendering(): void {
     $storage = \Drupal::entityTypeManager()->getStorage('node');
 
     // Create a node.
@@ -556,7 +569,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests title is not escaped (but XSS-filtered) for details form element.
    */
-  public function testDetailsTitleIsNotEscaped() {
+  public function testDetailsTitleIsNotEscaped(): void {
     // Create an image field.
     \Drupal::service('module_installer')->install(['image']);
     FieldStorageConfig::create([
@@ -571,12 +584,10 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
       'translatable' => TRUE,
     ])->save();
 
-    $this->drupalLogin($this->administrator);
     // Make the image field a multi-value field in order to display a
     // details form element.
-    $edit = ['field_storage[subform][cardinality_number]' => 2];
-    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.field_image');
-    $this->submitForm($edit, 'Save');
+    $fieldStorage = FieldStorageConfig::loadByName('node', 'field_image');
+    $fieldStorage->setCardinality(2)->save();
 
     // Enable the display of the image field.
     EntityFormDisplay::load('node.article.default')
@@ -601,7 +612,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
    * When language neutral content is displayed on interface language, it should
    * consider the interface language for creating the content link.
    */
-  public function testUrlPrefixOnLanguageNeutralContent() {
+  public function testUrlPrefixOnLanguageNeutralContent(): void {
     $this->drupalLogin($this->administrator);
     $neutral_langcodes = [
       LanguageInterface::LANGCODE_NOT_SPECIFIED,
@@ -614,6 +625,33 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
       $this->drupalGet("{$this->langcodes[2]}/admin/content");
       $this->assertSession()->linkByHrefExists("{$this->langcodes[2]}/node/{$article->id()}");
     }
+  }
+
+  /**
+   * Tests redirection after saving translation.
+   */
+  public function testRedirect(): void {
+    $this->drupalLogin($this->administrator);
+
+    $article = $this->drupalCreateNode(['type' => 'article', 'langcode' => $this->langcodes[0]]);
+
+    $edit = [
+      'title[0][value]' => 'English node title',
+    ];
+    $this->drupalGet('node/' . $article->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+
+    $this->assertSession()->pageTextContains('English node title');
+    $this->assertEquals($this->baseUrl . '/node/' . $article->id(), $this->getSession()->getCurrentUrl());
+
+    $this->drupalGet('node/' . $article->id() . '/translations/add/' . $this->langcodes[0] . '/' . $this->langcodes[1]);
+    $edit = [
+      'title[0][value]' => 'Italian node title',
+    ];
+    $this->submitForm($edit, 'Save (this translation)');
+
+    $this->assertSession()->pageTextContains('Italian node title');
+    $this->assertEquals($this->baseUrl . '/' . $this->langcodes[1] . '/node/' . $article->id(), $this->getSession()->getCurrentUrl());
   }
 
 }

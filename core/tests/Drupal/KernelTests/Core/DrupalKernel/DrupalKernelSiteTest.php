@@ -6,18 +6,20 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests site-specific service overrides.
- *
- * @group DrupalKernel
  */
+#[Group('DrupalKernel')]
+#[RunTestsInSeparateProcesses]
 class DrupalKernelSiteTest extends KernelTestBase {
 
   /**
    * Tests services.yml in site directory.
    */
-  public function testServicesYml() {
+  public function testServicesYml(): void {
     $container_yamls = Settings::get('container_yamls');
     $container_yamls[] = $this->siteDirectory . '/services.yml';
     $this->setSetting('container_yamls', $container_yamls);
@@ -38,6 +40,7 @@ services:
   # Add a new service.
   site.service.yml:
     class: $class
+    arguments: ['test']
   # Swap out a core service.
   cache.backend.database:
     class: Drupal\Core\Cache\MemoryBackendFactory

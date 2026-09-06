@@ -4,106 +4,40 @@ namespace Drupal\views;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides a BC layer for modules providing old configurations.
  *
  * @internal
  */
-class ViewsConfigUpdater implements ContainerInjectionInterface {
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
-
-  /**
-   * The typed config manager.
-   *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
-   */
-  protected $typedConfigManager;
-
-  /**
-   * The views data service.
-   *
-   * @var \Drupal\views\ViewsData
-   */
-  protected $viewsData;
-
-  /**
-   * The formatter plugin manager service.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
-   */
-  protected $formatterPluginManager;
+class ViewsConfigUpdater {
 
   /**
    * Flag determining whether deprecations should be triggered.
-   *
-   * @var bool
    */
-  protected $deprecationsEnabled = TRUE;
+  protected bool $deprecationsEnabled = TRUE;
 
   /**
    * Stores which deprecations were triggered.
-   *
-   * @var bool
    */
-  protected $triggeredDeprecations = [];
+  protected array $triggeredDeprecations = [];
 
   /**
    * ViewsConfigUpdater constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
-   *   The typed config manager.
-   * @param \Drupal\views\ViewsData $views_data
-   *   The views data service.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $formatter_plugin_manager
-   *   The formatter plugin manager service.
    */
   public function __construct(
-    EntityTypeManagerInterface $entity_type_manager,
-    EntityFieldManagerInterface $entity_field_manager,
-    TypedConfigManagerInterface $typed_config_manager,
-    ViewsData $views_data,
-    PluginManagerInterface $formatter_plugin_manager
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly EntityFieldManagerInterface $entityFieldManager,
+    private readonly TypedConfigManagerInterface $typedConfigManager,
+    private readonly ViewsData $viewsData,
+    #[Autowire(service: 'plugin.manager.field.formatter')]
+    private readonly PluginManagerInterface $formatterPluginManager,
+    protected EntityDisplayRepositoryInterface $entityDisplayRepository,
   ) {
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityFieldManager = $entity_field_manager;
-    $this->typedConfigManager = $typed_config_manager;
-    $this->viewsData = $views_data;
-    $this->formatterPluginManager = $formatter_plugin_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity_type.manager'),
-      $container->get('entity_field.manager'),
-      $container->get('config.typed'),
-      $container->get('views.views_data'),
-      $container->get('plugin.manager.field.formatter')
-    );
   }
 
   /**
@@ -112,8 +46,15 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
    * @param bool $enabled
    *   Whether deprecations should be enabled.
    */
-  public function setDeprecationsEnabled($enabled) {
+  public function setDeprecationsEnabled(bool $enabled): void {
     $this->deprecationsEnabled = $enabled;
+  }
+
+  /**
+   * Whether deprecations are enabled.
+   */
+  public function areDeprecationsEnabled(): bool {
+    return $this->deprecationsEnabled;
   }
 
   /**
@@ -127,8 +68,8 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
    */
   public function updateAll(ViewEntityInterface $view) {
     return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
-      $changed = FALSE;
-      return $changed;
+      // @todo leaving this here now but new update hooks will need to update.
+      return FALSE;
     });
   }
 

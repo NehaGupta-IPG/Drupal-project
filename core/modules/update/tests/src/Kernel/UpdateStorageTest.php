@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\update\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the Update module storage is cleared correctly.
- *
- * @group update
+ * Tests the Update Status module storage is cleared correctly.
  */
+#[Group('update')]
+#[RunTestsInSeparateProcesses]
 class UpdateStorageTest extends KernelTestBase {
 
   /**
@@ -21,14 +23,14 @@ class UpdateStorageTest extends KernelTestBase {
   ];
 
   /**
-   * Tests the Update module storage is cleared correctly.
+   * Tests the Update Status module storage is cleared correctly.
    */
-  public function testUpdateStorage() {
+  public function testUpdateStorage(): void {
     // Setting values in both key stores, then installing the module and
     // testing if these key values are cleared.
     $keyvalue_update = $this->container->get('keyvalue.expirable')->get('update');
     $keyvalue_update->set('key', 'some value');
-    $keyvalue_update_available_release = $this->container->get('keyvalue.expirable')->get('update_available_release');
+    $keyvalue_update_available_release = $this->container->get('keyvalue.expirable')->get('update_available_releases');
     $keyvalue_update_available_release->set('key', 'some value');
     $this->container->get('module_installer')->install(['help']);
     $this->assertNull($keyvalue_update->get('key'));

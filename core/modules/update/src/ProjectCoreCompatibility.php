@@ -50,16 +50,16 @@ final class ProjectCoreCompatibility {
    * @param array $core_data
    *   The project data for Drupal core as returned by
    *   \Drupal\update\UpdateManagerInterface::getProjects() and then processed
-   *   by update_process_project_info() and
-   *   update_calculate_project_update_status().
+   *   by \Drupal\update\UpdateCalculator::processProjectInfo() and
+   *   \Drupal\update\UpdateCalculator::updateProjectStatus().
    * @param array $core_releases
    *   The Drupal core available releases.
    * @param array $supported_branches
    *   An array for supported branches as returned by drupal.org update XML.
    *
    * @see \Drupal\update\UpdateManagerInterface::getProjects()
-   * @see update_process_project_info()
-   * @see update_calculate_project_update_status()
+   * @see \Drupal\update\UpdateCalculator::processProjectInfo()
+   * @see \Drupal\update\UpdateCalculator::updateProjectStatus()
    */
   public function __construct(array $core_data, array $core_releases, array $supported_branches) {
     if (isset($core_data['existing_version'])) {
@@ -86,7 +86,15 @@ final class ProjectCoreCompatibility {
       // versions after the existing version.
       return [];
     }
-    $supported_versions = array_filter(array_keys($core_releases), function ($version) use ($supported_branches) {
+    $version_parser = new VersionParser();
+    $supported_versions = array_filter(array_keys($core_releases), function ($version) use ($supported_branches, $version_parser) {
+      // Filter out invalid semantic versions from external sources.
+      try {
+        $version_parser->normalize($version);
+      }
+      catch (\UnexpectedValueException) {
+        return FALSE;
+      }
       foreach ($supported_branches as $supported_branch) {
         if (strpos($version, $supported_branch) === 0) {
           return TRUE;
@@ -94,8 +102,13 @@ final class ProjectCoreCompatibility {
       }
       return FALSE;
     });
-    $possible_core_update_versions = Semver::satisfiedBy($supported_versions, '>= ' . $this->existingCoreVersion);
-    $possible_core_update_versions = Semver::sort($possible_core_update_versions);
+    try {
+      $possible_core_update_versions = Semver::satisfiedBy($supported_versions, '>= ' . $this->existingCoreVersion);
+      $possible_core_update_versions = Semver::sort($possible_core_update_versions);
+    }
+    catch (\UnexpectedValueException) {
+      return [];
+    }
     $possible_core_update_versions = array_filter($possible_core_update_versions, function ($version) {
       return VersionParser::parseStability($version) === 'stable';
     });
@@ -108,9 +121,9 @@ final class ProjectCoreCompatibility {
    * @param array &$project_data
    *   The project data as returned by
    *   \Drupal\update\UpdateManagerInterface::getProjects() and then processed
-   *   by update_process_project_info() and
-   *   update_calculate_project_update_status(). If set, the following keys are
-   *   used in this method:
+   *   by \Drupal\update\UpdateCalculator::processProjectInfo() and
+   *   \Drupal\update\UpdateCalculator::updateProjectStatus(). If set, the
+   *   following keys are used in this method:
    *   - recommended (string): A project version number.
    *   - latest_version (string): A project version number.
    *   - also (string[]): Project version numbers.
@@ -119,8 +132,8 @@ final class ProjectCoreCompatibility {
    *   - security updates (array[]): An array of project release information.
    *
    * @see \Drupal\update\UpdateManagerInterface::getProjects()
-   * @see update_process_project_info()
-   * @see update_calculate_project_update_status()
+   * @see \Drupal\update\UpdateCalculator::processProjectInfo()
+   * @see \Drupal\update\UpdateCalculator::updateProjectStatus()
    */
   public function setReleaseMessage(array &$project_data) {
     if (empty($this->possibleCoreUpdateVersions)) {
@@ -169,7 +182,12 @@ final class ProjectCoreCompatibility {
    *   version of Drupal core, otherwise FALSE.
    */
   protected function isCoreCompatible($core_compatibility_constraint) {
-    return Semver::satisfies($this->existingCoreVersion, $core_compatibility_constraint);
+    try {
+      return Semver::satisfies($this->existingCoreVersion, $core_compatibility_constraint);
+    }
+    catch (\Exception) {
+      return FALSE;
+    }
   }
 
   /**
@@ -187,7 +205,10 @@ final class ProjectCoreCompatibility {
       $range_messages = [];
       foreach ($core_compatibility_ranges as $core_compatibility_range) {
         if (count($core_compatibility_range) === 2) {
-          $range_messages[] = $this->t('@low_version_number to @high_version_number', ['@low_version_number' => $core_compatibility_range[0], '@high_version_number' => $core_compatibility_range[1]]);
+          $range_messages[] = $this->t('@low_version_number to @high_version_number', [
+            '@low_version_number' => $core_compatibility_range[0],
+            '@high_version_number' => $core_compatibility_range[1],
+          ]);
         }
         else {
           $range_messages[] = $core_compatibility_range[0];
@@ -213,7 +234,13 @@ final class ProjectCoreCompatibility {
   protected function getCompatibilityRanges($core_compatibility_constraint) {
     $compatibility_ranges = [];
     foreach ($this->possibleCoreUpdateVersions as $possible_core_update_version) {
-      if (Semver::satisfies($possible_core_update_version, $core_compatibility_constraint)) {
+      try {
+        $satisfies = Semver::satisfies($possible_core_update_version, $core_compatibility_constraint);
+      }
+      catch (\UnexpectedValueException) {
+        continue;
+      }
+      if ($satisfies) {
         if (empty($range)) {
           $range[] = $possible_core_update_version;
         }

@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the views bulk form with batch action.
  *
- * @group action
  * @see \Drupal\action\Plugin\views\field\BulkForm
  */
+#[Group('action')]
+#[RunTestsInSeparateProcesses]
 class UserBatchActionTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'user',
@@ -34,8 +35,8 @@ class UserBatchActionTest extends BrowserTestBase {
   /**
    * Tests user admin batch.
    */
-  public function testUserAction() {
-    $themes = ['stark', 'olivero', 'claro'];
+  public function testUserAction(): void {
+    $themes = ['stark', 'claro'];
     $this->container->get('theme_installer')->install($themes);
 
     $this->drupalLogin($this->createUser(['administer users']));

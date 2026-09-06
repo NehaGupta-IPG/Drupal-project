@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test\Form;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -28,7 +30,7 @@ class FormTestTableSelectMultipleFalseForm extends FormTestTableSelectFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('Submitted: @value', ['@value' => $form_state->getValue('tableselect')]));
   }
 

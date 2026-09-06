@@ -11,17 +11,22 @@ use Drupal\help\HelpTopicDiscovery;
 use Drupal\help\HelpTopicTwig;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\help\HelpTopicDiscovery
- * @group help
+ * Tests Drupal\help\HelpTopicDiscovery.
  */
+#[CoversClass(HelpTopicDiscovery::class)]
+#[Group('help')]
 class HelpTopicDiscoveryTest extends UnitTestCase {
 
   /**
-   * @covers ::findAll
+   * Tests discovery exception missing label.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testDiscoveryExceptionMissingLabel() {
+  public function testDiscoveryExceptionMissingLabel(): void {
     vfsStream::setup('root');
 
     vfsStream::create([
@@ -37,14 +42,16 @@ class HelpTopicDiscoveryTest extends UnitTestCase {
     $discovery = new HelpTopicDiscovery(['test' => vfsStream::url('root/modules/test/help_topics')]);
 
     $this->expectException(DiscoveryException::class);
-    $this->expectExceptionMessage("vfs://root/modules/test/help_topics/test.topic.html.twig does not contain the required key with name='label'");
+    $this->expectExceptionMessageIs("vfs://root/modules/test/help_topics/test.topic.html.twig does not contain the required key with name='label'");
     $discovery->getDefinitions();
   }
 
   /**
-   * @covers ::findAll
+   * Tests discovery exception invalid yaml key.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testDiscoveryExceptionInvalidYamlKey() {
+  public function testDiscoveryExceptionInvalidYamlKey(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -65,14 +72,16 @@ EOF;
     $discovery = new HelpTopicDiscovery(['test' => vfsStream::url('root/modules/test/help_topics')]);
 
     $this->expectException(DiscoveryException::class);
-    $this->expectExceptionMessage("vfs://root/modules/test/help_topics/test.topic.html.twig contains invalid key='foo'");
+    $this->expectExceptionMessageIs("vfs://root/modules/test/help_topics/test.topic.html.twig contains invalid key='foo'");
     $discovery->getDefinitions();
   }
 
   /**
-   * @covers ::findAll
+   * Tests discovery exception invalid top level.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testDiscoveryExceptionInvalidTopLevel() {
+  public function testDiscoveryExceptionInvalidTopLevel(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -93,14 +102,16 @@ EOF;
     $discovery = new HelpTopicDiscovery(['test' => vfsStream::url('root/modules/test/help_topics')]);
 
     $this->expectException(DiscoveryException::class);
-    $this->expectExceptionMessage("vfs://root/modules/test/help_topics/test.topic.html.twig contains invalid value for 'top_level' key, the value must be a Boolean");
+    $this->expectExceptionMessageIs("vfs://root/modules/test/help_topics/test.topic.html.twig contains invalid value for 'top_level' key, the value must be a Boolean");
     $discovery->getDefinitions();
   }
 
   /**
-   * @covers ::findAll
+   * Tests discovery exception invalid related.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testDiscoveryExceptionInvalidRelated() {
+  public function testDiscoveryExceptionInvalidRelated(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -121,14 +132,16 @@ EOF;
     $discovery = new HelpTopicDiscovery(['test' => vfsStream::url('root/modules/test/help_topics')]);
 
     $this->expectException(DiscoveryException::class);
-    $this->expectExceptionMessage("vfs://root/modules/test/help_topics/test.topic.html.twig contains invalid value for 'related' key, the value must be an array of strings");
+    $this->expectExceptionMessageIs("vfs://root/modules/test/help_topics/test.topic.html.twig contains invalid value for 'related' key, the value must be an array of strings");
     $discovery->getDefinitions();
   }
 
   /**
-   * @covers ::findAll
+   * Tests help topics extension provider special case.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testHelpTopicsExtensionProviderSpecialCase() {
+  public function testHelpTopicsExtensionProviderSpecialCase(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -151,9 +164,11 @@ EOF;
   }
 
   /**
-   * @covers ::findAll
+   * Tests help topics in core.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testHelpTopicsInCore() {
+  public function testHelpTopicsInCore(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -174,9 +189,11 @@ EOF;
   }
 
   /**
-   * @covers ::findAll
+   * Tests help topics broken yaml.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testHelpTopicsBrokenYaml() {
+  public function testHelpTopicsBrokenYaml(): void {
     vfsStream::setup('root');
     $topic_content = <<<EOF
 ---
@@ -196,14 +213,16 @@ EOF;
     ]);
     $discovery = new HelpTopicDiscovery(['help' => vfsStream::url('root/modules/help/help_topics')]);
     $this->expectException(DiscoveryException::class);
-    $this->expectExceptionMessage("Malformed YAML in help topic \"vfs://root/modules/help/help_topics/core.topic.html.twig\":");
+    $this->expectExceptionMessageIsOrContains("Malformed YAML in help topic \"vfs://root/modules/help/help_topics/core.topic.html.twig\":");
     $discovery->getDefinitions();
   }
 
   /**
-   * @covers ::findAll
+   * Tests help topics definition.
+   *
+   * @legacy-covers ::findAll
    */
-  public function testHelpTopicsDefinition() {
+  public function testHelpTopicsDefinition(): void {
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->getStringTranslationStub());
     \Drupal::setContainer($container);

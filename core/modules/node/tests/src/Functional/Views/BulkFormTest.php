@@ -6,13 +6,16 @@ namespace Drupal\Tests\node\Functional\Views;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests a node bulk form.
  *
- * @group node
  * @see \Drupal\node\Plugin\views\field\BulkForm
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class BulkFormTest extends NodeTestBase {
 
   /**
@@ -102,7 +105,7 @@ class BulkFormTest extends NodeTestBase {
   /**
    * Tests the node bulk form.
    */
-  public function testBulkForm() {
+  public function testBulkForm(): void {
     // Unpublish a node using the bulk form.
     $node = reset($this->nodes);
     $this->assertTrue($node->isPublished(), 'Node is initially published');
@@ -150,21 +153,21 @@ class BulkFormTest extends NodeTestBase {
     $node = $this->loadNode($node->id());
     $this->assertFalse($node->isSticky(), 'Node is not sticky anymore');
 
-    // Promote to front page.
-    $this->assertFalse($node->isPromoted(), 'Node is not promoted to the front page');
-    $this->assertFalse($node->getTranslation('en-gb')->isPromoted(), 'Node translation is not promoted to the front page');
-    $this->assertFalse($node->getTranslation('it')->isPromoted(), 'Node translation is not promoted to the front page');
+    // Promote content.
+    $this->assertFalse($node->isPromoted(), 'Node is not promoted');
+    $this->assertFalse($node->getTranslation('en-gb')->isPromoted(), 'Node translation is not promoted');
+    $this->assertFalse($node->getTranslation('it')->isPromoted(), 'Node translation is not promoted');
     $edit = [
       'node_bulk_form[0]' => TRUE,
       'action' => 'node_promote_action',
     ];
     $this->submitForm($edit, 'Apply to selected items');
     $node = $this->loadNode($node->id());
-    $this->assertTrue($node->isPromoted(), 'Node has been promoted to the front page');
-    $this->assertFalse($node->getTranslation('en-gb')->isPromoted(), 'Node translation has not been promoted to the front page');
-    $this->assertFalse($node->getTranslation('it')->isPromoted(), 'Node translation has not been promoted to the front page');
+    $this->assertTrue($node->isPromoted(), 'Node has been promoted');
+    $this->assertFalse($node->getTranslation('en-gb')->isPromoted(), 'Node translation has not been promoted');
+    $this->assertFalse($node->getTranslation('it')->isPromoted(), 'Node translation has not been promoted');
 
-    // Demote from front page.
+    // Unpromote content.
     $edit = [
       'node_bulk_form[0]' => TRUE,
       'action' => 'node_unpromote_action',
@@ -223,7 +226,7 @@ class BulkFormTest extends NodeTestBase {
   /**
    * Tests multiple deletion.
    */
-  public function testBulkDeletion() {
+  public function testBulkDeletion(): void {
     // Select a bunch of translated and untranslated nodes and check that
     // nodes and individual translations are properly deleted.
     $edit = [
@@ -295,7 +298,6 @@ class BulkFormTest extends NodeTestBase {
   protected function loadNode($id) {
     /** @var \Drupal\node\NodeStorage $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage('node');
-    $storage->resetCache([$id]);
     return $storage->load($id);
   }
 

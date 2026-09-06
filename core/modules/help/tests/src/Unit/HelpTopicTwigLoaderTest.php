@@ -9,14 +9,15 @@ use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\help\HelpTopicTwigLoader;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Twig\Error\LoaderError;
 
 /**
  * Unit test for the HelpTopicTwigLoader class.
- *
- * @coversDefaultClass \Drupal\help\HelpTopicTwigLoader
- * @group help
  */
+#[CoversClass(HelpTopicTwigLoader::class)]
+#[Group('help')]
 class HelpTopicTwigLoaderTest extends UnitTestCase {
 
   /**
@@ -41,13 +42,13 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
 
     $this->setUpVfs();
 
-    $module_handler = $this->createMock(ModuleHandlerInterface::class);
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
     $module_handler
       ->method('getModuleDirectories')
       ->willReturn($this->directories['module']);
 
     /** @var \Drupal\Core\Extension\ThemeHandlerInterface|\Prophecy\Prophecy\ObjectProphecy $module_handler */
-    $theme_handler = $this->createMock(ThemeHandlerInterface::class);
+    $theme_handler = $this->createStub(ThemeHandlerInterface::class);
     $theme_handler
       ->method('getThemeDirectories')
       ->willReturn($this->directories['theme']);
@@ -56,9 +57,11 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::__construct
+   * Tests constructor.
+   *
+   * @legacy-covers ::__construct
    */
-  public function testConstructor() {
+  public function testConstructor(): void {
     // Verify that the module/theme directories were added in the constructor,
     // and non-existent directories were omitted.
     $paths = $this->helpLoader->getPaths(HelpTopicTwigLoader::MAIN_NAMESPACE);
@@ -68,19 +71,19 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getSourceContext
+   * Tests get source context.
    */
-  public function testGetSourceContext() {
+  public function testGetSourceContext(): void {
     $source = $this->helpLoader->getSourceContext('@' . HelpTopicTwigLoader::MAIN_NAMESPACE . '/test.topic.html.twig');
     $this->assertEquals('{% line 4 %}<h2>Test</h2>', $source->getCode());
   }
 
   /**
-   * @covers ::getSourceContext
+   * Tests get source context exception.
    */
-  public function testGetSourceContextException() {
+  public function testGetSourceContextException(): void {
     $this->expectException(LoaderError::class);
-    $this->expectExceptionMessage("Malformed YAML in help topic \"vfs://root/modules/test/help_topics/test.invalid_yaml.html.twig\":");
+    $this->expectExceptionMessageIs("Malformed YAML in help topic \"vfs://root/modules/test/help_topics/test.invalid_yaml.html.twig\": An error occurred when attempting to parse front matter data on line 2.");
 
     $this->helpLoader->getSourceContext('@' . HelpTopicTwigLoader::MAIN_NAMESPACE . '/test.invalid_yaml.html.twig');
   }
@@ -88,7 +91,7 @@ class HelpTopicTwigLoaderTest extends UnitTestCase {
   /**
    * Sets up the virtual file system.
    */
-  protected function setUpVfs() {
+  protected function setUpVfs(): void {
     $content = <<<EOF
 ---
 label: Test

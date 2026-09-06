@@ -24,7 +24,7 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function drupalGet($path, array $options = [], array $headers = []) {
+  protected function drupalGet($path, array $options = [], array $headers = []): string {
     $return = parent::drupalGet($path, $options, $headers);
     $this->assertPageLoadComplete();
     return $return;
@@ -77,7 +77,7 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
    *
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
-  protected function waitForOffCanvasToOpen($position = 'side') {
+  protected function waitForOffCanvasToOpen(string $position = 'side') {
     $this->waitForOffCanvasArea();
     // Check that the canvas is positioned on the side.
     $this->assertSession()->elementExists('css', '.ui-dialog-position-' . $position);
@@ -94,6 +94,7 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
    * Gets the off-canvas dialog element.
    *
    * @return \Behat\Mink\Element\NodeElement|null
+   *   The off-canvas dialog element.
    */
   protected function getOffCanvasDialog() {
     $off_canvas_dialog = $this->getSession()->getPage()->find('css', '.ui-dialog[aria-describedby="drupal-off-canvas"]');
@@ -107,8 +108,8 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
    * @return string[]
    *   Theme names to test.
    */
-  protected function getTestThemes() {
-    return ['claro', 'olivero', 'stable9', 'stark'];
+  protected static function getTestThemes() {
+    return ['claro', 'stark'];
   }
 
   /**
@@ -122,7 +123,7 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
    * @param int $timeout
    *   (Optional) Timeout in milliseconds, defaults to 10000.
    */
-  protected function assertElementVisibleAfterWait($selector, $locator, $timeout = 10000) {
+  protected function assertElementVisibleAfterWait(string $selector, $locator, int $timeout = 10000) {
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertNotEmpty($this->assertSession()->waitForElementVisible($selector, $locator, $timeout));
   }
@@ -130,8 +131,8 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
   /**
    * Data provider that returns theme name as the sole argument.
    */
-  public function themeDataProvider() {
-    $themes = $this->getTestThemes();
+  public static function themeDataProvider() {
+    $themes = static::getTestThemes();
     $data = [];
     foreach ($themes as $theme) {
       $data[$theme] = [

@@ -6,27 +6,32 @@ namespace Drupal\Tests\Core\Extension;
 
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\ExtensionList;
 use Drupal\Core\Extension\InfoParserInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\State\StateInterface;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\Core\Extension\ExtensionList
- * @group Extension
+ * Tests Drupal\Core\Extension\ExtensionList.
  */
+#[CoversClass(ExtensionList::class)]
+#[Group('Extension')]
 class ExtensionListTest extends UnitTestCase {
 
   /**
-   * @covers ::getName
+   * Tests get name with non existing extension.
    */
-  public function testGetNameWithNonExistingExtension() {
+  public function testGetNameWithNonExistingExtension(): void {
     [$cache, $info_parser, $module_handler, $state] = $this->getMocks();
     $test_extension_list = new TestExtension($this->randomMachineName(), 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), $state->reveal(), 'testing');
 
@@ -39,18 +44,18 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getName
+   * Tests get name.
    */
-  public function testGetName() {
+  public function testGetName(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
     $this->assertEquals('test name', $test_extension_list->getName('test_name'));
   }
 
   /**
-   * @covers ::get
+   * Tests get with non existing extension.
    */
-  public function testGetWithNonExistingExtension() {
+  public function testGetWithNonExistingExtension(): void {
     [$cache, $info_parser, $module_handler, $state] = $this->getMocks();
     $test_extension_list = new TestExtension($this->randomMachineName(), 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), $state->reveal(), 'testing');
 
@@ -63,9 +68,9 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::get
+   * Tests get.
    */
-  public function testGet() {
+  public function testGet(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
     $extension = $test_extension_list->get('test_name');
@@ -74,9 +79,9 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getList
+   * Tests get list.
    */
-  public function testGetList() {
+  public function testGetList(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
     $extensions = $test_extension_list->getList();
@@ -85,10 +90,12 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getExtensionInfo
-   * @covers ::getAllInstalledInfo
+   * Tests get extension info.
+   *
+   * @legacy-covers ::getExtensionInfo
+   * @legacy-covers ::getAllInstalledInfo
    */
-  public function testGetExtensionInfo() {
+  public function testGetExtensionInfo(): void {
     $test_extension_list = $this->setupTestExtensionList();
     $test_extension_list->setInstalledExtensions(['test_name']);
 
@@ -102,9 +109,9 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getAllAvailableInfo
+   * Tests get all available info.
    */
-  public function testGetAllAvailableInfo() {
+  public function testGetAllAvailableInfo(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
     $infos = $test_extension_list->getAllAvailableInfo();
@@ -119,9 +126,9 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getAllInstalledInfo
+   * Tests get all installed info.
    */
-  public function testGetAllInstalledInfo() {
+  public function testGetAllInstalledInfo(): void {
     $test_extension_list = $this->setupTestExtensionList(['test_name', 'test_name_2']);
     $test_extension_list->setInstalledExtensions(['test_name_2']);
 
@@ -137,9 +144,9 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getPathNames
+   * Tests get path names.
    */
-  public function testGetPathNames() {
+  public function testGetPathNames(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
     $filenames = $test_extension_list->getPathNames();
@@ -149,9 +156,9 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getPathname
+   * Tests get pathname.
    */
-  public function testGetPathname() {
+  public function testGetPathname(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
     $pathname = $test_extension_list->getPathname('test_name');
@@ -159,20 +166,46 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setPathname
-   * @covers ::getPathname
+   * Tests set pathname.
+   *
+   * @legacy-covers ::setPathname
+   * @legacy-covers ::getPathname
    */
-  public function testSetPathname() {
+  #[IgnoreDeprecations]
+  public function testSetPathname(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
+    $this->expectUserDeprecationMessage('Drupal\Core\Extension\ExtensionList::setPathname() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/2934063');
     $test_extension_list->setPathname('test_name', 'vfs://drupal_root/example2/test_name/test_name.info.yml');
     $this->assertEquals('vfs://drupal_root/example2/test_name/test_name.info.yml', $test_extension_list->getPathname('test_name'));
   }
 
   /**
-   * @covers ::getPath
+   * Tests that set pathname survives reset.
+   *
+   * @legacy-covers ::setPathname
+   * @legacy-covers ::getPathname
+   * @legacy-covers ::reset
    */
-  public function testGetPath() {
+  #[IgnoreDeprecations]
+  public function testSetPathnameSurvivesReset(): void {
+    $test_extension_list = $this->setupTestExtensionList();
+
+    $pathname = 'vfs://drupal_root/example2/test_name/test_name.info.yml';
+    $this->expectUserDeprecationMessage('Drupal\Core\Extension\ExtensionList::setPathname() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/2934063');
+    $test_extension_list->setPathname('test_name', $pathname);
+    $this->assertSame($pathname, $test_extension_list->getPathname('test_name'));
+
+    $test_extension_list->reset();
+
+    $this->assertSame($pathname, $test_extension_list->getPathname('test_name'));
+    $this->assertSame('vfs://drupal_root/example2/test_name', $test_extension_list->getPath('test_name'));
+  }
+
+  /**
+   * Tests get path.
+   */
+  public function testGetPath(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
     $path = $test_extension_list->getPath('test_name');
@@ -180,9 +213,9 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::reset
+   * Tests reset.
    */
-  public function testReset() {
+  public function testReset(): void {
     $test_extension_list = $this->setupTestExtensionList();
 
     $path = $test_extension_list->getPath('test_name');
@@ -208,19 +241,18 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::checkIncompatibility
-   *
-   * @dataProvider providerCheckIncompatibility
+   * Tests check incompatibility.
    */
-  public function testCheckIncompatibility($additional_settings, $expected) {
+  #[DataProvider('providerCheckIncompatibility')]
+  public function testCheckIncompatibility(array $additional_settings, bool $expected): void {
     $test_extension_list = $this->setupTestExtensionList(['test_name'], $additional_settings);
     $this->assertSame($expected, $test_extension_list->checkIncompatibility('test_name'));
   }
 
   /**
-   * DataProvider for testCheckIncompatibility().
+   * Data provider for testCheckIncompatibility().
    */
-  public static function providerCheckIncompatibility() {
+  public static function providerCheckIncompatibility(): array {
     return [
       'core_incompatible true' => [
         [
@@ -278,7 +310,7 @@ class ExtensionListTest extends UnitTestCase {
    * @return \Drupal\Tests\Core\Extension\TestExtension
    *   The test extension list.
    */
-  protected function setupTestExtensionList(array $extension_names = ['test_name'], array $additional_info_values = []) {
+  protected function setupTestExtensionList(array $extension_names = ['test_name'], array $additional_info_values = []): TestExtension {
     vfsStream::setup('drupal_root');
 
     $folders = ['example' => []];
@@ -311,7 +343,7 @@ class ExtensionListTest extends UnitTestCase {
     return $test_extension_list;
   }
 
-  protected function getMocks() {
+  protected function getMocks(): array {
     $cache = $this->prophesize(CacheBackendInterface::class);
     $info_parser = $this->prophesize(InfoParserInterface::class);
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
@@ -321,6 +353,9 @@ class ExtensionListTest extends UnitTestCase {
 
 }
 
+/**
+ * Stub class for testing ExtensionList.
+ */
 class TestExtension extends ExtensionList {
 
   /**
@@ -337,11 +372,11 @@ class TestExtension extends ExtensionList {
    * @param \Drupal\Core\Extension\ExtensionDiscovery $extension_discovery
    *   The extension discovery class.
    */
-  public function setExtensionDiscovery(ExtensionDiscovery $extension_discovery) {
+  public function setExtensionDiscovery(ExtensionDiscovery $extension_discovery): void {
     $this->extensionDiscovery = $extension_discovery;
   }
 
-  public function setInstalledExtensions(array $extension_names) {
+  public function setInstalledExtensions(array $extension_names): void {
     $this->installedExtensions = $extension_names;
   }
 

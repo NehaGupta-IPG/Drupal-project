@@ -16,12 +16,13 @@ use Drupal\views\Plugin\views\display\DisplayPluginBase;
  * Allows for display of true/false, yes/no, on/off, enabled/disabled.
  *
  * Definition terms:
- *   - output formats: An array where the first entry is displayed on boolean true
- *      and the second is displayed on boolean false. An example for sticky is:
+ *   - output formats: An array where the first entry is displayed on boolean
+ *     true and the second is displayed on boolean false. An example for sticky
+ *     is:
  *      @code
- *      'output formats' => array(
- *        'sticky' => array(t('Sticky'), ''),
- *      ),
+ *      'output formats' => [
+ *        'sticky' => [t('Sticky'), ''],
+ *      ],
  *      @endcode
  *
  * @ingroup views_field_handlers
@@ -50,7 +51,7 @@ class Boolean extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
     $default_formats = [

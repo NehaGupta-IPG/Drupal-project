@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Functional;
 
+use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests concurrent edits in different workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceConcurrentEditingTest extends BrowserTestBase {
 
   use WorkspaceTestUtilities;
@@ -18,7 +21,7 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'workspaces'];
+  protected static $modules = ['block', 'node', 'workspaces', 'workspaces_ui'];
 
   /**
    * {@inheritdoc}
@@ -28,7 +31,7 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
   /**
    * Tests editing a node in multiple workspaces.
    */
-  public function testConcurrentEditing() {
+  public function testConcurrentEditing(): void {
     // Create a test node.
     $this->createContentType(['type' => 'test', 'label' => 'Test']);
     $this->setupWorkspaceSwitcherBlock();
@@ -43,7 +46,11 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
     $mayer = $this->drupalCreateUser($permissions);
     $this->drupalLogin($mayer);
 
-    $test_node = $this->createNodeThroughUi('Test node', 'test');
+    $test_node = $this->drupalCreateNode([
+      'title' => 'Test node',
+      'type' => 'test',
+      'status' => NodeInterface::PUBLISHED,
+    ]);
 
     // Check that the user can edit the node.
     $page = $this->getSession()->getPage();
