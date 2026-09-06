@@ -8,12 +8,19 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\package_manager\PathExcluder\SiteConfigurationExcluder;
 use Drupal\package_manager\PathLocator;
 use Drupal\Tests\package_manager\Kernel\PackageManagerKernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\package_manager\PathExcluder\SiteConfigurationExcluder
- * @group package_manager
+ * Tests Site Configuration Excluder.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[Group('#slow')]
+#[CoversClass(SiteConfigurationExcluder::class)]
+#[RunTestsInSeparateProcesses]
 class SiteConfigurationExcluderTest extends PackageManagerKernelTestBase {
 
   /**
@@ -47,7 +54,7 @@ class SiteConfigurationExcluderTest extends PackageManagerKernelTestBase {
     $stage = $this->createStage();
     $stage->create();
     $stage->require(['ext-json:*']);
-    $stage_dir = $stage->getStageDirectory();
+    $stage_dir = $stage->getSandboxDirectory();
 
     $excluded = [
       "$site_path/settings.php",
@@ -98,7 +105,7 @@ class SiteConfigurationExcluderTest extends PackageManagerKernelTestBase {
     $stage->create();
     // The staged `sites/default` will be made world-writable, because we want
     // to ensure the scaffold plugin can copy certain files into there.
-    $staged_dir = str_replace($project_root, $stage->getStageDirectory(), $live_dir);
+    $staged_dir = str_replace($project_root, $stage->getSandboxDirectory(), $live_dir);
     $this->assertDirectoryIsWritable($staged_dir);
 
     $stage->require(['ext-json:*']);
@@ -115,6 +122,9 @@ class SiteConfigurationExcluderTest extends PackageManagerKernelTestBase {
  */
 class TestSiteConfigurationExcluder extends SiteConfigurationExcluder {
 
+  /**
+   * The site path.
+   */
   public string $sitePath;
 
 }

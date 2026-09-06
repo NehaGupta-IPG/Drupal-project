@@ -14,22 +14,34 @@ use Drupal\Core\Database\Event\StatementExecutionEndEvent;
  *
  * Every connection has one and only one logging object on it for all targets
  * and logging keys.
+ *
+ * @phpstan-type DatabaseLogEntry array{
+ *   'query': string,
+ *   'args': list<mixed>,
+ *   'caller': string,
+ *   'target': string,
+ *   'time': float,
+ *   'start': float,
+ * }
  */
 class Log {
 
   /**
-   * Cache of logged queries. This will only be used if the query logger is enabled.
+   * Cache of logged queries.
    *
-   * The structure for the logging array is as follows:
+   * This will only be used if the query logger is enabled.
    *
-   * array(
-   *   $logging_key = array(
-   *     array('query' => '', 'args' => array(), 'caller' => '', 'target' => '', 'time' => 0, 'start' => 0),
-   *     array('query' => '', 'args' => array(), 'caller' => '', 'target' => '', 'time' => 0, 'start' => 0),
-   *   ),
-   * );
+   * @var array<string,list<DatabaseLogEntry>>
+   *   The structure for the logging array is as follows:
    *
-   * @var array
+   * @code
+   * [
+   *   $logging_key = [
+   *     ['query' => '', 'args' => [], 'caller' => '', 'target' => '', 'time' => 0, 'start' => 0],
+   *     ['query' => '', 'args' => [], 'caller' => '', 'target' => '', 'time' => 0, 'start' => 0],
+   *   ],
+   * ];
+   * @endcode
    */
   protected $queryLog = [];
 
@@ -43,10 +55,13 @@ class Log {
   /**
    * Constructor.
    *
-   * @param $key
+   * @param string $key
    *   The database connection key for which to enable logging.
    */
   public function __construct($key = 'default') {
+    if (!is_string($key)) {
+      @trigger_error('Passing a non-string value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
     $this->connectionKey = $key;
   }
 
@@ -55,7 +70,7 @@ class Log {
    *
    * If the specified logging key is already running this method does nothing.
    *
-   * @param $logging_key
+   * @param string $logging_key
    *   The identification key for this log request. By specifying different
    *   logging keys we are able to start and stop multiple logging runs
    *   simultaneously without them colliding.
@@ -69,10 +84,10 @@ class Log {
   /**
    * Retrieve the query log for the specified logging key so far.
    *
-   * @param $logging_key
+   * @param string $logging_key
    *   The logging key to fetch.
    *
-   * @return array
+   * @return list<DatabaseLogEntry>
    *   An indexed array of all query records for this logging key.
    */
   public function get($logging_key) {
@@ -85,7 +100,7 @@ class Log {
    * This method does not stop logging, it simply clears the log. To stop
    * logging, use the end() method.
    *
-   * @param $logging_key
+   * @param string $logging_key
    *   The logging key to empty.
    */
   public function clear($logging_key) {
@@ -95,7 +110,7 @@ class Log {
   /**
    * Stop logging for the specified logging key.
    *
-   * @param $logging_key
+   * @param string $logging_key
    *   The logging key to stop.
    */
   public function end($logging_key) {

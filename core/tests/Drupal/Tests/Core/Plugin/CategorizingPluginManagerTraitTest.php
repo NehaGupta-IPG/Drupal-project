@@ -11,12 +11,16 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\CategorizingPluginManagerTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\CategorizingPluginManagerTrait
- * @group Plugin
- * @runTestsInSeparateProcesses
+ * Tests Drupal\Core\Plugin\CategorizingPluginManagerTrait.
  */
+#[CoversClass(CategorizingPluginManagerTrait::class)]
+#[Group('Plugin')]
+#[RunTestsInSeparateProcesses]
 class CategorizingPluginManagerTraitTest extends UnitTestCase {
 
   /**
@@ -32,14 +36,14 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $module_handler->expects($this->any())
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
+    $module_handler
       ->method('getModuleList')
       ->willReturn(['node' => []]);
-    $module_extension_list = $this->createMock(ModuleExtensionList::class);
-    $module_extension_list->expects($this->any())
+    $module_extension_list = $this->createStub(ModuleExtensionList::class);
+    $module_extension_list
       ->method('getName')
-      ->willReturnCallback(function ($argument) {
+      ->willReturnCallback(function ($argument): string {
         if ($argument == 'node') {
           return 'Node';
         }
@@ -50,7 +54,7 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getCategories
+   * Tests get categories.
    */
   public function testGetCategories(): void {
     $this->assertSame([
@@ -60,7 +64,7 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getSortedDefinitions
+   * Tests get sorted definitions.
    */
   public function testGetSortedDefinitions(): void {
     $sorted = $this->pluginManager->getSortedDefinitions();
@@ -68,7 +72,7 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getGroupedDefinitions
+   * Tests get grouped definitions.
    */
   public function testGetGroupedDefinitions(): void {
     $grouped = $this->pluginManager->getGroupedDefinitions();
@@ -78,7 +82,7 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processDefinitionCategory
+   * Tests process definition category.
    */
   public function testProcessDefinitionCategory(): void {
     // Existing category.
@@ -124,6 +128,7 @@ class CategorizingPluginManager extends DefaultPluginManager implements Categori
    * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
    *   The module extension list.
    */
+  // @phpstan-ignore pluginManagerSetsCacheBackend.missingCacheBackend
   public function __construct(ModuleHandlerInterface $module_handler, ModuleExtensionList $module_extension_list) {
     $this->moduleHandler = $module_handler;
     $this->moduleExtensionList = $module_extension_list;
@@ -134,7 +139,7 @@ class CategorizingPluginManager extends DefaultPluginManager implements Categori
    *
    * Provides some test definitions to the trait.
    */
-  public function getDefinitions() {
+  public function getDefinitions(): array {
     return [
       'cucumber' => [
         'label' => 'cucumber',

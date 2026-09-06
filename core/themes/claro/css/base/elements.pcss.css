@@ -158,7 +158,6 @@ ul {
   margin-block: 0.25em;
   margin-inline: 1.5em 0;
   padding-inline-start: 0;
-  list-style-type: disc;
   list-style-image: none;
 }
 ol {
@@ -192,9 +191,6 @@ img {
 
 /**
  * Default focus styles for focused elements.
- *
- * This is applied globally to all interactive elements except Toolbar and
- * Settings Tray since they have their own styles.
  */
 .page-wrapper *:focus,
 .ui-dialog *:focus {

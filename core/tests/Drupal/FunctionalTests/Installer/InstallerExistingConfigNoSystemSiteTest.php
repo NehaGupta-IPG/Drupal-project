@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Installer;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Testing installing from config without system.site.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerExistingConfigNoSystemSiteTest extends InstallerConfigDirectoryTestBase {
 
   /**
@@ -31,7 +34,7 @@ class InstallerExistingConfigNoSystemSiteTest extends InstallerConfigDirectoryTe
    * Tests that profiles with no system.site do not work.
    */
   public function testConfigSync(): void {
-    $this->htmlOutput(NULL);
+    $this->htmlOutput();
     $this->assertSession()->titleEquals('Configuration validation | Drupal');
     $this->assertSession()->pageTextContains('The configuration synchronization failed validation.');
     $this->assertSession()->pageTextContains('This import does not contain system.site configuration, so has been rejected.');

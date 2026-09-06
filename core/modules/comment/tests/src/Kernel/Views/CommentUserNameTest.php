@@ -13,12 +13,14 @@ use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment user name field.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentUserNameTest extends ViewsKernelTestBase {
 
   /**
@@ -83,7 +85,7 @@ class CommentUserNameTest extends ViewsKernelTestBase {
 
     $commentType = CommentType::create([
       'id' => 'entity_test_comment',
-      'label' => t('Entity Test Comment'),
+      'label' => 'Entity Test Comment',
       'target_entity_type_id' => 'entity_test',
     ]);
     $commentType->save();
@@ -171,7 +173,7 @@ class CommentUserNameTest extends ViewsKernelTestBase {
     $this->assertLink('Anonymous comment title');
     // Display plugin of the view is showing the name field. When comment
     // belongs to an authenticated user the name field has no value.
-    $comment_author = $this->xpath('//div[contains(@class, :class)]/span[normalize-space(text())=""]', [
+    $comment_author = $this->getSimpleXmlElementsByXpath('//div[contains(@class, :class)]/span[normalize-space(text())=""]', [
       ':class' => 'views-field-subject',
     ]);
     $this->assertNotEmpty($comment_author);

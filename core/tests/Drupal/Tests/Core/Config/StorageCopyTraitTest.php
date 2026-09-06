@@ -11,21 +11,24 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\Core\Config\StorageCopyTrait
- * @group Config
+ * Tests Drupal\Core\Config\StorageCopyTrait.
  */
+#[CoversClass(StorageCopyTrait::class)]
+#[Group('Config')]
 class StorageCopyTraitTest extends UnitTestCase {
 
   use StorageCopyTrait;
 
   /**
-   * @covers ::replaceStorageContents
-   *
-   * @dataProvider providerTestReplaceStorageContents
+   * Tests replace storage contents.
    */
+  #[DataProvider('providerTestReplaceStorageContents')]
   public function testReplaceStorageContents($source_collections, $target_collections): void {
     $source = new MemoryStorage();
     $target = new MemoryStorage();
@@ -56,6 +59,7 @@ class StorageCopyTraitTest extends UnitTestCase {
     // After copying they are the same, this asserts that items not present
     // in the source get removed from the target.
     self::replaceStorageContents($source, $target);
+    $this->assertInstanceOf(MemoryStorage::class, $target);
     $this->assertEquals($source_data, self::toArray($target));
     // Assert that the copy method did indeed not change the source.
     $this->assertEquals($source_data, self::toArray($source));
@@ -68,7 +72,7 @@ class StorageCopyTraitTest extends UnitTestCase {
   /**
    * Provides data for testCheckRequirements().
    */
-  public static function providerTestReplaceStorageContents() {
+  public static function providerTestReplaceStorageContents(): array {
     $data = [];
     $data[] = [TRUE, TRUE];
     $data[] = [TRUE, FALSE];
@@ -85,6 +89,7 @@ class StorageCopyTraitTest extends UnitTestCase {
    *   The config storage to extract the data from.
    *
    * @return array
+   *   The config data as an array.
    */
   protected static function toArray(MemoryStorage $storage) {
     $reflection = new \ReflectionObject($storage);
@@ -119,7 +124,7 @@ class StorageCopyTraitTest extends UnitTestCase {
   /**
    * Tests replaceStorageContents() with config with an invalid configuration.
    *
-   * @covers ::replaceStorageContents
+   * @legacy-covers ::replaceStorageContents
    */
   public function testWithInvalidConfiguration(): void {
     $source = new TestStorage();

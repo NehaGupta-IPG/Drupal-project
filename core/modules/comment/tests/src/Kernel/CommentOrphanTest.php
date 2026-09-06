@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\Tests\EntityViewTrait;
-use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests loading and rendering orphan comments.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentOrphanTest extends EntityKernelTestBase {
 
   use EntityViewTrait;
@@ -36,10 +39,9 @@ class CommentOrphanTest extends EntityKernelTestBase {
 
   /**
    * Test loading/deleting/rendering orphaned comments.
-   *
-   * @dataProvider providerTestOrphan
    */
-  public function testOrphan($property): void {
+  #[DataProvider('providerTestOrphan')]
+  public function testOrphan(string $property): void {
 
     DateFormat::create([
       'id' => 'fallback',
@@ -77,7 +79,7 @@ class CommentOrphanTest extends EntityKernelTestBase {
       'label' => 'Comment',
     ])->save();
 
-    // Make two comments
+    // Make two comments.
     $comment1 = $comment_storage->create([
       'field_name' => 'comment',
       'comment_body' => 'test',
@@ -99,7 +101,7 @@ class CommentOrphanTest extends EntityKernelTestBase {
     $renderer = \Drupal::service('renderer');
     $comments = $comment_storage->loadMultiple();
     foreach ($comments as $comment) {
-      $built = $this->buildEntityView($comment, 'full', NULL);
+      $built = $this->buildEntityView($comment, 'full');
       $renderer->renderInIsolation($built);
     }
 
@@ -114,19 +116,19 @@ class CommentOrphanTest extends EntityKernelTestBase {
     // Render the comments with an orphan comment.
     $comments = $comment_storage->loadMultiple();
     foreach ($comments as $comment) {
-      $built = $this->buildEntityView($comment, 'full', NULL);
+      $built = $this->buildEntityView($comment, 'full');
       $renderer->renderInIsolation($built);
     }
 
     $node = $node_storage->load($node->id());
-    $built = $this->buildEntityView($node, 'full', NULL);
+    $built = $this->buildEntityView($node, 'full');
     $renderer->renderInIsolation($built);
   }
 
   /**
    * Provides test data for testOrphan.
    */
-  public static function providerTestOrphan() {
+  public static function providerTestOrphan(): array {
     return [
       ['entity_id'],
       ['uid'],

@@ -6,12 +6,14 @@ namespace Drupal\Tests\system\Kernel\Form;
 
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the programmatic form submission behavior.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class ProgrammaticTest extends KernelTestBase {
 
   /**
@@ -23,11 +25,6 @@ class ProgrammaticTest extends KernelTestBase {
    * Tests the programmatic form submission workflow.
    */
   public function testSubmissionWorkflow(): void {
-    // Backup the current batch status and reset it to avoid conflicts while
-    // processing the dummy form submit handler.
-    $current_batch = $batch =& batch_get();
-    $batch = [];
-
     // Test that a programmatic form submission is rejected when a required
     // textfield is omitted and correctly processed when it is provided.
     $this->doSubmitForm([], FALSE);
@@ -50,9 +47,6 @@ class ProgrammaticTest extends KernelTestBase {
     $this->doSubmitForm(['op' => 'Submit with limited validation', 'field_to_validate' => 'all'], FALSE);
     $this->doSubmitForm(['op' => 'Submit with limited validation', 'field_to_validate' => 'textfield'], FALSE);
     $this->doSubmitForm(['op' => 'Submit with limited validation', 'field_to_validate' => 'field_to_validate'], TRUE);
-
-    // Restore the current batch status.
-    $batch = $current_batch;
   }
 
   /**
@@ -64,7 +58,7 @@ class ProgrammaticTest extends KernelTestBase {
    *   A boolean indicating whether or not the form submission is expected to
    *   be valid.
    */
-  protected function doSubmitForm($values, $valid_input): void {
+  protected function doSubmitForm(array $values, $valid_input): void {
     // Programmatically submit the given values.
     $form_state = (new FormState())->setValues($values);
     \Drupal::formBuilder()->submitForm('\Drupal\form_test\Form\FormTestProgrammaticForm', $form_state);
