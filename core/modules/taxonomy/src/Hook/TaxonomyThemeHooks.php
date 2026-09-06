@@ -7,7 +7,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
- * Hook implementations for taxonomy.
+ * Implements theme hooks for the Taxonomy module.
  */
 class TaxonomyThemeHooks {
 
@@ -19,7 +19,7 @@ class TaxonomyThemeHooks {
    * Implements hook_theme().
    */
   #[Hook('theme')]
-  public function theme() : array {
+  public function theme(): array {
     return [
       'taxonomy_term' => [
         'render element' => 'elements',

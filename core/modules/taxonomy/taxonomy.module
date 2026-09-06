@@ -60,11 +60,6 @@ function taxonomy_term_is_page(Term $term) {
 }
 
 /**
- * @addtogroup taxonomy_index
- * @{
- */
-
-/**
  * Builds and inserts taxonomy index entries for a given node.
  *
  * The index lists all terms that are related to a given node entity, and is
@@ -143,7 +138,3 @@ function taxonomy_delete_node_index(EntityInterface $node): void {
     \Drupal::database()->delete('taxonomy_index')->condition('nid', $node->id())->execute();
   }
 }
-
-/**
- * @} End of "addtogroup taxonomy_index".
- */
