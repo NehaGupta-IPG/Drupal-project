@@ -112,8 +112,7 @@
 :is(#extra-specificity-hack, [data-drupal-admin-styles]) .top-bar__actions .toolbar-button--primary,
 #edit-submit.form-submit,
 .button--primary,
-.button--primary:not(:focus),
-.ief-entity-submit {
+.button--primary:not(:focus) {
   background: var(--admin-color-primary);
   box-shadow: 0.1em 0.25em 0.5em var(--admin-color-primary-soft);
 
