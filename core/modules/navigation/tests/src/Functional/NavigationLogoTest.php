@@ -65,6 +65,21 @@ class NavigationLogoTest extends BrowserTestBase {
   }
 
   /**
+   * Tests the anti-flicker script is loaded in the document head.
+   */
+  public function testAntiFlickerLibraryInHead(): void {
+    $this->drupalGet('/admin/config/user-interface/navigation/settings');
+    $this->assertSession()->elementExists(
+      'css',
+      'head script[src*="navigation.anti-flicker.js"]',
+    );
+    $this->assertSession()->elementNotExists(
+      'xpath',
+      '//body//script[contains(., "Drupal.navigation.sidebarExpanded")]',
+    );
+  }
+
+  /**
    * Tests Navigation logo configuration base options.
    */
   public function testSettingsLogoOptionsForm(): void {
