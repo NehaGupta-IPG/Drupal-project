@@ -10,7 +10,10 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\user\Entity\User;
 use Drupal\user\Hook\UserThemeHooks;
+use Drupal\user\LoginFinalizer;
+use Drupal\user\LogoutFinalizer;
 use Drupal\user\OneTimeAuthentication;
+use Drupal\user\NotificationHandler;
 use Drupal\user\UserInterface;
 
 /**
@@ -20,8 +23,14 @@ use Drupal\user\UserInterface;
  * user picture implementations (e.g., Gravatar) should provide their own
  * add/edit/delete forms and populate the 'picture' variable during the
  * preprocess stage.
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There
+ *   is no replacement, check the definition directly.
+ *
+ * @see https://www.drupal.org/node/3619932
  */
 function user_picture_enabled() {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement, check the definition directly. See https://www.drupal.org/node/3619932', E_USER_DEPRECATED);
   $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('user', 'user');
   return isset($field_definitions['user_picture']);
 }
@@ -84,29 +93,16 @@ function user_load_by_name($name) {
  * @param \Drupal\user\UserInterface $account
  *   The account to log in.
  *
- * @see hook_user_login()
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *    \Drupal\user\LoginFinalizer::finalizeLogin() instead.
+ *
+ * @see https://www.drupal.org/node/3379194
  * @see \Drupal\user\Authentication\Provider\Cookie
+ * @see hook_user_login()
  */
 function user_login_finalize(UserInterface $account): void {
-  \Drupal::currentUser()->setAccount($account);
-  \Drupal::logger('user')->info('Session opened for %name.', ['%name' => $account->getAccountName()]);
-  // Update the user table timestamp noting user has logged in.
-  // This is also used to invalidate one-time login links.
-  $account->setLastLoginTime(\Drupal::time()->getRequestTime());
-  \Drupal::entityTypeManager()
-    ->getStorage('user')
-    ->updateLastLoginTimestamp($account);
-
-  // Regenerate the session ID to prevent against session fixation attacks.
-  // This is called before hook_user_login() in case one of those functions
-  // fails or incorrectly does a redirect which would leave the old session
-  // in place.
-  /** @var \Symfony\Component\HttpFoundation\Session\SessionInterface $session */
-  $session = \Drupal::service('session');
-  $session->migrate();
-  $session->set('uid', $account->id());
-  $session->set('check_logged_in', TRUE);
-  \Drupal::moduleHandler()->invokeAll('user_login', [$account]);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\user\LoginFinalizer::finalizeLogin() instead. See https://www.drupal.org/node/3379194', E_USER_DEPRECATED);
+  \Drupal::service(LoginFinalizer::class)->finalizeLogin($account);
 }
 
 /**
@@ -264,6 +260,7 @@ function user_cancel($edit, $uid, $method): void {
  */
 function _user_cancel($edit, $account, $method): void {
   $logger = \Drupal::logger('user');
+  $notificationHandler = \Drupal::service(NotificationHandler::class);
 
   switch ($method) {
     case 'user_cancel_block':
@@ -271,7 +268,7 @@ function _user_cancel($edit, $account, $method): void {
     default:
       // Send account blocked notification if option was checked.
       if (!empty($edit['user_cancel_notify'])) {
-        _user_mail_notify('status_blocked', $account);
+        $notificationHandler->sendStatusBlocked($account);
       }
       $account->block();
       $account->save();
@@ -286,7 +283,7 @@ function _user_cancel($edit, $account, $method): void {
     case 'user_cancel_delete':
       // Send account canceled notification if option was checked.
       if (!empty($edit['user_cancel_notify'])) {
-        _user_mail_notify('status_canceled', $account);
+        $notificationHandler->sendStatusCancelled($account);
       }
       $account->delete();
       \Drupal::messenger()->addStatus(t('Account %name has been deleted.', ['%name' => $account->getDisplayName()]));
@@ -516,9 +513,14 @@ function user_role_revoke_permissions($rid, array $permissions = []): void {
  *   account does not have an email address.
  *
  * @see \Drupal\user\OneTimeAuthentication::tokens()
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the
+ *   methods from Drupal\user\NotificationHandler service instead.
+ *
+ * @see https://www.drupal.org/node/3539363
  */
 function _user_mail_notify($op, AccountInterface $account) {
-
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use the methods from Drupal\user\NotificationHandler service instead. See https://www.drupal.org/node/3539363', E_USER_DEPRECATED);
   if (\Drupal::config('user.settings')->get('notify.' . $op)) {
     $params['account'] = $account;
     // Get the custom site notification email to use as the from email address
@@ -603,19 +605,13 @@ function user_cookie_delete($cookie_name): void {
 
 /**
  * Logs the current user out.
+ *
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\user\LogoutFinalizer::finalizeLogout() instead.
+ *
+ * @see https://www.drupal.org/node/3379194
  */
-function user_logout(): void {
-  $user = \Drupal::currentUser();
-
-  \Drupal::logger('user')->info('Session closed for %name.', ['%name' => $user->getAccountName()]);
-
-  \Drupal::moduleHandler()->invokeAll('user_logout', [$user]);
-
-  // Destroy the current session, and reset $user to the anonymous user.
-  // Note: In Symfony the session is intended to be destroyed with
-  // Session::invalidate(). Regrettably this method is currently broken and may
-  // lead to the creation of spurious session records in the database.
-  // @see https://github.com/symfony/symfony/issues/12375
-  \Drupal::service('session_manager')->destroy();
-  $user->setAccount(new AnonymousUserSession());
+function user_logout():void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\user\LogoutFinalizer::finalizeLogout() instead. See https://www.drupal.org/node/3379194', E_USER_DEPRECATED);
+  \Drupal::service(LogoutFinalizer::class)->finalizeLogout();
 }

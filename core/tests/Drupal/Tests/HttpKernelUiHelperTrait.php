@@ -78,6 +78,7 @@ trait HttpKernelUiHelperTrait {
 
     foreach ($headers as $header_name => $header_value) {
       assert(is_string($header_name));
+      assert(!is_null($header_name));
 
       $session->setRequestHeader($header_name, $header_value);
     }
@@ -85,6 +86,7 @@ trait HttpKernelUiHelperTrait {
     $session->visit($path);
 
     $out = $session->getPage()->getContent();
+    $this->content = $out;
 
     if ($this->htmlOutputEnabled) {
       $html_output = 'GET request to: ' . $path;
@@ -182,6 +184,10 @@ trait HttpKernelUiHelperTrait {
    * Initializes Mink sessions.
    *
    * Helper for static::getSession().
+   *
+   * This should be called after changes to the service container, such as
+   * installing modules, as otherwise it will contain a reference to a stale
+   * container.
    */
   protected function initMink(): void {
     $driver = $this->getDefaultDriverInstance();
@@ -229,10 +235,11 @@ trait HttpKernelUiHelperTrait {
    *
    * The search is relative to the root element (HTML tag normally) of the page.
    *
-   * This method is identical to \Drupal\Tests\BrowserTestBase::xpath() and
-   * should be used when converting Browser tests to Kernel tests, as
-   * \Drupal\KernelTests\AssertContentTrait::xpath() which Kernel tests use does
-   * not have the same return type.
+   * This method is identical to
+   * \Drupal\Tests\BrowserTestBase::getNodeElementsByXpath() and should be used
+   * when converting Browser tests to Kernel tests, as
+   * \Drupal\KernelTests\AssertContentTrait::getSimpleXmlElementsByXpath() which
+   * Kernel tests use does not have the same return type.
    *
    * @param string $xpath
    *   The xpath string to use in the search.
