@@ -128,7 +128,7 @@ CacheTagGroupedLookups:
     - 'media:19'
   -
     - block_content_view
-ScriptCount: 12
+ScriptCount: 13
 ScriptBytes: 187160
-StylesheetCount: 13
+StylesheetCount: 12
 StylesheetBytes: 73614
