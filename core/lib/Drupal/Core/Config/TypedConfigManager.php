@@ -43,6 +43,11 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   protected $definitions;
 
   /**
+   * The array of base definitions, keyed by type.
+   */
+  protected array $baseDefinitions = [];
+
+  /**
    * Creates a new typed configuration manager.
    *
    * @param \Drupal\Core\Config\StorageInterface $configStorage
@@ -191,7 +196,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $object
    *   A config schema object to get the static type root for.
    *
-   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface
+   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface<int|string, \Drupal\Core\TypedData\TypedDataInterface>
    *   The ancestral config schema object at which the static type root lies:
    *   either the first ancestor with a dynamic type (for example:
    *   `block.block.*:settings`, which has the `block.settings.[%parent.plugin]`
@@ -278,7 +283,10 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $definition = $definitions[$type];
     // Check whether this type is an extension of another one and compile it.
     if (isset($definition['type'])) {
-      $merge = $this->getDefinition($definition['type'], $exception_on_invalid);
+      if (!isset($this->baseDefinitions[$definition['type']])) {
+        $this->baseDefinitions[$definition['type']] = $this->getDefinition($definition['type'], $exception_on_invalid);
+      }
+      $merge = $this->baseDefinitions[$definition['type']];
       // Preserve integer keys on merge, so sequence item types can override
       // parent settings as opposed to adding unused second, third, etc. items.
       $definition = NestedArray::mergeDeepArray([$merge, $definition], TRUE);
@@ -298,7 +306,9 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       }
       // Unset type so we try the merge only once per type.
       unset($definition['type']);
-      $this->definitions[$type] = $definition;
+      if (!empty($replacements)) {
+        $this->definitions[$type] = $definition;
+      }
     }
     // Add type and default definition class.
     $definition += [
@@ -321,6 +331,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    */
   public function clearCachedDefinitions() {
     $this->schemaStorage->reset();
+    $this->baseDefinitions = [];
     parent::clearCachedDefinitions();
   }
 
@@ -376,14 +387,13 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       else {
         // No definition for this level. Collapse multiple wildcards to a single
         // wildcard to see if there is a greedy match. For example,
-        // breakpoint.breakpoint.*.* becomes
-        // breakpoint.breakpoint.*
+        // "breakpoint.breakpoint.*.*" becomes "breakpoint.breakpoint.*".
         $one_star = preg_replace('/\.([:\.\*]*)$/', '.*', $replaced);
         if ($one_star != $replaced && isset($this->definitions[$one_star])) {
           return $one_star;
         }
-        // Check for next level. For example, if breakpoint.breakpoint.* has
-        // been checked and no match found then check breakpoint.*.*
+        // Check for next level. For example, if "breakpoint.breakpoint.*" has
+        // been checked and no match found then check "breakpoint.*.*".
         return $this->getFallbackName($replaced);
       }
     }

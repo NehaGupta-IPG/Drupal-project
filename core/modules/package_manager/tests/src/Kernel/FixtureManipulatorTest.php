@@ -8,43 +8,40 @@ use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\fixture_manipulator\FixtureManipulator;
 use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\InstalledPackagesList;
-use Drupal\Tests\package_manager\Traits\InstalledPackagesListTrait;
 use Drupal\package_manager\PathLocator;
+use Drupal\Tests\package_manager\Traits\InstalledPackagesListTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\fixture_manipulator\FixtureManipulator
- *
- * @group package_manager
+ * Tests Drupal\fixture_manipulator\FixtureManipulator.
  */
+#[CoversClass(FixtureManipulator::class)]
+#[Group('package_manager')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class FixtureManipulatorTest extends PackageManagerKernelTestBase {
 
   use InstalledPackagesListTrait;
 
   /**
    * The root directory of the test project.
-   *
-   * @var string
    */
   private string $dir;
 
   /**
    * The exception expected in ::tearDown() of this test.
-   *
-   * @var \Exception
    */
   private \Exception $expectedTearDownException;
 
   /**
    * The Composer inspector service.
-   *
-   * @var \Drupal\package_manager\ComposerInspector
    */
   private ComposerInspector $inspector;
 
   /**
    * The original fixture package list at the start of the test.
-   *
-   * @var \Drupal\package_manager\InstalledPackagesList
    */
   private InstalledPackagesList $originalFixturePackages;
 
@@ -78,7 +75,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
   }
 
   /**
-   * @covers ::addPackage
+   * Tests add package.
    */
   public function testAddPackage(): void {
     // Packages cannot be added without a name.
@@ -140,7 +137,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
   }
 
   /**
-   * @covers ::modifyPackageConfig
+   * Tests modify package config.
    */
   public function testModifyPackageConfig(): void {
     // Assert ::modifyPackage() works with a package in an existing fixture not
@@ -172,7 +169,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
   }
 
   /**
-   * @covers ::removePackage
+   * Tests remove package.
    */
   public function testRemovePackage(): void {
     // We should not be able to remove a package that's not installed.
@@ -207,13 +204,13 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
    */
   public function testActiveManipulatorNoCommitError(): void {
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('commitChanges() must be called.');
+    $this->expectExceptionMessageIs('commitChanges() must be called.');
     (new ActiveFixtureManipulator())
       ->setVersion('drupal/core', '1.2.3');
   }
 
   /**
-   * @covers ::addDotGitFolder
+   * Tests add dot git folder.
    */
   public function testAddDotGitFolder(): void {
     $path_locator = $this->container->get(PathLocator::class);

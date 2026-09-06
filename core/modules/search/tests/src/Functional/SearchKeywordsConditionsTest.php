@@ -6,6 +6,9 @@ namespace Drupal\Tests\search\Functional;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verify the search without keywords set and extra conditions.
@@ -13,9 +16,10 @@ use Drupal\Tests\BrowserTestBase;
  * Verifies that a plugin can override the isSearchExecutable() method to allow
  * searching without keywords set and that GET query parameters are made
  * available to plugins during search execution.
- *
- * @group search
  */
+#[Group('search')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class SearchKeywordsConditionsTest extends BrowserTestBase {
 
   /**

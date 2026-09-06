@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Heading;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\jsonapi\JsonApiSpec;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "Editor" config entity type.
- *
- * @group jsonapi
  */
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class EditorTest extends ConfigEntityResourceTestBase {
 
   /**
@@ -66,7 +68,7 @@ class EditorTest extends ConfigEntityResourceTestBase {
         'filter_html' => [
           'status' => TRUE,
           'settings' => [
-            'allowed_html' => '<p> <a> <b> <lo>',
+            'allowed_html' => '<a> <b> <lo> <p>',
           ],
         ],
       ],
@@ -184,7 +186,7 @@ class EditorTest extends ConfigEntityResourceTestBase {
         'filter_html' => [
           'status' => TRUE,
           'settings' => [
-            'allowed_html' => '<p> <a> <b> <lo>',
+            'allowed_html' => '<a> <b> <lo> <p>',
           ],
         ],
       ],

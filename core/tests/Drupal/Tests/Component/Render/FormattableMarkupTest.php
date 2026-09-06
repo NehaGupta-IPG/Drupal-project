@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Render;
 
+// cspell:ignore errfile errline
+
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Tests the TranslatableMarkup class.
- *
- * @coversDefaultClass \Drupal\Component\Render\FormattableMarkup
- * @group utility
  */
+#[CoversClass(FormattableMarkup::class)]
+#[Group('utility')]
 class FormattableMarkupTest extends TestCase {
-
-  use ExpectDeprecationTrait;
 
   /**
    * The error message of the last error in the error handler.
@@ -33,8 +34,8 @@ class FormattableMarkupTest extends TestCase {
   protected $lastErrorNumber;
 
   /**
-   * @covers ::__toString
-   * @covers ::jsonSerialize
+   * @legacy-covers ::__toString
+   * @legacy-covers ::jsonSerialize
    */
   public function testToString(): void {
     $string = 'Can I have a @replacement';
@@ -46,7 +47,7 @@ class FormattableMarkupTest extends TestCase {
   }
 
   /**
-   * @covers ::count
+   * Tests count.
    */
   public function testCount(): void {
     $string = 'Can I have a @replacement';
@@ -55,30 +56,20 @@ class FormattableMarkupTest extends TestCase {
   }
 
   /**
-   * Custom error handler that saves the last error.
-   *
-   * We need this custom error handler because we cannot rely on the error to
-   * exception conversion as __toString is never allowed to leak any kind of
-   * exception.
-   *
-   * @param int $error_number
-   *   The error number.
-   * @param string $error_message
-   *   The error message.
+   * @legacy-covers ::__toString
    */
-  public function errorHandler($error_number, $error_message): void {
-    $this->lastErrorNumber = $error_number;
-    $this->lastErrorMessage = $error_message;
-  }
-
-  /**
-   * @covers ::__toString
-   * @dataProvider providerTestUnexpectedPlaceholder
-   */
-  public function testUnexpectedPlaceholder($string, $arguments, $error_number, $error_message): void {
-    // We set a custom error handler because of
+  #[DataProvider('providerTestUnexpectedPlaceholder')]
+  public function testUnexpectedPlaceholder(string $string, array $arguments, ?int $error_number, string $error_message): void {
+    // We set a custom error handler that saves the last error.
+    // We need this custom error handler because we cannot rely on the error to
+    // exception conversion as __toString is never allowed to leak any kind of
+    // exception.
     // https://github.com/sebastianbergmann/phpunit/issues/487
-    set_error_handler([$this, 'errorHandler']);
+    set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline): bool {
+      $this->lastErrorNumber = $errno;
+      $this->lastErrorMessage = $errstr;
+      return TRUE;
+    });
     // We want this to trigger an error.
     $markup = new FormattableMarkup($string, $arguments);
     // Cast it to a string which will generate the errors.
@@ -96,10 +87,20 @@ class FormattableMarkupTest extends TestCase {
    * @return array
    *   An array of test cases.
    */
-  public static function providerTestUnexpectedPlaceholder() {
+  public static function providerTestUnexpectedPlaceholder(): array {
     return [
-      ['Non alpha, non-allowed starting character: ~placeholder', ['~placeholder' => 'replaced'], E_USER_WARNING, 'Placeholders must begin with one of the following "@", ":" or "%", invalid placeholder (~placeholder) with string: "Non alpha, non-allowed starting character: ~placeholder"'],
-      ['Alpha starting character: placeholder', ['placeholder' => 'replaced'], NULL, ''],
+      [
+        'Non alpha, non-allowed starting character: ~placeholder',
+        ['~placeholder' => 'replaced'],
+        E_USER_WARNING,
+        'Placeholders must begin with one of the following "@", ":" or "%", invalid placeholder (~placeholder) with string: "Non alpha, non-allowed starting character: ~placeholder"',
+      ],
+      [
+        'Alpha starting character: placeholder',
+        ['placeholder' => 'replaced'],
+        NULL,
+        '',
+      ],
       // Ensure that where the placeholder is located in the string is
       // irrelevant.
       ['placeholder', ['placeholder' => 'replaced'], NULL, ''],

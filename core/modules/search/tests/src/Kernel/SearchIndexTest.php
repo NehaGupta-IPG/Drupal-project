@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the service "search.index".
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class SearchIndexTest extends KernelTestBase {
 
   /**

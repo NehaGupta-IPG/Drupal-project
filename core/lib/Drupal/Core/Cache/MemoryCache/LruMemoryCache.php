@@ -79,8 +79,8 @@ class LruMemoryCache extends MemoryCache {
     }
     elseif (count($this->cache) > $this->allowedSlots - 1) {
       // Remove one item from the cache to ensure we remain within the allowed
-      // number of slots. Avoid using array_slice() because it makes a copy of the
-      // array, and avoid using array_splice() or array_shift() because they
+      // number of slots. Avoid using array_slice() because it makes a copy of
+      // the array, and avoid using array_splice() or array_shift() because they
       // re-index numeric keys.
       unset($this->cache[array_key_first($this->cache)]);
     }
@@ -113,14 +113,13 @@ class LruMemoryCache extends MemoryCache {
    * {@inheritdoc}
    */
   public function invalidateTags(array $tags): void {
-    $items = [];
+    // Remove items when tags are invalidated so that memory is freed
+    // immediately.
     foreach ($this->cache as $cid => $item) {
       if (array_intersect($tags, $item->tags)) {
-        parent::invalidate($cid);
-        $items[$cid] = $this->cache[$cid];
+        unset($this->cache[$cid]);
       }
     }
-    $this->moveItemsToLeastRecentlyUsed($items);
   }
 
   /**

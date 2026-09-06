@@ -120,6 +120,8 @@ interface ConfigManagerInterface {
   /**
    * Finds config entities that are dependent on extensions or entities.
    *
+   * Config entities are loaded without overrides.
+   *
    * @param string $type
    *   The type of dependency being checked. Either 'module', 'theme', 'config'
    *   or 'content'.
@@ -134,7 +136,7 @@ interface ConfigManagerInterface {
   public function findConfigEntityDependenciesAsEntities($type, array $names);
 
   /**
-   * Lists which config entities to update and delete on removal of a dependency.
+   * Lists config entities to update and delete on removal of a dependency.
    *
    * @param string $type
    *   The type of dependency being checked. Either 'module', 'theme', 'config'

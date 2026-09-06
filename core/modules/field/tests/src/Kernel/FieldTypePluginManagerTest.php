@@ -7,12 +7,14 @@ namespace Drupal\Tests\field\Kernel;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\entity_test\Entity\EntityTest;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the field type manager.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldTypePluginManagerTest extends FieldKernelTestBase {
 
   /**
@@ -132,7 +134,7 @@ class FieldTypePluginManagerTest extends FieldKernelTestBase {
     $module_list = $listing->scan('module', FALSE);
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
-    $module_list = array_filter(array_keys($module_list), function ($module) use ($module_handler, $module_list) {
+    $module_list = array_filter(array_keys($module_list), function (int|string $module) use ($module_handler, $module_list): bool {
       return !$module_handler->moduleExists($module) && str_starts_with($module_list[$module]->getPath(), 'core');
     });
     $this->enableModules($module_list);

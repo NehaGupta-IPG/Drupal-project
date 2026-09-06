@@ -2,6 +2,7 @@
 
 namespace Drupal\navigation;
 
+use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Block\BlockPluginInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Handle rendering for different pieces of the navigation.
  *
- * @internal The navigation module is experimental.
+ * @internal
  */
 final class NavigationRenderer {
 
@@ -67,21 +68,6 @@ final class NavigationRenderer {
     private AccountInterface $currentUser,
     private EntityRouteHelper $entityRouteHelper,
   ) {}
-
-  /**
-   * Remove the toolbar provided by Toolbar module.
-   *
-   * @param array $page_top
-   *   A renderable array representing the top of the page.
-   *
-   * @see toolbar_page_top()
-   * @see hook_page_top()
-   */
-  public function removeToolbar(array &$page_top): void {
-    if (isset($page_top['toolbar'])) {
-      unset($page_top['toolbar']);
-    }
-  }
 
   /**
    * Build out the navigation bar.
@@ -130,23 +116,8 @@ final class NavigationRenderer {
       ->addCacheableDependency($this->configFactory->get('navigation.block_layout'));
     $cacheability->applyTo($build);
 
-    $module_path = $this->requestStack->getCurrentRequest()->getBasePath() . '/' . $this->moduleExtensionList->getPath('navigation');
-    $asset_url = $module_path . '/assets/fonts/inter-var.woff2';
-
     $defaults = [
-      'settings' => ['hide_logo' => $logo_provider === self::LOGO_PROVIDER_HIDE],
-      '#attached' => [
-        'html_head_link' => [
-          [
-            [
-              'rel' => 'preload',
-              'href' => $asset_url,
-              'as' => 'font',
-              'crossorigin' => 'anonymous',
-            ],
-          ],
-        ],
-      ],
+      '#settings' => ['hide_logo' => $logo_provider === self::LOGO_PROVIDER_HIDE],
     ];
     $build[0] = NestedArray::mergeDeepArray([$build[0], $defaults]);
 
@@ -157,10 +128,10 @@ final class NavigationRenderer {
       if (!empty($logo_path) && is_file($logo_path)) {
         $logo_managed_url = $this->fileUrlGenerator->generateAbsoluteString($logo_path);
         $image = $this->imageFactory->get($logo_path);
-        $build[0]['settings']['logo_path'] = $logo_managed_url;
+        $build[0]['#settings']['logo_path'] = $logo_managed_url;
         if ($image->isValid()) {
-          $build[0]['settings']['logo_width'] = $image->getWidth();
-          $build[0]['settings']['logo_height'] = $image->getHeight();
+          $build[0]['#settings']['logo_width'] = $image->getWidth();
+          $build[0]['#settings']['logo_height'] = $image->getHeight();
         }
       }
     }
@@ -204,17 +175,29 @@ final class NavigationRenderer {
    * @see hook_page_top()
    */
   public function buildTopBar(array &$page_top): void {
-    if (!$this->moduleHandler->moduleExists('navigation_top_bar')) {
-      return;
+    $page_top['top_bar']['#cache']['contexts'][] = 'user.permissions';
+    if ($this->currentUser->hasPermission('access navigation')) {
+      $page_top['top_bar'] = [
+        '#cache' => [
+          'keys' => ['navigation', 'top_bar'],
+          'max-age' => CacheBackendInterface::CACHE_PERMANENT,
+        ],
+        '#lazy_builder' => ['navigation.renderer:doBuildTopBar', []],
+        '#placeholder_strategy_denylist' => [
+          BigPipeStrategy::class => TRUE,
+        ],
+        '#create_placeholder' => TRUE,
+      ];
     }
+  }
 
-    $page_top['top_bar'] = [
+  /**
+   * Lazy builder to generate the top bar render array.
+   */
+  #[TrustedCallback]
+  public function doBuildTopBar(): array {
+    return [
       '#type' => 'top_bar',
-      '#access' => $this->currentUser->hasPermission('access navigation'),
-      '#cache' => [
-        'keys' => ['top_bar'],
-        'contexts' => ['user.permissions'],
-      ],
     ];
   }
 
@@ -236,7 +219,7 @@ final class NavigationRenderer {
     if ($block->getPluginId() !== 'local_tasks_block') {
       return;
     }
-    if ($this->hasLocalTasks() && $this->moduleHandler->moduleExists('navigation_top_bar')) {
+    if ($this->hasLocalTasks()) {
       $build['#access'] = FALSE;
     }
   }

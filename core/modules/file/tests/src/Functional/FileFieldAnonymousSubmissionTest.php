@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional;
 
+use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
 use Drupal\user\RoleInterface;
-use Drupal\file\Entity\File;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Confirm that file field submissions work correctly for anonymous visitors.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileFieldAnonymousSubmissionTest extends FileFieldTestBase {
 
   /**
@@ -139,12 +141,7 @@ class FileFieldAnonymousSubmissionTest extends FileFieldTestBase {
       'body[0][value]' => 'Test article',
       'files[field_image_0]' => $this->container->get('file_system')->realpath($image->getFileUri()),
     ];
-    if (!$this->loggedInUser) {
-      $label = 'Save';
-    }
-    else {
-      $label = 'Save';
-    }
+    $label = 'Save';
     $this->submitForm($edit, $label);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextNotContains("$type $title has been created.");

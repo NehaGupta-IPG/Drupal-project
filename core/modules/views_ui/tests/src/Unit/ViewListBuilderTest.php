@@ -4,38 +4,45 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views_ui\Unit;
 
+use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Menu\MenuParentFormSelector;
+use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Entity\View;
+use Drupal\views\Plugin\views\display\DefaultDisplay;
+use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\ViewExecutableFactory;
+use Drupal\views\ViewsData;
 use Drupal\views_ui\ViewListBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\views_ui\ViewListBuilder
- * @group views_ui
+ * Tests Drupal\views_ui\ViewListBuilder.
  */
+#[CoversClass(ViewListBuilder::class)]
+#[Group('views_ui')]
 class ViewListBuilderTest extends UnitTestCase {
 
   /**
    * Tests the listing of displays on a views list builder.
    *
    * @see \Drupal\views_ui\ViewListBuilder::getDisplaysList()
-   * @covers ::buildRow
    */
   public function testBuildRowEntityList(): void {
-    $storage = $this->getMockBuilder('Drupal\Core\Config\Entity\ConfigEntityStorage')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $display_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $storage = $this->createStub(ConfigEntityStorage::class);
+    $display_manager = $this->createStub(ViewsPluginManager::class);
 
-    $display_manager->expects($this->any())
+    $display_manager
       ->method('getDefinition')
       ->willReturnMap([
         [
@@ -74,19 +81,20 @@ class ViewListBuilderTest extends UnitTestCase {
         ],
       ]);
 
-    $default_display = $this->getMockBuilder('Drupal\views\Plugin\views\display\DefaultDisplay')
-      ->onlyMethods(['initDisplay'])
-      ->setConstructorArgs([[], 'default', $display_manager->getDefinition('default')])
-      ->getMock();
-    $route_provider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
-    $state = $this->createMock('\Drupal\Core\State\StateInterface');
-    $menu_storage = $this->createMock('\Drupal\Core\Entity\EntityStorageInterface');
-    $parent_form_selector = $this->createMock(MenuParentFormSelector::class);
+    $default_display = $this->createStub(DefaultDisplay::class);
     $page_display = $this->getMockBuilder('Drupal\views\Plugin\views\display\Page')
       ->onlyMethods(['initDisplay', 'getPath'])
-      ->setConstructorArgs([[], 'default', $display_manager->getDefinition('page'), $route_provider, $state, $menu_storage, $parent_form_selector])
+      ->setConstructorArgs([
+        [],
+        'default',
+        $display_manager->getDefinition('page'),
+        $this->createStub(RouteProviderInterface::class),
+        $this->createStub(StateInterface::class),
+        $this->createStub(EntityStorageInterface::class),
+        $this->createStub(MenuParentFormSelector::class),
+      ])
       ->getMock();
-    $page_display->expects($this->any())
+    $page_display->expects($this->atLeastOnce())
       ->method('getPath')
       ->willReturnOnConsecutiveCalls(
         'test_page',
@@ -98,6 +106,8 @@ class ViewListBuilderTest extends UnitTestCase {
       ->onlyMethods(['initDisplay'])
       ->setConstructorArgs([[], 'default', $display_manager->getDefinition('embed')])
       ->getMock();
+    $embed_display->expects($this->once())
+      ->method('initDisplay');
 
     $values = [];
     $values['label'] = 'Test';
@@ -125,7 +135,7 @@ class ViewListBuilderTest extends UnitTestCase {
     $values['display']['embed']['display_title'] = 'Embedded';
     $values['display']['embed']['display_plugin'] = 'embed';
 
-    $display_manager->expects($this->any())
+    $display_manager
       ->method('createInstance')
       ->willReturnMap([
         ['default', $values['display']['default'], $default_display],
@@ -136,13 +146,11 @@ class ViewListBuilderTest extends UnitTestCase {
       ]);
 
     $container = new ContainerBuilder();
-    $user = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $user = $this->createStub(AccountInterface::class);
     $request_stack = new RequestStack();
     $request_stack->push(new Request());
-    $views_data = $this->getMockBuilder('Drupal\views\ViewsData')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $route_provider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
+    $views_data = $this->createStub(ViewsData::class);
+    $route_provider = $this->createStub(RouteProviderInterface::class);
     $executable_factory = new ViewExecutableFactory($user, $request_stack, $views_data, $route_provider, $display_manager);
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $container->set('views.executable', $executable_factory);
@@ -152,7 +160,7 @@ class ViewListBuilderTest extends UnitTestCase {
 
     // Setup a view list builder with a mocked buildOperations method,
     // because t() is called on there.
-    $entity_type = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
+    $entity_type = $this->createStub(EntityTypeInterface::class);
     $entity_type_manager->getDefinition('view')->willReturn($entity_type);
     $view_list_builder = new TestViewListBuilder($entity_type, $storage, $display_manager);
     $view_list_builder->setStringTranslation($this->getStringTranslationStub());
@@ -194,7 +202,10 @@ class ViewListBuilderTest extends UnitTestCase {
  */
 class TestViewListBuilder extends ViewListBuilder {
 
-  public function buildOperations(EntityInterface $entity) {
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOperations(EntityInterface $entity): array {
     return [];
   }
 

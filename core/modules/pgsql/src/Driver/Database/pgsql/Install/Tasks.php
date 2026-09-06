@@ -21,9 +21,9 @@ class Tasks extends InstallTasks {
    *
    * The contrib extension pg_trgm is supposed to be installed.
    *
-   * @see https://www.postgresql.org/docs/16/pgtrgm.html
+   * @see https://www.postgresql.org/docs/18/pgtrgm.html
    */
-  const PGSQL_MINIMUM_VERSION = '16';
+  const PGSQL_MINIMUM_VERSION = '18';
 
   /**
    * {@inheritdoc}
@@ -112,7 +112,10 @@ class Tasks extends InstallTasks {
         catch (DatabaseNotFoundException $e) {
           // Still no dice; probably a permission issue. Raise the error to the
           // installer.
-          $this->fail($this->t('Database %database not found. The server reports the following message when attempting to create the database: %error.', ['%database' => $database, '%error' => $e->getMessage()]));
+          $this->fail($this->t('Database %database not found. The server reports the following message when attempting to create the database: %error.', [
+            '%database' => $database,
+            '%error' => $e->getMessage(),
+          ]));
         }
       }
       else {

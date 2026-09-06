@@ -6,12 +6,14 @@ namespace Drupal\Tests\system\Kernel\Common;
 
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Make sure that attaching feeds works correctly with various constructs.
- *
- * @group Common
  */
+#[Group('Common')]
+#[RunTestsInSeparateProcesses]
 class AddFeedTest extends KernelTestBase {
 
   /**
@@ -77,11 +79,10 @@ class AddFeedTest extends KernelTestBase {
   /**
    * Creates a pattern representing the RSS feed in the page.
    */
-  public function urlToRSSLinkPattern($url, $title = '') {
+  public function urlToRSSLinkPattern($url, string $title = ''): string {
     // Escape any regular expression characters in the URL ('?' is the worst).
     $url = preg_replace('/([+?.*])/', '[$0]', $url);
-    $generated_pattern = '%<link +href="' . $url . '" +rel="alternate" +title="' . $title . '" +type="application/rss.xml" */>%';
-    return $generated_pattern;
+    return '%<link +href="' . $url . '" +rel="alternate" +title="' . $title . '" +type="application/rss.xml" */>%';
   }
 
   /**

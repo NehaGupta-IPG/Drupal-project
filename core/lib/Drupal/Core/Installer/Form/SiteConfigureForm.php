@@ -86,7 +86,7 @@ class SiteConfigureForm extends ConfigFormBase {
     global $install_state;
     $form['#title'] = $this->t('Configure site');
 
-    // Warn about settings.php permissions risk
+    // Warn about settings.php permissions risk.
     $settings_dir = $this->sitePath;
     $settings_file = $settings_dir . '/settings.php';
     // Check that $_POST is empty so we only show this message when the form is
@@ -106,6 +106,7 @@ class SiteConfigureForm extends ConfigFormBase {
         ]));
     }
 
+    $form['#attached']['library'][] = 'core/drupal.fieldgroup';
     $form['#attached']['library'][] = 'system/drupal.system';
     // Add JavaScript time zone detection.
     $form['#attached']['library'][] = 'core/drupal.timezone';
@@ -114,7 +115,8 @@ class SiteConfigureForm extends ConfigFormBase {
     $form['#attached']['drupalSettings']['copyFieldValue']['edit-site-mail'] = ['edit-account-mail'];
 
     $form['site_information'] = [
-      '#type' => 'fieldgroup',
+      '#type' => 'fieldset',
+      '#attributes' => ['class' => ['fieldgroup']],
       '#title' => $this->t('Site information'),
       '#access' => empty($install_state['config_install_path']),
     ];
@@ -125,13 +127,10 @@ class SiteConfigureForm extends ConfigFormBase {
       '#weight' => -20,
       '#access' => empty($install_state['config_install_path']),
     ];
-    // Use the default site mail if one is already configured, or fall back to
-    // PHP's configured sendmail_from.
-    $default_site_mail = $this->config('system.site')->get('mail') ?: ini_get('sendmail_from');
     $form['site_information']['site_mail'] = [
       '#type' => 'email',
       '#title' => $this->t('Site email address'),
-      '#default_value' => $default_site_mail,
+      '#default_value' => $this->config('system.site')->get('mail'),
       '#description' => $this->t("Automated emails, such as registration information, will be sent from this address. Use an address ending in your site's domain to help prevent these emails from being flagged as spam."),
       '#required' => TRUE,
       '#weight' => -15,
@@ -146,7 +145,8 @@ class SiteConfigureForm extends ConfigFormBase {
     }
 
     $form['admin_account'] = [
-      '#type' => 'fieldgroup',
+      '#type' => 'fieldset',
+      '#attributes' => ['class' => ['fieldgroup']],
       '#title' => $account_label,
     ];
     $form['admin_account']['account']['name'] = [
@@ -170,7 +170,8 @@ class SiteConfigureForm extends ConfigFormBase {
     ];
 
     $form['regional_settings'] = [
-      '#type' => 'fieldgroup',
+      '#type' => 'fieldset',
+      '#attributes' => ['class' => ['fieldgroup']],
       '#title' => $this->t('Regional settings'),
       '#access' => empty($install_state['config_install_path']),
     ];
@@ -189,9 +190,10 @@ class SiteConfigureForm extends ConfigFormBase {
     ];
 
     $form['update_notifications'] = [
-      '#type' => 'fieldgroup',
+      '#type' => 'fieldset',
+      '#attributes' => ['class' => ['fieldgroup']],
       '#title' => $this->t('Update notifications'),
-      '#description' => $this->t('When checking for updates, your site automatically sends anonymous information to Drupal.org. See the <a href="@update-module-docs" target="_blank">Update module documentation</a> for details.', ['@update-module-docs' => 'https://www.drupal.org/node/178772']),
+      '#description' => $this->t('When checking for updates, your site automatically sends anonymous information to Drupal.org. See the <a href="@update-status-module-docs" target="_blank">Update Status module documentation</a> for details.', ['@update-status-module-docs' => 'https://www.drupal.org/node/178772']),
       '#access' => empty($install_state['config_install_path']),
     ];
     $form['update_notifications']['enable_update_status_module'] = [
@@ -243,11 +245,11 @@ class SiteConfigureForm extends ConfigFormBase {
       $this->config('system.site')
         ->set('name', (string) $form_state->getValue('site_name'))
         ->set('mail', (string) $form_state->getValue('site_mail'))
-        ->save(TRUE);
+        ->save();
 
       $this->config('system.date')
         ->set('timezone.default', (string) $form_state->getValue('date_default_timezone'))
-        ->save(TRUE);
+        ->save();
     }
 
     $account_values = $form_state->getValue('account');
@@ -256,14 +258,16 @@ class SiteConfigureForm extends ConfigFormBase {
     $update_status_module = $form_state->getValue('enable_update_status_module');
     if (empty($install_state['config_install_path']) && $update_status_module) {
       $this->moduleInstaller->install(['update']);
+      // After a module is installed, there is a new container, so all class
+      // properties dependent on the container need to be reset.
+      $this->resetPropertiesFromContainer();
 
       // Add the site maintenance account's email address to the list of
       // addresses to be notified when updates are available, if selected.
       $email_update_status_emails = $form_state->getValue('enable_update_status_emails');
       if ($email_update_status_emails) {
-        // Reset the configuration factory so it is updated with the new module.
-        $this->resetConfigFactory();
-        $this->config('update.settings')->set('notification.emails', [$account_values['mail']])->save(TRUE);
+        // Reset the configuration so it is updated with the new module.
+        $this->config('update.settings')->set('notification.emails', [$account_values['mail']])->save();
       }
     }
 
@@ -308,6 +312,20 @@ class SiteConfigureForm extends ConfigFormBase {
    */
   protected function getAdminRoles(): array {
     return $this->entityTypeManager->getStorage('user_role')->loadByProperties(['is_admin' => TRUE]);
+  }
+
+  /**
+   * Repopulate class properties from container.
+   */
+  protected function resetPropertiesFromContainer(): void {
+    $this->resetConfigFactory();
+    $container = \Drupal::getContainer();
+    $this->root = $container->getParameter('app.root');
+    $this->sitePath = $container->getParameter('site.path');
+    $this->entityTypeManager = $container->get('entity_type.manager');
+    $this->moduleInstaller = $container->get('module_installer');
+    $this->userNameValidator = $container->get('user.name_validator');
+    $this->superUserAccessPolicy = $container->getParameter('security.enable_super_user') ?? TRUE;
   }
 
 }

@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\navigation\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the definition of navigation safe blocks.
- *
- * @group navigation
  */
+#[Group('navigation')]
+#[RunTestsInSeparateProcesses]
 class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
 
   /**
@@ -51,14 +53,12 @@ class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
    */
   public function testNavigationSafeBlockDefinition(): void {
     // Confirm that default blocks are available.
-    $layout_url = '/admin/config/user-interface/navigation-block';
+    $layout_url = '/layout_builder/choose/block/navigation/navigation.block_layout/0/content';
     $this->drupalGet($layout_url);
-    $this->clickLink('Add block');
 
     $this->assertSession()->linkExists('Administration');
     $this->assertSession()->linkExists('Content');
     $this->assertSession()->linkExists('Footer');
-    $this->assertSession()->linkExists('Navigation Shortcuts');
     $this->assertSession()->linkExists('User');
     $this->assertSession()->linkNotExists('Link');
 
@@ -71,7 +71,6 @@ class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
     $this->assertSession()->linkExists('Content');
     $this->assertSession()->linkExists('Footer');
     $this->assertSession()->linkExists('Link');
-    $this->assertSession()->linkNotExists('Navigation Shortcuts');
   }
 
   /**
@@ -83,7 +82,6 @@ class NavigationSafeBlockDefinitionTest extends BrowserTestBase {
     $this->clickLink('Place block');
     $this->assertSession()->linkByHrefNotExists('/admin/structure/block/add/navigation_menu%3Aadmin/stark');
     $this->assertSession()->linkByHrefNotExists('/admin/structure/block/add/navigation_menu%3Acontent/stark');
-    $this->assertSession()->linkByHrefNotExists('/admin/structure/block/add/navigation_shortcuts/stark');
     $this->assertSession()->linkByHrefNotExists('/admin/structure/block/add/navigation_user/stark');
     $this->assertSession()->linkByHrefNotExists('/admin/structure/block/add/navigation_link/stark');
   }

@@ -11,11 +11,12 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use Drupal\node\NodeAccessRebuild;
 
 /**
  * Tests the Field UI "Manage fields" screen.
  */
-class ManageFieldsFunctionalTestBase extends BrowserTestBase {
+abstract class ManageFieldsFunctionalTestBase extends BrowserTestBase {
 
   use EntityReferenceFieldCreationTrait;
   use FieldUiTestTrait;
@@ -137,7 +138,7 @@ class ManageFieldsFunctionalTestBase extends BrowserTestBase {
       ->save();
 
     // Setup node access testing.
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
     $this->addPrivateField(NodeType::load('article'));
     \Drupal::state()->set('node_access_test.private', TRUE);
 

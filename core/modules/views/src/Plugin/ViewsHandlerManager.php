@@ -7,6 +7,8 @@ use Drupal\Component\Plugin\FallbackPluginManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\Plugin\PreWarmablePluginManagerTrait;
+use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\views\Plugin\views\HandlerBase;
 use Drupal\views\Plugin\views\join\JoinPluginInterface;
 use Drupal\views\Plugin\views\ViewsHandlerInterface;
@@ -16,7 +18,9 @@ use Symfony\Component\DependencyInjection\Container;
 /**
  * Plugin type manager for all views handlers.
  */
-class ViewsHandlerManager extends DefaultPluginManager implements FallbackPluginManagerInterface {
+class ViewsHandlerManager extends DefaultPluginManager implements FallbackPluginManagerInterface, PreWarmableInterface {
+
+  use PreWarmablePluginManagerTrait;
 
   /**
    * The views data cache.
@@ -93,7 +97,17 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
 
     if (isset($data[$field][$this->handlerType])) {
       $definition = $data[$field][$this->handlerType];
-      foreach (['group', 'title', 'title short', 'label', 'help', 'real field', 'real table', 'entity type', 'entity field'] as $key) {
+      foreach ([
+        'group',
+        'title',
+        'title short',
+        'label',
+        'help',
+        'real field',
+        'real table',
+        'entity type',
+        'entity field',
+      ] as $key) {
         if (!isset($definition[$key])) {
           // First check the field level.
           if (!empty($data[$field][$key])) {

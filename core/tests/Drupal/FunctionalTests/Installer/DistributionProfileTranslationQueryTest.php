@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Serialization\Yaml;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests distribution profile support with a 'langcode' query string.
  *
- * @group Installer
- *
  * @see \Drupal\FunctionalTests\Installer\DistributionProfileTranslationTest
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class DistributionProfileTranslationQueryTest extends InstallerTestBase {
 
   /**
@@ -31,6 +33,11 @@ class DistributionProfileTranslationQueryTest extends InstallerTestBase {
    * @var array
    */
   protected $info;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile;
 
   /**
    * {@inheritdoc}
@@ -55,19 +62,19 @@ class DistributionProfileTranslationQueryTest extends InstallerTestBase {
     file_put_contents("$path/my_distribution.info.yml", Yaml::encode($this->info));
     // Place a custom local translation in the translations directory.
     mkdir($this->root . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
-    file_put_contents($this->root . '/' . $this->siteDirectory . '/files/translations/drupal-8.0.0.de.po', $this->getPo('de'));
-    file_put_contents($this->root . '/' . $this->siteDirectory . '/files/translations/drupal-8.0.0.fr.po', $this->getPo('fr'));
+    file_put_contents($this->root . '/' . $this->siteDirectory . '/files/translations/drupal-' . \Drupal::VERSION . '.de.po', $this->getPo('de'));
+    file_put_contents($this->root . '/' . $this->siteDirectory . '/files/translations/drupal-' . \Drupal::VERSION . '.fr.po', $this->getPo('fr'));
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function visitInstaller(): void {
+  protected function visitInstaller(array $query = []): void {
     // Pass a different language code than the one set in the distribution
     // profile. This distribution language should still be used.
     // The unrouted URL assembler does not exist at this point, so we build the
     // URL ourselves.
-    $this->drupalGet($GLOBALS['base_url'] . '/core/install.php' . '?langcode=fr');
+    parent::visitInstaller(['langcode' => 'fr']);
   }
 
   /**
@@ -76,13 +83,6 @@ class DistributionProfileTranslationQueryTest extends InstallerTestBase {
   protected function setUpLanguage(): void {
     // This step is skipped, because the distribution profile uses a fixed
     // language.
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUpProfile(): void {
-    // This step is skipped, because there is a distribution profile.
   }
 
   /**

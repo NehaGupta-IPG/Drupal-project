@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeBulkUpdate;
 use Drupal\user\UserInterface;
 
 /**
@@ -43,22 +44,20 @@ function hook_user_cancel($edit, UserInterface $account, $method): void {
   switch ($method) {
     case 'user_cancel_block_unpublish':
       // Unpublish nodes (current revisions).
-      \Drupal::moduleHandler()->loadInclude('node', 'inc', 'node.admin');
       $nodes = \Drupal::entityQuery('node')
         ->accessCheck(FALSE)
         ->condition('uid', $account->id())
         ->execute();
-      node_mass_update($nodes, ['status' => 0], NULL, TRUE);
+      \Drupal::service(NodeBulkUpdate::class)->process($nodes, ['status' => 0], NULL, TRUE);
       break;
 
     case 'user_cancel_reassign':
       // Anonymize nodes (current revisions).
-      \Drupal::moduleHandler()->loadInclude('node', 'inc', 'node.admin');
       $nodes = \Drupal::entityQuery('node')
         ->accessCheck(FALSE)
         ->condition('uid', $account->id())
         ->execute();
-      node_mass_update($nodes, ['uid' => 0], NULL, TRUE);
+      \Drupal::service(NodeBulkUpdate::class)->process($nodes, ['uid' => 0], NULL, TRUE);
       // Anonymize old revisions.
       \Drupal::database()->update('node_field_revision')
         ->fields(['uid' => 0])

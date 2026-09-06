@@ -32,14 +32,10 @@ class EditorManager extends DefaultPluginManager {
    */
   protected array $editors = [];
 
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected ?EntityTypeManagerInterface $entityTypeManager = NULL) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected EntityTypeManagerInterface $entityTypeManager) {
     parent::__construct('Plugin/Editor', $namespaces, $module_handler, EditorPluginInterface::class, Editor::class, 'Drupal\editor\Annotation\Editor');
     $this->alterInfo('editor_info');
     $this->setCacheBackend($cache_backend, 'editor_plugins');
-    if ($this->entityTypeManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $entityTypeManager argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3447794', E_USER_DEPRECATED);
-      $this->entityTypeManager = \Drupal::entityTypeManager();
-    }
   }
 
   /**
@@ -60,7 +56,7 @@ class EditorManager extends DefaultPluginManager {
    * Retrieves text editor libraries and JavaScript settings.
    *
    * @param array $format_ids
-   *   An array of format IDs as returned by array_keys(filter_formats()).
+   *   An array of format IDs.
    *
    * @return array
    *   An array of attachments, for use with #attached.

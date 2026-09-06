@@ -9,12 +9,15 @@ use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the rendering of a layout section field.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutSectionTest extends BrowserTestBase {
 
   /**
@@ -25,6 +28,7 @@ class LayoutSectionTest extends BrowserTestBase {
     'layout_builder',
     'node',
     'block_test',
+    'dynamic_page_cache',
   ];
 
   /**
@@ -61,7 +65,7 @@ class LayoutSectionTest extends BrowserTestBase {
   /**
    * Provides test data for ::testLayoutSectionFormatter().
    */
-  public static function providerTestLayoutSectionFormatter() {
+  public static function providerTestLayoutSectionFormatter(): array {
     $data = [];
     $data['block_with_global_context'] = [
       [
@@ -168,10 +172,9 @@ class LayoutSectionTest extends BrowserTestBase {
 
   /**
    * Tests layout_section formatter output.
-   *
-   * @dataProvider providerTestLayoutSectionFormatter
    */
-  public function testLayoutSectionFormatter($layout_data, $expected_selector, $expected_content, $expected_cache_contexts, $expected_cache_tags, $expected_dynamic_cache): void {
+  #[DataProvider('providerTestLayoutSectionFormatter')]
+  public function testLayoutSectionFormatter(array $layout_data, $expected_selector, $expected_content, string $expected_cache_contexts, string $expected_cache_tags, string $expected_dynamic_cache): void {
     $node = $this->createSectionNode($layout_data);
 
     $canonical_url = $node->toUrl('canonical');

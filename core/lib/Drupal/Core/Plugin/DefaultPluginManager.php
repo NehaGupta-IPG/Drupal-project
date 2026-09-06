@@ -165,6 +165,9 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
       // Backward compatibility.
       $this->pluginDefinitionAnnotationName = $plugin_definition_attribute_name ?? 'Drupal\Component\Annotation\Plugin';
       $this->additionalAnnotationNamespaces = $plugin_definition_annotation_name ?? [];
+      if ($plugin_definition_attribute_name) {
+        throw new \InvalidArgumentException(static::class . ' only supports annotation-based discovery, which is no longer supported as of Drupal 12.0. Provide an Attribute class and an Annotation class for BC. See https://www.drupal.org/node/3395582', E_USER_WARNING);
+      }
     }
   }
 

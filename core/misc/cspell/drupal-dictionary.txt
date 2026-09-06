@@ -1,6 +1,9 @@
+anyall
+autoplay
 bartik
 bubbleable
 buytaert
+buytaert's
 daterange
 dbtng
 dependee
@@ -18,13 +21,14 @@ druplicon
 drush
 fapi
 fieldable
+fulldate
+groupby
 groupwise
 itok
 jswebassert
 keyvalue
 langcode
 langcodes
-lullabot
 mulrev
 mulrevpub
 olivero
@@ -36,6 +40,7 @@ revpub
 simpletest
 sitename
 tempstore
+tempstore's
 umami
 unpromote
 unsticky

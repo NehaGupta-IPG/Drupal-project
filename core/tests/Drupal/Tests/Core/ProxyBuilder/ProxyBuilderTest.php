@@ -6,11 +6,14 @@ namespace Drupal\Tests\Core\ProxyBuilder;
 
 use Drupal\Core\ProxyBuilder\ProxyBuilder;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\ProxyBuilder\ProxyBuilder
- * @group proxy_builder
+ * Tests Drupal\Core\ProxyBuilder\ProxyBuilder.
  */
+#[CoversClass(ProxyBuilder::class)]
+#[Group('proxy_builder')]
 class ProxyBuilderTest extends UnitTestCase {
 
   /**
@@ -30,9 +33,11 @@ class ProxyBuilderTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::buildMethod
-   * @covers ::buildParameter
-   * @covers ::buildMethodBody
+   * Tests build complex method.
+   *
+   * @legacy-covers ::buildMethod
+   * @legacy-covers ::buildParameter
+   * @legacy-covers ::buildMethodBody
    */
   public function testBuildComplexMethod(): void {
     $class = 'Drupal\Tests\Core\ProxyBuilder\TestServiceComplexMethod';
@@ -46,7 +51,7 @@ class ProxyBuilderTest extends UnitTestCase {
  * {@inheritdoc}
  */
 public function complexMethod($parameter, callable $function, ?\Drupal\Tests\Core\ProxyBuilder\TestServiceNoMethod $test_service = NULL, array &$elements = array (
-))
+)): true
 {
     return $this->lazyLoadItself()->complexMethod($parameter, $function, $test_service, $elements);
 }
@@ -69,7 +74,7 @@ EOS;
    * @return string
    *   The code of the entire proxy.
    */
-  protected function buildExpectedClass($class, $expected_methods_body, $interface_string = '') {
+  protected function buildExpectedClass($class, $expected_methods_body, $interface_string = ''): string {
     $reflection = new \ReflectionClass($class);
     $namespace = ProxyBuilder::buildProxyNamespace($class);
     $proxy_class = $reflection->getShortName();
@@ -143,7 +148,7 @@ namespace {{ namespace }} {
 
 EOS;
 
-    $expected_methods_body = implode("\n", array_map(function ($value) {
+    $expected_methods_body = implode("\n", array_map(function ($value): string {
       if ($value === '') {
         return $value;
       }
@@ -173,8 +178,8 @@ class TestServiceNoMethod {
  */
 class TestServiceComplexMethod {
 
-  public function complexMethod($parameter, callable $function, ?TestServiceNoMethod $test_service = NULL, array &$elements = []) {
-
+  public function complexMethod($parameter, callable $function, ?TestServiceNoMethod $test_service = NULL, array &$elements = []): true {
+    return TRUE;
   }
 
 }

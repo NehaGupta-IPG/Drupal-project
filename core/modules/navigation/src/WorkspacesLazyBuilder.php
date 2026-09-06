@@ -59,12 +59,15 @@ final class WorkspacesLazyBuilder {
           'title' => $active_workspace ? $active_workspace->label() : $this->t('Live'),
           'url' => $url,
           'class' => 'workspaces',
+          'icon' => [
+            'icon_id' => 'workspaces',
+          ],
         ],
       ],
       '#attached' => [
         'library' => [
           'navigation/internal.navigation-workspaces',
-          'workspaces/drupal.workspaces.off-canvas',
+          'workspaces/drupal.workspaces_ui.off-canvas',
         ],
       ],
       '#cache' => [

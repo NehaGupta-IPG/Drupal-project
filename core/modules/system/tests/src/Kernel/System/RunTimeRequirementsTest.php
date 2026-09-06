@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\System;
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the effectiveness of hook_runtime_requirements().
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class RunTimeRequirementsTest extends KernelTestBase {
 
   use StringTranslationTrait;
@@ -31,7 +34,7 @@ class RunTimeRequirementsTest extends KernelTestBase {
       'title' => 'RuntimeError',
       'value' => 'None',
       'description' => 'Runtime Error.',
-      'severity' => REQUIREMENT_ERROR,
+      'severity' => RequirementSeverity::Error,
     ];
     $requirements = \Drupal::service('system.manager')->listRequirements()['test.runtime.error'];
     $this->assertEquals($testRequirements, $requirements);
@@ -40,7 +43,7 @@ class RunTimeRequirementsTest extends KernelTestBase {
       'title' => 'RuntimeWarning',
       'value' => 'None',
       'description' => 'Runtime Warning.',
-      'severity' => REQUIREMENT_WARNING,
+      'severity' => RequirementSeverity::Warning,
     ];
     $requirementsAlter = \Drupal::service('system.manager')->listRequirements()['test.runtime.error.alter'];
     $this->assertEquals($testRequirementsAlter, $requirementsAlter);

@@ -1,6 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Plugin, icons } from 'ckeditor5/src/core';
-import { ButtonView } from 'ckeditor5/src/ui';
+import { Plugin, IconCaption, ButtonView } from 'ckeditor5';
 import { getMediaCaptionFromModelSelection } from './utils';
 
 /**
@@ -34,7 +33,7 @@ export default class DrupalMediaCaptionUI extends Plugin {
       const captionCommand = editor.commands.get('toggleMediaCaption');
       button.set({
         label: Drupal.t('Caption media'),
-        icon: icons.caption,
+        icon: IconCaption,
         tooltip: true,
         isToggleable: true,
       });

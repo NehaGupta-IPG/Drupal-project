@@ -4,6 +4,7 @@ namespace Drupal\taxonomy\Plugin\views\argument_default;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -13,8 +14,6 @@ use Drupal\views\Plugin\views\argument_default\ArgumentDefaultPluginBase;
 use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\taxonomy\VocabularyStorageInterface;
-
-// cspell:ignore anyall
 
 /**
  * Taxonomy tid default argument.
@@ -171,6 +170,9 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
     if (!empty($this->options['node'])) {
       // Just check, if a node could be detected.
       if (($node = $this->routeMatch->getParameter('node')) && $node instanceof NodeInterface) {
+        CacheableMetadata::createFromRenderArray($this->view->element)
+          ->merge(CacheableMetadata::createFromObject($node))
+          ->applyTo($this->view->element);
         $taxonomy = [];
         foreach ($node->getFieldDefinitions() as $field) {
           if ($field->getType() == 'entity_reference' && $field->getSetting('target_type') == 'taxonomy_term') {
@@ -183,7 +185,7 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
         }
         if (!empty($this->options['limit'])) {
           $tids = [];
-          // Filter by vocabulary
+          // Filter by vocabulary.
           foreach ($taxonomy as $tid => $vocab) {
             if (!empty($this->options['vids'][$vocab])) {
               $tids[] = $tid;
@@ -197,19 +199,6 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
         }
       }
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheTags() {
-    $tags = parent::getCacheTags();
-    if (!empty($this->options['node'])) {
-      if (($node = $this->routeMatch->getParameter('node')) && $node instanceof NodeInterface) {
-        $tags = Cache::mergeTags($tags, $node->getCacheTags());
-      }
-    }
-    return $tags;
   }
 
   /**

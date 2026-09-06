@@ -5,13 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageBase;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\EntityStorageBase
- * @group Entity
+ * Tests Drupal\Core\Entity\EntityStorageBase.
  */
+#[CoversClass(EntityStorageBase::class)]
+#[Group('Entity')]
 class EntityStorageBaseTest extends UnitTestCase {
 
   /**
@@ -20,12 +26,12 @@ class EntityStorageBaseTest extends UnitTestCase {
    * @param string $id
    *   ID value for this entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\Entity\EntityInterface|\PHPUnit\Framework\MockObject\Stub
    *   The mocked entity.
    */
-  public function generateEntityInterface(string $id): EntityInterface&MockObject {
-    $mock_entity = $this->createMock(EntityInterface::class);
-    $mock_entity->expects($this->any())
+  public function generateEntityInterface(string $id): EntityInterface&Stub {
+    $mock_entity = $this->createStub(EntityInterface::class);
+    $mock_entity
       ->method('id')
       ->willReturn($id);
     return $mock_entity;
@@ -43,10 +49,9 @@ class EntityStorageBaseTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::load
-   *
-   * @dataProvider providerLoad
+   * Tests load.
    */
+  #[DataProvider('providerLoad')]
   public function testLoad(string|null $expected, array $entity_fixture, string $query): void {
     if (!is_null($expected)) {
       $expected = $this->generateEntityInterface($expected);
@@ -85,21 +90,22 @@ class EntityStorageBaseTest extends UnitTestCase {
 
     // Data set for results for all IDs.
     $ids = ['1', '2', '3'];
-    yield 'results-for-all-ids' => [$ids, $ids, $ids];
+    yield 'results-for-all-ids' => [array_combine($ids, $ids), array_combine($ids, $ids), $ids];
 
     // Data set for partial results for multiple IDs.
-    yield 'partial-results-for-multiple-ids' => [$ids, $ids, array_merge($ids, ['11', '12'])];
+    yield 'partial-results-for-multiple-ids' => [
+      array_combine($ids, $ids),
+      array_combine($ids, $ids),
+      array_merge($ids, ['11', '12']),
+    ];
   }
 
   /**
    * Test loadMultiple().
    *
    * Does not cover statically-cached results.
-   *
-   * @covers ::loadMultiple
-   *
-   * @dataProvider providerLoadMultiple
    */
+  #[DataProvider('providerLoadMultiple')]
   public function testLoadMultiple(array $expected, array $load_multiple, array|null $query): void {
     $expected = array_map([$this, 'generateEntityInterface'], $expected);
     $load_multiple = array_map([$this, 'generateEntityInterface'], $load_multiple);
@@ -117,9 +123,9 @@ class EntityStorageBaseTest extends UnitTestCase {
       ->willReturn($load_multiple);
 
     // Make our EntityTypeInterface mock so that we can turn off static caching.
-    $mock_entity_type = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
+    $mock_entity_type = $this->createStub(EntityTypeInterface::class);
     // Disallow caching.
-    $mock_entity_type->expects($this->any())
+    $mock_entity_type
       ->method('isStaticallyCacheable')
       ->willReturn(FALSE);
     // Add the EntityTypeInterface to the storage object.

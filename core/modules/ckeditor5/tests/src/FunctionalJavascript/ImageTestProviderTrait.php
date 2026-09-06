@@ -6,6 +6,7 @@ namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 // cspell:ignore imageresize
 
@@ -18,9 +19,8 @@ trait ImageTestProviderTrait {
    * Tests that alt text is required for images.
    *
    * @see https://ckeditor.com/docs/ckeditor5/latest/framework/guides/architecture/editing-engine.html#conversion
-   *
-   * @dataProvider providerAltTextRequired
    */
+  #[DataProvider('providerAltTextRequired')]
   public function testAltTextRequired(bool $unrestricted): void {
     // Disable filter_html.
     if ($unrestricted) {
@@ -54,8 +54,7 @@ trait ImageTestProviderTrait {
 
     // Add alt text to the block image.
     $image_block->find('css', '.image-alternative-text-missing button')->click();
-    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-balloon-panel'));
-    $this->assertVisibleBalloon('.ck-text-alternative-form');
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-balloon-panel .ck-text-alternative-form'));
 
     // Ensure that the missing alt text warning is hidden when the alternative
     // text form is open.
@@ -122,9 +121,8 @@ trait ImageTestProviderTrait {
 
   /**
    * Tests alignment integration.
-   *
-   * @dataProvider providerAlignment
    */
+  #[DataProvider('providerAlignment')]
   public function testAlignment(string $image_type): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
@@ -186,7 +184,7 @@ trait ImageTestProviderTrait {
   /**
    * Data provider for testAlignment().
    */
-  public static function providerAlignment() {
+  public static function providerAlignment(): array {
     return [
       'Block image' => ['block'],
       'Inline image' => ['inline'],
@@ -198,9 +196,8 @@ trait ImageTestProviderTrait {
    *
    * @param string $width
    *   The width input for the image.
-   *
-   * @dataProvider providerWidth
    */
+  #[DataProvider('providerWidth')]
   public function testWidth(string $width): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
@@ -215,7 +212,7 @@ trait ImageTestProviderTrait {
     }
 
     // Add image to the host body.
-    $this->host->body->value = sprintf('<img data-foo="bar" alt="drupalimage test image" ' . $this->imageAttributesAsString() . ' width="%s" />', $width);
+    $this->host->body->value = sprintf('<img data-foo="bar" alt="drupalimage test image" width="%s" ' . $this->imageAttributesAsString() . ' />', $width);
     $this->host->save();
 
     $this->drupalGet($this->host->toUrl('edit-form'));
@@ -264,9 +261,8 @@ trait ImageTestProviderTrait {
    *
    * @param bool $is_resize_enabled
    *   Boolean flag to test enabled or disabled.
-   *
-   * @dataProvider providerResize
    */
+  #[DataProvider('providerResize')]
   public function testResize(bool $is_resize_enabled): void {
     // Disable resize plugin because it is enabled by default.
     if (!$is_resize_enabled) {
@@ -289,8 +285,8 @@ trait ImageTestProviderTrait {
     $this->drupalGet('node/add');
     $page->fillField('title[0][value]', 'My test content');
     $this->addImage();
-    $image_figure = $assert_session->waitForElementVisible('css', 'figure');
-    $this->assertSame($is_resize_enabled, $image_figure->hasClass('ck-widget_with-resizer'));
+    $selector = $is_resize_enabled ? 'figure.ck-widget_with-resizer' : 'figure:not(.ck-widget_with-resizer)';
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', $selector));
   }
 
   /**

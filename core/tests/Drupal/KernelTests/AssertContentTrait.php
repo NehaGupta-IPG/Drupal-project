@@ -6,7 +6,6 @@ namespace Drupal\KernelTests;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Render\RenderContext;
 use Symfony\Component\CssSelector\CssSelectorConverter;
@@ -18,38 +17,30 @@ trait AssertContentTrait {
 
   /**
    * The current raw content.
-   *
-   * @var string
    */
-  protected $content;
+  protected string $content;
 
   /**
    * The plain-text content of raw $content (text nodes).
-   *
-   * @var string
    */
-  protected $plainTextContent;
+  protected ?string $plainTextContent;
 
   /**
    * The drupalSettings value from the current raw $content.
    *
    * Variable drupalSettings refers to the drupalSettings JavaScript variable.
-   *
-   * @var array
    */
-  protected $drupalSettings;
+  protected array $drupalSettings;
 
   /**
    * The XML structure parsed from the current raw $content.
-   *
-   * @var \SimpleXMLElement
    */
-  protected $elements;
+  protected ?\SimpleXMLElement $elements;
 
   /**
    * Gets the current raw content.
    */
-  protected function getRawContent() {
+  protected function getRawContent(): string {
     return $this->content;
   }
 
@@ -59,7 +50,7 @@ trait AssertContentTrait {
    * @param string|\Stringable $content
    *   The raw content to set.
    */
-  protected function setRawContent($content) {
+  protected function setRawContent(string|\Stringable $content): void {
     $this->content = (string) $content;
     $this->plainTextContent = NULL;
     $this->elements = NULL;
@@ -72,7 +63,7 @@ trait AssertContentTrait {
   /**
    * Retrieves the plain-text content from the current raw content.
    */
-  protected function getTextContent() {
+  protected function getTextContent(): string {
     if (!isset($this->plainTextContent)) {
       $raw_content = $this->getRawContent();
       // Strip everything between the HEAD tags.
@@ -92,7 +83,7 @@ trait AssertContentTrait {
    * and when you want to use e.g. assertText() but ignore potential white-space
    * caused by HTML output templates.
    */
-  protected function removeWhiteSpace() {
+  protected function removeWhiteSpace(): void {
     $this->content = preg_replace('@>\s+<@', '><', $this->content);
     $this->plainTextContent = NULL;
     $this->elements = NULL;
@@ -103,7 +94,7 @@ trait AssertContentTrait {
    *
    * Variable drupalSettings refers to the drupalSettings JavaScript variable.
    */
-  protected function getDrupalSettings() {
+  protected function getDrupalSettings(): array {
     return $this->drupalSettings;
   }
 
@@ -112,7 +103,7 @@ trait AssertContentTrait {
    *
    * Variable drupalSettings refers to the drupalSettings JavaScript variable.
    */
-  protected function setDrupalSettings($settings) {
+  protected function setDrupalSettings(array $settings): void {
     $this->drupalSettings = $settings;
   }
 
@@ -122,7 +113,7 @@ trait AssertContentTrait {
    * @return \SimpleXMLElement|false
    *   A SimpleXMLElement or FALSE on failure.
    */
-  protected function parse() {
+  protected function parse(): ?\SimpleXMLElement {
     if (!isset($this->elements)) {
       $content = $this->getRawContent();
       $dom = Html::load($content);
@@ -156,7 +147,7 @@ trait AssertContentTrait {
    * @return string
    *   An XPath query with arguments replaced.
    */
-  protected function buildXPathQuery($xpath, array $args = []) {
+  protected function buildXPathQuery(string $xpath, array $args = []): string {
     // Replace placeholders.
     foreach ($args as $placeholder => $value) {
       // Cast MarkupInterface objects to string.
@@ -184,7 +175,7 @@ trait AssertContentTrait {
       $replacement = function ($matches) use ($value) {
         return $value;
       };
-      $xpath = preg_replace_callback('/' . preg_quote($placeholder, NULL) . '\b/', $replacement, $xpath);
+      $xpath = preg_replace_callback('/' . preg_quote($placeholder) . '\b/', $replacement, $xpath);
     }
     return $xpath;
   }
@@ -201,14 +192,42 @@ trait AssertContentTrait {
    *   placeholders in the query. The values may be either strings or numeric
    *   values.
    *
-   * @return \SimpleXMLElement[]|bool
+   * @return \SimpleXMLElement[]|false
+   *   The return value of the xpath search or FALSE on failure. For details on
+   *   the xpath string format and return values see the SimpleXML
+   *   documentation.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\KernelTests\AssertContentTrait::getSimpleXmlElementsByXpath()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3589621
+   */
+  protected function xpath(string $xpath, array $arguments = []): array|false {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\KernelTests\AssertContentTrait::getSimpleXmlElementsByXpath() instead. See https://www.drupal.org/node/3589621', E_USER_DEPRECATED);
+    return $this->getSimpleXmlElementsByXpath($xpath, $arguments);
+  }
+
+  /**
+   * Performs an xpath search on the contents of the internal browser.
+   *
+   * The search is relative to the root element (HTML tag normally) of the page.
+   *
+   * @param string $xpath
+   *   The xpath string to use in the search.
+   * @param array $arguments
+   *   An array of arguments with keys in the form ':name' matching the
+   *   placeholders in the query. The values may be either strings or numeric
+   *   values.
+   *
+   * @return \SimpleXMLElement[]|false
    *   The return value of the xpath search or FALSE on failure. For details on
    *   the xpath string format and return values see the SimpleXML
    *   documentation.
    *
    * @see http://php.net/manual/function.simplexml-element-xpath.php
    */
-  protected function xpath($xpath, array $arguments = []) {
+  protected function getSimpleXmlElementsByXpath(string $xpath, array $arguments = []): array|false {
     if ($this->parse()) {
       $xpath = $this->buildXPathQuery($xpath, $arguments);
       $result = $this->elements->xpath($xpath);
@@ -232,8 +251,8 @@ trait AssertContentTrait {
    *   The return value of the XPath search performed after converting the CSS
    *   selector to an XPath selector.
    */
-  protected function cssSelect($selector) {
-    return $this->xpath((new CssSelectorConverter())->toXPath($selector));
+  protected function cssSelect(string $selector): array {
+    return $this->getSimpleXmlElementsByXpath((new CssSelectorConverter())->toXPath($selector));
   }
 
   /**
@@ -283,7 +302,7 @@ trait AssertContentTrait {
   protected function assertLink($label, $index = 0, $message = ''): bool {
     // Cast MarkupInterface objects to string.
     $label = (string) $label;
-    $links = $this->xpath('//a[normalize-space(text())=:label]', [':label' => $label]);
+    $links = $this->getSimpleXmlElementsByXpath('//a[normalize-space(text())=:label]', [':label' => $label]);
     $message = ($message ?: strtr('Link with label %label found.', ['%label' => $label]));
     $this->assertArrayHasKey($index, $links, $message);
     return TRUE;
@@ -307,7 +326,7 @@ trait AssertContentTrait {
   protected function assertNoLink($label, $message = ''): bool {
     // Cast MarkupInterface objects to string.
     $label = (string) $label;
-    $links = $this->xpath('//a[normalize-space(text())=:label]', [':label' => $label]);
+    $links = $this->getSimpleXmlElementsByXpath('//a[normalize-space(text())=:label]', [':label' => $label]);
     $message = $message ?: "Link with label $label not found.";
     $this->assertEmpty($links, $message);
     return TRUE;
@@ -331,65 +350,9 @@ trait AssertContentTrait {
    *   TRUE if the assertion succeeded.
    */
   protected function assertLinkByHref($href, $index = 0, $message = ''): bool {
-    $links = $this->xpath('//a[contains(@href, :href)]', [':href' => $href]);
+    $links = $this->getSimpleXmlElementsByXpath('//a[contains(@href, :href)]', [':href' => $href]);
     $message = $message ?: "Link containing href $href found.";
     $this->assertArrayHasKey($index, $links, (string) $message);
-    return TRUE;
-  }
-
-  /**
-   * Passes if a link containing a given href (part) is not found.
-   *
-   * @param string $href
-   *   The full or partial value of the 'href' attribute of the anchor tag.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertNoLinkByHref($href, $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $links = $this->xpath('//a[contains(@href, :href)]', [':href' => $href]);
-    $message = ($message ?: new FormattableMarkup('No link containing href %href found.', ['%href' => $href]));
-    $this->assertEmpty($links, $message);
-    return TRUE;
-  }
-
-  /**
-   * Passes if a link containing a given href is not found in the main region.
-   *
-   * @param string $href
-   *   The full or partial value of the 'href' attribute of the anchor tag.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE if the assertion succeeded.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertNoLinkByHrefInMainRegion($href, $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $links = $this->xpath('//main//a[contains(@href, :href)]', [':href' => $href]);
-    $message = ($message ?: new FormattableMarkup('No link containing href %href found.', ['%href' => $href]));
-    $this->assertEmpty($links, $message);
     return TRUE;
   }
 
@@ -457,28 +420,6 @@ trait AssertContentTrait {
   }
 
   /**
-   * Passes if raw text IS NOT found escaped on loaded page, fail otherwise.
-   *
-   * Raw text refers to the raw HTML that the page generated.
-   *
-   * @param string $raw
-   *   Raw (HTML) string to look for.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   */
-  protected function assertNoEscaped($raw, $message = ''): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    if (!$message) {
-      $message = 'Escaped "' . Html::escape((string) $raw) . '" not found';
-    }
-    $this->assertStringNotContainsString(Html::escape((string) $raw), $this->getRawContent(), $message);
-  }
-
-  /**
    * Passes if the page (with HTML stripped) contains the text.
    *
    * Note that stripping HTML tags also removes their attributes, such as
@@ -541,7 +482,7 @@ trait AssertContentTrait {
    */
   protected function assertTextHelper($text, $message = '', $group = NULL, $not_exists = TRUE): void {
     if (!$message) {
-      $message = !$not_exists ? new FormattableMarkup('"@text" found', ['@text' => $text]) : new FormattableMarkup('"@text" not found', ['@text' => $text]);
+      $message = !$not_exists ? "'$text' found" : "'$text' not found";
     }
     if ($not_exists) {
       $this->assertStringNotContainsString((string) $text, $this->getTextContent(), (string) $message);
@@ -549,108 +490,6 @@ trait AssertContentTrait {
     else {
       $this->assertStringContainsString((string) $text, $this->getTextContent(), (string) $message);
     }
-  }
-
-  /**
-   * Passes if the text is found ONLY ONCE on the text version of the page.
-   *
-   * The text version is the equivalent of what a user would see when viewing
-   * through a web browser. In other words the HTML has been filtered out of
-   * the contents.
-   *
-   * @param string|\Drupal\Component\Render\MarkupInterface $text
-   *   Plain text to look for.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass, FALSE on fail.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertUniqueText($text, $message = '') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    return $this->assertUniqueTextHelper($text, $message, NULL, TRUE);
-  }
-
-  /**
-   * Passes if the text is found MORE THAN ONCE on the text version of the page.
-   *
-   * The text version is the equivalent of what a user would see when viewing
-   * through a web browser. In other words the HTML has been filtered out of
-   * the contents.
-   *
-   * @param string|\Drupal\Component\Render\MarkupInterface $text
-   *   Plain text to look for.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass, FALSE on fail.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertNoUniqueText($text, $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    return $this->assertUniqueTextHelper($text, $message, NULL, FALSE);
-  }
-
-  /**
-   * Helper for assertUniqueText and assertNoUniqueText.
-   *
-   * It is not recommended to call this function directly.
-   *
-   * @param string|\Drupal\Component\Render\MarkupInterface $text
-   *   Plain text to look for.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   * @param string $group
-   *   Deprecated.
-   * @param bool $be_unique
-   *   (optional) TRUE if this text should be found only once, FALSE if it
-   *   should be found more than once. Defaults to FALSE.
-   *
-   * @return bool
-   *   TRUE on pass.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertUniqueTextHelper($text, $message = '', $group = NULL, $be_unique = FALSE): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    // Cast MarkupInterface objects to string.
-    $text = (string) $text;
-    if (!$message) {
-      $message = '"' . $text . '"' . ($be_unique ? ' found only once' : ' found more than once');
-    }
-    $first_occurrence = strpos($this->getTextContent(), $text);
-    if ($first_occurrence === FALSE) {
-      $this->fail($message);
-    }
-    $offset = $first_occurrence + strlen($text);
-    $second_occurrence = strpos($this->getTextContent(), $text, $offset);
-    $this->assertEquals($be_unique, $second_occurrence === FALSE, $message);
-    return TRUE;
   }
 
   /**
@@ -670,7 +509,7 @@ trait AssertContentTrait {
    */
   protected function assertPattern($pattern, $message = ''): bool {
     if (!$message) {
-      $message = new FormattableMarkup('Pattern "@pattern" found', ['@pattern' => $pattern]);
+      $message = "Pattern '$pattern' found";
     }
     $this->assertMatchesRegularExpression($pattern, $this->getRawContent(), (string) $message);
     return TRUE;
@@ -693,34 +532,9 @@ trait AssertContentTrait {
    */
   protected function assertNoPattern($pattern, $message = ''): bool {
     if (!$message) {
-      $message = new FormattableMarkup('Pattern "@pattern" not found', ['@pattern' => $pattern]);
+      $message = "Pattern '$pattern' found";
     }
     $this->assertDoesNotMatchRegularExpression($pattern, $this->getRawContent(), $message);
-    return TRUE;
-  }
-
-  /**
-   * Asserts that a Perl regex pattern is found in the plain-text content.
-   *
-   * @param string $pattern
-   *   Perl regex to look for including the regex delimiters.
-   * @param string $message
-   *   (optional) A message to display with the assertion.
-   *
-   * @return bool
-   *   TRUE on pass.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertTextPattern($pattern, $message = NULL): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    if (!isset($message)) {
-      $message = new FormattableMarkup('Pattern "@pattern" found', ['@pattern' => $pattern]);
-    }
-    $this->assertMatchesRegularExpression($pattern, $this->getTextContent(), $message);
     return TRUE;
   }
 
@@ -736,46 +550,19 @@ trait AssertContentTrait {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    */
-  protected function assertTitle($title, $message = '') {
+  protected function assertTitle($title, $message = ''): void {
     // Don't use xpath as it messes with HTML escaping.
     preg_match('@<title>(.*)</title>@', $this->getRawContent(), $matches);
     if (isset($matches[1])) {
       $actual = $matches[1];
       if (!$message) {
-        $message = new FormattableMarkup('Page title @actual is equal to @expected.', [
-          '@actual' => var_export($actual, TRUE),
-          '@expected' => var_export($title, TRUE),
-        ]);
+        $message = sprintf("Page title %s is equal to %s", var_export($actual, TRUE), var_export($title, TRUE));
       }
       $this->assertEquals($title, $actual, (string) $message);
     }
     else {
       $this->fail('No title element found on the page.');
     }
-  }
-
-  /**
-   * Pass if the page title is not the given string.
-   *
-   * @param string $title
-   *   The string the title should not be.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   */
-  protected function assertNoTitle($title, $message = '') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $actual = (string) current($this->xpath('//title'));
-    if (!$message) {
-      $message = new FormattableMarkup('Page title @actual is not equal to @unexpected.', [
-        '@actual' => var_export($actual, TRUE),
-        '@unexpected' => var_export($title, TRUE),
-      ]);
-    }
-    $this->assertNotEquals($title, $actual, $message);
   }
 
   /**
@@ -794,7 +581,7 @@ trait AssertContentTrait {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    */
-  protected function assertThemeOutput($callback, array $variables = [], $expected = '', $message = '') {
+  protected function assertThemeOutput(string $callback, array $variables = [], $expected = '', $message = ''): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -805,9 +592,8 @@ trait AssertContentTrait {
       return \Drupal::theme()->render($callback, $variables);
     });
     if (!$message) {
-      $message = '%callback rendered correctly.';
+      $message = "'theme_" . $callback . "()' rendered correctly.";
     }
-    $message = new FormattableMarkup($message, ['%callback' => 'theme_' . $callback . '()']);
     $this->assertSame($expected, $output, (string) $message);
   }
 
@@ -887,7 +673,7 @@ trait AssertContentTrait {
    *   TRUE on pass, FALSE on fail.
    */
   protected function assertFieldByXPath($xpath, $value = NULL, $message = ''): bool {
-    $fields = $this->xpath($xpath);
+    $fields = $this->getSimpleXmlElementsByXpath($xpath);
 
     return $this->assertFieldsByValue($fields, $value, $message);
   }
@@ -901,7 +687,7 @@ trait AssertContentTrait {
    * @return bool
    *   The selected value or FALSE.
    */
-  protected function getSelectedItem(\SimpleXMLElement $element) {
+  protected function getSelectedItem(\SimpleXMLElement $element): bool {
     foreach ($element->children() as $item) {
       if (isset($item['selected'])) {
         return $item['value'];
@@ -913,50 +699,6 @@ trait AssertContentTrait {
       }
     }
     return FALSE;
-  }
-
-  /**
-   * Asserts that a field does not exist or its value does not match, by XPath.
-   *
-   * @param string $xpath
-   *   XPath used to find the field.
-   * @param string $value
-   *   (optional) Value of the field, to assert that the field's value on the
-   *   page does not match it.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertNoFieldByXPath($xpath, $value = NULL, $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $fields = $this->xpath($xpath);
-
-    // If value specified then check array for match.
-    $found = TRUE;
-    if (isset($value)) {
-      $found = FALSE;
-      if ($fields) {
-        foreach ($fields as $field) {
-          if ($field['value'] == $value) {
-            $found = TRUE;
-          }
-        }
-      }
-    }
-    $this->assertNotEmpty($fields);
-    $this->assertTrue($found, (string) $message);
-    return TRUE;
   }
 
   /**
@@ -981,361 +723,13 @@ trait AssertContentTrait {
   protected function assertFieldByName($name, $value = NULL, $message = NULL): bool {
     if (!isset($message)) {
       if (!isset($value)) {
-        $message = new FormattableMarkup('Found field with name @name', [
-          '@name' => var_export($name, TRUE),
-        ]);
+        $message = sprintf("Found field with name %s", var_export($name, TRUE));
       }
       else {
-        $message = new FormattableMarkup('Found field with name @name and value @value', [
-          '@name' => var_export($name, TRUE),
-          '@value' => var_export($value, TRUE),
-        ]);
+        $message = sprintf("Found field with name %s and value %s", var_export($name, TRUE), var_export($value, TRUE));
       }
     }
     return $this->assertFieldByXPath($this->constructFieldXpath('name', $name), $value, $message);
-  }
-
-  /**
-   * Asserts that a field does not exist with the given name and value.
-   *
-   * @param string $name
-   *   Name of field to assert.
-   * @param string $value
-   *   (optional) Value for the field, to assert that the field's value on the
-   *   page doesn't match it. You may pass in NULL to skip checking the
-   *   value, while still checking that the field doesn't exist. However, the
-   *   default value ('') asserts that the field value is not an empty string.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass, FALSE on fail.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertNoFieldByName($name, $value = '', $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    return $this->assertNoFieldByXPath($this->constructFieldXpath('name', $name), $value, $message ?: new FormattableMarkup('Did not find field by name @name', ['@name' => $name]));
-  }
-
-  /**
-   * Asserts that a field exists with the given ID and value.
-   *
-   * @param string $id
-   *   ID of field to assert.
-   * @param string|\Drupal\Component\Render\MarkupInterface $value
-   *   (optional) Value for the field to assert. You may pass in NULL to skip
-   *   checking the value, while still checking that the field exists.
-   *   However, the default value ('') asserts that the field value is an empty
-   *   string.
-   * @param string|\Drupal\Component\Render\MarkupInterface $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass, FALSE on fail.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertFieldById($id, $value = '', $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    // Cast MarkupInterface objects to string.
-    if (isset($value)) {
-      $value = (string) $value;
-    }
-    $message = (string) $message;
-    return $this->assertFieldByXPath($this->constructFieldXpath('id', $id), $value, $message ?: new FormattableMarkup('Found field by id @id', ['@id' => $id]));
-  }
-
-  /**
-   * Asserts that a field does not exist with the given ID and value.
-   *
-   * @param string $id
-   *   ID of field to assert.
-   * @param string $value
-   *   (optional) Value for the field, to assert that the field's value on the
-   *   page doesn't match it. You may pass in NULL to skip checking the value,
-   *   while still checking that the field doesn't exist. However, the default
-   *   value ('') asserts that the field value is not an empty string.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass, FALSE on fail.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertNoFieldById($id, $value = '', $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    return $this->assertNoFieldByXPath($this->constructFieldXpath('id', $id), $value, $message ?: new FormattableMarkup('Did not find field by id @id', ['@id' => $id]));
-  }
-
-  /**
-   * Asserts that a checkbox field in the current page is checked.
-   *
-   * @param string $id
-   *   ID of field to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertFieldChecked($id, $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $message = $message ?: new FormattableMarkup('Checkbox field @id is checked.', ['@id' => $id]);
-    $elements = $this->xpath('//input[@id=:id]', [':id' => $id]);
-    $this->assertNotEmpty($elements, $message);
-    $this->assertNotEmpty($elements[0]['checked'], $message);
-    return TRUE;
-  }
-
-  /**
-   * Asserts that a checkbox field in the current page is not checked.
-   *
-   * @param string $id
-   *   ID of field to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertNoFieldChecked($id, $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $message = $message ?: new FormattableMarkup('Checkbox field @id is not checked.', ['@id' => $id]);
-    $elements = $this->xpath('//input[@id=:id]', [':id' => $id]);
-    $this->assertNotEmpty($elements, $message);
-    $this->assertEmpty($elements[0]['checked'], $message);
-    return TRUE;
-  }
-
-  /**
-   * Asserts that a select option in the current page exists.
-   *
-   * @param string $id
-   *   ID of select field to assert.
-   * @param string $option
-   *   Option to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   */
-  protected function assertOption($id, $option, $message = '') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $options = $this->xpath('//select[@id=:id]//option[@value=:option]', [':id' => $id, ':option' => $option]);
-    $this->assertTrue(isset($options[0]), $message ?: new FormattableMarkup('Option @option for field @id exists.', ['@option' => $option, '@id' => $id]));
-  }
-
-  /**
-   * Asserts that a select option with the visible text exists.
-   *
-   * @param string $id
-   *   The ID of the select field to assert.
-   * @param string $text
-   *   The text for the option tag to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertOptionByText($id, $text, $message = '') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $options = $this->xpath('//select[@id=:id]//option[normalize-space(text())=:text]', [':id' => $id, ':text' => $text]);
-    $this->assertTrue(isset($options[0]), $message ?: 'Option with text label ' . $text . ' for select field ' . $id . ' exits.');
-  }
-
-  /**
-   * Asserts that a select option in the current page exists.
-   *
-   * @param string $drupal_selector
-   *   The data drupal selector of select field to assert.
-   * @param string $option
-   *   Option to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   */
-  protected function assertOptionWithDrupalSelector($drupal_selector, $option, $message = '') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $options = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [':data_drupal_selector' => $drupal_selector, ':option' => $option]);
-    $this->assertTrue(isset($options[0]), $message ?: new FormattableMarkup('Option @option for field @data_drupal_selector exists.', ['@option' => $option, '@data_drupal_selector' => $drupal_selector]));
-  }
-
-  /**
-   * Asserts that a select option in the current page does not exist.
-   *
-   * @param string $id
-   *   ID of select field to assert.
-   * @param string $option
-   *   Option to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertNoOption($id, $option, $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $message = $message ?: new FormattableMarkup('Option @option for field @id does not exist.', ['@option' => $option, '@id' => $id]);
-    $selects = $this->xpath('//select[@id=:id]', [':id' => $id]);
-    $options = $this->xpath('//select[@id=:id]//option[@value=:option]', [':id' => $id, ':option' => $option]);
-    $this->assertArrayHasKey(0, $selects, $message);
-    $this->assertEmpty($options, $message);
-    return TRUE;
-  }
-
-  /**
-   * Asserts that a select option in the current page is checked.
-   *
-   * @param string $id
-   *   ID of select field to assert.
-   * @param string $option
-   *   Option to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass.
-   *
-   * @todo $id is unusable. Replace with $name.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertOptionSelected($id, $option, $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $message = $message ?: new FormattableMarkup('Option @option for field @id is selected.', ['@option' => $option, '@id' => $id]);
-    $elements = $this->xpath('//select[@id=:id]//option[@value=:option]', [':id' => $id, ':option' => $option]);
-    $this->assertNotEmpty($elements, $message);
-    $this->assertNotEmpty($elements[0]['selected'], $message);
-    return TRUE;
-  }
-
-  /**
-   * Asserts that a select option in the current page is checked.
-   *
-   * @param string $drupal_selector
-   *   The data drupal selector of select field to assert.
-   * @param string $option
-   *   Option to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass, FALSE on fail.
-   *
-   * @todo $id is unusable. Replace with $name.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertOptionSelectedWithDrupalSelector($drupal_selector, $option, $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $message = $message ?: new FormattableMarkup('Option @option for field @data_drupal_selector is selected.', ['@option' => $option, '@data_drupal_selector' => $drupal_selector]);
-    $elements = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [':data_drupal_selector' => $drupal_selector, ':option' => $option]);
-    $this->assertNotEmpty($elements, $message);
-    $this->assertNotEmpty($elements[0]['selected'], $message);
-    return TRUE;
-  }
-
-  /**
-   * Asserts that a select option in the current page is not checked.
-   *
-   * @param string $id
-   *   ID of select field to assert.
-   * @param string $option
-   *   Option to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertNoOptionSelected($id, $option, $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $message = $message ?: new FormattableMarkup('Option @option for field @id is not selected.', ['@option' => $option, '@id' => $id]);
-    $elements = $this->xpath('//select[@id=:id]//option[@value=:option]', [':id' => $id, ':option' => $option]);
-    $this->assertNotEmpty($elements, $message);
-    $this->assertEmpty($elements[0]['selected'], $message);
-    return TRUE;
   }
 
   /**
@@ -1358,73 +752,6 @@ trait AssertContentTrait {
   }
 
   /**
-   * Asserts that a field does not exist with the given name or ID.
-   *
-   * @param string $field
-   *   Name or ID of field to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   *
-   * @return bool
-   *   TRUE on pass, FALSE on fail.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertNoField($field, $message = ''): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    return $this->assertNoFieldByXPath($this->constructFieldXpath('name', $field) . '|' . $this->constructFieldXpath('id', $field), NULL, $message);
-  }
-
-  /**
-   * Asserts that each HTML ID is used for just a single element.
-   *
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   * @param string $group
-   *   Deprecated.
-   * @param array $ids_to_skip
-   *   An optional array of ids to skip when checking for duplicates. It is
-   *   always a bug to have duplicate HTML IDs, so this parameter is to enable
-   *   incremental fixing of core code. Whenever a test passes this parameter,
-   *   it should add a "todo" comment above the call to this function explaining
-   *   the legacy bug that the test wishes to ignore and including a link to an
-   *   issue that is working to fix that legacy bug.
-   *
-   * @return bool
-   *   TRUE on pass.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3476110
-   */
-  protected function assertNoDuplicateIds($message = '', $group = NULL, $ids_to_skip = []): bool {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $status = TRUE;
-    foreach ($this->xpath('//*[@id]') as $element) {
-      $id = (string) $element['id'];
-      if (isset($seen_ids[$id]) && !in_array($id, $ids_to_skip)) {
-        $this->fail(new FormattableMarkup('The HTML ID %id is unique.', ['%id' => $id]));
-        $status = FALSE;
-      }
-      $seen_ids[$id] = TRUE;
-    }
-    $this->assertTrue($status, $message);
-    return TRUE;
-  }
-
-  /**
    * Helper: Constructs an XPath for the given set of attributes and value.
    *
    * @param string $attribute
@@ -1435,7 +762,7 @@ trait AssertContentTrait {
    * @return string
    *   XPath for specified values.
    */
-  protected function constructFieldXpath($attribute, $value) {
+  protected function constructFieldXpath(string $attribute, string $value): string {
     $xpath = '//textarea[@' . $attribute . '=:value]|//input[@' . $attribute . '=:value]|//select[@' . $attribute . '=:value]';
     return $this->buildXPathQuery($xpath, [':value' => $value]);
   }
