@@ -7,6 +7,7 @@ namespace Drupal\Tests\olivero\Functional;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -50,6 +51,7 @@ class OliveroTest extends BrowserTestBase {
   /**
    * Test Olivero's configuration schema.
    */
+  #[IgnoreDeprecations]
   public function testConfigSchema(): void {
     // Required configuration.
     $this->drupalGet('');
@@ -75,6 +77,7 @@ class OliveroTest extends BrowserTestBase {
    *
    * @see olivero.libraries.yml
    */
+  #[IgnoreDeprecations]
   public function testPreprocessBlock(): void {
     $this->drupalGet('');
     $this->assertSession()->statusCodeEquals(200);
@@ -150,7 +153,7 @@ class OliveroTest extends BrowserTestBase {
 
     $this->drupalGet('pager-test/multiple-pagers', ['query' => ['page' => 1]]);
     $this->assertSession()->statusCodeEquals(200);
-    $elements = $this->xpath('//ul[contains(@class, :class)]/li', [':class' => 'pager__items']);
+    $elements = $this->getNodeElementsByXpath('//ul[contains(@class, :class)]/li', [':class' => 'pager__items']);
     $this->assertNotEmpty($elements, 'Pager found.');
 
     // Check all links for pager-test attribute.
