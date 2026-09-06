@@ -222,6 +222,97 @@ module.exports = {
       },
     );
   },
+  'Toggle tray with SPACE key': (browser) => {
+    // Load a long page that will scroll.
+    browser
+      .drupalRelativeURL('/admin/modules')
+      // Confirm that loaded page is actually the modules page and not
+      // a Not Found or Access Denied page. Otherwise, the check for
+      // page scrolling will pass falsely because those are too short
+      // for scrolling to occur.
+      .assert.titleMatches('^Extend');
+
+    const manageLink = browser.element({
+      selector: 'Manage',
+      locateStrategy: 'link text',
+    });
+
+    // The link in the tray that is tested for visibility.
+    const extendLink = browser.element({
+      selector: 'Extend',
+      locateStrategy: 'link text',
+    });
+
+    // Check initial state.
+    extendLink.assert.visible('The Manage tray is open initially');
+
+    // Close with SPACE.
+    manageLink.sendKeys(browser.Keys.SPACE);
+    extendLink.assert.not.visible(
+      'The Manage tray is closed by pressing SPACE',
+    );
+    browser.assert.domPropertyEquals(
+      'html',
+      'scrollTop',
+      0,
+      'Page did not scroll',
+    );
+
+    // Open again with SPACE.
+    manageLink.sendKeys(browser.Keys.SPACE);
+    extendLink.assert.visible(
+      'The Manage tray is open again by pressing SPACE',
+    );
+
+    // Does *not* toggle with `keydown` event.
+    browser.execute(
+      function (id) {
+        document.querySelector(`#${id}`).dispatchEvent(
+          new KeyboardEvent('keydown', {
+            key: ' ',
+            bubbles: true,
+          }),
+        );
+      },
+      [manageLink.getAttribute('id')],
+    );
+
+    extendLink.assert.visible(
+      'The Manage tray is still open after an explicit keydown event with SPACE',
+    );
+  },
+  'Toggle tray with ENTER key': (browser) => {
+    // Scroll check is not necessary with ENTER because the browser fires
+    // a `click` event.
+    // The default behavior in that case on an `a` tag with an `href` attribute
+    // is to go to the URL. If it's a different URL than what was initially
+    // loaded here, the test will error.
+    const manageLink = browser.element({
+      selector: 'Manage',
+      locateStrategy: 'link text',
+    });
+
+    // The link in the tray that is tested for visibility.
+    const extendLink = browser.element({
+      selector: 'Extend',
+      locateStrategy: 'link text',
+    });
+
+    // Check initial state.
+    extendLink.assert.visible('The Manage tray is open initially');
+
+    // Close with ENTER.
+    manageLink.sendKeys(browser.Keys.ENTER);
+    extendLink.assert.not.visible(
+      'The Manage tray is closed by pressing ENTER',
+    );
+
+    // Open again with ENTER.
+    manageLink.sendKeys(browser.Keys.ENTER);
+    extendLink.assert.visible(
+      'The Manage tray is open again by pressing ENTER',
+    );
+  },
   'Open submenu': (browser) => {
     browser.executeAsync(
       function (done) {
