@@ -4,18 +4,29 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Kernel;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\fixture_manipulator\ActiveFixtureManipulator;
-use Drupal\package_manager\Event\PreCreateEvent;
-use Drupal\package_manager\Exception\StageEventException;
+use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\ComposerPatchesValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\package_manager\Validator\ComposerPatchesValidator
- * @group package_manager
+ * Tests Composer Patches Validator.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[Group('#slow')]
+#[CoversClass(ComposerPatchesValidator::class)]
+#[RunTestsInSeparateProcesses]
 class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
+
+  use StringTranslationTrait;
 
   const ABSENT = 0;
   const CONFIG_ALLOWED_PLUGIN = 1;
@@ -24,80 +35,17 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
   const REQUIRE_PACKAGE_INDIRECTLY = 8;
 
   /**
-   * Data provider for testErrorDuringPreCreate().
-   *
-   * @return mixed[][]
-   *   The test cases.
+   * {@inheritdoc}
    */
-  public static function providerErrorDuringPreCreate(): array {
-    $summary = t('Problems detected related to the Composer plugin <code>cweagans/composer-patches</code>.');
-    return [
-      'INVALID: exit-on-patch-failure missing' => [
-        static::CONFIG_ALLOWED_PLUGIN | static::REQUIRE_PACKAGE_FROM_ROOT,
-        [
-          ValidationResult::createError([
-            t('The <code>composer-exit-on-patch-failure</code> key is not set to <code>true</code> in the <code>extra</code> section of <code>composer.json</code>.'),
-          ], $summary),
-        ],
-      ],
-      'INVALID: indirect dependency' => [
-        static::CONFIG_ALLOWED_PLUGIN | static::EXTRA_EXIT_ON_PATCH_FAILURE | static::REQUIRE_PACKAGE_INDIRECTLY,
-        [
-          ValidationResult::createError([
-            t('It must be a root dependency.'),
-          ], $summary),
-        ],
-        [
-          'package-manager-faq-composer-patches-not-a-root-dependency',
-          NULL,
-        ],
-      ],
-      'VALID: present' => [
-        static::CONFIG_ALLOWED_PLUGIN | static::EXTRA_EXIT_ON_PATCH_FAILURE | static::REQUIRE_PACKAGE_FROM_ROOT,
-        [],
-      ],
-      'VALID: absent' => [
-        static::ABSENT,
-        [],
-      ],
-    ];
-  }
+  protected function setUp(): void {
+    parent::setUp();
 
-  /**
-   * Tests that the patcher configuration is validated during pre-create.
-   *
-   * @param int $options
-   *   What aspects of the patcher are installed how.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
-   *   The expected validation results.
-   *
-   *  @dataProvider providerErrorDuringPreCreate
-   */
-  public function testErrorDuringPreCreate(int $options, array $expected_results): void {
-    $active_manipulator = new ActiveFixtureManipulator();
-    if ($options & static::CONFIG_ALLOWED_PLUGIN) {
-      $active_manipulator->addConfig(['allow-plugins.cweagans/composer-patches' => TRUE]);
-    }
-    if ($options & static::EXTRA_EXIT_ON_PATCH_FAILURE) {
-      $active_manipulator->addConfig(['extra.composer-exit-on-patch-failure' => TRUE]);
-    }
-    if ($options & static::REQUIRE_PACKAGE_FROM_ROOT) {
-      $active_manipulator->requirePackage('cweagans/composer-patches', '@dev');
-    }
-    elseif ($options & static::REQUIRE_PACKAGE_INDIRECTLY) {
-      $active_manipulator->addPackage([
-        'type' => 'package',
-        'name' => 'dummy/depends-on-composer-patches',
-        'description' => 'A dummy package depending on cweagans/composer-patches',
-        'version' => '1.0.0',
-        'require' => ['cweagans/composer-patches' => '*'],
-      ]);
-    }
-    if ($options !== static::ABSENT) {
-      $active_manipulator->commitChanges();
-    }
-    $this->assertStatusCheckResults($expected_results);
-    $this->assertResults($expected_results, PreCreateEvent::class);
+    // The composer-patches plugin is not allowed by default.
+    $this->config('package_manager.settings')
+      ->set('additional_trusted_composer_plugins', [
+        'cweagans/composer-patches',
+      ])
+      ->save();
   }
 
   /**
@@ -187,10 +135,13 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
    *   Whether patcher is installed in stage.
    * @param \Drupal\package_manager\ValidationResult[] $expected_results
    *   The expected validation results.
-   *
-   * @dataProvider providerErrorDuringPreApply
+   * @param string[] $help_page_sections
+   *   An associative array of fragments (anchors) in the online help. The keys
+   *   should be the numeric indices of the validation result messages which
+   *   should link to those fragments.
    */
-  public function testErrorDuringPreApply(int $in_active, int $in_stage, array $expected_results): void {
+  #[DataProvider('providerErrorDuringPreApply')]
+  public function testErrorDuringPreApply(int $in_active, int $in_stage, array $expected_results, array $help_page_sections): void {
     // Simulate in active.
     $active_manipulator = new ActiveFixtureManipulator();
     if ($in_active & static::CONFIG_ALLOWED_PLUGIN) {
@@ -204,6 +155,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
     }
     if ($in_active !== static::ABSENT) {
       $active_manipulator->commitChanges();
+      $active_manipulator->updateLock();
     }
 
     // Simulate in stage.
@@ -237,7 +189,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
 
     $stage = $this->createStage();
     $stage->create();
-    $stage_dir = $stage->getStageDirectory();
+    $stage_dir = $stage->getSandboxDirectory();
     $stage->require(['drupal/core:9.8.1']);
 
     try {
@@ -245,7 +197,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
       // If we didn't get an exception, ensure we didn't expect any errors.
       $this->assertSame([], $expected_results);
     }
-    catch (StageEventException $e) {
+    catch (SandboxEventException $e) {
       $this->assertNotEmpty($expected_results);
       $this->assertValidationResultsEqual($expected_results, $e->event->getResults(), NULL, $stage_dir);
     }
@@ -264,9 +216,8 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
    *   An associative array of fragments (anchors) in the online help. The keys
    *   should be the numeric indices of the validation result messages which
    *   should link to those fragments.
-   *
-   * @dataProvider providerErrorDuringPreApply
    */
+  #[DataProvider('providerErrorDuringPreApply')]
   public function testErrorDuringPreApplyWithHelp(int $in_active, int $in_stage, array $expected_results, array $help_page_sections): void {
     $this->enableModules(['help']);
 
@@ -281,12 +232,17 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
             ->toString();
           // Reformat the provided results so that they all have the link to the
           // online documentation appended to them.
-          $messages[$message_index] = t('@message See <a href=":url">the help page</a> for information on how to resolve the problem.', ['@message' => $message, ':url' => $url]);
+          $messages[$message_index] = $this->t(
+            '@message See <a href=":url">the help page</a> for information on how to resolve the problem.',
+            [
+              '@message' => $message,
+              ':url' => $url,
+            ]);
         }
       }
       $expected_results[$result_index] = ValidationResult::createError($messages, $result->summary);
     }
-    $this->testErrorDuringPreApply($in_active, $in_stage, $expected_results);
+    $this->testErrorDuringPreApply($in_active, $in_stage, $expected_results, $help_page_sections);
   }
 
 }

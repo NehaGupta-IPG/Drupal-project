@@ -1,0 +1,11 @@
+form_test:
+  version: VERSION
+  js:
+    js/form_test.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+  before:
+    # Ensure that details summaries are loaded before vertical-tabs.js to
+    # simulate what happens on entity forms.
+    - core/drupal.collapse

@@ -10,13 +10,14 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\file\Upload\ManagedFileElementHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * File test form class.
  */
 class FileTestSaveUploadFromForm extends FormBase {
+  use FileTestFormTrait;
 
   /**
    * Stores the state storage service.
@@ -48,7 +49,7 @@ class FileTestSaveUploadFromForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('state'),
       $container->get('messenger')
@@ -58,56 +59,21 @@ class FileTestSaveUploadFromForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return '_file_test_save_upload_from_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
+
+    $form = $this->baseForm($form, $form_state);
+
     $form['file_test_upload'] = [
       '#type' => 'file',
       '#multiple' => TRUE,
       '#title' => $this->t('Upload a file'),
-    ];
-    $form['file_test_replace'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Replace existing image'),
-      '#options' => [
-        FileExists::Rename->name => new TranslatableMarkup('Appends number until name is unique'),
-        FileExists::Replace->name => new TranslatableMarkup('Replace the existing file'),
-        FileExists::Error->name => new TranslatableMarkup('Fail with an error'),
-      ],
-      '#default_value' => FileExists::Rename->name,
-    ];
-    $form['file_subdir'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Subdirectory for test file'),
-      '#default_value' => '',
-    ];
-
-    $form['extensions'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Allowed extensions.'),
-      '#default_value' => '',
-    ];
-
-    $form['allow_all_extensions'] = [
-      '#title' => t('Allow all extensions?'),
-      '#type' => 'radios',
-      '#options' => [
-        'false' => 'No',
-        'empty_array' => 'Empty array',
-        'empty_string' => 'Empty string',
-      ],
-      '#default_value' => 'false',
-    ];
-
-    $form['is_image_file'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Is this an image file?'),
-      '#default_value' => TRUE,
     ];
 
     $form['error_message'] = [
@@ -116,17 +82,13 @@ class FileTestSaveUploadFromForm extends FormBase {
       '#default_value' => '',
     ];
 
-    $form['submit'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Submit'),
-    ];
     return $form;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
     // Process the upload and perform validation. Note: we're using the
     // form value for the $replace parameter.
     if (!$form_state->isValueEmpty('file_subdir')) {
@@ -161,7 +123,7 @@ class FileTestSaveUploadFromForm extends FormBase {
 
     // The test for \Drupal::service('file_system')->moveUploadedFile()
     // triggering a warning is unavoidable. We're interested in what happens
-    // afterwards in _file_save_upload_from_form().
+    // afterwards in ManagedFileElementHelper::saveFileUploads().
     if ($this->state->get('file_test.disable_error_collection')) {
       define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     }
@@ -169,9 +131,9 @@ class FileTestSaveUploadFromForm extends FormBase {
     $form['file_test_upload']['#upload_validators'] = $validators;
     $form['file_test_upload']['#upload_location'] = $destination;
 
-    $this->messenger->addStatus($this->t('Number of error messages before _file_save_upload_from_form(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
-    $file = _file_save_upload_from_form($form['file_test_upload'], $form_state, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
-    $this->messenger->addStatus($this->t('Number of error messages after _file_save_upload_from_form(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
+    $this->messenger->addStatus($this->t('Number of error messages before ManagedFileElementHelper::saveFileUploads(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
+    $file = \Drupal::service(ManagedFileElementHelper::class)->saveFileUploads($form['file_test_upload'], $form_state, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
+    $this->messenger->addStatus($this->t('Number of error messages after ManagedFileElementHelper::saveFileUploads(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
 
     if ($file) {
       $form_state->setValue('file_test_upload', $file);
@@ -188,7 +150,7 @@ class FileTestSaveUploadFromForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * Get a FileExists enum from its name.

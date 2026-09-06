@@ -47,7 +47,8 @@ use Drupal\user\UserInterface;
   ],
   links: [
     'canonical' => '/entity_test/{entity_test}',
-    'add-form' => '/entity_test/add',
+    'add-form' => '/entity_test/add/{type}',
+    'add-page' => '/entity_test/add',
     'edit-form' => '/entity_test/manage/{entity_test}/edit',
     'delete-form' => '/entity_test/delete/entity_test/{entity_test}',
   ],
@@ -63,7 +64,7 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageInterface $storage, array &$values) {
+  public static function preCreate(EntityStorageInterface $storage, array &$values): void {
     parent::preCreate($storage, $values);
     if (empty($values['type'])) {
       $values['type'] = $storage->getEntityTypeId();
@@ -165,6 +166,7 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
    * Returns the name.
    *
    * @return string
+   *   The name of the entity.
    */
   public function getName() {
     return $this->get('name')->value;

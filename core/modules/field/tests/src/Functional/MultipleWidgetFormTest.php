@@ -7,14 +7,17 @@ namespace Drupal\Tests\field\Functional;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestBaseFieldDisplay;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests field form handling.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class MultipleWidgetFormTest extends FieldTestBase {
 
   /**
@@ -147,7 +150,7 @@ class MultipleWidgetFormTest extends FieldTestBase {
     $this->drupalLogin($user);
 
     // Ensure that the 'bar' bundle exists, to avoid config validation errors.
-    entity_test_create_bundle('bar', entity_type: 'entity_test_base_field_display');
+    EntityTestHelper::createBundle('bar', entity_type: 'entity_test_base_field_display');
 
     FieldStorageConfig::create([
       'entity_type' => 'entity_test_base_field_display',
@@ -209,7 +212,7 @@ class MultipleWidgetFormTest extends FieldTestBase {
   /**
    * Tests widget alter hooks for a given hook name.
    */
-  protected function widgetAlterTest($hook, $widget) {
+  protected function widgetAlterTest(string $hook, $widget) {
     // Create a field with fixed cardinality, configure the form to use a
     // "multiple" widget.
     $field_storage = $this->fieldStorageMultiple;

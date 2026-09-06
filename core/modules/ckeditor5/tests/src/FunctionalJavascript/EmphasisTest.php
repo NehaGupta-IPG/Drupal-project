@@ -9,6 +9,8 @@ use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
@@ -17,9 +19,10 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  * CKEditor's use of <i> is converted to <em> in Drupal, so additional coverage
  * is provided here to verify successful conversion.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class EmphasisTest extends WebDriverTestBase {
   use CKEditor5TestTrait;
 
@@ -90,7 +93,7 @@ class EmphasisTest extends WebDriverTestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -135,6 +138,7 @@ class EmphasisTest extends WebDriverTestBase {
     $this->assertNotEmpty($emphasis_source);
     $this->assertEquals('test!', $emphasis_source[0]->textContent);
     $page->pressButton('Save');
+    $this->assertNotEmpty($assert_session->waitForText('blog Animals with strange names has been updated.'));
 
     $assert_session->responseContains('<p>This is a <em>test!</em></p>');
   }

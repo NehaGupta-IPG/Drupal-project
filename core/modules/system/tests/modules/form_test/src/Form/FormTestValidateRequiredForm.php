@@ -32,14 +32,14 @@ class FormTestValidateRequiredForm extends FormBase {
       '#type' => 'textfield',
       '#title' => 'Name',
       '#required' => TRUE,
-      '#required_error' => t('Enter a name.'),
+      '#required_error' => $this->t('Enter a name.'),
     ];
     $form['checkboxes'] = [
       '#type' => 'checkboxes',
       '#title' => 'Checkboxes',
       '#options' => $options,
       '#required' => TRUE,
-      '#form_test_required_error' => t('Choose at least one option.'),
+      '#form_test_required_error' => $this->t('Choose at least one option.'),
       '#element_validate' => $validate,
     ];
     $form['select'] = [
@@ -47,7 +47,7 @@ class FormTestValidateRequiredForm extends FormBase {
       '#title' => 'Select',
       '#options' => $options,
       '#required' => TRUE,
-      '#form_test_required_error' => t('Select something.'),
+      '#form_test_required_error' => $this->t('Select something.'),
       '#element_validate' => $validate,
     ];
     $form['radios'] = [
@@ -75,7 +75,7 @@ class FormTestValidateRequiredForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function elementValidateRequired($element, FormStateInterface $form_state) {
+  public function elementValidateRequired($element, FormStateInterface $form_state): void {
     // Set a custom validation error on the #required element.
     if (!empty($element['#required_but_empty']) && isset($element['#form_test_required_error'])) {
       $form_state->setError($element, $element['#form_test_required_error']);
@@ -85,7 +85,7 @@ class FormTestValidateRequiredForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus('The form_test_validate_required_form form was submitted successfully.');
   }
 

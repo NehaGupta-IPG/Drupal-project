@@ -6,7 +6,6 @@ namespace Drupal\filter_test\Plugin\Filter;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\filter\Attribute\Filter;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
@@ -30,12 +29,14 @@ class FilterTestPlaceholders extends FilterBase implements TrustedCallbackInterf
     $result = new FilterProcessResult($text);
     $placeholder_with_argument = $result->createPlaceholder('\Drupal\filter_test\Plugin\Filter\FilterTestPlaceholders::renderDynamicThing', ['llama']);
     $placeholder_without_arguments = $result->createPlaceholder('\Drupal\filter_test\Plugin\Filter\FilterTestPlaceholders::renderStaticThing', []);
-    $result->setProcessedText($text . '<p>' . $placeholder_with_argument . '</p>' . '<p>' . $placeholder_without_arguments . '</p>');
+    $result->setProcessedText($text . '<p>' . $placeholder_with_argument . '</p><p>' . $placeholder_without_arguments . '</p>');
     return $result;
   }
 
   /**
-   * #lazy_builder callback; builds a render array containing the dynamic thing.
+   * Render API callback: Builds a render array containing the dynamic thing.
+   *
+   * This function is assigned as a #lazy_builder callback.
    *
    * @param string $thing
    *   A "thing" string.
@@ -45,12 +46,14 @@ class FilterTestPlaceholders extends FilterBase implements TrustedCallbackInterf
    */
   public static function renderDynamicThing($thing) {
     return [
-      '#markup' => new FormattableMarkup('This is a dynamic @thing.', ['@thing' => $thing]),
+      '#markup' => "This is a dynamic $thing.",
     ];
   }
 
   /**
-   * #lazy_builder callback; builds a render array.
+   * Render API callback: Builds a render array.
+   *
+   * This function is assigned as a #lazy_builder callback.
    *
    * @return array
    *   A renderable array.

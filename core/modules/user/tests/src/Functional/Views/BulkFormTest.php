@@ -4,18 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional\Views;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
+use Drupal\system\Entity\Action;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests a user bulk form.
  *
- * @group user
  * @see \Drupal\user\Plugin\views\field\UserBulkForm
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class BulkFormTest extends UserTestBase {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -47,6 +54,37 @@ class BulkFormTest extends UserTestBase {
     $this->drupalGet('test-user-bulk-form');
     $this->assertNotEmpty($this->cssSelect('#edit-action option'));
 
+    // Select a role.
+    $account = $user_storage->load($this->users[0]->id());
+    $roles = Role::loadMultiple();
+    unset($roles[RoleInterface::ANONYMOUS_ID]);
+    unset($roles[RoleInterface::AUTHENTICATED_ID]);
+    $role = key($roles);
+
+    // Create system actions for adding or removing the selected user role.
+    // These actions are only created automatically when roles are created using
+    // the user role form in the admin UI.
+    $action = Action::create([
+      'id' => 'user_add_role_action.' . $role,
+      'type' => 'user',
+      'label' => $this->t('Add the @label role to the selected users', ['@label' => $role]),
+      'configuration' => [
+        'rid' => $role,
+      ],
+      'plugin' => 'user_add_role_action',
+    ]);
+    $action->save();
+    $action = Action::create([
+      'id' => 'user_remove_role_action.' . $role,
+      'type' => 'user',
+      'label' => $this->t('Remove the @label role from the selected users', ['@label' => $role]),
+      'configuration' => [
+        'rid' => $role,
+      ],
+      'plugin' => 'user_remove_role_action',
+    ]);
+    $action->save();
+
     // Test submitting the page with no selection.
     $edit = [
       'action' => 'user_block_user_action',
@@ -55,13 +93,7 @@ class BulkFormTest extends UserTestBase {
     $this->submitForm($edit, 'Apply to selected items');
     $this->assertSession()->pageTextContains('No users selected.');
 
-    // Assign a role to a user.
-    $account = $user_storage->load($this->users[0]->id());
-    $roles = Role::loadMultiple();
-    unset($roles[RoleInterface::ANONYMOUS_ID]);
-    unset($roles[RoleInterface::AUTHENTICATED_ID]);
-    $role = key($roles);
-
+    // Assign selected role to a user.
     $this->assertFalse($account->hasRole($role), 'The user currently does not have a custom role.');
     $edit = [
       'user_bulk_form[1]' => TRUE,
@@ -69,7 +101,6 @@ class BulkFormTest extends UserTestBase {
     ];
     $this->submitForm($edit, 'Apply to selected items');
     // Re-load the user and check their roles.
-    $user_storage->resetCache([$account->id()]);
     $account = $user_storage->load($account->id());
     $this->assertTrue($account->hasRole($role), 'The user now has the custom role.');
 
@@ -79,7 +110,6 @@ class BulkFormTest extends UserTestBase {
     ];
     $this->submitForm($edit, 'Apply to selected items');
     // Re-load the user and check their roles.
-    $user_storage->resetCache([$account->id()]);
     $account = $user_storage->load($account->id());
     $this->assertFalse($account->hasRole($role), 'The user no longer has the custom role.');
 
@@ -92,7 +122,6 @@ class BulkFormTest extends UserTestBase {
     ];
     $this->submitForm($edit, 'Apply to selected items');
     // Re-load the user and check their status.
-    $user_storage->resetCache([$account->id()]);
     $account = $user_storage->load($account->id());
     $this->assertTrue($account->isBlocked(), 'The user is blocked.');
     $this->assertSession()->pageTextNotContains($account->label());

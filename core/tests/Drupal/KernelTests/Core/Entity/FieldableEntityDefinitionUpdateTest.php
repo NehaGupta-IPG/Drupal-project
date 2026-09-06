@@ -4,29 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\EntityDefinitionUpdateManager;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Site\Settings;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests EntityDefinitionUpdateManager's fieldable entity update functionality.
- *
- * @coversDefaultClass \Drupal\Core\Entity\EntityDefinitionUpdateManager
- *
- * @group Entity
  */
+#[CoversClass(EntityDefinitionUpdateManager::class)]
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;
-
-  /**
-   * The entity definition update manager.
-   *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
-   */
-  protected $entityDefinitionUpdateManager;
 
   /**
    * The last installed schema repository service.
@@ -81,7 +77,6 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'content_translation',
     'entity_test_update',
     'language',
   ];
@@ -107,8 +102,8 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
     // updated, so add it to the entity type that is being tested in order to
     // provide test coverage for this special case.
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the content block was last edited.'))
+      ->setLabel('Changed')
+      ->setDescription('The time that the content block was last edited.')
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE);
     $this->state->set('entity_test_update.additional_base_field_definitions', $fields);
@@ -229,7 +224,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
   protected function assertEntityData(bool $revisionable, bool $translatable): void {
     $entities = $this->entityTypeManager->getStorage($this->entityTypeId)->loadMultiple();
     $this->assertCount(3, $entities);
-    foreach ($entities as $entity_id => $entity) {
+    foreach ($entities as $entity) {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
       $this->assertEquals("test entity - {$entity->id()} - en", $entity->label());
       $this->assertEquals("bundle field - {$entity->id()} - en", $entity->new_bundle_field->value);
@@ -540,7 +535,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
     // Make the update throw an exception during the entity save process.
     \Drupal::state()->set('entity_test_update.throw_exception', TRUE);
     $this->expectException(EntityStorageException::class);
-    $this->expectExceptionMessage('The entity update process failed while processing the entity type entity_test_update, ID: 1.');
+    $this->expectExceptionMessageIs('The entity update process failed while processing the entity type entity_test_update, ID: 1.');
 
     try {
       $updated_entity_type = $this->getUpdatedEntityTypeDefinition(TRUE, TRUE);
@@ -557,6 +552,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
     }
     // Allow other tests to be performed after the exception has been thrown.
     finally {
+      assert(isset($e));
       $this->assertSame('Peekaboo!', $e->getPrevious()->getMessage());
 
       // Check that the last installed entity type definition is kept as
@@ -564,8 +560,8 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
       $new_entity_type = $this->lastInstalledSchemaRepository->getLastInstalledDefinition('entity_test_update');
       $this->assertFalse($new_entity_type->isRevisionable(), 'The entity type is kept unchanged.');
 
-      // Check that the last installed field storage definitions did not change by
-      // looking at the 'langcode' field, which is updated automatically.
+      // Check that the last installed field storage definitions did not change
+      // by looking at the 'langcode' field, which is updated automatically.
       $new_storage_definitions = $this->lastInstalledSchemaRepository->getLastInstalledFieldStorageDefinitions('entity_test_update');
       $langcode_key = $original_entity_type->getKey('langcode');
       $this->assertEquals($original_storage_definitions[$langcode_key]->isRevisionable(), $new_storage_definitions[$langcode_key]->isRevisionable(), "The 'langcode' field is kept unchanged.");
@@ -578,6 +574,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
       $new_entity_schema_data = $this->installedStorageSchema->get('entity_test_update.entity_schema_data', []);
       $this->assertEquals($original_entity_schema_data, $new_entity_schema_data);
 
+      $new_field_schema_data = [];
       foreach ($new_storage_definitions as $storage_definition) {
         $new_field_schema_data[$storage_definition->getName()] = $this->installedStorageSchema->get('entity_test_update.field_schema_data.' . $storage_definition->getName(), []);
       }

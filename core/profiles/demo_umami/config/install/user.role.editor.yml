@@ -2,9 +2,6 @@ langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_display.node.article.full
-    - core.entity_view_display.node.page.full
-    - core.entity_view_display.node.recipe.full
     - node.type.article
     - node.type.page
     - node.type.recipe
@@ -16,13 +13,11 @@ dependencies:
     - content_translation
     - contextual
     - file
-    - layout_builder
+    - navigation
     - node
     - path
-    - shortcut
     - system
     - taxonomy
-    - toolbar
 id: editor
 label: Editor
 weight: 4
@@ -32,15 +27,10 @@ permissions:
   - 'access content overview'
   - 'access contextual links'
   - 'access files overview'
+  - 'access navigation'
   - 'access taxonomy overview'
-  - 'access toolbar'
-  - 'administer shortcuts'
   - 'cancel account'
   - 'change own username'
-  - 'configure editable article node layout overrides'
-  - 'configure editable page node layout overrides'
-  - 'configure editable recipe node layout overrides'
-  - 'create and edit custom blocks'
   - 'create content translations'
   - 'create terms in recipe_category'
   - 'create terms in tags'

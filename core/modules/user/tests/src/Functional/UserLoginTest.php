@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional;
 
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensure that login works as expected.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserLoginTest extends BrowserTestBase {
 
   use AssertMailTrait {
@@ -133,9 +136,14 @@ class UserLoginTest extends BrowserTestBase {
     $this->resetUserPassword($user1);
     $this->drupalLogout();
 
+    // Add Created field to the user profile display so that there is something
+    // to check page contents against.
+    EntityViewDisplay::collectRenderDisplay($user1, 'default')
+      ->setComponent('created', ['type' => 'timestamp'])
+      ->save();
     // Try to log in as user 1, it should be successful.
     $this->drupalLogin($user1);
-    $this->assertSession()->responseContains('Member for');
+    $this->assertSession()->responseContains('Created');
   }
 
   /**
@@ -152,7 +160,6 @@ class UserLoginTest extends BrowserTestBase {
     $this->drupalLogout();
 
     // Load the stored user. The password hash shouldn't need a rehash.
-    $user_storage = $this->container->get('entity_type.manager')->getStorage('user');
     $account = User::load($account->id());
 
     // Check that the stored password doesn't need rehash.
@@ -177,8 +184,7 @@ class UserLoginTest extends BrowserTestBase {
     $this->submitForm($edit, 'Log in');
 
     // Load the stored user, which should have a different password hash now.
-    $user_storage->resetCache([$account->id()]);
-    $account = $user_storage->load($account->id());
+    $account = User::load($account->id());
 
     // Check that the stored password doesn't need rehash.
     $this->assertFalse($password_hasher->needsRehash($account->getPassword()));
@@ -192,6 +198,11 @@ class UserLoginTest extends BrowserTestBase {
     // Create a new user and authenticate.
     $account = $this->drupalCreateUser([]);
     $current_password = $account->passRaw;
+    // Add Created field to the user profile display so that there is something
+    // to check page contents against.
+    EntityViewDisplay::collectRenderDisplay($account, 'default')
+      ->setComponent('created', ['type' => 'timestamp'])
+      ->save();
     $this->drupalLogin($account);
 
     // Use the length specified in
@@ -200,11 +211,11 @@ class UserLoginTest extends BrowserTestBase {
 
     $current_password = $this->doPasswordLengthLogin($account, $current_password, $length);
     $this->assertSession()->pageTextNotContains('Password cannot be longer than');
-    $this->assertSession()->pageTextContains('Member for');
+    $this->assertSession()->pageTextContains('Created');
 
     $this->doPasswordLengthLogin($account, $current_password, $length + 1);
     $this->assertSession()->pageTextContains('Password cannot be longer than ' . $length . ' characters but is currently ' . ($length + 1) . ' characters long.');
-    $this->assertSession()->pageTextNotContains('Member for');
+    $this->assertSession()->pageTextNotContains('Created');
   }
 
   /**

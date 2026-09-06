@@ -9,10 +9,8 @@
 
 declare(strict_types=1);
 
-use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
-use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
-use Symfony\Component\ErrorHandler\DebugClassLoader;
+use PHPUnit\TextUI\Configuration\Registry as PhpunitConfigurationRegistry;
 
 /**
  * Finds all valid extension directories recursively within a given directory.
@@ -24,7 +22,7 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
  *   An associative array of extension directories found within the scanned
  *   directory, keyed by extension name.
  */
-function drupal_phpunit_find_extension_directories($scan_directory) {
+function drupal_phpunit_find_extension_directories($scan_directory): array {
   $extensions = [];
   $dirs = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($scan_directory, \RecursiveDirectoryIterator::FOLLOW_SYMLINKS));
   foreach ($dirs as $dir) {
@@ -48,7 +46,7 @@ function drupal_phpunit_find_extension_directories($scan_directory) {
  * @return array
  *   An array of directories under which contributed extensions may exist.
  */
-function drupal_phpunit_contrib_extension_directory_roots($root = NULL) {
+function drupal_phpunit_contrib_extension_directory_roots($root = NULL): array {
   if ($root === NULL) {
     $root = dirname(__DIR__, 2);
   }
@@ -83,7 +81,7 @@ function drupal_phpunit_contrib_extension_directory_roots($root = NULL) {
  * @return array
  *   An associative array of extension directories, keyed by their namespace.
  */
-function drupal_phpunit_get_extension_namespaces($dirs) {
+function drupal_phpunit_get_extension_namespaces($dirs): array {
   $namespaces = [];
   foreach ($dirs as $extension => $dir) {
     if (is_dir($dir . '/src')) {
@@ -144,7 +142,7 @@ function drupal_phpunit_populate_class_loader() {
 }
 
 // Do class loader population.
-$loader = drupal_phpunit_populate_class_loader();
+drupal_phpunit_populate_class_loader();
 class_alias('\Drupal\Tests\DocumentElement', '\Behat\Mink\Element\DocumentElement', TRUE);
 
 // Set sane locale settings, to ensure consistent string, dates, times and
@@ -163,18 +161,14 @@ mb_language('uni');
 // reduce the fragility of the testing system in general.
 date_default_timezone_set('Australia/Sydney');
 
-// Bootstrap the DeprecationHandler extension and the DebugClassloader to report
-// deprecations in PHPUnit 10+.
-if ($deprecationBridgeConfiguration = DeprecationHandler::getConfiguration()) {
-  DeprecationHandler::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
-
-  // Need to have an early error handler to manage deprecations triggered by
-  // DebugClassLoader, that occur before tests' setUp() methods are called.
-  // We pass an instance of the PHPUnit error handler to redirect any error not
-  // managed by our layer back to PHPUnit.
-  set_error_handler(new BootstrapErrorHandler(PhpUnitErrorHandler::instance()));
-
-  // Enable the DebugClassLoader to get deprecations for methods' signature
-  // changes.
-  DebugClassLoader::enable();
+// Get deprecation override handling as early as possible, depending on the
+// extension configuration.
+try {
+  DeprecationHandler::preBootstrap(PhpunitConfigurationRegistry::get());
+}
+catch (\AssertionError) {
+  // In case this script is executed outside of a PHPUnit test run, the
+  // configuration is not defined, so we cannot bootstrap the deprecation
+  // handler extension. In such case, do nothing.
+  // @see core/scripts/test-site.php for an example.
 }

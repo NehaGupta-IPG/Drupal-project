@@ -41,7 +41,7 @@ class EventSubscriber implements EventSubscriberInterface {
    *
    * @throws \Drupal\Core\Config\ConfigNameException
    */
-  public function onConfigImporterValidate(ConfigImporterEvent $event) {
+  public function onConfigImporterValidate(ConfigImporterEvent $event): void {
     if ($this->state->get('config_import_test.config_import_validate_fail', FALSE)) {
       // Log more than one error to test multiple validation errors.
       $event->getConfigImporter()->logError('Config import validate error 1.');
@@ -55,7 +55,7 @@ class EventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\Importer\MissingContentEvent $event
    *   The missing content event.
    */
-  public function onConfigImporterMissingContentOne(MissingContentEvent $event) {
+  public function onConfigImporterMissingContentOne(MissingContentEvent $event): void {
     if ($this->state->get('config_import_test.config_import_missing_content', FALSE) && $this->state->get('config_import_test.config_import_missing_content_one', FALSE) === FALSE) {
       $missing = $event->getMissingContent();
       $uuid = key($missing);
@@ -73,7 +73,7 @@ class EventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\Importer\MissingContentEvent $event
    *   The missing content event.
    */
-  public function onConfigImporterMissingContentTwo(MissingContentEvent $event) {
+  public function onConfigImporterMissingContentTwo(MissingContentEvent $event): void {
     if ($this->state->get('config_import_test.config_import_missing_content', FALSE) && $this->state->get('config_import_test.config_import_missing_content_two', FALSE) === FALSE) {
       $missing = $event->getMissingContent();
       $uuid = key($missing);
@@ -88,7 +88,7 @@ class EventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\ConfigCrudEvent $event
    *   The event.
    */
-  public function onConfigSave(ConfigCrudEvent $event) {
+  public function onConfigSave(ConfigCrudEvent $event): void {
     $config = $event->getConfig();
     if ($config->getName() == 'automated_cron.settings') {
       $values = $this->state->get('ConfigImportUITest.automated_cron.settings.interval', []);
@@ -103,7 +103,7 @@ class EventSubscriber implements EventSubscriberInterface {
       $data = $config->get('module');
       $install = array_diff_key($data, $original);
       if (!empty($install)) {
-        $installed[] = key($install);
+        $installed = array_merge($installed, $install);
       }
       $uninstall = array_diff_key($original, $data);
       if (!empty($uninstall)) {
@@ -121,7 +121,7 @@ class EventSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\ConfigCrudEvent $event
    *   The event.
    */
-  public function onConfigDelete(ConfigCrudEvent $event) {
+  public function onConfigDelete(ConfigCrudEvent $event): void {
     $config = $event->getConfig();
     if ($config->getName() == 'automated_cron.settings') {
       $value = $this->state->get('ConfigImportUITest.automated_cron.settings.delete', 0);
@@ -139,7 +139,10 @@ class EventSubscriber implements EventSubscriberInterface {
     $events[ConfigEvents::SAVE][] = ['onConfigSave', 40];
     $events[ConfigEvents::DELETE][] = ['onConfigDelete', 40];
     $events[ConfigEvents::IMPORT_VALIDATE] = ['onConfigImporterValidate'];
-    $events[ConfigEvents::IMPORT_MISSING_CONTENT] = [['onConfigImporterMissingContentOne'], ['onConfigImporterMissingContentTwo', -100]];
+    $events[ConfigEvents::IMPORT_MISSING_CONTENT] = [
+      ['onConfigImporterMissingContentOne'],
+      ['onConfigImporterMissingContentTwo', -100],
+    ];
     return $events;
   }
 

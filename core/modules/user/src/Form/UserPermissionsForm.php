@@ -6,58 +6,45 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\user\RoleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Provides the user permissions administration form.
  *
+ * @phpstan-import-type PermissionInfoList from
+ *   \Drupal\user\PermissionHandlerInterface
+ *
  * @internal
  */
+#[Route(
+  path: '/admin/people/permissions',
+  name: 'user.admin_permissions',
+  requirements: [
+    '_permission' => 'administer permissions',
+  ],
+  defaults: [
+    '_title' => new TranslatableMarkup('Permissions'),
+  ],
+)]
 class UserPermissionsForm extends FormBase {
-
-  /**
-   * The permission handler.
-   *
-   * @var \Drupal\user\PermissionHandlerInterface
-   */
-  protected $permissionHandler;
-
-  /**
-   * The role storage.
-   *
-   * @var \Drupal\user\RoleStorageInterface
-   */
-  protected $roleStorage;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
 
   /**
    * Constructs a new UserPermissionsForm.
    *
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
+   * @param \Drupal\user\PermissionHandlerInterface $permissionHandler
    *   The permission handler.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
+   * @param \Drupal\user\RoleStorageInterface $roleStorage
    *   The role storage.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList|null $moduleExtensionList
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
    *   The module extension list.
    */
-  public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, protected ?ModuleExtensionList $moduleExtensionList = NULL) {
-    $this->permissionHandler = $permission_handler;
-    $this->roleStorage = $role_storage;
-    $this->moduleHandler = $module_handler;
-    if ($this->moduleExtensionList === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
-      $this->moduleExtensionList = \Drupal::service('extension.list.module');
-    }
+  public function __construct(protected PermissionHandlerInterface $permissionHandler, protected RoleStorageInterface $roleStorage, protected ModuleHandlerInterface $moduleHandler, protected ModuleExtensionList $moduleExtensionList) {
   }
 
   /**
@@ -86,15 +73,18 @@ class UserPermissionsForm extends FormBase {
    *   An array of role objects.
    */
   protected function getRoles() {
-    return $this->roleStorage->loadMultiple();
+    return $this->roleStorage->loadMultipleOverrideFree();
   }
 
   /**
    * Group permissions by the modules that provide them.
    *
-   * @return string[][]
+   * @return array<string, PermissionInfoList>
    *   A nested array. The outer keys are modules that provide permissions. The
-   *   inner arrays are permission names keyed by their machine names.
+   *   inner arrays contain permissions info as defined in
+   *   PermissionHandlerInterface.
+   *
+   * @see \Drupal\user\PermissionHandlerInterface::getPermissions
    */
   protected function permissionsByProvider(): array {
     $permissions = $this->permissionHandler->getPermissions();
@@ -143,8 +133,6 @@ class UserPermissionsForm extends FormBase {
       '#value' => $role_names,
     ];
     // Render role/permission overview:
-    $hide_descriptions = system_admin_compact_mode();
-
     $form['system_compact_link'] = [
       '#id' => FALSE,
       '#type' => 'system_compact_link',
@@ -188,7 +176,7 @@ class UserPermissionsForm extends FormBase {
 
     foreach ($this->permissionsByProvider() as $provider => $permissions) {
       // Module name.
-      $form['permissions'][$provider] = [
+      $form['permissions']['module_' . $provider] = [
         [
           '#wrapper_attributes' => [
             'colspan' => count($role_names) + 1,
@@ -207,16 +195,13 @@ class UserPermissionsForm extends FormBase {
         ];
         $form['permissions'][$perm]['description'] = [
           '#type' => 'inline_template',
-          '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning %}<div class="description">{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
+          '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning %}<div class="description" data-admin-compact-collapsible>{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
           '#context' => [
             'title' => $perm_item['title'],
           ],
         ];
-        // Show the permission description.
-        if (!$hide_descriptions) {
-          $form['permissions'][$perm]['description']['#context']['description'] = $perm_item['description'];
-          $form['permissions'][$perm]['description']['#context']['warning'] = $perm_item['warning'];
-        }
+        $form['permissions'][$perm]['description']['#context']['description'] = $perm_item['description'];
+        $form['permissions'][$perm]['description']['#context']['warning'] = $perm_item['warning'];
         foreach ($role_names as $rid => $name) {
           $form['permissions'][$perm][$rid] = [
             '#title' => $name . ': ' . $perm_item['title'],
