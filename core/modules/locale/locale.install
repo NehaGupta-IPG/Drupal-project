@@ -295,7 +295,7 @@ function _locale_schema_versions(): VersionedSchema {
           $locales_location,
           $locale_file,
         ],
-      )
+      ),
     ],
   );
 }
