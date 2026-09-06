@@ -57,7 +57,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    * @return \Drupal\file\FileInterface
    *   A file object, or FALSE on error.
    */
-  protected function createTemporaryFile($data, ?UserInterface $user = NULL) {
+  protected function createTemporaryFile(string $data, ?UserInterface $user = NULL) {
     /** @var \Drupal\file\FileRepositoryInterface $file_repository */
     $file_repository = \Drupal::service('file.repository');
     $file = $file_repository->writeData($data, "public://");
@@ -169,7 +169,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
       foreach ([1, 1, 0] as $delta) {
         // Ensure we have the expected number of Remove buttons, and that they
         // are numbered sequentially.
-        $buttons = $this->xpath('//input[@type="submit" and @value="Remove"]');
+        $buttons = $this->getNodeElementsByXpath('//input[@type="submit" and @value="Remove"]');
         $this->assertCount($num_expected_remove_buttons, $buttons, "There are $num_expected_remove_buttons \"Remove\" buttons displayed.");
         foreach ($buttons as $i => $button) {
           $key = $i >= $remaining ? $i - $remaining : $i;
@@ -481,7 +481,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $type_name = 'article';
     $field_name = $this->randomMachineName();
     $this->createFileField($field_name, 'node', $type_name);
-    /** @var \Drupal\Field\FieldConfigInterface $field */
+    /** @var \Drupal\field\FieldConfigInterface $field */
     $field = FieldConfig::loadByName('node', $type_name, $field_name);
     $field_id = $field->id();
     $this->drupalGet("admin/structure/types/manage/$type_name/fields/$field_id");
@@ -492,7 +492,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $this->assertSession()->pageTextContains('Saved ' . $field_name . ' configuration.');
 
     // Reload the field config to check for the saved value.
-    /** @var \Drupal\Field\FieldConfigInterface $field */
+    /** @var \Drupal\field\FieldConfigInterface $field */
     $field = FieldConfig::loadByName('node', $type_name, $field_name);
     $settings = $field->getSettings();
     $this->assertEquals('5.1 megabytes', $settings['max_filesize'], 'The max filesize value had been trimmed on save.');

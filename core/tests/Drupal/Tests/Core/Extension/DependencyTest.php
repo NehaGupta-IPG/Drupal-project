@@ -20,8 +20,6 @@ class DependencyTest extends UnitTestCase {
 
   /**
    * Tests create from string.
-   *
-   * @legacy-covers ::createFromString
    */
   #[DataProvider('providerCreateFromString')]
   public function testCreateFromString($string, $expected_name, $expected_project, $expected_constraint): void {
@@ -34,7 +32,7 @@ class DependencyTest extends UnitTestCase {
   /**
    * Data provider for testCreateFromString.
    */
-  public static function providerCreateFromString() {
+  public static function providerCreateFromString(): array {
     $tests = [];
     $tests['module_name_only'] = ['views', 'views', '', ''];
     $tests['module_and_project_names'] = ['drupal:views', 'views', 'drupal', ''];
@@ -45,8 +43,6 @@ class DependencyTest extends UnitTestCase {
 
   /**
    * Tests is compatible.
-   *
-   * @legacy-covers ::isCompatible
    */
   public function testIsCompatible(): void {
     $dependency = new Dependency('paragraphs_demo', 'paragraphs', '>8.x-1.1');

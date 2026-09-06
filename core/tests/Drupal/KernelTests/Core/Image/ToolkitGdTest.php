@@ -15,7 +15,6 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore imagecreatefrom
-
 /**
  * Tests for the GD image toolkit.
  */
@@ -166,15 +165,16 @@ class ToolkitGdTest extends KernelTestBase {
 
   /**
    * Tests get requirements.
-   *
-   * @legacy-covers ::getRequirements
    */
   public function testGetRequirements(): void {
     $this->assertEquals([
       'version' => [
         'title' => 'GD library',
         'value' => gd_info()['GD Version'],
-        'description' => sprintf("Supported image file formats: %s.", implode(', ', ['GIF', 'JPEG', 'PNG', 'WEBP', 'AVIF'])),
+        'description' => sprintf(
+          "Supported image file formats: %s.",
+          implode(', ', ['GIF', 'JPEG', 'PNG', 'WEBP', 'AVIF']),
+        ),
       ],
     ], $this->imageFactory->get()->getToolkit()->getRequirements());
   }

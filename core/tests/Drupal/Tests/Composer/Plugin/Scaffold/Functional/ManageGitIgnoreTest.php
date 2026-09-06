@@ -82,7 +82,7 @@ class ManageGitIgnoreTest extends TestCase {
    * @return string
    *   The path to the fixture directory.
    */
-  protected function createSutWithGit($fixture_name): string {
+  protected function createSutWithGit(string $fixture_name): string {
     $this->fixturesDir = $this->fixtures->tmpDir($this->name());
     $sut = $this->fixturesDir . '/' . $fixture_name;
     $replacements = ['SYMLINK' => 'false', 'PROJECT_ROOT' => $this->projectRoot];
@@ -122,6 +122,7 @@ class ManageGitIgnoreTest extends TestCase {
 /.gitattributes
 /.ht.router.php
 /autoload.php
+/autoload_runtime.php
 /index.php
 /robots.txt
 /update.php

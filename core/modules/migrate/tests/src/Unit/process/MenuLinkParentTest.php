@@ -92,7 +92,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
   public function testConstructorException(array $configuration, bool $is_valid): void {
     if (!$is_valid) {
       $this->expectException('TypeError');
-      $this->expectExceptionMessage('Cannot assign string to property ' . MenuLinkParent::class . '::$lookupMigrations of type array');
+      $this->expectExceptionMessageIs('Cannot assign string to property ' . MenuLinkParent::class . '::$lookupMigrations of type array');
     }
     $plugin = new MenuLinkParent($configuration, 'map', [], $this->migrateLookup->reveal(), $this->menuLinkManager->reveal(), $this->menuLinkStorage->reveal(), $this->migration->reveal());
     if ($is_valid) {
@@ -144,14 +144,14 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
     $this->migrateLookup->lookup(NULL, [1])->willReturn([]);
     $plugin = new MenuLinkParent([], 'map', [], $this->migrateLookup->reveal(), $this->menuLinkManager->reveal(), $this->menuLinkStorage->reveal(), $this->migration->reveal());
     $this->expectException(MigrateSkipRowException::class);
-    $this->expectExceptionMessage("No parent link found for plid '$parent_id' in menu '$menu_name'.");
+    $this->expectExceptionMessageIs("No parent link found for plid '$parent_id' in menu '$menu_name'.");
     $plugin->transform($source_value, $this->migrateExecutable, $this->row, 'destination');
   }
 
   /**
    * Provides data for testTransformException().
    */
-  public static function providerTransformException() {
+  public static function providerTransformException(): array {
     // The parent ID does not for the following tests.
     return [
       'parent link external and could not be loaded' => [
@@ -185,7 +185,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
    * @throws \Drupal\migrate\MigrateSkipRowException
    */
   #[DataProvider('providerMenuLinkParent')]
-  public function testMenuLinkParent(array $source_value, $lookup_result, $plugin_id, $route_name, $expected_result): void {
+  public function testMenuLinkParent(array $source_value, ?int $lookup_result, ?string $plugin_id, ?string $route_name, string $expected_result): void {
     [$parent_id, $menu_name, $parent_link_path] = $source_value;
     $this->migrateLookup->lookup(NULL, [$parent_id])
       ->willReturn([['id' => $lookup_result]]);
@@ -208,7 +208,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
   /**
    * Provides data for testMenuLinkParent().
    */
-  public static function providerMenuLinkParent() {
+  public static function providerMenuLinkParent(): array {
     return [
       'menu link is route item' => [
         'source_value' => [0, NULL, NULL],

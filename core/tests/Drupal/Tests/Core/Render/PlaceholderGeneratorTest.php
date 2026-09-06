@@ -33,8 +33,6 @@ class PlaceholderGeneratorTest extends RendererTestBase {
    * impossible to replace the placeholders: the placeholder markup in
    * #attached versus that in the HTML processed by DOMDocument would no longer
    * match.
-   *
-   * @legacy-covers ::createPlaceholder
    */
   #[DataProvider('providerCreatePlaceholderGeneratesValidHtmlMarkup')]
   public function testCreatePlaceholderGeneratesValidHtmlMarkup(array $element): void {
@@ -93,13 +91,48 @@ class PlaceholderGeneratorTest extends RendererTestBase {
    * @return array
    *   An array of test cases with different placeholder inputs.
    */
-  public static function providerCreatePlaceholderGeneratesValidHtmlMarkup() {
+  public static function providerCreatePlaceholderGeneratesValidHtmlMarkup(): array {
     return [
-      'multiple-arguments' => [['#lazy_builder' => ['Drupal\Tests\Core\Render\PlaceholdersTest::callback', ['foo', 'bar']]]],
-      'special-character-&' => [['#lazy_builder' => ['Drupal\Tests\Core\Render\PlaceholdersTest::callback', ['foo&bar']]]],
-      'special-character-"' => [['#lazy_builder' => ['Drupal\Tests\Core\Render\PlaceholdersTest::callback', ['foo"bar']]]],
-      'special-character-<' => [['#lazy_builder' => ['Drupal\Tests\Core\Render\PlaceholdersTest::callback', ['foo<bar']]]],
-      'special-character->' => [['#lazy_builder' => ['Drupal\Tests\Core\Render\PlaceholdersTest::callback', ['foo>bar']]]],
+      'multiple-arguments' => [
+        [
+          '#lazy_builder' => [
+            'Drupal\Tests\Core\Render\PlaceholdersTest::callback',
+            ['foo', 'bar'],
+          ],
+        ],
+      ],
+      'special-character-&' => [
+        [
+          '#lazy_builder' => [
+            'Drupal\Tests\Core\Render\PlaceholdersTest::callback',
+            ['foo&bar'],
+          ],
+        ],
+      ],
+      'special-character-"' => [
+        [
+          '#lazy_builder' => [
+            'Drupal\Tests\Core\Render\PlaceholdersTest::callback',
+            ['foo"bar'],
+          ],
+        ],
+      ],
+      'special-character-<' => [
+        [
+          '#lazy_builder' => [
+            'Drupal\Tests\Core\Render\PlaceholdersTest::callback',
+            ['foo<bar'],
+          ],
+        ],
+      ],
+      'special-character->' => [
+        [
+          '#lazy_builder' => [
+            'Drupal\Tests\Core\Render\PlaceholdersTest::callback',
+            ['foo>bar'],
+          ],
+        ],
+      ],
     ];
 
   }

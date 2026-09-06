@@ -57,16 +57,15 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
   public function set($property, $value);
 
   /**
-   * Gets the name of the original entity type class.
+   * Gets the list of all the classes for this entity type.
    *
    * In case the class name was changed with setClass(), this will return
-   * the initial value. Useful when trying to identify the entity type ID based
-   * on the class.
+   * the list of all the changes.
    *
-   * @return string
-   *   The name of the original entity type class.
+   * @return class-string[]
+   *   The list of classes.
    */
-  public function getOriginalClass();
+  public function getDecoratedClasses(): array;
 
   /**
    * Gets an array of entity keys.
@@ -671,6 +670,11 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *
    * @return callable|null
    *   A valid callback that is passed the entity or NULL if none is specified.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use link
+   *   templates or a route provider to specify entity URIs.
+   *
+   * @see https://www.drupal.org/node/3575062
    */
   public function getUriCallback();
 
@@ -681,6 +685,11 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *   A callback to use to provide a URI for the entity.
    *
    * @return $this
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use link
+   *   templates or a route provider to specify entity URIs.
+   *
+   * @see https://www.drupal.org/node/3575062
    */
   public function setUriCallback($callback);
 
@@ -808,7 +817,7 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *
    * @return $this
    */
-  public function addConstraint($constraint_name, $options = NULL);
+  public function addConstraint(string $constraint_name, ?array $options = NULL): static;
 
   /**
    * Gets the config dependency info for this entity, if any exists.
@@ -822,5 +831,16 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *   - 'name': The name of the config dependency.
    */
   public function getBundleConfigDependency($bundle);
+
+  /**
+   * Checks if this entity type has an integer ID.
+   *
+   * @return bool|null
+   *   Returns:
+   *     - TRUE if the entity type ID is defined as integer;
+   *     - FALSE if the entity type ID is defined as string;
+   *     - NULL if the entity type lacks an ID key.
+   */
+  public function hasIntegerId(): ?bool;
 
 }

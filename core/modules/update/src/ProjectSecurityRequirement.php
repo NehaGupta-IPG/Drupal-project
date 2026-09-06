@@ -9,7 +9,7 @@ use Drupal\Core\Url;
 /**
  * Class for generating a project's security requirement.
  *
- * @see update_requirements()
+ * @see Drupal\update\Hook\UpdateRequirements::runtime()
  *
  * @internal
  *   This class implements logic to determine security coverage for Drupal core
@@ -91,7 +91,7 @@ final class ProjectSecurityRequirement {
    *
    * @see \Drupal\update\UpdateManagerInterface::getProjects()
    * @see \Drupal\update\ProjectSecurityData::getCoverageInfo()
-   * @see update_process_project_info()
+   * @see \Drupal\update\UpdateCalculator::processProjectInfo()
    */
   public static function createFromProjectDataAndSecurityCoverageInfo(array $project_data, array $security_coverage_info) {
     if ($project_data['project_type'] !== 'core' || $project_data['name'] !== 'drupal' || empty($security_coverage_info)) {

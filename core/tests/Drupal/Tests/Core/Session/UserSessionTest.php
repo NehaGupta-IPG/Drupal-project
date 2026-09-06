@@ -8,7 +8,6 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Session\UserSession;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\RoleInterface;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -30,7 +29,7 @@ class UserSessionTest extends UnitTestCase {
    * @return \Drupal\Core\Session\AccountInterface
    *   The created user session.
    */
-  protected function createUserSession(array $rids = [], $authenticated = FALSE) {
+  protected function createUserSession(array $rids = [], $authenticated = FALSE): UserSession {
     array_unshift($rids, $authenticated ? RoleInterface::AUTHENTICATED_ID : RoleInterface::ANONYMOUS_ID);
     return new UserSession(['roles' => $rids]);
   }
@@ -69,8 +68,6 @@ class UserSessionTest extends UnitTestCase {
 
   /**
    * Tests the hasRole method.
-   *
-   * @legacy-covers ::hasRole
    */
   public function testHasRole(): void {
     $user1 = $this->createUserSession(['role_one']);
@@ -86,34 +83,16 @@ class UserSessionTest extends UnitTestCase {
   }
 
   /**
-   * Tests the name property deprecation.
+   * Tests that ::getLastAccessedTime() returns an integer.
    *
-   * @legacy-covers ::__get
-   * @legacy-covers ::__isset
-   * @legacy-covers ::__set
+   * @legacy-covers ::getLastAccessedTime
    */
-  #[IgnoreDeprecations]
-  public function testNamePropertyDeprecation(): void {
+  public function testGetLastAccessedTime(): void {
     $user = new UserSession([
-      'name' => 'test',
+      'access' => '1234567890',
     ]);
-    $this->expectDeprecation('Getting the name property is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Session\UserSession::getAccountName() instead. See https://www.drupal.org/node/3513856');
-    self::assertEquals($user->name, $user->getAccountName());
-    $this->expectDeprecation('Checking for the name property is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Session\UserSession::getAccountName() instead. See https://www.drupal.org/node/3513856');
-    self::assertTrue(isset($user->name));
 
-    // Test setting the name property.
-    $this->expectDeprecation('Setting the name property is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Set the name via the constructor when creating the UserSession instance. See https://www.drupal.org/node/3513856');
-    $user->name = 'test new';
-    $this->assertEquals('test new', $user->getAccountName());
-
-    // Verify protected properties cannot be accessed.
-    $this->expectExceptionMessage('Cannot access protected property mail in Drupal\Core\Session\UserSession');
-    $user->mail;
-
-    // Verify dynamic properties can be set and accessed.
-    $user->foo = 'bar';
-    $this->assertEquals('bar', $user->foo);
+    $this->assertSame(1234567890, $user->getLastAccessedTime());
   }
 
 }

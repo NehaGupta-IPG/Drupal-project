@@ -25,8 +25,10 @@ use Drupal\Core\TypedData\OptionsProviderInterface;
   no_ui: TRUE,
   constraints: [
     "ComplexData" => [
-      "value" => [
-        "Length" => ["max" => 12],
+      "properties" => [
+        "value" => [
+          "Length" => ["max" => 12],
+        ],
       ],
     ],
   ]
@@ -88,7 +90,8 @@ class LanguageItem extends FieldItemBase implements OptionsProviderInterface {
    */
   public function applyDefaultValue($notify = TRUE) {
     // Default to the site's default language. When language module is enabled,
-    // this behavior is configurable, see language_field_info_alter().
+    // this behavior is configurable.
+    // @see \Drupal\language\Hook\LanguageHooks::fieldInfoAlter().
     $this->setValue(['value' => \Drupal::languageManager()->getDefaultLanguage()->getId()], $notify);
     return $this;
   }
@@ -112,7 +115,8 @@ class LanguageItem extends FieldItemBase implements OptionsProviderInterface {
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     // Defer to the callback in the item definition as it can be overridden.
-    $constraint = $field_definition->getItemDefinition()->getConstraint('ComplexData');
+    $complex_data_constraint = $field_definition->getItemDefinition()->getConstraint('ComplexData') ?: [];
+    $constraint = $complex_data_constraint['properties'] ?? $complex_data_constraint;
     if (isset($constraint['value']['AllowedValues']['callback'])) {
       $languages = call_user_func($constraint['value']['AllowedValues']['callback']);
     }

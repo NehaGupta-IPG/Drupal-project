@@ -24,13 +24,6 @@ class FieldUninstallValidatorTest extends UnitTestCase {
   protected $fieldUninstallValidator;
 
   /**
-   * The mock field type plugin manager.
-   *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $fieldTypePluginManager;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -44,8 +37,6 @@ class FieldUninstallValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate no storages.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidateNoStorages(): void {
     $this->fieldUninstallValidator->expects($this->once())
@@ -60,8 +51,6 @@ class FieldUninstallValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate deleted.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidateDeleted(): void {
     $field_storage = $this->getMockBuilder('Drupal\field\Entity\FieldStorageConfig')
@@ -82,8 +71,6 @@ class FieldUninstallValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate no deleted.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidateNoDeleted(): void {
     $field_storage = $this->getMockBuilder('Drupal\field\Entity\FieldStorageConfig')

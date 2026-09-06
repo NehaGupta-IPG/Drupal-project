@@ -7,12 +7,13 @@ namespace Drupal\Core\Hook;
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\Attribute\ReorderHook;
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -33,7 +34,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @internal
  */
-class ThemeHookCollectorPass implements CompilerPassInterface {
+class ThemeHookCollectorPass extends HookCollectorBase implements CompilerPassInterface {
 
   /**
    * OOP implementation theme names keyed by hook name and "$class::$method".
@@ -58,6 +59,15 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
    * @var array<string, true>
    */
   protected array $preprocessForSuggestions;
+
+  /**
+   * Deprecated .theme files.
+   *
+   * These are stored to allow emitting deprecation messages.
+   *
+   * @var array<string, true>
+   */
+  protected array $deprecatedThemeFiles = [];
 
   /**
    * Constructor.
@@ -96,6 +106,10 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
       'theme_hook_list' => $this->sortByTheme($implementationsByHook),
       'theme_preprocess_for_suggestions' => $this->preprocessForSuggestions ?? [],
     ]);
+
+    foreach ($this->deprecatedThemeFiles as $deprecatedThemeFile => $v) {
+      @trigger_error('Using ' . $deprecatedThemeFile . '.theme is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use classes instead. See https://www.drupal.org/node/3581222', E_USER_DEPRECATED);
+    }
   }
 
   /**
@@ -133,7 +147,7 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
     foreach ($implementationsByHookOrig as $hook => $hookImplementations) {
       if (is_string($hook) && str_starts_with($hook, 'preprocess_') && str_contains($hook, '__')) {
         foreach ($hookImplementations as $theme) {
-          $this->preprocessForSuggestions[$theme . '_' . $hook] = TRUE;
+          $this->preprocessForSuggestions[$theme . '_' . $hook] = 'theme';
         }
       }
     }
@@ -212,23 +226,35 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
     $hookFileCache = FileCacheFactory::get('theme_hook_implementations');
     $proceduralHookFileCache = FileCacheFactory::get('theme_procedural_hook_implementations:' . $allThemesPreg);
 
-    $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS);
-    $iterator = new \RecursiveCallbackFilterIterator($iterator, static::filterIterator(...));
-    $iterator = new \RecursiveIteratorIterator($iterator);
-    /** @var \RecursiveDirectoryIterator | \RecursiveIteratorIterator $iterator*/
-    foreach ($iterator as $fileinfo) {
+    foreach ($this->getHookFileIterator($dir, ["$theme.theme", 'theme-settings.php']) as $fileinfo) {
       assert($fileinfo instanceof \SplFileInfo);
       $fileExtension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
 
-      if ($fileExtension === 'php') {
+      $isThemeSettings = str_ends_with($filename, 'theme-settings.php');
+
+      if ($fileExtension === 'theme') {
+        $this->deprecatedThemeFiles[pathinfo($filename, PATHINFO_FILENAME)] = TRUE;
+      }
+
+      if ($isThemeSettings) {
+        @trigger_error('Using a theme-settings.php file in the ' . $theme . ' theme is deprecated in drupal:11.5.0 and is removed from drupal:12.0.0. Convert the hooks to use attributes or move to the .theme file. See https://www.drupal.org/node/3587273', E_USER_DEPRECATED);
+      }
+
+      if ($fileExtension === 'php' && !$isThemeSettings) {
         $cached = $hookFileCache->get($filename);
         if ($cached) {
           $class = $cached['class'];
           $attributes = $cached['attributes'];
         }
         else {
-          $namespace = preg_replace('#^src/#', "Drupal/$theme/", $iterator->getSubPath());
+          // Immediately after a deployment, opcache may not yet have refreshed
+          // depending on the value of opcache.revalidation_freq which defaults
+          // to 2 seconds. Ensure that reflection operates on the new code by
+          // forcibly invalidating the opcode cache.
+          // @see https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.revalidate-freq
+          OpCodeCache::invalidate($filename);
+          $namespace = preg_replace('#^src/#', "Drupal/$theme/", substr($fileinfo->getPath(), strlen($dir) + 1));
           $class = $namespace . '/' . $fileinfo->getBasename('.php');
           $class = str_replace('/', '\\', $class);
           $attributes = [];
@@ -258,19 +284,27 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
         if ($implementations === NULL) {
           $finder = MockFileFinder::create($filename);
           $parser = new StaticReflectionParser('', $finder);
-          $implementations = [];
+          $implementations = [
+            'hooks' => [],
+          ];
           foreach ($parser->getMethodAttributes() as $function => $attributes) {
+            if (StaticReflectionParser::hasAttribute($attributes, ExtensionFileIsConverted::class)) {
+              $implementations['@skip_theme_file_deprecation'] = TRUE;
+            }
             if (StaticReflectionParser::hasAttribute($attributes, ProceduralHookScanStop::class)) {
               break;
             }
             if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && (preg_match($currentThemePreg, $function, $matches) || preg_match($allThemesPreg, $function, $matches))) {
               assert($function === $matches['theme'] . '_' . $matches['hook']);
-              $implementations[] = ['theme' => $matches['theme'], 'hook' => $matches['hook']];
+              $implementations['hooks'][] = ['theme' => $matches['theme'], 'hook' => $matches['hook']];
             }
           }
           $proceduralHookFileCache->set($filename, $implementations);
         }
-        foreach ($implementations as $implementation) {
+        if (isset($implementations['@skip_theme_file_deprecation'])) {
+          unset($this->deprecatedThemeFiles[pathinfo($filename, PATHINFO_FILENAME)]);
+        }
+        foreach ($implementations['hooks'] as $implementation) {
           $this->proceduralImplementations[$implementation['hook']][] = $implementation['theme'];
         }
       }
@@ -304,57 +338,6 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
   }
 
   /**
-   * Registers the hook implementation services.
-   *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-   *   The container builder.
-   * @param array<string, array<string, string>> $implementationsByHook
-   *   Implementations, as module names keyed by hook name and "$class::$method"
-   *   or $function identifier.
-   */
-  protected static function registerHookServices(
-    ContainerBuilder $container,
-    array $implementationsByHook,
-  ): void {
-    $classesMap = [];
-    foreach ($implementationsByHook as $hookImplementations) {
-      foreach (array_keys($hookImplementations) as $identifier) {
-        $parts = explode('::', $identifier, 2);
-        if (isset($parts[1])) {
-          $classesMap[$parts[0]] = TRUE;
-        }
-      }
-    }
-
-    foreach (array_keys($classesMap) as $class) {
-      if (!$container->hasDefinition($class)) {
-        $container
-          ->register($class, $class)
-          ->setAutowired(TRUE);
-      }
-    }
-  }
-
-  /**
-   * Filter iterator callback. Allows include files and .php files in src/Hook.
-   */
-  protected static function filterIterator(\SplFileInfo $fileInfo, $key, \RecursiveDirectoryIterator $iterator): bool {
-    $subPathName = $iterator->getSubPathname();
-    $extension = $fileInfo->getExtension();
-    if (str_starts_with($subPathName, 'src/Hook/')) {
-      return $iterator->isDir() || $extension === 'php';
-    }
-    if ($iterator->isDir()) {
-      if ($subPathName === 'src' || $subPathName === 'src/Hook') {
-        return TRUE;
-      }
-      // glob() doesn't support streams but scandir() does.
-      return !in_array($fileInfo->getFilename(), ['tests', 'js', 'css', 'templates']) && !array_filter(scandir($key), static fn($filename) => str_ends_with($filename, '.info.yml'));
-    }
-    return in_array($extension, ['inc', 'theme']);
-  }
-
-  /**
    * Checks for hooks which can't be supported in theme classes.
    *
    * @param \Drupal\Core\Hook\Attribute\Hook $hookAttribute
@@ -371,28 +354,6 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
     if ($hookAttribute->order !== NULL) {
       throw new \LogicException("The 'order' parameter on the #[Hook] attribute is not allowed in themes. Found in $class.");
     }
-  }
-
-  /**
-   * Get attribute instances from class and method reflections.
-   *
-   * @param \ReflectionClass $reflectionClass
-   *   A reflected class.
-   *
-   * @return array<string, list<\Drupal\Core\Hook\Attribute\HookAttributeInterface>>
-   *   Lists of Hook attribute instances by method name.
-   */
-  protected static function getAttributeInstances(\ReflectionClass $reflectionClass): array {
-    $attributes = [];
-    $reflections = $reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC);
-    $reflections[] = $reflectionClass;
-    foreach ($reflections as $reflection) {
-      if ($reflectionAttributes = $reflection->getAttributes(HookAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF)) {
-        $method = $reflection instanceof \ReflectionMethod ? $reflection->getName() : '__invoke';
-        $attributes[$method] = array_map(static fn(\ReflectionAttribute $ra) => $ra->newInstance(), $reflectionAttributes);
-      }
-    }
-    return $attributes;
   }
 
 }

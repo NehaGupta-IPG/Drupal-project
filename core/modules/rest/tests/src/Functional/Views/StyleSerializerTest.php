@@ -131,11 +131,11 @@ class StyleSerializerTest extends ViewTestBase {
     // Test with no format as well as html explicitly.
     $this->drupalGet('test/serialize/shared');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->responseHeaderEquals('content-type', 'text/html; charset=UTF-8');
+    $this->assertSession()->responseHeaderEquals('content-type', 'text/html; charset=utf-8');
 
     $this->drupalGet('test/serialize/shared', ['query' => ['_format' => 'html']]);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->responseHeaderEquals('content-type', 'text/html; charset=UTF-8');
+    $this->assertSession()->responseHeaderEquals('content-type', 'text/html; charset=utf-8');
 
     $this->drupalGet('test/serialize/shared', ['query' => ['_format' => 'json']]);
     $this->assertSession()->statusCodeEquals(200);
@@ -143,7 +143,7 @@ class StyleSerializerTest extends ViewTestBase {
 
     $this->drupalGet('test/serialize/shared', ['query' => ['_format' => 'xml']]);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->responseHeaderEquals('content-type', 'text/xml; charset=UTF-8');
+    $this->assertSession()->responseHeaderEquals('content-type', 'text/xml; charset=utf-8');
   }
 
   /**
@@ -168,7 +168,7 @@ class StyleSerializerTest extends ViewTestBase {
    * @param string $format
    *   The new request format.
    */
-  protected function addRequestWithFormat($format): void {
+  protected function addRequestWithFormat(?string $format): void {
     $request = \Drupal::request();
     $request = clone $request;
     $request->setRequestFormat($format);

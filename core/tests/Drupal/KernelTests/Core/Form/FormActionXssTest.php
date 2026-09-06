@@ -30,14 +30,14 @@ class FormActionXssTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'external_form_url_test';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['something'] = [
       '#type' => 'textfield',
       '#title' => 'What do you think?',
@@ -48,12 +48,12 @@ class FormActionXssTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
+  public function validateForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
+  public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
   /**
    * {@inheritdoc}
@@ -89,7 +89,7 @@ class FormActionXssTest extends KernelTestBase implements FormInterface {
     $markup = \Drupal::service('renderer')->renderRoot($form);
     $this->setRawContent($markup);
 
-    $elements = $this->xpath('//form');
+    $elements = $this->getSimpleXmlElementsByXpath('//form');
     $action = isset($elements[0]['action']) ? (string) $elements[0]['action'] : FALSE;
     $injected = isset($elements[0]['injected']) ? (string) $elements[0]['injected'] : FALSE;
 

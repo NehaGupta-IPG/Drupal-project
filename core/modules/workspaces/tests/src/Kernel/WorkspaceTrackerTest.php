@@ -240,7 +240,7 @@ class WorkspaceTrackerTest extends KernelTestBase {
    *   An array of expected values for the initial revisions, i.e. for the
    *   entities that were created in the specified workspace.
    */
-  protected function assertWorkspaceAssociations($entity_type_id, array $expected_latest_revisions, array $expected_all_revisions, array $expected_initial_revisions): void {
+  protected function assertWorkspaceAssociations(?string $entity_type_id, array $expected_latest_revisions, array $expected_all_revisions, array $expected_initial_revisions): void {
     /** @var \Drupal\workspaces\WorkspaceTrackerInterface $workspace_tracker */
     $workspace_tracker = \Drupal::service('workspaces.tracker');
     foreach ($expected_latest_revisions as $workspace_id => $expected_tracked_revision_ids) {
@@ -262,8 +262,6 @@ class WorkspaceTrackerTest extends KernelTestBase {
 
   /**
    * Tests moving an entity with multiple revisions between workspaces.
-   *
-   * @legacy-covers ::moveTrackedEntities
    */
   public function testMoveTrackedEntitiesWithMultipleRevisions(): void {
     $entity_type_id = 'entity_test_mulrevpub';
@@ -303,8 +301,6 @@ class WorkspaceTrackerTest extends KernelTestBase {
 
   /**
    * Tests moving all entities of a specific type while leaving others.
-   *
-   * @legacy-covers ::moveTrackedEntities
    */
   public function testMoveTrackedEntitiesOfSpecificType(): void {
     $entity_type_id = 'entity_test_mulrevpub';
@@ -372,8 +368,6 @@ class WorkspaceTrackerTest extends KernelTestBase {
 
   /**
    * Tests validation for moveTrackedEntities().
-   *
-   * @legacy-covers ::moveTrackedEntities
    */
   #[DataProvider('providerMoveTrackedEntitiesValidation')]
   public function testMoveTrackedEntitiesValidation(
@@ -388,7 +382,7 @@ class WorkspaceTrackerTest extends KernelTestBase {
     $workspace_tracker = \Drupal::service('workspaces.tracker');
 
     $this->expectException($exception_class);
-    $this->expectExceptionMessage($exception_message);
+    $this->expectExceptionMessageIs($exception_message);
 
     $workspace_tracker->moveTrackedEntities($source_workspace_id, $target_workspace_id, $entity_type_id, $entity_ids);
   }

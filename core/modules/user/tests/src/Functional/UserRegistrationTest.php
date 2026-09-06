@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\user\OneTimeAuthentication;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -58,7 +60,7 @@ class UserRegistrationTest extends BrowserTestBase {
     $accounts = $storage->loadByProperties(['name' => $name, 'mail' => $mail]);
     $new_user = reset($accounts);
     $this->assertTrue($new_user->isActive(), 'New account is active after registration.');
-    $resetURL = user_pass_reset_url($new_user);
+    $resetURL = \Drupal::service(OneTimeAuthentication::class)->generateOneTimeLoginUrl($new_user)->toString();
     $this->drupalGet($resetURL);
     $this->assertSession()->titleEquals('Set password | Drupal');
 
@@ -144,10 +146,15 @@ class UserRegistrationTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
     $this->drupalLogout();
 
+    // Add Created field to the user profile display so that there is something
+    // to check page contents against.
+    EntityViewDisplay::collectRenderDisplay($new_user, 'default')
+      ->setComponent('created', ['type' => 'timestamp'])
+      ->save();
     // Log in after administrator approval.
     $this->drupalGet('user/login');
     $this->submitForm($auth, 'Log in');
-    $this->assertSession()->pageTextContains('Member for');
+    $this->assertSession()->pageTextContains('Created');
   }
 
   /**

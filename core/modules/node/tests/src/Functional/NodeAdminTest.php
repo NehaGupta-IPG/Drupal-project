@@ -10,6 +10,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\user\RoleInterface;
+use Drupal\node\NodeAccessRebuild;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -173,7 +174,7 @@ class NodeAdminTest extends NodeTestBase {
     $this->drupalGet('admin/content');
     $this->assertSession()->statusCodeEquals(200);
 
-    $node_type_labels = $this->xpath('//td[contains(@class, "views-field-type")]');
+    $node_type_labels = $this->getNodeElementsByXpath('//td[contains(@class, "views-field-type")]');
     $delta = 0;
     foreach ($nodes as $node) {
       $this->assertSession()->linkByHrefExists('node/' . $node->id());
@@ -258,7 +259,7 @@ class NodeAdminTest extends NodeTestBase {
   public function testContentAdminPageWithLimitedContentViewer(): void {
     \Drupal::service('module_installer')->install(['node_access_test']);
     $this->addPrivateField(NodeType::load('page'));
-    node_access_rebuild();
+    \Drupal::service(NodeAccessRebuild::class)->rebuild();
 
     $role_id = $this->drupalCreateRole([
       'access content overview',

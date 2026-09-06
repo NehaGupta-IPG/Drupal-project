@@ -24,8 +24,6 @@ class ValidationResultTest extends UnitTestCase {
 
   /**
    * Tests create warning result.
-   *
-   * @legacy-covers ::createWarning
    */
   #[DataProvider('providerValidConstructorArguments')]
   public function testCreateWarningResult(array $messages, ?string $summary): void {
@@ -63,8 +61,6 @@ class ValidationResultTest extends UnitTestCase {
 
   /**
    * Tests create error result.
-   *
-   * @legacy-covers ::createError
    */
   #[DataProvider('providerValidConstructorArguments')]
   public function testCreateErrorResult(array $messages, ?string $summary): void {
@@ -81,14 +77,12 @@ class ValidationResultTest extends UnitTestCase {
    *   The warning messages of the validation result.
    * @param string $expected_exception_message
    *   The expected exception message.
-   *
-   * @legacy-covers ::createWarning
    */
   #[DataProvider('providerCreateExceptions')]
   public function testCreateWarningResultException(array $messages, string $expected_exception_message): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage($expected_exception_message);
-    ValidationResult::createWarning($messages, NULL);
+    $this->expectExceptionMessageIs($expected_exception_message);
+    ValidationResult::createWarning($messages);
   }
 
   /**
@@ -98,14 +92,12 @@ class ValidationResultTest extends UnitTestCase {
    *   The error messages of the validation result.
    * @param string $expected_exception_message
    *   The expected exception message.
-   *
-   * @legacy-covers ::createError
    */
   #[DataProvider('providerCreateExceptions')]
   public function testCreateErrorResultException(array $messages, string $expected_exception_message): void {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage($expected_exception_message);
-    ValidationResult::createError($messages, NULL);
+    $this->expectExceptionMessageIs($expected_exception_message);
+    ValidationResult::createError($messages);
   }
 
   /**

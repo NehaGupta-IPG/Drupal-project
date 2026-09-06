@@ -104,7 +104,13 @@ class ContentTranslationFormLanguageHooks {
                 '#default_value' => $definition->isTranslatable(),
               ];
               // Display the column translatability configuration widget.
-              $column_element = $this->fieldSyncWidget->widget($definition, "settings[{$entity_type_id}][{$bundle}][columns][{$field_name}]");
+              // Base field definitions do not carry third-party settings.
+              // Use the bundle-level config wrapper so sync options are
+              // available even before a BaseFieldOverride is explicitly saved.
+              $field_for_sync_widget = $definition->getFieldStorageDefinition()->isBaseField()
+                ? $definition->getConfig($bundle)
+                : $definition;
+              $column_element = $this->fieldSyncWidget->widget($field_for_sync_widget, "settings[{$entity_type_id}][{$bundle}][columns][{$field_name}]");
               if ($column_element) {
                 $form['settings'][$entity_type_id][$bundle]['columns'][$field_name] = $column_element;
               }
@@ -186,6 +192,13 @@ class ContentTranslationFormLanguageHooks {
             if (isset($bundle_settings['columns'][$field_name]) && !array_filter($bundle_settings['columns'][$field_name])) {
               $translatable = FALSE;
             }
+            // Skip fields for bundles that are not translatable and were not
+            // previously enabled for translation. This prevents unnecessary
+            // BaseFieldOverride config entities from being created when
+            // getConfig() is called on base field definitions.
+            if (empty($bundle_settings['translatable']) && !$content_translation_manager->isEnabled($entity_type_id, $bundle)) {
+              continue;
+            }
             $field_config = $fields[$field_name]->getConfig($bundle);
             if ($field_config->isTranslatable() != $translatable) {
               $field_config
@@ -243,7 +256,11 @@ class ContentTranslationFormLanguageHooks {
     // set of well-known fields implementing entity system business logic.
     return $definition->isTranslatable() &&
       $definition->getProvider() != 'content_translation' &&
-      !in_array($definition->getName(), [$entity_type->getKey('langcode'), $entity_type->getKey('default_langcode'), 'revision_translation_affected']);
+      !in_array($definition->getName(), [
+        $entity_type->getKey('langcode'),
+        $entity_type->getKey('default_langcode'),
+        'revision_translation_affected',
+      ]);
   }
 
 }

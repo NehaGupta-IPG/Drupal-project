@@ -19,11 +19,12 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class SourceEditingPreventSelfXssConstraint extends SymfonyConstraint {
 
-  /**
-   * When Source Editing is configured to allow self-XSS.
-   *
-   * @var string
-   */
-  public $message = 'The following tag in the Source Editing "Manually editable HTML tags" field is a security risk: %dangerous_tag.';
+  public function __construct(
+    public $message = 'The following tag in the Source Editing "Manually editable HTML tags" field is a security risk: %dangerous_tag.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct(groups: $groups, payload: $payload);
+  }
 
 }

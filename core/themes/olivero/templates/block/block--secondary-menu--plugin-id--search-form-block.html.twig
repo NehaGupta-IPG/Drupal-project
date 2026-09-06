@@ -16,7 +16,7 @@
  * - title_suffix: Additional output populated by modules, intended to be
  *   displayed after the main title tag that appears in the template.
  *
- * @see template_preprocess_block()
+ * @see \Drupal\block\Hook\BlockHooks::preprocessBlock()
  * @see search_preprocess_block()
  *
  * @ingroup themeable
@@ -35,8 +35,8 @@
   {% endif %}
   {{ title_suffix }}
   {% block content %}
-    <button class="block-search-wide__button" aria-label="{{ 'Search Form'|t }}" data-drupal-selector="block-search-wide-button">
-      {% include "@olivero/../images/search.svg" %}
+    <button class="block-search-wide__button" aria-label="{{ 'Search Form'|t }}" data-drupal-selector="block-search-wide-button" aria-expanded="false">
+      {{ include('@olivero/../images/search.svg') }}
       <span class="block-search-wide__button-close"></span>
     </button>
 

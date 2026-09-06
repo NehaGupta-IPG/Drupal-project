@@ -22,7 +22,7 @@ class PluralTranslatableMarkupTest extends UnitTestCase {
    * Tests serialization of PluralTranslatableMarkup().
    */
   #[DataProvider('providerPluralTranslatableMarkupSerialization')]
-  public function testPluralTranslatableMarkupSerialization($count, $expected_text): void {
+  public function testPluralTranslatableMarkupSerialization(int $count, string $expected_text): void {
     // Add a mock string translation service to the container.
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->getStringTranslationStub());
@@ -37,7 +37,7 @@ class PluralTranslatableMarkupTest extends UnitTestCase {
   /**
    * Data provider for ::testPluralTranslatableMarkupSerialization().
    */
-  public static function providerPluralTranslatableMarkupSerialization() {
+  public static function providerPluralTranslatableMarkupSerialization(): array {
     return [
       [1, 'singular 1'],
       [2, 'plural 2'],

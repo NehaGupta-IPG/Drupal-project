@@ -31,7 +31,7 @@ class SortArrayTest extends TestCase {
    * @legacy-covers ::sortByKeyInt
    */
   #[DataProvider('providerSortByWeightElement')]
-  public function testSortByWeightElement($a, $b, $expected): void {
+  public function testSortByWeightElement(array $a, array $b, int $expected): void {
     $result = SortArray::sortByWeightElement($a, $b);
     $this->assertBothNegativePositiveOrZero($expected, $result);
   }
@@ -45,7 +45,7 @@ class SortArrayTest extends TestCase {
    *
    * @see \Drupal\Tests\Component\Utility\SortArrayTest::testSortByWeightElement()
    */
-  public static function providerSortByWeightElement() {
+  public static function providerSortByWeightElement(): array {
     $tests = [];
 
     // Weights set and equal.
@@ -107,7 +107,7 @@ class SortArrayTest extends TestCase {
    * @legacy-covers ::sortByKeyInt
    */
   #[DataProvider('providerSortByWeightProperty')]
-  public function testSortByWeightProperty($a, $b, $expected): void {
+  public function testSortByWeightProperty($a, $b, int $expected): void {
     $result = SortArray::sortByWeightProperty($a, $b);
     $this->assertBothNegativePositiveOrZero($expected, $result);
   }
@@ -121,7 +121,7 @@ class SortArrayTest extends TestCase {
    *
    * @see \Drupal\Tests\Component\Utility\SortArrayTest::testSortByWeightProperty()
    */
-  public static function providerSortByWeightProperty() {
+  public static function providerSortByWeightProperty(): array {
     $tests = [];
 
     // Weights set and equal.
@@ -183,7 +183,7 @@ class SortArrayTest extends TestCase {
    * @legacy-covers ::sortByKeyString
    */
   #[DataProvider('providerSortByTitleElement')]
-  public function testSortByTitleElement($a, $b, $expected): void {
+  public function testSortByTitleElement($a, $b, int $expected): void {
     $result = SortArray::sortByTitleElement($a, $b);
     $this->assertBothNegativePositiveOrZero($expected, $result);
   }
@@ -197,7 +197,7 @@ class SortArrayTest extends TestCase {
    *
    * @see \Drupal\Tests\Component\Utility\SortArrayTest::testSortByTitleElement()
    */
-  public static function providerSortByTitleElement() {
+  public static function providerSortByTitleElement(): array {
     $tests = [];
 
     // Titles set and equal.
@@ -252,7 +252,7 @@ class SortArrayTest extends TestCase {
    * @legacy-covers ::sortByKeyString
    */
   #[DataProvider('providerSortByTitleProperty')]
-  public function testSortByTitleProperty($a, $b, $expected): void {
+  public function testSortByTitleProperty($a, $b, int $expected): void {
     $result = SortArray::sortByTitleProperty($a, $b);
     $this->assertBothNegativePositiveOrZero($expected, $result);
   }
@@ -266,7 +266,7 @@ class SortArrayTest extends TestCase {
    *
    * @see \Drupal\Tests\Component\Utility\SortArrayTest::testSortByTitleProperty()
    */
-  public static function providerSortByTitleProperty() {
+  public static function providerSortByTitleProperty(): array {
     $tests = [];
 
     // Titles set and equal.

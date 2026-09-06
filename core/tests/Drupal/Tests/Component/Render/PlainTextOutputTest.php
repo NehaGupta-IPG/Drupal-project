@@ -30,8 +30,6 @@ class PlainTextOutputTest extends TestCase {
    * @param array $args
    *   (optional) An associative array of replacements to make. Defaults to
    *   none.
-   *
-   * @legacy-covers ::renderFromHtml
    */
   #[DataProvider('providerRenderFromHtml')]
   public function testRenderFromHtml($expected, $string, $args = []): void {
@@ -43,7 +41,7 @@ class PlainTextOutputTest extends TestCase {
   /**
    * Data provider for ::testRenderFromHtml()
    */
-  public static function providerRenderFromHtml() {
+  public static function providerRenderFromHtml(): array {
     $prophet = new Prophet();
     $data = [];
 
@@ -58,7 +56,11 @@ class PlainTextOutputTest extends TestCase {
     $safe_string = $prophet->prophesize(MarkupInterface::class);
     $safe_string->__toString()->willReturn('<em>"this"</em>');
     $safe_string = $safe_string->reveal();
-    $data['escaped-html-with-quotes-and-placeholders'] = [$expected, 'The @tag tag makes your text look like @result.', ['@tag' => '<em>', '@result' => $safe_string]];
+    $data['escaped-html-with-quotes-and-placeholders'] = [
+      $expected,
+      'The @tag tag makes your text look like @result.',
+      ['@tag' => '<em>', '@result' => $safe_string],
+    ];
 
     $safe_string = $prophet->prophesize(MarkupInterface::class);
     $safe_string->__toString()->willReturn($string);
