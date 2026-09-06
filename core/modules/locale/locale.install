@@ -70,13 +70,6 @@ function locale_uninstall(): void {
  * Implements hook_schema().
  */
 function locale_schema(): Schema {
-  return _locale_schema_11401();
-}
-
-/**
- * Version 11401 of the locale schema.
- */
-function _locale_schema_11401(): Schema {
   $locales_source = new Table(
     name: 'locales_source',
     description: 'List of English source strings.',
@@ -303,8 +296,15 @@ function locale_update_last_removed(): int {
  * Add a hash column to the {locale_file} table.
  */
 function locale_update_11401(): void {
+  $spec = [
+    'type' => 'varchar_ascii',
+    'length' => 32,
+    'not null' => TRUE,
+    'default' => '',
+    'description' => 'The hash of the imported file.',
+  ];
   $schema = \Drupal::database()->schema();
   if (!$schema->fieldExists('locale_file', 'hash')) {
-    $schema->addTableColumnFromDefinition(_locale_schema_11401(), 'locale_file', 'hash');
+    $schema->addField('locale_file', 'hash', $spec);
   }
 }
