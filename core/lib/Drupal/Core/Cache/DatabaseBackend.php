@@ -7,7 +7,7 @@ use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\SchemaObjectExistsException;
 
 /**
  * Defines a default cache implementation.
@@ -443,7 +443,7 @@ class DatabaseBackend implements CacheBackendInterface {
     // If another process has already created the cache table, attempting to
     // recreate it will throw an exception. In this case just catch the
     // exception and do nothing.
-    catch (DatabaseException) {
+    catch (SchemaObjectExistsException) {
       return TRUE;
     }
     return FALSE;
