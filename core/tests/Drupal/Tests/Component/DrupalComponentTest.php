@@ -100,11 +100,11 @@ class DrupalComponentTest extends TestCase {
   protected function assertNoCoreUsage(string $class_path): void {
     $contents = file_get_contents($class_path);
     preg_match_all('/^.*Drupal\\\Core.*$/m', $contents, $matches);
-    $matches = array_filter($matches[0], function ($line) {
+    $matches = array_filter($matches[0], function (string $line): bool {
       // Filter references that don't really matter.
-      return preg_match('/@see|E_USER_DEPRECATED|expectDeprecation/', $line) === 0;
+      return preg_match('/@see|E_USER_DEPRECATED|expectUserDeprecationMessage/', $line) === 0;
     });
-    $this->assertEmpty($matches, "Checking for illegal reference to 'Drupal\\Core' namespace in $class_path");
+    $this->assertEmpty($matches, "Checking for invalid reference to 'Drupal\\Core' namespace in $class_path");
   }
 
   /**
@@ -127,13 +127,11 @@ class DrupalComponentTest extends TestCase {
       ],
       [
         FALSE,
-        "@see \\Drupal\\Core\\Something\n" .
-        '\\Drupal\\Core\\Something',
+        "@see \\Drupal\\Core\\Something\n" . '\\Drupal\\Core\\Something',
       ],
       [
         FALSE,
-        "\\Drupal\\Core\\Something\n" .
-        '@see \\Drupal\\Core\\Something',
+        "\\Drupal\\Core\\Something\n" . '@see \\Drupal\\Core\\Something',
       ],
     ];
   }
@@ -142,7 +140,7 @@ class DrupalComponentTest extends TestCase {
    * @legacy-covers \Drupal\Tests\Component\DrupalComponentTest::assertNoCoreUsage
    */
   #[DataProvider('providerAssertNoCoreUsage')]
-  public function testAssertNoCoreUsage($expected_pass, $file_data): void {
+  public function testAssertNoCoreUsage(bool $expected_pass, string $file_data): void {
     // Set up a virtual file to read.
     $vfs_root = vfsStream::setup('root');
     vfsStream::newFile('Test.php')->at($vfs_root)->setContent($file_data);

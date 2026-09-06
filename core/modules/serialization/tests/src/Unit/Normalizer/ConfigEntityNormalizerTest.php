@@ -23,8 +23,6 @@ class ConfigEntityNormalizerTest extends UnitTestCase {
 
   /**
    * Tests the normalize() method.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalize(): void {
     $test_export_properties = [
@@ -35,9 +33,9 @@ class ConfigEntityNormalizerTest extends UnitTestCase {
       ],
     ];
 
-    $entity_field_manager = $this->createMock(EntityFieldManagerInterface::class);
-    $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
-    $entity_type_repository = $this->createMock(EntityTypeRepositoryInterface::class);
+    $entity_field_manager = $this->createStub(EntityFieldManagerInterface::class);
+    $entity_type_manager = $this->createStub(EntityTypeManagerInterface::class);
+    $entity_type_repository = $this->createStub(EntityTypeRepositoryInterface::class);
     $normalizer = new ConfigEntityNormalizer(
       $entity_type_manager,
       $entity_type_repository,
@@ -54,8 +52,6 @@ class ConfigEntityNormalizerTest extends UnitTestCase {
 
   /**
    * Tests denormalize.
-   *
-   * @legacy-covers ::denormalize
    */
   public function testDenormalize(): void {
     $test_value = $this->randomMachineName();
@@ -76,7 +72,7 @@ class ConfigEntityNormalizerTest extends UnitTestCase {
     $entity_storage = $this->prophesize(EntityStorageInterface::class);
     $entity_storage->create($expected_storage_data)
       ->shouldBeCalled()
-      ->will(function ($args) {
+      ->will(function ($args): \stdClass {
         $entity = new \stdClass();
         $entity->received_data = $args[0];
         return $entity;

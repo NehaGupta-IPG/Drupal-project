@@ -27,7 +27,7 @@ class AnnotationBaseTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getId
+   * Tests get id.
    */
   public function testGetId(): void {
     $plugin = new AnnotationBaseStub();
@@ -55,6 +55,6 @@ class AnnotationBaseStub extends AnnotationBase {
   /**
    * {@inheritdoc}
    */
-  public function get() {}
+  public function get(): void {}
 
 }

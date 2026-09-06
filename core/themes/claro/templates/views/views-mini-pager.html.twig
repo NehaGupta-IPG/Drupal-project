@@ -8,14 +8,14 @@
  * - pagination_heading_level: The heading level to use for the pager.
  * - items: List of pager items.
  *
- * @see template_preprocess_views_mini_pager()
+ * @see \Drupal\views\Hook\ViewsThemeHooks::preprocessViewsMiniPager()
  */
 #}
 {%
   set pager_action_classes = [
     'pager__link',
     'pager__link--mini',
-    'pager__link--action-link'
+    'pager__link--action-link',
   ]
 %}
 {% if items.previous or items.next %}

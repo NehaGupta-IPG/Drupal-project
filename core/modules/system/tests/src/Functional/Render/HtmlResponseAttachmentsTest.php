@@ -18,7 +18,7 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['render_attached_test'];
+  protected static $modules = ['render_attached_test', 'page_cache'];
 
   /**
    * {@inheritdoc}
@@ -119,7 +119,7 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
    */
   protected function assertFeed(): void {
     // Discover the DOM element for the feed link.
-    $test_meta = $this->xpath('//head/link[@href="test://url"]');
+    $test_meta = $this->getNodeElementsByXpath('//head/link[@href="test://url"]');
     $this->assertCount(1, $test_meta, 'Link has URL.');
     // Reconcile the other attributes.
     $test_meta_attributes = [
@@ -146,7 +146,7 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
    */
   protected function assertHead(): void {
     // Discover the DOM element for the meta link.
-    $test_meta = $this->xpath('//head/meta[@test-attribute="test_value"]');
+    $test_meta = $this->getNodeElementsByXpath('//head/meta[@test-attribute="test_value"]');
     $this->assertCount(1, $test_meta, 'There\'s only one test attribute.');
     // Grab the only DOM element.
     $test_meta = reset($test_meta);

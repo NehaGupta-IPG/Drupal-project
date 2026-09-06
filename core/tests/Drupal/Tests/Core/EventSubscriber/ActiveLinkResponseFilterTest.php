@@ -39,7 +39,7 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
    *
    * @see \Drupal\Core\EventSubscriber\ActiveLinkResponseFilter::setLinkActiveClass()
    */
-  public static function providerTestSetLinkActiveClass() {
+  public static function providerTestSetLinkActiveClass(): array {
     // Define all the variations that *don't* affect whether or not an
     // "is-active" class is set, but that should remain unchanged:
     // - surrounding HTML
@@ -696,7 +696,7 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
         for ($c = 0; $c < count($contents); $c++) {
           $tag_content = $contents[$c];
 
-          $create_markup = function (Attribute $attributes) use ($html_prefix, $html_suffix, $tag, $tag_content) {
+          $create_markup = function (Attribute $attributes) use ($html_prefix, $html_suffix, $tag, $tag_content): string {
             return $html_prefix . '<' . $tag . $attributes . '>' . $tag_content . '</' . $tag . '>' . $html_suffix;
           };
 
@@ -835,8 +835,6 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
    *   The query string for the current URL.
    * @param string $expected_html_markup
    *   The expected updated HTML markup.
-   *
-   * @legacy-covers ::setLinkActiveClass
    */
   #[DataProvider('providerTestSetLinkActiveClass')]
   public function testSetLinkActiveClass($html_markup, $current_path, $is_front, $url_language, array $query, $expected_html_markup): void {

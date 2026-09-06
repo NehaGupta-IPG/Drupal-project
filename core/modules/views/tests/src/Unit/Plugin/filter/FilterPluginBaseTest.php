@@ -19,8 +19,6 @@ class FilterPluginBaseTest extends UnitTestCase {
 
   /**
    * Tests accept exposed input.
-   *
-   * @legacy-covers ::acceptExposedInput
    */
   #[DataProvider('acceptExposedInputProvider')]
   public function testAcceptExposedInput(bool $expected_result, array $options, array $input): void {
@@ -39,7 +37,7 @@ class FilterPluginBaseTest extends UnitTestCase {
    * @return array
    *   The data set.
    */
-  public static function acceptExposedInputProvider() {
+  public static function acceptExposedInputProvider(): array {
     return [
       'not-exposed' => [TRUE, ['exposed' => FALSE], []],
       'exposed-no-input' => [TRUE, ['exposed' => TRUE], []],

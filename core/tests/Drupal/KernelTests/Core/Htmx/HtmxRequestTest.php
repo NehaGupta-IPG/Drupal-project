@@ -31,11 +31,6 @@ class HtmxRequestTest extends KernelTestBase {
   ];
 
   /**
-   * Class under test.
-   */
-  protected Htmx $htmx;
-
-  /**
    * Injected kernel service.
    */
   protected HttpKernelInterface $httpKernel;
@@ -56,7 +51,7 @@ class HtmxRequestTest extends KernelTestBase {
   }
 
   /**
-   * Test all 5 request verb methods.
+   * Test all 7 request methods.
    */
   #[DataProvider('htmxRequestProvider')]
   public function testHxRequest(string $method): void {
@@ -105,6 +100,8 @@ class HtmxRequestTest extends KernelTestBase {
       ['put'],
       ['patch'],
       ['delete'],
+      ['query'],
+      ['action'],
     ];
   }
 

@@ -57,7 +57,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    * @return \Drupal\file\FileInterface
    *   A file object, or FALSE on error.
    */
-  protected function createTemporaryFile($data, ?UserInterface $user = NULL) {
+  protected function createTemporaryFile(string $data, ?UserInterface $user = NULL) {
     /** @var \Drupal\file\FileRepositoryInterface $file_repository */
     $file_repository = \Drupal::service('file.repository');
     $file = $file_repository->writeData($data, "public://");
@@ -169,7 +169,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
       foreach ([1, 1, 0] as $delta) {
         // Ensure we have the expected number of Remove buttons, and that they
         // are numbered sequentially.
-        $buttons = $this->xpath('//input[@type="submit" and @value="Remove"]');
+        $buttons = $this->getNodeElementsByXpath('//input[@type="submit" and @value="Remove"]');
         $this->assertCount($num_expected_remove_buttons, $buttons, "There are $num_expected_remove_buttons \"Remove\" buttons displayed.");
         foreach ($buttons as $i => $button) {
           $key = $i >= $remaining ? $i - $remaining : $i;
