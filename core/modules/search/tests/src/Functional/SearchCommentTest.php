@@ -14,12 +14,14 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests integration searching comments.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchCommentTest extends BrowserTestBase {
 
@@ -29,7 +31,7 @@ class SearchCommentTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['filter', 'node', 'comment', 'search'];
+  protected static $modules = ['filter', 'node', 'comment', 'search', 'search_node'];
 
   /**
    * {@inheritdoc}

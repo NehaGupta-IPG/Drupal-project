@@ -20,12 +20,11 @@ class StandardInstallerTest extends ConfigAfterInstallerTestBase {
   protected $profile = 'standard';
 
   /**
-   * Ensures that the user page is available after installation.
+   * Ensures that the welcome page is shown after installation.
    */
   public function testInstaller(): void {
-    // Verify that Olivero's default frontpage appears.
-    $this->assertSession()->pageTextContains('Congratulations and welcome to the Drupal community.');
-    $this->assertSession()->elementTextContains('css', '#block-olivero-powered', 'Powered by Drupal');
+    $this->assertSession()->addressEquals('admin/welcome');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
   /**
