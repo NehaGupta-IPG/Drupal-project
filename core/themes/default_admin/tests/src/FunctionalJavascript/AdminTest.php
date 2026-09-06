@@ -74,9 +74,6 @@ class AdminTest extends WebDriverTestBase {
     $toggle->press();
     $this->assertFalse($toggle->hasClass('has-error'));
 
-    // TEMPORARY. Clear render cache.
-    $this->container->get('cache_factory')->get('render')->deleteAll();
-
     $page->pressButton('Save');
 
     $assert_session

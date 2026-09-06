@@ -740,6 +740,12 @@ class FormHooks {
         'aria-controls' => 'default_admin_sidebar',
       ],
       '#weight' => 1000,
+      '#cache' => [
+        // Don't cache so error indicator changes.
+        'tags' => [
+          'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:admin_advanced_sidebar_toggle',
+        ],
+      ],
     ];
     $form['#attached']['library'][] = 'default_admin/sidebar';
 
