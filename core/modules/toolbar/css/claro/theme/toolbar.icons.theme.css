@@ -278,7 +278,6 @@
 
 .toolbar .toolbar-icon.toolbar-handle {
   width: 4em;
-  text-indent: -9999px;
 }
 
 .toolbar .toolbar-icon.toolbar-handle::before {

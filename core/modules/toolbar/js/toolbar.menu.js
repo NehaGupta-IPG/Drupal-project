@@ -18,7 +18,7 @@
    * Maintains active tab in horizontal orientation.
    */
   $.fn.drupalToolbarMenuHorizontal = function () {
-    let currentPath = drupalSettings.path.currentPath;
+    let { currentPath } = drupalSettings.path;
     const menu = once('toolbar-menu-horizontal', this);
     if (menu.length) {
       const $menu = $(menu);
@@ -42,11 +42,6 @@
   };
 
   $.fn.drupalToolbarMenu = function () {
-    const ui = {
-      handleOpen: Drupal.t('Extend'),
-      handleClose: Drupal.t('Collapse'),
-    };
-
     /**
      * Toggle the open/close state of a list is a menu.
      *
@@ -67,11 +62,8 @@
       $item.toggleClass('open', switcher);
       // Twist the toggle.
       $toggle.toggleClass('open', switcher);
-      // Adjust the toggle text.
-      $toggle.find('.action').each((index, element) => {
-        // Expand Structure, Collapse Structure.
-        element.textContent = switcher ? ui.handleClose : ui.handleOpen;
-      });
+      // Update the toggle's aria-expanded attribute.
+      $toggle.attr('aria-expanded', switcher ? 'true' : 'false');
     }
 
     /**
@@ -124,7 +116,7 @@
     function initItems($menu) {
       const options = {
         class: 'toolbar-icon toolbar-handle',
-        action: ui.handleOpen,
+        expanded: 'false',
         text: '',
       };
       // Initialize items and their links.
@@ -135,7 +127,7 @@
         if ($item.children('ul.toolbar-menu').length) {
           const $box = $item.children('.toolbar-box');
           const $link = $box.find('a');
-          options.text = Drupal.t('@label', {
+          options.text = Drupal.t('@label menu', {
             '@label': $link.length ? $link[0].textContent : '',
           });
           $item
@@ -180,7 +172,7 @@
      *   The root of the menu.
      */
     function openActiveItem($menu) {
-      let currentPath = drupalSettings.path.currentPath;
+      let { currentPath } = drupalSettings.path;
       const pathItem = $menu.find(`a[href="${window.location.pathname}"]`);
       if (pathItem.length && !activeItem) {
         activeItem = window.location.pathname;
@@ -242,8 +234,8 @@
    *   Options for the button.
    * @param {string} options.class
    *   Class to set on the button.
-   * @param {string} options.action
-   *   Action for the button.
+   * @param {string} options.expanded
+   *   The button's aria-expanded attribute.
    * @param {string} options.text
    *   Used as label for the button.
    *
@@ -251,6 +243,6 @@
    *   A string representing a DOM fragment.
    */
   Drupal.theme.toolbarMenuItemToggle = function (options) {
-    return `<button class="${options.class}"><span class="action">${options.action}</span> <span class="label">${options.text}</span></button>`;
+    return `<button aria-expanded="${options.expanded}" class="${options.class}"><span class="label visually-hidden">${options.text}</span></button>`;
   };
 })(jQuery, Drupal, drupalSettings);

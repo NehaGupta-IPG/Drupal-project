@@ -190,6 +190,13 @@ class ToolbarThemeHooks {
           unset($libraries[$library]['css'][$concern][$original]);
         }
       }
+      // Claro's CSS relies on toolbar.menu.js from the core toolbar module, so
+      // insist on that version of the file.
+      $config = $libraries['toolbar.menu']['js']['js/toolbar.menu.js'];
+      unset($libraries['toolbar.menu']['js']['js/toolbar.menu.js']);
+      $toolbar_path = \Drupal::service('extension.path.resolver')
+        ->getPath('module', 'toolbar');
+      $libraries['toolbar.menu']['js']["/$toolbar_path/js/toolbar.menu.js"] = $config;
     }
   }
 

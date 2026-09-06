@@ -91,6 +91,15 @@ module.exports = {
       '#toolbar-item-administration-tray li:nth-child(2) button',
       'open',
     );
+    browser.assert.attributeEquals(
+      '#toolbar-item-administration-tray li:nth-child(2) button',
+      'aria-expanded',
+      'false',
+    );
+    browser
+      .element('#toolbar-item-administration-tray li:nth-child(2) button')
+      .getAccessibleName()
+      .assert.equals('Configuration menu');
     browser.click('#toolbar-item-administration-tray li:nth-child(2) button');
     browser.assert.hasClass(
       '#toolbar-item-administration-tray li:nth-child(2)',
@@ -100,6 +109,15 @@ module.exports = {
       '#toolbar-item-administration-tray li:nth-child(2) button',
       'open',
     );
+    browser.assert.attributeEquals(
+      '#toolbar-item-administration-tray li:nth-child(2) button',
+      'aria-expanded',
+      'true',
+    );
+    browser
+      .element('#toolbar-item-administration-tray li:nth-child(2) button')
+      .getAccessibleName()
+      .assert.equals('Configuration menu');
     browser.expect
       .element('#toolbar-link-user-admin_index')
       .text.to.equal('People');
@@ -118,6 +136,11 @@ module.exports = {
       '#toolbar-item-administration-tray li.menu-item.level-2 button',
       'open',
     );
+    browser.assert.attributeEquals(
+      '#toolbar-item-administration-tray li.menu-item.level-2 button',
+      'aria-expanded',
+      'false',
+    );
     browser.click(
       '#toolbar-item-administration-tray li.menu-item.level-2 button',
     );
@@ -128,6 +151,11 @@ module.exports = {
     browser.assert.hasClass(
       '#toolbar-item-administration-tray li.menu-item.level-2 button',
       'open',
+    );
+    browser.assert.attributeEquals(
+      '#toolbar-item-administration-tray li.menu-item.level-2 button',
+      'aria-expanded',
+      'true',
     );
     browser.expect
       .element('#toolbar-link-entity-user-admin_form')
