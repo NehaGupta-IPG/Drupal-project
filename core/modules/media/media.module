@@ -9,6 +9,15 @@ use Drupal\Core\Url;
 use Drupal\media\Hook\MediaHooks;
 
 /**
+ * Implements hook_rebuild().
+ */
+function media_rebuild(): void {
+  // Ensure the media icons exist.
+  \Drupal::moduleHandler()->loadInclude('media', 'install');
+  _media_provision_icons();
+}
+
+/**
  * Returns the appropriate URL to add media for the current user.
  *
  * @todo Remove in https://www.drupal.org/project/drupal/issues/2938116
