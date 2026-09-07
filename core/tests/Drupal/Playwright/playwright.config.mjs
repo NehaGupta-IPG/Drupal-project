@@ -6,6 +6,8 @@ export default defineConfig({
   testDir: './Tests',
   testMatch: '**/*.spec.mjs',
   timeout: 60000,
+  workers: 3,
+  maxFailures: 3,
   reporter: [
     ['list'],
     ['junit', { outputFile: `${outputFolder}/results.xml` }],
@@ -18,6 +20,6 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     // headless: true,
-    headless: !!process.env.DRUPAL_PLAYWRIGHT_HEADED
+    headless: !process.env.DRUPAL_PLAYWRIGHT_HEADED,
   },
 });
