@@ -395,6 +395,8 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     // based on the domain.
     $this->addExtraCacheKeyPart('language', $this->getCurrentLanguageCacheIdPart());
 
+    $this->addExtraCacheKeyPart('query_parameters', $this->getQueryParametersCacheIdPart($request));
+
     // Sort the cache key parts by their provider in order to have predictable
     // cache keys.
     ksort($this->extraCacheKeyParts);
@@ -420,13 +422,10 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * @return string
    *   The query parameters identifier for the route collection cache.
    *
-   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Requests
-   *   with query parameters are no longer cached by default.
-   *
-   * @see https://www.drupal.org/node/3619781
    */
   protected function getQueryParametersCacheIdPart(Request $request) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Requests with query parameters are no longer cached by default. See https://www.drupal.org/node/3619781', E_USER_DEPRECATED);
+    // @todo Use \Symfony\Component\HttpFoundation\Request::normalizeQueryString
+    //   for recursive key ordering if support is added in the future.
     $recursive_sort = function (&$array) use (&$recursive_sort) {
       foreach ($array as &$v) {
         if (is_array($v)) {
