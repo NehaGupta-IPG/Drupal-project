@@ -24,9 +24,6 @@ use Drupal\Core\Database\Query\SelectInterface;
  *   INSERT clause cannot be generated;
  * - values are inserted into serial fields, because the generic insert path
  *   takes care of synchronizing the corresponding sequences afterwards.
- * The emulation is reimplemented here so that its insert can be protected
- * with a savepoint: on PostgreSQL a failed statement aborts the whole
- * transaction, so recovering from a racing insert requires one.
  *
  * A native MERGE is not immune to race conditions under the default READ
  * COMMITTED isolation level: a concurrent transaction can insert the same row
@@ -45,7 +42,7 @@ class Merge extends QueryMerge {
     }
 
     if (!$this->isNativeMerge()) {
-      return $this->executeEmulatedMerge();
+      return parent::execute();
     }
 
     // Fetch the list of blobs and sequences used on that table.
@@ -54,7 +51,7 @@ class Merge extends QueryMerge {
     // Inserting values into serial fields requires synchronizing the
     // sequence afterwards, which the generic insert path takes care of.
     if (!empty($table_information->serial_fields) && array_intersect($table_information->serial_fields, array_keys($this->insertFields))) {
-      return $this->executeEmulatedMerge();
+      return parent::execute();
     }
 
     try {
@@ -66,67 +63,6 @@ class Merge extends QueryMerge {
       // now be matched and updated instead.
       return $this->executeNativeMerge($table_information);
     }
-  }
-
-  /**
-   * Executes the merge as a SELECT followed by an INSERT or an UPDATE.
-   *
-   * This is the generic emulation of the parent class, with the insert
-   * protected by a savepoint. The insert can fail when a racing insert beat
-   * us in inserting the same row, which the catch below recovers from. On
-   * PostgreSQL a failed statement aborts the whole transaction, so an
-   * enclosing transaction must be protected with a savepoint for the
-   * recovery to work.
-   *
-   * @return int|null
-   *   One of Merge::STATUS_INSERT, Merge::STATUS_UPDATE or NULL if the row
-   *   already existed and no update was requested.
-   */
-  protected function executeEmulatedMerge(): ?int {
-    $select = $this->connection->select($this->conditionTable)
-      ->condition($this->condition);
-    $select->addExpression('1');
-
-    if (!$select->execute()->fetchField()) {
-      $savepoint = $this->connection->inTransaction() ? $this->connection->startTransaction() : NULL;
-      try {
-        $insert = $this->connection->insert($this->table)->fields($this->insertFields);
-        if ($this->defaultFields) {
-          $insert->useDefaults($this->defaultFields);
-        }
-        $insert->execute();
-        $savepoint?->commitOrRelease();
-        return self::STATUS_INSERT;
-      }
-      catch (IntegrityConstraintViolationException $e) {
-        $savepoint?->rollBack();
-        // The insert query failed, maybe it's because a racing insert query
-        // beat us in inserting the same row. Retry the select query, if it
-        // returns a row, ignore the error and continue with the update
-        // query below.
-        if (!$select->execute()->fetchField()) {
-          throw $e;
-        }
-      }
-      catch (\Exception $e) {
-        $savepoint?->rollBack();
-        throw $e;
-      }
-    }
-
-    if ($this->needsUpdate) {
-      $update = $this->connection->update($this->table)
-        ->fields($this->updateFields)
-        ->condition($this->condition);
-      if ($this->expressionFields) {
-        foreach ($this->expressionFields as $field => $data) {
-          $update->expression($field, $data['expression'], $data['arguments']);
-        }
-      }
-      $update->execute();
-      return self::STATUS_UPDATE;
-    }
-    return NULL;
   }
 
   /**
@@ -206,23 +142,10 @@ class Merge extends QueryMerge {
       $bind($placeholder, $value);
     }
 
-    // Create a savepoint so we can rollback a failed query. This is so we can
-    // mimic MySQL and SQLite transactions which don't fail if a single query
-    // fails. This is important for tables that are created on demand. For
-    // example, \Drupal\Core\Cache\DatabaseBackend.
-    if ($this->connection->inTransaction()) {
-      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
-    }
     try {
       $stmt->execute(NULL, $this->queryOptions);
-      if (isset($savepoint)) {
-        $savepoint->commitOrRelease();
-      }
     }
     catch (\Exception $e) {
-      if (isset($savepoint)) {
-        $savepoint->rollback();
-      }
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, [], $this->queryOptions);
     }
 
