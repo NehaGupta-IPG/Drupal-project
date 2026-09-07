@@ -8,6 +8,7 @@ use Drupal\breakpoint\Breakpoint;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -90,6 +91,31 @@ class BreakpointTest extends UnitTestCase {
     $this->pluginDefinition['mediaQuery'] = 'only screen and (min-width: 1220px)';
     $this->setupBreakpoint();
     $this->assertEquals('only screen and (min-width: 1220px)', $this->breakpoint->getMediaQuery());
+  }
+
+  /**
+   * Tests get a media query with various inputs.
+   */
+  #[DataProvider('providerGetMediaQueryHandlesVariousInputs')]
+  public function testGetMediaQueryHandlesVariousInputs($input, $expected): void {
+    $this->pluginDefinition['mediaQuery'] = $input;
+    $this->setupBreakpoint();
+    $this->assertSame($expected, $this->breakpoint->getMediaQuery());
+  }
+
+  /**
+   * Data provider for testGetMediaQueryHandlesVariousInputs().
+   */
+  public static function providerGetMediaQueryHandlesVariousInputs(): array {
+    return [
+      'Empty string' => ['', ''],
+      'NULL' => [NULL, ''],
+      'Not empty string' => ['not empty string', 'not empty string'],
+      'Not empty but "0" falsy string' => ['0', '0'],
+      'Not empty but "FALSE" falsy string' => ['FALSE', 'FALSE'],
+      'Whitespace only' => ['   ', ''],
+      'Whitespace padded string' => ['  hello  ', 'hello'],
+    ];
   }
 
   /**

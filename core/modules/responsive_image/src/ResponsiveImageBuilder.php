@@ -228,7 +228,7 @@ class ResponsiveImageBuilder {
       'srcset' => implode(', ', array_unique($srcset)),
     ]);
     $media_query = trim($breakpoint->getMediaQuery());
-    if (!empty($media_query)) {
+    if ($media_query !== '') {
       $source_attributes->setAttribute('media', $media_query);
     }
     if (count(array_unique($derivative_mime_types)) == 1) {
