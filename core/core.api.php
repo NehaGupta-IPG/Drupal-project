@@ -1407,9 +1407,9 @@
  *   plugins go in directory Plugin/Filter under the module namespace.
  * - Define an annotation class for your plugin type. This class should extend
  *   \Drupal\Component\Annotation\Plugin, and for most plugin types, it should
- *   contain member variables corresponding to the annotations plugins will
- *   need to provide.
- *     - All plugins have at least an ID, which is a unique string within
+ *   contain member variables corresponding to the annotations that pulugins
+ *   will need to provide.
+ *     - All plugins have at least an ID. The ID must be a unique string within
  *       plugins of the same type. There are no restrictions on the characters
  *       that can be used. However, the colon, ':', is used internally to build
  *       the ID of derived plugins. You should only use the colon in a plugin ID
