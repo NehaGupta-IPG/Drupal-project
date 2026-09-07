@@ -36,7 +36,7 @@ const booleanInputTypes = [
 test.use({
   drupalInstallOptions: {
     setupFile:
-      'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
+      'core/themes/olivero/tests/TestSite/TestSiteOliveroInstallTestScript.php',
     installProfile: 'minimal',
   },
 });

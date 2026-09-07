@@ -16,7 +16,7 @@ const searchNarrowSelector = '.block-search-narrow';
 test.use({
   drupalInstallOptions: {
     setupFile:
-      'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
+      'core/modules/search/tests/src/Nightwatch/Tests/Olivero/TestSiteOliveroInstallTestScript.php',
     installProfile: 'minimal',
   },
 });
@@ -78,24 +78,25 @@ test.describe('Olivero search form', { tag: ['@core', '@olivero'] }, () => {
     // Wait for transitionend event to fire.
     await page.waitForTimeout(400);
 
-    // Focus should be on the wide search input.
+    // Assert that focus is moved to wide search text input.
     const inputFocused = await page.evaluate(
       (sel) => document.activeElement.matches(sel),
       searchWideInputSelector,
     );
     expect(inputFocused).toBe(true);
 
-    // Shift+Tab should keep search form visible (focus on disclosure button).
+    // Assert that search form is still visible when focus is on disclosure button.
     await page.keyboard.down('Shift');
     await page.keyboard.press('Tab');
     await page.waitForTimeout(50);
     await expect(page.locator(searchWideSelector)).toBeVisible();
 
-    // Another Tab (with Shift held) should close search form.
+    // Assert that search form is NOT visible when focus moves back to menu item.
     await page.keyboard.press('Tab');
-    await page.keyboard.up('Shift');
     await page.waitForTimeout(50);
     await page.locator(searchWideSelector).waitFor({ state: 'hidden' });
+    // Release SHIFT key.
+    await page.keyboard.up('Shift');
   });
 
   test('search narrow form is accessible', async ({ drupalPage: page }) => {

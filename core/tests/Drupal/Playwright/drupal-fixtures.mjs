@@ -8,15 +8,13 @@ function testSiteCommand(command) {
     : `php scripts/test-site.php ${command}`;
   try {
     return execSync(cmd).toString().trim();
-  }
-  catch (error) {
+  } catch (error) {
     const stdout = error.stdout?.toString().trim() || '';
     const stderr = error.stderr?.toString().trim() || '';
     const details = [stdout, stderr].filter(Boolean).join('\n');
-    throw new Error(
-      `Command failed: ${cmd}${details ? `\n${details}` : ''}`,
-      { cause: error },
-    );
+    throw new Error(`Command failed: ${cmd}${details ? `\n${details}` : ''}`, {
+      cause: error,
+    });
   }
 }
 

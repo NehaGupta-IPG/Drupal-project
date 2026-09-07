@@ -12,7 +12,7 @@ const headerSelector = '#edit-field-multiple-value-form-field-wrapper h4';
 test.use({
   drupalInstallOptions: {
     setupFile:
-      'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
+      'core/themes/olivero/tests/TestSite/TestSiteOliveroInstallTestScript.php',
     installProfile: 'minimal',
   },
 });
@@ -27,12 +27,12 @@ test.describe(
       await drupalCreateUser(page, {
         name: 'user',
         password: '123',
-        permissions: ['access site-wide contact form'],
+        permissions: ['create article content'],
       });
       await drupalLogin(page, { name: 'user', password: '123' });
 
       await page.setViewportSize({ width: 1400, height: 800 });
-      await page.goto('./contact/olivero_test_contact_form');
+      await page.goto('./node/add/article');
       await expect(page.locator(tableSelector)).toBeVisible();
       await expect(page.locator(tableSelector)).toHaveClass(
         /tabledrag-disabled/,
