@@ -22,7 +22,8 @@ class PoDatabaseWriter implements PoWriterInterface {
    *   - customized: boolean indicating that customized strings should be
    *     overwritten.
    * - customized: the strings being imported should be saved as customized.
-   *     One of LOCALE_CUSTOMIZED or LOCALE_NOT_CUSTOMIZED.
+   *     One of LocaleDefaultOptions::CUSTOMIZED or
+   *     LocaleDefaultOptions::NOT_CUSTOMIZED.
    *
    * @var array
    */
@@ -118,7 +119,8 @@ class PoDatabaseWriter implements PoWriterInterface {
    *     - customized: Boolean indicating that customized strings should be
    *       overwritten.
    *   - customized: The strings being imported should be saved as customized.
-   *     One of LOCALE_CUSTOMIZED or LOCALE_NOT_CUSTOMIZED.
+   *     One of LocaleDefaultOptions::CUSTOMIZED or
+   *     LocaleDefaultOptions::NOT_CUSTOMIZED.
    */
   public function setOptions(array $options) {
     if (!isset($options['overwrite_options'])) {
@@ -129,7 +131,7 @@ class PoDatabaseWriter implements PoWriterInterface {
       'customized' => FALSE,
     ];
     $options += [
-      'customized' => LOCALE_NOT_CUSTOMIZED,
+      'customized' => LocaleDefaultOptions::NOT_CUSTOMIZED,
     ];
     $this->options = $options;
   }
@@ -241,7 +243,7 @@ class PoDatabaseWriter implements PoWriterInterface {
 
     if (!empty($translation)) {
       // Skip this string unless it passes a check for dangerous code.
-      if (!locale_string_is_safe($translation)) {
+      if (!LocaleXss::stringIsSafe($translation)) {
         \Drupal::logger('locale')->error('Import of string "%string" was skipped because of disallowed or malformed HTML.', ['%string' => $translation]);
         $this->report['skips']++;
         return 0;
