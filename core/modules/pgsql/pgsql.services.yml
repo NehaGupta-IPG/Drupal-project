@@ -2,10 +2,6 @@ parameters:
   pgsql.skip_procedural_hook_scan: true
 
 services:
-  _defaults:
-    autoconfigure: true
-    autowire: true
   pgsql.entity.query.sql:
     class: Drupal\pgsql\EntityQuery\QueryFactory
-  queue.database:
-    class: Drupal\pgsql\Queue\QueueDatabaseFactory
+    autowire: true

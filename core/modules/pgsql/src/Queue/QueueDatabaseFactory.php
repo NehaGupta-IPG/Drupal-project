@@ -13,10 +13,11 @@ class QueueDatabaseFactory extends CoreQueueDatabaseFactory {
    * {@inheritdoc}
    */
   public function get($name) {
-    // The pgsql module may be installed while another driver provides the
-    // default connection, for example when PostgreSQL is only used for a
-    // non-default connection. Only use the PostgreSQL specific queue when
-    // the queue connection actually is PostgreSQL.
+    // This factory is only used when the default connection is PostgreSQL, but
+    // the connection the queue runs on is a service argument a site can point
+    // at another connection. Fall back to the generic queue when it does, so
+    // that PostgreSQL specific SQL is never sent to another database.
+    // @see \Drupal\pgsql\PgsqlServiceProvider::alter()
     if ($this->connection->databaseType() === 'pgsql') {
       return new DatabaseQueue($name, $this->connection);
     }

@@ -26,6 +26,11 @@ class DatabaseQueueTest extends DriverSpecificKernelTestBase {
     $factory = $this->container->get('queue.database');
     $this->assertInstanceOf(QueueDatabaseFactory::class, $factory);
     $this->assertInstanceOf(DatabaseQueue::class, $factory->get($this->randomMachineName()));
+
+    // Only the class of the core service is replaced, so the queue is still
+    // collected in the queue factory's service locator under its own name.
+    // @see \Drupal\pgsql\PgsqlServiceProvider::alter()
+    $this->assertInstanceOf(DatabaseQueue::class, $this->container->get('queue')->get($this->randomMachineName()));
   }
 
   /**
