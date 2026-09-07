@@ -6,7 +6,18 @@ function testSiteCommand(command) {
   const cmd = process.env.DRUPAL_TEST_WEBSERVER_USER
     ? `sudo -u ${process.env.DRUPAL_TEST_WEBSERVER_USER} php scripts/test-site.php ${command}`
     : `php scripts/test-site.php ${command}`;
-  return execSync(cmd).toString().trim();
+  try {
+    return execSync(cmd).toString().trim();
+  }
+  catch (error) {
+    const stdout = error.stdout?.toString().trim() || '';
+    const stderr = error.stderr?.toString().trim() || '';
+    const details = [stdout, stderr].filter(Boolean).join('\n');
+    throw new Error(
+      `Command failed: ${cmd}${details ? `\n${details}` : ''}`,
+      { cause: error },
+    );
+  }
 }
 
 /**
