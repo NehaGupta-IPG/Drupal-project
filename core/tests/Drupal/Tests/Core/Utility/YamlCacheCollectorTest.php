@@ -9,10 +9,12 @@ use Drupal\Component\Datetime\Time;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\CacheCollector;
+use Drupal\Core\Discovery\YamlCacheCollectorDiscovery;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Lock\NullLockBackend;
 use Drupal\Core\Utility\YamlCacheCollector;
 use Drupal\Tests\UnitTestCase;
+use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -85,6 +87,32 @@ class YamlCacheCollectorTest extends UnitTestCase {
 
     $cached = $this->cacheBackend->get('key');
     $this->assertArrayNotHasKey('foo_bar.txt', $cached->data);
+  }
+
+  /**
+   * Tests that discovery destruction does not read time after cache reset.
+   */
+  public function testDiscoveryDestructionAfterCacheReset(): void {
+    $directory = vfsStream::setup('modules', NULL, [
+      'example.links.menu.yml' => "example.link:\n  title: Example\n",
+    ]);
+    $time = $this->createMock(TimeInterface::class);
+    // Only the initial cache write needs the current time. A decorated time
+    // service may query the database after its connected has closed
+    // during shutdown.
+    $time->expects($this->once())
+      ->method('getCurrentTime')
+      ->willReturn($this->time->getCurrentTime());
+    $collector = new YamlCacheCollector($this->cid, $this->cacheBackend, $this->lock, $time);
+    $discovery = new YamlCacheCollectorDiscovery('links.menu', ['example' => $directory->url()], $collector);
+
+    $this->assertSame([
+      'example' => ['example.link' => ['title' => 'Example']],
+    ], $discovery->findAll());
+
+    // findAll() has already flushed and reset the collector. Destruction must
+    // not access the time service again if there is no remaining cache work.
+    unset($discovery);
   }
 
 }
