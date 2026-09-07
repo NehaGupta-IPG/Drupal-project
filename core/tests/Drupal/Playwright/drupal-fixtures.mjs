@@ -90,6 +90,18 @@ export const test = base.extend({
       drupalInstallOptions,
     );
 
+    // A workaround for the Playwright issue with root-relative paths.
+    // Overrides goto so root-relative paths ("/foo") resolve against baseURL
+    // as "./foo" instead of being treated as host-absolute.
+    // @see https://github.com/microsoft/playwright/issues/39720
+    const originalGoto = page.goto.bind(page);
+    page.goto = async (url, options) => {
+      if (typeof url === 'string' && url.startsWith('/')) {
+        url = '.' + url;
+      }
+      return originalGoto(url, options);
+    };
+
     await use(page);
 
     await page.context().close();
