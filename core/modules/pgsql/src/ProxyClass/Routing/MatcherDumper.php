@@ -12,8 +12,7 @@ namespace Drupal\pgsql\ProxyClass\Routing {
      *
      * @see \Drupal\Component\ProxyBuilder
      */
-    class MatcherDumper implements \Drupal\Core\Routing\MatcherDumperInterface
-    {
+    class MatcherDumper implements \Drupal\Core\Routing\MatcherDumperInterface {
 
         use \Drupal\Core\DependencyInjection\DependencySerializationTrait;
 

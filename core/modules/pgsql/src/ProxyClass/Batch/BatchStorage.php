@@ -12,8 +12,7 @@ namespace Drupal\pgsql\ProxyClass\Batch {
      *
      * @see \Drupal\Component\ProxyBuilder
      */
-    class BatchStorage implements \Drupal\Core\Batch\BatchStorageInterface
-    {
+    class BatchStorage implements \Drupal\Core\Batch\BatchStorageInterface {
 
         use \Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
