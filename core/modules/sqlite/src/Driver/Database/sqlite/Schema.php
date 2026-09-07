@@ -2,6 +2,7 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
 use Drupal\Core\Database\SchemaException;
@@ -348,8 +349,14 @@ class Schema extends DatabaseSchema {
     if (!$this->tableExists($table)) {
       return FALSE;
     }
+    // SQLite validates a view only when it is used, so dropping the table
+    // leaves the views that read it in place and broken. SQLite keeps no
+    // dependency catalog to say which ones those are, so drop the ones that
+    // stop resolving instead.
+    $shapes_before = $this->queryViewShapes($this->getPrefixInfo($table)['schema']);
     $this->connection->tableDropped = TRUE;
     $this->executeDdlStatement('DROP TABLE {' . $table . '}');
+    $this->dropBrokenViews($shapes_before, []);
     return TRUE;
   }
 
@@ -519,39 +526,172 @@ class Schema extends DatabaseSchema {
     $old_count = $this->connection->query('SELECT COUNT(*) FROM {' . $table . '}')->fetchField();
     $new_count = $this->connection->query('SELECT COUNT(*) FROM {' . $new_table . '}')->fetchField();
     if ($old_count == $new_count) {
-      // SQLite cannot rename the replacement table while a view references
-      // the dropped table. Because SQLite has no dependency catalog, preserve
-      // and recreate every view in the schema.
-      $info = $this->getPrefixInfo($table);
-      // Don't use {} around sqlite_master table.
-      $views = $this->connection->query('SELECT name, sql FROM [' . $info['schema'] . '].sqlite_master WHERE type = :type ORDER BY rowid', [
-        ':type' => 'view',
-      ])->fetchAllKeyed();
+      $schema = $this->getPrefixInfo($table)['schema'];
+      $shapes_before = $this->queryViewShapes($schema);
 
-      // Prepare every statement before dropping anything. Restore the schema
-      // omitted by sqlite_master while preserving the optional output-column
-      // list. The pattern ignores parentheses inside quoted identifiers.
-      $recreate_statements = [];
-      foreach ($views as $view_name => $view_sql) {
-        $view_sql = preg_replace('/^CREATE\s+VIEW\s+(?:"[^"]+"|\[[^\]]+\]|`[^`]+`|[^\s(]+)\s*(\((?:"[^"]*"|`[^`]*`|\[[^\]]*\]|[^()])*\))?\s+AS\s/is', 'CREATE VIEW [' . $info['schema'] . '].[' . $view_name . ']$1 AS ', $view_sql, 1, $count);
-        if (!$count) {
-          throw new SchemaException("Unable to recreate the SQL view $view_name.");
+      // Views temporarily reference a missing table between DROP and RENAME.
+      // Legacy mode skips view validation and preserves their definitions
+      // until the replacement table takes the original name.
+      $this->connection->query('PRAGMA legacy_alter_table = ON');
+      try {
+        $this->connection->tableDropped = TRUE;
+        $this->executeDdlStatement('DROP TABLE {' . $table . '}');
+        $this->renameTable($new_table, $table);
+      }
+      finally {
+        $this->connection->query('PRAGMA legacy_alter_table = OFF');
+      }
+
+      $this->dropBrokenViews($shapes_before, array_diff(array_keys($old_schema['fields']), array_keys($new_schema['fields'])));
+    }
+  }
+
+  /**
+   * Records what every SQL view of an attached database resolves to.
+   *
+   * @param string $schema
+   *   The attached database to look in.
+   *
+   * @return array
+   *   The return value of ::queryViewShape() for each view, keyed by view
+   *   name.
+   */
+  private function queryViewShapes(string $schema): array {
+    $shapes = [];
+    foreach ($this->queryViewNames($schema) as $view_name) {
+      $shapes[$view_name] = $this->queryViewShape($view_name);
+    }
+    return $shapes;
+  }
+
+  /**
+   * Drops the SQL views that a schema change broke.
+   *
+   * @param array $shapes_before
+   *   The return value of ::queryViewShapes() from before the change.
+   * @param string[] $removed_columns
+   *   The names of the columns the change removed from the table.
+   */
+  private function dropBrokenViews(array $shapes_before, array $removed_columns): void {
+    // Dropping a view breaks the views reading it, and those may have been
+    // checked already, so keep going until a pass drops nothing.
+    do {
+      $dropped = FALSE;
+      foreach ($shapes_before as $view_name => $shape) {
+        if ($shape !== NULL && $this->viewIsBroken($shape, $this->queryViewShape($view_name), $removed_columns)) {
+          $this->dropView($view_name);
+          unset($shapes_before[$view_name]);
+          $dropped = TRUE;
         }
-        $recreate_statements[] = $view_sql;
       }
+    } while ($dropped);
+  }
 
-      foreach (array_keys($views) as $view_name) {
-        $this->dropView($view_name);
+  /**
+   * Describes what a SQL view resolves to.
+   *
+   * @param string $view
+   *   The name of the view, without prefixing.
+   *
+   * @return array|null
+   *   An array with two keys: 'columns', the names of the columns the view
+   *   returns, and 'literals', how many times each string literal occurs in
+   *   the compiled query, keyed by the literal in ASCII lower case to match
+   *   SQLite's identifier comparison. NULL when the view does not resolve.
+   */
+  private function queryViewShape(string $view): ?array {
+    $columns = $this->queryViewColumns($view);
+    if ($columns === NULL) {
+      return NULL;
+    }
+    $literals = [];
+    // An unresolved double-quoted identifier can become a string literal.
+    // EXPLAIN exposes these literals even in expressions and WHERE clauses.
+    try {
+      $rows = $this->connection->query('EXPLAIN SELECT * FROM {' . $view . '}')->fetchAll();
+    }
+    catch (DatabaseException) {
+      // The view lists its columns but its query does not compile.
+      return NULL;
+    }
+    foreach ($rows as $row) {
+      if ($row->opcode === 'String8') {
+        $literal = strtolower($row->p4);
+        $literals[$literal] = ($literals[$literal] ?? 0) + 1;
       }
+    }
+    return ['columns' => $columns, 'literals' => $literals];
+  }
 
-      $this->dropTable($table);
-      $this->renameTable($new_table, $table);
-
-      foreach ($recreate_statements as $view_sql) {
-        // A view selecting from a column that no longer exists is still
-        // recreated: SQLite validates a view only when it is queried.
-        $this->executeDdlStatement($view_sql);
+  /**
+   * Tells whether a schema change broke a SQL view.
+   *
+   * A view is broken if it no longer resolves, loses an output column, or
+   * gains a literal matching a removed column name.
+   *
+   * @param array $before
+   *   The shape from ::queryViewShape() before the change.
+   * @param array|null $after
+   *   The shape after the change.
+   * @param string[] $removed_columns
+   *   The names of the columns the change removed from the table.
+   *
+   * @return bool
+   *   TRUE if the view should be dropped.
+   */
+  private function viewIsBroken(array $before, ?array $after, array $removed_columns): bool {
+    // SELECT * may gain or reorder columns without losing any references.
+    if ($after === NULL || array_diff($before['columns'], $after['columns'])) {
+      return TRUE;
+    }
+    // Only compare literals matching removed column names. Added virtual
+    // generated columns can introduce unrelated literals into the query.
+    foreach ($removed_columns as $column) {
+      $column = strtolower($column);
+      if (($after['literals'][$column] ?? 0) > ($before['literals'][$column] ?? 0)) {
+        return TRUE;
       }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Returns the names of the SQL views of an attached database.
+   *
+   * @param string $schema
+   *   The attached database to look in.
+   *
+   * @return string[]
+   *   The view names, without prefixing.
+   */
+  private function queryViewNames(string $schema): array {
+    // Don't use {} around sqlite_master table.
+    return $this->connection->query('SELECT name FROM [' . $schema . '].sqlite_master WHERE type = :type', [
+      ':type' => 'view',
+    ])->fetchCol();
+  }
+
+  /**
+   * Returns the names of the columns a SQL view produces.
+   *
+   * @param string $view
+   *   The name of the view, without prefixing.
+   *
+   * @return string[]|null
+   *   The column names, in the order the view returns them, or NULL when the
+   *   view does not resolve at all.
+   */
+  private function queryViewColumns(string $view): ?array {
+    $info = $this->getPrefixInfo($view);
+    try {
+      // Don't use {} around the pragma argument.
+      return $this->connection
+        ->query('PRAGMA [' . $info['schema'] . '].table_info([' . $info['table'] . '])')
+        ->fetchCol(1);
+    }
+    catch (DatabaseException) {
+      // A view naming a column that is gone fails to resolve here.
+      return NULL;
     }
   }
 

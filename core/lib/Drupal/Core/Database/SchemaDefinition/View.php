@@ -36,11 +36,9 @@ final class View {
    * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
    */
   private function validate(): void {
-
     if ($this->name === '') {
       throw new SchemaDefinitionException("The 'name' argument of a View cannot be empty");
     }
-
   }
 
 }

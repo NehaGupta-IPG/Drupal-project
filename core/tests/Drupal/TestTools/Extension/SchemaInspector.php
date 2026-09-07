@@ -35,7 +35,7 @@ class SchemaInspector {
       $schema = $handler->invoke($module, 'schema') ?? [];
       // @todo Remove Schema check in drupal:13.0.0.
       if ($schema instanceof Schema) {
-        assert(in_array($schema->type, [SchemaDefinitionType::Module, SchemaDefinitionType::Test], TRUE), 'Invalid schema definition type, must be SchemaDefinitionType::Module or SchemaDefinitionType::Test');
+        assert($schema->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
         assert($schema->name === $module, 'Invalid schema definition name, must be equal to the module name');
         return $schema;
       }

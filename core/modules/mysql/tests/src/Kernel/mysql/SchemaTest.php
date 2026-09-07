@@ -58,19 +58,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   /**
    * {@inheritdoc}
    */
-  public function checkSqlViewExists(bool $exists, string $view): void {
-    $get_prefix_info = new \ReflectionMethod($this->schema, 'getPrefixInfo');
-    $info = $get_prefix_info->invoke($this->schema, $view);
-    $found = (bool) $this->connection->query('SELECT 1 FROM information_schema.views WHERE table_schema = :schema AND table_name = :name', [
-      ':schema' => $info['database'],
-      ':name' => $info['table'],
-    ])->fetchField();
-    $this->assertSame($exists, $found);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function assertCollation(): void {
     // Make sure that varchar fields have the correct collations.
     $columns = $this->connection->query('SHOW FULL COLUMNS FROM {test_table}');

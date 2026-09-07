@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\sqlite\Kernel\sqlite;
 
-use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnExpression;
@@ -55,20 +54,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       }
     }
     $this->fail("Column '$column' was not found in table '$table'.");
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkSqlViewExists(bool $exists, string $view): void {
-    $get_prefix_info = new \ReflectionMethod($this->schema, 'getPrefixInfo');
-    $info = $get_prefix_info->invoke($this->schema, $view);
-    // Don't use {} around sqlite_master table.
-    $found = (bool) $this->connection->query('SELECT 1 FROM [' . $info['schema'] . '].sqlite_master WHERE type = :type AND name = :name', [
-      ':type' => 'view',
-      ':name' => $info['table'],
-    ])->fetchField();
-    $this->assertSame($exists, $found);
   }
 
   /**
@@ -129,10 +114,12 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     // Leave the column unquoted so SQLite reports it as missing instead of
     // treating a double-quoted name as a string literal.
     $this->schema->createView('test_name_view', 'SELECT name FROM {test_alter}');
+    // An unresolved reference preserves its case when interpreted as a
+    // literal. The alias keeps the output column name unchanged.
+    $this->schema->createView('test_upper_view', 'SELECT [NAME] AS [value] FROM {test_alter}');
     // Create directly because createView() does not expose SQLite's optional
-    // output-column list. The rebuild must preserve it.
+    // output-column list. The rebuild leaves it alone.
     $this->connection->query('CREATE VIEW {test_column_list_view} (id_a, id_b) AS SELECT [id] AS a, [id] AS b FROM {test_alter}');
-    // Cover a closing parenthesis inside a quoted output-column name.
     $this->connection->query('CREATE VIEW {test_quoted_paren_view} ("id)a") AS SELECT [id] AS a FROM {test_alter}');
 
     // Changing a field recreates the table through a scratch table.
@@ -158,13 +145,39 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->assertEquals(42, $record['id_b']);
     $this->assertEquals(42, $this->connection->query('SELECT [id)a] FROM {test_quoted_paren_view}')->fetchField());
 
-    // A view selecting from a dropped column survives the rebuild but fails
-    // when queried, matching SQLite's lazy view validation.
+    // Recreate the base view so cleanup encounters its dependent view first.
+    $this->schema->createView('test_star_base', 'SELECT * FROM {test_alter}');
+    $this->schema->createView('test_star_nested', 'SELECT [id] FROM {test_star_base}');
+    $this->schema->createView('test_star_base', 'SELECT * FROM {test_alter}', TRUE);
+
+    // Drop views that read the removed column and preserve the others.
     $this->schema->dropField('test_alter', 'name');
-    $this->assertTrue($this->schema->viewExists('test_name_view'));
+    $this->assertFalse($this->schema->viewExists('test_name_view'));
+    $this->assertFalse($this->schema->viewExists('test_upper_view'), 'The view reading the column in another case goes.');
+    $this->assertFalse($this->schema->viewExists('test_star_base'), 'The SELECT * view lost a column and goes.');
+    $this->assertFalse($this->schema->viewExists('test_star_nested'), 'The view over it goes too, whichever is checked first.');
+
+    // A virtual generated column is computed when read, so a SELECT * view
+    // picks up the literals of its expression. That is not a broken
+    // reference. The new index forces the rebuild that checks the views.
+    $this->schema->createView('test_star_view', 'SELECT * FROM {test_alter}');
+    $this->schema->addField('test_alter', 'flag', [
+      'type' => 'varchar',
+      'length' => 3,
+      'generated' => Column::generated(
+        name: 'flag',
+        type: ColumnType::Varchar,
+        storage: GeneratedColumnStorage::Virtual,
+        expression: new GeneratedColumnExpression("CASE WHEN [id] > 0 THEN 'yes' ELSE 'no' END"),
+        length: 3,
+      ),
+    ], ['indexes' => ['test_alter_id' => ['id']]]);
+    $this->assertTrue($this->schema->viewExists('test_star_view'), 'The SELECT * view survives a virtual column with literals.');
+    $this->assertSame('yes', $this->connection->query('SELECT [flag] FROM {test_star_view}')->fetchField());
+    $this->assertTrue($this->schema->viewExists('test_id_view'));
+    $this->assertTrue($this->schema->viewExists('test_id_view_2'));
+    $this->assertTrue($this->schema->viewExists('test_alter_0'));
     $this->assertEquals(42, $this->connection->query('SELECT [id] FROM {test_id_view_2}')->fetchField());
-    $this->expectException(DatabaseExceptionWrapper::class);
-    $this->connection->query('SELECT [name] FROM {test_name_view}')->fetchField();
   }
 
   /**

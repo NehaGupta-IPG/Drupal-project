@@ -86,6 +86,9 @@ class SchemaDefinitionTest extends UnitTestCase {
     // Check ::viewNames().
     $this->assertSame(['foo_view'], $schemaDefinition->viewNames());
 
+    // A view has no legacy array form, so ::toArray() leaves it out.
+    $this->assertSame(['foo', 'bar'], array_keys($schemaDefinition->toArray()));
+
     // Check ::getViewDefinition().
     $viewDefinition = $schemaDefinition->getViewDefinition('foo_view');
     $this->assertInstanceOf(View::class, $viewDefinition);

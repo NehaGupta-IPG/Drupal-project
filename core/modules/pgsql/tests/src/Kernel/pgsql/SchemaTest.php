@@ -47,19 +47,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   /**
    * {@inheritdoc}
    */
-  public function checkSqlViewExists(bool $exists, string $view): void {
-    $get_prefix_info = new \ReflectionMethod($this->schema, 'getPrefixInfo');
-    $info = $get_prefix_info->invoke($this->schema, $view);
-    $found = (bool) $this->connection->query('SELECT 1 FROM pg_views WHERE schemaname = :schema AND viewname = :view', [
-      ':schema' => $info['schema'],
-      ':view' => $info['table'],
-    ])->fetchField();
-    $this->assertSame($exists, $found);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function checkSequenceRenaming(string $tableName): void {
     // For PostgreSQL, we also need to check that the sequence has been renamed.
     // The initial name of the sequence has been generated automatically by
@@ -76,26 +63,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
 
     $sequenceExists = (bool) $this->connection->query("SELECT pg_get_serial_sequence('{" . $anotherTableName . "}', 'id')")->fetchField();
     $this->assertTrue($sequenceExists, 'Sequence was renamed.');
-  }
-
-  /**
-   * Tests that findViews() orders a view after the view it selects from.
-   */
-  public function testFindViewsOrder(): void {
-    $table_specification = [
-      'fields' => [
-        'id' => [
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-        ],
-      ],
-    ];
-    $this->schema->createTable('test_order_table', $table_specification);
-    $this->schema->createView('test_order_base', 'SELECT [id] FROM {test_order_table}');
-    $this->schema->createView('test_order_derived', 'SELECT [id] FROM {test_order_base}');
-
-    $this->assertSame(['test_order_base', 'test_order_derived'], array_values($this->schema->findViews('test_order_%')));
   }
 
   /**

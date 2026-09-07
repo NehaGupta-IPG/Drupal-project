@@ -80,13 +80,8 @@ class EnvironmentCleaner implements EnvironmentCleanerInterface {
     $schema = $this->testDatabase->schema();
     $count = 0;
     // Drop views, including views built on other views, before their tables.
-    $views = [];
-    foreach ($schema->findViews('test%') as $view) {
-      // Only drop views which begin with 'test' followed by digits.
-      if (preg_match('/^test\d+.*/', $view, $matches)) {
-        $views[] = $matches[0];
-      }
-    }
+    // Only drop views which begin with 'test' followed by digits.
+    $views = preg_grep('/^test\d+/', $schema->findViews('test%'));
     $schema->dropViews($views);
     $count += count($views);
     $tables = $schema->findTables('test%');

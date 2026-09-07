@@ -15,9 +15,6 @@ interface SchemaDefinitionInterface {
    * @return array
    *   The legacy array-based specification.
    *
-   * @throws \LogicException
-   *   When the object cannot be represented as a legacy array specification.
-   *
    * @internal
    */
   public function toArray(): array;

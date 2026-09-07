@@ -756,20 +756,17 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     foreach ($tables as $table) {
       if ($specification instanceof Schema) {
         try {
-          $table_definition = $specification->getTableDefinition($table);
-          $schema->createTableFromDefinition($specification->type, $specification->name, $table_definition);
-          continue;
-        }
-        catch (SchemaDefinitionException) {
-          // The name might be a SQL view instead of a table.
-        }
-        try {
-          $view_definitions[] = $specification->getViewDefinition($table);
-          continue;
+          if (in_array($table, $specification->viewNames(), TRUE)) {
+            $view_definitions[] = $specification->getViewDefinition($table);
+          }
+          else {
+            $schema->createTableFromDefinition($specification->type, $specification->name, $specification->getTableDefinition($table));
+          }
         }
         catch (SchemaDefinitionException) {
           throw new \LogicException("$module module does not define a schema for table or view '$table'.");
         }
+        continue;
       }
       if (empty($specification[$table])) {
         throw new \LogicException("$module module does not define a schema for table '$table'.");

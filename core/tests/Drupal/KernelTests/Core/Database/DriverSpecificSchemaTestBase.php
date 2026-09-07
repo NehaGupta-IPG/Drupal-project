@@ -83,20 +83,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   abstract public function checkGeneratedColumnStorage(GeneratedColumnStorage $storage, string $table, string $column): void;
 
   /**
-   * Checks whether a SQL view exists in the database catalog.
-   *
-   * Drivers can override this method to query their database catalog directly.
-   *
-   * @param bool $exists
-   *   Whether the view is expected to exist.
-   * @param string $view
-   *   The view to test.
-   */
-  public function checkSqlViewExists(bool $exists, string $view): void {
-    $this->assertSame($exists, $this->schema->viewExists($view));
-  }
-
-  /**
    * Tests inserting data into an existing table.
    *
    * @param string $table
@@ -1264,11 +1250,9 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     $this->assertFalse($this->schema->viewExists('test_view'));
     $this->assertFalse($this->schema->viewExists('test_table'), 'Table is not checked by viewExists() method');
-    $this->checkSqlViewExists(FALSE, 'test_view');
 
     $this->schema->createView('test_view', 'SELECT [id], [name] FROM {test_table}');
     $this->assertTrue($this->schema->viewExists('test_view'));
-    $this->checkSqlViewExists(TRUE, 'test_view');
 
     $this->assertTrue($this->schema->tableExists('test_table'), 'Table exists');
     $this->assertFalse($this->schema->tableExists('test_view'), 'View is not checked by tableExists() method');
@@ -1334,7 +1318,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     $this->assertTrue($this->schema->dropView('test_view'));
     $this->assertFalse($this->schema->viewExists('test_view'));
-    $this->checkSqlViewExists(FALSE, 'test_view');
     $this->assertEquals([], $this->schema->findViews('t%'));
     $this->assertFalse($this->schema->dropView('test_view'));
 
@@ -1387,7 +1370,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->schema->createSchemaFromDefinition($schemaDefinition);
     $this->assertTrue($this->schema->tableExists($tableName));
     $this->assertTrue($this->schema->viewExists($viewName));
-    $this->checkSqlViewExists(TRUE, $viewName);
 
     $this->connection->insert($tableName)->fields(['name' => 'John'])->execute();
     $shout = $this->connection
@@ -1424,6 +1406,173 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     // dependent view.
     $this->assertTrue($this->schema->dropView($viewName));
     $this->assertTrue($this->schema->dropTable($tableName));
+  }
+
+  /**
+   * Tests that dropping a table also drops its dependent views.
+   */
+  public function testDropTableWithDependentViews(): void {
+    $this->setUpDependentView();
+    $this->schema->createView('dep_view_nested', 'SELECT [id], [name] FROM {dep_view}');
+    $this->schema->createTable('spare_table', [
+      'fields' => ['id' => ['type' => 'int', 'not null' => TRUE]],
+    ]);
+    $this->connection->insert('spare_table')->fields(['id' => 1])->execute();
+    $this->schema->createView('spare_view', 'SELECT [id] FROM {spare_table}');
+    // A literal containing the view's own qualified name must not be
+    // mistaken for a dependency cycle.
+    $self_reference = '`' . $this->connection->getConnectionOptions()['database'] . '`.`' . $this->connection->getPrefix() . 'dep_view_self`';
+    $this->schema->createView('dep_view_self', "SELECT [id], '$self_reference' AS [me] FROM {dep_table}");
+
+    $this->assertTrue($this->schema->dropTable('dep_table'));
+
+    // Drop dependent views and preserve unrelated views.
+    $this->assertFalse($this->schema->viewExists('dep_view'));
+    $this->assertFalse($this->schema->viewExists('dep_view_nested'), 'A view reading a dropped view goes too.');
+    $this->assertFalse($this->schema->viewExists('dep_view_self'));
+    $this->assertTrue($this->schema->viewExists('spare_view'));
+    $this->assertSame(1, (int) $this->connection->query('SELECT COUNT(*) FROM {spare_view}')->fetchField());
+
+    $this->schema->dropView('spare_view');
+    $this->schema->dropTable('spare_table');
+  }
+
+  /**
+   * Tests that renaming a table keeps the views that read it working.
+   */
+  public function testRenameTableWithDependentViews(): void {
+    $this->setUpDependentView();
+    $this->schema->createView('dep_view_nested', 'SELECT [id], [name] FROM {dep_view}');
+
+    $this->schema->renameTable('dep_table', 'dep_table_renamed');
+
+    $this->assertTrue($this->schema->tableExists('dep_table_renamed'));
+    $this->assertTrue($this->schema->viewExists('dep_view'));
+    $this->assertTrue($this->schema->viewExists('dep_view_nested'));
+    $this->assertSame('John', $this->connection->query('SELECT [name] FROM {dep_view}')->fetchField());
+    $this->assertSame('John', $this->connection->query('SELECT [name] FROM {dep_view_nested}')->fetchField());
+
+    // Verify that the views read new rows from the renamed table.
+    $this->connection->insert('dep_table_renamed')
+      ->fields(['id' => 2, 'name' => 'Jane', 'spare' => ''])
+      ->execute();
+    $this->assertSame(2, (int) $this->connection->query('SELECT COUNT(*) FROM {dep_view_nested}')->fetchField());
+
+    $this->schema->dropViews(['dep_view', 'dep_view_nested', 'dep_view_star']);
+    $this->schema->dropTable('dep_table_renamed');
+  }
+
+  /**
+   * Tests that a view survives changes that leave the columns it reads alone.
+   */
+  public function testDependentViewSurvivesSchemaOperations(): void {
+    $operations = [
+      'dropUnusedField' => fn () => $this->schema->dropField('dep_table', 'spare'),
+      'changeUsedFieldType' => fn () => $this->schema->changeField('dep_table', 'name', 'name', [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ]),
+      'addField' => fn () => $this->schema->addField('dep_table', 'added', [
+        'type' => 'int',
+        'not null' => FALSE,
+      ]),
+      'addIndex' => fn () => $this->schema->addIndex('dep_table', 'ix', ['spare'], [
+        'fields' => ['spare' => ['type' => 'varchar', 'length' => 32]],
+      ]),
+      'dropPrimaryKey' => fn () => $this->schema->dropPrimaryKey('dep_table'),
+    ];
+
+    foreach ($operations as $scenario => $operation) {
+      $this->setUpDependentView();
+
+      $operation();
+
+      $this->assertSame('John', $this->connection->query('SELECT [name] FROM {dep_view}')->fetchField(), "The view still reads correctly after '$scenario'.");
+      // SELECT * depends on every column, including the dropped one.
+      $star_survives = $scenario !== 'dropUnusedField';
+      $this->assertSame($star_survives, $this->schema->viewExists('dep_view_star'), "Whether the SELECT * view is still there after '$scenario'.");
+      if ($star_survives) {
+        $this->assertSame('John', $this->connection->query('SELECT [name] FROM {dep_view_star}')->fetchField(), "The SELECT * view still reads correctly after '$scenario'.");
+      }
+
+      $this->schema->dropViews(['dep_view', 'dep_view_star']);
+      $this->schema->dropTable('dep_table');
+    }
+  }
+
+  /**
+   * Tests that renaming a column drops the views reading it and keeps the rest.
+   */
+  public function testRenameFieldDropsDependentViews(): void {
+    $this->setUpDependentView();
+    $this->schema->createView('dep_view_nested', 'SELECT [id], [name] FROM {dep_view}');
+    $this->schema->createView('dep_view_spare', 'SELECT [id], [spare] FROM {dep_table}');
+
+    $this->schema->changeField('dep_table', 'name', 'label', [
+      'type' => 'varchar',
+      'length' => 64,
+      'not null' => TRUE,
+      'default' => '',
+    ]);
+
+    $this->assertTrue($this->schema->fieldExists('dep_table', 'label'));
+    $this->assertFalse($this->schema->fieldExists('dep_table', 'name'));
+    $this->assertFalse($this->schema->viewExists('dep_view'), 'The view reading the renamed column goes.');
+    $this->assertFalse($this->schema->viewExists('dep_view_nested'), 'The view reading that view goes too.');
+    $this->assertFalse($this->schema->viewExists('dep_view_star'), 'The SELECT * view goes.');
+    $this->assertTrue($this->schema->viewExists('dep_view_spare'), 'The view reading other columns is kept.');
+    $this->assertSame('unused', $this->connection->query('SELECT [spare] FROM {dep_view_spare}')->fetchField());
+
+    $this->schema->dropView('dep_view_spare');
+    $this->schema->dropTable('dep_table');
+  }
+
+  /**
+   * Tests that a view is only dropped when the change actually breaks it.
+   */
+  public function testDependentViewsAreKeptWhereTheyStillWork(): void {
+    $this->setUpDependentView();
+    // Reads a column that survives; every other view reads 'name'.
+    $this->schema->createView('dep_view_spare', 'SELECT [id], [spare] FROM {dep_table}');
+    $this->schema->createView('dep_view_nested', 'SELECT [id], [name] FROM {dep_view}');
+    // The dropped column does not show in the names these views return.
+    $this->schema->createView('dep_view_aliased', 'SELECT [id], [name] AS [value] FROM {dep_table}');
+    $this->schema->createView('dep_view_function', 'SELECT [id], UPPER([name]) AS [shout] FROM {dep_table}');
+    $this->schema->createView('dep_view_where', "SELECT [id] FROM {dep_table} WHERE [name] <> 'x'");
+
+    $this->schema->dropField('dep_table', 'name');
+
+    $this->assertFalse($this->schema->viewExists('dep_view'), 'The view reading the dropped column goes.');
+    $this->assertFalse($this->schema->viewExists('dep_view_nested'), 'The view reading that view goes too.');
+    $this->assertFalse($this->schema->viewExists('dep_view_star'), 'The SELECT * view lost a column and goes.');
+    $this->assertFalse($this->schema->viewExists('dep_view_aliased'), 'The view reading the column under another name goes.');
+    $this->assertFalse($this->schema->viewExists('dep_view_function'), 'The view reading the column inside a function goes.');
+    $this->assertFalse($this->schema->viewExists('dep_view_where'), 'The view reading the column in a condition goes.');
+    $this->assertTrue($this->schema->viewExists('dep_view_spare'), 'The view reading other columns is kept.');
+    $this->assertSame('unused', $this->connection->query('SELECT [spare] FROM {dep_view_spare}')->fetchField());
+
+    $this->schema->dropView('dep_view_spare');
+    $this->schema->dropTable('dep_table');
+  }
+
+  /**
+   * Creates a table with one row and a view selecting from it.
+   */
+  protected function setUpDependentView(): void {
+    $this->schema->createTable('dep_table', [
+      'fields' => [
+        'id' => ['type' => 'int', 'not null' => TRUE],
+        'name' => ['type' => 'varchar', 'length' => 32, 'not null' => TRUE, 'default' => ''],
+        'spare' => ['type' => 'varchar', 'length' => 32, 'not null' => TRUE, 'default' => ''],
+      ],
+    ]);
+    $this->connection->insert('dep_table')
+      ->fields(['id' => 1, 'name' => 'John', 'spare' => 'unused'])
+      ->execute();
+    $this->schema->createView('dep_view', 'SELECT [id], [name] FROM {dep_table}');
+    $this->schema->createView('dep_view_star', 'SELECT * FROM {dep_table}');
   }
 
   /**

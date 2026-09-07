@@ -25,9 +25,7 @@ enum SchemaDefinitionType: string {
   // Schemas provided by migration.
   case Migrate = 'migrate';
 
-  // Schemas that exist for test purposes, whether built inline in a test
-  // class or provided via hook_schema() by a module installed only for
-  // testing.
+  // Schemas provided by test classes for test purposes.
   case Test = 'test';
 
 }

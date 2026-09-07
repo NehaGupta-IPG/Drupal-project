@@ -509,6 +509,24 @@ use Drupal\Core\Database\SchemaDefinition\ViewQuery;
  * select query without parameters. Identifier and table-prefix replacement
  * also affects literal square or curly brackets inside strings.
  *
+ * Schema operations on a table treat the views that read it the same way on
+ * every database:
+ * - A view that still works after the change is kept, with the same column
+ *   names it returned before. Renaming a table, changing a column type,
+ *   adding a column, and adding or dropping keys and indexes keep the views
+ *   working.
+ * - A view that reads a dropped or renamed column cannot work and is
+ *   dropped, together with every view that reads it. A SELECT * view
+ *   reads every column. Dropping a table drops the views that read it.
+ * Nothing recreates a dropped view. A module that declares views over a table
+ * and drops or renames a column they read in an update hook has to create
+ * the views again in that update hook, from definitions that suit the
+ * changed table.
+ * Views are dropped and created again outside any transaction on MySQL, so a
+ * failure in the middle of a schema operation can leave them dropped. A view
+ * created outside Drupal with its own DEFINER, SQL SECURITY, ALGORITHM or
+ * CHECK OPTION comes back with the defaults after a rename on MySQL.
+ *
  * @see \Drupal\Core\Extension\ModuleInstaller::installSchema()
  * @see \Drupal\Core\Extension\ModuleInstaller::uninstallSchema()
  * @see \Drupal\TestTools\Extension\SchemaInspector::getTablesSpecification()
