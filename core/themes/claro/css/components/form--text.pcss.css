@@ -128,3 +128,20 @@
 .form-element--type-textarea.error + .ck-editor > .ck-editor__main {
   border: var(--input--error-border-size) solid var(--input--error-border-color);
 }
+
+/* The machine name field appears on pages such as 'edit menu' and 'add content
+type'. This field initially appears but then is hidden by machine-name.js, which
+causes a layout shift. To mitigate this, we hide the same selectors via CSS when
+we know that JavaScript is enabled. Note that this field needs to be visible in
+the case where its in an error status (like if it's indicating a duplicate
+machine name. */
+@media (scripting: enabled) {
+  .js-form-item:has(.form-element--api-machine-name:not(.error)) {
+    display: none;
+  }
+}
+
+/* Hide the machine name field when JavaScript is disabled or unsupported */
+html:not(.js) .js-form-item:has(.form-element--api-machine-name:not(.error)) {
+  display: none;
+}
