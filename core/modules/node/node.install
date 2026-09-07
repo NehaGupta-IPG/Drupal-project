@@ -15,6 +15,7 @@ use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 
 /**
@@ -116,8 +117,12 @@ function node_install(): void {
   // these permissions. Doing so also allows tests to continue to operate as
   // expected without first having to manually grant these default permissions.
   if (\Drupal::moduleHandler()->moduleExists('user')) {
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access content']);
-    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access content']);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)?->grantPermissions([
+      'access content',
+    ])?->save();
+    Role::loadOverrideFree(RoleInterface::AUTHENTICATED_ID)?->grantPermissions([
+      'access content',
+    ])?->save();
   }
 
   // Populate the node access table.
