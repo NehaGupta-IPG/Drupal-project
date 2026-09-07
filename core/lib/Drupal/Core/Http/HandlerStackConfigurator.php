@@ -3,7 +3,6 @@
 namespace Drupal\Core\Http;
 
 use GuzzleHttp\HandlerStack;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a class for configuring middlewares on the http handler stack.
@@ -29,30 +28,20 @@ class HandlerStackConfigurator {
   protected $middlewares = NULL;
 
   /**
-   * A list of used middleware service IDs.
+   * The middleware services.
    *
-   * @var string[]
+   * @var iterable
    */
-  protected $middlewareIds = [];
-
-  /**
-   * The service container.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
-   */
-  protected $container;
+  protected $middlewareServices;
 
   /**
    * Constructs a new HandlerStackConfigurator object.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The service container.
-   * @param string[] $middleware_ids
-   *   The middleware IDs.
+   * @param iterable $middleware_services
+   *   The middleware services.
    */
-  public function __construct(ContainerInterface $container, array $middleware_ids) {
-    $this->middlewareIds = $middleware_ids;
-    $this->container = $container;
+  public function __construct(iterable $middleware_services) {
+    $this->middlewareServices = $middleware_services;
   }
 
   /**
@@ -61,8 +50,7 @@ class HandlerStackConfigurator {
   protected function initializeMiddlewares() {
     if (!isset($this->middlewares)) {
       $this->middlewares = [];
-      foreach ($this->middlewareIds as $middleware_id) {
-        $middleware = $this->container->get($middleware_id);
+      foreach ($this->middlewareServices as $middleware_id => $middleware) {
         if (is_callable($middleware)) {
           $this->middlewares[$middleware_id] = $middleware();
         }

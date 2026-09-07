@@ -678,9 +678,7 @@ services:
   http_handler_stack_configurator:
     class: Drupal\Core\Http\HandlerStackConfigurator
     public: false
-    arguments: ['@service_container']
-    tags:
-      - { name: service_id_collector, tag: http_client_middleware }
+    arguments: [!tagged_iterator http_client_middleware]
   Drupal\Core\Http\HandlerStackConfigurator: '@http_handler_stack_configurator'
   http_client:
     class: GuzzleHttp\Client
