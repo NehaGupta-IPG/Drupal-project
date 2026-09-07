@@ -1526,17 +1526,17 @@ class SystemRequirementsHooks {
       $system_settings = \Drupal::config('system.performance');
       $css_preprocess = $system_settings->get('css.preprocess');
       $js_preprocess = $system_settings->get('js.preprocess');
-        $requirements['preprocess_enabled'] = [
-          'title' => $this->t('Bandwidth optimization'),
-          'value' => $this->t('Enabled'),
-          'description' => $this->t('Aggregating CSS and JavaScript files reduces both the size and number of requests made to your website. See the @link settings page.', [
-            '@link' => Link::createFromRoute(
-              'Performance',
-              'system.performance_settings',
-            )->toString(),
-          ]),
-          'severity' => RequirementSeverity::Info,
-        ];
+      $requirements['preprocess_enabled'] = [
+        'title' => $this->t('Bandwidth optimization'),
+        'value' => $this->t('Enabled'),
+        'description' => $this->t('Aggregating CSS and JavaScript files reduces both the size and number of requests made to your website. See the @link settings page.', [
+          '@link' => Link::createFromRoute(
+            'Performance',
+            'system.performance_settings',
+          )->toString(),
+        ]),
+        'severity' => RequirementSeverity::Info,
+      ];
       if (!$css_preprocess || !$js_preprocess) {
         $requirements['preprocess_enabled']['value'] = $this->t('Disabled');
         $requirements['preprocess_enabled']['severity'] = RequirementSeverity::Warning;
