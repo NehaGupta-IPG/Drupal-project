@@ -370,8 +370,11 @@ default:
     KUBERNETES_CPU_REQUEST: "16"
     YARN_ENABLE_GLOBAL_CACHE: false
     YARN_ENABLE_MIRROR: false
+    SELENIUM_REMOTE_URL: "http://selenium:4444/"
+
   services:
     - <<: *with-database
+    - <<: *with-selenium-chrome
   script:
     - export DRUPAL_TEST_DB_URL=$SIMPLETEST_DB
     - export DRUPAL_TEST_BASE_URL=$SIMPLETEST_BASE_URL
@@ -381,7 +384,6 @@ default:
     - corepack enable
     - yarn install
     - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
-    - yarn playwright install --with-deps chromium-headless-shell
     - yarn test:playwright
   artifacts:
     when: always
@@ -397,7 +399,6 @@ default:
         - ./core/yarn.lock
     paths:
       - ./core/.yarn/cache
-      - /root/.cache/ms-playwright
     policy: pull
 
 '👷️️️ PHPUnit Build':
