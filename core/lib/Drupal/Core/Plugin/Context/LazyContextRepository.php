@@ -2,27 +2,13 @@
 
 namespace Drupal\Core\Plugin\Context;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * Provides a context repository which uses context provider services.
  */
 class LazyContextRepository implements ContextRepositoryInterface {
-
-  /**
-   * The set of available context providers service IDs.
-   *
-   * @var string[]
-   *   Context provider service IDs.
-   */
-  protected $contextProviderServiceIDs = [];
-
-  /**
-   * The service container.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
-   */
-  protected $container;
 
   /**
    * The statically cached contexts.
@@ -34,15 +20,14 @@ class LazyContextRepository implements ContextRepositoryInterface {
   /**
    * Constructs a LazyContextRepository object.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The current service container.
-   * @param string[] $context_provider_service_ids
-   *   The set of the available context provider service IDs.
+   * @param \Symfony\Contracts\Service\ServiceProviderInterface $container
+   *   A service locator containing the services tagged 'context_provider',
+   *   keyed by service ID.
    */
-  public function __construct(ContainerInterface $container, array $context_provider_service_ids) {
-    $this->container = $container;
-    $this->contextProviderServiceIDs = $context_provider_service_ids;
-  }
+  public function __construct(
+    #[AutowireLocator('context_provider')]
+    protected ServiceProviderInterface $container,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -85,7 +70,7 @@ class LazyContextRepository implements ContextRepositoryInterface {
    */
   public function getAvailableContexts() {
     $contexts = [];
-    foreach ($this->contextProviderServiceIDs as $service_id) {
+    foreach (array_keys($this->container->getProvidedServices()) as $service_id) {
       $contexts_by_service = $this->container->get($service_id)->getAvailableContexts();
       foreach ($contexts_by_service as $unqualified_context_id => $context) {
         $context_id = '@' . $service_id . ':' . $unqualified_context_id;
