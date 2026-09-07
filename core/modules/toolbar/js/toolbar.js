@@ -205,18 +205,20 @@
           });
         }
 
+        let height;
         window.addEventListener('dialog:aftercreate', (e) => {
           const $element = $(e.target);
           const { settings } = e;
           const toolbarBar = document.getElementById('toolbar-bar');
+
           if (toolbarBar) {
-            toolbarBar.style.marginTop = '0';
+            if ($element[0].classList.contains('ui-dialog-position-top')) {
+              toolbarBar.style.marginTop = '0';
+            }
 
             // When off-canvas is positioned in top, toolbar has to be moved down.
             if (settings.drupalOffCanvasPosition === 'top') {
-              const height = Drupal.offCanvas
-                .getContainer($element)
-                .outerHeight();
+              height = Drupal.offCanvas.getContainer($element).outerHeight();
               toolbarBar.style.marginTop = `${height}px`;
 
               $element.on('dialogContentResize.off-canvas', () => {
@@ -231,8 +233,9 @@
 
         window.addEventListener('dialog:beforeclose', () => {
           const toolbarBar = document.getElementById('toolbar-bar');
+          const activeDialog = document.activeElement.closest('.ui-dialog');
           if (toolbarBar) {
-            toolbarBar.style.marginTop = '0';
+            toolbarBar.style.marginTop = activeDialog ? `${height}px` : '0';
           }
         });
       });
