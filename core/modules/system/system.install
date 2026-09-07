@@ -71,3 +71,22 @@ function system_update_12001(): TranslatableMarkup|null {
   }
   return NULL;
 }
+
+/**
+ * Removes the orphan system.performance.stale_file_threshold config key.
+ *
+ * The key was removed from the schema in #3301573 (committed to 11.x in
+ * July 2023) without a corresponding update hook to clean it from active
+ * configuration. The 10.2.x deprecation re-add (#3410301) gave 10.x sites
+ * a window to manually clean it via config export/import; sites that
+ * upgraded directly from earlier versions to 11.x without that step
+ * carry the orphan key forward and hit form-save errors on
+ * /admin/config/development/performance.
+ *
+ * @see https://www.drupal.org/project/drupal/issues/3587940
+ */
+function system_update_12002(): void {
+  \Drupal::configFactory()->getEditable('system.performance')
+    ->clear('stale_file_threshold')
+    ->save();
+}
