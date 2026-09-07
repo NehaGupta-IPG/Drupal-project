@@ -24,6 +24,13 @@ final class KeyColumn implements SchemaDefinitionInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function arrayPropertyNormalizationKeys(): array {
+    return [];
+  }
+
+  /**
    * The key column cannot be converted to an array.
    *
    * @throws \LogicException

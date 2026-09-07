@@ -94,6 +94,18 @@ final class Table implements SchemaDefinitionInterface {
   /**
    * {@inheritdoc}
    */
+  public function arrayPropertyNormalizationKeys(): array {
+    return [
+      'columns' => 'name',
+      'uniqueKeys' => 'name',
+      'indexes' => 'name',
+      'foreignKeys' => 'name',
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function toArray(): array {
     $spec = [];
     if ($this->description !== NULL) {

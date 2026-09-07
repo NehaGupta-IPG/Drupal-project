@@ -44,6 +44,15 @@ final class Schema implements SchemaDefinitionInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function arrayPropertyNormalizationKeys(): array {
+    return [
+      'tables' => 'name',
+    ];
+  }
+
+  /**
    * Returns the names of the tables.
    *
    * @return list<string>

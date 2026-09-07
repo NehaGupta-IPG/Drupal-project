@@ -217,6 +217,13 @@ final class Column implements SchemaDefinitionInterface {
   /**
    * {@inheritdoc}
    */
+  public function arrayPropertyNormalizationKeys(): array {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function toArray(): array {
     $spec = [];
     if ($this->type) {
