@@ -171,8 +171,11 @@ default:
     fi
   # Get the cache file from the artifacts of the latest successful job from the
   # target branch. Allow the job to proceed and pass if the file doesn't exist.
-  - if [[ "$DAILY_TEST" != "1" ]]; then
-      echo Downloading $CACHE_URL && curl --fail --location --create-dirs --output $CACHE_FILE "$CACHE_URL" || true
+  - |
+    if [[ "$DAILY_TEST" != "1" ]]; then
+      [[ echo Downloading $CACHE_URL && curl --fail --location --create-dirs --output $CACHE_FILE "$CACHE_URL" || true ]]
+    else
+      echo Skipping cache download on daily pipeline
     fi
 
 .core-spellcheck: &core-spellcheck
