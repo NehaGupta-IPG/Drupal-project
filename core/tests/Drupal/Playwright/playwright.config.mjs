@@ -17,6 +17,7 @@ export default defineConfig({
     baseURL: `${process.env.DRUPAL_TEST_BASE_URL}/`,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
-    headless: true,
+    // headless: true,
+    headless: !!process.env.DRUPAL_PLAYWRIGHT_HEADED
   },
 });
