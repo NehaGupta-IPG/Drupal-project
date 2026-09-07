@@ -98,15 +98,6 @@ export default defineConfig(
       'yml/indent': ['error', 2],
       ...noJQuery.configs.all.rules,
     },
-    overrides: [
-      {
-        files: ["tests/Drupal/Playwright/**/*.mjs"],
-        rules: {
-          "no-restricted-syntax": "off",
-          "no-await-in-loop": "off"
-        }
-      }
-    ],
     settings: {
       jsdoc: {
         tagNamePreference: {
@@ -114,6 +105,13 @@ export default defineConfig(
           property: 'prop',
         },
       },
+    },
+  },
+  {
+    files: ['tests/Drupal/Playwright/**/*.mjs'],
+    rules: {
+      'no-restricted-syntax': 'off',
+      'no-await-in-loop': 'off',
     },
   },
 );
