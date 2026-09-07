@@ -68,10 +68,10 @@ class UserDeprecatedPermissionsTest extends BrowserTestBase {
     $this->grantPermissions(Role::load($this->rid), ['f', 'i']);
 
     $this->drupalGet('admin/people/permissions');
-    $row = $this->xpath('//tr[@data-drupal-selector="edit-permissions-e"]');
+    $row = $this->getNodeElementsByXpath('//tr[@data-drupal-selector="edit-permissions-e"]');
     // Check class of table row.
     $this->assertStringContainsString('deprecated', $row[0]->getAttribute('class'));
-    $warning = $this->xpath('//tr[@data-drupal-selector="edit-permissions-e"]//em');
+    $warning = $this->getNodeElementsByXpath('//tr[@data-drupal-selector="edit-permissions-e"]//em');
     $this->assertCount(1, $warning);
     $this->assertSame('The "e" permission is deprecated in drupal:12.0.0 and is removed from drupal:12.1.0. There is no replacement.', $warning[0]->getText());
     // Checkboxes for all roles should be disabled.
@@ -79,10 +79,10 @@ class UserDeprecatedPermissionsTest extends BrowserTestBase {
     $this->assertSession()->elementAttributeExists('css', '[name="authenticated[e]"]', 'disabled');
     $this->assertSession()->elementAttributeExists('css', '[name="' . $this->rid . '[e]"]', 'disabled');
 
-    $row = $this->xpath('//tr[@data-drupal-selector="edit-permissions-f"]');
+    $row = $this->getNodeElementsByXpath('//tr[@data-drupal-selector="edit-permissions-f"]');
     // Check class of table row.
     $this->assertStringContainsString('deprecated', $row[0]->getAttribute('class'));
-    $warning = $this->xpath('//tr[@data-drupal-selector="edit-permissions-f"]//em');
+    $warning = $this->getNodeElementsByXpath('//tr[@data-drupal-selector="edit-permissions-f"]//em');
     $this->assertCount(1, $warning);
     $this->assertSame('The "f" permission is deprecated in drupal:12.0.0 and is removed from drupal:12.1.0. There is no replacement.', $warning[0]->getText());
     // Checkboxes for anonymous and authenticated role should be disabled.
@@ -92,10 +92,10 @@ class UserDeprecatedPermissionsTest extends BrowserTestBase {
     $this->assertSession()->checkboxChecked($this->rid . '[f]');
     $this->assertSession()->elementAttributeNotExists('css', '[name="' . $this->rid . '[f]"]', 'disabled');
 
-    $row = $this->xpath('//tr[@data-drupal-selector="edit-permissions-h"]');
+    $row = $this->getNodeElementsByXpath('//tr[@data-drupal-selector="edit-permissions-h"]');
     // Check class of table row.
     $this->assertStringContainsString('deprecated', $row[0]->getAttribute('class'));
-    $warning = $this->xpath('//tr[@data-drupal-selector="edit-permissions-h"]//em');
+    $warning = $this->getNodeElementsByXpath('//tr[@data-drupal-selector="edit-permissions-h"]//em');
     $this->assertCount(2, $warning);
     $this->assertSame('Warning: Give to trusted roles only; this permission has security implications.', $warning[0]->getText());
     $this->assertSame('The "h" permission is deprecated in drupal:12.0.0 and is removed from drupal:12.1.0. There is no replacement.', $warning[1]->getText());
@@ -104,10 +104,10 @@ class UserDeprecatedPermissionsTest extends BrowserTestBase {
     $this->assertSession()->elementAttributeExists('css', '[name="authenticated[h]"]', 'disabled');
     $this->assertSession()->elementAttributeExists('css', '[name="' . $this->rid . '[h]"]', 'disabled');
 
-    $row = $this->xpath('//tr[@data-drupal-selector="edit-permissions-i"]');
+    $row = $this->getNodeElementsByXpath('//tr[@data-drupal-selector="edit-permissions-i"]');
     // Check class of table row.
     $this->assertStringContainsString('deprecated', $row[0]->getAttribute('class'));
-    $warning = $this->xpath('//tr[@data-drupal-selector="edit-permissions-i"]//em');
+    $warning = $this->getNodeElementsByXpath('//tr[@data-drupal-selector="edit-permissions-i"]//em');
     $this->assertCount(2, $warning);
     $this->assertSame('Warning: Give to trusted roles only; this permission has security implications.', $warning[0]->getText());
     $this->assertSame('The "i" permission is deprecated in drupal:12.0.0 and is removed from drupal:12.1.0. There is no replacement.', $warning[1]->getText());
