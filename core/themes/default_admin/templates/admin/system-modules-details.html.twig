@@ -24,12 +24,14 @@
  * @ingroup themeable
  */
 #}
+{{ attach_library('core/drupal.dropbutton') }}
 <table class="responsive-enabled module-list">
   <thead>
     <tr>
       <th class="checkbox visually-hidden">{{ 'Installed'|t }}</th>
       <th class="name visually-hidden">{{ 'Name'|t }}</th>
       <th class="description visually-hidden priority-low">{{ 'Description'|t }}</th>
+      <th class="module-list__operations visually-hidden">{{ 'Operations'|t }}</th>
     </tr>
   </thead>
   <tbody>
@@ -58,16 +60,47 @@
                     <div class="module-details__requirement">{{ 'Required by: @module-list'|t({'@module-list': module.required_by}) }}</div>
                   {% endif %}
                 </div>
-                {% if module.links %}
-                  <div class="module-details__links">
-                    {% for link_type in ['help', 'permissions', 'configure'] %}
-                      {{ module.links[link_type] }}
-                    {% endfor %}
-                  </div>
-                {% endif %}
               </div>
             </div>
           </details>
+        </td>
+        <td class="module-list__operations">
+          {% if module.links %}
+            {% set link_count = 0 %}
+            {% set first_link = null %}
+            {% set other_links = [] %}
+            {% for link_type in ['configure', 'permissions', 'help'] %}
+              {% if module.links[link_type] %}
+                {% set link_count = link_count + 1 %}
+                {% if first_link is null %}
+                  {% set first_link = module.links[link_type] %}
+                {% else %}
+                  {% set other_links = other_links|merge([module.links[link_type]]) %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+            
+            {% if link_count == 1 %}
+              <div class="module-details__links">
+                {{ first_link }}
+              </div>
+            {% elseif link_count > 1 %}
+              <div class="dropbutton-wrapper dropbutton-multiple">
+                <div class="dropbutton-widget">
+                  <ul class="dropbutton dropbutton--extrasmall dropbutton--multiple">
+                    <li class="dropbutton__item dropbutton-action">
+                      {{ first_link }}
+                    </li>
+                    {% for link in other_links %}
+                      <li class="dropbutton__item dropbutton-action secondary-action">
+                        {{ link }}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            {% endif %}
+          {% endif %}
         </td>
       </tr>
     {% endfor %}
