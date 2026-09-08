@@ -49,6 +49,10 @@ final class Schema implements SchemaDefinitionInterface {
     if ($this->views && !Inspector::assertAllObjects($this->views, View::class)) {
       throw new SchemaDefinitionException("All members of the 'views' argument of a Schema must be View objects");
     }
+    $viewNames = $this->viewNames();
+    if (count($viewNames) !== count(array_unique($viewNames))) {
+      throw new SchemaDefinitionException("Duplicate views for '{$this->name}' schema: " . implode(', ', $viewNames));
+    }
   }
 
   /**

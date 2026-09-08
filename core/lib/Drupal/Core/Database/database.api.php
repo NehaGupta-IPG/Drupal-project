@@ -707,7 +707,11 @@ function hook_schema(): Schema {
 
   $views[] = new View(
     name: 'users_data_serialized',
-    query: new ViewQuery('SELECT [uid], [module], [name] FROM {users_data} WHERE [serialized] = 1'),
+    query: new ViewQuery(
+      \Drupal::database()->select('users_data', 'ud')
+        ->fields('ud', ['uid', 'module', 'name'])
+        ->where('[ud].[serialized] = 1'),
+    ),
     description: 'The serialized records of the {users_data} table.',
   );
 

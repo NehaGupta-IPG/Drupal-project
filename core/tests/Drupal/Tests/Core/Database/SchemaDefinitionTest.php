@@ -120,6 +120,23 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests rejecting two views with the same name in Schema::$views.
+   */
+  public function testDuplicateViewInSchema(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage("Duplicate views for 'test' schema: foo_view, foo_view");
+    new Schema(
+      type: SchemaDefinitionType::Test,
+      name: 'test',
+      tables: [],
+      views: [
+        new View(name: 'foo_view', query: new ViewQuery('SELECT [id] FROM {foo}')),
+        new View(name: 'foo_view', query: new ViewQuery('SELECT [id] FROM {bar}')),
+      ],
+    );
+  }
+
+  /**
    * Tests rejecting an empty View::$name.
    */
   public function testEmptyViewName(): void {
