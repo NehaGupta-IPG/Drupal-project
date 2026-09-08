@@ -6,9 +6,11 @@ namespace Drupal\Tests\search\Unit;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Language\Language;
 use Drupal\search\Entity\SearchPage;
 use Drupal\search\SearchPageInterface;
 use Drupal\search\SearchPageRepository;
@@ -53,6 +55,13 @@ class SearchPageRepositoryTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $language_manager = $this->createMock('\Drupal\Core\Language\LanguageManagerInterface');
+    $language_manager->method('getCurrentLanguage')
+      ->with()
+      ->willReturn(new Language(['id' => 'en']));
+    $container = new ContainerBuilder();
+    $container->set('language_manager', $language_manager);
+    \Drupal::setContainer($container);
 
     $this->query = $this->createMock('Drupal\Core\Entity\Query\QueryInterface');
 

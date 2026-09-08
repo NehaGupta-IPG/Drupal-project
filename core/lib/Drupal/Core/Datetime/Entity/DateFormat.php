@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Datetime\Entity;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
@@ -82,9 +83,25 @@ class DateFormat extends ConfigEntityBase implements DateFormatInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Callback for uasort() to compare configuration entities.
+   */
+  public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, ?\Collator $collator): int {
+    if ($a->isLocked() == $b->isLocked()) {
+      return SortArray::sortByString($a->label(), $b->label(), $collator);
+    }
+    return $a->isLocked() ? 1 : -1;
+  }
+
+  /**
+   * Helper callback for uasort() to sort configuration entities.
+   *
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
+   * \Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities() instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/2265487
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
+    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
     if ($a->isLocked() == $b->isLocked()) {
       $a_label = $a->label();
       $b_label = $b->label();

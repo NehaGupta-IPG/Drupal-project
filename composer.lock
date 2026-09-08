@@ -368,7 +368,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "768b19e54ebcd94ff909dded39b680c7b99d7f03"
+                "reference": "32b1413ed97a0e6b77cea99d15a5113fbc862c40"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -454,6 +454,9 @@
                 "drupal/core-utility": "self.version",
                 "drupal/core-uuid": "self.version",
                 "drupal/core-version": "self.version"
+            },
+            "suggest": {
+                "ext-intl": "Improves sorting of non-english languages."
             },
             "bin": [
                 "scripts/dr"

@@ -321,7 +321,7 @@ class EntityController implements ContainerInjectionInterface {
     /** @var \Drupal\Core\Entity\EntityDescriptionInterface[] $bundle_entities */
     $bundle_entities = $storage->loadMultiple($bundle_names);
 
-    uasort($bundle_entities, [$bundle_entity_type->getClass(), 'sort']);
+    $bundle_entity_type->getClass()::sortEntities($bundle_entities);
     $bundles = array_replace($bundle_entities, $bundles);
 
     foreach ($bundles as $bundle_name => &$bundle_info) {

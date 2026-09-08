@@ -53,7 +53,8 @@ readonly class FilterFormatRepository implements FilterFormatRepositoryInterface
 
     $formats = $this->entityTypeManager->getStorage('filter_format')
       ->loadByProperties(['status' => TRUE]);
-    uasort($formats, ConfigEntityBase::class . '::sort');
+    // Sort the entities using the entity class's sortEntities() method.
+    ConfigEntityBase::sortEntities($formats);
     $this->cache->set($cid, $formats, Cache::PERMANENT, $this->getCacheTags());
 
     return $formats;

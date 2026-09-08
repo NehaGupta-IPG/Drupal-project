@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Entity;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Plugin\ConfigurableInterface;
@@ -168,9 +169,29 @@ class Action extends ConfigEntityBase implements ActionConfigEntityInterface, En
   }
 
   /**
-   * {@inheritdoc}
+   * Helper callback for uasort() to compare configuration entities.
+   */
+  public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, ?\Collator $collator): int {
+    /** @var \Drupal\system\ActionConfigEntityInterface $a */
+    /** @var \Drupal\system\ActionConfigEntityInterface $b */
+    $a_type = $a->getType();
+    $b_type = $b->getType();
+    if ($a_type != $b_type) {
+      return SortArray::sortByString($a_type, $b_type, $collator);
+    }
+    return parent::compare($a, $b, $collator);
+  }
+
+  /**
+   * Helper callback for uasort() to sort configuration entities.
+   *
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
+   * \Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities() instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/2265487
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
+    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
     /** @var \Drupal\system\ActionConfigEntityInterface $a */
     /** @var \Drupal\system\ActionConfigEntityInterface $b */
     $a_type = $a->getType();

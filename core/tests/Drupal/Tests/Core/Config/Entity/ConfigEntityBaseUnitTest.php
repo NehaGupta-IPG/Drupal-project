@@ -37,6 +37,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use Prophecy\Argument;
 
+// cspell:ignore Émission
+
 /**
  * Tests Drupal\Core\Config\Entity\ConfigEntityBase.
  */
@@ -149,6 +151,9 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $this->languageManager = $this->createStub(LanguageManagerInterface::class);
     $this->languageManager
       ->method('getLanguage')
+      ->willReturn(new Language(['id' => 'en']));
+    $this->languageManager
+      ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => 'en']));
 
     $this->cacheTagsInvalidator = $this->createStub(CacheTagsInvalidatorInterface::class);
@@ -793,7 +798,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   }
 
   /**
-   * Tests sort.
+   * Tests ConfigEntityBase::sort.
    */
   public function testSort(): void {
     $this->setUpMockEntityType();
@@ -802,28 +807,28 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       ->with('label')
       ->willReturn('label');
 
-    $entity_a = new SortTestConfigEntityWithWeight(['label' => 'foo'], $this->entityTypeId);
-    $entity_b = new SortTestConfigEntityWithWeight(['label' => 'bar'], $this->entityTypeId);
+    $entity_a = new SortTestConfigEntityWithWeight(['label' => 'Format 100x100'], $this->entityTypeId);
+    $entity_b = new SortTestConfigEntityWithWeight(['label' => 'Format 10x10'], $this->entityTypeId);
 
     // Test sorting by label.
     $list = [$entity_a, $entity_b];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
-    $this->assertSame($entity_b, $list[0]);
+    ConfigEntityBase::sortEntities($list);
+    $this->assertSame($entity_b, reset($list));
 
     $list = [$entity_b, $entity_a];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
-    $this->assertSame($entity_b, $list[0]);
+    ConfigEntityBase::sortEntities($list);
+    $this->assertSame($entity_b, reset($list));
 
     // Test sorting by weight.
     $entity_a->weight = 0;
     $entity_b->weight = 1;
     $list = [$entity_b, $entity_a];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
-    $this->assertSame($entity_a, $list[0]);
+    ConfigEntityBase::sortEntities($list);
+    $this->assertSame($entity_a, reset($list));
 
     $list = [$entity_a, $entity_b];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
-    $this->assertSame($entity_a, $list[0]);
+    ConfigEntityBase::sortEntities($list);
+    $this->assertSame($entity_a, reset($list));
   }
 
   /**

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Config\Entity;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
@@ -240,9 +241,49 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   }
 
   /**
+   * Sorts entities by weight and label (using the natural sort order).
+   *
+   * If this method is overwritten, it is important to use
+   * SortArray::createSortCollator() in order to get the collator and pass it
+   * to the compare() function to preserve multilingual natural sorting.
+   */
+  public static function sortEntities(array &$entities): bool {
+    $collator = SortArray::createSortCollator(\Drupal::service('language_manager')->getCurrentLanguage()->getId());
+    return uasort($entities, function ($a, $b) use ($collator) {
+      return static::compare($a, $b, $collator);
+    });
+  }
+
+  /**
+   * Callback for uasort() to compare entities by weight and label.
+   *
+   * The comparison uses the natural sort order.
+   *
+   * If this method is overwritten, it is important to use
+   * SortArray::sortByString() to compare labels and pass it the collator to
+   * preserve multilingual natural sorting.
+   */
+  public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, ?\Collator $collator): int {
+    $a_weight = $a->weight ?? 0;
+    $b_weight = $b->weight ?? 0;
+    if ($a_weight == $b_weight) {
+      $a_label = $a->label() ?? '';
+      $b_label = $b->label() ?? '';
+      return SortArray::sortByString($a_label, $b_label, $collator);
+    }
+    return $a_weight <=> $b_weight;
+  }
+
+  /**
    * Callback for uasort() to sort configuration entities by weight and label.
+   *
+   * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use
+   * \Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities() instead.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/2265487
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
+    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
     $a_weight = $a->weight ?? 0;
     $b_weight = $b->weight ?? 0;
     if ($a_weight == $b_weight) {

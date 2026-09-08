@@ -10492,12 +10492,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block/tests/modules/block_test/src/Plugin/Condition/MissingSchema.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$position might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/BlockRenderOrderTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$edit might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
@@ -19744,12 +19738,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Select.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$callback of function uasort expects callable\\(Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\)\\: int, \'\\\\\\\\Drupal\\\\\\\\responsive…\' given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/src/Plugin/Field/FieldFormatter/ResponsiveImageFormatter.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$responsive_image_styles in empty\\(\\) always exists and is not falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
@@ -23720,12 +23708,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\Entity\\\\Role\\:\\:preSave\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/src/Entity/Role.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\#2 \\$callback of function uasort expects callable\\(Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\)\\: int, array\\{class\\-string\\<static\\(Drupal\\\\user\\\\Entity\\\\Role\\)\\>, \'sort\'\\} given\\.$#',
-	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/src/Entity/Role.php',
 ];

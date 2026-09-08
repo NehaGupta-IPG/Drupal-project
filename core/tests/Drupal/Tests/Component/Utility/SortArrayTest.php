@@ -10,6 +10,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
+// cspell:ignore Émission
+
 /**
  * Tests the SortArray component.
  */
@@ -356,6 +358,32 @@ class SortArrayTest extends TestCase {
       'another key' => ['a' => 'bee', 'b' => 'see'],
       'one key' => ['one', 'two', 'three'],
     ]);
+  }
+
+  /**
+   * Tests sorting arrays with unicode strings.
+   */
+  public function testSortByString(): void {
+    $string_a = 'Format 100x100';
+    $string_b = 'Format 10x10';
+    // Word with accent.
+    $string_c = 'Émission';
+
+    $collator = \Collator::create('en');
+    $collator->setAttribute(\Collator::NUMERIC_COLLATION, \Collator::ON);
+
+    $this->assertEquals(1, SortArray::sortByString($string_a, $string_b, $collator));
+    $this->assertEquals(1, SortArray::sortByString($string_a, $string_b, NULL));
+
+    $this->assertEquals(-1, SortArray::sortByString($string_b, $string_a, $collator));
+    $this->assertEquals(-1, SortArray::sortByString($string_b, $string_a, NULL));
+
+    // Strnatcasecmp doesn't take accents into account.
+    $this->assertEquals(1, SortArray::sortByString($string_b, $string_c, $collator));
+    $this->assertEquals(-1, SortArray::sortByString($string_b, $string_c, NULL));
+
+    $this->assertEquals(-1, SortArray::sortByString($string_c, $string_b, $collator));
+    $this->assertEquals(1, SortArray::sortByString($string_c, $string_b, NULL));
   }
 
 }
