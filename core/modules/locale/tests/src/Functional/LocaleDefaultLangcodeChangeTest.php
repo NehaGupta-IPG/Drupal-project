@@ -31,7 +31,7 @@ class LocaleDefaultLangcodeChangeTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Tests config is relabelled and retranslated on a default language change.
+   * Tests config is updated and retranslated on a default language change.
    */
   public function testDefaultLanguageChangeRetranslatesConfig(): void {
     // locale_test.translation ships with langcode 'en' and English text.

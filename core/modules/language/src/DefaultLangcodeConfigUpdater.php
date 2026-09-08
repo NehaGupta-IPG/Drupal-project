@@ -71,9 +71,9 @@ class DefaultLangcodeConfigUpdater {
    * target translators worked into.
    *
    * A configuration override already existing for the new default langcode
-   * is absorbed into the configuration being relabelled, then removed: the
-   * new default language can no longer have an override of its own once the
-   * active configuration itself becomes its canonical copy.
+   * is absorbed into the configuration being updated, then removed: the new
+   * default language can no longer have an override of its own once the active
+   * configuration itself becomes its canonical copy.
    *
    * @param string $old_langcode
    *   The previous default langcode.
@@ -120,10 +120,10 @@ class DefaultLangcodeConfigUpdater {
         if ($had_override) {
           // The override predates the new default and holds deliberately
           // authored values for it - more authoritative than whatever the
-          // relabelled configuration currently says. Merge it in before the
-          // active configuration is saved, so a subscriber reacting to the
-          // override's removal below sees the merged content already in
-          // place, not the pre-merge values it is replacing.
+          // updated configuration currently says. Merge it in before the active
+          // configuration is saved, so a subscriber reacting to the override's
+          // removal below sees the merged content already in place, not the
+          // pre-merge values it is replacing.
           $config->setData(NestedArray::mergeDeepArray([$data, $override->get()], TRUE));
         }
         $config->set('langcode', $new_langcode)->save();
@@ -133,10 +133,10 @@ class DefaultLangcodeConfigUpdater {
           // canonical copy.
           $override->delete();
         }
-        // Record which names were actually relabelled to the new default, so
+        // Record which names were actually updated to the new default, so
         // other batch operations (for example locale module translating
         // them) know what to act on.
-        $context['results']['relabelled_names'][] = $name;
+        $context['results']['updated_names'][] = $name;
       }
     }
 

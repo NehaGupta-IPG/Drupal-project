@@ -308,7 +308,7 @@ class ConfigInstallTest extends KernelTestBase {
     $this->installModules(['config_test_language']);
 
     // config_test.dynamic.dotted.english ships with no langcode: it must be
-    // relabelled to the site's configuration default, not left as 'en'.
+    // updated to the site's configuration default, not left as 'en'.
     $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
 
     // config_test.dynamic.dotted.french ships with its own explicit
@@ -316,7 +316,7 @@ class ConfigInstallTest extends KernelTestBase {
     $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.french')->get('langcode'));
 
     // A translatable simple configuration object with no langcode of its own
-    // must be relabelled the same way as a config entity.
+    // must be updated the same way as a config entity.
     $this->assertEquals('fr', $this->config('config_test.langcode_test')->get('langcode'));
   }
 
@@ -358,7 +358,7 @@ class ConfigInstallTest extends KernelTestBase {
     $this->installModules(['config_test_language']);
 
     // config_test.dynamic.dotted.english ships with no langcode of its own,
-    // so it gets relabelled to the site's non-English default.
+    // so it gets updated to the site's non-English default.
     $this->assertEquals('fr', $this->config('config_test.dynamic.dotted.english')->get('langcode'));
 
     // The stored hash must still match a hash calculated from the shipped

@@ -70,7 +70,7 @@ class LocaleThemeInstallTest extends BrowserTestBase {
     $this->rebuildContainer();
 
     // core.date_format.olivero_medium ships with langcode 'en'. ConfigInstaller
-    // should have relabelled it to 'de'.
+    // should have updated it to 'de'.
     $langcode = $this->config('core.date_format.olivero_medium')->get('langcode');
     $this->assertSame('de', $langcode);
 
