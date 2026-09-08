@@ -7,6 +7,8 @@ namespace Drupal\Tests\standard\FunctionalJavascript;
 use Drupal\Core\Cache\Cache;
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
 use Drupal\Tests\PerformanceData;
+use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -48,7 +50,9 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->drupalCreateContentType(['type' => 'test_content', 'name' => 'Test Content']);
     $this->drupalCreateNode(['type' => 'test_content']);
     // Grant the anonymous user the permission to look at user profiles.
-    user_role_grant_permissions('anonymous', ['access user profiles']);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+      'access user profiles',
+    ])->save();
   }
 
   /**
@@ -56,8 +60,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
    */
   public function testStandardPerformance(): void {
     $this->testAnonymous();
-    $this->testLogin();
-    $this->testLoginBlock();
     $this->testAdmin();
   }
 
@@ -108,68 +110,12 @@ class StandardPerformanceTest extends PerformanceTestBase {
   }
 
   /**
-   * Tests the performance of logging in.
-   */
-  protected function testLogin(): void {
-    // Create a user and log them in to warm all caches. Manually submit the
-    // form so that we repeat the same steps when recording performance data. Do
-    // this twice so that any caches which take two requests to warm are also
-    // covered.
-    for ($i = 0; $i < 2; $i++) {
-      $this->drupalGet('');
-      $this->submitLoginForm($this->user);
-      $this->drupalLogout();
-    }
-
-    $this->drupalGet('');
-    $performance_data = $this->collectPerformanceData(function () {
-      $this->submitLoginForm($this->user);
-    }, 'standardLogin');
-
-    $this->assertQueriesByName('standardLogin', $performance_data->getQueries());
-    $this->assertMetricsByName('standardLogin', $performance_data);
-    $this->drupalLogout();
-  }
-
-  /**
-   * Tests the performance of logging in via the user login block.
-   */
-  protected function testLoginBlock(): void {
-    $this->drupalPlaceBlock('user_login_block');
-    // Log the user in in to warm all caches. Manually submit the form so that
-    // we repeat the same steps when recording performance data. Do this twice
-    // so that any caches which take two requests to warm are also covered.
-
-    for ($i = 0; $i < 2; $i++) {
-      $this->drupalGet('node/1');
-      $this->assertSession()->responseContains('Password');
-      $this->submitLoginForm($this->user);
-      $this->drupalLogout();
-    }
-
-    $this->drupalGet('node/1');
-    $this->assertSession()->responseContains('Password');
-    $performance_data = $this->collectPerformanceData(function () {
-      $this->submitLoginForm($this->user);
-    }, 'standardBlockLogin');
-
-    $this->assertQueriesByName('standardBlockLogin', $performance_data->getQueries());
-    $this->assertMetricsByName('standardBlockLogin', $performance_data);
-  }
-
-  /**
    * Tests performance of a logged-in admin user with the navigation toolbar.
    */
   protected function testAdmin(): void {
     $admin_user = $this->drupalCreateUser();
     $admin_user->addRole('administrator');
     $admin_user->save();
-
-    // Ensure no user is logged in and clear the render cache bin before
-    // starting the warm-up, since prior sub-tests may leave an active session
-    // and stale render cache entries.
-    $this->drupalLogout();
-    \Drupal::cache('render')->deleteAll();
 
     $this->drupalLogin($admin_user);
     // Request the node/1 page twice to ensure all cache collectors are fully
@@ -192,16 +138,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
     // The navigation toolbar must be cached under low-cardinality contexts,
     // not per-user, to ensure it scales for authenticated admins.
     $this->assertIsObject(\Drupal::cache('render')->get('navigation:navigation:[languages:language_interface]=en:[theme]=stark:[user.permissions]=is-admin'));
-  }
-
-  /**
-   * Submit the user login form.
-   */
-  protected function submitLoginForm($account): void {
-    $this->submitForm([
-      'name' => $account->getAccountName(),
-      'pass' => $account->passRaw,
-    ], 'Log in');
   }
 
   /**

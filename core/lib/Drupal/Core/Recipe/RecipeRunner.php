@@ -51,7 +51,7 @@ final class RecipeRunner {
    *   The recipe to apply.
    */
   public static function processRecipe(Recipe $recipe): void {
-    $set_is_applying = static::setIsApplying();
+    $set_is_applying = static::tryToSetIsApplying();
     static::processRecipes($recipe->recipes);
     static::processInstall($recipe->install, $recipe->config->getConfigStorage());
     static::processConfiguration($recipe);
@@ -314,7 +314,7 @@ final class RecipeRunner {
     if (empty($modules)) {
       throw new \InvalidArgumentException('No modules provided.');
     }
-    $set_is_applying = static::setIsApplying();
+    $set_is_applying = static::tryToSetIsApplying();
     if ($recipeConfigStorage instanceof Recipe) {
       $recipeConfigStorage = $recipeConfigStorage->config->getConfigStorage();
     }
@@ -369,7 +369,7 @@ final class RecipeRunner {
    *   The batch context if called by a batch.
    */
   public static function installTheme(string $theme, StorageInterface|Recipe $recipeConfigStorage, ?array &$context = NULL): void {
-    $set_is_applying = static::setIsApplying();
+    $set_is_applying = static::tryToSetIsApplying();
     if ($recipeConfigStorage instanceof Recipe) {
       $recipeConfigStorage = $recipeConfigStorage->config->getConfigStorage();
     }
@@ -401,7 +401,7 @@ final class RecipeRunner {
    *   The batch context if called by a batch.
    */
   public static function installConfig(Recipe $recipe, ?array &$context = NULL): void {
-    $set_is_applying = static::setIsApplying();
+    $set_is_applying = static::tryToSetIsApplying();
     static::processConfiguration($recipe);
     $context['message'] = t('Installed configuration for %recipe recipe.', ['%recipe' => $recipe->name]);
     $context['results']['config'][] = $recipe->name;
@@ -419,7 +419,7 @@ final class RecipeRunner {
    *   The batch context if called by a batch.
    */
   public static function installContent(Recipe $recipe, ?array &$context = NULL): void {
-    $set_is_applying = static::setIsApplying();
+    $set_is_applying = static::tryToSetIsApplying();
     static::processContent($recipe->content);
     $context['message'] = t('Created content for %recipe recipe.', ['%recipe' => $recipe->name]);
     $context['results']['content'][] = $recipe->name;
@@ -429,12 +429,12 @@ final class RecipeRunner {
   }
 
   /**
-   * Sets the isApplying flag to TRUE.
+   * Tries to set the isApplying flag to TRUE.
    *
    * @return bool
-   *   TRUE if the flag was set, FALSE if it was already set.
+   *   TRUE if this call set the flag, FALSE if it was already set.
    */
-  private static function setIsApplying(): bool {
+  private static function tryToSetIsApplying(): bool {
     if (!static::$isApplying) {
       static::$isApplying = TRUE;
       return TRUE;
