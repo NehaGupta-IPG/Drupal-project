@@ -55,7 +55,7 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
    *   The batch context.
    */
   public function translateUpdatedConfigOperation(string $new_langcode, &$context): void {
-    $names = $context['results']['update_names'] ?? [];
+    $names = $context['results']['updated_names'] ?? [];
     if (!empty($names)) {
       $this->localeConfigManager->updateConfigTranslations($names, [$new_langcode]);
     }
