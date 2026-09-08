@@ -504,10 +504,8 @@ use Drupal\Core\Database\SchemaDefinition\ViewQuery;
  *
  * Write view queries with curly braces around table names and square brackets
  * around identifiers. View definitions cannot contain bound parameters, so
- * never include user input. A
- * \Drupal\Core\Database\SchemaDefinition\ViewQuery can also be built from a
- * select query without parameters. Identifier and table-prefix replacement
- * also affects literal square or curly brackets inside strings.
+ * never include user input. Identifier and table-prefix replacement also
+ * affects literal square or curly brackets inside strings.
  *
  * Schema operations on a table treat the views that read it the same way on
  * every database:
@@ -707,11 +705,7 @@ function hook_schema(): Schema {
 
   $views[] = new View(
     name: 'users_data_serialized',
-    query: new ViewQuery(
-      \Drupal::database()->select('users_data', 'ud')
-        ->fields('ud', ['uid', 'module', 'name'])
-        ->where('[ud].[serialized] = 1'),
-    ),
+    query: new ViewQuery('SELECT [uid], [module], [name] FROM {users_data} WHERE [serialized] = 1'),
     description: 'The serialized records of the {users_data} table.',
   );
 

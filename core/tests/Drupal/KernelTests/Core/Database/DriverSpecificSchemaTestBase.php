@@ -6,7 +6,6 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaDefinition\Column;
@@ -1378,29 +1377,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       ->execute()
       ->fetchField();
     $this->assertSame('JOHN', $shout);
-
-    // A view query can also be built from a select query without bound
-    // parameters.
-    $select = $this->connection->select($tableName, 't')->fields('t', ['id', 'name']);
-    $select->where('[t].[id] > 0');
-    $this->schema->createViewFromDefinition(SchemaDefinitionType::Test, 'test_schema', new View(
-      name: 'test_people_filtered',
-      query: new ViewQuery($select),
-    ));
-    $this->assertSame('John', $this->connection->query('SELECT [name] FROM {test_people_filtered}')->fetchField());
-    $this->assertTrue($this->schema->dropView('test_people_filtered'));
-
-    // A select query with bound parameters is rejected.
-    $select = $this->connection->select($tableName, 't')
-      ->fields('t', ['id'])
-      ->condition('name', 'John');
-    try {
-      new ViewQuery($select);
-      $this->fail('Building a view query from a select query with bound parameters did not fail.');
-    }
-    catch (SchemaDefinitionException $e) {
-      $this->assertSame('The query of a SQL view cannot contain bound parameters', $e->getMessage());
-    }
 
     // Drop the view first: PostgreSQL refuses to drop a table that has a
     // dependent view.
