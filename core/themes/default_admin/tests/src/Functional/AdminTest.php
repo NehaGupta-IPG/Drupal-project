@@ -21,6 +21,7 @@ class AdminTest extends BrowserTestBase {
   protected static $modules = [
     'block',
     'node',
+    'views',
   ];
 
   /**
@@ -127,6 +128,16 @@ class AdminTest extends BrowserTestBase {
     // Login as admin.
     $this->drupalLogin($this->rootUser);
     $this->assertStringContainsString('"dark_mode":"auto"', $this->drupalGet('edit-form'));
+  }
+
+  /**
+   * Tests the visible heading on views exposed filter forms.
+   */
+  public function testViewsExposedFormFiltersHeading(): void {
+    $this->drupalGet('/admin/content');
+    $this->assertSession()->elementExists('css', 'form.views-exposed-form h2');
+    $this->assertSession()->elementTextEquals('css', 'form.views-exposed-form h2', 'Filter');
+    $this->assertSession()->elementAttributeContains('css', 'form.views-exposed-form', 'aria-label', 'Filter the contents of the Content view');
   }
 
   /**
