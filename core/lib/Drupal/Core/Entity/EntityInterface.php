@@ -10,8 +10,8 @@ use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
  * Defines a common interface for all entity objects.
  *
  * Entities have the option of having an original ID. When the original ID is
- * used it allows the entity to be renamed. In core, this is only supported by
- * configuration entities
+ * used, it allows the entity to be renamed. In core, this is only supported by
+ * configuration entities.
  *
  * @ingroup entity_api
  */
@@ -61,9 +61,9 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
   /**
    * Enforces an entity to be new.
    *
-   * Making an entity as 'new' before saving allows entities with pre-defined
-   * IDs to be duplicated or imported to the site. It is used by the Migrate API
-   * and the experimental Importer Service.
+   * Making an entity 'new' before saving allows entities with pre-defined IDs
+   * to be duplicated or imported to the site. It is used by the Migrate API and
+   * the experimental Importer Service.
    *
    * @param bool $value
    *   (optional) Whether the entity should be forced to be new. Defaults to
