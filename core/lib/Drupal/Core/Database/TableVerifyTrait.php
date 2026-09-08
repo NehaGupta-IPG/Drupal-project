@@ -58,6 +58,9 @@ trait TableVerifyTrait {
   /**
    * Makes sure a table exists before it is used.
    *
+   * Drivers that create tables lazily recover from the statement failure
+   * caused by the missing table, so for those the check is skipped.
+   *
    * @param string $table
    *   The name of the table.
    */
@@ -70,6 +73,9 @@ trait TableVerifyTrait {
     // therefore never reach the hard table exist round trip to the database.
     // See: https://www.drupal.org/node/3615649
     $connection = $this->verifyTableConnection();
+    if ($connection->supportsLazyTableCreation()) {
+      return;
+    }
     if (!$connection->schema()->tableExists($table)) {
       // Another process can create the table at the same time, so a failed
       // creation is ignored. Inside a transaction the savepoint keeps the
