@@ -319,7 +319,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   Permissions to grant.
    */
   protected function grantPermissionsToAnonymousRole(array $permissions) {
-    $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), $permissions);
+    Role::load(RoleInterface::ANONYMOUS_ID)->grantPermissions($permissions)->save();
   }
 
   /**
@@ -329,7 +329,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   Permissions to grant.
    */
   protected function grantPermissionsToAuthenticatedRole(array $permissions) {
-    $this->grantPermissions(Role::load(RoleInterface::AUTHENTICATED_ID), $permissions);
+    Role::load(RoleInterface::AUTHENTICATED_ID)->grantPermissions($permissions)->save();
   }
 
   /**

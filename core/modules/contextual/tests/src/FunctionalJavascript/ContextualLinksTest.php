@@ -55,10 +55,10 @@ class ContextualLinksTest extends WebDriverTestBase {
     $this->assertEmpty($contextualLinks);
 
     // Grant permissions to use contextual links on blocks.
-    $this->grantPermissions(Role::load(Role::AUTHENTICATED_ID), [
+    Role::load(Role::AUTHENTICATED_ID)->grantPermissions([
       'access contextual links',
       'administer blocks',
-    ]);
+    ])->save();
 
     $this->drupalGet('user');
     $contextualLinks = $this->assertSession()->waitForElement('css', '.contextual button');
@@ -114,10 +114,10 @@ class ContextualLinksTest extends WebDriverTestBase {
    * Tests the contextual links destination.
    */
   public function testContextualLinksDestination(): void {
-    $this->grantPermissions(Role::load(Role::AUTHENTICATED_ID), [
+    Role::load(Role::AUTHENTICATED_ID)->grantPermissions([
       'access contextual links',
       'administer blocks',
-    ]);
+    ])->save();
     $this->drupalGet('user');
     $this->assertSession()->waitForElement('css', '.contextual button');
     $expected_destination_value = (string) $this->loggedInUser->toUrl()->toString();
@@ -129,10 +129,10 @@ class ContextualLinksTest extends WebDriverTestBase {
    * Tests the contextual links destination with query.
    */
   public function testContextualLinksDestinationWithQuery(): void {
-    $this->grantPermissions(Role::load(Role::AUTHENTICATED_ID), [
+    Role::load(Role::AUTHENTICATED_ID)->grantPermissions([
       'access contextual links',
       'administer blocks',
-    ]);
+    ])->save();
 
     $this->drupalGet('admin/structure/block', ['query' => ['foo' => 'bar']]);
     $this->assertSession()->waitForElement('css', '.contextual button');

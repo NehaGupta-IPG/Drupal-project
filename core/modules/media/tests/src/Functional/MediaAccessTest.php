@@ -98,7 +98,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $this->assertCacheContext('user.permissions');
     $assert_session->statusCodeEquals(403);
     $permissions = ['create ' . $media_type->id() . ' media'];
-    $this->grantPermissions($role, $permissions);
+    $role->grantPermissions($permissions)->save();
     $this->drupalGet('media/add/' . $media_type->id());
     $this->assertCacheContext('user.permissions');
     $assert_session->statusCodeEquals(200);
@@ -108,7 +108,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
 
     // Verify the author can not view the unpublished media item without
     // 'view own unpublished media' permission.
-    $this->grantPermissions($role, ['view media']);
+    $role->grantPermission('view media')->save();
     $this->drupalGet('media/' . $user_media->id());
     $this->assertNoCacheContext('user');
     $this->assertCacheContext('user.permissions');
@@ -121,13 +121,13 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $assert_session->statusCodeEquals(403);
     $access_result = $user_media->access('view', NULL, TRUE);
     $this->assertSame("The user must be the owner and the 'view own unpublished media' permission is required when the media item is unpublished.", $access_result->getReason());
-    $this->grantPermissions($role, ['view own unpublished media']);
+    $role->grantPermission('view own unpublished media')->save();
     $this->drupalGet('media/' . $user_media->id());
     $this->assertCacheContext('user');
     $assert_session->statusCodeEquals(200);
 
     // Test revision access - logged-in user.
-    $this->grantPermissions($role, ['view all media revisions']);
+    $role->grantPermission('view all media revisions')->save();
     $this->drupalGet('media/' . $user_media->id() . '/revisions');
     $this->assertCacheContext('user');
     $assert_session->statusCodeEquals(200);
@@ -168,7 +168,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $this->assertCacheContext('user.permissions');
     $assert_session->statusCodeEquals(403);
     $permissions = ['create media'];
-    $this->grantPermissions($role, $permissions);
+    $role->grantPermissions($permissions)->save();
     $this->drupalGet('media/add/' . $media_type->id());
     $this->assertCacheContext('user.permissions');
     $assert_session->statusCodeEquals(200);
@@ -186,7 +186,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
       'edit own ' . $user_media->bundle() . ' media',
       'delete own ' . $user_media->bundle() . ' media',
     ];
-    $this->grantPermissions($role, $permissions);
+    $role->grantPermissions($permissions)->save();
     $this->drupalGet('media/' . $user_media->id() . '/edit');
     $this->assertCacheContext('user');
     $assert_session->statusCodeEquals(200);
@@ -207,7 +207,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
       'edit any ' . $media->bundle() . ' media',
       'delete any ' . $media->bundle() . ' media',
     ];
-    $this->grantPermissions($role, $permissions);
+    $role->grantPermissions($permissions)->save();
     $this->drupalGet('media/' . $media->id() . '/edit');
     $this->assertCacheContext('user.permissions');
     $assert_session->statusCodeEquals(200);
@@ -216,7 +216,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $assert_session->statusCodeEquals(200);
 
     // Test the 'access media overview' permission.
-    $this->grantPermissions($role, ['access content overview']);
+    $role->grantPermission('access content overview')->save();
     $this->drupalGet('admin/content');
     $assert_session->linkByHrefNotExists('/admin/content/media');
     $this->assertCacheContext('user');
@@ -225,7 +225,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $mediaOverviewRole = $this->createRole(['access content overview', 'access media overview']);
     $this->nonAdminUser->addRole($mediaOverviewRole)->save();
 
-    $this->grantPermissions($role, ['access user profiles']);
+    $role->grantPermission('access user profiles')->save();
     $this->drupalGet('admin/content');
     $assert_session->linkByHrefExists('/admin/content/media');
     $this->clickLink('Media');
@@ -278,7 +278,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $assert_session->statusCodeEquals(403);
     $access_result = $media->access('view', NULL, TRUE);
     $this->assertSame("The 'view media' permission is required when the media item is published.", $access_result->getReason());
-    $this->grantPermissions($role, ['view media']);
+    $role->grantPermission('view media')->save();
     $this->drupalGet('media/' . $media->id());
     $this->assertCacheContext('user.permissions');
     $assert_session->statusCodeEquals(200);
@@ -349,7 +349,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $user_media->save();
 
     $role = Role::load(RoleInterface::ANONYMOUS_ID);
-    $this->grantPermissions($role, ['view media', 'view own unpublished media']);
+    $role->grantPermissions(['view media', 'view own unpublished media'])->save();
     $this->drupalLogout();
 
     // Make sure anonymous users can access published media.

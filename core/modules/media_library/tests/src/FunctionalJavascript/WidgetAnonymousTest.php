@@ -37,11 +37,11 @@ class WidgetAnonymousTest extends MediaLibraryTestBase {
 
     // Allow the anonymous user to create pages and view media.
     $role = Role::load(RoleInterface::ANONYMOUS_ID);
-    $this->grantPermissions($role, [
+    $role->grantPermissions([
       'access content',
       'create basic_page content',
       'view media',
-    ]);
+    ])->save();
   }
 
   /**
@@ -52,11 +52,11 @@ class WidgetAnonymousTest extends MediaLibraryTestBase {
 
     // Allow the anonymous user to create pages and view media.
     $role = Role::load(RoleInterface::ANONYMOUS_ID);
-    $this->grantPermissions($role, [
+    $role->grantPermissions([
       'access content',
       'create basic_page content',
       'view media',
-    ]);
+    ])->save();
 
     // Ensure the widget works as an anonymous user.
     $this->drupalGet('node/add/basic_page');

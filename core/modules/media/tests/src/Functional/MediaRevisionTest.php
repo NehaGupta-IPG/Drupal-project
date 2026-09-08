@@ -91,13 +91,13 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
     ])->save();
     $this->drupalGet($media->toUrl('revision'));
     $assert->statusCodeEquals(403);
-    $this->grantPermissions($role, ['view any test media revisions']);
+    $role->grantPermissions(['view any test media revisions'])->save();
     $this->drupalGet($media->toUrl('revision'));
     $assert->statusCodeEquals(200);
     Role::loadOverrideFree($role->id())->revokePermissions([
       'view any test media revisions',
     ])->save();
-    $this->grantPermissions($role, ['view all media revisions']);
+    $role->grantPermissions(['view all media revisions'])->save();
     $this->drupalGet($media->toUrl('revision'));
     $assert->statusCodeEquals(200);
 

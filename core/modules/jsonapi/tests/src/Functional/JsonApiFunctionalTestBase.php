@@ -208,10 +208,10 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
       'access user profiles',
     ]);
 
-    $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), [
+    Role::load(RoleInterface::ANONYMOUS_ID)->grantPermissions([
       'access user profiles',
       'administer taxonomy',
-    ]);
+    ])->save();
 
     \Drupal::service('router.builder')->rebuild();
   }

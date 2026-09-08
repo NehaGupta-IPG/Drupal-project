@@ -115,9 +115,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $this->assertSame($node->getTitle() . ' (ca)', $document_ca['data']['attributes']['title']);
 
     // PATCH the 'ca' translation.
-    $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), [
-      'bypass node access',
-    ]);
+    Role::load(RoleInterface::ANONYMOUS_ID)->grantPermission('bypass node access')->save();
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
     $request_options[RequestOptions::BODY] = Json::encode([
@@ -218,9 +216,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $this->assertSame($node->getTitle() . ' (ca)', $document_ca_fr['data']['attributes']['title']);
 
     // PATCH the 'ca-fr' translation.
-    $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), [
-      'bypass node access',
-    ]);
+    Role::load(RoleInterface::ANONYMOUS_ID)->grantPermission('bypass node access')->save();
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
     $request_options[RequestOptions::BODY] = Json::encode([
@@ -243,9 +239,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
    */
   public function testPostTranslation(): void {
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
-    $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), [
-      'bypass node access',
-    ]);
+    Role::load(RoleInterface::ANONYMOUS_ID)->grantPermission('bypass node access')->save();
 
     $title = 'Llamas FTW (ca)';
     $request_document = [
@@ -307,9 +301,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
    */
   public function testDeleteMultilingual(): void {
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
-    $this->grantPermissions(Role::load(RoleInterface::ANONYMOUS_ID), [
-      'bypass node access',
-    ]);
+    Role::load(RoleInterface::ANONYMOUS_ID)->grantPermission('bypass node access')->save();
 
     $response = $this->request('DELETE', Url::fromUri('base:/ca/jsonapi/node/article/' . $this->nodes[0]->uuid()), []);
     $this->assertSame(405, $response->getStatusCode());

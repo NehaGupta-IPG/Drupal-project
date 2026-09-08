@@ -668,7 +668,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   Permissions to grant.
    */
   protected function grantPermissionsToTestedRole(array $permissions) {
-    $this->grantPermissions(Role::load(RoleInterface::AUTHENTICATED_ID), $permissions);
+    Role::load(RoleInterface::AUTHENTICATED_ID)->grantPermissions($permissions)->save();
   }
 
   /**

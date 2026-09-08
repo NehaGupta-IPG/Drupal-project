@@ -246,7 +246,7 @@ trait UserCreationTrait {
 
     // Grant the specified permissions to the role, if any.
     if (!empty($permissions)) {
-      $this->grantPermissions($role, $permissions);
+      $role->grantPermissions($permissions)->save();
       $assigned_permissions = Role::load($role->id())->getPermissions();
       $missing_permissions = array_diff($permissions, $assigned_permissions);
       $this->assertEmpty($missing_permissions);
@@ -282,6 +282,7 @@ trait UserCreationTrait {
    *   (optional) A list of permission names to grant.
    */
   protected function grantPermissions(RoleInterface $role, array $permissions): void {
+    trigger_error(__METHOD__ . ' is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/project/drupal/issues/3621087', E_USER_DEPRECATED);
     foreach ($permissions as $permission) {
       $role->grantPermission($permission);
     }
