@@ -9,6 +9,8 @@ use Drupal\Core\Url;
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,6 +24,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 class BreadcrumbTest extends BrowserTestBase {
 
   use AssertBreadcrumbTrait;
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -69,7 +72,9 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->container->get('theme_installer')->install(['claro']);
     $this->config('system.theme')->set('admin', 'claro')->save();
 
+    $this->enablePromotedContentView();
     $this->config('system.site')->set('page.front', '/node')->save();
+
     $perms = array_keys(\Drupal::service('user.permissions')->getPermissions());
     $this->adminUser = $this->drupalCreateUser($perms);
     $this->drupalLogin($this->adminUser);
@@ -296,7 +301,7 @@ class BreadcrumbTest extends BrowserTestBase {
     // Logout the user because we want to check the active class as well, which
     // is just rendered as anonymous user.
     $this->drupalLogout();
-    foreach ($tags as $name => $data) {
+    foreach ($tags as $data) {
       $term = $data['term'];
       /** @var \Drupal\menu_link_content\MenuLinkContentInterface $link */
       $link = $data['link'];
@@ -325,9 +330,9 @@ class BreadcrumbTest extends BrowserTestBase {
     // Verify breadcrumbs on user and user/%.
     // We need to log back in and out below, and cannot simply grant the
     // 'administer users' permission, since user_page() makes your head explode.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
       'access user profiles',
-    ]);
+    ])->save();
 
     // Verify breadcrumb on front page.
     $this->assertBreadcrumb('<front>', []);

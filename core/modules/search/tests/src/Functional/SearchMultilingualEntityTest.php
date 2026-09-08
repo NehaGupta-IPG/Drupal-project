@@ -11,12 +11,14 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\search\SearchIndexInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests entities with multilingual fields.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchMultilingualEntityTest extends BrowserTestBase {
 
@@ -30,7 +32,7 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
   /**
    * Node search plugin.
    *
-   * @var \Drupal\node\Plugin\Search\NodeSearch
+   * @var \Drupal\node\Plugin\Search\SearchNode
    */
   protected $plugin;
 
@@ -44,6 +46,7 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
     'node',
     'search',
     'search_node',
+    'search_user',
   ];
 
   /**

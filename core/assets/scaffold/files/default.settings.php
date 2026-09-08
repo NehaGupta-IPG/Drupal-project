@@ -311,21 +311,6 @@ $settings['hash_salt'] = '';
  */
 $settings['update_free_access'] = FALSE;
 
-/**
- * Fallback to HTTP for Update Status and for fetching security advisories.
- *
- * If your site fails to connect to updates.drupal.org over HTTPS (either when
- * fetching data on available updates, or when fetching the feed of critical
- * security announcements), you may uncomment this setting and set it to TRUE to
- * allow an insecure fallback to HTTP. Note that doing so will open your site up
- * to a potential man-in-the-middle attack. You should instead attempt to
- * resolve the issues before enabling this option.
- * @see https://www.drupal.org/docs/system-requirements/php-requirements#openssl
- * @see https://en.wikipedia.org/wiki/Man-in-the-middle_attack
- * @see \Drupal\update\UpdateFetcher
- * @see \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher
- */
-# $settings['update_fetch_with_http_fallback'] = TRUE;
 
 /**
  * External access proxy settings:
@@ -778,11 +763,11 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
 # $settings['trusted_host_patterns'] = [];
 
 /**
- * The default list of directories that will be ignored by Drupal's file API.
+ * Directories that will be ignored by Drupal's file API and when scanning for
+ * extensions and hooks.
  *
- * By default ignore node_modules and bower_components folders to avoid issues
- * with common frontend tools and recursive scanning of directories looking for
- * extensions.
+ * By default, node_modules and bower_components are ignored to speed up scanning
+ * by skipping folders containing non-PHP build dependencies.
  *
  * @see \Drupal\Core\File\FileSystemInterface::scanDirectory()
  * @see \Drupal\Core\Extension\ExtensionDiscovery::scanDirectory()

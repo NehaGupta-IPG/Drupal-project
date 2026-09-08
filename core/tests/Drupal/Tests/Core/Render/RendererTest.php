@@ -292,7 +292,7 @@ class RendererTest extends RendererTestBase {
         ->with(static::logicalOr('common_test_foo', 'container'))
         ->willReturnCallback(function ($theme, array $vars): string {
           if ($theme == 'container') {
-            return '<div' . (string) (new Attribute($vars['#attributes'])) . '>' . $vars['#children'] . "</div>\n";
+            return '<div' . new Attribute($vars['#attributes']) . '>' . $vars['#children'] . "</div>\n";
           }
           return $vars['#foo'] . $vars['#bar'];
         });
@@ -319,10 +319,10 @@ class RendererTest extends RendererTestBase {
         ->with(static::logicalOr('link', 'container'))
         ->willReturnCallback(function ($theme, array $vars): string {
           if ($theme == 'container') {
-            return '<div' . (string) (new Attribute($vars['#attributes'])) . '>' . $vars['#children'] . "</div>\n";
+            return '<div' . new Attribute($vars['#attributes']) . '>' . $vars['#children'] . "</div>\n";
           }
           $attributes = new Attribute(['href' => $vars['#url']] + ($vars['#attributes'] ?? []));
-          return '<a' . (string) $attributes . '>' . $vars['#title'] . '</a>';
+          return '<a' . $attributes . '>' . $vars['#title'] . '</a>';
         });
     };
     $data[] = [
@@ -361,7 +361,7 @@ class RendererTest extends RendererTestBase {
         ->method('render')
         ->with('container')
         ->willReturnCallback(function ($theme, array $vars): string {
-          return '<div' . (string) (new Attribute($vars['#attributes'])) . '>' . $vars['#children'] . "</div>\n";
+          return '<div' . new Attribute($vars['#attributes']) . '>' . $vars['#children'] . "</div>\n";
         });
     };
     $data[] = [$build, '<div class="foo"><div class="bar"></div>' . "\n" . '</div>' . "\n", $setup_code];
@@ -376,7 +376,7 @@ class RendererTest extends RendererTestBase {
         ->method('render')
         ->with(['container'])
         ->willReturnCallback(function ($theme, array $vars): string {
-          return '<div' . (string) (new Attribute($vars['#attributes'])) . '>' . $vars['#children'] . "</div>\n";
+          return '<div' . new Attribute($vars['#attributes']) . '>' . $vars['#children'] . "</div>\n";
         });
     };
     $data[] = [$build, '<div class="foo"></div>' . "\n", $setup_code];
@@ -1197,6 +1197,7 @@ class RendererTest extends RendererTestBase {
       foreach ([0, 1] as $key) {
         $fibers[] = new \Fiber(static fn (): MarkupInterface|string => $fiber_callback());
       }
+      $fiber = NULL;
       while ($fibers) {
         foreach ($fibers as $key => $fiber) {
           if ($fiber->isTerminated()) {
@@ -1211,7 +1212,7 @@ class RendererTest extends RendererTestBase {
           }
         }
       }
-      return $fiber->getReturn();
+      return $fiber?->getReturn();
     });
     $this->assertEquals(Markup::create('foo'), $return);
   }
@@ -1242,11 +1243,11 @@ class TestAccessClass implements TrustedCallbackInterface {
     return FALSE;
   }
 
-  public static function accessResultAllowed() {
+  public static function accessResultAllowed(): AccessResultAllowed {
     return AccessResult::allowed();
   }
 
-  public static function accessResultForbidden() {
+  public static function accessResultForbidden(): AccessResultForbidden {
     return AccessResult::forbidden();
   }
 
