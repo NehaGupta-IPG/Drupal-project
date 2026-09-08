@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Entity\Comment;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -79,12 +80,12 @@ class CommentInterfaceTest extends CommentTestBase {
 
     // Comment as anonymous with preview required.
     $this->drupalLogout();
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
       'access content',
       'access comments',
       'post comments',
       'skip comment approval',
-    ]);
+    ])->save();
     $anonymous_comment = $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName(), TRUE);
     $this->assertTrue($this->commentExists($anonymous_comment), 'Comment found.');
     $anonymous_comment->delete();
@@ -190,7 +191,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->node = $this->drupalCreateNode([
       'type' => 'article',
       'promote' => 1,
-      'comment' => [['status' => CommentItemInterface::HIDDEN]],
+      'comment' => [['status' => CommentingStatus::Hidden->value]],
     ]);
     $this->assertNotNull($this->node, 'Article node created.');
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
@@ -201,7 +202,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->node = $this->drupalCreateNode([
       'type' => 'article',
       'promote' => 1,
-      'comment' => [['status' => CommentItemInterface::CLOSED]],
+      'comment' => [['status' => CommentingStatus::Closed->value]],
     ]);
     $this->assertNotNull($this->node, 'Article node created.');
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
@@ -212,7 +213,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->node = $this->drupalCreateNode([
       'type' => 'article',
       'promote' => 1,
-      'comment' => [['status' => CommentItemInterface::OPEN]],
+      'comment' => [['status' => CommentingStatus::Open->value]],
     ]);
     $this->assertNotNull($this->node, 'Article node created.');
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');

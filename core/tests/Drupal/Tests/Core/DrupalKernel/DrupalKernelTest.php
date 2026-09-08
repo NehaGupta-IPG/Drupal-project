@@ -28,7 +28,7 @@ class DrupalKernelTest extends UnitTestCase {
    * @legacy-covers ::setupTrustedHosts
    */
   #[DataProvider('providerTestTrustedHosts')]
-  public function testTrustedHosts($host, $server_name, $message, $expected = FALSE): void {
+  public function testTrustedHosts($host, $server_name, string $message, $expected = FALSE): void {
     $request = new Request();
 
     $trusted_host_patterns = [
@@ -115,8 +115,6 @@ class DrupalKernelTest extends UnitTestCase {
    *
    * This test is run in a separate process since it defines DRUPAL_ROOT. This
    * stops any possible pollution of other tests.
-   *
-   * @legacy-covers ::findSitePath
    */
   #[RunInSeparateProcess]
   public function testFindSitePath(): void {

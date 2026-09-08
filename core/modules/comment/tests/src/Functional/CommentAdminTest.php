@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
-use Drupal\comment\CommentInterface;
+use Drupal\comment\AnonymousContact;
 use Drupal\comment\Entity\Comment;
 use Drupal\Component\Utility\Html;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -38,14 +39,14 @@ class CommentAdminTest extends CommentTestBase {
    */
   public function testApprovalAdminInterface(): void {
     // Set anonymous comments to require approval.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
       'access comments' => TRUE,
       'post comments' => TRUE,
       'skip comment approval' => FALSE,
-    ]);
+    ])->save();
     $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
+    $this->setCommentAnonymous(AnonymousContact::Forbidden);
 
     // Test that the comments page loads correctly when there are no comments.
     $this->drupalGet('admin/content/comment');
@@ -131,13 +132,13 @@ class CommentAdminTest extends CommentTestBase {
    */
   public function testApprovalNodeInterface(): void {
     // Set anonymous comments to require approval.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
       'access comments' => TRUE,
       'post comments' => TRUE,
       'skip comment approval' => FALSE,
-    ]);
+    ])->save();
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
+    $this->setCommentAnonymous(AnonymousContact::Forbidden);
 
     // Post anonymous comment without contact info.
     $subject = $this->randomMachineName();
@@ -206,11 +207,11 @@ class CommentAdminTest extends CommentTestBase {
    */
   public function testEditComment(): void {
     // Enable anonymous user comments.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
       'access comments',
       'post comments',
       'skip comment approval',
-    ]);
+    ])->save();
 
     // Log in as a web user.
     $this->drupalLogin($this->webUser);
@@ -221,7 +222,7 @@ class CommentAdminTest extends CommentTestBase {
 
     // Post anonymous comment.
     // Ensure that we need email id before posting comment.
-    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MUST_CONTACT);
+    $this->setCommentAnonymous(AnonymousContact::Required);
 
     // Post comment with contact info (required).
     $author_name = $this->randomMachineName();
@@ -261,7 +262,7 @@ class CommentAdminTest extends CommentTestBase {
     // Rebuild the container to update the default language container variable.
     $this->rebuildContainer();
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
+    $this->setCommentAnonymous(AnonymousContact::Forbidden);
     $this->drupalLogin($this->webUser);
     $count_query = \Drupal::entityTypeManager()
       ->getStorage('comment')

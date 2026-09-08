@@ -190,11 +190,9 @@ class CronTest extends UnitTestCase {
 
   /**
    * Tests the ::processQueues() method.
-   *
-   * @legacy-covers ::processQueues
    */
   #[DataProvider('processQueuesTestData')]
-  public function testProcessQueues($item, $message_logged_assertion, $count_post_run): void {
+  public function testProcessQueues(string $item, string $message_logged_assertion, int $count_post_run): void {
     $this->resetTestingState();
     $this->queue->createItem($item);
     $this->assertFalse($this->state->get('cron_test.message_logged'));

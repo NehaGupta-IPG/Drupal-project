@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the file field widget, single and multi-valued, using AJAX upload.
  */
 #[Group('file')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class FileFieldWidgetTest extends WebDriverTestBase {
 
@@ -102,7 +103,7 @@ class FileFieldWidgetTest extends WebDriverTestBase {
       foreach ([1, 1, 0] as $delta) {
         // Ensure we have the expected number of Remove buttons, and that they
         // are numbered sequentially.
-        $buttons = $this->xpath('//input[@type="submit" and @value="Remove"]');
+        $buttons = $this->getNodeElementsByXpath('//input[@type="submit" and @value="Remove"]');
         $this->assertCount($num_expected_remove_buttons, $buttons, 'There are ' . $num_expected_remove_buttons . ' "Remove" buttons displayed.');
         foreach ($buttons as $i => $button) {
           $key = $i >= $remaining ? $i - $remaining : $i;

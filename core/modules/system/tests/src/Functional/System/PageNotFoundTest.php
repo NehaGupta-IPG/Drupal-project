@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,7 +23,7 @@ class PageNotFoundTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system_test'];
+  protected static $modules = ['node', 'path', 'system_test'];
 
   /**
    * {@inheritdoc}
@@ -50,8 +51,12 @@ class PageNotFoundTest extends BrowserTestBase {
     $this->adminUser->roles[] = 'administrator';
     $this->adminUser->save();
 
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access user profiles']);
-    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access user profiles']);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+      'access user profiles',
+    ])->save();
+    Role::loadOverrideFree(RoleInterface::AUTHENTICATED_ID)->grantPermissions([
+      'access user profiles',
+    ])->save();
   }
 
   /**
@@ -102,6 +107,22 @@ class PageNotFoundTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(404);
     // Verify the access cacheability metadata for custom 404 is bubbled.
     $this->assertCacheContext('user.roles');
+
+    // Create a custom 404 page with a path alias.
+    $this->drupalCreateContentType(['type' => 'page']);
+    $this->drupalCreateNode([
+      'body' => "I have absolutely no idea what you're talking about.",
+      'path' => '/custom-page-not-found',
+    ]);
+    $edit = ['site_404' => '/custom-page-not-found'];
+    $this->drupalGet('admin/config/system/site-information');
+    $this->submitForm($edit, 'Save configuration');
+    $assert_session = $this->assertSession();
+    $assert_session->statusMessageContains('The configuration options have been saved.');
+    $this->assertSame('/custom-page-not-found', $this->config('system.site')->get('page.404'));
+    $this->drupalGet('/not-a-page');
+    $assert_session->statusCodeEquals(404);
+    $assert_session->pageTextContains("I have absolutely no idea what you're talking about.");
   }
 
 }

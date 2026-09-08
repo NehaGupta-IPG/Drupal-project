@@ -51,6 +51,30 @@ interface ModuleInstallerInterface {
   public function install(array $module_list, $enable_dependencies = TRUE);
 
   /**
+   * Determines the full set of modules corresponding to the given list.
+   *
+   * @param string[] $module_list
+   *   An array of module machine names.
+   * @param bool $enable_dependencies
+   *   (optional) If TRUE, dependencies are resolved and added to the returned
+   *   list in the correct install order. If FALSE, only the given modules that
+   *   are not yet installed are returned.
+   *
+   * @return string[]
+   *   The machine names of the modules that are not yet installed, including
+   *   resolved dependencies, ordered the way ::install() would install them.
+   *   Already installed modules are omitted.
+   *
+   * @throws \Drupal\Core\Extension\MissingDependencyException
+   *   Thrown when a requested module, or a dependency of one, can not be found
+   *   or is incompatible with this version of Drupal core.
+   *
+   * @throws \Drupal\Core\Extension\Exception\ObsoleteExtensionException
+   *   Thrown when a requested module is obsolete.
+   */
+  public function getModulesToInstall(array $module_list, bool $enable_dependencies = TRUE): array;
+
+  /**
    * Uninstalls a given list of modules.
    *
    * @param string[] $module_list
@@ -71,19 +95,6 @@ interface ModuleInstallerInterface {
    * @see hook_modules_uninstalled()
    */
   public function uninstall(array $module_list, $uninstall_dependents = TRUE);
-
-  /**
-   * Adds a module uninstall validator.
-   *
-   * @param \Drupal\Core\Extension\ModuleUninstallValidatorInterface $uninstall_validator
-   *   The uninstall validator to add.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject
-   *   the uninstall validators into the constructor instead.
-   *
-   * @see https://www.drupal.org/node/3432595
-   */
-  public function addUninstallValidator(ModuleUninstallValidatorInterface $uninstall_validator);
 
   /**
    * Determines whether a list of modules can be uninstalled.

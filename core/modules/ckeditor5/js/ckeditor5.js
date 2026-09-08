@@ -3,7 +3,7 @@
  * CKEditor 5 implementation of {@link Drupal.editors} API.
  */
 
-((Drupal, debounce, CKEditor5, $, once) => {
+((Drupal, debounce, CKEDITOR, $, once) => {
   /**
    * The CKEditor 5 instances.
    *
@@ -173,7 +173,9 @@
   /**
    * Select CKEditor 5 plugin classes to include.
    *
-   * Found in the CKEditor 5 global JavaScript object as {package.Class}.
+   * Plugins are specified as {package.Class} strings. Upstream plugins are
+   * found on the flat CKEDITOR UMD global, Drupal custom plugins on the
+   * nested CKEditor5.{package}.{Class} global.
    *
    * @param {Array} plugins
    *  List of package and Class name of plugins
@@ -184,8 +186,20 @@
   function selectPlugins(plugins) {
     return plugins.map((pluginDefinition) => {
       const [build, name] = pluginDefinition.split('.');
-      if (CKEditor5[build] && CKEditor5[build][name]) {
-        return CKEditor5[build][name];
+      // Upstream plugins: flat on the CKEDITOR UMD global.
+      if (CKEDITOR[name]) {
+        return CKEDITOR[name];
+      }
+      // Drupal custom plugins: nested on window.CKEditor5.{build}.{name}.
+      // CKEditor5 is referenced from window at runtime (not captured in the
+      // IIFE closure) because custom plugin scripts may load after this file
+      // and assign to window.CKEditor5.
+      if (
+        window.CKEditor5 &&
+        window.CKEditor5[build] &&
+        window.CKEditor5[build][name]
+      ) {
+        return window.CKEditor5[build][name];
       }
 
       // eslint-disable-next-line no-console
@@ -353,7 +367,6 @@
      *   The text format for the editor.
      */
     attach(element, format) {
-      const { editorClassic } = CKEditor5;
       const { toolbar, plugins, config, language } = format.editorSettings;
       const extraPlugins = selectPlugins(plugins);
       const pluginConfig = processConfig(config);
@@ -367,7 +380,7 @@
       };
       // Set the id immediately so that it is available when onChange is called.
       const id = setElementId(element);
-      const { ClassicEditor } = editorClassic;
+      const { ClassicEditor } = CKEDITOR;
 
       ClassicEditor.create(element, editorConfig)
         .then((editor) => {
@@ -428,9 +441,18 @@
           }
 
           // If the textarea is disabled, enable CKEditor's read-only mode.
-          if (element.hasAttribute('disabled')) {
-            editor.enableReadOnlyMode('ckeditor5_disabled');
-          }
+          const readOnlyIfDisabled = () => {
+            if (element.disabled) {
+              editor.enableReadOnlyMode('ckeditor5_disabled');
+            } else {
+              editor.disableReadOnlyMode('ckeditor5_disabled');
+            }
+          };
+          const disabledMutationObserver = new MutationObserver(() => {
+            readOnlyIfDisabled();
+          });
+          disabledMutationObserver.observe(element, { attributes: true });
+          readOnlyIfDisabled();
 
           // Integrate CKEditor 5 viewport offset with Drupal displace.
           // @see \Drupal\Tests\ckeditor5\FunctionalJavascript\CKEditor5ToolbarTest
@@ -533,7 +555,6 @@
      *   The id attribute for the main editor toolbar, if any.
      */
     attachInlineEditor(element, format, mainToolbarId) {
-      const { editorDecoupled } = CKEditor5;
       const {
         toolbar,
         plugins,
@@ -548,7 +569,7 @@
         ...processConfig(pluginConfig),
       };
       const id = setElementId(element);
-      const { DecoupledEditor } = editorDecoupled;
+      const { DecoupledEditor } = CKEDITOR;
 
       DecoupledEditor.create(element, config)
         .then((editor) => {
@@ -604,9 +625,13 @@
         : [];
       classes.push('ui-dialog--narrow');
       dialogSettings.classes['ui-dialog'] = classes.join(' ');
-      dialogSettings.autoResize =
-        window.matchMedia('(min-width: 600px)').matches;
-      dialogSettings.width = 'auto';
+      if (typeof dialogSettings.autoResize === 'undefined') {
+        dialogSettings.autoResize =
+          window.matchMedia('(min-width: 600px)').matches;
+      }
+      if (typeof dialogSettings.width === 'undefined') {
+        dialogSettings.width = 'auto';
+      }
 
       const ckeditorAjaxDialog = Drupal.ajax({
         dialog: dialogSettings,
@@ -627,13 +652,16 @@
 
   Drupal.behaviors.editorStyleFix = {
     attach(context) {
-      // CKEditor's DLL injects a style tag that overrides native list
-      // type styling. The following find the style(s) causing the problem
-      // and removes them.
+      // CKEditor injects a style tag that overrides native list type styling.
+      // The following find the style(s) causing the problem and removes them.
       // @todo remove this entire behavior when this issue is fixed
       //  https://github.com/ckeditor/ckeditor5/issues/14613
       [...document.styleSheets]
-        .filter((sheet) => sheet.ownerNode.hasAttribute('data-cke'))
+        .filter(
+          (sheet) =>
+            sheet.ownerNode.hasAttribute('data-cke') ||
+            (sheet.href && sheet.href.includes('ckeditor5')),
+        )
         .forEach((sheet) => {
           [...sheet.cssRules].forEach((rule, ruleIndex) => {
             if (
@@ -701,4 +729,4 @@
       Drupal.ckeditor5.saveCallback = null;
     }
   });
-})(Drupal, Drupal.debounce, CKEditor5, jQuery, once);
+})(Drupal, Drupal.debounce, CKEDITOR, jQuery, once);

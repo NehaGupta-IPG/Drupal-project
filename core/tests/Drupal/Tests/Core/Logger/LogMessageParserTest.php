@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Logger;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Logger\LogMessageParser;
+use Drupal\Core\Render\Markup;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -29,8 +29,6 @@ class LogMessageParserTest extends UnitTestCase {
    *   An array with the expected values after the test has run.
    *    - message: The expected parsed message.
    *    - context: The expected values of the placeholders.
-   *
-   * @legacy-covers ::parseMessagePlaceholders
    */
   #[DataProvider('providerTestParseMessagePlaceholders')]
   public function testParseMessagePlaceholders(array $value, array $expected): void {
@@ -82,7 +80,7 @@ class LogMessageParserTest extends UnitTestCase {
         ],
       ],
       'Stringable object placeholder' => [
-        ['message' => 'object @b', 'context' => ['@b' => new FormattableMarkup('convertible', [])]],
+        ['message' => 'object @b', 'context' => ['@b' => Markup::create('convertible')]],
         ['message' => 'object @b', 'context' => ['@b' => 'convertible']],
       ],
       'Non-placeholder context value' => [

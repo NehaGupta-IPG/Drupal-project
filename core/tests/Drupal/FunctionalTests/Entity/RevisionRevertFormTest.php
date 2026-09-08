@@ -20,7 +20,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(RevisionRevertForm::class)]
 #[Group('Entity')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class RevisionRevertFormTest extends BrowserTestBase {
 
@@ -192,8 +191,6 @@ class RevisionRevertFormTest extends BrowserTestBase {
    *   Expected messenger message.
    * @param string $expectedDestination
    *   Expected destination after deletion.
-   *
-   * @legacy-covers ::submitForm
    */
   #[DataProvider('providerSubmitForm')]
   public function testSubmitForm(array $permissions, string $entityTypeId, string $entityLabel, array $expectedLog, string $expectedMessage, string $expectedDestination): void {
@@ -306,8 +303,6 @@ class RevisionRevertFormTest extends BrowserTestBase {
 
   /**
    * Tests the revert process.
-   *
-   * @legacy-covers ::prepareRevision
    */
   protected function testPrepareRevision(): void {
     $user = $this->createUser();

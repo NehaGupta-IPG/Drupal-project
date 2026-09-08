@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\search\Functional;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * - Nodes with comment status set to Hidden should never show comment counts
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchCommentCountToggleTest extends BrowserTestBase {
 
@@ -29,7 +31,7 @@ class SearchCommentCountToggleTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'comment', 'search', 'dblog'];
+  protected static $modules = ['node', 'comment', 'search', 'search_node', 'dblog'];
 
   /**
    * {@inheritdoc}
@@ -107,9 +109,9 @@ class SearchCommentCountToggleTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('1 comment');
 
     // Test comment count display for nodes with comment status set to Closed.
-    $this->searchableNodes['0 comments']->set('comment', CommentItemInterface::CLOSED);
+    $this->searchableNodes['0 comments']->set('comment', CommentingStatus::Closed->value);
     $this->searchableNodes['0 comments']->save();
-    $this->searchableNodes['1 comment']->set('comment', CommentItemInterface::CLOSED);
+    $this->searchableNodes['1 comment']->set('comment', CommentingStatus::Closed->value);
     $this->searchableNodes['1 comment']->save();
 
     $this->submitForm($edit, 'Search');
@@ -117,9 +119,9 @@ class SearchCommentCountToggleTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('1 comment');
 
     // Test comment count display for nodes with comment status set to Hidden.
-    $this->searchableNodes['0 comments']->set('comment', CommentItemInterface::HIDDEN);
+    $this->searchableNodes['0 comments']->set('comment', CommentingStatus::Hidden->value);
     $this->searchableNodes['0 comments']->save();
-    $this->searchableNodes['1 comment']->set('comment', CommentItemInterface::HIDDEN);
+    $this->searchableNodes['1 comment']->set('comment', CommentingStatus::Hidden->value);
     $this->searchableNodes['1 comment']->save();
 
     $this->submitForm($edit, 'Search');

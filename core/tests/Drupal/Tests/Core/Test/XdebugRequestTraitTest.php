@@ -27,8 +27,6 @@ class XdebugRequestTraitTest extends UnitTestCase {
    *   The request server array.
    * @param array $expected_cookies
    *   The expected cookies for the request.
-   *
-   * @legacy-covers ::extractCookiesFromRequest
    */
   #[DataProvider('extractCookiesDataProvider')]
   public function testExtractCookiesFromRequest(array $server, array $expected_cookies): void {
@@ -42,7 +40,7 @@ class XdebugRequestTraitTest extends UnitTestCase {
    * @return iterable
    *   Test scenarios.
    */
-  public static function extractCookiesDataProvider() {
+  public static function extractCookiesDataProvider(): \Iterator {
     yield 'no XDEBUG_CONFIG' => [[], []];
     yield 'empty string XDEBUG_CONFIG' => [['XDEBUG_CONFIG' => ''], []];
     yield 'only space string XDEBUG_CONFIG' => [['XDEBUG_CONFIG' => ' '], []];

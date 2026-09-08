@@ -49,7 +49,7 @@ class DisplayFeedTest extends UITestBase {
    * @param string $view_name
    *   The view name to check against.
    */
-  protected function checkFeedViewUi($view_name): void {
+  protected function checkFeedViewUi(string|int|float|bool $view_name): void {
     $this->drupalGet('admin/structure/views');
     // Verify that the page lists the $view_name view.
     // Regression test: ViewListBuilder::getDisplayPaths() did not properly
@@ -63,7 +63,7 @@ class DisplayFeedTest extends UITestBase {
     $this->assertSession()->assertEscaped('<em>Page</em>');
 
     // Load all the options of the checkbox.
-    $result = $this->xpath('//div[@id="edit-displays"]/div');
+    $result = $this->getNodeElementsByXpath('//div[@id="edit-displays"]/div');
     $options = [];
     foreach ($result as $item) {
       $input_node = $item->find('css', 'input');

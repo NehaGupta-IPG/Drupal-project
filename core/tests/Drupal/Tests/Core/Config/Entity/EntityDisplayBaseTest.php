@@ -9,7 +9,6 @@ use Drupal\Core\Entity\EntityType;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\Core\Entity\EntityDisplayBase.
@@ -21,7 +20,7 @@ class EntityDisplayBaseTest extends UnitTestCase {
   /**
    * The mocked EntityDisplay object for testing.
    */
-  protected EntityDisplayBaseMockableClass&MockObject $entityDisplay;
+  protected EntityDisplayBaseMockableClass $entityDisplay;
 
   /**
    * {@inheritdoc}
@@ -29,16 +28,11 @@ class EntityDisplayBaseTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->entityDisplay = $this->getMockBuilder(EntityDisplayBaseMockableClass::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods([])
-      ->getMock();
+    $this->entityDisplay = new EntityDisplayBaseMockableClass([], 'test');
   }
 
   /**
    * Tests get target entity type id.
-   *
-   * @legacy-covers ::getTargetEntityTypeId
    */
   public function testGetTargetEntityTypeId(): void {
     $reflection = new \ReflectionProperty($this->entityDisplay, 'targetEntityType');
@@ -48,8 +42,6 @@ class EntityDisplayBaseTest extends UnitTestCase {
 
   /**
    * Tests get mode.
-   *
-   * @legacy-covers ::getMode
    */
   public function testGetMode(): void {
     $reflection = new \ReflectionProperty($this->entityDisplay, 'mode');
@@ -59,8 +51,6 @@ class EntityDisplayBaseTest extends UnitTestCase {
 
   /**
    * Tests get original mode.
-   *
-   * @legacy-covers ::getOriginalMode
    */
   public function testGetOriginalMode(): void {
     $reflection = new \ReflectionProperty($this->entityDisplay, 'originalMode');
@@ -70,8 +60,6 @@ class EntityDisplayBaseTest extends UnitTestCase {
 
   /**
    * Tests get target bundle.
-   *
-   * @legacy-covers ::getTargetBundle
    */
   public function testGetTargetBundle(): void {
     $reflection = new \ReflectionProperty($this->entityDisplay, 'bundle');
@@ -81,8 +69,6 @@ class EntityDisplayBaseTest extends UnitTestCase {
 
   /**
    * Tests set target bundle.
-   *
-   * @legacy-covers ::setTargetBundle
    */
   public function testSetTargetBundle(): void {
     $reflection = new \ReflectionProperty($this->entityDisplay, 'bundle');
@@ -96,6 +82,10 @@ class EntityDisplayBaseTest extends UnitTestCase {
  * A class extending EntityDisplayBase for testing purposes.
  */
 class EntityDisplayBaseMockableClass extends EntityDisplayBase {
+
+  // @phpstan-ignore-next-line
+  public function __construct(array $values, $entity_type) {
+  }
 
   public function getPluginCollections(): array {
     return [];

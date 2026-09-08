@@ -12,7 +12,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -48,21 +47,18 @@ class LoggerChannelTest extends UnitTestCase {
       ->with($this->anything(), $message, $this->callback($expected));
     $channel->addLogger($logger);
     if ($request) {
-      $request_mock = $this->getMockBuilder(Request::class)
-        ->onlyMethods(['getClientIp'])
-        ->getMock();
-      $request_mock->expects($this->any())
+      $request_mock = $this->createStub(Request::class);
+      $request_mock
         ->method('getClientIp')
         ->willReturn('127.0.0.1');
-      $request_mock->headers = $this->createMock(HeaderBag::class);
 
       $requestStack = new RequestStack();
       $requestStack->push($request_mock);
       $channel->setRequestStack($requestStack);
     }
     if ($account) {
-      $account_mock = $this->createMock(AccountInterface::class);
-      $account_mock->expects($this->any())
+      $account_mock = $this->createStub(AccountInterface::class);
+      $account_mock
         ->method('id')
         ->willReturn(1);
 
@@ -73,8 +69,6 @@ class LoggerChannelTest extends UnitTestCase {
 
   /**
    * Tests LoggerChannel::log() recursion protection.
-   *
-   * @legacy-covers ::log
    */
   public function testLogRecursionProtection(): void {
     $channel = new LoggerChannel('test');
@@ -118,7 +112,7 @@ class LoggerChannelTest extends UnitTestCase {
   public function testNullIp(): void {
     // Create a logger that will fail if $context['ip'] is not an empty string.
     $logger = $this->createMock(LoggerInterface::class);
-    $expected = function ($context) {
+    $expected = function (array $context): bool {
       return $context['channel'] == 'test' && $context['ip'] === '';
     };
     $logger->expects($this->once())
@@ -128,10 +122,8 @@ class LoggerChannelTest extends UnitTestCase {
     // Set up a request stack that has a request that will return NULL when
     // ::getClientIp() is called.
     $requestStack = new RequestStack();
-    $request_mock = $this->getMockBuilder(Request::class)
-      ->onlyMethods(['getClientIp'])
-      ->getMock();
-    $request_mock->expects($this->any())
+    $request_mock = $this->createStub(Request::class);
+    $request_mock
       ->method('getClientIp')
       ->willReturn(NULL);
     $requestStack->push($request_mock);
@@ -151,7 +143,7 @@ class LoggerChannelTest extends UnitTestCase {
   public static function providerTestLog(): \Generator {
     // No request or account.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['channel'] == 'test' && empty($context['uid']) && $context['ip'] === '';
       },
       FALSE,
@@ -161,7 +153,7 @@ class LoggerChannelTest extends UnitTestCase {
     // With account but not request. Since the request is not available the
     // current user should not be used.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['uid'] === 0 && $context['ip'] === '';
       },
       FALSE,
@@ -170,7 +162,7 @@ class LoggerChannelTest extends UnitTestCase {
 
     // With request but not account.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['ip'] === '127.0.0.1' && empty($context['uid']);
       },
       TRUE,
@@ -179,7 +171,7 @@ class LoggerChannelTest extends UnitTestCase {
 
     // Both request and account.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['ip'] === '127.0.0.1' && $context['uid'] === 1;
       },
       TRUE,
@@ -197,10 +189,8 @@ class NaughtyRecursiveLogger implements LoggerInterface {
 
   /**
    * The logger channel.
-   *
-   * @var \Drupal\Core\Logger\LoggerChannel
    */
-  protected $channel;
+  protected LoggerChannel $channel;
 
   /**
    * The message to log.
