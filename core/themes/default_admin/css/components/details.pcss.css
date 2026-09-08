@@ -364,13 +364,13 @@
 }
 
 /* Styles for details that contain child validation errors. */
-.gin-details.error {
+.details.error {
   position: relative;
   border-color: var(--input--error-color);
   border-left: none;
 
   /* Remove left border for open details summary. */
-  &[open] > .gin-details__summary::after {
+  &[open] > .details__summary::after {
     border-left: none;
   }
 
@@ -389,7 +389,7 @@
     border-end-start-radius: var(--admin-radius-m);
   }
 
-  & > .gin-details__summary {
+  & > .details__summary {
     &:not(:hover) {
       color: var(--input--error-color);
     }
@@ -418,7 +418,7 @@
       }
     }
 
-    &.gin-details__summary--vertical-tabs-item > span:first-child::before {
+    &.details__summary--vertical-tabs-item > span:first-child::before {
       padding-block-end: var(--summary-accordion-line-height);
     }
   }
