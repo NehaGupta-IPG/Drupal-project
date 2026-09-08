@@ -516,3 +516,10 @@ condition.plugin.current_theme:
     theme:
       type: string
       label: Theme
+      deprecated: "The 'theme' condition.plugin config schema is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use the 'themes' config schema instead. See https://www.drupal.org/node/3523553."
+    themes:
+      type: sequence
+      label: Themes
+      sequence:
+        type: string
+        label: Theme

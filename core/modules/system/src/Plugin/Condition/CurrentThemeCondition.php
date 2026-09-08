@@ -57,20 +57,22 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return ['theme' => ''] + parent::defaultConfiguration();
+    return ['themes' => []] + parent::defaultConfiguration();
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form['theme'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Theme'),
-      '#default_value' => $this->configuration['theme'],
-      '#options' => array_map(function ($theme_info) {
-        return $theme_info->info['name'];
-      }, $this->themeHandler->listInfo()),
+    $form['themes'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Themes'),
+      // @todo $this->configuration['theme'] won't be supported in Drupal 13.0.0.
+      // remove it:
+      // @see https://www.drupal.org/node/3523553
+      '#default_value' => isset($this->configuration['theme']) ? [$this->configuration['theme']] : $this->configuration['themes'],
+      '#options' => $this->getAllAvailableThemeOptions(),
+      '#description' => $this->t('Select the themes to enforce. If none are selected, all themes will be allowed.'),
     ];
     return parent::buildConfigurationForm($form, $form_state);
   }
@@ -79,7 +81,11 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->configuration['theme'] = $form_state->getValue('theme');
+    $this->configuration['themes'] = array_filter($form_state->getValue('themes', []));
+    // @todo $this->configuration['theme'] won't be supported in Drupal 13.0.0.
+    // remove it:
+    // @see https://www.drupal.org/node/3523553
+    unset($this->configuration['theme']);
     parent::submitConfigurationForm($form, $form_state);
   }
 
@@ -87,22 +93,41 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
    * {@inheritdoc}
    */
   public function evaluate() {
-    if (!$this->configuration['theme']) {
-      return TRUE;
+    $configuredThemes = $this->configuration['themes'];
+
+    // Handle deprecated 'theme' configuration option.
+    if (empty($configuredThemes) && !empty($this->configuration['theme'])) {
+      @trigger_error('The "theme" configuration key is deprecated in drupal:12.0.0 and will be removed in drupal:13.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553', E_USER_DEPRECATED);
+      $configuredThemes = [$this->configuration['theme']];
     }
 
-    return $this->themeManager->getActiveTheme()->getName() == $this->configuration['theme'];
+    // If no themes are configured, the condition always evaluates to TRUE.
+    if (empty($configuredThemes)) {
+      return TRUE;
+    }
+    // Return whether the current theme is in the currently configured themes:
+    return in_array($this->themeManager->getActiveTheme()->getName(), $configuredThemes, TRUE);
   }
 
   /**
    * {@inheritdoc}
    */
   public function summary() {
-    if ($this->isNegated()) {
-      return $this->t('The current theme is not @theme', ['@theme' => $this->configuration['theme']]);
+    $allowed_themes = $this->configuration['themes'];
+    // @todo $this->configuration['theme'] won't be supported in Drupal 13.0.0.
+    // remove it:
+    // @see https://www.drupal.org/node/3523553
+    if (empty($allowed_themes) && !empty($this->configuration['theme'])) {
+      $allowed_themes = [$this->configuration['theme']];
     }
-
-    return $this->t('The current theme is @theme', ['@theme' => $this->configuration['theme']]);
+    $all_themes = $this->getAllAvailableThemeOptions();
+    $result = empty($allowed_themes) ? array_keys($all_themes) : $allowed_themes;
+    $count = count($result);
+    $themes = implode(', ', array_intersect_key($all_themes, array_flip($result)));
+    if (!empty($this->configuration['negate'])) {
+      return $this->formatPlural($count, 'The current theme is not: @themes', 'The current theme is not one of the following: @themes', ['@themes' => $themes]);
+    }
+    return $this->formatPlural($count, 'The current theme is: @themes', 'The current theme is one of the following: @themes', ['@themes' => $themes]);
   }
 
   /**
@@ -112,6 +137,19 @@ class CurrentThemeCondition extends ConditionPluginBase implements ContainerFact
     $contexts = parent::getCacheContexts();
     $contexts[] = 'theme';
     return $contexts;
+  }
+
+  /**
+   * Retrieves a list of all available themes.
+   *
+   * @return array
+   *   An associative array of themes, where the keys are the theme
+   *   machine names and the values are the displayed theme names.
+   */
+  protected function getAllAvailableThemeOptions(): array {
+    return array_map(function ($theme_info) {
+      return $theme_info->info['name'];
+    }, $this->themeHandler->listInfo());
   }
 
 }
