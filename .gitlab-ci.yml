@@ -369,7 +369,10 @@ default:
   retry: 1
   variables:
     KUBERNETES_CPU_REQUEST: "16"
-    DRUPAL_PLAYWRIGHT_OUTPUT: ../playwright_output
+    # Playwright resolves reporter paths relative to the config file
+    # (core/tests/Drupal/Playwright/), not cwd — use an absolute path so
+    # artifacts at ./playwright_output match where files are written.
+    DRUPAL_PLAYWRIGHT_OUTPUT: $CI_PROJECT_DIR/playwright_output
     SELENIUM_REMOTE_URL: "http://selenium:4444/"
 
   services:
@@ -382,6 +385,8 @@ default:
     - corepack enable
     - yarn install --frozen-lockfile
     - yarn test:playwright
+  # Clean the after_script from the test-setup include.
+  after_script: []
   artifacts:
     when: always
     expire_in: 6 mos

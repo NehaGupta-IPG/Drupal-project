@@ -10,8 +10,10 @@ export default defineConfig({
   maxFailures: 3,
   reporter: [
     ['list'],
+    // Keep junit outside the HTML outputFolder — the HTML reporter clears
+    // its folder and would delete results.xml if they shared a directory.
     ['junit', { outputFile: `${outputFolder}/results.xml` }],
-    ['html', { open: 'never', outputFolder }],
+    ['html', { open: 'never', outputFolder: `${outputFolder}/html` }],
   ],
   use: {
     // Playwright expects `/` at the end of the baseURL to make relative URLs
