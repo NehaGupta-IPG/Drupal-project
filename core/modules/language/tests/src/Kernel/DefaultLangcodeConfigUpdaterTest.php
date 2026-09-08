@@ -106,6 +106,32 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   }
 
   /**
+   * Tests hook_language_update_config_langcode_list_alter() can protect config.
+   *
+   * @see config_test_language_update_config_langcode_list_alter()
+   */
+  public function testAlterHookProtectsConfiguration(): void {
+    $this->config('config_test.langcode_test')
+      ->set('optional_translatable_value', 'Hello')
+      ->save();
+
+    \Drupal::state()->set('config_test.langcode_update_protected_names', ['config_test.langcode_test']);
+
+    $context = $this->reconcile('en', 'fr');
+
+    // The protected configuration keeps its old langcode and is not
+    // reported as updated.
+    $this->assertSame('en', $this->config('config_test.langcode_test')->get('langcode'));
+    $this->assertNotContains('config_test.langcode_test', $context['results']['updated_names'] ?? []);
+
+    // Remove the protection and re-run.
+    \Drupal::state()->set('config_test.langcode_update_protected_names', []);
+    $context = $this->reconcile('en', 'fr');
+    $this->assertSame('fr', $this->config('config_test.langcode_test')->get('langcode'));
+    $this->assertContains('config_test.langcode_test', $context['results']['updated_names'] ?? []);
+  }
+
+  /**
    * Tests an existing override for the new default is absorbed and removed.
    */
   public function testExistingOverrideForNewDefaultIsAbsorbed(): void {

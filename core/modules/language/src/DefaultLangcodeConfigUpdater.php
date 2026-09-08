@@ -10,6 +10,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
@@ -30,6 +31,7 @@ class DefaultLangcodeConfigUpdater {
     protected readonly EventDispatcherInterface $eventDispatcher,
     #[Autowire(service: 'config.storage')]
     protected readonly StorageInterface $configStorage,
+    protected readonly ModuleHandlerInterface $moduleHandler,
   ) {}
 
   /**
@@ -81,7 +83,9 @@ class DefaultLangcodeConfigUpdater {
    */
   public function reconcileConfigLangcodeOperation(string $old_langcode, string $new_langcode, &$context): void {
     if (!isset($context['sandbox']['names'])) {
-      $context['sandbox']['names'] = $this->configFactory->listAll();
+      $names = $this->configFactory->listAll();
+      $this->moduleHandler->alter('language_update_config_langcode_list', $names);
+      $context['sandbox']['names'] = $names;
       $context['sandbox']['max'] = count($context['sandbox']['names']);
     }
 
