@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database;
 
+use Drupal\Core\Database\Transaction\TransactionManagerBase;
+
 /**
  * Makes sure a table exists before it is used.
  *
@@ -21,9 +23,9 @@ namespace Drupal\Core\Database;
 trait TableVerifyTrait {
 
   /**
-   * The tables that are known to exist, keyed by table name.
+   * The transaction and schema versions when each table was verified.
    *
-   * @var array<string, true>
+   * @var array<string, array{int, int}>
    */
   protected array $verifiedTables = [];
 
@@ -37,7 +39,7 @@ trait TableVerifyTrait {
    *   The name of the table.
    */
   protected function verifyTableInTransaction(string $table): void {
-    if (isset($this->verifiedTables[$table]) || !$this->verifyTableRequired()) {
+    if (!$this->verifyTableRequired()) {
       return;
     }
     $this->verifyTable($table);
@@ -65,18 +67,24 @@ trait TableVerifyTrait {
    *   The name of the table.
    */
   protected function verifyTable(string $table): void {
-    if (isset($this->verifiedTables[$table])) {
+    $connection = $this->verifyTableConnection();
+    if ($connection->supportsLazyTableCreation()) {
+      return;
+    }
+    $manager = $connection->transactionManager();
+    $schema = $connection->schema();
+    // Replacement transaction managers may not track table visibility. In
+    // that case, retain the conservative behavior of checking on every call.
+    $version = $manager instanceof TransactionManagerBase ?
+      [$manager->getTransactionVersion(), $schema->getTableInformationVersion()] : NULL;
+    if ($version !== NULL && ($this->verifiedTables[$table] ?? NULL) === $version) {
       return;
     }
     // @todo Use the to be created table information service that will be
     // prewarmed to check if a table exists. A site in production should
     // therefore never reach the hard table exist round trip to the database.
     // See: https://www.drupal.org/node/3615649
-    $connection = $this->verifyTableConnection();
-    if ($connection->supportsLazyTableCreation()) {
-      return;
-    }
-    if (!$connection->schema()->tableExists($table)) {
+    if (!$schema->tableExists($table)) {
       // Another process can create the table at the same time, so a failed
       // creation is ignored. Inside a transaction the savepoint keeps the
       // enclosing transaction usable when that race is lost.
@@ -89,11 +97,11 @@ trait TableVerifyTrait {
         $savepoint?->rollBack();
       }
     }
-    // A table visible inside a transaction may have been created in that
-    // transaction, including by another service. A root or savepoint rollback
-    // can remove it, so do not retain that verification beyond this call.
-    if (!$connection->inTransaction()) {
-      $this->verifiedTables[$table] = TRUE;
+    // A rollback can remove a table created by any service on this connection.
+    // Cache against the version from before verification: a rollback during
+    // table creation must also invalidate this entry.
+    if ($version !== NULL) {
+      $this->verifiedTables[$table] = $version;
     }
   }
 

@@ -120,6 +120,11 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   public bool $triggerWarningWhenUnpilingOnVoidTransaction = FALSE;
 
   /**
+   * The version of table visibility after transaction boundaries.
+   */
+  private int $transactionVersion = 0;
+
+  /**
    * Constructor.
    *
    * @param \Drupal\Core\Database\Connection $connection
@@ -137,6 +142,21 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    */
   public function __destruct() {
     assert($this->stack === [], "Transaction \$stack was not empty. Active stack: " . $this->dumpStackItemsAsString());
+  }
+
+  /**
+   * Returns the version used to invalidate cached table verification.
+   *
+   * Changes when a root transaction ends or a savepoint is rolled back.
+   * Releasing a savepoint does not change table visibility.
+   *
+   * @return int
+   *   The version of table visibility.
+   *
+   * @internal
+   */
+  public function getTransactionVersion(): int {
+    return $this->transactionVersion;
   }
 
   /**
@@ -435,7 +455,10 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
     elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
       // If this was the root Drupal transaction, we can commit the client
-      // transaction.
+      // transaction. Some databases roll back an aborted transaction on
+      // commit, so the version changes before the commit is attempted,
+      // including when the client throws an exception.
+      $this->transactionVersion++;
       $this->processRootCommit();
     }
     else {
@@ -468,6 +491,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         // Rollback the client transaction to the savepoint when the Drupal
         // transaction is not a root one. Then, release the savepoint too. The
         // client connection remains active.
+        $this->transactionVersion++;
         $this->rollbackClientSavepoint($name);
         $this->releaseClientSavepoint($name);
         // The Transaction object remains open, and when it will get destructed
@@ -477,6 +501,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
         // If this was the root Drupal transaction, we can rollback the client
         // transaction. The transaction is closed.
+        $this->transactionVersion++;
         $this->processRootRollback();
         if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::RolledBack) {
           // The Transaction object remains open, and when it will get
