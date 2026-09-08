@@ -88,7 +88,7 @@ variables:
   POSTGRES_USER: drupaltestbot
   POSTGRES_PASSWORD: drupaltestbotpw
   SIMPLETEST_BASE_URL: http://localhost/subdirectory
-  MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome", "goog:chromeOptions":{"w3c": true, "args":["--no-sandbox","--ignore-certificate-errors", "--allow-insecure-localhost", "--headless", "--dns-prefetch-disable", "--disable-dev-shm-usage"]}}, "http://selenium:4444"]'
+  MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome", "goog:chromeOptions":{"w3c": true, "args":["--no-sandbox","--ignore-certificate-errors", "--allow-insecure-localhost", "--headless", "--dns-prefetch-disable", "--disable-dev-shm-usage"]}}, "${SELENIUM_REMOTE_URL}"]'
   SELENIUM_JAVA_OPTS: "-Dwebdriver.chrome.logfile=/builds/chromedriver.log"
   # Use local cache for yarn, see .yarn-install-from-cache.
   YARN_ENABLE_GLOBAL_CACHE: false
@@ -147,6 +147,7 @@ default:
     SE_SESSION_REQUEST_TIMEOUT: "60"
     SE_START_XVFB: "true"
     SE_START_VNC: "false"
+    SELENIUM_REMOTE_URL: "http://selenium:4444/"
 
 .default-job-settings-lint: &default-job-settings-lint
   rules:
@@ -368,8 +369,7 @@ default:
   retry: 1
   variables:
     KUBERNETES_CPU_REQUEST: "16"
-    YARN_ENABLE_GLOBAL_CACHE: false
-    YARN_ENABLE_MIRROR: false
+    DRUPAL_PLAYWRIGHT_OUTPUT: ../playwright_output
     SELENIUM_REMOTE_URL: "http://selenium:4444/"
 
   services:
@@ -378,12 +378,9 @@ default:
   script:
     - export DRUPAL_TEST_DB_URL=$SIMPLETEST_DB
     - export DRUPAL_TEST_BASE_URL=$SIMPLETEST_BASE_URL
-    - export DRUPAL_PLAYWRIGHT_OUTPUT=../playwright_output
-    - chown -R www-data:www-data ./sites /var/www
     - cd core
     - corepack enable
-    - yarn install
-    - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
+    - yarn install --frozen-lockfile
     - yarn test:playwright
   artifacts:
     when: always
