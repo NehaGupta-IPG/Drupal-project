@@ -112,5 +112,27 @@ function hook_language_fallback_candidates_OPERATION_alter(array &$candidates, a
 }
 
 /**
+ * Alter the configuration checked when the default language changes.
+ *
+ * When the site's default language changes,
+ * \Drupal\language\DefaultLangcodeConfigUpdater relabels every configuration
+ * object whose langcode currently matches the previous default to the new
+ * one. Removing a name from $names stops that configuration object from
+ * being relabelled - it keeps its current langcode, whatever the new
+ * default becomes.
+ *
+ * @param array $names
+ *   The names of the configuration objects that will be checked for
+ *   relabelling to the new default langcode.
+ *
+ * @see \Drupal\language\DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation()
+ */
+function hook_language_update_config_langcode_list_alter(array &$names) {
+  // Keep a specific piece of configuration in its current language,
+  // regardless of the site's new default.
+  $names = array_diff($names, ['my_module.settings']);
+}
+
+/**
  * @} End of "addtogroup hooks".
  */
