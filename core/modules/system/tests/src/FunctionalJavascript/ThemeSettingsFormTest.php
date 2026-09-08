@@ -79,6 +79,7 @@ class ThemeSettingsFormTest extends WebDriverTestBase {
     $this->assertFalse($file->isPermanent());
 
     $page->pressButton('Save configuration');
+    $assert_session->statusMessageContainsAfterWait('The configuration options have been saved.', 'status');
     \Drupal::entityTypeManager()->getStorage('file')->resetCache();
 
     // Assert the uploaded file is saved as permanent.
