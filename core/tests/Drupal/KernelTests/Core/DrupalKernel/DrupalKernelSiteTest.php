@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\DrupalKernel;
 
-use Drupal\Core\Cache\DatabaseBackendFactory;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -28,9 +27,7 @@ class DrupalKernelSiteTest extends KernelTestBase {
     // A service provider class always has precedence over services.yml files.
     // KernelTestBase::buildContainer() swaps out many services with in-memory
     // implementations already, so those cannot be tested.
-    // Use assertInstanceOf() because database driver modules may replace the
-    // class with a driver-specific subclass.
-    $this->assertInstanceOf(DatabaseBackendFactory::class, $this->container->get('cache.backend.database'));
+    $this->assertSame('Drupal\\Core\\Cache\\DatabaseBackendFactory', get_class($this->container->get('cache.backend.database')));
 
     $class = __CLASS__;
     $doc = <<<EOD
