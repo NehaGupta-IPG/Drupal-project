@@ -162,6 +162,7 @@ class ThemeCommonElements {
           'percent' => NULL,
           'message' => NULL,
         ],
+        'initial preprocess' => ThemePreprocess::class . ':preprocessProgressBar',
       ],
       'indentation' => [
         'variables' => ['size' => 1],

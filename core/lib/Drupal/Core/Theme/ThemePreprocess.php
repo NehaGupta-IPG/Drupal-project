@@ -360,6 +360,21 @@ class ThemePreprocess {
   }
 
   /**
+   * Prepares variables for progress bar templates.
+   *
+   * Default template: progress-bar.html.twig.
+   *
+   * @param array $variables
+   *   An associative array containing:
+   *   - label: The label of the working task.
+   *   - percent: The percentage of the progress.
+   *   - message: A string containing information to be displayed.
+   */
+  public function preprocessProgressBar(array &$variables): void {
+    $variables['#attached']['library'][] = 'core/drupal.progress';
+  }
+
+  /**
    * Prepares variables for maintenance page templates.
    *
    * Default template: maintenance-page.html.twig.
