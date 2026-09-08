@@ -1708,6 +1708,11 @@ class ViewExecutable {
     }
 
     $this->preview = TRUE;
+
+    // Allow the display handler to run functionality that is necessary
+    // prior to preExecute().
+    $this->display_handler->preparePreview();
+
     $this->preExecute($args);
     // Preview the view.
     $output = $this->display_handler->preview();

@@ -260,6 +260,54 @@ class ViewsHooks {
   }
 
   /**
+   * Implements hook_ENTITY_TYPE_update().
+   */
+  #[Hook('view_update')]
+  public function viewUpdate(EntityInterface $entity): void {
+    // Clear the views block config cache.
+    $views_block_config_store = \Drupal::keyValue('views_block_overrides');
+    if ($views_block_config_store->has($entity->id())) {
+      $views_block_config_store->delete($entity->id());
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_update().
+   */
+  #[Hook('view_delete')]
+  public function viewDelete(EntityInterface $entity): void {
+    $this->viewUpdate($entity);
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_update().
+   */
+  #[Hook('block_update')]
+  public function blockUpdate(EntityInterface $entity): void {
+    // Clear the views block config cache.
+    $plugin_id = $entity->getPluginId();
+    if (str_starts_with($plugin_id, 'views_block:')) {
+      // Extract view id from plugin id.
+      $view_id = explode('-', substr($plugin_id, 12))[0] ?? NULL;
+      if (!empty($view_id)) {
+        // Clear the views block config cache.
+        $views_block_config_store = \Drupal::keyValue('views_block_overrides');
+        if ($views_block_config_store->has($view_id)) {
+          $views_block_config_store->delete($view_id);
+        }
+      }
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_delete().
+   */
+  #[Hook('block_delete')]
+  public function blockDelete(EntityInterface $entity): void {
+    $this->blockUpdate($entity);
+  }
+
+  /**
    * Replaces the substitutions recursive foreach condition.
    */
   protected function viewsQueryTagAlterCondition(AlterableInterface $query, array &$conditions, array $substitutions): void {

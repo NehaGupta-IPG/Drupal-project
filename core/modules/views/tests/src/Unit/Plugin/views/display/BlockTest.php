@@ -6,11 +6,18 @@ namespace Drupal\Tests\views\Unit\Plugin\views\display;
 
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\KeyValueStore\DatabaseStorage;
+use Drupal\Core\KeyValueStore\KeyValueDatabaseFactory;
+use Drupal\Core\Plugin\Context\ContextHandlerInterface;
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\views\Plugin\Block\ViewsBlock;
 use Drupal\views\Plugin\views\display\Block;
+use Drupal\views\ViewExecutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests Drupal\views\Plugin\views\display\Block.
@@ -46,22 +53,44 @@ class BlockTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
+    $this->executable = $this->getMockBuilder(ViewExecutable::class)
       ->disableOriginalConstructor()
-      ->onlyMethods(['executeDisplay', 'setDisplay', 'setItemsPerPage'])
+      ->onlyMethods(['id', 'setDisplay', 'setItemsPerPage', 'getRequest'])
       ->getMock();
-    $this->executable
-      ->method('setDisplay')
-      ->with('block_1')
-      ->willReturn(TRUE);
+    $this->executable->method('setDisplay')->with('block_1')->willReturn(TRUE);
+    $this->executable->method('id')->willReturn('foo');
+    $this->executable->method('getRequest')->willReturn(new Request());
 
-    $this->blockDisplay = $this->executable->display_handler = new Block([], 'test_plugin', [], $this->createStub(EntityTypeManagerInterface::class), $this->createStub(BlockManagerInterface::class));
+    $key_value = $this->createStub(DatabaseStorage::class);
+    $key_value->method('has')->willReturn(TRUE);
+    $key_value->method('set')->willReturn(NULL);
+    $key_value->method('getMultiple')->willReturn(NULL);
+
+    $key_value_factory = $this->createStub(KeyValueDatabaseFactory::class);
+    $key_value_factory->method('get')->willReturn($key_value);
+
+    $args = [
+      [],
+      'views_block',
+      [],
+      $this->createStub(EntityTypeManagerInterface::class),
+      $this->createStub(BlockManagerInterface::class),
+      $key_value_factory,
+      $this->createStub(ContextRepositoryInterface::class),
+      $this->createStub(ContextHandlerInterface::class),
+    ];
+    $this->blockDisplay = $this->executable->display_handler = $this->getMockBuilder(Block::class)
+      ->setConstructorArgs($args)
+      ->onlyMethods(['calculateConfigurationHash', 'ajaxEnabled'])
+      ->getMock();
+    $this->blockDisplay->expects($this->once())
+      ->method('calculateConfigurationHash')
+      ->willReturn('foobar');
+    $this->blockDisplay->method('ajaxEnabled')->willReturn(TRUE);
 
     $this->blockDisplay->view = $this->executable;
 
-    $this->blockPlugin = $this->getMockBuilder('Drupal\views\Plugin\Block\ViewsBlock')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->blockPlugin = $this->createMock(ViewsBlock::class);
   }
 
   /**

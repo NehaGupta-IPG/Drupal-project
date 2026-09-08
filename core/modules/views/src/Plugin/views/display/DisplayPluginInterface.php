@@ -510,6 +510,11 @@ interface DisplayPluginInterface {
   public function buildRenderable(array $args = [], $cache = TRUE);
 
   /**
+   * Prepares the display for preview prior to preExecute().
+   */
+  public function preparePreview(): void;
+
+  /**
    * Renders the display for the purposes of a live preview.
    *
    * Also might be used for some other AJAXy reason.
