@@ -89,7 +89,12 @@ trait TableVerifyTrait {
         $savepoint?->rollBack();
       }
     }
-    $this->verifiedTables[$table] = TRUE;
+    // A table visible inside a transaction may have been created in that
+    // transaction, including by another service. A root or savepoint rollback
+    // can remove it, so do not retain that verification beyond this call.
+    if (!$connection->inTransaction()) {
+      $this->verifiedTables[$table] = TRUE;
+    }
   }
 
   /**
