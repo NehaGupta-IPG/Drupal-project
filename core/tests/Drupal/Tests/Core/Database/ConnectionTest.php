@@ -145,18 +145,34 @@ class ConnectionTest extends UnitTestCase {
         'SELECT * FROM {table} WHERE col = \'it\\\'s a test\'',
         ['"', '"'],
       ],
-      // BC: {table} inside single quotes that is not valid JSON gets expanded.
+      // {table} inside single quotes that is not valid JSON gets expanded.
       [
         "SELECT * FROM \"test_table\" WHERE col = '\"test_table\"'",
         'test_',
         "SELECT * FROM {table} WHERE col = '{table}'",
         ['"', '"'],
       ],
-      // BC: multiple {word} patterns inside single quotes that are not JSON.
+      // Multiple {word} patterns inside single quotes that are not JSON.
       [
         "SELECT * FROM \"test_table\" WHERE col = '\"test_a\" and \"test_b\"'",
         'test_',
         "SELECT * FROM {table} WHERE col = '{a} and {b}'",
+        ['"', '"'],
+      ],
+      // JSON holding a {word}-like value and a quote escaped by doubling it,
+      // as quote() does on PostgreSQL and SQLite.
+      [
+        'SELECT * FROM "test_table" WHERE col = \'{"key": "it\'\'s {table}"}\'',
+        'test_',
+        'SELECT * FROM {table} WHERE col = \'{"key": "it\'\'s {table}"}\'',
+        ['"', '"'],
+      ],
+      // JSON holding a {word}-like value and a quote escaped with a backslash,
+      // as quote() does on MySQL.
+      [
+        'SELECT * FROM "test_table" WHERE col = \'{"key": "it\\\'s {table}"}\'',
+        'test_',
+        'SELECT * FROM {table} WHERE col = \'{"key": "it\\\'s {table}"}\'',
         ['"', '"'],
       ],
       // JSON object with a {word}-like key is preserved (not expanded).

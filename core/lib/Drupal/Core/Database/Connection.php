@@ -370,21 +370,25 @@ abstract class Connection {
    *   The properly-prefixed string.
    */
   public function prefixTables($sql) {
-    // A simple str_replace() would mangle JSON strings embedded in
-    // single-quoted SQL literals, e.g. '{"key": 1}' would have its curly
-    // braces replaced. The regex below skips single-quoted strings entirely,
-    // then replaces {table} patterns only outside of them.
+    // A simple str_replace() would also rewrite the braces of a JSON literal
+    // such as '{"key": 1}'. The regex below matches a single-quoted literal
+    // as a unit, so that a {table} placeholder outside a literal is always
+    // replaced and one inside a literal only when the literal is not valid
+    // JSON. A quote inside a literal is escaped either by doubling it, as
+    // quote() does on PostgreSQL and SQLite, or with a backslash, as quote()
+    // does on MySQL.
     return preg_replace_callback(
-      "/'([^'\\\\]*(?:\\\\.[^'\\\\]*)*)'|(?'simple'\{(\w+)\})/",
+      '/\'((?:[^\'\\\\]|\\\\.|\'\')*)\'|(?\'simple\'\{(\w+)\})/',
       function ($matches) {
         return match (TRUE) {
-          // {table} outside single quotes — apply prefix.
+          // {table} outside single quotes: apply the prefix.
           array_key_exists('simple', $matches) => "{$this->tablePlaceholderReplacements[0]}{$matches[3]}{$this->tablePlaceholderReplacements[1]}",
-          // BC layer: historically, '{table}' inside single quotes was valid.
-          // Replace {word} patterns only when the quoted string is not valid
-          // JSON, so '{"key": 1}' is preserved but '{table}' is expanded.
-          preg_match('/\{\w+\}/', $matches[1]) && !json_validate($matches[1]) => preg_replace_callback('/\{(\w+)\}/', fn($m) => "{$this->tablePlaceholderReplacements[0]}{$m[1]}{$this->tablePlaceholderReplacements[1]}", $matches[0]),
-          // Single-quoted string without {word} patterns — return as-is.
+          // Schema descriptions and raw SQL that names a table inside a string
+          // literal rely on the replacement, while a JSON document has to stay
+          // as it is. The escaped quotes are unescaped first, so that a
+          // JSON string holding a quote validates as well.
+          preg_match('/\{\w+\}/', $matches[1]) && !json_validate(str_replace(["\\'", "''"], "'", $matches[1])) => preg_replace_callback('/\{(\w+)\}/', fn($m) => "{$this->tablePlaceholderReplacements[0]}{$m[1]}{$this->tablePlaceholderReplacements[1]}", $matches[0]),
+          // Single-quoted string without {word} patterns: return as-is.
           default => $matches[0],
         };
       },
