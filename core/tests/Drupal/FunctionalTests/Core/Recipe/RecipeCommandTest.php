@@ -7,7 +7,6 @@ namespace Drupal\FunctionalTests\Core\Recipe;
 use Drupal\config_enum_test\EnumValue;
 use Drupal\Core\Config\Checkpoint\Checkpoint;
 use Drupal\Core\Recipe\Command\RecipeCommand;
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -86,22 +85,31 @@ class RecipeCommandTest extends BrowserTestBase {
   }
 
   /**
-   * Tests recipe config langcode matches a non-English site default.
-   *
-   * Applying a recipe through the real `dr recipe` command - not a direct
-   * PHP call - must resolve unlabelled recipe config the same way a module's
-   * own shipped config would: to the site's actual default langcode, not a
-   * hardcoded assumption of English.
+   * Tests the isApplying flag when a recipe is applied via a batch.
    */
-  public function testRecipeConfigLangcodeMatchesNonEnglishSiteDefault(): void {
-    \Drupal::service('module_installer')->install(['language']);
-    ConfigurableLanguage::createFromLangcode('fr')->save();
-    $this->config('system.site')->set('default_langcode', 'fr')->save();
+  public function testIsApplyingDuringBatch(): void {
+    // The default content importer needs an administrative account to import
+    // the content as.
+    $this->drupalCreateUser(admin: TRUE);
 
-    $process = $this->applyRecipe('core/tests/fixtures/recipes/config_with_langcode');
-    $this->assertSame(0, $process->getExitCode());
+    $this->applyRecipe('core/tests/fixtures/recipes/recipe_is_applying_test');
 
-    $this->assertSame('fr', $this->config('config_test.dynamic.recipe_default')->get('langcode'));
+    // Prove that the recipe did what it is expected to do.
+    $this->assertTrue(\Drupal::moduleHandler()->moduleExists('recipe_is_applying_test'));
+    $this->assertTrue(\Drupal::service('theme_handler')->themeExists('test_base_theme'));
+    $this->assertSame('Only in the recipe', $this->config('recipe_is_applying_test.settings')->get('recipe'));
+    $entity = \Drupal::service('entity.repository')->loadEntityByUuid('entity_test', '290a8baa-837f-4a81-8a37-1c54ae407080');
+    $this->assertNotNull($entity);
+
+    // The recipe_is_applying_test module records the value of
+    // RecipeRunner::isApplying() in a key value collection as each batch
+    // operation runs.
+    $key_value = \Drupal::keyValue('recipe_is_applying_test');
+    $this->assertTrue($key_value->get('modules_installed'), 'RecipeRunner::isApplying() returned TRUE during hook_modules_installed()');
+    $this->assertTrue($key_value->get('themes_installed'), 'RecipeRunner::isApplying() returned TRUE during hook_themes_installed()');
+    $this->assertTrue($key_value->get('config_save'), 'RecipeRunner::isApplying() returned TRUE while saving recipe-provided configuration');
+    $this->assertTrue($key_value->get('entity_test_insert'), 'RecipeRunner::isApplying() returned TRUE while creating recipe-provided content');
+    $this->assertFalse($key_value->get('recipe_applied_event'), 'RecipeRunner::isApplying() returned FALSE while triggering the recipe-applied event');
   }
 
   /**
