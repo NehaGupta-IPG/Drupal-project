@@ -77,7 +77,7 @@ class AdminTest extends WebDriverTestBase {
     $page->pressButton('Save');
 
     $assert_session
-      ->waitForElementVisible('css', '[role="alert"]');
+      ->statusMessageContainsAfterWait('The alias path has to start with a slash.', 'error');
 
     // Check that toggle has error indicators.
     $this->assertTrue($toggle->hasClass('has-error'));
