@@ -412,6 +412,7 @@ abstract class JsonExpression {
    *   The combined boolean SQL.
    *
    * @see https://www.postgresql.org/docs/current/sql-expressions.html#SYNTAX-EXPRESS-EVAL
+   * @see https://www.sqlite.org/lang_expr.html#case
    */
   protected function guardedTestSql(string $guard, string $test): string {
     return $guard === '' ? $test : "CASE WHEN {$guard} THEN {$test} ELSE FALSE END";
