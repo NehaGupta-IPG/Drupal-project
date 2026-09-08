@@ -422,10 +422,21 @@ trait DatabaseTestSchemaDataTrait {
       'ENDS_WITH underscore' => ['$.special', '_sale', 'ENDS_WITH', [8]],
       'CONTAINS percent no false positive' => ['$.key', '%', 'CONTAINS', []],
 
-      // Values with quotes must not break SQL string literals.
+      // SQL injection attempts. A value is bound as a query argument, a
+      // JSON_CONTAINS document and a jsonpath are quoted through the
+      // connection, so quotes and backslashes in them must not break the SQL
+      // string literals. See providerJsonExpressionPathValidation() for the
+      // characters an unquoted path rejects.
       'Quotes in JSON_CONTAINS value' => ['$.associative', ['mountain' => "' OR 1=1--"], 'JSON_CONTAINS', []],
+      'Backslash before the quote in JSON_CONTAINS value' => [
+        '$.associative', ['mountain' => "\\') OR 1=1--"], 'JSON_CONTAINS', [],
+      ],
       'Quotes in scalar value' => ['$.key', "' OR 1=1--", '=', []],
       'Quotes in CONTAINS value' => ['$.key', "' OR '1'='1", 'CONTAINS', []],
+      'Quotes in quoted key' => ['$["key\' OR \'1\'=\'1"]', 'value', '=', []],
+      'Escaped double quote in quoted key' => ['$["key\\") OR 1=1--"]', 'value', '=', []],
+      'Backslash before the closing quote of a quoted key' => ['$["key\\\\"]', 'value', '=', []],
+      'Quotes in quoted key after a wildcard' => ['$.revs[*]["name\' OR \'1\'=\'1"]', 'editor', '=', []],
 
       // Hyphenated key names.
       'Hyphenated key equals' => ['$.hyphen-key', 'hyphen value', '=', [9]],
@@ -438,7 +449,6 @@ trait DatabaseTestSchemaDataTrait {
       'Bracket notation equals' => ['$["hyphen-key"]', 'hyphen value', '=', [9]],
       'Bracket nested' => ['$["nested-obj"]["inner-key"]', 42, '=', [9]],
       'Bracket mixed with dot' => ['$.nested-obj["inner-key"]', 42, '=', [9]],
-      'Bracket with single quote no injection' => ['$["key\' OR \'1\'=\'1"]', 'value', '=', []],
       // Path syntax characters inside a quoted key are literal key characters,
       // and a leading dash key is double-quoted when the path is rendered. No
       // sample row holds these keys, so the paths run and match nothing.
