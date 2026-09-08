@@ -11,7 +11,7 @@ use Drupal\Core\Batch\BatchBuilder;
  * Event fired when the site's default language changes.
  *
  * Subscribers add their own batch operations - for example, translating
- * relabelled configuration - to run as part of the same batch that
+ * updated configuration - to run as part of the same batch that
  * reconciles configuration langcode with the new default.
  */
 final class LanguageDefaultLangcodeChangeEvent extends Event {
@@ -35,11 +35,18 @@ final class LanguageDefaultLangcodeChangeEvent extends Event {
   /**
    * Adds a batch operation to run as part of the same batch.
    *
+   * The batch operation callback will be passed the list of configuration
+   * object names updated by
+   * DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation() in
+   * $context['results']['updated_names'].
+   *
    * @param callable|string $callback
    *   The batch operation callback.
    * @param array $arguments
    *   Arguments to pass to the callback, before the $context argument
    *   Batch API appends automatically.
+   *
+   * @see \Drupal\language\DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation()
    */
   public function addOperation(callable|string $callback, array $arguments = []): void {
     $this->batch->addOperation($callback, $arguments);

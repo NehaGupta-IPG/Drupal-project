@@ -9,7 +9,7 @@ use Drupal\locale\LocaleConfigManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Translates configuration relabelled by a default language change.
+ * Translates configuration updated by a default language change.
  *
  * @see \Drupal\language\DefaultLangcodeConfigUpdater
  */
@@ -25,22 +25,22 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
    */
   public function onDefaultLangcodeChange(LanguageDefaultLangcodeChangeEvent $event): void {
     $event->addOperation(
-      static::class . ':translateRelabelledConfigOperation',
+      static::class . ':translateUpdatedConfigOperation',
       [$event->newLangcode]
     );
   }
 
   /**
-   * Batch operation: translates configuration the sweep just relabelled.
+   * Batch operation: translates configuration the sweep just updated.
    *
    * Runs after \Drupal\language\DefaultLangcodeConfigUpdater's own operation
-   * completes, so $context['results']['relabelled_names'] holds every name
-   * it relabelled to the new default, and its pre-change content already
+   * completes, so $context['results']['updated_names'] holds every name
+   * it updated to the new default, and its pre-change content already
    * saved as an override for the previous default. Applying translations
    * here reuses LocaleConfigManager::updateConfigTranslations(), the same
    * mechanism that already merges real translated strings into a config
    * object's active record when the target langcode matches the object's
-   * own langcode - which, having just been relabelled, it now does.
+   * own langcode - which, having just been updated, it now does.
    *
    * Only the new default is passed: updateConfigTranslations() would happily
    * accept the previous one too, but asking it for a translation "into" that
@@ -54,8 +54,8 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
    * @param array|\ArrayAccess $context
    *   The batch context.
    */
-  public function translateRelabelledConfigOperation(string $new_langcode, &$context): void {
-    $names = $context['results']['relabelled_names'] ?? [];
+  public function translateUpdatedConfigOperation(string $new_langcode, &$context): void {
+    $names = $context['results']['update_names'] ?? [];
     if (!empty($names)) {
       $this->localeConfigManager->updateConfigTranslations($names, [$new_langcode]);
     }

@@ -77,9 +77,9 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   }
 
   /**
-   * Tests a config entity without an explicit langcode is relabelled.
+   * Tests a config entity without an explicit langcode is updated.
    */
-  public function testConfigEntityIsRelabelled(): void {
+  public function testConfigEntityIsUpdated(): void {
     \Drupal::entityTypeManager()->getStorage('config_test')->create([
       'id' => 'no_explicit_langcode',
       'label' => 'No explicit langcode',
@@ -92,9 +92,9 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
   }
 
   /**
-   * Tests the relabelled names are returned for other batch operations.
+   * Tests the updated names are returned for other batch operations.
    */
-  public function testRelabelledNamesAreRecorded(): void {
+  public function testUpdatedNamesAreRecorded(): void {
     $this->config('config_test.langcode_test')
       ->set('optional_translatable_value', 'Hello')
       ->set('untranslatable_value', 'foo')
@@ -102,7 +102,7 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
 
     $context = $this->reconcile('en', 'fr');
 
-    $this->assertContains('config_test.langcode_test', $context['results']['relabelled_names']);
+    $this->assertContains('config_test.langcode_test', $context['results']['updated_names']);
   }
 
   /**
@@ -160,7 +160,7 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
    * Tests the previous default's content is preserved as an override.
    *
    * Otherwise it would simply be lost the moment locale module translates
-   * the newly-relabelled config into the new default - locale has no
+   * the newly-updated config into the new default - locale has no
    * stored translation "into" English to fall back on, since English is
    * the language this content was authored in, not translated into.
    */
@@ -197,7 +197,7 @@ class DefaultLangcodeConfigUpdaterTest extends KernelTestBase {
 
     $this->reconcile('en', 'fr');
 
-    // Stand in for locale module translating the newly-relabelled config,
+    // Stand in for locale module translating the newly-updated config,
     // the same way it would for a real French translation.
     $this->config('config_test.langcode_test')
       ->set('optional_translatable_value', 'Bonjour')
