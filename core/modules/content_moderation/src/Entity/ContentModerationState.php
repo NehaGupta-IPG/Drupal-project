@@ -4,6 +4,7 @@ namespace Drupal\content_moderation\Entity;
 
 use Drupal\content_moderation\ContentModerationStateAccessControlHandler;
 use Drupal\content_moderation\ContentModerationStateStorageSchema;
+use Drupal\content_moderation\Entity\Handler\CancellationHandler;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -39,6 +40,7 @@ use Drupal\views\EntityViewsData;
     'storage_schema' => ContentModerationStateStorageSchema::class,
     'views_data' => EntityViewsData::class,
     'access' => ContentModerationStateAccessControlHandler::class,
+    'user_cancel' => CancellationHandler::class,
   ],
   base_table: 'content_moderation_state',
   data_table: 'content_moderation_state_field_data',

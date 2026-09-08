@@ -6,7 +6,6 @@ use Drupal\comment\CommentingStatus;
 use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\user\UserInterface;
 use Drupal\user\RoleInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -369,39 +368,6 @@ class CommentHooks {
       ];
     }
     return [];
-  }
-
-  /**
-   * Implements hook_user_cancel().
-   */
-  #[Hook('user_cancel')]
-  public function userCancel($edit, UserInterface $account, $method): void {
-    switch ($method) {
-      case 'user_cancel_block_unpublish':
-        $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
-        foreach ($comments as $comment) {
-          $comment->setUnpublished();
-          $comment->save();
-        }
-        break;
-
-      case 'user_cancel_reassign':
-        /** @var \Drupal\comment\CommentInterface[] $comments */
-        $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
-        foreach ($comments as $comment) {
-          $langcodes = array_keys($comment->getTranslationLanguages());
-          // For efficiency manually set the original comment before applying
-          // any changes.
-          $comment->setOriginal(clone $comment);
-          foreach ($langcodes as $langcode) {
-            $comment_translated = $comment->getTranslation($langcode);
-            $comment_translated->setOwnerId(0);
-            $comment_translated->setAuthorName(\Drupal::config('user.settings')->get('anonymous'));
-          }
-          $comment->save();
-        }
-        break;
-    }
   }
 
   /**

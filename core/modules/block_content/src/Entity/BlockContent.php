@@ -23,6 +23,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\block_content\BlockContentInterface;
+use Drupal\user\Entity\Handler\DefaultCancellationHandler;
 
 /**
  * Defines the content block entity class.
@@ -68,6 +69,7 @@ use Drupal\block_content\BlockContentInterface;
       'revision' => RevisionHtmlRouteProvider::class,
     ],
     'translation' => BlockContentTranslationHandler::class,
+    'user_cancel' => DefaultCancellationHandler::class,
   ],
   links: [
     'add-page' => '/block/add',

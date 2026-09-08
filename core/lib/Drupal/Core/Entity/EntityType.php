@@ -338,6 +338,9 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    *
    * @throws \Drupal\Core\Entity\Exception\EntityTypeIdLengthException
    *   Thrown when attempting to instantiate an entity type with too long ID.
+   * @throws \InvalidArgumentException
+   *   Thrown when a non-content entity type defines a user cancellation
+   *   handler.
    */
   public function __construct($definition) {
     // Throw an exception if the entity type ID is longer than 32 characters.
@@ -356,6 +359,13 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
 
     foreach ($definition as $property => $value) {
       $this->set($property, $value);
+    }
+
+    if (isset($this->handlers['user_cancel']) && !$this instanceof ContentEntityTypeInterface) {
+      throw new \InvalidArgumentException(sprintf(
+        'The "%s" entity type cannot specify a "user_cancel" handler because it is not a content entity type.',
+        $this->id(),
+      ));
     }
 
     // Ensure defaults.

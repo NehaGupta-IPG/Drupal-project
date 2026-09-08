@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\Entity\EntityFormMode;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -175,6 +176,27 @@ class EntityTypeTest extends UnitTestCase {
     $this->assertSame(StubEntityHandlerBase::class, $entity_type->getHandlerClass('form', 'default'));
     $this->assertNull($entity_type->getHandlerClass('foo'));
     $this->assertNull($entity_type->getHandlerClass('foo', 'bar'));
+  }
+
+  /**
+   * Tests that user cancellation handlers require a content entity type.
+   */
+  public function testUserCancelHandlerRequiresContentEntityType(): void {
+    $definition = [
+      'id' => 'example_entity_type',
+      'handlers' => [
+        'user_cancel' => StubEntityHandlerBase::class,
+      ],
+    ];
+    $entity_type = new ContentEntityType($definition);
+    $this->assertSame(
+      StubEntityHandlerBase::class,
+      $entity_type->getHandlerClass('user_cancel'),
+    );
+
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('The "example_entity_type" entity type cannot specify a "user_cancel" handler because it is not a content entity type.');
+    new EntityType($definition);
   }
 
   /**

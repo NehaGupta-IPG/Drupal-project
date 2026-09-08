@@ -24,6 +24,7 @@ use Drupal\media\MediaSourceFieldConstraintsInterface;
 use Drupal\media\MediaStorage;
 use Drupal\media\MediaViewsData;
 use Drupal\media\Routing\MediaRouteProvider;
+use Drupal\user\Entity\Handler\ReassignOnDeleteCancellationHandler;
 use Drupal\user\EntityOwnerTrait;
 
 /**
@@ -70,6 +71,7 @@ use Drupal\user\EntityOwnerTrait;
       'view' => MediaLinkTargetStandaloneWhenAvailable::class,
       'download' => MediaLinkTarget::class,
     ],
+    'user_cancel' => ReassignOnDeleteCancellationHandler::class,
   ],
   links: [
     'add-page' => '/media/add',

@@ -24,7 +24,32 @@ class MediaStorage extends SqlContentEntityStorage {
     //   https://www.drupal.org/project/drupal/issues/2992426 for further
     //   discussion.
     if (method_exists($media, 'prepareSave')) {
-      $media->prepareSave();
+      // Metadata preparation must compare an historical revision with itself,
+      // not with the current default revision. Restore the original afterwards
+      // so that the generic storage layer can perform its normal validation.
+      $restore_original = FALSE;
+      if (
+        $media instanceof MediaInterface
+        && !$media->isDefaultRevision()
+        && !$media->getOriginal()
+        && $media->getLoadedRevisionId()
+      ) {
+        $original = $this->loadRevisionUnchanged(
+          $media->getLoadedRevisionId(),
+        );
+        if ($original) {
+          $media->setOriginal($original);
+          $restore_original = TRUE;
+        }
+      }
+      try {
+        $media->prepareSave();
+      }
+      finally {
+        if ($restore_original) {
+          $media->setOriginal(NULL);
+        }
+      }
     }
     return parent::save($media);
   }

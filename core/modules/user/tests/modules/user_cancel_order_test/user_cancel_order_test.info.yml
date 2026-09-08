@@ -1,0 +1,8 @@
+name: 'User cancellation order test'
+type: module
+description: 'Support module for testing user cancellation ordering.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:node
+  - drupal:user

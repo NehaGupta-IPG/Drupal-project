@@ -68,6 +68,7 @@ services:
     class: Drupal\user\UserNameValidator
   Drupal\user\UserNameValidator: '@user.name_validator'
   Drupal\user\OneTimeAuthentication: ~
+  Drupal\user\EntityCancellationProcessor: ~
   Drupal\user\LoginFinalizer: ~
   Drupal\user\LogoutFinalizer: ~
   Drupal\user\NotificationHandler: ~
