@@ -72,6 +72,10 @@ tr .form-item,
   font-weight: normal;
 }
 
+.form-item__error-message {
+  font-weight: bold;
+}
+
 /* Label states. */
 
 .form-item__label.is-disabled {
