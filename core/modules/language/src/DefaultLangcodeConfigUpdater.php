@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\language;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Config\StorageInterface;
@@ -39,18 +40,18 @@ class DefaultLangcodeConfigUpdater {
    * @param string $new_langcode
    *   The new default langcode.
    *
-   * @return array
-   *   A Batch API definition, suitable for batch_set().
+   * @return \Drupal\Core\Batch\BatchBuilder
+   *   A batch builder object.
    */
-  public function buildBatch(string $old_langcode, string $new_langcode): array {
-    $event = new LanguageDefaultLangcodeChangeEvent($old_langcode, $new_langcode);
-    $event->addOperation(static::class . ':reconcileConfigLangcodeOperation', [$old_langcode, $new_langcode]);
+  public function buildBatch(string $old_langcode, string $new_langcode): BatchBuilder {
+    $batch = new BatchBuilder()
+      ->setTitle(new TranslatableMarkup('Updating configuration for the new default language'))
+      ->addOperation(static::class . ':reconcileConfigLangcodeOperation', [$old_langcode, $new_langcode]);
+
+    $event = new LanguageDefaultLangcodeChangeEvent($old_langcode, $new_langcode, $batch);
     $this->eventDispatcher->dispatch($event);
 
-    return [
-      'title' => new TranslatableMarkup('Updating configuration for the new default language'),
-      'operations' => $event->getOperations(),
-    ];
+    return $event->getBatch();
   }
 
   /**
