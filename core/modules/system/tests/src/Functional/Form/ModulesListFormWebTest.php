@@ -159,12 +159,12 @@ BROKEN;
    */
   public function testRequiredByThemeMessage(): void {
     $this->drupalGet('admin/modules');
-    $module_theme_depends_on_description = $this->getSession()->getPage()->findAll('css', '#edit-modules-test-module-required-by-theme-enable-description .admin-requirements li:contains("Test Theme Depending on Modules (theme) (uninstalled)")');
+    $module_theme_depends_on_description = $this->getSession()->getPage()->findAll('css', '#edit-modules-test-module-required-by-theme-enable-description .admin-requirements li:contains("Test Theme Depending on Modules (theme) (not installed)")');
     // Confirm that 'Test Theme Depending on Modules' is listed as being
     // required by the module 'Test Module Required by Theme'.
     $this->assertCount(1, $module_theme_depends_on_description);
     // Confirm that the required by message does not appear anywhere else.
-    $this->assertSession()->pageTextContains('Test Theme Depending on Modules (Theme) (uninstalled)');
+    $this->assertSession()->pageTextContains('Test Theme Depending on Modules (Theme) (not installed)');
   }
 
   /**

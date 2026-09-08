@@ -102,7 +102,7 @@ class ThemeUiTest extends BrowserTestBase {
     };
     // All the modules should be listed as disabled.
     foreach ($all_dependent_modules as $module) {
-      $expected_required_list_items[$module] = $this->testModules[$module] . " (uninstalled)";
+      $expected_required_list_items[$module] = $this->testModules[$module] . " (not installed)";
     }
     $this->assertUninstallableTheme($expected_required_list_items, $theme_name);
 

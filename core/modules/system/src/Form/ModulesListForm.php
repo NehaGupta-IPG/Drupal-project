@@ -391,7 +391,7 @@ class ModulesListForm extends FormBase {
           $row['enable']['#disabled'] = TRUE;
         }
         else {
-          $row['#required_by'][$dependent] = $this->t('@module (<span class="admin-disabled">uninstalled</span>)', ['@module' => $modules[$dependent]->info['name']]);
+          $row['#required_by'][$dependent] = $this->t('@module (<span class="admin-disabled">not installed</span>)', ['@module' => $modules[$dependent]->info['name']]);
         }
       }
     }

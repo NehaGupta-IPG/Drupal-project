@@ -297,7 +297,7 @@ class SystemController extends ControllerBase {
           }
 
           $module_name = $modules[$dependency]->info['name'];
-          $theme->module_dependencies_list[$dependency] = $modules[$dependency]->status ? $this->t('@module_name', ['@module_name' => $module_name]) : $this->t('@module_name (<span class="admin-disabled">uninstalled</span>)', ['@module_name' => $module_name]);
+          $theme->module_dependencies_list[$dependency] = $modules[$dependency]->status ? $this->t('@module_name', ['@module_name' => $module_name]) : $this->t('@module_name (<span class="admin-disabled">not installed</span>)', ['@module_name' => $module_name]);
 
           // Create an additional property that contains only disabled module
           // dependencies. This will determine if it is possible to install the
