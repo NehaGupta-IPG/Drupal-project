@@ -602,7 +602,7 @@ views_field:
       type: boolean
       label: 'Add default classes'
     empty:
-      type: string
+      type: text
       label: 'No results text'
     hide_empty:
       type: boolean
