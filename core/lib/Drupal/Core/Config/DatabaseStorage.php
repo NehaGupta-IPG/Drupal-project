@@ -4,6 +4,7 @@ namespace Drupal\Core\Config;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\TableVerifyTrait;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
@@ -11,6 +12,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
  */
 class DatabaseStorage implements StorageInterface {
   use DependencySerializationTrait;
+  use TableVerifyTrait;
 
   /**
    * The database connection.
@@ -64,6 +66,7 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function exists($name) {
+    $this->verifyTableInTransaction($this->table);
     try {
       return (bool) $this->connection->queryRange('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', 0, 1, [
         ':collection' => $this->collection,
@@ -84,6 +87,7 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function read($name) {
+    $this->verifyTableInTransaction($this->table);
     $data = FALSE;
     try {
       $raw = $this->connection->query('SELECT [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :name', [
@@ -111,6 +115,7 @@ class DatabaseStorage implements StorageInterface {
     if (empty($names)) {
       return [];
     }
+    $this->verifyTableInTransaction($this->table);
 
     $list = [];
     try {
@@ -138,6 +143,7 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function write($name, array $data) {
+    $this->verifyTableInTransaction($this->table);
     $data = $this->encode($data);
     try {
       return $this->doWrite($name, $data);
@@ -280,6 +286,7 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function listAll($prefix = '') {
+    $this->verifyTableInTransaction($this->table);
     try {
       $query = $this->connection->select($this->table);
       $query->fields($this->table, ['name']);
@@ -302,6 +309,7 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function deleteAll($prefix = '') {
+    $this->verifyTableInTransaction($this->table);
     try {
       return (bool) $this->connection->delete($this->table, $this->options)
         ->condition('name', $prefix . '%', 'LIKE')
@@ -341,6 +349,7 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function getAllCollectionNames() {
+    $this->verifyTableInTransaction($this->table);
     try {
       return $this->connection->query('SELECT DISTINCT [collection] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] <> :collection ORDER by [collection]', [
         ':collection' => StorageInterface::DEFAULT_COLLECTION,

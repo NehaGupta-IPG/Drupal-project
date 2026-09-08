@@ -1229,6 +1229,17 @@ abstract class Connection {
   }
 
   /**
+   * Determines if this driver supports lazy table creation.
+   *
+   * @return bool
+   *   TRUE if this connection supports creating tables lazily, FALSE
+   *   otherwise.
+   */
+  public function supportsLazyTableCreation(): bool {
+    return TRUE;
+  }
+
+  /**
    * Returns the name of the database engine accessed by this driver.
    *
    * @return string

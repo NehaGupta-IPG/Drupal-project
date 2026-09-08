@@ -3,6 +3,7 @@
 namespace Drupal\Core\Routing;
 
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\TableVerifyTrait;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
@@ -16,6 +17,8 @@ use Drupal\Core\Database\Connection;
  * @see \Drupal\Core\Routing\RouteProvider
  */
 class MatcherDumper implements MatcherDumperInterface {
+
+  use TableVerifyTrait;
 
   /**
    * The routes to be dumped.
@@ -84,6 +87,13 @@ class MatcherDumper implements MatcherDumperInterface {
    *   failed.
    */
   public function dump(array $options = []): string {
+    // The table is verified before the transaction starts, not with the
+    // in-transaction check, because the transaction below is started here.
+    // A driver that does not create tables lazily would abort it with the
+    // failed delete query on a missing table.
+    if (!$this->connection->supportsLazyTableCreation()) {
+      $this->verifyTable($this->tableName);
+    }
     // Convert all of the routes into database records.
     // Accumulate the menu masks on top of any we found before.
     $masks = array_flip($this->state->get('routing.menu_masks.' . $this->tableName, []));

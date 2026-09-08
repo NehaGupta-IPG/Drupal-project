@@ -4,6 +4,7 @@ namespace Drupal\Core\Queue;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\TableVerifyTrait;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
@@ -14,6 +15,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInterface, DelayableQueueInterface {
 
   use DependencySerializationTrait;
+  use TableVerifyTrait;
 
   /**
    * The database table name.
@@ -51,6 +53,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function createItem($data) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     $try_again = FALSE;
     try {
       $id = $this->doCreateItem($data);
@@ -100,6 +103,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function numberOfItems() {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     try {
       return (int) $this->connection->query('SELECT COUNT([item_id]) FROM {' . static::TABLE_NAME . '} WHERE [name] = :name', [':name' => $this->name])
         ->fetchField();
@@ -115,6 +119,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function claimItem($lease_time = 30) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     // Claim an item by updating its expire fields. If claim is not successful
     // another thread may have claimed the item in the meantime. Therefore loop
     // until an item is successfully claimed or we are reasonably sure there
@@ -157,6 +162,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function releaseItem($item) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     try {
       $update = $this->connection->update(static::TABLE_NAME)
         ->fields([
@@ -180,6 +186,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
     if ($delay < 0) {
       throw new \InvalidArgumentException('$delay must be non-negative');
     }
+    $this->verifyTableInTransaction(static::TABLE_NAME);
 
     try {
       // Add the delay relative to the current time.
@@ -203,6 +210,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function deleteItem($item) {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     try {
       $this->connection->delete(static::TABLE_NAME)
         ->condition('item_id', $item->item_id)
@@ -225,6 +233,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function deleteQueue() {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     try {
       $this->connection->delete(static::TABLE_NAME)
         ->condition('name', $this->name)
@@ -239,6 +248,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    * {@inheritdoc}
    */
   public function garbageCollection() {
+    $this->verifyTableInTransaction(static::TABLE_NAME);
     try {
       // Clean up the queue for failed batches.
       $this->connection->delete(static::TABLE_NAME)

@@ -42,6 +42,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function has($key) {
+    $this->verifyTableInTransaction($this->table);
     try {
       return (bool) $this->connection->query('SELECT 1 FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] = :key AND [expire] > :now', [
         ':collection' => $this->collection,
@@ -59,6 +60,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function getMultiple(array $keys) {
+    $this->verifyTableInTransaction($this->table);
     try {
       $values = $this->connection->query(
         'SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [expire] > :now AND [name] IN ( :keys[] ) AND [collection] = :collection',
@@ -83,6 +85,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function getAll() {
+    $this->verifyTableInTransaction($this->table);
     try {
       $values = $this->connection->query(
         'SELECT [name], [value] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [expire] > :now',
@@ -102,6 +105,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function getAllKeys(): iterable {
+    $this->verifyTableInTransaction($this->table);
     try {
       $values = $this->connection->query(
         'SELECT [name] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [expire] > :now',
@@ -145,6 +149,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function setWithExpire($key, $value, $expire) {
+    $this->verifyTableInTransaction($this->table);
     try {
       $this->doSetWithExpire($key, $value, $expire);
     }
@@ -186,6 +191,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    * {@inheritdoc}
    */
   public function setWithExpireIfNotExists($key, $value, $expire) {
+    $this->verifyTableInTransaction($this->table);
     try {
       return $this->doSetWithExpireIfNotExists($key, $value, $expire);
     }

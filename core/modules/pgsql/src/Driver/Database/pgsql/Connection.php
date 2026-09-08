@@ -217,38 +217,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       }
     }
 
-    // We need to wrap queries with a savepoint if:
-    // - Currently in a transaction.
-    // - A 'mimic_implicit_commit' does not exist already.
-    // - The query is not a savepoint query.
-    if (
-      $this->inTransaction() &&
-      !$this->transactionManager()->has('mimic_implicit_commit') &&
-      !(is_string($query) && (
-        stripos($query, 'ROLLBACK TO SAVEPOINT ') === 0 ||
-        stripos($query, 'RELEASE SAVEPOINT ') === 0 ||
-        stripos($query, 'SAVEPOINT ') === 0
-      ))
-    ) {
-      // Create a savepoint so we can rollback a failed query. This is so we can
-      // mimic MySQL and SQLite transactions which don't fail if a single query
-      // fails. This is important for tables that are created on demand. For
-      // example, \Drupal\Core\Cache\DatabaseBackend.
-      $savepoint = $this->startTransaction('mimic_implicit_commit');
-      try {
-        $return = parent::query($query, $args, $options);
-        $savepoint->commitOrRelease();
-      }
-      catch (\Exception $e) {
-        $savepoint->rollback();
-        throw $e;
-      }
-    }
-    else {
-      $return = parent::query($query, $args, $options);
-    }
-
-    return $return;
+    return parent::query($query, $args, $options);
   }
 
   /**
@@ -291,6 +260,13 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function databaseType() {
     return 'pgsql';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function supportsLazyTableCreation(): bool {
+    return FALSE;
   }
 
   /**
@@ -476,6 +452,13 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
+  public function merge($table, array $options = []) {
+    return new Merge($this, $table, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function upsert($table, array $options = []) {
     return new Upsert($this, $table, $options);
   }
@@ -485,20 +468,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function update($table, array $options = []) {
     return new Update($this, $table, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function delete($table, array $options = []) {
-    return new Delete($this, $table, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function truncate($table, array $options = []) {
-    return new Truncate($this, $table, $options);
   }
 
   /**
