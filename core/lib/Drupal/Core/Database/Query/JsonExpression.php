@@ -8,12 +8,12 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\InvalidQueryException;
 
 /**
- * Generates a SQL fragment for extracting a scalar value from a JSON column.
+ * Builds driver-specific SQL for reading and testing a value in a JSON column.
  *
  * Each database driver provides its own subclass with driver-specific SQL.
  * Used internally by JsonCondition, Select::jsonOrderBy() and
  * Select::addJsonExpression(). To add a JSON extraction to a SELECT field list,
- * use the query builder instead of this class:
+ * use SelectInterface::addJsonExpression() instead of this class:
  * @code
  * $alias = $query->addJsonExpression('field_data', '$.status', 'status');
  * // With a type cast:
@@ -31,9 +31,10 @@ abstract class JsonExpression {
    * The normalized JSONPath expression.
    *
    * All key names are in a format supported by all database drivers:
-   * - Keys of word characters from dot notation stay unquoted: $.key
-   * - All other keys use double-quoted dot notation, with " and \ escaped:
-   *   $."key-x"
+   * - A key written in dot notation with word characters only stays unquoted:
+   *   $.key
+   * - Every other key, including any key written in bracket notation, is
+   *   rendered in double-quoted dot notation with " and \ escaped: $."key-x"
    * - Array indices are unchanged: $[0]
    * - Both wildcard accessors are unchanged: $.* and $[*]
    */
@@ -42,8 +43,9 @@ abstract class JsonExpression {
   /**
    * The parsed path segments (key names and array indices as strings).
    *
-   * Key names are decoded. A wildcard segment keeps its accessor apart:
-   * self::WILDCARD_MEMBER for $.*, self::WILDCARD_ELEMENT for $[*].
+   * Key names are decoded. A wildcard segment is self::WILDCARD_MEMBER for
+   * $.* or self::WILDCARD_ELEMENT for $[*], so the two accessors stay
+   * distinguishable.
    *
    * @var string[]
    */
@@ -53,7 +55,7 @@ abstract class JsonExpression {
    * The parsed JSONPath segments.
    *
    * Key segments include the decoded key and a quoting flag. Index segments
-   * include the index, while wildcard segments contain only their marker.
+   * include the index. Wildcard segments hold only their segment type.
    *
    * @var list<array{0: string, 1?: string, 2?: bool}>
    */
@@ -163,10 +165,12 @@ abstract class JsonExpression {
    *   JSON column.
    * @param string|null $type_expression
    *   A SQL expression returning the JSON type name of the value $expression
-   *   yields. SQLite values lose the boolean type outside the JSON domain, so
-   *   its text cast reads the type from this expression instead. Only needed
-   *   together with $expression; the type of the value at the JSON path is
-   *   used without it.
+   *   yields. SQLite's json_extract() and json_each() return a JSON boolean
+   *   as the integer 1 or 0, so the SQLite text cast cannot tell a boolean
+   *   from a number by the value alone. It reads the JSON type name from this
+   *   expression and renders 'true' or 'false' like the other drivers. Only
+   *   needed together with $expression. Without it the type of the value at
+   *   the JSON path is used.
    *
    * @return string
    *   A SQL fragment that casts the value to the given type.
@@ -227,34 +231,40 @@ abstract class JsonExpression {
   abstract protected function doToHasKeySql(): string;
 
   /**
-   * Generates SQL for JSON array containment check.
+   * Generates SQL testing whether the JSON value at the path contains another.
+   *
+   * Containment follows the semantics of PostgreSQL's @> operator and MySQL's
+   * JSON_CONTAINS() function. An array is tested against a JSON array and an
+   * object against a JSON object.
    *
    * @param string $encoded_value
-   *   The JSON-encoded value to check for containment.
+   *   The JSON-encoded array or object to look for.
    *
    * @return string
-   *   A SQL fragment that evaluates to TRUE if the JSON array at the path
+   *   A SQL fragment that evaluates to TRUE if the JSON value at the path
    *   contains the given value.
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
    *   If the path contains a wildcard.
    *
+   * @see \Drupal\Core\Database\Query\JsonCondition::compile()
+   *
    * @internal
    *   This method should only be used by the database layer.
    */
   public function toContainsSql(string $encoded_value): string {
-    $this->assertNoWildcard('testing array containment');
+    $this->assertNoWildcard('testing containment');
     return $this->doToContainsSql($encoded_value);
   }
 
   /**
-   * Generates SQL for JSON array containment check.
+   * Generates SQL testing whether the JSON value at the path contains another.
    *
    * @param string $encoded_value
-   *   The JSON-encoded value to check for containment.
+   *   The JSON-encoded array or object to look for.
    *
    * @return string
-   *   A SQL fragment that evaluates to TRUE if the JSON array at the path
+   *   A SQL fragment that evaluates to TRUE if the JSON value at the path
    *   contains the given value.
    */
   abstract protected function doToContainsSql(string $encoded_value): string;
@@ -270,10 +280,11 @@ abstract class JsonExpression {
    * backend, because a value of another type equals no value of the compared
    * type.
    *
-   * The test only runs when the guard passes, so a value of another type
-   * matches no operator, including a negated one such as <> or NOT BETWEEN.
-   * This is what PostgreSQL's type aware jsonpath comparison does for scalar
-   * values.
+   * toPredicateSql() only runs the comparison on values that pass this
+   * predicate, so a value of another JSON type fails every operator, including
+   * a negated one such as <> or NOT BETWEEN. PostgreSQL's jsonpath comparisons
+   * behave the same way for scalars. A comparison across JSON types is false,
+   * not an error.
    *
    * @param \Drupal\Core\Database\Query\JsonCastType $type
    *   The cast type the comparison uses.
@@ -286,6 +297,11 @@ abstract class JsonExpression {
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
    *   If the path contains a wildcard and $type_expression is NULL.
+   *
+   * @see https://dev.mysql.com/doc/mysql-errors/8.4/en/server-error-reference.html#error_er_truncated_wrong_value
+   * @see https://www.postgresql.org/docs/current/errcodes-appendix.html
+   * @see https://www.sqlite.org/lang_expr.html#cast_expressions
+   * @see https://www.postgresql.org/docs/current/functions-json.html#FUNCTIONS-SQLJSON-PATH
    *
    * @internal
    *   This method should only be used by the database layer.
@@ -323,9 +339,12 @@ abstract class JsonExpression {
    * JSON type is skipped instead of cast.
    *
    * Numeric comparisons use floating-point precision so that JSON integers
-   * and floats share one comparison domain. Values beyond 2^53 may therefore
+   * and floats compare as one numeric type. Values beyond 2^53 may therefore
    * lose precision, including before the query is built if PHP receives them
-   * as floats. Result casts via toCastSql() keep the integer type.
+   * as floats, which happens to an integer literal beyond PHP_INT_MAX. The
+   * float comparison applies to conditions only. Select::addJsonExpression()
+   * and Select::jsonOrderBy() call toCastSql() directly and keep the integer
+   * type.
    *
    * @param \Drupal\Core\Database\Query\JsonCastType $type
    *   The cast type the test compares in.
@@ -337,12 +356,14 @@ abstract class JsonExpression {
    *   @endcode
    * @param bool $type_guarded
    *   Whether the test runs only on values of the JSON type matching $type.
-   *   The LIKE family passes FALSE: it searches the text rendering of a value
-   *   of any type.
+   *   CONTAINS, STARTS_WITH and ENDS_WITH pass FALSE, because they search the
+   *   text representation of a value of any JSON type.
    *
    * @return string
    *   A SQL fragment that evaluates to TRUE if a value at the path satisfies
    *   the test.
+   *
+   * @see https://www.php.net/manual/en/language.types.integer.php#language.types.integer.overflow
    *
    * @internal
    *   This method should only be used by the database layer.
@@ -375,12 +396,11 @@ abstract class JsonExpression {
   }
 
   /**
-   * Combines a guard and a test so the test runs behind the guard.
+   * Wraps a test in a CASE so that the guard is evaluated first.
    *
-   * SQL does not promise an evaluation order for AND, so the test could run
-   * on a value the guard rejects: PostgreSQL could cast a value the type
-   * guard skips, SQLite could extract from a scalar row the row filter
-   * excludes. CASE promises the order.
+   * SQL does not guarantee evaluation order for AND. Use CASE WHEN to
+   * evaluate the guard before the test, avoiding invalid casts on PostgreSQL
+   * and extraction from scalar values on SQLite.
    *
    * @param string $guard
    *   A boolean SQL predicate, such as a type guard or a wildcard row filter,
@@ -390,6 +410,8 @@ abstract class JsonExpression {
    *
    * @return string
    *   The combined boolean SQL.
+   *
+   * @see https://www.postgresql.org/docs/current/sql-expressions.html#SYNTAX-EXPRESS-EVAL
    */
   protected function guardedTestSql(string $guard, string $test): string {
     return $guard === '' ? $test : "CASE WHEN {$guard} THEN {$test} ELSE FALSE END";
@@ -400,7 +422,24 @@ abstract class JsonExpression {
    *
    * Each backend has its own mechanism for iterating the values a wildcard
    * matches: JSON_TABLE on MySQL, json_each on SQLite, jsonb_path_query on
-   * PostgreSQL. The pieces are combined by toPredicateSql().
+   * PostgreSQL. toPredicateSql() combines the pieces into an EXISTS subquery
+   * that is TRUE when any row of the set passes the filter and the test. For
+   * example, SQLite expands the path $.tags[*] on the column data into:
+   * @code
+   * [
+   *   'from' => "json_each(data, '$.tags') je",
+   *   'value' => 'je.value',
+   *   'type' => 'je.type',
+   *   'filter' => "json_type(data, '$.tags') = 'array'",
+   * ]
+   * @endcode
+   * and a test of the value against a placeholder becomes:
+   * @code
+   * EXISTS (SELECT 1 FROM json_each(data, '$.tags') je
+   *   WHERE CASE WHEN json_type(data, '$.tags') = 'array'
+   *     THEN <the type guard of je.type and the test of je.value>
+   *     ELSE FALSE END)
+   * @endcode
    *
    * @return array{from: string, value: string, type: string, filter: string}
    *   An array with:
@@ -420,7 +459,8 @@ abstract class JsonExpression {
    * @param string $from
    *   The FROM clause of the row set, as returned by wildcardRowSet().
    * @param string $where
-   *   The condition a row has to satisfy.
+   *   The condition a row has to satisfy, as built by toPredicateSql() from
+   *   the filter of wildcardRowSet(), the type guard and the test.
    *
    * @return string
    *   A SQL fragment that evaluates to TRUE if any row satisfies $where.
@@ -458,10 +498,13 @@ abstract class JsonExpression {
   }
 
   /**
-   * Builds placeholder arguments for an IN/NOT IN comparison.
+   * Builds the placeholders and the cast type for a comparison value.
+   *
+   * Works for a single value and for an IN/NOT IN list. A boolean is bound as
+   * 1 or 0, because the boolean cast of every driver yields an integer.
    *
    * @param array $value
-   *   The array of values.
+   *   The values to bind. A single-value comparison passes one.
    * @param \Drupal\Core\Database\Query\PlaceholderInterface $queryPlaceholder
    *   The placeholder interface for generating unique placeholders.
    *
@@ -583,9 +626,10 @@ abstract class JsonExpression {
    * - Dot notation with keys of word characters and dashes: $.key, $.key-name
    * - Bracket notation with integer indices: $[0], $[42]
    * - Bracket notation with quoted keys, the empty key included: $["any key"],
-   *   $["esc\"aped"], $[""]. The only escape sequences are \" and \\. Other
-   *   escapes like \n are not decoded, so they are rejected instead of
-   *   reading a different key on each backend.
+   *   $["esc\"aped"], $[""]. The only escape sequences are \" and \\. Any
+   *   other escape, such as \n, is rejected. The backends do not agree on how
+   *   to decode it, so passing it through would read a different key on each
+   *   one.
    * - One wildcard: $.*, $[*], $.level1.*.level2
    *
    * @param string $path
@@ -660,19 +704,24 @@ abstract class JsonExpression {
   /**
    * Renders parsed segments as a portable JSONPath.
    *
-   * Keys of word characters from dot notation stay unquoted ($.key), all
-   * other keys use double-quoted dot notation with " and \ escaped
-   * ($."key-x"). Array indices keep their bracket form ($[0]).
+   * A key written in dot notation with word characters only stays unquoted
+   * ($.key). Every other key is rendered in double-quoted dot notation with "
+   * and \ escaped ($."key-x"). Array indices keep their bracket form ($[0]).
    *
-   * The two wildcard accessors are kept apart. Every backend reads $.* as the
-   * object member wildcard and $[*] as the array element wildcard, so folding
-   * one into the other selects different values.
+   * The two wildcard accessors select different values, so each is rendered
+   * as written. MySQL and PostgreSQL read $.* as every member of an object and
+   * $[*] as every element of an array. The SQLite driver reproduces that
+   * distinction with a container type filter, because its path syntax has no
+   * wildcard.
    *
    * @param array[] $segments
    *   The parsed segments to render.
    *
    * @return string
    *   The rendered JSONPath.
+   *
+   * @see https://dev.mysql.com/doc/refman/8.4/en/json.html#json-path-syntax
+   * @see https://www.postgresql.org/docs/current/functions-json.html#FUNCTIONS-SQLJSON-PATH
    */
   protected function renderSegments(array $segments): string {
     $path = '$';

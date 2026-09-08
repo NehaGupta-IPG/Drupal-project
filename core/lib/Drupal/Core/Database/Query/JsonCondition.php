@@ -43,8 +43,9 @@ class JsonCondition extends Condition {
    * The operators that accept a path with a wildcard segment.
    *
    * These are the operators that test one extracted value, so the same test
-   * can be applied to every value a wildcard matches. The remaining operators
-   * read the document at the path itself, which a wildcard does not address.
+   * can be applied to every value a wildcard matches. IS NULL, IS NOT NULL,
+   * HAS KEY and JSON_CONTAINS read the JSON value at the path as a whole, and
+   * a wildcard path names no single value.
    *
    * @see \Drupal\Core\Database\Query\JsonExpression::toPredicateSql()
    * @see \Drupal\Core\Database\Query\JsonExpression::assertNoWildcard()
@@ -64,9 +65,9 @@ class JsonCondition extends Condition {
    * @param string $path
    *   The JSONPath expression (must start with '$').
    * @param string|int|float|array|bool|null $value
-   *   The comparison value. Unary operators (IS NULL, IS NOT NULL, HAS KEY)
-   *   ignore it; every other operator requires it. Its PHP type determines
-   *   the comparison domain. See
+   *   The comparison value. It is ignored by IS NULL, IS NOT NULL, and HAS
+   *   KEY, and required by every other operator. Its PHP type selects the
+   *   JSON type it is compared against, see
    *   ConditionInterface::jsonCondition().
    * @param string $operator
    *   The comparison operator.
@@ -173,20 +174,18 @@ class JsonCondition extends Condition {
    * {@inheritdoc}
    */
   public function compile(Connection $connection, PlaceholderInterface $queryPlaceholder): void {
-    // Re-compile if this condition changed or if we are compiled against a
-    // different query placeholder object. The second case gives the condition
-    // the placeholder names of that object, instead of keeping the names of
-    // an earlier compilation.
+    // Reuse the compiled condition if neither it nor the query placeholder
+    // object has changed. Otherwise, rebuild it with the current query's
+    // placeholder names.
     if (!$this->changed && isset($this->queryPlaceholderIdentifier) && $this->queryPlaceholderIdentifier == $queryPlaceholder->uniqueIdentifier()) {
       return;
     }
 
     $expression = $connection->jsonExpression($this->field, $this->path);
 
-    // A wildcard is expanded into a row set by toPredicateSql() only. The
-    // other operators build their SQL from forms that return a single value,
-    // so they cannot express one. JsonExpression rejects those forms as well;
-    // this check names the operator that reached them.
+    // Reject unsupported wildcard operators here so the error message can
+    // name the operator. JsonExpression also rejects these paths, but does
+    // not have that information.
     if ($expression->hasWildcard() && !in_array($this->operator, self::WILDCARD_OPERATORS, TRUE)) {
       throw new InvalidQueryException(sprintf(
         'JSON operator %s does not support the wildcard in jsonpath "%s". Operators that support a wildcard path: %s.',
@@ -215,21 +214,26 @@ class JsonCondition extends Condition {
         return;
 
       case 'JSON_CONTAINS':
-        // Containment compares the candidate against the value at the path as
-        // a whole:
+        // Containment, as the PostgreSQL @> operator and MySQL JSON_CONTAINS()
+        // define it, compares the candidate against the value at the path as a
+        // whole:
         // - Both have to be of the same JSON type, an array against an array
-        //   and an object against an object.
+        //   or an object against an object.
         // - Every element of a candidate array has to be contained in some
         //   element of the value.
         // - Every member of a candidate object has to be present in the value
         //   under the same name, and its value contained.
         // - A scalar is contained when it is equal and of the same JSON type,
         //   except that numbers compare numerically across integer and float.
-        // On an array of objects this matches one element as a whole, so it
-        // tests a combination of values, where a jsonCondition() per value can
-        // match values of different elements. Nesting an array inside a
-        // candidate array is not portable, MariaDB compares the elements of
-        // those one by one.
+        // Against an array of objects, a candidate object has to match inside
+        // one element, so JSON_CONTAINS tests a combination of values. Separate
+        // jsonCondition() calls with a wildcard path may match each value in a
+        // different element instead. Do not nest an array inside a
+        // candidate array. MariaDB compares the nested elements one by one
+        // instead of as one array, so the result differs from MySQL and
+        // PostgreSQL. This is not covered by the MariaDB documentation.
+        // @see https://www.postgresql.org/docs/current/datatype-json.html#JSON-CONTAINMENT
+        // @see https://dev.mysql.com/doc/refman/8.4/en/json-search-functions.html#function_json-contains
         $encoded = json_encode($this->value, JSON_THROW_ON_ERROR);
         $this->stringVersion = $expression->toContainsSql($encoded);
         $this->arguments = [];
@@ -289,9 +293,9 @@ class JsonCondition extends Condition {
         return;
     }
 
-    // Scalar and boolean comparisons are handled by the expression, which
-    // generates driver-appropriate SQL (extract+placeholder for MySQL/SQLite,
-    // jsonpath operators for PgSQL).
+    // A comparison against a single value is built by the expression. MySQL
+    // and SQLite extract the value and compare it to a placeholder, PostgreSQL
+    // uses jsonpath operators.
     $result = $expression->toComparisonSql($this->operator, $this->value, $queryPlaceholder);
     $this->stringVersion = $result['sql'];
     $this->arguments = $result['args'];

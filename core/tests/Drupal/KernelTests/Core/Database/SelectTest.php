@@ -15,8 +15,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cSpell:ignore bigserial
-
 /**
  * Tests the Select query builder.
  */
@@ -1283,8 +1281,8 @@ class SelectTest extends DatabaseTestBase {
   /**
    * Tests that an integer cast holds values wider than 32 bits.
    *
-   * Entity and revision IDs come from bigserial columns, so the integer cast
-   * has to be 64-bit on every driver.
+   * A JSON number can hold any 64-bit integer, so the integer cast has to be
+   * 64-bit on every driver.
    */
   public function testJsonIntCastIs64Bit(): void {
     // Above the 2147483647 limit of a 32-bit signed integer.

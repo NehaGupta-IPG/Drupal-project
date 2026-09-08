@@ -26,8 +26,9 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * Builds the path array the #> and #>> operators take.
    *
-   * Uses an ARRAY[] constructor instead of a '{a,b}' literal so the curly
-   * braces don't need to survive prefixTables() and quoteIdentifiers().
+   * Uses an ARRAY[] constructor instead of a '{a,b}' literal. Each segment is
+   * quoted with quote() on its own, so a key may hold any character. A
+   * '{a,b}' literal would need its own escaping for commas, quotes and braces.
    *
    * @return string
    *   A SQL text array of the path segments.
@@ -44,13 +45,15 @@ class JsonExpression extends BaseJsonExpression {
     $sql = $expression ?? $this->toSql();
     return match ($type) {
       JsonCastType::Bool => "({$sql})::boolean::integer",
-      // bigint, not integer: MySQL's SIGNED and SQLite's INTEGER are both
-      // 64-bit, and PostgreSQL raises an out of range error instead of
-      // truncating. Entity and revision IDs come from bigserial columns.
+      // Cast to bigint, not integer. A JSON number can hold any 64-bit value,
+      // MySQL's SIGNED and SQLite's INTEGER are 64-bit, and PostgreSQL raises
+      // an out of range error instead of truncating a value that does not fit.
       JsonCastType::Int => "({$sql})::bigint",
       JsonCastType::Float => "({$sql})::double precision",
-      // Parentheses prevent PgSQL's prepareStatement() from appending ::text to
-      // the ARRAY[]::text[] portion when used before LIKE/ILIKE.
+      // Without the parentheses, the ::text the driver appends before LIKE and
+      // ILIKE (see Connection::prepareStatement() and
+      // Connection::$postgresqlConditionOperatorMap) would attach to the
+      // ARRAY[]::text[] operand and turn the path into plain text.
       JsonCastType::Text => "({$sql})",
     };
   }
@@ -59,8 +62,9 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   protected function doToHasKeySql(): string {
-    // @? checks if the jsonpath returns any items. PDO requires doubling the ?
-    // to avoid placeholder interpretation.
+    // @? tests whether the jsonpath matches any item. PDO reads a lone ? as a
+    // positional placeholder, so it is written as ?? here.
+    // @see https://www.php.net/manual/en/pdo.prepare.php
     return "{$this->field} @?? {$this->connection->quote($this->path)}";
   }
 
@@ -68,9 +72,10 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   protected function doToContainsSql(string $encoded_value): string {
-    // Escape the encoded value with quote(), then strip the surrounding
-    // quotes it adds: the value is embedded inside an existing single-quoted
-    // jsonpath literal. The other embedding sites in this class do the same.
+    // quote() returns the value with surrounding quotes. Strip them, because
+    // the value goes inside the single-quoted jsonb array literal on the right
+    // of @>. toComparisonSql() and wildcardRowSet() embed the path into a
+    // jsonpath literal the same way.
     $sql_value = substr($this->connection->quote($encoded_value), 1, -1);
     $quoted_path = $this->connection->quote($this->path);
     return "JSONB_PATH_QUERY_ARRAY({$this->field}, {$quoted_path}) @> '[{$sql_value}]'";
@@ -80,14 +85,14 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
-    // An IN/NOT IN comparison is built from placeholders on a cast value by the
-    // base class, which expands a wildcard path through wildcardRowSet().
+    // The base class builds IN and NOT IN from placeholders on the cast value
+    // and expands a wildcard path through wildcardRowSet().
     if (is_array($value)) {
       return parent::toComparisonSql($operator, $value, $queryPlaceholder);
     }
 
-    // PgSQL uses jsonpath operators for scalar comparisons, which bake the
-    // value into the SQL expression instead of using placeholders.
+    // A comparison against a single value uses jsonpath operators. The value
+    // is part of the SQL text, not a placeholder.
     $op = $operator === '=' ? '==' : $operator;
     $encoded = is_string($value) || is_bool($value)
       ? json_encode($value, JSON_THROW_ON_ERROR)
@@ -96,7 +101,7 @@ class JsonExpression extends BaseJsonExpression {
     $sql_value = substr($this->connection->quote((string) $encoded), 1, -1);
     // Escape the path before embedding it in the same predicate.
     $escaped_path = substr($this->connection->quote($this->path), 1, -1);
-    // PDO requires the ? be doubled else they are considered placeholders.
+    // Double the ? in @? for PDO, see doToHasKeySql().
     return [
       'sql' => "{$this->field} @?? '{$escaped_path} ? (@ {$op} {$sql_value})'",
       'args' => [],
@@ -107,9 +112,10 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   protected function wildcardRowSet(): array {
-    // jsonb_path_query returns one row per value the jsonpath matches, so the
-    // wildcard needs no rewriting. The #>> operator reads the value of a row as
-    // text, with an empty path array addressing the value itself.
+    // jsonb_path_query() accepts the wildcard path as is and returns one row
+    // per matched value, so the path is not split at the wildcard like on
+    // MySQL and SQLite. '{}' is an empty path array, so v #>> '{}' reads the
+    // row's own value as text.
     // Escape the path before embedding it in the function call.
     $escaped_path = substr($this->connection->quote($this->path), 1, -1);
     return [
@@ -124,8 +130,9 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   protected function doToTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
-    // PostgreSQL reports every number as 'number', so one type name covers
+    // jsonb_typeof() reports every number as 'number', so one type name covers
     // both numeric casts.
+    // @see https://www.postgresql.org/docs/current/functions-json.html
     $json_type = match ($type) {
       JsonCastType::Int, JsonCastType::Float => 'number',
       JsonCastType::Bool => 'boolean',

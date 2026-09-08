@@ -103,6 +103,31 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  * ... [':my_field' => 'foo'] ...
  * @endcode
  *
+ * @section sec_json Querying JSON columns
+ * A column of type 'json' holds a JSON document. The dynamic query builders
+ * read values inside the document with a JSONPath expression:
+ *
+ * @code
+ * $query = \Drupal::database()->select('example', 'e');
+ * $query->fields('e', ['id']);
+ * // Match rows whose $.status is "active".
+ * $query->jsonCondition('e.data', '$.status', 'active');
+ * // Add the value of $.score to the select list as an integer.
+ * $score_alias = $query->addJsonExpression('e.data', '$.score', 'score', JsonCastType::Int);
+ * // Sort by that value.
+ * $query->jsonOrderBy('e.data', '$.score', 'DESC', JsonCastType::Int);
+ * @endcode
+ *
+ * The PHP type of the comparison value selects the JSON type it is compared
+ * against. An integer or float matches JSON numbers, a boolean matches JSON
+ * booleans, and a string matches JSON strings. See
+ * \Drupal\Core\Database\Query\ConditionInterface::jsonCondition() for the
+ * supported path syntax and operators, and
+ * \Drupal\Core\Database\Query\SelectInterface::addJsonExpression() for the
+ * available casts. Update, Delete and Merge queries take a jsonCondition() as
+ * well, and Update, Insert and Merge queries can write an extracted value
+ * into a column with jsonExpression().
+ *
  * @section sec_dynamic Dynamic SELECT queries
  * For SELECT queries where the simple query API described in @ref sec_simple
  * will not work well, you need to use the dynamic query API. However, you
@@ -338,6 +363,9 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *       'float', 'numeric', 'serial', or 'json'. Most types just map to the
  *       according database engine specific data types. Use 'serial' for auto
  *       incrementing fields. This will expand to 'INT auto_increment' on MySQL.
+ *       Use 'json' for a column holding a JSON document. It maps to JSON on
+ *       MySQL and SQLite and to jsonb on PostgreSQL, and only allows a NULL
+ *       default.
  *       A special 'varchar_ascii' type is also available for limiting machine
  *       name field to US ASCII characters.
  *     - 'mysql_type', 'pgsql_type', 'sqlite_type', etc.: If you need to

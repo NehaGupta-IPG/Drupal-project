@@ -699,7 +699,8 @@ class Select extends Query implements SelectInterface {
     $expression = $this->connection->jsonExpression($field, $jsonpath);
     $sql = $expression->toCastSql($cast);
 
-    // NULLS LAST: rows where the JSON value is NULL sort after non-NULL.
+    // Sort NULL values last regardless of direction. The IS NULL expression is
+    // 0 for a value and 1 for NULL, so ordering it ASC puts NULLs after values.
     $nullAlias = $this->addExpression("({$sql} IS NULL)");
     $this->orderBy($nullAlias, 'ASC');
 

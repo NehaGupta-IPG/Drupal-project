@@ -30,13 +30,15 @@ class JsonExpression extends BaseJsonExpression {
     return match ($type) {
       JsonCastType::Bool, JsonCastType::Int => "CAST({$sql} AS INTEGER)",
       JsonCastType::Float => "CAST({$sql} AS REAL)",
-      // json_extract() reads a JSON boolean as the integer 1 or 0, while the
-      // text extraction on MySQL and PostgreSQL reads it as 'true' or
-      // 'false'. Only the JSON type still knows it was a boolean, so map it
-      // back to the JSON literal. json_extract() also leaves a JSON number as
-      // SQL INTEGER or REAL, so every other value is cast to TEXT like the
-      // text extraction on the other backends. CAST keeps NULL as NULL, so a
-      // missing path and a JSON null still read as SQL NULL.
+      // json_extract() returns a JSON boolean as the integer 1 or 0, while the
+      // text extraction on MySQL and PostgreSQL returns 'true' or 'false'.
+      // json_type() is the only way to tell the boolean from a number, so when
+      // a type expression is available the CASE maps it back to the literal.
+      // Without one a plain CAST is all that is possible. json_extract() also
+      // returns a JSON number as SQL INTEGER or REAL, so every other value is
+      // cast to TEXT like on the other backends. CAST keeps NULL, so a missing
+      // path and a JSON null still read as SQL NULL.
+      // @see https://www.sqlite.org/json1.html#the_json_extract_function
       JsonCastType::Text => $type_expression === NULL ? "CAST({$sql} AS TEXT)" : "CASE {$type_expression} WHEN 'true' THEN 'true' WHEN 'false' THEN 'false' ELSE CAST({$sql} AS TEXT) END",
     };
   }
@@ -52,10 +54,10 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   protected function doToContainsSql(string $encoded_value): string {
-    // SQLite has no containment operator, so the test is built from the
-    // structure of the candidate, which is known while the query is built.
-    // Decoding the encoded candidate normalizes it to arrays and scalars,
-    // whichever of those the caller combined it from.
+    // SQLite has no containment operator. The value to look for (the
+    // candidate) is known while the query is built, so the test follows its
+    // structure. json_decode() with $associative = TRUE turns both JSON arrays
+    // and JSON objects into PHP arrays, so one code path handles both.
     $candidate = json_decode($encoded_value, TRUE, flags: JSON_THROW_ON_ERROR);
     $source = "{$this->field}, {$this->connection->quote($this->path)}";
     // The candidate and the value at the path have to be of the same JSON type.
@@ -70,13 +72,15 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * Builds the containment test of every part of a candidate value.
    *
-   * An element of a candidate array is contained when any element of the value
-   * at the path contains it, a member of a candidate object when the member of
-   * the same name does. Both are a test over the rows json_each() returns, so
-   * the two cases differ in the test of the key only.
+   * For a JSON array, every element of $candidate has to be contained in some
+   * element of the stored array. For a JSON object, every member of $candidate
+   * has to be contained in the stored member of the same name. Both are tests
+   * over the rows json_each() returns, so they differ only in whether the key
+   * is compared.
    *
    * @param array $candidate
-   *   The candidate array or object.
+   *   The decoded candidate, a list for a JSON array or an associative array
+   *   for a JSON object.
    * @param string $source
    *   The arguments of the json_each() call reading the value the candidate is
    *   tested against, written as "<document>, <jsonpath>".
@@ -128,10 +132,10 @@ class JsonExpression extends BaseJsonExpression {
     return match (TRUE) {
       is_bool($part) => "{$alias}.type = '" . ($part ? 'true' : 'false') . "'",
       $part === NULL => "{$alias}.type = 'null'",
-      // A whole number is reported as an integer and a fractional one as a
-      // real, so both types satisfy a numeric candidate and the comparison
-      // decides. The number is written as a numeric literal, because a quoted
-      // one would compare as text and equal no number.
+      // json_type() reports a whole number as 'integer' and a fractional one
+      // as 'real', so both are accepted and the value comparison does the
+      // rest. The number is written as a numeric literal. A quoted literal
+      // would be compared as text and never equal a numeric value.
       is_int($part), is_float($part) => "{$alias}.type IN ('integer', 'real') AND {$alias}.value = " . json_encode($part, JSON_THROW_ON_ERROR),
       default => "{$alias}.type = 'text' AND {$alias}.value = {$this->connection->quote((string) $part)}",
     };
@@ -141,9 +145,10 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   protected function wildcardRowSet(): array {
-    // SQLite doesn't support wildcards in json_extract. Use json_each to
-    // iterate the wildcard level and read each element's value at the
+    // The SQLite path syntax has no wildcard. json_each() iterates the values
+    // at the wildcard level, and the value of each row is read at the
     // remaining suffix path.
+    // @see https://www.sqlite.org/json1.html#path_arguments
     [$prefix, $suffix] = $this->splitAtWildcard();
     // json_each walks object members and array elements alike. Filter on the
     // container type so [*] matches only arrays and .* only objects, like
@@ -157,8 +162,10 @@ class JsonExpression extends BaseJsonExpression {
     else {
       $extract = "json_extract(je.value, {$this->connection->quote($suffix)})";
       $element_type = "json_type(je.value, {$this->connection->quote($suffix)})";
-      // json_extract on a scalar je.value (e.g. a string) causes a
-      // "malformed JSON" error. Filter to object/array values only.
+      // json_each() returns a JSON string unquoted, and json_extract() on such
+      // a value raises a "malformed JSON" error. Filter to object and array
+      // values only.
+      // @see https://www.sqlite.org/json1.html#jeach
       $row_filter .= " AND je.type IN ('object', 'array')";
     }
     return [
@@ -173,9 +180,10 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   protected function doToTypeGuardSql(JsonCastType $type, ?string $type_expression = NULL): string {
-    // SQLite has no boolean JSON type, it reports the literals true and false
-    // as their own type. A whole number satisfies a float comparison, so
-    // 'integer' is accepted for both numeric casts.
+    // SQLite has no boolean JSON type. json_type() reports the literals true
+    // and false as their own types. A whole number satisfies a float
+    // comparison, so 'integer' is accepted for both numeric casts.
+    // @see https://www.sqlite.org/json1.html#jtype
     $json_types = match ($type) {
       JsonCastType::Int, JsonCastType::Float => "'integer', 'real'",
       JsonCastType::Bool => "'true', 'false'",

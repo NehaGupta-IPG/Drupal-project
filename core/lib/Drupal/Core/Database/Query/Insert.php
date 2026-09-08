@@ -4,8 +4,6 @@ namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\InvalidQueryException;
 
-// cspell:ignore uncast
-
 /**
  * General class for an abstracted INSERT query.
  *
@@ -55,17 +53,27 @@ abstract class Insert extends Query implements \Countable {
    * Adds a condition on a JSON column to the query the rows come from.
    *
    * An INSERT statement has no WHERE clause of its own, so this method only
-   * applies to a query that inserts the result of a select query. Call from()
-   * before this method.
+   * applies to a query that inserts the result of a SELECT query. Call from()
+   * before this method:
+   * @code
+   * $select = $connection->select('source', 's')
+   *   ->fields('s', ['id', 'data']);
+   * $connection->insert('target')
+   *   ->fields(['id', 'data'])
+   *   ->from($select)
+   *   ->jsonCondition('data', '$.status', 'active')
+   *   ->execute();
+   * @endcode
    *
    * @param string $field
-   *   The JSON column to filter on.
+   *   The JSON column, optionally table-qualified (e.g. "n.data").
    * @param string $jsonpath
    *   The JSONPath expression (must start with '$').
    * @param string|int|float|array|bool|null $value
-   *   The comparison value. Unary operators (IS NULL, IS NOT NULL, HAS KEY)
-   *   ignore it; every other operator requires it. Its PHP type determines
-   *   the comparison domain.
+   *   The comparison value. It is ignored by IS NULL, IS NOT NULL, and HAS
+   *   KEY, and required by every other operator. Its PHP type selects the
+   *   JSON type it is compared against, see
+   *   ConditionInterface::jsonCondition().
    * @param string $operator
    *   The comparison operator.
    *
@@ -73,7 +81,7 @@ abstract class Insert extends Query implements \Countable {
    *   The called object.
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
-   *   If the query has no select query to insert the result of.
+   *   If no source SELECT query has been set with from().
    *
    * @see \Drupal\Core\Database\Query\Insert::from()
    * @see \Drupal\Core\Database\Query\ConditionInterface::jsonCondition()
@@ -87,18 +95,17 @@ abstract class Insert extends Query implements \Countable {
   /**
    * Inserts a value extracted from a JSON column into a column.
    *
-   * The value is taken from the rows the select query returns, so this method
-   * only applies to a query that inserts the result of a select query. Call
+   * The value is taken from the rows the SELECT query returns, so this method
+   * only applies to a query that inserts the result of a SELECT query. Call
    * from() before this method.
    *
-   * The extracted value is always cast, so that its type is the same on all
-   * database backends. Inserting an uncast extraction into a column is not
-   * portable.
+   * The extracted value is always cast to give it a consistent type across
+   * database backends.
    *
-   * The extraction is added to the select list of the select query under the
-   * name of the target column. A call to fields() on this query overrides the
-   * columns the values are inserted into, in which case the extraction keeps
-   * the position it has in the select list.
+   * The extraction is appended to the select list of the SELECT query, aliased
+   * to the target column name. When fields() is also called on this query, the
+   * columns are matched by position, not by name, so list the target column
+   * in the same position the extraction has in the select list.
    *
    * @param string $field
    *   The column to insert the extracted value into.
@@ -108,13 +115,13 @@ abstract class Insert extends Query implements \Countable {
    *   The JSONPath expression (must start with '$').
    * @param \Drupal\Core\Database\Query\JsonCastType $cast
    *   The type to cast the extracted value to. Defaults to text, which returns
-   *   the value unquoted.
+   *   a JSON string without its surrounding double quotes.
    *
    * @return $this
    *   The called object.
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
-   *   If the query has no select query to insert the result of, if the select
+   *   If no source SELECT query has been set with from(), if the SELECT
    *   query already has a field or an expression named after the target
    *   column, or if the jsonpath is invalid or contains a wildcard. A
    *   wildcard matches any number of values, and an inserted column takes
@@ -140,10 +147,10 @@ abstract class Insert extends Query implements \Countable {
   }
 
   /**
-   * Checks that the query inserts the result of a select query.
+   * Checks that the query inserts the result of a SELECT query.
    *
    * @param string $type
-   *   The kind of clause that requires the select query, for the message of
+   *   The kind of clause that requires the SELECT query, for the message of
    *   the exception.
    *
    * @throws \Drupal\Core\Database\InvalidQueryException

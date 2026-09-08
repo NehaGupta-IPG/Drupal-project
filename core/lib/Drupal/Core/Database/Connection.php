@@ -709,11 +709,15 @@ abstract class Connection {
     $options += $this->defaultOptions();
 
     $this->expandArguments($query, $args);
-    // Normalize boolean arguments to integers. Clients bind parameters as
-    // strings, which turns TRUE into '1' and FALSE into ''. An integer column
-    // compared to '' does not match 0 on SQLite, and PostgreSQL rejects it.
-    // Expanded array arguments are normalized as well, so the values of an IN
-    // condition behave the same as a scalar one.
+    // Normalize boolean arguments to integers. PDO and mysqli bind every
+    // parameter as a string, so TRUE becomes '1' and FALSE becomes ''.
+    // SQLite cannot convert '' to a number, and a TEXT value never equals an
+    // INTEGER, so an integer column compared to '' does not match 0.
+    // PostgreSQL rejects the comparison with SQLSTATE 22P02. Expanded array
+    // arguments are normalized as well, so the values of an IN condition
+    // behave the same as a scalar one.
+    // @see https://www.sqlite.org/datatype3.html#type_conversions_prior_to_comparison
+    // @see https://www.postgresql.org/docs/current/errcodes-appendix.html
     // Do not iterate by reference. That turns every element of $args into a PHP
     // reference, which is shared with each copy of the array, including the one
     // held by the statement execution event. \PDOStatement::execute() converts

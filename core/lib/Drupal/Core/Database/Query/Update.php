@@ -4,8 +4,6 @@ namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
 
-// cspell:ignore uncast
-
 /**
  * General class for an abstracted UPDATE operation.
  *
@@ -116,15 +114,14 @@ class Update extends Query implements ConditionInterface {
    * This is the JSON counterpart of expression(), and takes precedence over
    * fields() in the same way.
    *
-   * The extracted value is always cast, so that its type is the same on all
-   * database backends. Assigning an uncast extraction to a column is not
-   * portable.
+   * The extracted value is always cast to give it a consistent type across
+   * database backends.
    *
-   * Unlike a comparison, an assignment cannot skip the rows holding a value of
-   * another type. The path must hold a value of the cast type in every updated
-   * row, because MySQL and PostgreSQL reject a numeric cast of a JSON string.
-   * Restrict the query with a jsonCondition() when the column holds mixed
-   * types.
+   * jsonCondition() skips rows whose value has another JSON type. An
+   * assignment cannot skip rows. Every updated row must hold a value of the
+   * cast type at the path, because MySQL rejects a numeric cast of a JSON
+   * string with error 1292 and PostgreSQL with SQLSTATE 22P02. Restrict the
+   * query with a jsonCondition() when the column holds mixed types.
    *
    * @param string $field
    *   The field to set.
@@ -134,7 +131,7 @@ class Update extends Query implements ConditionInterface {
    *   The JSONPath expression (must start with '$').
    * @param \Drupal\Core\Database\Query\JsonCastType $cast
    *   The type to cast the extracted value to. Defaults to text, which returns
-   *   the value unquoted.
+   *   a JSON string without its surrounding double quotes.
    *
    * @return $this
    *   The called object.
@@ -146,6 +143,8 @@ class Update extends Query implements ConditionInterface {
    * @see \Drupal\Core\Database\Query\Update::expression()
    * @see \Drupal\Core\Database\Query\SelectInterface::addJsonExpression()
    * @see \Drupal\Core\Database\Query\ConditionInterface::jsonCondition()
+   * @see https://dev.mysql.com/doc/mysql-errors/8.4/en/server-error-reference.html#error_er_truncated_wrong_value
+   * @see https://www.postgresql.org/docs/current/errcodes-appendix.html
    */
   public function jsonExpression(string $field, string $json_field, string $jsonpath, JsonCastType $cast = JsonCastType::Text): static {
     $expression = $this->connection->jsonExpression($json_field, $jsonpath);

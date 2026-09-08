@@ -45,12 +45,13 @@ final class NamedPlaceholderConverter {
   private const string MULTICHAR = ':{2,}';
   private const string NAMED_PARAMETER = ':[a-zA-Z0-9_]+';
   private const string POSITIONAL_PARAMETER = '(?<!\\?)\\?(?!\\?)';
-  // In MySQL and MariaDB a one line comment only starts when the second dash is
-  // followed by a whitespace or control character. Without that, '1--2' is a
-  // subtraction of a negative number, and treating it as a comment discards the
-  // rest of the line, including any placeholder in it. The character is matched
-  // with a lookahead so that a comment ending immediately at a newline does not
-  // consume the newline, which would take the next line with it.
+  // MySQL and MariaDB start a one line comment at '--' only when a whitespace
+  // or control character follows. For example, '1--2' subtracts a negative
+  // number. Treating '--2' as a comment would discard the rest of the line,
+  // including any placeholders. The character is matched with a lookahead
+  // so that an empty comment, '--' directly followed by a newline, does not
+  // consume the newline and the next line with it.
+  // @see https://dev.mysql.com/doc/refman/8.4/en/comments.html
   private const string ONE_LINE_COMMENT = '--(?=[\s\x00-\x08\x0B\x0C\x0E-\x1F])[^\r\n]*';
   private const string MULTI_LINE_COMMENT = '/\*([^*]+|\*+[^/*])*\**\*/';
   private const string SPECIAL = '[' . self::SPECIAL_CHARS . ']';
@@ -174,17 +175,16 @@ final class NamedPlaceholderConverter {
   /**
    * Helper to return a regex pattern from a delimiter character.
    *
-   * MySQL and MariaDB treat a backslash as an escape character inside string
-   * literals, so a literal does not end at a delimiter preceded by a backslash.
-   * Values are escaped with \mysqli::real_escape_string(), which produces such
-   * literals. An ANSI pattern ends the literal at the escaped delimiter and
-   * mistakes the rest of the literal for SQL, which leaves any placeholder that
-   * follows it unconverted.
+   * MySQL and MariaDB treat a backslash inside a string literal as an escape
+   * character, so a delimiter preceded by a backslash does not end the
+   * literal. \mysqli::real_escape_string() escapes quotes this way. A pattern
+   * that only knows the ANSI doubled delimiter ('' or "") would end the
+   * literal at the escaped quote, read the rest of the literal as SQL, and
+   * leave any placeholder after it unconverted. A doubled delimiter is still
+   * matched.
    *
-   * A delimiter escaped by doubling it is matched as well.
-   *
-   * This does not account for the NO_BACKSLASH_ESCAPES SQL mode, which is not
-   * part of the SQL mode Drupal sets.
+   * The NO_BACKSLASH_ESCAPES SQL mode is not handled, because Drupal does not
+   * set it.
    *
    * @param string $delimiter
    *   A delimiter character.
@@ -192,7 +192,8 @@ final class NamedPlaceholderConverter {
    * @return string
    *   The regex pattern.
    *
-   * @see \Drupal\mysqli\Driver\Database\mysqli\Connection::getConnectionOptions()
+   * @see \Drupal\mysqli\Driver\Database\mysqli\Connection::open()
+   * @see https://dev.mysql.com/doc/refman/8.4/en/sql-mode.html#sqlmode_no_backslash_escapes
    */
   private function getMySQLStringLiteralPattern(string $delimiter): string {
     return $delimiter . '(?:[^' . $delimiter . '\\\\]|\\\\.|' . $delimiter . $delimiter . ')*' . $delimiter;

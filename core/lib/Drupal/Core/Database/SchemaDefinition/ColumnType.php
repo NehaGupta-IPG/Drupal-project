@@ -53,8 +53,9 @@ enum ColumnType: string {
         FloatValue::class,
         NullValue::class,
       ],
-      // MySQL cannot apply a literal default to a JSON column, so only an
-      // explicit NULL default is portable.
+      // MySQL only accepts an expression as the default of a JSON column, not
+      // a literal, so only an explicit NULL default is portable.
+      // @see https://dev.mysql.com/doc/refman/8.4/en/data-type-defaults.html
       ColumnType::Json => [
         NullValue::class,
       ],
