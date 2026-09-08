@@ -274,7 +274,7 @@ class InsertJsonTest extends DatabaseTestBase {
       $this->fail('Should not be able to add an expression for a column the select query already selects.');
     }
     catch (InvalidQueryException $e) {
-      $this->assertSame('The select query already has a field named "status".', $e->getMessage());
+      $this->assertSame('The SELECT query the rows are inserted from already has a field named "status".', $e->getMessage());
     }
 
     $insert = $this->connection->insert('json')
@@ -282,7 +282,7 @@ class InsertJsonTest extends DatabaseTestBase {
       ->jsonExpression('name', 'test_field', '$.key');
 
     $this->expectException(InvalidQueryException::class);
-    $this->expectExceptionMessage('The select query already has an expression named "name".');
+    $this->expectExceptionMessage('The SELECT query the rows are inserted from already has an expression named "name".');
     $insert->jsonExpression('name', 'test_field', '$.number');
   }
 
@@ -291,7 +291,7 @@ class InsertJsonTest extends DatabaseTestBase {
    */
   public function testJsonConditionWithoutFromQuery(): void {
     $this->expectException(InvalidQueryException::class);
-    $this->expectExceptionMessage('An insert query only takes a JSON condition when it inserts the result of a select query. Call from() first.');
+    $this->expectExceptionMessage('An INSERT query only takes a JSON condition when it inserts the result of a SELECT query. Call from() first.');
     $this->connection->insert('json')
       ->jsonCondition('test_field', '$.number', 5);
   }
@@ -301,7 +301,7 @@ class InsertJsonTest extends DatabaseTestBase {
    */
   public function testJsonExpressionWithoutFromQuery(): void {
     $this->expectException(InvalidQueryException::class);
-    $this->expectExceptionMessage('An insert query only takes a JSON expression when it inserts the result of a select query. Call from() first.');
+    $this->expectExceptionMessage('An INSERT query only takes a JSON expression when it inserts the result of a SELECT query. Call from() first.');
     $this->connection->insert('json')
       ->jsonExpression('name', 'test_field', '$.key');
   }

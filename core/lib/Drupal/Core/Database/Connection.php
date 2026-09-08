@@ -1017,37 +1017,48 @@ abstract class Connection {
    * Creates a JsonExpression for extracting a value from a JSON column.
    *
    * @param string $field
-   *   The column name, optionally table-qualified (e.g. "t.data").
-   * @param string $path
-   *   The JSONPath expression (e.g. "$.status").
+   *   The JSON column, optionally table-qualified (e.g. "n.data").
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
    *
    * @return \Drupal\Core\Database\Query\JsonExpression
    *   A driver-specific JsonExpression instance.
+   *
+   * @throws \LogicException
+   *   If the driver has no JsonExpression class.
    */
-  public function jsonExpression(string $field, string $path): JsonExpression {
+  public function jsonExpression(string $field, string $jsonpath): JsonExpression {
     $class = $this->getDriverClass('JsonExpression');
     if ($class === 'JsonExpression') {
-      @trigger_error('Not implementing JsonExpression in database drivers is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Implement JsonExpression to provide JSON support. See https://www.drupal.org/node/3389682', E_USER_DEPRECATED);
+      @trigger_error('Not implementing JsonExpression in database drivers is deprecated in drupal:11.5.0 and will be required in drupal:13.0.0. Implement JsonExpression to provide JSON support. See https://www.drupal.org/node/3389682', E_USER_DEPRECATED);
       throw new \LogicException('Driver does not provide JSON support.');
     }
-    return new $class($this, $field, $path);
+    return new $class($this, $field, $jsonpath);
   }
 
   /**
    * Creates a condition on a value inside a JSON column.
    *
+   * Select, Update, Delete and Merge queries and condition groups have their
+   * own jsonCondition() method that adds the condition directly. Call this
+   * method when the condition is needed as an object, for example to pass it
+   * to condition():
+   * @code
+   * $query->condition($connection->jsonCondition('data', '$.status', 'active'));
+   * @endcode
+   *
    * The returned object is a condition group, so it can be nested in another
-   * condition group. Query builders that hold a condition provide a
-   * jsonCondition() method that adds the condition for you.
+   * condition group.
    *
    * @param string $field
-   *   The name of the JSON column.
-   * @param string $path
-   *   The JSONPath expression (e.g. "$.status").
+   *   The JSON column, optionally table-qualified (e.g. "n.data").
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
    * @param string|int|float|array|bool|null $value
-   *   The comparison value. Unary operators (IS NULL, IS NOT NULL, HAS KEY)
-   *   ignore it; every other operator requires it. Its PHP type determines
-   *   the comparison domain.
+   *   The comparison value. It is ignored by IS NULL, IS NOT NULL, and HAS
+   *   KEY, and required by every other operator. Its PHP type selects the
+   *   JSON type it is compared against, see
+   *   ConditionInterface::jsonCondition().
    * @param string $operator
    *   The comparison operator.
    *
@@ -1057,12 +1068,12 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Query\ConditionInterface::jsonCondition()
    */
-  public function jsonCondition(string $field, string $path, string|int|float|array|bool|null $value = NULL, string $operator = '='): JsonCondition {
+  public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): JsonCondition {
     $class = $this->getDriverClass('JsonCondition');
     if ($class === 'JsonCondition') {
       $class = JsonCondition::class;
     }
-    return new $class($field, $path, $value, $operator);
+    return new $class($field, $jsonpath, $value, $operator);
   }
 
   /**

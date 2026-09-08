@@ -96,13 +96,13 @@ class JsonCondition extends Condition {
         implode(', ', self::SUPPORTED_OPERATORS),
       ));
     }
-    if (in_array($this->operator, ['IN', 'NOT IN', 'JSON_CONTAINS'], TRUE) && !is_array($this->value)) {
+    if (!is_array($this->value) && in_array($this->operator, ['IN', 'NOT IN', 'JSON_CONTAINS'], TRUE)) {
       throw new InvalidQueryException(sprintf(
         'JSON operator %s requires an array value.',
         $this->operator,
       ));
     }
-    if (in_array($this->operator, ['BETWEEN', 'NOT BETWEEN'], TRUE) && (!is_array($this->value) || count($this->value) !== 2)) {
+    if ((!is_array($this->value) || count($this->value) !== 2) && in_array($this->operator, ['BETWEEN', 'NOT BETWEEN'], TRUE)) {
       throw new InvalidQueryException(sprintf(
         'JSON operator %s requires an array of exactly two values.',
         $this->operator,
@@ -119,11 +119,14 @@ class JsonCondition extends Condition {
         $this->operator,
       ));
     }
-    // A comparison list holds scalars of one comparison domain, where
-    // integers and floats compare as one numeric domain. JSON_CONTAINS is
-    // exempt: nested heterogeneous JSON is meaningful there.
+    // The values passed to IN, NOT IN, BETWEEN and NOT BETWEEN have to share
+    // one JSON type: number (an integer or a float), boolean or string. A
+    // stored value is only compared against values of its own JSON type, so a
+    // mixed list would match on some of its values and never on the others.
+    // JSON_CONTAINS is exempt, because its value is a JSON document, whose
+    // members can be of any type.
     if (in_array($this->operator, ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], TRUE)) {
-      $domains = [];
+      $types = [];
       foreach ($this->value as $element) {
         if (is_array($element)) {
           throw new InvalidQueryException(sprintf(
@@ -143,17 +146,17 @@ class JsonCondition extends Condition {
             $this->operator,
           ));
         }
-        $domains[match (TRUE) {
+        $types[match (TRUE) {
           is_int($element), is_float($element) => 'number',
           is_bool($element) => 'boolean',
           default => 'string',
         }] = TRUE;
       }
-      if (count($domains) > 1) {
+      if (count($types) > 1) {
         throw new InvalidQueryException(sprintf(
-          'JSON operator %s requires all values to share one comparison domain (number, boolean or string), got %s.',
+          'JSON operator %s requires all values to be of one type (number, boolean or string), got %s.',
           $this->operator,
-          implode(' and ', array_keys($domains)),
+          implode(' and ', array_keys($types)),
         ));
       }
     }

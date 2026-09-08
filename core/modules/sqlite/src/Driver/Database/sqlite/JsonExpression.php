@@ -102,9 +102,9 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * Builds the containment test of one part of a candidate value.
    *
-   * @param mixed $part
+   * @param array|string|int|float|bool|null $part
    *   An element of a candidate array, or the value of a member of a candidate
-   *   object.
+   *   object, as json_decode() returns it.
    * @param string $alias
    *   The alias of the json_each() row holding the value to test.
    * @param int $depth
@@ -113,7 +113,7 @@ class JsonExpression extends BaseJsonExpression {
    * @return string
    *   The SQL testing that the value of the row contains $part.
    */
-  protected function containsPartSql(mixed $part, string $alias, int $depth): string {
+  protected function containsPartSql(array|string|int|float|bool|null $part, string $alias, int $depth): string {
     if (is_array($part)) {
       // json_each() returns an array or an object as JSON text, so the same
       // test applies to its parts one level down.

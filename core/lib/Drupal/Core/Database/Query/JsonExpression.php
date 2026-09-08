@@ -517,27 +517,35 @@ abstract class JsonExpression {
   }
 
   /**
-   * Throws when the path holds a wildcard the SQL form cannot express.
+   * Throws when the path holds a wildcard and the caller needs a single value.
    *
    * A wildcard matches any number of values. toPredicateSql() expands it into
    * a row set and asks whether any of the matched values satisfies the test.
-   * The other forms produce a single value, so they have nowhere to expand the
-   * wildcard into. Without this check each backend degrades in its own way:
-   * PostgreSQL looks for a literal "*" key and returns NULL, SQLite raises an
-   * error, and MySQL returns the whole matched set.
+   * The other public methods return the SQL of a single value, which has no
+   * room for that expansion. Without this check each backend degrades in its
+   * own way:
+   * PostgreSQL looks for a literal "*" key and returns NULL, because the #>>
+   * operator takes the path as an array of keys, SQLite raises an error,
+   * because its path syntax has no wildcard, and MySQL returns the whole
+   * matched set as a JSON array.
    *
-   * @param string $form
-   *   What the caller asked the expression for, used in the message.
+   * @param string $action
+   *   What the caller was building, for the exception message. For example
+   *   'casting a value'.
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
    *   If the path contains a wildcard.
+   *
+   * @see https://www.postgresql.org/docs/current/functions-json.html
+   * @see https://www.sqlite.org/json1.html#path_arguments
+   * @see https://dev.mysql.com/doc/refman/8.4/en/json.html#json-path-syntax
    */
-  protected function assertNoWildcard(string $form): void {
+  protected function assertNoWildcard(string $action): void {
     if ($this->hasWildcard()) {
       throw new InvalidQueryException(sprintf(
         'The jsonpath "%s" contains a wildcard, which is not supported when %s. A wildcard path is supported in a comparison condition only, with one of the operators: %s.',
         $this->path,
-        $form,
+        $action,
         implode(', ', JsonCondition::WILDCARD_OPERATORS),
       ));
     }

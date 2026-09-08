@@ -20,13 +20,14 @@ enum JsonCastType: string {
   /**
    * Infers the cast type from a PHP value's type.
    *
-   * @param string|int|float|bool|null $value
-   *   The value to infer from.
+   * @param string|int|float|bool $value
+   *   The value to infer from. NULL is not accepted; JsonCondition rejects a
+   *   NULL comparison value before calling this method.
    *
    * @return self
    *   The matching cast type.
    */
-  public static function fromPhpValue(string|int|float|bool|null $value): self {
+  public static function fromPhpValue(string|int|float|bool $value): self {
     return match (TRUE) {
       is_int($value) => self::Int,
       is_float($value) => self::Float,

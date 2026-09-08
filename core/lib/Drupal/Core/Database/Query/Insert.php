@@ -128,11 +128,11 @@ abstract class Insert extends Query implements \Countable {
     $this->validateFromQuery('expression');
     $fields = $this->fromQuery->getFields();
     if (isset($fields[$field])) {
-      throw new InvalidQueryException(sprintf('The select query already has a field named "%s".', $field));
+      throw new InvalidQueryException(sprintf('The SELECT query the rows are inserted from already has a field named "%s".', $field));
     }
     $expressions = $this->fromQuery->getExpressions();
     if (isset($expressions[$field])) {
-      throw new InvalidQueryException(sprintf('The select query already has an expression named "%s".', $field));
+      throw new InvalidQueryException(sprintf('The SELECT query the rows are inserted from already has an expression named "%s".', $field));
     }
     $expression = $this->connection->jsonExpression($json_field, $jsonpath);
     $this->fromQuery->addExpression($expression->toCastSql($cast), $field);
@@ -151,7 +151,7 @@ abstract class Insert extends Query implements \Countable {
    */
   protected function validateFromQuery(string $type): void {
     if (empty($this->fromQuery)) {
-      throw new InvalidQueryException(sprintf('An insert query only takes a JSON %s when it inserts the result of a select query. Call from() first.', $type));
+      throw new InvalidQueryException(sprintf('An INSERT query only takes a JSON %s when it inserts the result of a SELECT query. Call from() first.', $type));
     }
   }
 
