@@ -332,6 +332,42 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     $this->assertSession()->pageTextContains($nodes[0]->getTitle());
     $this->assertSession()->pageTextContains($nodes[2]->getTitle());
     $this->assertSession()->pageTextNotContains($nodes[1]->getTitle());
+
+    // Change the group's identifier, which is stored separately from the
+    // exposed filter's identifier.
+    $this->drupalGet('/admin/structure/views/nojs/handler/test_taxonomy_exposed_grouped_filter/page_1/filter/field_views_testing_tags_target_id');
+    $edit = [
+      'options[group_info][identifier]' => 'tags_group',
+    ];
+    $this->submitForm($edit, 'Apply');
+    $this->submitForm([], 'Save');
+
+    // The exposed form is built with the changed identifier.
+    $this->drupalGet('/test-taxonomy-exposed-grouped-filter');
+    $this->assertSession()->elementExists('css', 'input[name="tags_group"]');
+
+    // Selecting a group still filters the results.
+    $this->submitForm(['tags_group' => 1], 'Apply');
+    $this->assertSession()->pageTextContains($nodes[0]->getTitle());
+    $this->assertSession()->pageTextContains($nodes[1]->getTitle());
+    $this->assertSession()->pageTextNotContains($nodes[2]->getTitle());
+
+    $this->submitForm(['tags_group' => 2], 'Apply');
+    $this->assertSession()->pageTextContains($nodes[1]->getTitle());
+    $this->assertSession()->pageTextContains($nodes[2]->getTitle());
+    $this->assertSession()->pageTextNotContains($nodes[0]->getTitle());
+
+    $this->submitForm(['tags_group' => 3], 'Apply');
+    $this->assertSession()->pageTextContains($nodes[0]->getTitle());
+    $this->assertSession()->pageTextContains($nodes[2]->getTitle());
+    $this->assertSession()->pageTextNotContains($nodes[1]->getTitle());
+
+    // The grouped filter is also applied when the exposed input is passed in
+    // the query string.
+    $this->drupalGet('/test-taxonomy-exposed-grouped-filter', ['query' => ['tags_group' => 2]]);
+    $this->assertSession()->pageTextContains($nodes[1]->getTitle());
+    $this->assertSession()->pageTextContains($nodes[2]->getTitle());
+    $this->assertSession()->pageTextNotContains($nodes[0]->getTitle());
   }
 
   /**
