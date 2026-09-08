@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\language\Event;
 
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\Core\Batch\BatchBuilder;
 
 /**
  * Event fired when the site's default language changes.
@@ -16,23 +17,19 @@ use Drupal\Component\EventDispatcher\Event;
 final class LanguageDefaultLangcodeChangeEvent extends Event {
 
   /**
-   * The batch operations gathered so far.
-   *
-   * @var array
-   */
-  private array $operations = [];
-
-  /**
    * Constructs a LanguageDefaultLangcodeChangeEvent.
    *
    * @param string $oldLangcode
    *   The previous default langcode.
    * @param string $newLangcode
    *   The new default langcode.
+   * @param \Drupal\Core\Batch\BatchBuilder $batch
+   *   The batch builder object.
    */
   public function __construct(
     public readonly string $oldLangcode,
     public readonly string $newLangcode,
+    private readonly BatchBuilder $batch,
   ) {}
 
   /**
@@ -45,17 +42,17 @@ final class LanguageDefaultLangcodeChangeEvent extends Event {
    *   Batch API appends automatically.
    */
   public function addOperation(callable|string $callback, array $arguments = []): void {
-    $this->operations[] = [$callback, $arguments];
+    $this->batch->addOperation($callback, $arguments);
   }
 
   /**
-   * Gets the batch operations gathered so far.
+   * Gets the batch builder object.
    *
-   * @return array
-   *   An array of Batch API operations.
+   * @return \Drupal\Core\Batch\BatchBuilder
+   *   The batch builder object.
    */
-  public function getOperations(): array {
-    return $this->operations;
+  public function getBatch(): BatchBuilder {
+    return $this->batch;
   }
 
 }

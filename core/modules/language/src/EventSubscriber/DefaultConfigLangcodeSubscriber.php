@@ -75,7 +75,7 @@ class DefaultConfigLangcodeSubscriber implements EventSubscriberInterface {
       // completed by the time this method returns.
       // @todo Create follow-up - we have this problem today with the locale
       //   batch set in the modules installed hook.
-      batch_set($batch);
+      batch_set($batch->toArray());
     }
   }
 
