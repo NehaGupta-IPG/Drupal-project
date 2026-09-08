@@ -79,7 +79,14 @@ class AdminTest extends WebDriverTestBase {
     $assert_session
       ->waitForElementVisible('css', '[role="alert"]');
 
+    // Check that toggle has error indicators.
     $this->assertTrue($toggle->hasClass('has-error'));
+    $this->assertStringEndsWith(' (sidebar contains error)', $toggle->getText());
+
+    // Check that error indicators aren't cached.
+    $this->drupalGet('/node/add/article');
+    $this->assertFalse($toggle->hasClass('has-error'));
+    $this->assertStringNotContainsString('(sidebar contains error)', $toggle->getText());
   }
 
 }
