@@ -4,7 +4,6 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides a form element for a set of checkboxes.
@@ -110,26 +109,13 @@ class Checkboxes extends FormElementBase {
     }
 
     if (!empty($element['#check_all'])) {
-      $check_all_id = ($element['#id'] ?? '') . '--check-all';
+      // The "Select all" control only works with JavaScript, so its markup
+      // is added client-side by core/drupal.checkboxes-check-all. This
+      // placeholder just marks where it should be inserted:
       $element['all_wrapper'] = [
         '#type' => 'container',
-        '#attributes' => ['class' => ['check-all']],
+        '#attributes' => ['class' => ['form-checkboxes__check-all']],
         '#weight' => 0,
-      ];
-      $element['all_wrapper']['check_all_input'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'input',
-        '#attributes' => [
-          'type' => 'checkbox',
-          'class' => ['check-all'],
-          'id' => $check_all_id,
-        ],
-      ];
-      $element['all_wrapper']['check_all_label'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'label',
-        '#value' => new TranslatableMarkup('Select all'),
-        '#attributes' => ['for' => $check_all_id],
       ];
       $element['#attached']['library'][] = 'core/drupal.checkboxes-check-all';
     }

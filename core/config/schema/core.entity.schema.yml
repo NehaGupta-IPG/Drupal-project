@@ -283,14 +283,6 @@ field.widget.settings.boolean_checkbox:
       type: boolean
       label: 'Display label'
 
-field.widget.settings.options_buttons:
-  type: mapping
-  label: 'Check boxes/radio buttons format settings'
-  mapping:
-    check_all_enabled:
-      type: boolean
-      label: 'Check All enabled'
-
 field.widget.settings.hidden:
   type: mapping
   label: '- Hidden - format settings'

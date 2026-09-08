@@ -5,15 +5,14 @@
  * Post update functions for Options module.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+
 /**
  * Add check_all_enabled setting to existing options_buttons widget instances.
  */
-function options_post_update_options_buttons_check_all_setting(): void {
-  $form_displays = \Drupal::entityTypeManager()
-    ->getStorage('entity_form_display')
-    ->loadMultiple();
-
-  foreach ($form_displays as $form_display) {
+function options_post_update_options_buttons_check_all_setting(array &$sandbox): void {
+  $callback = function (EntityFormDisplayInterface $form_display): bool {
     $changed = FALSE;
     foreach ($form_display->getComponents() as $field_name => $component) {
       if (($component['type'] ?? '') === 'options_buttons') {
@@ -24,8 +23,7 @@ function options_post_update_options_buttons_check_all_setting(): void {
         }
       }
     }
-    if ($changed) {
-      $form_display->save();
-    }
-  }
+    return $changed;
+  };
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'entity_form_display', $callback);
 }
