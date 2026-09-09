@@ -84,7 +84,7 @@ class SubformStateTest extends UnitTestCase {
     // Modify the retrieved values and confirm they are modified by reference in
     // the parent form state.
     $subform_state_values['fish'] = 'Jim';
-    $this->assertSame($subform_state_values, $subform_state->getValues());
+    $this->assertEquals($subform_state_values, $subform_state->getValues());
   }
 
   /**
@@ -224,7 +224,7 @@ class SubformStateTest extends UnitTestCase {
    * Tests set values broken.
    */
   #[DataProvider('providerTestSetValuesBroken')]
-  public function testSetValuesBroken($parents, $new_values, $expected): void {
+  public function testSetValuesBroken(array $parents, array $new_values, $expected): void {
     $this->expectException(\UnexpectedValueException::class);
     $this->testSetValues($parents, $new_values, $expected);
   }

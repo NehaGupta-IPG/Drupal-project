@@ -17,38 +17,30 @@ trait AssertContentTrait {
 
   /**
    * The current raw content.
-   *
-   * @var string
    */
-  protected $content;
+  protected string $content;
 
   /**
    * The plain-text content of raw $content (text nodes).
-   *
-   * @var string
    */
-  protected $plainTextContent;
+  protected ?string $plainTextContent;
 
   /**
    * The drupalSettings value from the current raw $content.
    *
    * Variable drupalSettings refers to the drupalSettings JavaScript variable.
-   *
-   * @var array
    */
-  protected $drupalSettings;
+  protected array $drupalSettings;
 
   /**
    * The XML structure parsed from the current raw $content.
-   *
-   * @var \SimpleXMLElement
    */
-  protected $elements;
+  protected ?\SimpleXMLElement $elements;
 
   /**
    * Gets the current raw content.
    */
-  protected function getRawContent() {
+  protected function getRawContent(): string {
     return $this->content;
   }
 
@@ -58,7 +50,7 @@ trait AssertContentTrait {
    * @param string|\Stringable $content
    *   The raw content to set.
    */
-  protected function setRawContent($content) {
+  protected function setRawContent(string|\Stringable $content): void {
     $this->content = (string) $content;
     $this->plainTextContent = NULL;
     $this->elements = NULL;
@@ -71,7 +63,7 @@ trait AssertContentTrait {
   /**
    * Retrieves the plain-text content from the current raw content.
    */
-  protected function getTextContent() {
+  protected function getTextContent(): string {
     if (!isset($this->plainTextContent)) {
       $raw_content = $this->getRawContent();
       // Strip everything between the HEAD tags.
@@ -91,7 +83,7 @@ trait AssertContentTrait {
    * and when you want to use e.g. assertText() but ignore potential white-space
    * caused by HTML output templates.
    */
-  protected function removeWhiteSpace() {
+  protected function removeWhiteSpace(): void {
     $this->content = preg_replace('@>\s+<@', '><', $this->content);
     $this->plainTextContent = NULL;
     $this->elements = NULL;
@@ -102,7 +94,7 @@ trait AssertContentTrait {
    *
    * Variable drupalSettings refers to the drupalSettings JavaScript variable.
    */
-  protected function getDrupalSettings() {
+  protected function getDrupalSettings(): array {
     return $this->drupalSettings;
   }
 
@@ -111,7 +103,7 @@ trait AssertContentTrait {
    *
    * Variable drupalSettings refers to the drupalSettings JavaScript variable.
    */
-  protected function setDrupalSettings($settings) {
+  protected function setDrupalSettings(array $settings): void {
     $this->drupalSettings = $settings;
   }
 
@@ -155,7 +147,7 @@ trait AssertContentTrait {
    * @return string
    *   An XPath query with arguments replaced.
    */
-  protected function buildXPathQuery($xpath, array $args = []) {
+  protected function buildXPathQuery(string $xpath, array $args = []): string {
     // Replace placeholders.
     foreach ($args as $placeholder => $value) {
       // Cast MarkupInterface objects to string.
@@ -183,7 +175,7 @@ trait AssertContentTrait {
       $replacement = function ($matches) use ($value) {
         return $value;
       };
-      $xpath = preg_replace_callback('/' . preg_quote($placeholder, NULL) . '\b/', $replacement, $xpath);
+      $xpath = preg_replace_callback('/' . preg_quote($placeholder) . '\b/', $replacement, $xpath);
     }
     return $xpath;
   }
@@ -205,9 +197,37 @@ trait AssertContentTrait {
    *   the xpath string format and return values see the SimpleXML
    *   documentation.
    *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\KernelTests\AssertContentTrait::getSimpleXmlElementsByXpath()
+   *   instead.
+   *
+   * @see https://www.drupal.org/node/3589621
+   */
+  protected function xpath(string $xpath, array $arguments = []): array|false {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\KernelTests\AssertContentTrait::getSimpleXmlElementsByXpath() instead. See https://www.drupal.org/node/3589621', E_USER_DEPRECATED);
+    return $this->getSimpleXmlElementsByXpath($xpath, $arguments);
+  }
+
+  /**
+   * Performs an xpath search on the contents of the internal browser.
+   *
+   * The search is relative to the root element (HTML tag normally) of the page.
+   *
+   * @param string $xpath
+   *   The xpath string to use in the search.
+   * @param array $arguments
+   *   An array of arguments with keys in the form ':name' matching the
+   *   placeholders in the query. The values may be either strings or numeric
+   *   values.
+   *
+   * @return \SimpleXMLElement[]|false
+   *   The return value of the xpath search or FALSE on failure. For details on
+   *   the xpath string format and return values see the SimpleXML
+   *   documentation.
+   *
    * @see http://php.net/manual/function.simplexml-element-xpath.php
    */
-  protected function xpath($xpath, array $arguments = []) {
+  protected function getSimpleXmlElementsByXpath(string $xpath, array $arguments = []): array|false {
     if ($this->parse()) {
       $xpath = $this->buildXPathQuery($xpath, $arguments);
       $result = $this->elements->xpath($xpath);
@@ -231,8 +251,8 @@ trait AssertContentTrait {
    *   The return value of the XPath search performed after converting the CSS
    *   selector to an XPath selector.
    */
-  protected function cssSelect(string $selector) {
-    return $this->xpath((new CssSelectorConverter())->toXPath($selector));
+  protected function cssSelect(string $selector): array {
+    return $this->getSimpleXmlElementsByXpath((new CssSelectorConverter())->toXPath($selector));
   }
 
   /**
@@ -282,7 +302,7 @@ trait AssertContentTrait {
   protected function assertLink($label, $index = 0, $message = ''): bool {
     // Cast MarkupInterface objects to string.
     $label = (string) $label;
-    $links = $this->xpath('//a[normalize-space(text())=:label]', [':label' => $label]);
+    $links = $this->getSimpleXmlElementsByXpath('//a[normalize-space(text())=:label]', [':label' => $label]);
     $message = ($message ?: strtr('Link with label %label found.', ['%label' => $label]));
     $this->assertArrayHasKey($index, $links, $message);
     return TRUE;
@@ -306,7 +326,7 @@ trait AssertContentTrait {
   protected function assertNoLink($label, $message = ''): bool {
     // Cast MarkupInterface objects to string.
     $label = (string) $label;
-    $links = $this->xpath('//a[normalize-space(text())=:label]', [':label' => $label]);
+    $links = $this->getSimpleXmlElementsByXpath('//a[normalize-space(text())=:label]', [':label' => $label]);
     $message = $message ?: "Link with label $label not found.";
     $this->assertEmpty($links, $message);
     return TRUE;
@@ -330,7 +350,7 @@ trait AssertContentTrait {
    *   TRUE if the assertion succeeded.
    */
   protected function assertLinkByHref($href, $index = 0, $message = ''): bool {
-    $links = $this->xpath('//a[contains(@href, :href)]', [':href' => $href]);
+    $links = $this->getSimpleXmlElementsByXpath('//a[contains(@href, :href)]', [':href' => $href]);
     $message = $message ?: "Link containing href $href found.";
     $this->assertArrayHasKey($index, $links, (string) $message);
     return TRUE;
@@ -397,28 +417,6 @@ trait AssertContentTrait {
       $message = 'Escaped "' . Html::escape((string) $raw) . '" found';
     }
     $this->assertStringContainsString(Html::escape((string) $raw), $this->getRawContent(), $message);
-  }
-
-  /**
-   * Passes if raw text IS NOT found escaped on loaded page, fail otherwise.
-   *
-   * Raw text refers to the raw HTML that the page generated.
-   *
-   * @param string $raw
-   *   Raw (HTML) string to look for.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   */
-  protected function assertNoEscaped($raw, $message = ''): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    if (!$message) {
-      $message = 'Escaped "' . Html::escape((string) $raw) . '" not found';
-    }
-    $this->assertStringNotContainsString(Html::escape((string) $raw), $this->getRawContent(), $message);
   }
 
   /**
@@ -552,7 +550,7 @@ trait AssertContentTrait {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    */
-  protected function assertTitle($title, $message = '') {
+  protected function assertTitle($title, $message = ''): void {
     // Don't use xpath as it messes with HTML escaping.
     preg_match('@<title>(.*)</title>@', $this->getRawContent(), $matches);
     if (isset($matches[1])) {
@@ -565,27 +563,6 @@ trait AssertContentTrait {
     else {
       $this->fail('No title element found on the page.');
     }
-  }
-
-  /**
-   * Pass if the page title is not the given string.
-   *
-   * @param string $title
-   *   The string the title should not be.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   */
-  protected function assertNoTitle($title, $message = '') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $actual = (string) current($this->xpath('//title'));
-    if (!$message) {
-      $message = sprintf("Page title %s is not equal to %s", var_export($actual, TRUE), var_export($title, TRUE));
-    }
-    $this->assertNotEquals($title, $actual, $message);
   }
 
   /**
@@ -604,7 +581,7 @@ trait AssertContentTrait {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    */
-  protected function assertThemeOutput(string $callback, array $variables = [], $expected = '', $message = '') {
+  protected function assertThemeOutput(string $callback, array $variables = [], $expected = '', $message = ''): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -696,7 +673,7 @@ trait AssertContentTrait {
    *   TRUE on pass, FALSE on fail.
    */
   protected function assertFieldByXPath($xpath, $value = NULL, $message = ''): bool {
-    $fields = $this->xpath($xpath);
+    $fields = $this->getSimpleXmlElementsByXpath($xpath);
 
     return $this->assertFieldsByValue($fields, $value, $message);
   }
@@ -710,7 +687,7 @@ trait AssertContentTrait {
    * @return bool
    *   The selected value or FALSE.
    */
-  protected function getSelectedItem(\SimpleXMLElement $element) {
+  protected function getSelectedItem(\SimpleXMLElement $element): bool {
     foreach ($element->children() as $item) {
       if (isset($item['selected'])) {
         return $item['value'];
@@ -756,51 +733,6 @@ trait AssertContentTrait {
   }
 
   /**
-   * Asserts that a select option in the current page exists.
-   *
-   * @param string $id
-   *   ID of select field to assert.
-   * @param string $option
-   *   Option to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   */
-  protected function assertOption($id, $option, $message = '') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $options = $this->xpath('//select[@id=:id]//option[@value=:option]', [':id' => $id, ':option' => $option]);
-    $message = $message ?: sprintf('Option %s for field %s exists.', $options, $id);
-    $this->assertTrue(isset($options[0]), $message);
-  }
-
-  /**
-   * Asserts that a select option in the current page exists.
-   *
-   * @param string $drupal_selector
-   *   The data drupal selector of select field to assert.
-   * @param string $option
-   *   Option to assert.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages with t(). Use double quotes and embed variables directly in
-   *   message text, or use sprintf() if necessary. Avoid the use of
-   *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
-   *   a string. If left blank, a default message will be displayed.
-   */
-  protected function assertOptionWithDrupalSelector($drupal_selector, $option, $message = '') {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $options = $this->xpath(
-      '//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]',
-      [':data_drupal_selector' => $drupal_selector, ':option' => $option],
-    );
-    $message = $message ?: sprintf('Option %s for field %s exists.', $option, $drupal_selector);
-    $this->assertTrue(isset($options[0]), $message);
-  }
-
-  /**
    * Asserts that a field exists with the given name or ID.
    *
    * @param string $field
@@ -830,7 +762,7 @@ trait AssertContentTrait {
    * @return string
    *   XPath for specified values.
    */
-  protected function constructFieldXpath(string $attribute, $value) {
+  protected function constructFieldXpath(string $attribute, string $value): string {
     $xpath = '//textarea[@' . $attribute . '=:value]|//input[@' . $attribute . '=:value]|//select[@' . $attribute . '=:value]';
     return $this->buildXPathQuery($xpath, [':value' => $value]);
   }

@@ -15,6 +15,7 @@ use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -33,6 +34,7 @@ use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Prophecy\Argument;
 
 /**
@@ -45,23 +47,23 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   /**
    * The entity under test.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityBase|\PHPUnit\Framework\MockObject\MockObject
+   * @var object
+   *   Could be StubConfigEntity or
+   *   ConfigEntityBaseWithPluginCollections&MockObject.
+   *
+   * @todo split the variable to allow proper type.
    */
   protected $entity;
 
   /**
    * The entity type used for testing.
-   *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface
    */
-  protected $entityType;
+  protected ConfigEntityTypeInterface&Stub $entityType;
 
   /**
    * The entity type manager used for testing.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&Stub $entityTypeManager;
 
   /**
    * The ID of the type of the entity under test.
@@ -72,10 +74,8 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * The UUID generator used for testing.
-   *
-   * @var \Drupal\Component\Uuid\UuidInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $uuid;
+  protected UuidInterface&Stub $uuid;
 
   /**
    * The provider of the entity type.
@@ -84,10 +84,8 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&Stub $languageManager;
 
   /**
    * The entity ID.
@@ -97,18 +95,14 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   protected $id;
 
   /**
-   * The mocked cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\Stub
+   * The cache backend.
    */
-  protected $cacheTagsInvalidator;
+  protected CacheTagsInvalidatorInterface&Stub $cacheTagsInvalidator;
 
   /**
-   * The mocked typed config manager.
-   *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * The typed config manager.
    */
-  protected $typedConfigManager;
+  protected TypedConfigManagerInterface&Stub $typedConfigManager;
 
   /**
    * The module handler.
@@ -288,6 +282,78 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $method->invoke($this->entity, 'entity', 'system.action.id');
     $dependencies = $this->entity->getDependencies();
     $this->assertEquals(['entity', 'module'], array_keys($dependencies));
+  }
+
+  /**
+   * Tests ConfigEntityBase::loadOverrideFree().
+   *
+   * When called statically on a subclass of ConfigEntityBase.
+   */
+  public function testLoadOverrideFree(): void {
+    $class_name = get_class($this->entity);
+
+    $entity_type_repository = $this->createMock(EntityTypeRepositoryInterface::class);
+    $entity_type_repository->expects($this->once())
+      ->method('getEntityTypeFromClass')
+      ->with($class_name)
+      ->willReturn($this->entityTypeId);
+
+    $storage = $this->createMock(ConfigEntityStorageInterface::class);
+    $storage->expects($this->once())
+      ->method('loadOverrideFree')
+      ->with($this->id)
+      ->willReturn($this->entity);
+
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
+    $this->entityTypeManager
+      ->method('getDefinition')
+      ->willReturn($this->entityType);
+    $this->entityTypeManager
+      ->method('getStorage')
+      ->willReturn($storage);
+    \Drupal::getContainer()->set('entity_type.manager', $this->entityTypeManager);
+
+    \Drupal::getContainer()->set('entity_type.repository', $entity_type_repository);
+
+    // Call ConfigEntityBase::loadOverrideFree() statically and check that it
+    // returns the mock entity.
+    $this->assertSame($this->entity, $class_name::loadOverrideFree($this->id));
+  }
+
+  /**
+   * Tests ConfigEntityBase::loadMultipleOverrideFree().
+   *
+   * When called statically on a subclass of ConfigEntityBase.
+   */
+  public function testLoadMultipleOverrideFree(): void {
+    $class_name = get_class($this->entity);
+
+    $entity_type_repository = $this->createMock(EntityTypeRepositoryInterface::class);
+    $entity_type_repository->expects($this->once())
+      ->method('getEntityTypeFromClass')
+      ->with($class_name)
+      ->willReturn($this->entityTypeId);
+
+    $storage = $this->createMock(ConfigEntityStorageInterface::class);
+    $storage->expects($this->once())
+      ->method('loadMultipleOverrideFree')
+      ->with([$this->id])
+      ->willReturn([$this->id => $this->entity]);
+
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
+    $this->entityTypeManager
+      ->method('getDefinition')
+      ->willReturn($this->entityType);
+    $this->entityTypeManager
+      ->method('getStorage')
+      ->willReturn($storage);
+    \Drupal::getContainer()->set('entity_type.manager', $this->entityTypeManager);
+
+    \Drupal::getContainer()->set('entity_type.repository', $entity_type_repository);
+
+    // Call ConfigEntityBase::loadMultipleOverrideFree() statically and check that it
+    // returns the mock entity.
+    $this->assertSame([$this->id => $this->entity], $class_name::loadMultipleOverrideFree([$this->id]));
   }
 
   /**
@@ -855,7 +921,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       ->method('getClass')
       ->willReturn("FooConfigEntity");
     $this->expectException(SchemaIncompleteException::class);
-    $this->expectExceptionMessage("Entity type 'FooConfigEntity' is missing 'config_export' definition in its annotation");
+    $this->expectExceptionMessageIs("Entity type 'FooConfigEntity' is missing 'config_export' definition in its annotation");
     $this->entity->toArray();
   }
 
@@ -1012,15 +1078,11 @@ class SortTestConfigEntityWithWeight extends ConfigEntityBase {
 
   /**
    * The label.
-   *
-   * @var string
    */
   public string $label;
 
   /**
    * The weight.
-   *
-   * @var int
    */
   public int $weight;
 

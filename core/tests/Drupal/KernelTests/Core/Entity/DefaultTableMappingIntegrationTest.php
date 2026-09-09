@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -35,20 +33,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
    * @var \Drupal\Core\Entity\Sql\DefaultTableMapping
    */
   protected $tableMapping;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected EntityFieldManagerInterface $entityFieldManager;
-
-  /**
-   * The entity definition update manager.
-   *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
-   */
-  protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 
   /**
    * {@inheritdoc}

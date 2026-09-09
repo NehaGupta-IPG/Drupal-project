@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\editor\Entity\Editor;
@@ -51,6 +52,7 @@ class CKEditor5Test extends CKEditor5TestBase {
     $page->fillField('title[0][value]', 'My test content');
     $page->fillField('body[0][value]', '<p>This is test content</p>');
     $page->pressButton('Save');
+    $this->assertNotEmpty($assert_session->waitForText('page My test content has been created.'));
     $assert_session->responseNotContains('<p>This is test content</p>');
     $assert_session->responseContains('&lt;p&gt;This is test content&lt;/p&gt;');
 
@@ -62,9 +64,12 @@ class CKEditor5Test extends CKEditor5TestBase {
     $page->selectFieldOption('body[0][format]', 'ckeditor5');
     $this->assertNotEmpty($assert_session->waitForText('Change text format?'));
     $page->pressButton('Continue');
-    // Ensure the editor is loaded.
+    // CKEditor initialization can exceed the normal wait time under CI.
+    // Ensure the editor is loaded and has loaded the existing content.
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-editor'));
+    $this->assertNotEmpty($assert_session->waitForText('This is test content', 20000));
     $page->pressButton('Save');
+    $this->assertNotEmpty($assert_session->waitForText('page My test content has been updated.'));
 
     // Assert that the HTML is rendered correctly.
     $assert_session->responseContains('<p>This is test content</p>');
@@ -80,7 +85,7 @@ class CKEditor5Test extends CKEditor5TestBase {
 
     $this->addNewTextFormat();
     $this->drupalGet('admin/config/content/formats/manage/ckeditor5');
-    $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<br> <p> <h2> <h3> <h4> <h5> <h6> <strong> <em>');
+    $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<br> <em> <h2> <h3> <h4> <h5> <h6> <p> <strong>');
 
     $this->drupalGet('node/add/page');
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-heading-dropdown button'));
@@ -118,7 +123,7 @@ class CKEditor5Test extends CKEditor5TestBase {
     $page->uncheckField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading4]');
     $assert_session->assertWaitOnAjaxRequest();
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading4]'));
-    $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<br> <p> <h1> <h3> <h5> <h6> <strong> <em>');
+    $this->assertHtmlEsqueFieldValueEquals('filters[filter_html][settings][allowed_html]', '<br> <em> <h1> <h3> <h5> <h6> <p> <strong>');
     $this->assertTrue($page->hasUncheckedField('editor[settings][plugins][ckeditor5_heading][enabled_headings][heading4]'));
 
     $page->pressButton('Save configuration');
@@ -235,7 +240,7 @@ JS;
       $assert_session->assertWaitOnAjaxRequest();
     }
     $page->pressButton('Save configuration');
-    $assert_session->responseContains('The text format <em class="placeholder">ckeditor5</em> has been updated.');
+    $this->assertNotEmpty($assert_session->waitForText('The text format ckeditor5 has been updated.'));
   }
 
   /**
@@ -538,6 +543,7 @@ JS;
     $page->fillField('title[0][value]', 'My test content');
     $page->fillField('body[0][value]', '<p>This is a <em>test!</em></p>');
     $page->pressButton('Save');
+    $this->assertNotEmpty($assert_session->waitForText('page My test content has been created.'));
 
     $this->addNewTextFormat();
 
@@ -547,7 +553,9 @@ JS;
     $page->pressButton('Continue');
 
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-editor'));
+    $this->assertTrue($assert_session->waitForText('This is a test!', 20000));
     $page->pressButton('Save');
+    $this->assertNotEmpty($assert_session->waitForText('page My test content has been updated.'));
 
     $assert_session->responseContains('<p>This is a <em>test!</em></p>');
   }
@@ -612,7 +620,7 @@ JS;
     $editor->setSettings($settings)->save();
 
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -711,7 +719,7 @@ JS;
         // While this is a bit of an indirect way to find the correct button, it
         // accounts for the mixed dash characters and worked better than other
         // attempts.
-        $toolbar_button_tips = array_map(fn($item) => str_replace('–', '-', $item->getAttribute('data-cke-tooltip-text')), $toolbar_buttons);
+        $toolbar_button_tips = array_map(fn(NodeElement $item): string => str_replace('–', '-', $item->getAttribute('data-cke-tooltip-text')), $toolbar_buttons);
         $this->assertNotFalse(array_search($type, $toolbar_button_tips));
         $toolbar_buttons[array_search($type, $toolbar_button_tips)]->click();
         $widget_selector = '.ck-editor__editable_inline > ' . $list_tag . '[type="' . $type_attribute . '"]';
@@ -764,7 +772,7 @@ JS;
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -785,7 +793,7 @@ JS;
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -804,7 +812,7 @@ JS;
     $editor = $page->find('css', '.ck-content');
     $editor->setValue('Very important information');
     $page->pressButton('Save');
-    $this->assertSession()->responseContains('Very important information');
+    $this->assertTrue($this->assertSession()->waitForText('Very important information'));
 
     // Test that changes only in source are saved.
     $this->drupalGet('node/1/edit');
@@ -814,7 +822,7 @@ JS;
     $editor = $page->find('css', '.ck-source-editing-area textarea');
     $editor->setValue('Text hidden in the source');
     $page->pressButton('Save');
-    $this->assertSession()->responseContains('Text hidden in the source');
+    $this->assertTrue($this->assertSession()->waitForText('Text hidden in the source'));
   }
 
 }

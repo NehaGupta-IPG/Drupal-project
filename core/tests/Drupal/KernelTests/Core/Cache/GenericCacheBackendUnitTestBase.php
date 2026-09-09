@@ -23,9 +23,9 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Array of objects implementing Drupal\Core\Cache\CacheBackendInterface.
    *
-   * @var array
+   * @var array<string,\Drupal\Core\Cache\CacheBackendInterface>|null
    */
-  protected $cacheBackends;
+  protected ?array $cacheBackends = NULL;
 
   /**
    * Cache bin to use for testing.
@@ -46,8 +46,6 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
    *
    * Some caches explicitly allow this, for example,
    * \Drupal\Core\Cache\MemoryCache\MemoryCache.
-   *
-   * @var bool
    */
   protected bool $testObjectProperties = TRUE;
 
@@ -60,7 +58,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
    * @return string
    *   Bin name.
    */
-  protected function getTestBin() {
+  protected function getTestBin(): string {
     if (!isset($this->testBin)) {
       $this->testBin = 'page';
     }
@@ -78,12 +76,12 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
    * @return \Drupal\Core\Cache\CacheBackendInterface
    *   Cache backend to test.
    */
-  abstract protected function createCacheBackend($bin);
+  abstract protected function createCacheBackend($bin): CacheBackendInterface;
 
   /**
    * Allows specific implementation to change the environment before a test run.
    */
-  public function setUpCacheBackend() {
+  public function setUpCacheBackend(): void {
   }
 
   /**
@@ -92,7 +90,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
    * Used before the real tear down because the tear down will change things
    * such as the database prefix.
    */
-  public function tearDownCacheBackend() {
+  public function tearDownCacheBackend(): void {
   }
 
   /**
@@ -135,7 +133,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
     foreach ($this->cacheBackends as $bin => $cache_backend) {
       $this->cacheBackends[$bin]->deleteAll();
     }
-    unset($this->cacheBackends);
+    $this->cacheBackends = NULL;
 
     $this->tearDownCacheBackend();
 

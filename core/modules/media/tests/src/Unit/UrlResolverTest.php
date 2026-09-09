@@ -6,6 +6,7 @@ namespace Drupal\Tests\media\Unit;
 
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\media\OEmbed\ProviderRepositoryInterface;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
 use Drupal\media\OEmbed\UrlResolver;
@@ -25,6 +26,16 @@ use PHPUnit\Framework\Attributes\Group;
 class UrlResolverTest extends UnitTestCase {
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    new Settings(
+      ['media_oembed_discovery_trusted_host_patterns' => ['example\.com']],
+    );
+  }
+
+  /**
    * Creates a UrlResolver with exposed protected methods for testing.
    *
    * @param \GuzzleHttp\Client $client
@@ -35,10 +46,10 @@ class UrlResolverTest extends UnitTestCase {
    */
   protected function createTestableUrlResolver(Client $client): UrlResolver {
     return new class (
-      $this->createMock(ProviderRepositoryInterface::class),
-      $this->createMock(ResourceFetcherInterface::class),
+      $this->createStub(ProviderRepositoryInterface::class),
+      $this->createStub(ResourceFetcherInterface::class),
       $client,
-      $this->createMock(ModuleHandlerInterface::class),
+      $this->createStub(ModuleHandlerInterface::class),
       new NullBackend('default'),
     ) extends UrlResolver {
 

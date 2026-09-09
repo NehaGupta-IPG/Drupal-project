@@ -16,35 +16,35 @@
  * - accordion_item: whether the details element is an item of an accordion
  *   list.
  *
- * @see\Drupal\Core\Form\FormPreprocess::preprocessDetails()
- * @see gin_preprocess_details()
+ * @see \Drupal\Core\Form\FormPreprocess::preprocessDetails()
+ * @see \Drupal\default_admin\Hook\PreprocessHooks::preprocessDetails()
  */
 #}
 {%
   set classes = [
-    'gin-details',
-    'gin-details--vertical-tabs-item',
+    'details',
+    'details--vertical-tabs-item',
   ]
 %}
 {%
   set content_wrapper_classes = [
-    'gin-details__wrapper',
+    'details__wrapper',
     'details-wrapper',
-    'gin-details__wrapper--vertical-tabs-item',
+    'details__wrapper--vertical-tabs-item',
   ]
 %}
 {%
   set inner_wrapper_classes = [
-    'gin-details__content',
-    'gin-details__content--vertical-tabs-item',
+    'details__content',
+    'details__content--vertical-tabs-item',
   ]
 %}
 <details{{ attributes.addClass(classes) }}>
   {%- if title -%}
     {%
       set summary_classes = [
-        'gin-details__summary',
-        'gin-details__summary--vertical-tabs-item',
+        'details__summary',
+        'details__summary--vertical-tabs-item',
         required ? 'js-form-required',
         required ? 'form-required',
       ]
@@ -61,7 +61,7 @@
         </div>
       {% endif %}
       {%- if description -%}
-        <div class="gin-details__description">{{ description }}</div>
+        <div class="details__description">{{ description }}</div>
       {%- endif -%}
       {%- if children -%}
         {{ children }}

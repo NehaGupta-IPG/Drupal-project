@@ -98,7 +98,7 @@ class EntityTypeManagerTest extends UnitTestCase {
   /**
    * Sets up the entity type manager to be tested.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
+   * @param array<\Prophecy\Prophecy\ProphecyInterface<\Drupal\Core\Entity\EntityTypeInterface>> $definitions
    *   (optional) An array of entity type definitions.
    */
   protected function setUpEntityTypeDefinitions(array $definitions = []): void {
@@ -112,12 +112,13 @@ class EntityTypeManagerTest extends UnitTestCase {
       // Give the entity type a legitimate class to return.
       $entity_type->getClass()->willReturn($class);
       $entity_type->setClass($class)->willReturn($entity_type->reveal());
+      $entity_type->get('entity_bundle_info')->willReturn(NULL);
 
       $definitions[$key] = $entity_type->reveal();
     }
 
     $this->discovery->getDefinition(Argument::cetera())
-      ->will(function ($args) use ($definitions) {
+      ->will(function (array $args) use ($definitions): EntityTypeInterface {
         $entity_type_id = $args[0];
         $exception_on_invalid = $args[1];
         if (isset($definitions[$entity_type_id])) {
@@ -278,7 +279,7 @@ class EntityTypeManagerTest extends UnitTestCase {
     $this->setUpEntityTypeDefinitions([$entity_type_id => $entity]);
 
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage($exception_message);
+    $this->expectExceptionMessageIs($exception_message);
     $this->entityTypeManager->getFormObject($entity_type_id, $operation);
   }
 
@@ -295,7 +296,7 @@ class EntityTypeManagerTest extends UnitTestCase {
       'donkey' => $donkey,
     ]);
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage('The "default" form handler of the "donkey" entity type specifies a class "Drupal\Tests\Core\Entity\TestNotAnEntityForm" that does not extend "Drupal\Core\Entity\EntityFormInterface".');
+    $this->expectExceptionMessageIs('The "default" form handler of the "donkey" entity type specifies a class "Drupal\Tests\Core\Entity\TestNotAnEntityForm" that does not extend "Drupal\Core\Entity\EntityFormInterface".');
     $this->entityTypeManager->getFormObject('donkey', 'default');
   }
 
@@ -354,7 +355,7 @@ class EntityTypeManagerTest extends UnitTestCase {
     }
     $this->setUpEntityTypeDefinitions([$entity_type => $entity]);
     $this->expectException(InvalidPluginDefinitionException::class);
-    $this->expectExceptionMessage($exception_message);
+    $this->expectExceptionMessageIs($exception_message);
     $this->entityTypeManager->getHandler($entity_type, $handler_name);
   }
 
@@ -386,7 +387,7 @@ class EntityTypeManagerTest extends UnitTestCase {
 
     $definition = $apple->reveal();
     $this->expectException(InvalidLinkTemplateException::class);
-    $this->expectExceptionMessage("Link template 'canonical' for entity type 'apple' must start with a leading slash, the current link template is 'path/to/apple'");
+    $this->expectExceptionMessageIs("Link template 'canonical' for entity type 'apple' must start with a leading slash, the current link template is 'path/to/apple'");
     $this->entityTypeManager->processDefinition($definition, 'apple');
   }
 
@@ -432,7 +433,7 @@ class EntityTypeManagerTest extends UnitTestCase {
     $this->setUpEntityTypeDefinitions();
 
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage('The "pear" entity type does not exist.');
+    $this->expectExceptionMessageIs('The "pear" entity type does not exist.');
     $this->entityTypeManager->getDefinition('pear', TRUE);
   }
 

@@ -76,8 +76,6 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * The node type.
-   *
-   * @var \Drupal\node\Entity\NodeType
    */
   protected NodeType $nodeType;
 
@@ -90,29 +88,21 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * A user.
-   *
-   * @var \Drupal\user\Entity\User
    */
   protected User $user2;
 
   /**
    * A vocabulary.
-   *
-   * @var \Drupal\taxonomy\Entity\Vocabulary
    */
   protected Vocabulary $vocabulary;
 
   /**
    * A term.
-   *
-   * @var \Drupal\taxonomy\Entity\Term
    */
   protected Term $term1;
 
   /**
    * A term.
-   *
-   * @var \Drupal\taxonomy\Entity\Term
    */
   protected Term $term2;
 
@@ -131,9 +121,9 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   protected $resourceTypeRepository;
 
   /**
-   * @var \Drupal\file\Entity\File
+   * The example image file.
    */
-  private $file;
+  private File $file;
 
   /**
    * {@inheritdoc}
@@ -750,7 +740,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
    * @return array
    *   The test data.
    */
-  protected function denormalizeUuidProviderBuilder(array $options) {
+  protected function denormalizeUuidProviderBuilder(array $options): array {
     [$input, $expected] = $options;
     [$input_tag_uuids, $input_user_uuid] = $input;
     [$expected_tag_ids, $expected_user_id] = $expected;

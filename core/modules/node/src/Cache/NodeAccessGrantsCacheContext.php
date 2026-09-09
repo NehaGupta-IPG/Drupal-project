@@ -7,6 +7,7 @@ use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
 use Drupal\Core\Cache\Context\UserCacheContextBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeGrantsHelper;
 
 /**
  * Defines the node access view cache context service.
@@ -25,6 +26,7 @@ class NodeAccessGrantsCacheContext extends UserCacheContextBase implements Calcu
   public function __construct(
     AccountInterface $user,
     protected EntityTypeManagerInterface $entityTypeManager,
+    protected NodeGrantsHelper $nodeGrantsHelper,
   ) {
     parent::__construct($user);
   }
@@ -40,6 +42,10 @@ class NodeAccessGrantsCacheContext extends UserCacheContextBase implements Calcu
    * {@inheritdoc}
    */
   public function getContext($operation = NULL) {
+    // If there are no grants at all, then always return all.
+    if (!\Drupal::moduleHandler()->hasImplementations('node_grants')) {
+      return 'all';
+    }
     // If the current user either can bypass node access then we don't need to
     // determine the exact node grants for the current user.
     if ($this->user->hasPermission('bypass node access')) {
@@ -79,7 +85,7 @@ class NodeAccessGrantsCacheContext extends UserCacheContextBase implements Calcu
       return 'view.all';
     }
 
-    $grants = node_access_grants($operation, $this->user);
+    $grants = $this->nodeGrantsHelper->nodeAccessGrants($operation, $this->user);
     $grants_context_parts = [];
     foreach ($grants as $realm => $gids) {
       $grants_context_parts[] = $realm . ':' . implode(',', $gids);

@@ -15,6 +15,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -35,31 +36,23 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Storage.
-   *
-   * @var \Drupal\Core\Config\StorageInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $storage;
+  protected StorageInterface&Stub $storage;
 
   /**
    * Event Dispatcher.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $eventDispatcher;
+  protected EventDispatcherInterface&Stub $eventDispatcher;
 
   /**
    * Typed Config.
-   *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $typedConfig;
+  protected TypedConfigManagerInterface&Stub $typedConfig;
 
   /**
    * The mocked cache tags invalidator.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface
    */
-  protected $cacheTagsInvalidator;
+  protected CacheTagsInvalidatorInterface&Stub $cacheTagsInvalidator;
 
   /**
    * {@inheritdoc}
@@ -294,7 +287,7 @@ class ConfigTest extends UnitTestCase {
 
     // Attempt to treat the single value as a nested item.
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Cannot create key "invalidOffset" on non-array value.');
+    $this->expectExceptionMessageIs('Cannot create key "invalidOffset" on non-array value.');
     $this->config->set('testData.invalidOffset', 1);
   }
 
@@ -395,7 +388,7 @@ class ConfigTest extends UnitTestCase {
     }
 
     // Check that overrides have persisted.
-    foreach ($module_data as $key => $value) {
+    foreach ($module_data as $value) {
       $this->assertConfigDataEquals($module_data);
       $this->assertOriginalConfigDataEquals($module_data, TRUE);
     }
@@ -440,7 +433,7 @@ class ConfigTest extends UnitTestCase {
   #[DataProvider('validateNameProvider')]
   public function testValidateNameException($name, string $exception_message): void {
     $this->expectException('\Drupal\Core\Config\ConfigNameException');
-    $this->expectExceptionMessage($exception_message);
+    $this->expectExceptionMessageIs($exception_message);
     $this->config->validateName($name);
   }
 

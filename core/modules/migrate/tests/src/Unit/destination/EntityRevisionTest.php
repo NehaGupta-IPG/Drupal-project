@@ -31,8 +31,6 @@ class EntityRevisionTest extends UnitTestCase {
 
   /**
    * The migration.
-   *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
    */
   protected MigrationInterface $migration;
 
@@ -45,29 +43,21 @@ class EntityRevisionTest extends UnitTestCase {
 
   /**
    * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
   protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
    * The field type manager.
-   *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
    */
   protected FieldTypePluginManagerInterface $fieldTypeManager;
 
   /**
    * The account switcher.
-   *
-   * @var \Drupal\Core\Session\AccountSwitcherInterface
    */
   protected AccountSwitcherInterface $accountSwitcher;
 
   /**
    * The entity type bundle information.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
   protected EntityTypeBundleInfoInterface $entityTypeBundle;
 
@@ -201,7 +191,7 @@ class EntityRevisionTest extends UnitTestCase {
    *
    * @see \Drupal\Tests\migrate\Unit\Destination\EntityRevision
    */
-  protected function getEntityRevisionDestination(array $configuration = [], $plugin_id = 'entity_revision', array $plugin_definition = []) {
+  protected function getEntityRevisionDestination(array $configuration = [], $plugin_id = 'entity_revision', array $plugin_definition = []): EntityRevision {
     return new EntityRevision($configuration, $plugin_id, $plugin_definition,
       $this->migration,
       $this->storage->reveal(),
@@ -249,7 +239,7 @@ class EntityRevision extends RealEntityRevision {
    * @return \Drupal\Core\Entity\EntityInterface
    *   An updated entity from row values.
    */
-  protected function updateEntity(EntityInterface $entity, Row $row) {
+  protected function updateEntity(EntityInterface $entity, Row $row): EntityInterface {
     return $entity;
   }
 

@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\search\Unit;
 
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\search\Plugin\SearchInterface;
 use Drupal\search\Plugin\SearchPluginCollection;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests Drupal\search\Plugin\SearchPluginCollection.
  */
 #[CoversClass(SearchPluginCollection::class)]
+#[IgnoreDeprecations]
 #[Group('search')]
 class SearchPluginCollectionTest extends UnitTestCase {
 
   /**
    * The mocked plugin manager.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $pluginManager;
+  protected PluginManagerInterface&MockObject $pluginManager;
 
   /**
    * The tested plugin collection.
@@ -30,13 +32,6 @@ class SearchPluginCollectionTest extends UnitTestCase {
    * @var \Drupal\search\Plugin\SearchPluginCollection
    */
   protected $searchPluginCollection;
-
-  /**
-   * Stores all setup plugin instances.
-   *
-   * @var \Drupal\search\Plugin\SearchInterface[]
-   */
-  protected $pluginInstances;
 
   /**
    * {@inheritdoc}

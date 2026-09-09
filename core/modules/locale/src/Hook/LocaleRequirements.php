@@ -9,6 +9,8 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\locale\LocaleSource;
+use Drupal\locale\LocaleLanguages;
 
 /**
  * Requirements for the Locale module.
@@ -16,6 +18,11 @@ use Drupal\Core\Url;
 class LocaleRequirements {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    protected LocaleSource $localeSource,
+    protected readonly LocaleLanguages $localeLanguages,
+  ) {}
 
   /**
    * Implements hook_runtime_requirements().
@@ -25,18 +32,18 @@ class LocaleRequirements {
     $requirements = [];
     $available_updates = [];
     $untranslated = [];
-    $languages = locale_translatable_language_list();
+    $languages = $this->localeLanguages->getTranslatableLanguages();
 
     if ($languages) {
       // Determine the status of the translation updates per language.
-      $status = locale_translation_get_status();
-      if ($status) {
-        foreach ($status as $project) {
+      $sources = $this->localeSource->loadSources();
+      if ($sources) {
+        foreach ($sources as $project) {
           foreach ($project as $langcode => $project_info) {
             if (empty($project_info->type)) {
               $untranslated[$langcode] = $languages[$langcode]->getName();
             }
-            elseif ($project_info->type == LOCALE_TRANSLATION_LOCAL || $project_info->type == LOCALE_TRANSLATION_REMOTE) {
+            elseif ($project_info->isUpdateAvailable()) {
               $available_updates[$langcode] = $languages[$langcode]->getName();
             }
           }

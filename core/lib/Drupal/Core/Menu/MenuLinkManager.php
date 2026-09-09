@@ -5,9 +5,10 @@ namespace Drupal\Core\Menu;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Cache\CacheCollectorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
-use Drupal\Core\Plugin\Discovery\YamlDiscovery;
+use Drupal\Core\Plugin\Discovery\YamlCacheCollectorDiscovery;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
 
 /**
@@ -33,41 +34,12 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    */
   protected $factory;
 
-  /**
-   * The menu link tree storage.
-   *
-   * @var \Drupal\Core\Menu\MenuTreeStorageInterface
-   */
-  protected $treeStorage;
-
-  /**
-   * Service providing overrides for static links.
-   *
-   * @var \Drupal\Core\Menu\StaticMenuLinkOverridesInterface
-   */
-  protected $overrides;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * Constructs a \Drupal\Core\Menu\MenuLinkManager object.
-   *
-   * @param \Drupal\Core\Menu\MenuTreeStorageInterface $tree_storage
-   *   The menu link tree storage.
-   * @param \Drupal\Core\Menu\StaticMenuLinkOverridesInterface $overrides
-   *   The service providing overrides for static links.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   */
-  public function __construct(MenuTreeStorageInterface $tree_storage, StaticMenuLinkOverridesInterface $overrides, ModuleHandlerInterface $module_handler) {
-    $this->treeStorage = $tree_storage;
-    $this->overrides = $overrides;
-    $this->moduleHandler = $module_handler;
+  public function __construct(
+    protected MenuTreeStorageInterface $treeStorage,
+    protected StaticMenuLinkOverridesInterface $overrides,
+    protected ModuleHandlerInterface $moduleHandler,
+    protected CacheCollectorInterface $yamlCacheCollector,
+  ) {
   }
 
   /**
@@ -98,7 +70,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    */
   protected function getDiscovery() {
     if (!isset($this->discovery)) {
-      $yaml_discovery = new YamlDiscovery('links.menu', $this->moduleHandler->getModuleDirectories());
+      $yaml_discovery = new YamlCacheCollectorDiscovery('links.menu', $this->moduleHandler->getModuleDirectories(), $this->yamlCacheCollector);
       $yaml_discovery->addTranslatableProperty('title', 'title_context');
       $yaml_discovery->addTranslatableProperty('description', 'description_context');
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($yaml_discovery);

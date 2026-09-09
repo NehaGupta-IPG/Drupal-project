@@ -70,7 +70,7 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -177,7 +177,7 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -323,7 +323,7 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolationInterface $v): string {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -343,6 +343,7 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
       $editor->setValue($markup);
       $page->pressButton('Save');
 
+      $this->assertNotEmpty($assert_session->waitForText("Style and script test - $test_case_name"));
       $assert_session->responseContains($expected_content);
     }
   }

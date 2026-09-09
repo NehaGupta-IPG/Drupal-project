@@ -15,6 +15,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\Core\Theme\Plugin\IconExtractor\SvgExtractor.
@@ -32,17 +33,13 @@ class SvgExtractorTest extends UnitTestCase {
 
   /**
    * The SvgExtractor instance.
-   *
-   * @var \Drupal\Core\Theme\Plugin\IconExtractor\SvgExtractor
    */
   private SvgExtractor $svgExtractorPlugin;
 
   /**
    * The IconFinder instance.
-   *
-   * @var \Drupal\Core\Theme\Icon\IconFinder|\PHPUnit\Framework\MockObject\MockObject
    */
-  private IconFinder $iconFinder;
+  private IconFinder&MockObject $iconFinder;
 
   /**
    * {@inheritdoc}

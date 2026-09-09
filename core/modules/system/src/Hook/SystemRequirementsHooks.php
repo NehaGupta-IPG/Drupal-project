@@ -63,13 +63,10 @@ class SystemRequirementsHooks {
     // Get the current default PHP requirements for this version of Drupal.
     $minimum_supported_php = PhpRequirements::getMinimumSupportedPhp();
 
-    // Reset the extension lists.
     /** @var \Drupal\Core\Extension\ModuleExtensionList $module_extension_list */
     $module_extension_list = \Drupal::service('extension.list.module');
-    $module_extension_list->reset();
     /** @var \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list */
     $theme_extension_list = \Drupal::service('extension.list.theme');
-    $theme_extension_list->reset();
     $requirements = [];
 
     // Report Drupal version
@@ -128,7 +125,7 @@ class SystemRequirementsHooks {
               ':url' => 'https://www.drupal.org/core/experimental',
             ]
           ),
-          'severity' => RequirementSeverity::Warning,
+          'severity' => RequirementSeverity::Info,
         ];
       }
       // Warn if any deprecated modules are installed.
@@ -169,7 +166,7 @@ class SystemRequirementsHooks {
         $requirements['experimental_themes'] = [
           'title' => $this->t('Experimental themes installed'),
           'value' => $this->t('Experimental themes found: %theme_list. Experimental themes are provided for testing purposes only. Use at your own risk.', ['%theme_list' => implode(', ', $experimental_themes)]),
-          'severity' => RequirementSeverity::Warning,
+          'severity' => RequirementSeverity::Info,
         ];
       }
 
@@ -476,6 +473,29 @@ class SystemRequirementsHooks {
     }
 
     // Database information.
+    $allConnections = Database::getAllConnectionInfo();
+    $connection_info = [];
+    foreach ($allConnections as $target) {
+      foreach ($target as $connection_options) {
+        if (!empty($connection_options['host'])) {
+          $connection_info[] = $this->t('Host: %host', ['%host' => $connection_options['host']]);
+        }
+        $connection_info[] = $this->t('Database: %database', ['%database' => $connection_options['database']]);
+        $prefix = !empty($connection_options['prefix']) ? $connection_options['prefix'] : NULL;
+        $connection_info[] = !empty($prefix) ? $this->t('Prefix: %prefix', ['%prefix' => $prefix]) : $this->t('No prefix');
+        $connection_info[] = " ";
+      }
+    }
+    $requirements['database_connection'] = [
+      'title' => new PluralTranslatableMarkup(
+        count($allConnections),
+        'Database connection',
+        'Database connections',
+        ['@version' => \Drupal::VERSION]
+      ),
+      'value' => ['#markup' => implode('<br/>', $connection_info)],
+    ];
+
     $class = Database::getConnection()->getConnectionOptions()['namespace'] . '\\Install\\Tasks';
     /** @var \Drupal\Core\Database\Install\Tasks $tasks */
     $tasks = new $class();
@@ -928,8 +948,8 @@ class SystemRequirementsHooks {
       ];
     };
     $profile = \Drupal::installProfile();
-    $files = $module_extension_list->getList();
-    $files += $theme_extension_list->getList();
+    $files = $module_extension_list->getList(TRUE);
+    $files += $theme_extension_list->getList(TRUE);
     $core_incompatible_extensions = [];
     $php_incompatible_extensions = [];
     foreach ($files as $extension_name => $file) {
@@ -1232,6 +1252,16 @@ class SystemRequirementsHooks {
           'description' => $this->t('The rebuild_access setting is enabled in settings.php. It is recommended to have this setting disabled unless you are performing a rebuild.'),
         ];
       }
+
+      // Warn about HTML5 validation setting removal in Drupal 13.
+      if (Settings::get('enable_html5_validation') === TRUE) {
+        $requirements['enable_html5_validation'] = [
+          'title' => $this->t('HTML5 validation'),
+          'value' => $this->t('Enabled'),
+          'severity' => RequirementSeverity::Warning,
+          'description' => $this->t('The enable_html5_validation setting will be removed in Drupal 13, and HTML5 validation will be disabled on all forms.  Make sure your forms will still work the way you expect before upgrading by setting the value to FALSE in a test environment. See <a href=":url">the change record</a> for more information.', [':url' => 'https://www.drupal.org/node/3537128']),
+        ];
+      }
     }
 
     // Check if the SameSite cookie attribute is set to a valid value. Since
@@ -1364,6 +1394,10 @@ class SystemRequirementsHooks {
       }
     }
 
+    if ($phase === 'runtime') {
+      $requirements['password_hashing'] = $this->checkPasswordHashing();
+    }
+
     // Ensure that no module has a current schema version that is lower than the
     // one that was last removed.
     if ($phase == 'update') {
@@ -1460,7 +1494,7 @@ class SystemRequirementsHooks {
             // and both the previous update and the equivalent update are not
             // found in the current code base, prevent updating. This indicates
             // a site attempting to go 'backwards' in terms of database schema.
-            // @see \Drupal\Core\Update\UpdateHookRegistry::markFutureUpdateEquivalent()
+            // @see \Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent
             if (!function_exists($ran_update_function_name) && !function_exists($future_update_function_name)) {
               // If the module is provided by core prepend helpful text as the
               // module does not exist in composer or Drupal.org.
@@ -1520,6 +1554,54 @@ class SystemRequirementsHooks {
     }
 
     return $requirements;
+  }
+
+  /**
+   * Builds password hashing requirements check result.
+   *
+   * @return array
+   *   Hashing requirements result.
+   */
+  protected function checkPasswordHashing(): array {
+    $availableAlgorithms = password_algos();
+    $hashingAlgorithm = \Drupal::getContainer()->getParameter('password.algorithm') ?? PASSWORD_DEFAULT;
+
+    if (!in_array($hashingAlgorithm, $availableAlgorithms, TRUE)) {
+      return [
+        'title' => $this->t('Password hashing'),
+        'value' => $this->t('The configured password hashing algorithm %algorithm is not available in your PHP installation. Ensure that the <a href=":url">necessary PHP extensions</a> are installed and that the Drupal password hashing configuration is correct.', [
+          '%algorithm' => $hashingAlgorithm,
+          ':url' => 'https://www.php.net/manual/password.requirements.php',
+        ]),
+        'severity' => RequirementSeverity::Error,
+      ];
+    }
+    if ($hashingAlgorithm !== PASSWORD_BCRYPT) {
+      return [
+        'title' => $this->t('Password hashing'),
+        'value' => $this->t('Passwords are hashed with the %algorithm algorithm.', [
+          '%algorithm' => $hashingAlgorithm,
+        ]),
+        'severity' => RequirementSeverity::Info,
+      ];
+    }
+
+    if (count(array_intersect(['argon2id', 'argon2i'], $availableAlgorithms)) > 0) {
+      return [
+        'title' => $this->t('Password hashing'),
+        'value' => $this->t('Passwords are hashed with the bcrypt algorithm. It is recommended to <a href=":url">switch</a> to argon2id.', [
+          ':url' => 'https://www.drupal.org/node/3530196',
+        ]),
+        'severity' => RequirementSeverity::Warning,
+      ];
+    }
+    return [
+      'title' => $this->t('Password hashing'),
+      'value' => $this->t('Passwords are hashed with the bcrypt algorithm. It is recommended to enable <a href=":url">argon2 password hashing</a> in your PHP installation and to switch to argon2id.', [
+        ':url' => 'https://www.php.net/manual/password.requirements.php',
+      ]),
+      'severity' => RequirementSeverity::Warning,
+    ];
   }
 
 }

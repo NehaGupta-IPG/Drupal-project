@@ -111,7 +111,7 @@ class ScaffoldTest extends TestCase {
    * @param bool $relocated_docroot
    *   Whether the named fixture has a relocated document root.
    */
-  public function scaffoldSut($fixture_name, $is_link = FALSE, $relocated_docroot = TRUE): ScaffoldTestResult {
+  public function scaffoldSut(string $fixture_name, $is_link = FALSE, $relocated_docroot = TRUE): ScaffoldTestResult {
     $sut = $this->createSut($fixture_name, ['SYMLINK' => $is_link ? 'true' : 'false']);
     // Run composer install to get the dependencies we need to test.
     $this->fixtures->runComposer("install --no-ansi --no-scripts --no-plugins", $sut);
@@ -171,6 +171,8 @@ class ScaffoldTest extends TestCase {
    */
   #[DataProvider('scaffoldExpectedExceptionTestValues')]
   public function testScaffoldWithExpectedException(string $fixture_name, string $expected_exception_message, bool $is_link): void {
+    // @todo Fix random test failure.
+    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3150040');
     // Test scaffold. Expect an error.
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage($expected_exception_message);

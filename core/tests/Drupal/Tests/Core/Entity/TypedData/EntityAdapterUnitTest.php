@@ -15,6 +15,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldTypePluginManager;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\TypedData\Exception\MissingDataException;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
@@ -23,6 +24,8 @@ use Drupal\Tests\Core\Entity\ContentEntityBaseMockableClass;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -35,10 +38,8 @@ class EntityAdapterUnitTest extends UnitTestCase {
 
   /**
    * The bundle used for testing.
-   *
-   * @var string
    */
-  protected $bundle;
+  protected string $bundle;
 
   /**
    * The content entity used for testing.
@@ -47,86 +48,65 @@ class EntityAdapterUnitTest extends UnitTestCase {
 
   /**
    * The content entity adapter under test.
-   *
-   * @var \Drupal\Core\Entity\Plugin\DataType\EntityAdapter
    */
-  protected $entityAdapter;
+  protected EntityAdapter $entityAdapter;
 
   /**
    * The entity type used for testing.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $entityType;
+  protected EntityTypeInterface&Stub $entityType;
 
   /**
    * The entity type manager used for testing.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&MockObject $entityTypeManager;
 
   /**
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The entity field manager.
    */
-  protected $entityFieldManager;
+  protected EntityFieldManagerInterface&MockObject $entityFieldManager;
 
   /**
    * The type ID of the entity under test.
-   *
-   * @var string
    */
-  protected $entityTypeId;
+  protected string $entityTypeId;
 
   /**
    * The typed data manager used for testing.
-   *
-   * @var \Drupal\Core\TypedData\TypedDataManager|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $typedDataManager;
+  protected TypedDataManagerInterface&MockObject $typedDataManager;
 
   /**
    * The field item list returned by the typed data manager.
-   *
-   * @var \Drupal\Core\Field\FieldItemListInterface
    */
-  protected $fieldItemList;
+  protected FieldItemListInterface&Stub $fieldItemList;
 
   /**
    * The field type manager used for testing.
-   *
-   * @var \Drupal\Core\Field\FieldTypePluginManager|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $fieldTypePluginManager;
+  protected FieldTypePluginManager&Stub $fieldTypePluginManager;
 
   /**
    * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&MockObject $languageManager;
 
   /**
    * The UUID generator used for testing.
-   *
-   * @var \Drupal\Component\Uuid\UuidInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $uuid;
+  protected UuidInterface&Stub $uuid;
 
   /**
    * The entity ID.
-   *
-   * @var int
    */
-  protected $id;
+  protected int $id;
 
   /**
    * Field definitions.
    *
-   * @var \Drupal\Core\Field\BaseFieldDefinition[]
+   * @var array{'id': \Drupal\Core\Field\BaseFieldDefinition, 'revision_id': \Drupal\Core\Field\BaseFieldDefinition}
    */
-  protected $fieldDefinitions;
+  protected array $fieldDefinitions;
 
   /**
    * {@inheritdoc}
@@ -161,6 +141,7 @@ class EntityAdapterUnitTest extends UnitTestCase {
 
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
     $this->entityTypeManager
+      ->expects($this->exactly(6))
       ->method('getDefinition')
       ->with($this->entityTypeId)
       ->willReturn($this->entityType);
@@ -169,6 +150,7 @@ class EntityAdapterUnitTest extends UnitTestCase {
 
     $this->typedDataManager = $this->createMock(TypedDataManagerInterface::class);
     $this->typedDataManager
+      ->expects($this->never())
       ->method('getDefinition')
       ->with('entity')
       ->willReturn(['class' => '\Drupal\Core\Entity\Plugin\DataType\EntityAdapter']);
@@ -191,6 +173,7 @@ class EntityAdapterUnitTest extends UnitTestCase {
       ->willReturn([LanguageInterface::LANGCODE_NOT_SPECIFIED => $not_specified]);
 
     $this->languageManager
+      ->expects($this->never())
       ->method('getLanguage')
       ->with(LanguageInterface::LANGCODE_NOT_SPECIFIED)
       ->willReturn($not_specified);
@@ -224,6 +207,7 @@ class EntityAdapterUnitTest extends UnitTestCase {
       'revision_id' => BaseFieldDefinition::create('integer'),
     ];
     $this->entityFieldManager
+      ->expects($this->once())
       ->method('getFieldDefinitions')
       ->with($this->entityTypeId, $this->bundle)
       ->willReturn($this->fieldDefinitions);
@@ -263,7 +247,7 @@ class EntityAdapterUnitTest extends UnitTestCase {
    * Tests get root.
    */
   public function testGetRoot(): void {
-    $this->assertSame(spl_object_hash($this->entityAdapter), spl_object_hash($this->entityAdapter->getRoot()));
+    $this->assertSame($this->entityAdapter, $this->entityAdapter->getRoot());
   }
 
   /**

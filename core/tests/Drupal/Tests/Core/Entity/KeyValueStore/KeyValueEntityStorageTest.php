@@ -16,6 +16,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -23,84 +24,70 @@ use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage.
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage::class)]
-#[\PHPUnit\Framework\Attributes\Group('Entity')]
+#[CoversClass(KeyValueEntityStorage::class)]
+#[Group('Entity')]
 class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
    * The entity type.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityType;
+  protected EntityTypeInterface&MockObject $entityType;
 
   /**
    * The key value store.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
    */
-  protected $keyValueStore;
+  protected KeyValueStoreInterface&Stub $keyValueStore;
 
   /**
    * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * The UUID service.
-   *
-   * @var \Drupal\Component\Uuid\UuidInterface
    */
-  protected $uuidService;
+  protected UuidInterface&Stub $uuidService;
 
   /**
    * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&Stub $languageManager;
 
   /**
    * The entity storage.
-   *
-   * @var \Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage
    */
-  protected $entityStorage;
+  protected KeyValueEntityStorage $entityStorage;
 
   /**
    * The mocked entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&Stub $entityTypeManager;
 
   /**
    * The mocked entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $entityFieldManager;
+  protected EntityFieldManagerInterface&Stub $entityFieldManager;
 
   /**
    * The mocked cache tags invalidator.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\Stub
    */
-  protected $cacheTagsInvalidator;
+  protected CacheTagsInvalidatorInterface&Stub $cacheTagsInvalidator;
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->entityType = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
+    $this->entityType = $this->createMock(EntityTypeInterface::class);
   }
 
   /**
@@ -108,10 +95,8 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    *
    * @param string|null $uuid_key
    *   (optional) The entity key used for the UUID. Defaults to 'uuid'.
-   *
-   * @legacy-covers ::__construct
    */
-  protected function setUpKeyValueEntityStorage($uuid_key = 'uuid'): void {
+  protected function setUpKeyValueEntityStorage(?string $uuid_key = 'uuid'): void {
     $this->entityType->expects($this->atLeastOnce())
       ->method('getKey')
       ->willReturnMap([
@@ -126,10 +111,9 @@ class KeyValueEntityStorageTest extends UnitTestCase {
       ->method('getListCacheTags')
       ->willReturn(['test_entity_type_list']);
 
-    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
     $this->entityTypeManager
       ->method('getDefinition')
-      ->with('test_entity_type')
       ->willReturn($this->entityType);
 
     $this->entityFieldManager = $this->createStub(EntityFieldManagerInterface::class);
@@ -225,7 +209,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->entityType->expects($this->once())
       ->method('getClass')
       ->willReturn(EntityBaseTest::class);
-    $this->setUpKeyValueEntityStorage(NULL);
+    $this->setUpKeyValueEntityStorage();
     $this->setUpMockModuleHandler();
     $this->setUpMockUuidService();
 
@@ -327,7 +311,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @legacy-covers ::save
    * @legacy-covers ::doSave
    */
-  #[\PHPUnit\Framework\Attributes\Depends('testSaveInsert')]
+  #[Depends('testSaveInsert')]
   public function testSaveUpdate(EntityInterface $entity): void {
     $this->entityType->expects($this->once())
       ->method('getClass')
@@ -406,7 +390,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @legacy-covers ::save
    * @legacy-covers ::doSave
    */
-  #[\PHPUnit\Framework\Attributes\Depends('testSaveConfigEntity')]
+  #[Depends('testSaveConfigEntity')]
   public function testSaveRenameConfigEntity(ConfigEntityInterface $entity): void {
     $this->entityType->expects($this->once())
       ->method('getClass')
@@ -499,7 +483,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->keyValueStore->expects($this->never())
       ->method('delete');
     $this->expectException(EntityMalformedException::class);
-    $this->expectExceptionMessage('The entity does not have an ID.');
+    $this->expectExceptionMessageIs('The entity does not have an ID.');
     $this->entityStorage->save($entity);
   }
 
@@ -523,7 +507,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->keyValueStore->expects($this->never())
       ->method('delete');
     $this->expectException(EntityStorageException::class);
-    $this->expectExceptionMessage("'test_entity_type' entity with ID 'foo' already exists");
+    $this->expectExceptionMessageIs("'test_entity_type' entity with ID 'foo' already exists");
     $this->entityStorage->save($entity);
   }
 

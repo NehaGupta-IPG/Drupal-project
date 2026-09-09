@@ -6,6 +6,7 @@ use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityFieldValueTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -13,6 +14,7 @@ use Drupal\Core\Flood\PrefixFloodInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\UserSessionRepositoryInterface;
 use Drupal\user\Form\UserCancelForm;
+use Drupal\user\NotificationHandler;
 use Drupal\user\ProfileForm;
 use Drupal\user\ProfileTranslationHandler;
 use Drupal\user\RegisterForm;
@@ -78,7 +80,7 @@ use Drupal\user\UserViewsData;
 )]
 class User extends ContentEntityBase implements UserInterface {
 
-  use EntityChangedTrait;
+  use EntityChangedTrait, EntityFieldValueTrait;
 
   /**
    * Stores a reference for a reusable anonymous user entity.
@@ -167,8 +169,13 @@ class User extends ContentEntityBase implements UserInterface {
       // Send emails after we have the new user object.
       if ($this->status->value != $this->getOriginal()->status->value) {
         // The user's status is changing; conditionally send notification email.
-        $op = $this->status->value == 1 ? 'status_activated' : 'status_blocked';
-        _user_mail_notify($op, $this);
+        $notificationHandler = \Drupal::service(NotificationHandler::class);
+        if ($this->isActive()) {
+          $notificationHandler->sendStatusActivated($this);
+        }
+        else {
+          $notificationHandler->sendStatusBlocked($this);
+        }
       }
     }
   }
@@ -288,7 +295,7 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function getLastAccessedTime() {
-    return $this->get('access')->value;
+    return (int) $this->getFieldValue('access', 'value');
   }
 
   /**
@@ -318,7 +325,7 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function isActive() {
-    return $this->get('status')->value == 1;
+    return $this->getFieldValue('status', 'value') == 1;
   }
 
   /**
@@ -351,7 +358,7 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function getTimeZone() {
-    return $this->get('timezone')->value;
+    return $this->getFieldValue('timezone', 'value');
   }
 
   /**
@@ -407,7 +414,7 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function getAccountName() {
-    return $this->get('name')->value ?: '';
+    return $this->getFieldValue('name', 'value') ?: '';
   }
 
   /**
@@ -554,7 +561,11 @@ class User extends ContentEntityBase implements UserInterface {
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time that the user was created.'));
+      ->setDescription(t('The time that the user was created.'))
+      ->setDisplayOptions('view', [
+        'region' => 'hidden',
+      ])
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))

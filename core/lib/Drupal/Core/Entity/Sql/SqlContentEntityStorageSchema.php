@@ -678,12 +678,12 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   public static function getTemporaryTableMappingPrefix(EntityTypeInterface $entity_type, array $field_storage_definitions, $first_prefix_part = 'tmp_') {
     // Construct a unique prefix based on the contents of the entity type and
     // field storage definitions.
-    $prefix_parts[] = spl_object_hash($entity_type);
+    $prefix_parts[] = spl_object_id($entity_type);
     foreach ($field_storage_definitions as $storage_definition) {
-      $prefix_parts[] = spl_object_hash($storage_definition);
+      $prefix_parts[] = spl_object_id($storage_definition);
     }
     $prefix_parts[] = \Drupal::time()->getRequestTime();
-    $hash = hash('sha256', implode('', $prefix_parts));
+    $hash = hash('sha256', implode(':', $prefix_parts));
 
     return $first_prefix_part . substr($hash, 0, 6);
   }
@@ -788,6 +788,10 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
           $this->database->insert($dedicated_revision_table_name)
             ->from($this->getSelectQueryForFieldStorageDeletion($revision_table, $shared_table_field_columns, $dedicated_table_field_columns, $field_table_name))
             ->execute();
+        }
+
+        if (isset($transaction)) {
+          $transaction->commitOrRelease();
         }
       }
       catch (\Exception $e) {
@@ -1742,6 +1746,10 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         // to a dedicated table schema, hence we should use the proper API.
         $this->performFieldSchemaOperation('delete', $original);
         $this->performFieldSchemaOperation('create', $storage_definition);
+
+        if (isset($transaction)) {
+          $transaction->commitOrRelease();
+        }
       }
       catch (\Exception $e) {
         if ($this->database->supportsTransactionalDDL()) {
@@ -1836,6 +1844,10 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         // to a schema table schema, hence we should use the proper API.
         $this->performFieldSchemaOperation('delete', $original);
         $this->performFieldSchemaOperation('create', $storage_definition);
+
+        if (isset($transaction)) {
+          $transaction->commitOrRelease();
+        }
       }
       catch (\Exception $e) {
         if ($this->database->supportsTransactionalDDL()) {

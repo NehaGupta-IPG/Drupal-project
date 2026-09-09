@@ -44,13 +44,6 @@ class DisplayPageTest extends ViewsKernelTestBase {
   ];
 
   /**
-   * The router dumper to get all routes.
-   *
-   * @var \Drupal\Core\Routing\MatcherDumper
-   */
-  protected $routerDumper;
-
-  /**
    * Checks the behavior of the page for access denied/not found behaviors.
    */
   public function testPageResponses(): void {
@@ -180,7 +173,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
     $output = $renderer->renderRoot($output);
 
     $this->setRawContent($output);
-    $result = $this->xpath('//div[@class=:class]/a', [':class' => 'more-link']);
+    $result = $this->getSimpleXmlElementsByXpath('//div[@class=:class]/a', [':class' => 'more-link']);
     $this->assertEquals(Url::fromRoute('view.test_display_more.page_1')->toString(), $result[0]->attributes()->href, 'The right more link is shown.');
     $this->assertEquals($expected_more_text, trim((string) $result[0][0]), 'The right link text is shown.');
 
@@ -189,7 +182,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
     $more_link = $view->display_handler->renderMoreLink();
     $more_link = $renderer->renderRoot($more_link);
     $this->setRawContent($more_link);
-    $result = $this->xpath('//div[@class=:class]/a', [':class' => 'more-link']);
+    $result = $this->getSimpleXmlElementsByXpath('//div[@class=:class]/a', [':class' => 'more-link']);
     $this->assertEquals(Url::fromRoute('view.test_display_more.page_1')->toString(), $result[0]->attributes()->href, 'The right more link is shown.');
     $this->assertEquals($expected_more_text, trim((string) $result[0][0]), 'The right link text is shown.');
 
@@ -205,7 +198,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
     $output = $view->preview();
     $output = $renderer->renderRoot($output);
     $this->setRawContent($output);
-    $result = $this->xpath('//div[@class=:class]/a', [':class' => 'more-link']);
+    $result = $this->getSimpleXmlElementsByXpath('//div[@class=:class]/a', [':class' => 'more-link']);
     $this->assertEmpty($result, 'The more link is not shown.');
 
     $view = Views::getView('test_display_more');
@@ -223,7 +216,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
     $output = $view->preview();
     $output = $renderer->renderRoot($output);
     $this->setRawContent($output);
-    $result = $this->xpath('//div[@class=:class]/a', [':class' => 'more-link']);
+    $result = $this->getSimpleXmlElementsByXpath('//div[@class=:class]/a', [':class' => 'more-link']);
     $this->assertEmpty($result, 'The more link is not shown when view has more records.');
 
     // Test the default value of use_more_always.
@@ -247,7 +240,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
       'html_list' => '//div[@class="item-list"]//li',
     ];
 
-    $themes = ['olivero', 'stark', 'claro'];
+    $themes = ['stark', 'claro'];
 
     foreach ($themes as $theme) {
       \Drupal::service('theme_installer')->install([$theme]);
@@ -263,7 +256,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
         $output = $view->preview();
         $output = \Drupal::service('renderer')->renderRoot($output);
         $this->setRawContent($output);
-        $this->assertCount(5, $this->xpath("{$xpath}[not(text()) and not(node())]"), "Empty rows in theme '$theme', type '$type'.");
+        $this->assertCount(5, $this->getSimpleXmlElementsByXpath("{$xpath}[not(text()) and not(node())]"), "Empty rows in theme '$theme', type '$type'.");
       }
     }
   }

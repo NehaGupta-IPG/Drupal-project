@@ -21,6 +21,7 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -32,8 +33,6 @@ abstract class RendererTestBase extends UnitTestCase {
 
   /**
    * System time service.
-   *
-   * @var \Drupal\Component\Datetime\TimeInterface
    */
   protected TimeInterface $datetimeTime;
 
@@ -64,35 +63,29 @@ abstract class RendererTestBase extends UnitTestCase {
   protected $requestStack;
 
   /**
-   * @var \Drupal\Core\Cache\VariationCacheFactoryInterface
+   * The variation cache factory.
    */
-  protected $cacheFactory;
+  protected VariationCacheFactoryInterface&Stub $cacheFactory;
 
   /**
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager
+   * The cache contexts manager.
    */
-  protected $cacheContextsManager;
+  protected CacheContextsManager&Stub $cacheContextsManager;
 
   /**
-   * The mocked controller resolver.
-   *
-   * @var \Drupal\Core\Utility\CallableResolver
+   * The controller resolver.
    */
-  protected $callableResolver;
+  protected CallableResolver&Stub $callableResolver;
 
   /**
-   * The mocked theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * The theme manager.
    */
-  protected $themeManager;
+  protected ThemeManagerInterface&Stub $themeManager;
 
   /**
-   * The mocked element info.
-   *
-   * @var \Drupal\Core\Render\ElementInfoManagerInterface|\PHPUnit\Framework\MockObject\Stub
+   * The element info.
    */
-  protected $elementInfo;
+  protected ElementInfoManagerInterface&Stub $elementInfo;
 
   /**
    * @var \Drupal\Core\Cache\VariationCacheInterface
@@ -265,7 +258,7 @@ abstract class RendererTestBase extends UnitTestCase {
   /**
    * Sets up a render cache back-end that is asserted to be never used.
    */
-  protected function setUpUnusedCache() {
+  protected function setUpUnusedCache(): void {
     $this->setUpMockVariationCacheFactory();
 
     $this->cacheFactory->expects($this->never())
@@ -275,7 +268,7 @@ abstract class RendererTestBase extends UnitTestCase {
   /**
    * Sets up a memory-based render cache back-end.
    */
-  protected function setUpMemoryCache() {
+  protected function setUpMemoryCache(): void {
     $this->setUpMockVariationCacheFactory();
 
     $this->memoryCache = $this->memoryCache ?: new VariationCache($this->requestStack, new MemoryBackend(new Time($this->requestStack)), $this->cacheContextsManager);
@@ -292,7 +285,7 @@ abstract class RendererTestBase extends UnitTestCase {
    * @param string $method
    *   The HTTP method to use for the request. Defaults to 'GET'.
    */
-  protected function setUpRequest(string $method = 'GET') {
+  protected function setUpRequest(string $method = 'GET'): void {
     $request = Request::create('/', $method);
     // Ensure that the request time is set as expected.
     $request->server->set('REQUEST_TIME', (int) $_SERVER['REQUEST_TIME']);
@@ -309,7 +302,7 @@ abstract class RendererTestBase extends UnitTestCase {
    * @param string $bin
    *   The expected cache bin.
    */
-  protected function assertRenderCacheItem(array $keys, array $data, $bin = 'render') {
+  protected function assertRenderCacheItem(array $keys, array $data, $bin = 'render'): void {
     $cache_backend = $this->cacheFactory->get($bin);
     $cached = $cache_backend->get($keys, CacheableMetadata::createFromRenderArray($data));
     $this->assertNotFalse($cached, sprintf('Expected cache item "%s" exists.', implode(':', $keys)));

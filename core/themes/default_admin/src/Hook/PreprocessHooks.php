@@ -9,19 +9,14 @@ use Drupal\default_admin\Settings;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Asset\AssetQueryStringInterface;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Extension\ThemeExtensionList;
-use Drupal\Core\Extension\ThemeHandlerInterface;
-use Drupal\Core\Extension\ThemeSettingsProvider;
-use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
@@ -36,6 +31,7 @@ use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
+use Drupal\views\Plugin\views\field\EntityField;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 // cspell:ignore imce
@@ -51,21 +47,16 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Constructs the theme related hooks.
    */
   public function __construct(
-    protected readonly ThemeExtensionList $themeExtensionList,
-    protected readonly ThemeHandlerInterface $themeHandler,
     protected readonly ThemeManagerInterface $themeManager,
     protected readonly RequestStack $requestStack,
-    protected readonly AssetQueryStringInterface $assetQueryString,
     protected readonly RouteMatchInterface $currentRouteMatch,
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly AccountInterface $currentUser,
     protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly EntityTypeBundleInfoInterface $entityTypeBundleInfo,
     protected readonly BlockManagerInterface $blockManager,
     protected readonly RendererInterface $renderer,
-    protected readonly ThemeSettingsProvider $themeSettingsProvider,
-    protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
     protected readonly ModuleHandlerInterface $moduleHandler,
-    protected ClassResolverInterface $classResolver,
   ) {}
 
   /**
@@ -91,7 +82,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for admin_block.
    */
   #[Hook('preprocess_admin_block')]
-  public function adminBlock(array &$variables): void {
+  public function preprocessAdminBlock(array &$variables): void {
     if (!empty($variables['block']['content'])) {
       $variables['block']['content']['#attributes']['class'][] = 'admin-list--panel';
     }
@@ -101,7 +92,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for admin_block.
    */
   #[Hook('preprocess_admin_block_content')]
-  public function adminBlockContent(array &$variables): void {
+  public function preprocessAdminBlockContent(array &$variables): void {
     foreach ($variables['content'] as &$item) {
       $link_attributes = $item['url']->getOption('attributes') ?: [];
       $link_attributes['class'][] = 'admin-item__link';
@@ -120,7 +111,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Disables contextual links for all blocks except for layout builder blocks.
    */
   #[Hook('preprocess_block')]
-  public function block(array &$variables): void {
+  public function preprocessBlock(array &$variables): void {
     if (isset($variables['title_suffix']['contextual_links']) && !isset($variables['elements']['#contextual_links']['layout_builder_block'])) {
       unset($variables['title_suffix']['contextual_links'], $variables['elements']['#contextual_links']);
 
@@ -134,7 +125,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Makes block_content_add_list variables compatible with entity_add_list.
    */
   #[Hook('preprocess_block_content_add_list')]
-  public function blockContentAddList(array &$variables): void {
+  public function preprocessBlockContentAddList(array &$variables): void {
     if (!empty($variables['content'])) {
       $query = $this->requestStack->getCurrentRequest()->query->all();
       /** @var \Drupal\block_content\BlockContentTypeInterface $type */
@@ -166,7 +157,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for breadcrumb.
    */
   #[Hook('preprocess_breadcrumb')]
-  public function breadcrumb(array &$variables): void {
+  public function preprocessBreadcrumb(array &$variables): void {
     if (empty($variables['breadcrumb'])) {
       return;
     }
@@ -197,11 +188,13 @@ final class PreprocessHooks implements TrustedCallbackInterface {
 
       $entity_type = $entity->getEntityType();
       $type_label = $entity_type->getSingularLabel();
-      $bundle_key = $entity_type->getKey('bundle');
 
-      if ($bundle_key) {
-        $bundle_entity = $entity->get($bundle_key)->entity;
-        $type_label = $bundle_entity->label();
+      if ($entity_type->hasKey('bundle')) {
+        $bundle_info = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
+        $bundle_label = $bundle_info[$entity->bundle()]['label'] ?? NULL;
+        if ($bundle_label !== NULL) {
+          $type_label = $bundle_label;
+        }
       }
 
       if ($entity_type->id() === 'user') {
@@ -258,7 +251,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
         }
         else {
           // Let escapeAdmin override the return URL.
-          $variables['breadcrumb'][$key]['attributes']['data'] = 'data-gin-toolbar-escape-admin';
+          $variables['breadcrumb'][$key]['attributes']['data'] = 'data-toolbar-escape-admin';
         }
       }
       elseif (isset($url) && $item['url'] === $url->setAbsolute(FALSE)->toString()) {
@@ -292,7 +285,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for datetime_wrapper.
    */
   #[Hook('preprocess_datetime_wrapper')]
-  public function datetimeWrapper(array &$variables): void {
+  public function preprocessDatetimeWrapper(array &$variables): void {
     if (!empty($variables['element']['#errors'])) {
       $variables['title_attributes']['class'][] = 'has-error';
     }
@@ -311,7 +304,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for details.
    */
   #[Hook('preprocess_details')]
-  public function details(array &$variables): void {
+  public function preprocessDetails(array &$variables): void {
     // @todo Revisit when https://www.drupal.org/node/3056089 is in.
     $element = $variables['element'];
 
@@ -348,7 +341,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for entity_add_list.
    */
   #[Hook('preprocess_entity_add_list')]
-  public function entityAddList(array &$variables): void {
+  public function preprocessEntityAddList(array &$variables): void {
     // Remove description if empty.
     foreach ($variables['bundles'] as $type_id => $values) {
       if (isset($values['description']['#markup']) && empty($values['description']['#markup'])) {
@@ -361,7 +354,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for field_multiple_value_form.
    */
   #[Hook('preprocess_field_multiple_value_form')]
-  public function fieldMultipleValueForm(array &$variables): void {
+  public function preprocessFieldMultipleValueForm(array &$variables): void {
     // Make disabled available for the template.
     $variables['disabled'] = !empty($variables['element']['#disabled']);
 
@@ -402,7 +395,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for fieldset.
    */
   #[Hook('preprocess_fieldset')]
-  public function fieldset(array &$variables): void {
+  public function preprocessFieldset(array &$variables): void {
     $element = $variables['element'];
     $composite_types = ['checkboxes', 'radios'];
 
@@ -442,7 +435,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * @see \Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::formElement()
    */
   #[Hook('preprocess_fieldset__media_library_widget')]
-  public function fieldsetMediaLibraryWidget(array &$variables): void {
+  public function preprocessFieldsetMediaLibraryWidget(array &$variables): void {
     if (isset($variables['prefix']['weight_toggle'])) {
       $variables['prefix']['weight_toggle']['#attributes']['class'][] = 'action-link';
       $variables['prefix']['weight_toggle']['#attributes']['class'][] = 'action-link--extrasmall';
@@ -455,10 +448,20 @@ final class PreprocessHooks implements TrustedCallbackInterface {
   }
 
   /**
+   * Implements hook_preprocess_HOOK() for container__media_library_widget_selection.
+   *
+   * @see \Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::formElement()
+   */
+  #[Hook('preprocess_container__media_library_widget_selection')]
+  public function preprocessContainerMediaLibraryWidgetSelection(array &$variables): void {
+    $variables['attributes']['class'][] = 'media-library-selection';
+  }
+
+  /**
    * Implements hook_preprocess_HOOK() for file_managed_file.
    */
   #[Hook('preprocess_file_managed_file')]
-  public function fileManagedFile(array &$variables): void {
+  public function preprocessFileManagedFile(array &$variables): void {
     // Produce the same renderable element structure as image widget has.
     $child_keys = Element::children($variables['element']);
     foreach ($child_keys as $child_key) {
@@ -471,7 +474,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for file_widget_multiple.
    */
   #[Hook('preprocess_file_widget_multiple')]
-  public function fileWidgetMultiple(array &$variables): void {
+  public function preprocessFileWidgetMultiple(array &$variables): void {
     $has_upload = FALSE;
 
     if (isset($variables['table']['#type']) && $variables['table']['#type'] === 'table') {
@@ -544,7 +547,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for filter_tips.
    */
   #[Hook('preprocess_filter_tips')]
-  public function filterTips(array &$variables): void {
+  public function preprocessFilterTips(array &$variables): void {
     $variables['#attached']['library'][] = 'filter/drupal.filter';
   }
 
@@ -552,7 +555,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for form_element.
    */
   #[Hook('preprocess_form_element')]
-  public function formElement(array &$variables): void {
+  public function preprocessFormElement(array &$variables): void {
     if (!empty($variables['element']['#errors'])) {
       $variables['label']['#attributes']['class'][] = 'has-error';
     }
@@ -571,7 +574,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for form_element__password.
    */
   #[Hook('preprocess_form_element__password')]
-  public function formElementPassword(array &$variables): void {
+  public function preprocessFormElementPassword(array &$variables): void {
     if (!empty($variables['element']['#array_parents']) && in_array('pass1', $variables['element']['#array_parents'], TRUE)) {
       // This is the main password form element.
       $variables['attributes']['class'][] = 'password-confirm__password';
@@ -587,7 +590,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for form_element__password_confirm.
    */
   #[Hook('preprocess_form_element__password_confirm')]
-  public function formElementPasswordConfirm(array &$variables): void {
+  public function preprocessFormElementPasswordConfirm(array &$variables): void {
     // Add CSS classes needed for theming the password confirm widget.
     $variables['attributes']['class'][] = 'password-confirm';
     $variables['attributes']['class'][] = 'is-initial';
@@ -599,7 +602,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for HTML.
    */
   #[Hook('preprocess_html')]
-  public function html(array &$variables): void {
+  public function preprocessHtml(array &$variables): void {
     // Check if IMCE is active.
     if (isset($variables['attributes']['class']) && in_array('imce-page', $variables['attributes']['class'], TRUE)) {
       return;
@@ -609,7 +612,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     $settings = Settings::getInstance();
 
     // Old way to set accent color.
-    $variables['html_attributes']['data-gin-accent'] = $settings->get('preset_accent_color');
+    $variables['html_attributes']['data-accent'] = $settings->get('preset_accent_color');
 
     // New way to set accent color.
     $accent_colors = Helper::accentColors();
@@ -628,19 +631,19 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     }
 
     // Set focus color.
-    $variables['html_attributes']['data-gin-focus'] = $settings->get('preset_focus_color');
+    $variables['html_attributes']['data-admin-focus'] = $settings->get('preset_focus_color');
 
     // High contrast mode.
     if ($settings->get('high_contrast_mode')) {
-      $variables['html_attributes']['class'][] = 'gin--high-contrast-mode';
+      $variables['html_attributes']['class'][] = 'high-contrast-mode';
     }
 
     // Set layout density.
-    $variables['html_attributes']['data-gin-layout-density'] = $settings->get('layout_density');
+    $variables['html_attributes']['data-layout-density'] = $settings->get('layout_density');
 
     // Edit form? Use the new admin Edit form layout.
     if (Helper::isContentForm()) {
-      $variables['attributes']['class'][] = 'gin--edit-form';
+      $variables['attributes']['class'][] = 'edit-form';
     }
 
     // Only add toolbar/navigation class if user has permission.
@@ -653,11 +656,11 @@ final class PreprocessHooks implements TrustedCallbackInterface {
 
     // Check if Navigation module is active.
     if ($this->moduleHandler->moduleExists('navigation')) {
-      $variables['attributes']['class'][] = 'gin--navigation';
+      $variables['attributes']['class'][] = 'admin--navigation';
     }
     else {
       // Set toolbar class.
-      $variables['attributes']['class'][] = 'gin--toolbar';
+      $variables['attributes']['class'][] = 'admin--toolbar';
     }
   }
 
@@ -665,7 +668,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for image_widget.
    */
   #[Hook('preprocess_image_widget')]
-  public function imageWidget(array &$variables): void {
+  public function preprocessImageWidget(array &$variables): void {
     // This prevents image widget templates from rendering preview container
     // HTML to users that do not have permission to access these previews.
     // @todo Revisit in https://drupal.org/node/953034
@@ -680,7 +683,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for input.
    */
   #[Hook('preprocess_input')]
-  public function input(array &$variables): void {
+  public function preprocessInput(array &$variables): void {
     if (
       !empty($variables['element']['#title_display']) &&
       $variables['element']['#title_display'] === 'attribute' &&
@@ -728,7 +731,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_install_page().
    */
   #[Hook('preprocess_install_page')]
-  public function installPage(array &$variables): void {
+  public function preprocessInstallPage(array &$variables): void {
     // Admin has custom styling for the install page.
     $variables['#attached']['library'][] = 'default_admin/install-page';
   }
@@ -740,7 +743,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * before they are saved.
    */
   #[Hook('preprocess_item_list__media_library_add_form_media_list')]
-  public function itemListMediaLibraryAddFormMediaList(array &$variables): void {
+  public function preprocessItemListMediaLibraryAddFormMediaList(array &$variables): void {
     foreach ($variables['items'] as &$item) {
       $item['value']['preview']['#attributes']['class'][] = 'media-library-add-form__preview';
       $item['value']['fields']['#attributes']['class'][] = 'media-library-add-form__fields';
@@ -765,7 +768,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for links.
    */
   #[Hook('preprocess_links')]
-  public function links(array &$variables): void {
+  public function preprocessLinks(array &$variables): void {
     foreach ($variables['links'] as $links_item) {
       if (!empty($links_item['link']) && !empty($links_item['link']['#url']) && $links_item['link']['#url'] instanceof Url && $links_item['link']['#url']->isRouted()) {
         switch ($links_item['link']['#url']->getRouteName()) {
@@ -807,7 +810,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for links__action_links.
    */
   #[Hook('preprocess_links__action_links')]
-  public function linksActionLinks(array &$variables): void {
+  public function preprocessLinksActionLinks(array &$variables): void {
     $variables['attributes']['class'][] = 'action-links';
     foreach ($variables['links'] as $delta => $link_item) {
       $variables['links'][$delta]['attributes']->addClass('action-links__item');
@@ -818,7 +821,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for links__dropbutton.
    */
   #[Hook('preprocess_links__dropbutton')]
-  public function linksDropbutton(array &$variables): void {
+  public function preprocessLinksDropbutton(array &$variables): void {
     // Add the right CSS class for the dropbutton list that helps reducing FOUC.
     if (!empty($variables['links'])) {
       $variables['attributes']['class'][] = count($variables['links']) > 1
@@ -841,7 +844,8 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    *   https://www.drupal.org/project/drupal/issues/3088856 is resolved.
    */
   #[Hook('preprocess_links__media_library_menu')]
-  public function linksMediaLibraryMenu(array &$variables): void {
+  public function preprocessLinksMediaLibraryMenu(array &$variables): void {
+    $variables['attributes']['class'][] = 'media-library-menu';
     foreach ($variables['links'] as &$link) {
       // Add a class to the Media Library menu items.
       $link['attributes']->addClass('media-library-menu__item');
@@ -853,7 +857,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_maintenance_page().
    */
   #[Hook('preprocess_maintenance_page')]
-  public function maintenancePage(array &$variables): void {
+  public function preprocessMaintenancePage(array &$variables): void {
     // Admin has custom styling for the maintenance page.
     $variables['#attached']['library'][] = 'default_admin/maintenance-page';
   }
@@ -865,7 +869,8 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * the modal media library dialog.
    */
   #[Hook('preprocess_media_library_item__small')]
-  public function mediaLibraryItemSmall(array &$variables): void {
+  public function preprocessMediaLibraryItemSmall(array &$variables): void {
+    $variables['attributes']['class'][] = 'media-library-item';
     $variables['content']['select']['#attributes']['class'][] = 'media-library-item__click-to-select-checkbox';
   }
 
@@ -875,7 +880,8 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * This targets each media item selected in an entity reference field.
    */
   #[Hook('preprocess_media_library_item__widget')]
-  public function mediaLibraryItemWidget(array &$variables): void {
+  public function preprocessMediaLibraryItemWidget(array &$variables): void {
+    $variables['attributes']['class'][] = 'media-library-item';
     $variables['content']['remove_button']['#attributes']['class'][] = 'media-library-item__remove';
     $variables['content']['remove_button']['#attributes']['class'][] = 'icon-link';
   }
@@ -884,7 +890,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for menu_local_action.
    */
   #[Hook('preprocess_menu_local_action')]
-  public function menuLocalAction(array &$variables): void {
+  public function preprocessMenuLocalAction(array &$variables): void {
     $variables['link']['#options']['attributes']['class'][] = 'button--primary';
     $variables['attributes']['class'][] = 'local-actions__item';
     $legacy_class_key = array_search('button-action', $variables['link']['#options']['attributes']['class'], TRUE);
@@ -906,7 +912,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for menu-local-task templates.
    */
   #[Hook('preprocess_menu_local_task')]
-  public function menuLocalTask(array &$variables): void {
+  public function preprocessMenuLocalTask(array &$variables): void {
     $variables['link']['#options']['attributes']['class'][] = 'tabs__link';
     $variables['link']['#options']['attributes']['class'][] = 'js-tabs-link';
 
@@ -926,7 +932,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for menu-local-task Views UI templates.
    */
   #[Hook('preprocess_menu_local_task__views_ui')]
-  public function menuLocalTaskViewsUi(array &$variables): void {
+  public function preprocessMenuLocalTaskViewsUi(array &$variables): void {
     // Remove 'tabs__link' without adding a new class because it couldn't be
     // used reliably.
     // @see https://www.drupal.org/node/3051605
@@ -944,7 +950,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * invoked.
    */
   #[Hook('preprocess_menu_local_tasks')]
-  public function menuLocalTasks(array &$variables): void {
+  public function preprocessMenuLocalTasks(array &$variables): void {
     if (!empty($variables['primary'])) {
       $variables['primary']['#attached'] = [
         'library' => [
@@ -972,7 +978,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for navigation.
    */
   #[Hook('preprocess_navigation')]
-  public function navigation(array &$variables): void {
+  public function preprocessNavigation(array &$variables): void {
     // Get theme configs.
     $logo_default = Settings::getInstance()->getDefault('logo.use_default');
     $variables['icon_path'] = !$logo_default ? Settings::getInstance()->getDefault('logo.path') : '';
@@ -989,7 +995,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Makes node_add_list variables compatible with entity_add_list.
    */
   #[Hook('preprocess_node_add_list')]
-  public function nodeAddList(array &$variables): void {
+  public function preprocessNodeAddList(array &$variables): void {
     if (!empty($variables['content'])) {
       /** @var \Drupal\node\NodeTypeInterface $type */
       foreach ($variables['content'] as $type) {
@@ -1016,7 +1022,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for page.
    */
   #[Hook('preprocess_page')]
-  public function page(array &$variables): void {
+  public function preprocessPage(array &$variables): void {
     // Required for allowing sub-theming admin.
     $activeThemeName = $this->themeManager->getActiveTheme()->getName();
     $variables['active_admin_theme'] = $activeThemeName;
@@ -1036,12 +1042,12 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     // Get form actions.
     if ($form_actions = Helper::formActions()) {
       if ($this->moduleHandler->moduleExists('navigation')) {
-        $variables['gin_form_actions'] = '';
+        $variables['default_admin_form_actions'] = '';
       }
       else {
-        $variables['gin_form_actions'] = $form_actions;
+        $variables['default_admin_form_actions'] = $form_actions;
       }
-      $variables['gin_form_actions_class'] = 'gin-sticky-form-actions--preprocessed';
+      $variables['default_admin_form_actions_class'] = 'sticky-form-actions--preprocessed';
     }
   }
 
@@ -1049,7 +1055,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for page__node__revisions.
    */
   #[Hook('preprocess_page__node__revisions')]
-  public function pageNodeRevisions(array &$page): void {
+  public function preprocessPageNodeRevisions(array &$page): void {
     // Attach the init script.
     $page['#attached']['library'][] = 'default_admin/revisions';
   }
@@ -1058,7 +1064,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for page_title.
    */
   #[Hook('preprocess_page_title')]
-  public function pageTitle(array &$variables): void {
+  public function preprocessPageTitle(array &$variables): void {
     if (preg_match('/entity\.node\..*/', $this->currentRouteMatch->getRouteName(), $matches)) {
       $node = $this->currentRouteMatch->getParameter('node');
       if ($node instanceof Node) {
@@ -1084,7 +1090,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for select.
    */
   #[Hook('preprocess_select')]
-  public function select(array &$variables): void {
+  public function preprocessSelect(array &$variables): void {
     if (!empty($variables['element']['#title_display']) && $variables['element']['#title_display'] === 'attribute' && !empty((string) $variables['element']['#title'])) {
       $variables['attributes']['title'] = (string) $variables['element']['#title'];
     }
@@ -1107,7 +1113,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for status_messages.
    */
   #[Hook('preprocess_status_messages')]
-  public function statusMessages(array &$variables): void {
+  public function preprocessStatusMessages(array &$variables): void {
     $variables['title_ids'] = [];
     foreach ($variables['message_list'] as $message_type => $messages) {
       $variables['title_ids'][$message_type] = Html::getUniqueId("message-$message_type-title");
@@ -1118,7 +1124,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for system_themes_page.
    */
   #[Hook('preprocess_system_themes_page')]
-  public function systemThemesPage(array &$variables): void {
+  public function preprocessSystemThemesPage(array &$variables): void {
     if (!empty($variables['theme_groups'])) {
       foreach ($variables['theme_groups'] as &$theme_group) {
         if (!empty($theme_group['themes'])) {
@@ -1152,7 +1158,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    */
   #[Hook('preprocess_field_ui_table')]
   #[Hook('preprocess_table')]
-  public function table(array &$variables): void {
+  public function preprocessTable(array &$variables): void {
     // Adding table sort indicator CSS class for inactive sort link.
     // @todo Revisit after https://www.drupal.org/node/3025726 or
     //   https://www.drupal.org/node/1973418 is in.
@@ -1197,7 +1203,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for text_format_wrapper.
    */
   #[Hook('preprocess_text_format_wrapper')]
-  public function textFormatWrapper(array &$variables): void {
+  public function preprocessTextFormatWrapper(array &$variables): void {
     // @todo Remove when https://www.drupal.org/node/3016343 is fixed.
     $description_attributes = [];
     if (!empty($variables['attributes']['id'])) {
@@ -1213,41 +1219,10 @@ final class PreprocessHooks implements TrustedCallbackInterface {
   }
 
   /**
-   * Implements toolbar preprocess.
-   *
-   * This is also called by system_preprocess_toolbar() in instances where Admin
-   * is the administration theme but not the active theme.
-   *
-   * @see system_preprocess_toolbar()
-   */
-  #[Hook('preprocess_toolbar')]
-  public function toolbar(array &$variables): void {
-    $variables['attributes']['data-drupal-gin-processed-toolbar'] = TRUE;
-
-    // The controller resolver does not support Closures at this time. For now,
-    // we use a wrapper function to load the service with dependencies.
-    // @see https://www.drupal.org/project/drupal/issues/3060638
-    $variables['user_picture'] = [
-      '#lazy_builder' => [static::class . '::lazyToolbarUserPicture', []],
-      '#create_placeholder' => TRUE,
-    ];
-
-    // Check if Navigation module is active.
-    if ($this->moduleHandler->moduleExists('navigation')) {
-      // Attach the new drupal navigation styles.
-      $variables['#attached']['library'][] = 'default_admin/navigation';
-      return;
-    }
-
-    // Toolbar library.
-    $variables['#attached']['library'][] = 'default_admin/toolbar';
-  }
-
-  /**
    * Lazy builder callback for the user picture.
    */
   #[Hook('preprocess_toolbar_user_picture')]
-  public function toolbarUserPicture(): array {
+  public function preprocessToolbarUserPicture(): array {
     $user = $this->entityTypeManager->getStorage('user')->load($this->currentUser->id());
     $url = $user->toUrl();
 
@@ -1315,7 +1290,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for top_bar.
    */
   #[Hook('preprocess_top_bar')]
-  public function topBar(array &$variables): void {
+  public function preprocessTopBar(array &$variables): void {
     if (!$this->moduleHandler->moduleExists('navigation')) {
       return;
     }
@@ -1323,20 +1298,20 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     // Get local actions.
     $plugin_block = $this->blockManager->createInstance('local_actions_block', []);
     $block_content = $plugin_block->build();
-    $variables['gin_local_actions'] = $this->renderer->render($block_content);
+    $variables['default_admin_local_actions'] = $this->renderer->render($block_content);
     $variables['#attached']['library'][] = 'default_admin/top_bar';
 
     // Get form actions.
     if ($form_actions = Helper::formActions()) {
-      $variables['gin_form_actions'] = $form_actions;
-      $variables['gin_form_actions_class'] = 'gin-sticky-form-actions--preprocessed';
+      $variables['default_admin_form_actions'] = $form_actions;
+      $variables['default_admin_form_actions_class'] = 'sticky-form-actions--preprocessed';
       $variables['#attached']['library'][] = 'default_admin/top_bar';
     }
 
     // Get breadcrumb.
     $plugin_block = $this->blockManager->createInstance('system_breadcrumb_block', []);
     $block_content = $plugin_block->build();
-    $variables['gin_breadcrumbs'] = $this->renderer->render($block_content);
+    $variables['default_admin_breadcrumbs'] = $this->renderer->render($block_content);
     $variables['#attached']['library'][] = 'default_admin/top_bar';
   }
 
@@ -1344,7 +1319,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for views_exposed_form.
    */
   #[Hook('preprocess_views_exposed_form')]
-  public function viewsExposedForm(array &$variables): void {
+  public function preprocessViewsExposedForm(array &$variables): void {
     $form = &$variables['form'];
 
     // Add BEM classes for items in the form.
@@ -1379,7 +1354,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_preprocess_HOOK() for views_ui_display_tab_bucket.
    */
   #[Hook('preprocess_views_ui_display_tab_bucket')]
-  public function viewsUiDisplayTabBucket(array &$variables): void {
+  public function preprocessViewsUiDisplayTabBucket(array &$variables): void {
     // Instead of re-styling Views UI dropbuttons with module-specific CSS
     // styles, change dropbutton variants to the extra small version.
     // @todo Revisit after https://www.drupal.org/node/3057581 is added.
@@ -1392,7 +1367,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    * Implements hook_form_FORM_ID_alter() for Views UI rearrange filter form.
    */
   #[Hook('preprocess_views_ui_rearrange_filter_form')]
-  public function viewsUiRearrangeFilterForm(array &$variables): void {
+  public function preprocessViewsUiRearrangeFilterForm(array &$variables): void {
     foreach ($variables['table']['#rows'] as &$row) {
       // Remove the container-inline class from the operator table cell.
       if (isset($row['data'][0]['class'])) {
@@ -1402,13 +1377,44 @@ final class PreprocessHooks implements TrustedCallbackInterface {
   }
 
   /**
+   * Implements hook_preprocess_HOOK() for views_view_field__status.
+   *
+   * Determines the publication state of the entity the row belongs to, so that
+   * the template can wrap the output in a publication status marker. The
+   * template cannot do this on its own, because resolving the translation of
+   * the row requires the field handler.
+   *
+   * The theme suggestion is derived from the field ID, so this runs for every
+   * views field with the ID 'status', of every entity type. The publication
+   * state therefore stays unknown for anything that is not the publication
+   * status field of a publishable entity type.
+   *
+   * @see \Drupal\views\Plugin\views\field\FieldPluginBase::themeFunctions()
+   */
+  #[Hook('preprocess_views_view_field__status')]
+  public function preprocessViewsViewFieldStatus(array &$variables): void {
+    $field_handler = $variables['field'];
+    if (!($field_handler instanceof EntityField)) {
+      $variables['is_published'] = NULL;
+      return;
+    }
+
+    $entity = $field_handler->getEntity($variables['row']);
+    if ($entity?->get($field_handler->definition['field_name'])->getFieldDefinition()->getType() === 'boolean') {
+      $variables['is_published'] = (bool) $field_handler->getValue($variables['row']);
+      return;
+    }
+    $variables['is_published'] = NULL;
+  }
+
+  /**
    * Implements hook_preprocess_views_view_fields().
    *
    * This targets each rendered media item in the grid display of the media
    * library's modal dialog.
    */
   #[Hook('preprocess_views_view_fields__media_library')]
-  public function viewsViewFieldsMediaLibrary(array &$variables): void {
+  public function preprocessViewsViewFieldsMediaLibrary(array &$variables): void {
     // Add classes to media rendered entity field so it can be targeted for
     // styling. Adding this class in a template is very difficult to do.
     if (isset($variables['fields']['rendered_entity']->wrapper_attributes)) {
@@ -1423,7 +1429,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
    *   https://www.drupal.org/node/1973418 is in.
    */
   #[Hook('preprocess_views_view_table')]
-  public function viewsViewTable(array &$variables): void {
+  public function preprocessViewsViewTable(array &$variables): void {
     if (!empty($variables['header'])) {
       foreach ($variables['header'] as &$header_cell) {
         if (!empty($header_cell['url'])) {

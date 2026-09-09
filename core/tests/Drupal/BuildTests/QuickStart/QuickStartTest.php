@@ -44,20 +44,12 @@ class QuickStartTest extends BuildTestBase {
   protected $testDb;
 
   /**
-   * The Drupal root directory.
-   *
-   * @var string
-   */
-  protected $root;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
     $php_executable_finder = new PhpExecutableFinder();
     $this->php = $php_executable_finder->find();
-    $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
     chdir($this->root);
     if (!is_writable("{$this->root}/sites/simpletest")) {
       $this->markTestSkipped('This test requires a writable sites/simpletest directory');
@@ -99,7 +91,7 @@ class QuickStartTest extends BuildTestBase {
 
     $install_command = [
       $this->php,
-      'core/scripts/drupal',
+      'core/scripts/dr',
       'quick-start',
       'standard',
       "--site-name='Test site {$this->testDb->getDatabasePrefix()}'",
@@ -126,6 +118,10 @@ class QuickStartTest extends BuildTestBase {
     sleep(2);
     $this->assertStringContainsString("127.0.0.1:$port/user/reset/1/", $process->getOutput());
 
+    $matches = [];
+    $this->assertSame(1, preg_match('@http://127\\.0\\.0\\.1:' . $port . '/user/reset/1/[^\\s<"]+/login@', $process->getOutput(), $matches));
+    $one_time_login_link = $matches[0];
+
     // Generate a cookie so we can make a request against the installed site.
     define('DRUPAL_TEST_IN_CHILD_SITE', FALSE);
     chmod($this->testDb->getTestSitePath(), 0755);
@@ -133,6 +129,15 @@ class QuickStartTest extends BuildTestBase {
       'SIMPLETEST_USER_AGENT' => drupal_generate_test_ua($this->testDb->getDatabasePrefix()),
     ], '127.0.0.1');
 
+    // First request will be a 403 as the standard front page is admin-only.
+    $response = $guzzle->get('http://127.0.0.1:' . $port, [
+      'cookies' => $cookieJar,
+      'http_errors' => FALSE,
+    ]);
+    $this->assertSame(403, $response->getStatusCode());
+
+    // Use the one-time login link, then load the front page as authenticated.
+    $guzzle->get($one_time_login_link, ['cookies' => $cookieJar]);
     $response = $guzzle->get('http://127.0.0.1:' . $port, ['cookies' => $cookieJar]);
     $content = (string) $response->getBody();
     $this->assertStringContainsString('Test site ' . $this->testDb->getDatabasePrefix(), $content);
@@ -153,7 +158,7 @@ class QuickStartTest extends BuildTestBase {
     // Install a site.
     $install_command = [
       $this->php,
-      'core/scripts/drupal',
+      'core/scripts/dr',
       'install',
       'minimal',
       "--password='secret'",
@@ -170,7 +175,7 @@ class QuickStartTest extends BuildTestBase {
     // Run the PHP built-in webserver.
     $server_command = [
       $this->php,
-      'core/scripts/drupal',
+      'core/scripts/dr',
       'server',
       '--suppress-login',
     ];
@@ -205,7 +210,7 @@ class QuickStartTest extends BuildTestBase {
     // Try to re-install over the top of an existing site.
     $install_command = [
       $this->php,
-      'core/scripts/drupal',
+      'core/scripts/dr',
       'install',
       'testing',
       "--site-name='Test another site {$this->testDb->getDatabasePrefix()}'",
@@ -233,7 +238,7 @@ class QuickStartTest extends BuildTestBase {
     // link generation works.
     $install_command = [
       $this->php,
-      'core/scripts/drupal',
+      'core/scripts/dr',
       'quick-start',
       'umami',
       "--site-name='Test site {$this->testDb->getDatabasePrefix()}' --suppress-login",
@@ -249,7 +254,7 @@ class QuickStartTest extends BuildTestBase {
   public function testServerWithNoInstall(): void {
     $server_command = [
       $this->php,
-      'core/scripts/drupal',
+      'core/scripts/dr',
       'server',
       '--suppress-login',
     ];

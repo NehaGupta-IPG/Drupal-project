@@ -22,11 +22,7 @@ use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
-use Drupal\TestTools\Extension\Dump\DebugDump;
 use GuzzleHttp\Cookie\CookieJar;
-use PHPUnit\Framework\Attributes\BeforeClass;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Provides a test case for functional Drupal tests.
@@ -50,9 +46,8 @@ use Symfony\Component\VarDumper\VarDumper;
  *
  * @ingroup testing
  */
-abstract class BrowserTestBase extends TestCase {
+abstract class BrowserTestBase extends DrupalTestCase {
 
-  use DrupalTestCaseTrait;
   use FunctionalTestSetupTrait;
   use UiHelperTrait {
     FunctionalTestSetupTrait::refreshVariables insteadof UiHelperTrait;
@@ -70,21 +65,17 @@ abstract class BrowserTestBase extends TestCase {
     createContentType as drupalCreateContentType;
   }
   use ConfigTestTrait;
-  use TestRequirementsTrait;
   use UserCreationTrait {
     createRole as drupalCreateRole;
     createUser as drupalCreateUser;
   }
   use XdebugRequestTrait;
-  use PhpUnitCompatibilityTrait;
   use ExtensionListTestTrait;
 
   /**
    * Time limit in seconds for the test.
-   *
-   * @var int
    */
-  protected $timeLimit = 500;
+  protected int $timeLimit = 500;
 
 
   /**
@@ -131,9 +122,9 @@ abstract class BrowserTestBase extends TestCase {
    *
    * Value can be overridden using the environment variable MINK_DRIVER_CLASS.
    *
-   * @var string
+   * @var class-string<\Behat\Mink\Driver\DriverInterface>
    */
-  protected $minkDefaultDriverClass = BrowserKitDriver::class;
+  protected string $minkDefaultDriverClass = BrowserKitDriver::class;
 
   /**
    * Mink default driver params.
@@ -153,10 +144,8 @@ abstract class BrowserTestBase extends TestCase {
    * Mink session manager.
    *
    * This will not be initialized if there was an error during the test setup.
-   *
-   * @var \Behat\Mink\Mink|null
    */
-  protected $mink;
+  protected ?Mink $mink;
 
   /**
    * The base URL.
@@ -171,24 +160,6 @@ abstract class BrowserTestBase extends TestCase {
    * @var array
    */
   protected $originalShutdownCallbacks = [];
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(string $name) {
-    parent::__construct($name);
-    $this->setRunTestInSeparateProcess(TRUE);
-  }
-
-  /**
-   * Registers the dumper CLI handler when the DebugDump extension is enabled.
-   */
-  #[BeforeClass]
-  public static function setDebugDumpHandler(): void {
-    if (DebugDump::isEnabled()) {
-      VarDumper::setHandler(DebugDump::class . '::cliHandler');
-    }
-  }
 
   /**
    * Initializes Mink sessions.
@@ -208,6 +179,8 @@ abstract class BrowserTestBase extends TestCase {
 
       // Inject a Guzzle middleware to generate debug output for every request
       // performed in the test.
+      // Getting the handler via ::getConfig is discouraged, see
+      // https://github.com/guzzle/guzzle/issues/3114.
       $handler_stack = $client->getConfig('handler');
       $handler_stack->push($this->getResponseLogHandler());
 
@@ -329,12 +302,11 @@ abstract class BrowserTestBase extends TestCase {
    */
   protected function setUp(): void {
     if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
-      @trigger_error('Functional/FunctionalJavascript test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and is throwing an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
+      throw new \Exception('Functional/FunctionalJavascript test classes must specify the #[RunTestsInSeparateProcesses] attribute');
     }
 
     parent::setUp();
 
-    $this->setUpAppRoot();
     chdir($this->root);
 
     // Allow tests to compare MarkupInterface objects via assertEquals().
@@ -358,11 +330,14 @@ abstract class BrowserTestBase extends TestCase {
 
   /**
    * Sets up the root application path.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Access
+   *   $this->root directly.
+   *
+   * @see https://www.drupal.org/node/3574112
    */
   protected function setUpAppRoot(): void {
-    if ($this->root === NULL) {
-      $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
-    }
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Access $this->root directly. See https://www.drupal.org/node/3574112', E_USER_DEPRECATED);
   }
 
   /**
@@ -413,7 +388,7 @@ abstract class BrowserTestBase extends TestCase {
   protected function tearDown(): void {
     // Close any mink sessions as early as possible to free a new browser
     // session up for the next test method or test.
-    if ($this->mink) {
+    if (isset($this->mink)) {
       $this->mink->stopSessions();
     }
     parent::tearDown();
@@ -479,10 +454,14 @@ abstract class BrowserTestBase extends TestCase {
    */
   protected function getSessionCookies() {
     $domain = parse_url($this->getUrl(), PHP_URL_HOST);
-    $session_id = $this->getSession()->getCookie($this->getSessionName());
-    $cookies = CookieJar::fromArray([$this->getSessionName() => $session_id], $domain);
+    $session_name = $this->getSessionName();
+    $session_id = $this->getSession()->getCookie($session_name);
 
-    return $cookies;
+    $cookies = [];
+    if ($session_id !== NULL) {
+      $cookies[$session_name] = $session_id;
+    }
+    return CookieJar::fromArray($cookies, $domain);
   }
 
   /**
@@ -522,18 +501,10 @@ abstract class BrowserTestBase extends TestCase {
     $this->initSettings();
     $this->container = $container = $this->initKernel(\Drupal::request());
     $this->initConfig($container);
-    $this->installDefaultThemeFromClassProperty($container);
-    $this->installModulesFromClassProperty($container);
 
     // Clear the static cache so that subsequent cache invalidations will work
     // as expected.
     $this->container->get('cache_tags.invalidator')->resetChecksums();
-
-    // Explicitly call register() again on the container registered in \Drupal.
-    // @todo This should already be called through
-    //   DrupalKernel::prepareLegacyRequest() -> DrupalKernel::boot() but that
-    //   appears to be calling a different container.
-    $this->container->get('stream_wrapper_manager')->register();
   }
 
   /**
@@ -568,8 +539,35 @@ abstract class BrowserTestBase extends TestCase {
    *
    * @return \Behat\Mink\Element\NodeElement[]
    *   The list of elements matching the xpath expression.
+   *
+   * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+   *   BrowserTestBase::getNodeElementsByXpath instead.
+   *
+   * @see https://www.drupal.org/node/3589621
    */
   protected function xpath($xpath, array $arguments = []) {
+    @trigger_error(__CLASS__ . "::" . __FUNCTION__ . " is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use BrowserTestBase::getNodeElementsByXpath instead. See https://www.drupal.org/node/3589621", E_USER_DEPRECATED);
+    return $this->getNodeElementsByXpath($xpath, $arguments);
+  }
+
+  /**
+   * Performs an xpath search on the contents of the internal browser.
+   *
+   * The search is relative to the root element (HTML tag normally) of the page.
+   *
+   * @param string $xpath
+   *   The xpath string to use in the search.
+   * @param array $arguments
+   *   An array of arguments with keys in the form ':name' matching the
+   *   placeholders in the query. The values may be either strings or numeric
+   *   values.
+   *
+   * @return \Behat\Mink\Element\NodeElement[]
+   *   The list of elements matching the xpath expression.
+   *
+   * @todo should we use DrupalTestCaseTrait to avoid duplication?
+   */
+  protected function getNodeElementsByXpath($xpath, array $arguments = []): array {
     $xpath = $this->assertSession()->buildXPathQuery($xpath, $arguments);
     return $this->getSession()->getPage()->findAll('xpath', $xpath);
   }
@@ -594,7 +592,7 @@ abstract class BrowserTestBase extends TestCase {
    *   The JSON decoded drupalSettings value from the current page.
    */
   protected function getDrupalSettings() {
-    if ($elements = $this->xpath('//script[@type="application/json" and @data-drupal-selector="drupal-settings-json"]')) {
+    if ($elements = $this->getNodeElementsByXpath('//script[@type="application/json" and @data-drupal-selector="drupal-settings-json"]')) {
       $settings = Json::decode($elements[0]->getText());
       if (isset($settings['ajaxPageState']['libraries'])) {
         $settings['ajaxPageState']['libraries'] = UrlHelper::uncompressQueryParameter($settings['ajaxPageState']['libraries']);
@@ -614,12 +612,17 @@ abstract class BrowserTestBase extends TestCase {
     $backtrace = debug_backtrace();
     // Find the test class that has the test method.
     while ($caller = Error::getLastCaller($backtrace)) {
-      // If we match PHPUnit's TestCase::runTest, then the previously processed
-      // caller entry is where our test method sits.
-      if (isset($last_caller) && isset($caller['function']) && $caller['function'] === 'PHPUnit\Framework\TestCase->runTest()') {
-        // Return the last caller since that has to be the test class.
-        $caller = $last_caller;
-        break;
+      // If we match PHPUnit's TestCase::runTest or ::invokeTestMethod, then
+      // the previously processed caller entry is where our test method sits.
+      if (isset($last_caller) && isset($caller['function'])) {
+        if (in_array($caller['function'], [
+          'PHPUnit\Framework\TestCase->runTest()',
+          'PHPUnit\Framework\TestCase->invokeTestMethod()',
+        ], TRUE)) {
+          // Return the last caller since that has to be the test class.
+          $caller = $last_caller;
+          break;
+        }
       }
 
       // If the test method is implemented by a test class's parent then the
