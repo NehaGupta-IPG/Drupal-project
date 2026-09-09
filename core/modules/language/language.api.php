@@ -124,13 +124,19 @@ function hook_language_fallback_candidates_OPERATION_alter(array &$candidates, a
  * @param array $names
  *   The names of the configuration objects that will be checked for
  *   relabelling to the new default langcode.
+ * @param string $old_langcode
+ *   The previous default langcode. Passed for context only.
+ * @param string $new_langcode
+ *   The new default langcode.Passed for context only.
  *
  * @see \Drupal\language\DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation()
  */
-function hook_language_update_config_langcode_list_alter(array &$names) {
+function hook_language_update_config_langcode_list_alter(array &$names, string $old_langcode, string $new_langcode) {
   // Keep a specific piece of configuration in its current language,
   // regardless of the site's new default.
-  $names = array_diff($names, ['my_module.settings']);
+  if ($old_langcode === 'en') {
+    $names = array_diff($names, ['my_module.settings']);
+  }
 }
 
 /**
