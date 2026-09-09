@@ -22,7 +22,7 @@ class LocaleGetPluralDeprecationTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['locale'];
+  protected static $modules = ['language', 'locale'];
 
   /**
    * Tests deprecation of locale_get_plural().

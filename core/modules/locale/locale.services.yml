@@ -37,8 +37,7 @@ services:
       - { name: stream_wrapper, scheme: translations }
   locale.config_subscriber:
     class: Drupal\locale\LocaleConfigSubscriber
-  locale.default_langcode_config_updater_decorator:
-    class: Drupal\locale\DefaultLangcodeConfigUpdaterDecorator
+  Drupal\locale\DefaultLangcodeConfigUpdaterDecorator:
     decorates: language.default_langcode_config_updater
     arguments: ['@.inner', '@locale.config_manager']
     public: false
