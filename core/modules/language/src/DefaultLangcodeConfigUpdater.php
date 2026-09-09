@@ -74,17 +74,24 @@ class DefaultLangcodeConfigUpdater {
    * default language can no longer have an override of its own once the active
    * configuration itself becomes its canonical copy.
    *
+   * Before the first batch step reads the full configuration list, modules
+   * can remove names from it via
+   * hook_language_update_config_langcode_list_alter(), so that configuration
+   * keeps its current langcode regardless of the new default.
+   *
    * @param string $old_langcode
    *   The previous default langcode.
    * @param string $new_langcode
    *   The new default langcode.
    * @param array|\ArrayAccess $context
    *   The batch context.
+   *
+   * @see hook_language_update_config_langcode_list_alter()
    */
   public function reconcileConfigLangcodeOperation(string $old_langcode, string $new_langcode, &$context): void {
     if (!isset($context['sandbox']['names'])) {
       $names = $this->configFactory->listAll();
-      $this->moduleHandler->alter('language_update_config_langcode_list', $names);
+      $this->moduleHandler->alter('language_update_config_langcode_list', $names, $old_langcode, $new_langcode);
       $context['sandbox']['names'] = $names;
       $context['sandbox']['max'] = count($context['sandbox']['names']);
     }
