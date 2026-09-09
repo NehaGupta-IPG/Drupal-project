@@ -333,7 +333,7 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *     and its purpose. References to other tables should be enclosed in curly
  *     brackets.
  *   - 'columns': An array of Drupal\Core\Database\SchemaDefinition\Column
- *     objects that describes the table's database columns.  The following
+ *     objects that describes the table's database columns. The following
  *     object properties are defined:
  *     - 'name': A string identifying the column in Drupal.
  *     - 'description': A string in non-markup plain text describing this column
