@@ -50,22 +50,10 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     protected RendererInterface $renderer,
     protected ModuleHandlerInterface $moduleHandler,
     protected LanguageManagerInterface $languageManager,
-    protected ?FileUrlGeneratorInterface $fileUrlGenerator = NULL,
-    protected ?AssetCollectionRendererInterface $importMapRenderer = NULL,
-    protected ?AssetCollectionRendererInterface $modulePreloadRenderer = NULL,
+    protected FileUrlGeneratorInterface $fileUrlGenerator,
+    protected AssetCollectionRendererInterface $importMapRenderer,
+    protected AssetCollectionRendererInterface $modulePreloadRenderer,
   ) {
-    if (!isset($fileUrlGenerator)) {
-      $this->fileUrlGenerator = \Drupal::service('file_url_generator');
-      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without a file url generator is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3585574', E_USER_DEPRECATED);
-    }
-    if (!isset($importMapRenderer)) {
-      $this->importMapRenderer = \Drupal::service('asset.importmap.renderer');
-      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without an import map renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
-    }
-    if (!isset($modulePreloadRenderer)) {
-      $this->modulePreloadRenderer = \Drupal::service('asset.modulepreload.renderer');
-      @trigger_error('Constructing HtmlResponseAttachmentsProcessor without a module preload renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
-    }
     $this->config = $config_factory->get('system.performance');
   }
 

@@ -37,24 +37,12 @@ class BigPipeResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
     RendererInterface $renderer,
     ModuleHandlerInterface $module_handler,
     LanguageManagerInterface $language_manager,
-    ?FileUrlGeneratorInterface $file_url_generator = NULL,
+    FileUrlGeneratorInterface $file_url_generator,
     #[Autowire(service: 'asset.importmap.renderer')]
-    ?AssetCollectionRendererInterface $import_map_renderer = NULL,
+    AssetCollectionRendererInterface $import_map_renderer,
     #[Autowire(service: 'asset.modulepreload.renderer')]
-    ?AssetCollectionRendererInterface $module_preload_renderer = NULL,
+    AssetCollectionRendererInterface $module_preload_renderer,
   ) {
-    if (!isset($file_url_generator)) {
-      $file_url_generator = \Drupal::service('file_url_generator');
-      @trigger_error('Constructing BigPipeResponseAttachmentsProcessor without a file url generator is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3585574', E_USER_DEPRECATED);
-    }
-    if (!isset($import_map_renderer)) {
-      $import_map_renderer = \Drupal::service('asset.importmap.renderer');
-      @trigger_error('Constructing BigPipeResponseAttachmentsProcessor without an import map renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
-    }
-    if (!isset($module_preload_renderer)) {
-      $module_preload_renderer = \Drupal::service('asset.modulepreload.renderer');
-      @trigger_error('Constructing BigPipeResponseAttachmentsProcessor without a module preload renderer is deprecated in drupal:11.5.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3398525', E_USER_DEPRECATED);
-    }
 
     parent::__construct($asset_resolver, $config_factory, $css_collection_renderer, $js_collection_renderer, $request_stack, $renderer, $module_handler, $language_manager, $file_url_generator, $import_map_renderer, $module_preload_renderer);
   }
