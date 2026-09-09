@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\dblog\Functional;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
