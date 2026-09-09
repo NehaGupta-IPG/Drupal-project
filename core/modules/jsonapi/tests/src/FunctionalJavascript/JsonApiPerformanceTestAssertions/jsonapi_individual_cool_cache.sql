@@ -13,5 +13,5 @@ SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.re
 SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.revision_uid.related" )
 SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.uid.relationship.get" )
 SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.uid.related" )
-INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("path_alias_prefix_list:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")
+INSERT IGNORE INTO "semaphore" ("name", "value", "expire") VALUES ("path_alias_prefix_list:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")
 DELETE FROM "semaphore"  WHERE ("name" = "path_alias_prefix_list:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")

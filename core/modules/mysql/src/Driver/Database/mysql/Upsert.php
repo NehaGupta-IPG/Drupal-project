@@ -93,13 +93,6 @@ class Upsert extends QueryUpsert {
   /**
    * Determines whether the update condition fits in a single statement.
    *
-   * MariaDB supports RETURNING on an upsert, which reports the record the
-   * statement leaves behind. Comparing it with the values that were written
-   * tells whether the update was done, where the affected row count cannot:
-   * with CLIENT_FOUND_ROWS, which the driver connects with, an existing
-   * record left at its current values counts as one affected row, the same as
-   * an inserted record. MySQL has no RETURNING clause at any version.
-   *
    * @return bool
    *   TRUE if the condition and its outcome fit in one statement.
    */
@@ -107,7 +100,7 @@ class Upsert extends QueryUpsert {
     // Columns inserted with their schema default hold no value to compare, so
     // at least one column must carry one. The columns of a query no longer
     // change once it is executed, so the answer is kept.
-    return $this->atomicUpdateCondition ??= $this->connection->isMariaDb()
+    return $this->atomicUpdateCondition ??= $this->connection->isMariaDB()
       && (bool) array_diff($this->insertFields, $this->key);
   }
 
@@ -196,8 +189,6 @@ class Upsert extends QueryUpsert {
       }
     }
 
-    // On MariaDB the whole upsert is one statement that reports its own
-    // outcome.
     if ($this->hasAtomicUpdateCondition()) {
       $query = (string) $this;
       $arguments = $values + $this->updateAppliedArguments() + $this->updateCondition->arguments;
@@ -208,13 +199,6 @@ class Upsert extends QueryUpsert {
       return (int) (bool) $this->connection->query($query, $arguments, $this->queryOptions)->fetchField();
     }
 
-    // MySQL has no condition clause for the update part of an upsert, and no
-    // RETURNING to report the outcome with. Gating each column assignment of
-    // the clause with a CASE expression cannot report it either: with
-    // CLIENT_FOUND_ROWS, which the driver connects with, an existing record
-    // left at its current values counts as one affected row, the same as an
-    // inserted record.
-    //
     // The insert and the conditional update are therefore done as two
     // statements. Both are atomic and exclude each other: the insert only adds
     // a record while none exists, and the update only writes while the
