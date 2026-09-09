@@ -54,6 +54,10 @@ final class Schema implements SchemaDefinitionInterface {
     if (count($viewNames) !== count(array_unique($viewNames))) {
       throw new SchemaDefinitionException("Duplicate views for '{$this->name}' schema: " . implode(', ', $viewNames));
     }
+    $collisions = array_intersect($viewNames, $tableNames);
+    if ($collisions) {
+      throw new SchemaDefinitionException("Views named like a table in '{$this->name}' schema: " . implode(', ', $collisions));
+    }
   }
 
   /**

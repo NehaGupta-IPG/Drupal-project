@@ -420,6 +420,25 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
+   * Tests that dropping a view clears its cached column metadata.
+   */
+  public function testDropViewResetsTableInformation(): void {
+    $this->schema->createTable('test_table', [
+      'fields' => [
+        'id' => ['type' => 'serial', 'not null' => TRUE],
+        'data' => ['type' => 'blob'],
+      ],
+      'primary key' => ['id'],
+    ]);
+    $this->schema->createView('test_view', 'SELECT [id], [data] FROM {test_table}');
+    $this->assertSame(['data' => TRUE], $this->schema->queryTableInformation('test_view')->blob_fields);
+
+    // Replacing the view drops it first, which has to clear the cache.
+    $this->schema->createView('test_view', 'SELECT [id] FROM {test_table}', TRUE);
+    $this->assertSame([], $this->schema->queryTableInformation('test_view')->blob_fields);
+  }
+
+  /**
    * Tests column name escaping in field constraints.
    */
   public function testUnsignedField(): void {

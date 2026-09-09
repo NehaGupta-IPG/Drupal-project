@@ -1327,6 +1327,17 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->schema->dropViews(['test_view', 'test_view2']);
     $this->assertFalse($this->schema->viewExists('test_view'));
     $this->assertFalse($this->schema->viewExists('test_view2'));
+
+    // The retry also works inside a transaction. On PostgreSQL a failed
+    // statement aborts the transaction, but the connection runs each query in
+    // a savepoint of its own and rolls back to it.
+    $this->schema->createView('test_view', 'SELECT [id] FROM {test_table}');
+    $this->schema->createView('test_view2', 'SELECT [id] FROM {test_view}');
+    $transaction = $this->connection->startTransaction();
+    $this->schema->dropViews(['test_view', 'test_view2']);
+    $transaction->commitOrRelease();
+    $this->assertFalse($this->schema->viewExists('test_view'));
+    $this->assertFalse($this->schema->viewExists('test_view2'));
   }
 
   /**

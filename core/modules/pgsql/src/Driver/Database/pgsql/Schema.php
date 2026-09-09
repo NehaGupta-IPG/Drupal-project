@@ -545,6 +545,18 @@ EOD;
   /**
    * {@inheritdoc}
    */
+  public function dropView(string $name): bool {
+    $dropped = parent::dropView($name);
+    if ($dropped) {
+      // ::queryTableInformation() caches the column metadata of views too.
+      $this->resetTableInformation($name);
+    }
+    return $dropped;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function viewExists(string $name, bool $add_prefix = TRUE): bool {
     $prefixInfo = $this->getPrefixInfo($name, $add_prefix);
 

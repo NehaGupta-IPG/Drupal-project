@@ -137,6 +137,28 @@ class SchemaDefinitionTest extends UnitTestCase {
   }
 
   /**
+   * Tests rejecting a view named like a table in the same Schema.
+   */
+  public function testViewNamedLikeTableInSchema(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage("Views named like a table in 'test' schema: foo");
+    new Schema(
+      type: SchemaDefinitionType::Test,
+      name: 'test',
+      tables: [
+        new Table(
+          name: 'foo',
+          columns: [Column::serial(name: 'id')],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+      ],
+      views: [
+        new View(name: 'foo', query: new ViewQuery('SELECT [id] FROM {bar}')),
+      ],
+    );
+  }
+
+  /**
    * Tests rejecting an empty View::$name.
    */
   public function testEmptyViewName(): void {
