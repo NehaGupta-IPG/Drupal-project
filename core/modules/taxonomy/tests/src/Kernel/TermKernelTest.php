@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel;
 
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\Node;
+use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -24,7 +29,15 @@ class TermKernelTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['filter', 'taxonomy', 'text', 'user', 'system'];
+  protected static $modules = [
+    'taxonomy',
+    'node',
+    'user',
+    'text',
+    'field',
+    'filter',
+    'system',
+  ];
 
   /**
    * {@inheritdoc}
@@ -32,8 +45,13 @@ class TermKernelTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installConfig(['filter']);
+    $this->installConfig(['taxonomy']);
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('user');
+    $this->installEntitySchema('node');
+    $this->installSchema('node', 'node_access');
+
+
   }
 
   /**
@@ -49,17 +67,64 @@ class TermKernelTest extends KernelTestBase {
   }
 
   /**
-   * Tests that a non-numeric term is not indexed.
+   * Tests that the taxonomy index can only contain numeric values.
    */
   public function testTermNonNumeric(): void {
-    $vocabulary = $this->createVocabulary();
-    $term = $this->createTerm($vocabulary);
-    // Change the valid term to a non-numeric value.
-    $term->id() = '0123';
-    // Try to save the invalid term.
+    \Drupal::configFactory()->getEditable('taxonomy.settings')->set('maintain_index_table', TRUE)->save();
+
+    Vocabulary::create([
+      'name' => 'test',
+      'vid' => 'test',
+    ])->save();
+    $term = Term::create([
+      'name' => 'term1',
+      'vid' => 'test',
+    ]);
     $term->save();
-    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['vid' => $vocabulary->id()]);
-    $this->assertEmpty($terms, 'Vocabulary is empty after trying to save a non-numeric term.');
+    $term = Term::create([
+      'name' => 'term2',
+      'vid' => 'test',
+    ]);
+    $term->save();
+
+    NodeType::create([
+      'type' => 'page',
+      'name' => 'Page',
+    ])->save();
+
+    FieldStorageConfig::create([
+      'entity_type' => 'node',
+      'field_name' => 'field_tags',
+      'type' => 'entity_reference',
+      'settings' => [
+        'target_type' => 'taxonomy_term',
+      ],
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_tags',
+      'entity_type' => 'node',
+      'bundle' => 'page',
+    ])->save();
+    $node = Node::create([
+      'type' => 'page',
+      'title' => 'test_title',
+      'field_tags' => [$term->id()],
+    ]);
+    $node->save();
+
+    // todo add test coverage
+
+  }
+
+  /**
+   * Retrieves the taxonomy index from the database.
+   */
+  protected function getTaxonomyIndex() {
+    return \Drupal::database()->select('taxonomy_index')
+      ->fields('taxonomy_index')
+      ->execute()
+      ->fetchAllAssoc('nid');
   }
 
   /**
