@@ -40,6 +40,6 @@ CacheTagGroupedLookups:
     - 'config:core.extension'
     - views_data
 ScriptCount: 1
-ScriptBytes: 0
+ScriptBytes: 418
 StylesheetCount: 2
 StylesheetBytes: 1234
