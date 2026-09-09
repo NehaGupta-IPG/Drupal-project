@@ -50,8 +50,6 @@ class TermKernelTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installSchema('node', 'node_access');
-
-
   }
 
   /**
@@ -113,7 +111,7 @@ class TermKernelTest extends KernelTestBase {
     ]);
     $node->save();
 
-    // todo add test coverage
+    // Add test coverage
 
   }
 
