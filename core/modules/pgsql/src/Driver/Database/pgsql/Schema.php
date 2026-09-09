@@ -679,7 +679,7 @@ EOD;
     }
 
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
-    $is_primary_key = isset($new_keys['primary key']) && in_array($field, $this->fieldNames($new_keys['primary key']), TRUE);
+    $is_primary_key = !empty($keys_new['primary key']);
     if ($is_primary_key) {
       $this->validatePrimaryKeySchema($new_keys['primary key'], [$field => $spec]);
     }
@@ -813,14 +813,13 @@ EOD;
    * {@inheritdoc}
    */
   public function addPrimaryKey($table, $fields) {
-    $this->validatePrimaryKeySchema($fields);
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add primary key to table '$table': table doesn't exist.");
     }
     if ($this->constraintExists($table, 'pkey')) {
       throw new SchemaObjectExistsException("Cannot add primary key to table '$table': primary key already exists.");
     }
-
+    $this->validatePrimaryKeySchema($fields);
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD CONSTRAINT ' . $this->ensureIdentifiersLength($table, '', 'pkey') . ' PRIMARY KEY (' . $this->createPrimaryKeySql($fields) . ')');
     $this->resetTableInformation($table);
   }
@@ -852,14 +851,13 @@ EOD;
    * {@inheritdoc}
    */
   public function addUniqueKey($table, $name, $fields) {
-    $this->validateUniqueKeySchema($fields);
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add unique key '$name' to table '$table': table doesn't exist.");
     }
     if ($this->constraintExists($table, $name . '__key')) {
       throw new SchemaObjectExistsException("Cannot add unique key '$name' to table '$table': unique key already exists.");
     }
-
+    $this->validateUniqueKeySchema($fields);
     // Use the createPrimaryKeySql(), which already discards any prefix lengths
     // passed as part of the key column specifiers. (Postgres doesn't support
     // setting a prefix length for PRIMARY or UNIQUE indices.)
@@ -952,7 +950,7 @@ EOD;
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
-    if (isset($new_keys['primary key']) && in_array($field_new, $this->fieldNames($new_keys['primary key']), TRUE)) {
+    if (!empty($keys_new['primary key'])) {
       $this->validatePrimaryKeySchema($new_keys['primary key'], [$field_new => $spec]);
     }
     if (!empty($new_keys['unique keys'])) {

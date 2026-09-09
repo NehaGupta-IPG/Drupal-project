@@ -433,24 +433,18 @@ abstract class Schema implements PlaceholderInterface {
    *   If the specified fields fail validation.
    */
   protected function validatePrimaryKeySchema(array $key_fields, array $fields = []): void {
-    // Ensure no partial column length specified.
-    $fixed_key_fields = [];
+    // Partial column lengths are only allowed on indexes.
     foreach ($key_fields as $key_field) {
       if (is_array($key_field)) {
         @trigger_error('Specification of primary key with column length is deprecated in drupal:11.5.0 and will throw a SchemaException from drupal:13.0.0. Specify full columns for a primary key, or use an index for columns with partial length. See https://www.drupal.org/node/3375071', E_USER_DEPRECATED);
-        $fixed_key_fields[] = $key_field[0];
-      }
-      else {
-        $fixed_key_fields[] = $key_field;
+        break;
       }
     }
 
-    // Ensure primary key is not null.
-    if (!empty($fields)) {
-      foreach (array_intersect($fixed_key_fields, array_keys($fields)) as $field_name) {
-        if (!isset($fields[$field_name]['not null']) || $fields[$field_name]['not null'] !== TRUE) {
-          throw new SchemaException("The '$field_name' field specification does not define 'not null' as TRUE.");
-        }
+    // Primary key columns must be NOT NULL.
+    foreach (array_intersect($this->fieldNames($key_fields), array_keys($fields)) as $field_name) {
+      if (!isset($fields[$field_name]['not null']) || $fields[$field_name]['not null'] !== TRUE) {
+        throw new SchemaException("The '$field_name' field specification does not define 'not null' as TRUE.");
       }
     }
   }
@@ -512,14 +506,11 @@ abstract class Schema implements PlaceholderInterface {
    *
    * @param KeyColumns $key_fields
    *   An array containing the fields that will form the unique key.
-   * @param TableColumns $fields
-   *   (Optional) An array containing the field specifications of the table,
-   *   as per the schema data structure format.
    *
    * @throws \Drupal\Core\Database\SchemaException
    *   If the specified key fails validation.
    */
-  protected function validateUniqueKeySchema(array $key_fields, array $fields = []): void {
+  protected function validateUniqueKeySchema(array $key_fields): void {
     foreach ($key_fields as $key_field) {
       if (is_array($key_field)) {
         @trigger_error('Specification of unique keys with column length is deprecated in drupal:11.5.0 and will throw a SchemaException from drupal:13.0.0. Specify full columns for an unique key, or use an index for columns with partial length. See https://www.drupal.org/node/3375071', E_USER_DEPRECATED);
