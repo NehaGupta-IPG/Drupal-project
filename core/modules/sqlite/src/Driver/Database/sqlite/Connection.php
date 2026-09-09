@@ -159,7 +159,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * Destructor for the SQLite connection.
    *
-   * We prune empty databases on destruct, but only if tables have been
+   * We delete empty database files on destruct if tables or views were
    * dropped. This is especially needed when running the test suite, which
    * creates and destroy databases several times in a row.
    */
@@ -173,8 +173,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
             ':pattern' => 'sqlite_%',
           ])->fetchField();
 
-          // We can prune the database file if it doesn't have any tables or
-          // views.
+          // Delete the database file if it has no tables or views.
           if ($count == 0 && $this->connectionOptions['database'] != ':memory:' && file_exists($this->connectionOptions['database'] . '-' . $prefix)) {
             // Detach the database.
             $this->query('DETACH DATABASE :schema', [':schema' => $prefix]);

@@ -603,9 +603,8 @@ EOD;
     $results = $this->connection->query("SELECT viewname FROM pg_views WHERE schemaname = :schema", [':schema' => $this->defaultSchema]);
     foreach ($results as $view) {
       if ($prefix && substr($view->viewname, 0, $prefix_length) !== $prefix) {
-        // This view name does not start with the default prefix, which means
-        // that it is not managed by Drupal so it should be excluded from the
-        // result.
+        // Views outside this connection's prefix are not managed by this
+        // Drupal installation, so exclude them.
         continue;
       }
 
@@ -618,8 +617,8 @@ EOD;
       }
     }
 
-    // Convert the view expression from its SQL LIKE syntax to a regular
-    // expression and escape the delimiter that will be used for matching.
+    // Convert the SQL LIKE pattern to a regular expression, escaping literal
+    // characters and the regular expression delimiter.
     $view_expression = str_replace(['%', '_'], ['.*?', '.'], preg_quote($view_expression, '/'));
     return preg_grep('/^' . $view_expression . '$/i', $views);
   }

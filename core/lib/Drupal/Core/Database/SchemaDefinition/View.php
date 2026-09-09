@@ -19,8 +19,8 @@ final class View {
    * @param ViewQuery $query
    *   The SELECT query defining the view.
    * @param ?string $description
-   *   (Optional) A plain-text description of the view. This documents the
-   *   definition and is not stored in the database.
+   *   (optional) A plain-text description that documents the view definition.
+   *   It is not stored in the database.
    */
   public function __construct(
     public readonly string $name,
@@ -31,9 +31,10 @@ final class View {
   }
 
   /**
-   * Validates the properties of the value object.
+   * Checks that the view name is not empty.
    *
    * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
+   *   When the view name is empty.
    */
   private function validate(): void {
     if ($this->name === '') {

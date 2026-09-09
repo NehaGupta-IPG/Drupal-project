@@ -22,7 +22,8 @@ final class Schema implements SchemaDefinitionInterface {
    * @param list<Table> $tables
    *   A list of Table objects.
    * @param list<View> $views
-   *   (Optional) A list of View objects.
+   *   (optional) A list of View objects in creation order. Declare each view
+   *   before any views that depend on it.
    */
   public function __construct(
     public readonly SchemaDefinitionType $type,
@@ -135,8 +136,7 @@ final class Schema implements SchemaDefinitionInterface {
    * {@inheritdoc}
    */
   public function toArray(): array {
-    // SQL views have no legacy array-based specification, so a declared
-    // view is not present in the returned array.
+    // The legacy array format cannot describe SQL views, so omit them.
     $spec = [];
     foreach ($this->tables as $table) {
       $spec[$table->name] = $table->toArray();

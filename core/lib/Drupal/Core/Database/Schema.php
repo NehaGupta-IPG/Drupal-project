@@ -266,19 +266,17 @@ abstract class Schema implements PlaceholderInterface {
   }
 
   /**
-   * Finds all SQL views that are like the specified base view name.
+   * Finds SQL views whose names match a pattern.
    *
    * @param string $view_expression
-   *   A case-insensitive pattern against which view names are compared. Both
-   *   '_' and '%' are treated like wildcards in MySQL 'LIKE' expressions,
-   *   where '_' matches any single character and '%' matches an arbitrary
-   *   number of characters (including zero characters).
+   *   A case-insensitive SQL LIKE pattern. '_' matches one character and '%'
+   *   matches any number of characters, including none.
    *
    * @return array
-   *   Both the keys and values are the matching views, in no particular
-   *   order. A view can select from another view, and some database
-   *   engines refuse to drop one while the other still exists; pass the
-   *   result to ::dropViews() to drop them all safely regardless of order.
+   *   The matching view names without prefixes, as both keys and values, in no
+   *   particular order. Some databases refuse to drop a view while another
+   *   view depends on it. Pass the result to ::dropViews() to drop the views
+   *   regardless of their order.
    */
   public function findViews(string $view_expression): array {
     $condition = $this->buildTableNameCondition('%', 'LIKE');
@@ -292,8 +290,8 @@ abstract class Schema implements PlaceholderInterface {
     $results = $this->connection->query("SELECT table_name AS table_name FROM information_schema.views WHERE " . (string) $condition, $condition->arguments());
     foreach ($results as $view) {
       if ($prefix && substr($view->table_name, 0, $prefix_length) !== $prefix) {
-        // This view name does not start with the prefix, which means that it
-        // is not managed by Drupal so it should be excluded from the result.
+        // Views outside this connection's prefix are not managed by this
+        // Drupal installation, so exclude them.
         continue;
       }
 
@@ -306,8 +304,8 @@ abstract class Schema implements PlaceholderInterface {
       }
     }
 
-    // Convert the view expression from its SQL LIKE syntax to a regular
-    // expression and escape the delimiter that will be used for matching.
+    // Convert the SQL LIKE pattern to a regular expression, escaping literal
+    // characters and the regular expression delimiter.
     $view_expression = str_replace(['%', '_'], ['.*?', '.'], preg_quote($view_expression, '/'));
     return preg_grep('/^' . $view_expression . '$/i', $views);
   }
@@ -378,8 +376,7 @@ abstract class Schema implements PlaceholderInterface {
   /**
    * Creates a SQL view.
    *
-   * Tables and views share one namespace per database, so a view cannot take
-   * the name of an existing table.
+   * A view cannot have the same name as a table in the same database schema.
    *
    * @param string $name
    *   The name of the view to create, without prefixing.
@@ -389,17 +386,16 @@ abstract class Schema implements PlaceholderInterface {
    *   cannot contain bound parameters. Never include user input in it.
    * @param bool $replace
    *   (optional) If TRUE and a view with the same name exists, it is replaced.
-   *   Replacement drops and recreates the view because database support for
-   *   replacing views differs. This is not atomic: a failed creation leaves
-   *   the old view dropped. Defaults to FALSE.
+   *   Database support for replacing views differs, so this method drops the
+   *   old view before creating the new one. Replacement is not atomic: if
+   *   creation fails, the old view is not restored. Defaults to FALSE.
    *
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If a table with the specified name already exists, or if a view with the
    *   specified name already exists and $replace is FALSE.
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
-   *   When the query is not valid, for example when it references a table
-   *   that does not exist. SQLite validates the query only when the view is
-   *   first used, so it does not throw at creation time.
+   *   When the query is invalid. SQLite allows references to missing tables
+   *   or columns at creation time and reports them when the view is used.
    */
   public function createView(string $name, string $query, bool $replace = FALSE): void {
     if ($this->tableExists($name)) {
@@ -421,8 +417,7 @@ abstract class Schema implements PlaceholderInterface {
    *   The name of the view to drop, without prefixing.
    *
    * @return bool
-   *   TRUE if the view was successfully dropped, FALSE if there was no view by
-   *   that name to begin with.
+   *   TRUE if the view was dropped, FALSE if it did not exist.
    */
   public function dropView(string $name): bool {
     if (!$this->viewExists($name)) {
@@ -433,10 +428,10 @@ abstract class Schema implements PlaceholderInterface {
   }
 
   /**
-   * Drops multiple SQL views, accounting for dependencies between them.
+   * Drops SQL views that may depend on each other.
    *
    * PostgreSQL refuses to drop a view that another view depends on. Views that
-   * fail to drop are retried until a pass makes no progress.
+   * fail to drop are retried until all are dropped or none can be dropped.
    *
    * @param string[] $views
    *   The names of the views to drop, without prefixing. The order does not
@@ -470,7 +465,7 @@ abstract class Schema implements PlaceholderInterface {
    * @param string $name
    *   The name of the view, without prefixing.
    * @param bool $add_prefix
-   *   Boolean to indicate whether the view name needs to be prefixed.
+   *   Whether to add the connection's prefix to the view name.
    *
    * @return bool
    *   TRUE if the given view exists, otherwise FALSE.
@@ -787,7 +782,10 @@ abstract class Schema implements PlaceholderInterface {
   abstract public function changeField($table, $field, $field_new, $spec, $keys_new = []);
 
   /**
-   * Creates the tables and the SQL views in a schema definition.
+   * Creates the tables and SQL views in a schema definition.
+   *
+   * Tables are created first, then views in the order listed. Declare each view
+   * before any views that depend on it.
    *
    * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
    *   A Schema definition.
