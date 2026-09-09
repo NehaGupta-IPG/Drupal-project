@@ -3,6 +3,7 @@
 namespace Drupal\filter\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Template\Attribute;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\filter\FilterFormatRepositoryInterface;
 
@@ -27,6 +28,7 @@ class FilterThemeHooks {
           'tips' => NULL,
           'long' => FALSE,
         ],
+        'initial preprocess' => static::class . ':preprocessFilterTips',
       ],
       'text_format_wrapper' => [
         'variables' => [
@@ -92,6 +94,47 @@ class FilterThemeHooks {
       unset($variables['attributes']['aria-describedby']);
     }
   }
+  /**
+   * Prepares variables for filter tips templates.
+   *
+   * Default template: filter-tips.html.twig.
+   *
+   * @param array $variables
+   *   An associative array containing:
+   *   - tips: An array containing descriptions and a CSS ID in the form of
+   *     'module-name/filter-id' (only used when $long is TRUE) for each
+   *     filter in one or more text formats. Example:
+   *     @code
+   *       [
+   *         'Full HTML' => [
+   *           0 => [
+   *             'tip' => 'Web page addresses and email addresses turn into links automatically.',
+   *             'id' => 'filter/2',
+   *           ],
+   *         ],
+   *       ];
+   *     @endcode
+   *
+   * @see https://www.drupal.org/node/3567879
+   */
+  public function preprocessFilterTips(array &$variables): void
+  {
+    $tips = $variables['tips'];
+
+    foreach ($variables['tips'] as $name => $tip_list) {
+      foreach ($tip_list as $tip_key => $tip) {
+        $tip_list[$tip_key]['attributes'] = new Attribute();
+      }
+
+      $variables['tips'][$name] = [
+        'attributes' => new Attribute(),
+        'name' => $name,
+        'list' => $tip_list,
+      ];
+    }
+
+    $variables['multiple'] = count($tips) > 1;
+  }
 
   /**
    * Retrieves the filter tips.
@@ -106,7 +149,8 @@ class FilterThemeHooks {
    *   - tip: Tip text.
    *   - id: Filter ID.
    */
-  protected function getFilterTips(?string $formatId = NULL): array {
+  protected function getFilterTips(?string $formatId = NULL): array
+  {
     $formats = $this->formatRepository->getFormatsForAccount($this->currentUser);
 
     $tips = [];
