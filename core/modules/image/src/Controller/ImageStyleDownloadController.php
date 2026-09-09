@@ -133,7 +133,7 @@ class ImageStyleDownloadController extends FileDownloadController {
     // The $target variable for a derivative of a style has
     // styles/<style_name>/... as structure, so we check if the $target variable
     // starts with styles/.
-    $token = $request->query->get(ImageStyleInterface::TOKEN, '');
+    $token = $request->query->get(IMAGE_DERIVATIVE_TOKEN, '');
     $token_is_valid = hash_equals($image_style->getPathToken($image_uri), $token)
       || hash_equals($image_style->getPathToken($scheme . '://' . $target), $token);
     if (!$this->config('image.settings')->get('allow_insecure_derivatives') || str_starts_with(ltrim($target, '\/'), 'styles/')) {
@@ -167,19 +167,35 @@ class ImageStyleDownloadController extends FileDownloadController {
 
     $headers = [];
 
-    // Don't try to generate file if source is missing.
+    // Don't try to generate the image if the source is missing.
     if ($image_uri !== $sample_image_uri && !$this->sourceImageExists($image_uri, $token_is_valid)) {
-      // If the image style converted the extension, it has been added to the
-      // original file, resulting in filenames like image.png.jpeg. So to find
-      // the actual source image, we remove the extension and check if that
-      // image exists.
+      $source_found = FALSE;
+      // Legacy: handle old double-extension derivative filenames (e.g.
+      // image.png.webp) generated before addExtension() replaced extensions
+      // instead of appending them.
       $converted_image_uri = static::getUriWithoutConvertedExtension($image_uri);
       if ($converted_image_uri !== $image_uri &&
-          $this->sourceImageExists($converted_image_uri, $token_is_valid)) {
-        // The converted file does exist, use it as the source.
+        $this->sourceImageExists($converted_image_uri, $token_is_valid)) {
         $image_uri = $converted_image_uri;
+        $source_found = TRUE;
       }
-      else {
+      if (!$source_found) {
+        // Current: derivative uses a single replaced extension (e.g.
+        // image.webp). Try swapping the extension with known source formats.
+        $derivative_extension = pathinfo(StreamWrapperManager::getTarget($image_uri), PATHINFO_EXTENSION);
+        if ($derivative_extension) {
+          $base_uri = substr($image_uri, 0, -(strlen($derivative_extension) + 1));
+          foreach (['jpeg', 'jpg', 'png', 'gif', 'webp', 'tiff', 'bmp'] as $ext) {
+            $candidate_uri = $base_uri . '.' . $ext;
+            if ($candidate_uri !== $image_uri && $this->sourceImageExists($candidate_uri, $token_is_valid)) {
+              $image_uri = $candidate_uri;
+              $source_found = TRUE;
+              break;
+            }
+          }
+        }
+      }
+      if (!$source_found) {
         $this->logger->notice('Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.', [
           '%source_image_path' => $image_uri,
           '%derivative_path' => $derivative_uri,
@@ -283,16 +299,18 @@ class ImageStyleDownloadController extends FileDownloadController {
   }
 
   /**
-   * Get the file URI without the extension from any conversion image style.
+   * Gets the file URI without a legacy double extension from style conversion.
    *
-   * If the image style converted the image, then an extension has been added
-   * to the original file, resulting in filenames like image.png.jpeg.
+   * Handles old-style derivative filenames (e.g. image.png.webp) that were
+   * generated before addExtension() was changed to replace extensions rather
+   * than append them.
    *
    * @param string $uri
    *   The file URI.
    *
    * @return string
-   *   The file URI without the extension from any conversion image style.
+   *   The URI with the appended conversion extension stripped, or the original
+   *   URI if it does not have a double extension.
    */
   public static function getUriWithoutConvertedExtension(string $uri): string {
     $original_uri = $uri;

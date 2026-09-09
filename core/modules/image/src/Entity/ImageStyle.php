@@ -41,7 +41,6 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
   label_singular: new TranslatableMarkup('image style'),
   label_plural: new TranslatableMarkup('image styles'),
   config_prefix: 'style',
-  static_cache: TRUE,
   entity_keys: [
     'id' => 'name',
     'label' => 'label',
@@ -235,7 +234,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
         $path = \Drupal::config('system.file')->get('default_scheme') . '://' . $path;
       }
       $original_uri = $stream_wrapper_manager->normalizeUri($path);
-      $token_query = [ImageStyleInterface::TOKEN => $this->getPathToken($original_uri)];
+      $token_query = [IMAGE_DERIVATIVE_TOKEN => $this->getPathToken($original_uri)];
     }
 
     if ($clean_urls === NULL) {
@@ -256,10 +255,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     // built.
     if ($clean_urls === FALSE && $stream_wrapper_manager::getScheme($uri) == 'public' && !file_exists($uri)) {
       $directory_path = $stream_wrapper_manager->getViaUri($uri)->getDirectoryPath();
-      return Url::fromUri('base:' . $directory_path . '/' . $stream_wrapper_manager::getTarget($uri), [
-        'absolute' => TRUE,
-        'query' => $token_query,
-      ])->toString();
+      return Url::fromUri('base:' . $directory_path . '/' . $stream_wrapper_manager::getTarget($uri), ['absolute' => TRUE, 'query' => $token_query])->toString();
     }
 
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
@@ -437,6 +433,25 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
   }
 
   /**
+   * Returns the replacement ID for the image style.
+   *
+   * @return string|null
+   *   The replacement image style ID, or NULL if no replacement exists.
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There
+   *   is no replacement.
+   *
+   * @see https://www.drupal.org/node/3520914
+   * @see \Drupal\image\ImageStyleStorageInterface::getReplacementId
+   */
+  public function getReplacementID() {
+    @trigger_error("\Drupal\image\Entity\ImageStyle::getReplacementID() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3520914", E_USER_DEPRECATED);
+    /** @var \Drupal\image\ImageStyleStorageInterface $storage */
+    $storage = $this->entityTypeManager()->getStorage($this->getEntityTypeId());
+    return $storage->getReplacementId($this->id());
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getName() {
@@ -494,24 +509,25 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
   }
 
   /**
-   * Adds an extension to a path.
+   * Replaces the extension on a path when a derivative uses a different format.
    *
    * If this image style changes the extension of the derivative, this method
-   * adds the new extension to the given path. This way we avoid filename
-   * clashes while still allowing us to find the source image.
+   * replaces the original extension in the given path with the new one,
+   * producing clean single-extension filenames (e.g. image.webp, not
+   * image.png.webp).
    *
    * @param string $path
-   *   The path to add the extension to.
+   *   The path whose extension should be replaced.
    *
    * @return string
    *   The given path if this image style doesn't change its extension, or the
-   *   path with the added extension if it does.
+   *   path with the replaced extension if it does.
    */
   protected function addExtension($path) {
     $original_extension = pathinfo($path, PATHINFO_EXTENSION);
     $extension = $this->getDerivativeExtension($original_extension);
     if ($original_extension !== $extension) {
-      $path = str_replace($original_extension, $extension, $path);
+      $path = substr($path, 0, -(strlen($original_extension) + 1)) . '.' . $extension;
     }
     return $path;
   }
