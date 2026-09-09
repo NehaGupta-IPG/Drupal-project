@@ -13,5 +13,6 @@ SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.re
 SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.revision_uid.related" )
 SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.uid.relationship.get" )
 SELECT "name", "route" FROM "router" WHERE "name" IN ( "jsonapi.node--article.uid.related" )
+SELECT VERSION()
 INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("path_alias_prefix_list:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE") ON DUPLICATE KEY UPDATE "value" = CASE WHEN "semaphore"."expire" < "NOW" THEN VALUES("value") ELSE "value" END, "expire" = CASE WHEN "semaphore"."expire" < "NOW" THEN VALUES("expire") ELSE "expire" END RETURNING ("value" <=> "LOCK_ID" AND "expire" <=> "EXPIRE")
 DELETE FROM "semaphore"  WHERE ("name" = "path_alias_prefix_list:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")

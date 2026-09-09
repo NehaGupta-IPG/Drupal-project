@@ -24,6 +24,7 @@ SELECT 1 AS "expression" FROM "path_alias" "base_table" WHERE ("base_table"."sta
 SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "core.entity_view_display.user.user.compact", "core.entity_view_display.user.user.default" )
 SELECT "name", "data" FROM "config" WHERE "collection" = "" AND "name" IN ( "filter.format.plain_text" )
 SELECT "name", "route" FROM "router" WHERE "name" IN ( "view.promoted_content.page_1" )
+SELECT VERSION()
 INSERT IGNORE INTO "semaphore" ("name", "value", "expire") VALUES ("state:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")
 DELETE FROM "semaphore"  WHERE ("name" = "state:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")
 INSERT IGNORE INTO "semaphore" ("name", "value", "expire") VALUES ("theme_registry:runtime:stark:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")
