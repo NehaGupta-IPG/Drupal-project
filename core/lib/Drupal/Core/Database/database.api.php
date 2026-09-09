@@ -366,8 +366,8 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *     - 'length': The maximal length of a type ::Char, ::Varchar or ::Text
  *       column. Ignored for other column types.
  *     - 'unsigned': A boolean indicating whether a type ::Int, ::Float and
- *       ::Numeric only is signed or unsigned. Defaults to FALSE. Ignored for
- *       other column types.
+ *       ::Numeric only is signed or unsigned. Defaults to FALSE. For ::Serial
+ *       columns, it is forced to TRUE. Ignored for other column types.
  *     - 'precision', 'scale': For type ::Numeric columns, indicates the
  *       precision (total number of significant digits) and scale (decimal
  *       digits right of the decimal point). Both values are mandatory. Ignored

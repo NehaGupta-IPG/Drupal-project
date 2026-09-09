@@ -32,28 +32,15 @@ class UpdatePathTest extends UpdatePathTestBase {
    * Tests that, after update 11500, the 'wid' column is an unsigned integer.
    */
   public function testLogEntryWithNegativeId(): void {
-    global $base_root;
+    $connection = Database::getConnection();
+
+    // Insert a normal row first. On PostgreSQL, inserting an explicit value
+    // into a serial column resyncs the sequence to GREATEST(MAX(wid), <value>),
+    // which fails while the table is empty.
+    $this->insertLogEntry($connection);
 
     // Before updates, a negative WID should be possible.
-    $connection = Database::getConnection();
-    $insert = $connection->insert('watchdog');
-    $insert->fields([
-      'wid'         => -1000,
-      'message'     => 'Dblog test log message with negative WID',
-      'type'        => 'test',
-      'variables'   => '',
-      'severity'    => RfcLogLevel::NOTICE,
-      'uid'         => 1,
-      'location'    => $base_root . \Drupal::request()->getRequestUri(),
-      'hostname'    => $base_root,
-      'timestamp'   => \Drupal::time()->getRequestTime(),
-    ]);
-    try {
-      $insert->execute();
-    }
-    catch (DatabaseExceptionWrapper) {
-      // PostgreSQL does not allow negative WID even prior the update.
-    }
+    $this->insertLogEntry($connection, -1000);
 
     $this->runUpdates();
 
@@ -62,25 +49,40 @@ class UpdatePathTest extends UpdatePathTestBase {
     $this->assertEquals(['wid'], $method->invoke($connection->schema(), 'watchdog'));
 
     // After updates, a negative WID should not be allowed.
-    $insert = $connection->insert('watchdog');
-    $insert->fields([
-      'wid'         => -1000,
-      'message'     => 'Dblog test log message with negative WID',
-      'type'        => 'test',
-      'variables'   => '',
-      'severity'    => RfcLogLevel::NOTICE,
-      'uid'         => 1,
-      'location'    => $base_root . \Drupal::request()->getRequestUri(),
-      'hostname'    => $base_root,
-      'timestamp'   => \Drupal::time()->getRequestTime(),
-    ]);
     try {
-      $insert->execute();
+      $this->insertLogEntry($connection, -1000);
       $this->fail('After updates, a negative WID should not be allowed.');
     }
     catch (IntegrityConstraintViolationException | DatabaseExceptionWrapper) {
       // Expected.
     }
+  }
+
+  /**
+   * Inserts a row into the watchdog table.
+   *
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
+   * @param int|null $wid
+   *   An explicit watchdog ID, or NULL to let the sequence assign one.
+   */
+  private function insertLogEntry(Connection $connection, ?int $wid = NULL): void {
+    global $base_root;
+
+    $fields = [
+      'message' => 'Dblog test log message',
+      'type' => 'test',
+      'variables' => '',
+      'severity' => RfcLogLevel::NOTICE,
+      'uid' => 1,
+      'location' => $base_root . \Drupal::request()->getRequestUri(),
+      'hostname' => $base_root,
+      'timestamp' => \Drupal::time()->getRequestTime(),
+    ];
+    if ($wid !== NULL) {
+      $fields['wid'] = $wid;
+    }
+    $connection->insert('watchdog')->fields($fields)->execute();
   }
 
 }
