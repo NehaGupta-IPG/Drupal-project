@@ -117,7 +117,7 @@ function dblog_update_last_removed(): int {
 /**
  * Change the 'wid' of the 'watchdog' table to an unsigned big integer.
  */
-function dblog_update_11100(&$sandbox = NULL): void {
+function dblog_update_11500(): void {
   $connection = \Drupal::database();
 
   // Remove the - extreme case - rows that have a negative WID.
@@ -125,18 +125,11 @@ function dblog_update_11100(&$sandbox = NULL): void {
     ->condition('wid', 0, '<')
     ->execute();
 
-  $new_specification = [
+  $connection->schema()->changeField('watchdog', 'wid', 'wid', [
     'size' => 'big',
     'type' => 'serial',
     'unsigned' => TRUE,
     'not null' => TRUE,
     'description' => 'Primary Key: Unique watchdog event ID.',
-  ];
-  $new_keys = match ($connection->databaseType()) {
-    'sqlite' => [
-      'primary key' => ['wid'],
-    ],
-    default => [],
-  };
-  $connection->schema()->changeField('watchdog', 'wid', 'wid', $new_specification, $new_keys);
+  ]);
 }
