@@ -109,7 +109,7 @@ class Schema extends DatabaseSchema {
     }
     if (!empty($table['unique keys'])) {
       foreach ($table['unique keys'] as $key_fields) {
-        $this->validateUniqueKeySchema($key_fields, $table['fields']);
+        $this->validateUniqueKeySchema($key_fields);
       }
     }
     $keys = $this->createKeysSql($table);
@@ -436,7 +436,7 @@ class Schema extends DatabaseSchema {
 
     if (!empty($keys_new['unique keys'])) {
       foreach ($keys_new['unique keys'] as $key_fields) {
-        $this->validateUniqueKeySchema($key_fields, [$field => $spec]);
+        $this->validateUniqueKeySchema($key_fields);
       }
     }
 
@@ -667,7 +667,7 @@ class Schema extends DatabaseSchema {
     }
     if (!empty($keys_new['unique keys'])) {
       foreach ($keys_new['unique keys'] as $key_fields) {
-        $this->validateUniqueKeySchema($key_fields, [$field_new => $spec]);
+        $this->validateUniqueKeySchema($key_fields);
       }
     }
 

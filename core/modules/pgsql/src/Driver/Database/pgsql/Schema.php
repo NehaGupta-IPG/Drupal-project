@@ -312,7 +312,7 @@ EOD;
     }
     if (isset($table['unique keys']) && is_array($table['unique keys'])) {
       foreach ($table['unique keys'] as $key_name => $key) {
-        $this->validateUniqueKeySchema($key, $table['fields']);
+        $this->validateUniqueKeySchema($key);
         // Use the createPrimaryKeySql(), which already discards any prefix
         // lengths passed as part of the key column specifiers. (Postgres
         // doesn't support setting a prefix length for PRIMARY or UNIQUE
@@ -679,14 +679,14 @@ EOD;
     }
 
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
-    $is_primary_key = !empty($keys_new['primary key']);
+    $is_primary_key = !empty($new_keys['primary key']);
     if ($is_primary_key) {
       $this->validatePrimaryKeySchema($new_keys['primary key'], [$field => $spec]);
     }
 
     if (!empty($new_keys['unique keys'])) {
       foreach ($new_keys['unique keys'] as $key_fields) {
-        $this->validateUniqueKeySchema($key_fields, [$field => $spec]);
+        $this->validateUniqueKeySchema($key_fields);
       }
     }
 
@@ -950,12 +950,12 @@ EOD;
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
-    if (!empty($keys_new['primary key'])) {
+    if (!empty($new_keys['primary key'])) {
       $this->validatePrimaryKeySchema($new_keys['primary key'], [$field_new => $spec]);
     }
     if (!empty($new_keys['unique keys'])) {
       foreach ($new_keys['unique keys'] as $key_fields) {
-        $this->validateUniqueKeySchema($key_fields, [$field_new => $spec]);
+        $this->validateUniqueKeySchema($key_fields);
       }
     }
 
