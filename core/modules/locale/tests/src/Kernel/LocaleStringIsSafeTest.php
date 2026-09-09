@@ -22,7 +22,7 @@ class LocaleStringIsSafeTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['locale', 'locale_test'];
+  protected static $modules = ['language', 'locale', 'locale_test'];
 
   /**
    * Tests for LocaleXss::stringIsSafe().
