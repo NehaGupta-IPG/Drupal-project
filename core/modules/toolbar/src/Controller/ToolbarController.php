@@ -31,14 +31,20 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
   /**
    * Returns an AJAX response to render the toolbar subtrees.
    *
+   * @param string $hash
+   *   The hash of the toolbar subtrees.
+   *
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The AJAX response containing the rendered toolbar subtrees.
    */
-  public function subtreesAjax() {
+  public function subtreesAjax($hash) {
     [$subtrees] = toolbar_get_rendered_subtrees();
-    $response = new AjaxResponse();
-    $response->addCommand(new SetSubtreesCommand($subtrees));
+    $expected_hash = _toolbar_get_subtrees_hash()[0];
 
+    $response = new AjaxResponse();
+    if (hash_equals($expected_hash, $hash)) {
+      $response->addCommand(new SetSubtreesCommand($subtrees));
+    }
     // The Expires HTTP header is the heart of the client-side HTTP caching. The
     // additional server-side page cache only takes effect when the client
     // accesses the callback URL again (e.g., after clearing the browser cache
@@ -64,8 +70,7 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
    *   The access result.
    */
   public function checkSubTreeAccess($hash) {
-    $expected_hash = _toolbar_get_subtrees_hash()[0];
-    return AccessResult::allowedIf($this->currentUser()->hasPermission('access toolbar') && hash_equals($expected_hash, $hash))->cachePerPermissions();
+    return AccessResult::allowedIf($this->currentUser()->hasPermission('access toolbar'))->cachePerPermissions();
   }
 
   /**
