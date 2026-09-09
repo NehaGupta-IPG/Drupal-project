@@ -3,31 +3,7 @@
  * Claro's polyfill enhancements for HTML5 details.
  */
 
-(($, Drupal) => {
-  /**
-   * Workaround for Firefox.
-   *
-   * Firefox applies the focus state only for keyboard navigation.
-   * We have to manually trigger focus to make the behavior consistent across
-   * browsers.
-   *
-   * @type {Drupal~behavior}
-   */
-  Drupal.behaviors.claroDetails = {
-    attach(context) {
-      // The second argument of once() needs to be an instance of Element, but
-      // document is an instance of Document, replace it with the html Element.
-      $(once('claroDetails', context === document ? 'html' : context)).on(
-        'click',
-        (event) => {
-          if (event.target.nodeName === 'SUMMARY') {
-            $(event.target).trigger('focus');
-          }
-        },
-      );
-    },
-  };
-
+((Drupal) => {
   /**
    * Theme override providing a wrapper for summarized details content.
    *
@@ -46,4 +22,4 @@
    *   The formatted summarized content text.
    */
   Drupal.theme.detailsSummarizedContentText = (text) => text || '';
-})(jQuery, Drupal);
+})(Drupal);
