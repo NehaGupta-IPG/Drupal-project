@@ -42,7 +42,7 @@ class SetComponentThirdPartySettingConfigActionTest extends KernelTestBase {
 
     $this->installEntitySchema('user');
     $this->installConfig('user');
-    $recipe = Recipe::createFromDirectory($this->getDrupalRoot() . '/core/recipes/user_picture');
+    $recipe = Recipe::createFromDirectory($this->root . '/core/recipes/user_picture');
     RecipeRunner::processRecipe($recipe);
   }
 
