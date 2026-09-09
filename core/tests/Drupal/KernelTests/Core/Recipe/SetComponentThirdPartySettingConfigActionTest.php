@@ -41,7 +41,7 @@ class SetComponentThirdPartySettingConfigActionTest extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('user');
-    $this->installConfig('user');
+    $this->installConfig(['system', 'user']);
     $recipe = Recipe::createFromDirectory($this->root . '/core/recipes/user_picture');
     RecipeRunner::processRecipe($recipe);
   }
