@@ -108,42 +108,42 @@ class SetComponentThirdPartySettingConfigActionTest extends KernelTestBase {
 
     $manager->applyAction(
       'setComponentThirdPartySettings',
-      'core.entity_view_display.user.user.default',
+      'core.entity_form_display.user.user.default',
       [
         [
           'component' => 'user_picture',
           'provider' => 'field_third_party_test',
           'settings' => [
-            'field_test_field_formatter_third_party_settings_form' => 'one',
-            'second_field_formatter_third_party_settings_form' => 'two',
+            'field_test_widget_third_party_settings_form' => 'one',
+            'second_field_widget_third_party_settings_form' => 'two',
           ],
         ],
         [
-          'component' => 'member_for',
+          'component' => 'timezone',
           'provider' => 'field_third_party_test',
           'settings' => [
-            'field_test_field_formatter_third_party_settings_form' => 'three',
-            'second_field_formatter_third_party_settings_form' => 'four',
+            'field_test_widget_third_party_settings_form' => 'three',
+            'second_field_widget_third_party_settings_form' => 'four',
           ],
         ],
       ],
     );
 
     $display = $this->container->get(EntityDisplayRepositoryInterface::class)
-      ->getViewDisplay('user', 'user');
+      ->getFormDisplay('user', 'user');
 
     $component = $display->getComponent('user_picture');
     $this->assertIsArray($component);
     $this->assertSame([
-      'field_test_field_formatter_third_party_settings_form' => 'one',
-      'second_field_formatter_third_party_settings_form' => 'two',
+      'field_test_widget_third_party_settings_form' => 'one',
+      'second_field_widget_third_party_settings_form' => 'two',
     ], $component['third_party_settings']['field_third_party_test']);
 
-    $component = $display->getComponent('member_for');
+    $component = $display->getComponent('timezone');
     $this->assertIsArray($component);
     $this->assertSame([
-      'field_test_field_formatter_third_party_settings_form' => 'three',
-      'second_field_formatter_third_party_settings_form' => 'four',
+      'field_test_widget_third_party_settings_form' => 'three',
+      'second_field_widget_third_party_settings_form' => 'four',
     ], $component['third_party_settings']['field_third_party_test']);
   }
 
