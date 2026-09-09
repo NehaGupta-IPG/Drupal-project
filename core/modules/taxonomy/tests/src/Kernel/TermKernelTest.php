@@ -117,7 +117,7 @@ class TermKernelTest extends KernelTestBase {
   /**
    * Retrieves the taxonomy index from the database.
    */
-  protected function getTaxonomyIndex() {
+  protected function getTaxonomyIndex(): array {
     return \Drupal::database()->select('taxonomy_index')
       ->fields('taxonomy_index')
       ->execute()
