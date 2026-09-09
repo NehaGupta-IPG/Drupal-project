@@ -112,7 +112,6 @@ class TermKernelTest extends KernelTestBase {
     $node->save();
 
     // Add test coverage
-
   }
 
   /**
