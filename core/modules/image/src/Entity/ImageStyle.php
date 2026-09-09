@@ -511,20 +511,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     $original_extension = pathinfo($path, PATHINFO_EXTENSION);
     $extension = $this->getDerivativeExtension($original_extension);
     if ($original_extension !== $extension) {
-      $directory_path = pathinfo($path, PATHINFO_DIRNAME);
-      // Directory path for root is '.' or 'public:', otherwise folder name.
-      if (!empty($directory_path)) {
-        if ($directory_path == '.') {
-          $path = pathinfo($path, PATHINFO_FILENAME);
-        }
-        elseif ($directory_path == 'public:') {
-          $path = $directory_path . '//' . pathinfo($path, PATHINFO_FILENAME);
-        }
-        else {
-          $path = $directory_path . '/' . pathinfo($path, PATHINFO_FILENAME);
-        }
-      }
-      $path .= '.' . $extension;
+      $path = str_replace($original_extension, $extension, $path);
     }
     return $path;
   }
