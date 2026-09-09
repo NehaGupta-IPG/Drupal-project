@@ -4,6 +4,7 @@ namespace Drupal\options\Plugin\views\argument;
 
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\options\OptionsAllowedValuesInterface;
 use Drupal\views\Attribute\ViewsArgument;
 use Drupal\views\FieldAPIHandlerTrait;
 use Drupal\views\ViewExecutable;
@@ -29,6 +30,16 @@ class StringListField extends StringArgument {
    */
   protected $allowedValues = NULL;
 
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected OptionsAllowedValuesInterface $optionsAllowedValues,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -36,7 +47,7 @@ class StringListField extends StringArgument {
     parent::init($view, $display, $options);
 
     $field_storage = $this->getFieldStorageDefinition();
-    $this->allowedValues = options_allowed_values($field_storage);
+    $this->allowedValues = $this->optionsAllowedValues->getAllowedValues($field_storage);
   }
 
   /**

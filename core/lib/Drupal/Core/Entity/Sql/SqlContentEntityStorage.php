@@ -535,115 +535,6 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   }
 
   /**
-   * Loads values for fields stored in the shared data tables.
-   *
-   * @param array &$values
-   *   Associative array of entities values, keyed on the entity ID or the
-   *   revision ID.
-   * @param array &$translations
-   *   List of translations, keyed on the entity ID.
-   * @param bool $load_from_revision
-   *   Flag to indicate whether revisions should be loaded or not.
-   *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no
-   * replacement.
-   * @see https://www.drupal.org/node/3586362
-   */
-  protected function loadFromSharedTables(array &$values, array &$translations, $load_from_revision) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3586362');
-    $record_key = !$load_from_revision ? $this->idKey : $this->revisionKey;
-    if ($this->dataTable) {
-      // If a revision table is available, we need all the properties of the
-      // latest revision. Otherwise we fall back to the data table.
-      $table = $this->revisionDataTable ?: $this->dataTable;
-      $alias = $this->revisionDataTable ? 'revision' : 'data';
-      $query = $this->database->select($table, $alias, ['fetch' => FetchAs::Associative])
-        ->fields($alias)
-        ->condition($alias . '.' . $record_key, array_keys($values), 'IN')
-        ->orderBy($alias . '.' . $record_key);
-
-      $table_mapping = $this->getTableMapping();
-      if ($this->revisionDataTable) {
-        // Find revisioned fields that are not entity keys. Exclude the langcode
-        // key as the base table holds only the default language.
-        $base_fields = array_diff($table_mapping->getFieldNames($this->baseTable), [$this->langcodeKey]);
-        $revisioned_fields = array_diff($table_mapping->getFieldNames($this->revisionDataTable), $base_fields);
-
-        // Find fields that are not revisioned or entity keys. Data fields have
-        // the same value regardless of entity revision.
-        $data_fields = array_diff($table_mapping->getFieldNames($this->dataTable), $revisioned_fields, $base_fields);
-        // If there are no data fields then only revisioned fields are needed
-        // else both data fields and revisioned fields are needed to map the
-        // entity values.
-        $all_fields = $revisioned_fields;
-        if ($data_fields) {
-          $all_fields = array_merge($revisioned_fields, $data_fields);
-          $query->leftJoin($this->dataTable, 'data', "([revision].[$this->idKey] = [data].[$this->idKey] AND [revision].[$this->langcodeKey] = [data].[$this->langcodeKey])");
-          $column_names = [];
-          // Some fields can have more then one columns in the data table so
-          // column names are needed.
-          foreach ($data_fields as $data_field) {
-            // \Drupal\Core\Entity\Sql\TableMappingInterface::getColumnNames()
-            // returns an array keyed by property names so remove the keys
-            // before array_merge() to avoid losing data with fields having the
-            // same columns i.e. value.
-            $column_names[] = array_values($table_mapping->getColumnNames($data_field));
-          }
-          $column_names = array_merge(...$column_names);
-          $query->fields('data', $column_names);
-        }
-
-        // Get the revision IDs.
-        $revision_ids = [];
-        foreach ($values as $entity_values) {
-          $revision_ids[] = $entity_values[$this->revisionKey][LanguageInterface::LANGCODE_DEFAULT];
-        }
-        $query->condition('revision.' . $this->revisionKey, $revision_ids, 'IN');
-      }
-      else {
-        $all_fields = $table_mapping->getFieldNames($this->dataTable);
-      }
-
-      $result = $query->execute();
-
-      $field_definition_columns = [];
-      $field_columns = [];
-
-      foreach ($all_fields as $field_name) {
-        $field_definition_columns[$field_name] = $this->fieldStorageDefinitions[$field_name]->getColumns();
-        $field_columns[$field_name] = $table_mapping->getColumnNames($field_name);
-      }
-
-      foreach ($result as $row) {
-        $id = $row[$record_key];
-
-        // Field values in default language are stored with
-        // LanguageInterface::LANGCODE_DEFAULT as key.
-        $langcode = empty($row[$this->defaultLangcodeKey]) ? $row[$this->langcodeKey] : LanguageInterface::LANGCODE_DEFAULT;
-
-        $translations[$id][$langcode] = TRUE;
-
-        foreach ($all_fields as $field_name) {
-          $definition_columns = $field_definition_columns[$field_name];
-          $columns = $field_columns[$field_name];
-          // Do not key single-column fields by property name.
-          if (count($columns) == 1) {
-            $column_name = reset($columns);
-            $column_attributes = $definition_columns[key($columns)];
-            $values[$id][$field_name][$langcode] = (!empty($column_attributes['serialize'])) ? $this->handleNullableFieldUnserialize($row[$column_name]) : $row[$column_name];
-          }
-          else {
-            foreach ($columns as $property_name => $column_name) {
-              $column_attributes = $definition_columns[$property_name];
-              $values[$id][$field_name][$langcode][$property_name] = (!empty($column_attributes['serialize'])) ? $this->handleNullableFieldUnserialize($row[$column_name]) : $row[$column_name];
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
    * {@inheritdoc}
    */
   protected function doLoadMultipleRevisionsFieldItems($revision_ids) {
@@ -1346,7 +1237,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         $chunks = [$multiple_cardinality_fields];
       }
       foreach ($chunks as $fields) {
-        $this->loadMultipleCardinalityFields($values, $id_key, $load_from_revision, $fields, $definitions, $field_columns, $field_definition_columns, $default_langcodes, $ids);
+        $this->loadMultipleCardinalityFields($values, $base_table, $base_id_key, $id_key, $load_from_revision, $fields, $definitions, $field_columns, $field_definition_columns, $default_langcodes, $ids);
       }
     }
   }
@@ -1536,6 +1427,10 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    *
    * @param array &$values
    *   The entity values populated so far.
+   * @param string $base_table
+   *   The base table used to identify default translations.
+   * @param string $base_id_key
+   *   The ID key in the base table.
    * @param string $id_key
    *   The ID key depending on whether regular entities or revisions are being
    *   loaded.
@@ -1556,6 +1451,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    */
   private function loadMultipleCardinalityFields(
     array &$values,
+    string $base_table,
+    string $base_id_key,
     string $id_key,
     bool $load_from_revision,
     array $multiple_cardinality_fields,
@@ -1635,6 +1532,19 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $delta_keys[$field_name] = $query->addField($table, 'delta', $field_name . '_delta');
     }
 
+    if ($this->langcodeKey && $this->defaultLangcodeKey) {
+      if (count($multiple_cardinality_fields) > 1) {
+        $join_id = '[delta_join].[id]';
+        $join_langcode = '[delta_join].[langcode]';
+      }
+      else {
+        $join_id = "[$table].[$id_key]";
+        $join_langcode = "[$table].[langcode]";
+      }
+      $query->innerJoin($base_table, 'base', "[base].[$base_id_key] = $join_id AND [base].[$this->langcodeKey] = $join_langcode");
+      $query->addField('base', $this->defaultLangcodeKey, 'base_default_langcode');
+    }
+
     $results = $query->execute();
 
     foreach ($results as $row) {
@@ -1643,7 +1553,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       // Field values in default language are stored with
       // LanguageInterface::LANGCODE_DEFAULT as key.
       $langcode = LanguageInterface::LANGCODE_DEFAULT;
-      if ($this->langcodeKey && isset($default_langcodes[$value_key]) && $row['langcode'] != $default_langcodes[$value_key]) {
+      if ($this->langcodeKey && empty($row['base_default_langcode']) && isset($default_langcodes[$value_key]) && $row['langcode'] != $default_langcodes[$value_key]) {
         $langcode = $row['langcode'];
       }
 
