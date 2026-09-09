@@ -117,7 +117,7 @@ function dblog_update_last_removed(): int {
 /**
  * Change the 'wid' of the 'watchdog' table to an unsigned big integer.
  */
-function dblog_update_11500(&$sandbox = NULL): void {
+function dblog_update_11500(): void {
   $connection = \Drupal::database();
 
   // Remove the - extreme case - rows that have a negative WID.
