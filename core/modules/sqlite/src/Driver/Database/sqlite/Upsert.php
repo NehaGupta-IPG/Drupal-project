@@ -56,6 +56,9 @@ class Upsert extends QueryUpsert {
 
     if (!empty($update)) {
       $query .= 'UPDATE SET ' . implode(', ', $update);
+      if ($this->updateCondition) {
+        $query .= ' WHERE ' . $this->updateCondition->expression;
+      }
     }
     else {
       $query .= 'NOTHING';

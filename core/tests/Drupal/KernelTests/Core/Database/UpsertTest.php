@@ -8,6 +8,7 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\Query\NoFieldsException;
 use Drupal\Core\Database\Query\UpsertUpdateExpression;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -137,6 +138,179 @@ class UpsertTest extends DatabaseTestBase {
     catch (\InvalidArgumentException $e) {
       $this->assertStringContainsString('must be keyed by its column name', $e->getMessage());
     }
+  }
+
+  /**
+   * Confirms that an update condition can leave the existing record untouched.
+   */
+  public function testUpsertWithUpdateCondition(): void {
+    // The only record is 'Speaker', aged 30, named 'Meredith'.
+    $this->assertSame('1', $this->connection->query('SELECT COUNT(*) FROM {test_people}')->fetchField());
+
+    // The columns are listed with the column the condition reads last, the
+    // order MySQL and MariaDB need.
+    $upsert = fn (int $below, int $age, string $name): int => $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job', 'name', 'age'])
+      ->values(['Speaker', $name, $age])
+      ->updateCondition('{test_people}.[age] < :below', [':below' => $below])
+      ->execute();
+
+    // The condition does not hold, so the record is left untouched. No driver
+    // reports the record as affected.
+    $this->assertSame(0, $upsert(30, 32, 'Tiffany'));
+    $person = $this->connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Speaker'])->fetch();
+    $this->assertSame('30', $person->age);
+    $this->assertSame('Meredith', $person->name);
+
+    // The condition holds, so every column is updated.
+    $this->assertGreaterThan(0, $upsert(31, 32, 'Tiffany'));
+    $person = $this->connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Speaker'])->fetch();
+    $this->assertSame('32', $person->age);
+    $this->assertSame('Tiffany', $person->name);
+
+    // A record that does not exist yet is inserted, whatever the condition.
+    $rows = $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job', 'name', 'age'])
+      ->values(['Presenter', 'Zaphod', 31])
+      ->updateCondition('{test_people}.[age] < :below', [':below' => 0])
+      ->execute();
+    $this->assertGreaterThan(0, $rows);
+    $person = $this->connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Presenter'])->fetch();
+    $this->assertSame('31', $person->age);
+    $this->assertSame('Zaphod', $person->name);
+
+    // An update condition needs a column to update.
+    $this->expectException(NoFieldsException::class);
+    $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job'])
+      ->values(['Speaker'])
+      ->updateCondition('{test_people}.[age] < :below', [':below' => 99])
+      ->execute();
+  }
+
+  /**
+   * Confirms that an update condition can read a column that is updated.
+   *
+   * The condition is evaluated against the existing record, so a column it
+   * reads holds its old value even when the same statement overwrites it.
+   */
+  public function testUpsertWithUpdateConditionOnUpdatedColumn(): void {
+    $rows = $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job', 'age', 'name'])
+      ->values(['Speaker', 32, 'Tiffany'])
+      ->updateCondition('{test_people}.[age] < :below', [':below' => 31])
+      ->execute();
+
+    $this->assertGreaterThan(0, $rows);
+    $person = $this->connection->query('SELECT * FROM {test_people} WHERE [job] = :job', [':job' => 'Speaker'])->fetch();
+    $this->assertSame('32', $person->age);
+    $this->assertSame('Tiffany', $person->name, 'Every column of the record is updated.');
+  }
+
+  /**
+   * Confirms what an update condition cannot be combined with.
+   */
+  public function testUpsertWithUnsupportedUpdateCondition(): void {
+    // More than one row of values.
+    try {
+      $this->connection->upsert('test_people')
+        ->key('job')
+        ->fields(['job', 'name', 'age'])
+        ->values(['Speaker', 'Tiffany', 32])
+        ->values(['Presenter', 'Zaphod', 31])
+        ->updateCondition('{test_people}.[age] < :below', [':below' => 31])
+        ->execute();
+      $this->fail('Expected exception for an update condition on more than one row.');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertStringContainsString('only supported for a single row', $e->getMessage());
+    }
+
+    // A condition reading more than one of the updated columns.
+    try {
+      $this->connection->upsert('test_people')
+        ->key('job')
+        ->fields(['job', 'name', 'age'])
+        ->values(['Speaker', 'Tiffany', 32])
+        ->updateCondition('{test_people}.[age] < :below AND {test_people}.[name] <> :name', [
+          ':below' => 31,
+          ':name' => 'Tiffany',
+        ])
+        ->execute();
+      $this->fail('Expected exception for an update condition reading two updated columns.');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertStringContainsString('may read at most one of the updated columns', $e->getMessage());
+    }
+
+    // Reading a column of the key is always supported: it is never updated.
+    $rows = $this->connection->upsert('test_people')
+      ->key('job')
+      ->fields(['job', 'name', 'age'])
+      ->values(['Speaker', 'Tiffany', 32])
+      ->updateCondition('{test_people}.[job] = :job AND {test_people}.[age] < :below', [
+        ':job' => 'Speaker',
+        ':below' => 31,
+      ])
+      ->execute();
+    $this->assertGreaterThan(0, $rows);
+
+    // An update expression.
+    try {
+      $this->connection->upsert('test_people')
+        ->key('job')
+        ->fields(['job', 'name', 'age' => new UpsertUpdateExpression('{test_people}.[age] + 1')])
+        ->values(['Speaker', 'Tiffany', 32])
+        ->updateCondition('{test_people}.[age] < :below', [':below' => 31])
+        ->execute();
+      $this->fail('Expected exception for an update condition combined with an update expression.');
+    }
+    catch (\InvalidArgumentException $e) {
+      $this->assertStringContainsString('cannot be combined with an update expression', $e->getMessage());
+    }
+  }
+
+  /**
+   * Confirms that an update condition works with a composite key.
+   */
+  public function testCompositeKeyUpsertWithUpdateCondition(): void {
+    $this->installSchema('database_test', ['test_composite_primary']);
+    $this->connection->insert('test_composite_primary')
+      ->fields(['name', 'age', 'job'])
+      ->values(['name' => 'Meredith', 'age' => 30, 'job' => 'Speaker'])
+      ->execute();
+
+    // The condition reads the only column that is updated, which is what a
+    // condition on an expiration does.
+    $upsert = fn (string $job, string $held_by): int => $this->connection->upsert('test_composite_primary')
+      ->key(['name', 'age'])
+      ->fields(['name' => 'Meredith', 'age' => 30, 'job' => $job])
+      ->updateCondition('{test_composite_primary}.[job] = :job', [':job' => $held_by])
+      ->execute();
+
+    // The condition does not hold, so the record is left untouched.
+    $this->assertSame(0, $upsert('Organizer', 'Presenter'));
+    $person = $this->connection->query('SELECT * FROM {test_composite_primary} WHERE [name] = :name', [':name' => 'Meredith'])->fetch();
+    $this->assertSame('Speaker', $person->job);
+
+    // The condition holds, so the record is updated.
+    $this->assertGreaterThan(0, $upsert('Organizer', 'Speaker'));
+    $person = $this->connection->query('SELECT * FROM {test_composite_primary} WHERE [name] = :name', [':name' => 'Meredith'])->fetch();
+    $this->assertSame('Organizer', $person->job);
+
+    // A record that does not exist yet is inserted, whatever the condition.
+    $rows = $this->connection->upsert('test_composite_primary')
+      ->key(['name', 'age'])
+      ->fields(['name' => 'Meredith', 'age' => 31, 'job' => 'Presenter'])
+      ->updateCondition('{test_composite_primary}.[job] = :job', [':job' => 'nobody'])
+      ->execute();
+    $this->assertGreaterThan(0, $rows);
+    $person = $this->connection->query('SELECT * FROM {test_composite_primary} WHERE [age] = :age', [':age' => 31])->fetch();
+    $this->assertSame('Presenter', $person->job);
   }
 
   /**

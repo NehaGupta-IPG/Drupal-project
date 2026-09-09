@@ -5,7 +5,6 @@ namespace Drupal\Core\Lock;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
-use Drupal\Core\Database\IntegrityConstraintViolationException;
 
 /**
  * Defines the database lock backend. This is the default backend in Drupal.
@@ -45,9 +44,10 @@ class DatabaseLockBackend extends LockBackendAbstract {
   public function acquire($name, $timeout = 30.0) {
     $name = $this->normalizeName($name);
 
-    // Insure that the timeout is at least 1 ms.
+    // Ensure that the timeout is at least 1 ms.
     $timeout = max($timeout, 0.001);
-    $expire = microtime(TRUE) + $timeout;
+    $now = microtime(TRUE);
+    $expire = $now + $timeout;
     if (isset($this->locks[$name])) {
       // Try to extend the expiration of a lock we already acquired.
       $success = (bool) $this->database->update('semaphore')
@@ -61,48 +61,39 @@ class DatabaseLockBackend extends LockBackendAbstract {
       }
       return $success;
     }
-    else {
-      // Optimistically try to acquire the lock, then retry once if it fails.
-      // The first time through the loop cannot be a retry.
-      $retry = FALSE;
-      // We always want to do this code at least once.
-      do {
-        try {
-          $this->database->insert('semaphore')
-            ->fields([
-              'name' => $name,
-              'value' => $this->getLockId(),
-              'expire' => $expire,
-            ])
-            ->execute();
-          // We track all acquired locks in the global variable.
-          $this->locks[$name] = TRUE;
-          // We never need to try again.
-          $retry = FALSE;
-        }
-        catch (IntegrityConstraintViolationException) {
-          // Suppress the error. If this is our first pass through the loop,
-          // then $retry is FALSE. In this case, the insert failed because some
-          // other request acquired the lock but did not release it. We decide
-          // whether to retry by checking lockMayBeAvailable(). This will clear
-          // the offending row from the database table in case it has expired.
-          $retry = $retry ? FALSE : $this->lockMayBeAvailable($name);
-        }
-        catch (\Exception $e) {
-          // Create the semaphore table if it does not exist and retry.
-          if ($this->ensureTableExists()) {
-            // Retry only once.
-            $retry = !$retry;
-          }
-          else {
-            throw $e;
-          }
-        }
-        // We only retry in case the first attempt failed, but we then broke
-        // an expired lock.
-      } while ($retry);
+
+    // A single upsert takes a free lock and takes over an expired one. When
+    // another request still holds the lock, the update condition does not
+    // hold, the record is left untouched and no row is reported as affected.
+    // One statement makes this free of the race between checking the lock and
+    // taking it, and it cannot fail with an integrity constraint violation the
+    // way a plain insert does when two requests take a free lock at once.
+    // The values of an upsert are consumed by its execution, so the query is
+    // built again for the retry below.
+    $upsert = fn (): bool => (bool) $this->database->upsert(static::TABLE_NAME)
+      ->key('name')
+      // The condition reads [expire], so it is the last column updated.
+      ->fields(['name', 'value', 'expire'])
+      ->values([$name, $this->getLockId(), $expire])
+      ->updateCondition('{' . static::TABLE_NAME . '}.[expire] < :now', [':now' => $now])
+      ->execute();
+
+    try {
+      $acquired = $upsert();
     }
-    return isset($this->locks[$name]);
+    catch (\Exception $e) {
+      // Create the semaphore table if it does not exist and retry.
+      if (!$this->ensureTableExists()) {
+        throw $e;
+      }
+      $acquired = $upsert();
+    }
+
+    if ($acquired) {
+      // We track all acquired locks in the global variable.
+      $this->locks[$name] = TRUE;
+    }
+    return $acquired;
   }
 
   /**

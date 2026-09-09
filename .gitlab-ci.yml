@@ -479,10 +479,14 @@ default:
 
 'MySQL (via PDO)':
   <<: [ *recursive-trigger, *run-on-mr ]
+  # Run automatically on merge requests while this issue changes the pgsql
+  # driver. Revert to the manual *run-on-mr rules before commit.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   parallel:
     matrix:
-      - _TARGET_PHP: !reference [.php_versions]
-        _TARGET_DB: [mysql-8, mysql-8.4, mysql-9]
+      - _TARGET_PHP: [8.5-ubuntu]
+        _TARGET_DB: [mysql-8]
   variables:
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
@@ -499,16 +503,24 @@ default:
 
 'PostgreSQL':
   <<: [ *recursive-trigger, *run-on-mr ]
+  # Run automatically on merge requests while this issue changes the pgsql
+  # driver. Revert to the manual *run-on-mr rules before commit.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   parallel:
     matrix:
-      - _TARGET_PHP: !reference [.php_versions]
+      - _TARGET_PHP: [8.5-ubuntu]
         _TARGET_DB: [pgsql-18]
 
 'SQLite':
   <<: [ *recursive-trigger, *run-on-mr ]
+  # Run automatically on merge requests while this issue changes the pgsql
+  # driver. Revert to the manual *run-on-mr rules before commit.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   parallel:
     matrix:
-      - _TARGET_PHP: !reference [.php_versions]
+      - _TARGET_PHP: [8.5-ubuntu]
         _TARGET_DB: [sqlite-3]
 
 # Jobs running on commits.

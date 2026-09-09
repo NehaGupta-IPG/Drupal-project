@@ -73,6 +73,52 @@ class LockTest extends KernelTestBase {
   }
 
   /**
+   * Tests that a lock held by another request is not acquired.
+   */
+  public function testBackendLockConcurrentRequests(): void {
+    // A second backend instance stands in for another request: it has its own
+    // lock ID and its own record of the locks it holds.
+    $other_request = new DatabaseLockBackend($this->container->get('database'));
+    $this->assertTrue($other_request->acquire('lock_a', 60), 'The other request could acquire the lock.');
+    $held_by = $this->lockHolder('lock_a');
+
+    // The lock is held elsewhere and has not expired.
+    $this->assertFalse($this->lock->acquire('lock_a'), 'A lock held by another request cannot be acquired.');
+    $this->assertFalse($this->lock->lockMayBeAvailable('lock_a'), 'A lock held by another request is unavailable.');
+    $this->assertSame($held_by, $this->lockHolder('lock_a'), 'The failed acquisition left the lock with its holder.');
+
+    // Expire the lock of the other request, which frees it for takeover.
+    Database::getConnection()->update('semaphore')
+      ->fields(['expire' => microtime(TRUE) - 1])
+      ->condition('name', 'lock_a')
+      ->execute();
+
+    $this->assertTrue($this->lock->acquire('lock_a'), 'An expired lock could be acquired.');
+    $this->assertNotSame($held_by, $this->lockHolder('lock_a'), 'Taking over an expired lock replaced its holder.');
+    $this->assertFalse($this->lock->lockMayBeAvailable('lock_a'), 'The taken over lock is held.');
+
+    // The other request no longer holds the lock it acquired first.
+    $this->assertFalse($other_request->acquire('lock_a'), 'The other request cannot extend a lock taken over from it.');
+  }
+
+  /**
+   * Returns the lock ID a lock is held with.
+   *
+   * @param string $name
+   *   The lock name.
+   *
+   * @return string
+   *   The lock ID stored for the lock.
+   */
+  protected function lockHolder(string $name): string {
+    return Database::getConnection()->select('semaphore', 's')
+      ->fields('s', ['value'])
+      ->condition('name', $name)
+      ->execute()
+      ->fetchField();
+  }
+
+  /**
    * Tests backend release functionality.
    */
   public function testBackendLockReleaseAll(): void {

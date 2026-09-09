@@ -3,6 +3,7 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Expression;
 
 /**
  * General class for an abstracted "Upsert" (UPDATE or INSERT) query operation.
@@ -36,6 +37,18 @@ abstract class Upsert extends Query implements \Countable {
   protected array $updateExpressions = [];
 
   /**
+   * The condition that must hold for the update to be done.
+   *
+   * If the insert part of the upsert fails, the default behavior is to update
+   * the existing record unconditionally. This is the condition set by
+   * ::updateCondition(), which leaves the existing record untouched when it
+   * does not hold.
+   *
+   * @var \Drupal\Core\Database\Expression|null
+   */
+  protected ?Expression $updateCondition = NULL;
+
+  /**
    * Constructs an Upsert object.
    *
    * @param \Drupal\Core\Database\Connection $connection
@@ -60,6 +73,43 @@ abstract class Upsert extends Query implements \Countable {
    */
   public function key(string|array $field) {
     $this->key = (array) $field;
+
+    return $this;
+  }
+
+  /**
+   * Sets a condition that must hold for the update to be done.
+   *
+   * By default the update done in case of insert failure overwrites the
+   * existing record. With a condition set, the existing record is only
+   * updated when the condition holds for it, and is left untouched
+   * otherwise. The number of rows reported by ::execute() tells the two
+   * apart: an untouched record is not counted as affected by any driver.
+   *
+   * This is how an upsert expresses "write this record, unless the existing
+   * one is still in use", without the race a separate check and write have.
+   *
+   * A condition is supported for a single row of values, cannot be combined
+   * with an update expression, and may read at most one of the columns it
+   * updates. The restrictions are what MySQL and MariaDB need: they have no
+   * condition clause for their upsert, so their driver either gates each
+   * column assignment with the condition, or does the insert and the
+   * conditional update as two statements. The columns of the unique / primary
+   * key are never updated, so a condition may always read those.
+   *
+   * @param string $condition
+   *   The condition text, evaluated against the existing record. Columns of
+   *   the existing record must be referenced in their qualified form,
+   *   "{table}.[column]", which PostgreSQL requires to tell them apart from
+   *   the values that would have been inserted. Never include user input in
+   *   the condition text; pass it through $arguments placeholders instead.
+   * @param array<string,string|int|float|bool> $arguments
+   *   (optional) The condition arguments, keyed by placeholder name.
+   *
+   * @return $this
+   */
+  public function updateCondition(string $condition, array $arguments = []): static {
+    $this->updateCondition = new Expression($condition, $arguments);
 
     return $this;
   }
@@ -156,6 +206,37 @@ abstract class Upsert extends Query implements \Countable {
       throw new NoFieldsException('There are no fields available to insert with.');
     }
 
+    if ($this->updateCondition) {
+      // A condition on an update that cannot happen is a no-op that would
+      // silently hide a mistake in the query.
+      if (!array_diff(array_merge($this->defaultFields, $this->insertFields), $this->key)) {
+        throw new NoFieldsException('There are no fields available to update, so an update condition cannot apply.');
+      }
+      if (count($this->insertValues) > 1) {
+        throw new \InvalidArgumentException('An update condition is only supported for a single row of values.');
+      }
+      if ($this->updateExpressions) {
+        throw new \InvalidArgumentException('An update condition cannot be combined with an update expression.');
+      }
+      // MySQL and MariaDB evaluate the condition once per updated column, in
+      // the order the columns were passed to ::fields(), against the record as
+      // it is being updated. Their driver updates a column the condition reads
+      // last, so that every assignment still sees the record as it was, which
+      // leaves no correct order for a second such column.
+      $condition = $this->updateCondition->expression;
+      $columns_read = array_filter(
+        array_diff(array_merge($this->defaultFields, $this->insertFields), $this->key),
+        fn (string $column): bool => str_contains($condition, "[$column]")
+          || str_contains($condition, $this->connection->escapeField($column)),
+      );
+      if (count($columns_read) > 1) {
+        throw new \InvalidArgumentException(sprintf(
+          'An update condition may read at most one of the updated columns, but reads %s.',
+          implode(', ', $columns_read),
+        ));
+      }
+    }
+
     // If no values have been added, silently ignore this query. This can happen
     // if values are added conditionally, so we don't want to throw an
     // exception.
@@ -186,6 +267,9 @@ abstract class Upsert extends Query implements \Countable {
       foreach ($update_expression->arguments as $argument => $value) {
         $values[$argument] = $value;
       }
+    }
+    foreach ($this->updateCondition?->arguments ?? [] as $argument => $value) {
+      $values[$argument] = $value;
     }
 
     $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions, TRUE);
