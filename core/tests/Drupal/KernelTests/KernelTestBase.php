@@ -725,14 +725,14 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
   }
 
   /**
-   * Installs database tables from a module schema definition.
+   * Installs database tables and SQL views from a module schema definition.
    *
    * @param string $module
-   *   The name of the module that defines the table's schema.
+   *   The name of the module that defines the schema.
    * @param string|array $tables
    *   The names of tables to install. Object-based definitions also accept SQL
-   *   view names in any order relative to their tables: tables are installed
-   *   first. Declare each view before any views that depend on it.
+   *   view names. Tables are installed first, then the views in the order
+   *   given here. Declare each view after the views it depends on.
    *
    * @throws \LogicException
    *   If $module is not enabled or the table schema cannot be found.

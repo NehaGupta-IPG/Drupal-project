@@ -62,10 +62,10 @@ class EnvironmentCleaner implements EnvironmentCleanerInterface {
   public function cleanDatabase(): void {
     $count = $this->doCleanDatabase();
     if ($count > 0) {
-      $this->output->write('Leftover tables removed: ' . $count);
+      $this->output->write('Leftover tables and views removed: ' . $count);
     }
     else {
-      $this->output->write('No leftover tables to remove.');
+      $this->output->write('No leftover tables or views to remove.');
     }
   }
 

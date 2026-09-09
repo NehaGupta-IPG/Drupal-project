@@ -47,7 +47,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   protected $attachedDatabases = [];
 
   /**
-   * Whether or not a table has been dropped this request.
+   * Whether a table or view has been dropped this request.
    *
    * The destructor will only try to get rid of unnecessary databases if there
    * is potential of them being empty.

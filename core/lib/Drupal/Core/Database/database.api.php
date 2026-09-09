@@ -505,22 +505,25 @@ use Drupal\Core\Database\SchemaDefinition\ViewQuery;
  * Write view queries with curly braces around table names and square brackets
  * around identifiers. View definitions cannot contain bound parameters, so
  * never include user input. Identifier and table-prefix replacement also
- * affects literal square or curly brackets inside strings.
+ * affects literal square or curly brackets inside strings. Apart from that
+ * replacement the query runs as written, so use only SQL that every supported
+ * database engine accepts.
  *
  * The Schema API does not drop, update or recreate views when changing their
  * tables. The module that declares a view must drop it before changing,
- * renaming or dropping its table or a column it reads, and create it again
- * afterwards. When another module changes the table in an update function, use
- * hook_update_dependencies() to drop the view before that update function and
- * create it again after. Leaving a view in place can cause the operation to
- * fail or leave the view unusable, depending on the operation and database.
+ * renaming or dropping a table or column the view depends on, and create it
+ * again afterwards. When another module changes the table in an update
+ * function, use hook_update_dependencies() to drop the view before that update
+ * function and create it again after. Leaving a view in place can cause the
+ * operation to fail or leave the view unusable, depending on the operation and
+ * database.
  *
  * On SQLite, rebuilding a table drops the original table before renaming its
- * replacement. If a view still reads the original table, the rename fails.
- * Unless an enclosing transaction is rolled back, the original table is gone
- * and its data remains in the replacement table under a generated name. A view
- * that reads a missing table also prevents later table renames in that database
- * until the view is dropped.
+ * replacement. If a view still depends on the original table, the rename
+ * fails. Unless an enclosing transaction is rolled back, the original table is
+ * gone and its data remains in the replacement table under a generated name.
+ * A view that depends on a missing table also prevents later table renames in
+ * that database until the view is dropped.
  *
  * @see \Drupal\Core\Extension\ModuleInstaller::installSchema()
  * @see \Drupal\Core\Extension\ModuleInstaller::uninstallSchema()
