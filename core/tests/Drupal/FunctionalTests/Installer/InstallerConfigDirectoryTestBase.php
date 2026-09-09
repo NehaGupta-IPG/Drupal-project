@@ -110,13 +110,9 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
       $module = Database::getConnection()->getProvider();
       if ($module !== 'core') {
         $core_extension['module'][$module] = 0;
-        // A driver module can depend on other modules, for instance mysqli
-        // depends on mysql. The configuration import validates that every
-        // module it installs has its dependencies in the module list too, so
-        // add them as well.
-        // @see \Drupal\Core\EventSubscriber\ConfigImportSubscriber::validateModules()
-        $requires = \Drupal::service('extension.list.module')->get($module)->requires ?? [];
-        foreach (array_keys($requires) as $dependency) {
+        // If the module depends on another driver module, add that too.
+        $info = Database::getConnection()->getConnectionOptions();
+        foreach (array_keys($info['dependencies'] ?? []) as $dependency) {
           $core_extension['module'][$dependency] = 0;
         }
         $core_extension['module'] = \Drupal::service(ModuleWeight::class)->sort($core_extension['module']);
