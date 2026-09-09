@@ -388,36 +388,6 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  protected function findDirectDependentViews(string $name): array {
-    $info = $this->getPrefixInfo($name);
-    $prefix = $this->connection->getPrefix();
-    $prefix_length = strlen($prefix);
-    $views = [];
-    // MariaDB has no information_schema.view_table_usage, so the stored
-    // definitions are searched instead. MySQL and MariaDB both rewrite a view
-    // to qualify every table it reads with `database`.`table`; the closing
-    // backtick stops a longer name that starts the same from matching. A
-    // string literal can hold the same text, so the search skips literals.
-    $reference = '`' . $info['database'] . '`.`' . $info['table'] . '`';
-    $results = $this->connection->query("SELECT table_name AS view_name, view_definition AS view_definition FROM information_schema.views WHERE table_schema = :schema", [
-      ':schema' => $info['database'],
-    ]);
-    foreach ($results as $view) {
-      if ($prefix && substr($view->view_name, 0, $prefix_length) !== $prefix) {
-        // This view is not managed by Drupal, so exclude it.
-        continue;
-      }
-      $literals = [];
-      if (str_contains($this->maskStringLiterals($view->view_definition, $literals), $reference)) {
-        $views[] = substr($view->view_name, $prefix_length);
-      }
-    }
-    return $views;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function renameTable($table, $new_name) {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot rename '$table' to '$new_name': table '$table' doesn't exist.");
@@ -429,62 +399,8 @@ class Schema extends DatabaseSchema {
       throw new SchemaObjectExistsException("Cannot rename '$table' to '$new_name': view '$new_name' already exists.");
     }
 
-    // MySQL does not update dependent view definitions when a table is
-    // renamed, so recreate them with the new table name.
-    $views = $this->dropDependentViews($table);
-
-    $old_info = $this->getPrefixInfo($table);
     $info = $this->getPrefixInfo($new_name);
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} RENAME TO [' . $info['table'] . ']');
-
-    // Replace the qualified table name, preserving references to tables
-    // with the same name in other databases.
-    $old_reference = '`' . $old_info['database'] . '`.`' . $old_info['table'] . '`';
-    $new_reference = '`' . $info['database'] . '`.`' . $info['table'] . '`';
-    foreach ($views as $view => $definition) {
-      $views[$view] = $this->rewriteViewDefinition($definition, fn (string $sql): string => str_replace($old_reference, $new_reference, $sql));
-    }
-    $this->restoreDependentViews($views);
-  }
-
-  /**
-   * Rewrites a stored view definition, leaving its string literals alone.
-   *
-   * @param string $definition
-   *   The view definition as MySQL stores it.
-   * @param callable $rewrite
-   *   Takes the definition with its literals masked and returns it rewritten.
-   *
-   * @return string
-   *   The rewritten definition with its literals back in place.
-   */
-  private function rewriteViewDefinition(string $definition, callable $rewrite): string {
-    $literals = [];
-    $masked = $this->maskStringLiterals($definition, $literals);
-    return preg_replace_callback('/\0(\d+)\0/', fn (array $matches): string => $literals[(int) $matches[1]], $rewrite($masked));
-  }
-
-  /**
-   * Swaps the string literals of a stored view definition for placeholders.
-   *
-   * @param string $definition
-   *   The view definition as MySQL stores it.
-   * @param string[] $literals
-   *   Receives the literals, in the order their placeholders appear.
-   *
-   * @return string
-   *   The definition with each literal replaced by a NUL-delimited index.
-   */
-  private function maskStringLiterals(string $definition, array &$literals): string {
-    // Match backtick-quoted identifiers as whole tokens so quotes inside
-    // them cannot start a string literal.
-    return preg_replace_callback('/`(?:[^`]|``)*`|\'(?:[^\'\\\\]|\\\\.|\'\')*\'/s', function (array $matches) use (&$literals): string {
-      if ($matches[0][0] === '`') {
-        return $matches[0];
-      }
-      $literals[] = $matches[0];
-      return "\0" . (count($literals) - 1) . "\0";
-    }, $definition);
   }
 
   /**
@@ -495,9 +411,6 @@ class Schema extends DatabaseSchema {
       return FALSE;
     }
 
-    // A view cannot outlive the table it reads, and MySQL leaves one behind
-    // that only fails once it is queried.
-    $this->dropViews($this->findDependentViews($table));
     $this->executeDdlStatement('DROP TABLE {' . $table . '}');
     return TRUE;
   }
@@ -595,11 +508,7 @@ class Schema extends DatabaseSchema {
       $this->dropPrimaryKey($table);
     }
 
-    // A view reading the dropped column cannot be put back, so it goes; one
-    // reading other columns is created again unchanged.
-    $views = $this->dropDependentViews($table);
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP [' . $field . ']');
-    $this->restoreDependentViews($views);
     return TRUE;
   }
 
@@ -749,16 +658,11 @@ class Schema extends DatabaseSchema {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field_new => $spec]);
     }
 
-    // Recreate views from their original definitions. Views referencing a
-    // renamed column will fail to recreate and remain dropped.
-    $views = $this->dropDependentViews($table);
-
     $sql = 'ALTER TABLE {' . $table . '} CHANGE [' . $field . '] ' . $this->createFieldSql($field_new, $this->processField($spec));
     if ($keys_sql = $this->createKeysSql($keys_new)) {
       $sql .= ', ADD ' . implode(', ADD ', $keys_sql);
     }
     $this->executeDdlStatement($sql);
-    $this->restoreDependentViews($views);
 
     if ($spec['type'] === 'serial') {
       $max = $this->connection->query('SELECT MAX(`' . $field_new . '`) FROM {' . $table . '}')->fetchField();

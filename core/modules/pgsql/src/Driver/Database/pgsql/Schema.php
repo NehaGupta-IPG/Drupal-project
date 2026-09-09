@@ -708,8 +708,7 @@ EOD;
       return FALSE;
     }
 
-    // CASCADE also drops views that depend on this table.
-    $this->executeDdlStatement('DROP TABLE {' . $table . '} CASCADE');
+    $this->executeDdlStatement('DROP TABLE {' . $table . '}');
     $this->resetTableInformation($table);
     return TRUE;
   }
@@ -784,9 +783,7 @@ EOD;
       return FALSE;
     }
 
-    // CASCADE drops views that depend on this column, including indirect
-    // dependencies. Views reading only other columns are preserved.
-    $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP COLUMN "' . $field . '" CASCADE');
+    $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP COLUMN "' . $field . '"');
     $this->resetTableInformation($table);
     return TRUE;
   }
@@ -997,11 +994,6 @@ EOD;
       $this->ensureNotNullPrimaryKey($new_keys['primary key'], [$field_new => $spec]);
     }
 
-    // PostgreSQL requires dependent views to be dropped before a type
-    // change. Recreate them afterwards; references to a renamed column will
-    // no longer be valid.
-    $views = $this->dropDependentViews($table);
-
     $spec = $this->processField($spec);
 
     // Type 'serial' is known to PostgreSQL, but only during table creation,
@@ -1107,7 +1099,6 @@ EOD;
     if (isset($new_keys)) {
       $this->_createKeys($table, $new_keys);
     }
-    $this->restoreDependentViews($views);
     $this->resetTableInformation($table);
   }
 

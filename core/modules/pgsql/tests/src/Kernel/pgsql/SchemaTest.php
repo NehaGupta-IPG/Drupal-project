@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore attgenerated attname attnum attrelid objid refobjid refobjsubid
 // cSpell:ignore regclass
-// cspell:ignore relkind relname schemaname viewname
+// cspell:ignore relkind relname
 
 /**
  * Tests schema API for the PostgreSQL driver.
