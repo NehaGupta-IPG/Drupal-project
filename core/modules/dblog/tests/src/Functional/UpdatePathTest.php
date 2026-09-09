@@ -42,6 +42,11 @@ class UpdatePathTest extends UpdatePathTestBase {
 
     // Before updates, a negative WID should be possible.
     $this->insertLogEntry($connection, -1000);
+    $this->assertEquals(1, $connection->select('watchdog')
+      ->condition('wid', 0, '<')
+      ->countQuery()
+      ->execute()
+      ->fetchField());
 
     $this->runUpdates();
 
