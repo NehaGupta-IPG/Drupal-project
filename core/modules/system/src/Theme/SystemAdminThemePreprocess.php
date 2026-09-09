@@ -165,7 +165,7 @@ class SystemAdminThemePreprocess {
         $dependency_name = Dependency::createFromString($dependency)->getName();
         if (isset($form[$dependency_name])) {
           // Add themes to the module's required by list.
-          $form[$dependency_name]['#required_by'][] = $theme->status ? $this->t('@theme (theme)', ['@theme' => $theme->info['name']]) : $this->t('@theme (theme) (<span class="admin-disabled">disabled</span>)', ['@theme' => $theme->info['name']]);
+          $form[$dependency_name]['#required_by'][] = $theme->status ? $this->t('@theme (theme)', ['@theme' => $theme->info['name']]) : $this->t('@theme (theme) (<span class="admin-disabled">not installed<</span>)', ['@theme' => $theme->info['name']]);
         }
       }
     }
