@@ -473,6 +473,29 @@ class SystemRequirementsHooks {
     }
 
     // Database information.
+    $allConnections = Database::getAllConnectionInfo();
+    $connection_info = [];
+    foreach ($allConnections as $target) {
+      foreach ($target as $connection_options) {
+        if (!empty($connection_options['host'])) {
+          $connection_info[] = $this->t('Host: %host', ['%host' => $connection_options['host']]);
+        }
+        $connection_info[] = $this->t('Database: %database', ['%database' => $connection_options['database']]);
+        $prefix = !empty($connection_options['prefix']) ? $connection_options['prefix'] : NULL;
+        $connection_info[] = !empty($prefix) ? $this->t('Prefix: %prefix', ['%prefix' => $prefix]) : $this->t('No prefix');
+        $connection_info[] = " ";
+      }
+    }
+    $requirements['database_connection'] = [
+      'title' => new PluralTranslatableMarkup(
+        count($allConnections),
+        'Database connection',
+        'Database connections',
+        ['@version' => \Drupal::VERSION]
+      ),
+      'value' => ['#markup' => implode('<br/>', $connection_info)],
+    ];
+
     $class = Database::getConnection()->getConnectionOptions()['namespace'] . '\\Install\\Tasks';
     /** @var \Drupal\Core\Database\Install\Tasks $tasks */
     $tasks = new $class();
@@ -1471,7 +1494,7 @@ class SystemRequirementsHooks {
             // and both the previous update and the equivalent update are not
             // found in the current code base, prevent updating. This indicates
             // a site attempting to go 'backwards' in terms of database schema.
-            // @see \Drupal\Core\Update\UpdateHookRegistry::markFutureUpdateEquivalent()
+            // @see \Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent
             if (!function_exists($ran_update_function_name) && !function_exists($future_update_function_name)) {
               // If the module is provided by core prepend helpful text as the
               // module does not exist in composer or Drupal.org.
