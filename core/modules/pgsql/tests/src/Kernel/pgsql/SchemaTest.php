@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
+use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
@@ -388,6 +389,13 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->schema->renameTable($table_name_old, $table_name_new);
 
     $this->assertTrue($this->schema->tableExists($table_name_new));
+
+    // A view can hold the new index name too, since PostgreSQL keeps tables,
+    // views and indexes in one namespace.
+    $this->schema->createTable('indexed_table', $table_specification);
+    $this->schema->createView('other_table_name__id__idx', 'SELECT [id] FROM {indexed_table}');
+    $this->schema->renameTable('indexed_table', 'other_table_name');
+    $this->assertTrue($this->schema->tableExists('other_table_name'));
   }
 
   /**
@@ -417,6 +425,23 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     $this->schema->renameTable($table_name_old, $table_name_new);
 
     $this->assertTrue($this->schema->tableExists($table_name_new));
+  }
+
+  /**
+   * Tests dropping a view that another view depends on.
+   */
+  public function testDropViewsWithDependentView(): void {
+    $this->schema->createTable('test_table', [
+      'fields' => [
+        'id' => ['type' => 'int', 'default' => NULL],
+      ],
+    ]);
+    $this->schema->createView('test_view', 'SELECT [id] FROM {test_table}');
+    $this->schema->createView('test_view2', 'SELECT [id] FROM {test_view}');
+
+    // PostgreSQL refuses to drop a view that another view depends on.
+    $this->expectException(DatabaseExceptionWrapper::class);
+    $this->schema->dropViews(['test_view']);
   }
 
   /**

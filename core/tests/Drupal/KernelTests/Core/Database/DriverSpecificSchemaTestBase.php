@@ -1252,6 +1252,14 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     $this->schema->createView('test_view', 'SELECT [id], [name] FROM {test_table}');
     $this->assertTrue($this->schema->viewExists('test_view'));
+    $this->assertTrue($this->schema->viewExists('test_view', TRUE));
+    $this->assertFalse($this->schema->viewExists('test_view', FALSE), 'The unprefixed name is looked up as given.');
+
+    // A prefixed name is found only when no further prefix is added.
+    $prefixed_view_name = $this->connection->getPrefix() . 'test_view';
+    $this->assertFalse($this->schema->viewExists($prefixed_view_name));
+    $this->assertFalse($this->schema->viewExists($prefixed_view_name, TRUE));
+    $this->assertTrue($this->schema->viewExists($prefixed_view_name, FALSE));
 
     $this->assertTrue($this->schema->tableExists('test_table'), 'Table exists');
     $this->assertFalse($this->schema->tableExists('test_view'), 'View is not checked by tableExists() method');
@@ -1322,6 +1330,8 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     $this->schema->createView('test_view', 'SELECT [id] FROM {test_table}');
     $this->schema->createView('test_view2', 'SELECT [id] FROM {test_view}');
+    // '_' matches exactly one character.
+    $this->assertEquals(['test_view2'], array_values($this->schema->findViews('test_view_')));
     // Pass the base view first to verify that dropViews() resolves
     // dependencies.
     $this->schema->dropViews(['test_view', 'test_view2']);
@@ -1380,6 +1390,14 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->schema->createSchemaFromDefinition($schemaDefinition);
     $this->assertTrue($this->schema->tableExists($tableName));
     $this->assertTrue($this->schema->viewExists($viewName));
+
+    try {
+      $this->schema->createViewFromDefinition(SchemaDefinitionType::Test, 'test_schema', $schemaDefinition->getViewDefinition($viewName));
+      $this->fail('Creating an existing view from its definition did not fail.');
+    }
+    catch (SchemaObjectExistsException $e) {
+      $this->assertSame("View '$viewName' already exists.", $e->getMessage());
+    }
 
     $this->connection->insert($tableName)->fields(['name' => 'John'])->execute();
     $shout = $this->connection

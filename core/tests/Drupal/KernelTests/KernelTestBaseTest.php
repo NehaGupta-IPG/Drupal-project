@@ -259,11 +259,14 @@ class KernelTestBaseTest extends KernelTestBase {
    */
   public function testInstallSchemaWithView(): void {
     $this->enableModules(['sql_view_test']);
-    $this->installSchema('sql_view_test', ['sql_view_test', 'sql_view_test_view']);
+    // Views can be listed before their table, but after the views they depend
+    // on.
+    $this->installSchema('sql_view_test', ['sql_view_test_view', 'sql_view_test_view2', 'sql_view_test']);
 
     $schema = Database::getConnection()->schema();
     $this->assertTrue($schema->tableExists('sql_view_test'));
     $this->assertTrue($schema->viewExists('sql_view_test_view'));
+    $this->assertTrue($schema->viewExists('sql_view_test_view2'));
 
     try {
       $this->installSchema('sql_view_test', ['does_not_exist']);

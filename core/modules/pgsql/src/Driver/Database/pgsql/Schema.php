@@ -677,10 +677,11 @@ EOD;
         preg_match('/^' . preg_quote($table_name, NULL) . '__(.*)__' . preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
         $index_name = $matches[1];
       }
-      // The renaming of an index will fail when the there exists an table with
-      // the same name as the renamed index.
-      if (!$this->tableExists($this->ensureIdentifiersLength($new_name, $index_name, $index_type), FALSE)) {
-        $this->executeDdlStatement('ALTER INDEX "' . $this->defaultSchema . '"."' . $index->indexname . '" RENAME TO ' . $this->ensureIdentifiersLength($new_name, $index_name, $index_type));
+      // Tables, views and indexes share one namespace, so renaming the index
+      // fails when a table or view has the new index name.
+      $new_index_name = $this->ensureIdentifiersLength($new_name, $index_name, $index_type);
+      if (!$this->tableExists($new_index_name, FALSE) && !$this->viewExists($new_index_name, FALSE)) {
+        $this->executeDdlStatement('ALTER INDEX "' . $this->defaultSchema . '"."' . $index->indexname . '" RENAME TO ' . $new_index_name);
       }
     }
 
