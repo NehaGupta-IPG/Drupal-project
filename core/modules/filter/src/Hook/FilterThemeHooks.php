@@ -94,6 +94,7 @@ class FilterThemeHooks {
       unset($variables['attributes']['aria-describedby']);
     }
   }
+
   /**
    * Prepares variables for filter tips templates.
    *
