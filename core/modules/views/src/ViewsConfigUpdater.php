@@ -67,10 +67,91 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
-      // @todo leaving this here now but new update hooks will need to update.
-      return FALSE;
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
+      $changed = FALSE;
+      if ($this->processEmptyGroupColumn($handler, $handler_type, $key, $display_id, $view)) {
+        $changed = TRUE;
+      }
+
+      return $changed;
     });
+  }
+
+  /**
+   * Checks if there are any fields that have an empty group_column.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View to update.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function needsFixForEmptyGroupColumn(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
+      return $this->processEmptyGroupColumn($handler, $handler_type, $key, $display_id, $view);
+    });
+  }
+
+  /**
+   * Fixes empty group columns.
+   *
+   * Some fields could be saved without a group column, this assures that every
+   * field has a default group column.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   * @param string $key
+   *   The handler key.
+   * @param string $display_id
+   *   The handler display ID.
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view being updated.
+   */
+  public function processEmptyGroupColumn(&$handler, string $handler_type, $key, $display_id, ViewEntityInterface $view): bool {
+    if ($handler_type !== 'field') {
+      return FALSE;
+    }
+    $changed = FALSE;
+    if (!empty($handler['plugin_id']) && $handler['plugin_id'] === 'field' && isset($handler['group_column']) && empty($handler['group_column'])) {
+      // Attempt to load the field storage definition of the field.
+      $executable = $view->getExecutable();
+      $executable->setDisplay($display_id);
+      /** @var \Drupal\views\Plugin\views\field\FieldHandlerInterface $field_handler */
+      $field_handler = $executable->getDisplay()->getHandler('field', $handler['id']);
+      if ($entity_type_id = $field_handler->getEntityType()) {
+        $field_storage_definitions = $this->entityFieldManager->getFieldStorageDefinitions($entity_type_id);
+
+        $field_storage = NULL;
+        if (isset($handler['field']) && isset($field_storage_definitions[$handler['field']])) {
+          $field_storage = $field_storage_definitions[$handler['field']];
+        }
+        elseif (isset($handler['entity_field']) && isset($field_storage_definitions[$handler['entity_field']])) {
+          $field_storage = $field_storage_definitions[$handler['entity_field']];
+        }
+        if ($field_storage !== NULL) {
+          // Use the field's main property as default column. If the field
+          // item does not define a main property, use the first column as
+          // default column.
+          $default_column = $field_storage->getMainPropertyName();
+          if (empty($default_column)) {
+            $column_names = array_keys($field_storage->getColumns());
+            $default_column = $column_names[0];
+          }
+          $handler['group_column'] = $default_column;
+          $changed = TRUE;
+        }
+      }
+    }
+
+    $deprecations_triggered = &$this->triggeredDeprecations['2815881'][$view->id()];
+    if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
+      $deprecations_triggered = TRUE;
+      @trigger_error(sprintf('Setting "group_column" on field "%s" to an empty value for the "%s" view is deprecated in drupal:9.4.0 and is disallowed in drupal:11.0.0. Module-provided Views configuration should be updated. See https://www.drupal.org/node/3255641', $handler['field'], $view->id()), E_USER_DEPRECATED);
+    }
+
+    return $changed;
   }
 
   /**

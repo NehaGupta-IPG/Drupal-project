@@ -5,6 +5,9 @@
  * Post update functions for Views.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\views\ViewsConfigUpdater;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -53,6 +56,18 @@ function views_removed_post_updates(): array {
     'views_post_update_block_items_per_page' => '12.0.0',
     'views_post_update_add_date_default_arguments' => '12.0.0',
   ];
+}
+
+/**
+ * Fix views containing entity fields with an empty group column value set.
+ */
+function views_post_update_empty_entity_field_group_column(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function ($view) use ($view_config_updater) {
+    return $view_config_updater->needsFixForEmptyGroupColumn($view);
+  });
 }
 
 /**
