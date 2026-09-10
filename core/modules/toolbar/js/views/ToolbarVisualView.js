@@ -298,6 +298,10 @@
           .find('.toolbar-toggle-orientation')
           .toggle(this.model.get('isTrayToggleVisible'));
         const $orientationToggleButton = $orientationToggle.find('button');
+        if ($orientationToggleButton.length === 0) {
+          // Ignore this if there is no orientation toggle button.
+          return;
+        }
         $orientationToggleButton[0].value = antiOrientation;
         $orientationToggleButton
           .attr('title', this.strings[antiOrientation])
