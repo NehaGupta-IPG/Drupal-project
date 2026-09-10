@@ -165,6 +165,16 @@ class FormGroupingElementsTest extends WebDriverTestBase {
 
     // Confirm the tab containing the field with error is open.
     $this->assertNotNull($assert_session->waitForElementVisible('css', '[name="element_2"].error'));
+
+    // Confirm the tab containing the field with error indicates child errors.
+    $title_element = $assert_session->waitForElement('css', ':nth-child(2).vertical-tabs__menu-item.error');
+    $this->assertStringNotContainsString($title_element->getText(), '(contains error)');
+
+    // Confirm '(contains error)' text is in title and has
+    // 'visually-hidden' class.
+    $error_indicator_element = $title_element->find('css', '.child-error-indicator');
+    $this->assertTrue($error_indicator_element->hasClass('visually-hidden'));
+    $this->assertEquals('(contains error)', $error_indicator_element->getText());
   }
 
   /**
@@ -198,6 +208,18 @@ class FormGroupingElementsTest extends WebDriverTestBase {
     $this->assertTrue($textfield->isVisible(), 'Text field is visible');
     $this->assertTrue($textarea->isVisible(), 'Text area field is visible');
     $this->assertTrue($select->isVisible(), 'Select field is visible');
+
+    // Confirm details element indicates child errors.
+    $this->assertEquals('2', $details->getAttribute('data-child-error-count'));
+    $summary = $details->find('xpath', './summary');
+    $this->assertTrue($details->hasClass('error'));
+    $this->assertStringNotContainsString($summary->getText(), '(contains error)');
+
+    // Confirm '(contains error)' text is in summary and has
+    // 'visually-hidden' class.
+    $error_indicator_element = $summary->find('xpath', './*[contains(@class, "child-error-indicator")]');
+    $this->assertTrue($error_indicator_element->hasClass('visually-hidden'));
+    $this->assertEquals('(contains error)', $error_indicator_element->getText());
   }
 
   /**

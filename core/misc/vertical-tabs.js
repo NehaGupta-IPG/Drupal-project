@@ -90,9 +90,13 @@
             // we only want to copy the summary title, which is the first child
             // node.
             const title = $summary[0]?.firstChild?.textContent || '';
+            const $childErrorIndicator = $summary
+              .find('.child-error-indicator')
+              .detach();
             const verticalTab = new Drupal.verticalTab({
               title,
               details: $that,
+              childErrorIndicator: $childErrorIndicator,
             });
             tabList.append(verticalTab.item);
             $that
@@ -152,6 +156,8 @@
    *   The name of the tab.
    * @param {jQuery} settings.details
    *   The jQuery object of the details element that is the tab pane.
+   * @param {jQuery} settings.childErrorIndicator
+   *   The indicator for form errors contained inside the tab pane.
    *
    * @fires event:summaryUpdated
    *
@@ -295,6 +301,10 @@
    *   An object with the following keys:
    * @param {string} settings.title
    *   The name of the tab.
+   * @param {jQuery} settings.details
+   *   The jQuery object of the details element that is the tab pane.
+   * @param {jQuery} settings.childErrorIndicator
+   *   The indicator for form errors contained inside the tab pane.
    *
    * @return {object}
    *   This function has to return an object with at least these keys:
@@ -318,6 +328,10 @@
           )),
         )),
     );
+    if (settings.childErrorIndicator.length) {
+      tab.item.addClass('error');
+      tab.title.append(settings.childErrorIndicator);
+    }
     return tab;
   };
 })(jQuery, Drupal, drupalSettings);

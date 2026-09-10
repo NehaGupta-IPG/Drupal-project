@@ -4,6 +4,7 @@ namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides a render element for a details element, similar to a fieldset.
@@ -89,6 +90,11 @@ class Details extends RenderElementBase {
       if (!empty($element['#optional']) && !Element::getVisibleChildren($element['#groups'][$group])) {
         $element['#printed'] = TRUE;
       }
+    }
+
+    // Indicate that there is a child element with an error.
+    if (!empty($element['#children_errors'])) {
+      $element['#title'] = new TranslatableMarkup('<span>@title</span> <span class="visually-hidden child-error-indicator"> (contains error)</span>', ['@title' => $element['#title']]);
     }
 
     return $element;
