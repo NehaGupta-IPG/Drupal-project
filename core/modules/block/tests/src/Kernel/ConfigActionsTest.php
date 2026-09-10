@@ -171,7 +171,7 @@ class ConfigActionsTest extends KernelTestBase {
   /**
    * Tests place block in static region using `default_region`.
    */
-  #[TestWith(["placeBlockInDefaultTheme", "olivero"])]
+  #[TestWith(["placeBlockInDefaultTheme", "stark"])]
   #[TestWith(["placeBlockInAdminTheme", "claro"])]
   public function testPlaceBlockInStaticDefaultRegion(string $action, string $expected_theme): void {
     $this->configActionManager->applyAction($action, 'block.block.test_block', [
