@@ -1117,7 +1117,7 @@
         // against it as a sibling.
         sourceRow = $(this.table).find('tr.draggable:first-of-type').get(0);
         if (sourceRow === this.rowObject.element) {
-          sourceRow = $(this.rowObject.group[this.rowObject.group.length - 1])
+          sourceRow = $(this.rowObject.group.at(-1))
             .next('tr.draggable')
             .get(0);
         }
@@ -1167,7 +1167,7 @@
               .each(function () {
                 values.push(this.value);
               });
-            const maxVal = values[values.length - 1];
+            const maxVal = values.at(-1);
             // Populate the values in the siblings.
             $(siblings)
               .find(targetClass)
@@ -1440,7 +1440,7 @@
       currentRow = currentRow.next('tr.draggable');
     }
     if (addClasses && rows.length) {
-      $(rows[rows.length - 1])
+      $(rows.at(-1))
         .find(`.js-indentation:nth-child(${parentIndentation + 1})`)
         .addClass('tree-child-last');
     }

@@ -54,7 +54,7 @@
           };
 
           const focusLastInGroup = (focusableElements) => {
-            focusableElements[focusableElements.length - 1].focus();
+            focusableElements.at(-1).focus();
           };
 
           const focusNextInGroup = (focusableElements, element) => {
@@ -77,7 +77,7 @@
             );
 
             if (currentIndex === 0) {
-              focusableElements[focusableElements.length - 1].focus();
+              focusableElements.at(-1).focus();
             } else {
               focusableElements[currentIndex - 1].focus();
             }
@@ -137,7 +137,7 @@
               element.closest('[data-toolbar-popover]'),
             );
             if (elements?.length > 0) {
-              elements[elements.length - 1].focus();
+              elements.at(-1).focus();
             }
           };
 

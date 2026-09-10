@@ -111,7 +111,7 @@ export default class DrupalEntityLinkSuggestionsEditing extends Plugin {
         }
         const { model } = editor;
         const { selection } = model.document;
-        const displayedText = args[args.length - 1] || '';
+        const displayedText = args.at(-1) || '';
         // This can update the Href value, so we need to know what the updated
         // value is to properly target ranges when the selection is collapsed.
         const currentHref = args[0];
