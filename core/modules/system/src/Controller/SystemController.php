@@ -20,7 +20,6 @@ use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\system\SystemManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * Returns responses for System routes.
@@ -117,32 +116,6 @@ class SystemController extends ControllerBase {
       $tree_access_cacheability->applyTo($build);
       return $build;
     }
-  }
-
-  /**
-   * Sets whether the admin menu is in compact mode or not.
-   *
-   * @param string $mode
-   *   Valid values are 'on' and 'off'.
-   *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
-   *   A redirect response to the front page.
-   */
-  #[Route(
-    path: '/admin/compact/{mode}',
-    name: 'system.admin_compact_page',
-    requirements: ['_permission' => 'access administration pages'],
-    defaults: ['mode' => 'off'],
-  )]
-  public function compactPage($mode) {
-    $response = $this->redirect('<front>');
-    if ($mode === 'on') {
-      $response->headers->setCookie(new Cookie('Drupal.visitor.admin_compact_mode', '1', $this->time->getRequestTime() + 31536000));
-    }
-    else {
-      $response->headers->clearCookie('Drupal.visitor.admin_compact_mode');
-    }
-    return $response;
   }
 
   /**
