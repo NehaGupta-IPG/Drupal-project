@@ -102,7 +102,7 @@ class FilterThemeHooks {
    * @param array $variables
    *   An associative array containing:
    *   - tips: An array containing descriptions and a CSS ID in the form of
-   *     'module-name/filter-id' (only used when $long is TRUE) for each
+   *     'module-name/filter-id' for each
    *     filter in one or more text formats. Example:
    *     @code
    *       [
@@ -117,8 +117,7 @@ class FilterThemeHooks {
    *
    * @see https://www.drupal.org/node/3567879
    */
-  public function preprocessFilterTips(array &$variables): void
-  {
+  public function preprocessFilterTips(array &$variables): void {
     $tips = $variables['tips'];
 
     foreach ($variables['tips'] as $name => $tip_list) {
@@ -149,8 +148,7 @@ class FilterThemeHooks {
    *   - tip: Tip text.
    *   - id: Filter ID.
    */
-  protected function getFilterTips(?string $formatId = NULL): array
-  {
+  protected function getFilterTips(?string $formatId = NULL): array {
     $formats = $this->formatRepository->getFormatsForAccount($this->currentUser);
 
     $tips = [];
