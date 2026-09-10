@@ -119,6 +119,27 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
     $this->assertTrue($override->isNew());
     $this->assertNull($override->get('value'));
 
+    // Ensure removing the last translatable value removes the override too.
+    // 'label' is the only translatable value left, so clearing it makes
+    // config_test.bar untranslatable: Config::save() strips its langcode,
+    // and the German override - now the last thing referencing a 'label'
+    // that no longer exists in the source - is emptied and removed.
+    $config = \Drupal::configFactory()->getEditable('config_test.bar');
+    $this->assertSame('en', $config->get('langcode'));
+    $config->clear('label')->save();
+    $this->assertNull($config->get('langcode'));
+    $override = \Drupal::languageManager()->getLanguageConfigOverride('de', 'config_test.bar');
+    $this->assertTrue($override->isNew());
+    $this->assertNull($override->get('label'));
+
+    // Make the config translatable again.
+    $config->set('label', 'test')->save();
+    $this->assertSame('en', $config->get('langcode'));
+    \Drupal::languageManager()
+      ->getLanguageConfigOverride('de', 'config_test.foo')
+      ->set('label', 'Override')
+      ->save();
+
     // Ensure deleting the config will delete the override.
     \Drupal::configFactory()->getEditable('config_test.bar')->delete();
     $override = \Drupal::languageManager()->getLanguageConfigOverride('de', 'config_test.bar');
