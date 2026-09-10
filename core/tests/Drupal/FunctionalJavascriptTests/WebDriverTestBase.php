@@ -73,7 +73,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
     // the cookie domain is equal to the domain of the active document. When the
     // browser starts up the active document is not our domain but 'about:blank'
     // or similar. To be able to set our User-Agent and Xdebug cookies at the
-    // start of the test we now do a request to the front page so the active
+    // start of the test we now do a request to an image so the active
     // document matches the domain.
     // @see https://w3c.github.io/webdriver/webdriver-spec.html#add-cookie
     // @see https://www.w3.org/Bugs/Public/show_bug.cgi?id=20975
