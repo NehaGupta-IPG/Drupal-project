@@ -111,13 +111,23 @@ class TermKernelTest extends KernelTestBase {
     ]);
     $node->save();
 
-    // Try saving a non-numeric value to the taxonomy index.
-    $node->field_tags->target_id = '01234';
+    // Try saving a numeric value to the taxonomy index.
+    $valid_term_id = 4321;
+    $node->field_tags->target_id = $valid_term_id;
     $node->save();
 
     // Check whether the non-numeric value was stored in the index.
     $taxonomy_index = $this->getTaxonomyIndex();
-    $this->assertEquals($term->id(), $taxonomy_index[$node->id()]->tid);
+    $this->assertEquals($valid_term_id, $taxonomy_index[$node->id()]->tid);
+
+    // Try saving a non-numeric value to the taxonomy index.
+    $invalid_term_id = '4321';
+    $node->field_tags->target_id = $invalid_term_id;
+    $node->save();
+
+    // Check whether the non-numeric value was stored in the index.
+    $taxonomy_index = $this->getTaxonomyIndex();
+    $this->assertEquals($invalid_term_id, $taxonomy_index[$node->id()]->tid);
   }
 
   /**
