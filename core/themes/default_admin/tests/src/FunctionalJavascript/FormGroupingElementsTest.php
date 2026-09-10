@@ -83,4 +83,33 @@ class FormGroupingElementsTest extends WebDriverTestBase {
     $this->assertTrue($child_1->isVisible(), 'Child 1 is visible after clicking the parent tab');
   }
 
+  /**
+   * Confirms that there are indicators on tabs with child errors.
+   */
+  public function testVerticalTabsIndicateTabChildErrors(): void {
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet('form-test/group-vertical-tabs');
+    $page->clickLink('Second group element');
+    $input_field = $assert_session->waitForField('element_2');
+    $this->assertNotNull($input_field);
+
+    // Enter a value that will trigger a validation error.
+    $input_field->setValue('bad');
+
+    // Submit the form.
+    $page->pressButton('Save');
+
+    // Confirm the tab containing the field with error indicates child errors.
+    $title_element = $assert_session->waitForElement('css', ':nth-child(2).vertical-tabs__menu-item.error');
+    $this->assertStringNotContainsString($title_element->getText(), '(contains error)');
+
+    // Confirm '(contains error)' text is in title and has
+    // 'visually-hidden' class.
+    $error_indicator_element = $title_element->find('css', '.child-error-indicator');
+    $this->assertTrue($error_indicator_element->hasClass('visually-hidden'));
+    $this->assertEquals('(contains error)', $error_indicator_element->getText());
+  }
+
 }
