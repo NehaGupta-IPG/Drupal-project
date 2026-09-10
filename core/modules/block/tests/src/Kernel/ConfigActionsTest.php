@@ -151,7 +151,7 @@ class ConfigActionsTest extends KernelTestBase {
   }
 
   /**
-   * Tests place block in static region.
+   * Tests place block in static region using `region`.
    */
   #[TestWith(["placeBlockInDefaultTheme", "stark"])]
   #[TestWith(["placeBlockInAdminTheme", "claro"])]
