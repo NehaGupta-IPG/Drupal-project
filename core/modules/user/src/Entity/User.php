@@ -13,6 +13,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Flood\PrefixFloodInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\UserSessionRepositoryInterface;
+use Drupal\user\ColorSchemeItem;
 use Drupal\user\Form\UserCancelForm;
 use Drupal\user\NotificationHandler;
 use Drupal\user\ProfileForm;
@@ -565,8 +566,9 @@ class User extends ContentEntityBase implements UserInterface {
       ->setDescription(t("The user's preferred color scheme for the interface."))
       ->setDefaultValue('auto')
       ->addPropertyConstraints('value', [
-        'AllowedValues' => ['choices' => ['light', 'dark', 'auto']],
+        'AllowedValues' => ['choices' => ColorSchemeItem::ALLOWED_VALUES],
       ]);
+    $fields['color_scheme']->getItemDefinition()->setClass(ColorSchemeItem::class);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('User status'))
