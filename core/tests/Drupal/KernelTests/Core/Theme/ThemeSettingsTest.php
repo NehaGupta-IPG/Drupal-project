@@ -121,32 +121,39 @@ class ThemeSettingsTest extends KernelTestBase {
   }
 
   /**
-   * Tests default favicon configuration can be overridden.
+   * Tests that the default favicon config can be overridden.
    */
   public function testFaviconConfig(): void {
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = $this->container->get('theme_installer');
-    $theme_installer->install(['olivero']);
+    $theme_installer->install(['test_parent_theme']);
     /** @var \Drupal\Core\Extension\ThemeHandler $theme_handler */
     $theme_handler = $this->container->get('theme_handler');
-    $theme = $theme_handler->getTheme('olivero');
+    $theme = $theme_handler->getTheme('test_parent_theme');
 
-    // Tests default behavior.
+    // Tests the default behavior of using favicon.ico from the theme root when
+    // the theme does not declare a favicon in its .info.yml file.
     $expected = '/' . $theme->getPath() . '/favicon.ico';
-    $this->assertEquals($expected, theme_get_setting('favicon.url', 'olivero'));
+    $this->assertEquals($expected, \Drupal::service(ThemeSettingsProvider::class)->getSetting('favicon.url', 'test_parent_theme'));
+    $this->assertEquals('image/vnd.microsoft.icon', \Drupal::service(ThemeSettingsProvider::class)->getSetting('favicon.mimetype', 'test_parent_theme'));
+
+    // The favicon is not inherited from a base theme, even when the base theme
+    // provides one. This matches how the logo is resolved.
+    $theme_installer->install(['test_child_theme']);
+    $this->assertEquals('/core/misc/favicon.ico', \Drupal::service(ThemeSettingsProvider::class)->getSetting('favicon.url', 'test_child_theme'));
 
     $theme_installer->install(['stark']);
+    $theme_handler = $this->container->get('theme_handler');
     $theme = $theme_handler->getTheme('stark');
 
-    $config = $this->config('stark.settings');
-
-    drupal_static_reset('theme_get_setting');
-
-    // Test when the theme does not have a favicon configured.
+    // Tests the fallback to the favicon shipped with core when the theme does
+    // not provide one.
     $expected = '/core/misc/favicon.ico';
-    $this->assertEquals($expected, theme_get_setting('favicon.url', 'stark'));
+    $this->assertEquals($expected, \Drupal::service(ThemeSettingsProvider::class)->getSetting('favicon.url', 'stark'));
+    $this->assertEquals('image/vnd.microsoft.icon', \Drupal::service(ThemeSettingsProvider::class)->getSetting('favicon.mimetype', 'stark'));
 
-    drupal_static_reset('theme_get_setting');
+    $config = $this->config('stark.settings');
+    \Drupal::service('cache.memory')->invalidateTags(['config:stark.settings']);
 
     $values = [
       'default_favicon' => FALSE,
@@ -158,7 +165,7 @@ class ThemeSettingsTest extends KernelTestBase {
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
     $file_url_generator = \Drupal::service('file_url_generator');
     $expected = $file_url_generator->generateString('public://favicon_with_scheme.png');
-    $this->assertEquals($expected, theme_get_setting('favicon.url', 'stark'));
+    $this->assertEquals($expected, \Drupal::service(ThemeSettingsProvider::class)->getSetting('favicon.url', 'stark'));
 
     $values = [
       'default_favicon' => FALSE,
@@ -166,24 +173,28 @@ class ThemeSettingsTest extends KernelTestBase {
     ];
     theme_settings_convert_to_config($values, $config)->save();
 
-    drupal_static_reset('theme_get_setting');
+    \Drupal::service('cache.memory')->invalidateTags(['config:stark.settings']);
 
     // Tests relative path.
     $expected = '/' . $theme->getPath() . '/favicon_relative_path.ico';
-    $this->assertEquals($expected, theme_get_setting('favicon.url', 'stark'));
+    $this->assertEquals($expected, \Drupal::service(ThemeSettingsProvider::class)->getSetting('favicon.url', 'stark'));
 
     $theme_installer->install(['test_theme']);
     \Drupal::configFactory()
       ->getEditable('system.theme')
       ->set('default', 'test_theme')
       ->save();
+    $theme_handler = $this->container->get('theme_handler');
     $theme = $theme_handler->getTheme('test_theme');
 
-    drupal_static_reset('theme_get_setting');
-
-    // Tests favicon set in test_theme.info.yml.
+    // Tests that the favicon set in test_theme.info.yml takes precedence over
+    // the favicon.ico in the theme root.
+    $this->assertFileExists($theme->getPath() . '/favicon.ico');
     $expected = '/' . $theme->getPath() . '/images/favicon2.svg';
-    $this->assertEquals($expected, theme_get_setting('favicon.url', 'test_theme'));
+    $this->assertEquals($expected, \Drupal::service(ThemeSettingsProvider::class)->getSetting('favicon.url', 'test_theme'));
+    // The MIME type follows the file the theme declares, so a theme is not
+    // limited to shipping an .ico file.
+    $this->assertEquals('image/svg+xml', \Drupal::service(ThemeSettingsProvider::class)->getSetting('favicon.mimetype', 'test_theme'));
   }
 
 }
