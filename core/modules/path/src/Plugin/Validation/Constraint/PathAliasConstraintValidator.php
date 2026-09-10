@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
- * Constraint validator for changing path aliases in pending revisions.
+ * Constraint validator for path alias changes.
  */
 class PathAliasConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
@@ -44,8 +44,11 @@ class PathAliasConstraintValidator extends ConstraintValidator implements Contai
    */
   public function validate($value, Constraint $constraint): void {
     $entity = !empty($value->getParent()) ? $value->getEntity() : NULL;
+    if (!$entity) {
+      return;
+    }
 
-    if ($entity && !$entity->isNew() && !$entity->isDefaultRevision()) {
+    if (!$entity->isNew() && !$entity->isDefaultRevision()) {
       /** @var \Drupal\Core\Entity\ContentEntityInterface $original */
       $original = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->loadUnchanged($entity->id());
       $entity_langcode = $entity->language()->getId();
@@ -56,6 +59,14 @@ class PathAliasConstraintValidator extends ConstraintValidator implements Contai
         if ($value->alias != $original->getTranslation($entity_langcode)->path->alias) {
           $this->context->addViolation($constraint->message);
         }
+      }
+    }
+
+    if (!empty($value->pid) && !$entity->isNew() && $entity->hasLinkTemplate('canonical')) {
+      /** @var \Drupal\path_alias\PathAliasInterface|null $path_alias */
+      $path_alias = $this->entityTypeManager->getStorage('path_alias')->load($value->pid);
+      if (!$path_alias || $path_alias->getPath() !== '/' . $entity->toUrl()->getInternalPath()) {
+        $this->context->addViolation($constraint->pidMessage);
       }
     }
   }
