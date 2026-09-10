@@ -39,7 +39,7 @@ class Embed extends DisplayPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function usesExposedFormInBlock() {
+  public function usesExposedFormInBlock(): bool {
     return TRUE;
   }
 
