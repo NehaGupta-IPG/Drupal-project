@@ -12,6 +12,11 @@
   border-radius: var(--base-border-radius);
   background-color: var(--color-white);
   box-shadow: var(--details-box-shadow);
+  &.error {
+    color: var(--input--error-color);
+    border-width: var(--input--error-border-size);
+    border-color: var(--input--error-border-color);
+  }
 }
 
 .fieldset--group {

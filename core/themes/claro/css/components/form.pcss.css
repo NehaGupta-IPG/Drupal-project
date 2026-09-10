@@ -68,7 +68,8 @@ tr .form-item,
 }
 
 .form-item__label.form-required::after,
-.fieldset__label.form-required::after {
+.fieldset__label.form-required::after,
+fieldset.required legend span.fieldset-legend::after{
   display: inline-block;
   margin-inline: 0.15em;
   content: "*";
