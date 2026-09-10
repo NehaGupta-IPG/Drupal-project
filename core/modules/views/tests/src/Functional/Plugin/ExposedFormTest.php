@@ -337,6 +337,7 @@ class ExposedFormTest extends ViewTestBase {
   public static function providerTestExposedBlock(): array {
     return [
       'page_display' => ['page_1'],
+      'embed_display' => ['embed_1'],
       'block_display' => ['block_1'],
     ];
   }
