@@ -585,9 +585,7 @@ services:
     arguments: ['@serialization.phpserialize', '@database', '@datetime.time']
   logger.factory:
     class: Drupal\Core\Logger\LoggerChannelFactory
-    arguments: ['@request_stack', '@current_user']
-    tags:
-      - { name: service_collector, tag: logger, call: addLogger }
+    arguments: ['@request_stack', '@current_user', !tagged_iterator logger]
   Drupal\Core\Logger\LoggerChannelFactoryInterface: '@logger.factory'
   logger.channel_base:
     abstract: true
