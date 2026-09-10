@@ -13,14 +13,6 @@ table {
   margin-block: var(--admin-space-l);
   border-collapse: collapse;
 
-  /* Above this width, size the table to its content instead of always
-   * filling 100% of the container, so sparse/empty columns (e.g. an unused
-   * Description column) don't create excessive horizontal whitespace. */
-  @media (--admin-medium) {
-    width: auto;
-    max-width: 100%;
-  }
-
   thead {
     border-radius: var(--admin-radius-m);
     background: transparent;
@@ -110,6 +102,14 @@ table {
       display: block;
       width: max-content;
     }
+  }
+
+  /* Above this width, size the table to its content instead of always
+   * filling 100% of the container, so sparse/empty columns (e.g. an unused
+   * Description column) don't create excessive horizontal whitespace. */
+  @media (--admin-medium) {
+    width: auto;
+    max-width: 100%;
   }
 }
 
