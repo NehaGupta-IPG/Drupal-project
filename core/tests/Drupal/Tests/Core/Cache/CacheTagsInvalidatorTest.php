@@ -11,8 +11,8 @@ use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Cache\CacheTagsPurgeInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests Drupal\Core\Cache\CacheTagsInvalidator.
@@ -64,7 +64,8 @@ class CacheTagsInvalidatorTest extends UnitTestCase {
   /**
    * Tests injected iterators and runtime additions support repeated operations.
    */
-  #[DataProvider('runtimeAdditionsProvider')]
+  #[TestWith([FALSE])]
+  #[TestWith([TRUE])]
   public function testIteratorsWithRuntimeAdditions(bool $add_at_runtime): void {
     $invalidators = [];
     for ($i = 0; $i < 2; $i++) {
@@ -105,13 +106,6 @@ class CacheTagsInvalidatorTest extends UnitTestCase {
       $cache_tags_invalidator->resetChecksums();
       $cache_tags_invalidator->purge();
     }
-  }
-
-  /**
-   * Provides whether to add invalidators and bins at runtime.
-   */
-  public static function runtimeAdditionsProvider(): array {
-    return [[FALSE], [TRUE]];
   }
 
 }

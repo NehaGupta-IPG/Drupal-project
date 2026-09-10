@@ -11,9 +11,9 @@ use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -70,7 +70,8 @@ class CacheTagsInvalidatorTest extends KernelTestBase {
   /**
    * Tests checksum operations do not initialize cache bins.
    */
-  #[DataProvider('checksumOperationProvider')]
+  #[TestWith(['resetChecksums'])]
+  #[TestWith(['purge'])]
   public function testLazyChecksumOperation(string $method): void {
     $invalidator = $this->container->get('cache_tags.invalidator');
     $this->assertFalse($this->container->initialized('test.cache_tags_invalidator'));
@@ -81,13 +82,6 @@ class CacheTagsInvalidatorTest extends KernelTestBase {
       $this->assertFalse($this->container->initialized('test.cache.bin.memory'));
       $this->assertFalse($this->container->initialized('test.non_invalidating_bin'));
     }
-  }
-
-  /**
-   * Provides checksum operations.
-   */
-  public static function checksumOperationProvider(): array {
-    return [['resetChecksums'], ['purge']];
   }
 
 }

@@ -37,11 +37,9 @@ class CacheTagsInvalidator implements CacheTagsInvalidatorInterface, CacheTagsPu
     }
 
     // Additionally, notify each cache bin if it implements the service.
-    foreach ([$this->bins, $this->memoryBins] as $bins) {
-      foreach ($bins as $bin) {
-        if ($bin instanceof CacheTagsInvalidatorInterface) {
-          $bin->invalidateTags($tags);
-        }
+    foreach ([...$this->bins, ...$this->memoryBins] as $bin) {
+      if ($bin instanceof CacheTagsInvalidatorInterface) {
+        $bin->invalidateTags($tags);
       }
     }
   }
