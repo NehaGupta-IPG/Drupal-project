@@ -111,7 +111,13 @@ class TermKernelTest extends KernelTestBase {
     ]);
     $node->save();
 
-    // Add test coverage
+    // Try saving a non-numeric value to the taxonomy index.
+    $node->field_tags->target_id = '01234';
+    $node->save();
+
+    // Check whether the non-numeric value was stored in the index.
+    $taxonomy_index = $this->getTaxonomyIndex();
+    $this->assertEquals($term->id(), $taxonomy_index[$node->id()]->tid);
   }
 
   /**
