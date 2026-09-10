@@ -55,7 +55,7 @@ class LoggerChannelFactory implements LoggerChannelFactoryInterface {
         // The tagged iterator has already sorted the services by priority.
         $this->loggers[0][] = $logger;
       }
-      // Update channels requested while the logger services were being resolved.
+      // Update channels requested while logger services were being resolved.
       foreach ($this->channels as $instance) {
         $instance->setLoggers($this->loggers);
       }
