@@ -10,6 +10,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -62,12 +63,14 @@ class LoggerChannelFactoryTest extends UnitTestCase {
   /**
    * Tests requesting a channel while a logger service is being constructed.
    */
-  public function testLoggerChannelDependency(): void {
+  #[TestWith(['test'])]
+  #[TestWith(['another'])]
+  public function testLoggerChannelDependency(string $channelName): void {
     $logger = new TestLogger();
     $factory = NULL;
     $channel = NULL;
-    $loggers = (static function () use (&$factory, &$channel, $logger): \Generator {
-      $channel = $factory->get('test');
+    $loggers = (static function () use (&$factory, &$channel, $logger, $channelName): \Generator {
+      $channel = $factory->get($channelName);
       yield $logger;
     })();
     $factory = new LoggerChannelFactory(
@@ -75,7 +78,8 @@ class LoggerChannelFactoryTest extends UnitTestCase {
       $this->createStub(AccountInterface::class),
       $loggers,
     );
-    $this->assertSame($factory->get('test'), $channel);
+    $factory->get('test');
+    $this->assertSame($factory->get($channelName), $channel);
     $channel->notice('Test message');
     $this->assertCount(1, $logger->records);
   }
