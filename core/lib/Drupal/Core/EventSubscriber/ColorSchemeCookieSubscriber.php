@@ -77,11 +77,6 @@ class ColorSchemeCookieSubscriber implements EventSubscriberInterface {
   /**
    * Sets the color scheme to reconcile the cookie with.
    *
-   * The current user is built from the session at the start of the request, so
-   * it still holds the previous preference after an account was saved. The
-   * account form uses this to make the new preference take effect on the page
-   * that follows the save.
-   *
    * @param string $color_scheme
    *   The color scheme, one of 'light', 'dark' or 'auto'.
    *

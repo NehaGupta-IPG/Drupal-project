@@ -563,7 +563,10 @@ class User extends ContentEntityBase implements UserInterface {
     $fields['color_scheme'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Color scheme'))
       ->setDescription(t("The user's preferred color scheme for the interface."))
-      ->setDefaultValue('auto');
+      ->setDefaultValue('auto')
+      ->addPropertyConstraints('value', [
+        'AllowedValues' => ['choices' => ['light', 'dark', 'auto']],
+      ]);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('User status'))
