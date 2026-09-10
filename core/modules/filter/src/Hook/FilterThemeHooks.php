@@ -102,8 +102,8 @@ class FilterThemeHooks {
    * @param array $variables
    *   An associative array containing:
    *   - tips: An array containing descriptions and a CSS ID in the form of
-   *     'module-name/filter-id' for each
-   *     filter in one or more text formats. Example:
+   *     'module-name/filter-id' for each filter in one or more text formats.
+   *     Example:
    *     @code
    *       [
    *         'Full HTML' => [
