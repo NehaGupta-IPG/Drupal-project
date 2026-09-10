@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Theme\ThemeInitializationInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\file\Upload\ManagedFileElementHelper;
 
@@ -89,6 +90,8 @@ class ThemeSettingsForm extends ConfigFormBase {
    *   The file system.
    * @param \Drupal\Core\Extension\ThemeSettingsProvider|null $themeSettingsProvider
    *   The theme settings helper service.
+   * @param \Drupal\Core\Theme\ThemeInitializationInterface $themeInitialization
+   *   The theme initialization.
    */
   public function __construct(
     ConfigFactoryInterface $config_factory,
@@ -99,6 +102,7 @@ class ThemeSettingsForm extends ConfigFormBase {
     ThemeManagerInterface $theme_manager,
     FileSystemInterface $file_system,
     protected ThemeSettingsProvider $themeSettingsProvider,
+    protected ThemeInitializationInterface $themeInitialization,
   ) {
     parent::__construct($config_factory, $typedConfigManager);
 
@@ -122,6 +126,7 @@ class ThemeSettingsForm extends ConfigFormBase {
       $container->get('theme.manager'),
       $container->get('file_system'),
       $container->get(ThemeSettingsProvider::class),
+      $container->get('theme.initialization'),
     );
   }
 
@@ -315,7 +320,10 @@ class ThemeSettingsForm extends ConfigFormBase {
     }
 
     // Inject human-friendly values and form element descriptions for logo and
-    // favicon.
+    // favicon. The theme the settings are being edited for is not necessarily
+    // the active theme, so the files it ships are read from its own active
+    // theme object.
+    $editing_active_theme = $theme ? $this->themeInitialization->getActiveThemeByName($theme) : $this->themeManager->getActiveTheme();
     foreach (['logo' => 'logo.svg', 'favicon' => 'favicon.ico'] as $type => $default) {
       if (isset($form[$type]['settings'][$type . '_path'])) {
         $element = &$form[$type]['settings'][$type . '_path'];
@@ -330,15 +338,14 @@ class ThemeSettingsForm extends ConfigFormBase {
           $element['#default_value'] = $friendly_path;
         }
 
-        // Prepare local file path for description.
+        // Prepare local file path for description. Themes can declare the
+        // logo and favicon they ship in their .info.yml file, so use the paths
+        // resolved for the theme rather than assuming the default file names.
         if ($original_path && isset($friendly_path)) {
           $local_file = strtr($original_path, ['public:/' => PublicStream::basePath()]);
         }
-        elseif ($theme) {
-          $local_file = $this->themeHandler->getTheme($theme)->getPath() . '/' . $default;
-        }
         else {
-          $local_file = $this->themeManager->getActiveTheme()->getPath() . '/' . $default;
+          $local_file = $type === 'logo' ? $editing_active_theme->getLogo() : $editing_active_theme->getFavicon();
         }
 
         $element['#description'] = $this->t('Examples: <code>@implicit-public-file</code> (for a file in the public filesystem), <code>@explicit-file</code>, or <code>@local-file</code>.', [
@@ -365,12 +372,9 @@ class ThemeSettingsForm extends ConfigFormBase {
       // work without having to pass the theme name to it.
       $default_active_theme = $this->themeManager->getActiveTheme();
       $default_theme = $default_active_theme->getName();
-      /** @var \Drupal\Core\Theme\ThemeInitialization $theme_initialization */
-      $theme_initialization = \Drupal::service('theme.initialization');
 
       // We need to account for viewing themes that are not currently active so
       // we temporarily set the theme we are viewing as active.
-      $editing_active_theme = $theme_initialization->getActiveThemeByName($theme);
       $this->themeManager->setActiveTheme($editing_active_theme);
 
       // Process the theme and all its base themes.
