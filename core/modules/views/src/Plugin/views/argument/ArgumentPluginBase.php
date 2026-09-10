@@ -1376,10 +1376,6 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    */
   public function getCacheContexts() {
     $contexts = [];
-    // By definition arguments depends on the URL.
-    // @todo Once contexts are properly injected into block views we could pull
-    //   the information from there.
-    $contexts[] = 'url';
 
     // Asks all subplugins (argument defaults, argument validator and styles).
     if (($plugin = $this->getPlugin('argument_default')) && $plugin instanceof CacheableDependencyInterface) {

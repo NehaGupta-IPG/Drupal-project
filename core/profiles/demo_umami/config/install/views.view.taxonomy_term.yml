@@ -257,7 +257,6 @@ display:
       max-age: -1
       contexts:
         - 'languages:language_interface'
-        - url
         - url.query_args
         - 'user.node_grants:view'
         - user.permissions
@@ -318,7 +317,6 @@ display:
       max-age: -1
       contexts:
         - 'languages:language_interface'
-        - url
         - url.query_args
         - 'user.node_grants:view'
         - user.permissions

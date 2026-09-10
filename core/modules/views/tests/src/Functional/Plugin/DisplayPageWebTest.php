@@ -68,7 +68,7 @@ class DisplayPageWebTest extends ViewTestBase {
     // Ensure that just the filtered entry is returned.
     $this->drupalGet('test_route_with_argument/1');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertCacheContexts(['languages:language_interface', 'route', 'theme', 'url']);
+    $this->assertCacheContexts(['languages:language_interface', 'route', 'theme', 'url.query_args']);
     $this->assertSession()->elementsCount('xpath', $xpath, 1);
     $this->assertSession()->elementTextEquals('xpath', $xpath, '1');
 

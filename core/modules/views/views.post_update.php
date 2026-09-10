@@ -61,3 +61,17 @@ function views_removed_post_updates(): array {
 function views_post_update_counter_field_not_sortable(): void {
   // Empty update to trigger a cache rebuild so updated Views data is applied.
 }
+
+/**
+ * Re-save all views using arguments to update cache metadata.
+ */
+function views_post_update_views_argument_cache_contexts(?array &$sandbox = NULL): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('view');
+  $argument_view_ids = $storage
+    ->getQuery()
+    ->exists('display.*.display_options.arguments.*')
+    ->execute();
+  foreach ($argument_view_ids as $id) {
+    $storage->load($id)?->save();
+  }
+}

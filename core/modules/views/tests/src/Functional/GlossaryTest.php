@@ -82,7 +82,7 @@ class GlossaryTest extends ViewTestBase {
         'languages:' . LanguageInterface::TYPE_CONTENT,
         'languages:' . LanguageInterface::TYPE_INTERFACE,
         'theme',
-        'url',
+        'url.query_args',
         'user.node_grants:view',
         'user.permissions',
       ],
