@@ -34,8 +34,8 @@ class OptionsSelectWidget extends OptionsWidgetBase {
     if (!empty($selected) !== $this->has_value) {
       $this->has_value = !empty($selected);
       // Reset cached options so getEmptyLabel() is re-evaluated with the
-      // updated has_value.
-      unset($this->options);
+      // updated has_value, preventing stale _none inclusion/exclusion.
+      $this->options = NULL;
     }
 
     $element += [
