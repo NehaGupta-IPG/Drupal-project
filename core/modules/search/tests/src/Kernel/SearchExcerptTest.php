@@ -6,6 +6,7 @@ namespace Drupal\Tests\search\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('search')]
 #[RunTestsInSeparateProcesses]
+#[IgnoreDeprecations]
 class SearchExcerptTest extends KernelTestBase {
 
   /**
@@ -190,7 +192,7 @@ class SearchExcerptTest extends KernelTestBase {
    * @return string
    *   A string containing HTML for the excerpt.
    */
-  protected function doSearchExcerpt($keys, $render_array, $langcode = NULL) {
+  protected function doSearchExcerpt($keys, $render_array, $langcode = NULL): ?string {
     $render_array = search_excerpt($keys, $render_array, $langcode);
     $text = (string) \Drupal::service('renderer')->renderInIsolation($render_array);
     // The search_excerpt() function adds some extra spaces -- not

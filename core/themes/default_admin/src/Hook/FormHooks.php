@@ -620,7 +620,7 @@ class FormHooks {
    * @see hook_form_alter()
    */
   public function stickyActionButtonsAndSidebar(array &$form, FormStateInterface $form_state, string $form_id): void {
-    if ($this->isModalOrOffcanvas()) {
+    if ($this->isAjax()) {
       $form['is_ajax_request'] = ['#weight' => -1];
       return;
     }
@@ -639,12 +639,12 @@ class FormHooks {
     // sticky action container for the top bar.
     if (isset($form['actions']) && (self::useStickyActionButtons($is_content_form) || $is_content_form)) {
       // Sticky action container.
-      $form['gin_sticky_actions'] = [
+      $form['default_admin_sticky_actions'] = [
         '#type' => 'container',
         '#weight' => -1,
         '#multilingual' => TRUE,
         '#attributes' => [
-          'class' => ['gin-sticky-form-actions'],
+          'class' => ['sticky-form-actions'],
         ],
       ];
       $form['#after_build'][] = [__CLASS__, 'formAfterBuild'];
@@ -653,7 +653,7 @@ class FormHooks {
     // Sticky action buttons.
     if (self::useStickyActionButtons($is_content_form) && isset($form['actions'])) {
       // Add sticky class.
-      $form['actions']['#attributes']['class'][] = 'gin-sticky-form-actions';
+      $form['actions']['#attributes']['class'][] = 'sticky-form-actions';
 
       // Add a class to identify modified forms.
       if (!isset($form['#attributes']['class'])) {
@@ -662,10 +662,10 @@ class FormHooks {
       elseif (is_string($form['#attributes']['class'])) {
         $form['#attributes']['class'] = [$form['#attributes']['class']];
       }
-      $form['#attributes']['class'][] = 'gin--has-sticky-form-actions';
+      $form['#attributes']['class'][] = 'has-sticky-form-actions';
 
-      // Assign status to gin_actions.
-      $form['gin_sticky_actions']['status'] = [
+      // Assign status to default_admin_actions.
+      $form['default_admin_sticky_actions']['status'] = [
         '#type' => 'container',
         '#weight' => -1,
         '#multilingual' => TRUE,
@@ -688,8 +688,8 @@ class FormHooks {
       }
 
       // Helper item to move focus to sticky header.
-      $form['gin_move_focus_to_sticky_bar'] = [
-        '#markup' => '<a href="#" class="visually-hidden" role="button" gin-move-focus-to-sticky-bar>Moves focus to sticky header actions</a>',
+      $form['default_admin_move_focus_to_sticky_bar'] = [
+        '#markup' => '<a href="#" class="visually-hidden" role="button" data-move-focus-to-sticky-bar>Moves focus to sticky header actions</a>',
         '#weight' => 999,
       ];
 
@@ -719,46 +719,46 @@ class FormHooks {
 
     // Add sidebar toggle.
     $hide_panel = $this->t('Hide sidebar panel');
-    $form['gin_sticky_actions']['gin_sidebar_toggle'] = [
-      '#markup' => '<a href="#toggle-sidebar" class="meta-sidebar__trigger trigger" role="button" title="' . $hide_panel . '" aria-controls="gin_sidebar"><span class="visually-hidden">' . $hide_panel . '</span></a>',
+    $form['default_admin_sticky_actions']['default_admin_sidebar_toggle'] = [
+      '#markup' => '<a href="#toggle-sidebar" class="meta-sidebar__trigger trigger" role="button" title="' . $hide_panel . '" aria-controls="default_admin_sidebar"><span class="visually-hidden">' . $hide_panel . '</span></a>',
       '#weight' => 1000,
     ];
     $form['#attached']['library'][] = 'default_admin/sidebar';
 
-    // Create gin_sidebar group.
-    $form['gin_sidebar'] = [
+    // Create default_admin_sidebar group.
+    $form['default_admin_sidebar'] = [
       '#group' => 'meta',
       '#type' => 'container',
       '#weight' => 99,
       '#multilingual' => TRUE,
       '#attributes' => [
         'class' => [
-          'gin-sidebar',
+          'admin-sidebar',
         ],
       ],
     ];
     // Copy footer over.
-    $form['gin_sidebar']['footer'] = ($form['footer']) ?? [];
+    $form['default_admin_sidebar']['footer'] = ($form['footer']) ?? [];
 
     // Sidebar close button.
     $close_sidebar_translation = $this->t('Close sidebar panel');
-    $form['gin_sidebar']['gin_sidebar_close'] = [
+    $form['default_admin_sidebar']['default_admin_sidebar_close'] = [
       '#markup' => '<a href="#close-sidebar" class="meta-sidebar__close trigger" role="button" title="' . $close_sidebar_translation . '"><span class="visually-hidden">' . $close_sidebar_translation . '</span></a>',
     ];
 
-    $form['gin_sidebar_overlay'] = [
+    $form['default_admin_sidebar_overlay'] = [
       '#markup' => '<div class="meta-sidebar__overlay trigger"></div>',
     ];
 
     // Specify necessary node form theme and library.
-    // @see gin_form_node_form_alter
+    // @see \Drupal\default_admin\Hook\FormHooks::formNodeFormAlter()
     $form['#theme'] = ['node_edit_form'];
     // Attach libraries.
     $form['#attached']['library'][] = 'default_admin/node-form';
     $form['#attached']['library'][] = 'default_admin/edit_form';
 
     // Add a class that allows the logic in edit_form.js to identify the form.
-    $form['#attributes']['class'][] = 'gin-node-edit-form';
+    $form['#attributes']['class'][] = 'node-edit-form';
 
     // If not logged in hide changed and author node info on add forms.
     $not_logged_in = $this->currentUser->isAnonymous();
@@ -788,17 +788,6 @@ class FormHooks {
   }
 
   /**
-   * Check the context we're in.
-   *
-   * Checks if the form is in either a modal or an off-canvas dialog.
-   */
-  private function isModalOrOffcanvas(): bool {
-    $wrapper_format = $this->getRequestWrapperFormat() ?? '';
-    return str_contains($wrapper_format, 'drupal_modal') ||
-      str_contains($wrapper_format, 'drupal_dialog');
-  }
-
-  /**
    * Helper function to remember the form actions after form has been built.
    */
   public static function formAfterBuild(array $form): array {
@@ -816,7 +805,7 @@ class FormHooks {
 
         $navigation_enabled = \Drupal::service('module_handler')->moduleExists('navigation');
         if ($navigation_enabled) {
-          $form['gin_sticky_actions']['actions'][$key] = $button;
+          $form['default_admin_sticky_actions']['actions'][$key] = $button;
         }
 
         // The media_type_add_form form is a special case.
@@ -824,21 +813,21 @@ class FormHooks {
         // @see \Drupal\media\MediaTypeForm::actions
         if ((isset($button['#type']) && $button['#type'] === 'submit') || $form['#form_id'] === 'media_type_add_form') {
           // Update button.
-          $button['#attributes']['id'] = 'gin-sticky-' . $button['#id'];
+          $button['#attributes']['id'] = 'sticky-' . $button['#id'];
           $button['#attributes']['form'] = $form['#id'];
-          $button['#attributes']['data-drupal-selector'] = 'gin-sticky-' . $button['#attributes']['data-drupal-selector'];
-          $button['#attributes']['data-gin-sticky-form-selector'] = $button['#attributes']['data-drupal-selector'];
+          $button['#attributes']['data-drupal-selector'] = 'sticky-' . $button['#attributes']['data-drupal-selector'];
+          $button['#attributes']['data-sticky-form-selector'] = $button['#attributes']['data-drupal-selector'];
 
           // Add the button to the form actions array.
-          if (!empty($button['#gin_action_item']) || $navigation_enabled || in_array($key, $includes, TRUE)) {
-            $form['gin_sticky_actions']['actions'][$key] = $button;
+          if (!empty($button['#default_admin_action_item']) || $navigation_enabled || in_array($key, $includes, TRUE)) {
+            $form['default_admin_sticky_actions']['actions'][$key] = $button;
           }
         }
       }
     }
 
-    Helper::formActions($form['gin_sticky_actions'] ?? NULL);
-    unset($form['gin_sticky_actions']);
+    Helper::formActions($form['default_admin_sticky_actions'] ?? NULL);
+    unset($form['default_admin_sticky_actions']);
 
     return $form;
   }

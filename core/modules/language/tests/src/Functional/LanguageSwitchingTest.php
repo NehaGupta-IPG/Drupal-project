@@ -108,7 +108,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageBlock()
    */
-  protected function doTestHomePageLinks($block_label): void {
+  protected function doTestHomePageLinks(string|int|float|bool $block_label): void {
     // Create a node and set as home page.
     $this->createHomePage();
     // Go to home page.
@@ -117,7 +117,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($block_label);
     // Assert that each list item and anchor element has the appropriate data-
     // attributes.
-    $language_switchers = $this->xpath('//div[@id=:id]/ul/li', [':id' => 'block-test-language-block']);
+    $language_switchers = $this->getNodeElementsByXpath('//div[@id=:id]/ul/li', [':id' => 'block-test-language-block']);
     $list_items = [];
     $anchors = [];
     $labels = [];
@@ -170,14 +170,14 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageBlock()
    */
-  protected function doTestLanguageBlockAuthenticated($block_label): void {
+  protected function doTestLanguageBlockAuthenticated(string|int|float|bool $block_label): void {
     // Assert that the language switching block is displayed on the frontpage.
     $this->drupalGet('');
     $this->assertSession()->pageTextContains($block_label);
 
     // Assert that each list item and anchor element has the appropriate data-
     // attributes.
-    $language_switchers = $this->xpath('//div[@id=:id]/ul/li', [':id' => 'block-test-language-block']);
+    $language_switchers = $this->getNodeElementsByXpath('//div[@id=:id]/ul/li', [':id' => 'block-test-language-block']);
     $list_items = [];
     $anchors = [];
     $labels = [];
@@ -219,7 +219,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    *
    * @see self::testLanguageBlock()
    */
-  protected function doTestLanguageBlockAnonymous($block_label): void {
+  protected function doTestLanguageBlockAnonymous(string|int|float|bool $block_label): void {
     $this->drupalLogout();
 
     // Assert that the language switching block is displayed on the frontpage
@@ -228,7 +228,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($block_label);
 
     // Assert that only the current language is marked as active.
-    $language_switchers = $this->xpath('//div[@id=:id]/ul/li', [':id' => 'block-test-language-block']);
+    $language_switchers = $this->getNodeElementsByXpath('//div[@id=:id]/ul/li', [':id' => 'block-test-language-block']);
     $links = [
       'active' => [],
       'inactive' => [],
@@ -278,7 +278,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
 
     // Assert that each list item and anchor element has the appropriate data-
     // attributes.
-    $language_switchers = $this->xpath('//div[@id=:id]/ul/li', [':id' => 'block-test-language-block']);
+    $language_switchers = $this->getNodeElementsByXpath('//div[@id=:id]/ul/li', [':id' => 'block-test-language-block']);
     $list_items = [];
     $anchors = [];
     $labels = [];
@@ -686,7 +686,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
    * @param string $label
    *   The native name of the language.
    */
-  protected function saveNativeLanguageName($langcode, $label): void {
+  protected function saveNativeLanguageName(string $langcode, $label): void {
     \Drupal::service('language.config_factory_override')
       ->getOverride($langcode, 'language.entity.' . $langcode)->set('label', $label)->save();
   }

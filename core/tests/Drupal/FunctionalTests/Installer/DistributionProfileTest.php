@@ -27,6 +27,11 @@ class DistributionProfileTest extends InstallerTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile;
+
   protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     $this->info = [
@@ -37,7 +42,7 @@ class DistributionProfileTest extends InstallerTestBase {
         'name' => 'My Distribution',
         'install' => [
           'theme' => 'test_installer_theme',
-          'finish_url' => '/root-user',
+          'finish_url' => 'root-user',
         ],
       ],
     ];
@@ -71,8 +76,14 @@ class DistributionProfileTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpProfile(): void {
-    // This step is skipped, because there is a distribution profile.
+  protected function setUpSite(): void {
+    // This is the last installer step. The profile has installed its own themes
+    // by now, and the install theme still renders this page, so the install
+    // theme and its base theme must both keep their hook implementations.
+    $this->assertSession()->pageTextContains('Added by custom installer theme on the last step.');
+    $this->assertSession()->responseContains("claro/css/theme/install-page.css");
+
+    parent::setUpSite();
   }
 
   /**

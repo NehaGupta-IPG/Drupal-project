@@ -53,10 +53,12 @@ use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeField;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 use Drupal\jsonapi\Revisions\ResourceVersionRouteEnhancer;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
+use Drupal\user\AccountCancellation;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -76,131 +78,27 @@ class EntityResource {
 
   use EntityValidationTrait;
 
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $fieldManager;
-
-  /**
-   * The resource type repository.
-   *
-   * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
-   */
-  protected $resourceTypeRepository;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * The entity repository.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
-   */
-  protected $entityRepository;
-
-  /**
-   * The include resolver.
-   *
-   * @var \Drupal\jsonapi\IncludeResolver
-   */
-  protected $includeResolver;
-
-  /**
-   * The JSON:API entity access checker.
-   *
-   * @var \Drupal\jsonapi\Access\EntityAccessChecker
-   */
-  protected $entityAccessChecker;
-
-  /**
-   * The JSON:API field resolver.
-   *
-   * @var \Drupal\jsonapi\Context\FieldResolver
-   */
-  protected $fieldResolver;
-
-  /**
-   * The JSON:API serializer.
-   *
-   * @var \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Normalizer\DenormalizerInterface
-   */
-  protected $serializer;
-
-  /**
-   * The time service.
-   *
-   * @var \Drupal\Component\Datetime\TimeInterface
-   */
-  protected $time;
-
-  /**
-   * The current user account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $user;
-
-  /**
-   * The event dispatcher.
-   *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-   */
-  protected EventDispatcherInterface $eventDispatcher;
-
-  /**
-   * Instantiates an EntityResource object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
-   *   The entity type field manager.
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON:API resource type repository.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   * @param \Drupal\jsonapi\IncludeResolver $include_resolver
-   *   The include resolver.
-   * @param \Drupal\jsonapi\Access\EntityAccessChecker $entity_access_checker
-   *   The JSON:API entity access checker.
-   * @param \Drupal\jsonapi\Context\FieldResolver $field_resolver
-   *   The JSON:API field resolver.
-   * @param \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Normalizer\DenormalizerInterface $serializer
-   *   The JSON:API serializer.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param \Drupal\Core\Session\AccountInterface $user
-   *   The current user account.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
-   */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $field_manager, ResourceTypeRepositoryInterface $resource_type_repository, RendererInterface $renderer, EntityRepositoryInterface $entity_repository, IncludeResolver $include_resolver, EntityAccessChecker $entity_access_checker, FieldResolver $field_resolver, SerializerInterface $serializer, TimeInterface $time, AccountInterface $user, EventDispatcherInterface $event_dispatcher) {
-    $this->entityTypeManager = $entity_type_manager;
-    $this->fieldManager = $field_manager;
-    $this->resourceTypeRepository = $resource_type_repository;
-    $this->renderer = $renderer;
-    $this->entityRepository = $entity_repository;
-    $this->includeResolver = $include_resolver;
-    $this->entityAccessChecker = $entity_access_checker;
-    $this->fieldResolver = $field_resolver;
-    $this->serializer = $serializer;
-    $this->time = $time;
-    $this->user = $user;
-    $this->eventDispatcher = $event_dispatcher;
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityFieldManagerInterface $fieldManager,
+    protected ResourceTypeRepositoryInterface $resourceTypeRepository,
+    protected RendererInterface $renderer,
+    protected EntityRepositoryInterface $entityRepository,
+    protected IncludeResolver $includeResolver,
+    protected EntityAccessChecker $entityAccessChecker,
+    protected FieldResolver $fieldResolver,
+    #[Autowire(service: 'jsonapi.serializer')]
+    protected SerializerInterface $serializer,
+    protected TimeInterface $time,
+    protected AccountInterface $user,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected ?AccountCancellation $accountCancellation = NULL,
+  ) {
+    if ($accountCancellation === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $accountCancellation argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3620934', E_USER_DEPRECATED);
+      $accountCancellation = \Drupal::service(AccountCancellation::class);
+    }
+    $this->accountCancellation = $accountCancellation;
   }
 
   /**
@@ -387,9 +285,9 @@ class EntityResource {
 
       // Allow other modules to act.
 
-      user_cancel([], $entity->id(), $cancel_method);
-      // Since user_cancel() is not invoked via Form API, batch processing
-      // needs to be invoked manually.
+      $this->accountCancellation->cancel([], $entity->id(), $cancel_method);
+      // Since AccountCancellation::cancel() is not invoked via Form API, batch
+      // processing needs to be invoked manually.
       $batch =& batch_get();
       // Mark this batch as non-progressive to bypass the progress bar and
       // redirect.
@@ -654,6 +552,10 @@ class EntityResource {
       throw new ConflictHttpException(sprintf('You can only POST to to-many relationships. %s is a to-one relationship.', $related));
     }
 
+    // @todo Inject the plugin manager service.
+    $definition = \Drupal::service('plugin.manager.field.field_type')->getDefinition($field_definition->getType());
+    $serialized_property_names = $definition['serialized_property_names'] ?? [];
+
     $original_resource_identifiers = ResourceIdentifier::toResourceIdentifiersWithArityRequired($field_list);
     $new_resource_identifiers = array_udiff(
       ResourceIdentifier::deduplicate(array_merge($original_resource_identifiers, $resource_identifiers)),
@@ -673,7 +575,16 @@ class EntityResource {
       $new_field_value = ['entity' => $this->getEntityFromResourceIdentifier($new_resource_identifier)];
       // Remove `arity` from the received extra properties, otherwise this
       // will fail field validation.
-      $new_field_value += array_diff_key($new_resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      $meta = array_diff_key($new_resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      foreach ($serialized_property_names as $property_name) {
+        if (isset($meta[$property_name]) && is_string($meta[$property_name])) {
+          throw new BadRequestHttpException(sprintf(
+            'The relationship meta field "%s" cannot accept a serialized string value.',
+            $property_name,
+          ));
+        }
+      }
+      $new_field_value += $meta;
       $field_list->appendItem($new_field_value);
     }
 
@@ -757,13 +668,26 @@ class EntityResource {
    *   The field definition of the entity field to be updated.
    */
   protected function doPatchMultipleRelationship(EntityInterface $entity, array $resource_identifiers, FieldDefinitionInterface $field_definition) {
-    $entity->{$field_definition->getName()} = array_map(function (ResourceIdentifier $resource_identifier) {
+    // @todo Inject the plugin manager service.
+    $definition = \Drupal::service('plugin.manager.field.field_type')->getDefinition($field_definition->getType());
+    $serialized_property_names = $definition['serialized_property_names'] ?? [];
+
+    $entity->{$field_definition->getName()} = array_map(function (ResourceIdentifier $resource_identifier) use ($serialized_property_names) {
       // We assume all entity reference fields have an 'entity' computed
       // property that can be used to assign the needed values.
       $field_properties = ['entity' => $this->getEntityFromResourceIdentifier($resource_identifier)];
       // Remove `arity` from the received extra properties, otherwise this
       // will fail field validation.
-      $field_properties += array_diff_key($resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      $meta = array_diff_key($resource_identifier->getMeta(), array_flip([ResourceIdentifier::ARITY_KEY]));
+      foreach ($serialized_property_names as $property_name) {
+        if (isset($meta[$property_name]) && is_string($meta[$property_name])) {
+          throw new BadRequestHttpException(sprintf(
+            'The relationship meta field "%s" cannot accept a serialized string value.',
+            $property_name,
+          ));
+        }
+      }
+      $field_properties += $meta;
       return $field_properties;
     }, $resource_identifiers);
   }

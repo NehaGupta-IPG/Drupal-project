@@ -9,12 +9,14 @@ use Drupal\Tests\language\Traits\LanguageTestTrait;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests search integration filters with multilingual nodes.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class ViewsMultilingualTest extends ViewTestBase {
 
@@ -27,6 +29,8 @@ class ViewsMultilingualTest extends ViewTestBase {
   protected static $modules = [
     'node',
     'search',
+    'search_node',
+    'search_test_views',
     'language',
     'content_translation',
   ];
@@ -35,6 +39,13 @@ class ViewsMultilingualTest extends ViewTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['search_test_views']): void {
+    parent::setUp($import_test_views, $modules);
+  }
 
   /**
    * Views used by this test.

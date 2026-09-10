@@ -68,6 +68,8 @@ parameters:
   tempstore.expire: 604800
   queue.config:
     suspendMaximumWait: 30.0
+  instant_queue.config:
+    maximumItems: 5
   stream_wrapper.allowed_file_extensions:
     module:
       - json
@@ -129,6 +131,11 @@ services:
       - { name: cache.context}
   cache_context.request_format:
     class: Drupal\Core\Cache\Context\RequestFormatCacheContext
+    arguments: ['@request_stack']
+    tags:
+      - { name: cache.context }
+  cache_context.exception_status_code:
+    class: Drupal\Core\Cache\Context\ExceptionStatusCodeCacheContext
     arguments: ['@request_stack']
     tags:
       - { name: cache.context }
@@ -345,12 +352,25 @@ services:
       - { name: cache.bin, default_backend: cache.backend.chainedfast }
     factory: ['@cache_factory', 'get']
     arguments: [discovery]
+  cache.routes:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin, default_backend: cache.backend.chainedfast }
+    factory: ['@cache_factory', 'get']
+    arguments: [routes]
   cache.memory:
     class: Drupal\Core\Cache\MemoryCache\MemoryCacheInterface
     tags:
       - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
     factory: ['@cache_factory', 'get']
     arguments: [memory]
+  cache.file_parsing:
+    # The cache.bin service tag is intentionally omitted because items in this
+    # bin are designed to persist between cache clears. Invalidation happens via
+    # filemtime checks instead.
+    class: Drupal\Core\Cache\CacheBackendInterface
+    factory: ['@cache_factory', 'get']
+    arguments: [file_parsing]
   cache_prewarmer:
     class: Drupal\Core\PreWarm\CachePreWarmer
     arguments: ['@class_resolver']
@@ -452,9 +472,20 @@ services:
     arguments: ['@config.storage', '@database', '@event_dispatcher', '@lock']
     public: false
   Drupal\Core\Config\StorageManagerInterface: '@config.storage.export.manager'
+  config.parsing_cache:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['config.parsing_cache', '@cache.file_parsing', '@lock', '@datetime.time']
+    tags:
+      - { name: needs_destruction }
+  config.file_storage.factory:
+    class: Drupal\Core\Config\FileStorageFactory
+  Drupal\Core\Config\FileStorageFactory: '@config.file_storage.factory'
   config.storage.sync:
-    class: Drupal\Core\Config\FileStorage
-    factory: Drupal\Core\Config\FileStorageFactory::getSync
+    class: Drupal\Core\Config\AutoloadingStorage
+    factory: ['@Drupal\Core\Config\SyncFactory', 'get']
+  Drupal\Core\Config\SyncFactory:
+    autowire: true
+    public: false
   config.storage.snapshot:
     class: Drupal\Core\Config\DatabaseStorage
     arguments: ['@database', config_snapshot]
@@ -593,6 +624,9 @@ services:
   logger.channel.menu:
     parent: logger.channel_base
     arguments: ['menu']
+  logger.channel.queue:
+    parent: logger.channel_base
+    arguments: ['queue']
   logger.channel.router:
     parent: logger.channel_base
     arguments: ['router']
@@ -629,6 +663,11 @@ services:
   path.current:
     class: Drupal\Core\Path\CurrentPathStack
     arguments: ['@request_stack']
+  Drupal\Core\Queue\InstantQueueRunnerInterface:
+    class: 'Drupal\Core\Queue\InstantQueueRunner'
+    autowire: true
+    tags:
+      - { name: needs_destruction }
   Drupal\Core\Path\CurrentPathStack: '@path.current'
   http_handler_stack:
     class: GuzzleHttp\HandlerStack
@@ -674,10 +713,6 @@ services:
   container.namespaces:
     class: ArrayObject
     arguments: [ '%container.namespaces%' ]
-  container.trait:
-    abstract: true
-    calls:
-      - [setContainer, ['@service_container']]
   default_plugin_manager:
     abstract: true
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
@@ -787,6 +822,8 @@ services:
     class: Drupal\Core\Field\DeletedFieldsRepository
     arguments: ['@state']
   Drupal\Core\Field\DeletedFieldsRepositoryInterface: '@entity_field.deleted_fields_repository'
+  Drupal\Core\Field\FieldPurger:
+    autowire: true
   field_storage_definition.listener:
     class: Drupal\Core\Field\FieldStorageDefinitionListener
     arguments: ['@entity_type.manager', '@event_dispatcher', '@entity.last_installed_schema.repository', '@entity_field.manager', '@entity_field.deleted_fields_repository']
@@ -839,9 +876,12 @@ services:
   plugin.manager.action:
     class: Drupal\Core\Action\ActionManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
+  menu_link.yaml_cache_collector:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['menu.link.yaml', '@cache.file_parsing', '@lock', '@datetime.time']
   plugin.manager.menu.link:
     class: Drupal\Core\Menu\MenuLinkManager
-    arguments: ['@menu.tree_storage', '@menu_link.static.overrides', '@module_handler']
+    arguments: ['@menu.tree_storage', '@menu_link.static.overrides', '@module_handler', '@menu_link.yaml_cache_collector']
   Drupal\Core\Menu\MenuLinkManagerInterface: '@plugin.manager.menu.link'
   menu.link_tree:
     class: Drupal\Core\Menu\MenuLinkTree
@@ -862,13 +902,19 @@ services:
     class: Drupal\Core\Menu\MenuParentFormSelector
     arguments: ['@menu.link_tree', '@entity_type.manager', '@string_translation']
   Drupal\Core\Menu\MenuParentFormSelectorInterface: '@menu.parent_form_selector'
+  local_action.yaml_cache_collector:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['menu.local_action.yaml', '@cache.file_parsing', '@lock', '@datetime.time']
   plugin.manager.menu.local_action:
     class: Drupal\Core\Menu\LocalActionManager
-    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user']
+    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user', '@local_action.yaml_cache_collector']
   Drupal\Core\Menu\LocalActionManagerInterface: '@plugin.manager.menu.local_action'
+  local_task.yaml_cache_collector:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['menu.local_task.yaml', '@cache.file_parsing', '@lock', '@datetime.time']
   plugin.manager.menu.local_task:
     class: Drupal\Core\Menu\LocalTaskManager
-    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user']
+    arguments: ['@http_kernel.controller.argument_resolver', '@request_stack', '@current_route_match', '@router.route_provider', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user', '@local_task.yaml_cache_collector']
   Drupal\Core\Menu\LocalTaskManagerInterface: '@plugin.manager.menu.local_task'
   plugin.manager.menu.contextual_link:
     class: Drupal\Core\Menu\ContextualLinkManager
@@ -1056,7 +1102,7 @@ services:
       - { name: string_translator, priority: 30 }
   string_translation:
     class: Drupal\Core\StringTranslation\TranslationManager
-    arguments: ['@language.default']
+    autowire: true
     tags:
       - { name: service_collector, tag: string_translator, call: addTranslator }
   Drupal\Core\StringTranslation\TranslationInterface: '@string_translation'
@@ -1082,13 +1128,11 @@ services:
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
-    lazy: true
   lock.persistent:
     class: Drupal\Core\Lock\PersistentDatabaseLockBackend
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
-    lazy: true
   router.request_context:
     class: Drupal\Core\Routing\RequestContext
     tags:
@@ -1102,16 +1146,13 @@ services:
   Drupal\Core\Routing\AdminContext: '@router.admin_context'
   router.route_provider:
     class: Drupal\Core\Routing\RouteProvider
-    arguments: ['@database', '@state', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', 'router', '@language_manager']
+    arguments: ['@database', '@state', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', '@cache.routes', 'router', '@language_manager']
     tags:
       - { name: backend_overridable }
   Drupal\Core\Routing\RouteProviderInterface: '@router.route_provider'
   router.route_provider.lazy_builder:
     class: Drupal\Core\Routing\RouteProviderLazyBuilder
     arguments: ['@router.route_provider', '@router.builder']
-  router.route_preloader:
-    class: Drupal\Core\Routing\RoutePreloader
-    arguments: ['@router.route_provider', '@state']
   url_generator.non_bubbling:
     class: Drupal\Core\Routing\UrlGenerator
     arguments: ['@router.route_provider', '@path_processor_manager', '@route_processor_manager', '@request_stack', '%filter_protocols%']
@@ -1182,9 +1223,12 @@ services:
   router.builder.attributes:
     class: Drupal\Core\Routing\AttributeRouteDiscovery
     arguments: ['@container.namespaces']
+  router.yaml_cache_collector:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['router.parsing_cache', '@cache.file_parsing', '@lock', '@datetime.time']
   router.builder.yaml:
     class: Drupal\Core\Routing\YamlRouteDiscovery
-    arguments: ['@module_handler', '@controller_resolver']
+    arguments: ['@module_handler', '@controller_resolver', '@router.yaml_cache_collector']
   menu.rebuild_subscriber:
     class: Drupal\Core\EventSubscriber\MenuRouterRebuildSubscriber
     arguments: ['@lock', '@plugin.manager.menu.link', '@database', '@database.replica_kill_switch', '@logger.channel.menu']
@@ -1353,8 +1397,8 @@ services:
     arguments: ['@main_content_renderer.ajax', '@current_route_match', '@callable_resolver']
   Drupal\Core\Form\FormAjaxResponseBuilderInterface: '@form_ajax_response_builder'
   router_listener:
-    class: Symfony\Component\HttpKernel\EventListener\RouterListener
-    arguments: ['@router', '@request_stack', '@router.request_context', NULL]
+    class: Drupal\Core\Http\EventListener\RouterListener
+    arguments: ['@router', '@request_stack', '@router.request_context']
   options_request_listener:
     class: Drupal\Core\EventSubscriber\OptionsRequestSubscriber
     arguments: ['@router.route_provider']
@@ -1408,7 +1452,7 @@ services:
       - { name: access_check, applies_to: _entity_delete_multiple_access }
   access_check.theme:
     class: Drupal\Core\Theme\ThemeAccessCheck
-    arguments: ['@theme_handler']
+    arguments: ['%container.themes%']
     tags:
       - { name: access_check, applies_to: _access_theme }
   access_check.custom:
@@ -1425,7 +1469,7 @@ services:
     class: Drupal\Core\Access\CsrfRequestHeaderAccessCheck
     arguments: ['@session_configuration', '@csrf_token']
     tags:
-      - { name: access_check, needs_incoming_request: TRUE }
+      - { name: access_check, applies_to: _csrf_request_header_token, needs_incoming_request: TRUE }
   maintenance_mode:
     class: Drupal\Core\Site\MaintenanceMode
     arguments: ['@state', '@config.factory']
@@ -1445,7 +1489,7 @@ services:
     arguments: ['@asset.resolver', '@config.factory', '@asset.css.collection_renderer', '@asset.js.collection_renderer', '@request_stack', '@renderer', '@module_handler', '@language_manager']
   html_response.attachments_processor:
     class: Drupal\Core\Render\HtmlResponseAttachmentsProcessor
-    arguments: ['@asset.resolver', '@config.factory', '@asset.css.collection_renderer', '@asset.js.collection_renderer', '@request_stack', '@renderer', '@module_handler', '@language_manager']
+    arguments: ['@asset.resolver', '@config.factory', '@asset.css.collection_renderer', '@asset.js.collection_renderer', '@request_stack', '@renderer', '@module_handler', '@language_manager', '@file_url_generator']
   html_response.subscriber:
     class: Drupal\Core\EventSubscriber\HtmlResponseSubscriber
     arguments: ['@html_response.attachments_processor']
@@ -1467,7 +1511,7 @@ services:
     arguments: ['@config.manager', '@config.storage', '@config.storage.snapshot']
   config_exclude_modules_subscriber:
     class: Drupal\Core\EventSubscriber\ExcludedModulesEventSubscriber
-    arguments: ['@config.storage', '@settings', '@config.manager']
+    arguments: ['@config.storage', '@settings', '@config.manager', '@Drupal\Core\Extension\ModuleWeight']
   exception.needs_installer:
     class: Drupal\Core\EventSubscriber\ExceptionDetectNeedsInstallSubscriber
     arguments: ['@database']
@@ -1769,8 +1813,13 @@ services:
   Drupal\Core\Asset\LibraryDiscoveryInterface: '@library.discovery'
   library.discovery.parser:
     class: Drupal\Core\Asset\LibraryDiscoveryParser
-    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc']
+    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc', '@library.parsing_cache']
   Drupal\Core\Asset\LibraryDiscoveryParser: '@library.discovery.parser'
+  library.parsing_cache:
+    class: Drupal\Core\Utility\YamlCacheCollector
+    arguments: ['library.parsing_cache', '@cache.file_parsing', '@lock', '@datetime.time']
+    tags:
+      - { name: needs_destruction }
   library.libraries_directory_file_finder:
     class: Drupal\Core\Asset\LibrariesDirectoryFileFinder
     arguments: ['%app.root%', '%site.path%', '@extension.list.profile', '%install_profile%']
@@ -1852,12 +1901,26 @@ services:
     class: Drupal\Core\Template\Loader\StringLoader
     tags:
       - { name: twig.loader, priority: -100 }
+  # Service holding the commands made available to the `dr` command.
+  # The service is completed with ConsoleCompilerPass.
+  console.command_loader:
+    class: Symfony\Component\Console\CommandLoader\CommandLoaderInterface
+  logger.console:
+    class: Drupal\Core\Command\DrupalConsoleLogger
+    arguments: ['@logger.log_message_parser']
+    tags:
+      - { name: logger }
+  Drupal\Core\Command\DrupalConsoleLogger: '@logger.console'
+  Drupal\Core\Command\EventSubscriber\ConsoleSubscriber:
+    autowire: true
   element_info:
     alias: plugin.manager.element_info
   file.htaccess_writer:
     class: Drupal\Core\File\HtaccessWriter
     arguments: ['@logger.channel.security', '@stream_wrapper_manager', '@settings']
   Drupal\Core\File\HtaccessWriterInterface: '@file.htaccess_writer'
+  Drupal\Core\File\UploadedFilesExtractor:
+    autowire: true
   file.mime_type.guesser:
     class: Drupal\Core\File\MimeType\MimeTypeGuesser
     arguments: ['@stream_wrapper_manager', !tagged_iterator mime_type_guesser]
@@ -1917,7 +1980,7 @@ services:
   Drupal\Core\Update\UpdateHookRegistry: '@update.update_hook_registry'
   update.post_update_registry:
     class: Drupal\Core\Update\UpdateRegistry
-    arguments: ['%app.root%', '%site.path%', '%container.modules%', '@update.key_value.post_update', '@theme_handler', 'post_update']
+    arguments: ['%app.root%', '%site.path%', '%container.modules%', '@update.key_value.post_update', '@theme_handler', '@cache.memory', 'post_update']
   update.key_value.post_update:
     class: Drupal\Core\KeyValueStore\KeyValueStoreInterface
     factory: ['@keyvalue', 'get']
@@ -2022,5 +2085,19 @@ services:
       ]
     tags:
       - { name: needs_destruction }
+  plugin.manager.design_token:
+    class: Drupal\Core\Theme\DesignToken\DesignTokenPluginManager
+    arguments:
+      - '@module_handler'
+      - '@theme_handler'
+      - '@cache.discovery'
+      - '@plugin.manager.design_token_value'
+  Drupal\Core\Theme\DesignToken\DesignTokenPluginManagerInterface: '@plugin.manager.design_token'
+  plugin.manager.design_token_value:
+    class: Drupal\Core\Theme\DesignToken\DesignTokenValuePluginManager
+    parent: default_plugin_manager
+  Drupal\Core\Theme\DesignToken\DesignTokenValuePluginManagerInterface: '@plugin.manager.design_token_value'
   Drupal\Core\Extension\ThemeSettingsProvider:
+    autowire: true
+  Drupal\Core\Extension\ModuleWeight:
     autowire: true

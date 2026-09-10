@@ -9,6 +9,8 @@ use Drupal\Core\Url;
 use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\node\Traits\PromotedContentViewTestTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -22,6 +24,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 class BreadcrumbTest extends BrowserTestBase {
 
   use AssertBreadcrumbTrait;
+  use PromotedContentViewTestTrait;
 
   /**
    * {@inheritdoc}
@@ -37,7 +40,7 @@ class BreadcrumbTest extends BrowserTestBase {
     'field_ui',
     'filter_test',
     'menu_test',
-    'olivero_test',
+    'stark_test',
   ];
 
   /**
@@ -55,9 +58,14 @@ class BreadcrumbTest extends BrowserTestBase {
   protected $webUser;
 
   /**
+   * Breadcrumb block ID.
+   */
+  protected string $breadcrumbBlockId;
+
+  /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'olivero';
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
@@ -69,21 +77,29 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->container->get('theme_installer')->install(['claro']);
     $this->config('system.theme')->set('admin', 'claro')->save();
 
+    $this->enablePromotedContentView();
     $this->config('system.site')->set('page.front', '/node')->save();
+
     $perms = array_keys(\Drupal::service('user.permissions')->getPermissions());
     $this->adminUser = $this->drupalCreateUser($perms);
     $this->drupalLogin($this->adminUser);
 
+    $block = $this->drupalPlaceBlock('system_breadcrumb_block', [
+      'region' => 'content',
+      'theme' => 'stark',
+    ]);
+    $this->breadcrumbBlockId = $block->id();
+
     // This test puts menu links in the Tools menu and then tests for their
     // presence on the page, so we need to ensure that the Tools block will be
-    // displayed in the admin theme and olivero.
+    // displayed in the Admin theme and Stark.
     $this->drupalPlaceBlock('system_menu_block:tools', [
       'region' => 'content',
       'theme' => $this->config('system.theme')->get('admin'),
     ]);
     $this->drupalPlaceBlock('system_menu_block:tools', [
       'region' => 'content',
-      'theme' => 'olivero',
+      'theme' => 'stark',
     ]);
   }
 
@@ -296,7 +312,7 @@ class BreadcrumbTest extends BrowserTestBase {
     // Logout the user because we want to check the active class as well, which
     // is just rendered as anonymous user.
     $this->drupalLogout();
-    foreach ($tags as $name => $data) {
+    foreach ($tags as $data) {
       $term = $data['term'];
       /** @var \Drupal\menu_link_content\MenuLinkContentInterface $link */
       $link = $data['link'];
@@ -313,7 +329,7 @@ class BreadcrumbTest extends BrowserTestBase {
       // untranslated menu links automatically generated from menu router items
       // ('taxonomy/term/%') should never be translated and appear in any menu
       // other than the breadcrumb trail.
-      $this->assertSession()->elementsCount('xpath', '//nav[contains(@class, "menu--tools")]/descendant::a[@href="' . Url::fromUri('base:' . $link_path)->toString() . '"]', 1);
+      $this->assertSession()->elementsCount('xpath', '//nav[contains(@id, "block-stark-tools")]/descendant::a[@href="' . Url::fromUri('base:' . $link_path)->toString() . '"]', 1);
 
       // Next iteration should expect this tag as parent link.
       // Note: Term name, not link name, due to taxonomy_term_page().
@@ -325,9 +341,9 @@ class BreadcrumbTest extends BrowserTestBase {
     // Verify breadcrumbs on user and user/%.
     // We need to log back in and out below, and cannot simply grant the
     // 'administer users' permission, since user_page() makes your head explode.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
       'access user profiles',
-    ]);
+    ])->save();
 
     // Verify breadcrumb on front page.
     $this->assertBreadcrumb('<front>', []);
@@ -442,7 +458,7 @@ class BreadcrumbTest extends BrowserTestBase {
 
     // Remove the breadcrumb block to test the trait when breadcrumbs are not
     // shown.
-    Block::load('olivero_breadcrumbs')->delete();
+    Block::load($this->breadcrumbBlockId)->delete();
 
     // If there is no trail, this should pass as there is no breadcrumb.
     $this->assertBreadcrumb('menu-test/breadcrumb1', []);

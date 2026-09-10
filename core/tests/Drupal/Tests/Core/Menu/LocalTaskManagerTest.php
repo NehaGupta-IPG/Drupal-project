@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Menu;
 
+use Drupal\Component\Datetime\Time;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Core\Access\AccessManagerInterface;
@@ -12,15 +13,18 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Lock\NullLockBackend;
 use Drupal\Core\Menu\LocalTaskInterface;
 use Drupal\Core\Menu\LocalTaskManager;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Utility\YamlCacheCollector;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -127,14 +131,14 @@ class LocalTaskManagerTest extends UnitTestCase {
       ->method('getDefinitions')
       ->willReturn($definitions);
 
-    $mock_plugin = $this->createStub(LocalTaskInterface::class);
+    $pluginStub = $this->createStub(LocalTaskInterface::class);
 
-    $this->setupFactory($mock_plugin);
+    $this->setupFactory($pluginStub);
     $this->setupLocalTaskManager();
 
     $local_tasks = $this->manager->getLocalTasksForRoute('menu_local_task_test_tasks_view');
 
-    $result = $this->getLocalTasksForRouteResult($mock_plugin);
+    $result = $this->getLocalTasksForRouteResult($pluginStub);
 
     $this->assertEquals($result, $local_tasks);
   }
@@ -151,14 +155,14 @@ class LocalTaskManagerTest extends UnitTestCase {
       ->method('getDefinitions')
       ->willReturn($definitions);
 
-    $mock_plugin = $this->createStub(LocalTaskInterface::class);
+    $pluginStub = $this->createStub(LocalTaskInterface::class);
 
-    $this->setupFactory($mock_plugin);
+    $this->setupFactory($pluginStub);
     $this->setupLocalTaskManager();
 
     $local_tasks = $this->manager->getLocalTasksForRoute('menu_local_task_test_tasks_child1_page');
 
-    $result = $this->getLocalTasksForRouteResult($mock_plugin);
+    $result = $this->getLocalTasksForRouteResult($pluginStub);
 
     $this->assertEquals($result, $local_tasks);
   }
@@ -173,12 +177,12 @@ class LocalTaskManagerTest extends UnitTestCase {
       ->method('getDefinitions')
       ->willReturn($definitions);
 
-    $mock_plugin = $this->createStub(LocalTaskInterface::class);
-    $this->setupFactory($mock_plugin);
+    $pluginStub = $this->createStub(LocalTaskInterface::class);
+    $this->setupFactory($pluginStub);
 
     $this->setupLocalTaskManager();
 
-    $result = $this->getLocalTasksForRouteResult($mock_plugin);
+    $result = $this->getLocalTasksForRouteResult($pluginStub);
 
     $this->cacheBackend->get('local_task_plugins:en:menu_local_task_test_tasks_view')
       ->shouldBeCalled();
@@ -201,8 +205,8 @@ class LocalTaskManagerTest extends UnitTestCase {
     $this->pluginDiscovery->expects($this->never())
       ->method('getDefinitions');
 
-    $mock_plugin = $this->createStub(LocalTaskInterface::class);
-    $this->setupFactory($mock_plugin);
+    $pluginStub = $this->createStub(LocalTaskInterface::class);
+    $this->setupFactory($pluginStub);
 
     $this->setupLocalTaskManager();
 
@@ -214,7 +218,7 @@ class LocalTaskManagerTest extends UnitTestCase {
     $this->cacheBackend->set()
       ->shouldNotBeCalled();
 
-    $result = $this->getLocalTasksForRouteResult($mock_plugin);
+    $result = $this->getLocalTasksForRouteResult($pluginStub);
     $local_tasks = $this->manager->getLocalTasksForRoute('menu_local_task_test_tasks_view');
     $this->assertEquals($result, $local_tasks);
   }
@@ -258,8 +262,9 @@ class LocalTaskManagerTest extends UnitTestCase {
     $language_manager
       ->method('getCurrentLanguage')
       ->willReturn(new Language(['id' => 'en']));
+    $yaml_cache_collector = new YamlCacheCollector('test', new MemoryCache(new Time()), new NullLockBackend(), new Time());
 
-    $this->manager = new LocalTaskManager($this->argumentResolver, $request_stack, $this->routeMatch, $this->routeProvider, $module_handler, $this->cacheBackend->reveal(), $language_manager, $this->accessManager, $this->account);
+    $this->manager = new LocalTaskManager($this->argumentResolver, $request_stack, $this->routeMatch, $this->routeProvider, $module_handler, $this->cacheBackend->reveal(), $language_manager, $this->accessManager, $this->account, $yaml_cache_collector);
 
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'discovery');
     $property->setValue($this->manager, $this->pluginDiscovery);
@@ -328,13 +333,13 @@ class LocalTaskManagerTest extends UnitTestCase {
   /**
    * Setups the plugin factory with some local task plugins.
    *
-   * @param \PHPUnit\Framework\MockObject\MockObject $mock_plugin
-   *   The mock plugin.
+   * @param \Drupal\Core\Menu\LocalTaskInterface|\PHPUnit\Framework\MockObject\Stub $pluginStub
+   *   The stubbed plugin.
    */
-  protected function setupFactory($mock_plugin): void {
+  protected function setupFactory(LocalTaskInterface&Stub $pluginStub): void {
     $map = [];
     foreach ($this->getLocalTaskFixtures() as $info) {
-      $map[] = [$info['id'], [], $mock_plugin];
+      $map[] = [$info['id'], [], $pluginStub];
     }
     $this->factory
       ->method('createInstance')
@@ -344,25 +349,24 @@ class LocalTaskManagerTest extends UnitTestCase {
   /**
    * Returns an expected result for getLocalTasksForRoute.
    *
-   * @param \PHPUnit\Framework\MockObject\MockObject $mock_plugin
-   *   The mock plugin.
+   * @param \Drupal\Core\Menu\LocalTaskInterface|\PHPUnit\Framework\MockObject\Stub $pluginStub
+   *   The stubbed plugin.
    *
    * @return array
    *   The expected result, keyed by local task level.
    */
-  protected function getLocalTasksForRouteResult($mock_plugin): array {
-    $result = [
+  protected function getLocalTasksForRouteResult(LocalTaskInterface&Stub $pluginStub): array {
+    return [
       0 => [
-        'menu_local_task_test_tasks_settings' => $mock_plugin,
-        'menu_local_task_test_tasks_view.tab' => $mock_plugin,
-        'menu_local_task_test_tasks_edit' => $mock_plugin,
+        'menu_local_task_test_tasks_settings' => $pluginStub,
+        'menu_local_task_test_tasks_view.tab' => $pluginStub,
+        'menu_local_task_test_tasks_edit' => $pluginStub,
       ],
       1 => [
-        'menu_local_task_test_tasks_view_child1' => $mock_plugin,
-        'menu_local_task_test_tasks_view_child2' => $mock_plugin,
+        'menu_local_task_test_tasks_view_child1' => $pluginStub,
+        'menu_local_task_test_tasks_view_child2' => $pluginStub,
       ],
     ];
-    return $result;
   }
 
   /**

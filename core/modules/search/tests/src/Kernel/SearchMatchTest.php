@@ -10,6 +10,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\search\SearchIndexInterface;
 use Drupal\search\SearchQuery;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore cillum dolore enim veniam
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Indexes content and queries it.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchMatchTest extends KernelTestBase {
 
@@ -135,7 +137,7 @@ class SearchMatchTest extends KernelTestBase {
    *   6  enim am minim veniam es cillum
    *   7  am minim veniam es cillum dolore eu.
    */
-  public function getText($n) {
+  public function getText($n): string {
     $words = explode(' ', "Ipsum dolore sit am. Ut enim am minim veniam. Es cillum dolore eu.");
     return implode(' ', array_slice($words, $n - 1, $n));
   }
@@ -150,7 +152,7 @@ class SearchMatchTest extends KernelTestBase {
    *   11 came over from germany
    *   12 over from germany swimming.
    */
-  public function getText2($n) {
+  public function getText2($n): string {
     $words = explode(' ', "Dear King Philip came over from Germany swimming.");
     return implode(' ', array_slice($words, $n - 1, $n));
   }

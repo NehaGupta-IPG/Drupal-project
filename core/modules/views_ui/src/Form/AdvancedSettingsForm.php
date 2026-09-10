@@ -4,13 +4,25 @@ namespace Drupal\views_ui\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Views;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Form builder for the advanced admin settings page.
  *
  * @internal
  */
+#[Route(
+  path: '/admin/structure/views/settings/advanced',
+  name: 'views_ui.settings_advanced',
+  requirements: [
+    '_permission' => 'administer views',
+  ],
+  defaults: [
+    '_title' => new TranslatableMarkup('Advanced Views settings'),
+  ],
+)]
 class AdvancedSettingsForm extends ConfigFormBase {
 
   /**
@@ -94,7 +106,7 @@ class AdvancedSettingsForm extends ConfigFormBase {
    * Submission handler to clear the Views cache.
    */
   public function cacheSubmit() {
-    views_invalidate_cache();
+    Views::invalidateCache();
     $this->messenger()->addStatus($this->t('The cache has been cleared.'));
   }
 

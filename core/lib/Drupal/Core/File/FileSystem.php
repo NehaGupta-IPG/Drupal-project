@@ -338,9 +338,16 @@ class FileSystem implements FileSystemInterface {
    * {@inheritdoc}
    */
   public function deleteRecursive($path, ?callable $callback = NULL) {
-    // Ensure paths are local paths when a recursive delete is started.
+    // Resolve stream wrapper URIs to local paths so that is_link() can
+    // detect symlinks and prevent traversal outside the target directory.
+    // Remote stream wrappers return FALSE from realpath(), in which case
+    // the original URI is kept since is_link() does not work with stream
+    // wrapper URIs.
     if ($this->streamWrapperManager->isValidUri($path)) {
-      $path = $this->realpath($path);
+      $realpath = $this->realpath($path);
+      if ($realpath !== FALSE) {
+        $path = $realpath;
+      }
     }
 
     if ($callback) {
@@ -452,9 +459,10 @@ class FileSystem implements FileSystemInterface {
     }
 
     // Determine whether we can perform this operation based on overwrite rules.
+    $original_destination = $destination;
     $destination = $this->getDestinationFilename($destination, $fileExists);
     if ($destination === FALSE) {
-      throw new FileExistsException("File '$original_source' could not be copied because a file by that name already exists in the destination directory ('$destination').");
+      throw new FileExistsException("File '$original_source' could not be copied because a file by that name already exists in the destination directory ('$original_destination').");
     }
 
     // Assert that the source and destination filenames are not the same.

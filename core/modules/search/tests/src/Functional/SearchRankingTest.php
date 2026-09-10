@@ -14,12 +14,14 @@ use Drupal\search\SearchIndexInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Indexes content and tests ranking factors.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchRankingTest extends BrowserTestBase {
 
@@ -36,7 +38,7 @@ class SearchRankingTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search', 'comment'];
+  protected static $modules = ['node', 'search', 'comment', 'search_node'];
 
   /**
    * {@inheritdoc}

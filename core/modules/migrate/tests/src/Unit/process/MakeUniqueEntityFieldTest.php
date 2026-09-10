@@ -68,7 +68,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
    * Tests making an entity field value unique.
    */
   #[DataProvider('providerTestMakeUniqueEntityField')]
-  public function testMakeUniqueEntityField($count, $postfix = '', $start = NULL, $length = NULL): void {
+  public function testMakeUniqueEntityField(int $count, ?string $postfix = '', ?int $start = NULL, ?int $length = NULL): void {
     $configuration = [
       'entity_type' => 'test_entity_type',
       'field' => 'test_field',
@@ -100,7 +100,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
     ];
     $plugin = new MakeUniqueEntityField($configuration, 'make_unique', [], $this->getMigration(), $this->entityTypeManager);
     $this->expectException('Drupal\migrate\MigrateException');
-    $this->expectExceptionMessage('The start position configuration key should be an integer. Omit this key to capture from the beginning of the string.');
+    $this->expectExceptionMessageIs('The start position configuration key should be an integer. Omit this key to capture from the beginning of the string.');
     $plugin->transform('test_start', $this->migrateExecutable, $this->row, 'foo');
   }
 
@@ -117,14 +117,14 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
     ];
     $plugin = new MakeUniqueEntityField($configuration, 'make_unique', [], $this->getMigration(), $this->entityTypeManager);
     $this->expectException('Drupal\migrate\MigrateException');
-    $this->expectExceptionMessage('The character length configuration key should be an integer. Omit this key to capture the entire string.');
+    $this->expectExceptionMessageIs('The character length configuration key should be an integer. Omit this key to capture the entire string.');
     $plugin->transform('test_length', $this->migrateExecutable, $this->row, 'foo');
   }
 
   /**
    * Data provider for testMakeUniqueEntityField().
    */
-  public static function providerTestMakeUniqueEntityField() {
+  public static function providerTestMakeUniqueEntityField(): array {
     return [
       // Tests no duplication.
       [0],
@@ -176,7 +176,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
       ->willReturn($this->entityQuery);
     $this->entityQuery->expects($this->exactly($count + 1))
       ->method('execute')
-      ->willReturnCallback(function () use (&$count) {
+      ->willReturnCallback(function () use (&$count): int {
         return $count--;
       });
   }

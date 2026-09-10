@@ -60,7 +60,7 @@ class ExplodeTest extends MigrateProcessTestCase {
    */
   public function testExplodeWithNonString(): void {
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('is not a string');
+    $this->expectExceptionMessageIsOrContains('is not a string');
     $this->plugin->transform(['foo'], $this->migrateExecutable, $this->row, 'destination_property');
   }
 
@@ -68,7 +68,7 @@ class ExplodeTest extends MigrateProcessTestCase {
    * Tests that explode works on non-strings but with strict set to FALSE.
    */
   #[DataProvider('providerExplodeWithNonStrictAndEmptySource')]
-  public function testExplodeWithNonStrictAndEmptySource($value, $expected): void {
+  public function testExplodeWithNonStrictAndEmptySource(string|int|bool|null $value, array $expected): void {
     $plugin = new Explode(['delimiter' => '|', 'strict' => FALSE], 'map', []);
 
     $processed = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destination_property');
@@ -78,7 +78,7 @@ class ExplodeTest extends MigrateProcessTestCase {
   /**
    * Data provider for ::testExplodeWithNonStrictAndEmptySource().
    */
-  public static function providerExplodeWithNonStrictAndEmptySource() {
+  public static function providerExplodeWithNonStrictAndEmptySource(): array {
     return [
       'normal_string' => ['a|b|c', ['a', 'b', 'c']],
       'integer_cast_to_string' => [123, ['123']],
@@ -96,7 +96,7 @@ class ExplodeTest extends MigrateProcessTestCase {
   public function testExplodeWithNonStrictAndNonCastable(): void {
     $plugin = new Explode(['delimiter' => '|', 'strict' => FALSE], 'map', []);
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('cannot be casted to a string');
+    $this->expectExceptionMessageIsOrContains('cannot be casted to a string');
     $processed = $plugin->transform(['foo'], $this->migrateExecutable, $this->row, 'destination_property');
     $this->assertSame(['foo'], $processed);
   }
@@ -115,7 +115,7 @@ class ExplodeTest extends MigrateProcessTestCase {
    */
   public function testExplodeWithEmptyDelimiter(): void {
     $this->expectException(MigrateException::class);
-    $this->expectExceptionMessage('delimiter is empty');
+    $this->expectExceptionMessageIs('delimiter is empty');
     $plugin = new Explode(['delimiter' => ''], 'map', []);
     $plugin->transform('foo,bar', $this->migrateExecutable, $this->row, 'destination_property');
   }

@@ -11,6 +11,7 @@ use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -29,7 +30,7 @@ class PageCacheTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['test_page_test', 'system_test', 'entity_test'];
+  protected static $modules = ['page_cache', 'test_page_test', 'system_test', 'entity_test'];
 
   /**
    * {@inheritdoc}
@@ -338,7 +339,9 @@ class PageCacheTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:user.role.anonymous');
 
     // 2. anonymous user, with permission.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['pet llamas']);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+      'pet llamas',
+    ])->save();
     $this->drupalGet($content_url);
     $this->assertSession()->pageTextContains('Permission to pet llamas: yes!');
     $this->assertCacheContext('user.permissions');
@@ -359,7 +362,9 @@ class PageCacheTest extends BrowserTestBase {
     $this->assertSession()->responseHeaderNotContains('X-Drupal-Cache-Tags', 'config:user.role.authenticated');
 
     // 4. authenticated user, with permission.
-    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['pet llamas']);
+    Role::loadOverrideFree(RoleInterface::AUTHENTICATED_ID)->grantPermissions([
+      'pet llamas',
+    ])->save();
     $this->drupalGet($content_url);
     $this->assertSession()->pageTextContains('Permission to pet llamas: yes!');
     $this->assertCacheContext('user.permissions');
@@ -386,7 +391,9 @@ class PageCacheTest extends BrowserTestBase {
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
-      $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', '4xx-response');
+      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', '4xx-response config:user.role.anonymous http_response rendered');
+      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', 'languages:language_interface theme url.query_args:_wrapper_format user.permissions user.roles:authenticated');
+      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
@@ -443,6 +450,9 @@ class PageCacheTest extends BrowserTestBase {
       $this->drupalGet($content_url);
       $this->assertSession()->statusCodeEquals($code);
       $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'MISS');
+      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', '4xx-response config:user.role.anonymous http_response rendered');
+      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', 'languages:language_interface theme url.query_args:_wrapper_format user.permissions user.roles:authenticated');
+      $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
     }
     // Restore 403 and 404 caching.
     $settings['settings']['cache_ttl_4xx'] = (object) [
