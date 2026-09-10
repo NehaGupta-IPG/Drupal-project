@@ -89,6 +89,13 @@ class PathItem extends FieldItemBase {
         'langcode' => $alias_langcode,
       ];
 
+      if ($pid) {
+        $supplied_alias = $path_alias_storage->load($pid);
+        if (!$supplied_alias || $supplied_alias->getPath() !== $properties['path']) {
+          $pid = NULL;
+        }
+      }
+
       if (!$pid) {
         // Try to load it from storage before creating it. In some cases the
         // path alias could be created before this function runs. For example,
@@ -127,8 +134,13 @@ class PathItem extends FieldItemBase {
       }
     }
     elseif ($pid) {
-      // Otherwise, delete the old alias if the user erased it.
+      // Otherwise, delete the old alias if the user erased it, but only when it
+      // belongs to this entity.
       $path_alias = $path_alias_storage->load($pid);
+      // Only delete an alias that belongs to this entity.
+      if (!$path_alias || $path_alias->getPath() !== '/' . $entity->toUrl()->getInternalPath()) {
+        return;
+      }
       if ($entity->isDefaultRevision()) {
         $path_alias_storage->delete([$path_alias]);
       }

@@ -9,6 +9,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Drupal\path\Plugin\Validation\Constraint\PathAliasConstraint;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -243,6 +244,101 @@ class PathItemTest extends KernelTestBase {
     $path_field->generateSampleItems();
     $node->save();
     $this->assertStringStartsWith('/', $node->get('path')->alias);
+  }
+
+  /**
+   * Tests that a supplied pid cannot target another entity's path alias.
+   */
+  public function testCrossEntityAliasProtection(): void {
+    $alias_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+
+    // A victim node with its own alias.
+    $victim = Node::create([
+      'title' => 'Victim',
+      'type' => 'foo',
+      'path' => ['alias' => '/victim-page'],
+    ]);
+    $victim->save();
+    $victim_internal_path = '/' . $victim->toUrl()->getInternalPath();
+    /** @var \Drupal\path_alias\PathAliasInterface $victim_alias */
+    $victim_alias = current($alias_storage->loadByProperties(['path' => $victim_internal_path]));
+    $victim_pid = (int) $victim_alias->id();
+
+    // An attacker node the attacker is allowed to edit.
+    $attacker = Node::create([
+      'title' => 'Attacker',
+      'type' => 'foo',
+      'path' => ['alias' => '/attacker-page'],
+    ]);
+    $attacker->save();
+
+    // Update vector: point the attacker's pid at the victim's alias and try to
+    // rename it. The victim alias must be untouched, and a new alias is created
+    // for the attacker node instead.
+    $attacker->get('path')->alias = '/hijacked';
+    $attacker->get('path')->pid = $victim_pid;
+    $attacker->save();
+
+    $alias_storage->resetCache();
+    $reloaded_victim_alias = $alias_storage->load($victim_pid);
+    $this->assertEquals('/victim-page', $reloaded_victim_alias->getAlias());
+    $this->assertEquals($victim_internal_path, $reloaded_victim_alias->getPath());
+    // The attacker's alias points to the attacker's node, not the victim's.
+    $attacker_alias = current($alias_storage->loadByProperties([
+      'path' => '/' . $attacker->toUrl()->getInternalPath(),
+      'alias' => '/hijacked',
+    ]));
+    $this->assertNotFalse($attacker_alias);
+    $this->assertNotEquals($victim_pid, (int) $attacker_alias->id());
+
+    // Deletion vector: an empty alias plus the victim's pid must not delete the
+    // victim's alias.
+    $attacker->get('path')->alias = '';
+    $attacker->get('path')->pid = $victim_pid;
+    $attacker->save();
+
+    $alias_storage->resetCache();
+    $this->assertNotNull($alias_storage->load($victim_pid));
+    $this->assertEquals('/victim-page', $alias_storage->load($victim_pid)->getAlias());
+
+    // Create vector: a brand new entity supplying a foreign pid must not touch
+    // the victim's alias; a fresh alias is minted for the new entity instead.
+    $new_attacker = Node::create([
+      'title' => 'New attacker',
+      'type' => 'foo',
+      'path' => ['alias' => '/created-hijack', 'pid' => $victim_pid],
+    ]);
+    $new_attacker->save();
+
+    $alias_storage->resetCache();
+    $this->assertEquals('/victim-page', $alias_storage->load($victim_pid)->getAlias());
+    $created_alias = current($alias_storage->loadByProperties([
+      'path' => '/' . $new_attacker->toUrl()->getInternalPath(),
+      'alias' => '/created-hijack',
+    ]));
+    $this->assertNotFalse($created_alias);
+    $this->assertNotEquals($victim_pid, (int) $created_alias->id());
+
+    // The validation constraint rejects a mismatched pid outright, giving
+    // JSON:API and other validated write paths a proper violation.
+    $pid_message = (string) (new PathAliasConstraint())->pidMessage;
+    $attacker->get('path')->alias = '/hijacked-again';
+    $attacker->get('path')->pid = $victim_pid;
+    $violations = $attacker->get('path')->validate();
+    $this->assertGreaterThan(0, $violations->count());
+    $messages = array_map(
+      fn ($violation) => (string) $violation->getMessage(),
+      iterator_to_array($violations),
+    );
+    $this->assertContains($pid_message, $messages);
+
+    // A matching pid (the entity's own alias) validates and saves normally.
+    $attacker->get('path')->alias = '/legitimate';
+    $attacker->get('path')->pid = (int) $attacker_alias->id();
+    $this->assertEquals(0, $attacker->get('path')->validate()->count());
+    $attacker->save();
+    $alias_storage->resetCache();
+    $this->assertEquals('/legitimate', $alias_storage->load($attacker_alias->id())->getAlias());
   }
 
 }
