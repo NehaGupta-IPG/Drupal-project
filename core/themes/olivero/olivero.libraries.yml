@@ -33,6 +33,7 @@ global-styling:
       css/components/breadcrumb.css: {}
       css/components/embedded-media.css: {}
       css/components/footer.css: {}
+      css/components/back-to-top.css: {}
       css/components/button.css: {}
       css/components/container-inline.module.css: {}
       css/components/fieldset.css: {}
@@ -60,6 +61,7 @@ global-styling:
 
   js:
     js/checkbox.js: {}
+    js/back-to-top.js: {}
 
   dependencies:
     - core/drupal

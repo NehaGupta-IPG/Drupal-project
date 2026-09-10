@@ -1,0 +1,51 @@
+/**
+ * @file
+ * Back to top styling.
+ */
+
+.scroll-top {
+  position: fixed;
+  z-index: 9999;
+  right: 30px;
+  bottom: 30px;
+  visibility: hidden; /* Initially hidden */
+  transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 1s;
+  pointer-events: auto;
+  opacity: 0; /* Initially hidden */
+
+  & .scroll-top__progress {
+    position: relative;
+    width: var(--sp2-5);
+    height: var(--sp2-5);
+    border-radius: 50%;
+  }
+
+  & .scroll-top__progress-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--sp2);
+    height: var(--sp2);
+    transform: translate(-50%, -50%);
+    border: solid 2px var(--color--white);
+    border-radius: 50%;
+    background: var(--color--gray-20);
+  }
+
+  & .scroll-top__button {
+    cursor: pointer;
+    border: none;
+    background: none;
+
+    svg {
+      transform: rotate(180deg);
+
+      path {
+        fill: var(--color--white);
+      }
+    }
+  }
+}
