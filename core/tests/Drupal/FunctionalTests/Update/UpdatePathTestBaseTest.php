@@ -111,7 +111,12 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
     $this->assertSession()->linkByHrefExists('/admin/structure');
     $this->assertSession()->linkByHrefNotExists('/admin-structure-alias');
 
-    $account = $this->createUser(['administer site configuration', 'access administration pages', 'access dblog reports', 'access site reports']);
+    $account = $this->createUser([
+      'administer site configuration',
+      'access administration pages',
+      'access dblog reports',
+      'access site reports',
+    ]);
     $this->drupalLogin($account);
 
     // Go to the status report page and check that the alias is used.

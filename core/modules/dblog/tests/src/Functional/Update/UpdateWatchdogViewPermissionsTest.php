@@ -7,12 +7,14 @@ namespace Drupal\Tests\dblog\Functional\Update;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewExecutable;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the permission update to the Watchdog view in the 112002 update.
- *
- * @group dblog
  */
+#[Group('dblog')]
+#[RunTestsInSeparateProcesses]
 class UpdateWatchdogViewPermissionsTest extends UpdatePathTestBase {
 
   /**
