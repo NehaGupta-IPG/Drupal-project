@@ -1,21 +1,26 @@
 <?php
 
-namespace Drupal\views\Plugin\views\style;
+namespace Drupal\views_grid\Plugin\views\style;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsStyle;
+use Drupal\views\Plugin\views\style\StylePluginBase;
 
 /**
  * Style plugin to render each item in a grid cell.
+ *
+ * @deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use the
+ *   responsive grid style plugin instead.
+ * @see https://www.drupal.org/node/3301811
  *
  * @ingroup views_style_plugins
  */
 #[ViewsStyle(
   id: "grid",
-  title: new TranslatableMarkup("Grid"),
-  help: new TranslatableMarkup("Displays rows in a grid."),
+  title: new TranslatableMarkup("Grid (deprecated)"),
+  help: new TranslatableMarkup("Displays rows in a grid. This style is deprecated, use the responsive grid style instead."),
   theme: "views_view_grid",
   display_types: ["normal"],
 )]
@@ -29,7 +34,7 @@ class Grid extends StylePluginBase {
   /**
    * {@inheritdoc}
    */
-  protected function defineOptions() {
+  protected function defineOptions(): array {
     $options = parent::defineOptions();
     $options['columns'] = ['default' => '4'];
     $options['automatic_width'] = ['default' => TRUE];
@@ -46,6 +51,15 @@ class Grid extends StylePluginBase {
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
+
+    // Add deprecation warning at the top of the form.
+    $form['deprecation_warning'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['messages', 'messages--warning']],
+      '#markup' => $this->t('<strong>This grid style is deprecated.</strong> Consider using the "Responsive Grid" style instead, which provides better mobile support and modern CSS Grid layout.'),
+      '#weight' => -100,
+    ];
+
     $form['columns'] = [
       '#type' => 'number',
       '#title' => $this->t('Number of columns'),

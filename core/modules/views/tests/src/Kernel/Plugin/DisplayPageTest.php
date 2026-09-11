@@ -236,7 +236,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
     $styles = [
       'default' => '//div[@class="views-row"]',
       // Olivero does not use the 'views-col' class.
-      'grid' => '//div[contains(@class, "views-col") or contains(@class, "views-view-grid__item-inner")]',
+      'grid_responsive' => '//div[contains(@class, "views-view-responsive-grid__item-inner")]',
       'html_list' => '//div[@class="item-list"]//li',
     ];
 

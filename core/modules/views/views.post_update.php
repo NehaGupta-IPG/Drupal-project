@@ -61,3 +61,45 @@ function views_removed_post_updates(): array {
 function views_post_update_counter_field_not_sortable(): void {
   // Empty update to trigger a cache rebuild so updated Views data is applied.
 }
+
+/**
+ * Update config dependencies for views using the grid style plugin.
+ */
+function views_post_update_add_views_grid_dependencies(): void {
+  // Only run if views_grid module is enabled.
+  if (!\Drupal::moduleHandler()->moduleExists('views_grid')) {
+    return;
+  }
+
+  $config_factory = \Drupal::configFactory();
+  $view_configs = $config_factory->listAll('views.view.');
+
+  foreach ($view_configs as $config_name) {
+    $config = $config_factory->getEditable($config_name);
+    $displays = $config->get('display') ?? [];
+    $has_grid_in_view = FALSE;
+
+    // Check if this view uses the grid style plugin.
+    foreach ($displays as $display) {
+      $style = $display['display_options']['style']['type'] ?? NULL;
+      if ($style === 'grid') {
+        $has_grid_in_view = TRUE;
+        break;
+      }
+    }
+
+    // Update dependencies if the view uses grid style.
+    if ($has_grid_in_view) {
+      $dependencies = $config->get('dependencies') ?? [];
+      $module_dependencies = $dependencies['module'] ?? [];
+
+      if (!in_array('views_grid', $module_dependencies)) {
+        $module_dependencies[] = 'views_grid';
+        sort($module_dependencies);
+        $dependencies['module'] = $module_dependencies;
+        $config->set('dependencies', $dependencies);
+        $config->save();
+      }
+    }
+  }
+}
