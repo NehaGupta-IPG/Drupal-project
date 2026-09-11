@@ -37,7 +37,7 @@ class ViewsExposedFormFiltersHeadingTest extends ViewsKernelTestBase {
   }
 
   /**
-   * Tests the heading and aria-label of a view's exposed filter form.
+   * Tests the heading of a view's exposed filter form.
    */
   public function testFiltersHeading(): void {
     $storage = View::create([
@@ -76,8 +76,8 @@ class ViewsExposedFormFiltersHeadingTest extends ViewsKernelTestBase {
     $form = $exposed_form->renderExposedForm();
     $output = (string) \Drupal::service('renderer')->renderInIsolation($form);
 
-    $this->assertMatchesRegularExpression('#<h2[^>]*>Filter</h2>#', $output);
-    $this->assertStringContainsString('aria-label="Filter the contents of the Test view view"', $output);
+    $this->assertMatchesRegularExpression('#<h2[^>]*>Filter Test view</h2>#', $output);
+    $this->assertStringNotContainsString('aria-label', $output);
   }
 
 }

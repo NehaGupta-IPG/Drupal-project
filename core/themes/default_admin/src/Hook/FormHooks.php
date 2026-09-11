@@ -503,17 +503,16 @@ class FormHooks {
     $view = $form_state->getStorage()['view'];
     $view_title = $view->getTitle();
 
-    // Add a label so screen readers can identify the purpose of the exposed
-    // form without having to scan content that appears further down the page.
-    $form['#attributes']['aria-label'] = $this->t('Filter the contents of the %view_title view', ['%view_title' => $view_title]);
-
     // Add a short visible heading so sighted users, zoomed-in users, and
     // users navigating by heading (for example with a screen reader rotor)
-    // can also identify the exposed filters.
+    // can identify the exposed filters. The view title is included so that
+    // headings stay distinct when a page includes more than one exposed
+    // filter form. This replaces the previous aria-label, which duplicated
+    // the heading text for screen reader users.
     $form['filters_heading'] = [
       '#type' => 'html_tag',
       '#tag' => 'h2',
-      '#value' => $this->t('Filter'),
+      '#value' => $this->t('Filter @view_title', ['@view_title' => $view_title]),
       '#weight' => -1000,
     ];
   }
