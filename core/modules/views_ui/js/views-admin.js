@@ -205,7 +205,7 @@
        *   The source form field value.
        */
       getTransliterated() {
-        let from = this.source.length ? this.source[0].value : '';
+        let from = this.source?.[0]?.value ?? '';
         if (this.exclude) {
           from = from.toLowerCase().replace(this.exclude, this.replace);
         }
@@ -1252,7 +1252,7 @@
       ).forEach((dropdown) => {
         // Closures! :(
         const submit = context.querySelector('[id^=edit-submit]');
-        const oldValue = submit ? submit.value : '';
+        const oldValue = submit?.value ?? '';
 
         $(once('views-ui-override-button-text', submit)).on(
           'mouseup',

@@ -184,9 +184,7 @@
     /**
      * Keeps track of rows that have changed.
      */
-    this.changedRowIds = Drupal.tableDrag[table.id]
-      ? Drupal.tableDrag[table.id].changedRowIds
-      : new Set();
+    this.changedRowIds = Drupal.tableDrag[table.id]?.changedRowIds ?? new Set();
 
     Object.keys(tableSettings || {}).forEach((group) => {
       Object.keys(tableSettings[group] || {}).forEach((n) => {

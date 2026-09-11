@@ -61,8 +61,7 @@
       const $toggle = $item
         .children('.toolbar-box')
         .children('.toolbar-handle');
-      switcher =
-        typeof switcher !== 'undefined' ? switcher : !$item.hasClass('open');
+      switcher = switcher ?? !$item.hasClass('open');
       // Toggle the item open state.
       $item.toggleClass('open', switcher);
       // Twist the toggle.
@@ -136,7 +135,7 @@
           const $box = $item.children('.toolbar-box');
           const $link = $box.find('a');
           options.text = Drupal.t('@label', {
-            '@label': $link.length ? $link[0].textContent : '',
+            '@label': $link?.[0]?.textContent ?? '',
           });
           $item
             .children('.toolbar-box')

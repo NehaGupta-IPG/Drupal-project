@@ -503,9 +503,8 @@ window.Drupal = { behaviors: {}, locale: {} };
     // Determine the index of the plural form.
     if (drupalTranslations?.pluralFormula) {
       index =
-        count in drupalTranslations.pluralFormula
-          ? drupalTranslations.pluralFormula[count]
-          : drupalTranslations.pluralFormula.default;
+        drupalTranslations.pluralFormula?.[count] ??
+        drupalTranslations.pluralFormula.default;
     } else if (args['@count'] !== 1) {
       index = 1;
     }

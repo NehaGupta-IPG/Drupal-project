@@ -283,10 +283,7 @@
     // If there is a username edit box on the page, compare password to that,
     // otherwise use value from the database.
     const $usernameBox = $('input.username');
-    const username =
-      $usernameBox.length > 0
-        ? $usernameBox[0].value
-        : passwordSettings.username;
+    const username = $usernameBox?.[0]?.value ?? passwordSettings.username;
 
     // Lose 5 points for every character less than 12, plus a 30 point penalty.
     if (password.length < 12) {
