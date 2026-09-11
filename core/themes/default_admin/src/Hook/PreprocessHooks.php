@@ -18,6 +18,7 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
@@ -251,7 +252,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
         }
         else {
           // Let escapeAdmin override the return URL.
-          $variables['breadcrumb'][$key]['attributes']['data'] = 'data-gin-toolbar-escape-admin';
+          $variables['breadcrumb'][$key]['attributes']['data'] = 'data-toolbar-escape-admin';
         }
       }
       elseif (isset($url) && $item['url'] === $url->setAbsolute(FALSE)->toString()) {
@@ -612,11 +613,14 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     $settings = Settings::getInstance();
 
     // Old way to set accent color.
-    $variables['html_attributes']['data-gin-accent'] = $settings->get('preset_accent_color');
+    $variables['html_attributes']['data-accent'] = $settings->get('preset_accent_color');
 
     // New way to set accent color.
     $accent_colors = Helper::accentColors();
-    $preset = $settings->get('preset_accent_color');
+    // The theme settings are not available while Drupal is being installed,
+    // because they are stored in configuration. Fall back to an empty string so
+    // that the preset can be used as an array offset.
+    $preset = $settings->get('preset_accent_color') ?? '';
     $accent_color = '';
 
     if ($preset === 'custom' && $settings->get('accent_color')) {
@@ -631,19 +635,26 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     }
 
     // Set focus color.
-    $variables['html_attributes']['data-gin-focus'] = $settings->get('preset_focus_color');
+    $variables['html_attributes']['data-admin-focus'] = $settings->get('preset_focus_color');
 
     // High contrast mode.
     if ($settings->get('high_contrast_mode')) {
-      $variables['html_attributes']['class'][] = 'gin--high-contrast-mode';
+      $variables['html_attributes']['class'][] = 'high-contrast-mode';
     }
 
     // Set layout density.
-    $variables['html_attributes']['data-gin-layout-density'] = $settings->get('layout_density');
+    $variables['html_attributes']['data-layout-density'] = $settings->get('layout_density');
 
     // Edit form? Use the new admin Edit form layout.
     if (Helper::isContentForm()) {
-      $variables['attributes']['class'][] = 'gin--edit-form';
+      $variables['attributes']['class'][] = 'edit-form';
+    }
+
+    // Checking permissions requires a database connection, which does not
+    // exist yet while Drupal is being installed. Installer pages have neither
+    // a toolbar nor a navigation, so there is nothing to add.
+    if (InstallerKernel::installationAttempted()) {
+      return;
     }
 
     // Only add toolbar/navigation class if user has permission.
@@ -656,11 +667,11 @@ final class PreprocessHooks implements TrustedCallbackInterface {
 
     // Check if Navigation module is active.
     if ($this->moduleHandler->moduleExists('navigation')) {
-      $variables['attributes']['class'][] = 'gin--navigation';
+      $variables['attributes']['class'][] = 'admin--navigation';
     }
     else {
       // Set toolbar class.
-      $variables['attributes']['class'][] = 'gin--toolbar';
+      $variables['attributes']['class'][] = 'admin--toolbar';
     }
   }
 
@@ -1047,7 +1058,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
       else {
         $variables['default_admin_form_actions'] = $form_actions;
       }
-      $variables['default_admin_form_actions_class'] = 'gin-sticky-form-actions--preprocessed';
+      $variables['default_admin_form_actions_class'] = 'sticky-form-actions--preprocessed';
     }
   }
 
@@ -1304,7 +1315,7 @@ final class PreprocessHooks implements TrustedCallbackInterface {
     // Get form actions.
     if ($form_actions = Helper::formActions()) {
       $variables['default_admin_form_actions'] = $form_actions;
-      $variables['default_admin_form_actions_class'] = 'gin-sticky-form-actions--preprocessed';
+      $variables['default_admin_form_actions_class'] = 'sticky-form-actions--preprocessed';
       $variables['#attached']['library'][] = 'default_admin/top_bar';
     }
 

@@ -6,6 +6,9 @@ namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
 use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaDefinition\GinIndex;
+use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
@@ -15,15 +18,14 @@ use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Language\Language;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
-use Drupal\pgsql\Driver\Database\pgsql\GinIndex;
-use Drupal\pgsql\Driver\Database\pgsql\GistIndex;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cSpell:ignore attname attnum attrelid indexdef jsonb objid refobjid
-// cSpell:ignore refobjsubid regclass regconfig relkind relname tsvector
+// cSpell:ignore attgenerated attname attnum attrelid indexdef jsonb objid
+// cSpell:ignore refobjid refobjsubid regclass regconfig relkind relname
+// cSpell:ignore tsvector
 
 /**
  * Tests schema API for the PostgreSQL driver.
@@ -38,6 +40,20 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
    */
   public function checkSchemaComment(string|false $description, string $table, ?string $column = NULL): void {
     $this->assertSame($description, $this->schema->getComment($table, $column), 'The comment matches the schema description.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkGeneratedColumnStorage(GeneratedColumnStorage $storage, string $table, string $column): void {
+    $generated = $this->connection->query("SELECT [attgenerated] FROM [pg_attribute] WHERE [attrelid] = '{" . $table . "}'::regclass AND [attname] = :column", [
+      ':column' => $column,
+    ])->fetchField();
+    $expected = match ($storage) {
+      GeneratedColumnStorage::Virtual => 'v',
+      GeneratedColumnStorage::Stored => 's',
+    };
+    $this->assertSame($expected, $generated);
   }
 
   /**

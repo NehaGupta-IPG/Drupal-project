@@ -7,6 +7,7 @@ namespace Drupal\Tests\olivero\Functional;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -50,6 +51,7 @@ class OliveroTest extends BrowserTestBase {
   /**
    * Test Olivero's configuration schema.
    */
+  #[IgnoreDeprecations]
   public function testConfigSchema(): void {
     // Required configuration.
     $this->drupalGet('');
@@ -75,6 +77,7 @@ class OliveroTest extends BrowserTestBase {
    *
    * @see olivero.libraries.yml
    */
+  #[IgnoreDeprecations]
   public function testPreprocessBlock(): void {
     $this->drupalGet('');
     $this->assertSession()->statusCodeEquals(200);
@@ -150,7 +153,7 @@ class OliveroTest extends BrowserTestBase {
 
     $this->drupalGet('pager-test/multiple-pagers', ['query' => ['page' => 1]]);
     $this->assertSession()->statusCodeEquals(200);
-    $elements = $this->xpath('//ul[contains(@class, :class)]/li', [':class' => 'pager__items']);
+    $elements = $this->getNodeElementsByXpath('//ul[contains(@class, :class)]/li', [':class' => 'pager__items']);
     $this->assertNotEmpty($elements, 'Pager found.');
 
     // Check all links for pager-test attribute.
@@ -175,6 +178,51 @@ class OliveroTest extends BrowserTestBase {
 
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains('Community carpentry');
+  }
+
+  /**
+   * Tests the theme settings color input.
+   */
+  public function testThemeSettingsColorHexCode() : void {
+    $this->drupalLogin($this->drupalCreateUser([
+      'access administration pages',
+      'view the administration theme',
+      'administer themes',
+    ]));
+
+    // Define invalid and valid hex color codes.
+    $invalid_hex_codes = [
+      'xyz',
+      '#xyz',
+      '#ffff',
+      '#00000',
+      '#FFFFF ',
+      '00#000',
+    ];
+    $valid_hex_codes = [
+      '0F0',
+      '#F0F',
+      '#2ecc71',
+      '0074cc',
+    ];
+
+    // Visit Olivero's theme settings page.
+    $this->drupalGet('admin/appearance/settings/olivero');
+
+    // Test invalid hex color codes.
+    foreach ($invalid_hex_codes as $invalid_hex) {
+      $this->submitForm(['base_primary_color' => $invalid_hex], 'Save configuration');
+      // Invalid hex codes should throw error.
+      $this->assertSession()->statusMessageContains('"' . $invalid_hex . '" is not a valid hexadecimal color.', 'error');
+      $this->assertTrue($this->getSession()->getPage()->findField('base_primary_color')->hasClass('error'));
+    }
+
+    // Test valid hex color codes.
+    foreach ($valid_hex_codes as $valid_hex) {
+      $this->submitForm(['base_primary_color' => $valid_hex], 'Save configuration');
+      $this->assertSession()->statusMessageContains('The configuration options have been saved.', 'status');
+      $this->assertSame($valid_hex, \Drupal::service('config.factory')->getEditable('olivero.settings')->get('base_primary_color'));
+    }
   }
 
 }

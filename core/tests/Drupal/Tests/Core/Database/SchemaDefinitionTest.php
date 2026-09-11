@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Database;
 
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Core\Database\SchemaDefinition\AlternativeIndexes;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\FloatValue;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnExpression;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
 use Drupal\Core\Database\SchemaDefinition\GinIndex;
 use Drupal\Core\Database\SchemaDefinition\GistIndex;
 use Drupal\Core\Database\SchemaDefinition\Index;
@@ -20,7 +23,6 @@ use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
-use Drupal\Core\Database\Exception\SchemaDefinitionException;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -221,6 +223,50 @@ class SchemaDefinitionTest extends UnitTestCase {
         ),
       ],
       primaryKey: new PrimaryKey(['id']),
+    );
+  }
+
+  /**
+   * Tests Serial column.
+   */
+  public function testInvalidSerialForGeneratedExpression(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage('Cannot set \'generatedExpression\' for serial column \'id\'');
+    new Table(
+      name: 'test',
+      columns: [
+        Column::generated(
+          name: 'id',
+          type: ColumnType::Serial,
+          expression: new GeneratedColumnExpression('1 + 1'),
+          storage: GeneratedColumnStorage::Virtual,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['id']),
+    );
+  }
+
+  /**
+   * Tests that a generated column cannot be part of the primary key.
+   */
+  public function testInvalidPrimaryKeyForGeneratedColumn(): void {
+    $this->expectException(SchemaDefinitionException::class);
+    $this->expectExceptionMessage("The primary key of the 'test' Table cannot include generated columns");
+    new Table(
+      name: 'test',
+      columns: [
+        Column::create(
+          name: 'age',
+          type: ColumnType::Int,
+        ),
+        Column::generated(
+          name: 'double_age',
+          type: ColumnType::Int,
+          expression: new GeneratedColumnExpression('[age] * 2'),
+          storage: GeneratedColumnStorage::Stored,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['double_age']),
     );
   }
 
