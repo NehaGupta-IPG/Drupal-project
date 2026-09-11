@@ -12,12 +12,11 @@
     attach(context) {
       const $context = $(context);
       $context
-        .find('fieldset.comment-entity-settings-form')
+        .find('.comment-settings-form')
         .drupalSetSummary((context) =>
           Drupal.checkPlain(
-            $(context)
-              .find('.js-form-item-comment input:checked')
-              .next('label')[0].textContent,
+            $(context).find('input[name$="[status]"]:checked').next('label')[0]
+              .textContent,
           ),
         );
     },
