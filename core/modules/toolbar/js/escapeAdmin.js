@@ -5,7 +5,17 @@
 
 (function ($, Drupal, drupalSettings) {
   const pathInfo = drupalSettings.path;
-  const escapeAdminPath = sessionStorage.getItem('escapeAdminPath');
+  const oldEscapeAdminPath = sessionStorage.getItem('escapeAdminPath');
+  if (oldEscapeAdminPath) {
+    Drupal.deprecationError({
+      message:
+        'escapeAdminPath is deprecated in drupal:10.4.x and will be removed from drupal:12.0.0. See https://www.drupal.org/node/3461699',
+    });
+  }
+  const escapeAdminPath =
+    oldEscapeAdminPath ??
+    sessionStorage.getItem('Drupal.toolbar.escapeAdminPath');
+
   const windowLocation = window.location;
 
   // Saves the last non-administrative page in the browser to be able to link
@@ -16,7 +26,7 @@
     !pathInfo.currentPathIsAdmin &&
     !windowLocation.search.includes('destination=')
   ) {
-    sessionStorage.setItem('escapeAdminPath', windowLocation);
+    sessionStorage.setItem('Drupal.toolbar.escapeAdminPath', windowLocation);
   }
 
   /**
