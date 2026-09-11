@@ -14,8 +14,6 @@
 
 namespace GuzzleHttp\Cookie;
 
-use GuzzleHttp\Utils;
-
 // phpcs:ignoreFile
 
 // Only define the class if the real one has not already been loaded.
@@ -100,7 +98,7 @@ if (!class_exists(FileCookieJar::class, false)) {
                 }
             }
 
-            $jsonStr = Utils::jsonEncode($json, \JSON_HEX_TAG);
+            $jsonStr = \json_encode($json, \JSON_HEX_TAG | \JSON_THROW_ON_ERROR);
             if (false === \file_put_contents($filename, $jsonStr, \LOCK_EX)) {
                 throw new \RuntimeException("Unable to save file {$filename}");
             }
@@ -125,7 +123,7 @@ if (!class_exists(FileCookieJar::class, false)) {
                 return;
             }
 
-            $data = Utils::jsonDecode($json, true);
+            $data = \json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
             if (\is_array($data)) {
                 foreach ($data as $cookie) {
                   if (!\is_array($cookie)) {
