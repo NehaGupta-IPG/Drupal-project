@@ -281,6 +281,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $language_switchers = $this->getNodeElementsByXpath('//div[@id=:id]/ul/li', [':id' => 'block-test-language-block']);
     $list_items = [];
     $anchors = [];
+    $active_states = [];
     $labels = [];
     foreach ($language_switchers as $list_item) {
       $list_items[] = [
@@ -293,6 +294,8 @@ class LanguageSwitchingTest extends BrowserTestBase {
         'hreflang' => $link->getAttribute('hreflang'),
         'data-drupal-link-system-path' => $link->getAttribute('data-drupal-link-system-path'),
       ];
+      $active_states[] = $link->hasClass('is-active');
+
       $labels[] = $link->getText();
     }
     $expected_list_items = [
@@ -306,6 +309,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     ];
     $this->assertSame($expected_anchors, $anchors, 'The anchors have the correct attributes that will allow the drupal.active-link library to mark them as active.');
     $this->assertSame(['English', 'français'], $labels, 'The language links labels are in their own language on the language switcher block.');
+    $this->assertSame([true, false], $active_states);
   }
 
   /**
