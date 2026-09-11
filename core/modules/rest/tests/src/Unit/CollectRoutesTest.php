@@ -58,14 +58,10 @@ class CollectRoutesTest extends UnitTestCase {
     $view_executable->storage = $view;
     $view_executable->argument = [];
 
-    $display_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $display_manager = $this->createMock(ViewsPluginManager::class);
     $container->set('plugin.manager.views.display', $display_manager);
 
-    $access_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $access_manager = $this->createMock(ViewsPluginManager::class);
     $container->set('plugin.manager.views.access', $access_manager);
 
     $route_provider = $this->createStub(RouteProviderInterface::class);
@@ -76,9 +72,7 @@ class CollectRoutesTest extends UnitTestCase {
     $state = $this->createStub(StateInterface::class);
     $container->set('state', $state);
 
-    $style_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $style_manager = $this->createMock(ViewsPluginManager::class);
     $container->set('plugin.manager.views.style', $style_manager);
     $container->set('renderer', $this->createStub(RendererInterface::class));
 

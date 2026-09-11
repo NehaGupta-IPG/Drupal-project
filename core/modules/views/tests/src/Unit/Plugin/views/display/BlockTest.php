@@ -58,9 +58,7 @@ class BlockTest extends UnitTestCase {
 
     $this->blockDisplay->view = $this->executable;
 
-    $this->blockPlugin = $this->getMockBuilder(ViewsBlock::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->blockPlugin = $this->createMock(ViewsBlock::class);
   }
 
   /**

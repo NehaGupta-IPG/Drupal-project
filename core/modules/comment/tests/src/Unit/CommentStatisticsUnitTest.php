@@ -82,9 +82,7 @@ class CommentStatisticsUnitTest extends UnitTestCase {
       ->method('execute')
       ->willReturn($this->statement);
 
-    $this->database = $this->getMockBuilder(Connection::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->database = $this->createMock(Connection::class);
 
     $this->database->expects($this->once())
       ->method('select')
