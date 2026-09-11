@@ -30,7 +30,7 @@ class DrupalConsoleLogger extends AbstractLogger implements LoggerAwareInterface
     // Populate the message placeholders and then replace them in the message.
     $message_placeholders = $this->parser->parseMessagePlaceholders($message, $context);
     $message = empty($message_placeholders) ? $message : strtr($message, $message_placeholders);
-    $this->logger?->log(self::toPsr3($level), $message, []);
+    $this->logger?->log(\is_int($level) ? self::toPsr3($level) : $level, $message, []);
   }
 
   /**
