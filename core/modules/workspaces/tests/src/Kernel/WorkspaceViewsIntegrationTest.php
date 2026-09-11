@@ -235,6 +235,42 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
   }
 
   /**
+   * Tests sorting a view by a formula in a workspace.
+   */
+  public function testViewsSortByFormula(): void {
+    $nodes = $this->createNodesEditedInWorkspace();
+
+    $view = Views::getView('promoted_content');
+    $view->setDisplay('page_1');
+    $display = $view->displayHandlers->get('page_1');
+    $display->overrideOption('filters', []);
+    // A date sort with a granularity coarser than 'second' sorts by a formula
+    // that references the column directly, so the reference is rewritten inside
+    // the formula.
+    $display->overrideOption('sorts', [
+      'created' => [
+        'id' => 'created',
+        'table' => 'node_field_data',
+        'field' => 'created',
+        'entity_type' => 'node',
+        'entity_field' => 'created',
+        'plugin_id' => 'date',
+        'granularity' => 'day',
+        'order' => 'ASC',
+      ],
+    ]);
+    $view->execute();
+
+    // In the workspace node A has the earliest creation date, so ascending
+    // order by day is A, C, B.
+    $this->assertIdenticalResultset($view, [
+      ['nid' => $nodes['a']->id()],
+      ['nid' => $nodes['c']->id()],
+      ['nid' => $nodes['b']->id()],
+    ], ['nid' => 'nid']);
+  }
+
+  /**
    * Tests a click sort with DISTINCT on a revisionable field in a workspace.
    */
   public function testViewsClickSortWithDistinct(): void {
@@ -262,6 +298,101 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
       ['nid' => $nodes['b']->id()],
       ['nid' => $nodes['c']->id()],
     ], ['nid' => 'nid']);
+  }
+
+  /**
+   * Tests a filter that wraps a revisionable field in a condition object.
+   */
+  public function testViewsFilterConditionObject(): void {
+    $nodes = $this->createNodesEditedInWorkspace();
+
+    // The 'contains any/all words' string operator adds the field inside an
+    // AND/OR condition object, instead of a plain condition string.
+    $view = $this->buildNodeView('workspace_title_contains', [
+      'fields' => [
+        'nid' => [
+          'id' => 'nid',
+          'table' => 'node_field_data',
+          'field' => 'nid',
+          'entity_type' => 'node',
+          'entity_field' => 'nid',
+          'plugin_id' => 'field',
+        ],
+      ],
+      'filters' => [
+        'title' => [
+          'id' => 'title',
+          'table' => 'node_field_data',
+          'field' => 'title',
+          'entity_type' => 'node',
+          'entity_field' => 'title',
+          'plugin_id' => 'string',
+          'operator' => 'allwords',
+          'value' => 'Z',
+        ],
+      ],
+    ]);
+    $view->execute();
+
+    // Only node A has the title 'Z' in the workspace.
+    $this->assertIdenticalResultset($view, [
+      ['nid' => $nodes['a']->id()],
+    ], ['nid' => 'nid']);
+
+    // Outside the workspace no node has 'Z' in its title.
+    $this->switchToLive();
+    $view = Views::getView('workspace_title_contains');
+    $view->execute();
+    $this->assertIdenticalResultset($view, [], ['nid' => 'nid']);
+  }
+
+  /**
+   * Tests the node published status filter in a workspace.
+   */
+  public function testViewsNodeStatusFilter(): void {
+    $node_1 = $this->createNode(['title' => 'Published in Live', 'status' => TRUE, 'promote' => TRUE]);
+    $node_2 = $this->createNode(['title' => 'Unpublished in Live', 'status' => FALSE, 'promote' => TRUE]);
+
+    $this->switchToWorkspace('stage');
+
+    // Flip the published status of both nodes in the workspace.
+    $node_1->setUnpublished()->save();
+    $node_2->setPublished()->save();
+
+    // The 'node_status' filter adds a raw SQL snippet instead of a condition,
+    // so its 'status' and 'uid' references are rewritten inside the snippet and
+    // the filter checks the workspace revision.
+    $view = $this->promotedContentViewWithNodeStatusFilter();
+    $view->execute();
+    $this->assertIdenticalResultset($view, [['nid' => $node_2->id()]], ['nid' => 'nid']);
+
+    // Outside the workspace the live status decides what is visible.
+    $this->switchToLive();
+    $view = $this->promotedContentViewWithNodeStatusFilter();
+    $view->execute();
+    $this->assertIdenticalResultset($view, [['nid' => $node_1->id()]], ['nid' => 'nid']);
+  }
+
+  /**
+   * Loads the promoted content view, filtered by the node status filter.
+   *
+   * @return \Drupal\views\ViewExecutable
+   *   The executable view.
+   */
+  protected function promotedContentViewWithNodeStatusFilter(): ViewExecutable {
+    $view = Views::getView('promoted_content');
+    $view->setDisplay('page_1');
+    $view->displayHandlers->get('page_1')->overrideOption('filters', [
+      'status_extra' => [
+        'id' => 'status_extra',
+        'table' => 'node_field_data',
+        'field' => 'status_extra',
+        'entity_type' => 'node',
+        'plugin_id' => 'node_status',
+      ],
+    ]);
+
+    return $view;
   }
 
   /**
@@ -308,6 +439,56 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
 
     // Grouping by the live column would give [0 => 2, 1 => 1].
     $this->assertSame([0 => 1, 1 => 2], $counts);
+  }
+
+  /**
+   * Tests a HAVING clause on a counted base field in a workspace.
+   */
+  public function testViewsHavingOnCount(): void {
+    $this->createNodesEditedInWorkspace();
+
+    $view = $this->buildNodeAggregateView('workspace_having_count', [
+      'sticky' => $this->nodeHandlerConfig('sticky', 'boolean', 'group'),
+      'nid' => $this->nodeHandlerConfig('nid', 'numeric', 'count'),
+    ], [
+      'nid' => $this->nodeHandlerConfig('nid', 'numeric', 'count') + [
+        'operator' => '>=',
+        'value' => ['value' => 2],
+      ],
+    ]);
+    $view->execute();
+
+    // Only the sticky group has 2 nodes in the workspace (A and C).
+    $this->assertCount(1, $view->result);
+    $row = reset($view->result);
+    $this->assertSame(1, (int) $view->field['sticky']->getValue($row));
+    $this->assertSame(2, (int) $view->field['nid']->getValue($row));
+  }
+
+  /**
+   * Tests a HAVING clause on an aggregated revisionable field in a workspace.
+   */
+  public function testViewsHavingOnAggregatedField(): void {
+    $this->createNodesEditedInWorkspace();
+
+    // Group by the content type, which is not revisionable, so the nodes stay
+    // in a single group and the HAVING condition (which wraps the column in an
+    // aggregate, e.g. SUM(sticky)) is the only thing that depends on
+    // revisionable values.
+    $view = $this->buildNodeAggregateView('workspace_having_sum', [
+      'type' => $this->nodeHandlerConfig('type', 'field', 'group'),
+    ], [
+      'sticky' => $this->nodeHandlerConfig('sticky', 'numeric', 'sum') + [
+        'operator' => '>=',
+        'value' => ['value' => 2],
+      ],
+    ]);
+    $view->execute();
+
+    // In the workspace 2 of the 3 nodes are sticky, so SUM(sticky) is 2 and the
+    // 'page' group passes the HAVING condition. With live values SUM(sticky) is
+    // 1 and the group would be filtered out.
+    $this->assertCount(1, $view->result);
   }
 
   /**
