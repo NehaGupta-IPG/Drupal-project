@@ -255,7 +255,7 @@ class ViewsOperations {
     unset($order);
 
     // @todo Handle expressions and HAVING clauses in
-    //   https://www.drupal.org/node/2968165.
+    //   https://www.drupal.org/node/3622522.
   }
 
   /**
