@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\workspaces\Hook;
 
-use Drupal\Core\Database\Query\ConditionInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -178,106 +177,10 @@ class ViewsOperations {
       }
     }
 
-    // A relationship can join on a revisionable base field, e.g. the 'Content:
-    // Author' relationship joins 'users_field_data' on 'node_field_data.uid'.
-    // Its extra conditions can compare a revisionable base column to a value,
-    // and a raw string extra can reference one directly, e.g. the
-    // 'node_search_index' join in the Search module. Collect those joins first,
-    // because rewriting them adds tables to the table queue and moves them
-    // around.
-    $joins_to_rewrite = [];
-    foreach ($table_queue as $alias => $join_table_info) {
-      $join = $join_table_info['join'] ?? NULL;
-      // Skip the joins added by this class, they already point to the revision
-      // table, as well as joins that use a formula for the left side.
-      if (!$join instanceof JoinPluginInterface || $this->adjustedTables->offsetExists($join) || $join->leftFormula) {
-        continue;
-      }
-
-      // The left side and the array extras can only reference this join's
-      // left table, so they matter only for a join on the base table.
-      $rewrite_left = FALSE;
-      $rewrite_extras = [];
-      if (in_array($join->leftTable, $relationships, TRUE)) {
-        $rewrite_left = in_array($join->leftField, $revisionable_fields, TRUE);
-
-        if (is_array($join->extra)) {
-          foreach ($join->extra as $key => $info) {
-            if (is_array($info) && $this->isRevisionableExtra($info, $base_entity_table, $revisionable_fields)) {
-              $rewrite_extras[] = $key;
-            }
-          }
-        }
-      }
-
-      // A string extra is a SQL snippet, so it can reference any relationship,
-      // not just this join's left table. Keep references to the table being
-      // joined unchanged: its revision table depends on this join, so using
-      // that revision table here would create a circular dependency.
-      $extra_relationships = is_string($join->extra)
-        ? $this->getReferencedRelationships($join->extra, array_diff($relationships, [$alias]), $revisionable_fields)
-        : [];
-
-      if ($rewrite_left || $rewrite_extras || $extra_relationships) {
-        $joins_to_rewrite[$alias] = [$join, $rewrite_left, $rewrite_extras, $extra_relationships];
-      }
-    }
-
-    foreach ($joins_to_rewrite as $alias => [$join, $rewrite_left, $rewrite_extras, $extra_relationships]) {
-      // The revision tables this join now references, keyed by relationship.
-      $revision_tables = [];
-
-      if (($rewrite_left || $rewrite_extras) && ($revision_table = $this->ensureRevisionTable($entity_type, $query, $join->leftTable))) {
-        $revision_tables[$join->leftTable] = $revision_table;
-
-        // If the workspace revision has no row for a translation (e.g. it was
-        // removed in the workspace), the left side is NULL and a required
-        // relationship drops the row. That's correct, the translation doesn't
-        // exist in the workspace, and a rewritten filter does the same.
-        if ($rewrite_left) {
-          $join->leftFormula = "$revision_table.$join->leftField";
-        }
-
-        // An extra condition has no left-side formula, but it can use any table
-        // alias, so point it at the revision table instead.
-        foreach ($rewrite_extras as $key) {
-          $info = $join->extra[$key];
-          $info['table'] = $revision_table;
-          $info['field'] = $info['field'] ?? $info['left_field'];
-          unset($info['left_field']);
-          $join->extra[$key] = $info;
-        }
-      }
-
-      if ($extra_relationships) {
-        $join->extra = $this->rewriteRevisionableFieldReferences($join->extra, $query, $entity_type, $extra_relationships, $revisionable_fields);
-        foreach ($extra_relationships as $relationship) {
-          if ($revision_table = $this->ensureRevisionTable($entity_type, $query, $relationship)) {
-            $revision_tables[$relationship] = $revision_table;
-          }
-        }
-      }
-
-      // The revision table has to come before the join that references it, and
-      // the 'workspace_association' table before the revision table. Move the
-      // revision table first, otherwise moving it would leave the
-      // 'workspace_association' table behind.
-      foreach ($revision_tables as $relationship => $revision_table) {
-        $this->moveEntityTable($query, $revision_table, $alias);
-        $workspace_association_table = $this->ensureWorkspaceAssociationTable($entity_type->id(), $query, $relationship);
-        $this->moveEntityTable($query, $workspace_association_table, $revision_table);
-      }
-    }
-
     // Go through and look to see if we have to modify fields.
     foreach ($query->fields as &$field_info) {
-      // Fields without a table are formulas, e.g. a date sort with a
-      // granularity coarser than 'second'. We can't swap the table, so rewrite
-      // any revisionable field reference inside the formula instead.
+      // Formula fields do not identify a single table and column.
       if (empty($field_info['table'])) {
-        if (is_string($field_info['field'])) {
-          $field_info['field'] = $this->rewriteRevisionableFieldReferences($field_info['field'], $query, $entity_type, $relationships, $revisionable_fields);
-        }
         continue;
       }
 
@@ -294,26 +197,41 @@ class ViewsOperations {
     }
     unset($field_info);
 
-    // Rewrite revisionable field references in the WHERE and HAVING clauses. A
-    // reference can be a bare column, a column wrapped in an aggregate like
-    // SUM(base.field), or one inside a condition object built by a filter.
-    foreach (['where', 'having'] as $clause_type) {
-      foreach ($query->{$clause_type} as &$clauses) {
-        foreach ($clauses['conditions'] as &$condition_info) {
-          $this->rewriteConditionField($condition_info['field'], $query, $entity_type, $relationships, $revisionable_fields);
+    // Now we have to go through our where clauses and modify any of our fields.
+    foreach ($query->where as &$clauses) {
+      foreach ($clauses['conditions'] as &$where_info) {
+        // Build a matrix of our possible relationships against fields we need
+        // to switch.
+        foreach ($relationships as $relationship) {
+          foreach ($revisionable_fields as $field) {
+            if (is_string($where_info['field']) && $where_info['field'] == "$relationship.$field") {
+              $alias = $this->ensureRevisionTable($entity_type, $query, $relationship);
+              if ($alias) {
+                // Change the base table to use the revision table instead.
+                $where_info['field'] = "$alias.$field";
+              }
+            }
+          }
         }
-        unset($condition_info);
       }
-      unset($clauses);
     }
+
+    unset($where_info, $clauses);
 
     // GROUP BY clauses for the selected fields are built later from field
     // aliases, so they follow the field rewrite above. Only Sql::addGroupBy()
     // calls end up here. Core passes only aliases, but contrib can pass a
     // '<table>.<column>' clause, so rewrite those.
     foreach ($query->groupby as &$group_field) {
-      if (is_string($group_field)) {
-        $group_field = $this->rewriteRevisionableFieldReferences($group_field, $query, $entity_type, $relationships, $revisionable_fields);
+      foreach ($relationships as $relationship) {
+        foreach ($revisionable_fields as $field) {
+          if ($group_field === "$relationship.$field") {
+            $alias = $this->ensureRevisionTable($entity_type, $query, $relationship);
+            if ($alias) {
+              $group_field = "$alias.$field";
+            }
+          }
+        }
       }
     }
     unset($group_field);
@@ -323,149 +241,21 @@ class ViewsOperations {
     // node_field_data.changed), so rewrite it too, or it won't match the
     // SELECT list under DISTINCT.
     foreach ($query->orderby as &$order) {
-      if (is_string($order['field'])) {
-        $order['field'] = $this->rewriteRevisionableFieldReferences($order['field'], $query, $entity_type, $relationships, $revisionable_fields);
+      foreach ($relationships as $relationship) {
+        foreach ($revisionable_fields as $field) {
+          if ($order['field'] === "$relationship.$field") {
+            $alias = $this->ensureRevisionTable($entity_type, $query, $relationship);
+            if ($alias) {
+              $order['field'] = "$alias.$field";
+            }
+          }
+        }
       }
     }
     unset($order);
-  }
 
-  /**
-   * Checks whether a join extra compares a revisionable base column to a value.
-   *
-   * Two shapes qualify: a 'left_field' with a 'value', and a 'table' set to the
-   * base table with a 'field' and a 'value'. An extra that compares a left
-   * column to a column of the joined table ('left_field' with 'field') can't
-   * be moved to another table, so it keeps reading the base table.
-   *
-   * @param array $info
-   *   The extra definition.
-   * @param string $base_entity_table
-   *   The base table of the entity type, e.g. 'node_field_data'.
-   * @param string[] $revisionable_fields
-   *   The names of the revisionable fields of the entity type.
-   *
-   * @return bool
-   *   TRUE if the extra should read the revision table instead.
-   */
-  protected function isRevisionableExtra(array $info, string $base_entity_table, array $revisionable_fields): bool {
-    if (isset($info['left_field']) && !isset($info['field'])) {
-      return in_array($info['left_field'], $revisionable_fields, TRUE);
-    }
-    if (isset($info['field']) && !isset($info['left_field']) && ($info['table'] ?? NULL) === $base_entity_table) {
-      return in_array($info['field'], $revisionable_fields, TRUE);
-    }
-    return FALSE;
-  }
-
-  /**
-   * Finds the relationships a query expression reads revisionable fields from.
-   *
-   * Matches the same references that rewriteRevisionableFieldReferences()
-   * replaces, so a caller can tell which revision tables the rewrite needs
-   * before running it.
-   *
-   * @param string $expression
-   *   The query expression, e.g. a raw string join extra.
-   * @param string[] $relationships
-   *   The relationships that point to the entity type's base table.
-   * @param string[] $revisionable_fields
-   *   The names of the revisionable fields of the entity type.
-   *
-   * @return string[]
-   *   The relationships the expression reads a revisionable field from.
-   */
-  protected function getReferencedRelationships(string $expression, array $relationships, array $revisionable_fields): array {
-    $referenced = [];
-    foreach ($relationships as $relationship) {
-      foreach ($revisionable_fields as $field) {
-        $reference = "$relationship.$field";
-        if (str_contains($expression, $reference) && preg_match('/\b' . preg_quote($reference, '/') . '\b/', $expression)) {
-          $referenced[] = $relationship;
-          continue 2;
-        }
-      }
-    }
-
-    return $referenced;
-  }
-
-  /**
-   * Rewrites references to revisionable base fields in a query expression.
-   *
-   * Replaces every '<relationship>.<field>' reference to a revisionable field
-   * with a reference to the entity type's revision table, adding that table to
-   * the query if it's not there yet. This is a plain string replacement, not
-   * SQL parsing, so a reference inside a quoted string or a comment in a raw
-   * snippet is rewritten too.
-   *
-   * @param string $expression
-   *   The query expression, e.g. a field, a formula or a condition snippet.
-   * @param \Drupal\views\Plugin\views\query\Sql $query
-   *   The query plugin object for the query.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param string[] $relationships
-   *   The relationships that point to the entity type's base table.
-   * @param string[] $revisionable_fields
-   *   The names of the revisionable fields of the entity type.
-   *
-   * @return string
-   *   The rewritten expression.
-   */
-  protected function rewriteRevisionableFieldReferences(string $expression, Sql $query, EntityTypeInterface $entity_type, array $relationships, array $revisionable_fields): string {
-    foreach ($relationships as $relationship) {
-      foreach ($revisionable_fields as $field) {
-        $reference = "$relationship.$field";
-        // Skip the regex entirely for the common case of no match at all.
-        if (!str_contains($expression, $reference)) {
-          continue;
-        }
-
-        // Add the revision table only when the pattern really matches, and use
-        // a callback so that the replacement is not scanned for backreferences.
-        $pattern = '/\b' . preg_quote($reference, '/') . '\b/';
-        $expression = preg_replace_callback($pattern, function () use ($query, $entity_type, $relationship, $field) {
-          // Reference the revision table instead of the base table.
-          $alias = $this->ensureRevisionTable($entity_type, $query, $relationship);
-          return $alias ? "$alias.$field" : "$relationship.$field";
-        }, $expression);
-      }
-    }
-
-    return $expression;
-  }
-
-  /**
-   * Rewrites revisionable field references in a WHERE or HAVING condition.
-   *
-   * @param mixed $field
-   *   The condition field, rewritten in place.
-   * @param \Drupal\views\Plugin\views\query\Sql $query
-   *   The query plugin object for the query.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param string[] $relationships
-   *   The relationships that point to the entity type's base table.
-   * @param string[] $revisionable_fields
-   *   The names of the revisionable fields of the entity type.
-   */
-  protected function rewriteConditionField(mixed &$field, Sql $query, EntityTypeInterface $entity_type, array $relationships, array $revisionable_fields): void {
-    if ($field instanceof ConditionInterface) {
-      // Changing the array in place doesn't mark the condition as changed, so
-      // this relies on Views compiling conditions after the alter runs.
-      $conditions = &$field->conditions();
-      foreach ($conditions as &$condition_info) {
-        // Skip the '#conjunction' element and anything without a field.
-        if (is_array($condition_info) && isset($condition_info['field'])) {
-          $this->rewriteConditionField($condition_info['field'], $query, $entity_type, $relationships, $revisionable_fields);
-        }
-      }
-      unset($condition_info);
-    }
-    elseif (is_string($field)) {
-      $field = $this->rewriteRevisionableFieldReferences($field, $query, $entity_type, $relationships, $revisionable_fields);
-    }
+    // @todo Handle expressions and HAVING clauses in
+    //   https://www.drupal.org/node/2968165.
   }
 
   /**
@@ -604,24 +394,24 @@ class ViewsOperations {
   }
 
   /**
-   * Moves a table to appear before the given alias.
+   * Moves a 'workspace_association' table to appear before the given alias.
    *
-   * Because Workspaces chains possibly pre-existing tables onto the
-   * 'workspace_association' table and the revision table, we have to ensure
-   * that those tables appear in the query before the alias they're chained on
-   * or the SQL is invalid.
+   * Because Workspace chains possibly pre-existing tables onto the
+   * 'workspace_association' table, we have to ensure that the
+   * 'workspace_association' table appears in the query before the alias it's
+   * chained on or the SQL is invalid.
    *
    * @param \Drupal\views\Plugin\views\query\Sql $query
    *   The SQL query object.
-   * @param string $table_alias
-   *   The alias of the table to move.
+   * @param string $workspace_association_table
+   *   The alias of the 'workspace_association' table.
    * @param string $alias
    *   The alias of the table it needs to appear before.
    */
-  protected function moveEntityTable(Sql $query, string $table_alias, string $alias): void {
+  protected function moveEntityTable(Sql $query, string $workspace_association_table, string $alias): void {
     $table_queue =& $query->getTableQueue();
     $keys = array_keys($table_queue);
-    $current_index = array_search($table_alias, $keys);
+    $current_index = array_search($workspace_association_table, $keys);
     $index = array_search($alias, $keys);
 
     // If it's already before our table, we don't need to move it, as we could
@@ -629,8 +419,8 @@ class ViewsOperations {
     if ($current_index < $index) {
       return;
     }
-    $splice = [$table_alias => $table_queue[$table_alias]];
-    unset($table_queue[$table_alias]);
+    $splice = [$workspace_association_table => $table_queue[$workspace_association_table]];
+    unset($table_queue[$workspace_association_table]);
 
     // Now move the item to the proper location in the array. Don't use
     // array_splice() because that breaks indices.
