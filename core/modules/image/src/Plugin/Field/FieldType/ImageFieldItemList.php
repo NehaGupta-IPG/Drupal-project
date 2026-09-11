@@ -15,13 +15,13 @@ class ImageFieldItemList extends FileFieldItemList {
   /**
    * The properties that hold the editable content of an image item.
    */
-  protected const COMPARED_PROPERTIES = ['alt', 'target_id', 'title'];
+  protected const array COMPARED_PROPERTIES = ['alt', 'target_id', 'title'];
 
   /**
    * {@inheritdoc}
    */
-  public function hasAffectingChanges(FieldItemListInterface $original_items, $langcode): bool {
-    return static::getComparableValue($this) !== static::getComparableValue($original_items);
+  public function equals(FieldItemListInterface $list_to_compare) {
+    return $this->getComparableValue($this) === $this->getComparableValue($list_to_compare);
   }
 
   /**
@@ -46,7 +46,7 @@ class ImageFieldItemList extends FileFieldItemList {
    * @see \Drupal\image\Plugin\Field\FieldType\ImageItem::preSave()
    * @see \Drupal\image\Plugin\Field\FieldWidget\ImageWidget::process()
    */
-  protected static function getComparableValue(FieldItemListInterface $items): array {
+  protected function getComparableValue(FieldItemListInterface $items): array {
     $values = [];
     foreach ($items as $delta => $item) {
       $value = $item->getValue();

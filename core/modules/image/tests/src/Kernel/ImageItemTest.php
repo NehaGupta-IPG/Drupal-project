@@ -240,12 +240,8 @@ class ImageItemTest extends FieldKernelTestBase {
   /**
    * Tests that resubmitting an unchanged image is not an affecting change.
    *
-   * The widget renders no control for the dimensions, so a submission cannot
-   * carry them back, and they are only recomputed in ImageItem::preSave(),
-   * after validation has run. It also renders an empty string for a title that
-   * is stored as NULL. Either one on its own makes the submitted item compare
-   * as different from the stored one, so an untouched image field is reported
-   * as an untranslatable field change every time the entity form is saved.
+   * The widget submits no dimensions and renders a NULL title as an empty
+   * string, so a stored item would otherwise never compare as equal.
    *
    * @see \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityUntranslatableFieldsConstraintValidator
    */
