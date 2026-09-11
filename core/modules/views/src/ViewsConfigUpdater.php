@@ -67,10 +67,52 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) {
-      // @todo leaving this here now but new update hooks will need to update.
-      return FALSE;
-    });
+    return $this->updateTableSortableCounter($view);
+  }
+
+  /**
+   * Updates table style settings so result counters are not click sortable.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   View to update.
+   *
+   * @return bool
+   *   Whether the view was updated.
+   */
+  public function updateTableSortableCounter(ViewEntityInterface $view): bool {
+    $changed = FALSE;
+    $displays = $view->get('display');
+
+    foreach ($displays as &$display) {
+      if (
+        ($display['display_options']['style']['type'] ?? NULL) !== 'table'
+        || empty($display['display_options']['fields'])
+        || empty($display['display_options']['style']['options']['info'])
+      ) {
+        continue;
+      }
+
+      foreach ($display['display_options']['fields'] as $field_id => $field) {
+        if (($field['table'] ?? NULL) !== 'views' || ($field['field'] ?? NULL) !== 'counter') {
+          continue;
+        }
+        if (!empty($display['display_options']['style']['options']['info'][$field_id]['sortable'])) {
+          $display['display_options']['style']['options']['info'][$field_id]['sortable'] = FALSE;
+          $changed = TRUE;
+        }
+      }
+    }
+    if ($changed) {
+      $view->set('display', $displays);
+    }
+
+    $deprecations_triggered = &$this->triggeredDeprecations['counter_field_table_sortable'][$view->id()];
+    if ($this->areDeprecationsEnabled() && $changed && !$deprecations_triggered) {
+      $deprecations_triggered = TRUE;
+      @trigger_error(sprintf('The update to make the result counter field non-sortable in table displays for view "%s" is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3588188', $view->id()), E_USER_DEPRECATED);
+    }
+
+    return $changed;
   }
 
   /**
