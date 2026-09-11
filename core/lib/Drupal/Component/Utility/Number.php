@@ -62,23 +62,17 @@ class Number {
   private static function countSignificantDecimals(int|float|string $number): int {
     $number_str = (string) $number;
 
+    $exponent = 0;
     // Handle scientific notation (for example, 1.0E-5).
-    if (stripos($number_str, 'e') !== FALSE) {
-      [$mantissa, $exponent] = preg_split('/e/i', $number_str);
-      $mantissa_decimals = 0;
-      if (strpos($mantissa, '.') !== FALSE) {
-        $mantissa_decimals = strlen(substr(strrchr($mantissa, '.'), 1));
-      }
-      $exp_val = (int) $exponent;
-      return $exp_val < 0 ? $mantissa_decimals + abs($exp_val) : max(0, $mantissa_decimals - $exp_val);
+    if (($e_pos = stripos($number_str, 'e')) !== FALSE) {
+      $exponent = (int) substr($number_str, $e_pos + 1);
+      $number_str = substr($number_str, 0, $e_pos);
     }
 
-    // Standard decimal handling.
-    if (strpos($number_str, '.') !== FALSE) {
-      return strlen(substr(strrchr($number_str, '.'), 1));
-    }
+    $dot = strpos($number_str, '.');
+    $decimals = $dot === FALSE ? 0 : strlen($number_str) - $dot - 1;
 
-    return 0;
+    return max(0, $decimals - $exponent);
   }
 
   /**
