@@ -309,7 +309,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     ];
     $this->assertSame($expected_anchors, $anchors, 'The anchors have the correct attributes that will allow the drupal.active-link library to mark them as active.');
     $this->assertSame(['English', 'français'], $labels, 'The language links labels are in their own language on the language switcher block.');
-    $this->assertSame([true, false], $active_states);
+    $this->assertSame([TRUE, FALSE], $active_states);
   }
 
   /**
