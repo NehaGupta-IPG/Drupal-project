@@ -29,13 +29,4 @@
 %}
 <div{{ attributes.addClass(classes) }}>
   {{ children }}
-  {% if description %}
-    {%
-      set description_classes = [
-        aria_description ? 'form-item__description',
-        disabled ? 'is-disabled',
-      ]
-    %}
-    <div{{ description_attributes.addClass(description_classes) }}>{{ description }}</div>
-  {% endif %}
 </div>

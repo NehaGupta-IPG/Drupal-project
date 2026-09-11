@@ -96,8 +96,6 @@ class TextFormat extends RenderElementBase {
       // Do not copy #config_target to prevent multiple elements targeting the
       // same property.
       '#config_target',
-      // Description is handled by theme_text_format_wrapper().
-      '#description',
       // Ensure proper ordering of children.
       '#weight',
       // Properties already processed for the parent element.
