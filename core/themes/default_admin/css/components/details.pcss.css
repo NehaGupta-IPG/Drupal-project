@@ -403,7 +403,7 @@
       &::before {
         position: absolute;
         display: block;
-        padding-block-end: var(--summary-accordion-line-height);
+        padding-block-end: var(--admin-space-m); /* Match line-height */
         padding-inline-end: var(--admin-space-m);
         content: "";
         mask-image: var(--admin-icon-error);
@@ -416,6 +416,10 @@
           background: canvasText;
         }
       }
+    }
+
+    &.details__summary--vertical-tabs-item > span:first-child::before {
+      padding-block-end: var(--summary-accordion-line-height);
     }
   }
 }
