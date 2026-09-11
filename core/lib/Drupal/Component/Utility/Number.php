@@ -10,37 +10,6 @@ namespace Drupal\Component\Utility;
 class Number {
 
   /**
-   * Normalizes a numeric value to a lossless, easily parseable numeric string.
-   *
-   * The normalized value is a string suitable for use with libraries such as
-   * BCMath.
-   *
-   * @param int|float|string $number
-   *   The value to normalize. If its a string, it must be formatted as an
-   *   integer or float. Float with a higher number of significant decimals
-   *   than the precision value from the PHP runtime configuration
-   *   [default: 14] will lose the additional precision as PHP does not
-   *   guarantee that precision value.
-   *
-   * @see https://secure.php.net/manual/en/book.bc.php
-   *
-   * @return string
-   *   The normalized numeric string.
-   */
-  private static function normalize(int|float|string $number): string {
-    if (is_float($number)) {
-      // If the float has fewer significant decimals than the PHP runtime
-      // configuration guarantees, convert it to a string directly.
-      if (preg_match('/^\d+\.\d+$/', (string) $number)) {
-        return (string) $number;
-      }
-      // Discard digits beyond what can be rounded to float and back.
-      return rtrim(number_format($number, PHP_FLOAT_DIG, '.', ''), '0');
-    }
-    return (string) $number;
-  }
-
-  /**
    * Counts a number's significant decimals.
    *
    * @param int|float|string $number
