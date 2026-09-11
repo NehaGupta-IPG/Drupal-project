@@ -3,8 +3,10 @@
 namespace Drupal\views\Plugin\views\pager;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsPager;
+use Drupal\views\Element\View;
 
 /**
  * The plugin to handle full pager.
@@ -94,6 +96,15 @@ class Full extends SqlBase {
       4 => $this->options['tags']['last'],
     ];
 
+    $render = ['#attributes' => []];
+    if ($this->view->ajaxEnabled()) {
+      (new Htmx())
+        ->boost()
+        ->onlyMainContent()
+        ->swap('none', View::htmxScrollModifier($this->view))
+        ->applyTo($render);
+    }
+
     return [
       '#theme' => $this->themeFunctions(),
       '#tags' => $tags,
@@ -102,6 +113,7 @@ class Full extends SqlBase {
       '#parameters' => $input,
       '#quantity' => $this->options['quantity'],
       '#route_name' => !empty($this->view->live_preview) ? '<current>' : '<none>',
+      '#attributes' => $render['#attributes'],
     ];
   }
 

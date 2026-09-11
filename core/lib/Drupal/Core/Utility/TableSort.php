@@ -4,6 +4,7 @@ namespace Drupal\Core\Utility;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\HttpFoundation\Request;
@@ -180,7 +181,12 @@ class TableSort {
    * @internal
    */
   public static function getQueryParameters(Request $request) {
-    return UrlHelper::filterQueryParameters($request->query->all(), ['sort', 'order']);
+    return UrlHelper::filterQueryParameters($request->query->all(), [
+      'sort',
+      'order',
+      'ajax_page_state',
+      MainContentViewSubscriber::WRAPPER_FORMAT,
+    ]);
   }
 
 }

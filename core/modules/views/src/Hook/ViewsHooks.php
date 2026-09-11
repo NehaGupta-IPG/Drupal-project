@@ -81,7 +81,6 @@ class ViewsHooks {
           ],
         ],
       ];
-      $view->element['#attached']['library'][] = 'views/views.ajax';
     }
   }
 
