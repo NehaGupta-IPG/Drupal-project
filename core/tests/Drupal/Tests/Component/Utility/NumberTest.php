@@ -145,6 +145,10 @@ class NumberTest extends TestCase {
       'Precision 32 scale 10' => ['1234567890123456789012.1234567890', '0.0000000001', TRUE],
       'Precision 32 all nines' => ['9999999999999999999999.9999999999', '0.0000000001', TRUE],
 
+      // 1000000000.2 has just one decimal place, so it should always be
+      // valid here. For a number this large, the code gets it wrong.
+      'Large number wrongly rejected' => ['1000000000.2', '0.0000000001', TRUE],
+
       // Decimal field: 5 digits before, 4 after.
       '5 digits before decimal' => ['19999.0000', '0.0001', TRUE],
       '5 nines before decimal' => ['99999.0000', '0.0001', TRUE],

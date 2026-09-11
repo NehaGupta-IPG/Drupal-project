@@ -148,6 +148,42 @@ class NumberFieldTest extends BrowserTestBase {
   }
 
   /**
+   * Tests a decimal field with a scale of 0.
+   *
+   * A scale of 0 is the documented minimum for decimal fields, and must not
+   * break the field settings form or the widget form element.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/2230909
+   */
+  public function testNumberDecimalFieldZeroScale(): void {
+    $field_name = $this->randomMachineName();
+    FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => 'decimal',
+      'settings' => ['precision' => 10, 'scale' => 0],
+    ])->save();
+    FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+    ])->save();
+
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+    $display_repository->getFormDisplay('entity_test', 'entity_test')
+      ->setComponent($field_name, ['type' => 'number'])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
+
+    $edit = ["{$field_name}[0][value]" => '42'];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextNotContains("{$field_name} must be a number.");
+  }
+
+  /**
    * Tests integer field.
    */
   public function testNumberIntegerField(): void {
