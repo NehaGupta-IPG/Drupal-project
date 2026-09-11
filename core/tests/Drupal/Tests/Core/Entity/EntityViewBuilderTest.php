@@ -50,6 +50,7 @@ class EntityViewBuilderTest extends UnitTestCase {
     $entity_id = mt_rand(20, 30);
     $field_item_list = $this->createStub(FieldItemListInterface::class);
     $item = new \stdClass();
+    /** @var \Iterator&\PHPUnit\Framework\MockObject\Stub $field_item_list */
     $this->setupMockIterator($field_item_list, [$item]);
     $entity = $this->createConfiguredStub(FieldableEntityInterface::class, [
       'bundle' => $bundle,

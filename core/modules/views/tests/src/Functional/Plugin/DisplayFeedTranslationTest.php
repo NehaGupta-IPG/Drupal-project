@@ -144,6 +144,7 @@ class DisplayFeedTranslationTest extends ViewTestBase {
    *   The node entity that's been created.
    */
   protected function checkFeedResults($link_style, Node $node): void {
+    /** @var \Drupal\Core\Language\LanguageManagerInterface $language_manager */
     $language_manager = \Drupal::languageManager()->reset();
 
     $node_links = [];
