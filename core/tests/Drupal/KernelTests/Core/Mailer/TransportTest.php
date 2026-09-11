@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\mailer\Kernel;
+namespace Drupal\KernelTests\Core\Mailer;
 
 use Drupal\Core\Mailer\TransportServiceFactory;
 use Drupal\Core\Site\Settings;
@@ -29,7 +29,7 @@ class TransportTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['mailer', 'system'];
+  protected static $modules = ['system', 'core_mailer_services_test'];
 
   /**
    * Sets up a mailer DSN config override.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\mailer\Kernel;
+namespace Drupal\KernelTests\Core\Mailer;
 
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Mailer\EventSubscriber\OriginatorSubscriber;
@@ -34,8 +34,8 @@ class OriginatorSubscriberTest extends KernelTestBase {
   protected static $modules = [
     'language',
     'locale',
-    'mailer',
     'system',
+    'core_mailer_services_test',
     'mailer_event_subscriber_test',
   ];
 

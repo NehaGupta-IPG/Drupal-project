@@ -1,0 +1,5 @@
+name: Core mailer services test
+type: module
+description: "Support testing core's experimental mailer services."
+package: Testing
+version: VERSION

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\mailer\Functional;
+namespace Drupal\FunctionalTests\Mailer;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -21,7 +21,7 @@ class TransportServiceFactoryTest extends BrowserTestBase {
    */
   protected static $modules = [
     'system',
-    'mailer',
+    'core_mailer_services_test',
     'mailer_transport_factory_functional_test',
   ];
 

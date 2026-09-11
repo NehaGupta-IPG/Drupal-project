@@ -1,9 +1,13 @@
-parameters:
-  mailer.skip_procedural_hook_scan: true
-
+# Experimental mailer services.
+# To enable this feature, either:
+#  - Add the following code to your settings.php.
+#      $settings['container_yamls'][] = $app_root . '/core/experimental/mailer.services.yml';
+#  - Add a service provider to a module like
+#    \Drupal\core_mailer_services_test\CoreMailerServicesTestServiceProvider,
 services:
   _defaults:
     autoconfigure: true
+    autowire: true
   Symfony\Component\Mailer\Transport\AbstractTransportFactory:
     abstract: true
     arguments:
@@ -29,25 +33,20 @@ services:
       - { name: mailer.transport_factory }
   Drupal\Core\Mailer\Transport\SendmailCommandValidationTransportFactory:
     decorates: Symfony\Component\Mailer\Transport\SendmailTransportFactory
-    autowire: true
     public: false
   Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory:
     parent: Symfony\Component\Mailer\Transport\AbstractTransportFactory
     tags:
       - { name: mailer.transport_factory, priority: -100 }
   Drupal\Core\Mailer\TransportServiceFactory:
-    autowire: true
     public: false
   Drupal\Core\Mailer\TransportServiceFactoryInterface: '@Drupal\Core\Mailer\TransportServiceFactory'
   Symfony\Component\Mailer\Transport\TransportInterface:
     factory: ['@Drupal\Core\Mailer\TransportServiceFactoryInterface', 'createTransport']
   Symfony\Component\Mailer\Messenger\MessageHandler:
-    autowire: true
     public: false
     tags:
       - { name: messenger.message_handler }
-  Symfony\Component\Mailer\Mailer:
-    autowire: true
+  Symfony\Component\Mailer\Mailer: ~
   Symfony\Component\Mailer\MailerInterface: '@Symfony\Component\Mailer\Mailer'
-  Drupal\Core\Mailer\EventSubscriber\OriginatorSubscriber:
-    autowire: true
+  Drupal\Core\Mailer\EventSubscriber\OriginatorSubscriber: ~

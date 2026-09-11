@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\mailer\Functional;
+namespace Drupal\FunctionalTests\Mailer;
 
 use Drupal\Core\Test\MailerCaptureTrait;
 use Drupal\Tests\BrowserTestBase;
@@ -32,7 +32,7 @@ class MailerCaptureTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['mailer', 'mailer_capture', 'mailer_capture_test'];
+  protected static $modules = ['core_mailer_services_test', 'mailer_capture', 'mailer_capture_test'];
 
   /**
    * Tests collecting mail sent in the test runner.
