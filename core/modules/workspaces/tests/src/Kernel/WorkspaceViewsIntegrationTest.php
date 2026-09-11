@@ -347,6 +347,175 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
   }
 
   /**
+   * Tests a relationship that joins on a revisionable base field.
+   */
+  public function testViewsRelationshipOnRevisionableField(): void {
+    $live_author = $this->createUser([], 'live author');
+    $workspace_author = $this->createUser([], 'workspace author');
+
+    $node = $this->createNode(['title' => 'A', 'uid' => $live_author->id(), 'promote' => TRUE]);
+    $node->addTranslation('ro', ['title' => 'A (ro)', 'uid' => $live_author->id()])->save();
+
+    $this->switchToWorkspace('stage');
+    // 'uid' is translatable, so only the 'en' translation gets a new author.
+    $node->setOwner($workspace_author)->save();
+
+    // The author relationship joins 'users_field_data' on the revisionable
+    // 'node_field_data.uid' column, so the join has to use the author recorded
+    // on the workspace revision.
+    $view = $this->buildNodeView('workspace_author_relationship', [
+      'relationships' => [
+        'uid' => [
+          'id' => 'uid',
+          'table' => 'node_field_data',
+          'field' => 'uid',
+          'entity_type' => 'node',
+          'entity_field' => 'uid',
+          'plugin_id' => 'standard',
+          'required' => TRUE,
+        ],
+      ],
+      'fields' => [
+        'langcode' => [
+          'id' => 'langcode',
+          'table' => 'node_field_data',
+          'field' => 'langcode',
+          'entity_type' => 'node',
+          'entity_field' => 'langcode',
+          'plugin_id' => 'field',
+        ],
+        'name' => [
+          'id' => 'name',
+          'table' => 'users_field_data',
+          'field' => 'name',
+          'relationship' => 'uid',
+          'entity_type' => 'user',
+          'entity_field' => 'name',
+          'plugin_id' => 'field',
+        ],
+      ],
+    ]);
+    $view->execute();
+    $this->assertSame(['en' => 'workspace author', 'ro' => 'live author'], $this->getAuthorsByLangcode($view));
+
+    // A translation removed in the workspace has no row in the workspace
+    // revision, so the required relationship drops it.
+    $node->removeTranslation('ro');
+    $node->save();
+    $view = Views::getView('workspace_author_relationship');
+    $view->execute();
+    $this->assertSame(['en' => 'workspace author'], $this->getAuthorsByLangcode($view));
+
+    // Outside the workspace the relationship resolves to the live author.
+    $this->switchToLive();
+    $view = Views::getView('workspace_author_relationship');
+    $view->execute();
+    $this->assertSame(['en' => 'live author', 'ro' => 'live author'], $this->getAuthorsByLangcode($view));
+
+    // An extra join condition on a revisionable base column has to read the
+    // workspace revision too. The node is sticky only in the workspace.
+    $this->switchToWorkspace('stage');
+    $node->setSticky(TRUE)->save();
+    $view = $this->authorRelationshipViewWithStickyExtra([['left_field' => 'sticky', 'value' => 1]]);
+    $view->execute();
+    $this->assertSame(['en' => 'workspace author'], $this->getAuthorsByLangcode($view));
+
+    $this->switchToLive();
+    $view = $this->authorRelationshipViewWithStickyExtra([['left_field' => 'sticky', 'value' => 1]]);
+    $view->execute();
+    $this->assertSame([], $this->getAuthorsByLangcode($view));
+
+    // A string extra is a raw SQL snippet, so the reference inside it has to be
+    // rewritten. Joining on the non-revisionable 'nid' column leaves the extra
+    // as the only reason to add the revision table, like the
+    // 'node_search_index' join in the Search module.
+    $this->switchToWorkspace('stage');
+    $view = $this->authorRelationshipViewWithStickyExtra('node_field_data.sticky = 1', 'nid');
+    $view->execute();
+
+    $query = (string) $view->build_info['query'];
+    $this->assertStringContainsString('node_field_revision.sticky = 1', $query);
+    $this->assertStringNotContainsString('node_field_data.sticky', $query);
+
+    // The revision table is joined before the relationship whose ON clause
+    // reads it, otherwise the query above would have failed.
+    $tables = array_keys($view->build_info['query']->getTables());
+    $author_table = $view->relationship['uid']->alias;
+    $this->assertContains($author_table, $tables);
+    $this->assertContains('node_field_revision', $tables);
+    $this->assertLessThan(array_search($author_table, $tables), array_search('node_field_revision', $tables));
+
+    // A raw extra can also reference the table being joined. Its revision
+    // table depends on that join, so that reference must stay unchanged while
+    // references to earlier tables still use the workspace revision.
+    foreach ([FALSE, TRUE] as $required) {
+      $view = Views::getView('workspace_author_relationship');
+      $view->setDisplay();
+      $view->initQuery();
+      $join = \Drupal::service('plugin.manager.views.join')->createInstance('standard', [
+        'table' => 'node_field_data',
+        'field' => 'nid',
+        'left_table' => 'node_field_data',
+        'left_field' => 'nid',
+        'extra' => 'node_field_data.sticky = 1 AND related_node.sticky = 0',
+        'type' => $required ? 'INNER' : 'LEFT',
+      ]);
+      $view->query->addRelationship('related_node', $join, 'node_field_data');
+      $view->query->addField('related_node', 'nid', 'related_nid');
+      $view->execute();
+
+      $this->assertNotEmpty($view->result);
+      foreach ($view->result as $row) {
+        $this->assertEquals($node->id(), $row->related_nid);
+      }
+      $query = (string) $view->build_info['query'];
+      $this->assertStringContainsString('node_field_revision.sticky = 1 AND related_node.sticky = 0', $query);
+    }
+  }
+
+  /**
+   * Loads the author relationship view, joining only sticky nodes to authors.
+   *
+   * @param array|string $extra
+   *   The 'sticky' extra to put on the author join, in either of the two
+   *   shapes a join supports: a list of conditions, or a raw SQL snippet.
+   * @param string|null $left_field
+   *   The base table column to join on, or NULL to keep the revisionable
+   *   'uid' column.
+   *
+   * @return \Drupal\views\ViewExecutable
+   *   The executable view.
+   */
+  protected function authorRelationshipViewWithStickyExtra(array|string $extra, ?string $left_field = NULL): ViewExecutable {
+    $view = Views::getView('workspace_author_relationship');
+    $view->setDisplay();
+    $view->initHandlers();
+    $view->relationship['uid']->definition['extra'] = $extra;
+    if ($left_field) {
+      $view->relationship['uid']->realField = $left_field;
+    }
+    return $view;
+  }
+
+  /**
+   * Returns the author names of an executed view, keyed by row langcode.
+   *
+   * @param \Drupal\views\ViewExecutable $view
+   *   The executed view, with 'langcode' and 'name' field handlers.
+   *
+   * @return string[]
+   *   The author names, keyed by langcode and sorted by key.
+   */
+  protected function getAuthorsByLangcode(ViewExecutable $view): array {
+    $authors = [];
+    foreach ($view->result as $row) {
+      $authors[(string) $view->field['langcode']->getValue($row)] = (string) $view->field['name']->getValue($row);
+    }
+    ksort($authors);
+    return $authors;
+  }
+
+  /**
    * Tests the node published status filter in a workspace.
    */
   public function testViewsNodeStatusFilter(): void {
