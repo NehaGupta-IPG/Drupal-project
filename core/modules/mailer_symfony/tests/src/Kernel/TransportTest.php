@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\mailer\Kernel;
+namespace Drupal\Tests\mailer_symfony\Kernel;
 
 use Drupal\Core\Mailer\TransportServiceFactory;
 use Drupal\Core\Site\Settings;
@@ -22,14 +22,14 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  * Tests the transport factory service.
  */
 #[CoversClass(TransportServiceFactory::class)]
-#[Group('mailer')]
+#[Group('mailer_symfony')]
 #[RunTestsInSeparateProcesses]
 class TransportTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['mailer', 'system'];
+  protected static $modules = ['mailer_symfony', 'system'];
 
   /**
    * Sets up a mailer DSN config override.

@@ -1,5 +1,5 @@
 parameters:
-  mailer.skip_procedural_hook_scan: true
+  mailer_symfony.skip_procedural_hook_scan: true
 
 services:
   _defaults:

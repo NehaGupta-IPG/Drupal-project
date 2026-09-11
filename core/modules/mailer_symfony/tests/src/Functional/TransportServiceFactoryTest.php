@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\mailer\Functional;
+namespace Drupal\Tests\mailer_symfony\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -12,7 +12,7 @@ use Symfony\Component\Mailer\Transport\NullTransport;
 /**
  * Tests the transport service factory in the child site of browser tests.
  */
-#[Group('mailer')]
+#[Group('mailer_symfony')]
 #[RunTestsInSeparateProcesses]
 class TransportServiceFactoryTest extends BrowserTestBase {
 
@@ -21,7 +21,7 @@ class TransportServiceFactoryTest extends BrowserTestBase {
    */
   protected static $modules = [
     'system',
-    'mailer',
+    'mailer_symfony',
     'mailer_transport_factory_functional_test',
   ];
 
