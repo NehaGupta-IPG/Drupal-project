@@ -62,6 +62,7 @@ class Styles extends FormElementBase {
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     if (\is_array($input)
+      && \array_key_exists('wrapper', $input)
       && \is_array($input['wrapper'])
       && !empty($input['wrapper'])
     ) {
