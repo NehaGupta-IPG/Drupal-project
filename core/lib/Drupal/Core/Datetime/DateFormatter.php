@@ -4,6 +4,7 @@ namespace Drupal\Core\Datetime;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -31,6 +32,13 @@ class DateFormatter implements DateFormatterInterface {
    * @var array
    */
   protected $dateFormats = [];
+
+  /**
+   * DateFormat Storage
+   * 
+   * @var EntityStorageInterface
+   */
+  protected  $dateFormatStorage;
 
   /**
    * Contains the different date interval units.
@@ -298,10 +306,15 @@ class DateFormatter implements DateFormatterInterface {
    *   non-custom formats, NULL otherwise.
    */
   protected function dateFormat($type, $langcode) {
+    if (isset($this->dateFormats[$type][$langcode])) {
+      if ($this->dateFormatStorage->load($type)->getPattern() !== $this->dateFormats[$type][$langcode]->getPattern()) {
+        $this->dateFormats[$type][$langcode] = NULL;
+      }
+    }
     if (!isset($this->dateFormats[$type][$langcode])) {
       $original_language = $this->languageManager->getConfigOverrideLanguage();
       $this->languageManager->setConfigOverrideLanguage(new Language(['id' => $langcode]));
-      $this->dateFormats[$type][$langcode] = $this->entityTypeManager->getStorage('date_format')->load($type);
+      $this->dateFormats[$type][$langcode] = $this->dateFormatStorage->load($type);
       $this->languageManager->setConfigOverrideLanguage($original_language);
     }
     return $this->dateFormats[$type][$langcode];
