@@ -1494,7 +1494,7 @@ class SystemRequirementsHooks {
             // and both the previous update and the equivalent update are not
             // found in the current code base, prevent updating. This indicates
             // a site attempting to go 'backwards' in terms of database schema.
-            // @see \Drupal\Core\Update\UpdateHookRegistry::markFutureUpdateEquivalent()
+            // @see \Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent
             if (!function_exists($ran_update_function_name) && !function_exists($future_update_function_name)) {
               // If the module is provided by core prepend helpful text as the
               // module does not exist in composer or Drupal.org.
@@ -1516,6 +1516,21 @@ class SystemRequirementsHooks {
               ];
               break;
             }
+          }
+        }
+      }
+
+      if (!\Drupal::moduleHandler()->moduleExists('text_with_summary')) {
+        $config_storage = \Drupal::service('config.storage');
+        foreach ($config_storage->listAll('field.storage.') as $config_name) {
+          $config = $config_storage->read($config_name);
+          if (($config['type'] ?? NULL) === 'text_with_summary') {
+            $requirements['text_with_summary'] = [
+              'title' => $this->t('Missing text_with_summary field type'),
+              'description' => $this->t("The text_with_summary field type has been moved to a contributed module. Install it before updating by running 'composer require drupal/text_with_summary' and then enable the text_with_summary module."),
+              'severity' => RequirementSeverity::Error,
+            ];
+            break;
           }
         }
       }

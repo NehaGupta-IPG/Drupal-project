@@ -606,6 +606,15 @@ class Views {
   }
 
   /**
+   * Invalidates views data cache.
+   */
+  public static function invalidateCache(): void {
+    \Drupal::service('cache_tags.invalidator')->invalidateTags(['views_data']);
+    // Allow modules to respond to the Views cache being cleared.
+    \Drupal::moduleHandler()->invokeAll('views_invalidate_cache');
+  }
+
+  /**
    * Builds args.
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
