@@ -15,14 +15,14 @@
    */
   Drupal.theme.progressBar = function (id) {
     const escapedId = Drupal.checkPlain(id);
-    return (
-      `<div id="${escapedId}" class="progress" aria-live="polite">` +
-      '<div class="progress__label">&nbsp;</div>' +
-      '<div class="progress__track"><div class="progress__bar"></div></div>' +
-      '<div class="progress__percentage"></div>' +
-      '<div class="progress__description">&nbsp;</div>' +
-      '</div>'
-    );
+    return `<div id="${escapedId}" class="progress" aria-live="polite">
+        <label>
+          <div class="progress__label">&nbsp;</div>
+          <progress class="progress__element" value="0" max="100"></progress>
+        </label>
+        <div class="progress__percentage"></div>
+        <div class="progress__description">&nbsp;</div>
+      </div>`;
   };
 
   /**
@@ -75,11 +75,7 @@
        */
       setProgress(percentage, message, label) {
         if (percentage >= 0 && percentage <= 100) {
-          $(this.element)
-            .find('div.progress__bar')
-            .each(function () {
-              this.style.width = `${percentage}%`;
-            });
+          this.element.querySelector('progress').value = percentage;
           $(this.element)
             .find('div.progress__percentage')
             .html(`${percentage}%`);

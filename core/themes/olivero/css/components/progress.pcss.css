@@ -5,14 +5,18 @@
 
 @import "../base/media-queries.pcss.css";
 
-.progress__track {
-  overflow: hidden;
+.progress__element {
   height: var(--sp);
   border: 1px solid var(--color--primary-40);
   border-radius: var(--border-radius);
 }
 
-.progress__bar {
+.progress__element::-webkit-progress-value {
+  height: var(--sp);
+  background-color: var(--color--primary-40);
+}
+
+.progress__element::-moz-progress-bar {
   height: var(--sp);
   background-color: var(--color--primary-40);
 }
