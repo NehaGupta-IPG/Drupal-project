@@ -90,7 +90,7 @@ class Renderer implements RendererInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
    * @param array $renderer_config
-   *    The renderer configuration array.
+   *   The renderer configuration array.
    * @param \Drupal\Core\Theme\Style\StylePluginManagerInterface|null $stylePluginManager
    *   The style plugin manager.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface|null $loggerFactory
