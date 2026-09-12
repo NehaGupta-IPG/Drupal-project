@@ -67,6 +67,18 @@ function views_post_update_counter_field_not_sortable(): void {
 }
 
 /**
+ * Add default min_label and max_label to exposed numeric-type filters.
+ */
+function views_post_update_filter_min_max_labels(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsMinMaxLabelUpdate($view);
+  });
+}
+
+/**
  * Adds the disable_ajax_bookmarking setting to views displays.
  */
 function views_post_update_disable_ajax_bookmarking(?array &$sandbox = NULL): void {

@@ -7,12 +7,14 @@ namespace Drupal\Tests\search\Functional\views;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests search integration filters.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class ViewsIntegrationTest extends ViewTestBase {
 
@@ -21,12 +23,19 @@ class ViewsIntegrationTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search', 'search_node'];
+  protected static $modules = ['node', 'search', 'search_node', 'search_test_views'];
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['search_test_views']): void {
+    parent::setUp($import_test_views, $modules);
+  }
 
   /**
    * Views used by this test.
@@ -119,7 +128,7 @@ class ViewsIntegrationTest extends ViewTestBase {
     $this->drupalGet('test-arg/rocks');
     $xpath = '//div[@class="views-row"]//a';
     /** @var \Behat\Mink\Element\NodeElement[] $results */
-    $results = $this->xpath($xpath);
+    $results = $this->getNodeElementsByXpath($xpath);
     $this->assertEquals("Drupal's search rocks <em>really</em> rocks!", $results[0]->getText());
     $this->assertEquals("Drupal's search rocks.", $results[1]->getText());
     $this->assertSession()->assertEscaped("Drupal's search rocks <em>really</em> rocks!");
@@ -136,7 +145,7 @@ class ViewsIntegrationTest extends ViewTestBase {
     $this->drupalGet('test-arg/one');
     $xpath = '//div[@class="views-row"]//a';
     /** @var \SimpleXMLElement[] $results */
-    $results = $this->xpath($xpath);
+    $results = $this->getNodeElementsByXpath($xpath);
     $this->assertEquals("Testing one one one", $results[0]->getText());
     $this->assertEquals("Testing one two two two", $results[1]->getText());
   }

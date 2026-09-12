@@ -27,15 +27,8 @@ class AjaxTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
+   * Tests that AJAX works on admin routes.
    */
-  protected function setUp(): void {
-    if ($this->name() === 'testAjaxFocus') {
-      $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3396536");
-    }
-    parent::setUp();
-  }
-
   public function testAjaxWithAdminRoute(): void {
     \Drupal::service('theme_installer')->install(['stark', 'claro']);
     $theme_config = \Drupal::configFactory()->getEditable('system.theme');
@@ -280,8 +273,8 @@ JS;
    */
   public function testUiAjaxException(): void {
     $themes = [
-      'olivero',
       'claro',
+      'default_admin',
       'stark',
     ];
     \Drupal::service('theme_installer')->install($themes);
@@ -302,11 +295,11 @@ JS;
       $this->assertSession()
         ->statusMessageContainsAfterWait("Oops, something went wrong. Check your browser's developer console for more details.", 'error');
 
-      if ($theme === 'olivero') {
+      if ($theme === 'default_admin') {
         // Check that the message can be closed.
-        $this->click('.messages__close');
+        $this->click('.button--dismiss');
         $this->assertTrue($page->find('css', '.messages--error')
-          ->hasClass('hidden'));
+          ->hasClass('visually-hidden'));
       }
     }
 
@@ -319,8 +312,6 @@ JS;
    * Tests ajax focus handling.
    */
   public function testAjaxFocus(): void {
-    // @todo Fix random test failure.
-    $this->markTestSkipped('Temporarily skipped due to random failures. See https://www.drupal.org/project/drupal/issues/3396536');
     $this->drupalGet('/ajax_forms_test_get_form');
 
     $this->assertNotNull($select = $this->assertSession()->elementExists('css', '#edit-select'));
@@ -348,11 +339,15 @@ JS;
 
     // Test textfield with 'change' event listener with refocus-blur set to
     // FALSE.
-    $textfield2->setValue('Llamas say hi');
     $textfield3->focus();
-    $this->assertSession()->assertWaitOnAjaxRequest();
-    $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
-    $this->assertEquals('edit-textfield-2', $has_focus_id);
+    // Trigger the change event via JavaScript so it fires while focus is on
+    // textfield-3, which is where the refocus must not return to.
+    $this->getSession()->executeScript(<<<JS
+const textfield2 = document.querySelector('#edit-textfield-2');
+textfield2.value = 'Llamas say hi';
+textfield2.dispatchEvent(new Event('change', { bubbles: true }));
+JS);
+    $this->assertTrue($this->getSession()->wait(10000, "document.activeElement.id === 'edit-textfield-2'"));
 
     // Test textfield with 'change' event.
     $textfield3->focus();
@@ -366,6 +361,7 @@ JS;
     // Test email field with 'blur' event listener.
     $email_field1->setValue('user@example.com');
     $email_field1->focus();
+    $email_field1->blur();
     $this->assertSession()->assertWaitOnAjaxRequest();
     $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
     $this->assertEquals('edit-email-field-1', $has_focus_id);

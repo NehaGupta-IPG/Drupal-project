@@ -2,8 +2,6 @@
 
 namespace Drupal\locale\Hook;
 
-use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\Core\Url;
@@ -11,6 +9,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\locale\LocaleSource;
 use Drupal\locale\File\LocaleFileManager;
+use Drupal\locale\LocaleJs;
 
 /**
  * Hook implementations for locale.
@@ -100,7 +99,7 @@ class LocaleHooks {
     // Changing the language settings impacts the interface: clear render cache.
     \Drupal::cache('render')->deleteAll();
     // Force JavaScript translation file re-creation for the new language.
-    _locale_invalidate_js($language->id());
+    \Drupal::service(LocaleJs::class)->invalidate($language->id());
   }
 
   /**
@@ -113,7 +112,7 @@ class LocaleHooks {
     // Changing the language settings impacts the interface: clear render cache.
     \Drupal::cache('render')->deleteAll();
     // Force JavaScript translation file re-creation for the modified language.
-    _locale_invalidate_js($language->id());
+    \Drupal::service(LocaleJs::class)->invalidate($language->id());
   }
 
   /**
@@ -129,7 +128,7 @@ class LocaleHooks {
     // Remove translated configuration objects.
     \Drupal::service('locale.config_manager')->deleteLanguageTranslations($language->id());
     // Changing the language settings impacts the interface:
-    _locale_invalidate_js($language->id());
+    \Drupal::service(LocaleJs::class)->invalidate($language->id());
     \Drupal::cache('render')->deleteAll();
     // Clear locale translation caches.
     \Drupal::service(LocaleSource::class)->deleteSourcesByLanguage($language->id());
@@ -142,52 +141,6 @@ class LocaleHooks {
   #[Hook('cache_flush')]
   public function cacheFlush(): void {
     \Drupal::state()->delete('system.javascript_parsed');
-  }
-
-  /**
-   * Implements hook_js_alter().
-   */
-  #[Hook('js_alter')]
-  public function jsAlter(&$javascript, AttachedAssetsInterface $assets, LanguageInterface $language): void {
-    $files = [];
-    foreach ($javascript as $item) {
-      if (isset($item['type']) && $item['type'] == 'file') {
-        // Ignore the JS translation placeholder file.
-        if ($item['data'] === 'core/modules/locale/locale.translation.js') {
-          continue;
-        }
-        $files[] = $item['data'];
-      }
-    }
-    // Replace the placeholder file with the actual JS translation file.
-    $placeholder_file = 'core/modules/locale/locale.translation.js';
-    if (isset($javascript[$placeholder_file])) {
-      if ($translation_file = locale_js_translate($files, $language)) {
-        $js_translation_asset =& $javascript[$placeholder_file];
-        $js_translation_asset['data'] = $translation_file;
-      }
-      else {
-        // If no translation file exists, then remove the placeholder JS asset.
-        unset($javascript[$placeholder_file]);
-      }
-    }
-  }
-
-  /**
-   * Implements hook_library_info_alter().
-   *
-   * Provides language support.
-   */
-  #[Hook('library_info_alter')]
-  public function libraryInfoAlter(array &$libraries, $module): void {
-    // When the locale module is enabled, we update the core/drupal library to
-    // have a dependency on the locale/translations library, which provides
-    // window.drupalTranslations, containing the translations for all strings in
-    // JavaScript assets in the current language.
-    // @see locale_js_alter()
-    if ($module === 'core' && isset($libraries['drupal'])) {
-      $libraries['drupal']['dependencies'][] = 'locale/translations';
-    }
   }
 
 }
