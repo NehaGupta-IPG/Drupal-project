@@ -28,6 +28,9 @@ include: '.gitlab-ci/php.yml'
 # https://gitlab.com/help/ci/pipelines/schedules
 ################
 
+.on-commit: &on-commit
+  if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "11.x"
+
 workflow:
   rules:
   # These 3 rules from https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Workflows/MergeRequest-Pipelines.gitlab-ci.yml
@@ -37,8 +40,9 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == 'pipeline'
     # Run when called from a parent pipeline
     - if: $CI_PIPELINE_SOURCE == 'parent_pipeline'
-    # Run on commits.
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    # Run on commits to release branches. Development branches keep a pipeline
+    # for lint-cache warming but skip the on-commit jobs below.
+    - *on-commit
     # The last rule above blocks manual and scheduled pipelines on non-default branch. The rule below allows them:
     - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project"
     # Run if triggered from Web using 'Run Pipelines'
@@ -84,7 +88,7 @@ variables:
   POSTGRES_USER: drupaltestbot
   POSTGRES_PASSWORD: drupaltestbotpw
   SIMPLETEST_BASE_URL: http://localhost/subdirectory
-  MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome", "goog:chromeOptions":{"w3c": true, "args":["--no-sandbox","--ignore-certificate-errors", "--allow-insecure-localhost", "--headless", "--dns-prefetch-disable"]}}, "http://selenium:4444"]'
+  MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome", "goog:chromeOptions":{"w3c": true, "args":["--no-sandbox","--ignore-certificate-errors", "--allow-insecure-localhost", "--headless", "--dns-prefetch-disable", "--disable-dev-shm-usage"]}}, "http://selenium:4444"]'
   SELENIUM_JAVA_OPTS: "-Dwebdriver.chrome.logfile=/builds/chromedriver.log"
   # Use local cache for yarn, see .yarn-install-from-cache.
   YARN_ENABLE_GLOBAL_CACHE: false
@@ -133,7 +137,7 @@ default:
   alias: database
 
 .with-selenium-chrome: &with-selenium-chrome
-  name: selenium/standalone-chrome:127.0
+  name: selenium/standalone-chrome:133.0
   alias: selenium
   variables:
     JAVA_OPTS: $SELENIUM_JAVA_OPTS
@@ -194,7 +198,7 @@ default:
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline" && $PERFORMANCE_TEST != "1"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - <<: *on-commit
       allow_failure: true
   before_script:
     - |
@@ -239,11 +243,6 @@ default:
     strategy: depend
     include: .gitlab-ci.yml
 
-.run-on-commit: &run-on-commit
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "11.x"
-      allow_failure: true
-
 .run-daily: &run-daily
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
@@ -282,20 +281,46 @@ default:
 # Test Jobs
 ################
 
-'👷️️️ PHPUnit Build':
+'🖱️️️ PHPUnit Functional Javascript':
   <<: [ *with-composer, *test-setup ]
-  retry: 1
+  parallel: 3
   variables:
-    TESTSUITE: build
-    KUBERNETES_CPU_REQUEST: "16"
-    CONCURRENCY: "8"
+    TESTSUITE: functional-javascript
+    CONCURRENCY: "12"
+    KUBERNETES_CPU_REQUEST: "14"
     _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
     DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version,database-driver,database-version"
     DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
-    # No parallel for this job, setup manually the env variables that need to
-    # be passed to run-tests.sh command line options.
-    CI_NODE_INDEX: 1
-    CI_NODE_TOTAL: 1
+  services:
+    - <<: *with-database
+    - <<: *with-selenium-chrome
+  after_script:
+    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+    - cp /builds/chromedriver.log ./
+
+'🌐️️ PHPUnit Functional':
+  <<: [ *with-composer, *test-setup ]
+  parallel: 8
+  variables:
+    TESTSUITE: functional
+    CONCURRENCY: "15"
+    KUBERNETES_CPU_REQUEST: "10"
+    _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
+    DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version,database-driver,database-version"
+    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
+  services:
+    - <<: *with-database
+
+'⚙️️ PHPUnit Kernel':
+  <<: [ *with-composer, *test-setup ]
+  parallel: 4
+  variables:
+    TESTSUITE: kernel
+    KUBERNETES_CPU_REQUEST: "12"
+    CONCURRENCY: "24"
+    _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
+    DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version,database-driver,database-version"
+    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
   services:
     - <<: *with-database
 
@@ -303,7 +328,7 @@ default:
   <<: [ *with-composer, *test-setup ]
   retry: 1
   variables:
-    KUBERNETES_CPU_REQUEST: "16"
+    KUBERNETES_CPU_REQUEST: "9"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
@@ -347,47 +372,18 @@ default:
       - ./core/.yarn/cache
     policy: pull
 
-'🖱️️️ PHPUnit Functional Javascript':
-  <<: [ *with-composer, *test-setup ]
-  parallel: 3
-  variables:
-    TESTSUITE: functional-javascript
-    CONCURRENCY: "12"
-    KUBERNETES_CPU_REQUEST: "14"
-    _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
-    DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version,database-driver,database-version"
-    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
-  services:
-    - <<: *with-database
-    - <<: *with-selenium-chrome
-  after_script:
-    - sed -i "s#$CI_PROJECT_DIR/##" $_ARTIFACTS_DIR/phpunit-*.xml || true
-    - php .gitlab-ci/scripts/statistics-job-consolidator.php $_ARTIFACTS_DIR/deprecation-handler/jobs $_ARTIFACTS_DIR/deprecation-statistics-$CI_JOB_ID.json
-    - cp /builds/chromedriver.log ./
 
-'🌐️️ PHPUnit Functional':
+'👷️️️ PHPUnit Build':
   <<: [ *with-composer, *test-setup ]
-  parallel: 8
+  retry: 1
   variables:
-    TESTSUITE: functional
-    CONCURRENCY: "24"
-    KUBERNETES_CPU_REQUEST: "14"
-    _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
-    DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version,database-driver,database-version"
-    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
-  services:
-    - <<: *with-database
-
-'⚙️️ PHPUnit Kernel':
-  <<: [ *with-composer, *test-setup ]
-  parallel: 4
-  variables:
-    TESTSUITE: kernel
-    KUBERNETES_CPU_REQUEST: "12"
-    CONCURRENCY: "24"
-    _ARTIFACTS_DIR: "test-artifacts/phpunit/${TESTSUITE}"
-    DRUPAL_TEST_CONTEXT_KEYS: "phpunit-testsuite,php-version,database-driver,database-version"
-    DRUPAL_DEPRECATION_FILTER_CONFIG: '{"enableDeprecationStatistics":true, "deprecationStatisticsOutputPath": "${_ARTIFACTS_DIR}"}'
+    TESTSUITE: build
+    KUBERNETES_CPU_REQUEST: "8"
+    CONCURRENCY: "6"
+    # No parallel for this job, setup manually the env variables that need to
+    # be passed to run-tests.sh command line options.
+    CI_NODE_INDEX: 1
+    CI_NODE_TOTAL: 1
   services:
     - <<: *with-database
 
@@ -486,7 +482,7 @@ default:
   parallel:
     matrix:
       - _TARGET_PHP: !reference [.php_versions]
-        _TARGET_DB: [mariadb-10.11]
+        _TARGET_DB: [mariadb-10.11, mariadb-12.3]
   variables:
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
@@ -528,26 +524,35 @@ default:
 # Jobs running on commits.
 # The value set in the "needs" property will determine the order in the sequence.
 '[Commit] PHP 8.5 PostgreSQL 18':
-  <<: [ *recursive-trigger, *run-on-commit ]
+  <<: [ *recursive-trigger ]
   variables:
     _TARGET_PHP: $MINIMUM_PHP
     _TARGET_DB: "pgsql-18"
+  rules:
+    - <<: *on-commit
+      allow_failure: true
 
 '[Commit] PHP 8.5 MySQL 9 via mysqli':
-  <<: [ *recursive-trigger, *run-on-commit ]
+  <<: [ *recursive-trigger ]
   needs: [ '[Commit] PHP 8.5 PostgreSQL 18' ]
   variables:
     _TARGET_PHP: $MINIMUM_PHP
     _TARGET_DB: "mysql-9"
     _TARGET_DB_DRIVER: "mysqli"
     _TARGET_DB_DRIVER_MODULE: "mysqli"
+  rules:
+    - <<: *on-commit
+      allow_failure: true
 
 '[Commit] PHP 8.5 SQLite 3.45':
-  <<: [ *recursive-trigger, *run-on-commit ]
+  <<: [ *recursive-trigger ]
   needs: [ '[Commit] PHP 8.5 MySQL 9 via mysqli' ]
   variables:
     _TARGET_PHP: $MINIMUM_PHP
     _TARGET_DB: "sqlite-3"
+  rules:
+    - <<: *on-commit
+      allow_failure: true
 
 # Jobs running daily.
 # The value set in the "needs" property will determine the order in the sequence.
@@ -632,23 +637,6 @@ default:
     - CACHE_FILE=core/.twigcsfixercache
     - *download-cache
 
-'📔 Spell-checking':
-  <<: [ *yarn-install-from-cache ]
-  <<: [ *default-job-settings-lint ]
-  stage: 🪄 Lint
-  variables:
-    KUBERNETES_CPU_REQUEST: "2"
-    CACHE_FILE: "core/.cspellcache"
-  script:
-    - *download-cache
-    - *core-spellcheck
-  artifacts:
-    expire_in: 1 week
-    expose_as: 'yarn-vendor'
-    paths:
-      - core/node_modules/
-      - core/.cspellcache
-
 '🧹 PHP Static Analysis (phpstan)':
   <<: [ *default-job-settings-lint ]
   stage: 🪄 Lint
@@ -697,6 +685,27 @@ default:
       - $_ARTIFACTS_DIR
       - core/phpstan-tmp/resultCache.php
 
+'📔 Spell-checking':
+  <<: [ *yarn-install-from-cache ]
+  stage: 🪄 Lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+  variables:
+    KUBERNETES_CPU_REQUEST: "2"
+    CACHE_FILE: "core/.cspellcache"
+  script:
+    - *download-cache
+    - *core-spellcheck
+  artifacts:
+    expire_in: 1 week
+    expose_as: 'yarn-vendor'
+    paths:
+      - core/node_modules/
+      - core/.cspellcache
+
 '🧹 PHP Coding standards (PHPCS)':
   <<: [ *default-job-settings-lint ]
   stage: 🪄 Lint
@@ -744,11 +753,12 @@ default:
       fi
     - mkdir -p $_ARTIFACTS_DIR
     - *download-cache
-  # Run on push, or on MRs if Twig files have changed, or manually.
+  # Run on release-branch pushes, or on MRs if Twig files have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - <<: *on-commit
+      allow_failure: true
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - core/.twig-cs-fixer.php
@@ -785,11 +795,12 @@ default:
   variables:
     KUBERNETES_CPU_REQUEST: "2"
     CACHE_FILE: "core/.eslintcache"
-  # Run on push, or on MRs if JS files have changed, or manually.
+  # Run on release-branch pushes, or on MRs if JS files have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - <<: *on-commit
+      allow_failure: true
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - core/.eslint*
@@ -819,11 +830,12 @@ default:
   variables:
     KUBERNETES_CPU_REQUEST: "2"
     CACHE_FILE: "core/.stylelintcache"
-  # Run on push, or on MRs if CSS files have changed, or manually.
+  # Run on release-branch pushes, or on MRs if CSS files have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - <<: *on-commit
+      allow_failure: true
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - core/.stylelintrc.json
@@ -907,11 +919,12 @@ default:
   image: node:20
   variables:
     KUBERNETES_CPU_REQUEST: "1"
-  # Run on push, or on MRs if package.json or yarn.lock have changed, or manually.
+  # Run on release-branch pushes, or on MRs if package.json or yarn.lock have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
       when: never
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - <<: *on-commit
+      allow_failure: true
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - core/package.json
