@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views_ui\Functional;
 
+use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -99,6 +100,28 @@ class FilterUITest extends UITestBase {
 
     // Group 3 now does not exist.
     $this->assertSession()->elementNotExists('xpath', '//span[text()="Group 3"]');
+  }
+
+  /**
+   * Tests that filters with a missing group render in the Views UI.
+   */
+  public function testFilterWithMissingGroup(): void {
+    $admin_user = $this->drupalCreateUser([
+      'administer views',
+      'administer site configuration',
+    ]);
+    $this->drupalLogin($admin_user);
+
+    $view = View::load('test_filter_groups');
+    $display = $view->get('display');
+    $display['page']['display_options']['filters']['status']['group'] = 3;
+    $view->set('display', $display);
+    $view->save();
+
+    $this->drupalGet('admin/structure/views/view/test_filter_groups/edit/page');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('Undefined array key 0');
+    $this->assertSession()->linkExists('Content: Published (= Yes)');
   }
 
   /**

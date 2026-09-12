@@ -1235,9 +1235,9 @@ class ViewEditForm extends ViewFormBase {
       if ($grouping) {
         $gid = $handler->options['group'];
 
-        // Show in default group if the group does not exist.
+        // Show in the first configured group if the group does not exist.
         if (empty($group_info['groups'][$gid])) {
-          $gid = 0;
+          $gid = array_key_first($group_info['groups']);
         }
         $groups[$gid][] = $id;
       }
