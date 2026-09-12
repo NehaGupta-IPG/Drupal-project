@@ -1,0 +1,13 @@
+name: Figure
+props:
+  type: object
+  properties:
+    classes:
+      type: string
+      title: Classes
+    node:
+      type: string
+      title: Node
+    caption:
+      type: string
+      title: Caption
