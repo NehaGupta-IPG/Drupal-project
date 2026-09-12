@@ -418,8 +418,11 @@
       }
     }
 
-    &.details__summary--vertical-tabs-item > span:first-child::before {
-      padding-block-end: var(--summary-accordion-line-height);
+    &.details__summary--accordion-item,
+    &.details__summary--vertical-tabs-item {
+      & > span:first-child::before {
+        padding-block-end: var(--summary-accordion-line-height);
+      }
     }
   }
 }
