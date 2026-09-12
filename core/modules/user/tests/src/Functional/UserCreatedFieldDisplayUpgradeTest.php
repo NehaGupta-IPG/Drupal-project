@@ -46,7 +46,7 @@ class UserCreatedFieldDisplayUpgradeTest extends UpdatePathTestBase {
     $this->expectUserDeprecationMessage('The user entity "member_for" display extra field is deprecated in drupal:11.5.0 and removed in drupal:13.0.0. Use the "created" field in displays instead. See https://www.drupal.org/node/3611943');
     $assertSession = $this->assertSession();
     $assertSession->addressEquals('user/1');
-    $assertSession->elementTextContains('css', 'h4.label', 'Member for');
+    $assertSession->elementTextContains('css', 'div.field__label', 'Member for');
   }
 
   /**
