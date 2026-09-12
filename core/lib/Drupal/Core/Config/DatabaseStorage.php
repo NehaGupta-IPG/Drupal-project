@@ -4,12 +4,22 @@ namespace Drupal\Core\Config;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\DatabaseStorageSchemaTrait;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
  * Defines the Database storage.
  */
 class DatabaseStorage implements StorageInterface {
+
+  use DatabaseStorageSchemaTrait;
   use DependencySerializationTrait;
 
   /**
@@ -144,7 +154,7 @@ class DatabaseStorage implements StorageInterface {
     }
     catch (\Exception $e) {
       // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
+      if ($this->ensureSchemaStorage()) {
         return $this->doWrite($name, $data);
       }
       // Some other failure that we can not recover from.
@@ -182,10 +192,19 @@ class DatabaseStorage implements StorageInterface {
    *
    * @throws \Drupal\Core\Config\StorageException
    *   If a database error occurs.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   ::ensureSchemaStorage() instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::ensureSchemaStorage() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     try {
-      $this->connection->schema()->createTable($this->table, static::schemaDefinition());
+      $this->connection->schema()->createTable(
+        $this->table,
+        $this->schemaDefinition()->getTableDefinition($this->table)->toArray(),
+      );
     }
     // If another process has already created the config table, attempting to
     // recreate it will throw an exception. In this case just catch the
@@ -204,34 +223,40 @@ class DatabaseStorage implements StorageInterface {
    *
    * @internal
    */
-  protected static function schemaDefinition() {
-    $schema = [
-      'description' => 'The base table for configuration data.',
-      'fields' => [
-        'collection' => [
-          'description' => 'Primary Key: Config object collection.',
-          'type' => 'varchar_ascii',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'name' => [
-          'description' => 'Primary Key: Config object name.',
-          'type' => 'varchar_ascii',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'data' => [
-          'description' => 'A serialized configuration object data.',
-          'type' => 'blob',
-          'not null' => FALSE,
-          'size' => 'big',
-        ],
+  public function schemaDefinition(): Schema {
+    $tables[] = new Table(
+      name: $this->table,
+      description: 'The base table for configuration data.',
+      columns: [
+        Column::varcharAscii(
+          name: 'collection',
+          description: 'Primary Key: Config object collection.',
+          length: 255,
+          notNull: TRUE,
+          default: new StringValue(''),
+        ),
+        Column::varcharAscii(
+          name: 'name',
+          description: 'Primary Key: Config object name.',
+          length: 255,
+          notNull: TRUE,
+          default: new StringValue(''),
+        ),
+        Column::blob(
+          name: 'data',
+          description: 'A serialized configuration object data.',
+          size: ColumnSize::Big,
+          notNull: FALSE,
+        ),
       ],
-      'primary key' => ['collection', 'name'],
-    ];
-    return $schema;
+      primaryKey: new PrimaryKey(['collection', 'name']),
+    );
+
+    return new Schema(
+      type: SchemaDefinitionType::Storage,
+      name: 'config',
+      tables: $tables,
+    );
   }
 
   /**

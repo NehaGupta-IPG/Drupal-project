@@ -13,12 +13,15 @@ use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\DatabaseStorageSchemaTrait;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Defines the storage handler class for batches.
  */
 class BatchStorage implements BatchStorageInterface {
+
+  use DatabaseStorageSchemaTrait;
 
   /**
    * The table name.
@@ -60,7 +63,7 @@ class BatchStorage implements BatchStorageInterface {
         ->fetchField();
     }
     catch (\Exception $e) {
-      $this->catchException($e);
+      $this->catchException(static::TABLE_NAME, $e);
       $batch = FALSE;
     }
     if ($batch) {
@@ -79,7 +82,7 @@ class BatchStorage implements BatchStorageInterface {
         ->execute();
     }
     catch (\Exception $e) {
-      $this->catchException($e);
+      $this->catchException(static::TABLE_NAME, $e);
     }
   }
 
@@ -94,7 +97,7 @@ class BatchStorage implements BatchStorageInterface {
         ->execute();
     }
     catch (\Exception $e) {
-      $this->catchException($e);
+      $this->catchException(static::TABLE_NAME, $e);
     }
   }
 
@@ -109,7 +112,7 @@ class BatchStorage implements BatchStorageInterface {
         ->execute();
     }
     catch (\Exception $e) {
-      $this->catchException($e);
+      $this->catchException(static::TABLE_NAME, $e);
     }
   }
 
@@ -140,7 +143,7 @@ class BatchStorage implements BatchStorageInterface {
     }
     catch (\Exception $e) {
       // If there was an exception, try to create the table.
-      if (!$try_again = $this->ensureTableExists()) {
+      if (!$try_again = $this->ensureSchemaStorage()) {
         // If the exception happened for other reason than the missing table,
         // propagate the exception.
         throw $e;
@@ -170,10 +173,19 @@ class BatchStorage implements BatchStorageInterface {
 
   /**
    * Check if the table exists and create it if not.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
+   *   ::ensureSchemaStorage() instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   protected function ensureTableExists() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ::ensureSchemaStorage() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     try {
-      $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition());
+      $this->connection->schema()->createTable(
+        static::TABLE_NAME,
+        $this->schemaDefinition()->getTableDefinition(static::TABLE_NAME)->toArray(),
+      );
     }
     // If another process has already created the batch table, attempting to
     // recreate it will throw an exception. In this case just catch the
@@ -184,24 +196,6 @@ class BatchStorage implements BatchStorageInterface {
       return FALSE;
     }
     return TRUE;
-  }
-
-  /**
-   * Act on an exception when batch might be stale.
-   *
-   * If the table does not yet exist, that's fine, but if the table exists and
-   * yet the query failed, then the batch is stale and the exception needs to
-   * propagate.
-   *
-   * @param \Exception $e
-   *   The exception.
-   *
-   * @throws \Exception
-   */
-  protected function catchException(\Exception $e) {
-    if ($this->connection->schema()->tableExists(static::TABLE_NAME)) {
-      throw $e;
-    }
   }
 
   /**
