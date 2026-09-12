@@ -4,7 +4,6 @@ namespace Drupal\Core\Datetime;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -34,11 +33,11 @@ class DateFormatter implements DateFormatterInterface {
   protected $dateFormats = [];
 
   /**
-   * DateFormat Storage
+   * DateFormat Storage.
    * 
-   * @var EntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected  $dateFormatStorage;
+  protected $dateFormatStorage;
 
   /**
    * Contains the different date interval units.
@@ -67,6 +66,7 @@ class DateFormatter implements DateFormatterInterface {
     protected RequestStack $requestStack,
   ) {
     $this->stringTranslation = $translation;
+    $this->dateFormatStorage = $this->entityTypeManager->getStorage('date_format');
   }
 
   /**
