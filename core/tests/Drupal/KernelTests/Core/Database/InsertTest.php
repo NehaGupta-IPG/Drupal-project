@@ -180,6 +180,32 @@ class InsertTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests that the INSERT INTO ... SELECT (fields) ... ORDER BY syntax works.
+   */
+  public function testInsertSelectFieldsOrderBy(): void {
+    $query = $this->connection->select('test', 't')
+      ->fields('t', ['name', 'job', 'age'])
+      ->condition('t.name', 'John')
+      // The field ordered on is not one of the selected fields. It must not be
+      // added to the SELECT, as the number of selected fields has to match the
+      // number of fields inserted.
+      ->orderBy('t.id');
+
+    // The resulting query should be equivalent to:
+    // INSERT INTO test_people (name, job, age)
+    // SELECT t.name AS name, t.job AS job, t.age AS age
+    // FROM test t
+    // WHERE t.name = 'John'
+    // ORDER BY t.id.
+    $this->connection->insert('test_people')
+      ->from($query)
+      ->execute();
+
+    $saved_age = $this->connection->query('SELECT [age] FROM {test_people} WHERE [name] = :name', [':name' => 'John'])->fetchField();
+    $this->assertSame('25', $saved_age, 'Can retrieve after inserting.');
+  }
+
+  /**
    * Tests that the INSERT INTO ... SELECT * ... syntax works.
    */
   public function testInsertSelectAll(): void {

@@ -379,10 +379,8 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    *
    * If the query uses DISTINCT or GROUP BY conditions, fields or expressions
    * that are used for the order must be selected to be compatible with some
-   * databases like PostgreSQL. The PostgreSQL driver can handle simple cases
-   * automatically but it is suggested to explicitly specify them. Additionally,
-   * when ordering on an alias, the alias must be added before orderBy() is
-   * called.
+   * databases like PostgreSQL. Additionally, when ordering on an alias, the
+   * alias must be added before orderBy() is called.
    *
    * @param string $field
    *   The field on which to order. The field is escaped for security so only

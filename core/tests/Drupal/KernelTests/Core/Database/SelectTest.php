@@ -432,6 +432,20 @@ class SelectTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests that ordering on a column that is not selected does not add it.
+   */
+  public function testOrderByColumnNotInSelect(): void {
+    $query = $this->connection->select('test', 't')
+      ->fields('t', ['name'])
+      ->orderBy('t.age');
+
+    $this->assertCount(1, $query->getFields(), 'The ordered column is not added to the selected fields.');
+
+    $names = $query->execute()->fetchCol();
+    $this->assertEquals(['John', 'Paul', 'George', 'Ringo'], $names, 'The rows are ordered by a column that is not selected.');
+  }
+
+  /**
    * Tests that random ordering of queries works.
    *
    * We take the approach of testing the Drupal layer only, rather than trying
