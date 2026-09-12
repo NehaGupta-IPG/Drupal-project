@@ -6,10 +6,12 @@ namespace Drupal\Tests\Core\Command;
 
 use Drupal\Core\Command\DrupalConsoleLogger;
 use Drupal\Core\Logger\LogMessageParser;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\InvalidArgumentException;
+use Psr\Log\LogLevel;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -26,8 +28,8 @@ class DrupalConsoleLoggerTest extends UnitTestCase {
   public function testLogLevel(): void {
     $logger = new DrupalConsoleLogger(new LogMessageParser());
     $logger->setLogger(new ConsoleLogger(new BufferedOutput()));
-    $logger->log(3, 'RFC integer level');
-    $logger->log('error', 'PSR string level');
+    $logger->log(RfcLogLevel::ERROR, 'RFC integer level');
+    $logger->log(LogLevel::ERROR, 'PSR string level');
     $this->expectException(InvalidArgumentException::class);
     $logger->log('unknown', 'Invalid string level');
   }
