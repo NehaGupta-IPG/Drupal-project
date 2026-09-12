@@ -5,10 +5,16 @@
  *
  * This script handles all dependencies except CKEditor, which require a custom
  * build step.
+ *
+ * For building unreleased CKEditor, clone the repository and follow their
+ * instructions to build the packages with pnpm. Then run this script with the
+ * CKEDITOR_PACKAGES_PATH environment variable pointing at the releases/npm
+ * folder that outputs. Ensure there is no trailing slash on the path passed.
  */
 
 const path = require('node:path');
-const { copyFile, writeFile, readFile, chmod, mkdir } = require('node:fs').promises;
+const { copyFile, writeFile, readFile, chmod, mkdir } =
+  require('node:fs').promises;
 const ckeditor5Files = require('./assets/ckeditor5Files');
 const jQueryUIProcess = require('./assets/process/jqueryui');
 const mapProcess = require('./assets/process/map');
@@ -31,7 +37,9 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
       const libraryDeclaration = libraries[libraryIndex];
       // Get the previous package version from the yaml file, versions can be
       // declared with a yaml anchor such as `version: &yaml_anchor "xxx"`
-      const currentVersion = libraryDeclaration.match(/version:(?: [&\w_]+)? "(.*)"\n/)[1];
+      const currentVersion = libraryDeclaration.match(
+        /version:(?: [&\w_]+)? "(.*)"\n/,
+      )[1];
       // Replace the version value and the version in the license URL.
       libraries[libraryIndex] = libraryDeclaration.replace(
         new RegExp(currentVersion, 'g'),
@@ -134,15 +142,16 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
     },
     {
       pack: 'tua-body-scroll-lock',
-      files: [
-        { from: 'dist/tua-bsl.umd.min.js', to: 'tua-bsl.umd.min.js' },
-      ],
+      files: [{ from: 'dist/tua-bsl.umd.min.js', to: 'tua-bsl.umd.min.js' }],
     },
     {
       pack: 'transliteration',
       files: [
         { from: 'dist/browser/bundle.umd.min.js', to: 'bundle.umd.min.js' },
-        { from: 'dist/browser/bundle.umd.min.js.map', to: 'bundle.umd.min.js.map' },
+        {
+          from: 'dist/browser/bundle.umd.min.js.map',
+          to: 'bundle.umd.min.js.map',
+        },
       ],
     },
     {
@@ -199,13 +208,19 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
       folder: 'floating-ui',
       library: 'internal.floating-ui',
       files: [
-        { from: '../core/dist/floating-ui.core.umd.min.js', to: 'floating-ui.core.umd.min.js' },
-        { from: 'dist/floating-ui.dom.umd.min.js', to: 'floating-ui.dom.umd.min.js' },
+        {
+          from: '../core/dist/floating-ui.core.umd.min.js',
+          to: 'floating-ui.core.umd.min.js',
+        },
+        {
+          from: 'dist/floating-ui.dom.umd.min.js',
+          to: 'floating-ui.dom.umd.min.js',
+        },
       ],
     },
     // CKEditor 5 builds the list of files dynamically based on what exists
     // in the filesystem.
-    ...ckeditor5Files(packageFolder),
+    ...ckeditor5Files(process.env.CKEDITOR_PACKAGES_PATH || packageFolder),
   ];
 
   /**
@@ -233,7 +248,13 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
     return normalized;
   }
 
-  for (const { pack, files = [], folder = false, library = false, process = {} } of ASSET_LIST) {
+  for (const {
+    pack,
+    files = [],
+    folder = false,
+    library = false,
+    process = {},
+  } of ASSET_LIST) {
     const sourceFolder = pack;
     const libraryName = library || folder || pack;
     const destFolder = folder || pack;
@@ -243,14 +264,20 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
     // Update the library version in core.libraries.yml with the version
     // from the npm package.
     try {
-      const packageInfo = JSON.parse((await readFile(`${packageFolder}/${sourceFolder}/package.json`)).toString());
+      const packageInfo = JSON.parse(
+        (
+          await readFile(`${packageFolder}/${sourceFolder}/package.json`)
+        ).toString(),
+      );
       updateLibraryVersion(libraryName, packageInfo);
     } catch (e) {
       // The package.json file doesn't exist, so nothing to do.
     }
 
     for (const file of files.map(normalizeFile)) {
-      const sourceFile = `${packageFolder}/${sourceFolder}/${file.from}`;
+      const sourceFile = sourceFolder.startsWith('/')
+        ? `${sourceFolder}/${file.from}`
+        : `${packageFolder}/${sourceFolder}/${file.from}`;
       const destFile = `${assetsFolder}/${destFolder}/${file.to}`;
       const extension = path.extname(file.from);
 
@@ -266,14 +293,21 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
         const contents = (await readFile(sourceFile)).toString();
         const results = await processCallbacks[extension]({ file, contents });
 
-        console.log(`Process ${sourceFolder}/${file.from} and save ${results.length} files:\n  ${results.map(({ filename = file.to }) => filename).join(', ')}`);
+        console.log(
+          `Process ${sourceFolder}/${file.from} and save ${results.length} files:\n  ${results.map(({ filename = file.to }) => filename).join(', ')}`,
+        );
         for (const { filename = file.to, contents } of results) {
           // The filename key can be used to change the name of the saved file.
-          await writeFile(`${assetsFolder}/${destFolder}/${filename}`, contents);
+          await writeFile(
+            `${assetsFolder}/${destFolder}/${filename}`,
+            contents,
+          );
         }
       } else {
         // There is no callback simply copy the file.
-        console.log(`Copy ${sourceFolder}/${file.from} to ${destFolder}/${file.to}`);
+        console.log(
+          `Copy ${sourceFolder}/${file.from} to ${destFolder}/${file.to}`,
+        );
         await copyFile(sourceFile, destFile);
       }
     }

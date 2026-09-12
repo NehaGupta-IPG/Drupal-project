@@ -22,23 +22,30 @@ const ckeditor5PluginMapping = {
 module.exports = (packageFolder) => {
   const fileList = [];
   // Get all the CKEditor 5 packages.
-  const ckeditor5Dirs = globSync(`{${packageFolder}/@ckeditor/ckeditor5*,${packageFolder}/ckeditor5}`).sort();
+  const ckeditor5Dirs = globSync(
+    `{${packageFolder}/@ckeditor/ckeditor5*,${packageFolder}/ckeditor5,${packageFolder}/ckeditor5*}`,
+  ).sort();
   for (const ckeditor5package of ckeditor5Dirs) {
     // Add all the files in the build/ directory to the process array for
     // copying.
     const buildFiles = globSync(`${ckeditor5package}/build/**/*.js`, {
-      nodir: true,
+      nodir: Boolean(process.env.CKEDITOR_PACKAGES_PATH),
     });
     if (buildFiles.length) {
       // Clean up the path to get the original package name.
       const pack = ckeditor5package.replace(`${packageFolder}/`, '');
       // Use the package name to generate the plugin name. There are some
       // exceptions that needs to be handled. Ideally remove the special cases.
-      let pluginName = pack.replace('@ckeditor/ckeditor5-', '');
+      const pluginName = pack
+        .replace('@ckeditor/ckeditor5-', '')
+        .replace(`ckeditor5-`, '');
       // Target folder in the vendor/assets folder.
-      let folder = `ckeditor5/${pluginName.replace('@ckeditor/ckeditor5-', '')}`;
+      // console.log(pluginName);
+      let folder = `ckeditor5/${pluginName.replace('@ckeditor/ckeditor5-', '').replace('ckeditor5-', '')}`;
       // Transform kebab-case to CamelCase.
-      let library = pluginName.replace(/-./g, (match) => match[1].toUpperCase());
+      let library = pluginName.replace(/-./g, (match) =>
+        match[1].toUpperCase(),
+      );
       // Special case for Drupal implementation.
       if (ckeditor5PluginMapping.hasOwnProperty(pluginName)) {
         library = ckeditor5PluginMapping[pluginName];
@@ -49,13 +56,15 @@ module.exports = (packageFolder) => {
         library = `ckeditor5.${library}`;
       }
       fileList.push({
-        pack,
+        pack: process.env.CKEDITOR_PACKAGES_PATH ? ckeditor5package : pack,
         library,
         folder,
-        files: buildFiles.map((absolutePath) => ({
-          from: absolutePath.replace(`${ckeditor5package}/`, ''),
-          to: absolutePath.replace(`${ckeditor5package}/build/`, ''),
-        })),
+        files: buildFiles.map((absolutePath) => {
+          return {
+            from: absolutePath.replace(`${ckeditor5package}/`, ''),
+            to: absolutePath.replace(`${ckeditor5package}/build/`, ''),
+          };
+        }),
       });
     }
   }
