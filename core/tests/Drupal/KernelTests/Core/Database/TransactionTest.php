@@ -1014,7 +1014,7 @@ class TransactionTest extends DatabaseTestBase {
 
     $this->expectException(TransactionNameNonUniqueException::class);
     $this->expectExceptionMessageIsOrContains("A transaction named savepoint_1 is already in use.");
-    $this->connection->startTransaction('savepoint_1');
+    (void) $this->connection->startTransaction('savepoint_1');
   }
 
   /**
@@ -1031,7 +1031,7 @@ class TransactionTest extends DatabaseTestBase {
 
     $this->expectException(TransactionNameNonUniqueException::class);
     $this->expectExceptionMessageIsOrContains("A transaction named Dipsy is already in use.");
-    $this->connection->startTransaction('Dipsy');
+    (void) $this->connection->startTransaction('Dipsy');
   }
 
   /**

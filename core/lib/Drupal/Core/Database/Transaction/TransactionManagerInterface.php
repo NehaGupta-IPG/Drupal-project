@@ -47,6 +47,7 @@ interface TransactionManagerInterface {
    * @throws \Drupal\Core\Database\TransactionNameNonUniqueException
    *   If a Drupal Transaction with the specified name exists already.
    */
+  #[\NoDiscard]
   public function push(string $name = ''): Transaction;
 
   /**

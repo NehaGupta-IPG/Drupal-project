@@ -494,6 +494,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function select($table, $alias = NULL, array $options = []) {
     return new Select($this, $table, $alias, $options);
   }
@@ -501,6 +502,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function insert($table, array $options = []) {
     return new Insert($this, $table, $options);
   }
@@ -508,6 +510,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function upsert($table, array $options = []) {
     return new Upsert($this, $table, $options);
   }
@@ -515,6 +518,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function truncate($table, array $options = []) {
     return new Truncate($this, $table, $options);
   }

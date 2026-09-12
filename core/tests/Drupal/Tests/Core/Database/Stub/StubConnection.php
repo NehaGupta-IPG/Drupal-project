@@ -113,6 +113,7 @@ class StubConnection extends Connection {
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function upsert($table, array $options = []): StubUpsert {
     return new StubUpsert($this, $table, $options);
   }
