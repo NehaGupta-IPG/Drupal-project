@@ -282,13 +282,21 @@ final class Exporter implements LoggerAwareInterface {
     if ($entity === NULL) {
       $referencer = $item->getEntity();
       $field_definition = $item->getFieldDefinition();
-      $this->logger?->warning('Failed to export reference to @target_type %missing_id referenced by %field on @entity_type %label because the referenced @target_type does not exist.', [
-        '@target_type' => (string) $this->entityTypeManager->getDefinition($field_definition->getFieldStorageDefinition()->getSetting('target_type'))->getSingularLabel(),
-        '%missing_id' => $item->get('target_id')->getValue(),
-        '%field' => $field_definition->getLabel(),
-        '@entity_type' => (string) $referencer->getEntityType()->getSingularLabel(),
-        '%label' => $referencer->label(),
-      ]);
+      $entity_type = (string) $referencer->getEntityType()->getSingularLabel();
+      $entity_id = $item->get('target_id')->getValue();
+      if($entity_type === 'taxonomy term' && $entity_id === 0) {
+        // entity_type is taxonomy term and current entity_id points
+        // to parent id of some top level taxonomy term.
+        // Skipping error message.
+      } else {
+        $this->logger?->warning('Failed to export reference to @target_type %missing_id referenced by %field on @entity_type %label because the referenced @target_type does not exist.', [
+          '@target_type' => (string) $this->entityTypeManager->getDefinition($field_definition->getFieldStorageDefinition()->getSetting('target_type'))->getSingularLabel(),
+          '%missing_id' => $entity_id,
+          '%field' => $field_definition->getLabel(),
+          '@entity_type' => $entity_type,
+          '%label' => $referencer->label(),
+        ]);
+      }
       return NULL;
     }
     $values = $this->exportFieldItem($item);
