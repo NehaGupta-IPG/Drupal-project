@@ -4,6 +4,8 @@ namespace Drupal\Core\Config;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\pgsql\Config\DatabaseStorage as PgsqlDatabaseStorage;
+use Drupal\pgsql\Driver\Database\pgsql\Connection as PgsqlConnection;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -49,7 +51,15 @@ final class ExportStorageManager implements StorageManagerInterface {
   ) {
     // The point of this service is to provide the storage and dispatch the
     // event when needed, so the storage itself can not be a service.
-    $this->storage = new DatabaseStorage($connection, 'config_export');
+    // On PostgreSQL a failed statement aborts the whole transaction, so the
+    // pgsql storage makes sure the table exists before it is used inside the
+    // transaction started in ::getStorage().
+    if ($connection instanceof PgsqlConnection) {
+      $this->storage = new PgsqlDatabaseStorage($connection, 'config_export');
+    }
+    else {
+      $this->storage = new DatabaseStorage($connection, 'config_export');
+    }
   }
 
   /**

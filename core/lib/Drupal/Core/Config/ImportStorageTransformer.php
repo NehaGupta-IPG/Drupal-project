@@ -4,6 +4,8 @@ namespace Drupal\Core\Config;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\pgsql\Config\DatabaseStorage as PgsqlDatabaseStorage;
+use Drupal\pgsql\Driver\Database\pgsql\Connection as PgsqlConnection;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -93,7 +95,15 @@ final class ImportStorageTransformer {
    */
   public function transform(StorageInterface $storage) {
     // We use a database storage to reduce the memory requirement.
-    $mutable = new DatabaseStorage($this->connection, 'config_import');
+    // On PostgreSQL a failed statement aborts the whole transaction, so the
+    // pgsql storage makes sure the table exists before it is used inside the
+    // transaction started below.
+    if ($this->connection instanceof PgsqlConnection) {
+      $mutable = new PgsqlDatabaseStorage($this->connection, 'config_import');
+    }
+    else {
+      $mutable = new DatabaseStorage($this->connection, 'config_import');
+    }
 
     if (!$this->persistentLock->lockMayBeAvailable(ConfigImporter::LOCK_NAME)) {
       // If the config importer is already importing, the transformation will

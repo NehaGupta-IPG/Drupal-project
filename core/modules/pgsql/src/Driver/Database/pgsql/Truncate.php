@@ -13,27 +13,6 @@ class Truncate extends QueryTruncate {
 
   /**
    * {@inheritdoc}
-   */
-  public function execute(): void {
-    if ($this->connection->inTransaction()) {
-      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
-    }
-    try {
-      parent::execute();
-    }
-    catch (\Exception $e) {
-      if (isset($savepoint)) {
-        $savepoint->rollback();
-      }
-      throw $e;
-    }
-    if (isset($savepoint)) {
-      $savepoint->commitOrRelease();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
    *
    * On PostgreSQL, TRUNCATE is fully transactional: it can be rolled back
    * and does not cause an implicit commit, so there is no need to fall back

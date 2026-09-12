@@ -19750,6 +19750,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Select.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\pgsql\\\\ProxyClass\\\\Batch\\\\BatchStorage\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/pgsql/src/ProxyClass/Batch/BatchStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\pgsql\\\\ProxyClass\\\\Routing\\\\MatcherDumper\\:\\:addRoutes\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/pgsql/src/ProxyClass/Routing/MatcherDumper.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Parameter \\#2 \\$callback of function uasort expects callable\\(Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\)\\: int, \'\\\\\\\\Drupal\\\\\\\\responsive…\' given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,

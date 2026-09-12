@@ -150,7 +150,7 @@ class Schema extends DatabaseSchema {
       ];
 
       if ($this->connection->inTransaction()) {
-        $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
+        $savepoint = $this->connection->startTransaction();
       }
 
       try {
@@ -268,32 +268,19 @@ EOD;
     $schema = $prefixInfo['schema'];
     $table_name = $prefixInfo['table'];
 
-    if ($this->connection->inTransaction()) {
-      $savepoint = $this->connection->startTransaction('mimic_implicit_commit');
-    }
+    // The catalog tables are queried with plain text comparisons on the schema,
+    // table and column name, so a table or a column that does not exist simply
+    // results in an empty result set. Unlike the ::regclass cast used by
+    // ::queryTableInformation(), this cannot raise an error that would abort an
+    // open transaction, so no savepoint is needed to protect it.
+    $checks = $this->connection->query("SELECT conname FROM pg_class cl INNER JOIN pg_constraint co ON co.conrelid = cl.oid INNER JOIN pg_attribute attr ON attr.attrelid = cl.oid AND attr.attnum = ANY (co.conkey) INNER JOIN pg_namespace ns ON cl.relnamespace = ns.oid WHERE co.contype = :constraint_type AND ns.nspname = :schema AND cl.relname = :table AND attr.attname = :column", [
+      ':constraint_type' => $constraint_type,
+      ':schema' => $schema,
+      ':table' => $table_name,
+      ':column' => $field,
+    ]);
 
-    try {
-      $checks = $this->connection->query("SELECT conname FROM pg_class cl INNER JOIN pg_constraint co ON co.conrelid = cl.oid INNER JOIN pg_attribute attr ON attr.attrelid = cl.oid AND attr.attnum = ANY (co.conkey) INNER JOIN pg_namespace ns ON cl.relnamespace = ns.oid WHERE co.contype = :constraint_type AND ns.nspname = :schema AND cl.relname = :table AND attr.attname = :column", [
-        ':constraint_type' => $constraint_type,
-        ':schema' => $schema,
-        ':table' => $table_name,
-        ':column' => $field,
-      ]);
-    }
-    catch (\Exception $e) {
-      if (isset($savepoint)) {
-        $savepoint->rollback();
-      }
-      throw $e;
-    }
-
-    if (isset($savepoint)) {
-      $savepoint->commitOrRelease();
-    }
-
-    $field_information = $checks->fetchCol();
-
-    return $field_information;
+    return $checks->fetchCol();
   }
 
   /**
