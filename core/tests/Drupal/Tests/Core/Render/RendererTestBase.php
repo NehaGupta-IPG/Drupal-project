@@ -201,7 +201,7 @@ abstract class RendererTestBase extends UnitTestCase {
       });
     $this->placeholderGenerator = new PlaceholderGenerator($this->cacheContextsManager, $this->rendererConfig);
     $this->renderCache = new PlaceholderingRenderCache($this->requestStack, $this->cacheFactory, $this->cacheContextsManager, $this->placeholderGenerator);
-    $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->stylePluginManager, $this->loggerFactory, $this->rendererConfig);
+    $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig, $this->stylePluginManager, $this->loggerFactory);
     $this->datetimeTime = new Time($this->requestStack);
 
     $container = new ContainerBuilder();

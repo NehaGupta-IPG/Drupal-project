@@ -59,14 +59,14 @@ class FiberPlaceholderTest extends UnitTestCase {
       $this->prophesize(PlaceholderGeneratorInterface::class)->reveal(),
       $this->prophesize(RenderCacheInterface::class)->reveal(),
       $request_stack->reveal(),
-      $this->prophesize(StylePluginManagerInterface::class)->reveal(),
-      $this->prophesize(LoggerChannelFactoryInterface::class)->reveal(),
       [
         'required_cache_contexts' => [
           'languages:language_interface',
           'theme',
         ],
       ],
+      $this->prophesize(StylePluginManagerInterface::class)->reveal(),
+      $this->prophesize(LoggerChannelFactoryInterface::class)->reveal(),
     );
 
     $session = $this->prophesize(SessionInterface::class);

@@ -1086,7 +1086,7 @@ HTML;
     $this->setUpRequest();
     $this->setupMemoryCache();
     $this->renderCache = new TestPlaceholderingRenderCache($this->requestStack, $this->cacheFactory, $this->cacheContextsManager, $this->placeholderGenerator);
-    $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->stylePluginManager, $this->loggerFactory, $this->rendererConfig);
+    $this->renderer = new Renderer($this->callableResolver, $this->themeManager, $this->elementInfo, $this->placeholderGenerator, $this->renderCache, $this->requestStack, $this->rendererConfig, $this->stylePluginManager, $this->loggerFactory);
 
     $this->cacheContextsManager
       ->method('convertTokensToKeys')

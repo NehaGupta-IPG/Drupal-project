@@ -63,9 +63,9 @@ class BubbleableMetadataTest extends UnitTestCase {
         $this->createStub(PlaceholderGeneratorInterface::class),
         $this->createStub(PlaceholderingRenderCache::class),
         new RequestStack(),
+        [],
         $this->createStub(StylePluginManagerInterface::class),
         $this->createStub(LoggerChannelFactoryInterface::class),
-        [],
       );
     }
 

@@ -152,14 +152,14 @@ class ViewAjaxControllerTest extends UnitTestCase {
       $this->createStub(PlaceholderGeneratorInterface::class),
       $this->createStub(RenderCacheInterface::class),
       $request_stack,
-      $this->createStub(StylePluginManagerInterface::class),
-      $this->createStub(LoggerChannelFactoryInterface::class),
       [
         'required_cache_contexts' => [
           'languages:language_interface',
           'theme',
         ],
-      ]
+      ],
+      $this->createStub(StylePluginManagerInterface::class),
+      $this->createStub(LoggerChannelFactoryInterface::class),
     );
     $container = new ContainerBuilder();
     $container->set('renderer', $this->renderer);

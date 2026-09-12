@@ -37,6 +37,20 @@ class Renderer implements RendererInterface {
   protected $rendererConfig;
 
   /**
+   * The style plugin manager.
+   *
+   * @var \Drupal\Core\Theme\Style\StylePluginManagerInterface
+   */
+  protected $stylePluginManager;
+
+  /**
+   * The logger channel factory.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
+   */
+  protected $loggerFactory;
+
+  /**
    * Whether we're currently in a ::renderRoot() call.
    *
    * @var bool
@@ -75,12 +89,12 @@ class Renderer implements RendererInterface {
    *   The render cache service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Theme\Style\StylePluginManagerInterface $stylePluginManager
-   *   The style plugin manager.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerFactory
-   *   The logger factory.
    * @param array $renderer_config
-   *   The renderer configuration array.
+   *    The renderer configuration array.
+   * @param \Drupal\Core\Theme\Style\StylePluginManagerInterface|null $stylePluginManager
+   *   The style plugin manager.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface|null $loggerFactory
+   *   The logger factory.
    */
   public function __construct(
     protected CallableResolver $callableResolver,
@@ -89,14 +103,26 @@ class Renderer implements RendererInterface {
     protected PlaceholderGeneratorInterface $placeholderGenerator,
     protected RenderCacheInterface $renderCache,
     protected RequestStack $requestStack,
-    protected StylePluginManagerInterface $stylePluginManager,
-    protected LoggerChannelFactoryInterface $loggerFactory,
     array $renderer_config,
+    ?StylePluginManagerInterface $stylePluginManager = NULL,
+    ?LoggerChannelFactoryInterface $loggerFactory = NULL,
   ) {
     if (!isset($renderer_config['debug'])) {
       $renderer_config['debug'] = FALSE;
     }
     $this->rendererConfig = $renderer_config;
+
+    if (!isset($stylePluginManager)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $stylePluginManager argument is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/node/3517033', E_USER_DEPRECATED);
+      $stylePluginManager = \Drupal::service(StylePluginManagerInterface::class);
+    }
+    $this->stylePluginManager = $stylePluginManager;
+
+    if (!isset($loggerFactory)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $loggerFactory argument is deprecated in drupal:12.0.0 and the argument will be required in drupal:13.0.0. See https://www.drupal.org/node/3517033', E_USER_DEPRECATED);
+      $loggerFactory = \Drupal::service(LoggerChannelFactoryInterface::class);
+    }
+    $this->loggerFactory = $loggerFactory;
 
     // Initialize the context collection if needed.
     if (!isset(static::$contextCollection)) {
