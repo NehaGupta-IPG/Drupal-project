@@ -9,6 +9,23 @@ base:
       css/components/clearfix.module.css: {}
       css/components/hidden.module.css: {}
       css/components/js.module.css: {}
+  moved_files:
+    system/base:
+      deprecation_version: 11.5.0
+      removed_version: 12.0.0
+      deprecation_link: https://www.drupal.org/project/drupal/issues/3619507
+      css:
+        component:
+          css/components/align.module.css:
+            base: css/components/align.module.css
+          css/components/container-inline.module.css:
+            base: css/components/container-inline.module.css
+          css/components/clearfix.module.css:
+            base: css/components/clearfix.module.css
+          css/components/hidden.module.css:
+            base: css/components/hidden.module.css
+          css/components/js.module.css:
+            base: css/components/js.module.css
 
 admin:
   version: VERSION
