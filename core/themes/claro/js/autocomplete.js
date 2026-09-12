@@ -8,15 +8,16 @@
 (($, Drupal, once) => {
   Drupal.behaviors.claroAutoCompete = {
     attach(context) {
+      const classRemove = ($autoCompleteElem) => {
+        $autoCompleteElem.removeClass('is-autocompleting');
+        $autoCompleteElem
+          .siblings('[data-drupal-selector="autocomplete-message"]')
+          .addClass('hidden');
+      };
+
       once('claroAutoComplete', 'input.form-autocomplete', context).forEach(
         (value) => {
           const $input = $(value);
-          const classRemove = ($autoCompleteElem) => {
-            $autoCompleteElem.removeClass('is-autocompleting');
-            $autoCompleteElem
-              .siblings('[data-drupal-selector="autocomplete-message"]')
-              .addClass('hidden');
-          };
 
           $input.autocomplete({
             search(event) {
