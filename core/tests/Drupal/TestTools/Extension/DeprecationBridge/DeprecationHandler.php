@@ -6,11 +6,20 @@ namespace Drupal\TestTools\Extension\DeprecationBridge;
 
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\ErrorHandler\DrupalDebugClassLoader;
+use Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber\Deprecation;
+use Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber\PhpDeprecation;
+use Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber\TestFinished;
+use Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber\TestPreparationStarted;
+use Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber\TestRunnerFinished;
+use PHPUnit\Event\Code\TestMethod;
+use PHPUnit\Event\Test\DeprecationTriggered;
+use PHPUnit\Event\Test\PhpDeprecationTriggered;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration as PhpUnitConfiguration;
+use PHPUnit\Util\Filesystem;
 
 // cspell:ignore depsta bootstrapper bootstrappers
 
@@ -23,6 +32,31 @@ use PHPUnit\TextUI\Configuration\Configuration as PhpUnitConfiguration;
  * @internal
  */
 final class DeprecationHandler implements Extension {
+
+  /**
+   * The extension configuration.
+   */
+  private Configuration $config;
+
+  /**
+   * The path to the statistics staging file.
+   */
+  private string $statisticsStagingFilePath;
+
+  /**
+   * The path to the artifacts base directory.
+   *
+   * @todo remove.
+   */
+  private string $directory;
+
+  /**
+   * Statistics for the currently executing test case.
+   *
+   * @see \Drupal\TestTools\Extension\DeprecationBridge\TestPreparationStartedSubscriber
+   * @see \Drupal\TestTools\Extension\DeprecationBridge\TestFinishedSubscriber
+   */
+  private static ?array $currentTest = NULL;
 
   /**
    * Load configuration and setup.
@@ -86,6 +120,35 @@ final class DeprecationHandler implements Extension {
     Facade $facade,
     ParameterCollection $parameters,
   ): void {
+    // Use the extension configuration loaded in ::preBootstrap().
+    $this->config = Configuration::instance();
+
+    if (!$this->config->deprecationStatisticsEnabled) {
+      return;
+    }
+
+    // When deprecation statistics are enabled, prepare a temp data collection
+    // file and make its path visible to isolated tests via an env variable.
+    $this->statisticsStagingFilePath = tempnam(sys_get_temp_dir(), 'depsta');
+    putenv('_DEPRECATION_HANDLER_STATS_TEMP_FILE=' . $this->statisticsStagingFilePath);
+
+    $facade->registerSubscriber(new TestPreparationStarted($this));
+    $facade->registerSubscriber(new Deprecation($this));
+    $facade->registerSubscriber(new PhpDeprecation($this));
+    $facade->registerSubscriber(new TestFinished($this));
+    $facade->registerSubscriber(new TestRunnerFinished($this));
+
+    // Artifacts directory.
+    $directory = $this->config->deprecationStatisticsOutputPath . \DIRECTORY_SEPARATOR . 'deprecation-handler' . \DIRECTORY_SEPARATOR . 'jobs';
+    if ($jobId = getenv('CI_JOB_ID')) {
+      $directory .= \DIRECTORY_SEPARATOR . $jobId;
+    }
+    Filesystem::createDirectory($directory);
+    $realDirectory = realpath($directory);
+    if ($realDirectory === FALSE || !is_dir($realDirectory) || !is_writable($realDirectory)) {
+      throw new \RuntimeException("Test artifacts directory {$directory} is not a writable directory.");
+    }
+    $this->directory = $realDirectory;
   }
 
   /**
@@ -110,7 +173,18 @@ final class DeprecationHandler implements Extension {
    */
   public static function handle(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
     assert(Configuration::instance()->projectIgnoresEnabled, __METHOD__ . '() must not be called if the deprecation handler is not enabled.');
-    return self::isIgnoredByProject($errorString);
+
+    if (self::isIgnoredByProject(self::$currentTest['testId'] ?? NULL, $errorString)) {
+      if (self::$currentTest) {
+        self::$currentTest['ignored_by_project'][] = $errorString;
+      }
+      return TRUE;
+    }
+    if (self::$currentTest) {
+      self::$currentTest['relayed_to_phpunit'][] = $errorString;
+    }
+
+    return FALSE;
   }
 
   /**
@@ -145,28 +219,152 @@ final class DeprecationHandler implements Extension {
   }
 
   /**
+   * Dump statistics after test runner end.
+   */
+  public function processStatisticsArtifact(): void {
+    assert($this->config->deprecationStatisticsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
+    $content = @file_get_contents($this->statisticsStagingFilePath);
+
+    $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
+    if (!empty($test_run_id)) {
+      $dumpFileName = "deprecation-ignore-stats-{$test_run_id}.json";
+    }
+    else {
+      $dumpFileName = "deprecation-ignore-stats.json";
+    }
+
+    $encodedStats = explode("\n", $content);
+    $stats = [
+      'skips' => [],
+      'tests' => [],
+    ];
+    foreach ($encodedStats as $encodedStat) {
+      $stat = (array) json_decode(base64_decode($encodedStat));
+      // @todo echo "\n********\n";.
+      // @todo var_export($stat);.
+      if (empty($stat)) {
+        continue;
+      }
+      if ($stat['status'] === 'ignored_by_project') {
+        $stats['skips'][$stat['ignore-pattern']] = isset($stats['skips'][$stat['ignore-pattern']]) ? $stats['skips'][$stat['ignore-pattern']] + 1 : 1;
+      }
+      if ($stat['status'] === 'test_stats') {
+        $testId = $stat['testId'];
+        unset($stat['testId'], $stat['status']);
+        $stats['tests'][$testId] = $stat;
+      }
+    }
+    // @todo echo "\n********\n";.
+
+    file_put_contents(
+      $this->directory . \DIRECTORY_SEPARATOR . $dumpFileName,
+      json_encode($stats),
+    );
+  }
+
+  /**
+   * Write a statistic entry.
+   */
+  private static function writeStatisticEntry(string $status, array $stat): void {
+    $config = Configuration::instance();
+    assert($config->deprecationStatisticsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
+    $stat['status'] = $status;
+
+    $tempFilePath = getenv('_DEPRECATION_HANDLER_STATS_TEMP_FILE');
+
+    if (empty($tempFilePath)) {
+      // If no config available, we cannot record the stats.
+      throw new \RuntimeException("debug - " . var_export($stat, TRUE));
+      // @todo return;.
+    }
+
+    file_put_contents(
+      $tempFilePath,
+      base64_encode(json_encode($stat)) . "\n",
+      \FILE_APPEND,
+    );
+  }
+
+  /**
    * Determines if an actual deprecation is ignored by the project.
    *
    * Deprecations that match the patterns included in the ignore file should
    * be ignored.
    *
+   * @param \PHPUnit\Event\Code\TestMethod|null $testMethod
+   *   The test case being executed.
    * @param string $deprecationMessage
    *   The actual deprecation message triggered via trigger_error().
    *
    * @return bool
    *   TRUE if the deprecation is ignored at project level.
    */
-  private static function isIgnoredByProject(string $deprecationMessage): bool {
-    foreach (Configuration::instance()->deprecationIgnorePatterns as $pattern) {
+  private static function isIgnoredByProject(?string $testMethod, string $deprecationMessage): bool {
+    $config = Configuration::instance();
+    if (!$config->projectIgnoresEnabled) {
+      return FALSE;
+    }
+    foreach ($config->deprecationIgnorePatterns as $pattern) {
       $result = @preg_filter($pattern, '$0', $deprecationMessage);
       if (preg_last_error() !== \PREG_NO_ERROR) {
         throw new \RuntimeException(preg_last_error_msg());
       }
       if ((bool) $result) {
+        if ($config->deprecationStatisticsEnabled) {
+          $stat = [];
+          if ($testMethod !== NULL) {
+            $stat['testId'] = $testMethod;
+          }
+          $stat['message'] = $deprecationMessage;
+          $stat['ignore-pattern'] = $pattern;
+          self::writeStatisticEntry('ignored_by_project', $stat);
+        }
         return TRUE;
       }
     }
     return FALSE;
+  }
+
+  public function setCurrentTest(TestMethod $test): void {
+    assert($this->config->deprecationStatisticsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
+    self::$currentTest['testId'] = $test->id();
+    if ($test->metadata()->isIgnoreDeprecations()) {
+      self::$currentTest['testIgnoresDeprecations'] = !$test->metadata()->isIgnoreDeprecations()->isEmpty();
+    }
+    else {
+      self::$currentTest['testIgnoresDeprecations'] = FALSE;
+    }
+  }
+
+  public function deprecationTriggered(DeprecationTriggered|PhpDeprecationTriggered $deprecation): void {
+    assert($this->config->deprecationStatisticsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
+    if ($deprecation->ignoredByTest() || $deprecation->ignoredByBaseline()) {
+      self::$currentTest['ignored_by_phpunit'][] = $deprecation->message();
+      return;
+    }
+    self::$currentTest['reported'][] = $deprecation->message();
+  }
+
+  public function testFinished(): void {
+    assert($this->config->deprecationStatisticsEnabled, __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    $stat = [];
+    $stat['testId'] = self::$currentTest['testId'];
+    $stat['ignoreDeprecations'] = self::$currentTest['testIgnoresDeprecations'];
+    if (isset(self::$currentTest['ignored_by_project'])) {
+      $stat['ignoredByProject'] = self::$currentTest['ignored_by_project'];
+    }
+    if (isset(self::$currentTest['ignored_by_phpunit'])) {
+      $stat['ignoredByPhpunit'] = self::$currentTest['ignored_by_phpunit'];
+    }
+    if (isset(self::$currentTest['reported'])) {
+      $stat['reported'] = self::$currentTest['reported'];
+    }
+    $this->writeStatisticEntry('test_stats', $stat);
+    self::$currentTest = [];
   }
 
 }

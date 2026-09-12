@@ -41,6 +41,16 @@ final class Configuration {
   public private(set) array $deprecationIgnorePatterns = [];
 
   /**
+   * Indicates if the deprecation stats collection is enabled.
+   */
+  public private(set) bool $deprecationStatisticsEnabled = FALSE;
+
+  /**
+   * Path to the deprecation statistics output directory.
+   */
+  public private(set) string $deprecationStatisticsOutputPath;
+
+  /**
    * Returns the singleton.
    *
    * @return self
@@ -71,6 +81,12 @@ final class Configuration {
     if (array_key_exists('enableDebugClassLoader', $parameters)) {
       $this->debugClassLoaderEnabled = filter_var($parameters['enableDebugClassLoader'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
     }
+    if (array_key_exists('enableDeprecationStatistics', $parameters)) {
+      $this->deprecationStatisticsEnabled = filter_var($parameters['enableDeprecationStatistics'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+    }
+    if (array_key_exists('deprecationStatisticsOutputPath', $parameters)) {
+      $this->deprecationStatisticsOutputPath = $this->absolutePath($parameters['deprecationStatisticsOutputPath']);
+    }
   }
 
   /**
@@ -100,6 +116,8 @@ final class Configuration {
   /**
    * Returns an absolute file path, resolving relative ones from Drupal root.
    *
+   * The file must already exist.
+   *
    * @param string $path
    *   A file path.
    *
@@ -107,16 +125,26 @@ final class Configuration {
    *   An absolute file path.
    */
   private function absoluteAndExistingPath(string $path): string {
-    if (!str_starts_with($path, \DIRECTORY_SEPARATOR)) {
-      $realPath = realpath(dirname(__DIR__, 6) . \DIRECTORY_SEPARATOR . $path);
-    }
-    else {
-      $realPath = $path;
-    }
+    $realPath = realpath($this->absolutePath($path));
     if ($realPath === FALSE || !is_file($realPath)) {
       throw new \InvalidArgumentException(sprintf('The file "%s" does not exist.', $path));
     }
     return $realPath;
+  }
+
+  /**
+   * Returns an absolute file path, resolving relative ones from Drupal root.
+   *
+   * The file does not need to exist already.
+   *
+   * @param string $path
+   *   A file path.
+   *
+   * @return string
+   *   An absolute file path.
+   */
+  private function absolutePath(string $path): string {
+    return str_starts_with($path, \DIRECTORY_SEPARATOR) ? $path : dirname(__DIR__, 6) . \DIRECTORY_SEPARATOR . $path;
   }
 
 }

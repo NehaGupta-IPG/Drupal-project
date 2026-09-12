@@ -29,6 +29,8 @@
       <parameter name="enableProjectIgnores" value="true"/>
       <parameter name="projectIgnoreFile" value="core/.deprecation-ignore.txt"/>
       <parameter name="enableDebugClassLoader" value="true"/>
+      <parameter name="enableDeprecationStatistics" value="false"/>
+      <parameter name="deprecationStatisticsOutputPath" value="test-artifacts"/>
     </bootstrap>
   </extensions>
   <testsuites>

@@ -184,7 +184,9 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    * @internal
    */
   public function xmlLogFilePath(int $test_id): string {
-    return $this->workingDirectory . '/phpunit-' . $test_id . '.xml';
+    $env = getenv('_ARTIFACTS_DIR');
+    $dir = $env ? $this->appRoot . \DIRECTORY_SEPARATOR . $env : $this->workingDirectory;
+    return $dir . '/phpunit-' . $test_id . '.xml';
   }
 
   /**
@@ -240,7 +242,10 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     bool $suppressDeprecations = FALSE,
   ): array {
     global $base_url;
-    $process_environment_variables = [];
+
+    $process_environment_variables = [
+      'DRUPAL_TEST_RUN_ID' => $test_run->id(),
+    ];
 
     // Setup an environment variable containing the database connection if
     // available, so that non-unit tests can connect to the database.
@@ -260,9 +265,6 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       $process_environment_variables['BROWSERTEST_OUTPUT_DIRECTORY'] = $this->workingDirectory;
     }
 
-    // Determine the JUnit file path.
-    $log_junit_file_path = $this->xmlLogFilePath($test_run->id());
-
     // PHPUnit whereabouts.
     $phpunit_bin = $this->phpUnitCommand();
 
@@ -273,7 +275,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       $this->configurationFilePath,
       '--testdox',
       '--log-junit',
-      $log_junit_file_path,
+      $this->xmlLogFilePath($test_run->id()),
     ];
     if ($colors) {
       $command[] = '--colors=always';

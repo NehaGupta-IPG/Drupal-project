@@ -47,13 +47,14 @@
   <extensions>
     <!-- Deprecation handler.
       This extension allows to ignore some deprecations on the project overall,
-      and/or to enable the Symfony debug classloader to trigger deprecations
-      while checking class parameters and return types at class loading time.
+      to enable the Symfony debug classloader to trigger deprecations while
+      checking class parameters and return types at class loading time, and to
+      collect statistics on deprecations triggered during testing.
       The configuration defined here can be overridden by defining the
       environment variable DRUPAL_DEPRECATION_FILTER_CONFIG whose value must be
       a JSON string containing an array with the same parameter names as keys.
       For example,
-      DRUPAL_DEPRECATION_FILTER_CONFIG='{"enableDebugClassLoader":false}'
+      DRUPAL_DEPRECATION_FILTER_CONFIG='{"enableDeprecationStatistics":true}'
     -->
     <bootstrap class="Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler">
       <!-- Set to true to enable project level deprecation ignore patterns.
@@ -66,6 +67,12 @@
       <!-- Set to true to enable Symfony's DebugClassLoader.
         See https://github.com/symfony/error-handler -->
       <parameter name="enableDebugClassLoader" value="true"/>
+      <!-- Set to true to enable collection and reporting of deprecations
+        triggered during the execution of the tests. -->
+      <parameter name="enableDeprecationStatistics" value="false"/>
+      <!-- The path to the directory where the deprecation statistics should be
+        output. -->
+      <parameter name="deprecationStatisticsOutputPath" value="test-artifacts"/>
     </bootstrap>
     <!-- Functional tests HTML output logging. -->
     <bootstrap class="Drupal\TestTools\Extension\HtmlLogging\HtmlOutputLogger">
