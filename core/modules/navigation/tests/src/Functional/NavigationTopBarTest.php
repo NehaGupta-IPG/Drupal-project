@@ -125,6 +125,48 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
   }
 
   /**
+   * Tests that the page actions toggle is hidden when all actions are denied.
+   */
+  public function testTopBarPageActionsAccess(): void {
+    // A user who can reach the top bar, but has access to none of the local
+    // tasks of the node: no edit, no delete, no revisions, no layout.
+    $this->drupalLogin($this->drupalCreateUser([
+      'access navigation',
+      'access content',
+    ]));
+
+    $this->drupalGet($this->node->toUrl());
+
+    // The top bar itself is still there.
+    $this->assertSession()->elementExists('xpath', "//div[contains(@class, 'top-bar__content')]");
+    // But the "More actions" toggle is not, because it would open an empty
+    // menu: every page action is denied for this user.
+    $this->assertSession()->elementNotExists('xpath', "//div[contains(@class, 'top-bar__actions')]//button[contains(@class, 'toolbar-button--icon--dots')]");
+    $this->assertSession()->elementNotExists('xpath', '//*[@id="top-bar-page-actions"]');
+
+    // With no page actions to move into the top bar, the regular tabs block is
+    // left alone.
+    $this->assertSession()->elementExists('xpath', '//div[@id="block-tabs"]');
+
+    // A user who can access one of the local tasks still gets the toggle, and
+    // only the action they may use.
+    $this->drupalLogin($this->drupalCreateUser([
+      'access navigation',
+      'access content',
+      'view all revisions',
+    ]));
+
+    $this->drupalGet($this->node->toUrl());
+    $this->assertSession()->elementExists('xpath', "//div[contains(@class, 'top-bar__actions')]//button[contains(@class, 'toolbar-button--icon--dots')]");
+    $page_actions = $this->getSession()->getPage()->find('xpath', '//*[@id="top-bar-page-actions"]/ul');
+    $this->assertNotNull($page_actions);
+    $this->assertSame(['Revisions'], array_map(
+      fn($link) => trim($link->getText()),
+      $page_actions->findAll('css', 'li')
+    ));
+  }
+
+  /**
    * Asserts that top bar actions respect local tasks weights.
    *
    * @param \Behat\Mink\Element\NodeElement $toolbar_links

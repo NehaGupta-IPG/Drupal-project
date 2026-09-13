@@ -2,10 +2,12 @@
 
 namespace Drupal\navigation;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -258,6 +260,26 @@ final class NavigationRenderer {
       // in the page actions link list.
       $url = $local_task['#link']['url'] ?? NULL;
       if ($url?->getRouteName() === $entity_local_tasks['route_name']) {
+        continue;
+      }
+      // Exclude local tasks the current user has no access to. They render as
+      // an empty string inside the page actions dropdown, which leaves the
+      // "More actions" (3 dots) toggle visible above a menu with nothing in
+      // it. Both ::hasLocalTasks() and top-bar-page-actions.html.twig decide
+      // whether to show that toggle from this array being non-empty, so the
+      // access check has to happen here rather than at render time.
+      $access = $local_task['#access'] ?? TRUE;
+      if ($access instanceof CacheableDependencyInterface) {
+        // Keep the reason the task was hidden in the cacheability of the top
+        // bar, so the toggle reappears for a user who does have access.
+        $cacheability->addCacheableDependency($access);
+      }
+      if ($access instanceof AccessResultInterface) {
+        if (!$access->isAllowed()) {
+          continue;
+        }
+      }
+      elseif (!$access) {
         continue;
       }
       // The $local_task array that we get here is tailor-made for use
