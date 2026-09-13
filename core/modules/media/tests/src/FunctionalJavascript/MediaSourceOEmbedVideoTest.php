@@ -90,6 +90,7 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
       'field_string_width' => 'string',
       'field_string_height' => 'string',
       'field_string_author_name' => 'string',
+      'field_link_author_url' => 'link',
     ];
     $this->createMediaTypeFields($fields, $media_type_id);
 
@@ -102,6 +103,7 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
     $assert_session->selectExists('field_map[width]')->setValue('field_string_width');
     $assert_session->selectExists('field_map[height]')->setValue('field_string_height');
     $assert_session->selectExists('field_map[author_name]')->setValue('field_string_author_name');
+    $assert_session->selectExists('field_map[author_url]')->setValue('field_link_author_url');
     $assert_session->buttonExists('Save')->press();
 
     // Configure the iframe to be narrower than the actual video, so we can
@@ -165,6 +167,7 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
     $this->assertSame('Drupal Rap Video - Schipulcon09', $media->getName());
     $this->assertSame('480', $media->field_string_width->value);
     $this->assertSame('360', $media->field_string_height->value);
+    $this->assertSame('https://vimeo.com/schipul', $media->field_link_author_url->uri);
 
     // Try to create a media asset from a disallowed provider.
     $this->drupalGet("media/add/$media_type_id");
