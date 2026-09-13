@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
 #[Block(
   id: "help_block",
   admin_label: new TranslatableMarkup("Help"),
-  forms: ['settings_tray' => FALSE]
 )]
 class HelpBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
@@ -49,7 +48,7 @@ class HelpBlock extends BlockBase implements ContainerFactoryPluginInterface {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -107,6 +106,13 @@ class HelpBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public function getCacheContexts() {
     return Cache::mergeContexts(parent::getCacheContexts(), ['route']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createPlaceholder(): bool {
+    return TRUE;
   }
 
 }

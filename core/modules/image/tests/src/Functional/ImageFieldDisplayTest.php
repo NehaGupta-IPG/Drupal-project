@@ -11,14 +11,16 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\TestFileCreationTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the display of image fields.
- *
- * @group image
- * @group #slow
  */
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageFieldDisplayTest extends ImageFieldTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -28,9 +30,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field_ui'];
 
@@ -51,14 +51,16 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
    */
   public function testImageFieldFormattersPrivate(): void {
     // Remove access content permission from anonymous users.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, ['access content' => FALSE]);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->changePermissions([
+      'access content' => FALSE,
+    ])->save();
     $this->_testImageFieldFormatters('private');
   }
 
   /**
    * Tests image formatters on node display.
    */
-  public function _testImageFieldFormatters($scheme) {
+  public function _testImageFieldFormatters($scheme): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
@@ -67,7 +69,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $instance = $this->createImageField($field_name, 'node', 'article', ['uri_scheme' => $scheme], $field_settings);
 
     // Go to manage display page.
-    $this->drupalGet("admin/structure/types/manage/article/display");
+    $this->drupalGet("admin/structure/types/manage/article/display/default");
 
     // Test for existence of link to image styles configuration.
     $this->submitForm([], "{$field_name}_settings_edit");
@@ -75,17 +77,21 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Remove 'administer image styles' permission from testing admin user.
     $admin_user_roles = $this->adminUser->getRoles(TRUE);
-    user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => FALSE]);
+    Role::loadOverrideFree(reset($admin_user_roles))->changePermissions([
+      'administer image styles' => FALSE,
+    ])->save();
 
     // Go to manage display page again.
-    $this->drupalGet("admin/structure/types/manage/article/display");
+    $this->drupalGet("admin/structure/types/manage/article/display/default");
 
     // Test for absence of link to image styles configuration.
     $this->submitForm([], "{$field_name}_settings_edit");
     $this->assertSession()->linkByHrefNotExists(Url::fromRoute('entity.image_style.collection')->toString(), 'Link to image styles configuration is absent when permissions are insufficient');
 
-    // Restore 'administer image styles' permission to testing admin user
-    user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => TRUE]);
+    // Restore 'administer image styles' permission to testing admin user.
+    Role::loadOverrideFree(reset($admin_user_roles))->changePermissions([
+      'administer image styles' => TRUE,
+    ])->save();
 
     // Create a new node with an image attached.
     $test_image = current($this->drupalGetTestFiles('image'));
@@ -103,7 +109,6 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Save node.
     $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $alt);
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
 
     // Test that the default formatter is being used.
@@ -139,7 +144,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#alt' => $alt,
       '#attributes' => ['loading' => 'lazy'],
     ];
-    $default_output = '<a href="' . $file->createFileUrl() . '">' . (string) $renderer->renderRoot($image) . '</a>';
+    $default_output = '<a href="' . $file->createFileUrl() . '">' . $renderer->renderRoot($image) . '</a>';
     $this->drupalGet('node/' . $nid);
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', $file->getCacheTags()[0]);
     // @todo Remove in https://www.drupal.org/node/2646744.
@@ -236,7 +241,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     ];
     $display = \Drupal::service('entity_display.repository')->getViewDisplay('node', $node->getType(), 'default');
     $display->setComponent($field_name, $display_options)->save();
-    $this->drupalGet("admin/structure/types/manage/" . $node->getType() . "/display");
+    $this->drupalGet("admin/structure/types/manage/" . $node->getType() . "/display/default");
     $this->assertSession()->responseContains('Image style: Thumbnail (100×100)');
   }
 
@@ -291,7 +296,6 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Verify that the attached image is being previewed using the 'medium'
     // style.
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $file = $node->{$field_name}->entity;
 
@@ -372,7 +376,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $instance = $this->createImageField($field_name, 'node', 'article', [], $field_settings);
 
     // Go to manage display page.
-    $this->drupalGet("admin/structure/types/manage/article/display");
+    $this->drupalGet("admin/structure/types/manage/article/display/default");
 
     // Test for existence of link to image styles configuration.
     $this->submitForm([], "{$field_name}_settings_edit");
@@ -380,17 +384,21 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Remove 'administer image styles' permission from testing admin user.
     $admin_user_roles = $this->adminUser->getRoles(TRUE);
-    user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => FALSE]);
+    Role::loadOverrideFree(reset($admin_user_roles))->changePermissions([
+      'administer image styles' => FALSE,
+    ])->save();
 
     // Go to manage display page again.
-    $this->drupalGet("admin/structure/types/manage/article/display");
+    $this->drupalGet("admin/structure/types/manage/article/display/default");
 
     // Test for absence of link to image styles configuration.
     $this->submitForm([], "{$field_name}_settings_edit");
     $this->assertSession()->linkByHrefNotExists(Url::fromRoute('entity.image_style.collection')->toString(), 'Link to image styles configuration is absent when permissions are insufficient');
 
-    // Restore 'administer image styles' permission to testing admin user
-    user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => TRUE]);
+    // Restore 'administer image styles' permission to testing admin user.
+    Role::loadOverrideFree(reset($admin_user_roles))->changePermissions([
+      'administer image styles' => TRUE,
+    ])->save();
 
     // Create a new node with an image attached.
     $test_image = current($this->drupalGetTestFiles('image'));
@@ -408,7 +416,6 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Save node.
     $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $alt);
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
 
     // Test that the default image loading attribute is being used.
@@ -452,7 +459,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->drupalGet('node/' . $nid);
     $this->assertSession()->responseContains($default_output);
 
-    // Test the image loading "priority" formatter works together with "image_style".
+    // Test the image loading "priority" formatter works together with
+    // "image_style".
     $display_options['settings']['image_style'] = 'thumbnail';
     $display->setComponent($field_name, $display_options)
       ->save();
@@ -538,7 +546,6 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Upload the 'image-test.gif' file.
     $nid = $this->uploadNodeImage($images[2], $field_name, 'article', $alt);
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $file = $node->{$field_name}->entity;
     $image = [

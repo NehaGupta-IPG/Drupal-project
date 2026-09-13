@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the block demo page with admin themes.
- *
- * @group block
  */
+#[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockDemoTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block'];
 
@@ -46,7 +46,6 @@ class BlockDemoTest extends BrowserTestBase {
 
     // All available themes in core.
     $available_themes = [
-      'olivero',
       'claro',
       'stark',
     ];

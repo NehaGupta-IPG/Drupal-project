@@ -6,18 +6,21 @@ namespace Drupal\Tests\field\Kernel\EntityReference;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\node\Entity\NodeType;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 
 /**
  * Tests entity reference field settings.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceSettingsTest extends KernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -32,7 +35,6 @@ class EntityReferenceSettingsTest extends KernelTestBase {
     'user',
     'text',
     'entity_test',
-    'system',
   ];
 
   /**
@@ -41,13 +43,6 @@ class EntityReferenceSettingsTest extends KernelTestBase {
    * @var \Drupal\node\Entity\NodeType
    */
   protected $nodeType;
-
-  /**
-   * Testing vocabulary.
-   *
-   * @var \Drupal\taxonomy\Entity\Vocabulary
-   */
-  protected $vocabulary;
 
   /**
    * An entity bundle that is not stored as a configuration entity.
@@ -81,7 +76,7 @@ class EntityReferenceSettingsTest extends KernelTestBase {
 
     // Create a custom bundle.
     $this->customBundle = 'test_bundle_' . $this->randomMachineName();
-    entity_test_create_bundle($this->customBundle, NULL, 'entity_test');
+    EntityTestHelper::createBundle($this->customBundle, NULL, 'entity_test');
 
     // Prepare the logger for collecting the expected critical error.
     $this->container->get($this->testLogServiceName)->cleanLogs();
@@ -131,8 +126,8 @@ class EntityReferenceSettingsTest extends KernelTestBase {
 
     // Delete the other vocabulary.
     $vocabularies[1]->delete();
-    // Ensure that field_field_config_presave() logs the expected critical
-    // error.
+    // Ensure that \Drupal\field\Hook\FieldHooks::fieldConfigPresave() logs the
+    // expected critical error.
     $log_message = $this->container->get($this->testLogServiceName)->cleanLogs()[0];
     $this->assertEquals(RfcLogLevel::CRITICAL, $log_message[0]);
     $this->assertEquals('The %field_name entity reference field (entity_type: %entity_type, bundle: %bundle) no longer has any valid bundle it can reference. The field is not working correctly anymore and has to be adjusted.', $log_message[1]);
@@ -163,10 +158,10 @@ class EntityReferenceSettingsTest extends KernelTestBase {
     $this->assertEquals($handler_settings, $actual_handler_settings);
 
     // Delete the custom bundle.
-    entity_test_delete_bundle($this->customBundle, 'entity_test');
+    EntityTestHelper::deleteBundle($this->customBundle, 'entity_test');
 
-    // Ensure that field_field_config_presave() logs the expected critical
-    // error.
+    // Ensure that \Drupal\field\Hook\FieldHooks::fieldConfigPresave() logs the
+    // expected critical error.
     $log_message = $this->container->get($this->testLogServiceName)->cleanLogs()[0];
     $this->assertEquals(RfcLogLevel::CRITICAL, $log_message[0]);
     $this->assertEquals('The %field_name entity reference field (entity_type: %entity_type, bundle: %bundle) no longer has any valid bundle it can reference. The field is not working correctly anymore and has to be adjusted.', $log_message[1]);
@@ -184,7 +179,7 @@ class EntityReferenceSettingsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     $container
       ->register($this->testLogServiceName, BufferingLogger::class)

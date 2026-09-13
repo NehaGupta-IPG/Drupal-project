@@ -9,21 +9,21 @@ use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests restriction of IMG tags in HTML input.
- *
- * @group filter
  */
+#[Group('filter')]
+#[RunTestsInSeparateProcesses]
 class FilterHtmlImageSecureTest extends BrowserTestBase {
 
   use CommentTestTrait;
   use TestFileCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['filter', 'node', 'comment'];
 
@@ -144,7 +144,7 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
     foreach ($images as $image => $converted) {
       $found = FALSE;
-      foreach ($this->xpath('//img[@test-attribute="' . hash('sha256', $image) . '"]') as $element) {
+      foreach ($this->getNodeElementsByXpath('//img[@test-attribute="' . hash('sha256', $image) . '"]') as $element) {
         $found = TRUE;
         if ($converted == $red_x_image) {
           $this->assertEquals($red_x_image, $element->getAttribute('src'));

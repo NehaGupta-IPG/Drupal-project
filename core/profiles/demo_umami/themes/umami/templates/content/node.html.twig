@@ -37,7 +37,7 @@
  *     teaser would result in: "node--view-mode-teaser", and
  *     full: "node--view-mode-full".
  *   The following are controlled through the node publishing options.
- *   - node--promoted: Appears on nodes promoted to the front page.
+ *   - node--promoted: Appears on promoted nodes.
  *   - node--sticky: Appears on nodes ordered above other non-sticky nodes in
  *     teaser listings.
  *   - node--unpublished: Appears on unpublished nodes visible only to site
@@ -54,9 +54,8 @@
  *   displayed after the main title tag that appears in the template.
  * - view_mode: View mode; for example, "teaser" or "full".
  * - teaser: Flag for the teaser state. Will be true if view_mode is 'teaser'.
- * - page: Flag for the full page state. Will be true if view_mode is 'full'.
  *
- * @see template_preprocess_node()
+ * @see \Drupal\node\Hook\NodeThemeHooks::preprocessNode()
  */
 #}
 {%
@@ -76,7 +75,7 @@
 
   {{ title_prefix }}
   {% if label %}
-    {% if page %}
+    {% if view_mode == 'full' %}
       <header class="node__header">
         <h1 class="page-title">
           {{ label }}

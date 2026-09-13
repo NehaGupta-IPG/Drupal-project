@@ -5,19 +5,26 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Config\Checkpoint;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Config\Checkpoint\Checkpoint;
 use Drupal\Core\Config\Checkpoint\CheckpointExistsException;
-use Drupal\Core\Config\Checkpoint\UnknownCheckpointException;
 use Drupal\Core\Config\Checkpoint\LinearHistory;
+use Drupal\Core\Config\Checkpoint\UnknownCheckpointException;
+use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
+use Drupal\Core\Lock\NullLockBackend;
+use Drupal\Core\Render\Markup;
+use Drupal\Core\State\State;
 use Drupal\Core\State\StateInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\Core\Config\Checkpoint\LinearHistory
- * @group Config
+ * Tests Drupal\Core\Config\Checkpoint\LinearHistory.
  */
+#[CoversClass(LinearHistory::class)]
+#[Group('Config')]
 class LinearHistoryTest extends UnitTestCase {
 
   /**
@@ -28,10 +35,12 @@ class LinearHistoryTest extends UnitTestCase {
   private const CHECKPOINT_KEY = 'config.checkpoints';
 
   /**
-   * @covers ::add
-   * @covers ::count
-   * @covers ::getActiveCheckpoint
-   * @covers \Drupal\Core\Config\Checkpoint\Checkpoint
+   * Tests add.
+   *
+   * @legacy-covers ::add
+   * @legacy-covers ::count
+   * @legacy-covers ::getActiveCheckpoint
+   * @legacy-covers \Drupal\Core\Config\Checkpoint\Checkpoint
    */
   public function testAdd(): void {
     $state = $this->prophesize(StateInterface::class);
@@ -55,7 +64,7 @@ class LinearHistoryTest extends UnitTestCase {
     $this->assertSame('hash1', $checkpoints->getActiveCheckpoint()?->id);
 
     // Test that on the second call to add the ancestor is set correctly.
-    $checkpoint2 = $checkpoints->add('hash2', new FormattableMarkup('Another label', []));
+    $checkpoint2 = $checkpoints->add('hash2', Markup::create('Another label'));
     $this->assertSame('hash2', $checkpoint2->id);
     $this->assertSame('Another label', (string) $checkpoint2->label);
     $this->assertSame($checkpoint->id, $checkpoint2->parent);
@@ -74,7 +83,7 @@ class LinearHistoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::add
+   * Tests add exception.
    */
   public function testAddException(): void {
     $state = $this->prophesize(StateInterface::class);
@@ -87,12 +96,12 @@ class LinearHistoryTest extends UnitTestCase {
     // Add another checkpoint with the same ID and an exception should be
     // triggered.
     $this->expectException(CheckpointExistsException::class);
-    $this->expectExceptionMessage('Cannot create a checkpoint with the ID "hash1" as it already exists');
+    $this->expectExceptionMessageIs('Cannot create a checkpoint with the ID "hash1" as it already exists');
     $checkpoints->add('hash1', 'Label');
   }
 
   /**
-   * @covers ::delete
+   * Tests delete all.
    */
   public function testDeleteAll(): void {
     $state = $this->prophesize(StateInterface::class);
@@ -113,30 +122,40 @@ class LinearHistoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::delete
+   * Tests delete.
    */
   public function testDelete(): void {
-    $state = $this->prophesize(StateInterface::class);
+    // Create a real State object so that we can manipulate it.
+    $state = new State(new KeyValueMemoryFactory(), new NullBackend(''), new NullLockBackend());
     $test_data = [
       'hash1' => new Checkpoint('hash1', 'One', 1701539510, NULL),
       'hash2' => new Checkpoint('hash2', 'Two', 1701539520, 'hash1'),
       'hash3' => new Checkpoint('hash3', 'Three', 1701539530, 'hash2'),
     ];
-    $state->get(self::CHECKPOINT_KEY, [])->willReturn($test_data);
-    unset($test_data['hash1'], $test_data['hash2']);
-    $state->set(self::CHECKPOINT_KEY, $test_data)->willReturn();
+    $state->set(self::CHECKPOINT_KEY, $test_data);
     $time = $this->prophesize(TimeInterface::class);
-    $checkpoints = new LinearHistory($state->reveal(), $time->reveal());
+    $checkpoints = new LinearHistory($state, $time->reveal());
 
     $this->assertCount(3, $checkpoints);
     $this->assertSame('hash3', $checkpoints->getActiveCheckpoint()?->id);
     $checkpoints->delete('hash2');
     $this->assertCount(1, $checkpoints);
     $this->assertSame('hash3', $checkpoints->getActiveCheckpoint()?->id);
+    // We can call getParents without an exception.
+    foreach ($checkpoints->getParents('hash3') as $parent) {
+      $this->fail('Checkpoint should not have a parent ' . $parent->id);
+    }
+    $this->assertNull($checkpoints->getActiveCheckpoint()->parent);
+
+    // Now if we delete also the third one, the active one will be null.
+    $checkpoints->delete('hash3');
+    $this->assertCount(0, $checkpoints);
+    $this->assertNull($checkpoints->getActiveCheckpoint());
+    $this->assertNull($state->get(self::CHECKPOINT_KEY));
   }
 
   /**
-   * @covers ::delete
+   * Tests delete exception.
    */
   public function testDeleteException(): void {
     $state = $this->prophesize(StateInterface::class);
@@ -145,13 +164,13 @@ class LinearHistoryTest extends UnitTestCase {
     $checkpoints = new LinearHistory($state->reveal(), $time->reveal());
 
     $this->expectException(UnknownCheckpointException::class);
-    $this->expectExceptionMessage('Cannot delete a checkpoint with the ID "foo" as it does not exist');
+    $this->expectExceptionMessageIs('Cannot delete a checkpoint with the ID "foo" as it does not exist');
 
     $checkpoints->delete('foo');
   }
 
   /**
-   * @covers ::getParents
+   * Tests get parents.
    */
   public function testGetParents(): void {
     $state = $this->prophesize(StateInterface::class);
@@ -170,7 +189,7 @@ class LinearHistoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getParents
+   * Tests get parents exception.
    */
   public function testGetParentsException(): void {
     $state = $this->prophesize(StateInterface::class);
@@ -183,7 +202,7 @@ class LinearHistoryTest extends UnitTestCase {
     $checkpoints = new LinearHistory($state->reveal(), $time->reveal());
 
     $this->expectException(UnknownCheckpointException::class);
-    $this->expectExceptionMessage('The checkpoint "hash3" does not exist');
+    $this->expectExceptionMessageIs('The checkpoint "hash3" does not exist');
     iterator_to_array($checkpoints->getParents('hash3'));
   }
 

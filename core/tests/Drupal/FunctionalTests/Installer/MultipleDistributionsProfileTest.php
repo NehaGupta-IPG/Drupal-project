@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Serialization\Yaml;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests multiple distribution profile support.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class MultipleDistributionsProfileTest extends InstallerTestBase {
 
   /**
@@ -28,7 +30,7 @@ class MultipleDistributionsProfileTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     parent::prepareEnvironment();
     // Create two distributions.
     foreach (['distribution_one', 'distribution_two'] as $name) {
@@ -39,7 +41,7 @@ class MultipleDistributionsProfileTest extends InstallerTestBase {
         'distribution' => [
           'name' => $name,
           'install' => [
-            'theme' => 'claro',
+            'theme' => 'default_admin',
           ],
         ],
       ];
@@ -55,22 +57,15 @@ class MultipleDistributionsProfileTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpLanguage() {
+  protected function setUpLanguage(): void {
     // Verify that the distribution name appears.
     $this->assertSession()->pageTextContains('distribution_one');
     // Verify that the requested theme is used.
-    $this->assertSession()->responseContains('claro');
+    $this->assertSession()->responseContains('default_admin');
     // Verify that the "Choose profile" step does not appear.
     $this->assertSession()->pageTextNotContains('profile');
 
     parent::setUpLanguage();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUpProfile() {
-    // This step is skipped, because there is a distribution profile.
   }
 
   /**

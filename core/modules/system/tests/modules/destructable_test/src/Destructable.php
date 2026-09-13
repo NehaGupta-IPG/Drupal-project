@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\destructable_test;
 
 use Drupal\Core\DestructableInterface;
 
+/**
+ * Manages a semaphore file and performs an action upon destruction.
+ */
 final class Destructable implements DestructableInterface {
 
   /**
@@ -26,7 +31,7 @@ final class Destructable implements DestructableInterface {
   /**
    * {@inheritdoc}
    */
-  public function destruct() {
+  public function destruct(): void {
     sleep(3);
     file_put_contents($this->semaphore, 'ran');
   }

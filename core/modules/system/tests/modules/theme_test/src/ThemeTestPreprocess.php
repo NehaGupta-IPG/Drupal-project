@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\theme_test;
 
 /**
@@ -10,11 +12,11 @@ class ThemeTestPreprocess {
   /**
    * Preprocess callback for testing preprocess callbacks.
    *
-   * @param $variables
+   * @param array $variables
    *   An associative array containing:
    *   - foo: Text for testing preprocess callback.
    */
-  public static function preprocess(&$variables) {
+  public static function preprocess(&$variables): void {
     $variables['foo'] = 'Make Drupal full of kittens again!';
   }
 

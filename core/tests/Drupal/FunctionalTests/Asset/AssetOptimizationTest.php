@@ -6,14 +6,15 @@ namespace Drupal\FunctionalTests\Asset;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore abcdefghijklmnop
-
 /**
  * Tests asset aggregation.
- *
- * @group asset
  */
+#[Group('asset')]
+#[RunTestsInSeparateProcesses]
 class AssetOptimizationTest extends BrowserTestBase {
 
   /**
@@ -22,14 +23,16 @@ class AssetOptimizationTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * The file assets path settings value.
-   */
-  protected $fileAssetsPath;
-
-  /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
+  protected static $modules = ['header_assets_test'];
+
+  /**
+   * The file assets path settings value.
+   *
+   * @var string
+   */
+  protected $fileAssetsPath;
 
   /**
    * Tests that asset aggregates are rendered and created on disk.
@@ -78,11 +81,11 @@ class AssetOptimizationTest extends BrowserTestBase {
     $this->rebuildAll();
     $this->config('system.performance')->set('css', [
       'preprocess' => TRUE,
-      'gzip' => TRUE,
+      'compress' => TRUE,
     ])->save();
     $this->config('system.performance')->set('js', [
       'preprocess' => TRUE,
-      'gzip' => TRUE,
+      'compress' => TRUE,
     ])->save();
     $this->requestPage();
     $session = $this->getSession();
@@ -100,6 +103,19 @@ class AssetOptimizationTest extends BrowserTestBase {
     foreach ($script_elements as $element) {
       $script_urls[] = $element->getAttribute('src');
     }
+
+    // The header_assets_test module attaches a header library depending on
+    // core/drupal, so the page must include a header aggregate covering
+    // libraries that are only in the header via that dependency. Requesting
+    // this aggregate must succeed even though neither core/drupal nor
+    // core/drupalSettings is a header library on its own.
+    $header_dependency_aggregates = array_filter($script_urls, function (string $url): bool {
+      $query = UrlHelper::parse($this->getAbsoluteUrl($url))['query'];
+      return isset($query['libraries']) && str_contains(UrlHelper::uncompressQueryParameter($query['libraries']), 'core/drupal');
+    });
+    $this->assertNotEmpty($header_dependency_aggregates);
+
+    // Test requesting asset URLs.
     foreach ($style_urls as $url) {
       $this->assertAggregate($url, TRUE, 'text/css');
       // Once the file has been requested once, it's on disk. It is possible for
@@ -108,14 +124,58 @@ class AssetOptimizationTest extends BrowserTestBase {
       // condition is not really possible since it relies on timing. However, by
       // changing the case of the part of the URL that is handled by Drupal
       // routing, we can force the request to be served by Drupal.
-      $this->assertAggregate(str_replace($this->fileAssetsPath, strtoupper($this->fileAssetsPath), $url), TRUE, 'text/css');
+      $this->assertAggregate(str_replace($this->fileAssetsPath, strtoupper($this->fileAssetsPath), $url), TRUE, 'text/css', FALSE);
       $this->assertAggregate($url, FALSE, 'text/css');
-      $this->assertInvalidAggregates($url);
     }
 
     foreach ($script_urls as $url) {
       $this->assertAggregate($url);
       $this->assertAggregate($url, FALSE);
+    }
+
+    // The aggregates have just been created, so ::deleteAll() should avoid
+    // removing them.
+    \Drupal::service('asset.css.collection_optimizer')->deleteAll();
+    \Drupal::service('asset.js.collection_optimizer')->deleteAll();
+
+    foreach ($style_urls as $url) {
+      $this->assertAggregate($url, FALSE, 'text/css');
+    }
+
+    foreach ($script_urls as $url) {
+      $this->assertAggregate($url, FALSE);
+    }
+
+    // Now set the mtime of all the files in the directory to a year in the
+    // past, this is older than the threshold so they should be deleted.
+    foreach (['js', 'css'] as $type) {
+      $iterator = new \DirectoryIterator('assets://' . $type);
+      foreach ($iterator as $file) {
+        if ($file->isFile()) {
+          $mtime = $file->getMtime();
+          $return = touch($file->getPathName(), $mtime - (86400 * 365));
+          $this->assertTrue($return);
+        }
+      }
+    }
+
+    \Drupal::service('asset.css.collection_optimizer')->deleteAll();
+    \Drupal::service('asset.js.collection_optimizer')->deleteAll();
+    foreach ($style_urls as $url) {
+      $this->assertAggregate($url, TRUE, 'text/css');
+    }
+
+    foreach ($script_urls as $url) {
+      $this->assertAggregate($url, TRUE);
+    }
+
+    // Check manipulating asset URL parameters.
+    \Drupal::service('file_system')->deleteRecursive($this->fileAssetsPath);
+    foreach ($style_urls as $url) {
+      $this->assertInvalidAggregates($url);
+    }
+
+    foreach ($script_urls as $url) {
       $this->assertInvalidAggregates($url);
     }
   }
@@ -129,8 +189,10 @@ class AssetOptimizationTest extends BrowserTestBase {
    *   (optional) Is the result from PHP or disk? Defaults to TRUE (PHP).
    * @param string|null $content_type
    *   The expected content type, or NULL to skip checking.
+   * @param bool $test_compression
+   *   Test gzip/brotli compression.
    */
-  protected function assertAggregate(string $url, bool $from_php = TRUE, ?string $content_type = NULL): void {
+  protected function assertAggregate(string $url, bool $from_php = TRUE, ?string $content_type = NULL, bool $test_compression = TRUE): void {
     $url = $this->getAbsoluteUrl($url);
     if (!stripos($url, $this->fileAssetsPath) !== FALSE) {
       return;
@@ -143,12 +205,50 @@ class AssetOptimizationTest extends BrowserTestBase {
       $this->assertStringContainsString($content_type, $headers['Content-Type'][0]);
     }
     if ($from_php) {
-      $this->assertStringContainsString('no-store', $headers['Cache-Control'][0]);
       $this->assertArrayHasKey('X-Generator', $headers);
+      $this->assertStringContainsString('no-store', $headers['Cache-Control'][0]);
     }
     else {
       $this->assertArrayNotHasKey('X-Generator', $headers);
     }
+
+    // Only test this when the file is returned by the web server and not by Drupal.
+    if ($test_compression) {
+      $this->assertGzip($url);
+      $this->assertBrotli($url);
+    }
+  }
+
+  /**
+   * Tests gzip compression.
+   *
+   * @param string $url
+   *   The source URL.
+   */
+  protected function assertGzip(string $url): void {
+    $this->getSession()->setRequestHeader('Accept-Encoding', 'gzip');
+    $this->getSession()->visit($url);
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Guzzle decodes the gzip response automatically but adds the original
+    // Content-Encoding value in this header.
+    $this->assertSession()->responseHeaderEquals('x-encoded-content-encoding', 'gzip');
+  }
+
+  /**
+   * Tests brotli compression.
+   *
+   * @param string $url
+   *   The source URL.
+   */
+  protected function assertBrotli(string $url): void {
+    $this->getSession()->setRequestHeader('Accept-Encoding', 'br');
+    $this->getSession()->visit($url);
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Guzzle decodes the brotli response automatically but adds the original
+    // Content-Encoding value in this header.
+    $this->assertSession()->responseHeaderEquals('x-encoded-content-encoding', 'br');
   }
 
   /**
@@ -166,37 +266,56 @@ class AssetOptimizationTest extends BrowserTestBase {
       return;
     }
     $session = $this->getSession();
-    $session->visit($this->replaceGroupDelta($url));
-    $this->assertSession()->statusCodeEquals(200);
+
+    $parts = UrlHelper::parse($url);
+    if (isset($parts['query']['include'])) {
+      $session->visit($this->replaceGroupDelta($url, 100));
+      $this->assertSession()->statusCodeEquals(400);
+
+      $session->visit($this->omitInclude($url));
+      $this->assertSession()->statusCodeEquals(400);
+
+      $session->visit($this->invalidInclude($url));
+      $this->assertSession()->statusCodeEquals(400);
+
+      $session->visit($this->invalidExclude($url));
+      $this->assertSession()->statusCodeEquals(400);
+
+      // Library name must include at least one slash.
+      $session->visit($this->setInvalidLibrary($url, 'abcdefghijklmnop'));
+      $this->assertSession()->statusCodeEquals(400);
+
+      $session->visit($this->setInvalidLibrary($url, 'system/llama'));
+      $this->assertSession()->statusCodeEquals(200);
+    }
+    else {
+      if (isset($parts['query']['category'])) {
+        $session->visit($this->omitCategory($url));
+        $this->assertSession()->statusCodeEquals(400);
+
+        $session->visit($this->invalidCategory($url));
+        $this->assertSession()->statusCodeEquals(400);
+      }
+
+      $session->visit($this->omitLibraries($url));
+      $this->assertSession()->statusCodeEquals(400);
+
+      $session->visit($this->invalidLibraries($url));
+      $this->assertSession()->statusCodeEquals(400);
+    }
 
     $session->visit($this->omitTheme($url));
-    $this->assertSession()->statusCodeEquals(400);
-
-    $session->visit($this->omitInclude($url));
-    $this->assertSession()->statusCodeEquals(400);
-
-    $session->visit($this->invalidInclude($url));
-    $this->assertSession()->statusCodeEquals(400);
-
-    $session->visit($this->invalidExclude($url));
     $this->assertSession()->statusCodeEquals(400);
 
     $session->visit($this->replaceFileNamePrefix($url));
     $this->assertSession()->statusCodeEquals(400);
 
-    $session->visit($this->setInvalidLibrary($url));
-    $this->assertSession()->statusCodeEquals(200);
-
+    // When an invalid asset hash name is given.
     $session->visit($this->replaceGroupHash($url));
     $this->assertSession()->statusCodeEquals(200);
-    $headers = $session->getResponseHeaders();
-    $this->assertEquals(['no-store, private'], $headers['Cache-Control']);
-
-    // And again to confirm it's not cached on disk.
-    $session->visit($this->replaceGroupHash($url));
-    $this->assertSession()->statusCodeEquals(200);
-    $headers = $session->getResponseHeaders();
-    $this->assertEquals(['no-store, private'], $headers['Cache-Control']);
+    $current_url = $session->getCurrentUrl();
+    // Redirect to the correct one.
+    $this->assertEquals($url, $current_url);
   }
 
   /**
@@ -204,13 +323,17 @@ class AssetOptimizationTest extends BrowserTestBase {
    *
    * @param string $url
    *   The source URL.
+   * @param int $delta
+   *   The delta to apply.
    *
    * @return string
    *   The URL with the delta replaced.
    */
-  protected function replaceGroupDelta(string $url): string {
+  protected function replaceGroupDelta(string $url, int $delta): string {
+    // First replace the hash, so we don't get served the actual file on disk.
+    $url = $this->replaceGroupHash($url);
     $parts = UrlHelper::parse($url);
-    $parts['query']['delta'] = 100;
+    $parts['query']['delta'] = $delta;
     $query = UrlHelper::buildQuery($parts['query']);
     return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
   }
@@ -227,7 +350,7 @@ class AssetOptimizationTest extends BrowserTestBase {
   protected function replaceGroupHash(string $url): string {
     $parts = explode('_', $url, 2);
     $hash = strtok($parts[1], '.');
-    $parts[1] = str_replace($hash, 'abcdefghijklmnop', $parts[1]);
+    $parts[1] = str_replace($hash, $this->randomMachineName(), $parts[1]);
     return $this->getAbsoluteUrl(implode('_', $parts));
   }
 
@@ -249,16 +372,18 @@ class AssetOptimizationTest extends BrowserTestBase {
    *
    * @param string $url
    *   The source URL.
+   * @param string $library
+   *   The library to add.
    *
    * @return string
    *   The URL with the 'include' query set to an invalid value.
    */
-  protected function setInvalidLibrary(string $url): string {
+  protected function setInvalidLibrary(string $url, string $library): string {
     // First replace the hash, so we don't get served the actual file on disk.
     $url = $this->replaceGroupHash($url);
     $parts = UrlHelper::parse($url);
     $include = explode(',', UrlHelper::uncompressQueryParameter($parts['query']['include']));
-    $include[] = 'system/llama';
+    $include[] = $library;
     $parts['query']['include'] = UrlHelper::compressQueryParameter(implode(',', $include));
 
     $query = UrlHelper::buildQuery($parts['query']);
@@ -302,6 +427,42 @@ class AssetOptimizationTest extends BrowserTestBase {
   }
 
   /**
+   * Removes the 'category' query parameter from the given URL.
+   *
+   * @param string $url
+   *   The source URL.
+   *
+   * @return string
+   *   The URL with the 'category' parameter omitted.
+   */
+  protected function omitCategory(string $url): string {
+    // First replace the hash, so we don't get served the actual file on disk.
+    $url = $this->replaceGroupHash($url);
+    $parts = UrlHelper::parse($url);
+    unset($parts['query']['category']);
+    $query = UrlHelper::buildQuery($parts['query']);
+    return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
+  }
+
+  /**
+   * Removes the 'libraries' query parameter from the given URL.
+   *
+   * @param string $url
+   *   The source URL.
+   *
+   * @return string
+   *   The URL with the 'libraries' parameter omitted.
+   */
+  protected function omitLibraries(string $url): string {
+    // First replace the hash, so we don't get served the actual file on disk.
+    $url = $this->replaceGroupHash($url);
+    $parts = UrlHelper::parse($url);
+    unset($parts['query']['libraries']);
+    $query = UrlHelper::buildQuery($parts['query']);
+    return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
+  }
+
+  /**
    * Replaces the 'include' query parameter with an invalid value.
    *
    * @param string $url
@@ -315,6 +476,42 @@ class AssetOptimizationTest extends BrowserTestBase {
     $url = $this->replaceGroupHash($url);
     $parts = UrlHelper::parse($url);
     $parts['query']['include'] = 'abcdefghijklmnop';
+    $query = UrlHelper::buildQuery($parts['query']);
+    return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
+  }
+
+  /**
+   * Replaces the 'libraries' query parameter with an invalid value.
+   *
+   * @param string $url
+   *   The source URL.
+   *
+   * @return string
+   *   The URL with 'libraries' set to an arbitrary string.
+   */
+  protected function invalidLibraries(string $url): string {
+    // First replace the hash, so we don't get served the actual file on disk.
+    $url = $this->replaceGroupHash($url);
+    $parts = UrlHelper::parse($url);
+    $parts['query']['libraries'] = 'abcdefghijklmnop';
+    $query = UrlHelper::buildQuery($parts['query']);
+    return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
+  }
+
+  /**
+   * Replaces the 'category' query parameter with an invalid value.
+   *
+   * @param string $url
+   *   The source URL.
+   *
+   * @return string
+   *   The URL with 'category' set to an arbitrary string.
+   */
+  protected function invalidCategory(string $url): string {
+    // First replace the hash, so we don't get served the actual file on disk.
+    $url = $this->replaceGroupHash($url);
+    $parts = UrlHelper::parse($url);
+    $parts['query']['category'] = 'abcdefghijklmnop';
     $query = UrlHelper::buildQuery($parts['query']);
     return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
   }

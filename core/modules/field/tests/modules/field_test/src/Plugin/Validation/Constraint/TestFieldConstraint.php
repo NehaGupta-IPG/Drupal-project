@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\field_test\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -15,13 +17,6 @@ use Symfony\Component\Validator\Constraints\NotEqualTo;
   type: ['integer']
 )]
 class TestFieldConstraint extends NotEqualTo {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRequiredOptions(): array {
-    return ['value'];
-  }
 
   /**
    * {@inheritdoc}

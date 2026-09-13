@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\hold_test\EventSubscriber;
 
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -40,14 +42,14 @@ class HoldTestSubscriber implements EventSubscriberInterface {
   /**
    * Request hold.
    */
-  public function onRequest() {
+  public function onRequest(): void {
     $this->hold(static::HOLD_REQUEST);
   }
 
   /**
    * Response hold.
    */
-  public function onRespond() {
+  public function onRespond(): void {
     $this->hold(static::HOLD_RESPONSE);
   }
 

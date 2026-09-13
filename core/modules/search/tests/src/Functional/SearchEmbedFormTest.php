@@ -5,18 +5,22 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies that a form embedded in search results works.
- *
- * @group search
  */
+#[Group('search')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class SearchEmbedFormTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search', 'search_embedded_form'];
+  protected static $modules = ['node', 'search', 'search_embedded_form', 'search_node'];
 
   /**
    * {@inheritdoc}

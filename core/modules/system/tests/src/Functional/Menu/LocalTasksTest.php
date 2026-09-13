@@ -8,22 +8,21 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore ragdoll
-
 /**
  * Tests local tasks derived from router and added/altered via hooks.
- *
- * @group Menu
  */
+#[Group('Menu')]
+#[RunTestsInSeparateProcesses]
 class LocalTasksTest extends BrowserTestBase {
 
   use TaxonomyTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var string[]
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'menu_test', 'entity_test', 'node'];
 
@@ -62,7 +61,7 @@ class LocalTasksTest extends BrowserTestBase {
    * @internal
    */
   protected function assertLocalTasks(array $routes, int $level = 0): void {
-    $elements = $this->xpath('//*[contains(@class, :class)]//a', [
+    $elements = $this->getNodeElementsByXpath('//*[contains(@class, :class)]//a', [
       ':class' => $level == 0 ? 'tabs primary' : 'tabs secondary',
     ]);
     $this->assertGreaterThan(0, count($elements), 'Local tasks found.');
@@ -157,7 +156,7 @@ class LocalTasksTest extends BrowserTestBase {
 
     $xpath = '//ul[contains(@class, "tabs")]//a[contains(@class, "active")]';
     $this->assertSession()->elementsCount('xpath', $xpath, 2);
-    $links = $this->xpath($xpath);
+    $links = $this->getNodeElementsByXpath($xpath);
     $this->assertEquals('Settings', $links[0]->getText(), 'The settings tab is active.');
     $this->assertEquals('Dynamic title for TestTasksSettingsSub1', $links[1]->getText(), 'The sub1 tab is active.');
 
@@ -167,12 +166,12 @@ class LocalTasksTest extends BrowserTestBase {
     $this->drupalGet(Url::fromRoute('menu_test.local_task_test_tasks_settings_derived', ['placeholder' => 'derive1']));
     $this->assertLocalTasks($sub_tasks, 1);
 
-    $result = $this->xpath('//ul[contains(@class, "tabs")]//li[contains(@class, "active")]');
+    $result = $this->getNodeElementsByXpath('//ul[contains(@class, "tabs")]//li[contains(@class, "active")]');
     $this->assertCount(2, $result, 'There are tabs active on both levels.');
     $this->assertEquals('Settings', $result[0]->getText(), 'The settings tab is active.');
     $this->assertEquals('Derive 1', $result[1]->getText(), 'The derive1 tab is active.');
 
-    // Ensures that the local tasks contains the proper 'provider key'
+    // Ensures that the local tasks contains the proper 'provider key'.
     $definitions = $this->container->get('plugin.manager.menu.local_task')->getDefinitions();
     $this->assertEquals('menu_test', $definitions['menu_test.local_task_test_tasks_view']['provider']);
     $this->assertEquals('menu_test', $definitions['menu_test.local_task_test_tasks_edit']['provider']);
@@ -300,7 +299,7 @@ class LocalTasksTest extends BrowserTestBase {
       ['entity.node_type.edit_form', ['node_type' => 'page']],
       ['entity.node.field_ui_fields', ['node_type' => 'page']],
       ['entity.entity_form_display.node.default', ['node_type' => 'page']],
-      ['entity.entity_view_display.node.default', ['node_type' => 'page']],
+      ['entity.entity_view_display_overview.node', ['node_type' => 'page']],
       ['entity.node_type.entity_permissions_form', ['node_type' => 'page']],
     ]);
   }

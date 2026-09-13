@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\workflow_type_test\Form;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -29,7 +31,7 @@ class ComplexTestTypeConfigureForm extends WorkflowTypeConfigureFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     $type_configuration = $this->workflowType->getConfiguration();
     $type_configuration['example_setting'] = $form_state->getValue('example_setting');
     $this->workflowType->setConfiguration($type_configuration);

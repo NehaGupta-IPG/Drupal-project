@@ -71,7 +71,7 @@ abstract class Query implements PlaceholderInterface {
    *   Array of query options.
    */
   public function __construct(Connection $connection, $options) {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = bin2hex(random_bytes(12));
 
     $this->connection = $connection;
     $this->connectionKey = $this->connection->getKey();
@@ -100,16 +100,8 @@ abstract class Query implements PlaceholderInterface {
    * Implements the magic __clone function.
    */
   public function __clone() {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = bin2hex(random_bytes(12));
   }
-
-  /**
-   * Runs the query against the database.
-   *
-   * @return \Drupal\Core\Database\StatementInterface|null
-   *   A prepared statement, or NULL if the query is not valid.
-   */
-  abstract protected function execute();
 
   /**
    * Implements PHP magic __toString method to convert the query to a string.
@@ -119,6 +111,10 @@ abstract class Query implements PlaceholderInterface {
    *
    * @return string
    *   A prepared statement query string for this object.
+   *
+   * @throws \BadMethodCallException
+   *   Thrown when the operation is a Merge or the operation is not implemented,
+   *   as in test.
    */
   abstract public function __toString();
 
@@ -150,7 +146,7 @@ abstract class Query implements PlaceholderInterface {
    * The comment string will be sanitized to remove * / and other characters
    * that may terminate the string early so as to avoid SQL injection attacks.
    *
-   * @param $comment
+   * @param string $comment
    *   The comment string to be inserted into the query.
    *
    * @return $this

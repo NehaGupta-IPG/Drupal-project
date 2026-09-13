@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional;
 
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensure that login works as expected.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserLoginTest extends BrowserTestBase {
 
   use AssertMailTrait {
@@ -133,9 +136,14 @@ class UserLoginTest extends BrowserTestBase {
     $this->resetUserPassword($user1);
     $this->drupalLogout();
 
+    // Add Created field to the user profile display so that there is something
+    // to check page contents against.
+    EntityViewDisplay::collectRenderDisplay($user1, 'default')
+      ->setComponent('created', ['type' => 'timestamp'])
+      ->save();
     // Try to log in as user 1, it should be successful.
     $this->drupalLogin($user1);
-    $this->assertSession()->responseContains('Member for');
+    $this->assertSession()->responseContains('Created');
   }
 
   /**
@@ -152,7 +160,6 @@ class UserLoginTest extends BrowserTestBase {
     $this->drupalLogout();
 
     // Load the stored user. The password hash shouldn't need a rehash.
-    $user_storage = $this->container->get('entity_type.manager')->getStorage('user');
     $account = User::load($account->id());
 
     // Check that the stored password doesn't need rehash.
@@ -169,10 +176,15 @@ class UserLoginTest extends BrowserTestBase {
     $this->assertTrue($password_hasher->needsRehash($account->getPassword()));
 
     $account->passRaw = $password;
-    $this->drupalLogin($account);
+    $this->drupalGet('user/login');
+    $edit = [
+      'name' => $account->getAccountName(),
+      'pass' => $account->passRaw,
+    ];
+    $this->submitForm($edit, 'Log in');
+
     // Load the stored user, which should have a different password hash now.
-    $user_storage->resetCache([$account->id()]);
-    $account = $user_storage->load($account->id());
+    $account = User::load($account->id());
 
     // Check that the stored password doesn't need rehash.
     $this->assertFalse($password_hasher->needsRehash($account->getPassword()));
@@ -186,6 +198,11 @@ class UserLoginTest extends BrowserTestBase {
     // Create a new user and authenticate.
     $account = $this->drupalCreateUser([]);
     $current_password = $account->passRaw;
+    // Add Created field to the user profile display so that there is something
+    // to check page contents against.
+    EntityViewDisplay::collectRenderDisplay($account, 'default')
+      ->setComponent('created', ['type' => 'timestamp'])
+      ->save();
     $this->drupalLogin($account);
 
     // Use the length specified in
@@ -194,11 +211,11 @@ class UserLoginTest extends BrowserTestBase {
 
     $current_password = $this->doPasswordLengthLogin($account, $current_password, $length);
     $this->assertSession()->pageTextNotContains('Password cannot be longer than');
-    $this->assertSession()->pageTextContains('Member for');
+    $this->assertSession()->pageTextContains('Created');
 
     $this->doPasswordLengthLogin($account, $current_password, $length + 1);
     $this->assertSession()->pageTextContains('Password cannot be longer than ' . $length . ' characters but is currently ' . ($length + 1) . ' characters long.');
-    $this->assertSession()->pageTextNotContains('Member for');
+    $this->assertSession()->pageTextNotContains('Created');
   }
 
   /**
@@ -305,7 +322,7 @@ class UserLoginTest extends BrowserTestBase {
         ->fetchField();
       if ($flood_trigger == 'user') {
         $this->assertSession()->pageTextMatches("/There (has|have) been more than \w+ failed login attempt.* for this account. It is temporarily blocked. Try again later or request a new password./");
-        $this->assertSession()->elementExists('css', 'body.maintenance-page');
+        $this->assertSession()->elementExists('css', 'body.maintenance-page--flood');
         $this->assertSession()->linkExists("request a new password");
         $this->assertSession()->linkByHrefExists(Url::fromRoute('user.pass')->toString());
         $this->assertEquals('Flood control blocked login attempt for uid %uid from %ip', $last_log, 'A watchdog message was logged for the login attempt blocked by flood control per user.');
@@ -313,7 +330,7 @@ class UserLoginTest extends BrowserTestBase {
       else {
         // No uid, so the limit is IP-based.
         $this->assertSession()->pageTextContains("Too many failed login attempts from your IP address. This IP address is temporarily blocked. Try again later or request a new password.");
-        $this->assertSession()->elementExists('css', 'body.maintenance-page');
+        $this->assertSession()->elementExists('css', 'body.maintenance-page--flood');
         $this->assertSession()->linkExists("request a new password");
         $this->assertSession()->linkByHrefExists(Url::fromRoute('user.pass')->toString());
         $this->assertEquals('Flood control blocked login attempt from %ip', $last_log, 'A watchdog message was logged for the login attempt blocked by flood control per IP.');
@@ -332,7 +349,7 @@ class UserLoginTest extends BrowserTestBase {
    * @param object $user
    *   A user object.
    */
-  public function resetUserPassword($user) {
+  public function resetUserPassword($user): void {
     $this->drupalGet('user/password');
     $edit['name'] = $user->getDisplayName();
     $this->submitForm($edit, 'Submit');

@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional;
 
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment block functionality.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentBlockTest extends CommentTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'views'];
 
@@ -63,10 +64,14 @@ class CommentBlockTest extends CommentTestBase {
     // Test that a user without the 'access comments' permission cannot see the
     // block.
     $this->drupalLogout();
-    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access comments']);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->revokePermissions([
+      'access comments',
+    ])->save();
     $this->drupalGet('');
     $this->assertSession()->pageTextNotContains('Recent comments');
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access comments']);
+    Role::loadOverrideFree(RoleInterface::ANONYMOUS_ID)->grantPermissions([
+      'access comments',
+    ])->save();
 
     // Test that a user with the 'access comments' permission can see the
     // block.

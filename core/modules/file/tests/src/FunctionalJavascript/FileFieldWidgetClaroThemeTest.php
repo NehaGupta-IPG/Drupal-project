@@ -5,18 +5,21 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\FunctionalJavascript;
 
 use Drupal\Core\Url;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the widget visibility settings for the Claro theme.
  *
  * The widget is intentionally tested with Claro as the default theme to test
- * the changes added in _claro_preprocess_file_and_image_widget().
+ * the changes added in
+ * \Drupal\claro\Hook\ClaroHooks->fileAndImageWidgetHelper().
  *
- * @see _claro_preprocess_file_and_image_widget()
- *
- * @group file
- * @group #slow
+ * @see \Drupal\claro\Hook\ClaroHooks->fileAndImageWidgetHelper()
  */
+#[Group('file')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class FileFieldWidgetClaroThemeTest extends FileFieldWidgetTest {
 
   /**

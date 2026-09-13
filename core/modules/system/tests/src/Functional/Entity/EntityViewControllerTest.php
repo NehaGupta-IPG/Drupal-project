@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Entity;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests EntityViewController functionality.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityViewControllerTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test'];
 
@@ -52,7 +53,7 @@ class EntityViewControllerTest extends BrowserTestBase {
    * Tests EntityViewController.
    */
   public function testEntityViewController(): void {
-    $get_label_markup = function ($label) {
+    $get_label_markup = function (string $label): string {
       return '<h1 class="page-title">
             <div class="field field--name-name field--type-string field--label-hidden field__item">' . $label . '</div>
       </h1>';
@@ -133,7 +134,7 @@ class EntityViewControllerTest extends BrowserTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The created entity.
    */
-  protected function createTestEntity($entity_type, $name = NULL) {
+  protected function createTestEntity($entity_type, $name = NULL): EntityInterface {
     $data = [
       'bundle' => $entity_type,
       'name' => $name ?? $this->randomMachineName(),

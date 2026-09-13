@@ -5,21 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\breakpoint\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests discovery of breakpoints provided by themes and modules.
- *
- * @group breakpoint
  */
+#[Group('breakpoint')]
+#[RunTestsInSeparateProcesses]
 class BreakpointDiscoveryTest extends KernelTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'breakpoint',
     'breakpoint_module_test',
   ];
@@ -190,7 +189,7 @@ class BreakpointDiscoveryTest extends KernelTestBase {
    */
   public function testBreakpointGroups(): void {
     $expected = [
-      'olivero' => 'Olivero',
+      'stark' => 'Stark',
       'breakpoint_module_test' => 'Breakpoint test module',
       'breakpoint_theme_test' => 'Breakpoint test theme',
       'breakpoint_theme_test.group2' => 'breakpoint_theme_test.group2',

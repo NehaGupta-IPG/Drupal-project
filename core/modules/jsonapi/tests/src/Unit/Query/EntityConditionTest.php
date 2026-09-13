@@ -8,15 +8,19 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\jsonapi\Query\EntityCondition;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * @coversDefaultClass \Drupal\jsonapi\Query\EntityCondition
- * @group jsonapi
+ * Tests Drupal\jsonapi\Query\EntityCondition.
  *
  * @internal
  */
+#[CoversClass(EntityCondition::class)]
+#[Group('jsonapi')]
 class EntityConditionTest extends UnitTestCase {
 
   /**
@@ -34,10 +38,10 @@ class EntityConditionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createFromQueryParameter
-   * @dataProvider queryParameterProvider
+   * Tests create from query parameter.
    */
-  public function testCreateFromQueryParameter($case): void {
+  #[DataProvider('queryParameterProvider')]
+  public function testCreateFromQueryParameter(array $case): void {
     $condition = EntityCondition::createFromQueryParameter($case);
     $this->assertEquals($case['path'], $condition->field());
     $this->assertEquals($case['value'], $condition->value());
@@ -49,7 +53,7 @@ class EntityConditionTest extends UnitTestCase {
   /**
    * Data provider for testDenormalize.
    */
-  public static function queryParameterProvider() {
+  public static function queryParameterProvider(): array {
     return [
       [['path' => 'some_field', 'value' => NULL, 'operator' => '=']],
       [['path' => 'some_field', 'operator' => '=', 'value' => 'some_string']],
@@ -72,13 +76,15 @@ class EntityConditionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
-   * @dataProvider validationProvider
+   * Tests validation.
+   *
+   * @legacy-covers ::validate
    */
-  public function testValidation($input, $exception): void {
+  #[DataProvider('validationProvider')]
+  public function testValidation(array $input, ?BadRequestHttpException $exception): void {
     if ($exception) {
       $this->expectException(get_class($exception));
-      $this->expectExceptionMessage($exception->getMessage());
+      $this->expectExceptionMessageIs($exception->getMessage());
     }
     EntityCondition::createFromQueryParameter($input);
     $this->assertNull($exception, 'No exception was expected.');
@@ -87,7 +93,7 @@ class EntityConditionTest extends UnitTestCase {
   /**
    * Data provider for testValidation.
    */
-  public static function validationProvider() {
+  public static function validationProvider(): array {
     return [
       [['path' => 'some_field', 'value' => 'some_value'], NULL],
       [

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Config\Action;
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
@@ -58,16 +59,7 @@ class ConfigActionManager extends DefaultPluginManager {
    *
    * @var string[]
    */
-  private static array $deprecatedPluginIds = [
-    'entity_create:ensure_exists' => [
-      'replacement' => 'entity_create:createIfNotExists',
-      'message' => 'The plugin ID "entity_create:ensure_exists" is deprecated in drupal:10.3.1 and will be removed in drupal:12.0.0. Use "entity_create:createIfNotExists" instead. See https://www.drupal.org/node/3458273.',
-    ],
-    'simple_config_update' => [
-      'replacement' => 'simpleConfigUpdate',
-      'message' => 'The plugin ID "simple_config_update" is deprecated in drupal:10.3.1 and will be removed in drupal:12.0.0. Use "simpleConfigUpdate" instead. See https://www.drupal.org/node/3458273.',
-    ],
-  ];
+  private static array $deprecatedPluginIds = [];
 
   /**
    * Constructs a new \Drupal\Core\Config\Action\ConfigActionManager object.
@@ -130,6 +122,18 @@ class ConfigActionManager extends DefaultPluginManager {
    * @see \Drupal\Core\Config\Action\ConfigActionManager::getConfigNamesMatchingExpression()
    */
   public function applyAction(string $action_id, string $configName, mixed $data): void {
+    if (str_starts_with($configName, '?')) {
+      if (str_contains($configName, '*')) {
+        throw new ConfigActionException("The '$configName' configuration name is optional because it starts with a question mark, and therefore cannot contain wildcards.");
+      }
+      $configName = trim($configName, '?');
+      if (!$this->configStorage->exists($configName)) {
+        // The config action is optional and the config doesn't exist.
+        // So there is nothing to do.
+        return;
+      }
+    }
+
     if (!$this->hasDefinition($action_id)) {
       // Get the full plugin ID from the shorthand map, if it is available.
       $entity_type = $this->configManager->getEntityTypeIdByName($configName);
@@ -137,8 +141,20 @@ class ConfigActionManager extends DefaultPluginManager {
         $action_id = $this->getShorthandActionIdsForEntityType($entity_type)[$action_id] ?? $action_id;
       }
     }
-    /** @var \Drupal\Core\Config\Action\ConfigActionPluginInterface $action */
-    $action = $this->createInstance($action_id);
+    try {
+      /** @var \Drupal\Core\Config\Action\ConfigActionPluginInterface $action */
+      $action = $this->createInstance($action_id);
+    }
+    catch (PluginNotFoundException $e) {
+      $entity_type = $this->configManager->getEntityTypeIdByName($configName);
+      if ($entity_type) {
+        $action_ids = $this->getShorthandActionIdsForEntityType($entity_type);
+        $valid_ids = implode(', ', array_keys($action_ids));
+        throw new PluginNotFoundException($action_id, sprintf('The "%s" entity does not support the "%s" config action. Valid config actions for %s are: %s', $entity_type, $action_id, $entity_type, $valid_ids));
+      }
+      throw $e;
+    }
+
     foreach ($this->getConfigNamesMatchingExpression($configName) as $name) {
       $action->apply($name, $data);
       $typed_config = $this->typedConfig->createFromNameAndData($name, $this->configFactory->get($name)->getRawData());

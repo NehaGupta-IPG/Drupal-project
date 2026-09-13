@@ -1,7 +1,7 @@
 drupal.language.admin:
   version: VERSION
   js:
-    language.admin.js: {}
+    js/language.admin.js: {}
   css:
     theme:
       css/language.admin.css: {}
@@ -9,3 +9,8 @@ drupal.language.admin:
     - core/jquery
     - core/drupal
     - core/once
+
+moved_to:
+  version: VERSION
+  js:
+    js/language.admin.js: {}

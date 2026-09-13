@@ -6,7 +6,9 @@ use Drupal\Core\Entity\Controller\EntityViewController;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\node\Form\NodePreviewForm;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -15,25 +17,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class NodePreviewController extends EntityViewController {
 
   /**
-   * The entity repository service.
-   *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * Creates a NodePreviewController object.
    */
-  protected $entityRepository;
-
-  /**
-   * Creates a NodeViewController object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer, EntityRepositoryInterface $entity_repository) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    RendererInterface $renderer,
+    protected readonly EntityRepositoryInterface $entityRepository,
+    protected readonly FormBuilderInterface $formBuilder,
+  ) {
     parent::__construct($entity_type_manager, $renderer);
-    $this->entityRepository = $entity_repository;
   }
 
   /**
@@ -43,7 +35,8 @@ class NodePreviewController extends EntityViewController {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('renderer'),
-      $container->get('entity.repository')
+      $container->get('entity.repository'),
+      $container->get('form_builder'),
     );
   }
 
@@ -55,24 +48,20 @@ class NodePreviewController extends EntityViewController {
     $build = parent::view($node_preview, $view_mode_id);
 
     $build['#attached']['library'][] = 'node/drupal.node.preview';
-
+    $build['#attached']['page_top']['node_preview'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => [
+          'node-preview-container',
+          'container-inline',
+        ],
+      ],
+      'view_mode' => $this->formBuilder->getForm(NodePreviewForm::class, $node_preview),
+    ];
     // Don't render cache previews.
     unset($build['#cache']);
 
     return $build;
-  }
-
-  /**
-   * The _title_callback for the page that renders a single node in preview.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $node_preview
-   *   The current node.
-   *
-   * @return string
-   *   The page title.
-   */
-  public function title(EntityInterface $node_preview) {
-    return $this->entityRepository->getTranslationFromContext($node_preview)->label();
   }
 
 }

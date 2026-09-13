@@ -4,35 +4,23 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Asset;
 
-use Drupal\Core\Asset\LibraryDiscovery;
+use Drupal\Core\Asset\LibraryDiscoveryCollector;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * @coversDefaultClass \Drupal\Core\Asset\LibraryDiscovery
- * @group Asset
+ * Tests Drupal\Core\Asset\LibraryDiscoveryCollector.
  */
+#[CoversClass(LibraryDiscoveryCollector::class)]
+#[Group('Asset')]
 class LibraryDiscoveryTest extends UnitTestCase {
 
   /**
    * The tested library discovery service.
-   *
-   * @var \Drupal\Core\Asset\LibraryDiscovery
    */
-  protected $libraryDiscovery;
-
-  /**
-   * The mocked library discovery cache collector.
-   *
-   * @var \Drupal\Core\Cache\CacheCollectorInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $libraryDiscoveryCollector;
-
-  /**
-   * The cache tags invalidator.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $cacheTagsInvalidator;
+  protected LibraryDiscoveryCollector&MockObject $libraryDiscovery;
 
   /**
    * Test library data.
@@ -67,35 +55,22 @@ class LibraryDiscoveryTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->cacheTagsInvalidator = $this->createMock('Drupal\Core\Cache\CacheTagsInvalidatorInterface');
-    $this->libraryDiscoveryCollector = $this->getMockBuilder('Drupal\Core\Asset\LibraryDiscoveryCollector')
+    $this->libraryDiscovery = $this->getMockBuilder('Drupal\Core\Asset\LibraryDiscoveryCollector')
+      ->onlyMethods(['resolveCacheMiss', 'getLibrariesByExtension'])
       ->disableOriginalConstructor()
       ->getMock();
-    $this->libraryDiscovery = new LibraryDiscovery($this->libraryDiscoveryCollector);
-    $this->libraryDiscoveryCollector->expects($this->once())
-      ->method('get')
+    $this->libraryDiscovery
+      ->method('resolveCacheMiss')
+      ->with('test')
+      ->willReturn($this->libraryData);
+    $this->libraryDiscovery
+      ->method('getLibrariesByExtension')
       ->with('test')
       ->willReturn($this->libraryData);
   }
 
   /**
-   * @covers ::getLibrariesByExtension
-   */
-  public function testGetLibrariesByExtension(): void {
-    $this->libraryDiscovery->getLibrariesByExtension('test');
-    // Verify that subsequent calls don't trigger hook_library_info_alter()
-    // and hook_js_settings_alter() invocations, nor do they talk to the
-    // collector again. This ensures that the alterations made by
-    // hook_library_info_alter() and hook_js_settings_alter() implementations
-    // are statically cached, as desired.
-    $this->libraryDiscovery->getLibraryByName('test', 'test_1');
-    $this->libraryDiscovery->getLibrariesByExtension('test');
-  }
-
-  /**
    * Tests getting a library by name.
-   *
-   * @covers ::getLibraryByName
    */
   public function testGetLibraryByName(): void {
     $this->assertSame($this->libraryData['test_1'], $this->libraryDiscovery->getLibraryByName('test', 'test_1'));
@@ -105,7 +80,8 @@ class LibraryDiscoveryTest extends UnitTestCase {
    * Tests getting a deprecated library.
    */
   public function testAssetLibraryDeprecation(): void {
-    $previous_error_handler = set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler) {
+    $previous_error_handler = get_error_handler();
+    set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler) {
       // Convert deprecation error into a catchable exception.
       if ($severity === E_USER_DEPRECATED) {
         throw new \ErrorException($message, 0, $severity, $file, $line);

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Verifies that various taxonomy pages use the expected theme.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class ThemeTest extends TaxonomyTestBase {
 
   /**
@@ -24,9 +27,9 @@ class ThemeTest extends TaxonomyTestBase {
 
     // Make sure we are using distinct default and administrative themes for
     // the duration of these tests.
-    \Drupal::service('theme_installer')->install(['olivero', 'claro']);
+    \Drupal::service('theme_installer')->install(['test_theme', 'claro']);
     $this->config('system.theme')
-      ->set('default', 'olivero')
+      ->set('default', 'test_theme')
       ->set('admin', 'claro')
       ->save();
 
@@ -56,7 +59,8 @@ class ThemeTest extends TaxonomyTestBase {
     $this->drupalGet('taxonomy/term/' . $term->id());
     // Check that the default theme's CSS appears on the page for viewing
     // a taxonomy term.
-    $this->assertSession()->responseContains('olivero/css/base/base.css');
+
+    $this->assertSession()->responseContains('test_theme/css/my-button.css');
 
     // Editing a taxonomy term should use the same theme as adding one.
     $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');

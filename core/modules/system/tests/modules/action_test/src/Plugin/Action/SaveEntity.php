@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\action_test\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
@@ -20,7 +22,7 @@ class SaveEntity extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  public function execute($entity = NULL) {
+  public function execute($entity = NULL): void {
     $entity->save();
   }
 

@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the ability to disable and enable view displays.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\display\Feed
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DisabledDisplayTest extends ViewTestBase {
 
   /**
@@ -22,9 +25,7 @@ class DisabledDisplayTest extends ViewTestBase {
   public static $testViews = ['test_disabled_display'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'node', 'views'];
 
@@ -78,10 +79,10 @@ class DisabledDisplayTest extends ViewTestBase {
     // Enable each disabled display and save the view.
     foreach ($display_ids as $display_id) {
       $view->getExecutable()->displayHandlers->get($display_id)->setOption('enabled', TRUE);
-      $view->save();
       $enabled = $view->getExecutable()->displayHandlers->get($display_id)->isEnabled();
       $this->assertTrue($enabled, 'Display ' . $display_id . ' is now enabled');
     }
+    $view->save();
 
     \Drupal::service('router.builder')->rebuildIfNeeded();
 

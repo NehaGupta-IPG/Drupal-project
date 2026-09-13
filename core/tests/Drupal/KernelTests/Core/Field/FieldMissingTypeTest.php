@@ -9,24 +9,26 @@ use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the exception when missing a field type.
- *
- * @group Field
  */
+#[Group('Field')]
+#[RunTestsInSeparateProcesses]
 class FieldMissingTypeTest extends EntityKernelTestBase {
 
   /**
    * Set to FALSE because we are hacking a field storage to use a fake type.
    *
    * @see \Drupal\Core\Config\Development\ConfigSchemaChecker
-   *
-   * @var bool
    */
-  protected $strictConfigSchema = FALSE;
+  protected bool $strictConfigSchema = FALSE;
 
   /**
+   * The field name.
+   *
    * @var string
    */
   protected $fieldName;
@@ -41,7 +43,6 @@ class FieldMissingTypeTest extends EntityKernelTestBase {
     $this->installEntitySchema($entity_type_id);
     $this->fieldName = $this->randomMachineName();
 
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     FieldStorageConfig::create([
       'field_name' => $this->fieldName,
       'type' => 'text',
@@ -64,7 +65,7 @@ class FieldMissingTypeTest extends EntityKernelTestBase {
    */
   public function testFieldStorageMissingType(): void {
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage("Unable to determine class for field type 'foo_field_storage' found in the 'field.storage.entity_test_mulrev.{$this->fieldName}' configuration");
+    $this->expectExceptionMessageIs("Unable to determine class for field type 'foo_field_storage' found in the 'field.storage.entity_test_mulrev.{$this->fieldName}' configuration");
     $entity = EntityTestMulRev::create([
       'name' => $this->randomString(),
       'field_test_item' => $this->randomString(),
@@ -84,7 +85,7 @@ class FieldMissingTypeTest extends EntityKernelTestBase {
    */
   public function testFieldMissingType(): void {
     $this->expectException(PluginNotFoundException::class);
-    $this->expectExceptionMessage("Unable to determine class for field type 'foo_field' found in the 'field.field.entity_test_mulrev.entity_test_mulrev.{$this->fieldName}' configuration");
+    $this->expectExceptionMessageIs("Unable to determine class for field type 'foo_field' found in the 'field.field.entity_test_mulrev.entity_test_mulrev.{$this->fieldName}' configuration");
     $entity = EntityTestMulRev::create([
       'name' => $this->randomString(),
       'field_test_item' => $this->randomString(),

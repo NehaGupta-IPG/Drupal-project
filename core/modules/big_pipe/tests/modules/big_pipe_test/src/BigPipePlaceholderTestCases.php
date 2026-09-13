@@ -1,14 +1,13 @@
 <?php
 
-/**
- * @file
- */
+declare(strict_types=1);
 
 // cspell:ignore divpiggydiv timecurrent timetime
 
 namespace Drupal\big_pipe_test;
 
 use Drupal\big_pipe\Render\BigPipeMarkup;
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,6 +33,7 @@ class BigPipePlaceholderTestCases {
    *   Optional. Necessary to get the embedded AJAX/HTML responses.
    *
    * @return \Drupal\big_pipe_test\BigPipePlaceholderTestCase[]
+   *   An array of placeholder test cases.
    */
   public static function cases(?ContainerInterface $container = NULL, ?AccountInterface $user = NULL) {
     // Define the two types of cacheability that we expect to see. These will be
@@ -105,11 +105,11 @@ class BigPipePlaceholderTestCases {
           'method' => 'replaceWith',
           // cspell:disable-next-line
           'selector' => '[data-big-pipe-placeholder-id="callback=Drupal%5CCore%5CRender%5CElement%5CStatusMessages%3A%3ArenderMessages&args%5B0%5D&token=_HAdUpwWmet0TOTe2PSiJuMntExoshbm1kh2wQzzzAA"]',
-          'data' => '<div data-drupal-messages>' . "\n" . ' <div role="contentinfo" aria-label="Status message">' . "\n" . ' <h2 class="visually-hidden">Status message</h2>' . "\n" . ' Hello from BigPipe!' . "\n" . ' </div>' . "\n" . '</div>' . "\n",
+          'data' => '<div data-drupal-messages>' . "\n" . ' <div role="status" aria-label="Status message">' . "\n" . ' <h2 class="visually-hidden">Status message</h2>' . "\n" . ' Hello from BigPipe!' . "\n" . ' </div>' . "\n" . '</div>' . "\n",
           'settings' => NULL,
         ],
       ];
-      $status_messages->embeddedHtmlResponse = '<div data-drupal-messages-fallback class="hidden"></div><div data-drupal-messages>' . "\n" . '  <div role="contentinfo" aria-label="Status message">' . "\n" . '              <h2 class="visually-hidden">Status message</h2>' . "\n" . '              Hello from BigPipe!' . "\n" . '          </div>' . "\n" . '</div>' . "\n";
+      $status_messages->embeddedHtmlResponse = '<div data-drupal-messages-fallback class="hidden"></div><div data-drupal-messages>' . "\n" . '  <div role="status" aria-label="Status message">' . "\n" . '          <h2 class="visually-hidden">Status message</h2>' . "\n" . '              Hello from BigPipe!' . "\n" . '      </div>' . "\n" . '</div>' . "\n";
     }
 
     // 2. Real-world example of HTML attribute value placeholder: form action.
@@ -135,28 +135,31 @@ class BigPipePlaceholderTestCases {
     }
 
     // 3. Real-world example of HTML attribute value subset placeholder: CSRF
-    // token in link.
+    // token in link. The route system.theme_set_default has _csrf_token: TRUE,
+    // so RouteProcessorCsrf generates Crypt::hashBase64($path) as a placeholder.
+    $csrf_token_path = 'admin/appearance/default';
+    $csrf_token_hash = Crypt::hashBase64($csrf_token_path);
     $csrf_token = new BigPipePlaceholderTestCase(
       [
         '#title' => 'Link with CSRF token',
         '#type' => 'link',
         '#url' => Url::fromRoute('system.theme_set_default'),
       ],
-      'e88b559cce72c80b687d56b0e2a3a5ae4b66bc0e',
+      $csrf_token_hash,
       [
         '#lazy_builder' => [
           'route_processor_csrf:renderPlaceholderCsrfToken',
-          ['admin/config/user-interface/shortcut/manage/default/add-link-inline'],
+          [$csrf_token_path],
         ],
       ]
     );
-    $csrf_token->bigPipeNoJsPlaceholder = 'big_pipe_nojs_placeholder_attribute_safe:e88b559cce72c80b687d56b0e2a3a5ae4b66bc0e';
+    $csrf_token->bigPipeNoJsPlaceholder = 'big_pipe_nojs_placeholder_attribute_safe:' . $csrf_token_hash;
     $csrf_token->bigPipeNoJsPlaceholderRenderArray = [
-      '#markup' => 'big_pipe_nojs_placeholder_attribute_safe:e88b559cce72c80b687d56b0e2a3a5ae4b66bc0e',
+      '#markup' => 'big_pipe_nojs_placeholder_attribute_safe:' . $csrf_token_hash,
       '#cache' => $cacheability_depends_on_session_only,
       '#attached' => [
         'big_pipe_nojs_placeholders' => [
-          'big_pipe_nojs_placeholder_attribute_safe:e88b559cce72c80b687d56b0e2a3a5ae4b66bc0e' => $csrf_token->placeholderRenderArray,
+          'big_pipe_nojs_placeholder_attribute_safe:' . $csrf_token_hash => $csrf_token->placeholderRenderArray,
         ],
       ],
     ];
@@ -367,7 +370,7 @@ class BigPipePlaceholderTestCases {
     ];
     $exception->embeddedHtmlResponse = NULL;
 
-    // cSpell:disable-next-line.
+    // cSpell:disable-next-line
     $token = 'PxOHfS_QL-T01NjBgu7Z7I04tIwMp6La5vM-mVxezbU';
     // 8. Edge case: response filter throwing an exception for this placeholder.
     $embedded_response_exception = new BigPipePlaceholderTestCase(
@@ -430,6 +433,9 @@ class BigPipePlaceholderTestCases {
 
 }
 
+/**
+ * Provides a placeholder for the BigPipe placeholder test cases.
+ */
 class BigPipePlaceholderTestCase {
 
   /**

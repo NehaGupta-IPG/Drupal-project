@@ -5,31 +5,31 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\FunctionalJavascript\Batch;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group Batch
+ * Tests Processing.
  */
+#[Group('Batch')]
+#[RunTestsInSeparateProcesses]
 class ProcessingTest extends WebDriverTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['batch_test', 'test_page_test'];
 
   /**
    * {@inheritdoc}
-   *
-   * @todo Use the stark theme in https://drupal.org/i/3407067.
    */
-  protected $defaultTheme = 'olivero';
+  protected $defaultTheme = 'stark';
 
   /**
    * Tests that a link to the error page is shown.
    */
   public function testLinkToErrorPageAppears(): void {
-    $edit = ['batch' => 'batch_8'];
+    $edit = ['batch' => 'batch8'];
     $this->drupalGet('batch-test');
     $this->submitForm($edit, 'Submit');
     $this->assertNotNull($this->assertSession()->waitForLink('the error page'));

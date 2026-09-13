@@ -1,24 +1,15 @@
 base:
+  aggregate_target:
+    css: 'global'
   version: VERSION
   css:
     # Adjust the weights to load these early.
     component:
       css/components/align.module.css: { weight: -10 }
-      css/components/fieldgroup.module.css: { weight: -10 }
       css/components/container-inline.module.css: { weight: -10 }
       css/components/clearfix.module.css: { weight: -10 }
-      css/components/details.module.css: { weight: -10 }
       css/components/hidden.module.css: { weight: -10 }
-      css/components/item-list.module.css: { weight: -10 }
       css/components/js.module.css: { weight: -10 }
-      css/components/nowrap.module.css: { weight: -10 }
-      css/components/position-container.module.css: { weight: -10 }
-      css/components/reset-appearance.module.css: { weight: -10 }
-      css/components/resize.module.css: { weight: -10 }
-      css/components/system-status-counter.css: { weight: -10 }
-      css/components/system-status-report-counters.css: { weight: -10 }
-      css/components/system-status-report-general-info.css: { weight: -10 }
-      css/components/tablesort.module.css: { weight: -10 }
 
 admin:
   version: VERSION
@@ -36,6 +27,14 @@ maintenance:
   dependencies:
     - system/base
     - system/admin
+
+status.report:
+  version: VERSION
+  css:
+    component:
+      css/components/system-status-counter.css: { weight: -10 }
+      css/components/system-status-report-counters.css: { weight: -10 }
+      css/components/system-status-report-general-info.css: { weight: -10 }
 
 drupal.system:
   version: VERSION
@@ -57,6 +56,17 @@ drupal.system.modules:
     - core/drupal.debounce
     - core/once
     - core/drupal.announce
+
+drupal.system.admin_compact:
+  version: VERSION
+  css:
+    theme:
+      css/system.admin_compact.css: { weight: -10 }
+  js:
+    js/system.admin_compact.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
 
 diff:
   version: VERSION

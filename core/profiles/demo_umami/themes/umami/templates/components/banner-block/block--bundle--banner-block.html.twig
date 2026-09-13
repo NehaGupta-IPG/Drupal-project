@@ -1,4 +1,4 @@
-{% extends "block.html.twig" %}
+{% extends 'block.html.twig' %}
 {#
 /**
  * @file
@@ -24,7 +24,7 @@
  * - title_suffix: Additional output populated by modules, intended to be
  *   displayed after the main title tag that appears in the template.
  *
- * @see template_preprocess_block()
+ * @see \Drupal\block\Hook\BlockHooks::preprocessBlock()
  */
 #}
 {% block content %}
@@ -34,11 +34,11 @@
     {% block image %}
       {{ content.field_media_image }}
     {% endblock %}
-    {% block content %}
-      {% include "umami:title" with {
-        attributes: create_attribute({'class': ['banner__title']}),
+    {% block banner_content %}
+      {{ include('umami:title', {
+        attributes: create_attribute({class: ['banner__title']}),
         label: content.field_title,
-      } only %}
+      }, with_context: false) }}
       {{ content|without(['field_media_image', 'field_title']) }}
     {% endblock %}
   {% endembed %}

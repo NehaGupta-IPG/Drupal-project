@@ -13,15 +13,9 @@ trait RefinableCacheableDependencyTrait {
    * {@inheritdoc}
    */
   public function addCacheableDependency($other_object) {
-    if ($other_object instanceof CacheableDependencyInterface) {
-      $this->addCacheContexts($other_object->getCacheContexts());
-      $this->addCacheTags($other_object->getCacheTags());
-      $this->mergeCacheMaxAge($other_object->getCacheMaxAge());
-    }
-    else {
-      // Not a cacheable dependency, this can not be cached.
-      $this->cacheMaxAge = 0;
-    }
+    $this->addCacheContexts($other_object->getCacheContexts());
+    $this->addCacheTags($other_object->getCacheTags());
+    $this->mergeCacheMaxAge($other_object->getCacheMaxAge());
     return $this;
   }
 

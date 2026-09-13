@@ -11,6 +11,7 @@ use Drupal\Core\Asset\AssetCollectionRendererInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\AttachmentsInterface;
 use Drupal\Core\Render\AttachmentsResponseProcessorInterface;
@@ -18,23 +19,28 @@ use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\TestTools\Random;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Prophecy\Prophet;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\big_pipe\Render\BigPipeResponseAttachmentsProcessor
- * @group big_pipe
+ * Tests Drupal\big_pipe\Render\BigPipeResponseAttachmentsProcessor.
  */
+#[CoversClass(BigPipeResponseAttachmentsProcessor::class)]
+#[Group('big_pipe')]
 class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
 
   /**
-   * @covers ::processAttachments
+   * Tests non html response.
    *
-   * @dataProvider nonHtmlResponseProvider
+   * @legacy-covers ::processAttachments
    */
-  public function testNonHtmlResponse($response_class): void {
+  #[DataProvider('nonHtmlResponseProvider')]
+  public function testNonHtmlResponse(string $response_class): void {
     $big_pipe_response_attachments_processor = $this->createBigPipeResponseAttachmentsProcessor($this->prophesize(AttachmentsResponseProcessorInterface::class));
 
     $non_html_response = new $response_class();
@@ -42,7 +48,10 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
     $big_pipe_response_attachments_processor->processAttachments($non_html_response);
   }
 
-  public static function nonHtmlResponseProvider() {
+  /**
+   * Provides data to testNonHtmlResponse().
+   */
+  public static function nonHtmlResponseProvider(): array {
     return [
       'AjaxResponse, which implements AttachmentsInterface' => [AjaxResponse::class],
       'A dummy that implements AttachmentsInterface' => [get_class((new Prophet())->prophesize(AttachmentsInterface::class)->reveal())],
@@ -50,10 +59,11 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processAttachments
+   * Tests html response.
    *
-   * @dataProvider attachmentsProvider
+   * @legacy-covers ::processAttachments
    */
+  #[DataProvider('attachmentsProvider')]
   public function testHtmlResponse(array $attachments): void {
     $big_pipe_response = new BigPipeResponse(new HtmlResponse('original'));
     $big_pipe_response->setAttachments($attachments);
@@ -62,8 +72,9 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
     // service (that is this mock) never receives BigPipe placeholder
     // attachments, because it doesn't know (nor should it) how to handle them.
     $html_response_attachments_processor = $this->prophesize(AttachmentsResponseProcessorInterface::class);
-    $html_response_attachments_processor->processAttachments(Argument::that(function ($response) {
-      return $response instanceof HtmlResponse && empty(array_intersect(['big_pipe_placeholders', 'big_pipe_nojs_placeholders'], array_keys($response->getAttachments())));
+    $html_response_attachments_processor->processAttachments(Argument::that(function ($response): bool {
+      return $response instanceof HtmlResponse
+        && empty(array_intersect(['big_pipe_placeholders', 'big_pipe_nojs_placeholders'], array_keys($response->getAttachments())));
     }))
       ->will(function ($args) {
         /** @var \Symfony\Component\HttpFoundation\Response|\Drupal\Core\Render\AttachmentsInterface $response */
@@ -88,14 +99,26 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
     $this->assertEquals('processed', $processed_big_pipe_response->getContent(), 'Content of returned (processed) response object MUST be changed.');
   }
 
-  public static function attachmentsProvider() {
+  /**
+   * Provides data to testHtmlResponse().
+   */
+  public static function attachmentsProvider(): array {
     $typical_cases = [
       'no attachments' => [[]],
       'libraries' => [['library' => ['core/drupal']]],
       'libraries + drupalSettings' => [['library' => ['core/drupal'], 'drupalSettings' => ['foo' => 'bar']]],
     ];
 
-    $official_attachment_types = ['html_head', 'feed', 'html_head_link', 'http_header', 'library', 'placeholders', 'drupalSettings', 'html_response_attachment_placeholders'];
+    $official_attachment_types = [
+      'html_head',
+      'feed',
+      'html_head_link',
+      'http_header',
+      'library',
+      'placeholders',
+      'drupalSettings',
+      'html_response_attachment_placeholders',
+    ];
     $official_attachments_with_random_values = [];
     foreach ($official_attachment_types as $type) {
       $official_attachments_with_random_values[$type] = Random::machineName();
@@ -131,7 +154,7 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
    * @return \Drupal\big_pipe\Render\BigPipeResponseAttachmentsProcessor
    *   The BigPipeResponseAttachmentsProcessor to test.
    */
-  protected function createBigPipeResponseAttachmentsProcessor(ObjectProphecy $decorated_html_response_attachments_processor) {
+  protected function createBigPipeResponseAttachmentsProcessor(ObjectProphecy $decorated_html_response_attachments_processor): BigPipeResponseAttachmentsProcessor {
     return new BigPipeResponseAttachmentsProcessor(
       $decorated_html_response_attachments_processor->reveal(),
       $this->prophesize(AssetResolverInterface::class)->reveal(),
@@ -141,7 +164,8 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
       $this->prophesize(RequestStack::class)->reveal(),
       $this->prophesize(RendererInterface::class)->reveal(),
       $this->prophesize(ModuleHandlerInterface::class)->reveal(),
-      $this->prophesize(LanguageManagerInterface::class)->reveal()
+      $this->prophesize(LanguageManagerInterface::class)->reveal(),
+      $this->prophesize(FileUrlGeneratorInterface::class)->reveal()
     );
   }
 

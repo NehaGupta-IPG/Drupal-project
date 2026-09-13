@@ -6,13 +6,16 @@ namespace Drupal\Tests\user\Kernel\Views;
 
 use Drupal\Component\Utility\Html;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the permissions filter handler.
  *
- * @group user
  * @see \Drupal\user\Plugin\views\filter\Permissions
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class HandlerFilterPermissionTest extends UserKernelTestBase {
 
   /**
@@ -21,8 +24,6 @@ class HandlerFilterPermissionTest extends UserKernelTestBase {
    * @var array
    */
   public static $testViews = ['test_filter_permission'];
-
-  protected $columnMap;
 
   /**
    * Tests the permission filter handler.
@@ -106,7 +107,7 @@ class HandlerFilterPermissionTest extends UserKernelTestBase {
       $permission_by_module[$permission['provider']][$name] = $permission;
     }
     foreach (['system' => 'System', 'user' => 'User'] as $module => $title) {
-      $expected = array_map(function ($permission) {
+      $expected = array_map(function (array $permission): string {
         return Html::escape(strip_tags((string) $permission['title']));
       }, $permission_by_module[$module]);
 

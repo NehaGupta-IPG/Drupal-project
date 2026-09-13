@@ -8,14 +8,15 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cspell:ignore testbody
-
+// cspell:ignore blocknodebundle testbody
 /**
  * Tests toggling of content preview.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class ContentPreviewToggleTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
@@ -155,7 +156,7 @@ class ContentPreviewToggleTest extends WebDriverTestBase {
     $blocks = $page->findAll('css', '[data-layout-content-preview-placeholder-label]');
 
     // Filter will only return value if block contains expected text.
-    $blocks_with_expected_text = array_filter($blocks, function ($block, $key) use ($items) {
+    $blocks_with_expected_text = array_filter($blocks, function ($block, $key) use ($items): bool {
       $block_text = $block->getText();
       return str_contains($block_text, $items[$key]);
     }, ARRAY_FILTER_USE_BOTH);

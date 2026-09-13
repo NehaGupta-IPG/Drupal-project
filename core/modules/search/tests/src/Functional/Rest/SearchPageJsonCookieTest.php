@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group rest
+ * Tests Search Page Json Cookie.
  */
+#[Group('rest')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class SearchPageJsonCookieTest extends SearchPageResourceTestBase {
 
   use CookieResourceTestTrait;

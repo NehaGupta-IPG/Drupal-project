@@ -7,6 +7,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\FocusFirstCommand;
 use Drupal\Core\Ajax\InsertCommand;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -15,6 +16,8 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\OptionsProviderInterface;
+use Drupal\options\OptionsAllowedValues;
+use Drupal\options\OptionsAllowedValuesInterface;
 
 /**
  * Plugin base class inherited by the options field types.
@@ -62,15 +65,19 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * {@inheritdoc}
    */
   public function getSettableOptions(?AccountInterface $account = NULL) {
-    $allowed_options = options_allowed_values($this->getFieldDefinition()->getFieldStorageDefinition(), $this->getEntity());
-    return $allowed_options;
+    return \Drupal::service(OptionsAllowedValuesInterface::class)->getAllowedValues(
+      $this->getFieldDefinition()->getFieldStorageDefinition(),
+      $this->getEntity()
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $allowed_options = options_allowed_values($field_definition->getFieldStorageDefinition());
+    $allowed_options = \Drupal::service(OptionsAllowedValuesInterface::class)
+      ->getAllowedValues($field_definition->getFieldStorageDefinition());
+
     if (empty($allowed_options)) {
       $values['value'] = NULL;
       return $values;
@@ -83,7 +90,9 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * {@inheritdoc}
    */
   public function isEmpty() {
-    return empty($this->value) && (string) $this->value !== '0';
+    $value = $this->get('value')->getValue();
+
+    return empty($value) && (string) $value !== '0';
   }
 
   /**
@@ -105,12 +114,12 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
 
     $wrapper_id = Html::getUniqueId('allowed-values-wrapper');
     $element['allowed_values'] = [
+      '#type' => 'container',
       '#element_validate' => [[static::class, 'validateAllowedValues']],
       '#field_has_data' => $has_data,
       '#allowed_values' => $allowed_values,
       '#required' => TRUE,
-      '#prefix' => '<div id="' . $wrapper_id . '">',
-      '#suffix' => '</div>',
+      '#id' => $wrapper_id,
       '#access' => empty($allowed_values_function),
       'help_text' => ['#markup' => $this->allowedValuesDescription()],
     ];
@@ -334,12 +343,14 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   abstract protected function allowedValuesDescription();
 
   /**
-   * #element_validate callback for options field allowed values.
+   * Render API callback: Validates the allowed values of an options field.
    *
-   * @param $element
+   * This function is assigned as a #element_validate callback.
+   *
+   * @param array $element
    *   An associative array containing the properties and children of the
    *   generic form element.
-   * @param $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form for the form this element belongs to.
    *
    * @see \Drupal\Core\Render\Element\FormElementBase::processPattern()
@@ -347,13 +358,17 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   public static function validateAllowedValues($element, FormStateInterface $form_state) {
     $items = array_filter(array_map(function ($item) use ($element) {
       $current_element = $element['table'][$item];
-      if ($current_element['item']['key']['#value'] !== NULL && $current_element['item']['label']['#value']) {
-        return $current_element['item']['key']['#value'] . '|' . $current_element['item']['label']['#value'];
-      }
-      elseif ($current_element['item']['key']['#value']) {
+      $key_has_input = isset($current_element['item']['key']['#value']) && $current_element['item']['key']['#value'] !== '';
+      $label_has_input = isset($current_element['item']['label']['#value']) && $current_element['item']['label']['#value'] !== '';
+      if ($key_has_input) {
+        if ($label_has_input) {
+          return $current_element['item']['key']['#value'] . '|' . $current_element['item']['label']['#value'];
+        }
+
         return $current_element['item']['key']['#value'];
       }
-      elseif ($current_element['item']['label']['#value']) {
+
+      if ($label_has_input) {
         return $current_element['item']['label']['#value'];
       }
 
@@ -444,10 +459,12 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * @param string $option
    *   The option value entered by the user.
    *
-   * @return string
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|string|null
    *   The error message if the specified value is invalid, NULL otherwise.
    */
-  protected static function validateAllowedValue($option) {}
+  protected static function validateAllowedValue($option) {
+    return NULL;
+  }
 
   /**
    * Generates a string representation of an array of 'allowed values'.
@@ -557,10 +574,14 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   }
 
   /**
-   * Resets the static variable on field storage update.
+   * Resets the cached allowed values on field storage update.
+   *
+   * @todo Deprecate this method in #3583435.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3583435
    */
   public static function submitFieldStorageUpdate() {
-    drupal_static_reset('options_allowed_values');
+    Cache::invalidateTags([OptionsAllowedValues::CACHE_TAG]);
   }
 
 }

@@ -29,7 +29,7 @@ interface AssetResolverInterface {
    * - CSS_COMPONENT
    * - CSS_STATE
    * - CSS_THEME
-   * @see https://www.drupal.org/node/1887918#separate-concerns
+   *
    * This ensures proper cascading of styles so themes can easily override
    * module styles through CSS selectors.
    *
@@ -47,11 +47,15 @@ interface AssetResolverInterface {
    *   optimized CSS asset collection rather than an unoptimized one.
    * @param \Drupal\Core\Language\LanguageInterface $language
    *   (optional) The interface language the assets will be rendered with.
+   * @param bool $with_dependencies
+   *   Whether to get assets including library dependencies, defaults to TRUE.
    *
    * @return array
    *   A (possibly optimized) collection of CSS assets.
+   *
+   * @see https://www.drupal.org/node/1887918#separate-concerns
    */
-  public function getCssAssets(AttachedAssetsInterface $assets, $optimize, ?LanguageInterface $language = NULL);
+  public function getCssAssets(AttachedAssetsInterface $assets, $optimize, ?LanguageInterface $language = NULL, bool $with_dependencies = TRUE);
 
   /**
    * Returns the JavaScript assets for the current response's libraries.
@@ -75,6 +79,8 @@ interface AssetResolverInterface {
    *   optimized JavaScript asset collections rather than an unoptimized ones.
    * @param \Drupal\Core\Language\LanguageInterface $language
    *   (optional) The interface language for the assets will be rendered with.
+   * @param bool $with_dependencies
+   *   Whether to get assets including library dependencies, defaults to TRUE.
    *
    * @return array
    *   A nested array containing 2 values:
@@ -83,6 +89,19 @@ interface AssetResolverInterface {
    *   - at index one: the (possibly optimized) collection of JavaScript assets
    *     for the bottom of the page
    */
-  public function getJsAssets(AttachedAssetsInterface $assets, $optimize, ?LanguageInterface $language = NULL);
+  public function getJsAssets(AttachedAssetsInterface $assets, $optimize, ?LanguageInterface $language = NULL, bool $with_dependencies = TRUE);
+
+  /**
+   * Returns the fonts for the current response's libraries.
+   *
+   * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+   *   The assets attached to the current response.
+   * @param \Drupal\Core\Language\LanguageInterface $language
+   *   (optional) The interface language the assets will be rendered with.
+   *
+   * @return array
+   *   An array of font assets.
+   */
+  public function getFontAssets(AttachedAssetsInterface $assets, ?LanguageInterface $language = NULL): array;
 
 }

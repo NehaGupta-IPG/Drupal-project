@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\filter\Kernel;
 
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests creation, loading, updating, deleting of text formats and filters.
- *
- * @group filter
  */
+#[Group('filter')]
+#[RunTestsInSeparateProcesses]
 class FilterCrudTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['filter', 'filter_test', 'system', 'user'];
 
@@ -68,8 +69,8 @@ class FilterCrudTest extends KernelTestBase {
     // Disable the text format.
     $format->disable()->save();
 
-    $formats = filter_formats();
-    $this->assertTrue(!isset($formats[$format->id()]), 'filter_formats: Disabled text format no longer exists.');
+    $formats = \Drupal::service(FilterFormatRepositoryInterface::class)->getAllFormats();
+    $this->assertTrue(!isset($formats[$format->id()]), 'Disabled text format no longer exists.');
   }
 
   /**
@@ -90,7 +91,7 @@ class FilterCrudTest extends KernelTestBase {
   /**
    * Verifies that a text format is properly stored.
    */
-  public function verifyTextFormat($format) {
+  public function verifyTextFormat($format): void {
     $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
 
     // Verify the loaded filter has all properties.

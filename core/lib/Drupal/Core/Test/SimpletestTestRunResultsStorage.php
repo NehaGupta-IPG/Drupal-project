@@ -33,7 +33,6 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   public static function getConnection(): Connection {
     // Check whether there is a test runner connection.
     // @see run-tests.sh
-    // @todo Convert Simpletest UI runner to create + use this connection, too.
     try {
       $connection = Database::getConnection('default', 'test-runner');
     }
@@ -95,13 +94,14 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
    * {@inheritdoc}
    */
   public function removeResults(TestRun $test_run): int {
-    $this->connection->startTransaction('delete_test_run');
+    $transaction = $this->connection->startTransaction('delete_test_run');
     $this->connection->delete('simpletest')
       ->condition('test_id', $test_run->id())
       ->execute();
     $count = $this->connection->delete('simpletest_test_id')
       ->condition('test_id', $test_run->id())
       ->execute();
+    $transaction->commitOrRelease();
     return $count;
   }
 
@@ -133,8 +133,8 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
     // 'test_class' from {simpletest}.
     $select = $this->connection->select($max_message_id_subquery, 'st_sub');
     $select->join('simpletest', 'st', '[st].[message_id] = [st_sub].[max_message_id]');
-    $select->join('simpletest_test_id', 'sttid', '[st].[test_id] = [sttid].[test_id]');
-    $select->addField('sttid', 'last_prefix', 'db_prefix');
+    $select->join('simpletest_test_id', 'st_tid', '[st].[test_id] = [st_tid].[test_id]');
+    $select->addField('st_tid', 'last_prefix', 'db_prefix');
     $select->addField('st', 'test_class');
 
     return $select->execute()->fetchAssoc();
@@ -169,9 +169,10 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
    */
   public function cleanUp(): int {
     // Clear test results.
-    $this->connection->startTransaction('delete_simpletest');
+    $transaction = $this->connection->startTransaction('delete_simpletest');
     $this->connection->delete('simpletest')->execute();
     $count = $this->connection->delete('simpletest_test_id')->execute();
+    $transaction->commitOrRelease();
     return $count;
   }
 
@@ -208,7 +209,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
           'length' => 9,
           'not null' => TRUE,
           'default' => '',
-          'description' => 'Message status. Core understands pass, fail, exception.',
+          'description' => 'Message status.',
         ],
         'message' => [
           'type' => 'text',
@@ -241,6 +242,18 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
           'not null' => TRUE,
           'default' => '',
           'description' => 'Name of the file where the function is called.',
+        ],
+        'time' => [
+          'type' => 'float',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'Time elapsed for the execution of the test.',
+        ],
+        'exit_code' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'The exit code of the test executed.',
         ],
       ],
       'primary key' => ['message_id'],

@@ -1,17 +1,19 @@
 drupal.filter.admin:
   version: VERSION
   js:
-    filter.admin.js: {}
+    js/filter.admin.js: {}
   dependencies:
     - core/jquery
     - core/drupal
     - core/once
     - core/drupal.form
+    - core/drupal.tabledrag
+    - core/drupal.vertical-tabs
 
 drupal.filter:
   version: VERSION
   js:
-    filter.js: {}
+    js/filter.js: {}
   dependencies:
     - core/jquery
     - core/drupal

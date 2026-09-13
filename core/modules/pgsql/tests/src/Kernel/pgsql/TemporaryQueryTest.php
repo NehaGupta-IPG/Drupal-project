@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
 use Drupal\KernelTests\Core\Database\TemporaryQueryTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore relname relpersistence
 /**
  * Tests the temporary query functionality.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class TemporaryQueryTest extends TemporaryQueryTestBase {
 
   /**
@@ -24,7 +27,7 @@ class TemporaryQueryTest extends TemporaryQueryTestBase {
     $table_name_test = $connection->queryTemporary('SELECT [name] FROM {test}', []);
 
     // Assert that the table is indeed a temporary one.
-    $temporary_table_info = $connection->query("SELECT * FROM pg_class WHERE relname LIKE '%$table_name_test%'")->fetch();
+    $temporary_table_info = $connection->query("SELECT * FROM pg_class WHERE relname::text LIKE '%$table_name_test%'")->fetch();
     $this->assertEquals("t", $temporary_table_info->relpersistence);
 
     // Assert that both have the same field names.

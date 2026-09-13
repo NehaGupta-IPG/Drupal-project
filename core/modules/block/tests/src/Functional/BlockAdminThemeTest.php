@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the block system with admin themes.
- *
- * @group block
  */
+#[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockAdminThemeTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'contextual'];
 
@@ -38,15 +38,15 @@ class BlockAdminThemeTest extends BrowserTestBase {
 
     // Ensure that access to block admin page is denied when theme is not
     // installed.
-    $this->drupalGet('admin/structure/block/list/olivero');
+    $this->drupalGet('admin/structure/block/list/test_theme');
     $this->assertSession()->statusCodeEquals(403);
 
     // Install admin theme and confirm that tab is accessible.
-    \Drupal::service('theme_installer')->install(['olivero']);
-    $edit['admin_theme'] = 'olivero';
+    \Drupal::service('theme_installer')->install(['test_theme']);
+    $edit['admin_theme'] = 'test_theme';
     $this->drupalGet('admin/appearance');
     $this->submitForm($edit, 'Save configuration');
-    $this->drupalGet('admin/structure/block/list/olivero');
+    $this->drupalGet('admin/structure/block/list/test_theme');
     $this->assertSession()->statusCodeEquals(200);
   }
 

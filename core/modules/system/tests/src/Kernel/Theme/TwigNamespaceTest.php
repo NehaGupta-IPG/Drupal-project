@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Theme;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Twig\TemplateWrapper;
 
 /**
  * Tests Twig namespaces.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class TwigNamespaceTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'twig_theme_test',
@@ -36,7 +36,7 @@ class TwigNamespaceTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    \Drupal::service('theme_installer')->install(['test_theme', 'olivero']);
+    \Drupal::service('theme_installer')->install(['test_theme', 'claro']);
     $this->twig = \Drupal::service('twig');
   }
 
@@ -57,7 +57,7 @@ class TwigNamespaceTest extends KernelTestBase {
     $this->assertTwigTemplate($this->twig->load('@node/node.html.twig'), 'Found node.html.twig in node module.');
 
     // Tests resolving namespaced templates in themes.
-    $this->assertTwigTemplate($this->twig->load('@olivero/layout/page.html.twig'), 'Found page.html.twig in Olivero theme.');
+    $this->assertTwigTemplate($this->twig->load('@claro/page.html.twig'), 'Found page.html.twig in Stark theme.');
   }
 
   /**
