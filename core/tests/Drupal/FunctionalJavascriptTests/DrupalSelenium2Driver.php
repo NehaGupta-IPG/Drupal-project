@@ -242,7 +242,9 @@ JS);
    * Re-triggers within PHPUnit Javascript deprecations from the front-end.
    */
   public function processJavascriptDeprecations(): void {
-    $warnings = $this->evaluateScript("JSON.parse(sessionStorage.getItem('js_testing_log_test.warnings') || JSON.stringify([]))");
+    // Storage is disabled when no page has been visited yet, so guard the
+    // sessionStorage access with a try/catch.
+    $warnings = $this->evaluateScript("(function () { try { return JSON.parse(sessionStorage.getItem('js_testing_log_test.warnings') || JSON.stringify([])); } catch (e) { return []; } })()");
     foreach ($warnings as $warning) {
       if (str_contains($warning, '[Deprecation]')) {
         // phpcs:ignore Drupal.Semantics.FunctionTriggerError
