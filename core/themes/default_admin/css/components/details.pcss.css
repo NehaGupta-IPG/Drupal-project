@@ -186,12 +186,8 @@
 .details__summary--vertical-tabs-item {
   padding-block: var(--summary-accordion-padding-vertical);
   padding-inline: 2.75rem var(--admin-space-l);
-  background: var(--admin-color-bg-surface);
+  background-color: transparent;
   line-height: var(--summary-accordion-line-height);
-
-  .dark-mode & {
-    background-color: transparent;
-  }
 
   /* Make room for validation error icon. */
   .form-wrapper > & {
