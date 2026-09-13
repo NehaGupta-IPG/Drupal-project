@@ -17,3 +17,6 @@ translations:
     name:
       -
         value: 'Traducido al español'
+    field_only_in_spanish:
+      -
+        value: 'Solo en español'

@@ -8,6 +8,8 @@ use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\DefaultContent\Importer;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -43,7 +45,7 @@ class ImporterLanguageTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system', 'user', 'entity_test', 'language'];
+  protected static $modules = ['system', 'user', 'entity_test', 'field', 'language'];
 
   /**
    * {@inheritdoc}
@@ -54,6 +56,20 @@ class ImporterLanguageTest extends KernelTestBase {
     $this->installEntitySchema('entity_test_mul');
     $this->installConfig(['system', 'language']);
     $this->setUpCurrentUser(admin: TRUE);
+
+    // A translatable field which only the Spanish translation of the English
+    // fixture entity has a value in.
+    FieldStorageConfig::create([
+      'entity_type' => 'entity_test_mul',
+      'field_name' => 'field_only_in_spanish',
+      'type' => 'string',
+    ])->save();
+    FieldConfig::create([
+      'entity_type' => 'entity_test_mul',
+      'bundle' => 'entity_test_mul',
+      'field_name' => 'field_only_in_spanish',
+      'translatable' => TRUE,
+    ])->save();
   }
 
   /**
@@ -170,6 +186,35 @@ class ImporterLanguageTest extends KernelTestBase {
       ksort($translations);
       $this->assertSame($translations, $actual_translations, "Entity $uuid has the expected translations.");
     }
+  }
+
+  /**
+   * Tests that a field left empty in the original stays empty when kept.
+   *
+   * Exported translations only list fields that have a value, and a translation
+   * starts out as a copy of the default when it is imported. So when the
+   * original values are kept as a translation, a field that only the new
+   * default has must be emptied explicitly for them.
+   */
+  public function testEmptyFieldOfOriginalStaysEmpty(): void {
+    ConfigurableLanguage::createFromLangcode('es')->save();
+    $this->config('system.site')->set('default_langcode', 'es')->save();
+    $this->container->get('language_manager')->reset();
+
+    $GLOBALS['install_state'] = ['installation_finished' => FALSE];
+    $finder = new Finder($this->root . '/core/tests/fixtures/default_content_translations');
+    $this->container->get(Importer::class)->importContent($finder);
+    unset($GLOBALS['install_state']);
+
+    $entity = $this->container->get(EntityRepositoryInterface::class)
+      ->loadEntityByUuid('entity_test_mul', self::ENGLISH_UUID);
+    $this->assertInstanceOf(ContentEntityInterface::class, $entity);
+    // The Spanish translation became the default and brought its value along.
+    $this->assertSame('es', $entity->language()->getId());
+    $this->assertSame('Solo en español', $entity->get('field_only_in_spanish')->value);
+    // The English original never had a value in this field, so its translation
+    // does not have one either.
+    $this->assertTrue($entity->getTranslation('en')->get('field_only_in_spanish')->isEmpty());
   }
 
 }

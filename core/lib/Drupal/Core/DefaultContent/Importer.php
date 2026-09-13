@@ -280,6 +280,17 @@ final class Importer implements LoggerAwareInterface {
    *   The normalized data for the field.
    */
   private function setFieldValues(ContentEntityInterface $entity, string $field_name, array $values): void {
+    // An empty list means the field has no values. That matters for a
+    // translation, which starts out as a copy of the default translation. A
+    // field that is not translatable is shared by all translations, so it is
+    // only ever cleared on the default translation.
+    if ($values === []) {
+      if ($entity->isDefaultTranslation() || $entity->getFieldDefinition($field_name)?->isTranslatable()) {
+        $entity->set($field_name, []);
+      }
+      return;
+    }
+
     foreach ($values as $delta => $item_value) {
       if (!$entity->get($field_name)->get($delta)) {
         $entity->get($field_name)->appendItem();
@@ -414,10 +425,14 @@ final class Importer implements LoggerAwareInterface {
       if ($new_default_langcode !== NULL) {
         // Keep the original values as a translation in their own language, if
         // the site knows that language. Only the values which the chosen
-        // translation replaces are needed; everything else is shared with the
-        // translation that becomes the default.
+        // translation replaces are needed: the new default keeps the original
+        // values of every other field, and a translation starts out as a copy
+        // of the default. A field the chosen translation has but the original
+        // does not was empty in the original, so it is emptied explicitly.
         if ($this->languageManager->getLanguage($content_default_langcode)) {
-          $data['translations'][$content_default_langcode] = \array_intersect_key($data['default'], $translations[$new_default_langcode]);
+          $new_default_values = $translations[$new_default_langcode];
+          $data['translations'][$content_default_langcode] = \array_intersect_key($data['default'], $new_default_values)
+            + \array_fill_keys(\array_keys(\array_diff_key($new_default_values, $data['default'])), []);
         }
         $data['_meta']['default_langcode'] = $new_default_langcode;
         $data['default'] = \array_merge($data['default'], $translations[$new_default_langcode]);
