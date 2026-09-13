@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Theme override for a content entity form.
+ *
+ * Two column template for a content entity add/edit form.
+ *
+ * Available variables:
+ * - form: The content entity form.
+ */
+#}
+<div class="layout-content-entity-form clearfix">
+  <div class="layout-region layout-region-content-entity-main">
+    {{ form|without('advanced', 'actions') }}
+  </div>
+  <div class="layout-region layout-region-content-entity-secondary">
+    {{ form.advanced }}
+  </div>
+  <div class="layout-region layout-region-content-entity-footer">
+    {{ form.actions }}
+  </div>
+</div>

@@ -1,0 +1,31 @@
+{#
+/**
+ * @file
+ * Theme override for a content entity form with sidebar.
+ *
+ * Two column template for a content entity add/edit form.
+ *
+ * Available variables:
+ * - form: The content entity form.
+ */
+#}
+{{ attach_library('claro/content-entity-form-with-sidebar') }}
+<div class="layout-content-entity-form clearfix">
+  <div class="layout-region layout-region--content-entity-main">
+    <div class="layout-region__content">
+      {{ form|without('advanced', 'footer', 'actions') }}
+    </div>
+  </div>
+  <div class="layout-region layout-region--content-entity-secondary">
+    <div class="layout-region__content">
+      {{ form.advanced }}
+    </div>
+  </div>
+  <div class="layout-region layout-region--content-entity-footer">
+    <div class="layout-region__content">
+      <div class="divider"></div>
+      {{ form.footer }}
+      {{ form.actions }}
+    </div>
+  </div>
+</div>
