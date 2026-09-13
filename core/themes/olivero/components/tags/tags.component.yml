@@ -1,0 +1,15 @@
+name: Tags
+props:
+  type: object
+  properties:
+    classes:
+      type: array
+    title_classes:
+      type: array
+    label_hidden:
+      type: boolean
+    label:
+      type: string
+    items:
+      type: array
+
