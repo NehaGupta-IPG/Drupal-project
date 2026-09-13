@@ -9,6 +9,8 @@
 # @see https://ckeditor.com/docs/ckeditor5/latest/support/versioning-policy.html
 
 internal.ckeditor5.language:
+  aggregate_target:
+    css: 'ckeditor5'
   css:
     component:
       css/language.css: {}
@@ -16,12 +18,17 @@ internal.ckeditor5.language:
     - core/ckeditor5
 
 internal.drupal.ckeditor5.htmlEngine:
+  aggregate_target:
+    js: 'ckeditor5'
   js:
     js/build/drupalHtmlEngine.js: { minified: true }
   dependencies:
     - core/ckeditor5
 
 internal.drupal.ckeditor5:
+  aggregate_target:
+    js: 'ckeditor5'
+    css: 'ckeditor5'
   js:
     js/ckeditor5.js: {}
     # Backward-compatibility shim so contributed modules built with
@@ -55,6 +62,9 @@ internal.drupal.ckeditor5.codeBlock:
     - core/ckeditor5
 
 internal.drupal.ckeditor5.image:
+  aggregate_target:
+    js: 'ckeditor5'
+    css: 'ckeditor5'
   js:
     js/build/drupalImage.js: { minified: true }
   css:
@@ -65,6 +75,8 @@ internal.drupal.ckeditor5.image:
     - core/ckeditor5
 
 internal.drupal.ckeditor5.emphasis:
+  aggregate_target:
+    js: 'ckeditor5'
   version: VERSION
   js:
     js/build/drupalEmphasis.js: { minified: true }
@@ -72,6 +84,9 @@ internal.drupal.ckeditor5.emphasis:
     - core/ckeditor5
 
 internal.drupal.ckeditor5.link-entity-suggestions:
+  aggregate_target:
+    js: 'ckeditor5'
+    css: 'ckeditor5'
   js:
     js/build/drupalEntityLinkSuggestions.js: { minified: true }
   css:
@@ -83,6 +98,9 @@ internal.drupal.ckeditor5.link-entity-suggestions:
     - core/drupal.autocomplete
 
 internal.drupal.ckeditor5.media:
+  aggregate_target:
+    js: 'ckeditor5'
+    css: 'ckeditor5'
   js:
     js/build/drupalMedia.js: { minified: true }
   css:
@@ -94,6 +112,8 @@ internal.drupal.ckeditor5.media:
     - media/media_embed_ckeditor_theme
 
 internal.drupal.ckeditor5.mediaAlign:
+  aggregate_target:
+    css: 'ckeditor5'
   css:
     theme:
       css/media-alignment.css: { }
@@ -101,6 +121,8 @@ internal.drupal.ckeditor5.mediaAlign:
     - ckeditor5/internal.drupal.ckeditor5.media
 
 internal.drupal.ckeditor5.filter.admin:
+  aggregate_target:
+    js: 'ckeditor5'
   js:
     js/ckeditor5.filter.admin.js: {}
   dependencies:
@@ -111,6 +133,8 @@ internal.drupal.ckeditor5.filter.admin:
     - core/drupal.vertical-tabs
 
 internal.drupal.ckeditor5.table:
+  aggregate_target:
+    css: 'ckeditor5'
   css:
     theme:
       css/table.css: { }

@@ -276,6 +276,8 @@ loadjs:
 # @todo Remove when no longer required by drupal.autocomplete and drupal.dialog.
 internal.jquery_ui:
   version: VERSION
+  aggregate_target:
+    js: true
   js:
     # These JavaScript assets previously came from core/jquery.ui, a deprecated
     # library.
@@ -301,6 +303,8 @@ internal.jquery_ui:
 
 drupal.autocomplete:
   version: VERSION
+  aggregate_target:
+    js: true
   js:
     # The remaining JavaScript assets previously came from core/jquery.ui, a
     # deprecated library.
@@ -345,6 +349,8 @@ drupal.checkbox:
 
 drupal.collapse:
   version: VERSION
+  aggregate_target:
+    js: true
   js:
     misc/details-summarized-content.js: {}
     misc/details-aria.js: {}
@@ -365,6 +371,8 @@ drupal.debounce:
 
 drupal.dialog:
   version: VERSION
+  aggregate_target:
+    js: true
   js:
     # The remaining JavaScript assets previously came from core/jquery.ui, a
     # deprecated library.
