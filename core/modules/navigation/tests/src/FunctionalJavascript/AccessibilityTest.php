@@ -22,37 +22,29 @@ class AccessibilityTest extends AccessibilityTestBase {
   protected static $modules = ['navigation'];
 
   /**
-   * Tests the 'Claro page, mobile, sidebar open' case.
+   * Setup callback for 'Claro page, mobile, sidebar open' test case.
    */
-  public function testClaroPageMobileSidebarOpen(): void {
+  protected function setupClaroPageMobileSidebarOpen(): void {
     $session = $this->getSession();
+    $menu_button = $session->getPage()->find('css', '#admin-toolbar')->findButton('Create');
 
-    // Set the viewport before Navigation and page load.
-    $session->resizeWindow(500, 800);
+    $session->resizeWindow(
+      500,
+      800
+    );
 
-    $this->drupalLogin($this->drupalCreateUser(admin: TRUE));
-    $this->drupalGet('/admin');
-
-    $menu_button = $session->getPage()
-      ->find('css', '#admin-toolbar')
-      ->findButton('Create');
-
-    // A mobile page initially loads with its sidebar closed.
-    $this->assertTrue($menu_button->waitFor(2, function ($menu_button): bool {
+    // Wait and assert menu button is hidden.
+    $this->assertTrue($menu_button->waitFor(10, function ($menu_button): bool {
       return !$menu_button->isVisible();
     }));
 
+    // Expand sidebar.
     $session->getPage()->pressButton('Expand sidebar');
 
-    // The Create button is visible after expanding the sidebar.
+    // Wait and assert menu button is visible.
     $this->assertTrue($menu_button->waitFor(2, function ($menu_button): bool {
       return $menu_button->isVisible();
     }));
-
-    $this->assertSession()->responseNotContains('Page not found');
-    $this->assertSession()->responseNotContains('Access denied');
-
-    $this->executeAxe();
   }
 
   /**
@@ -65,6 +57,11 @@ class AccessibilityTest extends AccessibilityTestBase {
       TRUE,
     ];
 
+    yield 'Claro page, mobile, sidebar open' => [
+      'path' => '/admin',
+      'admin' => TRUE,
+      'setup_callback' => 'setupClaroPageMobileSidebarOpen',
+    ];
   }
 
 }
