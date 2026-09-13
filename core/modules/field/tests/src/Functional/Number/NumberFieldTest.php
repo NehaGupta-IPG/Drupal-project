@@ -175,8 +175,6 @@ class NumberFieldTest extends BrowserTestBase {
       ->setComponent($field_name, ['type' => 'number'])
       ->save();
 
-    \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
-
     $this->drupalGet('entity_test/add');
     $this->assertSession()->fieldExists("{$field_name}[0][value]");
 
