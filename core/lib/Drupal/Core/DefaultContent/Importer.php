@@ -383,27 +383,48 @@ final class Importer implements LoggerAwareInterface {
    *   and translations.
    */
   private function verifyNormalizedLanguage(array $data): array {
-    $default_langcode = $data['_meta']['default_langcode'];
-    $default_language = $this->languageManager->getDefaultLanguage();
-    // Check the language. If the default language isn't known, import as one of
-    // the available translations if one exists with those values. If none
-    // exists, create the entity in the default language. During the installer,
-    // when installing with an alternative language, `en` is still the default
-    // when modules are installed so check the default language instead.
-    if (!$this->languageManager->getLanguage($default_langcode) || (InstallerKernel::installationAttempted() && $default_language->getId() !== $default_langcode)) {
-      $use_default = TRUE;
-      foreach ($data['translations'] ?? [] as $langcode => $translation_data) {
-        if ($this->languageManager->getLanguage($langcode)) {
-          $data['_meta']['default_langcode'] = $langcode;
-          $data['default'] = \array_merge($data['default'], $translation_data);
-          unset($data['translations'][$langcode]);
-          $use_default = FALSE;
-          break;
+    $content_default_langcode = $data['_meta']['default_langcode'];
+    $site_default_langcode = $this->languageManager->getDefaultLanguage()->getId();
+    // Check the language. If the content's default language isn't known,
+    // import as one of the available translations if one exists with those
+    // values, preferring the one in the site's default language, and keep the
+    // original values as a translation if the site knows their language. If no
+    // translation can be used, create the entity in the site's default
+    // language. During the installer, when installing with an alternative
+    // language, `en` is still the default when modules are installed so check
+    // the site's default language instead.
+    if (!$this->languageManager->getLanguage($content_default_langcode) || (InstallerKernel::installationAttempted() && $site_default_langcode !== $content_default_langcode)) {
+      $translations = $data['translations'] ?? [];
+
+      // Prefer the translation in the site's default language. Otherwise, use
+      // the first translation in a language the site knows.
+      $new_default_langcode = NULL;
+      if (isset($translations[$site_default_langcode])) {
+        $new_default_langcode = $site_default_langcode;
+      }
+      else {
+        foreach (array_keys($translations) as $candidate) {
+          if ($this->languageManager->getLanguage($candidate)) {
+            $new_default_langcode = $candidate;
+            break;
+          }
         }
       }
 
-      if ($use_default) {
-        $data['_meta']['default_langcode'] = $default_language->getId();
+      if ($new_default_langcode !== NULL) {
+        // Keep the original values as a translation in their own language, if
+        // the site knows that language. Only the values which the chosen
+        // translation replaces are needed; everything else is shared with the
+        // translation that becomes the default.
+        if ($this->languageManager->getLanguage($content_default_langcode)) {
+          $data['translations'][$content_default_langcode] = \array_intersect_key($data['default'], $translations[$new_default_langcode]);
+        }
+        $data['_meta']['default_langcode'] = $new_default_langcode;
+        $data['default'] = \array_merge($data['default'], $translations[$new_default_langcode]);
+        unset($data['translations'][$new_default_langcode]);
+      }
+      else {
+        $data['_meta']['default_langcode'] = $site_default_langcode;
       }
     }
     return $data;
