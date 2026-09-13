@@ -40,12 +40,9 @@ module.exports = (packageFolder) => {
         .replace('@ckeditor/ckeditor5-', '')
         .replace(`ckeditor5-`, '');
       // Target folder in the vendor/assets folder.
-      // console.log(pluginName);
       let folder = `ckeditor5/${pluginName.replace('@ckeditor/ckeditor5-', '').replace('ckeditor5-', '')}`;
       // Transform kebab-case to CamelCase.
-      let library = pluginName.replace(/-./g, (match) =>
-        match[1].toUpperCase(),
-      );
+      let library = pluginName.replace(/-./g, (match) => match[1].toUpperCase());
       // Special case for Drupal implementation.
       if (ckeditor5PluginMapping.hasOwnProperty(pluginName)) {
         library = ckeditor5PluginMapping[pluginName];
@@ -59,12 +56,10 @@ module.exports = (packageFolder) => {
         pack: process.env.CKEDITOR_PACKAGES_PATH ? ckeditor5package : pack,
         library,
         folder,
-        files: buildFiles.map((absolutePath) => {
-          return {
-            from: absolutePath.replace(`${ckeditor5package}/`, ''),
-            to: absolutePath.replace(`${ckeditor5package}/build/`, ''),
-          };
-        }),
+        files: buildFiles.map((absolutePath) => ({
+          from: absolutePath.replace(`${ckeditor5package}/`, ''),
+          to: absolutePath.replace(`${ckeditor5package}/build/`, ''),
+        })),
       });
     }
   }
