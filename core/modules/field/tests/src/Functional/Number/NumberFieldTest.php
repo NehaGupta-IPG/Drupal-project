@@ -157,13 +157,14 @@ class NumberFieldTest extends BrowserTestBase {
    */
   public function testNumberDecimalFieldZeroScale(): void {
     $field_name = $this->randomMachineName();
-    FieldStorageConfig::create([
+    $field_storage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'decimal',
       'settings' => ['precision' => 10, 'scale' => 0],
     ])->save();
     FieldConfig::create([
+      'field_storage' => $field_storage,
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
