@@ -54,12 +54,14 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
           // optimizer adds inline 'media' statements for everything except
           // 'print', so only vary groups based on that.
           $group_keys = $item['preprocess'] ? [$item['type'], $item['media'] === 'print'] : FALSE;
-          if ($item['aggregate_target']['css']) {
-            if ($item['aggregate_target']['css'] === TRUE) {
-              $group_keys[] = $item['library'];
-            }
-            else {
-              $group_keys[] = $item['aggregate_target']['css'];
+          if ($group_keys !== FALSE) {
+            if ($item['aggregate_target']['css']) {
+              if ($item['aggregate_target']['css'] === TRUE) {
+                $group_keys[] = $item['library'];
+              }
+              else {
+                $group_keys[] = $item['aggregate_target']['css'];
+              }
             }
             $group_keys[] = $item['category'];
           }
@@ -89,28 +91,26 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         $current_group_keys = $group_keys ?: NULL;
       }
       // Alter hooks can add items without a library.
-      if ($item['aggregate_target']['css']) {
-        if ($record_libraries) {
-          $groups[$i]['libraries'][] = $item['library'];
-        }
-        // The first time a library is seen, add it to the list of libraries for
-        // the group and record the index.
-        $seen_index = $first_seen_libraries[$item['library']][$item['category']] ?? NULL;
-        if ($seen_index === NULL) {
-          $first_seen_libraries[$item['library']][$item['category']] = $i;
-          $seen_index = $i;
-        }
-        // If a library has been seen in a previous index, this means that index
-        // does not contain all of the assets for that library, so unset the
-        // libraries key from that group.
-        if ($seen_index !== $i) {
-          unset($groups[$seen_index]['libraries']);
-          unset($groups[$i]['libraries']);
-          unset($groups[$seen_index]['category']);
-          unset($groups[$i]['category']);
-          // Stop recording libraries until the next group.
-          $record_libraries = FALSE;
-        }
+      if ($record_libraries) {
+        $groups[$i]['libraries'][] = $item['library'];
+      }
+      // The first time a library is seen, add it to the list of libraries for
+      // the group and record the index.
+      $seen_index = $first_seen_libraries[$item['library']][$item['category']] ?? NULL;
+      if ($seen_index === NULL) {
+        $first_seen_libraries[$item['library']][$item['category']] = $i;
+        $seen_index = $i;
+      }
+      // If a library has been seen in a previous index, this means that index
+      // does not contain all of the assets for that library, so unset the
+      // libraries key from that group.
+      if ($seen_index !== $i) {
+        unset($groups[$seen_index]['libraries']);
+        unset($groups[$i]['libraries']);
+        unset($groups[$seen_index]['category']);
+        unset($groups[$i]['category']);
+        // Stop recording libraries until the next group.
+        $record_libraries = FALSE;
       }
 
       // Add the item to the current group.
