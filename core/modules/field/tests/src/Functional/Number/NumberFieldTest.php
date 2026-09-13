@@ -166,7 +166,6 @@ class NumberFieldTest extends BrowserTestBase {
     $field_storage->save();
     FieldConfig::create([
       'field_storage' => $field_storage,
-      'field_name' => $field_name,
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
     ])->save();
