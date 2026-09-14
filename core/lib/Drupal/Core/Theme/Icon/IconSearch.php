@@ -4,31 +4,28 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Theme\Icon;
 
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 
 /**
  * Service for searching icons.
  *
+ * Matches are ranked in six buckets, best first:
+ * 1. The full icon id or its icon part equals the query.
+ * 2. The icon name starts with the query.
+ * 3. Every query word is a whole word of the icon name, in query order.
+ * 4. Every query word is a whole word of the icon name, in any order.
+ * 5. The query is a substring of the icon id, or every query word is a
+ *    substring, in query order.
+ * 6. Every query word is a substring of the icon id, in any order.
+ *
+ * Within a bucket the order the icon packs declare their icons is kept.
+ *
  * @internal
  *   This API is experimental.
  */
-class IconSearch {
-
-  /**
-   * Minimum search query length.
-   */
-  public const int SEARCH_MIN_LENGTH = 2;
-
-  /**
-   * Default maximum number of search results.
-   */
-  public const int SEARCH_RESULT = 50;
-
-  /**
-   * Maximum allowed search results.
-   */
-  public const int SEARCH_RESULT_MAX = 200;
+class IconSearch implements IconSearchInterface {
 
   /**
    * Icon preview size in pixels.
@@ -49,17 +46,7 @@ class IconSearch {
   ) {}
 
   /**
-   * Search for icons matching the query.
-   *
-   * @param string $query
-   *   The search query string.
-   * @param array $allowed_icon_pack
-   *   Array of allowed icon pack IDs to limit search.
-   * @param int $max_result
-   *   Maximum number of results to return.
-   *
-   * @return array
-   *   Array of matching icon IDs.
+   * {@inheritdoc}
    */
   public function search(
     string $query,
@@ -69,89 +56,161 @@ class IconSearch {
     $query = trim($query);
 
     // Return empty if query is too short.
-    if (strlen($query) < self::SEARCH_MIN_LENGTH) {
+    if (mb_strlen($query) < self::SEARCH_MIN_LENGTH || $max_result < 1) {
       return [];
     }
 
-    // Limit max results.
-    $max_result = min($max_result, self::SEARCH_RESULT_MAX);
-
-    // Generate a human-readable cache key based on search parameters.
-    $cache_key = 'icon_search:' . $query . ':' . implode('+', $allowed_icon_pack) . ':' . $max_result;
+    // The full ranked list is cached and sliced on read, so the cache id only
+    // depends on the query and the pack set. Hashing keeps user input out of
+    // the id and its length within what every cache backend accepts.
+    sort($allowed_icon_pack);
+    $cache_key = 'icon_search:' . Crypt::hashBase64($query . '|' . implode('+', $allowed_icon_pack));
 
     // Try to get cached results.
     if ($cached = $this->cache->get($cache_key)) {
-      return $cached->data;
+      return array_slice($cached->data, 0, $max_result);
     }
 
     // Perform the search and cache permanently, tagged so results are
     // invalidated when icon packs change.
-    $results = $this->doSearch($query, $allowed_icon_pack, $max_result);
+    $results = $this->doSearch($query, $allowed_icon_pack);
+    if ($results === []) {
+      return [];
+    }
     $this->cache->set($cache_key, $results, CacheBackendInterface::CACHE_PERMANENT, ['icon_pack_plugin']);
 
-    return $results;
+    return array_slice($results, 0, $max_result);
   }
 
   /**
-   * Perform the actual icon search.
+   * Performs the actual icon search.
    *
    * @param string $query
    *   The search query string.
    * @param array $allowed_icon_pack
    *   Array of allowed icon pack IDs.
-   * @param int $max_result
-   *   Maximum number of results.
    *
-   * @return array
-   *   Array of matching icon IDs.
+   * @return string[]
+   *   All matching full icon ids, best match first.
    */
-  private function doSearch(string $query, array $allowed_icon_pack, int $max_result): array {
+  private function doSearch(string $query, array $allowed_icon_pack): array {
     $query_lower = mb_strtolower($query);
-    $results = [];
+    $query_words = preg_split('/\s+/', $query_lower, -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
-    // Get all icons from allowed packs.
-    $icons = $this->pluginManagerIconPack->getIcons($allowed_icon_pack);
+    // One bucket per priority level, see the class documentation.
+    $buckets = [[], [], [], [], [], []];
 
-    foreach ($icons as $icon_full_id => $icon_data) {
-      if (\count($results) >= $max_result) {
-        break;
+    foreach (array_keys($this->pluginManagerIconPack->getIcons($allowed_icon_pack)) as $icon_full_id) {
+      $id_lower = mb_strtolower((string) $icon_full_id);
+      $separator = mb_strpos($id_lower, ':');
+      $name_lower = $separator === FALSE ? $id_lower : mb_substr($id_lower, $separator + 1);
+      // Whole word buckets only look at the icon name so that a pack id never
+      // outranks icons actually named after the query.
+      $name_words = preg_split('/[-_\s]+/', $name_lower, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+      if ($id_lower === $query_lower || $name_lower === $query_lower) {
+        $buckets[0][] = $icon_full_id;
       }
-
-      $icon_id_lower = mb_strtolower($icon_full_id);
-
-      // Priority 1: Exact match — prepend to put it first.
-      if ($icon_id_lower === $query_lower) {
-        array_unshift($results, $icon_full_id);
-        continue;
+      elseif (str_starts_with($name_lower, $query_lower)) {
+        $buckets[1][] = $icon_full_id;
       }
-
-      // Priority 2: Starts with query.
-      if (str_starts_with($icon_id_lower, $query_lower)) {
-        $results[] = $icon_full_id;
-        continue;
+      elseif ($this->wordsInOrder($name_words, $query_words)) {
+        $buckets[2][] = $icon_full_id;
       }
-
-      // Priority 3: Contains query.
-      if (str_contains($icon_id_lower, $query_lower)) {
-        $results[] = $icon_full_id;
-        continue;
+      elseif (!array_diff($query_words, $name_words)) {
+        $buckets[3][] = $icon_full_id;
       }
-
-      // Priority 4: Fuzzy match (each word in query appears in icon ID).
-      $query_words = explode(' ', $query_lower);
-      $all_words_match = TRUE;
-      foreach ($query_words as $word) {
-        if (!str_contains($icon_id_lower, $word)) {
-          $all_words_match = FALSE;
-          break;
-        }
+      elseif (str_contains($id_lower, $query_lower) || $this->substringsInOrder($id_lower, $query_words)) {
+        $buckets[4][] = $icon_full_id;
       }
-      if ($all_words_match) {
-        $results[] = $icon_full_id;
+      elseif ($this->containsAllWords($id_lower, $query_words)) {
+        $buckets[5][] = $icon_full_id;
       }
     }
 
-    return $results;
+    return array_merge(...$buckets);
+  }
+
+  /**
+   * Checks that every query word is a whole icon name word, in query order.
+   *
+   * @param string[] $name_words
+   *   The words the icon name is made of.
+   * @param string[] $query_words
+   *   The lowercased query words.
+   *
+   * @return bool
+   *   TRUE when all query words appear as whole words in query order.
+   */
+  private function wordsInOrder(array $name_words, array $query_words): bool {
+    if ($query_words === []) {
+      return FALSE;
+    }
+
+    $index = 0;
+    foreach ($name_words as $name_word) {
+      if ($name_word === $query_words[$index]) {
+        $index++;
+        if ($index === \count($query_words)) {
+          return TRUE;
+        }
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * Checks that every query word is a substring of the icon id, in order.
+   *
+   * @param string $id_lower
+   *   The lowercased full icon id.
+   * @param string[] $query_words
+   *   The lowercased query words.
+   *
+   * @return bool
+   *   TRUE when all query words appear as substrings in query order.
+   */
+  private function substringsInOrder(string $id_lower, array $query_words): bool {
+    if ($query_words === []) {
+      return FALSE;
+    }
+
+    $offset = 0;
+    foreach ($query_words as $word) {
+      $position = mb_strpos($id_lower, $word, $offset);
+      if ($position === FALSE) {
+        return FALSE;
+      }
+      $offset = $position + mb_strlen($word);
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Checks that the icon id contains every query word as a substring.
+   *
+   * @param string $id_lower
+   *   The lowercased full icon id.
+   * @param string[] $query_words
+   *   The lowercased query words.
+   *
+   * @return bool
+   *   TRUE when all query words are substrings of the icon id.
+   */
+  private function containsAllWords(string $id_lower, array $query_words): bool {
+    if ($query_words === []) {
+      return FALSE;
+    }
+
+    foreach ($query_words as $word) {
+      if (!str_contains($id_lower, $word)) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
   }
 
 }

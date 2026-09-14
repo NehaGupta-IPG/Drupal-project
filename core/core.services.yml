@@ -2101,5 +2101,6 @@ services:
         '@cache.icon',
       ]
   Drupal\Core\Theme\Icon\IconSearch: '@icon.search'
+  Drupal\Core\Theme\Icon\IconSearchInterface: '@icon.search'
   Drupal\Core\Extension\ModuleWeight:
     autowire: true

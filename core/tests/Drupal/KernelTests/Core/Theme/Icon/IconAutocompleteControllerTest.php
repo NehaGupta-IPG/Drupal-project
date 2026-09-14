@@ -9,6 +9,7 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Icon\IconSearch;
+use Drupal\Core\Theme\Icon\IconSearchInterface;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Controller\IconAutocompleteController;
@@ -63,8 +64,8 @@ class IconAutocompleteControllerTest extends KernelTestBase {
    * Rebuilds the controller with a mocked icon pack manager.
    *
    * Replaces both plugin.manager.icon_pack and icon.search in the container so
-   * that the controller's IconSearch dependency uses the mock. Also replaces the
-   * renderer to avoid requiring real icon templates.
+   * that the controller's IconSearch dependency uses the mock. Also replaces
+   * the renderer to avoid requiring real icon templates.
    */
   private function rebuildControllerWithMock(IconPackManagerInterface $icon_pack_manager): void {
     $this->container->set('plugin.manager.icon_pack', $icon_pack_manager);
@@ -92,7 +93,7 @@ class IconAutocompleteControllerTest extends KernelTestBase {
        * {@inheritdoc}
        */
       public function renderPlaceholder($placeholder, array $elements) {
-        return Markup::create('');
+        return $elements;
       }
 
       /**
@@ -226,6 +227,53 @@ class IconAutocompleteControllerTest extends KernelTestBase {
 
     // Should be limited to 10 results.
     $this->assertCount(10, $data);
+  }
+
+  /**
+   * Tests that max_result is clamped to the allowed range.
+   */
+  public function testHandleSearchIconsClampsMaxResult(): void {
+    $icon_search = new class() implements IconSearchInterface {
+
+      /**
+       * The max_result values received by search(), in call order.
+       *
+       * @var int[]
+       */
+      public array $received = [];
+
+      /**
+       * {@inheritdoc}
+       */
+      public function search(
+        string $query,
+        array $allowed_icon_pack = [],
+        int $max_result = self::SEARCH_RESULT,
+      ): array {
+        $this->received[] = $max_result;
+        return [];
+      }
+
+    };
+    $this->container->set('icon.search', $icon_search);
+    $controller = IconAutocompleteController::create($this->container);
+
+    // Above the maximum: clamped down to SEARCH_RESULT_MAX.
+    $request = new Request();
+    $request->query->set('q', 'icon');
+    $request->query->set('max_result', '500');
+    $controller->handleSearchIcons($request);
+
+    // Below one: falls back to the default SEARCH_RESULT.
+    $request = new Request();
+    $request->query->set('q', 'icon');
+    $request->query->set('max_result', '0');
+    $controller->handleSearchIcons($request);
+
+    $this->assertSame([
+      IconSearchInterface::SEARCH_RESULT_MAX,
+      IconSearchInterface::SEARCH_RESULT,
+    ], $icon_search->received);
   }
 
   /**

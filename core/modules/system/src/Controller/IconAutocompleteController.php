@@ -12,6 +12,7 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Icon\IconSearch;
+use Drupal\Core\Theme\Icon\IconSearchInterface;
 use Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -27,7 +28,7 @@ final class IconAutocompleteController extends ControllerBase {
   /**
    * Constructs an IconAutocompleteController object.
    *
-   * @param \Drupal\Core\Theme\Icon\IconSearch $iconSearch
+   * @param \Drupal\Core\Theme\Icon\IconSearchInterface $iconSearch
    *   The icon search service.
    * @param \Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface $iconPackManager
    *   The icon pack manager.
@@ -35,7 +36,7 @@ final class IconAutocompleteController extends ControllerBase {
    *   The renderer service.
    */
   public function __construct(
-    private readonly IconSearch $iconSearch,
+    private readonly IconSearchInterface $iconSearch,
     private readonly IconPackManagerInterface $iconPackManager,
     private readonly RendererInterface $renderer,
   ) {}
@@ -63,8 +64,13 @@ final class IconAutocompleteController extends ControllerBase {
       $allowed_icon_pack = explode('+', (string) $request->query->get('allowed_icon_pack', ''));
     }
 
-    // Get max results from query parameter.
-    $max_result = (int) $request->query->get('max_result', IconSearch::SEARCH_RESULT);
+    // Get max results from query parameter. This route is accessible to
+    // anonymous users, so the value is clamped to a safe upper bound.
+    $max_result = (int) $request->query->get('max_result', IconSearchInterface::SEARCH_RESULT);
+    if ($max_result < 1) {
+      $max_result = IconSearchInterface::SEARCH_RESULT;
+    }
+    $max_result = min($max_result, IconSearchInterface::SEARCH_RESULT_MAX);
 
     // Perform the search to get raw icon IDs.
     $icon_ids = $this->iconSearch->search(
