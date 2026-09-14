@@ -17,4 +17,4 @@ require_once __DIR__ . '/field.purge.inc';
  * Suppress deprecations.
  */
 #[ExtensionFileIsConverted]
-function suppress_field() {}
+function suppress_field(): void {}
