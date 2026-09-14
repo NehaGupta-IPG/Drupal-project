@@ -6,6 +6,7 @@
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
 use Drupal\search\SearchTextProcessorInterface;
 
 /**
@@ -58,6 +59,7 @@ use Drupal\search\SearchTextProcessorInterface;
  * @return array
  *   A render array containing HTML for the excerpt.
  */
+#[ExtensionFileIsConverted]
 function search_excerpt($keys, $text, $langcode = NULL): array {
   // We highlight around non-indexable or CJK characters.
   $boundary_character = '[' . Unicode::PREG_CLASS_WORD_BOUNDARY . SearchTextProcessorInterface::PREG_CLASS_CJK . ']';
