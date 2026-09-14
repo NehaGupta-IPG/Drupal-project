@@ -93,7 +93,7 @@
          * because that is what happens without AJAX.
          */
         return (
-          this.$exposed_form.find(`[name="${name}"]`).length === 0 && 
+          this.$exposed_form.find(`[name="${name}"]`).length === 0 &&
           !['page', 'reset', 'sort', 'order', 'q', 'render'].includes(name)
         );
       });
