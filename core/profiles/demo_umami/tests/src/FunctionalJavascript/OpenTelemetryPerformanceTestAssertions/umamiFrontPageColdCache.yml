@@ -1,8 +1,8 @@
 QueryCount: 178
-CacheGetCount: 225
+CacheGetCount: 224
 CacheGetCountByBin:
   page: 1
-  config: 55
+  config: 54
   bootstrap: 15
   discovery: 83
   data: 10
@@ -13,7 +13,7 @@ CacheGetCountByBin:
   routes: 10
   menu: 3
   file_parsing: 2
-CacheSetCount: 240
+CacheSetCount: 239
 CacheDeleteCount: 0
 CacheTagInvalidationCount: 0
 CacheTagLookupQueryCount: 25
@@ -101,13 +101,18 @@ CacheTagGroupedLookups:
     - 'config:views.view.promoted_items'
     - 'node:18'
   -
+    - 'media:17'
+  -
     - 'config:image.style.medium_8_7'
     - 'file:37'
     - 'media:19'
   -
     - block_content_view
   -
-    - 'media:17'
+    - 'config:image.style.square_large'
+    - 'config:image.style.square_medium'
+    - 'config:image.style.square_small'
+    - 'config:responsive_image.styles.square'
   -
     - 'config:image.style.scale_crop_7_3_large'
     - 'config:image.style.scale_crop_7_3_medium'
@@ -115,11 +120,6 @@ CacheTagGroupedLookups:
     - 'config:image.style.scale_crop_7_3_wide'
     - 'config:responsive_image.styles.hero'
     - 'media:18'
-  -
-    - 'config:image.style.square_large'
-    - 'config:image.style.square_medium'
-    - 'config:image.style.square_small'
-    - 'config:responsive_image.styles.square'
   -
     - 'config:user.role.anonymous'
 ScriptCount: 3
