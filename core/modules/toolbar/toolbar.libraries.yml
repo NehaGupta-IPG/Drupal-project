@@ -57,3 +57,33 @@ toolbar.anti-flicker:
   header: true
   js:
     js/toolbar.anti-flicker.js: {}
+
+toolbar.contextual:
+  version: VERSION
+  js:
+    js/views/ContextualToolbarModelView.js: {}
+    js/toolbar.contextual.js: {}
+  css:
+    component:
+      css/toolbar.contextual.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+    - core/drupal.tabbingmanager
+    - core/drupal.announce
+    - contextual/drupal.contextual-links
+
+toolbar.announcements_feed:
+  version: VERSION
+  css:
+    theme:
+      css/toolbar.announcements_feed.css: { }
+
+toolbar.workspaces_ui:
+  version: VERSION
+  css:
+    theme:
+      css/toolbar.workspaces_ui.css: {}
+  dependencies:
+    - workspaces_ui/drupal.workspaces_ui.off-canvas
