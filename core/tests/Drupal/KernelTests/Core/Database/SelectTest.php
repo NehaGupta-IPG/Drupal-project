@@ -198,60 +198,112 @@ class SelectTest extends DatabaseTestBase {
     $record = $result->fetch();
     $this->assertEquals('George', $record->{$name_field}, 'Fetched name is correct.');
     $this->assertEquals(27, $record->{$age_field}, 'Fetched age is correct.');
-    $this->assertEquals($record->{$name_field}, $record->{$abstractQueryNameField});
-    $this->assertEquals($record->{$age_field}, $record->{$abstractQueryAgeField});
+    $this->assertEquals($record->{$name_field}, $hydratedRecord->{$abstractQueryNameField});
+    $this->assertEquals($record->{$age_field}, $hydratedRecord->{$abstractQueryAgeField});
   }
 
   /**
    * Tests SELECT statements with expressions.
    */
   public function testSimpleSelectExpression(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $abstractQueryNameField = $abstractQuery->addColumn('test', 'name');
+    $abstractQueryAgeField = $abstractQuery->addExpression("[age]*2", 'double_age');
+    $abstractQuery->condition('age', 27);
+
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
     $age_field = $query->addExpression("[age]*2", 'double_age');
     $query->condition('age', 27);
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedResult = $hydratedQuery->execute();
     $result = $query->execute();
+    $this->assertEquals($result, $hydratedResult);
 
     // Check that the aliases are being created the way we want.
     $this->assertEquals('name', $name_field, 'Name field alias is correct.');
     $this->assertEquals('double_age', $age_field, 'Age field alias is correct.');
+    $this->assertEquals($name_field, $abstractQueryNameField);
+    $this->assertEquals($age_field, $abstractQueryAgeField);
 
     // Ensure that we got the right record.
+    $hydratedRecord = $hydratedResult->fetch();
     $record = $result->fetch();
     $this->assertEquals('George', $record->{$name_field}, 'Fetched name is correct.');
     $this->assertEquals(27 * 2, $record->{$age_field}, 'Fetched age expression is correct.');
+    $this->assertEquals($record->{$name_field}, $hydratedRecord->{$abstractQueryNameField});
+    $this->assertEquals($record->{$age_field}, $hydratedRecord->{$abstractQueryAgeField});
   }
 
   /**
    * Tests SELECT statements with multiple expressions.
    */
   public function testSimpleSelectExpressionMultiple(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $abstractQueryNameField = $abstractQuery->addColumn('test', 'name');
+    $abstractQueryAgeDoubleField = $abstractQuery->addExpression("[age]*2");
+    $abstractQueryAgeTripleField = $abstractQuery->addExpression("[age]*3");
+    $abstractQuery->condition('age', 27);
+
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
     $age_double_field = $query->addExpression("[age]*2");
     $age_triple_field = $query->addExpression("[age]*3");
     $query->condition('age', 27);
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedResult = $hydratedQuery->execute();
     $result = $query->execute();
+    $this->assertEquals($result, $hydratedResult);
 
     // Check that the aliases are being created the way we want.
     $this->assertEquals('expression', $age_double_field, 'Double age field alias is correct.');
     $this->assertEquals('expression_2', $age_triple_field, 'Triple age field alias is correct.');
+    $this->assertEquals($age_double_field, $abstractQueryAgeDoubleField);
+    $this->assertEquals($age_triple_field, $abstractQueryAgeTripleField);
 
     // Ensure that we got the right record.
+    $hydratedRecord = $hydratedResult->fetch();
     $record = $result->fetch();
     $this->assertEquals('George', $record->{$name_field}, 'Fetched name is correct.');
     $this->assertEquals(27 * 2, $record->{$age_double_field}, 'Fetched double age expression is correct.');
     $this->assertEquals(27 * 3, $record->{$age_triple_field}, 'Fetched triple age expression is correct.');
+    $this->assertEquals($record->{$age_double_field}, $hydratedRecord->{$abstractQueryAgeDoubleField});
+    $this->assertEquals($record->{$age_triple_field}, $hydratedRecord->{$abstractQueryAgeTripleField});
   }
 
   /**
    * Tests adding multiple fields to a SELECT statement at the same time.
    */
   public function testSimpleSelectMultipleFields(): void {
-    $record = $this->connection->select('test')
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->columns('test', ['id', 'name', 'age', 'job'])
+      ->condition('age', 27);
+
+    $query = $this->connection->select('test')
       ->fields('test', ['id', 'name', 'age', 'job'])
-      ->condition('age', 27)
-      ->execute()->fetchObject();
+      ->condition('age', 27);
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedRecord = $hydratedQuery->execute()->fetchObject();
+    $record = $query->execute()->fetchObject();
+    $this->assertEquals($record, $hydratedRecord);
 
     // Check that all fields we asked for are present.
     $this->assertNotNull($record->id, 'ID field is present.');
@@ -271,10 +323,23 @@ class SelectTest extends DatabaseTestBase {
    * Tests adding all fields from a given table to a SELECT statement.
    */
   public function testSimpleSelectAllFields(): void {
-    $record = $this->connection->select('test')
+    $abstractQuery = new DatabaseAbstractSelect('test')
+      ->columns('test')
+      ->condition('age', 27);
+
+    $query = $this->connection->select('test')
       ->fields('test')
-      ->condition('age', 27)
-      ->execute()->fetchObject();
+      ->condition('age', 27);
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedRecord = $hydratedQuery->execute()->fetchObject();
+    $record = $query->execute()->fetchObject();
+    $this->assertEquals($record, $hydratedRecord);
 
     // Check that all fields we asked for are present.
     $this->assertNotNull($record->id, 'ID field is present.');
@@ -296,10 +361,23 @@ class SelectTest extends DatabaseTestBase {
   public function testNullCondition(): void {
     $this->ensureSampleDataNull();
 
-    $names = $this->connection->select('test_null', 'tn')
+    $abstractQuery = new DatabaseAbstractSelect('test_null', 'tn')
+      ->columns('tn', ['name'])
+      ->condition('age');
+
+    $query = $this->connection->select('test_null', 'tn')
       ->fields('tn', ['name'])
-      ->condition('age')
-      ->execute()->fetchCol();
+      ->condition('age');
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedNames = $hydratedQuery->execute()->fetchCol();
+    $names = $query->execute()->fetchCol();
+    $this->assertEquals($names, $hydratedNames);
 
     $this->assertCount(0, $names, 'No records found when comparing to NULL.');
   }
@@ -310,10 +388,23 @@ class SelectTest extends DatabaseTestBase {
   public function testIsNullCondition(): void {
     $this->ensureSampleDataNull();
 
-    $names = $this->connection->select('test_null', 'tn')
+    $abstractQuery = new DatabaseAbstractSelect('test_null', 'tn')
+      ->columns('tn', ['name'])
+      ->isNull('age');
+
+    $query = $this->connection->select('test_null', 'tn')
       ->fields('tn', ['name'])
-      ->isNull('age')
-      ->execute()->fetchCol();
+      ->isNull('age');
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedNames = $hydratedQuery->execute()->fetchCol();
+    $names = $query->execute()->fetchCol();
+    $this->assertEquals($names, $hydratedNames);
 
     $this->assertCount(1, $names, 'Correct number of records found with NULL age.');
     $this->assertEquals('Ernie', $names[0], 'Correct record returned for NULL age.');
@@ -325,11 +416,25 @@ class SelectTest extends DatabaseTestBase {
   public function testIsNotNullCondition(): void {
     $this->ensureSampleDataNull();
 
-    $names = $this->connection->select('test_null', 'tn')
+    $abstractQuery = new DatabaseAbstractSelect('test_null', 'tn')
+      ->columns('tn', ['name'])
+      ->isNotNull('tn.age')
+      ->orderBy('name');
+
+    $query = $this->connection->select('test_null', 'tn')
       ->fields('tn', ['name'])
       ->isNotNull('tn.age')
-      ->orderBy('name')
-      ->execute()->fetchCol();
+      ->orderBy('name');
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedNames = $hydratedQuery->execute()->fetchCol();
+    $names = $query->execute()->fetchCol();
+    $this->assertEquals($names, $hydratedNames);
 
     $this->assertCount(2, $names, 'Correct number of records found withNOT NULL age.');
     $this->assertEquals('Gonzo', $names[0], 'Correct record returned for NOT NULL age.');
@@ -348,11 +453,25 @@ class SelectTest extends DatabaseTestBase {
     $this->assertCount(1, $names);
     $this->assertSame($names[0], 'George');
 
-    $names = $this->connection->select('test', 'test')
+    $abstractQuery = new DatabaseAbstractSelect('test', 'test')
+      ->columns('test', ['name'])
+      ->condition('age', 27)
+      ->alwaysFalse();
+
+    $query = $this->connection->select('test', 'test')
       ->fields('test', ['name'])
       ->condition('age', 27)
-      ->alwaysFalse()
-      ->execute()->fetchCol();
+      ->alwaysFalse();
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedNames = $hydratedQuery->execute()->fetchCol();
+    $names = $query->execute()->fetchCol();
+    $this->assertEquals($names, $hydratedNames);
 
     $this->assertCount(0, $names);
   }

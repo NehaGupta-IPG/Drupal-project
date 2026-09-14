@@ -22,7 +22,7 @@ final class DatabaseAbstractSelect {
    *
    * @var list<string>
    */
-  protected array $comments = [];
+  public protected(set) array $comments = [];
 
   // ------------------------------------------------------
 
@@ -73,7 +73,7 @@ final class DatabaseAbstractSelect {
    * incorporated into the object; a separate array of arguments does not
    * need to be provided.
    */
-  protected array $tables = [];
+  public protected(set) array $tables = [];
 
   /**
    * The fields by which to order this query.
@@ -83,7 +83,7 @@ final class DatabaseAbstractSelect {
    *
    * @var array<string,string>
    */
-  protected array $order = [];
+  public protected(set) array $orderBy = [];
 
   /**
    * The fields by which to group.
@@ -160,25 +160,6 @@ final class DatabaseAbstractSelect {
   public function comment(string $comment): static {
     $this->comments[] = $comment;
     return $this;
-  }
-
-  /**
-   * Returns a reference to the comments array for the query.
-   *
-   * Because this method returns by reference, alter hooks may edit the comments
-   * array directly to make their changes. If just adding comments, however, the
-   * use of comment() is preferred.
-   *
-   * Note that this method must be called by reference as well:
-   * @code
-   * $comments =& $query->getComments();
-   * @endcode
-   *
-   * @return array
-   *   A reference to the comments array structure.
-   */
-  public function &getComments(): array {
-    return $this->comments;
   }
 
   // ------------------------------------------------------
@@ -336,8 +317,8 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function &getOrderBy() {
-    return $this->order;
+  public function resetOrderBy(): void {
+    $this->orderBy = [];
   }
 
   /**
@@ -345,13 +326,6 @@ final class DatabaseAbstractSelect {
    */
   public function &getGroupBy() {
     return $this->group;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function &getTables() {
-    return $this->tables;
   }
 
   /**
@@ -533,7 +507,7 @@ final class DatabaseAbstractSelect {
   public function orderBy($field, $direction = 'ASC') {
     // Only allow ASC and DESC, default to ASC.
     $direction = strtoupper($direction) == 'DESC' ? 'DESC' : 'ASC';
-    $this->order[$field] = $direction;
+    $this->orderBy[$field] = $direction;
     return $this;
   }
 
@@ -644,8 +618,7 @@ final class DatabaseAbstractSelect {
 
     // Ordering a count query is a waste of cycles, and breaks on some
     // databases anyway.
-    $orders = &$count->getOrderBy();
-    $orders = [];
+    $count->resetOrderBy();
 
     if ($count->distinct && !empty($group_by)) {
       // If the query is distinct and contains a GROUP BY, we need to remove the

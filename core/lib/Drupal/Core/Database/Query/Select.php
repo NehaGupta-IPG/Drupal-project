@@ -154,8 +154,8 @@ class Select extends Query implements SelectInterface {
   }
 
   protected function createFromAbstractSelect(DatabaseAbstractSelect $abstractSelect, ?string $alias): void {
-    $this->comments = $abstractSelect->getComments();
-    foreach ($abstractSelect->getTables() as $key => $table) {
+    $this->comments = $abstractSelect->comments;
+    foreach ($abstractSelect->tables as $key => $table) {
       $this->tables[$key] = $table;
       if ($table['table'] instanceof DatabaseAbstractSelect) {
         $this->tables[$key]['table'] = $this->connection->select($table['table']);
@@ -169,6 +169,12 @@ class Select extends Query implements SelectInterface {
         'alias' => $expression->alias,
       ];
     }
+    foreach ($abstractSelect->conditions() as $key => $condition) {
+      if ($key !== '#conjunction') {
+        $this->condition($condition['field'], $condition['value'], $condition['operator']);
+      }
+    }
+    $this->order = $abstractSelect->order ?? [];
   }
 
   /**
