@@ -2,13 +2,14 @@
 
 namespace Drupal\toolbar\Hook;
 
-use Drupal\announcements_feed\RenderCallbacks;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Hook\Attribute\HookDependsOnModule;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Routing\AdminContext;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\toolbar\Controller\ToolbarController;
+use Drupal\toolbar\RenderCallbacks;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -36,7 +37,9 @@ class ToolbarHooks {
     switch ($route_name) {
       case 'help.page.toolbar':
         $output = '<h2>' . $this->t('About') . '</h2>';
-        $output .= '<p>' . $this->t('The Toolbar module provides a toolbar for site administrators, which displays tabs and trays provided by the Toolbar module itself and other modules. For more information, see the <a href=":toolbar_docs">online documentation for the Toolbar module</a>.', [':toolbar_docs' => 'https://www.drupal.org/docs/8/core/modules/toolbar']) . '</p>';
+        $output .= '<p>' . $this->t('The Toolbar module provides a toolbar for site administrators to navigate the menu system to find pages for administrative tasks. The menu displays tabs and trays provided by the Toolbar module itself and other modules. The toolbar displays on the top or left side of the page (right side in right-to-left languages).') . '</p>';
+        $output .= '<p>' . $this->t('If you have the Announcements module enabled, you will see a direct link to announcements in the toolbar.') . '</p>';
+        $output .= '<p>' . $this->t('For more information, see the <a href=":toolbar_docs">online documentation for the Toolbar module</a>.', [':toolbar_docs' => 'https://www.drupal.org/docs/8/core/modules/toolbar']) . '</p>';
         $output .= '<h4>' . $this->t('Terminology') . '</h4>';
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Tabs') . '</dt>';
@@ -187,7 +190,7 @@ class ToolbarHooks {
       '#type' => 'toolbar_item',
       'tab' => [
         '#lazy_builder' => [
-          'announcements_feed.lazy_builders:renderAnnouncements',
+          'toolbar.announcements_feed_link_builder:renderAnnouncements',
           [],
         ],
         '#create_placeholder' => TRUE,
@@ -222,7 +225,7 @@ class ToolbarHooks {
   protected function contextualToolbar(): array {
     $items = [];
     $items['contextual'] = ['#cache' => ['contexts' => ['user.permissions']]];
-    if (!\Drupal::currentUser()->hasPermission('access contextual links')) {
+    if (!$this->currentUser->hasPermission('access contextual links')) {
       return $items;
     }
     $items['contextual'] += [
@@ -248,7 +251,7 @@ class ToolbarHooks {
       ],
       '#attached' => [
         'library' => [
-          'contextual/drupal.contextual-toolbar',
+          'toolbar/toolbar.contextual',
         ],
       ],
     ];
@@ -289,7 +292,7 @@ class ToolbarHooks {
   }
 
   protected function userToolbar(): array {
-    $user = \Drupal::currentUser();
+    $user = $this->currentUser;
     $items['user'] = [
       '#type' => 'toolbar_item',
       'tab' => [
@@ -314,11 +317,6 @@ class ToolbarHooks {
         '#heading' => $this->t('User account actions'),
       ],
       '#weight' => 100,
-      '#attached' => [
-        'library' => [
-          'user/drupal.user.icons',
-        ],
-      ],
     ];
     if ($user->isAnonymous()) {
       $links = [
@@ -340,7 +338,7 @@ class ToolbarHooks {
     else {
       $items['user']['tab']['#title'] = [
         '#lazy_builder' => [
-          'user.toolbar_link_builder:renderDisplayName',
+          'toolbar.user_link_builder:renderDisplayName',
           [],
         ],
         '#create_placeholder' => TRUE,
@@ -353,7 +351,7 @@ class ToolbarHooks {
       ];
       $items['user']['tray']['user_links'] = [
         '#lazy_builder' => [
-          'user.toolbar_link_builder:renderToolbarLinks',
+          'toolbar.user_link_builder:renderToolbarLinks',
           [],
         ],
         '#create_placeholder' => TRUE,
@@ -386,7 +384,7 @@ class ToolbarHooks {
     $items['workspace'] += [
       '#type' => 'toolbar_item',
       'tab' => [
-        '#lazy_builder' => ['workspaces_ui.lazy_builders:renderToolbarTab', []],
+        '#lazy_builder' => ['toolbar.workspaces_ui_link_builder:renderToolbarTab', []],
         '#create_placeholder' => TRUE,
         '#lazy_builder_preview' => [
           '#type' => 'link',
@@ -415,9 +413,26 @@ class ToolbarHooks {
     // render callback to remove the #attributes property. We start by adding
     // the defaults, and then we append our own pre render callback.
     $items['workspace'] += \Drupal::service('plugin.manager.element_info')->getInfo('toolbar_item');
-    $items['workspace']['#pre_render'][] = 'workspaces_ui.lazy_builders:removeTabAttributes';
+    $items['workspace']['#pre_render'][] = 'toolbar.workspaces_ui_link_builder:removeTabAttributes';
 
     return $items;
+  }
+
+  /**
+   * Implements hook_toolbar_alter().
+   */
+  #[Hook('toolbar_alter')]
+  #[HookDependsOnModule('announcements_feed')]
+  public function toolbarAlter(&$items): void {
+    // As the "Announcements" link is shown already in the top toolbar bar, we
+    // don't need it again in the administration menu tray, so hide it.
+    if (!empty($items['administration']['tray'])) {
+      $callable = function (array $element) {
+        unset($element['administration_menu']['#items']['announcements_feed.announcement']);
+        return $element;
+      };
+      $items['administration']['tray']['toolbar_administration']['#pre_render'][] = $callable;
+    }
   }
 
 }

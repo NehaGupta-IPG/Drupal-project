@@ -263,12 +263,12 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     $article = $this->drupalCreateNode(['type' => 'article', 'langcode' => $this->langcodes[0]]);
 
     // Set up the default admin theme and use it for node editing.
-    $this->container->get('theme_installer')->install(['claro']);
-    $this->config('system.theme')->set('admin', 'claro')->save();
+    $this->container->get('theme_installer')->install(['default_admin']);
+    $this->config('system.theme')->set('admin', 'default_admin')->save();
 
     // Verify that translation uses the admin theme if edit is admin.
     $this->drupalGet('node/' . $article->id() . '/translations');
-    $this->assertSession()->responseContains('core/themes/claro/css/base/elements.css');
+    $this->assertSession()->responseContains('core/themes/default_admin/css/base/elements.css');
 
     // Turn off admin theme for editing, assert inheritance to translations.
     $this->config('node.settings')->set('use_admin_theme', FALSE)->save();
@@ -277,7 +277,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
 
     // Verify that translation uses the frontend theme if edit is frontend.
     $this->drupalGet('node/' . $article->id() . '/translations');
-    $this->assertSession()->responseNotContains('core/themes/claro/css/base/elements.css');
+    $this->assertSession()->responseNotContains('core/themes/default_admin/css/base/elements.css');
 
     // Assert presence of translation page itself (vs. DisabledBundle below).
     $this->assertSession()->statusCodeEquals(200);
@@ -373,7 +373,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
         $expected_href = $base_path . $langcode . '/' . $node_href;
       }
       $pattern = '|^' . $expected_href . '$|';
-      foreach ($this->xpath("//a[text()='Read more']") as $link) {
+      foreach ($this->getNodeElementsByXpath("//a[text()='Read more']") as $link) {
         if (preg_match($pattern, $link->getAttribute('href'), $matches) == TRUE) {
           $num_match_found++;
         }
@@ -395,7 +395,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
         $expected_href = $base_path . $langcode . '/' . $comment_form_href;
       }
       $pattern = '|^' . $expected_href . '$|';
-      foreach ($this->xpath("//a[text()='Add new comment']") as $link) {
+      foreach ($this->getNodeElementsByXpath("//a[text()='Add new comment']") as $link) {
         if (preg_match($pattern, $link->getAttribute('href'), $matches) == TRUE) {
           $num_match_found++;
         }
