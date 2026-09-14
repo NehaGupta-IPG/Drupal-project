@@ -286,18 +286,6 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *   @code
  *   use Drupal\Core\Database\Database;
  *
- *   // ...
- *
- *   $connection = Database::getConnection();
- *   $query = $connection->query('...');
- *   @endcode
- * In procedural code, such as script files:
- * - Use \Drupal::database(); to get database connection.
- *   @code
- *   $connection = \Drupal::database();
- *   $query = $connection->query('...');
- *   @endcode
- *
  * @see https://www.drupal.org/docs/drupal-apis/database-api
  * @see entity_api
  * @see schemaapi
