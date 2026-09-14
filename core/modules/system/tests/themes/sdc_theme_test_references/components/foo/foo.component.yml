@@ -14,3 +14,8 @@ props:
       $ref: non-existing-schema://whatever
     recursive:
       $ref: theme://sdc_theme_test_references/schema.json#recursive_object
+    id:
+      type: object
+      properties:
+        id:
+          type: string

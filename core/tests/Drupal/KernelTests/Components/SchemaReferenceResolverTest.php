@@ -89,6 +89,14 @@ class SchemaReferenceResolverTest extends ComponentKernelTestBase {
         ],
       ],
     ];
+    $expectations['id'] = [
+      'type' => 'object',
+      'properties' => [
+        'id' => [
+          'type' => 'string',
+        ],
+      ],
+    ];
 
     return $expectations;
   }
