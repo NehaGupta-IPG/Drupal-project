@@ -42,7 +42,7 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
    * @see \Drupal\Tests\UiHelperTrait::drupalGet()
    */
   #[DataProvider('provider')]
-  public function testPages(string $path, bool $admin = FALSE, array $axe_options = [], ?string $setup_callback = NULL): void {
+  public function testAxeScan(string $path, bool $admin = FALSE, array $axe_options = [], ?string $setup_callback = NULL): void {
     if ($admin) {
       $this->drupalLogin($this->drupalCreateUser(admin: TRUE));
     }
