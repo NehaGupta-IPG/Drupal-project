@@ -462,7 +462,7 @@ class IconSearchTest extends UnitTestCase {
   public static function providerRanking(): array {
     $many = [];
     for ($i = 1; $i <= 60; $i++) {
-      $many["core:xhomex$i"] = ['source' => "xhomex$i.svg"];
+      $many["core:chrome-$i"] = ['source' => "chrome-$i.svg"];
     }
     $many['core:home'] = ['source' => 'home.svg'];
 
@@ -501,19 +501,19 @@ class IconSearchTest extends UnitTestCase {
       ],
       'substrings in order before any order' => [
         [
-          'core:xsettingsx-xuserx' => ['source' => 'a.svg'],
-          'core:xuserx-xsettingsx' => ['source' => 'b.svg'],
+          'core:settings-users' => ['source' => 'settings-users.svg'],
+          'core:users-settings' => ['source' => 'users-settings.svg'],
         ],
         'user settings',
-        ['core:xuserx-xsettingsx', 'core:xsettingsx-xuserx'],
+        ['core:users-settings', 'core:settings-users'],
       ],
       'whole words before substrings' => [
         [
-          'core:xaddx' => ['source' => 'xaddx.svg'],
+          'core:ladder' => ['source' => 'ladder.svg'],
           'core:add-new' => ['source' => 'add-new.svg'],
         ],
         'add',
-        ['core:add-new', 'core:xaddx'],
+        ['core:add-new', 'core:ladder'],
       ],
       'same name in several packs keeps pack order' => [
         [
