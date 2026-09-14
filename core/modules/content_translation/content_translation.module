@@ -5,7 +5,7 @@
  */
 
 use Drupal\content_translation\ContentTranslationEnableTranslationPerBundle;
-use Drupal\content_translation\Hook\ContentTranslationHooks;
+use Drupal\content_translation\Hook\ContentTranslationEntityHooks;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -18,14 +18,14 @@ use Drupal\Core\Form\FormStateInterface;
  * @todo Generalize this code in https://www.drupal.org/node/2346013.
  *
  * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use
- *   ContentTranslationHooks::installFieldStorageDefinitions() instead.
+ *   ContentTranslationEntityHooks::installFieldStorageDefinitions() instead.
  *
  * @see https://www.drupal.org/node/3567484
- * @see \Drupal\content_translation\Hook\ContentTranslationHooks::installFieldStorageDefinitions()
+ * @see \Drupal\content_translation\Hook\ContentTranslationEntityHooks::installFieldStorageDefinitions()
  */
 function _content_translation_install_field_storage_definitions($entity_type_id): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\content_translation\Hook\ContentTranslationHooks::installFieldStorageDefinitions() instead. See https://www.drupal.org/node/3567484', E_USER_DEPRECATED);
-  \Drupal::service(ContentTranslationHooks::class)->installFieldStorageDefinitions($entity_type_id);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use \Drupal\content_translation\Hook\ContentTranslationEntityHooks::installFieldStorageDefinitions() instead. See https://www.drupal.org/node/3567484', E_USER_DEPRECATED);
+  \Drupal::service(ContentTranslationEntityHooks::class)->installFieldStorageDefinitions($entity_type_id);
 }
 
 /**

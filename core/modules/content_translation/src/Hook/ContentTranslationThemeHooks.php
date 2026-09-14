@@ -7,9 +7,15 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\content_translation\ContentTranslationEnableTranslationPerBundle;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Url;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Path\PathMatcherInterface;
 
 /**
- * Hook implementations for content_translation.
+ * Theme hook implementations for content_translation.
  */
 class ContentTranslationThemeHooks {
 
@@ -18,6 +24,8 @@ class ContentTranslationThemeHooks {
   public function __construct(
     protected readonly RendererInterface $renderer,
     protected readonly AccountInterface $currentUser,
+    protected readonly RouteMatchInterface $routeMatch,
+    protected readonly PathMatcherInterface $pathMatcher,
   ) {}
 
   /**
@@ -138,6 +146,68 @@ class ContentTranslationThemeHooks {
     }
 
     $build['#rows'] = $rows;
+  }
+
+  /**
+   * Implements hook_page_attachments().
+   */
+  #[Hook('page_attachments')]
+  public function pageAttachments(&$page): void {
+    $cache = CacheableMetadata::createFromRenderArray($page);
+    $route_match = $this->routeMatch;
+    // If the current route has no parameters, return.
+    if (!($route = $route_match->getRouteObject()) || !($parameters = $route->getOption('parameters'))) {
+      return;
+    }
+    $is_front = $this->pathMatcher->isFrontPage();
+    // Determine if the current route represents an entity.
+    foreach ($parameters as $name => $options) {
+      if (!isset($options['type']) || !str_starts_with($options['type'], 'entity:')) {
+        continue;
+      }
+      $entity = $route_match->getParameter($name);
+      if ($entity instanceof ContentEntityInterface && $entity->hasLinkTemplate('canonical')) {
+        // Current route represents a content entity. Build hreflang links.
+        foreach ($entity->getTranslationLanguages() as $language) {
+          // Skip any translation that cannot be viewed.
+          $translation = $entity->getTranslation($language->getId());
+          $access = $translation->access('view', NULL, TRUE);
+          $cache->addCacheableDependency($access);
+          if (!$access->isAllowed()) {
+            continue;
+          }
+          if ($is_front) {
+            // If the current page is front page, do not create hreflang links
+            // from the entity route, just add the languages to root path.
+            $url = Url::fromRoute('<front>', [], ['absolute' => TRUE, 'language' => $language])->toString();
+          }
+          else {
+            $url = $entity->toUrl('canonical')->setOption('language', $language)->setAbsolute()->toString();
+          }
+          $page['#attached']['html_head_link'][] = [
+            [
+              'rel' => 'alternate',
+              'hreflang' => $language->getId(),
+              'href' => $url,
+            ],
+          ];
+        }
+      }
+      // Since entity was found, no need to iterate further.
+      break;
+    }
+    // Apply updated caching information.
+    $cache->applyTo($page);
+  }
+
+  /**
+   * Implements hook_element_info_alter().
+   */
+  #[Hook('element_info_alter')]
+  public function elementInfoAlter(&$type): void {
+    if (isset($type['language_configuration'])) {
+      $type['language_configuration']['#process'][] = ContentTranslationEnableTranslationPerBundle::class . ':configElementProcess';
+    }
   }
 
 }
