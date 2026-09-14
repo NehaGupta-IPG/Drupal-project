@@ -67,7 +67,7 @@ class SearchUser extends SearchPluginBase implements AccessibleInterface {
   }
 
   /**
-   * Creates a UserSearch object.
+   * Creates a SearchUser object.
    *
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
