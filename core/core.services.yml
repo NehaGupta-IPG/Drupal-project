@@ -885,8 +885,12 @@ services:
   Drupal\Core\Menu\MenuLinkManagerInterface: '@plugin.manager.menu.link'
   menu.link_tree:
     class: Drupal\Core\Menu\MenuLinkTree
-    arguments: ['@menu.tree_storage', '@plugin.manager.menu.link', '@router.route_provider', '@menu.active_trail', '@callable_resolver']
+    arguments: ['@menu.tree_storage', '@plugin.manager.menu.link', '@router.route_provider', '@menu.active_trail', '@callable_resolver', '@menu.tree_access_check']
   Drupal\Core\Menu\MenuLinkTreeInterface: '@menu.link_tree'
+  menu.tree_access_check:
+    class: Drupal\Core\Menu\MenuLinkTreeAccessCheck
+    arguments: ['@access_manager', '@current_user', '@entity_type.manager', '@module_handler']
+  Drupal\Core\Menu\MenuLinkTreeAccessCheckInterface: '@menu.tree_access_check'
   menu.default_tree_manipulators:
     class: Drupal\Core\Menu\DefaultMenuLinkTreeManipulators
     arguments: ['@access_manager', '@current_user', '@entity_type.manager', '@module_handler']

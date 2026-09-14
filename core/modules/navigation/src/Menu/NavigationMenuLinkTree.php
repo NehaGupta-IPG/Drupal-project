@@ -10,6 +10,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Menu\MenuActiveTrailInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuLinkTree;
+use Drupal\Core\Menu\MenuLinkTreeAccessCheckInterface;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Utility\CallableResolver;
@@ -36,6 +37,8 @@ final class NavigationMenuLinkTree extends MenuLinkTree {
    *   The callable resolver.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
+   * @param \Drupal\Core\Menu\MenuLinkTreeAccessCheckInterface $accessCheck
+   *   The menu link tree access check service.
    */
   public function __construct(
     MenuTreeStorageInterface $treeStorage,
@@ -44,8 +47,9 @@ final class NavigationMenuLinkTree extends MenuLinkTree {
     MenuActiveTrailInterface $menuActiveTrail,
     CallableResolver $callableResolver,
     protected ModuleHandlerInterface $moduleHandler,
+    MenuLinkTreeAccessCheckInterface $accessCheck,
   ) {
-    parent::__construct($treeStorage, $menuLinkManager, $routeProvider, $menuActiveTrail, $callableResolver);
+    parent::__construct($treeStorage, $menuLinkManager, $routeProvider, $menuActiveTrail, $callableResolver, $accessCheck);
   }
 
   /**

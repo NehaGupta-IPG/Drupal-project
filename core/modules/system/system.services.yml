@@ -67,6 +67,6 @@ services:
   Drupal\system\ModuleAdminLinksHelper: '@system.module_admin_links_helper'
   system.module_admin_links_helper:
     class: Drupal\system\ModuleAdminLinksHelper
-    arguments: ['@menu.link_tree', '@cache.memory']
+    arguments: ['@menu.link_tree', '@cache.memory', '@menu.default_tree_manipulators']
   system.access_route_alter_subscriber:
     class: Drupal\system\EventSubscriber\AccessRouteAlterSubscriber

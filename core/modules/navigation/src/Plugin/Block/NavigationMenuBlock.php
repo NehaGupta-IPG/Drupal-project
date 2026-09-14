@@ -33,14 +33,21 @@ final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFact
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    return new static(
+    $instance = new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $container->get('navigation.menu_tree'),
       $container->get('menu.active_trail'),
     );
+    $instance->navigationMenuLinkTreeManipulators = $container->get(NavigationMenuLinkTreeManipulators::class);
+    return $instance;
   }
+
+  /**
+   * The navigation-specific menu link tree manipulators service.
+   */
+  protected NavigationMenuLinkTreeManipulators $navigationMenuLinkTreeManipulators;
 
   /**
    * {@inheritdoc}
@@ -84,12 +91,8 @@ final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFact
       ->setMaxDepth(min($level + $depth, $this->menuTree->maxDepth()))
       ->onlyEnabledLinks();
     $tree = $this->menuTree->load($menu_name, $parameters);
-    $manipulators = [
-      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
-      ['callable' => NavigationMenuLinkTreeManipulators::class . ':addSecondLevelOverviewLinks'],
-      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-    ];
-    $tree = $this->menuTree->transform($tree, $manipulators);
+    $tree = $this->menuTree->checkAccess($tree);
+    $tree = $this->navigationMenuLinkTreeManipulators->addSecondLevelOverviewLinks($tree);
     $build = $this->menuTree->build($tree);
     if (!empty($build)) {
       $build['#title'] = $this->configuration['label'];

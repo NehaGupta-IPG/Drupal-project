@@ -40,7 +40,11 @@ class MenuParentFormSelector implements MenuParentFormSelectorInterface {
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    */
-  public function __construct(MenuLinkTreeInterface $menu_link_tree, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
+  public function __construct(
+    MenuLinkTreeInterface $menu_link_tree,
+    EntityTypeManagerInterface $entity_type_manager,
+    TranslationInterface $string_translation,
+  ) {
     $this->menuLinkTree = $menu_link_tree;
     $this->entityTypeManager = $entity_type_manager;
     $this->stringTranslation = $string_translation;
@@ -62,12 +66,7 @@ class MenuParentFormSelector implements MenuParentFormSelectorInterface {
       $parameters = new MenuTreeParameters();
       $parameters->setMaxDepth($depth_limit);
       $tree = $this->menuLinkTree->load($menu_name, $parameters);
-      $manipulators = [
-        ['callable' => 'menu.default_tree_manipulators:checkNodeAccess'],
-        ['callable' => 'menu.default_tree_manipulators:checkAccess'],
-        ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-      ];
-      $tree = $this->menuLinkTree->transform($tree, $manipulators);
+      $tree = $this->menuLinkTree->checkAccess($tree);
       $this->parentSelectOptionsTreeWalk($tree, $menu_name, '--', $options, $id, $depth_limit, $cacheability);
     }
     return $options;

@@ -13,6 +13,7 @@ use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\menu_ui\Menu\MenuUiMenuTreeManipulators;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\LinkGeneratorInterface;
@@ -64,6 +65,11 @@ class MenuForm extends EntityForm {
   protected $overviewTreeForm = ['#tree' => TRUE];
 
   /**
+   * The menu_ui menu tree access manipulator.
+   */
+  protected MenuUiMenuTreeManipulators $menuUiMenuTreeManipulators;
+
+  /**
    * Constructs a MenuForm object.
    *
    * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
@@ -86,12 +92,14 @@ class MenuForm extends EntityForm {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
+    $instance = new static(
       $container->get('plugin.manager.menu.link'),
       $container->get('menu.link_tree'),
       $container->get('link_generator'),
       $container->get('entity_type.manager')->getStorage('menu_link_content')
     );
+    $instance->menuUiMenuTreeManipulators = $container->get(MenuUiMenuTreeManipulators::class);
+    return $instance;
   }
 
   /**
@@ -228,20 +236,13 @@ class MenuForm extends EntityForm {
 
     $tree = $this->menuTree->load($this->entity->id(), new MenuTreeParameters());
 
-    // We indicate that a menu administrator is running the menu access check.
+    // Use the menu_ui-specific access check so users with 'administer menu'
+    // permission can edit links to inaccessible routes. The default access
+    // check would hide them.
+    // @see \Drupal\Core\Menu\MenuLinkTreeAccessCheck::checkAccess()
+    // @see \Drupal\menu_ui\Menu\MenuUiMenuTreeManipulators::checkAccess()
     $this->getRequest()->attributes->set('_menu_admin', TRUE);
-    $manipulators = [
-      // Use a dedicated menu tree access check manipulator as users editing
-      // this form, granted with 'administer menu' permission, should be able to
-      // access menu links with inaccessible routes. The default menu tree
-      // manipulator only allows the access to menu links with accessible
-      // routes.
-      // @see \Drupal\Core\Menu\DefaultMenuLinkTreeManipulators::checkAccess()
-      // @see \Drupal\menu_ui\Menu\MenuUiMenuTreeManipulators::checkAccess()
-      ['callable' => 'menu_ui.menu_tree_manipulators:checkAccess'],
-      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-    ];
-    $tree = $this->menuTree->transform($tree, $manipulators);
+    $tree = $this->menuUiMenuTreeManipulators->checkAccess($tree);
     $this->getRequest()->attributes->set('_menu_admin', FALSE);
 
     // Determine the delta; the number of weights to be made available.
