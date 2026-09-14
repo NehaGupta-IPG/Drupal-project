@@ -57,7 +57,7 @@ class FileValidator implements FileValidatorInterface {
     // Always check the insecure upload constraint.
     if (count($violations) === 0) {
       $insecureUploadConstraint = $this->constraintManager->create('FileExtensionSecure', []);
-      $insecureSvgUploadConstraint = $this->constraintManager->create('FileSvgXssConstraint', []);
+      $insecureSvgUploadConstraint = $this->constraintManager->create('FileSvgXss', []);
       $violations = $this->validator->validate($fileTypedData, [$insecureUploadConstraint, $insecureSvgUploadConstraint]);
     }
 
