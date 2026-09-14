@@ -162,7 +162,7 @@
             'activeTab',
             !activeTab || clickedTab !== activeTab ? clickedTab : null,
           );
-
+          this.model.trigger('change:activeTab');
           event.preventDefault();
           event.stopPropagation();
         }
