@@ -197,15 +197,18 @@ final class Settings implements ContainerInjectionInterface {
   /**
    * Return the active administration theme.
    *
-   * @return string
-   *   The active administration theme name.
+   * @return string|null
+   *   The active administration theme name, or NULL if it cannot be
+   *   determined. This is the case while Drupal is being installed, because
+   *   the system theme configuration does not exist yet. The theme settings
+   *   provider then falls back to the active theme.
    */
-  private function getAdminTheme(): string {
+  private function getAdminTheme(): ?string {
     $admin_theme = $this->configFactory->get('system.theme')->get('admin');
     if (empty($admin_theme)) {
       $admin_theme = $this->configFactory->get('system.theme')->get('default');
     }
-    return $admin_theme;
+    return $admin_theme ?: NULL;
   }
 
   /**
@@ -218,8 +221,8 @@ final class Settings implements ContainerInjectionInterface {
    *   The theme setting form elements.
    */
   public function getSettingsForm(?AccountInterface $account = NULL): array {
-    $experimental_label = ' <span class="gin-experimental-flag">Experimental</span>';
-    $beta_label = ' <span class="gin-beta-flag">Beta</span>';
+    $experimental_label = ' <span class="admin-experimental-flag">Experimental</span>';
+    $beta_label = ' <span class="admin-beta-flag">Beta</span>';
 
     $form['enable_dark_mode'] = [
       '#type' => 'radios',
@@ -292,7 +295,7 @@ final class Settings implements ContainerInjectionInterface {
       '#options' => [
         'gin' => $this->t('Default Admin Focus color (Default)'),
         'green' => $this->t('Green'),
-        'claro' => $this->t('Claro Green'),
+        'claro' => $this->t('Legacy green'),
         'orange' => $this->t('Orange'),
         'dark' => $this->t('Neutral'),
         'accent' => $this->t('Same as Accent color'),

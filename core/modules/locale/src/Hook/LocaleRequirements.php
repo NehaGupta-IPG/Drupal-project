@@ -10,6 +10,7 @@ use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\locale\LocaleSource;
+use Drupal\locale\LocaleLanguages;
 
 /**
  * Requirements for the Locale module.
@@ -20,6 +21,7 @@ class LocaleRequirements {
 
   public function __construct(
     protected LocaleSource $localeSource,
+    protected readonly LocaleLanguages $localeLanguages,
   ) {}
 
   /**
@@ -30,7 +32,7 @@ class LocaleRequirements {
     $requirements = [];
     $available_updates = [];
     $untranslated = [];
-    $languages = locale_translatable_language_list();
+    $languages = $this->localeLanguages->getTranslatableLanguages();
 
     if ($languages) {
       // Determine the status of the translation updates per language.
@@ -41,7 +43,7 @@ class LocaleRequirements {
             if (empty($project_info->type)) {
               $untranslated[$langcode] = $languages[$langcode]->getName();
             }
-            elseif ($project_info->type == LOCALE_TRANSLATION_LOCAL || $project_info->type == LOCALE_TRANSLATION_REMOTE) {
+            elseif ($project_info->isUpdateAvailable()) {
               $available_updates[$langcode] = $languages[$langcode]->getName();
             }
           }
