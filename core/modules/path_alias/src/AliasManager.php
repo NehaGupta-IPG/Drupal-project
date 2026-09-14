@@ -22,6 +22,14 @@ class AliasManager implements AliasManagerInterface {
   protected $lookupMap = [];
 
   /**
+   * Holds the map of alias lookups per language.
+   *
+   * Keyed by langcode then alias, storing the path a ::getPathByAlias()
+   * storage lookup resolved.
+   */
+  protected array $aliasLookupMap = [];
+
+  /**
    * Holds an array of aliases for which no path was found.
    *
    * @var array
@@ -87,14 +95,25 @@ class AliasManager implements AliasManagerInterface {
       return $alias;
     }
 
+    // Look for the alias within our own, previously resolved lookups.
+    if (isset($this->aliasLookupMap[$langcode][$alias])) {
+      return $this->aliasLookupMap[$langcode][$alias];
+    }
+
     // Look for the alias within the cached map.
     if (isset($this->lookupMap[$langcode]) && ($path = array_search($alias, $this->lookupMap[$langcode]))) {
       return $path;
     }
 
-    // Look for path in storage.
+    // Look for path in storage. The resolved path is memoized into
+    // $aliasLookupMap rather than $lookupMap: $lookupMap is keyed by
+    // langcode then path and is read directly by ::getAliasByPath(), but a
+    // storage hit here is only the canonical alias for its source when the
+    // caller happened to request the canonical one. Writing it into
+    // $lookupMap would let a stale, non-canonical alias answer a later
+    // ::getAliasByPath() call for the same source.
     if ($path_alias = $this->pathAliasRepository->lookupByAlias($alias, $langcode)) {
-      $this->lookupMap[$langcode][$path_alias['path']] = $path_alias['alias'];
+      $this->aliasLookupMap[$langcode][$alias] = $path_alias['path'];
       return $path_alias['path'];
     }
 
@@ -191,6 +210,11 @@ class AliasManager implements AliasManagerInterface {
     else {
       $this->lookupMap = [];
     }
+    // Unlike $lookupMap, $aliasLookupMap is keyed by alias rather than by
+    // $source, so it cannot be pruned by key the same way; reset it
+    // wholesale on every call, the same way $noPath and $noAlias already
+    // are below regardless of whether $source is given.
+    $this->aliasLookupMap = [];
     $this->noPath = [];
     $this->noAlias = [];
     $this->pathAliasPrefixListRebuild($source);

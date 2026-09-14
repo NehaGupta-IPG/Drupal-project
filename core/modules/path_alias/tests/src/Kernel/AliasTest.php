@@ -387,6 +387,31 @@ class AliasTest extends KernelTestBase {
   }
 
   /**
+   * Tests that ::getPathByAlias() does not poison ::getAliasByPath()'s cache.
+   *
+   * @legacy-covers \Drupal\path_alias\AliasManager::getPathByAlias
+   * @legacy-covers \Drupal\path_alias\AliasManager::getAliasByPath
+   */
+  public function testGetAliasByPathNotPoisonedByGetPathByAlias(): void {
+    $aliasManager = $this->container->get('path_alias.manager');
+
+    // Two aliases for the same, single-langcode source. The alias created
+    // last (highest id) is canonical: AliasRepository::lookupByAlias() and
+    // ::lookupBySystemPath() both order by id DESC once langcode ordering is
+    // equal, so a fresh, uncached call to either method returns '/new-alias'.
+    $this->createPathAlias('/user/1', '/old-alias');
+    $canonical_alias = $this->createPathAlias('/user/1', '/new-alias');
+
+    // Look up the OLDER, non-canonical alias by path first.
+    $this->assertEquals('/user/1', $aliasManager->getPathByAlias('/old-alias'), 'Reverse lookup of the older alias returns its source.');
+
+    // ::getAliasByPath() must still return the CANONICAL alias for this
+    // source, independent of the ::getPathByAlias() call above having
+    // resolved a different, older alias for the same path.
+    $this->assertEquals($canonical_alias->getAlias(), $aliasManager->getAliasByPath('/user/1'), 'Forward lookup returns the canonical alias, unaffected by an earlier reverse lookup of a different alias for the same source.');
+  }
+
+  /**
    * Tests the alias prefix.
    */
   public function testPrefixList(): void {
