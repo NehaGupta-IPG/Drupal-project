@@ -91,8 +91,8 @@ class ImporterLanguageTest extends KernelTestBase {
    *   The test cases.
    */
   public static function providerImportLanguage(): \Generator {
-    $french = 'Traduit en français';
-    $spanish = 'Traducido al español';
+    $french = 'Written in French';
+    $spanish = 'Written in Spanish';
     $english = 'Written in English';
 
     // The content's language is a language on the site and Drupal is not being
@@ -136,7 +136,7 @@ class ImporterLanguageTest extends KernelTestBase {
       TRUE, 'hu', ['hu'],
       [
         self::ENGLISH_UUID => ['hu', $english, []],
-        self::GERMAN_UUID => ['hu', 'Auf Deutsch geschrieben', []],
+        self::GERMAN_UUID => ['hu', 'Written in German', []],
       ],
     ];
   }
@@ -211,7 +211,7 @@ class ImporterLanguageTest extends KernelTestBase {
     $this->assertInstanceOf(ContentEntityInterface::class, $entity);
     // The Spanish translation became the default and brought its value along.
     $this->assertSame('es', $entity->language()->getId());
-    $this->assertSame('Solo en español', $entity->get('field_only_in_spanish')->value);
+    $this->assertSame('Only in Spanish', $entity->get('field_only_in_spanish')->value);
     // The English original never had a value in this field, so its translation
     // does not have one either.
     $this->assertTrue($entity->getTranslation('en')->get('field_only_in_spanish')->isEmpty());

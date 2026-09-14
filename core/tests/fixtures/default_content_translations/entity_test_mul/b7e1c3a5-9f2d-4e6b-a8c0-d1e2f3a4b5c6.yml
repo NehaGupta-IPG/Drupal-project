@@ -7,13 +7,13 @@ _meta:
 default:
   name:
     -
-      value: 'Auf Deutsch geschrieben'
+      value: 'Written in German'
 translations:
   fr:
     name:
       -
-        value: 'Traduit en français'
+        value: 'Written in French'
   es:
     name:
       -
-        value: 'Traducido al español'
+        value: 'Written in Spanish'

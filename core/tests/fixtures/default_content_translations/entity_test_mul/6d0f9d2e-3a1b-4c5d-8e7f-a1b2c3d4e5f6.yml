@@ -12,11 +12,11 @@ translations:
   fr:
     name:
       -
-        value: 'Traduit en français'
+        value: 'Written in French'
   es:
     name:
       -
-        value: 'Traducido al español'
+        value: 'Written in Spanish'
     field_only_in_spanish:
       -
-        value: 'Solo en español'
+        value: 'Only in Spanish'
