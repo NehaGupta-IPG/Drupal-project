@@ -85,6 +85,7 @@ function toolbar_get_rendered_subtrees() {
  */
 function _toolbar_get_subtrees_hash() {
   [$subtrees, $cacheability] = toolbar_get_rendered_subtrees();
-  $hash = Crypt::hashBase64(serialize($subtrees));
+  $modules = \Drupal::service('extension.list.module')->getAllInstalledInfo();
+  $hash = Crypt::hashBase64(serialize(array_keys(array_merge($subtrees, $modules))));
   return [$hash, $cacheability];
 }
