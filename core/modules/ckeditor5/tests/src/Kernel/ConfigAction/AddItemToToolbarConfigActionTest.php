@@ -69,10 +69,15 @@ class AddItemToToolbarConfigActionTest extends KernelTestBase {
   /**
    * Tests add item to toolbar.
    *
+   * A divider and a wrapping separator are toolbar items in their own right,
+   * so adding one must be saved to the editor.
+   *
    * @param string|array<string, mixed> $action
    *   The value to pass to the config action.
    * @param string[] $expected_toolbar_items
    *   The items which should be in the editor toolbar, in the expected order.
+   *
+   * @see https://www.drupal.org/i/3465033
    */
   #[TestWith(["sourceEditing", ["heading", "bold", "italic", "sourceEditing"]])]
   #[TestWith([["item_name" => "sourceEditing"], ["heading", "bold", "italic", "sourceEditing"]])]
@@ -83,6 +88,12 @@ class AddItemToToolbarConfigActionTest extends KernelTestBase {
   ])]
   #[TestWith([["item_name" => "bold"], ["heading", "bold", "italic"]])]
   #[TestWith([["item_name" => "bold", "allow_duplicate" => TRUE], ["heading", "bold", "italic", "bold"]])]
+  #[TestWith(["|", ["heading", "bold", "italic", "|"]])]
+  #[TestWith([["item_name" => "|"], ["heading", "bold", "italic", "|"]])]
+  #[TestWith([["item_name" => "|", "position" => 1], ["heading", "|", "bold", "italic"]])]
+  #[TestWith(["-", ["heading", "bold", "italic", "-"]])]
+  #[TestWith([["item_name" => "-"], ["heading", "bold", "italic", "-"]])]
+  #[TestWith([["item_name" => "-", "position" => 1], ["heading", "-", "bold", "italic"]])]
   public function testAddItemToToolbar(string|array $action, array $expected_toolbar_items): void {
     $recipe = $this->createRecipe([
       'name' => 'CKEditor 5 toolbar item test',
@@ -104,6 +115,36 @@ class AddItemToToolbarConfigActionTest extends KernelTestBase {
     if (in_array('sourceEditing', $expected_toolbar_items, TRUE)) {
       $this->assertSame([], $settings['plugins']['ckeditor5_sourceEditing']['allowed_tags']);
     }
+  }
+
+  /**
+   * Tests that separators are not treated as duplicates of one another.
+   *
+   * A toolbar can legitimately carry several dividers and several wrapping
+   * separators, so neither is subject to the duplicate check.
+   *
+   * @see https://www.drupal.org/i/3465033
+   */
+  #[TestWith(["|"])]
+  #[TestWith(["-"])]
+  public function testSeparatorsAreNeverDuplicates(string $item_name): void {
+    foreach ([1, 2] as $run) {
+      $recipe = $this->createRecipe([
+        'name' => "CKEditor 5 separator test $run",
+        'config' => [
+          'actions' => [
+            'editor.editor.filter_test' => [
+              'addItemToToolbar' => $item_name,
+            ],
+          ],
+        ],
+      ]);
+      RecipeRunner::processRecipe($recipe);
+    }
+
+    /** @var array{toolbar: array{items: string[]}} $settings */
+    $settings = Editor::load('filter_test')?->getSettings();
+    $this->assertSame(['heading', 'bold', 'italic', $item_name, $item_name], $settings['toolbar']['items']);
   }
 
   /**
