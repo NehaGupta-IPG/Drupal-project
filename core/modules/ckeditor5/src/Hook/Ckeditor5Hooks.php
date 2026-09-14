@@ -522,10 +522,10 @@ class Ckeditor5Hooks {
     $response = new AjaxResponse();
 
     // Replace the editor settings with the settings for the currently selected
-    // editor. This is the default behavior of editor.module. Except when using
-    // CKEditor 5: then we only want CKEditor 5's plugin settings to be updated:
-    // the client side-rendered admin UI would otherwise be dependent on network
-    // latency.
+    // editor. This is the default behavior of the editor module. Except when
+    // using CKEditor 5: then we only want CKEditor 5's plugin settings to be
+    // updated: the client side-rendered admin UI would otherwise be dependent
+    // on network latency.
     $renderedField = $this->renderer->render($form['editor']['settings']);
     if ($form_state->get('ckeditor5_is_active') && $form_state->get('ckeditor5_is_selected')) {
       $plugin_settings_markup = $form['editor']['settings']['subform']['plugin_settings']['#markup'];

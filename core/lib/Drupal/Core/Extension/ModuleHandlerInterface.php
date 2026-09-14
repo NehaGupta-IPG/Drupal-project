@@ -98,7 +98,7 @@ interface ModuleHandlerInterface {
    * Determines whether a given module is enabled.
    *
    * @param string $module
-   *   The name of the module (without the .module extension).
+   *   The name of the module (without the .info.yml extension).
    *
    * @return bool
    *   TRUE if the module is both installed and enabled.
@@ -189,7 +189,7 @@ interface ModuleHandlerInterface {
    * are void or an array. Arrays will be merged with NestedArray::mergeDeep.
    *
    * @param string $module
-   *   The name of the module (without the .module extension).
+   *   The name of the module (without the .info.yml extension).
    * @param string $hook
    *   The name of the hook to invoke.
    * @param array $args
@@ -228,7 +228,7 @@ interface ModuleHandlerInterface {
    * @param string $description
    *   Helpful text describing what to do instead of implementing this hook.
    * @param string $module
-   *   The name of the module (without the .module extension).
+   *   The name of the module (without the .info.yml extension).
    * @param string $hook
    *   The name of the hook to invoke.
    * @param array $args

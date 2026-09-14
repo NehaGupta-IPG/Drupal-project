@@ -20,7 +20,7 @@ class ModuleWeight {
    * The weight of uninstalled modules cannot be changed.
    *
    * @param string $module
-   *   The name of the module (without the .module extension).
+   *   The name of the module (without the .info.yml extension).
    * @param int $weight
    *   An integer representing the weight of the module.
    */

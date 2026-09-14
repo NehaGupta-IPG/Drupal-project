@@ -33,7 +33,7 @@ class FileThemeHooks {
   #[Hook('theme')]
   public function theme(): array {
     return [
-      // From file.module.
+      // From the file module.
       'file_link' => [
         'variables' => [
           'file' => NULL,

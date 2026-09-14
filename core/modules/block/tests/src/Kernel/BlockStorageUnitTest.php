@@ -153,7 +153,7 @@ class BlockStorageUnitTest extends KernelTestBase {
     $this->assertEmpty($entities, 'There are no blocks initially.');
     \Drupal::service('theme_installer')->install(['stark']);
 
-    // Install the block_test.module, so that its default config is installed.
+    // Install the block_test module, so that its default config is installed.
     $this->installConfig(['block_test']);
 
     $entities = Block::loadMultiple();

@@ -1,6 +1,6 @@
 /**
  * @file
- * JavaScript for locale_test.module.
+ * JavaScript for the locale_test module.
  *
  * @ignore
  */

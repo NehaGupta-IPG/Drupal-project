@@ -48,7 +48,7 @@ class FrontPageTest extends BrowserTestBase {
 
     // Configure the created node as front page.
     $this->config('system.site')->set('page.front', '/' . $this->nodePath)->save();
-    // Enable front page logging in system_test.module.
+    // Enable front page logging in the system_test module.
     \Drupal::state()->set('system_test.front_page_output', 1);
   }
 
