@@ -43,14 +43,14 @@ class ImageFieldWidgetTest extends ImageFieldTestBase {
     $this->assertSession()->pageTextNotContains('Image test on [site:name]');
 
     // Check for allowed image file extensions - default.
-    $this->assertSession()->pageTextContains('Allowed types: png gif jpg jpeg webp.');
+    $this->assertSession()->pageTextContains('Allowed types: png gif jpg jpeg webp avif.');
 
     // Try adding to the field config an unsupported extension, should not
     // appear in the allowed types.
     $field_config = FieldConfig::loadByName('node', 'article', $field_name);
-    $field_config->setSetting('file_extensions', 'png gif jpg jpeg webp tiff')->save();
+    $field_config->setSetting('file_extensions', 'png gif jpg jpeg webp avif tiff')->save();
     $this->drupalGet('node/add/article');
-    $this->assertSession()->pageTextContains('Allowed types: png gif jpg jpeg webp.');
+    $this->assertSession()->pageTextContains('Allowed types: png gif jpg jpeg webp avif.');
 
     // Add a supported extension and remove some supported ones, we should see
     // the intersect of those entered in field config with those supported.
