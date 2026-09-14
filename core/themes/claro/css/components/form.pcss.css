@@ -82,7 +82,7 @@ tr .form-item,
 .form-item__description {
   margin-block: calc(6rem / 16); /* 6px */
   color: var(--input-fg-color--description);
-  font-size: var(--font-size-xs); /* ~13px */
+  font-size: var(--font-size-s); /* ~14px */
   line-height: calc(17rem / 16); /* 17px */
 
   &.is-disabled {
