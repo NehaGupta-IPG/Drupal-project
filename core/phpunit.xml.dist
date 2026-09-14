@@ -134,6 +134,11 @@
       <directory>../profiles/*/**/tests/src/FunctionalJavascript</directory>
       <directory>../themes/*/**/tests/src/FunctionalJavascript</directory>
     </testsuite>
+    <testsuite name="issue-3338664">
+      <file>modules/navigation/tests/src/FunctionalJavascript/AccessibilityTest.php</file>
+      <file>themes/default_admin/tests/src/FunctionalJavascript/AccessibilityTest.php</file>
+      <file>themes/stark/tests/src/FunctionalJavascript/AccessibilityTest.php</file>
+    </testsuite>
     <testsuite name="build">
       <directory>tests/Drupal/BuildTests</directory>
       <directory>modules/**/tests/src/Build</directory>
