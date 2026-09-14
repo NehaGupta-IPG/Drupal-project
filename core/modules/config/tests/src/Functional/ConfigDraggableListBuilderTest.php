@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\Group;
@@ -49,7 +48,7 @@ class ConfigDraggableListBuilderTest extends BrowserTestBase {
     $this->assertSession()->titleEquals('Roles | Drupal');
 
     // Count the number of rows in table.
-    $rows = $this->xpath('//form[@class="user-admin-roles-form"]/table/tbody/tr');
+    $rows = $this->getNodeElementsByXpath('//form[@class="user-admin-roles-form"]/table/tbody/tr');
     $this->assertGreaterThan(50, count($rows));
     for ($i = 0; $i < 51; $i++) {
       $this->assertSession()->pageTextContains("Role $i");
@@ -60,7 +59,8 @@ class ConfigDraggableListBuilderTest extends BrowserTestBase {
     $role->set('label', $role_name)->save();
 
     $this->drupalGet('admin/people/roles');
-    $this->assertSession()->responseContains('<td>' . Html::escape($role_name));
+    $roleElementLabel = $this->cssSelect('td[data-drupal-wrapper-selector="edit-entities-role-0-label"]');
+    $this->assertEquals($role_name, $roleElementLabel[0]->getText());
   }
 
 }

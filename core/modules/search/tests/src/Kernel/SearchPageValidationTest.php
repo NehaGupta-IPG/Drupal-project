@@ -9,6 +9,7 @@ use Drupal\search\Entity\SearchPage;
 use Drupal\search\Plugin\Derivative\SearchLocalTask;
 use Drupal\search\SearchPageRepository;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -17,13 +18,14 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('search')]
 #[Group('config')]
 #[Group('Validation')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchPageValidationTest extends ConfigEntityValidationTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['search', 'user'];
+  protected static $modules = ['search', 'search_user', 'user'];
 
   /**
    * {@inheritdoc}
