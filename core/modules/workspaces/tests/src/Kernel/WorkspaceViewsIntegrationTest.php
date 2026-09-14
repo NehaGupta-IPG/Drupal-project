@@ -486,9 +486,14 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
     $view->execute();
 
     // In the workspace 2 of the 3 nodes are sticky, so SUM(sticky) is 2 and the
-    // 'page' group passes the HAVING condition. With live values SUM(sticky) is
-    // 1 and the group would be filtered out.
+    // 'page' group passes the HAVING condition.
     $this->assertCount(1, $view->result);
+
+    // With the live values SUM(sticky) is 1, so the group is filtered out.
+    $this->switchToLive();
+    $view = Views::getView('workspace_having_sum');
+    $view->execute();
+    $this->assertEmpty($view->result);
   }
 
   /**

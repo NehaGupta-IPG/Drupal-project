@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\workspaces\Hook;
 
 use Drupal\Core\Database\Query\ConditionInterface;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -300,7 +301,10 @@ class ViewsOperations {
    *   The names of the revisionable fields of the entity type.
    */
   protected function rewriteConditionField(mixed &$field, Sql $query, EntityTypeInterface $entity_type, array $relationships, array $revisionable_fields): void {
-    if ($field instanceof ConditionInterface) {
+    // A subquery is a condition object too, but its table aliases belong to the
+    // subquery. Rewriting a field inside it would point at a revision table
+    // that only exists in the outer query, so leave subqueries alone.
+    if ($field instanceof ConditionInterface && !$field instanceof SelectInterface) {
       // Changing the array in place doesn't mark the condition as changed, so
       // this relies on Views compiling conditions after the alter runs.
       $conditions = &$field->conditions();
