@@ -7,7 +7,9 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\InvalidQueryException;
+use Drupal\Core\Database\Query\DatabaseAbstractSelect;
 use Drupal\Core\Database\Query\SelectExtender;
+use Drupal\Core\Database\Query\SelectInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,33 +21,77 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class SelectTest extends DatabaseTestBase {
 
+  protected function resetUniqueIdentifiers(SelectInterface $select): void {
+    $main = new \ReflectionProperty($select, 'uniqueIdentifier');
+    $main->setValue($select, NULL);
+
+    $tables = new \ReflectionProperty($select, 'tables');
+    $tablesArray = $tables->getValue($select);
+    foreach ($tablesArray as $key => $value) {
+      if ($value['table'] instanceof SelectInterface) {
+        $tmp = new \ReflectionProperty($value['table'], 'uniqueIdentifier');
+        $tmp->setValue($value['table'], NULL);
+      }
+    }
+    $tables->setValue($select, $tablesArray);
+
+  }
+
   /**
    * Tests rudimentary SELECT statements.
    */
   public function testSimpleSelect(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $abstractQuery->addColumn('test', 'name');
+    $abstractQuery->addColumn('test', 'age', 'age');
+    $abstractQuery = $abstractQuery->countQuery();
+
     $query = $this->connection->select('test');
     $query->addField('test', 'name');
     $query->addField('test', 'age', 'age');
-    $num_records = $query->countQuery()->execute()->fetchField();
+    $query = $query->countQuery();
 
-    $this->assertEquals(4, $num_records, 'Returned the correct number of rows.');
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedResult = $hydratedQuery->execute()->fetchField();
+    $result = $query->execute()->fetchField();
+    $this->assertEquals($result, $hydratedResult);
+
+    $this->assertEquals(4, $result, 'Returned the correct number of rows.');
   }
 
   /**
    * Tests rudimentary SELECT statement with a COMMENT.
    */
   public function testSimpleComment(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test')->comment('Testing query comments');
+    $abstractQuery->addColumn('test', 'name');
+    $abstractQuery->addColumn('test', 'age', 'age');
+
     $query = $this->connection->select('test')->comment('Testing query comments');
     $query->addField('test', 'name');
     $query->addField('test', 'age', 'age');
-    $result = $query->execute();
 
-    $records = $result->fetchAll();
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $result = $hydratedQuery->execute();
+
+    $hydratedResultRecords = $hydratedQuery->execute()->fetchAll();
+    $resultRecords = $query->execute()->fetchAll();
+    $this->assertEquals($resultRecords, $hydratedResultRecords);
 
     $query = (string) $query;
     $expected = "/* Testing query comments */";
 
-    $this->assertCount(4, $records, 'Returned the correct number of rows.');
+    $this->assertCount(4, $resultRecords, 'Returned the correct number of rows.');
     $this->assertStringContainsString($expected, $query, 'The flattened query contains the comment string.');
   }
 
@@ -53,18 +99,29 @@ class SelectTest extends DatabaseTestBase {
    * Tests query COMMENT system against vulnerabilities.
    */
   public function testVulnerableComment(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test')->comment('Testing query comments */ SELECT nid FROM {node}; --');
+    $abstractQuery->addColumn('test', 'name');
+    $abstractQuery->addColumn('test', 'age', 'age');
+
     $query = $this->connection->select('test')->comment('Testing query comments */ SELECT nid FROM {node}; --');
     $query->addField('test', 'name');
     $query->addField('test', 'age', 'age');
-    $result = $query->execute();
 
-    $records = $result->fetchAll();
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedResultRecords = $hydratedQuery->execute()->fetchAll();
+    $resultRecords = $query->execute()->fetchAll();
+    $this->assertEquals($resultRecords, $hydratedResultRecords);
 
     $query = (string) $query;
     $expected = "/* Testing query comments  * / SELECT nid FROM {node}. -- */";
 
     // Check the returned number of rows.
-    $this->assertCount(4, $records);
+    $this->assertCount(4, $resultRecords);
     // Check that the flattened query contains the sanitized comment string.
     $this->assertStringContainsString($expected, $query);
 
@@ -110,20 +167,39 @@ class SelectTest extends DatabaseTestBase {
    * Tests basic conditionals on SELECT statements.
    */
   public function testSimpleSelectConditional(): void {
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $abstractQueryNameField = $abstractQuery->addColumn('test', 'name');
+    $abstractQueryAgeField = $abstractQuery->addColumn('test', 'age', 'age');
+    $abstractQuery->condition('age', 27);
+
     $query = $this->connection->select('test');
     $name_field = $query->addField('test', 'name');
     $age_field = $query->addField('test', 'age', 'age');
     $query->condition('age', 27);
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedResult = $hydratedQuery->execute();
     $result = $query->execute();
+    $this->assertEquals($result, $hydratedResult);
 
     // Check that the aliases are being created the way we want.
     $this->assertEquals('name', $name_field, 'Name field alias is correct.');
     $this->assertEquals('age', $age_field, 'Age field alias is correct.');
+    $this->assertEquals($name_field, $abstractQueryNameField);
+    $this->assertEquals($age_field, $abstractQueryAgeField);
 
     // Ensure that we got the right record.
+    $hydratedRecord = $hydratedResult->fetch();
     $record = $result->fetch();
     $this->assertEquals('George', $record->{$name_field}, 'Fetched name is correct.');
     $this->assertEquals(27, $record->{$age_field}, 'Fetched age is correct.');
+    $this->assertEquals($record->{$name_field}, $record->{$abstractQueryNameField});
+    $this->assertEquals($record->{$age_field}, $record->{$abstractQueryAgeField});
   }
 
   /**

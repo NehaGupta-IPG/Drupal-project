@@ -12,8 +12,6 @@ use Drupal\Core\Database\Expression;
  */
 final class DatabaseAbstractSelect {
 
-  use QueryConditionTrait;
-
   /**
    * The placeholder counter.
    */
@@ -25,6 +23,15 @@ final class DatabaseAbstractSelect {
    * @var list<string>
    */
   protected array $comments = [];
+
+  // ------------------------------------------------------
+
+  /**
+   * The condition object for this query.
+   *
+   * Condition handling is handled via composition.
+   */
+  public protected(set) DatabaseAbstractCondition $condition;
 
   // ------------------------------------------------------
 
@@ -88,12 +95,12 @@ final class DatabaseAbstractSelect {
   /**
    * The conditional object for the HAVING clause.
    */
-  protected DatabaseAbstractCondition $having;
+  public protected(set) DatabaseAbstractCondition $having;
 
   /**
    * Whether or not this query should be DISTINCT.
    */
-  protected bool $distinct = FALSE;
+  public protected(set) bool $distinct = FALSE;
 
   /**
    * The range limiters for this query.
@@ -119,8 +126,9 @@ final class DatabaseAbstractSelect {
   /**
    * The FOR UPDATE status.
    */
-  protected bool $forUpdate = FALSE;
+  public protected(set) bool $forUpdate = FALSE;
 
+  // ------------------------------------------------------
   // ------------------------------------------------------
 
   /**
@@ -186,10 +194,10 @@ final class DatabaseAbstractSelect {
   public function __construct(
     string|DatabaseAbstractSelect $table,
     ?string $alias = NULL,
-    string $conjunction = 'AND',
+    public readonly string $conjunction = 'AND',
   ) {
-    $this->condition = new DatabaseAbstractCondition($conjunction);
-    $this->having = new DatabaseAbstractCondition($conjunction);
+    // $this->condition = new DatabaseAbstractCondition($conjunction);
+    // $this->having = new DatabaseAbstractCondition($conjunction);
     $this->addJoin(NULL, $table, $alias);
   }
 
@@ -244,7 +252,7 @@ final class DatabaseAbstractSelect {
    * {@inheritdoc}
    */
   public function &havingConditions() {
-    return $this->having->conditions();
+    return $this->having?->conditions();
   }
 
   /**
@@ -602,7 +610,7 @@ final class DatabaseAbstractSelect {
     $count = clone($this);
 
     $group_by = $count->getGroupBy();
-    $having = $count->havingConditions();
+    $having = isset($this->having) ? $count->havingConditions() : NULL;
 
     if (!$count->distinct && !isset($having[0])) {
       // When not executing a distinct query, we can zero-out existing fields
@@ -653,6 +661,134 @@ final class DatabaseAbstractSelect {
     }
 
     return $count;
+  }
+
+  // ------------------------------------------------------
+
+  /**
+   * {@inheritdoc}
+   */
+  public function condition($field, $value = NULL, $operator = '=') {
+    if (!isset($this->condition)) {
+      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+    }
+    $this->condition->condition($field, $value, $operator);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isNull($field) {
+    if (!isset($this->condition)) {
+      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+    }
+    $this->condition->isNull($field);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isNotNull($field) {
+    if (!isset($this->condition)) {
+      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+    }
+    $this->condition->isNotNull($field);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function exists(SelectInterface $select) {
+    $this->condition->exists($select);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function notExists(SelectInterface $select) {
+    $this->condition->notExists($select);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function alwaysFalse() {
+    if (!isset($this->condition)) {
+      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+    }
+    $this->condition->alwaysFalse();
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function &conditions() {
+    if (!isset($this->condition)) {
+      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+    }
+    return $this->condition->conditions();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function conditionArguments() {
+    if (!isset($this->condition)) {
+      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+    }
+    return $this->condition->arguments();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function where($snippet, $args = []) {
+    if (!isset($this->condition)) {
+      $this->condition = new DatabaseAbstractCondition($this->conjunction);
+    }
+    $this->condition->where($snippet, $args);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function compile(Connection $connection, PlaceholderInterface $queryPlaceholder) {
+    $this->condition->compile($connection, $queryPlaceholder);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function compiled() {
+    return $this->condition->compiled();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function conditionGroupFactory($conjunction = 'AND') {
+    return $this->connection->condition($conjunction);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function andConditionGroup() {
+    return $this->conditionGroupFactory('AND');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function orConditionGroup() {
+    return $this->conditionGroupFactory('OR');
   }
 
 }

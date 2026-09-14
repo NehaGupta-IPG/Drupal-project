@@ -19,30 +19,30 @@ class DatabaseAbstractSelectTest extends UnitTestCase {
    * Tests rudimentary SELECT statements.
    */
   public function testSimpleSelect(): void {
-    $query = new DatabaseAbstractSelect('test');
-    $query->addColumn('test', 'name');
-    $query->addColumn('test', 'age', 'age');
-    dump($query->countQuery());
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $abstractQuery->addColumn('test', 'name');
+    $abstractQuery->addColumn('test', 'age', 'age');
+    dump($abstractQuery->countQuery());
   }
 
   /**
    * Tests rudimentary SELECT statement with a COMMENT.
    */
   public function testSimpleComment(): void {
-    $query = new DatabaseAbstractSelect('test')->comment('Testing query comments');
-    $query->addColumn('test', 'name');
-    $query->addColumn('test', 'age', 'age');
-    dump($query);
+    $abstractQuery = new DatabaseAbstractSelect('test')->comment('Testing query comments');
+    $abstractQuery->addColumn('test', 'name');
+    $abstractQuery->addColumn('test', 'age', 'age');
+    dump($abstractQuery);
   }
 
   /**
    * Tests query COMMENT system against vulnerabilities.
    */
   public function testVulnerableComment(): void {
-    $query = new DatabaseAbstractSelect('test')->comment('Testing query comments */ SELECT nid FROM {node}; --');
-    $query->addColumn('test', 'name');
-    $query->addColumn('test', 'age', 'age');
-    dump($query);
+    $abstractQuery = new DatabaseAbstractSelect('test')->comment('Testing query comments */ SELECT nid FROM {node}; --');
+    $abstractQuery->addColumn('test', 'name');
+    $abstractQuery->addColumn('test', 'age', 'age');
+    dump($abstractQuery);
   }
 
   /**
@@ -80,33 +80,33 @@ class DatabaseAbstractSelectTest extends UnitTestCase {
    * Tests basic conditionals on SELECT statements.
    */
   public function testSimpleSelectConditional(): void {
-    $query = new DatabaseAbstractSelect('test');
-    $name_field = $query->addColumn('test', 'name');
-    $age_field = $query->addColumn('test', 'age', 'age');
-    $query->condition('age', 27);
-    dump($query);
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $name_field = $abstractQuery->addColumn('test', 'name');
+    $age_field = $abstractQuery->addColumn('test', 'age', 'age');
+    $abstractQuery->condition('age', 27);
+    dump($abstractQuery);
   }
 
   /**
    * Tests SELECT statements with expressions.
    */
   public function testSimpleSelectExpression(): void {
-    $query = new DatabaseAbstractSelect('test');
-    $name_field = $query->addColumn('test', 'name');
-    $age_field = $query->addExpression("[age]*2", 'double_age');
-    $query->condition('age', 27);
-    dump($query);
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $name_field = $abstractQuery->addColumn('test', 'name');
+    $age_field = $abstractQuery->addExpression("[age]*2", 'double_age');
+    $abstractQuery->condition('age', 27);
+    dump($abstractQuery);
   }
 
   /**
    * Tests SELECT statements with multiple expressions.
    */
   public function testSimpleSelectExpressionMultiple(): void {
-    $query = new DatabaseAbstractSelect('test');
-    $name_field = $query->addColumn('test', 'name');
-    $age_double_field = $query->addExpression("[age]*2");
-    $age_triple_field = $query->addExpression("[age]*3");
-    $query->condition('age', 27);
+    $abstractQuery = new DatabaseAbstractSelect('test');
+    $name_field = $abstractQuery->addColumn('test', 'name');
+    $age_double_field = $abstractQuery->addExpression("[age]*2");
+    $age_triple_field = $abstractQuery->addExpression("[age]*3");
+    $abstractQuery->condition('age', 27);
     dump($query);
   }
 

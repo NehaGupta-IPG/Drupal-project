@@ -134,7 +134,7 @@ class Select extends Query implements SelectInterface {
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   Database connection object.
-   * @param string|\Drupal\Core\Database\Query\SelectInterface $table
+   * @param string|\Drupal\Core\Database\Query\SelectInterface|\Drupal\Core\Database\Query\DatabaseAbstractSelect $table
    *   The table name or subquery that is being queried.
    * @param string $alias
    *   The alias for the table.
@@ -146,7 +146,29 @@ class Select extends Query implements SelectInterface {
     $conjunction = $options['conjunction'] ?? 'AND';
     $this->condition = $this->connection->condition($conjunction);
     $this->having = $this->connection->condition($conjunction);
+    if ($table instanceof DatabaseAbstractSelect) {
+      $this->createFromAbstractSelect($table, $alias);
+      return;
+    }
     $this->addJoin(NULL, $table, $alias);
+  }
+
+  protected function createFromAbstractSelect(DatabaseAbstractSelect $abstractSelect, ?string $alias): void {
+    $this->comments = $abstractSelect->getComments();
+    foreach ($abstractSelect->getTables() as $key => $table) {
+      $this->tables[$key] = $table;
+      if ($table['table'] instanceof DatabaseAbstractSelect) {
+        $this->tables[$key]['table'] = $this->connection->select($table['table']);
+      }
+    }
+    $this->fields = $abstractSelect->getColumns();
+    foreach ($abstractSelect->getExpressions() as $key => $expression) {
+      $this->expressions[$key] = [
+        'expression' => $expression->expression,
+        'arguments' => $expression->arguments,
+        'alias' => $expression->alias,
+      ];
+    }
   }
 
   /**
