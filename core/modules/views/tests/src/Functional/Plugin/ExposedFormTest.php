@@ -609,7 +609,7 @@ class ExposedFormTest extends ViewTestBase {
   protected function assertNoDuplicateIds(): void {
     $args = ['@url' => $this->getUrl()];
 
-    if (!$elements = $this->xpath('//*[@id]')) {
+    if (!$elements = $this->getNodeElementsByXpath('//*[@id]')) {
       $this->fail((string) new FormattableMarkup('The page @url contains no HTML IDs.', $args));
       return;
     }
