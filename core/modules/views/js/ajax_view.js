@@ -86,20 +86,18 @@
       queryString = queryString.slice(1);
 
       // Remove current exposed filters.
-      const params = decodeURI(queryString)
-        .split('&')
-        .filter((param) => {
-          const [name, value] = param.split('=');
-          return (
-            this.$exposed_form.find(`input[name="${name}"]`).length === 0 &&
-            /*
-            Submitting filters should reset paging and sorting
-            because that is what happens without AJAX.
-             */
-            !['page', 'reset', 'sort', 'order', 'q', 'render'].includes(name)
-          );
-        });
-      queryString = encodeURI(params.join('&'));
+      const params = queryString.split('&').filter((param) => {
+        const name = decodeURIComponent(param.split('=')[0]);
+        /**
+         * Submitting filters should reset paging and sorting
+         * because that is what happens without AJAX.
+         */
+        return (
+          this.$exposed_form.find(`[name="${name}"]`).length === 0 && 
+          !['page', 'reset', 'sort', 'order', 'q', 'render'].includes(name)
+        );
+      });
+      queryString = params.join('&');
       // If there is a '?' in ajaxPath, clean URL are on and & should be
       // used to add parameters.
       if (queryString !== '') {
@@ -233,9 +231,8 @@
    *   URL to be set.
    */
   Drupal.AjaxCommands.prototype.setBrowserUrl = (ajax, response) => {
-    // Do not change browser URL if we are in a dialog wrapper.
-    if (ajax.element && !ajax.element.closest('.ui-dialog-content')) {
-      window.history.replaceState(null, '', response.url);
-    }
+    // Intentionally disabled: the replaceState URL update introduced in
+    // Drupal 11.3 (issue #343535) changes browser URL on every AJAX filter
+    // interaction, which is undesirable for this site's UX.
   };
 })(jQuery, Drupal, drupalSettings);
