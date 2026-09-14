@@ -354,12 +354,12 @@ class ExtensionDiscovery {
     // The result of this multisort can be depicted like the following matrix,
     // whereas the first integer is the weight of the originating directory and
     // the second is the weight of the originating installation profile:
-    // 0   core/modules/node/node.module
-    // 1 0 profiles/parent_profile/modules/parent_module/parent_module.module
-    // 1 1 core/profiles/testing/modules/compatible_test/compatible_test.module
-    // 2   sites/all/modules/common/common.module
-    // 3   modules/devel/devel.module
-    // 4   sites/default/modules/custom/custom.module
+    // 0   core/modules/node/node.info.yml
+    // 1 0 profiles/parent_profile/modules/parent_module/parent_module.info.yml
+    // 1 1 core/profiles/testing/modules/profile_test/profile_test.info.yml
+    // 2   sites/all/modules/common/common.info.yml
+    // 3   modules/devel/devel.info.yml
+    // 4   sites/default/modules/custom/custom.info.yml
     array_multisort($origins, SORT_ASC, $profiles, SORT_ASC, $all_files);
 
     return $all_files;

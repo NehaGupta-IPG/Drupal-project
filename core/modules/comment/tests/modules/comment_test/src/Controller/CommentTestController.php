@@ -8,7 +8,7 @@ use Drupal\comment\CommentInterface;
 use Drupal\Core\Controller\ControllerBase;
 
 /**
- * Controller for the comment_test.module.
+ * Controller for the comment_test module.
  */
 class CommentTestController extends ControllerBase {
 

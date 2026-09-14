@@ -298,7 +298,7 @@ class DbUpdateController extends ControllerBase {
       '#type' => 'details',
     ];
 
-    // Ensure system.module's updates appear first.
+    // Ensure the system module's updates appear first.
     $build['start']['system'] = [];
 
     $starting_updates = [];
@@ -456,7 +456,7 @@ class DbUpdateController extends ControllerBase {
       $last = $session->get('updates_remaining');
       $last = reset($last);
       [$module, $version] = array_pop($last);
-      $message = '<p class="error">' . $this->t('The update process was aborted prematurely while running <strong>update #@version in @module.module</strong>.', [
+      $message = '<p class="error">' . $this->t('The update process was aborted prematurely while running <strong>update #@version in @module</strong>.', [
         '@version' => $version,
         '@module' => $module,
       ]) . ' ' . $log_message;

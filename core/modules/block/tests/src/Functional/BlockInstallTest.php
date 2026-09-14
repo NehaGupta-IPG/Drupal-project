@@ -34,7 +34,7 @@ class BlockInstallTest extends BrowserTestBase {
     $this->rebuildContainer();
     $this->drupalPlaceBlock('system_powered_by_block');
 
-    // Check the same page, block.module's hook_install() should have
+    // Check the same page, the block module's hook_install() should have
     // invalidated the 'rendered' cache tag to make blocks show up.
     $this->drupalGet('');
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:block_list');

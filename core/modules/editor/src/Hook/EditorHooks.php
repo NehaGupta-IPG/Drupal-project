@@ -297,14 +297,14 @@ class EditorHooks {
     if (empty($usage_list['editor']) && ($file->isPermanent() || $file->getOwnerId() != \Drupal::currentUser()->id())) {
       return NULL;
     }
-    // Editor.module MUST NOT call $file->access() here (like
+    // The editor module MUST NOT call $file->access() here (like
     // file_file_download() does) as checking the 'download' access to a file
     // entity would end up in FileAccessControlHandler->checkAccess() and
     // \Drupal\file\FileReferenceResolver::getReferences(). This
-    // latter one would allow downloading files only handled by the file.module,
-    // which is exactly not the case right here. So instead we must check if the
-    // current user is allowed to view any of the entities that reference the
-    // image using the 'editor' module.
+    // latter one would allow downloading files only handled by the file
+    // module, which is exactly not the case right here. So instead we must
+    // check if the current user is allowed to view any of the entities that
+    // reference the image using the 'editor' module.
     if ($file->isPermanent()) {
       $referencing_entity_is_accessible = FALSE;
       $references = empty($usage_list['editor']) ? [] : $usage_list['editor'];

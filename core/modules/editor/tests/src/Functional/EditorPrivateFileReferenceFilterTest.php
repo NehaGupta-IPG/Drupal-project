@@ -24,7 +24,7 @@ class EditorPrivateFileReferenceFilterTest extends BrowserTestBase {
    */
   protected static $modules = [
     'editor_test',
-    // Depends on filter.module (indirectly).
+    // Depends on the filter module (indirectly).
     'node',
     // Pulls in the config we're using during testing which create a text format
     // - with the filter_html_image_secure filter DISABLED,

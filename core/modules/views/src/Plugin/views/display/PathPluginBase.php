@@ -323,7 +323,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     $links = [];
 
     // Replace % with the link to our standard views argument loader
-    // views_arg_load -- which lives in views.module.
+    // views_arg_load -- which lives in the views module.
 
     $bits = explode('/', $this->getOption('path'));
 

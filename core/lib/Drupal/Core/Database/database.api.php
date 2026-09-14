@@ -291,7 +291,7 @@ use Drupal\Core\Database\SchemaDefinition\Table;
  *   $connection = Database::getConnection();
  *   $query = $connection->query('...');
  *   @endcode
- * In procedural code, such as *.module, *.inc or script files:
+ * In procedural code, such as script files:
  * - Use \Drupal::database(); to get database connection.
  *   @code
  *   $connection = \Drupal::database();

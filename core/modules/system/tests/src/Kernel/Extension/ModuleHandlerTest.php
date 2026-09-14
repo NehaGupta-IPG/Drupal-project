@@ -317,7 +317,7 @@ class ModuleHandlerTest extends KernelTestBase {
    * Tests whether module-provided stream wrappers are registered properly.
    */
   public function testModuleStreamWrappers(): void {
-    // file_test.module provides (among others) a 'dummy' stream wrapper.
+    // The file_test module provides (among others) a 'dummy' stream wrapper.
     // Verify that it is not registered yet to prevent false positives.
     $stream_wrappers = \Drupal::service('stream_wrapper_manager')->getWrappers();
     $this->assertFalse(isset($stream_wrappers['dummy']));

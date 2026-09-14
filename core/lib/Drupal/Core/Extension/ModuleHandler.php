@@ -321,7 +321,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * Calls a function called $module . '_' . $hook if one exists.
    *
    * @param string $module
-   *   The name of the module (without the .module extension).
+   *   The name of the module (without the .info.yml extension).
    * @param string $hook
    *   The name of the hook to invoke.
    * @param array $args

@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests datetime_range.module when an entity type provides no views data.
+ * Tests the datetime_range module when an entity type provides no views data.
  */
 #[Group('datetime')]
 #[RunTestsInSeparateProcesses]
