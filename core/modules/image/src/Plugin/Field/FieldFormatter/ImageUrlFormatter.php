@@ -7,11 +7,14 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\file\FileUrlType;
+use Drupal\file\Trait\UrlSuggestionTrait;
 use Drupal\image\ImageDerivativeUtilities;
 
 /**
@@ -25,6 +28,8 @@ use Drupal\image\ImageDerivativeUtilities;
   ],
 )]
 class ImageUrlFormatter extends ImageFormatterBase {
+
+  use UrlSuggestionTrait;
 
   /**
    * The image style entity storage.
@@ -44,9 +49,14 @@ class ImageUrlFormatter extends ImageFormatterBase {
     EntityTypeManagerInterface $entity_type_manager,
     protected AccountInterface $currentUser,
     protected readonly ImageDerivativeUtilities $imageDerivativeUtilities,
+    protected ?FileUrlGeneratorInterface $fileUrlGenerator = NULL,
   ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->imageStyleStorage = $entity_type_manager->getStorage('image_style');
+    if ($fileUrlGenerator === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $file_url_generator argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410078', E_USER_DEPRECATED);
+      $this->fileUrlGenerator = \Drupal::service('file_url_generator');
+    }
   }
 
   /**
@@ -54,6 +64,7 @@ class ImageUrlFormatter extends ImageFormatterBase {
    */
   public static function defaultSettings() {
     return [
+      'show_link_as' => FileUrlType::Relative->value,
       'image_style' => '',
     ];
   }
@@ -63,6 +74,8 @@ class ImageUrlFormatter extends ImageFormatterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
+
+    $element = $this->showLinkAs($element, $this->fieldDefinition->getName());
 
     unset($element['image_link'], $element['image_loading']);
 
@@ -104,6 +117,8 @@ class ImageUrlFormatter extends ImageFormatterBase {
       $summary[] = $this->t('Original image');
     }
 
+    $summary[] = (FileUrlType::tryFrom($this->getSetting('show_link_as')) === FileUrlType::Absolute) ? $this->t('Absolute URL') : $this->t('Relative URL');
+
     return array_merge($summary, parent::settingsSummary());
   }
 
@@ -119,14 +134,21 @@ class ImageUrlFormatter extends ImageFormatterBase {
       return $elements;
     }
 
+    $absolute_link = FileUrlType::tryFrom($this->getSetting('show_link_as')) === FileUrlType::Absolute;
     /** @var \Drupal\image\ImageStyleInterface $image_style */
     $image_style = $this->imageStyleStorage->load($this->getSetting('image_style'));
-    /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
-    $file_url_generator = \Drupal::service('file_url_generator');
     /** @var \Drupal\file\FileInterface[] $images */
     foreach ($images as $delta => $image) {
+
       $image_uri = $image->getFileUri();
-      $url = $image_style ? $file_url_generator->transformRelative($image_style->buildUrl($image_uri)) : $file_url_generator->generateString($image_uri);
+
+      if ($image_style) {
+        $image_url = $image_style->buildUrl($image_uri);
+        $url = $absolute_link ? $image_url : $this->fileUrlGenerator->transformRelative($image_url);
+      }
+      else {
+        $url = $absolute_link ? $this->fileUrlGenerator->generateAbsoluteString($image_uri) : $this->fileUrlGenerator->generateString($image_uri);
+      }
 
       // Add cacheability metadata from the image and image style.
       $cacheability = CacheableMetadata::createFromObject($image);
@@ -136,6 +158,10 @@ class ImageUrlFormatter extends ImageFormatterBase {
 
       $elements[$delta] = ['#markup' => $url];
       $cacheability->applyTo($elements[$delta]);
+
+      if ($absolute_link) {
+        array_push($elements[$delta]['#cache']['contexts'], 'url.site');
+      }
     }
     return $elements;
   }

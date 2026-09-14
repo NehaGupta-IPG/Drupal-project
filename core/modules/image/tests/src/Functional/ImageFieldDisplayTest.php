@@ -8,6 +8,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\file\FileUrlType;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\TestFileCreationTrait;
@@ -25,8 +26,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
   use TestFileCreationTrait {
-    getTestFiles as drupalGetTestFiles;
-    compareFiles as drupalCompareFiles;
+    TestFileCreationTrait::getTestFiles as drupalGetTestFiles;
+    TestFileCreationTrait::compareFiles as drupalCompareFiles;
   }
 
   /**
@@ -228,8 +229,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
 
     // Test the image URL formatter with an image style.
+    $file_url_generator = \Drupal::service('file_url_generator');
+    $this->config('image.settings')->set('suppress_itok_output', TRUE)->save();
     $display_options['settings']['image_style'] = 'thumbnail';
-    $expected_url = \Drupal::service('file_url_generator')->transformRelative(ImageStyle::load('thumbnail')->buildUrl($image_uri));
+    $expected_url = $file_url_generator->transformRelative(ImageStyle::load('thumbnail')->buildUrl($image_uri));
     $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
 
     // Test the settings summary.
@@ -237,12 +240,37 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       'type' => 'image_url',
       'settings' => [
         'image_style' => 'thumbnail',
+        'show_link_as' => FileUrlType::Absolute->value,
       ],
     ];
     $display = \Drupal::service('entity_display.repository')->getViewDisplay('node', $node->getType(), 'default');
     $display->setComponent($field_name, $display_options)->save();
     $this->drupalGet("admin/structure/types/manage/" . $node->getType() . "/display/default");
     $this->assertSession()->responseContains('Image style: Thumbnail (100×100)');
+
+    // Tests the 'absolute_url' setting with the image style setting.
+    $image_style_uri = $file_url_generator->transformRelative($image_style->buildUri($image_uri));
+    $expected_url = $file_url_generator->generateAbsoluteString($image_style_uri);
+    $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
+    $this->assertContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
+
+    // Tests the 'absolute_url' setting with the original image.
+    $display_options['settings']['image_style'] = '';
+    $expected_url = $file_url_generator->generateAbsoluteString($image_uri);
+    $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
+    $this->assertContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
+
+    // Disable absolute_url option again to validate cache contexts.
+    $display_options = [
+      'type' => 'image_url',
+      'settings' => [
+        'image_style' => '',
+        'show_link_as' => FileUrlType::Relative->value,
+      ],
+    ];
+    $display = \Drupal::service('entity_display.repository')->getViewDisplay('node', $node->getType());
+    $display->setComponent($field_name, $display_options)->save();
+    $this->assertNotContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
   }
 
   /**
