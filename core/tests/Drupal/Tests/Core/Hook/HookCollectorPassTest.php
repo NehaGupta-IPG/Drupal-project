@@ -45,6 +45,9 @@ class HookCollectorPassTest extends UnitTestCase {
     file_put_contents('vfs://drupal_root/modules/test_module/test_module.module', <<<__EOF__
 <?php
 
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
+
+#[ExtensionFileIsConverted]
 function test_module_test_hook();
 
 __EOF__
