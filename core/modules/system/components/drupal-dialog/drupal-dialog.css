@@ -113,6 +113,27 @@ dialog.titlebar:empty {
   }
 }
 
+dialog.dialog--narrow {
+  width: min(500px, 95vw);
+  max-width: 500px;
+}
+
+dialog.dialog--default {
+  width: min(880px, 95vw);
+  max-width: 880px;
+}
+
+dialog.dialog--wide {
+  width: min(1100px, 95vw);
+  max-width: 1100px;
+}
+
+dialog.dialog--x-wide {
+  width: max(1800px, 95vw);
+  max-width: 1800px;
+  min-height: min(75vh, 600px);
+}
+
 /* Content */
 .dialog-content {
   overflow: auto;
@@ -120,3 +141,4 @@ dialog.titlebar:empty {
   padding: 1.25rem 1.5rem;
   background: #fff;
 }
+

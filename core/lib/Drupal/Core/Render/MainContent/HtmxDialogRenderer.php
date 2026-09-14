@@ -59,7 +59,7 @@ class HtmxDialogRenderer implements MainContentRendererInterface {
     $route_name = $route_match->getRouteName();
     $dialogId = Html::getId("drupal-dialog-$route_name");
     $title = $main_content['#title'] ?? $this->titleResolver->getTitle($request, $route_match->getRouteObject());
-    $dialog = $this->generateDialog($main_content, $dialogId, $title);
+    $dialog = $this->generateDialog($main_content, $dialogId, $title, $request);
     // Prepare the page with placeholders for assets.
     $token = Crypt::randomBytesBase64(55);
     $html = [
@@ -154,7 +154,10 @@ HTMX_RESPONSE,
    * @return array
    *   The generated dialog render array..
    */
-  protected function generateDialog(array $main_content, string $dialogId, mixed $title): array {
+  protected function generateDialog(array $main_content, string $dialogId, mixed $title, Request $request): array {
+    if ($request->query->has('class')) {
+      $dialogClasses = $request->query->get('class');
+    }
     return [
       '#type' => 'component',
       '#component' => 'system:drupal-dialog',
@@ -165,6 +168,7 @@ HTMX_RESPONSE,
       '#props' => [
         'id' => $dialogId,
         'title' => $title,
+        'dialog_classes' => $dialogClasses ?? [],
       ],
     ];
   }

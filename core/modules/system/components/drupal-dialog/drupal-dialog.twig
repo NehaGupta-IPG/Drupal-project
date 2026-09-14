@@ -36,7 +36,7 @@
       {% set content_id = 'drupal-modal' %}
     {% endif %}
     {# Dialogs are in the top layer so use a native <dialog> #}
-    <dialog open aria-labelledby="{{ id -}}-title" closedby="{{ close }}" {% if variant === 'modal' %} data-modal{% endif %} {{ attributes.addClass('ui-widget-content') }}>
+    <dialog open aria-labelledby="{{ id -}}-title" closedby="{{ close }}" {% if variant === 'modal' %} data-modal{% endif %} {{ attributes.addClass('ui-widget-content').addClass(dialog_classes) }}>
   {% endif %}
     <div class="titlebar ui-dialog-titlebar">
       <h2 id="{{ id -}}-title" class="dialog-title ui-dialog-title">{{ title }}</h2>

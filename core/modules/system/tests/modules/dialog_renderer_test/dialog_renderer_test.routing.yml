@@ -45,3 +45,35 @@ dialog_renderer_test.modal_form:
     _title: 'Modal Form'
   requirements:
     _access: 'TRUE'
+
+dialog_renderer_test.htmx_links:
+  path: '/htmx-dialog-test-links'
+  defaults:
+    _controller: '\Drupal\dialog_renderer_test\Controller\HtmxDialogController::linksDisplay'
+    _title: 'Dialogs via htmx'
+  requirements:
+    _access: 'TRUE'
+
+dialog_renderer_test.dialog_content:
+  path: '/htmx-dialog-content'
+  defaults:
+    _controller: '\Drupal\dialog_renderer_test\Controller\HtmxDialogController::dialogContent'
+    _title: 'Thing 1'
+  requirements:
+    _access: 'TRUE'
+
+dialog_renderer_test.dialog_content_link:
+  path: '/htmx-dialog-content-link'
+  defaults:
+    _controller: '\Drupal\dialog_renderer_test\Controller\HtmxDialogController::dialogContentLink'
+    _title: 'Thing 2'
+  requirements:
+    _access: 'TRUE'
+
+dialog_renderer_test.dialog_content_input:
+  path: '/htmx-dialog-content-input'
+  defaults:
+    _controller: '\Drupal\dialog_renderer_test\Controller\HtmxDialogController::dialogContentInput'
+    _title: 'Thing 3'
+  requirements:
+    _access: 'TRUE'

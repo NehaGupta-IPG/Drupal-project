@@ -38,6 +38,12 @@ props:
         - bottom
         - side
       default: default
+    dialog_classes:
+      type: array
+      title: Extra classes for the dialog tag
+      items:
+        type: string
+      default: {}
 
 slots:
   content:
