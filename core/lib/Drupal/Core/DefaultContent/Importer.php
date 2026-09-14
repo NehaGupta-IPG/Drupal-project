@@ -383,8 +383,14 @@ final class Importer implements LoggerAwareInterface {
   /**
    * Verifies that the site knows the default language of the normalized entity.
    *
-   * Will attempt to switch to an alternative translation or just import it
-   * with the site default language.
+   * When the language of the content is not known to the site, or Drupal is
+   * being installed in another language, the content is imported as one of
+   * its translations instead, if the site knows that language. The translation
+   * in the site's default language is preferred, and the original values are
+   * kept as a translation in their own language, if the site knows it: content
+   * written in English with a Spanish translation, imported into a Spanish
+   * site, ends up in Spanish with an English translation. If no translation
+   * can be used, the content is imported in the site's default language as-is.
    *
    * @param array $data
    *   The normalized entity data.
@@ -396,52 +402,57 @@ final class Importer implements LoggerAwareInterface {
   private function verifyNormalizedLanguage(array $data): array {
     $content_default_langcode = $data['_meta']['default_langcode'];
     $site_default_langcode = $this->languageManager->getDefaultLanguage()->getId();
-    // Check the language. If the content's default language isn't known,
-    // import as one of the available translations if one exists with those
-    // values, preferring the one in the site's default language, and keep the
-    // original values as a translation if the site knows their language. If no
-    // translation can be used, create the entity in the site's default
-    // language. During the installer, when installing with an alternative
-    // language, `en` is still the default when modules are installed so check
-    // the site's default language instead.
-    if (!$this->languageManager->getLanguage($content_default_langcode) || (InstallerKernel::installationAttempted() && $site_default_langcode !== $content_default_langcode)) {
-      $translations = $data['translations'] ?? [];
+    // Only step in when the content cannot be imported in its own language.
+    // During the installer, when installing with an alternative language, `en`
+    // is still the default when modules are installed, so check the site's
+    // default language instead.
+    $original_language_known = (bool) $this->languageManager->getLanguage($content_default_langcode);
+    if ($original_language_known && !(InstallerKernel::installationAttempted() && $site_default_langcode !== $content_default_langcode)) {
+      return $data;
+    }
 
-      // Prefer the translation in the site's default language. Otherwise, use
-      // the first translation in a language the site knows.
-      $new_default_langcode = NULL;
-      if (isset($translations[$site_default_langcode])) {
-        $new_default_langcode = $site_default_langcode;
-      }
-      else {
-        foreach (array_keys($translations) as $candidate) {
-          if ($this->languageManager->getLanguage($candidate)) {
-            $new_default_langcode = $candidate;
-            break;
-          }
-        }
-      }
-
-      if ($new_default_langcode !== NULL) {
-        // Keep the original values as a translation in their own language, if
-        // the site knows that language. Only the values which the chosen
-        // translation replaces are needed: the new default keeps the original
-        // values of every other field, and a translation starts out as a copy
-        // of the default. A field the chosen translation has but the original
-        // does not was empty in the original, so it is emptied explicitly.
-        if ($this->languageManager->getLanguage($content_default_langcode)) {
-          $new_default_values = $translations[$new_default_langcode];
-          $data['translations'][$content_default_langcode] = \array_intersect_key($data['default'], $new_default_values)
-            + \array_fill_keys(\array_keys(\array_diff_key($new_default_values, $data['default'])), []);
-        }
-        $data['_meta']['default_langcode'] = $new_default_langcode;
-        $data['default'] = \array_merge($data['default'], $translations[$new_default_langcode]);
-        unset($data['translations'][$new_default_langcode]);
-      }
-      else {
+    // Prefer the translation in the site's default language. Otherwise, take
+    // the first translation in a language the site knows. If there is none,
+    // import the content in the site's default language as-is.
+    $translations = $data['translations'] ?? [];
+    if (isset($translations[$site_default_langcode])) {
+      $new_default_langcode = $site_default_langcode;
+    }
+    else {
+      $new_default_langcode = array_find(
+        array_keys($translations),
+        fn (string|int $langcode): bool => (bool) $this->languageManager->getLanguage((string) $langcode),
+      );
+      if ($new_default_langcode === NULL) {
         $data['_meta']['default_langcode'] = $site_default_langcode;
+        return $data;
       }
     }
+
+    // Say the content is written in English with fields A, B and C, and its
+    // Spanish translation, which is about to become the default, has A, B and
+    // D. Exports only list fields that have a value, so C is empty in Spanish
+    // and D is empty in English. Merging the Spanish values over the English
+    // ones would give the new default A_es, B_es, C_en and D_es: an English
+    // value showing up in Spanish. So C, the fields only the original has, are
+    // listed for Spanish as explicitly empty, and the merge empties them.
+    $new_default_values = $translations[$new_default_langcode];
+    $new_default_values += \array_fill_keys(\array_keys(\array_diff_key($data['default'], $new_default_values)), []);
+
+    // Keep the original values as a translation in their own language, if the
+    // site knows that language. Every translation is created as a copy of the
+    // default (now A_es, B_es, C emptied and D_es), before the values listed
+    // for it are set. So the English translation needs:
+    // - A_en, B_en and C_en, to put back what Spanish replaced or emptied.
+    // - D emptied explicitly, because the copy has D_es and English never had
+    //   a value in D.
+    if ($original_language_known) {
+      $data['translations'][$content_default_langcode] = $data['default']
+        + \array_fill_keys(\array_keys(\array_diff_key($new_default_values, $data['default'])), []);
+    }
+    $data['_meta']['default_langcode'] = $new_default_langcode;
+    $data['default'] = \array_merge($data['default'], $new_default_values);
+    unset($data['translations'][$new_default_langcode]);
     return $data;
   }
 

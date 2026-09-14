@@ -57,19 +57,22 @@ class ImporterLanguageTest extends KernelTestBase {
     $this->installConfig(['system', 'language']);
     $this->setUpCurrentUser(admin: TRUE);
 
-    // A translatable field which only the Spanish translation of the English
-    // fixture entity has a value in.
-    FieldStorageConfig::create([
-      'entity_type' => 'entity_test_mul',
-      'field_name' => 'field_only_in_spanish',
-      'type' => 'string',
-    ])->save();
-    FieldConfig::create([
-      'entity_type' => 'entity_test_mul',
-      'bundle' => 'entity_test_mul',
-      'field_name' => 'field_only_in_spanish',
-      'translatable' => TRUE,
-    ])->save();
+    // Translatable fields which only the Spanish translation of the English
+    // fixture entity has a value in, and which only the originals of the
+    // fixture entities have a value in.
+    foreach (['field_only_in_spanish', 'field_only_in_original'] as $field_name) {
+      FieldStorageConfig::create([
+        'entity_type' => 'entity_test_mul',
+        'field_name' => $field_name,
+        'type' => 'string',
+      ])->save();
+      FieldConfig::create([
+        'entity_type' => 'entity_test_mul',
+        'bundle' => 'entity_test_mul',
+        'field_name' => $field_name,
+        'translatable' => TRUE,
+      ])->save();
+    }
   }
 
   /**
@@ -142,6 +145,15 @@ class ImporterLanguageTest extends KernelTestBase {
   }
 
   /**
+   * Imports the fixture content.
+   */
+  private function importFixture(): void {
+    $finder = new Finder($this->root . '/core/tests/fixtures/default_content_translations');
+    $this->container->get(Importer::class)->importContent($finder);
+    unset($GLOBALS['install_state']);
+  }
+
+  /**
    * Tests the language in which default content with translations is imported.
    *
    * @param bool $installing
@@ -167,9 +179,7 @@ class ImporterLanguageTest extends KernelTestBase {
     if ($installing) {
       $GLOBALS['install_state'] = ['installation_finished' => FALSE];
     }
-    $finder = new Finder($this->root . '/core/tests/fixtures/default_content_translations');
-    $this->container->get(Importer::class)->importContent($finder);
-    unset($GLOBALS['install_state']);
+    $this->importFixture();
 
     $repository = $this->container->get(EntityRepositoryInterface::class);
     foreach ($expected as $uuid => [$langcode, $label, $translations]) {
@@ -189,22 +199,22 @@ class ImporterLanguageTest extends KernelTestBase {
   }
 
   /**
-   * Tests that a field left empty in the original stays empty when kept.
+   * Tests that fields left empty in one language stay empty there.
    *
-   * Exported translations only list fields that have a value, and a translation
-   * starts out as a copy of the default when it is imported. So when the
-   * original values are kept as a translation, a field that only the new
-   * default has must be emptied explicitly for them.
+   * Exports only list fields that have a value. When a translation becomes the
+   * default, its values are merged over the original's, and a translation
+   * starts out as a copy of the default when it is imported. So a field that
+   * only the original has must be emptied explicitly for the new default, and
+   * a field that only the new default has must be emptied explicitly for the
+   * original when it is kept as a translation.
    */
-  public function testEmptyFieldOfOriginalStaysEmpty(): void {
+  public function testEmptyFieldsStayEmpty(): void {
     ConfigurableLanguage::createFromLangcode('es')->save();
     $this->config('system.site')->set('default_langcode', 'es')->save();
     $this->container->get('language_manager')->reset();
 
     $GLOBALS['install_state'] = ['installation_finished' => FALSE];
-    $finder = new Finder($this->root . '/core/tests/fixtures/default_content_translations');
-    $this->container->get(Importer::class)->importContent($finder);
-    unset($GLOBALS['install_state']);
+    $this->importFixture();
 
     $entity = $this->container->get(EntityRepositoryInterface::class)
       ->loadEntityByUuid('entity_test_mul', self::ENGLISH_UUID);
@@ -215,6 +225,19 @@ class ImporterLanguageTest extends KernelTestBase {
     // The English original never had a value in this field, so its translation
     // does not have one either.
     $this->assertTrue($entity->getTranslation('en')->get('field_only_in_spanish')->isEmpty());
+    // The Spanish translation never had a value in this field, so the Spanish
+    // default does not have one either, while the English translation kept it.
+    $this->assertTrue($entity->get('field_only_in_original')->isEmpty());
+    $this->assertSame('Only in English', $entity->getTranslation('en')->get('field_only_in_original')->value);
+
+    // The same holds when the original cannot be kept: the site does not know
+    // German, so the German values are gone, but they do not show up as
+    // Spanish either.
+    $entity = $this->container->get(EntityRepositoryInterface::class)
+      ->loadEntityByUuid('entity_test_mul', self::GERMAN_UUID);
+    $this->assertInstanceOf(ContentEntityInterface::class, $entity);
+    $this->assertSame('es', $entity->language()->getId());
+    $this->assertTrue($entity->get('field_only_in_original')->isEmpty());
   }
 
 }

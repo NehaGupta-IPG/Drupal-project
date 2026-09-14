@@ -8,6 +8,9 @@ default:
   name:
     -
       value: 'Written in English'
+  field_only_in_original:
+    -
+      value: 'Only in English'
 translations:
   fr:
     name:

@@ -8,6 +8,9 @@ default:
   name:
     -
       value: 'Written in German'
+  field_only_in_original:
+    -
+      value: 'Only in German'
 translations:
   fr:
     name:
