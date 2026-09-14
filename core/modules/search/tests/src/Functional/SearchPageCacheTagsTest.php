@@ -9,12 +9,14 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the search_page entity cache tags on the search results pages.
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchPageCacheTagsTest extends BrowserTestBase {
 
@@ -24,8 +26,7 @@ class SearchPageCacheTagsTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'search', 'search_node'];
-
+  protected static $modules = ['node', 'search', 'search_node', 'search_user'];
   /**
    * {@inheritdoc}
    */

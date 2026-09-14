@@ -6,6 +6,7 @@ namespace Drupal\Tests\search\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * @see \Drupal\Tests\system\Functional\System\ThemeTest::testAdministrationTheme()
  */
 #[Group('search')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class SearchAdminThemeTest extends BrowserTestBase {
 
@@ -29,6 +31,8 @@ class SearchAdminThemeTest extends BrowserTestBase {
     'search_help',
     'search_node',
     'search_extra_type',
+    'search_help',
+    'search_user',
     'user',
   ];
 
@@ -42,7 +46,7 @@ class SearchAdminThemeTest extends BrowserTestBase {
    *
    * @var string
    */
-  protected $adminTheme = 'claro';
+  protected $adminTheme = 'default_admin';
 
   /**
    * {@inheritdoc}
@@ -71,7 +75,7 @@ class SearchAdminThemeTest extends BrowserTestBase {
   /**
    * Tests that search results could be displayed in administration theme.
    *
-   * @see \Drupal\node\Plugin\Search\NodeSearch
+   * @see \Drupal\node\Plugin\Search\SearchNode
    * @see \Drupal\search_extra_type\Plugin\Search\SearchExtraTypeSearch
    * @see \Drupal\user\Plugin\Search\SearchUser
    */

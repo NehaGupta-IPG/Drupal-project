@@ -36,12 +36,10 @@ class CKEditor5FragmentLinkTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'ckeditor5'];
+  protected static $modules = ['node', 'ckeditor5', 'body_field'];
 
   /**
    * The admin user.
-   *
-   * @var \Drupal\user\Entity\User
    */
   protected User $account;
 

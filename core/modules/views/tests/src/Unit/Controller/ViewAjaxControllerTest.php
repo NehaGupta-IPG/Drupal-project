@@ -137,10 +137,9 @@ class ViewAjaxControllerTest extends UnitTestCase {
 
     $this->viewAjaxController = new ViewAjaxController($this->viewStorage, $this->executableFactory, $this->renderer, $this->currentPath, $this->redirectDestination, $this->pathValidator);
 
-    $element_info_manager = $this->createMock(ElementInfoManagerInterface::class);
+    $element_info_manager = $this->createStub(ElementInfoManagerInterface::class);
     $element_info_manager
       ->method('getInfo')
-      ->with('status_messages')
       ->willReturn([]);
     $request_stack = new RequestStack();
     $request_stack->push(new Request());
@@ -563,10 +562,9 @@ class ViewAjaxControllerTest extends UnitTestCase {
    * @return mixed
    *   Returns the commands.
    */
-  protected function getCommands(ViewAjaxResponse $response) {
+  protected function getCommands(ViewAjaxResponse $response): mixed {
     $reflection_property = new \ReflectionProperty('Drupal\views\Ajax\ViewAjaxResponse', 'commands');
-    $commands = $reflection_property->getValue($response);
-    return $commands;
+    return $reflection_property->getValue($response);
   }
 
   /**

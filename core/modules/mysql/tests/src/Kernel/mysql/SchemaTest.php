@@ -9,6 +9,7 @@ use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
 use Drupal\Core\Database\SchemaException;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
@@ -39,6 +40,24 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   /**
    * {@inheritdoc}
    */
+  public function checkGeneratedColumnStorage(GeneratedColumnStorage $storage, string $table, string $column): void {
+    $getPrefixInfo = new \ReflectionMethod(get_class($this->schema), 'getPrefixInfo');
+    $info = $getPrefixInfo->invoke($this->schema, $table);
+    $extra = $this->connection->query('SELECT [extra] FROM [information_schema].[columns] WHERE [table_schema] = :schema AND [table_name] = :table AND [column_name] = :column', [
+      ':schema' => $info['database'],
+      ':table' => $info['table'],
+      ':column' => $column,
+    ])->fetchField();
+    $expected = match ($storage) {
+      GeneratedColumnStorage::Virtual => 'VIRTUAL GENERATED',
+      GeneratedColumnStorage::Stored => 'STORED GENERATED',
+    };
+    $this->assertSame($expected, $extra);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function assertCollation(): void {
     // Make sure that varchar fields have the correct collations.
     $columns = $this->connection->query('SHOW FULL COLUMNS FROM {test_table}');
@@ -50,7 +69,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
         $string_ascii_check = $column->Collation;
       }
     }
-    $this->assertMatchesRegularExpression('#^(utf8mb4_general_ci|utf8mb4_0900_ai_ci)$#', $string_check, 'test_field_string should have a utf8mb4_general_ci or a utf8mb4_0900_ai_ci collation, but it has not.');
+    $this->assertMatchesRegularExpression('#^(utf8mb4_general_ci|utf8mb4_0900_ai_ci|utf8mb4_uca1400_ai_ci)$#', $string_check, 'test_field_string should have a supported utf8mb4 collation, but it has not.');
     $this->assertSame('ascii_general_ci', $string_ascii_check, 'test_field_string_ascii should have a ascii_general_ci collation, but it has not.');
   }
 
@@ -307,7 +326,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
    */
   public function testSchemaTableColumnSizeTooLargeException(): void {
     $this->expectException(SchemaTableColumnSizeTooLargeException::class);
-    $this->expectExceptionMessageIs("Column length too big for column 'too_large' (max = 16383); use BLOB or TEXT instead");
+    $this->expectExceptionMessageIsOrContains("Column length too big for column 'too_large' (max = 16383); use BLOB or TEXT instead");
     $this->schema->createTable('test_schema', [
       'description' => 'Tests SchemaTableColumnSizeTooLargeException.',
       'fields' => [
