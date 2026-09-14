@@ -53,6 +53,9 @@ __EOF__
     file_put_contents('vfs://drupal_root/modules/test_module/test_sub_module/test_sub_module.module', <<<__EOF__
 <?php
 
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
+
+#[ExtensionFileIsConverted]
 function test_module_should_be_skipped();
 
 __EOF__
@@ -138,6 +141,9 @@ __EOF__
     file_put_contents('vfs://drupal_root/modules/test_module/test_module.module', <<<__EOF__
 <?php
 
+use Drupal\Core\Hook\Attribute\ExtensionFileIsConverted;
+
+#[ExtensionFileIsConverted]
 function test_module_theme_suggestions_alter();
 
 __EOF__
