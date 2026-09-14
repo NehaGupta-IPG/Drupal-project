@@ -22,9 +22,9 @@ class AccessibilityTest extends AccessibilityTestBase {
   protected static $modules = ['navigation'];
 
   /**
-   * Setup callback for 'Claro page, mobile, sidebar open' test case.
+   * Setup callback for 'Admin page, mobile, sidebar open' test case.
    */
-  protected function setupClaroPageMobileSidebarOpen(): void {
+  protected function setupAdminPageMobileSidebarOpen(): void {
     $session = $this->getSession();
     $menu_button = $session->getPage()->find('css', '#admin-toolbar')->findButton('Create');
 
@@ -52,15 +52,15 @@ class AccessibilityTest extends AccessibilityTestBase {
    */
   public static function provider(): \Generator {
 
-    yield 'Claro page' => [
+    yield 'Admin page' => [
       '/user/1/edit',
       TRUE,
     ];
 
-    yield 'Claro page, mobile, sidebar open' => [
+    yield 'Admin page, mobile, sidebar open' => [
       'path' => '/admin',
       'admin' => TRUE,
-      'setup_callback' => 'setupClaroPageMobileSidebarOpen',
+      'setup_callback' => 'setupAdminPageMobileSidebarOpen',
     ];
   }
 
