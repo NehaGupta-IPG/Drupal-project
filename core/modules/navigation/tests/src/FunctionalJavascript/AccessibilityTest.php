@@ -45,6 +45,9 @@ class AccessibilityTest extends AccessibilityTestBase {
     $this->assertTrue($menu_button->waitFor(2, function ($menu_button): bool {
       return $menu_button->isVisible();
     }));
+
+    // Wait for sidebar to fully open before testing.
+    sleep(1);
   }
 
   /**
