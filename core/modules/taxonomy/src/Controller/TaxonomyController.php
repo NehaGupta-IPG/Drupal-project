@@ -3,6 +3,7 @@
 namespace Drupal\taxonomy\Controller;
 
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\taxonomy\TermInterface;
 use Drupal\taxonomy\VocabularyInterface;
@@ -31,11 +32,16 @@ class TaxonomyController extends ControllerBase {
    *
    * @param \Drupal\taxonomy\TermInterface $taxonomy_term
    *   The taxonomy term.
+   * @param \Drupal\Core\Cache\CacheableMetadata $cacheable_metadata
+   *   (optional) The cacheable metadata for the title callback.
    *
    * @return array
    *   The term label as a render array.
    */
-  public function termTitle(TermInterface $taxonomy_term) {
+  public function termTitle(TermInterface $taxonomy_term, ?CacheableMetadata $cacheable_metadata = NULL) {
+    if ($cacheable_metadata) {
+      $cacheable_metadata->addCacheableDependency($taxonomy_term);
+    }
     return ['#markup' => $taxonomy_term->getName(), '#allowed_tags' => Xss::getHtmlTagList()];
   }
 

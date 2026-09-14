@@ -27,7 +27,7 @@ trait AssertBreadcrumbTrait {
    * @param string $page_title
    *   (optional) A page title to additionally assert via
    *   \Drupal\Tests\WebAssert::titleEquals(). Without site name suffix.
-   * @param array $tree
+   * @param array|null $tree
    *   (optional) An associative array whose keys are link paths and whose
    *   values are link titles (not sanitized) of an expected active trail in a
    *   menu tree output on the page.
@@ -40,7 +40,7 @@ trait AssertBreadcrumbTrait {
    * @param string $active_class
    *   (optional) The class of the active element. Defaults to 'is-active'.
    */
-  protected function assertBreadcrumb($goto, array $trail, $page_title = NULL, array $tree = [], $last_active = TRUE, $active_trail_class = 'menu-item--active-trail', $active_class = 'is-active') {
+  protected function assertBreadcrumb($goto, array $trail, ?string $page_title = NULL, array $tree = [], bool $last_active = TRUE, string $active_trail_class = 'menu-item--active-trail', string $active_class = 'is-active'): void {
     if (isset($goto)) {
       $this->drupalGet($goto);
     }
@@ -64,13 +64,15 @@ trait AssertBreadcrumbTrait {
    *   An associative array whose keys are expected breadcrumb link paths and
    *   whose values are expected breadcrumb link texts (not sanitized).
    */
-  protected function assertBreadcrumbParts($trail) {
+  protected function assertBreadcrumbParts(array $trail): void {
     // Compare paths with actual breadcrumb.
     $parts = $this->getBreadcrumbParts();
     $found = $parts;
-    $pass = TRUE;
+    // A differing number of parts can never match, and also guards against an
+    // expected "Home" always passing when no parts are left to compare.
+    $pass = count($trail) === count($parts);
 
-    if (!empty($trail) && !empty($parts)) {
+    if ($pass) {
       foreach ($trail as $path => $title) {
         // If the path is empty, generate the path from the <front> route.  If
         // the path does not start with a leading slash, then run it through
@@ -89,14 +91,6 @@ trait AssertBreadcrumbTrait {
         $pass = ($pass && $part['href'] === $url && $part['text'] === Html::escape($title));
       }
     }
-    elseif (!empty($trail) && empty($parts) || empty($trail) && !empty($parts)) {
-      // Fail if there is no breadcrumb and we have a trail or breadcrumb
-      // exists but trail is empty.
-      $pass = FALSE;
-    }
-
-    // No parts must be left, or an expected "Home" will always pass.
-    $pass = ($pass && empty($parts));
 
     $this->assertTrue($pass, sprintf('Expected breadcrumb %s on %s but found %s.',
       implode(' » ', $trail),

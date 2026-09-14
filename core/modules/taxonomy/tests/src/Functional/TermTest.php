@@ -7,6 +7,7 @@ namespace Drupal\Tests\taxonomy\Functional;
 use Behat\Mink\Element\NodeElement;
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\taxonomy\Entity\Term;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class TermTest extends TaxonomyTestBase {
 
   use AssertBreadcrumbTrait;
+  use StringTranslationTrait;
 
   /**
    * Vocabulary for testing.
@@ -705,6 +707,25 @@ class TermTest extends TaxonomyTestBase {
     ];
     $this->assertBreadcrumb('taxonomy/term/' . $term->id() . '/delete', $trail);
     $this->assertSession()->assertEscaped($term->label());
+
+    // Edit the term and verify that breadcrumb is updated on term edit and
+    // delete pages.
+    $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
+    $edit = [
+      'name[0][value]' => $this->randomMachineName(14),
+      'description[0][value]' => $this->randomMachineName(100),
+      'parent[]' => [0],
+    ];
+    $this->submitForm($edit, 'Save');
+    $trail = [
+      '' => 'Home',
+      'taxonomy/term/' . $term->id() => $edit['name[0][value]'],
+    ];
+    $this->assertBreadcrumb('taxonomy/term/' . $term->id() . '/edit', $trail);
+    $this->assertSession()->assertEscaped($edit['name[0][value]']);
+
+    $this->assertBreadcrumb('taxonomy/term/' . $term->id() . '/delete', $trail);
+    $this->assertSession()->assertEscaped($edit['name[0][value]']);
   }
 
   /**

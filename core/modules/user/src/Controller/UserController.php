@@ -5,6 +5,7 @@ namespace Drupal\user\Controller;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Flood\FloodInterface;
@@ -405,12 +406,17 @@ class UserController extends ControllerBase {
    *
    * @param \Drupal\user\UserInterface $user
    *   The user account.
+   * @param \Drupal\Core\Cache\CacheableMetadata $cacheable_metadata
+   *   (optional) The cacheable metadata for the title callback.
    *
    * @return string|array
    *   The user account name as a render array or an empty string if $user is
    *   NULL.
    */
-  public function userTitle(?UserInterface $user = NULL) {
+  public function userTitle(?UserInterface $user = NULL, ?CacheableMetadata $cacheable_metadata = NULL) {
+    if ($user && $cacheable_metadata) {
+      $cacheable_metadata->addCacheableDependency($user);
+    }
     return $user ? ['#markup' => $user->getDisplayName(), '#allowed_tags' => Xss::getHtmlTagList()] : '';
   }
 

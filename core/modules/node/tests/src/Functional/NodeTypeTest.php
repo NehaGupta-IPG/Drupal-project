@@ -104,12 +104,20 @@ class NodeTypeTest extends NodeTestBase {
     $assert->pageTextContains('Title');
     $assert->pageTextContains('Body');
 
+    $front_page_path = Url::fromRoute('<front>')->toString();
+
     // Rename the title field.
     $edit = [
       'title_label' => 'Foo',
     ];
     $this->drupalGet('admin/structure/types/manage/page');
     $this->submitForm($edit, 'Save');
+
+    $this->assertBreadcrumb('admin/structure/types/manage/page/fields', [
+      $front_page_path => 'Home',
+      'admin/structure/types' => 'Content types',
+      'admin/structure/types/manage/page' => 'Basic page',
+    ]);
 
     $this->drupalGet('node/add/page');
     $assert->pageTextContains('Foo');
@@ -122,6 +130,12 @@ class NodeTypeTest extends NodeTestBase {
     ];
     $this->drupalGet('admin/structure/types/manage/page');
     $this->submitForm($edit, 'Save');
+
+    $this->assertBreadcrumb('admin/structure/types/manage/page/fields', [
+      $front_page_path => 'Home',
+      'admin/structure/types' => 'Content types',
+      'admin/structure/types/manage/page' => 'Bar',
+    ]);
 
     $this->drupalGet('node/add');
     $assert->pageTextContains('Bar');

@@ -1,0 +1,5 @@
+name: Breadcrumb Render Cache Test
+type: module
+description: Tests breadcrumb render cache.
+package: Testing
+version: VERSION

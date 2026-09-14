@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Controller;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityDescriptionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -210,12 +211,17 @@ class EntityController implements ContainerInjectionInterface {
    *   The route match.
    * @param \Drupal\Core\Entity\EntityInterface $_entity
    *   (optional) An entity, passed in directly from the request attributes.
+   * @param \Drupal\Core\Cache\CacheableMetadata $cacheable_metadata
+   *   (optional) The cacheable metadata for the title callback.
    *
    * @return string|null
    *   The title for the entity view page, if an entity was found.
    */
-  public function title(RouteMatchInterface $route_match, ?EntityInterface $_entity = NULL) {
-    if ($entity = $this->doGetEntity($route_match, $_entity)) {
+  public function title(RouteMatchInterface $route_match, ?EntityInterface $_entity = NULL, ?CacheableMetadata $cacheable_metadata = NULL) {
+    if ($entity = $this->doGetEntity($route_match, $_entity, $cacheable_metadata)) {
+      if ($cacheable_metadata) {
+        $cacheable_metadata->addCacheableDependency($entity);
+      }
       return $entity->label();
     }
   }
@@ -275,12 +281,14 @@ class EntityController implements ContainerInjectionInterface {
    * @param \Drupal\Core\Entity\EntityInterface $_entity
    *   (optional) The entity, set in
    *   \Drupal\Core\Entity\Enhancer\EntityRouteEnhancer.
+   * @param \Drupal\Core\Cache\CacheableMetadata $cacheable_metadata
+   *   The cacheable metadata to attach the cacheable metadata of the title to.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity, if it is passed in directly or if the first parameter of the
    *   active route is an entity; otherwise, NULL.
    */
-  protected function doGetEntity(RouteMatchInterface $route_match, ?EntityInterface $_entity = NULL) {
+  protected function doGetEntity(RouteMatchInterface $route_match, ?EntityInterface $_entity = NULL, ?CacheableMetadata $cacheable_metadata = NULL) {
     if ($_entity) {
       $entity = $_entity;
     }
@@ -291,6 +299,9 @@ class EntityController implements ContainerInjectionInterface {
           $entity = $parameter;
           break;
         }
+      }
+      if ($cacheable_metadata) {
+        $cacheable_metadata->addCacheContexts(['url.path.parent']);
       }
     }
     if (isset($entity)) {
