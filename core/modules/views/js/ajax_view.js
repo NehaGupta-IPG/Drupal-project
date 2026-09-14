@@ -86,19 +86,17 @@
       queryString = queryString.slice(1);
 
       // Remove current exposed filters.
-      const params = queryString
-        .split('&')
-        .filter((param) => {
-          const name = decodeURIComponent(param.split('=')[0]);
-          return (
-            this.$exposed_form.find(`[name="${name}"]`).length === 0 &&
-            /*
-            Submitting filters should reset paging and sorting
-            because that is what happens without AJAX.
-             */
-            !['page', 'reset', 'sort', 'order', 'q', 'render'].includes(name)
-          );
-        });
+      const params = queryString.split('&').filter((param) => {
+        const name = decodeURIComponent(param.split('=')[0]);
+        /**
+         * Submitting filters should reset paging and sorting
+         * because that is what happens without AJAX.
+         */
+        return (
+          this.$exposed_form.find(`[name="${name}"]`).length === 0 && 
+          !['page', 'reset', 'sort', 'order', 'q', 'render'].includes(name)
+        );
+      });
       queryString = params.join('&');
       // If there is a '?' in ajaxPath, clean URL are on and & should be
       // used to add parameters.
