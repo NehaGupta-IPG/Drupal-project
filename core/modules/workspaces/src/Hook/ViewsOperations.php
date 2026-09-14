@@ -180,93 +180,73 @@ class ViewsOperations {
 
     // A relationship can join on a revisionable base field, e.g. the 'Content:
     // Author' relationship joins 'users_field_data' on 'node_field_data.uid'.
-    // Its extra conditions can compare a revisionable base column to a value,
-    // and a raw string extra can reference one directly, e.g. the
-    // 'node_search_index' join in the Search module. Collect those joins first,
-    // because rewriting them adds tables to the table queue and moves them
-    // around.
+    // Its extra conditions can compare a revisionable base column to a value as
+    // well. Collect those joins first, because rewriting them adds tables to
+    // the table queue and moves them around.
     $joins_to_rewrite = [];
     foreach ($table_queue as $alias => $join_table_info) {
       $join = $join_table_info['join'] ?? NULL;
       // Skip the joins added by this class, they already point to the revision
-      // table, as well as joins that use a formula for the left side.
-      if (!$join instanceof JoinPluginInterface || $this->adjustedTables->offsetExists($join) || $join->leftFormula) {
+      // table, as well as joins that don't hold a base table column.
+      if (!$join instanceof JoinPluginInterface || $this->adjustedTables->offsetExists($join) || !in_array($join->leftTable, $relationships, TRUE)) {
         continue;
       }
 
-      // The left side and the array extras can only reference this join's
-      // left table, so they matter only for a join on the base table.
-      $rewrite_left = FALSE;
-      $rewrite_extras = [];
-      if (in_array($join->leftTable, $relationships, TRUE)) {
-        $rewrite_left = in_array($join->leftField, $revisionable_fields, TRUE);
+      // A join that builds its left side with a formula has no left field to
+      // rewrite, but its extras can still need one.
+      $rewrite_left = !$join->leftFormula && in_array($join->leftField, $revisionable_fields, TRUE);
 
-        if (is_array($join->extra)) {
-          foreach ($join->extra as $key => $info) {
-            if (is_array($info) && $this->isRevisionableExtra($info, $base_entity_table, $revisionable_fields)) {
-              $rewrite_extras[] = $key;
-            }
+      // Only an array extra says which table and column it compares. A raw
+      // string extra is SQL, and the two shapes that can appear in one need
+      // opposite treatment: a comparison to a value has to read the revision
+      // table, and a comparison to a column of the joined table has to keep
+      // reading the base table, like isRevisionableExtra() does. Telling them
+      // apart needs a SQL parser, so leave string extras alone.
+      $rewrite_extras = [];
+      if (is_array($join->extra)) {
+        foreach ($join->extra as $key => $info) {
+          if (is_array($info) && $this->isRevisionableExtra($info, $base_entity_table, $revisionable_fields)) {
+            $rewrite_extras[] = $key;
           }
         }
       }
 
-      // A string extra is a SQL snippet, so it can reference any relationship,
-      // not just this join's left table. Keep references to the table being
-      // joined unchanged: its revision table depends on this join, so using
-      // that revision table here would create a circular dependency.
-      $extra_relationships = is_string($join->extra)
-        ? $this->getReferencedRelationships($join->extra, array_diff($relationships, [$alias]), $revisionable_fields)
-        : [];
-
-      if ($rewrite_left || $rewrite_extras || $extra_relationships) {
-        $joins_to_rewrite[$alias] = [$join, $rewrite_left, $rewrite_extras, $extra_relationships];
+      if ($rewrite_left || $rewrite_extras) {
+        $joins_to_rewrite[$alias] = [$join, $rewrite_left, $rewrite_extras];
       }
     }
 
-    foreach ($joins_to_rewrite as $alias => [$join, $rewrite_left, $rewrite_extras, $extra_relationships]) {
-      // The revision tables this join now references, keyed by relationship.
-      $revision_tables = [];
-
-      if (($rewrite_left || $rewrite_extras) && ($revision_table = $this->ensureRevisionTable($entity_type, $query, $join->leftTable))) {
-        $revision_tables[$join->leftTable] = $revision_table;
-
-        // If the workspace revision has no row for a translation (e.g. it was
-        // removed in the workspace), the left side is NULL and a required
-        // relationship drops the row. That's correct, the translation doesn't
-        // exist in the workspace, and a rewritten filter does the same.
-        if ($rewrite_left) {
-          $join->leftFormula = "$revision_table.$join->leftField";
-        }
-
-        // An extra condition has no left-side formula, but it can use any table
-        // alias, so point it at the revision table instead.
-        foreach ($rewrite_extras as $key) {
-          $info = $join->extra[$key];
-          $info['table'] = $revision_table;
-          $info['field'] = $info['field'] ?? $info['left_field'];
-          unset($info['left_field']);
-          $join->extra[$key] = $info;
-        }
+    foreach ($joins_to_rewrite as $alias => [$join, $rewrite_left, $rewrite_extras]) {
+      $revision_table = $this->ensureRevisionTable($entity_type, $query, $join->leftTable);
+      if (!$revision_table) {
+        continue;
       }
 
-      if ($extra_relationships) {
-        $join->extra = $this->rewriteRevisionableFieldReferences($join->extra, $query, $entity_type, $extra_relationships, $revisionable_fields);
-        foreach ($extra_relationships as $relationship) {
-          if ($revision_table = $this->ensureRevisionTable($entity_type, $query, $relationship)) {
-            $revision_tables[$relationship] = $revision_table;
-          }
-        }
+      // If the workspace revision has no row for a translation (e.g. it was
+      // removed in the workspace), the left side is NULL and a required
+      // relationship drops the row. That's correct, the translation doesn't
+      // exist in the workspace, and a rewritten filter does the same.
+      if ($rewrite_left) {
+        $join->leftFormula = "$revision_table.$join->leftField";
+      }
+
+      // An extra condition has no left-side formula, but it can use any table
+      // alias, so point it at the revision table instead.
+      foreach ($rewrite_extras as $key) {
+        $info = $join->extra[$key];
+        $info['table'] = $revision_table;
+        $info['field'] = $info['field'] ?? $info['left_field'];
+        unset($info['left_field']);
+        $join->extra[$key] = $info;
       }
 
       // The revision table has to come before the join that references it, and
       // the 'workspace_association' table before the revision table. Move the
       // revision table first, otherwise moving it would leave the
       // 'workspace_association' table behind.
-      foreach ($revision_tables as $relationship => $revision_table) {
-        $this->moveEntityTable($query, $revision_table, $alias);
-        $workspace_association_table = $this->ensureWorkspaceAssociationTable($entity_type->id(), $query, $relationship);
-        $this->moveEntityTable($query, $workspace_association_table, $revision_table);
-      }
+      $this->moveEntityTable($query, $revision_table, $alias);
+      $workspace_association_table = $this->ensureWorkspaceAssociationTable($entity_type->id(), $query, $join->leftTable);
+      $this->moveEntityTable($query, $workspace_association_table, $revision_table);
     }
 
     // Go through and look to see if we have to modify fields.
@@ -356,38 +336,6 @@ class ViewsOperations {
       return in_array($info['field'], $revisionable_fields, TRUE);
     }
     return FALSE;
-  }
-
-  /**
-   * Finds the relationships a query expression reads revisionable fields from.
-   *
-   * Matches the same references that rewriteRevisionableFieldReferences()
-   * replaces, so a caller can tell which revision tables the rewrite needs
-   * before running it.
-   *
-   * @param string $expression
-   *   The query expression, e.g. a raw string join extra.
-   * @param string[] $relationships
-   *   The relationships that point to the entity type's base table.
-   * @param string[] $revisionable_fields
-   *   The names of the revisionable fields of the entity type.
-   *
-   * @return string[]
-   *   The relationships the expression reads a revisionable field from.
-   */
-  protected function getReferencedRelationships(string $expression, array $relationships, array $revisionable_fields): array {
-    $referenced = [];
-    foreach ($relationships as $relationship) {
-      foreach ($revisionable_fields as $field) {
-        $reference = "$relationship.$field";
-        if (str_contains($expression, $reference) && preg_match('/\b' . preg_quote($reference, '/') . '\b/', $expression)) {
-          $referenced[] = $relationship;
-          continue 2;
-        }
-      }
-    }
-
-    return $referenced;
   }
 
   /**

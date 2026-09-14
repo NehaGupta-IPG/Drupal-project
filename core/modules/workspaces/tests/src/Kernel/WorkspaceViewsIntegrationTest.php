@@ -425,52 +425,11 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
     $view->execute();
     $this->assertSame([], $this->getAuthorsByLangcode($view));
 
-    // A string extra is a raw SQL snippet, so the reference inside it has to be
-    // rewritten. Joining on the non-revisionable 'nid' column leaves the extra
-    // as the only reason to add the revision table, like the
-    // 'node_search_index' join in the Search module.
+    // A raw string extra is left alone, so it keeps reading the base table.
     $this->switchToWorkspace('stage');
-    $view = $this->authorRelationshipViewWithStickyExtra('node_field_data.sticky = 1', 'nid');
+    $view = $this->authorRelationshipViewWithStickyExtra('node_field_data.sticky = 1');
     $view->execute();
-
-    $query = (string) $view->build_info['query'];
-    $this->assertStringContainsString('node_field_revision.sticky = 1', $query);
-    $this->assertStringNotContainsString('node_field_data.sticky', $query);
-
-    // The revision table is joined before the relationship whose ON clause
-    // reads it, otherwise the query above would have failed.
-    $tables = array_keys($view->build_info['query']->getTables());
-    $author_table = $view->relationship['uid']->alias;
-    $this->assertContains($author_table, $tables);
-    $this->assertContains('node_field_revision', $tables);
-    $this->assertLessThan(array_search($author_table, $tables), array_search('node_field_revision', $tables));
-
-    // A raw extra can also reference the table being joined. Its revision
-    // table depends on that join, so that reference must stay unchanged while
-    // references to earlier tables still use the workspace revision.
-    foreach ([FALSE, TRUE] as $required) {
-      $view = Views::getView('workspace_author_relationship');
-      $view->setDisplay();
-      $view->initQuery();
-      $join = \Drupal::service('plugin.manager.views.join')->createInstance('standard', [
-        'table' => 'node_field_data',
-        'field' => 'nid',
-        'left_table' => 'node_field_data',
-        'left_field' => 'nid',
-        'extra' => 'node_field_data.sticky = 1 AND related_node.sticky = 0',
-        'type' => $required ? 'INNER' : 'LEFT',
-      ]);
-      $view->query->addRelationship('related_node', $join, 'node_field_data');
-      $view->query->addField('related_node', 'nid', 'related_nid');
-      $view->execute();
-
-      $this->assertNotEmpty($view->result);
-      foreach ($view->result as $row) {
-        $this->assertEquals($node->id(), $row->related_nid);
-      }
-      $query = (string) $view->build_info['query'];
-      $this->assertStringContainsString('node_field_revision.sticky = 1 AND related_node.sticky = 0', $query);
-    }
+    $this->assertStringContainsString('node_field_data.sticky = 1', (string) $view->build_info['query']);
   }
 
   /**
@@ -479,21 +438,15 @@ class WorkspaceViewsIntegrationTest extends ViewsKernelTestBase {
    * @param array|string $extra
    *   The 'sticky' extra to put on the author join, in either of the two
    *   shapes a join supports: a list of conditions, or a raw SQL snippet.
-   * @param string|null $left_field
-   *   The base table column to join on, or NULL to keep the revisionable
-   *   'uid' column.
    *
    * @return \Drupal\views\ViewExecutable
    *   The executable view.
    */
-  protected function authorRelationshipViewWithStickyExtra(array|string $extra, ?string $left_field = NULL): ViewExecutable {
+  protected function authorRelationshipViewWithStickyExtra(array|string $extra): ViewExecutable {
     $view = Views::getView('workspace_author_relationship');
     $view->setDisplay();
     $view->initHandlers();
     $view->relationship['uid']->definition['extra'] = $extra;
-    if ($left_field) {
-      $view->relationship['uid']->realField = $left_field;
-    }
     return $view;
   }
 
