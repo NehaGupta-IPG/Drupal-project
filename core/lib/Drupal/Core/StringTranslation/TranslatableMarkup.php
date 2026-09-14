@@ -232,7 +232,7 @@ class TranslatableMarkup extends FormattableMarkup {
    *   The string representation.
    */
   public function __toString(): string {
-    return $this->render();
+    return (string) $this->render();
   }
 
 }
