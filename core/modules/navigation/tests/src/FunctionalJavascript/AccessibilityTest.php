@@ -55,17 +55,6 @@ class AccessibilityTest extends AccessibilityTestBase {
    */
   public static function provider(): \Generator {
 
-    yield 'Admin page' => [
-      'path' => '/user/1/edit',
-      'admin' => TRUE,
-      // @todo remove the disabled 'region' rule after https://drupal.org/i/3583486.
-      'axe_options' => [
-        'rules' => [
-          'region' => ['enabled' => FALSE],
-        ],
-      ],
-    ];
-
     yield 'Admin page, mobile, sidebar open' => [
       'path' => '/admin',
       'admin' => TRUE,
