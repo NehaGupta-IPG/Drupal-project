@@ -291,6 +291,7 @@ class Merge extends Query implements ConditionInterface {
    *
    * The fields are copied to the condition of the query and the INSERT part.
    * If no other method is called, the UPDATE will become a no-op.
+   * Because of this, the keys() method should be called after fields() or insertFields().
    *
    * @param array $fields
    *   An array of fields to set, or an associative array of fields and values.
@@ -299,6 +300,8 @@ class Merge extends Query implements ConditionInterface {
    *   specified in the same order as the $fields array.
    *
    * @return $this
+   *
+   * @see \Drupal\Core\Cache\DatabaseCacheTagsChecksum::doInvalidateTags()
    */
   public function keys(array $fields, array $values = []) {
     if ($values) {
@@ -317,6 +320,8 @@ class Merge extends Query implements ConditionInterface {
    * Same as \Drupal\Core\Database\Query\Merge::keys() but offering a signature
    * that is more natural for the case of a single key.
    *
+   * As with keys(), this method should be called after fields() or insertFields().
+   *
    * @param string $field
    *   The name of the field to set.
    * @param mixed $value
@@ -325,6 +330,7 @@ class Merge extends Query implements ConditionInterface {
    * @return $this
    *
    * @see \Drupal\Core\Database\Query\Merge::keys()
+   * @see \Drupal\Core\Cache\DatabaseCacheTagsChecksum::doInvalidateTags()
    */
   public function key($field, $value = NULL) {
     assert(is_string($field));
