@@ -150,6 +150,8 @@ HTMX_RESPONSE,
    *   The unique identifier for the dialog.
    * @param mixed $title
    *   The title of the dialog.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current request object.
    *
    * @return array
    *   The generated dialog render array..

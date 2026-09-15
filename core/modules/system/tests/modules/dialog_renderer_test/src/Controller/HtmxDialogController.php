@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\dialog_renderer_test\Controller;
 
-use Drupal\Component\Serialization\Json;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Url;
 
