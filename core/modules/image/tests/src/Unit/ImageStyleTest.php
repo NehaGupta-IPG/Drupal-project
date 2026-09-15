@@ -59,7 +59,7 @@ class ImageStyleTest extends UnitTestCase {
    *   An array of additional method names to mock.
    *
    * @return \Drupal\image\Entity\ImageStyle&\PHPUnit\Framework\MockObject\MockObject
- *   The mocked image style.
+   *   The mocked image style.
    */
   protected function getImageStyleMock($image_effect_id, $image_effect, $stubs = []): ImageStyle&MockObject {
     $effectManager = $this->createStub(ImageEffectManager::class);
