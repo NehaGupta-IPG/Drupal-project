@@ -349,7 +349,10 @@ class ThemePreprocess {
     // of regions, preserving BigPipe and Dynamic Page Cache behavior.
     foreach ($this->themeManager->getActiveTheme()->getRegions() as $region) {
       if (!empty($variables['page'][$region]) && is_array($variables['page'][$region])) {
-        $this->visibilityResolver->resolveAccess($variables['page'][$region]);
+        $result = $this->visibilityResolver->resolveAccess($variables['page'][$region]);
+        if ($result->isForbidden()) {
+          $variables['page'][$region]['#access'] = FALSE;
+        }
       }
     }
 

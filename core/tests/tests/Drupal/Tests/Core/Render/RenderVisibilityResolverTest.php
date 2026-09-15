@@ -29,7 +29,7 @@ class RenderVisibilityResolverTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $callable_resolver = $this->createMock(CallableResolver::class);
+    $callable_resolver = $this->createStub(CallableResolver::class);
     $this->resolver = new RenderVisibilityResolver($callable_resolver);
   }
 
