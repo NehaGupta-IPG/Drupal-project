@@ -35,10 +35,10 @@ libraries-override:
     css:
       component:
         /core/modules/system/tests/themes/test_base_theme/css/components/dialog.css: false
-  system/base:
+  core/drupal.js-show-hide:
     css:
-      component:
-        css/components/js.module.css: false
+      base:
+        misc/js.module.css: false
   # It works for JS as well.
   core/drupal.batch:
     js:
