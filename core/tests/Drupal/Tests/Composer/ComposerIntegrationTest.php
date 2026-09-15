@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Tests Composer integration.
@@ -252,6 +253,11 @@ class ComposerIntegrationTest extends UnitTestCase {
     $json = json_decode(file_get_contents($this->root . '/core/composer.json'), FALSE);
     $composer_replace_packages = (array) $json->replace;
 
+    // Filter out the core extensions from the replace list.
+    $composer_replace_packages_components = array_filter($composer_replace_packages, function ($k) {
+      return (str_contains($k, "drupal/core"));
+    }, ARRAY_FILTER_USE_KEY);
+
     // Get a list of all the composer.json files in the components path.
     $components_composer_json_files = [];
 
@@ -265,7 +271,7 @@ class ComposerIntegrationTest extends UnitTestCase {
     }
 
     $this->assertNotEmpty($components_composer_json_files);
-    $this->assertCount(count($composer_replace_packages), $components_composer_json_files);
+    $this->assertCount(count($composer_replace_packages_components), $components_composer_json_files);
 
     // Assert that each core components has a corresponding 'replace' in
     // composer.json.
@@ -416,6 +422,64 @@ class ComposerIntegrationTest extends UnitTestCase {
     foreach (array_keys($config) as $package) {
       $this->assertContains(strtolower($package), $packages);
     }
+  }
+
+  /**
+   * Tests core's composer.json replace section.
+   *
+   * Verify that all core modules ans themes, that are not hidden, are also
+   * listed in the 'replace' section of core's composer.json.
+   */
+  public function testAllModulesReplaced(): void {
+    // Grab the 'replace' section of the core composer.json file.
+    $json = json_decode(file_get_contents($this->root . '/core/composer.json'));
+    $composer_replace_packages = (array) $json->replace;
+    // Filter out the components.
+    $composer_replace_extensions = array_filter(array_keys($composer_replace_packages), function ($value) {
+      return (!str_contains($value, "drupal/core"));
+    });
+    // Get just the extension name.
+    array_walk($composer_replace_extensions, function (&$value) {
+      $value = str_replace("drupal/", "", $value);
+    });
+    sort($composer_replace_extensions);
+
+    // Assemble a list of core extensions.
+    $extension_names = array_merge(
+      $this->getExtensions($this->root . '/core/modules'),
+      $this->getExtensions($this->root . '/core/themes')
+    );
+    sort($extension_names);
+    $this->assertNotEmpty($extension_names);
+
+    // Assert that each core extension, that is not hidden, has an entry in the
+    // 'replace' section of core/composer.json.
+    $this->assertSame($composer_replace_extensions, $extension_names);
+  }
+
+  /**
+   * Returns a list of extensions that are not hidden.
+   */
+  private function getExtensions($path): array {
+    // Make sure we only deal with directories that aren't . or ..
+    $extension_names = [];
+    $discard = ['.', '..'];
+    // Get a list of all the files in the path.
+    $folders = scandir($path);
+    foreach ($folders as $file_name) {
+      if ((!in_array($file_name, $discard)) && is_dir($path . '/' . $file_name)) {
+        // Skip any modules marked as hidden.
+        $info_yml = $path . '/' . $file_name . '/' . $file_name . '.info.yml';
+        if (file_exists($info_yml)) {
+          $info = Yaml::parseFile($info_yml);
+          if (!empty($info['hidden'])) {
+            continue;
+          }
+        }
+        $extension_names[] = $file_name;
+      }
+    }
+    return $extension_names;
   }
 
 }
