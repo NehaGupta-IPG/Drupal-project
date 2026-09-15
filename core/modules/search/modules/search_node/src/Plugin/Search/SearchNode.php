@@ -105,6 +105,7 @@ class SearchNode extends ConfigurableSearchPluginBase implements AccessibleInter
       $container->get('entity_type.bundle.info'),
     );
   }
+
   public function __construct(
     array $configuration,
     $plugin_id,

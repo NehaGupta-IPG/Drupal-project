@@ -65,6 +65,7 @@ class SearchUser extends SearchPluginBase implements AccessibleInterface {
       $plugin_definition
     );
   }
+
   public function __construct(Connection $database, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, array $configuration, $plugin_id, $plugin_definition) {
     $this->database = $database;
     $this->entityTypeManager = $entity_type_manager;
