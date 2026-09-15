@@ -105,10 +105,6 @@ class SearchNode extends ConfigurableSearchPluginBase implements AccessibleInter
       $container->get('entity_type.bundle.info'),
     );
   }
-
-  /**
-   * Constructs a \Drupal\search_node\Plugin\Search\SearchNode object.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,
