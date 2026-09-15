@@ -104,7 +104,7 @@ final class NavigationUserBlock extends BlockBase {
   /**
    * Replaces redirecting current-user links with canonical destinations.
    *
-   * The navigation user menu keeps parameterless routes so the links stay
+   * The navigation user menu keeps routes without parameters so the links stay
    * generic. The rendered URLs must match the pages the user lands on so
    * toolbar JavaScript can mark the current item.
    *
