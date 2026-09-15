@@ -609,10 +609,10 @@ class LocaleConfigManager {
    * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0.
    *   There is no replacement.
    *
-   * @see https://www.drupal.org/node/3337864
+   * @see https://www.drupal.org/node/3623413
    */
   public function updateDefaultConfigLangcodes() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3337864', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
     $this->isUpdatingFromLocale = TRUE;
     // Need to rewrite some default configuration language codes if the default
     // site language is not English.

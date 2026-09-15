@@ -214,7 +214,6 @@ function system_post_update_reconcile_translatable_config_langcode(&$sandbox = N
     // Configuration entities are always considered translatable and always
     // have a langcode of their own regardless of their current values, so
     // they never need reconciling here.
-    // @todo Are we really sure that all config entities have langcodes?
     if ($config_manager->getEntityTypeIdByName($name) || !$typed_config_manager->hasConfigSchema($name)) {
       continue;
     }

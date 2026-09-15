@@ -31,7 +31,7 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
   }
 
   /**
-   * Batch operation: translates configuration the sweep just updated.
+   * Translates configuration just updated by DefaultLangcodeConfigUpdater.
    *
    * Runs after \Drupal\language\DefaultLangcodeConfigUpdater's own operation
    * completes, so $context['results']['updated_names'] holds every name
@@ -42,17 +42,12 @@ class LanguageDefaultLangcodeChangeSubscriber implements EventSubscriberInterfac
    * object's active record when the target langcode matches the object's
    * own langcode - which, having just been updated, it now does.
    *
-   * Only the new default is passed: updateConfigTranslations() would happily
-   * accept the previous one too, but asking it for a translation "into" that
-   * langcode is not what's wanted here - it would look up locale's stored
-   * translation of the shipped default text, not preserve whatever the
-   * configuration's real content actually was, which is what
-   * DefaultLangcodeConfigUpdater's own override save already did.
-   *
    * @param string $new_langcode
    *   The new default langcode.
    * @param array|\ArrayAccess $context
    *   The batch context.
+   *
+   * @see \Drupal\language\DefaultLangcodeConfigUpdater::reconcileConfigLangcodeOperation()
    */
   public function translateUpdatedConfigOperation(string $new_langcode, &$context): void {
     $names = $context['results']['updated_names'] ?? [];

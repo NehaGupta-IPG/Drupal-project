@@ -73,8 +73,8 @@ class DefaultConfigLangcodeSubscriber implements EventSubscriberInterface {
       // drush command, a plain API call - is responsible for calling
       // batch_process() itself if it needs the reconciliation to have
       // completed by the time this method returns.
-      // @todo Create follow-up - we have this problem today with the locale
-      //   batch set in the modules installed hook.
+      // @todo https://www.drupal.org/project/drupal/issues/638712 Ensure
+      //   batches are process outside of the Form API.
       batch_set($batch->toArray());
     }
   }

@@ -156,13 +156,13 @@ class DefaultLangcodeConfigUpdater {
   }
 
   /**
-   * Gets a language override, bypassing the "skip English" shortcut.
+   * Gets a language override.
    *
-   * LanguageConfigFactoryOverride::getStorage() substitutes an empty storage
-   * for 'en' when English is both negotiated and default, assuming no 'en'
-   * override could exist. That assumption breaks exactly here: switching
-   * back to English is when an 'en' override left by an earlier switch away
-   * from it needs to be found.
+   * This method does not use LanguageConfigFactoryOverride::getStorage()
+   * because it skips loading overrides when English is the default language and
+   * the passed in langcode is English. That assumption breaks exactly here:
+   * switching back to English is when an 'en' override left by an earlier
+   * switch away from it needs to be found.
    *
    * @param StorageInterface $storage
    *   The config storage in the language's collection.

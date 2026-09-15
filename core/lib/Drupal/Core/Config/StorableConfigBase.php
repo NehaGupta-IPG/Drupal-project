@@ -223,7 +223,7 @@ abstract class StorableConfigBase extends ConfigBase {
    */
   protected function castValue($key, $value, bool &$is_translatable = FALSE) {
     if (func_num_args() === 2) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $is_translatable argument is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. See \Drupal\Core\Config\Config::save() for how this should be used. See https://www.drupal.org/node/3337864', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $is_translatable argument is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. See \Drupal\Core\Config\Config::save() for how this should be used. See https://www.drupal.org/node/3623413', E_USER_DEPRECATED);
     }
     $element = $this->getSchemaWrapper();
     if ($key !== NULL) {
