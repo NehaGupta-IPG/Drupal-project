@@ -8216,12 +8216,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\MenuTreeStorage\\:\\:purgeMultiple\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\MenuTreeStorage\\:\\:rebuild\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -8229,12 +8223,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\MenuTreeStorage\\:\\:resetDefinitions\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\MenuTreeStorage\\:\\:saveRecursive\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
