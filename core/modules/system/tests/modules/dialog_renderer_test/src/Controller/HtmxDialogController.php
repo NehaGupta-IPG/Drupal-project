@@ -75,164 +75,31 @@ class HtmxDialogController {
    * @return array
    *   Render array with links.
    */
-  public function linksDisplay() {
-    $url = Url::fromUri('internal:/htmx/dialog/modal/htmx-dialog-content');
-    $build = [
-      'normal_modal' => [
-        '#title' => 'Normal Modal!',
-        '#type' => 'checkbox',
-      ],
-      'wide_dialog' => [
-        '#title' => 'Wide dialog!',
-        '#type' => 'link',
-        '#url' => Url::fromRoute('dialog_renderer_test.dialog_content'),
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'modal',
-          'data-dialog-renderer' => 'wide',
-        ],
-        '#attached' => [
-          'library' => [
-            'core/drupal.ajax',
-          ],
-        ],
-      ],
-      'extra_wide_dialog' => [
-        '#title' => 'Extra Wide dialog!',
-        '#type' => 'link',
-        '#url' => Url::fromRoute('dialog_renderer_test.dialog_content'),
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'modal',
-          'data-dialog-renderer' => 'extra_wide',
-        ],
-        '#attached' => [
-          'library' => [
-            'core/drupal.ajax',
-          ],
-        ],
-      ],
-      'no_close_modal' => [
-        '#title' => 'Hidden close button modal!',
-        '#type' => 'link',
-        '#url' => Url::fromRoute('dialog_renderer_test.dialog_content'),
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'modal',
-          'data-dialog-options' => Json::encode([
-            'classes' => [
-              'ui-dialog' => 'no-close',
-            ],
-          ]),
-        ],
-        '#attached' => [
-          'library' => [
-            'core/drupal.ajax',
-            'dialog_renderer_test/dialog_test',
-          ],
-        ],
-      ],
-      'button_pane_modal' => [
-        '#title' => 'Button pane modal!',
-        '#type' => 'link',
-        '#url' => Url::fromRoute('dialog_renderer_test.dialog_content'),
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'modal',
-          'data-dialog-options' => Json::encode([
-            'buttons' => [
-              [
-                'text' => 'OK',
-                'click' => '() => {}',
-              ],
-            ],
-          ]),
-        ],
-        '#attached' => [
-          'library' => [
-            'core/drupal.ajax',
-          ],
-        ],
-      ],
-      'content_link_dialog' => [
-        '#title' => 'Content link dialog!',
-        '#type' => 'link',
-        '#url' => Url::fromRoute('dialog_renderer_test.dialog_content_link'),
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'modal',
-        ],
-        '#attached' => [
-          'library' => [
-            'core/drupal.ajax',
-          ],
-        ],
-      ],
-      'auto_focus_dialog' => [
-        '#title' => 'Auto focus dialog!',
-        '#type' => 'link',
-        '#url' => Url::fromRoute('dialog_renderer_test.dialog_content_input'),
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'modal',
-        ],
-        '#attached' => [
-          'library' => [
-            'core/drupal.ajax',
-          ],
-        ],
-      ],
-      'auto_buttons_default' => [
-        '#title' => 'Auto buttons default!',
-        '#type' => 'link',
-        '#url' => Url::fromRoute('dialog_renderer_test.modal_form'),
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'dialog',
-        ],
-        '#attached' => [
-          'library' => [
-            'core/drupal.ajax',
-          ],
-        ],
-      ],
-      'auto_buttons_false' => [
-        '#title' => 'Auto buttons false!',
-        '#type' => 'link',
-        '#url' => Url::fromRoute('dialog_renderer_test.modal_form'),
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'dialog',
-          'data-dialog-options' => Json::encode([
-            'drupalAutoButtons' => FALSE,
-          ]),
-        ],
-        '#attached' => [
-          'library' => [
-            'core/drupal.ajax',
-          ],
-        ],
-      ],
-      'auto_buttons_true' => [
-        '#title' => 'Auto buttons true!',
-        '#type' => 'link',
-        '#url' => Url::fromRoute('dialog_renderer_test.modal_form'),
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'dialog',
-          'data-dialog-options' => Json::encode([
-            'drupalAutoButtons' => TRUE,
-          ]),
-        ],
-        '#attached' => [
-          'library' => [
-            'core/drupal.ajax',
-          ],
-        ],
-      ],
+  public function testMarkup() {
+    $modalUrl = Url::fromUri('base:/htmx/dialog/modal/htmx-dialog-content');
+    $build['normal_modal'] = [
+      '#title' => 'Normal Modal',
+      '#type' => 'checkbox',
     ];
-    (new Htmx())->get($url)
+    (new Htmx())->get($modalUrl)
       ->applyTo($build['normal_modal']);
+
+    $defaultUrl = Url::fromUri('base:/htmx/dialog/default/htmx-dialog-content');
+    $build['normal_dialog'] = [
+      '#title' => 'Default dialog',
+      '#type' => 'checkbox',
+    ];
+    (new Htmx())->get($defaultUrl)
+      ->applyTo($build['normal_dialog']);
+
+    $offCanvasUrl = Url::fromUri('base:/htmx/dialog/off-canvas/htmx-dialog-content');
+    $build['normal_off_canvas'] = [
+      '#title' => 'Off-canvas side',
+      '#type' => 'checkbox',
+    ];
+    (new Htmx())->get($offCanvasUrl)
+      ->applyTo($build['normal_off_canvas']);
+
     return $build;
   }
 
