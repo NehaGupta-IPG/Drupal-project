@@ -773,23 +773,48 @@ class SelectTest extends DatabaseTestBase {
 
     // First select the items in order and make sure we get an ordered list.
     $expected_ids = range(1, $number_of_items);
-    $ordered_ids = $this->connection->select('test', 't')
+    $abstractOrderedIdsQuery = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['id'])
+      ->range(0, $number_of_items)
+      ->orderBy('id');
+    $ordered_ids_query = $this->connection->select('test', 't')
       ->fields('t', ['id'])
       ->range(0, $number_of_items)
-      ->orderBy('id')
-      ->execute()
-      ->fetchCol();
+      ->orderBy('id');
+
+    $hydratedOrderedIdsQuery = $this->connection->select($abstractOrderedIdsQuery);
+
+    $this->resetUniqueIdentifiers($ordered_ids_query);
+    $this->resetUniqueIdentifiers($hydratedOrderedIdsQuery);
+    $this->assertEquals($ordered_ids_query, $hydratedOrderedIdsQuery);
+
+    $ordered_ids = $ordered_ids_query->execute()->fetchCol();
+    $hydratedOrderedIds = $hydratedOrderedIdsQuery->execute()->fetchCol();
+    $this->assertEquals($ordered_ids, $hydratedOrderedIds);
+
     $this->assertEquals($expected_ids, $ordered_ids, 'A query without random ordering returns IDs in the correct order.');
 
     // Now perform the same query, but instead choose a random ordering. We
     // expect this to contain a differently ordered version of the original
     // result.
-    $randomized_ids = $this->connection->select('test', 't')
+    $abstractRandomizedIdsQuery = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['id'])
+      ->range(0, $number_of_items)
+      ->orderRandom();
+    $randomized_ids_query = $this->connection->select('test', 't')
       ->fields('t', ['id'])
       ->range(0, $number_of_items)
-      ->orderRandom()
-      ->execute()
-      ->fetchCol();
+      ->orderRandom();
+
+    $hydratedRandomizedIdsQuery = $this->connection->select($abstractRandomizedIdsQuery);
+
+    $this->resetUniqueIdentifiers($randomized_ids_query);
+    $this->resetUniqueIdentifiers($hydratedRandomizedIdsQuery);
+    $this->assertEquals($randomized_ids_query, $hydratedRandomizedIdsQuery);
+
+    $randomized_ids = $randomized_ids_query->execute()->fetchCol();
+    $hydratedORandomizedIds = $hydratedRandomizedIdsQuery->execute()->fetchCol();
+
     $this->assertNotEquals($ordered_ids, $randomized_ids, 'A query with random ordering returns an unordered set of IDs.');
     $sorted_ids = $randomized_ids;
     sort($sorted_ids);
@@ -851,12 +876,25 @@ class SelectTest extends DatabaseTestBase {
       ])
       ->execute();
 
+    $abstractQuery = new DatabaseAbstractSelect('test', 't');
+    $abstractQuery->addColumn('t', 'name');
+    $abstractQuery->condition("t.$column", $pattern, $operator);
+
     $query = $database->select('test', 't');
     $query->addField('t', 'name');
     $query->condition("t.$column", $pattern, $operator);
-    $result = $query->execute()->fetchCol();
-    sort($result);
 
+    $hydratedQuery = $this->connection->select($abstractQuery);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
+
+    $hydratedResult = $hydratedQuery->execute()->fetchCol();
+    $result = $query->execute()->fetchCol();
+    $this->assertEquals($result, $hydratedResult);
+
+    sort($result);
     $this->assertEquals($expected, $result);
   }
 
@@ -867,6 +905,11 @@ class SelectTest extends DatabaseTestBase {
     $query = $this->connection->select('test', 't');
     $alias1 = $query->addField('t', 'name', 'the_alias');
     $alias2 = $query->addField('t', 'age', 'the_alias');
+    $this->assertNotSame($alias1, $alias2, 'Duplicate aliases are renamed.');
+
+    $query = new DatabaseAbstractSelect('test', 't');
+    $alias1 = $query->addColumn('t', 'name', 'the_alias');
+    $alias2 = $query->addColumn('t', 'age', 'the_alias');
     $this->assertNotSame($alias1, $alias2, 'Duplicate aliases are renamed.');
   }
 
@@ -886,6 +929,28 @@ class SelectTest extends DatabaseTestBase {
    * Tests thrown exception for IN query conditions with an empty array.
    */
   public function testEmptyInCondition(): void {
+    try {
+      new DatabaseAbstractSelect('test', 't')
+        ->columns('t')
+        ->condition('age', [], 'IN');
+
+      $this->fail('Expected exception not thrown');
+    }
+    catch (InvalidQueryException $e) {
+      $this->assertEquals("Query condition 'age IN ()' cannot be empty.", $e->getMessage());
+    }
+
+    try {
+      new DatabaseAbstractSelect('test', 't')
+        ->columns('t')
+        ->condition('age', [], 'NOT IN');
+
+      $this->fail('Expected exception not thrown');
+    }
+    catch (InvalidQueryException $e) {
+      $this->assertEquals("Query condition 'age NOT IN ()' cannot be empty.", $e->getMessage());
+    }
+
     try {
       $this->connection->select('test', 't')
         ->fields('t')
@@ -944,6 +1009,19 @@ class SelectTest extends DatabaseTestBase {
       ->fields('t')
       ->condition('age', [26, 27], $operator)
       ->execute();
+  }
+
+  /**
+   * Tests non array operator conditions with array value in abstract select.
+   */
+  #[DataProvider('providerNonArrayOperatorWithArrayValueCondition')]
+  public function testAbstractNonArrayOperatorWithArrayValueCondition(?string $operator, string $operator_in_exception_message): void {
+    $this->expectException(InvalidQueryException::class);
+    $this->expectExceptionMessageIs("Query condition 'age " . $operator_in_exception_message . " 26, 27' must have an array compatible operator.");
+
+    new DatabaseAbstractSelect('test', 't')
+      ->columns('t')
+      ->condition('age', [26, 27], $operator);
   }
 
 }
