@@ -182,6 +182,46 @@ class FilterCriteriaTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests the "accept NULL" checkbox label on a boolean filter.
+   */
+  public function testBooleanFilterAcceptNullLabel(): void {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    $this->drupalGet('admin/structure/views/view/content');
+    $page->find('css', '#views-add-filter')->click();
+    $assert_session->assertWaitOnAjaxRequest();
+    $page->checkField('name[node_field_data.promote]');
+    $page->find('css', '.ui-dialog-buttonset')->pressButton('Add and configure filter criteria');
+    $assert_session->assertWaitOnAjaxRequest();
+
+    // The "Is equal to" operator is selected by default, so the checkbox
+    // is visible without changing the operator.
+    $checkbox = $assert_session->waitForField('options[accept_null]');
+    $this->assertNotNull($checkbox, 'The "accept NULL" checkbox is present.');
+    $this->assertTrue($checkbox->isVisible());
+
+    $label = $page->find('css', 'label[for="' . $checkbox->getAttribute('id') . '"]');
+    $this->assertNotNull($label);
+    $this->assertEquals('Treat a NULL value as No', trim($label->getText()));
+
+    $checkbox->check();
+    $this->assertTrue($checkbox->isChecked());
+
+    // The "Is empty (NULL)" operator has no value, so the checkbox is
+    // hidden while it is selected.
+    $page->find('css', 'input[name="options[operator]"][value="empty"]')->click();
+    $page->waitFor(10, fn () => !$checkbox->isVisible());
+    $this->assertFalse($checkbox->isVisible());
+
+    // Selecting "Is equal to" again shows the checkbox, still checked.
+    $page->find('css', 'input[name="options[operator]"][value="="]')->click();
+    $page->waitFor(10, fn () => $checkbox->isVisible());
+    $this->assertTrue($checkbox->isVisible());
+    $this->assertTrue($checkbox->isChecked());
+  }
+
+  /**
    * Uses the 'And/Or Rearrange' link for filters to open a dialog.
    */
   protected function openFilterDialog(): void {

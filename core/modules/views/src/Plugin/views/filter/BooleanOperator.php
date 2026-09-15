@@ -200,8 +200,7 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
 
     $form['accept_null'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Accept "NULL"'),
-      '#description' => $this->t('Treat a NULL value as false.'),
+      '#title' => $this->t('Treat a NULL value as %false-label', ['%false-label' => $this->getValueOptions()[0] ?? $this->t('false')]),
       '#default_value' => $this->accept_null,
     ];
   }
