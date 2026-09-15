@@ -154,7 +154,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
    *   The array of options for the widget.
    */
   protected function getOptions(FieldableEntityInterface $entity) {
-    if ($this->options === NULL) {
+    if (!isset($this->options)) {
       // Limit the settable options for the current user account.
       $options = $this->fieldDefinition
         ->getFieldStorageDefinition()

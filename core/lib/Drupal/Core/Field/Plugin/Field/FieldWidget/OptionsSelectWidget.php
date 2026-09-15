@@ -30,9 +30,12 @@ class OptionsSelectWidget extends OptionsWidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
+    // Checking for the scenario where the selected option is empty but there
+    // is a value in the field. This can happen when one of the options has
+    // been deleted.
     $selected = $this->getSelectedOptions($items);
-    if (!empty($selected) !== $this->has_value) {
-      $this->has_value = !empty($selected);
+    if (empty($selected) && $this->has_value) {
+      $this->has_value = FALSE;
       // Reset cached options so getEmptyLabel() is re-evaluated with the
       // updated has_value, preventing stale _none inclusion/exclusion.
       $this->options = NULL;
@@ -43,7 +46,7 @@ class OptionsSelectWidget extends OptionsWidgetBase {
       '#options' => $this->getOptions($items->getEntity()),
       '#default_value' => $selected,
       // Do not display a 'multiple' select box if there is only one option.
-      '#multiple' => $this->multiple && count($this->options) > 1,
+      '#multiple' => $this->multiple && (isset($this->options) && count($this->options) > 1),
     ];
 
     return $element;
