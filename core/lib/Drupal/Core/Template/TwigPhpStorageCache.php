@@ -114,22 +114,29 @@ class TwigPhpStorageCache implements CacheInterface {
    */
   public function write(string $key, string $content): void {
     $this->storage()->save($key, $content);
-    // Save the last mtime.
-    $cid = 'twig:' . $key;
-    $this->cache->set($cid, \Drupal::time()->getRequestTime());
   }
 
   /**
    * {@inheritdoc}
    */
   public function getTimestamp(string $key): int {
-    $cid = 'twig:' . $key;
-    if ($cache = $this->cache->get($cid)) {
-      return $cache->data;
-    }
-    else {
+    // The compiled template file is the cache entry, so its modification time
+    // is the timestamp Twig asks for here. There is no need to store it
+    // separately in a cache bin.
+    //
+    // @see \Drupal\Component\PhpStorage\MTimeProtectedFastFileStorage::save()
+    $path = $this->storage()->getFullPath($key);
+    if ($path === FALSE) {
+      // The storage prevents access to the file, so there is no timestamp to
+      // report. Twig reads 0 as a cache miss and recompiles the template.
       return 0;
     }
+    // write() can create the file earlier in this same request, so the stat
+    // cache can hold a missing or older entry for it. Only the entry for this
+    // path is cleared, and file_exists() below repopulates it, so the two
+    // calls cost one stat.
+    clearstatcache(TRUE, $path);
+    return file_exists($path) ? filemtime($path) : 0;
   }
 
 }
