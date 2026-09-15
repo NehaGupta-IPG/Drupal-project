@@ -7,6 +7,11 @@ views.sort.*:
 views.sort.boolean:
   type: views_sort
   label: 'Boolean sort'
+  mapping:
+    accept_null:
+      type: boolean
+      label: 'Accept NULL'
+      required: false
 
 views.sort.date:
   type: views_sort

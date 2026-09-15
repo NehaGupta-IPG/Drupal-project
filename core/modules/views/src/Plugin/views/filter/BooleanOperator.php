@@ -134,7 +134,10 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
       $this->value_value = $this->definition['title'];
     }
 
-    if (isset($this->definition['accept null'])) {
+    if (array_key_exists('accept_null', $options)) {
+      $this->accept_null = (bool) $options['accept_null'];
+    }
+    elseif (isset($this->definition['accept null'])) {
       $this->accept_null = (bool) $this->definition['accept null'];
     }
     elseif (isset($this->definition['accept_null'])) {
@@ -192,6 +195,20 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
   /**
    * {@inheritdoc}
    */
+  protected function operatorForm(&$form, FormStateInterface $form_state): void {
+    parent::operatorForm($form, $form_state);
+
+    $form['accept_null'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Accept "NULL"'),
+      '#description' => $this->t('Treat a NULL value as false.'),
+      '#default_value' => $this->accept_null,
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function valueForm(&$form, FormStateInterface $form_state) {
     $form['value'] = [];
 
@@ -243,6 +260,11 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
           $form['value']['#states']['visible'][] = [
             $source => ['value' => $operator],
           ];
+          if (isset($form['accept_null'])) {
+            $form['accept_null']['#states']['visible'][] = [
+              $source => ['value' => $operator],
+            ];
+          }
         }
       }
     }
