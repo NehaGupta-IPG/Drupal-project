@@ -87,8 +87,8 @@ class BatchBuilder {
   /**
    * The file containing the operation and finished callbacks.
    *
-   * If the callbacks are in the deprecated .module file or can be autoloaded,
-   * for example, static methods on a class, then this does not need to be set.
+   * If the callbacks are in the .module file or can be autoloaded, for example,
+   * static methods on a class, then this does not need to be set.
    *
    * @var string
    */

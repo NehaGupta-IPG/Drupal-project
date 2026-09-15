@@ -25,7 +25,7 @@ class UpdateScriptTestHooks {
    */
   #[Hook('cache_flush')]
   public function cacheFlush(): void {
-    \Drupal::messenger()->addStatus($this->t('hook_cache_flush() invoked for the update_script_test module.'));
+    \Drupal::messenger()->addStatus($this->t('hook_cache_flush() invoked for update_script_test.module.'));
   }
 
   /**

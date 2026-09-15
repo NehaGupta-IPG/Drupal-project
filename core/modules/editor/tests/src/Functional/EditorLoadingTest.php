@@ -312,9 +312,9 @@ class EditorLoadingTest extends BrowserTestBase {
     return [
       // JavaScript settings.
       $settings,
-      // The editor module's JS settings present.
+      // Editor.module's JS settings present.
       isset($settings['editor']),
-      // The editor module's JS present.
+      // Editor.module's JS present.
       str_contains($this->getSession()->getPage()->getContent(), $this->getModulePath('editor') . '/js/editor.js'),
       // Body field.
       '//' . $type . '[@id="edit-' . $field_name . '-0-value"]',

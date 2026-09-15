@@ -122,8 +122,8 @@ class MenuRouterTest extends BrowserTestBase {
     $menu_link = reset($menu_links);
     $this->assertEquals('original', $menu_link->getMenuName(), 'Menu name is "original".');
 
-    // Change the menu_name parameter in the menu_test module, then force a
-    // menu rebuild.
+    // Change the menu_name parameter in menu_test.module, then force a menu
+    // rebuild.
     MenuTestHelper::menuName('changed');
     $menu_link_manager->rebuild();
 

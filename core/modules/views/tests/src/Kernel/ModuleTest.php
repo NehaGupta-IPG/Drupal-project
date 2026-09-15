@@ -214,7 +214,7 @@ class ModuleTest extends ViewsKernelTestBase {
   }
 
   /**
-   * Tests the views module: views_embed_view().
+   * Tests views.module: views_embed_view().
    */
   #[IgnoreDeprecations]
   public function testViewsEmbedView(): void {

@@ -72,7 +72,7 @@ class BlockContentThemeSuggestionsTest extends BlockContentTestBase {
     // Extra field blocks are a block plugin provided by layout builder, so
     // enable layouts for the test bundle and view a node of that bundle.
     // A test module injects an extra field referencing a block content entity.
-    // @see the block_content_theme_suggestions_test module
+    // @see block_content_theme_suggestions_test.module
     // @see \Drupal\block_content_theme_suggestions_test\Hook\BlockContentThemeSuggestionsTestHooks
     $this->drupalLogin($this->drupalCreateUser([
       'configure any layout',

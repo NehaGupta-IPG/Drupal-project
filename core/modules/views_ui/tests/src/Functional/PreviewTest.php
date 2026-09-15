@@ -162,7 +162,7 @@ SQL;
     $this->submitForm($edit = [], 'Update preview');
 
     // Check for implementation of hook_views_preview_info_alter().
-    // @see the views_ui_test module.
+    // @see views_ui_test.module
     // Verify that Views Query Preview Info area was altered.
     $this->assertSession()->elementsCount('xpath', '//div[@id="views-live-preview"]/div[contains(@class, views-query-info)]//td[text()="Test row count"]', 1);
     // Check that additional assets are attached.

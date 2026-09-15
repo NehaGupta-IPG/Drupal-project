@@ -12,7 +12,7 @@ use Drupal\Core\Field\FieldStorageDefinitionListenerInterface;
  * type's field definitions changing, due to modules being installed or
  * uninstalled, or via field UI, or via code changes to the entity class.
  *
- * For example, configurable fields defined and exposed by the field module.
+ * For example, configurable fields defined and exposed by field.module.
  */
 interface DynamicallyFieldableEntityStorageSchemaInterface extends EntityStorageSchemaInterface, FieldStorageDefinitionListenerInterface {
 
