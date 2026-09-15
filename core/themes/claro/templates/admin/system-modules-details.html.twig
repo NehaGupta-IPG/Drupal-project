@@ -30,6 +30,7 @@
       <th class="checkbox visually-hidden">{{ 'Installed'|t }}</th>
       <th class="name visually-hidden">{{ 'Name'|t }}</th>
       <th class="description visually-hidden priority-low">{{ 'Description'|t }}</th>
+      <th class="operations visually-hidden priority-low">{{ 'Operations'|t }}</th>
     </tr>
   </thead>
   <tbody>
@@ -41,9 +42,11 @@
         <td class="module-list__module">
           <label id="{{ module.id }}" for="{{ module.enable_id }}" class="module-list__module-name table-filter-text-source">{{ module.name }}</label>
         </td>
-        <td class="expand priority-low module-list__description">
-          <details class="js-form-wrapper form-wrapper module-list__module-details claro-details" id="{{ module.enable_id }}-description">
-            <summary aria-controls="{{ module.enable_id }}-description" role="button" aria-expanded="false" class="claro-details__summary module-list__module-summary"><span class="text module-description">{{ module.description }}</span></summary>
+        <td class="expand priority-medium module-list__description">
+        <details class="js-form-wrapper form-wrapper module-list__module-details claro-details" id="{{ module.enable_id }}-description">
+          <summary aria-controls="{{ module.enable_id }}-description" role="button" aria-expanded="false" class="claro-details__summary module-list__module-summary">
+            <span class="text module-description">{{ module.description }}</span>
+          </summary>
             <div class="claro-details__wrapper module-details__wrapper">
               <div class="module-details__description">
                 <div class="module-details__requirements">
@@ -58,16 +61,16 @@
                     <div class="module-details__requirement">{{ 'Required by: @module-list'|t({'@module-list': module.required_by}) }}</div>
                   {% endif %}
                 </div>
-                {% if module.links %}
-                  <div class="module-details__links">
-                    {% for link_type in ['help', 'permissions', 'configure'] %}
-                      {{ module.links[link_type] }}
-                    {% endfor %}
-                  </div>
-                {% endif %}
               </div>
             </div>
           </details>
+        </td>
+        <td class="module-list__operations priority-low">
+          {% if module.links %}
+            <div class="module-operations__links">
+              {{ module.links }}
+            </div>
+          {% endif %}
         </td>
       </tr>
     {% endfor %}
