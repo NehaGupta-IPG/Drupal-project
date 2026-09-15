@@ -703,20 +703,38 @@ class SelectTest extends DatabaseTestBase {
    */
   public function testUnionOrderLimit(): void {
     // This gives George and Ringo.
+    $abstractQuery1 = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['name'])
+      ->condition('age', [27, 28], 'IN');
+    // This gives Paul.
+    $abstractQuery2 = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['name'])
+      ->condition('age', 26);
+    $abstractQuery1->union($abstractQuery2);
+    $abstractQuery1->orderBy('name', 'DESC');
+    $abstractQuery1->range(0, 2);
+
+    // This gives George and Ringo.
     $query_1 = $this->connection->select('test', 't')
       ->fields('t', ['name'])
       ->condition('age', [27, 28], 'IN');
-
     // This gives Paul.
     $query_2 = $this->connection->select('test', 't')
       ->fields('t', ['name'])
       ->condition('age', 26);
-
     $query_1->union($query_2);
     $query_1->orderBy('name', 'DESC');
     $query_1->range(0, 2);
 
+    $hydratedQuery1 = $this->connection->select($abstractQuery1);
+
+    $this->resetUniqueIdentifiers($query_1);
+    $this->resetUniqueIdentifiers($hydratedQuery1);
+    $this->assertEquals($query_1, $hydratedQuery1);
+
+    $hydratedNames = $hydratedQuery1->execute()->fetchCol();
     $names = $query_1->execute()->fetchCol();
+    $this->assertEquals($names, $hydratedNames);
 
     // Ensure we get all only 2 of the 3 records.
     $this->assertCount(2, $names, 'UNION with a limit returned rows from both queries.');
@@ -725,6 +743,8 @@ class SelectTest extends DatabaseTestBase {
     // regardless of which query they came from.
     $this->assertEquals('Ringo', $names[0], 'First query returned correct name.');
     $this->assertEquals('Paul', $names[1], 'Second query returned correct name.');
+    $this->assertEquals('Ringo', $hydratedNames[0], 'First query returned correct name.');
+    $this->assertEquals('Paul', $hydratedNames[1], 'Second query returned correct name.');
   }
 
   /**

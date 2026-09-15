@@ -184,6 +184,12 @@ class Select extends Query implements SelectInterface {
     foreach ($abstractSelect->union as $union) {
       $this->union($this->connection->select($union['query']), $union['type']);
     }
+    if (isset($abstractSelect->range)) {
+      $range = $abstractSelect->range;
+      if ($range !== []) {
+        $this->range($range['start'], $range['length']);
+      }
+    }
   }
 
   /**

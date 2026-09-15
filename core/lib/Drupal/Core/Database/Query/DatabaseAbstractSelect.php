@@ -107,7 +107,7 @@ final class DatabaseAbstractSelect {
    *
    * @var array|null
    */
-  protected ?array $range;
+  public protected(set) ?array $range;
 
   /**
    * An array whose elements specify a query to UNION, and the UNION type.
@@ -331,13 +331,6 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function &getRange(): ?array {
-    return $this->range;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function escapeLike($string) {
     return $this->connection->escapeLike($string);
   }
@@ -516,7 +509,7 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function range($start = NULL, $length = NULL) {
+  public function range(?int $start = NULL, ?int $length = NULL): static {
     $this->range = $start !== NULL ? ['start' => $start, 'length' => $length] : [];
     return $this;
   }
