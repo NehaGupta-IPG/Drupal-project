@@ -188,6 +188,7 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
     $options = parent::defineOptions();
 
     $options['value']['default'] = FALSE;
+    $options['accept_null']['default'] = FALSE;
 
     return $options;
   }
@@ -197,12 +198,6 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
    */
   protected function operatorForm(&$form, FormStateInterface $form_state): void {
     parent::operatorForm($form, $form_state);
-
-    $form['accept_null'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Treat a NULL value as %false-label', ['%false-label' => $this->getValueOptions()[0] ?? $this->t('false')]),
-      '#default_value' => $this->accept_null,
-    ];
   }
 
   /**
@@ -242,6 +237,11 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
         '#options' => $this->valueOptions,
         '#default_value' => $this->value,
       ];
+      $form['accept_null'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Treat a NULL value as %false-label', ['%false-label' => $this->getValueOptions()[0] ?? $this->t('false')]),
+        '#default_value' => $this->accept_null,
+      ];
       $identifier = $this->options['expose']['identifier'];
       $user_input = $form_state->getUserInput();
       if ($exposed && isset($identifier) && !isset($user_input[$identifier])) {
@@ -259,11 +259,9 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
           $form['value']['#states']['visible'][] = [
             $source => ['value' => $operator],
           ];
-          if (isset($form['accept_null'])) {
-            $form['accept_null']['#states']['visible'][] = [
-              $source => ['value' => $operator],
-            ];
-          }
+          $form['accept_null']['#states']['visible'][] = [
+            $source => ['value' => $operator],
+          ];
         }
       }
     }

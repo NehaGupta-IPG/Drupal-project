@@ -219,6 +219,17 @@ class FilterCriteriaTest extends WebDriverTestBase {
     $page->waitFor(10, fn () => $checkbox->isVisible());
     $this->assertTrue($checkbox->isVisible());
     $this->assertTrue($checkbox->isChecked());
+
+    // Save the filter, then save the view, and confirm "accept_null" was
+    // persisted to the view's configuration.
+    $page->find('css', '.ui-dialog-buttonset')->pressButton('Apply');
+    $assert_session->assertWaitOnAjaxRequest();
+    $this->submitForm([], 'Save');
+
+    $view = \Drupal::entityTypeManager()->getStorage('view')->loadUnchanged('content');
+    $filters = $view->get('display')['default']['display_options']['filters'];
+    $this->assertArrayHasKey('promote', $filters);
+    $this->assertTrue($filters['promote']['accept_null']);
   }
 
   /**
