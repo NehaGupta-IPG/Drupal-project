@@ -1,0 +1,13 @@
+{
+  "invalid_nested": {
+    "type": "object",
+    "required": [
+      "unresolvable"
+    ],
+    "properties": {
+      "unresolvable": {
+        "$ref": "non-existing-schema://whatever"
+      }
+    }
+  }
+}

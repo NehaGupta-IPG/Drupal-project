@@ -1,0 +1,90 @@
+{
+  "attributes": {
+    "type": "object",
+    "patternProperties": {
+      ".+": {
+        "anyOf": [
+          {
+            "type": ["string", "number"]
+          },
+          {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "links": {
+    "type": "array",
+    "items": {
+      "$ref": "#link"
+    }
+  },
+  "link": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "url": {
+        "type": "string",
+        "format": "iri-reference"
+      },
+      "attributes": {
+        "$ref": "#attributes"
+      },
+      "link_attributes": {
+        "$ref": "#attributes"
+      },
+      "below": {
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "image": {
+    "type": "object",
+    "required": ["src"],
+    "properties": {
+      "src": {
+        "type": "string",
+        "format": "uri-reference"
+      },
+      "alt": {
+        "type": "string"
+      },
+      "width": {
+        "type": "integer"
+      },
+      "height": {
+        "type": "integer"
+      }
+    }
+  },
+  "recursive_object": {
+    "type": "object",
+    "properties": {
+      "foo": {
+        "$ref": "theme://sdc_theme_test_references/schema.json#recursive_array"
+      }
+    }
+  },
+  "recursive_array": {
+    "type": "array",
+    "items": {
+      "$ref": "theme://sdc_theme_test_references/schema.json#recursive_object"
+    }
+  }
+}

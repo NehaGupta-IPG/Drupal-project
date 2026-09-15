@@ -21,6 +21,9 @@ use Drupal\Core\Plugin\Component;
 use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
 use Drupal\Core\Render\Component\Exception\IncompatibleComponentSchema;
 use Drupal\Core\Plugin\Discovery\DirectoryWithMetadataPluginDiscovery;
+use JsonSchema\Constraints\BaseConstraint;
+use JsonSchema\Exception\RuntimeException;
+use JsonSchema\SchemaStorage;
 
 /**
  * Defines a plugin manager to deal with components.
@@ -33,6 +36,16 @@ use Drupal\Core\Plugin\Discovery\DirectoryWithMetadataPluginDiscovery;
 class ComponentPluginManager extends DefaultPluginManager implements CategorizingPluginManagerInterface {
 
   use CategorizingPluginManagerTrait;
+
+  /**
+   * Maximum recursion depth for the JSON schema reference resolver.
+   */
+  private const int MAXIMUM_RECURSION_LEVEL = 5;
+
+  /**
+   * JSON schema storage utility used for resolving references.
+   */
+  protected SchemaStorage $schemaStorage;
 
   /**
    * {@inheritdoc}
@@ -84,6 +97,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     $this->moduleHandler = $module_handler;
     $this->factory = new ContainerFactory($this);
     $this->setCacheBackend($cacheBackend, 'component_plugins');
+    $this->schemaStorage = new SchemaStorage();
     // Note that we are intentionally skipping
     // $this->alterInfo('component_info'); We want to ensure that everything
     // related to a component is in the single directory. If the alteration of a
@@ -250,6 +264,23 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
   }
 
   /**
+   * Resolves schema references recursively.
+   *
+   * @param array $schema
+   *   JSON schema.
+   *
+   * @return array
+   *   JSON schema, with references resolved.
+   */
+  public function resolveJsonSchemaReferences(array $schema): array {
+    $schema = $this->doResolveJsonSchemaReferences('', $schema, [], 0);
+
+    // It looks heavy as a solution to convert objects to array recursively,
+    // but it is exactly what BaseConstraint::arrayToObjectRecursive() is doing.
+    return json_decode(json_encode($schema), TRUE);
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function processDefinitionCategory(&$definition): void {
@@ -263,7 +294,18 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     // Save in the definition whether this is a module or a theme. This is
     // important because when creating the plugin instance (the Component
     // object) we'll need to negotiate based on the active theme.
-    $definitions = array_map([$this, 'alterDefinition'], $definitions);
+    foreach ($definitions as $component_id => $definition) {
+      try {
+        $definitions[$component_id] = $this->alterDefinition($definition);
+      }
+      catch (RuntimeException $e) {
+        unset($definitions[$component_id]);
+        // Inform developers if verbose error reporting is on.
+        if (_drupal_get_error_level() === ERROR_REPORTING_DISPLAY_VERBOSE) {
+          throw $e;
+        }
+      }
+    }
     // Validate the definition after alterations.
     assert(
       Inspector::assertAll(
@@ -356,6 +398,9 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     $documentation_path = sprintf('%s/README.md', $this->fileSystem->dirname($metadata_path));
     if (file_exists($documentation_path)) {
       $definition['documentation'] = file_get_contents($documentation_path);
+    }
+    if (isset($definition['props']['properties']) && is_array($definition['props']['properties']) && !empty($definition['props']['properties'])) {
+      $definition['props'] = $this->resolveJsonSchemaReferences($definition['props']);
     }
     return $definition;
   }
@@ -523,6 +568,63 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     // The library owner is in <root>/core, so we need to go one level up to
     // find the app root.
     return '../' . $path_from_root;
+  }
+
+  /**
+   * Performs the schema references resolving.
+   *
+   * @param string|int $key
+   *   Array key of the schema.
+   * @param array $schema
+   *   JSON schema of a component.
+   * @param array $required
+   *   List of the required properties.
+   * @param int $depth
+   *   Depth index to avoid infinite recursion.
+   *
+   * @return array
+   *   JSON schema of a component, with references resolved.
+   */
+  private function doResolveJsonSchemaReferences(string|int $key, array $schema, array $required, int $depth = 0): array {
+    if (isset($schema['$ref']) && is_string($schema['$ref'])) {
+      $depth++;
+    }
+
+    try {
+      $schema = BaseConstraint::arrayToObjectRecursive($schema);
+      $refSchema = (array) $this->schemaStorage->resolveRefSchema($schema);
+      $schema = (array) $schema;
+      unset($schema['$ref']);
+      // Merge referenced schema into the current schema.
+      $schema += $refSchema;
+    }
+    catch (RuntimeException $e) {
+      // Forbid unresolved $ref when prop is required.
+      if (in_array($key, $required)) {
+        throw $e;
+      }
+      // Allow unresolved $ref when prop is optional.
+      $schema = (array) $schema;
+    }
+
+    if ($depth > self::MAXIMUM_RECURSION_LEVEL) {
+      // If we reach the limit, we keep only the `type` property as the leaf.
+      return isset($schema['type']) ? [
+        'type' => $schema['type'],
+      ] : [];
+    }
+
+    // Recursively resolve nested levels.
+    foreach ($schema as $next_key => $value) {
+      if (is_object($value)) {
+        if (isset($schema['type']) && $schema['type'] === 'object') {
+          $required = $schema['required'] ?? [];
+        }
+        $schema[$next_key] = $this->doResolveJsonSchemaReferences($next_key, (array) $value, $required, $depth);
+      }
+    }
+
+    return $schema;
   }
 
 }
