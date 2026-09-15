@@ -45,6 +45,11 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * The enabled/disabled status of the configuration entity.
    *
    * @var bool
+   *
+   * @todo Move to \Drupal\Core\Config\Entity\StatusTrait in Drupal 13.0.0.
+   *
+   * @see \Drupal\Core\Config\Entity\StatusInterface
+   * @see \Drupal\Core\Config\Entity\StatusTrait
    */
   protected $status = TRUE;
 
@@ -187,6 +192,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    */
   #[ActionMethod(adminLabel: new TranslatableMarkup('Enable'), pluralize: FALSE)]
   public function enable() {
+    @trigger_error('Deprecated in 11.4.0 and will removed in 13.0.0. ' . get_class($this) . ' should use \Drupal\Core\Config\Entity\StatusTrait instead, see https://www.drupal.org/node/2872193');
     return $this->setStatus(TRUE);
   }
 
@@ -195,6 +201,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    */
   #[ActionMethod(adminLabel: new TranslatableMarkup('Disable'), pluralize: FALSE)]
   public function disable() {
+    @trigger_error('Deprecated in 11.4.0 and will removed in 13.0.0. ' . get_class($this) . ' should use \Drupal\Core\Config\Entity\StatusTrait instead, see https://www.drupal.org/node/2872193');
     return $this->setStatus(FALSE);
   }
 
@@ -203,6 +210,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    */
   #[ActionMethod(adminLabel: new TranslatableMarkup('Set status'), pluralize: FALSE)]
   public function setStatus($status) {
+    @trigger_error('Deprecated in 11.4.0 and will removed in 13.0.0. ' . get_class($this) . ' should use \Drupal\Core\Config\Entity\StatusTrait instead, see https://www.drupal.org/node/2872193');
     $this->status = (bool) $status;
     return $this;
   }
@@ -211,6 +219,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * {@inheritdoc}
    */
   public function status() {
+    @trigger_error('Deprecated in 11.4.0 and will removed in 13.0.0. ' . get_class($this) . ' should use \Drupal\Core\Config\Entity\StatusTrait instead, see https://www.drupal.org/node/2872193');
     return !empty($this->status);
   }
 

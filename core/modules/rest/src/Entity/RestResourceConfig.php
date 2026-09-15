@@ -5,6 +5,7 @@ namespace Drupal\rest\Entity;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\Entity\StatusTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\rest\RestResourceConfigInterface;
@@ -35,6 +36,7 @@ use Drupal\rest\RestResourceConfigInterface;
   ],
 )]
 class RestResourceConfig extends ConfigEntityBase implements RestResourceConfigInterface {
+  use StatusTrait;
 
   /**
    * The REST resource config id.

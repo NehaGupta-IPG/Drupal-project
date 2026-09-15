@@ -17,6 +17,11 @@ interface ConfigEntityInterface extends EntityInterface, ThirdPartySettingsInter
    * Enables the configuration entity.
    *
    * @return $this
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Config\Entity\StatusInterface and
+   *   \Drupal\Core\Config\Entity\StatusTrait instead.
+   * @see https://www.drupal.org/node/2872193
    */
   public function enable();
 
@@ -24,6 +29,11 @@ interface ConfigEntityInterface extends EntityInterface, ThirdPartySettingsInter
    * Disables the configuration entity.
    *
    * @return $this
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Config\Entity\StatusInterface and
+   *   \Drupal\Core\Config\Entity\StatusTrait instead.
+   * @see https://www.drupal.org/node/2872193
    */
   public function disable();
 
@@ -34,6 +44,11 @@ interface ConfigEntityInterface extends EntityInterface, ThirdPartySettingsInter
    *   The status of the configuration entity.
    *
    * @return $this
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Config\Entity\StatusInterface and
+   *   \Drupal\Core\Config\Entity\StatusTrait instead.
+   * @see https://www.drupal.org/node/2872193
    */
   public function setStatus($status);
 
@@ -51,6 +66,11 @@ interface ConfigEntityInterface extends EntityInterface, ThirdPartySettingsInter
    *
    * @return bool
    *   Whether the entity is enabled or not.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal\Core\Config\Entity\StatusInterface and
+   *   \Drupal\Core\Config\Entity\StatusTrait instead.
+   * @see https://www.drupal.org/node/2872193
    */
   public function status();
 

@@ -3,11 +3,12 @@
 namespace Drupal\views;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\StatusInterface;
 
 /**
  * Defines an interface for View storage classes.
  */
-interface ViewEntityInterface extends ConfigEntityInterface {
+interface ViewEntityInterface extends ConfigEntityInterface, StatusInterface {
 
   /**
    * Gets an executable instance for this view.

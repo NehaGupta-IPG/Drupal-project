@@ -3,12 +3,13 @@
 namespace Drupal\rest;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\StatusInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 
 /**
  * Defines a configuration entity to store enabled REST resources.
  */
-interface RestResourceConfigInterface extends ConfigEntityInterface, EntityWithPluginCollectionInterface {
+interface RestResourceConfigInterface extends ConfigEntityInterface, EntityWithPluginCollectionInterface, StatusInterface {
 
   /**
    * Granularity value for per-method configuration.

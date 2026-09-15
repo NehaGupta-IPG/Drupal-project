@@ -8,6 +8,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\Entity\StatusTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\views\Plugin\DependentWithRemovalPluginInterface;
@@ -47,6 +48,7 @@ use Drupal\views\ViewEntityInterface;
   ],
 )]
 class View extends ConfigEntityBase implements ViewEntityInterface {
+  use StatusTrait;
 
   use StringTranslationTrait;
 

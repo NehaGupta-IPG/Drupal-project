@@ -3,11 +3,12 @@
 namespace Drupal\filter;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\StatusInterface;
 
 /**
  * Provides an interface defining a filter format entity.
  */
-interface FilterFormatInterface extends ConfigEntityInterface {
+interface FilterFormatInterface extends ConfigEntityInterface, StatusInterface {
 
   /**
    * Returns a sorted collection of filter plugins or an individual instance.

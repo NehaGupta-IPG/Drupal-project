@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\StatusTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\search\Form\SearchPageAddForm;
@@ -65,6 +66,7 @@ use Drupal\search\SearchPageListBuilder;
   ],
 )]
 class SearchPage extends ConfigEntityBase implements SearchPageInterface, EntityWithPluginCollectionInterface {
+  use StatusTrait;
 
   /**
    * The name (plugin ID) of the search page entity.

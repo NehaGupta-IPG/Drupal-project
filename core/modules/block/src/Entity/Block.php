@@ -14,6 +14,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\block\BlockPluginCollection;
 use Drupal\block\BlockInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\StatusTrait;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
@@ -69,6 +70,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   ],
 )]
 class Block extends ConfigEntityBase implements BlockInterface, EntityWithPluginCollectionInterface {
+  use StatusTrait;
 
   /**
    * The ID of the block.
