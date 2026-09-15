@@ -146,6 +146,31 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
   }
 
   /**
+   * Tests creating a new search page and verifying it works.
+   */
+  public function testSearchPageCreation(): void {
+    $this->drupalGet('admin/config/search/pages');
+    $this->assertSession()->statusCodeEquals(200);
+
+    $edit = ['search_type' => 'node_search'];
+    $this->submitForm($edit, 'Add search page');
+    $this->assertSession()->statusCodeEquals(200);
+
+    $edit = [
+      'label' => 'Test page',
+      'id' => 'test_page',
+      'path' => 'test-page',
+    ];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->addressEquals('admin/config/search/pages');
+    $this->assertSession()->statusMessageContains('The Test page search page has been added.', 'status');
+
+    $this->drupalGet('search/test-page');
+    $this->assertSession()->statusCodeEquals(200);
+  }
+
+  /**
    * Verifies plugin-supplied settings form.
    */
   public function testSearchModuleSettingsPage(): void {
