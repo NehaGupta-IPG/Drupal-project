@@ -128,15 +128,17 @@
         text: '',
       };
       // Initialize items and their links.
-      $menu.find('li > a').wrap('<div class="toolbar-box">');
+      $menu
+        .find('li > a, li > span.toolbar-icon')
+        .wrap('<div class="toolbar-box">');
       // Add a handle to each list item if it has a menu.
       $menu.find('li').each((index, element) => {
         const $item = $(element);
         if ($item.children('ul.toolbar-menu').length) {
           const $box = $item.children('.toolbar-box');
-          const $link = $box.find('a');
+          const $labelElement = $box.find('a, span');
           options.text = Drupal.t('@label', {
-            '@label': $link.length ? $link[0].textContent : '',
+            '@label': $labelElement.length ? $labelElement[0].textContent : '',
           });
           $item
             .children('.toolbar-box')

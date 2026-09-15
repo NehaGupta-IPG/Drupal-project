@@ -46,7 +46,8 @@
 .toolbar .toolbar-bar .toolbar-tab.hidden {
   display: none;
 }
-.toolbar a {
+.toolbar a,
+.toolbar span.toolbar-icon {
   display: block;
   line-height: 1;
 }
