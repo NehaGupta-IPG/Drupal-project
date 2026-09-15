@@ -38,7 +38,7 @@ admin:
 maintenance:
   version: VERSION
   css:
-    component:
+    theme:
       css/system.maintenance.css: {}
   dependencies:
     - system/base
