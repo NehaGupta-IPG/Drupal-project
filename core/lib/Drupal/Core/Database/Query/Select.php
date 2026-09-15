@@ -3,6 +3,7 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Expression;
 
 /**
  * Query builder for SELECT statements.
@@ -170,11 +171,17 @@ class Select extends Query implements SelectInterface {
       ];
     }
     foreach ($abstractSelect->conditions() as $key => $condition) {
-      if ($key !== '#conjunction') {
-        $this->condition($condition['field'], $condition['value'], $condition['operator']);
+      if ($key === '#conjunction') {
+        continue;
       }
+      if ($condition instanceof Expression) {
+        $this->where($condition->expression, $condition->arguments);
+        continue;
+      }
+      $this->condition($condition['field'], $condition['value'], $condition['operator']);
+
     }
-    $this->order = $abstractSelect->order ?? [];
+    $this->order = $abstractSelect->orderBy ?? [];
   }
 
   /**

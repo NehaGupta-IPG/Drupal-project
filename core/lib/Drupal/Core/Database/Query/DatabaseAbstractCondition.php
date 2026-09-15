@@ -3,6 +3,7 @@
 namespace Drupal\Core\Database\Query;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Expression;
 use Drupal\Core\Database\InvalidQueryException;
 
 /**
@@ -124,11 +125,7 @@ class DatabaseAbstractCondition implements ConditionInterface, \Countable {
    * {@inheritdoc}
    */
   public function where($snippet, $args = []) {
-    $this->conditions[] = [
-      'field' => $snippet,
-      'value' => $args,
-      'operator' => NULL,
-    ];
+    $this->conditions[] = new Expression($snippet, $args);
     $this->changed = TRUE;
 
     return $this;

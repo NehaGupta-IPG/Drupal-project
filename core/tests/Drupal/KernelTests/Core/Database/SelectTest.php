@@ -25,6 +25,14 @@ class SelectTest extends DatabaseTestBase {
     $main = new \ReflectionProperty($select, 'uniqueIdentifier');
     $main->setValue($select, NULL);
 
+    if ($select instanceof SelectExtender) {
+      $extender = $select;
+      $query = new \ReflectionProperty($extender, 'query');
+      $select = $query->getValue($extender);
+      $main = new \ReflectionProperty($select, 'uniqueIdentifier');
+      $main->setValue($select, NULL);
+    }
+
     $tables = new \ReflectionProperty($select, 'tables');
     $tablesArray = $tables->getValue($select);
     foreach ($tablesArray as $key => $value) {
@@ -35,6 +43,9 @@ class SelectTest extends DatabaseTestBase {
     }
     $tables->setValue($select, $tablesArray);
 
+    if (isset($extender)) {
+      $query->setValue($extender, $select);
+    }
   }
 
   /**
@@ -488,6 +499,24 @@ class SelectTest extends DatabaseTestBase {
 
     $this->assertCount(1, $names);
     $this->assertSame($names[0], 'George');
+
+    $abstractQuery = new DatabaseAbstractSelect('test', 'test')
+      ->columns('test', ['name'])
+      ->condition('age', 27)
+      ->alwaysFalse();
+
+    $query = $this->connection->select('test', 'test')
+      ->extend(SelectExtender::class)
+      ->fields('test', ['name'])
+      ->condition('age', 27)
+      ->alwaysFalse();
+
+    $hydratedQuery = $this->connection->select($abstractQuery);
+    $hydratedQuery = $hydratedQuery->extend(SelectExtender::class);
+
+    $this->resetUniqueIdentifiers($query);
+    $this->resetUniqueIdentifiers($hydratedQuery);
+    $this->assertEquals($query, $hydratedQuery);
 
     $names = $this->connection->select('test', 'test')
       ->extend(SelectExtender::class)
