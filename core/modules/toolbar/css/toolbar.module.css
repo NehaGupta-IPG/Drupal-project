@@ -59,6 +59,12 @@
   position: relative;
   z-index: 1250;
 }
+@media (min-width: 16.5em) {
+    .toolbar .toolbar-bar,
+    .toolbar .toolbar-tray {
+      position: fixed;
+  }
+}
 .toolbar-horizontal .toolbar-tray {
   position: fixed;
   left: 0;
