@@ -142,7 +142,7 @@ class Number {
     }
 
     // Allow small rounding errors from float scaling. The fractional
-    // part of a float has 24 bits. That means remainders smaller than 
+    // part of a float has 24 bits. That means remainders smaller than
     // $step_scaled / 2^24 are acceptable.
     $acceptable_error = (float) $step_scaled / (2 ** 24);
     return $remainder <= $acceptable_error || $remainder >= ($step_int - $acceptable_error);
