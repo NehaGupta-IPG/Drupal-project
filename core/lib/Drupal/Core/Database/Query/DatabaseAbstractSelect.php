@@ -121,7 +121,7 @@ final class DatabaseAbstractSelect {
    *
    * @var array
    */
-  protected array $union = [];
+  public protected(set) array $union = [];
 
   /**
    * The FOR UPDATE status.
@@ -338,13 +338,6 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function &getUnion() {
-    return $this->union;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function escapeLike($string) {
     return $this->connection->escapeLike($string);
   }
@@ -531,7 +524,7 @@ final class DatabaseAbstractSelect {
   /**
    * {@inheritdoc}
    */
-  public function union(DatabaseAbstractSelect $query, string $type = '') {
+  public function union(DatabaseAbstractSelect $query, string $type = ''): static {
     // Handle UNION aliasing.
     switch ($type) {
       // Fold UNION DISTINCT to UNION for better cross database support.

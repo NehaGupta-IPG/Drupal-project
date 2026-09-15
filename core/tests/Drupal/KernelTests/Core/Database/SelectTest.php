@@ -29,19 +29,24 @@ class SelectTest extends DatabaseTestBase {
       $extender = $select;
       $query = new \ReflectionProperty($extender, 'query');
       $select = $query->getValue($extender);
-      $main = new \ReflectionProperty($select, 'uniqueIdentifier');
-      $main->setValue($select, NULL);
+      $this->resetUniqueIdentifiers($select);
     }
 
     $tables = new \ReflectionProperty($select, 'tables');
     $tablesArray = $tables->getValue($select);
     foreach ($tablesArray as $key => $value) {
       if ($value['table'] instanceof SelectInterface) {
-        $tmp = new \ReflectionProperty($value['table'], 'uniqueIdentifier');
-        $tmp->setValue($value['table'], NULL);
+        $this->resetUniqueIdentifiers($value['table']);
       }
     }
     $tables->setValue($select, $tablesArray);
+
+    $union = new \ReflectionProperty($select, 'union');
+    $unionArray = $union->getValue($select);
+    foreach ($unionArray as $key => $value) {
+      $this->resetUniqueIdentifiers($value['query']);
+    }
+    $union->setValue($select, $unionArray);
 
     if (isset($extender)) {
       $query->setValue($extender, $select);
@@ -535,17 +540,31 @@ class SelectTest extends DatabaseTestBase {
    * that.
    */
   public function testUnion(): void {
+    $abstractQuery1 = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['name'])
+      ->condition('age', [27, 28], 'IN');
+    $abstractQuery2 = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['name'])
+      ->condition('age', 28);
+    $abstractQuery1->union($abstractQuery2);
+
     $query_1 = $this->connection->select('test', 't')
       ->fields('t', ['name'])
       ->condition('age', [27, 28], 'IN');
-
     $query_2 = $this->connection->select('test', 't')
       ->fields('t', ['name'])
       ->condition('age', 28);
-
     $query_1->union($query_2);
 
+    $hydratedQuery1 = $this->connection->select($abstractQuery1);
+
+    $this->resetUniqueIdentifiers($query_1);
+    $this->resetUniqueIdentifiers($hydratedQuery1);
+    $this->assertEquals($query_1, $hydratedQuery1);
+
+    $hydratedNames = $hydratedQuery1->execute()->fetchCol();
     $names = $query_1->execute()->fetchCol();
+    $this->assertEquals($names, $hydratedNames);
 
     // Ensure we only get 2 records.
     $this->assertCount(2, $names, 'UNION correctly discarded duplicates.');
@@ -557,17 +576,31 @@ class SelectTest extends DatabaseTestBase {
    * Tests that we can UNION ALL multiple SELECT queries together.
    */
   public function testUnionAll(): void {
+    $abstractQuery1 = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['name'])
+      ->condition('age', [27, 28], 'IN');
+    $abstractQuery2 = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['name'])
+      ->condition('age', 28);
+    $abstractQuery1->union($abstractQuery2, 'ALL');
+
     $query_1 = $this->connection->select('test', 't')
       ->fields('t', ['name'])
       ->condition('age', [27, 28], 'IN');
-
     $query_2 = $this->connection->select('test', 't')
       ->fields('t', ['name'])
       ->condition('age', 28);
-
     $query_1->union($query_2, 'ALL');
 
+    $hydratedQuery1 = $this->connection->select($abstractQuery1);
+
+    $this->resetUniqueIdentifiers($query_1);
+    $this->resetUniqueIdentifiers($hydratedQuery1);
+    $this->assertEquals($query_1, $hydratedQuery1);
+
+    $hydratedNames = $hydratedQuery1->execute()->fetchCol();
     $names = $query_1->execute()->fetchCol();
+    $this->assertEquals($names, $hydratedNames);
 
     // Ensure we get all 3 records.
     $this->assertCount(3, $names, 'UNION ALL correctly preserved duplicates.');
@@ -581,17 +614,36 @@ class SelectTest extends DatabaseTestBase {
    * Tests that we can get a count query for a UNION Select query.
    */
   public function testUnionCount(): void {
+    $abstractQuery1 = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['name'])
+      ->condition('age', [27, 28], 'IN');
+    $abstractQuery2 = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['name'])
+      ->condition('age', 28);
+    $abstractQuery1->union($abstractQuery2, 'ALL');
+    $abstractQuery1 = $abstractQuery1->countQuery();
+
     $query_1 = $this->connection->select('test', 't')
       ->fields('t', ['name', 'age'])
       ->condition('age', [27, 28], 'IN');
-
     $query_2 = $this->connection->select('test', 't')
       ->fields('t', ['name', 'age'])
       ->condition('age', 28);
-
     $query_1->union($query_2, 'ALL');
-    $names = $query_1->execute()->fetchCol();
-    $count = (int) $query_1->countQuery()->execute()->fetchField();
+    $detailQuery = clone($query_1);
+    $query_1 = $query_1->countQuery();
+
+    $hydratedQuery1 = $this->connection->select($abstractQuery1);
+
+    $this->resetUniqueIdentifiers($query_1);
+    $this->resetUniqueIdentifiers($hydratedQuery1);
+    $this->assertEquals($query_1, $hydratedQuery1);
+
+    $hydratedCount = (int) $hydratedQuery1->execute()->fetchField();
+    $count = (int) $query_1->execute()->fetchField();
+    $this->assertEquals($count, $hydratedCount);
+
+    $names = $detailQuery->execute()->fetchCol();
 
     // Ensure the counts match.
     $this->assertSame(count($names), $count, "The count query's result matched the number of rows in the UNION query.");
@@ -602,19 +654,36 @@ class SelectTest extends DatabaseTestBase {
    */
   public function testUnionOrder(): void {
     // This gives George and Ringo.
+    $abstractQuery1 = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['name'])
+      ->condition('age', [27, 28], 'IN');
+    // This gives Paul.
+    $abstractQuery2 = new DatabaseAbstractSelect('test', 't')
+      ->columns('t', ['name'])
+      ->condition('age', 26);
+    $abstractQuery1->union($abstractQuery2);
+    $abstractQuery1->orderBy('name', 'DESC');
+
+    // This gives George and Ringo.
     $query_1 = $this->connection->select('test', 't')
       ->fields('t', ['name'])
       ->condition('age', [27, 28], 'IN');
-
     // This gives Paul.
     $query_2 = $this->connection->select('test', 't')
       ->fields('t', ['name'])
       ->condition('age', 26);
-
     $query_1->union($query_2);
     $query_1->orderBy('name', 'DESC');
 
+    $hydratedQuery1 = $this->connection->select($abstractQuery1);
+
+    $this->resetUniqueIdentifiers($query_1);
+    $this->resetUniqueIdentifiers($hydratedQuery1);
+    $this->assertEquals($query_1, $hydratedQuery1);
+
+    $hydratedNames = $hydratedQuery1->execute()->fetchCol();
     $names = $query_1->execute()->fetchCol();
+    $this->assertEquals($names, $hydratedNames);
 
     // Ensure we get all 3 records.
     $this->assertCount(3, $names, 'UNION returned rows from both queries.');
@@ -624,6 +693,9 @@ class SelectTest extends DatabaseTestBase {
     $this->assertEquals('Ringo', $names[0], 'First query returned correct name.');
     $this->assertEquals('Paul', $names[1], 'Second query returned correct name.');
     $this->assertEquals('George', $names[2], 'Third query returned correct name.');
+    $this->assertEquals('Ringo', $hydratedNames[0], 'First query returned correct name.');
+    $this->assertEquals('Paul', $hydratedNames[1], 'Second query returned correct name.');
+    $this->assertEquals('George', $hydratedNames[2], 'Third query returned correct name.');
   }
 
   /**

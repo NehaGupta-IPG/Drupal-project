@@ -179,9 +179,11 @@ class Select extends Query implements SelectInterface {
         continue;
       }
       $this->condition($condition['field'], $condition['value'], $condition['operator']);
-
     }
     $this->order = $abstractSelect->orderBy ?? [];
+    foreach ($abstractSelect->union as $union) {
+      $this->union($this->connection->select($union['query']), $union['type']);
+    }
   }
 
   /**
