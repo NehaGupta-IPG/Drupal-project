@@ -128,7 +128,7 @@ class TwigPhpStorageCache implements CacheInterface {
     $path = $this->storage()->getFullPath($key);
     if ($path === FALSE) {
       // The storage prevents access to the file, so there is no timestamp to
-      // report. Twig reads 0 as a cache miss and recompiles the template.
+      // report. Twig reads 0 as a cache miss and re-compiles the template.
       return 0;
     }
     // write() can create the file earlier in this same request, so the stat
