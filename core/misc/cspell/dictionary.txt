@@ -112,7 +112,6 @@ createuser
 crossout
 crème
 csrftoken
-csslintrc
 csstools
 cweagans
 datelist
@@ -197,6 +196,7 @@ fodt
 fouc
 fourcol
 francais
+franken
 français
 fraîche
 frontpage
